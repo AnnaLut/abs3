@@ -1,0 +1,52 @@
+﻿@using Kendo.Mvc.UI
+@model IEnumerable<BarsWeb.Areas.Dwh.Models.V_DWH_REPORTS>
+@{
+    Layout = null;
+}
+
+@(Html.Kendo().Grid<BarsWeb.Areas.Dwh.Models.V_DWH_REPORTS>().HtmlAttributes(new { style = "height: 40%" })
+    .Name("ReportGrid")
+        .Pageable(pageable => pageable
+            .Refresh(true)
+            .PageSizes(false)
+            .ButtonCount(5))
+    .Scrollable()
+    .Selectable()
+    .Columns(columns =>
+            {
+                columns.Command(command => command.Custom("Виконати").Click("display")).Width(90);
+                columns.Bound(p => p.ID).Title("Ід.").Width(50);
+                columns.Bound(p => p.NAME).Title("Найменування").MinScreenWidth(210);
+                columns.Bound(p => p.TYPE_NAME).Title("Тип").Width(50);
+                columns.Bound(p => p.DESCRIPTION).Title("Опис").MinScreenWidth(200);
+            })
+    .Events(e => e.DataBound("onRowBound"))
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .PageSize(100)
+        .Read(read => read.Action("GridByModule_Read", "Report", new { moduleId = @ViewBag.Module }))
+    )
+)
+
+
+
+<script>
+
+    function display(e) {
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+
+        reportsModule.setReportId(dataItem.ID);
+        reportsModule.setReportType(dataItem.TYPE_VALUE);
+        reportsModule.showReport(dataItem.PARAMS);
+        return false;
+    }
+
+    function onRowBound(e) {
+        //$(".k-button").find("span").addClass("k-icon k-i-gear");
+        //$(".k-button").style("background:green");
+
+        $(".k-button").css("background-color", "rgb(29, 160, 84)");
+        $(".k-button").css("color", "white");
+    }
+
+</script>

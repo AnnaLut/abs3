@@ -1,0 +1,274 @@
+﻿<xmlform captiontype="OnlyTitle"   version="v.2.1.2" caption="Розбір картотек NL_">
+<grids>
+  <grid id="tNlg"  pagesize="10" showpagesizebox="true"  title="Розбір картотек NL_" >
+    <datasource>
+      <sql>
+        select a.acc, a.kv, a.nls, a.nms, a.ostc/100 ost_fk, a.ostb/100 ost_pl, sum(o.s) sum_kar, count(*) kount_pl, lower(a.tip) as tip
+        FROM v_gl a, v_per_nl_ o
+        where a.acc = o.acc --and a.tip = 'NLG'
+        group by a.acc, a.kv, a.nls, a.nms, a.ostc/100, a.ostb/100, a.tip
+        order by a.nls, a.kv
+      </sql>
+      <parameters>
+        <parameter type="QueryString" datatype="String" name="TIP" altname="nls_tip"></parameter>
+      </parameters>
+      </datasource>
+    <rowselection method="SingleRowServer"/>
+
+    <buttons>
+      <!--******перегляд оборотыв по рахунку      -->
+      <button caption="    Історія рахунка   " id="Bt1_a" type="Image" imagename="notebook_preferences"  hint="Показати історію оборотів по рахунку">
+        <command  type="Redirect" url="/barsroot/customerlist/showhistory.aspx" target="Blank">
+
+          <parameters>
+            <parameter type="DataField" name="ACC" altname="acc"></parameter>
+            <parameter datatype="Int64" type="Constant" name="TYPE" altname="type">
+              <defaultvalue type="Constant" value="1" />
+            </parameter>
+          </parameters>
+        </command>
+
+      </button>
+    </buttons>
+    
+    <fields>
+
+      <field name="ACC" datatype="Int64" key="true" sort="Default" size="30">
+        <column show="false" caption="Код валюти" width="10" />
+        <form show="false" rwmode="RO">
+          <uicontrol type="Text" />
+        </form>
+      </field>
+
+      <field name="KV" datatype="Int64" key="false" sort="Default" size="30">
+        <column show="true" caption="Код валюти" width="10" />
+        <form show="true" rwmode="RO">
+          <uicontrol type="Text" />
+        </form>
+      </field>
+
+      <field name="NLS" datatype="Int64" key="false" sort="Default" size="70">
+        <column show="true" caption="Рахунок" />
+        <form show="true" rwmode="RO">
+          <uicontrol type="AutoDetect" />
+        </form>
+      </field>
+
+      <field name="NMS" datatype="String" key="false" sort="Default" size="70">
+        <column show="true" caption="Назва рахунка"  width="350"/>
+        <form show="true" rwmode="RO">
+          <uicontrol type="Text" />
+        </form>
+      </field>
+      
+      <field name="ost_fk" datatype="Decimal" key="false" sort="Default" size="30">
+        <column show="true" caption="Фактичний залишок" />
+        <form show="true" rwmode="RO">
+          <uicontrol type="Text" />
+        </form>
+      </field>
+
+      <field name="ost_pl" datatype="Decimal" key="false"    sort="Default" size="50">
+        <column show="true" caption="Плановий залишок"  />
+        <form show="true" rwmode="RO"  >
+          <uicontrol type="Text" align="NotSet" />
+        </form>
+      </field>
+
+      <field name="kount_pl" datatype="Int64" key="false" sort="Default" size="30" >
+        <column show="true" caption="Кількість докум." width="40"  align="Right" />
+        <form show="true" rwmode="RO">
+          <uicontrol type="Text" />
+        </form>
+      </field>
+
+      
+      <field name="sum_kar" datatype="Decimal" key="false" sort="Default" size="30">
+        <column show="true" caption="Сума картотеки"  />
+        <form show="true" rwmode="RO">
+          <uicontrol type="Text" />
+        </form>
+      </field>
+      
+           <field name="TIP" datatype="String" key="false" sort="Default" size="30">
+        <column show="true" caption="TIP"  width="30"/>
+        <form show="true" rwmode="RO">
+          <uicontrol type="Text" />
+        </form>
+      </field>
+      
+    </fields>
+    </grid>
+
+  <grid id="tNlg2"  pagesize="10"  showpagesizebox="true"  title="Розбір рахунка "  >
+   <datasource>
+      <sql>
+        select v_per_nl_.*, (s*100)   s2
+        from v_per_nl_
+      </sql>
+      <parameters>
+        <parameter name="ACC"   masterid="tNlg"  type="MasterGrid" masterkeyfield="ACC" datatype="Int64"  >
+       </parameter>
+      </parameters>
+    </datasource>
+    <rowselection method="SingleRow"/>
+    <buttons>
+      <!--******перегляд вхідного документа      -->
+      <button caption="       Перегляд       " id="Bt1" type="Image" imagename="folder" hint="Відкрит карточку вхідного документа">
+        <command  type="Redirect" url="/barsroot/documentview/default.aspx" target="Blank">
+          
+         <parameters>
+            <parameter type="DataField" name="REF" altname="ref"></parameter>
+          </parameters> 
+        </command>
+        
+      </button>
+
+
+
+      <!-- ********** Видалити з картотеки        -->
+      <button caption="Видалити з картотеки" id="Bt2" type="Image" imagename="delete2"  hint="Видалит документ з картотеки"  confirmmessage="Видалити документ з картотеки?">
+        <command>
+          <sql>
+            delete v_per_nl_ where ref = :ref
+          </sql>
+          <parameters>
+            <parameter type="DataField" name="REF"></parameter>
+          </parameters>
+        </command>
+
+      </button>
+
+      <button caption="Створити документ" id="Bt3" type="Image" imagename="check2"  hint="Створити документ" >
+        <command  type="Redirect" url="/barsroot/docinput/docinput.aspx?tt=024">
+
+          <parameters>
+            <parameter type="DataField" name="KVA"   altname="kv_a"></parameter>
+            <parameter type="DataField" name="KVA"   altname="kv_b"></parameter>
+            <parameter type="DataField" name="REF"   altname="reqv_REF92"></parameter>     
+            <parameter type="DataField" name="NAZNO" altname="nazn"></parameter>
+            <parameter type="DataField" name="S2"    altname="sumc_t"></parameter>
+            <parameter type="DataField" name="S2"    altname="sumA_t"></parameter>
+            <parameter type="DataField" name="NLSA"  altname="nls_a"></parameter>
+            <parameter datatype="Int64" type="Constant" name="DK" altname="dk">
+              <defaultvalue type="Constant" value="1" />
+            </parameter>
+            <parameter type="DataField" name="BPROC" ></parameter>
+            <parameter type="DataField" name="APROC" ></parameter>
+          </parameters>
+        </command>
+
+
+      </button>
+      
+      <!-- ********** виконати перекриття  тест з вибором операції (
+           треба звязка з функцією визов строки  /barsroot/docinput/docinput.aspx?\S*      -->
+      
+       <button caption="Створити документ(вибір операції)" id="Bt4" type="Image" imagename="checks"  hint="Створити документ(вибір операції)" >
+         <command  type="Redirect" url="/barsroot/docinput/docinput.aspx">
+
+           <customfields oktext="OK" canceltext="End"  title="Вибір кода операції">
+             <customfield  datatype="String"  name="TT" altname="tt" required="true" label="Тип операції"  >
+               <uicontrol   type="DropDownList" addemptyitem="true" table="(select tt, tt||' - '||name as name from tts where tt in ('PS1','PS2','009','PKR','PKS','PKX','024') order by tt desc)"  keyfield="TT" valuefield="name">
+               </uicontrol>
+             </customfield>
+           </customfields>
+           <parameters>
+             <parameter type="DataField" name="KVA"  altname="kv_a"></parameter>
+             <parameter type="DataField" name="KVA"  altname="kv_b"></parameter>
+             <parameter type="DataField" name="NAZNO" altname="nazn"></parameter>
+             <parameter type="DataField" name="S2"    altname="sumc_t"></parameter>
+             <parameter type="DataField" name="S2"    altname="sumA_t"></parameter>
+             <parameter type="DataField" name="NLSA" altname="nls_a"></parameter>
+             <parameter datatype="Int64" type="Constant" name="DK" altname="dk"><defaultvalue type="Constant" value="1" /></parameter>
+             <parameter type="DataField" name="BPROC" ></parameter>
+             <parameter type="DataField" name="APROC" ></parameter>
+           </parameters>
+           
+        </command>
+
+         
+       </button>
+      
+      
+    </buttons>
+    
+    <fields>
+
+       <field name="REF" datatype="Int64" key="true" sort="Desc" sortindex="1" size="70">
+         <column show="true" caption="Референс"/>
+         <form show="true" rwmode="RO">
+           <uicontrol type="AutoDetect"/>
+         </form>
+      </field>
+
+
+      <field name="NLSA" datatype="Int64" key="true" sort="Default" size="70">
+        <column show="true" caption="Рахунок" />
+        <form show="true" rwmode="RO">
+          <uicontrol type="Text" controlwidth="60"  />
+        </form>
+       </field>
+
+      <field name="S" datatype="Decimal" key="false" sort="Default" size="70">
+        <column show="true" caption="Сума документу">
+        </column> 
+        <form show="true" rwmode="RO">
+          <uicontrol type="Text" controlwidth="60" />
+        </form>
+      </field>
+
+      <field name="NAZNO" datatype="String" key="true" sort="Default" size="170">
+        <column show="true" caption="Призначення платежу" width="400" />
+        <form show="true" rwmode="RO">
+          <uicontrol type="Text" controlwidth="60" />
+        </form>
+      </field>
+
+      <field name="DATD" datatype="DateTime" key="false" sort="Default" size="70">
+        <column show="true" caption="Дата документа" />
+        <form show="true" rwmode="RO">
+          <uicontrol type="Text" controlwidth="60" />
+        </form>
+      </field>
+
+      <field name="ACC" datatype="Int64" key="true" sort="Default" size="70">
+        <column show="false" caption="acc" />
+        <form show="false" rwmode="RO">
+          <uicontrol type="Text" controlwidth="60" />
+        </form>
+      </field>
+
+      <field name="APROC" datatype="String" key="true" sort="Default" size="70">
+        <column show="false" caption="aPROC" />
+        <form show="false" rwmode="RO">
+          <uicontrol type="Text" controlwidth="60" />
+        </form>
+      </field>
+
+      <field name="BPROC" datatype="String" key="true" sort="Default" size="70">
+        <column show="false" caption="bPROC" />
+        <form show="false" rwmode="RO">
+          <uicontrol type="Text" controlwidth="60"  />
+        </form>
+      </field>
+
+      <field name="KVA" datatype="Int64" key="true" sort="Default" size="70">
+        <column show="false" caption="KVA" />
+        <form show="true" rwmode="RO">
+          <uicontrol type="Text" controlwidth="60" />
+        </form>
+      </field>
+
+      <field name="S2"  key="true" sort="Default" size="70">
+        <column show="false" caption="Сума kop">
+        </column>
+      </field>
+
+
+    </fields>
+  </grid>
+
+
+</grids>
+</xmlform>

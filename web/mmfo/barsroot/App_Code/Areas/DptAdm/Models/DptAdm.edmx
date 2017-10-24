@@ -1,0 +1,275 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="2.0" xmlns:edmx="http://schemas.microsoft.com/ado/2008/10/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/02/edm/ssdl" Alias="Self" Namespace="Models.Store" Provider="Oracle.DataAccess.Client" ProviderManifestToken="11.2">
+        <EntityType Name="DPT_TYPES">
+          <Key>
+            <PropertyRef Name="TYPE_ID" />
+          </Key>
+          <Property Name="TYPE_ID" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="TYPE_CODE" Type="varchar2" MaxLength="4" />
+          <Property Name="TYPE_NAME" Type="varchar2" MaxLength="100" Nullable="false" />
+          <Property Name="FL_ACTIVE" Type="number" Precision="1" Scale="0" />
+          <Property Name="FL_DEMAND" Type="number" Precision="1" Scale="0" />
+          <Property Name="FL_WEBBANKING" Type="number" Precision="1" Scale="0" />
+          <Property Name="SORT_ORD" Type="number" Precision="38" Scale="0" />
+        </EntityType>
+        <EntityType Name="DPT_VIDD">
+          <Key>
+            <PropertyRef Name="VIDD" />
+          </Key>
+          <Property Name="VIDD" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="DEPOSIT_COD" Type="varchar2" MaxLength="4" />
+          <Property Name="TYPE_NAME" Type="varchar2" MaxLength="50" Nullable="false" />
+          <Property Name="BASEY" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="BASEM" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="BR_ID" Type="number" Precision="38" Scale="0" />
+          <Property Name="FREQ_N" Type="number" Precision="3" Scale="0" Nullable="false" />
+          <Property Name="FREQ_K" Type="number" Precision="3" Scale="0" Nullable="false" />
+          <Property Name="BSD" Type="char" MaxLength="4" Nullable="false" />
+          <Property Name="BSN" Type="char" MaxLength="4" Nullable="false" />
+          <Property Name="METR" Type="number" Precision="1" Scale="0" Nullable="false" />
+          <Property Name="AMR_METR" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="DURATION" Type="number" Precision="10" Scale="0" Nullable="false" />
+          <Property Name="TERM_TYPE" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="MIN_SUMM" Type="number" Precision="24" Scale="0" />
+          <Property Name="COMMENTS" Type="varchar2" MaxLength="128" />
+          <Property Name="FLAG" Type="number" Precision="1" Scale="0" Nullable="false" />
+          <Property Name="TYPE_COD" Type="varchar2" MaxLength="4" />
+          <Property Name="KV" Type="number" Precision="3" Scale="0" Nullable="false" />
+          <Property Name="TT" Type="char" MaxLength="3" />
+          <Property Name="SHABLON" Type="varchar2" MaxLength="15" />
+          <Property Name="IDG" Type="number" Precision="38" Scale="0" />
+          <Property Name="IDS" Type="number" Precision="38" Scale="0" />
+          <Property Name="NLS_K" Type="varchar2" MaxLength="15" />
+          <Property Name="DATN" Type="date" />
+          <Property Name="DATK" Type="date" />
+          <Property Name="BR_ID_L" Type="number" Precision="38" Scale="0" />
+          <Property Name="FL_DUBL" Type="number" Precision="1" Scale="0" Nullable="false" />
+          <Property Name="ACC7" Type="number" Precision="38" Scale="0" />
+          <Property Name="ID_STOP" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="KODZ" Type="number" Precision="38" Scale="0" />
+          <Property Name="FMT" Type="number" Precision="2" Scale="0" />
+          <Property Name="FL_2620" Type="number" Precision="1" Scale="0" Nullable="false" />
+          <Property Name="COMPROC" Type="number" Precision="1" Scale="0" Nullable="false" />
+          <Property Name="LIMIT" Type="number" Precision="24" Scale="0" />
+          <Property Name="TERM_ADD" Type="number" Precision="7" Scale="2" />
+          <Property Name="TERM_DUBL" Type="number" Precision="10" Scale="0" Nullable="false" />
+          <Property Name="DURATION_DAYS" Type="number" Precision="10" Scale="0" Nullable="false" />
+          <Property Name="EXTENSION_ID" Type="number" Precision="38" Scale="0" />
+          <Property Name="TIP_OST" Type="number" Precision="1" Scale="0" Nullable="false" />
+          <Property Name="BR_WD" Type="number" Precision="38" Scale="0" />
+          <Property Name="NLSN_K" Type="varchar2" MaxLength="14" />
+          <Property Name="BSA" Type="char" MaxLength="4" />
+          <Property Name="MAX_LIMIT" Type="number" Precision="24" Scale="0" />
+          <Property Name="BR_BONUS" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="BR_OP" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="AUTO_ADD" Type="number" Precision="1" Scale="0" Nullable="false" />
+          <Property Name="TYPE_ID" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="DISABLE_ADD" Type="number" Precision="1" Scale="0" />
+          <Property Name="CODE_TARIFF" Type="number" Precision="38" Scale="0" />
+          <Property Name="DURATION_MAX" Type="number" Precision="3" Scale="0" />
+          <Property Name="DURATION_DAYS_MAX" Type="number" Precision="3" Scale="0" />
+          <Property Name="IRREVOCABLE" Type="number" Precision="1" Scale="0" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_DPTVIDD_DPTTYPES">
+          <End Role="DPT_TYPES" Type="Self.DPT_TYPES" Multiplicity="1" />
+          <End Role="DPT_VIDD" Type="Self.DPT_VIDD" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="DPT_TYPES">
+              <PropertyRef Name="TYPE_ID" />
+            </Principal>
+            <Dependent Role="DPT_VIDD">
+              <PropertyRef Name="TYPE_ID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>        
+        <EntityContainer Name="DptAdmStoreContainer">
+          <EntitySet Name="DPT_TYPES" EntityType="Self.DPT_TYPES" Schema="BARS" store:Type="Tables" />
+          <EntitySet Name="DPT_VIDD" EntityType="Self.DPT_VIDD" Schema="BARS" store:Type="Tables" />
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="BarsWeb.Areas.DptAdm.Models" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+        <EntityContainer Name="DptAdmEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="DPT_TYPES" EntityType="BarsWeb.Areas.DptAdm.Models.DPT_TYPES" />
+          <EntitySet Name="DPT_VIDD" EntityType="BarsWeb.Areas.DptAdm.Models.DPT_VIDD" />
+        </EntityContainer>
+        <EntityType Name="DPT_TYPES">
+          <Key>
+            <PropertyRef Name="TYPE_ID" />
+          </Key>
+          <Property Name="TYPE_ID" Type="Decimal" Nullable="false" Precision="38" Scale="0" />
+          <Property Name="TYPE_NAME" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="TYPE_CODE" Type="String" MaxLength="4" FixedLength="false" Unicode="false" />
+          <Property Name="SORT_ORD" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="FL_ACTIVE" Type="Int16" />
+          <Property Name="FL_DEMAND" Type="Int16" />
+          <Property Name="FL_WEBBANKING" Type="Int16" />
+        </EntityType>
+        <EntityType Name="DPT_VIDD">
+          <Key>
+            <PropertyRef Name="VIDD" />
+          </Key>
+          <Property Name="VIDD" Type="Decimal" Nullable="false" Precision="38" Scale="0" />
+          <Property Name="DEPOSIT_COD" Type="String" MaxLength="4" FixedLength="false" Unicode="false" />
+          <Property Name="TYPE_NAME" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="BASEY" Type="Decimal" Nullable="false" Precision="38" Scale="0" />
+          <Property Name="BASEM" Type="Decimal" Nullable="false" Precision="38" Scale="0" />
+          <Property Name="BR_ID" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="FREQ_N" Type="Int16" Nullable="false" />
+          <Property Name="FREQ_K" Type="Int16" Nullable="false" />
+          <Property Name="BSD" Type="String" Nullable="false" MaxLength="4" FixedLength="true" Unicode="false" />
+          <Property Name="BSN" Type="String" Nullable="false" MaxLength="4" FixedLength="true" Unicode="false" />
+          <Property Name="METR" Type="Int16" Nullable="false" />
+          <Property Name="AMR_METR" Type="Decimal" Nullable="false" Precision="38" Scale="0" />
+          <Property Name="DURATION" Type="Int32" Nullable="false" />
+          <Property Name="TERM_TYPE" Type="Decimal" Nullable="false" Precision="38" Scale="0" />
+          <Property Name="MIN_SUMM" Type="Decimal" Precision="24" Scale="0" />
+          <Property Name="COMMENTS" Type="String" MaxLength="128" FixedLength="false" Unicode="false" />
+          <Property Name="FLAG" Type="Int16" Nullable="false" />
+          <Property Name="TYPE_COD" Type="String" MaxLength="4" FixedLength="false" Unicode="false" />
+          <Property Name="KV" Type="Int16" Nullable="false" />
+          <Property Name="TT" Type="String" MaxLength="3" FixedLength="true" Unicode="false" />
+          <Property Name="SHABLON" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="IDG" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="IDS" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="NLS_K" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="DATN" Type="DateTime" />
+          <Property Name="DATK" Type="DateTime" />
+          <Property Name="BR_ID_L" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="FL_DUBL" Type="Int16" Nullable="false" />
+          <Property Name="ACC7" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="ID_STOP" Type="Decimal" Nullable="false" Precision="38" Scale="0" />
+          <Property Name="KODZ" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="FMT" Type="Int16" />
+          <Property Name="FL_2620" Type="Int16" Nullable="false" />
+          <Property Name="COMPROC" Type="Int16" Nullable="false" />
+          <Property Name="LIMIT" Type="Decimal" Precision="24" Scale="0" />
+          <Property Name="TERM_ADD" Type="Decimal" Precision="7" Scale="2" />
+          <Property Name="TERM_DUBL" Type="Int32" Nullable="false" />
+          <Property Name="DURATION_DAYS" Type="Int32" Nullable="false" />
+          <Property Name="EXTENSION_ID" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="TIP_OST" Type="Int16" Nullable="false" />
+          <Property Name="BR_WD" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="NLSN_K" Type="String" MaxLength="14" FixedLength="false" Unicode="false" />
+          <Property Name="BSA" Type="String" MaxLength="4" FixedLength="true" Unicode="false" />
+          <Property Name="MAX_LIMIT" Type="Decimal" Precision="24" Scale="0" />
+          <Property Name="BR_BONUS" Type="Decimal" Nullable="false" Precision="38" Scale="0" />
+          <Property Name="BR_OP" Type="Decimal" Nullable="false" Precision="38" Scale="0" />
+          <Property Name="AUTO_ADD" Type="Int16" Nullable="false" />
+          <Property Name="TYPE_ID" Type="Decimal" Nullable="false" Precision="38" Scale="0" />
+          <Property Name="DISABLE_ADD" Type="Int16" />
+          <Property Name="CODE_TARIFF" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="DURATION_MAX" Type="Int16" />
+          <Property Name="DURATION_DAYS_MAX" Type="Int16" />
+          <Property Name="IRREVOCABLE" Type="Int16" Nullable="false" />
+        </EntityType>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping xmlns="http://schemas.microsoft.com/ado/2008/09/mapping/cs" Space="C-S">
+        <Alias Key="Model" Value="DptAdm" />
+        <Alias Key="Target" Value="DptAdm.Store" />
+        <EntityContainerMapping CdmEntityContainer="DptAdmEntities" StorageEntityContainer="DptAdmStoreContainer">
+          <EntitySetMapping Name="DPT_TYPES">
+            <EntityTypeMapping TypeName="BarsWeb.Areas.DptAdm.Models.DPT_TYPES">
+              <MappingFragment StoreEntitySet="DPT_TYPES">
+                <ScalarProperty Name="TYPE_ID" ColumnName="TYPE_ID" />
+                <ScalarProperty Name="TYPE_CODE" ColumnName="TYPE_CODE" />
+                <ScalarProperty Name="TYPE_NAME" ColumnName="TYPE_NAME" />
+                <ScalarProperty Name="FL_ACTIVE" ColumnName="FL_ACTIVE" />
+                <ScalarProperty Name="FL_DEMAND" ColumnName="FL_DEMAND" />
+                <ScalarProperty Name="FL_WEBBANKING" ColumnName="FL_WEBBANKING" />
+              <ScalarProperty Name="SORT_ORD" ColumnName="SORT_ORD" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="DPT_VIDD">
+            <EntityTypeMapping TypeName="BarsWeb.Areas.DptAdm.Models.DPT_VIDD">
+              <MappingFragment StoreEntitySet="DPT_VIDD">
+                <ScalarProperty Name="IRREVOCABLE" ColumnName="IRREVOCABLE" />
+                <ScalarProperty Name="DURATION_DAYS_MAX" ColumnName="DURATION_DAYS_MAX" />
+                <ScalarProperty Name="DURATION_MAX" ColumnName="DURATION_MAX" />
+                <ScalarProperty Name="CODE_TARIFF" ColumnName="CODE_TARIFF" />
+                <ScalarProperty Name="DISABLE_ADD" ColumnName="DISABLE_ADD" />
+                <ScalarProperty Name="TYPE_ID" ColumnName="TYPE_ID" />
+                <ScalarProperty Name="AUTO_ADD" ColumnName="AUTO_ADD" />
+                <ScalarProperty Name="BR_OP" ColumnName="BR_OP" />
+                <ScalarProperty Name="BR_BONUS" ColumnName="BR_BONUS" />
+                <ScalarProperty Name="MAX_LIMIT" ColumnName="MAX_LIMIT" />
+                <ScalarProperty Name="BSA" ColumnName="BSA" />
+                <ScalarProperty Name="NLSN_K" ColumnName="NLSN_K" />
+                <ScalarProperty Name="BR_WD" ColumnName="BR_WD" />
+                <ScalarProperty Name="TIP_OST" ColumnName="TIP_OST" />
+                <ScalarProperty Name="EXTENSION_ID" ColumnName="EXTENSION_ID" />
+                <ScalarProperty Name="DURATION_DAYS" ColumnName="DURATION_DAYS" />
+                <ScalarProperty Name="TERM_DUBL" ColumnName="TERM_DUBL" />
+                <ScalarProperty Name="TERM_ADD" ColumnName="TERM_ADD" />
+                <ScalarProperty Name="LIMIT" ColumnName="LIMIT" />
+                <ScalarProperty Name="COMPROC" ColumnName="COMPROC" />
+                <ScalarProperty Name="FL_2620" ColumnName="FL_2620" />
+                <ScalarProperty Name="FMT" ColumnName="FMT" />
+                <ScalarProperty Name="KODZ" ColumnName="KODZ" />
+                <ScalarProperty Name="ID_STOP" ColumnName="ID_STOP" />
+                <ScalarProperty Name="ACC7" ColumnName="ACC7" />
+                <ScalarProperty Name="FL_DUBL" ColumnName="FL_DUBL" />
+                <ScalarProperty Name="BR_ID_L" ColumnName="BR_ID_L" />
+                <ScalarProperty Name="DATK" ColumnName="DATK" />
+                <ScalarProperty Name="DATN" ColumnName="DATN" />
+                <ScalarProperty Name="NLS_K" ColumnName="NLS_K" />
+                <ScalarProperty Name="IDS" ColumnName="IDS" />
+                <ScalarProperty Name="IDG" ColumnName="IDG" />
+                <ScalarProperty Name="SHABLON" ColumnName="SHABLON" />
+                <ScalarProperty Name="TT" ColumnName="TT" />
+                <ScalarProperty Name="KV" ColumnName="KV" />
+                <ScalarProperty Name="TYPE_COD" ColumnName="TYPE_COD" />
+                <ScalarProperty Name="FLAG" ColumnName="FLAG" />
+                <ScalarProperty Name="COMMENTS" ColumnName="COMMENTS" />
+                <ScalarProperty Name="MIN_SUMM" ColumnName="MIN_SUMM" />
+                <ScalarProperty Name="TERM_TYPE" ColumnName="TERM_TYPE" />
+                <ScalarProperty Name="DURATION" ColumnName="DURATION" />
+                <ScalarProperty Name="AMR_METR" ColumnName="AMR_METR" />
+                <ScalarProperty Name="METR" ColumnName="METR" />
+                <ScalarProperty Name="BSN" ColumnName="BSN" />
+                <ScalarProperty Name="BSD" ColumnName="BSD" />
+                <ScalarProperty Name="FREQ_K" ColumnName="FREQ_K" />
+                <ScalarProperty Name="FREQ_N" ColumnName="FREQ_N" />
+                <ScalarProperty Name="BR_ID" ColumnName="BR_ID" />
+                <ScalarProperty Name="BASEM" ColumnName="BASEM" />
+                <ScalarProperty Name="BASEY" ColumnName="BASEY" />
+                <ScalarProperty Name="TYPE_NAME" ColumnName="TYPE_NAME" />
+                <ScalarProperty Name="DEPOSIT_COD" ColumnName="DEPOSIT_COD" />
+                <ScalarProperty Name="VIDD" ColumnName="VIDD" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+<Designer xmlns="http://schemas.microsoft.com/ado/2008/10/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="False" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="false" />
+        <DesignerProperty Name="UseLegacyProvider" Value="true" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="Default" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

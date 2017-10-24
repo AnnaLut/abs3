@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<xmlform caption="">
+  <grids>
+    <grid id="gv2" pagesize="2" showpagesizebox="true">
+      <filters caption="Дані клієнта (якщо треба)" buttontext="Знайти" columnscount="3" width="100%">
+        <filter field="drnk" caption ="РНК" columnindex="1" condition="Equal" id="fltrrnk">
+          <uicontrol></uicontrol>
+        </filter>
+        <filter field="okpo" caption ="ЗКПО" columnindex="2" condition="Equal" id="fltrokpo">
+          <uicontrol></uicontrol>
+        </filter>
+        <filter field="nmk" caption="ПІБ (назва)" columnindex="3" condition="LikeBoth" id="fltrname">
+          <uicontrol></uicontrol>
+        </filter>
+      </filters>
+      <datasource>
+        <sql>
+          select rnk drnk, okpo, custtype, nmk, adr, branch from customer
+        </sql>
+      </datasource>
+      <fields>
+        <field name="drnk" datatype="Int64" key="true">
+          <column caption="РНК" align="Right"></column>
+        </field>
+        <field name="okpo" datatype="String">
+          <column caption="ОКПО" align="Left"></column>
+        </field>
+        <field name="custtype" datatype="String">
+          <column caption="Тип" align="Left"></column>
+        </field>
+        <field name="nmk" datatype="String">
+          <column caption="Назва" align="Left"></column>
+        </field>
+        <field name="adr" datatype="String">
+          <column caption="Адреса" align="Left"></column>
+        </field>
+        <field name="branch" datatype="String">
+          <form show="false"></form>
+          <column caption="Відділення" align="Left">
+                      </column>
+        </field>
+       </fields>
+      <rowselection method="SingleRow"></rowselection>
+    </grid>
+  </grids>
+</xmlform>

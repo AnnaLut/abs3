@@ -1,0 +1,61 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    //ViewBag.Title = "";
+}
+<script src="~/Areas/Credit/Scripts/mainCreditCtrl.js"></script>
+<script src="~/Areas/Credit/Scripts/creditParamsCtrl.js"></script>
+<script src="~/Areas/Credit/Scripts/dataMaturityCtrl.js"></script>
+<script src="~/Areas/Credit/Scripts/commitionLimitCtrl.js"></script>
+<script src="~/Areas/Credit/Scripts/moreCreditParamsCtrl.js"></script>
+<div ng-controller="Credit.mainCreditCtrl">
+    <h1>{{Title}}</h1>
+    <div kendo-tool-bar="mainTool">
+        <button class="k-button" ng-click="save()"><span class='pf-icon pf-16 pf-save' ng-disabled="isSave"></span> Зберегти</button>
+    </div>
+    <fieldset ng-disabled="isSave">
+        <form kendo-validator="validator" k-options="mainValidationOptions">
+            <div kendo-tab-strip="mainTabStrip" k-options="tabStripMainOptions">
+                <ul>
+                    <li class="k-state-active">Параметри КД</li>
+                    <li>Дані про погашення</li>
+                    <li>Комісія та Ліміт</li>
+                    <li>Дод. параметри КД</li>
+                </ul>
+                <div>
+                    <div ng-include="'/barsroot/credit/newcredit/creditparams'"></div>
+                </div>
+                <div>
+                    <div ng-include="'/barsroot/credit/newcredit/datamaturity'"></div>
+                </div>
+                <div>
+                    <div ng-include="'/barsroot/credit/newcredit/commitionlimit'"></div>
+                </div>
+                <div>
+                    <div ng-include="'/barsroot/credit/newcredit/morecreditparams'"></div>
+                </div>
+            </div>
+        </form>
+    </fieldset>
+
+</div>
+<style>
+    .lbl-top {
+        display: block;
+    }
+    table td {
+        padding: 3px;
+    }
+    input:disabled {
+        background-color: #eee;
+        color: #808080;
+    }
+
+        input:disabled:hover {
+            background-color: #eee;
+            color: #808080;
+        }
+
+    .k-state-disabled {
+        opacity: 1;
+    }
+</style>

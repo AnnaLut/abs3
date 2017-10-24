@@ -1,0 +1,103 @@
+﻿<script src="~/Areas/Crkr/Scripts/Helpers/jszip.min.js"></script>
+<script src="~/Areas/Crkr/Scripts/Helpers/error.window.js"></script>
+<script src="~/Areas/Crkr/Scripts/RegPay/registerBackGrid.js"></script>
+<script src="~/Areas/Crkr/Scripts/RegPay/registerPayBack.js"></script>
+<link rel="stylesheet" href="~/Areas/Crkr/Content/index.css" />
+<div class="container-fluid">
+    <h1>Реєстр виплат</h1>
+    <form class="form-horizontal" id="periodForm">
+        <!--Ліва колонка значень-->
+        <div class="col-xs-9">
+            <label for="startDate" class="col-xs-1 control-label">з:</label>
+            <div class="col-xs-5">
+                <input class="datepicker" id="startDate" name="startDate" required pattern="^\d{1,2}.\d{1,2}.\d{4}" />
+            </div>
+            <label for="endDate" class="col-xs-1 control-label">по:</label>
+            <div class="col-xs-5">
+                <input class="datepicker" id="endDate" name="endDate" required pattern="^\d{1,2}.\d{1,2}.\d{4}" />
+            </div>
+        </div>
+        <!--Кнопки управління-->
+        <div class="col-xs-3">
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <input type="button" class="k-button right-pos" id="regPay" value="Сформувати реєстр" style="width: 140px" />
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-xs-12">
+                    <input type="button" class="k-button right-pos" id="sendPay" value="Сформувати платежі" style="width: 140px" />
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<br />
+<div id="backActual"></div>
+
+<style>
+    .control-label {
+        text-align: left;
+    }
+</style>
+
+
+<!--Вікно інформації-->
+<div id="infoWindow">
+    <div class="container col-xs-10">
+        <div class="form-group">
+            <label class="control-label">Всього вкладів в ЦРКР:</label>
+            <label class="control-label" id="compenAll"></label>
+        </div>
+        <div class="form-group">
+            <label class="control-label">Всього клієнтів в ЦРКР:</label>
+            <label class="control-label" id="actAll"></label>
+        </div>
+        <div class="form-group">
+            <label class="control-label">Всього клієнтів які в списку реєстру:</label>
+            <label class="control-label" id="actReg"></label>
+        </div>
+        <div class="form-group">
+            <label class="control-label">Всього актуалізованих вкладів:</label>
+            <label class="control-label" id="compenReg"></label>
+        </div>
+        <div class="form-group">
+            <label class="control-label">Нові актуалізації вкладів:</label>
+            <label class="control-label" id="compenNew"></label>
+
+        </div>
+        <div class="form-group">
+            <label class="control-label">сума планових виплат (у тому числі і спроба відправки):</label>
+            <label class="control-label" id="stateNew"></label>
+
+        </div>
+        <div class="form-group">
+            <label class="control-label">Сума сформованих виплат на очікувані візи в АБС:</label>
+            <label class="control-label" id="stateFormed"></label>
+
+        </div>
+        <div class="form-group">
+            <label class="control-label">Сума сформованих виплат, які оплачені:</label>
+            <label class="control-label" id="statePayed"></label>
+
+        </div>
+        <div class="form-group">
+            <label class="control-label">Сума план. виплат, які заблоковані для формування платежів:</label>
+            <label class="control-label" id="stateBlock"></label>
+
+        </div>
+        <div class="form-group">
+            <label class="control-label">Дата першої актуалізації:</label>
+            <label class="control-label" id="dateFirst"></label>
+
+        </div>
+        <div class="form-group">
+            <label class="control-label">Дата останньої актуалізації:</label>
+                <label class="control-label" id="dateLast"></label>
+        </div>
+    </div>
+</div>
+
+
+@Html.Partial("~/Areas/Crkr/PartialView/Error.cshtml")

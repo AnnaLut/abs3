@@ -1,0 +1,22 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = "АРМ Доступ до рахунків";
+
+}
+<div ng-controller="AccessToAccounts.MainCtrl">
+    <div kendo-grid="gridGroups" k-options="gridGroupsOptions" k-on-change="selectedGroups(data)"></div>
+    <div class="row containerGrids">
+        <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5">
+            <div kendo-grid="gridUserGroups" k-options="gridUserGroupsOptions" k-on-change="selectedUserGroups(data)"></div>
+        </div>
+        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1 containerButtons">
+            <button ng-click="changeUserGroup()"  ng-disabled='!buttonArrowRight'  class='k-button buttonsGridRight'><i class='pf-icon pf-16 pf-arrow_right'></i></button>
+            <button ng-click="changeAccountsGroup()"  ng-disabled='!buttonArrowLeft' class='k-button buttonsGridLeft'><i class='pf-icon pf-16 pf-arrow_left'></i></button>
+        </div>
+        <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5">
+            <div kendo-grid="gridAccountsGroups" k-options="gridAccountsGroupsOptions" k-on-change="selectedAccountsGroups(data)"></div>
+        </div>
+    </div>
+</div>
+@Styles.Render("~/bundles/AccessToAccounts/styles")
+@Scripts.Render("~/bundles/AccessToAccounts/scripts")

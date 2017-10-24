@@ -1,0 +1,27 @@
+﻿#fieldlist {
+    margin: 0;
+    padding: 10px;
+}
+
+    #fieldlist li {
+        list-style: none;
+        padding-bottom: .7em;
+        text-align: left;
+    }
+
+    #fieldlist label {
+        display: block;
+        padding-bottom: .3em;
+    }
+
+.btns {
+    float: right !important;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.bank-list-template {
+    display: inline-block;
+    min-width: 120px;
+    font-weight:bold;
+}

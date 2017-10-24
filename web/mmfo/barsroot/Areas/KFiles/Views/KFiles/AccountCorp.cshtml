@@ -1,0 +1,28 @@
+﻿@{
+    ViewBag.Title = "Рахунки корпоративних клієнтів";
+}
+<h1>Рахунки корпоративних клієнтів</h1>
+<link href="~/Areas/KFiles/CSS/mainKFiles.css" rel="stylesheet" />
+<script src="~/Areas/KFiles/Scripts/AccountCorpCtrl.js"></script>
+<script src="~/Areas/KFiles/Scripts/Services/AccountCorpService.js"></script>
+<div ng-controller="KFiles.AccountCorpCtrl as accCorp">
+
+    <div class="search-main"></div>
+
+    <div kendo-toolbar k-options="accCorp.toolbarOptionsAccCorp"></div>
+    <div kendo-grid="accCorp.accountCorpGrid" k-options="accCorp.accountCorpGridOptions" id="gridAccountCorp">
+        <div class="k-loading-image k-overlay" ng-show="accCorp.loading"></div>
+    </div>
+    <div kendo-window="accCorp.winCorporations"
+         k-width="800"
+         k-height="600"
+         id="windowCorporations"
+         k-visible="false"
+         modal="true"
+         k-on-close="accCorp.closeWinCorporations">
+        <button class="k-button" style="margin-bottom: 5pt;" ng-click="accCorp.btnSaveCorporation()" ng-disabled="accCorp.disabledSaveCorporation"><i class="pf-icon pf-16 pf-save"></i></button>
+        <div kendo-grid="accCorp.gridCorporations" k-options="accCorp.gridCorporationsOptions" k-on-change="accCorp.changeCorporations(data)" k-on-data-binding="accCorp.disabledSaveCorporation = true">
+        </div>
+    </div>
+
+</div>

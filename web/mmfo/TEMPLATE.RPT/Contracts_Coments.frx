@@ -1,0 +1,94 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="11/07/2012 12:51:58" ReportInfo.Modified="05/11/2017 17:49:23" ReportInfo.CreatorVersion="2013.2.2.0">
+  <ScriptText>using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows.Forms;
+using System.Drawing;
+using System.Data;
+using FastReport;
+using FastReport.Data;
+using FastReport.Dialog;
+using FastReport.Barcode;
+using FastReport.Table;
+using FastReport.Utils;
+
+namespace FastReport
+{
+  public class ReportScript
+  {
+
+    
+
+   
+   
+  }
+}
+</ScriptText>
+  <Dictionary>
+    <OracleDataConnection Name="HRSNTBD3" ConnectionString="rijcmlq9SEZoacNJntaKIKp6mVF16WbEOG0J3hFiiTSryc1r9WzHvtnL1e719UsLVVB25zQLZYHkNr4woXQjvxfMOQ0tkBJPxtDvobj/tG1SaTI+rA=">
+      <TableDataSource Name="Table2" Alias="K" DataType="System.Int32" Enabled="true" SelectCommand="select rownum as n, a.contr_id, a.num, a.dat, a.okpo, a.nmk, a.benef_name, a.country, a.txt,&#13;&#10;       substr(a.txt, 1, a.p1-1) as bank, substr(a.txt, a.p1+1, a.p2-a.p1-1) as l_num, substr(a.txt, a.p2+1, a.p3-a.p2-1) as l_dat,&#13;&#10;       substr(a.txt, a.p3+1, a.p4-a.p3-1)||decode(a.p7, 0, '', chr(13)||substr(a.txt, a.p6+1, a.p7-a.p6-1) ) as kv,&#13;&#10;       substr(a.txt, a.p4+1, a.p5-a.p4-1)||decode(a.p7, 0, '', chr(13)||substr(a.txt, a.p7+1, a.p8-a.p7-1) ) as s_k,&#13;&#10;       substr(a.txt, a.p5+1, decode(a.p6, 0, a.l, a.p6)-a.p5-1)||decode(a.p7, 0, '', chr(13)||substr(a.txt, a.p8+1, a.l-a.p8) ) as s_p&#13;&#10;  from&#13;&#10;( select k.contr_id, k.num, to_char(k.open_date, 'dd.mm.yyyy') as dat, c.okpo, c.nmk, b.benef_name, g.name as country, k.bank_change as txt, length(k.bank_change) as l,  &#13;&#10;         instr(k.bank_change, ';', 1, 1) as p1, instr(k.bank_change, ';', 1, 2) as p2, instr(k.bank_change, ';', 1, 3) as p3, instr(k.bank_change, ';', 1, 4) as p4, &#13;&#10;         instr(k.bank_change, ';', 1, 5) as p5, instr(k.bank_change, ';', 1, 6) as p6, instr(k.bank_change, ';', 1, 7) as p7, instr(k.bank_change, ';', 1, 8) as p8   &#13;&#10;    from cim_contracts k &#13;&#10;         join customer c on c.rnk=k.rnk&#13;&#10;         join cim_beneficiaries b on b.benef_id=k.benef_id&#13;&#10;         join country g on g.country=b.country_id&#13;&#10;   where k.bank_change is not null&#13;&#10;   order by c.nmk ) a">
+        <Column Name="CONTR_ID" DataType="System.Decimal"/>
+        <Column Name="NUM" DataType="System.String"/>
+        <Column Name="OKPO" DataType="System.String"/>
+        <Column Name="NMK" DataType="System.String"/>
+        <Column Name="BENEF_NAME" DataType="System.String"/>
+        <Column Name="DAT" DataType="System.String"/>
+        <Column Name="N" DataType="System.Decimal"/>
+        <Column Name="COUNTRY" DataType="System.String"/>
+        <Column Name="TXT" DataType="System.String"/>
+        <Column Name="BANK" DataType="System.String"/>
+        <Column Name="L_NUM" DataType="System.String"/>
+        <Column Name="L_DAT" DataType="System.String"/>
+        <Column Name="KV" DataType="System.String"/>
+        <Column Name="S_K" DataType="System.String"/>
+        <Column Name="S_P" DataType="System.String"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="p_fdat1" DataType="System.String"/>
+    <Parameter Name="p_fdat2" DataType="System.String"/>
+    <Parameter Name="p_name" DataType="System.String"/>
+    <Parameter Name="p_okpo" DataType="System.String"/>
+    <Parameter Name="p_mdtype" DataType="System.String"/>
+    <Parameter Name="p_kv" DataType="System.String"/>
+    <Parameter Name="p_branch" DataType="System.String"/>
+  </Dictionary>
+  <ReportPage Name="Page1" Landscape="true" PaperWidth="297" PaperHeight="210" RawPaperSize="9" RightMargin="5" Guides="1039.5">
+    <ReportTitleBand Name="ReportTitle1" Width="1065.96" Height="85.05">
+      <TextObject Name="Text8" Width="1067.85" Height="37.8" CanGrow="true" CanBreak="false" Text="Інформація про зовнішньоекономічні договори клієнтів, які переведено на обслуговування до банку з інших банків&#13;&#10;" HorzAlign="Center" WordWrap="false" Font="Times New Roman, 12pt, style=Bold"/>
+      <TextObject Name="Text2" Left="28.35" Top="47.25" Width="94.5" Height="37.8" Border.Lines="All" Text="Найменування&#13;&#10;клієнта" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text3" Left="122.85" Top="47.25" Width="75.6" Height="37.8" Border.Lines="All" Text="Код ЄДРПОУ" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text6" Left="198.45" Top="47.25" Width="75.6" Height="37.8" Border.Lines="All" Text="Номер контракту&#13;&#10;&#13;&#10;" HorzAlign="Center" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text12" Left="349.65" Top="47.25" Width="94.5" Height="37.8" Border.Lines="All" Text="Найменування&#13;&#10;нерезидента&#13;&#10;" HorzAlign="Center" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text13" Left="916.65" Top="47.25" Width="122.85" Height="37.8" Border.Lines="All" Text="Запис" HorzAlign="Center" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text16" Top="47.25" Width="28.35" Height="37.8" Border.Lines="All" Text="№" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text18" Left="274.05" Top="47.25" Width="75.6" Height="37.8" Border.Lines="All" Text="Дата контракту&#13;&#10;&#13;&#10;" HorzAlign="Center" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text20" Left="444.15" Top="47.25" Width="85.05" Height="37.8" Border.Lines="All" Text="Країна&#13;&#10;нерезидента&#13;&#10;" HorzAlign="Center" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text22" Left="529.2" Top="47.25" Width="85.05" Height="37.8" Border.Lines="All" Text="Назва банку&#13;&#10;" HorzAlign="Center" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text24" Left="614.25" Top="47.25" Width="66.15" Height="37.8" Border.Lines="All" Text="№ листа&#13;&#10;" HorzAlign="Center" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text26" Left="680.4" Top="47.25" Width="66.15" Height="37.8" Border.Lines="All" Text="Дата листа&#13;&#10;" HorzAlign="Center" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text28" Left="746.55" Top="47.25" Width="37.8" Height="37.8" Border.Lines="All" Text="Код вал.&#13;&#10;" HorzAlign="Center" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text30" Left="784.35" Top="47.25" Width="66.15" Height="37.8" Border.Lines="All" Text="Куплено&#13;&#10;" HorzAlign="Center" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text32" Left="850.5" Top="47.25" Width="66.15" Height="37.8" Border.Lines="All" Text="Перераховано&#13;&#10;" HorzAlign="Center" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text34" Left="1039.5" Top="47.25" Width="28.35" Height="37.8" Border.Lines="All" Text="ID" HorzAlign="Center" Font="Times New Roman, 10pt"/>
+    </ReportTitleBand>
+    <DataBand Name="Data1" Top="89.05" Width="1065.96" Height="28.35" CanGrow="true" CanShrink="true" DataSource="Table2">
+      <TextObject Name="Text1" Left="28.35" Width="94.5" Height="28.35" Border.Lines="All" CanGrow="true" CanShrink="true" GrowToBottom="true" Text="[K.NMK]" HorzAlign="Center" Font="Times New Roman, 9pt"/>
+      <TextObject Name="Text7" Left="122.85" Width="75.6" Height="28.35" Border.Lines="All" CanGrow="true" CanShrink="true" GrowToBottom="true" CanBreak="false" Text="[K.OKPO]" HorzAlign="Center" Font="Times New Roman, 9pt"/>
+      <TextObject Name="Text11" Left="198.45" Width="75.6" Height="28.35" Border.Lines="All" CanGrow="true" CanShrink="true" GrowToBottom="true" CanBreak="false" Text="[K.NUM]&#13;&#10;&#13;&#10;&#13;&#10;" HorzAlign="Center" Font="Times New Roman, 8pt"/>
+      <TextObject Name="Text14" Left="349.65" Width="94.5" Height="28.35" Border.Lines="All" CanGrow="true" CanShrink="true" GrowToBottom="true" CanBreak="false" Text="[K.BENEF_NAME]" HorzAlign="Center" Font="Times New Roman, 8pt"/>
+      <TextObject Name="Text15" Left="916.65" Width="122.85" Height="28.35" Border.Lines="All" CanGrow="true" CanShrink="true" GrowToBottom="true" CanBreak="false" Text="[K.TXT]&#13;&#10;" HorzAlign="Center" Font="Times New Roman, 8pt"/>
+      <TextObject Name="Text17" Width="28.35" Height="28.35" Border.Lines="All" CanGrow="true" CanShrink="true" GrowToBottom="true" Text="[K.N]" HorzAlign="Center" Font="Times New Roman, 9pt"/>
+      <TextObject Name="Text19" Left="274.05" Width="75.6" Height="28.35" Border.Lines="All" CanGrow="true" CanShrink="true" GrowToBottom="true" CanBreak="false" Text="[K.DAT]&#13;&#10;&#13;&#10;&#13;&#10;" HorzAlign="Center" Font="Times New Roman, 8pt"/>
+      <TextObject Name="Text21" Left="444.15" Width="85.05" Height="28.35" Border.Lines="All" CanGrow="true" CanShrink="true" GrowToBottom="true" CanBreak="false" Text="[K.COUNTRY]" HorzAlign="Center" Font="Times New Roman, 8pt"/>
+      <TextObject Name="Text23" Left="529.2" Width="85.05" Height="28.35" Border.Lines="All" CanGrow="true" CanShrink="true" GrowToBottom="true" CanBreak="false" Text="[K.BANK]" HorzAlign="Center" Font="Times New Roman, 8pt"/>
+      <TextObject Name="Text25" Left="614.25" Width="66.15" Height="28.35" Border.Lines="All" CanGrow="true" CanShrink="true" GrowToBottom="true" CanBreak="false" Text="[K.L_NUM]" HorzAlign="Center" Font="Times New Roman, 8pt"/>
+      <TextObject Name="Text27" Left="680.4" Width="66.15" Height="28.35" Border.Lines="All" CanGrow="true" CanShrink="true" GrowToBottom="true" CanBreak="false" Text="[K.L_DAT]" HorzAlign="Center" Font="Times New Roman, 8pt"/>
+      <TextObject Name="Text29" Left="746.55" Width="37.8" Height="28.35" Border.Lines="All" CanGrow="true" CanShrink="true" GrowToBottom="true" CanBreak="false" Text="[K.KV]" HorzAlign="Center" Font="Times New Roman, 8pt"/>
+      <TextObject Name="Text31" Left="784.35" Width="66.15" Height="28.35" Border.Lines="All" CanGrow="true" CanShrink="true" GrowToBottom="true" CanBreak="false" Text="[K.S_K]" HorzAlign="Center" Font="Times New Roman, 8pt"/>
+      <TextObject Name="Text33" Left="850.5" Width="66.15" Height="28.35" Border.Lines="All" CanGrow="true" CanShrink="true" GrowToBottom="true" CanBreak="false" Text="[K.S_P]" HorzAlign="Center" Font="Times New Roman, 8pt"/>
+      <TextObject Name="Text35" Left="1039.5" Width="28.35" Height="28.35" Border.Lines="All" CanGrow="true" CanShrink="true" GrowToBottom="true" CanBreak="false" Text="[K.CONTR_ID]&#13;&#10;" HorzAlign="Center" Font="Times New Roman, 8pt"/>
+    </DataBand>
+  </ReportPage>
+</Report>

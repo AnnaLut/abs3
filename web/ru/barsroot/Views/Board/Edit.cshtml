@@ -1,0 +1,51 @@
+﻿@inherits System.Web.Mvc.WebViewPage<BarsWeb.Models.BARS_BOARD>
+@{
+  ViewBag.Title = "Редагування оголошення";
+  Layout = null;
+}
+<script type="text/javascript">
+  var titleText = [
+      {title:"Формат тексту"},
+      {title:"Розмір шрифту"},
+      {title:"Колір"},
+      {title:"Жирній",hotkey:"B"},
+      {title:"Курсив",hotkey:"I"},
+      {title:"Підкреслення",hotkey:"U"},
+      {title:"Нумерований список",hotkey:"."},
+      {title:"Маркирований список",hotkey:","},
+      {title:"Індекс",hotkey:"down arrow"},
+      {title:"Верхній індекс",hotkey:"up arrow"},
+      {title:"Витуп",hotkey:"left arrow"},
+      {title:"Отступ",hotkey:"right arrow"},
+      {title:"Вирівняти зліва"},
+      {title:"Вирівняти по цнтру"},
+      {title:"Вирівняти справа"},
+      {title:"Зачеркнути",hotkey:"K"},
+      {title:"Додати посилання",hotkey:"L"},
+      {title:"Видалити посилання",hotkey:""},
+      {title:"Очистити стиль",hotkey:"Delete"},
+      {title:"Горизонтальна лінія",hotkey:"H"},
+      {title:"Показати HTML код",hotkey:""}
+  ];
+  if (bars.test.hasIE < 7) {
+
+  } else {
+    $("textarea[name=msg_text]").jqte({ titletext: titleText, link: true });
+  }
+</script>
+<form method="POST" action="@Url.Content("~/board/edit/")">
+  <input name="id" type="hidden" value="@Model.ID" />
+  <div>Заголовок:</div>
+  <input name="msg_title" type="text" value="@Model.MSG_TITLE" style="width: 96%;font-size: 18px;" />
+  <div>Текст:</div>
+  <textarea name="msg_text" style="width: 96%; height: 50px;">@Html.Raw(Model.MSG_TEXT)</textarea>
+  @if (!string.IsNullOrWhiteSpace(Model.WRITER_FIO))
+  {
+    <div>Автор: <b>@Model.WRITER_FIO</b></div>
+  }
+  @if (Model.MSG_DATE != null)
+  {
+    <div>Дата: <b>@Model.MSG_DATE</b></div>    
+  }
+</form>
+

@@ -1,0 +1,146 @@
+﻿<style>
+    .k-toolbar .k-datepicker input {
+        height: 1.65em;
+    }
+
+    .k-header.ng-scope.k-with-icon.k-filterable {
+        vertical-align: top;
+    }
+
+    .m-r-10 {
+        margin-right: 10px;
+    }
+    #reportGrid .k-grid-header .k-header {
+        white-space: normal;
+    }
+    #reportGrid .k-grid-header th.k-with-icon .k-link {
+        margin-right: 7px;
+    }
+</style>
+
+<script src="@Url.Content("~/Areas/Reporting/services/base64HelperService.js?v1.0")"></script>
+<script src="@Url.Content("~/Areas/Reporting/services/reportingNbuService.js?v1.0")"></script>
+<script src="@Url.Content("~/Areas/Reporting/controllers/reportingNbuController.js?v1.0")"></script>
+<script src="@Url.Content("~/lib/jsZip/jszip.min.js")"></script>
+
+
+
+<div data-ng-controller="Reporting.Nbu">
+    <h1 ng-bind="Title"></h1>
+
+    <div class="k-loading-image k-overlay" ng-show="loading"></div>
+
+    <div data-kendo-toolbar="" k-options="toolbarReportOptions" style="margin-bottom: 10px"> </div>
+    <div ng-show="selectedFileVersionInfo">
+        <div>
+            <b>Додаткова інформація про файл</b>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div style="vertical-align: top">
+                    <label class="m-r-10">
+                        Номер версії файлу:<br>
+                        <b ng-bind="selectedFileVersionInfo.VERSION_ID"></b>
+                    </label>
+                    <label class="m-r-10">
+                        Дата початку формування:<br>
+                        <b ng-bind="parseDate(selectedFileVersionInfo.START_TIME)"></b>
+                    </label>
+                    <label class="m-r-10">
+                        Дата закінчення формування:<br>
+                        <b ng-bind="parseDate(selectedFileVersionInfo.FINISH_TIME)"></b>
+                    </label>
+                    <label class="m-r-10">
+                        Статус:<br>
+                        <b ng-bind="selectedFileVersionInfo.STATUS"></b>
+                    </label>
+                    <label class="m-r-10">
+                        Ініціатор формування: <br>
+                        <b ng-bind="selectedFileVersionInfo.FIO"></b>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div data-kendo-toolbar="appToolbarReportGridOptions" k-options="toolbarReportGridOptions"></div>
+
+    <div id="reportGrid"></div>
+
+    <div data-kendo-window="archiveWindow" id="archiveWindow" data-options="archiveWindowOptions" style="display: none">
+        <!--<div data-kendo-grid="archiveGrid" data-options="archiveWindowOptions"></div>-->
+        <div id="archiveGrid" kendo-grid="archiveGrid" k-options="archiveGridOption"></div>
+    </div>
+
+    <div data-kendo-window="VersionWindow" id="VersionWindow" data-options="VersionWindowOptions" style="display: none">
+        <!--<div data-kendo-grid="archiveGrid" data-options="archiveWindowOptions"></div>-->
+        <div id="VersionGrid" kendo-grid="VersionGrid" k-options="VersionGridOptions"></div>
+
+        <div class="k-content k-window-footer">
+            <button ng-click="VersionWindow.close()" class="delete-confirm k-button" style="float: right; margin: 7px 5px 7px 5px;">
+                Відмінити
+            </button>
+            <button ng-click="selectFileVersion()" class="delete-confirm k-button k-primary" style="float: right; margin: 7px 5px 7px 5px;">
+                <span class="k-icon k-i-tick" disabled="disabled"></span> 
+                Вибрати
+            </button>
+        </div>
+    </div>
+
+
+    <div data-kendo-window="detailedReportWindow" id="detailedReportWindow" data-options="detailedReportWindowOptions" style="display: none;">
+
+        <div id="search"></div>
+
+        <div ng-show="selectedFileVersionInfo" id="detailedReportWindowFileInfo">
+            <div>
+                <b>Додаткова інформація про файл</b>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div style="vertical-align: top">
+                        <label class="m-r-10">
+                            Дата:<br>
+                            <b ng-bind="report.date"></b>
+                        </label>
+                        <label class="m-r-10">
+                            Код файлу:<br>
+                            <b ng-bind="report.FILE_CODE"></b>
+                        </label>
+                        <label class="m-r-10">
+                            Номер версії файлу:<br>
+                            <b ng-bind="selectedFileVersionInfo.VERSION_ID"></b>
+                        </label>
+                        <label class="m-r-10">
+                            Дата початку формування:<br>
+                            <b ng-bind="parseDate(selectedFileVersionInfo.START_TIME)"></b>
+                        </label>
+                        <label class="m-r-10">
+                            Дата закінчення формування:<br>
+                            <b ng-bind="parseDate(selectedFileVersionInfo.FINISH_TIME)"></b>
+                        </label>
+                        <label class="m-r-10">
+                            Статус:<br>
+                            <b ng-bind="selectedFileVersionInfo.STATUS"></b>
+                        </label>
+                        <label class="m-r-10">
+                            Ініціатор формування: <br>
+                            <b ng-bind="selectedFileVersionInfo.FIO"></b>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div data-kendo-toolbar="detailedReportGridToolbar" data-options="detailedReportGridToolbarOptions"></div>
+
+        <div id="detailedReportGrid"></div>
+
+        <!--<div id="detailedReportGrid"-->
+             <!--data-kendo-grid="detailedReportGrid"-->
+             <!--data-options="detailedReportGridOption"-->
+              <!--k-rebind="detailedReportGridOption.dataSource.transport.options.dataSource.options.schema.model.fields"></div>-->
+    </div>
+</div>
+
+

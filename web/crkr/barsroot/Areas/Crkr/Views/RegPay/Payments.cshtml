@@ -1,0 +1,23 @@
+﻿<script src="~/Areas/Crkr/Scripts/RegPay/registerPay.js"></script>
+<link rel="stylesheet" href="~/Areas/Crkr/Content/index.css" />
+<div class="container-fluid">
+    <h2>Реєстр виплат</h2>
+    <form class="form-horizontal" id="periodForm">
+        <div class="form-group col-xs-12">
+            <label for="startDate" class="col-xs-1 control-label">з:</label>
+            <div class="col-xs-4">
+                <input class="datepicker" id="startDate" name="startDate" required pattern="^\d{1,2}.\d{1,2}.\d{4}"/>
+            </div>
+            <label for="endDate" class="col-xs-1 control-label">по:</label>
+            <div class="col-xs-4">
+                <input class="datepicker" id="endDate" name="endDate" required pattern="^\d{1,2}.\d{1,2}.\d{4}"/>
+            </div>
+            <div class="col-xs-2">
+                <button type="submit" class="k-button" id="submit"><span class="k-sprite pf-icon pf-16 pf-search" style="margin-bottom: 3px"></span> Пошук</button>
+            </div>
+        </div>
+
+    </form>
+</div>
+<br />
+<div id="actualPay"></div>

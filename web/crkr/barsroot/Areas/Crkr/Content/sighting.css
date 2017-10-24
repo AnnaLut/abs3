@@ -1,0 +1,37 @@
+﻿.k-detail-cell {
+    padding-right: 676px !important;
+}
+
+#tabstrip .k-content {
+    min-height: 0px;
+}
+
+.link-color {
+    color: blue;
+}
+
+.badge {
+    float: right !important;
+    background-color: #428bca;
+    margin-left: 10px;
+}
+.legend-label-nonact{
+    margin-left:5px !important;
+}
+
+.legend-red{
+    vertical-align: middle;
+    display: inline-block;
+    margin-left:10px;
+    width:20px;
+    height: 20px; 
+    background-color:#ffa3a3;
+}
+.legend-green{
+   vertical-align: middle;
+    display: inline-block;
+    margin-left:10px;
+    width:20px;
+    height: 20px; 
+    background-color:#93ecaa;
+}

@@ -1,0 +1,13 @@
+﻿ #toolbar {
+        display: inline-block;  
+        width: 450px;
+        text-align: left;
+      }
+
+      .k-toolbar .k-button,
+      .k-toolbar>* {
+        display: block;
+      }
+div .toolbar {
+     text-align: left;
+}

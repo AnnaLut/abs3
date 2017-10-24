@@ -1,0 +1,72 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = "Адміністрування ролей";
+}
+
+@Scripts.Render("~/bundles/Admin/roles")
+@Styles.Render("~/bundles/Admin/styles")
+<div class="page-header">
+    <h1>@ViewBag.Title</h1>
+</div>
+<div id="RolesToolbar"></div>
+<div id="RolesGrid"></div>
+
+
+<script type="text/x-kendo-template" id="template">
+    <div class="RolesTabstrip"></div>
+</script>
+
+<!-- Create Form - START -->
+<div id="CreateRole-Window">
+    <div class="container-fluid" id="container-Create">
+        <form>
+            <div class="form-group">
+                <label for="roleCode">Код ролі:</label>
+                <input type="text" id="roleCode" class="form-control" placeholder="Код ролі">
+            </div>
+            <div class="form-group">
+                <label for="roleName">Назва ролі:</label>
+                <input type="text" id="roleName" class="form-control" placeholder="Назва ролі">
+            </div>
+            <div class="btns">
+                <button type="submit" class="k-button btnSave" id="saveCreateRole-btn">Зберегти</button>
+                <button type="button" class="k-button btnCancel" id="cencelCreateRole-btn">Відмінити</button>
+            </div>
+        </form>
+    </div>
+</div>
+<!-- Create Form - END -->
+
+<!-- Edit Form - START -->
+<div id="EditRole-Window">
+    <div id="EditBox"></div>
+    <div class="container-fluid">
+        <div class="btns">
+            <button type="submit" class="k-button btnSave" id="saveEditRole-btn">Зберегти</button>
+            <button type="button" class="k-button btnCancel" id="cencelEditRole-btn">Відмінити</button>
+        </div>
+    </div>
+</div>
+
+<script type="text/x-kendo-template" id="Edit">
+    <div class="container-fluid" id="container-Edit">
+        <form>
+            <div class="form-group">
+                <label for="edit-roleCode">Код ролі:</label>
+                <input type="text" id="edit-roleCode" class="form-control" readonly value="#=ROLE_CODE.toUpperCase()#">
+            </div>
+            <div class="form-group">
+                <label for="edit-stateName">Статус:</label>
+                <input type="text" id="edit-stateName" class="form-control" readonly value="#=STATE_NAME#">
+            </div>
+            <div class="form-group">
+                <label for="edit-roleName">Назва ролі:</label>
+                <input type="text" id="edit-roleName" class="form-control" required value="#=ROLE_NAME#">
+            </div>
+        </form>
+    </div>
+</script>
+
+<script>
+    bars.tabs.loadTemplate('@Url.Content("~/Areas/Admin/Scripts/roles/tpl/roleResources.tpl.htm")');
+</script>

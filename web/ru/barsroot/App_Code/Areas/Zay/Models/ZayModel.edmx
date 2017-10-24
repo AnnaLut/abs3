@@ -1,0 +1,100 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="2.0" xmlns:edmx="http://schemas.microsoft.com/ado/2008/10/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="BarsWeb.Areas.Zay.Models.Store" Provider="Oracle.DataAccess.Client" ProviderManifestToken="11.2" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/02/edm/ssdl">
+        <EntityType Name="BIRJA">
+          <Key>
+            <PropertyRef Name="PAR" />
+          </Key>
+          <Property Name="PAR" Type="varchar2" MaxLength="8" Nullable="false" />
+          <Property Name="COMM" Type="varchar2" MaxLength="70" Nullable="false" />
+          <Property Name="VAL" Type="varchar2" MaxLength="254" />
+        </EntityType>
+        <Function Name="P_ZAYDEBT" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="BARS">
+          <Parameter Name="MOD_" Type="number" Mode="In" />
+          <Parameter Name="ACC_" Type="number" Mode="In" />
+          <Parameter Name="REF_" Type="number" Mode="In" />
+          <Parameter Name="S1_" Type="number" Mode="In" />
+          <Parameter Name="S2_" Type="number" Mode="In" />
+          <Parameter Name="D27_1" Type="char" Mode="In" />
+          <Parameter Name="D27_2" Type="char" Mode="In" />
+          <Parameter Name="NAMEKB_" Type="varchar2" Mode="In" />
+          <Parameter Name="IDKB_" Type="varchar2" Mode="In" />
+          <Parameter Name="NAZN_" Type="varchar2" Mode="In" />
+          <Parameter Name="SOPER_" Type="number" Mode="In" />
+        </Function>
+        <EntityContainer Name="BarsWebAreasZayModelsStoreContainer">
+          <EntitySet Name="BIRJA" EntityType="Self.BIRJA" Schema="BARS" store:Type="Tables" />
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="BarsWeb.Areas.Zay.Models" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+        <EntityType Name="BIRJA">
+          <Key>
+            <PropertyRef Name="PAR" />
+          </Key>
+          <Property Name="PAR" Type="String" MaxLength="8" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="COMM" Type="String" MaxLength="70" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="VAL" Type="String" MaxLength="254" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityContainer Name="ZayModel" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="BIRJA" EntityType="Self.BIRJA" />
+          <FunctionImport Name="P_ZAYDEBT">
+            <Parameter Name="MOD_" Mode="In" Type="Decimal" />
+            <Parameter Name="ACC_" Mode="In" Type="Decimal" />
+            <Parameter Name="REF_" Mode="In" Type="Decimal" />
+            <Parameter Name="S1_" Mode="In" Type="Decimal" />
+            <Parameter Name="S2_" Mode="In" Type="Decimal" />
+            <Parameter Name="D27_1" Mode="In" Type="String" />
+            <Parameter Name="D27_2" Mode="In" Type="String" />
+            <Parameter Name="NAMEKB_" Mode="In" Type="String" />
+            <Parameter Name="IDKB_" Mode="In" Type="String" />
+            <Parameter Name="NAZN_" Mode="In" Type="String" />
+            <Parameter Name="SOPER_" Mode="In" Type="Decimal" />
+          </FunctionImport>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2008/09/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="BarsWebAreasZayModelsStoreContainer" CdmEntityContainer="ZayModel">
+          <EntitySetMapping Name="BIRJA">
+            <EntityTypeMapping TypeName="BarsWeb.Areas.Zay.Models.BIRJA">
+              <MappingFragment StoreEntitySet="BIRJA">
+                <ScalarProperty Name="PAR" ColumnName="PAR" />
+                <ScalarProperty Name="COMM" ColumnName="COMM" />
+                <ScalarProperty Name="VAL" ColumnName="VAL" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="P_ZAYDEBT" FunctionName="BarsWeb.Areas.Zay.Models.Store.P_ZAYDEBT" />
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2008/10/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="false" />
+        <DesignerProperty Name="UseLegacyProvider" Value="true" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="Default" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

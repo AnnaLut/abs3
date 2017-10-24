@@ -1,0 +1,120 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = "Подокументний склад процесінгово рахунку.";
+}
+
+@model BarsWeb.Areas.Sep.Models.ProccessingParams
+
+<script src="~/Areas/Sep/Scripts/SepProccessing/sepProcCtrl.js?v1.1"></script>
+<script src="~/Areas/Sep/Scripts/sep.techDocs.js"></script>
+
+<script src="~/lib/jsZip/jszip.min.js"></script>
+@Html.Partial("~/Areas/Sep/Views/Shared/_sepDocViewerTz.cshtml")
+<script id="accInfo-template" type="text/x-kendo-template">
+
+    <div style="margin-left:3px">
+        <div class="row">
+            <div class="col-xs-2" style="width: 25px"><input type="text" class="form-control input-sm" value="#= kv ? kv : '-' #" name="kv" title="Валюта" readonly ></div>
+            <div class="col-xs-2" style="width: 100px"><input type="text" class="form-control input-sm" value="#= nls ? nls : '-'#" name="nls" title="Рахунок процесінга" readonly ></div>
+            <div class="col-xs-2"  style="width: 485px"><input type="text" class="form-control input-sm" value="#= nms ? nms : '-' #" name="nms" title="Назва рахунку процесінга" readonly></div>
+        </div>
+        <div class="row">
+            <div class="col-xs-2" style="width: 154px"><input type="text" class="form-control input-sm" value="#= ost1 ? ost1 : '0.00' #" name="ost1" title="Вхідний залишок" readonly></div>
+            <div class="col-xs-2" style="width: 136px"><input type="text" class="form-control input-sm" value="#= dos ? dos : '0.00' #" name="dos" title="Дт загальний" readonly></div>
+            <div class="col-xs-2" style="width: 145px"><input type="text" class="form-control input-sm" value="#= kos ? kos : '0.00' #" name="kos" title="Кт загальний" readonly ></div>
+            <div class="col-xs-2" style="width: 145px"><input type="text" class="form-control input-sm" value="#= ost ? ost : '0.00' #" name="ost" title="Вихідний залишок" readonly></div>
+        </div>
+    </div>
+</script>
+
+<script id="accSumm-template" type="text/x-kendo-template">
+    <div style="margin-left:3px;">
+        <div class="row" style="margin-top: 8px;">
+            <div class="col-md-2" style="width: 320px"><input type="text" class="form-control input-sm" id="sumCred" title="Дт відфільтрованих" readonly></div>
+            <div class="col-md-2" style="width: 320px"><input type="text" class="form-control input-sm" id="sumDeb" title="Кт відфільтрованих" readonly></div>
+        </div>
+    </div>
+ 
+</script>
+<style>
+    .input-sm{
+        height:15px;
+    }
+</style>
+<script>
+    function gridParams() {
+
+        //var oParams = ViewBag.oParams;
+        debugger;
+        return {
+            acc: @Model.acc,
+            kv: @Model.kv,
+            DAOS: "@Model.DAOS",
+            DAPP: "@Model.DAPP",
+            DAZS: "@Model.DAZS",
+            DOSF: '@Model.DOSF',
+            KOSF: '@Model.KOSF',
+            NLS: '@Model.NLS',
+            NMS: '@Model.NMS',
+            OB22: '@Model.OB22',
+            OSTBF: '@Model.OSTBF',
+            OSTCF: '@Model.OSTCF',
+            OSTFF: '@Model.OSTFF'
+        }
+    };
+
+    function accInfoData() {
+        return {
+            acc: @Model.acc,
+            kv: '@Model.kv',
+            tip: '@Model.tip',
+            DAOS: "@Model.DAOS",
+            DAPP: "@Model.DAPP",
+            DAZS: "@Model.DAZS",
+            DOSF: '@Model.DOSF',
+            KOSF: '@Model.KOSF',
+            NLS: '@Model.NLS',
+            NMS: '@Model.NMS',
+            OB22: '@Model.OB22',
+            OSTBF: '@Model.OSTBF',
+            OSTCF: '@Model.OSTCF',
+            OSTFF: '@Model.OSTFF'
+        }
+    };
+    debugger;
+    var template = kendo.template($("#accInfo-template").html());
+    var templateSumm = kendo.template($("#accSumm-template").html());
+
+</script>
+
+<style>
+    /** --- grid header ----*/
+
+    .k-grid-header th.k-with-icon .k-link {
+        margin-right: 0px;
+        font-size: 11px;
+    }
+
+    .k-header .k-link {
+        text-align: center;
+        font-size: 11px;
+    }
+
+    .k-grid-header th.k-header, .k-filter-row th {
+        text-align: center;
+        font-size: 11px;
+    }
+
+    .k-list-optionlabel {
+        font-size: 13px;
+    }
+
+    .k-overflow-anchor .k-button {
+        visibility: hidden;
+    }
+</style>
+
+
+<h2>@ViewBag.Title</h2>
+<div id="Toolbar"></div>
+<div id="Grid"></div>

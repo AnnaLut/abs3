@@ -1,0 +1,28 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = "Спецпараметри рахунків -> БР";
+}
+<link href="~/Areas/Admin/Css/AssignmentSpecParams.css" rel="stylesheet" />
+<script src="~/Areas/Admin/Scripts/AssignmentSpecParams/Services/AssignmentSpecParamsService.js"></script>
+<script src="~/Areas/Admin/Scripts/AssignmentSpecParams/Controllers/AssignmentSpecParamsCtrl.js"></script>
+
+<div ng-controller="AssignmentSpecParamsCtrl as specParam">
+    <h1>Спец параметри балансовних рахунків</h1>
+    <div class="col-lg-12 col-sm-12 col-md-12 col-xs-12">
+        <div kendo-grid="specParam.balanceAccountGrid" k-options="specParam.balanceAccountOptions" k-on-change="specParam.changeBalanceAccountGrid(data)"></div>
+    </div>
+    <div class="col-lg-6 col-sm-6 col-md-6 col-xs-6 containerSpecParams">
+        <div kendo-toolbar="specParam.balanceAccountGridToolbar" k-options="specParam.balanceAccountGridToolbarOptions">
+            <button ng-click='specParam.updateParemeters()' title='Зберегти зміни' class='k-button' ng-disabled="specParam.paramsToUpdate.length == 0"><i class='pf-icon pf-16 pf-save'></i></button>
+            <label>Зберегти зміни</label>
+        </div>
+        <div kendo-grid="specParam.selectedParametersGrid" k-options="specParam.selectedParametersOptions" k-on-change="specParam.changeSelectedParametersGrid(data)"></div>
+    </div>
+    <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1 containerButtons">
+        <button ng-click="specParam.addParameters()" ng-disabled='specParam.paramsToAdd.length == 0' class='k-button buttonsStyle'><i class='pf-icon pf-16 pf-arrow_left'></i></button>
+        <button ng-click="specParam.deleteParameters()" ng-disabled='specParam.paramsToDelete.length == 0' class='k-button buttonsStyle'><i class='pf-icon pf-16 pf-arrow_right'></i></button>
+    </div>
+    <div class="col-lg-5 col-sm-5 col-md-5 col-xs-5 containerSpecParams">
+        <div kendo-grid="specParam.availableParametersGrid" k-options="specParam.availableParametersOptions" k-on-change="specParam.changeAvailableParametersGrid(data)"></div>
+    </div>
+</div>

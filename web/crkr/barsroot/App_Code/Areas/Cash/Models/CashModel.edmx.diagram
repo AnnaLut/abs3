@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="2.0" xmlns:edmx="http://schemas.microsoft.com/ado/2008/10/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2008/10/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="e84d0493b4634a3b82644cdf18fdfc12" Name="Diagram1" ZoomLevel="65">
+        <EntityTypeShape EntityType="BarsWeb.Areas.Cash.Models.CLIM_ACCOUNTS" Width="1.5" PointX="3" PointY="6.375" />
+        <EntityTypeShape EntityType="BarsWeb.Areas.Cash.Models.CLIM_ACCOUNTS_ARC" Width="1.5" PointX="5.5" PointY="5.625" />
+        <EntityTypeShape EntityType="BarsWeb.Areas.Cash.Models.CLIM_KV" Width="1.5" PointX="16.375" PointY="7.625" />
+        <EntityTypeShape EntityType="BarsWeb.Areas.Cash.Models.CLIM_LIMTYPE" Width="1.5" PointX="13.5" PointY="4" />
+        <EntityTypeShape EntityType="BarsWeb.Areas.Cash.Models.CLIM_MFO" Width="1.5" PointX="11" PointY="7.875" />
+        <EntityTypeShape EntityType="BarsWeb.Areas.Cash.Models.CLIM_PARAMS" Width="1.5" PointX="16.375" PointY="0.75" />
+        <EntityTypeShape EntityType="BarsWeb.Areas.Cash.Models.CLIM_PROTOCOL" Width="1.5" PointX="8.125" PointY="0.5" />
+        <EntityTypeShape EntityType="BarsWeb.Areas.Cash.Models.CLIM_SYNC_PARAMS" Width="1.5" PointX="11.25" PointY="0.625" />
+        <EntityTypeShape EntityType="BarsWeb.Areas.Cash.Models.CLIM_SYNCSTATUS" Width="1.5" PointX="13.5" PointY="0.625" />
+        <EntityTypeShape EntityType="BarsWeb.Areas.Cash.Models.CLIM_TRANSTYPE" Width="1.5" PointX="5.875" PointY="0.5" />
+        <EntityTypeShape EntityType="BarsWeb.Areas.Cash.Models.CLIM_VIOLATIONS" Width="1.5" PointX="4" PointY="2.5" />
+        <AssociationConnector Association="BarsWeb.Areas.Cash.Models.FK_CLIMACCOUNTSARC_ACCID" />
+        <AssociationConnector Association="BarsWeb.Areas.Cash.Models.FK_CLIMVIOLATIONS_ACCID" />
+        <AssociationConnector Association="BarsWeb.Areas.Cash.Models.FK_CLIMPROTOCOL" />
+        <AssociationConnector Association="BarsWeb.Areas.Cash.Models.FK_CLIMPROTOCOL_ID" />
+        <AssociationConnector Association="BarsWeb.Areas.Cash.Models.FK_CLIMSYNCPARAMS_STATUS" />
+        <EntityTypeShape EntityType="BarsWeb.Areas.Cash.Models.CLIM_ACCOUNT_LIMIT_PLAN" Width="1.5" PointX="2" PointY="14.375" />
+        <EntityTypeShape EntityType="BarsWeb.Areas.Cash.Models.CLIM_MFO_LIMIT_PLAN" Width="1.5" PointX="16.25" PointY="3.75" />
+        <AssociationConnector Association="BarsWeb.Areas.Cash.Models.FK_CLIMACCLIMITPLAN_ACCID" />
+        <AssociationConnector Association="BarsWeb.Areas.Cash.Models.FK_CLIMMFOLIMITPLAN_KV" />
+        <AssociationConnector Association="BarsWeb.Areas.Cash.Models.FK_CLIMMFOLIMITPLAN_LIMTYPE" />
+        <EntityTypeShape EntityType="BarsWeb.Areas.Cash.Models.CLIM_ATM_LIMIT_PLAN" Width="1.5" PointX="2" PointY="1.75" />
+        <AssociationConnector Association="BarsWeb.Areas.Cash.Models.FK_CLIMATMLIMITPLAN_ACCID" />
+        <EntityTypeShape EntityType="BarsWeb.Areas.Cash.Models.CLIM_REQUEST" Width="1.5" PointX="5.5" PointY="10.375" />
+        <AssociationConnector Association="BarsWeb.Areas.Cash.Models.FK_CLIMREQUEST_ACCID" />
+        <EntityTypeShape EntityType="BarsWeb.Areas.Cash.Models.CLIM_TRESHOLD" Width="1.5" PointX="11" PointY="4" />
+        <AssociationConnector Association="BarsWeb.Areas.Cash.Models.FK_CLIMTRASHOLD_LIMTYPE" />
+        <AssociationConnector Association="BarsWeb.Areas.Cash.Models.FK_CLIMTRESHOLD_MFO" />
+        <EntityTypeShape EntityType="BarsWeb.Areas.Cash.Models.CLIM_ACCOUNT_LIMIT" Width="1.5" PointX="0.875" PointY="7.375" />
+        <EntityTypeShape EntityType="BarsWeb.Areas.Cash.Models.CLIM_MFO_LIMIT" Width="1.5" PointX="13.375" PointY="7.125" />
+        <AssociationConnector Association="BarsWeb.Areas.Cash.Models.FK_CLIMACCOUNTLIMIT_ACCID" />
+        <AssociationConnector Association="BarsWeb.Areas.Cash.Models.FK_CLIMMFOLIMIT_KV" />
+        <AssociationConnector Association="BarsWeb.Areas.Cash.Models.FK_CLIMMFOLIMIT_LIMTYPE" />
+        <EntityTypeShape EntityType="BarsWeb.Areas.Cash.Models.CLIM_ATM_LIMIT" Width="1.5" PointX="3.875" PointY="14.5" />
+        <EntityTypeShape EntityType="BarsWeb.Areas.Cash.Models.CLIM_ATM_TRANSACTIONS" Width="1.5" PointX="5.5" PointY="7.75" />
+        <AssociationConnector Association="BarsWeb.Areas.Cash.Models.FK_CLIMATMLIMIT_ACCID" />
+        <AssociationConnector Association="BarsWeb.Areas.Cash.Models.FK_CLIMATMTRANS_ACCID" />
+        <EntityTypeShape EntityType="BarsWeb.Areas.Cash.Models.CLIM_CASHTYPE" Width="1.5" PointX="0.875" PointY="4.375" />
+        <EntityTypeShape EntityType="BarsWeb.Areas.Cash.Models.CLIM_REQSTATUS" Width="1.5" PointX="7.375" PointY="10.375" />
+        <AssociationConnector Association="BarsWeb.Areas.Cash.Models.FK_CLIMACCOUNTS_CASHTYPE" />
+        <AssociationConnector Association="BarsWeb.Areas.Cash.Models.FK_CLIMREQUEST_REQSTATUS" />
+        <EntityTypeShape EntityType="BarsWeb.Areas.Cash.Models.V_CLIM_ACC" Width="1.5" PointX="27.875" PointY="6.375" />
+        <EntityTypeShape EntityType="BarsWeb.Areas.Cash.Models.V_CLIM_ACC_ARC" Width="1.5" PointX="23.5" PointY="1" />
+        <EntityTypeShape EntityType="BarsWeb.Areas.Cash.Models.V_CLIM_ACCARC_BDATE" Width="1.5" PointX="21.25" PointY="18.625" />
+        <EntityTypeShape EntityType="BarsWeb.Areas.Cash.Models.V_CLIM_ACCOUNTS" Width="1.5" PointX="27.875" PointY="10.875" />
+        <EntityTypeShape EntityType="BarsWeb.Areas.Cash.Models.V_CLIM_BRANCH" Width="1.5" PointX="23.5" PointY="5.375" />
+        <EntityTypeShape EntityType="BarsWeb.Areas.Cash.Models.V_CLIM_CASHBRANCH_TODAY" Width="1.5" PointX="32" PointY="10.125" />
+        <EntityTypeShape EntityType="BarsWeb.Areas.Cash.Models.V_CLIM_FDAT" Width="1.5" PointX="27.875" PointY="1" />
+        <EntityTypeShape EntityType="BarsWeb.Areas.Cash.Models.V_CLIM_TRESHOLD_BRANCH" Width="1.5" PointX="21.25" PointY="1" />
+        <EntityTypeShape EntityType="BarsWeb.Areas.Cash.Models.V_CLIM_TRESHOLD_CASH" Width="1.5" PointX="32.125" PointY="7.375" />
+        <EntityTypeShape EntityType="BarsWeb.Areas.Cash.Models.V_CLIM_VIOLATIONS_LIM" Width="1.5" PointX="23.5" PointY="8.625" />
+        <EntityTypeShape EntityType="BarsWeb.Areas.Cash.Models.V_CLIM_VIOLATIONS_TRESHOLD" Width="1.5" PointX="25.625" PointY="1" />
+        <EntityTypeShape EntityType="BarsWeb.Areas.Cash.Models.V_CLIM_CASHBRANCH_VIOLATION" Width="1.5" PointX="23.5" PointY="14" />
+        <EntityTypeShape EntityType="BarsWeb.Areas.Cash.Models.V_CLIM_ACCLIM_HIST" Width="1.5" PointX="19" PointY="17.75" />
+        <EntityTypeShape EntityType="BarsWeb.Areas.Cash.Models.V_CLIM_ATMLIM_HIST" Width="1.5" PointX="32.125" PointY="14.625" />
+        <EntityTypeShape EntityType="BarsWeb.Areas.Cash.Models.CLIM_BRANCH_LIMIT_ARC" Width="1.5" PointX="27.875" PointY="14.625" />
+        <EntityTypeShape EntityType="BarsWeb.Areas.Cash.Models.V_CLIM_CASH_TODAY" Width="1.5" PointX="30" PointY="1.125" />
+        <EntityTypeShape EntityType="BarsWeb.Areas.Cash.Models.V_CLIM_REQUEST" Width="1.5" PointX="25.625" PointY="6.875" />
+        <EntityTypeShape EntityType="BarsWeb.Areas.Cash.Models.V_CLIM_ACCOUNT_LIMIT" Width="1.5" PointX="21.25" PointY="7.375" />
+        <EntityTypeShape EntityType="BarsWeb.Areas.Cash.Models.V_CLIM_CASH_VIOLATION" PointX="30" PointY="8.375" Width="1.5" />
+        <EntityTypeShape EntityType="BarsWeb.Areas.Cash.Models.V_CLIM_CASHVIOL_GRPBRANCHKV" Width="1.5" PointX="30" PointY="15.5" />
+        <EntityTypeShape EntityType="BarsWeb.Areas.Cash.Models.V_CLIM_CASHVIOL_GRPMFOKV" Width="1.5" PointX="19" PointY="14.75" />
+        <EntityTypeShape EntityType="BarsWeb.Areas.Cash.Models.V_CLIM_ATM_TRANSACTIONS" Width="1.5" PointX="25.625" PointY="11.875" />
+        <EntityTypeShape EntityType="BarsWeb.Areas.Cash.Models.V_CLIM_ATM_VIOLATION" Width="1.5" PointX="27.875" PointY="2.5" />
+        <EntityTypeShape EntityType="BarsWeb.Areas.Cash.Models.CLIM_MFO_LIMIT_ARC" Width="1.5" PointX="8.125" PointY="6.125" />
+        <EntityTypeShape EntityType="BarsWeb.Areas.Cash.Models.V_CLIM_ATM_LIMIT" Width="1.5" PointX="32.125" PointY="1.125" />
+        <EntityTypeShape EntityType="BarsWeb.Areas.Cash.Models.V_CLIM_ATM_LIMIT_ARC" Width="1.5" PointX="25.625" PointY="15.875" />
+        <EntityTypeShape EntityType="BarsWeb.Areas.Cash.Models.CLIM_ACCOUNT_LIMIT_ARC" Width="1.5" PointX="0.75" PointY="10.125" />
+        <AssociationConnector Association="BarsWeb.Areas.Cash.Models.FK_CLIMACCLIMITARC_ACCID" />
+        <EntityTypeShape EntityType="BarsWeb.Areas.Cash.Models.V_CLIM_ACCOUNT_LIMIT_ARC" Width="1.5" PointX="21.25" PointY="12.875" />
+        <EntityTypeShape EntityType="BarsWeb.Areas.Cash.Models.V_CLIM_MFO_LIMIT_ARC" Width="1.5" PointX="19" PointY="5.625" />
+        <EntityTypeShape EntityType="BarsWeb.Areas.Cash.Models.V_CLIM_BRANCH_LIMIT_ARC" Width="1.5" PointX="19" PointY="9.5" />
+        <EntityTypeShape EntityType="BarsWeb.Areas.Cash.Models.CLIM_LOG_HEADER_LOADXLS" Width="1.5" PointX="12.75" PointY="11" />
+        <EntityTypeShape EntityType="BarsWeb.Areas.Cash.Models.CLIM_LOG_LOADXLS_ACCLIM" Width="1.5" PointX="10.75" PointY="10.875" />
+        <EntityTypeShape EntityType="BarsWeb.Areas.Cash.Models.V_CLIM_LOG_LOADXLS_ACCLIM" Width="1.5" PointX="19" PointY="1" />
+        <AssociationConnector Association="BarsWeb.Areas.Cash.Models.FK_CLIMLOGLOADXLS_ACCLIM_IDSES" />
+        <EntityTypeShape EntityType="BarsWeb.Areas.Cash.Models.V_CLIM_MFOLIM" Width="1.5" PointX="21.25" PointY="3.375" />
+        </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

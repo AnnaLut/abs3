@@ -1,0 +1,513 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = "Адміністрування операцій";
+}
+
+<script src="~/Areas/Admin/Scripts/operCtrl.js"></script>
+<link href="~/Areas/Admin/Css/Oper.css" rel="stylesheet" />
+<script>
+    var access_mode = @Html.Raw(Json.Encode(ViewBag.AccessMode));
+</script>
+
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title">Довідник доступних операцій</h3>
+    </div>
+    <div class="panel-body" style="padding: 0px;">
+        <div id="OperList"></div>
+    </div>
+</div>
+<div class="panel panel-info">
+    <div class="panel-heading">
+        <h3 class="panel-title">Інформація по виділеній операції</h3>
+    </div>
+    <div class="panel-body" style="padding: 0px;">
+        <div id="tabstrip">
+            <ul>
+                <li>Карточка</li>
+                <li>Флаги та реквізити</li>
+                <li>Пов'язані операції</li>
+                <li>Балансові рахунки</li>
+                <li>Види документів</li>
+                <li>Групи контроля</li>
+                <li>Інформація</li>
+                <li>Папки</li>
+            </ul>
+            <div id="tabCards">
+                <div class="panels">
+                    <div id="CardToolbar"></div>
+                    <div id="AccountGrid"></div>
+                    <div id="AccountGridOptions"></div>
+                </div>
+            </div>
+            <div id="tabFlags">
+                <div class="panels">
+                    <div id="FlagsGrid"></div>
+                    <div id="PropsGrid"></div>
+                </div>
+            </div>
+            <div id="tabRelatedTransactions">
+                <div class="panels">
+                    <div id="RelatedTransactionsGrid"></div>
+                </div>
+            </div>
+            <div id="tabBalanceAccounts">
+                <div class="panels">
+                    <div id="BalanceAccountsGrid"></div>
+                </div>
+            </div>
+            <div id="tabVob">
+                <div class="panels">
+                    <div id="VobGrid"></div>
+                </div>
+            </div>
+            <div id="tabMonitoringGroup">
+                <div class="panels">
+                    <div id="MonitoringGroupGrid"></div>
+                </div>
+            </div>
+            <div id="tabInfo">
+                <div class="panels">
+                    <div id="info">
+                        <div id="infoBox"></div>
+                    </div>
+                </div>
+            </div>
+            <div id="tabFolders">
+                <div class="panels">
+                    <div id="FoldersGrid"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="CreateOperWindow">
+    <div class="container-fluid">
+        <div class="form-group">
+            <div class="box-left">
+                <label for="code"><b>Код</b></label>
+                <input type="text" id="code" class="form-control" placeholder="Код" maxlength="3">
+            </div>
+            <div class="box-right">
+                <label for="name"><b>Назва банківської операції</b></label>
+                <input type="text" id="name" class="form-control" placeholder="Операція" maxlength="69">
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="btnBlock">
+                <button id="btnSave" type="submit" class="k-button btnSave">Зберегти</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="EditOperWindow">
+    <div class="container-fluid">
+        <div class="form-group">
+            <div class="box-left">
+                <label for="code"><b>Код</b></label>
+                <input type="text" id="editCode" class="form-control" placeholder="Код" maxlength="3" disabled>
+            </div>
+            <div class="box-right">
+                <label for="name"><b>Назва банківської операції</b></label>
+                <input type="text" id="editName" class="form-control" placeholder="Операція" maxlength="69">
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="btnBlock">
+                <button id="btnSaveEdit" type="submit" class="k-button btnSave">Зберегти</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/x-kendo-template" id="template">
+    <div class="toolbar">
+        <button id="btn_addOper" class='btn btn-success'><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Додати</button>
+        <button id="btn_expSQL" class='btn btn-success'> Експорт операції в SQL сценарій</button>
+        <!--button id="btn_delOper" class='btn btn-danger'><span class="glyphicon glyphicon-minus" aria-hidden="true"></span> Видалити</button-->
+        <button id="btn_openEditWin" class='btn btn-success'><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> Редагувати</button>
+    </div>
+</script>
+
+<script type="text/x-kendo-template" id="addFlags-template">
+    <div class="toolbar">
+        <button id="btn_addFlag" class='btn btn-success'><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Додати</button>
+        <button id="btn_editFlag" class='btn btn-success'> Редагувати</button>
+    </div>
+</script>
+
+<div id="flags-window">
+    <div id="flags-grid" style="padding: 0px;"></div>
+</div>
+
+<div id="flag-add-window">
+    <form id="flag-form">
+        <table id="flag-tbl" class="table">
+            <tbody>
+            <tr>
+                <td>Флаг:</td>
+                <td><input id="fVal" style="width: 100%;" name="val" maxlength="1"/></td>
+            </tr>
+            <tr>
+                <td style="border-width: inherit;"></td>
+                <td style="float: right; border-width: inherit;">
+                    <button id="flag-add" class="btn btn-info">Виконати</button>
+                    <button id="flag-cencel" class="btn btn-danger" title="Відмінити"><i class="glyphicon glyphicon-remove"></i>Відмінити</button>    
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </form>
+</div>
+
+<div id="flag-edit-window">
+    <form id="flag-edit-form">
+        <table id="flag-edit-tbl" class="table">
+            <tbody>
+                <tr>
+                    <td>Задати значення:</td>
+                    <td><input id="flagVal"/></td>
+                </tr>
+                <tr>
+                    <td style="border-width: inherit;"></td>
+                    <td style="float: right; border-width: inherit;">
+                        <button id="flag-edit-add" class="btn btn-info">Виконати</button>
+                        <button id="flag-edit-cencel" class="btn btn-danger" title="Відмінити"><i class="glyphicon glyphicon-remove"></i>Відмінити</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </form>
+</div>
+
+<div id="rekv-edit-window">
+    <table id="prop-tbl-edit" class="table">
+        <tbody>
+            <tr>
+                <td>Флаг використання для вводу:</td>
+                <td>
+                    <div class="col-sm-9" style="padding-left: 0px;">
+                       
+                        <input id="flag_edit_prop" type="checkbox">
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>Ознака обов'язковості:</td>
+                <td style="width: 50%;">
+                   
+                    <input id="ozn_edit_prop" type="checkbox">
+                </td>
+            </tr>
+            <tr>
+                <td>Номер:</td>
+                <td><input id="edit_ord" style="width: 100%;" name="ord" maxlength="5" /></td>
+            </tr>
+            <tr>
+                <td>Значення:</td>
+                <td><input id="edit_val" style="width: 100%;" name="val" maxlength="100" /> </td>
+            </tr>
+            <tr>
+                <td style="border-width: inherit;"></td>
+                <td style="float: right; border-width: inherit;">
+                    <button id="prop_add_edit" class="btn btn-info">Продовжити</button>
+                    <button id="prop_cencel_edit" class="btn btn-danger" title="Відмінити"><i class="glyphicon glyphicon-remove"></i>Відмінити</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+
+
+<script type="text/x-kendo-template" id="addProps-template">
+    <div class="toolbar">
+        <button id="btn_addProp" class='btn btn-success'><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Додати</button>
+        <button id="btn_editPropm" class='btn btn-success'><span class="glyphicon " aria-hidden="true"></span> Редагувати</button>
+    </div>
+</script>
+
+<div id="props-window">
+    <div id="props-grid" style="padding: 0px;"></div>
+</div>
+
+<div id="prop-add-window">
+    <form id="prop-form">
+        <table id="prop-tbl" class="table">
+            <tbody>
+            <tr>
+                <td>Флаг використання для вводу:</td>
+                <td><input id="used" style="width: 100%;" name="used" /></td>
+            </tr>
+            <tr>
+                <td>Ознака обов'язковості:</td>
+                <td style="width: 50%;">
+                    <div class="col-sm-9" style="padding-left: 0px;">
+                        <div class="btn-group" data-toggle="buttons">
+                            <label id="labM" class="btn btn-default active">
+                                <input type="radio" id="opt_M" name="opt" value="M" checked="checked"/> M
+                            </label>
+                            <label id="labO" class="btn btn-default">
+                                <input type="radio" id="opt_O" name="opt" value="O"/> O
+                            </label>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>Номер:</td>
+                <td><input id="ord" style="width: 100%;" name="ord" maxlength="5"/></td>
+            </tr>
+            <tr>
+                <td>Значення:</td>
+                <td><input id="val" style="width: 100%;" name="val" maxlength="100"/> </td>
+            </tr>
+            <tr>
+                <td style="border-width: inherit;"></td>
+                <td style="float: right; border-width: inherit;" >
+                    <button id="prop-add" class="btn btn-info">Виконати</button>
+                    <button id="prop-cencel" class="btn btn-danger" title="Відмінити"><i class="glyphicon glyphicon-remove"></i>Відмінити</button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </form>
+</div>
+
+<script type="text/x-kendo-template" id="addBalAccounts-template">
+    <div class="toolbar" style="float: left">
+        <button id="btn_addAcc" class='btn btn-success'><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Додати</button>
+    </div>
+</script>
+
+
+<div id="accs-window">
+    <div id="accs-grid" style="padding: 0px;" ></div>
+</div>
+
+<div id="acc-add-window">
+    <form id="acc-form">
+        <table id="acc-tbl" class="table">
+            <tbody>
+                <tr>
+                    <td>
+                        Д/К:
+                    </td>
+                    <td><input id="dk" style="width: 95%;" name="dk" required/> <font color="red">**</font></td>
+                </tr>
+                <tr>
+                    <td>OB22:</td>
+                    <td><input id="ob" style="width: 95%;" name="ob" /></td>
+                </tr>
+                <tr>
+                    <td style="border-width: inherit;"></td>
+                    <td style="float: right; border-width: inherit;">
+                        <button id="acc-add" type="submit" class="btn btn-info">Виконати</button>
+                        <button id="acc-cencel" class="btn btn-danger" title="Відмінити"><i class="glyphicon glyphicon-remove"></i>Відмінити</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </form>
+</div>
+
+<script type="text/x-kendo-template" id="addTransaction-template">
+    <div class="toolbar">
+        <button id="btn_addTransaction" class='btn btn-success'><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Додати</button>        
+    </div>
+</script>
+
+<div id="transactions-window">
+    <div id="transactions-grid" style="padding: 0px;"></div>
+</div>
+
+<div id="transaction-add-window">
+    <form id="transaction-form">
+        <table id="transaction-tbl" class="table">
+            <tbody>
+                <tr>
+                    <td>Д/К:</td>
+                    <td><input id="trnsDk" style="width: 100%;" name="dk" /></td>
+                </tr>
+                <tr>
+                    <td style="border-width: inherit;"></td>
+                    <td style="float: right; border-width: inherit;">
+                        <button id="transaction-add" class="btn btn-info">Виконати</button>
+                        <button id="transaction-cencel" class="btn btn-danger" title="Відмінити"><i class="glyphicon glyphicon-remove"></i>Відмінити</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </form>
+</div>
+
+<script type="text/x-kendo-template" id="vobAddDoc-template">
+    <div class="toolbar">
+        <button id="btn_addDoc" class='btn btn-success'><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Додати</button>
+    </div>
+</script>
+
+<div id="bankDocs-window">
+    <div id="bankDocs-grid" style="padding: 0px;"></div>
+</div>
+
+<div id="vob-order-window">
+    <table id="vob-tbl" class="table">
+        <tbody>
+            <tr>
+                <td>Порядок сортування:</td>
+                <td><input id="vob-order" type="number"/></td>
+            </tr>
+            <tr>
+                <td style="border-width: inherit;"></td>
+                <td style="float: right;border-width: inherit;">
+                    <button id="vob-add" class="btn btn-info">Виконати</button>
+                    <button id="vob-cencel" class="btn btn-danger" title="Відмінити"><i class="glyphicon glyphicon-remove"></i>Відмінити</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<script type="text/x-kendo-template" id="addGroup-template">
+    <div class="toolbar">
+        <button id="btn_addGroup" class='btn btn-success'><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Додати</button>
+    </div>
+</script>
+
+<div id="groups-window">
+    <div id="groups-grid" style="padding: 0px;"></div>
+</div>
+
+<div id="group-add-window">
+    <form id="group-form">
+        <table id="groups-tbl" class="table">
+            <tbody>
+                <tr>
+                    <td>Підпис:</td>
+                    <td><input id="charge-dropdown" style="width: 100%;" name="charge"/></td>
+                </tr>
+                <tr>
+                    <td>Відповідь:</td>
+                    <td><input id="respond" style="width: 100%;" name="respond" /></td>
+                </tr>
+                <tr>
+                    <td>Приорітет:</td>
+                    <td><input id="priority" maxlength="1" style="width: 20%;" name="priority"/></td>
+                </tr>
+                <tr>
+                    <td>Додати SQL:</td>
+                    <td><input id="groups-checkbox" type="checkbox"></td>
+                </tr>
+                <tr id="sql-box" style="display: none;" class="info" >
+                    <td>Опис запиту:</td>
+                    <td><textarea id="sql" class="k-textbox" style="width: 100%;" maxlength="2048" rows="7" name="sql"></textarea></td>
+                </tr>
+                <tr>
+                    <td style="border-width: inherit;"></td>
+                    <td style="float: right; border-width: inherit;">
+                        <button id="chk-add" class="btn btn-info">Виконати</button>
+                        <button id="chk-cencel" class="btn btn-danger" title="Відмінити"><i class="glyphicon glyphicon-remove"></i>Відмінити</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </form>
+</div>
+
+<script type="text/x-kendo-template" id="addFolder-template">
+    <div class="toolbar">
+        <button id="btn_addFolder" class='btn btn-success'><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Додати</button>
+    </div>
+</script>
+
+<div id="folders-window">
+    <div id="folders-grid" style="padding: 0px;"></div>
+</div>
+
+<script type="text/x-kendo-template" id="info-template">
+    <table class="table">
+        <thead>
+            <tr class="info">
+                <th colspan="2">#:TT# . #:NAME#</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Тип банківської транзакції:</td>
+                <td><div id="info-transactions"></div></td>
+            </tr>
+            <tr>
+                <td>МФО банку:</td>
+                <td>#: MFOB != null ? MFOB : '-' #</td>
+            </tr>
+            <tr>
+                <td>Рахунок А / для ОПЛАТИ:</td>
+                <td>#: NLSM != null ? NLSM : '-' #</td>
+            </tr>
+            <tr>
+                <td>Рахунок Б / для ОПЛАТИ (980):</td>
+                <td>#: NLSK != null ? NLSK : '-' #</td>
+            </tr>
+            <tr>
+                <td>Рахунок банку А / для ВВОДУ:</td>
+                <td>#: NLSA != null ? NLSA : '-' #</td>
+            </tr>
+            <tr>
+                <td>Рахунок банку Б / для ВВОДУ:</td>
+                <td>#: NLSB != null ? NLSB : '-' #</td>
+            </tr>
+            <tr>
+                <td>Символ кассплана:</td>
+                <td>#: SK != null ? SK : '-' #</td>
+            </tr>
+            <tr>
+                <td>Формула суми-А документа:</td>
+                <td>#: S != null ? S : '-' #</td>
+            </tr>
+            <tr>
+                <td>Формула суми-Б документа:</td>
+                <td>#: S2 != null ? S2 : '-' #</td>
+            </tr>
+            <tr>
+                <td>Приорітет:</td>
+                <td>#: RANG != null ? RANG : '-' #</td>
+            </tr>
+            <tr class="info">
+                <td>Властивості мультивалютної операції</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Рахунок валют. позиції:</td>
+                <td>#: S3800 != null ? S3800 : '-' #</td>
+            </tr>
+            <tr>
+                <td>Флаги:</td>
+                <td><div id="info-flags"></div></td>
+            </tr>
+            <tr>
+                <td>Додаткові реквізити:</td>
+                <td><div id="info-props"></div></td>
+            </tr>
+            <tr>
+                <td>Види документів:</td>
+                <td><div id="info-docs"></div></td>
+            </tr>
+            <tr>
+                <td>Групи контролю:</td>
+                <td><div id="info-groups"></div></td>
+            </tr>
+            <tr class="warning">
+                <td><div id="info-rw"></div></td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+</script>
+
+
+
+
+   

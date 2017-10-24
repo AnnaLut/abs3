@@ -1,0 +1,20 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+}
+
+<link rel="stylesheet" href="~/Areas/Mbdk/Content/index.css" />
+
+<div class="container">
+    <div class="form-horizontal">
+        @{
+            if (!string.IsNullOrEmpty(ViewBag.ID))
+            {
+                @Html.Partial("MbdkRead");
+            }
+            else
+            {
+                @Html.Partial("MbdkWrite");
+            }
+        }
+    </div>
+</div>

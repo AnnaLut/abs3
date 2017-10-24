@@ -1,0 +1,237 @@
+﻿@{
+    ViewBag.Title = "";
+    Layout = null;
+}
+
+<style>
+    .form-group {
+        margin-bottom: 10px;
+    }
+
+    .form-group .k-colorpicker {
+        width: 55px;
+    }
+
+    .form-group > div > input,
+    .form-group > div > textarea,
+    .form-group > div > .k-widget {
+        margin-bottom: 5px;
+        margin-top: 5px;
+    }
+
+    .form-group > div > textarea,
+    .form-group > div > table textarea {
+        margin-bottom: 5px;
+    }
+
+    .form-group .k-datepicker {
+        width: 140px !important;
+    }
+
+    .form-group .k-datetimepicker {
+        width: 180px !important;
+    }
+
+    .form-group .k-tool-group .k-combobox,
+    .form-group .k-tool-group .k-dropdown {
+        width: 120px;
+    }
+
+    .form-group .k-tool-group .k-colorpicker {
+        width: 60px;
+        float: left;
+    }
+
+</style>
+
+
+    <h2 ng-bind="editorTitle()"></h2>
+    <div class="status " ng-class="validationClass" ng-bind="validationMessage"></div>
+    <div class="row" style="margin: 0">
+        <form kendo-validator="validator"
+              ng-submit="validate($event)"
+              class="k-content"
+              name="newTresholdForm"
+              novalidate
+              k-ignore="[]">
+            <div class="form-horizontal col-sm-11">
+                <div class="form-group">
+                    <label class="control-label col-xs-4 col-sm-4">Тип ліміту</label>
+                    <div class="col-xs-6 col-sm-6 col-md-6">
+                        <select kendo-drop-down-list="limitTypeDropDownList"
+                                style="width: 200px"
+                                k-options="limitTypeDropDownListOptions"
+                                ng-model="treshold.LimitType"
+                                ng-disabled="(treshold.Id)">
+                            <option value="CASH">
+                                Каса-МФО
+                            </option>
+                            <option value="BRANCH">
+                                Каса-ТВБВ
+                            </option>
+                            <option value="ATM">
+                                Банкомат
+                            </option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group" ng-hide="treshold.LimitType=='ATM'">
+                    <label class="control-label col-xs-4 col-sm-4">Валюта</label>
+                    <div class="col-xs-6 col-sm-6 col-md-6">
+                        <label>
+                            <input type="radio"
+                                   name="tresholdNacCurrencyFlag"
+                                   ng-model="treshold.NacCurrencyFlag"
+                                   value="0"
+                                   checked="checked"
+                                   ng-disabled="(treshold.Id)"/>
+                            національна
+                        </label>
+                        <label>
+                            <input type="radio"
+                                   name="tresholdNacCurrencyFlag"
+                                   ng-model="treshold.NacCurrencyFlag"
+                                   ng-disabled="(treshold.Id)"
+                                   value="1"/>
+                            іноземна
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group" ng-hide="treshold.LimitType=='ATM'">
+                    <label class="control-label col-xs-4 col-sm-4">Допустимий відсоток відхилення</label>
+                    <div class="col-xs-6 col-sm-6 col-md-6">
+                        <input kendo-numeric-text-box
+                               name="DeviationPercent"
+                               validationmessage="Заповніть поле"
+                               k-min="0"
+                               k-max="999"
+                               maxlength="3"
+                               k-ng-model="treshold.DeviationPercent"
+                               k-options="{format: '0',min:0,max:999}"
+                               ng-required="treshold.LimitType!='ATM'" />
+                        <span class="k-invalid-msg" data-for="DeviationPercent"></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-xs-4 col-sm-4" ng-hide="treshold.LimitType=='ATM'">К-ть допустимих днів порушення</label>
+                    <label class="control-label col-xs-4 col-sm-4" ng-show="treshold.LimitType=='ATM'">Кількість днів за які відображати порушення</label>
+                    <div class="col-xs-6 col-sm-6 col-md-6">
+                        <input kendo-numeric-text-box
+                               k-min="0"
+                               k-max="999"
+                               k-ng-model="treshold.ViolationDeys"
+                               maxlength="3"
+                               required
+                               name="ViolationDeys"
+                               validationmessage="Заповніть поле"
+                               k-options="{format: '0'}" />
+                        <span class="k-invalid-msg" data-for="ViolationDeys"></span>
+                    </div>
+
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-xs-4 col-sm-4">Колір при порушенні</label>
+                    <div class="col-xs-6 col-sm-6 col-md-6">
+                        <input kendo-color-picker k-options="clorPickerOptions" ng-model="treshold.ViolationColor" />
+                    </div>
+                </div>
+                @*<div class="form-group" ng-hide="treshold.LimitType=='CASH'">
+                    <label class="control-label col-xs-4 col-sm-4">Ліміт максимального завантаження (в коп.)</label>
+                    <div class="col-xs-6 col-sm-6 col-md-6">
+                        <input type="text" kendo-numeric-text-box k-min="0" k-max="999999999999999" k-options="{format: '{0:n0}'}" data-ng-model="treshold.MaxLoadLimit" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label col-xs-4 col-sm-4">Кількість днів за які відображати порушення</label>
+                    <div class="col-xs-6 col-sm-6 col-md-6">
+                        <input type="text" kendo-numeric-text-box k-min="0" k-max="999999999999999" k-options="{format: '{0:n0}'}" data-ng-model="treshold.MaxLoadLimit" />
+                    </div>
+                </div>*@
+
+                <div class="form-group">
+                    <label class="control-label col-xs-4 col-sm-4">Початок дії параметрів</label>
+                    <div class="col-xs-6 col-sm-6 col-md-6">
+
+                        <span style="padding-right: 10px">з</span>
+                        <input type="text"
+                               k-ng-model="treshold.DateStart"
+                               kendo-date-time-picker="dateStart"
+                               k-options="dateStartOptions"
+                               ng-disabled="(treshold.Id)"
+                               required
+                               name="DateStart"
+                               validationmessage="Заповніть поле" />
+                        <span class="k-invalid-msg" data-for="DateStart"></span>
+                        @*<div>
+                            <span>по</span>
+                            <input type="text" k-ng-model="treshold.DateStop" kendo-date-time-picker="dateStop" k-options="dateStopOptions" />
+                        </div>*@
+                    </div>
+                </div>
+
+                <div class="form-group" ng-hide="treshold.LimitType=='ATM'">
+                    <label class="control-label col-xs-4 col-sm-4">МФО</label>
+                    <div class="col-xs-6 col-sm-6 col-md-6">
+
+                        <table style="width: 100%">
+                            <tr>
+                                <td style="width: 100%">
+                                    <textarea class="k-textbox k-state-disabled"
+                                              disabled
+                                              k-min="1"
+                                              data-ng-model="treshold.Mfo"
+                                              name="Mfo"
+                                              validationmessage="Заповніть поле"
+                                              ng-required="treshold.LimitType!='ATM'"></textarea>
+                                </td>
+                                <td style="vertical-align: top;">
+                                    <button class="k-button"
+                                            ng-disabled="(treshold.Id)"
+                                            ng-class="treshold.Id ? 'k-state-disabled' : ''"
+                                            ng-click="showMfoHandBook()">
+                                        <i class="pf-icon pf-16 pf-book"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </table>
+                        <span class="k-invalid-msg" data-for="Mfo"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label col-xs-4 col-sm-4">Дата створення</label>
+                    <div class="col-xs-6 col-sm-6 col-md-6">
+                        <input type="text"
+                               k-ng-model="treshold.DateSet"
+                               kendo-date-time-picker="dateSet"
+                               k-options="dateStopOptions"
+                               k-format="'{0:dd/MM/yyyy HH:mm}'"
+                               disabled="disabled" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label col-xs-4 col-sm-4">Дата редагування</label>
+                    <div class="col-xs-6 col-sm-6 col-md-6">
+                        <input type="text"
+                               k-ng-model="treshold.DateUpdate"
+                               kendo-date-time-picker="dateSet"
+                               k-options="dateStopOptions"
+                               k-format="'{0:dd/MM/yyyy HH:mm}'"
+                               disabled="disabled" />
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+<div class="k-window-footer">
+    <button type="button" class="k-button" data-ng-click="tresholdWindow.close()">
+        Відмінити
+    </button>    
+    <button type="button" class="k-primary k-button" data-ng-click="saveTreshold()">
+        <i class="pf-icon pf-16 pf-save"></i> Зберегти
+    </button>
+
+</div>

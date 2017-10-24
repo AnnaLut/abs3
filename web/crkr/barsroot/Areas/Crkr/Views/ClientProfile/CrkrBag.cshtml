@@ -1,0 +1,79 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+}
+<script src="~/Areas/Crkr/Scripts/Helpers/jszip.min.js"></script>
+<script src="~/Areas/Crkr/Scripts/ClientProfile/crkrBag.js"></script>
+<link rel="stylesheet" href="~/Areas/Crkr/Content/index.css" />
+
+<div class="container-fluid">
+    <form class="form-horizontal" id="searchWarrant">
+        <div class="col-xs-6">
+            <div class="form-group">
+                <label for="fio" class="col-xs-4 control-label required">ПІБ Клієнта:</label>
+                <div class="col-xs-8">
+                    <input type="text" class="k-textbox" id="fio" name="fio" placeholder="ПІБ">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="birthday" class="col-xs-4 control-label required">Дата рождения:</label>
+                <div class="col-xs-8">
+                    <input type="text" class="k-textbox" id="clientbdate" name="clientbdate" placeholder="Дата рождения">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="doctype" class="col-xs-4 control-label">Вид документу:</label>
+                <div class="col-xs-8">
+                    <input class="form-control" id="doctype" name="doctype">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="docserial" class="col-xs-4 control-label">Серія:</label>
+                <div class="col-xs-3">
+                    <input type="text" class="k-textbox" id="docserial" name="docserial" placeholder="Серія:" pattern="[А-Яа-я]{2,3}" validationMessage="Хибна серія документу"/>
+                </div>
+                <label for="docnumber" class="col-xs-2 control-label">Номер:</label>
+                <div class="col-xs-3">
+                    <input type="text" class="k-textbox" id="docnumber" name="docnumber" placeholder="Номер:" pattern="\d{6}">
+                </div>
+            </div>
+            
+        </div>
+        
+        <div class="col-xs-6">
+            <div class="form-group">
+                <label for="kk" class="col-xs-4 control-label">OБ22:</label>
+                <div class="col-xs-8">
+                    <input type="text" class="k-textbox" id="ob22" name="ob22" placeholder="Б22:">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="icod" class="col-xs-4 control-label">ІНН Клієнта:</label>
+                <div class="col-xs-8">
+                    <input type="text" class="k-textbox" id="icod" name="icod" placeholder="ІНН" pattern="\d{10}">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="nsc" class="col-xs-4 control-label">Номер рахунку:</label>
+                <div class="col-xs-8">
+                    <input type="text" class="k-textbox" id="nsc" name="nsc" placeholder="Номер рахунку">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="branch" class="col-xs-4 control-label">МФО:</label>
+                <div class="col-xs-8">
+                    @*<input class="form-control" id="branch" name="branch">*@
+                    <input type="text" class="k-textbox" id="branch" name="branch" placeholder="/ХХХХХХ/">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-xs-4"></div>
+                <button type="submit" class="k-button right-pos" style="width: 130px"><span class="k-sprite pf-icon pf-16 pf-search" style="margin-bottom: 3px"></span> Пошук вкладів</button>
+
+            </div>
+        </div>
+    </form>
+</div>
+<br />
+<div id="toolbarHistory"></div>
+<div id="heriBag"></div>
+<br />

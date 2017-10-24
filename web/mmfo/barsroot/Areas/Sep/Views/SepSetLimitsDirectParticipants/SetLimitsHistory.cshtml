@@ -1,0 +1,88 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = "Історія встановлення лімітів прямим учасникам.";
+}
+<script src="http://cdnjs.cloudflare.com/ajax/libs/jszip/2.4.0/jszip.js"></script>
+<script src="~/Areas/Sep/Scripts/sep.setLimitsPartHistoryCtrl.js"></script>
+
+<h1>Історія встановлення лімітів прямим учасникам</h1>
+<div id="setLimitToolbarHistory"></div>
+<div id="setLimitGridHistory"></div>
+
+<script>
+    $(document).ready(function () {
+
+        $("#setLimitGridHistory").kendoGrid({
+            excel: {
+                allPages: true,
+                fileName: "Ліміти прямим учасникам.xlsx",
+                proxyURL: bars.config.urlContent("/Notary/ExportToExcel")
+            },
+            dataSource: {
+                transport: {
+                    read: {
+                        dataType: 'json',
+                        type: "GET",
+                        url: function () {
+                            return bars.config.urlContent('/sep/sepsetlimitsdirectparticipants/GetParticipantsHistoryInfo?MfoCode=@ViewBag.MFO');
+                        }
+                    }
+                },
+                pageSize: 15,
+                schema: {
+                    parse: function (response) {
+                        debugger;
+                        return response.data;
+                    },
+                    model: {
+                        fields: {
+                            DAT: { type: "string", editable: false, },
+                            USERID: { type: "string", editable: false, },
+                            LIM: { type: "string", editable: false, },
+                            LNO: { type: "string", editable: false, },
+                            DAT_SYS: { type: "string", editable: false, },
+                            FIO: { type: "string", editable: false, },
+                        }
+                    }
+                },
+                serverPaging: false,
+                serverFiltering: false,
+            },
+            sortable: true,
+            selectable: true,
+            pageable: {
+                refresh: true,
+                pageSizes: true,
+                buttonCount: 5
+            },
+            height: 450,
+            filterable: {
+                mode: "row",
+            },
+            editable: true,
+            columns:
+            [ {
+                field: "DAT",
+                title: "Банківська дата"
+            }, {
+                field: "USERID",
+                title: "Виконавець"
+            }, {
+                field: "FIO",
+                title: "ФІО виконавця"
+            },
+            {
+                field: "DAT_SYS",
+                title: "Системна дата-час"
+            },{
+                 field: "LNO",
+                 title: "Ліміт початк"
+             }, {
+                field: "LIM",
+                title: "Ліміт"
+            },
+            ]
+        });
+
+    });
+</script>

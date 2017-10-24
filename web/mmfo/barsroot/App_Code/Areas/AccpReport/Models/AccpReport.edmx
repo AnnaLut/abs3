@@ -1,0 +1,257 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="2.0" xmlns:edmx="http://schemas.microsoft.com/ado/2008/10/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="AccpReport.Store" Provider="Oracle.DataAccess.Client" ProviderManifestToken="11.2" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/02/edm/ssdl">
+        <EntityType Name="ACCP_ACCOUNTS">
+          <Key>
+            <PropertyRef Name="MFO" />
+            <PropertyRef Name="NLS" />
+          </Key>
+          <Property Name="OKPO" Type="varchar2" MaxLength="10" />
+          <Property Name="MFO" Type="varchar2" MaxLength="6" Nullable="false" />
+          <Property Name="NLS" Type="varchar2" MaxLength="14" Nullable="false" />
+          <Property Name="CHECK_ON" Type="number" Precision="2" Scale="0" />
+        </EntityType>
+        <EntityType Name="ACCP_ORDER_FEE">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="number" Precision="2" Scale="0" Nullable="false" />
+          <Property Name="TEXT" Type="varchar2" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="ACCP_ORGS">
+          <Key>
+            <PropertyRef Name="OKPO" />
+          </Key>
+          <Property Name="NAME" Type="varchar2" MaxLength="70" />
+          <Property Name="NDOG" Type="varchar2" MaxLength="20" />
+          <Property Name="DDOG" Type="date" />
+          <Property Name="OKPO" Type="varchar2" MaxLength="10" Nullable="false" />
+          <Property Name="SCOPE_DOG" Type="number" Precision="2" Scale="0" />
+          <Property Name="ORDER_FEE" Type="number" Precision="2" Scale="0" />
+          <Property Name="AMOUNT_FEE" Type="number" Precision="38" Scale="0" />
+          <Property Name="FEE_MFO" Type="varchar2" MaxLength="6" />
+          <Property Name="FEE_NLS" Type="varchar2" MaxLength="15" />
+          <Property Name="FEE_OKPO" Type="varchar2" MaxLength="10" />
+        </EntityType>
+        <EntityType Name="ACCP_SCOPE">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="number" Precision="2" Scale="0" Nullable="false" />
+          <Property Name="TEXT" Type="varchar2" MaxLength="50" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'BARS.V_ACCP_ACCOUNTS' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="V_ACCP_ACCOUNTS">
+          <Key>
+            <PropertyRef Name="OKPO" />
+          </Key>
+          <Property Name="NAME" Type="varchar2" MaxLength="70" />
+          <Property Name="DDOG" Type="date" />
+          <Property Name="NDOG" Type="varchar2" MaxLength="20" />
+          <Property Name="OKPO" Type="varchar2" MaxLength="10" Nullable="false" />
+          <Property Name="MFO" Type="varchar2" MaxLength="6" />
+          <Property Name="NLS" Type="varchar2" MaxLength="14" />
+          <Property Name="SCOPE_DOG" Type="varchar2" MaxLength="50" />
+          <Property Name="ORDER_FEE" Type="varchar2" MaxLength="50" />
+          <Property Name="AMOUNT_FEE" Type="number" Precision="38" Scale="0" />
+          <Property Name="FEE_MFO" Type="varchar2" MaxLength="6" />
+          <Property Name="FEE_NLS" Type="varchar2" MaxLength="15" />
+          <Property Name="FEE_OKPO" Type="varchar2" MaxLength="10" />
+          <Property Name="CHECK_ON" Type="number" Precision="2" Scale="0" />
+          <Property Name="FEE_TYPE_ID" Type="number" Precision="1" Scale="0" />
+          <Property Name="FEE_BY_TARIF" Type="number" Precision="38" Scale="0" />
+        </EntityType>
+        <EntityContainer Name="AccpReportStoreContainer">
+          <EntitySet Name="ACCP_ACCOUNTS" EntityType="Self.ACCP_ACCOUNTS" Schema="BARS" store:Type="Tables" />
+          <EntitySet Name="ACCP_ORDER_FEE" EntityType="Self.ACCP_ORDER_FEE" Schema="BARS" store:Type="Tables" />
+          <EntitySet Name="ACCP_ORGS" EntityType="Self.ACCP_ORGS" Schema="BARS" store:Type="Tables" />
+          <EntitySet Name="ACCP_SCOPE" EntityType="Self.ACCP_SCOPE" Schema="BARS" store:Type="Tables" />
+          <EntitySet Name="V_ACCP_ACCOUNTS" EntityType="Self.V_ACCP_ACCOUNTS" store:Type="Views" store:Schema="BARS">
+            <DefiningQuery>SELECT 
+"V_ACCP_ACCOUNTS"."NAME" AS "NAME", 
+"V_ACCP_ACCOUNTS"."DDOG" AS "DDOG", 
+"V_ACCP_ACCOUNTS"."NDOG" AS "NDOG", 
+"V_ACCP_ACCOUNTS"."OKPO" AS "OKPO", 
+"V_ACCP_ACCOUNTS"."MFO" AS "MFO", 
+"V_ACCP_ACCOUNTS"."NLS" AS "NLS", 
+"V_ACCP_ACCOUNTS"."SCOPE_DOG" AS "SCOPE_DOG", 
+"V_ACCP_ACCOUNTS"."ORDER_FEE" AS "ORDER_FEE", 
+"V_ACCP_ACCOUNTS"."AMOUNT_FEE" AS "AMOUNT_FEE", 
+"V_ACCP_ACCOUNTS"."FEE_MFO" AS "FEE_MFO", 
+"V_ACCP_ACCOUNTS"."FEE_NLS" AS "FEE_NLS", 
+"V_ACCP_ACCOUNTS"."FEE_OKPO" AS "FEE_OKPO", 
+"V_ACCP_ACCOUNTS"."CHECK_ON" AS "CHECK_ON",
+"V_ACCP_ACCOUNTS"."FEE_TYPE_ID" AS "FEE_TYPE_ID",
+"V_ACCP_ACCOUNTS"."FEE_BY_TARIF" AS "FEE_BY_TARIF"
+FROM "BARS"."V_ACCP_ACCOUNTS" "V_ACCP_ACCOUNTS"</DefiningQuery>
+          </EntitySet>
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="AccpReport" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+        <EntityType Name="ACCP_ACCOUNTS">
+          <Key>
+            <PropertyRef Name="MFO" />
+            <PropertyRef Name="NLS" />
+          </Key>
+          <Property Name="OKPO" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="MFO" Type="String" MaxLength="6" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="NLS" Type="String" MaxLength="14" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="CHECK_ON" Type="Int16" />
+        </EntityType>
+        <EntityType Name="ACCP_ORDER_FEE">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int16" Nullable="false" />
+          <Property Name="TEXT" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="ACCP_ORGS">
+          <Key>
+            <PropertyRef Name="OKPO" />
+          </Key>
+          <Property Name="NAME" Type="String" MaxLength="70" FixedLength="false" Unicode="false" />
+          <Property Name="NDOG" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="DDOG" Type="DateTime" />
+          <Property Name="OKPO" Type="String" MaxLength="10" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="SCOPE_DOG" Type="Int16" />
+          <Property Name="ORDER_FEE" Type="Int16" />
+          <Property Name="AMOUNT_FEE" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="FEE_MFO" Type="String" MaxLength="6" FixedLength="false" Unicode="false" />
+          <Property Name="FEE_NLS" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="FEE_OKPO" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="ACCP_SCOPE">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int16" Nullable="false" />
+          <Property Name="TEXT" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="V_ACCP_ACCOUNTS">
+          <Key>
+            <PropertyRef Name="OKPO" />
+          </Key>
+          <Property Name="NAME" Type="String" MaxLength="70" FixedLength="false" Unicode="false" />
+          <Property Name="DDOG" Type="DateTime" />
+          <Property Name="NDOG" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="OKPO" Type="String" MaxLength="10" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="MFO" Type="String" MaxLength="6" FixedLength="false" Unicode="false" />
+          <Property Name="NLS" Type="String" MaxLength="14" FixedLength="false" Unicode="false" />
+          <Property Name="SCOPE_DOG" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ORDER_FEE" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="AMOUNT_FEE" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="FEE_MFO" Type="String" MaxLength="6" FixedLength="false" Unicode="false" />
+          <Property Name="FEE_NLS" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="FEE_OKPO" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="CHECK_ON" Type="Int16" />
+          <Property Name="FEE_TYPE_ID" Type="Int16" Nullable="false" />
+          <Property Name="FEE_BY_TARIF" Type="Decimal" />
+        </EntityType>
+        <EntityContainer Name="Entities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="ACCP_ACCOUNTS" EntityType="Self.ACCP_ACCOUNTS" />
+          <EntitySet Name="ACCP_ORDER_FEE" EntityType="Self.ACCP_ORDER_FEE" />
+          <EntitySet Name="ACCP_ORGS" EntityType="Self.ACCP_ORGS" />
+          <EntitySet Name="ACCP_SCOPE" EntityType="Self.ACCP_SCOPE" />
+          <EntitySet Name="V_ACCP_ACCOUNTS" EntityType="Self.V_ACCP_ACCOUNTS" />
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2008/09/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="AccpReportStoreContainer" CdmEntityContainer="Entities">
+          <EntitySetMapping Name="ACCP_ACCOUNTS">
+            <EntityTypeMapping TypeName="AccpReport.ACCP_ACCOUNTS">
+              <MappingFragment StoreEntitySet="ACCP_ACCOUNTS">
+                <ScalarProperty Name="OKPO" ColumnName="OKPO" />
+                <ScalarProperty Name="MFO" ColumnName="MFO" />
+                <ScalarProperty Name="NLS" ColumnName="NLS" />
+                <ScalarProperty Name="CHECK_ON" ColumnName="CHECK_ON" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ACCP_ORDER_FEE">
+            <EntityTypeMapping TypeName="AccpReport.ACCP_ORDER_FEE">
+              <MappingFragment StoreEntitySet="ACCP_ORDER_FEE">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="TEXT" ColumnName="TEXT" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ACCP_ORGS">
+            <EntityTypeMapping TypeName="AccpReport.ACCP_ORGS">
+              <MappingFragment StoreEntitySet="ACCP_ORGS">
+                <ScalarProperty Name="NAME" ColumnName="NAME" />
+                <ScalarProperty Name="NDOG" ColumnName="NDOG" />
+                <ScalarProperty Name="DDOG" ColumnName="DDOG" />
+                <ScalarProperty Name="OKPO" ColumnName="OKPO" />
+                <ScalarProperty Name="SCOPE_DOG" ColumnName="SCOPE_DOG" />
+                <ScalarProperty Name="ORDER_FEE" ColumnName="ORDER_FEE" />
+                <ScalarProperty Name="AMOUNT_FEE" ColumnName="AMOUNT_FEE" />
+                <ScalarProperty Name="FEE_MFO" ColumnName="FEE_MFO" />
+                <ScalarProperty Name="FEE_NLS" ColumnName="FEE_NLS" />
+                <ScalarProperty Name="FEE_OKPO" ColumnName="FEE_OKPO" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ACCP_SCOPE">
+            <EntityTypeMapping TypeName="AccpReport.ACCP_SCOPE">
+              <MappingFragment StoreEntitySet="ACCP_SCOPE">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="TEXT" ColumnName="TEXT" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="V_ACCP_ACCOUNTS">
+            <EntityTypeMapping TypeName="AccpReport.V_ACCP_ACCOUNTS">
+              <MappingFragment StoreEntitySet="V_ACCP_ACCOUNTS">
+                <ScalarProperty Name="NAME" ColumnName="NAME" />
+                <ScalarProperty Name="DDOG" ColumnName="DDOG" />
+                <ScalarProperty Name="NDOG" ColumnName="NDOG" />
+                <ScalarProperty Name="OKPO" ColumnName="OKPO" />
+                <ScalarProperty Name="MFO" ColumnName="MFO" />
+                <ScalarProperty Name="NLS" ColumnName="NLS" />
+                <ScalarProperty Name="SCOPE_DOG" ColumnName="SCOPE_DOG" />
+                <ScalarProperty Name="ORDER_FEE" ColumnName="ORDER_FEE" />
+                <ScalarProperty Name="AMOUNT_FEE" ColumnName="AMOUNT_FEE" />
+                <ScalarProperty Name="FEE_MFO" ColumnName="FEE_MFO" />
+                <ScalarProperty Name="FEE_NLS" ColumnName="FEE_NLS" />
+                <ScalarProperty Name="FEE_OKPO" ColumnName="FEE_OKPO" />
+                <ScalarProperty Name="CHECK_ON" ColumnName="CHECK_ON" />
+                <ScalarProperty Name="FEE_TYPE_ID" ColumnName="FEE_TYPE_ID" />
+                <ScalarProperty Name="FEE_BY_TARIF" ColumnName="FEE_BY_TARIF" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2008/10/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="true" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="Default" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

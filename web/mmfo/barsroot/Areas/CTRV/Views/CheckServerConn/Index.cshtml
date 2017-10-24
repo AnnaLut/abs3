@@ -1,0 +1,11 @@
+﻿@{
+    ViewBag.Title = "Перевірка з'єднання з сервером валютообміну";
+}
+
+<script src="~/Areas/CTRV/Scripts/CheckServerConn/CheckServerConnCtrl.js"></script>
+<div id="content" ng-app="BarsWeb.Controllers" ng-controller="CheckServerConnCtrl">
+    <h2>@ViewBag.Title</h2>
+    <br />
+    <button type="button" class="k-button" ng-click="getStatus('/barsroot/api/ctrv/checkserverconnapi/getstatus')">Перевірити</button><br /><br />
+    <h2>{{status}}</h2>
+</div>

@@ -1,0 +1,90 @@
+﻿.containerDisplayClosed {
+    font-weight: bolder;
+}
+
+#formAddCorporation {
+    padding-top: 30px;
+    min-width: 90px;
+    min-height: 50px;
+    display: block;
+    top: 357.5px;
+    left: 651.5px;
+    z-index: 10003;
+    opacity: 1;
+    transform: scale(1);
+}
+
+.darkLayout {
+    display: block;
+    z-index: 10002;
+    opacity: 0.5;
+}
+
+.formChangeCorporationLevel {
+    width: 500px;
+}
+
+.textSubCorporation, .textChangeLevelCorporation {
+    font-size: 14px;
+}
+
+.containerTextSubCorporation, .containerSubCorporation, .containerTextChangeLevel, .containerChangeLevel {
+    margin-top: 8%;
+}
+
+.containerTextSubCorporation, .containerTextChangeLevel {
+    margin-left: 1%;
+}
+
+.containerButtonsChangeLevel {
+    margin-top: 10%;
+}
+
+.k-dirty {
+    display: none;
+}
+
+#ALT_CORP_NAMES_validationMessage {
+    display: none !important;
+}
+
+.checkAll {
+    display: inline;
+    margin-left: 5px !important;
+    margin-left: 100px;
+}
+
+.textChooseAll {
+    margin-left: 3px;
+    font-weight: 600;
+}
+
+.textSetToChecked {
+    margin-left: 50px;
+}
+
+.textValue {
+    margin-left: 25px;
+}
+
+.inputCodeTRKK {
+    width: 155px;
+    border-radius: 4px;
+    padding: 2px;
+}
+
+.codeCorp {
+    background-color: #C7C7C7 !important;
+    width: 300px;
+}
+
+.btnCodeCorp, .codeCorp {
+    margin-left: 3% !important;
+}
+.btnInstcode{
+    min-width: 60px  !important;
+}
+
+.k-grid-filter.k-state-active {
+        background-color:lightskyblue;
+}

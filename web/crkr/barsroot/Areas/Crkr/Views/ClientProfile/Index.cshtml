@@ -1,0 +1,343 @@
+@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+}
+
+<script src="~/Areas/Crkr/Scripts/Helpers/jquery.maskedinput.js"></script>
+<script src="~/Areas/Crkr/Scripts/ClientProfile/dropDownLists.js"></script>
+<script src="~/Areas/Crkr/Scripts/ClientProfile/panelAnimation.js"></script>
+<script src="~/Areas/Crkr/Scripts/ClientProfile/helperFunctions.js"></script>
+<script src="~/Areas/Crkr/Scripts/ClientProfile/clientGrids.js"></script>
+
+<script src="~/Areas/Crkr/Scripts/ClientProfile/clientProfile.js"></script>
+<script src="~/Areas/Crkr/Scripts/ClientProfile/benefProfile.js"></script>
+<link rel="stylesheet" href="~/Areas/Crkr/Content/index.css" />
+<div>
+    <div id="toolbar" class="toolbar-fixed"></div>
+    <div class="container-fluid" style="margin-top: 55px">
+        <form class="form-horizontal" id="clientProfile">
+            <div class="panel panel-primary">
+                <div class="panel-heading panel-collapsed" id="clientPanelHead">
+                    <h3 class="panel-title"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Анкета клієнта</h3>
+                    <span class="pull-right clickable glyphicon glyphicon-menu-down"></span>
+                </div>
+                <div class="panel-body">
+                    <div class="col-xs-6">
+                        <div class="form-group">
+                            <label for="lastname" class="col-xs-4 control-label required">Прізвище:</label>
+                            <div class="col-xs-8">
+                                <input type="text" class="k-textbox" id="lastname" name="lastname"
+                                       placeholder="Прізвище" required />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="firstname" class="col-xs-4 control-label required">Ім'я:</label>
+                            <div class="col-xs-8">
+                                <input type="text" class="k-textbox" id="firstname" name="firstname"
+                                       placeholder="Ім'я" required />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="middlename" class="col-xs-4 control-label required">По батькові:</label>
+                            <div class="col-xs-5">
+                                <input type="text" class="k-textbox" id="middlename" name="middlename"
+                                       placeholder="По батькові" required />
+                            </div>
+                            <div class="col-xs-3" style="margin-top: 5px">
+                                <input type="checkbox" id="middlenamecheck" class="k-checkbox">
+                                <label class="k-checkbox-label" for="middlenamecheck" style="left: 20px">Відсутнє</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="sexDropList" class="col-xs-4 control-label">Стать:</label>
+                            <div class="col-xs-8">
+                                <input class="form-control" id="sexDropList" name="sexDropList" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="birthday" class="col-xs-4 control-label">Дата народження:</label>
+                            <div class="col-xs-8">
+                                <input id="birthday" name="birthday" class="datepicker"
+                                       placeholder="Дата народження" type="date" required/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="inn" class="col-xs-4 control-label">ІНН Клієнта:</label>
+                            <div class="col-xs-5">
+                                <input type="number" class="k-textbox" id="inn" name="inn"
+                                       placeholder="Ідентифікаційний номер" required />
+                            </div>
+                            <div class="col-xs-3" style="margin-top: 5px">
+                                <input type="checkbox" id="inncheck" class="k-checkbox">
+                                <label class="k-checkbox-label" for="inncheck" style="left: 20px">Відсутнє</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="mobileNumber" class="col-xs-4 control-label">Моб. телефон:</label>
+                            <div class="col-xs-8">
+                                <input type="text" class="k-textbox" id="mobileNumber" name="mobileNumber" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-6">
+                        <div class="form-group">
+                            <label for="limit" class="col-xs-4 control-label">Ліміт:</label>
+                            <div class="col-xs-8">
+                                <input type="text" class="k-textbox" id="limit" name="limit" readonly />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="resDropList" class="col-xs-4 control-label">Ознака резидентності:</label>
+                            <div class="col-xs-8">
+                                <input class="form-control" id="resDropList" name="resDropList" required />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="country" class="col-xs-4 control-label">Громадянство:</label>
+                            <div class="col-xs-8">
+                                <input class="form-control" id="country" name="country" required />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="codeDep" class="col-xs-4 control-label">Код відділення:</label>
+                            <div class="col-xs-8">
+                                <input type="text" class="k-textbox" id="codeDep" name="codeDep" readonly />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="dateRegister" class="col-xs-4 control-label">Дата валютування:</label>
+                            <div class="col-xs-8">
+                                <input class="datepicker" placeholder="Дата реєстрації" id="dateRegister" name="dateRegister" type="date" required readonly />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone" class="col-xs-4 control-label">Телефон:</label>
+                            <div class="col-xs-8">
+                                <input type="number" class="k-textbox" id="phone" name="phone" placeholder="Телефон">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-xs-4"></div>
+                            <div class="col-xs-8">
+                                <button type="button" class="k-primary k-button next-btn" id="clientNextBtn">Далі</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-primary">
+                <div class="panel-heading" id="docPanelHead">
+                    <h3 class="panel-title"><span class="glyphicon glyphicon-file" aria-hidden="true"></span> Документ клієнта</h3>
+                    <span class="pull-right clickable glyphicon glyphicon-menu-down"></span>
+                </div>
+                <div class="panel-body">
+                    <div class="form-group">
+                        <label for="docTypeDropList" class="col-xs-2 control-label">Вид документу:</label>
+                        <div class="col-xs-4">
+                            <input class="form-control" id="docTypeDropList" name="docTypeDropList" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="organ" class="col-xs-2 control-label">Ким виданий:</label>
+                            <div class="col-xs-4">
+                                <input type="text" class="k-textbox" id="organ" name="organ" required />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group non-passp-id">
+                        <label for="serial" class="col-xs-2 control-label">Серія:</label>
+                        <div class="col-xs-2">
+                            <input type="text" class="k-textbox" id="serial" name="serial" placeholder="Серія:" />
+                        </div>
+                        <div class="col-xs-2" style="margin-top: 5px" id="checkForSerial">
+                            <input type="checkbox" id="serialcheck" class="k-checkbox">
+                            <label class="k-checkbox-label" for="serialcheck" style="left: 20px">Відсутній</label>
+                        </div>
+                        <div class="col-xs-2" style="display:none" id="emptyblock"></div>
+                        <label for="number" class="col-xs-2 control-label">Номер:</label>
+                        <div class="col-xs-4">
+                            <input type="text" class="k-textbox" id="number" name="number" placeholder="Номер:" />
+                        </div>
+                    </div>
+                    <div class="form-group passp-id">
+                        <label for="eddrid" class="col-xs-2 control-label">Запис ЄДДР:</label>
+                        <div class="col-xs-4">
+                            <input type="text" class="k-textbox" id="eddrid" name="eddrid" />
+                        </div>
+                        <label for="docid" class="col-xs-2 control-label">Документ:</label>
+                        <div class="col-xs-4">
+                            <input type="text" class="k-textbox" id="docid" name="docid" />
+                        </div>
+                    </div>
+                    <div class="form-group passp-id">
+                        <label for="actualdate" class="col-xs-2 control-label">Дійсний до:</label>
+                        <div class="col-xs-4">
+                            <input type="date" class="datepicker" id="actualdate" name="actualdate" />
+                        </div>
+                        <label for="bplace" class="col-xs-2 control-label">Місце народження:</label>
+                        <div class="col-xs-4">
+                            <input type="text" class="k-textbox" id="bplace" name="bplace" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="issueDate" class="col-xs-2 control-label">Дата видачі:</label>
+                        <div class="col-xs-3">
+                            <input type="date" class="datepicker" placeholder="Дата видачі" id="issueDate" name="issueDate" required />
+                        </div>
+                        <div class="col-xs-2"></div>
+                        <div class="col-xs-5">
+                            <button type="button" class="k-button k-primary next-btn" id="docNextBtn">Далі</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel panel-primary">
+                <div class="panel-heading" id="addressPanelHead">
+                    <h3 class="panel-title"><span class="glyphicon glyphicon-home" aria-hidden="true"></span> Адреса клієнта</h3>
+                    <span class="pull-right clickable glyphicon glyphicon-menu-down"></span>
+                </div>
+                <div class="panel-body">
+                    <div class="col-xs-6">
+                        <div class="form-group">
+                            <label for="postIndex" class="col-xs-4 control-label">Індекс:</label>
+                            <div class="col-xs-8">
+                                <input type="text" class="k-textbox" id="postIndex" name="postIndex" placeholder="Індекс" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="region" class="col-xs-4 control-label">Область:</label>
+                            <div class="col-xs-8">
+                                <input type="text" class="k-textbox" id="region" name="region"
+                                       placeholder="Область">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="area" class="col-xs-4 control-label">Район:</label>
+                            <div class="col-xs-8">
+                                <input type="text" class="k-textbox" id="area" name="area" placeholder="Район" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-6">
+                        <div class="form-group">
+                            <label for="city" class="col-xs-4 control-label">Населений пункт:</label>
+                            <div class="col-xs-8">
+                                <input type="text" class="k-textbox" id="city" name="city" placeholder="Населений пункт" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="address" class="col-xs-4 control-label">Адреса:</label>
+                            <div class="col-xs-8">
+                                <input type="text" class="k-textbox" id="address" name="address" placeholder="Адреса" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-xs-4"></div>
+                            <div class="col-xs-8">
+                                <button type="button" class="k-button k-primary next-btn" id="addressNextBtn">Далі</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel panel-primary" id="pnPayAttr">
+                <div class="panel-heading" id="reqPanelHead">
+                    <h3 class="panel-title"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> Реквізити для оплати</h3>
+                    <span class="pull-right clickable glyphicon glyphicon-menu-down"></span>
+                </div>
+                <div class="panel-body">
+                    <div class="form-group">
+                        <label for="mfo" class="col-xs-2 control-label">МФО:</label>
+                        <div class="col-xs-4" id="ml">
+                            <input class="form-control" id="mfo" name="mfo" placeholder="МФО" required />
+                        </div>
+                        <div class="col-xs-4" hidden id="me">
+                            <input type="text" class="k-textbox" id="mfoedrpou" name="mfoedrpou" placeholder="МФО" />
+                        </div>
+                        <label for="nls" class="col-xs-2 control-label">Рахунок:</label>
+                        <div class="col-xs-4" id="nl">
+                            <input type="text" class="form-control" id="nls" name="nls" placeholder="Рахунок" required />
+                        </div>
+                        <div class="col-xs-4" hidden id="ne">
+                            <input type="text" class="k-textbox" id="nlsedrpou" name="nlsedrpou" placeholder="Рахунок" />
+                        </div>
+
+                    </div>
+                    <div class="form-group only-for-funeral" style="display:none">
+                        <label for="edrpou" class="col-xs-2 control-label">ЄДРПОУ:</label>
+                        <div class="col-xs-2">
+                            <input type="text" class="k-textbox" id="edrpou" name="edrpou" placeholder="ЄДРПОУ:" readonly />
+                        </div>
+                        <div class="col-xs-2" style="margin-top: 5px">
+                            <input type="checkbox" id="edrpoucheck" class="k-checkbox">
+                            <label class="k-checkbox-label" for="edrpoucheck" style="left: 20px">Представник</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <br />
+    <div id="tabstrip">
+        <ul>
+            <li>Вклади</li>
+            <li>Вклади по похованню</li>
+            @*<li>Історія клієнта ЦРВ</li>
+            <li>Історія вкладів ЦРВ</li>
+            <li>Історія платежів ЦРВ</li>*@
+            <li>Довіреності</li>
+            <li>Заповідальне розпорядження</li>
+        </ul>
+        <div class="panels">
+            <div id="clientProfileGrid"></div>
+        </div>
+        <div class="panels">
+            <div id="depoOnFuneral"></div>
+        </div>
+        @*<div class="panels">
+            <div id="clientHistoryGrid"></div>
+        </div>
+        <div class="panels">
+            <div id="depoHistoryGrid"></div>
+        </div>
+        <div class="panels">
+            <div id="payHistoryGrid"></div>
+        </div>*@
+        <div class="panels">
+            <div id="powerOfAttorneyGrid"></div>
+        </div>
+        <div class="panels">
+            <div id="testamentaryDisposition"></div>
+        </div>
+    </div>
+
+
+    @Html.Partial("~/Areas/Crkr/PartialView/Benef.cshtml")
+
+    <div id="actual">
+        <div id="toolbarActual"></div>
+        <div id="deposit"></div>
+    </div>
+    <!--Вікно введення причини сторнування-->
+    <div id="reasonWindow">
+        <div id="window" class="contaiter">
+            <form class="form-horizontal">
+                <div class="col-xs-10">
+                    <div class="form-group">
+                        <div class="col-xs-7">
+                            <input type="text" class="k-textbox" id="reason" name="reason" placeholder="Причина запиту">
+                        </div>
+                        <div class="col-xs-3">
+                            <button type="button" id="canceled" class="k-button" style="width: 120px"><span class="k-sprite pf-icon pf-16 pf-arrow_left" style="margin-bottom: 3px"></span> Відправити</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<form id="fname" name="fname" method='post' action="getfile">
+    <input type="hidden" id="strmodel" name="strmodel" />
+</form>

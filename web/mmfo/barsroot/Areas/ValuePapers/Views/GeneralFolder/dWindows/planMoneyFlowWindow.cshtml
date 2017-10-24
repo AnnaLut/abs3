@@ -1,0 +1,49 @@
+﻿
+<div kendo-window="planMoneyFlowWindow" k-visible="false" k-modal="true"
+     k-width="1150" k-height="650" k-title="'Планові потоки грошових коштів і розрахунок IRR'" style="background-color: #F2F2F2;">
+
+    <form ng-controller="planMoneyFlowController" class="container" style="width: 1100px;">
+        <div class="row">
+            <input type="text" disabled class="k-textbox" ng-model="vm.P_KOIR" style="width:100px;" />
+            <label style="width: 100px; margin-left: 5px;">
+                <input type="radio" disabled ng-model="vm.P_RB_NEW" name="rb" ng-value="0" />
+                <span>Нові потоки</span>
+            </label>
+            <button style="background: whitesmoke;" title="Потоки" class="k-button" ng-click="openMoneyFlow()"><img src="~/Areas/ValuePapers/Content/Images/CHARTL.png"></button>
+            <button class="k-button" title="Вигрузка в Excel"><img src="~/Areas/ValuePapers/Content/Images/EXCEL.png"></button>
+            <button class="k-button" ng-disabled="gridData.NMODE1==2" title="Видалити" ng-click="delIir()"><img src="~/Areas/ValuePapers/Content/Images/STOP.png"></button>
+            <button class="k-button" title="Оновити" ng-click="refreshM()"><img src="~/Areas/ValuePapers/Content/Images/RECYCLE.png"></button>
+            <button class="k-button" title="Розрахувати еф.ставку" ng-click="calcEfectBet()"><img src="~/Areas/ValuePapers/Content/Images/A_SPEC.png"></button>
+            <input type="text" title="Реальна еф.ставка" disabled class=" k-textbox" name="P_IRR" ng-model="vm.P_IRR" style="width:130px;" />
+            <input type="text" title="Еталонна еф.ставка" disabled class="k-textbox" name="P_IRE" ng-model="vm.P_IRE" style="width:130px;" />
+            <input type="text" title="Номінальна еф.ставка" disabled class="k-textbox" name="P_IR_N0" ng-model="vm.P_IR_N0" style="width:100px;" />
+            <input type="text" title="Референс угоди" disabled class="k-textbox" name="P_REF" ng-model="vm.P_REF" style="width:100px;" />
+            <input type="text" title="ID ЦП в системі" disabled class="k-textbox" name="P_ID" ng-model="vm.P_ID" style="width:120px;" />
+            <input type="text" title="ISIN" disabled class="k-textbox" name="P_CP_ID" ng-model="vm.P_CP_ID" style="width:120px;" />            
+        </div>
+
+        <div class="row" style="margin-top: 2px;">
+            <input type="text" disabled class="k-textbox" name="KOIR" ng-model="vm.P_KOIP" style="width:100px;" />
+            <label style="width: 100px; margin-left: 5px;">
+                <input type="radio" disabled ng-model="vm.P_RB_NEW" name="rb" ng-value="1" />
+                <span>Попередні потоки</span>
+            </label>
+            <button class="k-button" title="Розрахувати потоки" ng-click="calcFlows()"><img src="~/Areas/ValuePapers/Content/Images/SORT.bmp"></button>
+            <input type="text" disabled kendo-date-picker k-options="datePickerOptions" k-ng-model="vm.P_DAT_EM" style="width:139px;" />
+            <input type="text" disabled class="k-textbox" name="KOIR" ng-model="vm.P_KY" style="width:80px;" />
+            <input type="text" disabled class="k-textbox" name="KOIR" ng-model="vm.P_CENA_KUP" sLftyle="width:80px;" />
+            <input type="text" disabled kendo-date-picker k-options="datePickerOptions" k-ng-model="vm.P_DOK" style="width:100px;" />
+            <input type="text" disabled kendo-date-picker k-options="datePickerOptions" k-ng-model="vm.P_DNK" style="width:100px;" />
+            <input type="text" disabled kendo-date-picker k-options="datePickerOptions" k-ng-model="vm.P_DATP" style="width:100px;" />
+            <input type="text" disabled class="k-textbox" name="KOIR" ng-model="vm.P_NOM_UG" style="width:90px;" />
+            <input type="text" disabled kendo-date-picker k-options="datePickerOptions" k-ng-model="vm.P_DAT_UG" style="width:100px;" />
+        </div>
+
+        <div class="row" style="margin-top: 20px;">
+            <div kendo-grid="planMoneyFlowGrid" k-options="gridOptions"></div>
+        </div>
+
+    </form>
+
+</div>
+

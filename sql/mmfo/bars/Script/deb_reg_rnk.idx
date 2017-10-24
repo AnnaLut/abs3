@@ -1,0 +1,8 @@
+begin
+  EXECUTE IMMEDIATE 
+ 'ALTER TABLE DEB_REG_RNK add CONSTRAINT PK_DEB_REG_RNK PRIMARY KEY (RNK)';
+exception when others then
+  -- ORA-02260: table can have only one primary key
+  if SQLCODE = -02260 then null;   else raise; end if; 
+end;
+/

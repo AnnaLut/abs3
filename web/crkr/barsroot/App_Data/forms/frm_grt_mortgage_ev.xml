@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<xmlform>
+  <customforms>
+    <customform name="frmV_GRT_MORTGAGE" buttonsposition="Top" columnscount="2" title="Виконання подій за договором забезпечення - іпотека">
+      <buttons defaulttype="Button">
+        <!--#include(frm_grt_btnback_warn_inc.xml)-->
+        <!--#include(frm_grt_mortgage_ev_btnsave_inc.xml)-->
+      </buttons>
+      <!--#include(frm_grt_mortgage_ev_ds_inc.xml)-->
+      <customfields>
+        <!--#include(frm_grt_deal_inc.xml)-->
+        <!--#include(frm_grt_mortgage_flds_inc.xml)-->
+        <!--#include(frm_grt_ev_flds_inc.xml)-->
+      </customfields>
+    </customform>
+  </customforms>
+</xmlform>

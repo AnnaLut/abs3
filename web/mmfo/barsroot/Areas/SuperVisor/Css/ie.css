@@ -1,0 +1,13 @@
+﻿body {
+}
+#divNbs, #divKv, #divDate {
+    float: left; 
+    margin-left: 5px;
+}
+
+#btnFilter {
+    float: left; 
+    margin-left: 5px;
+    margin-top: 23px;
+}
+

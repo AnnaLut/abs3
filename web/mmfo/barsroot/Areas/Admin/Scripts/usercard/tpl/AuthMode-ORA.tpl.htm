@@ -1,0 +1,20 @@
+﻿<script id="AuthMode-ORA" type="text/x-kendo-template">
+    <div class="container-fluid" id="container">
+        <div id="oraMode">
+            <label for="edit-ora-roles">Ролі Oracle:</label>
+            <!--<input type="text" class="form-control" id="ora-roles" readonly value="#=UserOraRoles#" />-->
+
+            <!--<div>
+                <button type="button" id="OraRoleBtn" class="k-button" title="Додати роль Oracle" disabled>
+                    <i class="pf-icon pf-16 pf-add_button"></i>
+                </button>
+            </div>-->
+
+            <div id="oraPanel" class="panel panel-default">
+                <div class="panel-body">
+                    #= UserOraRoles !== 'null' ? UserOraRoles : 'Відсутні' #
+                </div>
+            </div>
+        </div>
+    </div>
+</script>

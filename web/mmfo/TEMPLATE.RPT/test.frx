@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="05/18/2015 10:20:26" ReportInfo.Modified="05/18/2015 15:10:41" ReportInfo.CreatorVersion="2014.3.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqD6nWZEExUJ9MEhdFZpB1A6ZfSeiTM+6WLeB8pW5aURqkGwhV134I2SUIQGUGXcXiBzugrXfx7/zz4u9ohTn43Q==">
+      <TableDataSource Name="Table" Alias="lksdfj" DataType="System.Int32" Enabled="true" SelectCommand="select NUM00 RNK, CHAR00 NMK, CHAR01 OKPO, CHAR02 ADR from rs_tmp_report_data where session_id=:SESSION_ID order by id">
+        <Column Name="RNK" DataType="System.Decimal"/>
+        <Column Name="NMK" DataType="System.String"/>
+        <Column Name="OKPO" DataType="System.String"/>
+        <Column Name="ADR" DataType="System.String"/>
+        <CommandParameter Name="session_id" DataType="112" Expression="[session_id]" DefaultValue="0"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="session_id" DataType="System.Int32"/>
+  </Dictionary>
+  <ReportPage Name="Page1">
+    <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="37.8"/>
+    <PageHeaderBand Name="PageHeader1" Top="43.21" Width="718.2" Height="85.05">
+      <TextObject Name="Text2" Left="75.6" Top="9.45" Width="491.4" Height="56.7" Border.Lines="All" Fill.Color="LightGray" Text="Звіт М" HorzAlign="Center"/>
+    </PageHeaderBand>
+    <DataBand Name="Data1" Top="133.66" Width="718.2" Height="18.9" DataSource="Table">
+      <TableObject Name="Table1" Left="9.45" Width="472.5" Height="18.9">
+        <TableColumn Name="Column1" Width="207.9"/>
+        <TableColumn Name="Column2"/>
+        <TableColumn Name="Column3"/>
+        <TableColumn Name="Column4"/>
+        <TableColumn Name="Column5"/>
+        <TableRow Name="Row1">
+          <TableCell Name="Cell1" Border.Lines="All" Text="[lksdfj.RNK]"/>
+          <TableCell Name="Cell2" Border.Lines="All" Text="[lksdfj.NMK]"/>
+          <TableCell Name="Cell3" Border.Lines="All" Text="[lksdfj.OKPO]"/>
+          <TableCell Name="Cell4" Border.Lines="All" Text="[lksdfj.ADR]"/>
+          <TableCell Name="Cell5" Border.Lines="All"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+    <PageFooterBand Name="PageFooter1" Top="157.97" Width="718.2" Height="18.9"/>
+  </ReportPage>
+</Report>

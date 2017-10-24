@@ -1,0 +1,638 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="09/13/2016 18:12:42" ReportInfo.Modified="09/27/2016 07:54:48" ReportInfo.CreatorVersion="2014.1.2.0">
+  <ScriptText>using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows.Forms;
+using System.Drawing;
+using System.Data;
+using FastReport;
+using FastReport.Data;
+using FastReport.Dialog;
+using FastReport.Barcode;
+using FastReport.Table;
+using FastReport.Utils;
+
+namespace FastReport
+{
+  public class ReportScript
+  {
+
+      private void Data1_AfterData(object sender, EventArgs e)
+    {
+      if(  ((Decimal)Report.GetColumnValue(&quot;zvit264.BIS&quot;)) == 0) 
+      { Row3.Visible = true;
+        Row4.Visible = true;
+        Row5.Visible = true;
+        Row6.Visible = true;
+        
+        Row14.Visible = false;
+        Row15.Visible = false;
+        Row16.Visible = false;
+        Row17.Visible = false;
+        Row18.Visible = false;
+        
+        Row19.Visible = false;
+        Row20.Visible = false;
+        Row21.Visible = false;
+        Row22.Visible = false;
+        Row23.Visible = false;
+        
+        Row24.Visible = false;
+        Row25.Visible = false;
+        Row26.Visible = false;
+        Row27.Visible = false;
+        Row28.Visible = false;
+        
+        Row29.Visible = false;
+        Row30.Visible = false;
+        Row31.Visible = false;
+        Row32.Visible = false;
+        Row33.Visible = false;
+        
+        Row13.Visible = false;
+      }
+      else 
+      { Row3.Visible = false;
+        Row4.Visible = false;
+        Row5.Visible = false;
+        Row6.Visible = false;
+        
+        Row14.Visible = false;
+        Row15.Visible = false;
+        Row16.Visible = false;
+        Row17.Visible = false;
+        Row18.Visible = false;
+        
+        Row19.Visible = false;
+        Row20.Visible = false;
+        Row21.Visible = false;
+        Row22.Visible = false;
+        Row23.Visible = false;
+        
+        Row24.Visible = false;
+        Row25.Visible = false;
+        Row26.Visible = false;
+        Row27.Visible = false;
+        Row28.Visible = false;
+        
+        Row29.Visible = false;
+        Row30.Visible = false;
+        Row31.Visible = false;
+        Row32.Visible = false;
+        Row33.Visible = false;
+        
+        Row13.Visible = true;
+      }
+                
+      if(  ((Decimal)Report.GetColumnValue(&quot;zvit264.DK&quot;)) == 21) 
+      { Row3.Visible = false;
+        Row4.Visible = false;
+        Row5.Visible = false;
+        Row6.Visible = false;
+        
+        Row14.Visible = true;
+        Row15.Visible = true;
+        Row16.Visible = true;
+        Row17.Visible = true;
+        Row18.Visible = true;
+        
+        Row19.Visible = false;
+        Row20.Visible = false;
+        Row21.Visible = false;
+        Row22.Visible = false;
+        Row23.Visible = false;
+        
+        Row24.Visible = false;
+        Row25.Visible = false;
+        Row26.Visible = false;
+        Row27.Visible = false;
+        Row28.Visible = false;
+        
+        Row29.Visible = false;
+        Row30.Visible = false;
+        Row31.Visible = false;
+        Row32.Visible = false;
+        Row33.Visible = false;
+        
+        Row13.Visible = false;
+      }  
+      if(  ((Decimal)Report.GetColumnValue(&quot;zvit264.DK&quot;)) == 31) 
+      { Row3.Visible = false;
+        Row4.Visible = false;
+        Row5.Visible = false;
+        Row6.Visible = false;
+        
+        Row14.Visible = false;
+        Row15.Visible = false;
+        Row16.Visible = false;
+        Row17.Visible = false;
+        Row18.Visible = false;
+             
+        Row19.Visible = true;
+        Row20.Visible = true;
+        Row21.Visible = true;
+        Row22.Visible = true;
+        Row23.Visible = true;
+        
+        Row24.Visible = false;
+        Row25.Visible = false;
+        Row26.Visible = false;
+        Row27.Visible = false;
+        Row28.Visible = false;
+        
+        Row29.Visible = false;
+        Row30.Visible = false;
+        Row31.Visible = false;
+        Row32.Visible = false;
+        Row33.Visible = false;
+                                      
+        Row13.Visible = false;
+      }  
+      if(  ((Decimal)Report.GetColumnValue(&quot;zvit264.DK&quot;)) == 2) 
+      { Row3.Visible = false;
+        Row4.Visible = false;
+        Row5.Visible = false;
+        Row6.Visible = false;
+        
+        Row14.Visible = false;
+        Row15.Visible = false;
+        Row16.Visible = false;
+        Row17.Visible = false;
+        Row18.Visible = false;
+        
+        Row19.Visible = false;
+        Row20.Visible = false;
+        Row21.Visible = false;
+        Row22.Visible = false;
+        Row23.Visible = false;
+        
+        Row24.Visible = true;
+        Row25.Visible = true;
+        Row26.Visible = true;
+        Row27.Visible = true;
+        Row28.Visible = true;
+        
+        Row29.Visible = false;
+        Row30.Visible = false;
+        Row31.Visible = false;
+        Row32.Visible = false;
+        Row33.Visible = false;
+        
+        Row13.Visible = false;
+      }  
+       
+      if( ((Decimal)Report.GetColumnValue(&quot;zvit264.VOBSRT&quot;))  == 2) 
+      { Row3.Visible = false;
+        Row4.Visible = false;
+        Row5.Visible = false;
+        Row6.Visible = false;
+        
+        Row14.Visible = false;
+        Row15.Visible = false;
+        Row16.Visible = false;
+        Row17.Visible = false;
+        Row18.Visible = false;
+        
+        Row19.Visible = false;
+        Row20.Visible = false;
+        Row21.Visible = false;
+        Row22.Visible = false;
+        Row23.Visible = false;
+        
+        Row24.Visible = false;
+        Row25.Visible = false;
+        Row26.Visible = false;
+        Row27.Visible = false;
+        Row28.Visible = false;
+        
+        Row29.Visible = true;
+        Row30.Visible = true;
+        Row31.Visible = true;
+        Row32.Visible = true;
+        Row33.Visible = true;
+        
+        Row13.Visible = false;
+      }    
+    }
+      
+
+
+    private void Text5_AfterData(object sender, EventArgs e)
+    {
+      if (((DateTime)Report.GetParameterValue(&quot;sFdat1&quot;))&lt;((DateTime)Report.GetParameterValue(&quot;sFdat2&quot;)))
+      {
+        Text5.Visible = true;
+        Text6.Visible = false;
+      }
+    }
+
+    private void Text6_AfterData(object sender, EventArgs e)
+    {
+      if (((DateTime)Report.GetParameterValue(&quot;sFdat1&quot;))==((DateTime)Report.GetParameterValue(&quot;sFdat2&quot;)))
+      {
+        Text5.Visible = false;
+        Text6.Visible = true;
+      }   
+    }
+  }
+}
+</ScriptText>
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlq8+HCsj5mnfc2oQWOJAI1rOWOGv68sBpiXMxVx5dIqE7S+4DKv/07sM+3XfDcD0tiMyV2i1vYu2bZC4dDMhY6Kg==">
+      <TableDataSource Name="Table" Alias="zvit264" DataType="System.Int32" Enabled="true" SelectCommand="  SELECT CHAR00 FIO,&#13;&#10;         CHAR01 SRT,&#13;&#10;         NUM00 REF,&#13;&#10;         DAT00 DATD,&#13;&#10;         CHAR02 BRANCH,&#13;&#10;         NUM01 DOSR,&#13;&#10;         CHAR03 NB,&#13;&#10;         NUM02 DK,&#13;&#10;         NUM03 DKSRT,&#13;&#10;         NUM04 VOBSRT,&#13;&#10;         CHAR04 NMK,&#13;&#10;         CHAR05 OKPO,&#13;&#10;         NUM05 ACC,&#13;&#10;         CHAR06 NLS,&#13;&#10;         NUM06 KV,&#13;&#10;         CHAR07 LCV,&#13;&#10;         DAT01 FDAT,&#13;&#10;         DAT02 DAPP,&#13;&#10;         NUM07 OSTF,&#13;&#10;         CHAR08 NMS,&#13;&#10;         NUM08 S,&#13;&#10;         NUM09 SQ,&#13;&#10;         NUM10 DOSS,&#13;&#10;         NUM11 KOSS,&#13;&#10;         CHAR09 ND,&#13;&#10;         CHAR10 MFO2,&#13;&#10;         CHAR11 NB2,&#13;&#10;         CHAR12 NLS2,&#13;&#10;         CHAR13 NMK2,&#13;&#10;         CHAR14 OKPO2,&#13;&#10;         CHAR15 NAZN,&#13;&#10;         NUM12 BIS,&#13;&#10;         CHAR16 BRANCH&#13;&#10;    FROM rs_tmp_report_data&#13;&#10;   WHERE session_id = :SESSION_ID&#13;&#10;ORDER BY id">
+        <Column Name="FIO" DataType="System.String"/>
+        <Column Name="SRT" DataType="System.String"/>
+        <Column Name="REF" DataType="System.Decimal"/>
+        <Column Name="DATD" DataType="System.DateTime"/>
+        <Column Name="BRANCH" DataType="System.String"/>
+        <Column Name="DOSR" DataType="System.Decimal"/>
+        <Column Name="NB" DataType="System.String"/>
+        <Column Name="DK" DataType="System.Decimal"/>
+        <Column Name="DKSRT" DataType="System.Decimal"/>
+        <Column Name="VOBSRT" DataType="System.Decimal"/>
+        <Column Name="NMK" DataType="System.String"/>
+        <Column Name="OKPO" DataType="System.String"/>
+        <Column Name="ACC" DataType="System.Decimal"/>
+        <Column Name="NLS" DataType="System.String"/>
+        <Column Name="KV" DataType="System.Decimal"/>
+        <Column Name="LCV" DataType="System.String"/>
+        <Column Name="FDAT" DataType="System.DateTime"/>
+        <Column Name="DAPP" DataType="System.DateTime"/>
+        <Column Name="OSTF" DataType="System.Decimal"/>
+        <Column Name="NMS" DataType="System.String"/>
+        <Column Name="S" DataType="System.Decimal"/>
+        <Column Name="SQ" DataType="System.Decimal"/>
+        <Column Name="DOSS" DataType="System.Decimal"/>
+        <Column Name="KOSS" DataType="System.Decimal"/>
+        <Column Name="ND" DataType="System.String"/>
+        <Column Name="MFO2" DataType="System.String"/>
+        <Column Name="NB2" DataType="System.String"/>
+        <Column Name="NLS2" DataType="System.String"/>
+        <Column Name="NMK2" DataType="System.String"/>
+        <Column Name="OKPO2" DataType="System.String"/>
+        <Column Name="NAZN" DataType="System.String"/>
+        <Column Name="BIS" DataType="System.Decimal"/>
+        <Column Name="BRANCH1" DataType="System.String"/>
+        <CommandParameter Name="SESSION_ID" DataType="113" Expression="[session_id]" DefaultValue="0"/>
+      </TableDataSource>
+      <TableDataSource Name="Table1" Alias="user_id" DataType="System.Int32" Enabled="true" SelectCommand="select fio from staff$base where id = user_id()">
+        <Column Name="FIO" DataType="System.String"/>
+      </TableDataSource>
+      <TableDataSource Name="Table5" Alias="MFO" DataType="System.Int32" Enabled="true" SelectCommand="select sys_context('bars_gl','mfo') as MFO from dual">
+        <Column Name="MFO" DataType="System.String"/>
+      </TableDataSource>
+      <TableDataSource Name="Table6" Alias="BRANCH_NAME" DataType="System.Int32" Enabled="true" SelectCommand="SELECT val FROM params WHERE par='NAME'">
+        <Column Name="VAL" DataType="System.String"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="session_id" DataType="System.Int32" Expression="2732817"/>
+    <Parameter Name="sFdat1" DataType="System.DateTime" Expression="[Date]"/>
+    <Parameter Name="sFdat2" DataType="System.DateTime" Expression="[Date]"/>
+    <Total Name="DOSR" Expression="[zvit264.DOSS]" Evaluator="Data1" PrintOn="GroupFooter1" EvaluateCondition="[zvit264.DKSRT]==1"/>
+    <Total Name="KOSK" Expression="[zvit264.KOSS]" Evaluator="Data1" PrintOn="GroupFooter1" EvaluateCondition="[zvit264.DKSRT]==1"/>
+    <Total Name="Total" Expression="[zvit264.OSTF]+[KOSK]-[DOSR]" Evaluator="Data1"/>
+  </Dictionary>
+  <ReportPage Name="Page1">
+    <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="18.9" CanGrow="true" CanShrink="true">
+      <TableObject Name="Table8" Width="718.24" Height="18.9">
+        <TableColumn Name="Column42" Width="359.12"/>
+        <TableColumn Name="Column43" Width="359.12"/>
+        <TableRow Name="Row40">
+          <TableCell Name="Cell289" Border.Lines="Bottom" Text="Виписка по рахункам виконавця : [user_id.FIO]" Font="Arial, 8pt"/>
+          <TableCell Name="Cell290" Border.Lines="Bottom" Text="Надруковано: [Date]" HorzAlign="Right" Font="Arial, 8pt"/>
+        </TableRow>
+      </TableObject>
+    </ReportTitleBand>
+    <GroupHeaderBand Name="GroupHeader1" Top="21.66" Width="718.2" Height="126.4" CanGrow="true" CanShrink="true" StartNewPage="true" Condition="[zvit264.NLS]" SortOrder="None">
+      <TextObject Name="Text3" Width="491.4" Height="18.9" Text="[MFO.MFO] / [zvit264.NB]" VertAlign="Bottom" Font="Arial, 8pt"/>
+      <TextObject Name="Text5" Left="491.4" Width="226.8" Height="18.9" AfterDataEvent="Text5_AfterData" Text="Виписка за період: [sFdat1] - [sFdat2]" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt">
+        <Formats>
+          <DateFormat/>
+          <DateFormat/>
+        </Formats>
+      </TextObject>
+      <TextObject Name="Text4" Top="18.35" Width="491.4" Height="37.8" Text="Клієнт: [zvit264.NMK] ([zvit264.OKPO])" VertAlign="Center" Font="Arial, 8pt"/>
+      <TableObject Name="Table3" Top="55.7" Width="718.2" Height="51.21">
+        <TableColumn Name="Column32" Width="132.3"/>
+        <TableColumn Name="Column33" Width="132.3"/>
+        <TableColumn Name="Column34" Width="453.6"/>
+        <TableRow Name="Row9" Height="17.07">
+          <TableCell Name="Cell80" Border.Lines="Top" Text="Рахунок:" Font="Arial, 8pt"/>
+          <TableCell Name="Cell81" Border.Lines="Top" Text="[zvit264.NLS] ([zvit264.LCV])" Font="Arial, 8pt"/>
+          <TableCell Name="Cell82" Border.Lines="Top" Text="[zvit264.NMS]" Font="Arial, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row10" Height="17.07">
+          <TableCell Name="Cell85" Text="Попередня дата руху:" Font="Arial, 8pt"/>
+          <TableCell Name="Cell86" Text="[zvit264.DAPP]" Format="Date" Format.Format="d" Font="Arial, 8pt"/>
+          <TableCell Name="Cell87" Font="Arial, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row11" Height="17.07">
+          <TableCell Name="Cell90" Text="Вхiдний залишок на:" Font="Arial, 8pt"/>
+          <TableCell Name="Cell91" Text="[sFdat1]" Format="Date" Format.Format="d" Font="Arial, 8pt"/>
+          <TableCell Name="Cell92" Text="[zvit264.OSTF] [Switch([zvit264.OSTF]&gt; 0, &quot;Кр&quot;,[zvit264.OSTF]&lt; 0, &quot;Дт&quot;,[zvit264.OSTF]== 0, &quot;&quot;)]" Font="Arial, 8pt"/>
+        </TableRow>
+      </TableObject>
+      <TextObject Name="Text6" Left="491.4" Top="18.45" Width="226.8" Height="18.9" AfterDataEvent="Text6_AfterData" Text="Виписка за: [sFdat1]" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt">
+        <Formats>
+          <DateFormat/>
+          <DateFormat/>
+        </Formats>
+      </TextObject>
+      <TableObject Name="Table4" Top="107.5" Width="726.03" Height="18.9">
+        <TableColumn Name="Column8" Width="57.24"/>
+        <TableColumn Name="Column9" Width="94.5"/>
+        <TableColumn Name="Column10" Width="95.04"/>
+        <TableColumn Name="Column11" Width="76.14"/>
+        <TableColumn Name="Column12" Width="85.59"/>
+        <TableColumn Name="Column13" Width="158.76"/>
+        <TableColumn Name="Column14" Width="158.76"/>
+        <TableRow Name="Row2">
+          <TableCell Name="Cell28" Border.Lines="All" Border.Width="0.5" Text="МФО" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell29" Border.Lines="All" Border.Width="0.5" Text="Рахунок" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell30" Border.Lines="All" Border.Width="0.5" Text="№ Документа" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell31" Border.Lines="All" Border.Width="0.5" Text="ДЕБЕТ" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell32" Border.Lines="All" Border.Width="0.5" Text="КРЕДИТ" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell33" Border.Lines="Left, Top, Bottom" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell34" Border.Lines="Right, Top, Bottom" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+        </TableRow>
+      </TableObject>
+      <DataBand Name="Data1" Top="150.82" Width="718.2" Height="699.3" CanGrow="true" CanShrink="true" AfterDataEvent="Data1_AfterData" DataSource="Table">
+        <TableObject Name="Table2" Width="726.84" Height="699.3" GrowToBottom="true" AfterDataEvent="Table2_AfterData" RepeatHeaders="false">
+          <TableColumn Name="Column18" Width="57.24"/>
+          <TableColumn Name="Column19" Width="94.5"/>
+          <TableColumn Name="Column20" Width="95.04"/>
+          <TableColumn Name="Column21" Width="81.27"/>
+          <TableColumn Name="Column22" Width="81.27"/>
+          <TableColumn Name="Column23" Width="158.76"/>
+          <TableColumn Name="Column24" Width="158.76"/>
+          <TableRow Name="Row3">
+            <TableCell Name="Cell38" Text="[zvit264.MFO2]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+            <TableCell Name="Cell39" Text="[zvit264.NLS2]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+            <TableCell Name="Cell40" Text="[zvit264.ND]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+            <TableCell Name="Cell41" Text="[zvit264.DOSS]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+            <TableCell Name="Cell42" Text="[zvit264.KOSS]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+            <TableCell Name="Cell43" Text="[zvit264.FDAT]" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+            <TableCell Name="Cell44" Text="-&gt;[zvit264.OKPO2]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          </TableRow>
+          <TableRow Name="Row4">
+            <TableCell Name="Cell45" Font="Arial, 8pt"/>
+            <TableCell Name="Cell46" AfterDataEvent="Cell46_AfterData" Font="Arial, 8pt"/>
+            <TableCell Name="Cell47" Font="Arial, 8pt"/>
+            <TableCell Name="Cell48" Font="Arial, 8pt"/>
+            <TableCell Name="Cell49" Font="Arial, 8pt"/>
+            <TableCell Name="Cell50" Text="[zvit264.NMK2]" Font="Arial, 8pt" ColSpan="2"/>
+            <TableCell Name="Cell51" Font="Arial, 8pt"/>
+          </TableRow>
+          <TableRow Name="Row5">
+            <TableCell Name="Cell52" Font="Arial, 8pt"/>
+            <TableCell Name="Cell53" Font="Arial, 8pt"/>
+            <TableCell Name="Cell54" Font="Arial, 8pt"/>
+            <TableCell Name="Cell55" Font="Arial, 8pt"/>
+            <TableCell Name="Cell56" Font="Arial, 8pt"/>
+            <TableCell Name="Cell57" Text="[zvit264.NB2]" Font="Arial, 8pt" ColSpan="2"/>
+            <TableCell Name="Cell58" Font="Arial, 8pt"/>
+          </TableRow>
+          <TableRow Name="Row6" Height="56.7">
+            <TableCell Name="Cell59" Font="Arial, 8pt"/>
+            <TableCell Name="Cell60" Font="Arial, 8pt"/>
+            <TableCell Name="Cell61" Font="Arial, 8pt"/>
+            <TableCell Name="Cell62" Font="Arial, 8pt"/>
+            <TableCell Name="Cell63" Font="Arial, 8pt"/>
+            <TableCell Name="Cell64" Text="[zvit264.NAZN]" Font="Arial, 8pt" ColSpan="2"/>
+            <TableCell Name="Cell65" Font="Arial, 8pt"/>
+          </TableRow>
+          <TableRow Name="Row13">
+            <TableCell Name="Cell100" Font="Arial, 8pt"/>
+            <TableCell Name="Cell101" Font="Arial, 8pt"/>
+            <TableCell Name="Cell102" Font="Arial, 8pt"/>
+            <TableCell Name="Cell103" Font="Arial, 8pt"/>
+            <TableCell Name="Cell104" Font="Arial, 8pt"/>
+            <TableCell Name="Cell105" Text="[zvit264.BIS] : [zvit264.NAZN]" Font="Arial, 8pt" ColSpan="2"/>
+            <TableCell Name="Cell106" Font="Arial, 8pt"/>
+          </TableRow>
+          <TableRow Name="Row14" Height="28.35">
+            <TableCell Name="Cell107" Text="Наші запити на уточнення реквізитів:&#13;&#10;--------------------------------------" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" ColSpan="7"/>
+            <TableCell Name="Cell108" Font="Arial, 8pt"/>
+            <TableCell Name="Cell109" Font="Arial, 8pt"/>
+            <TableCell Name="Cell110" Font="Arial, 8pt"/>
+            <TableCell Name="Cell111" Font="Arial, 8pt"/>
+            <TableCell Name="Cell112" Font="Arial, 8pt"/>
+            <TableCell Name="Cell113" Font="Arial, 8pt"/>
+          </TableRow>
+          <TableRow Name="Row15">
+            <TableCell Name="Cell114" Text="[zvit264.MFO2]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+            <TableCell Name="Cell115" Text="[zvit264.NLS2]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+            <TableCell Name="Cell116" Text="[zvit264.ND]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+            <TableCell Name="Cell117" Text="[zvit264.DOSS]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+            <TableCell Name="Cell118" Text="[zvit264.KOSS]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+            <TableCell Name="Cell119" Text="[zvit264.FDAT]" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+            <TableCell Name="Cell120" Text="-&gt;[zvit264.OKPO2]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          </TableRow>
+          <TableRow Name="Row16">
+            <TableCell Name="Cell121" Font="Arial, 8pt"/>
+            <TableCell Name="Cell122" Font="Arial, 8pt"/>
+            <TableCell Name="Cell123" Font="Arial, 8pt"/>
+            <TableCell Name="Cell124" Font="Arial, 8pt"/>
+            <TableCell Name="Cell125" Font="Arial, 8pt"/>
+            <TableCell Name="Cell126" Text="[zvit264.NMK2]" Font="Arial, 8pt" ColSpan="2"/>
+            <TableCell Name="Cell127" Font="Arial, 8pt"/>
+          </TableRow>
+          <TableRow Name="Row17">
+            <TableCell Name="Cell128" Font="Arial, 8pt"/>
+            <TableCell Name="Cell129" Font="Arial, 8pt"/>
+            <TableCell Name="Cell130" Font="Arial, 8pt"/>
+            <TableCell Name="Cell131" Font="Arial, 8pt"/>
+            <TableCell Name="Cell132" Font="Arial, 8pt"/>
+            <TableCell Name="Cell133" Text="[zvit264.NB2]" Font="Arial, 8pt" ColSpan="2"/>
+            <TableCell Name="Cell134" Font="Arial, 8pt"/>
+          </TableRow>
+          <TableRow Name="Row18" Height="56.7">
+            <TableCell Name="Cell135" Font="Arial, 8pt"/>
+            <TableCell Name="Cell136" Font="Arial, 8pt"/>
+            <TableCell Name="Cell137" Font="Arial, 8pt"/>
+            <TableCell Name="Cell138" Font="Arial, 8pt"/>
+            <TableCell Name="Cell139" Font="Arial, 8pt"/>
+            <TableCell Name="Cell140" Text="[zvit264.NAZN]" Font="Arial, 8pt" ColSpan="2"/>
+            <TableCell Name="Cell141" Font="Arial, 8pt"/>
+          </TableRow>
+          <TableRow Name="Row19" Height="28.35">
+            <TableCell Name="Cell142" Text="Запити інших на уточнення реквізитів наших документів:&#13;&#10;-------------------------------------------------------" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" ColSpan="7"/>
+            <TableCell Name="Cell143" Font="Arial, 8pt"/>
+            <TableCell Name="Cell144" Font="Arial, 8pt"/>
+            <TableCell Name="Cell145" Font="Arial, 8pt"/>
+            <TableCell Name="Cell146" Font="Arial, 8pt"/>
+            <TableCell Name="Cell147" Font="Arial, 8pt"/>
+            <TableCell Name="Cell148" Font="Arial, 8pt"/>
+          </TableRow>
+          <TableRow Name="Row20">
+            <TableCell Name="Cell149" Text="[zvit264.MFO2]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+            <TableCell Name="Cell150" Text="[zvit264.NLS2]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+            <TableCell Name="Cell151" Text="[zvit264.ND]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+            <TableCell Name="Cell152" Text="[zvit264.DOSS]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+            <TableCell Name="Cell153" Text="[zvit264.KOSS]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+            <TableCell Name="Cell154" Text="[zvit264.FDAT]" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+            <TableCell Name="Cell155" Text="-&gt;[zvit264.OKPO2]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          </TableRow>
+          <TableRow Name="Row21">
+            <TableCell Name="Cell156" Font="Arial, 8pt"/>
+            <TableCell Name="Cell157" Font="Arial, 8pt"/>
+            <TableCell Name="Cell158" Font="Arial, 8pt"/>
+            <TableCell Name="Cell159" Font="Arial, 8pt"/>
+            <TableCell Name="Cell160" Font="Arial, 8pt"/>
+            <TableCell Name="Cell161" Text="[zvit264.NMK2]" Font="Arial, 8pt" ColSpan="2"/>
+            <TableCell Name="Cell162" Font="Arial, 8pt"/>
+          </TableRow>
+          <TableRow Name="Row22">
+            <TableCell Name="Cell163" Font="Arial, 8pt"/>
+            <TableCell Name="Cell164" Font="Arial, 8pt"/>
+            <TableCell Name="Cell165" Font="Arial, 8pt"/>
+            <TableCell Name="Cell166" Font="Arial, 8pt"/>
+            <TableCell Name="Cell167" Font="Arial, 8pt"/>
+            <TableCell Name="Cell168" Text="[zvit264.NB2]" Font="Arial, 8pt" ColSpan="2"/>
+            <TableCell Name="Cell169" Font="Arial, 8pt"/>
+          </TableRow>
+          <TableRow Name="Row23" Height="56.7">
+            <TableCell Name="Cell170" Font="Arial, 8pt"/>
+            <TableCell Name="Cell171" Font="Arial, 8pt"/>
+            <TableCell Name="Cell172" Font="Arial, 8pt"/>
+            <TableCell Name="Cell173" Font="Arial, 8pt"/>
+            <TableCell Name="Cell174" Font="Arial, 8pt"/>
+            <TableCell Name="Cell175" Text="[zvit264.NAZN]" Font="Arial, 8pt" ColSpan="2"/>
+            <TableCell Name="Cell176" Font="Arial, 8pt"/>
+          </TableRow>
+          <TableRow Name="Row24" Height="28.35">
+            <TableCell Name="Cell177" Text="Інформаційні повідомлення&#13;&#10;---------------------------" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" ColSpan="7"/>
+            <TableCell Name="Cell178" Font="Arial, 8pt"/>
+            <TableCell Name="Cell179" Font="Arial, 8pt"/>
+            <TableCell Name="Cell180" Font="Arial, 8pt"/>
+            <TableCell Name="Cell181" Font="Arial, 8pt"/>
+            <TableCell Name="Cell182" Font="Arial, 8pt"/>
+            <TableCell Name="Cell183" Font="Arial, 8pt"/>
+          </TableRow>
+          <TableRow Name="Row25">
+            <TableCell Name="Cell184" Text="[zvit264.MFO2]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+            <TableCell Name="Cell185" Text="[zvit264.NLS2]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+            <TableCell Name="Cell186" Text="[zvit264.ND]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+            <TableCell Name="Cell187" Text="[zvit264.DOSS]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+            <TableCell Name="Cell188" Text="[zvit264.KOSS]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+            <TableCell Name="Cell189" Text="[zvit264.FDAT]" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+            <TableCell Name="Cell190" Text="-&gt;[zvit264.OKPO2]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          </TableRow>
+          <TableRow Name="Row26">
+            <TableCell Name="Cell191" Font="Arial, 8pt"/>
+            <TableCell Name="Cell192" Font="Arial, 8pt"/>
+            <TableCell Name="Cell193" Font="Arial, 8pt"/>
+            <TableCell Name="Cell194" Font="Arial, 8pt"/>
+            <TableCell Name="Cell195" Font="Arial, 8pt"/>
+            <TableCell Name="Cell196" Text="[zvit264.NMK2]" Font="Arial, 8pt" ColSpan="2"/>
+            <TableCell Name="Cell197" Font="Arial, 8pt"/>
+          </TableRow>
+          <TableRow Name="Row27">
+            <TableCell Name="Cell198" Font="Arial, 8pt"/>
+            <TableCell Name="Cell199" Font="Arial, 8pt"/>
+            <TableCell Name="Cell200" Font="Arial, 8pt"/>
+            <TableCell Name="Cell201" Font="Arial, 8pt"/>
+            <TableCell Name="Cell202" Font="Arial, 8pt"/>
+            <TableCell Name="Cell203" Text="[zvit264.NB2]" Font="Arial, 8pt" ColSpan="2"/>
+            <TableCell Name="Cell204" Font="Arial, 8pt"/>
+          </TableRow>
+          <TableRow Name="Row28" Height="56.7">
+            <TableCell Name="Cell205" Font="Arial, 8pt"/>
+            <TableCell Name="Cell206" Font="Arial, 8pt"/>
+            <TableCell Name="Cell207" Font="Arial, 8pt"/>
+            <TableCell Name="Cell208" Font="Arial, 8pt"/>
+            <TableCell Name="Cell209" Font="Arial, 8pt"/>
+            <TableCell Name="Cell210" Text="[zvit264.NAZN]" Font="Arial, 8pt" ColSpan="2"/>
+            <TableCell Name="Cell211" Font="Arial, 8pt"/>
+          </TableRow>
+          <TableRow Name="Row29" Height="28.35">
+            <TableCell Name="Cell212" Text="Коригуючі: &#13;&#10;---------------------------" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" ColSpan="7"/>
+            <TableCell Name="Cell213" Font="Arial, 8pt"/>
+            <TableCell Name="Cell214" Font="Arial, 8pt"/>
+            <TableCell Name="Cell215" Font="Arial, 8pt"/>
+            <TableCell Name="Cell216" Font="Arial, 8pt"/>
+            <TableCell Name="Cell217" Font="Arial, 8pt"/>
+            <TableCell Name="Cell218" Font="Arial, 8pt"/>
+          </TableRow>
+          <TableRow Name="Row30">
+            <TableCell Name="Cell219" Text="[zvit264.MFO2]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+            <TableCell Name="Cell220" Text="[zvit264.NLS2]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+            <TableCell Name="Cell221" Text="[zvit264.ND]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+            <TableCell Name="Cell222" Text="[zvit264.DOSS]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+            <TableCell Name="Cell223" Text="[zvit264.KOSS]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+            <TableCell Name="Cell224" Text="[zvit264.FDAT]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+            <TableCell Name="Cell225" Text="[zvit264.OKPO2]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          </TableRow>
+          <TableRow Name="Row31">
+            <TableCell Name="Cell226" Font="Arial, 8pt"/>
+            <TableCell Name="Cell227" Font="Arial, 8pt"/>
+            <TableCell Name="Cell228" Font="Arial, 8pt"/>
+            <TableCell Name="Cell229" Font="Arial, 8pt"/>
+            <TableCell Name="Cell230" Font="Arial, 8pt"/>
+            <TableCell Name="Cell231" Text="[zvit264.NMK2]" Font="Arial, 8pt" ColSpan="2"/>
+            <TableCell Name="Cell232" Font="Arial, 8pt"/>
+          </TableRow>
+          <TableRow Name="Row32">
+            <TableCell Name="Cell233" Font="Arial, 8pt"/>
+            <TableCell Name="Cell234" Font="Arial, 8pt"/>
+            <TableCell Name="Cell235" Font="Arial, 8pt"/>
+            <TableCell Name="Cell236" Font="Arial, 8pt"/>
+            <TableCell Name="Cell237" Font="Arial, 8pt"/>
+            <TableCell Name="Cell238" Text="[zvit264.NB2]" Font="Arial, 8pt" ColSpan="2"/>
+            <TableCell Name="Cell239" Font="Arial, 8pt"/>
+          </TableRow>
+          <TableRow Name="Row33" Height="56.7">
+            <TableCell Name="Cell240" Font="Arial, 8pt"/>
+            <TableCell Name="Cell241" Font="Arial, 8pt"/>
+            <TableCell Name="Cell242" Font="Arial, 8pt"/>
+            <TableCell Name="Cell243" Font="Arial, 8pt"/>
+            <TableCell Name="Cell244" Font="Arial, 8pt"/>
+            <TableCell Name="Cell245" Text="[zvit264.NAZN]" Font="Arial, 8pt" ColSpan="2"/>
+            <TableCell Name="Cell246" Font="Arial, 8pt"/>
+          </TableRow>
+        </TableObject>
+      </DataBand>
+      <GroupFooterBand Name="GroupFooter1" Top="852.88" Width="718.2" Height="57.7">
+        <TableObject Name="Table7" Width="717.12" Height="57.7">
+          <TableColumn Name="Column35" Width="57.24"/>
+          <TableColumn Name="Column36" Width="85.59"/>
+          <TableColumn Name="Column37" Width="95.04"/>
+          <TableColumn Name="Column38" Width="76.14"/>
+          <TableColumn Name="Column39" Width="85.59"/>
+          <TableColumn Name="Column40" Width="158.76"/>
+          <TableColumn Name="Column41" Width="158.76"/>
+          <TableRow Name="Row38">
+            <TableCell Name="Cell275" Text="Оборотiв за період:" VertAlign="Center" Font="Arial, 8pt" ColSpan="3"/>
+            <TableCell Name="Cell276" Font="Arial, 8pt"/>
+            <TableCell Name="Cell277" Font="Arial, 8pt"/>
+            <TableCell Name="Cell278" Text="[DOSR]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+            <TableCell Name="Cell279" Text="[KOSK]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+            <TableCell Name="Cell280" Font="Arial, 8pt"/>
+            <TableCell Name="Cell281" Font="Arial, 8pt"/>
+          </TableRow>
+          <TableRow Name="Row12" Height="19.9">
+            <TableCell Name="Cell93" Text="Вихiдний залишок на:" VertAlign="Center" Font="Arial, 8pt" ColSpan="3"/>
+            <TableCell Name="Cell94" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+            <TableCell Name="Cell95" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+            <TableCell Name="Cell96" Text="[sFdat2]" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+            <TableCell Name="Cell97" Text="[[zvit264.OSTF]-[DOSR]+[KOSK]]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+            <TableCell Name="Cell98" Text="[Switch([zvit264.OSTF]-[DOSR]+[KOSK]&gt; 0, &quot;Кр&quot;,[zvit264.OSTF]-[DOSR]+[KOSK]&lt; 0, &quot;Дт&quot;, [zvit264.OSTF]-[DOSR]+[KOSK]== 0, &quot;&quot;)]" VertAlign="Center" Font="Arial, 8pt"/>
+            <TableCell Name="Cell99" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          </TableRow>
+          <TableRow Name="Row39">
+            <TableCell Name="Cell282" Border.Lines="Bottom" VertAlign="Center" ColSpan="7"/>
+            <TableCell Name="Cell283"/>
+            <TableCell Name="Cell284"/>
+            <TableCell Name="Cell285"/>
+            <TableCell Name="Cell286"/>
+            <TableCell Name="Cell287"/>
+            <TableCell Name="Cell288"/>
+          </TableRow>
+        </TableObject>
+      </GroupFooterBand>
+    </GroupHeaderBand>
+    <PageFooterBand Name="PageFooter1" Top="913.33" Width="718.2" Height="18.9"/>
+  </ReportPage>
+</Report>

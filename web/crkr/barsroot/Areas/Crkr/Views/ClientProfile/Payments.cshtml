@@ -1,0 +1,60 @@
+﻿<script src="~/Areas/Crkr/Scripts/CrkrBag.js"></script>
+<link rel="stylesheet" href="~/Areas/Crkr/Content/index.css" />
+<div class="container">
+    <h4>Реєстр виплат на формування</h4>
+    <form class="form-horizontal">
+        <!--Ліва колонка значень-->
+        <div class="col-md-5">
+            <div class="form-group">
+                <label for="" class="col-md-4 control-label">Кількість клієнтів:</label>
+                <div class="col-md-8">
+                    <input type="text" class="k-textbox" id="" readonly="readonly" value="Not Edit">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="" class="col-md-4 control-label">Кількість платежів:</label>
+                <div class="col-md-8">
+                    <input type="text" class="k-textbox" id="" readonly="readonly" value="Not Edit">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="" class="col-md-4 control-label">Загальна сума до зарахування:</label>
+                <div class="col-md-8">
+                    <input type="text" class="k-textbox" id="" readonly="readonly" value="Not Edit">
+                </div>
+            </div>
+        </div>
+        <!--Права колонка значень-->
+        <div class="col-md-5">
+            <div class="form-group">
+                <label for="codeDepDropList" class="col-md-4 control-label">Код відділення:</label>
+                <div class="col-md-8">
+                    <input class="form-control" id="codeDepDropList" name="codeDepDropList">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="" class="col-md-4 control-label">МФО:</label>
+                <div class="col-md-8">
+                    <input type="text" class="k-textbox" id="" placeholder="МФО">
+                </div>
+            </div>
+        </div>
+        <!--Кнопки управління-->
+        <div class="col-md-2">
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <button type="submit" class="k-button right-pos">Сформувати реєстр</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<br />
+<div id="heriBag"></div>
+<br />
+<div class="form-group">
+    <div class="col-md-12">
+        <button type="submit" class="k-button right-pos">Сформувати платежі</button>
+    </div>
+</div>
+<br />

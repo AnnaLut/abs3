@@ -1,0 +1,73 @@
+@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = "Ручне вивантаження даних";
+}
+<script src="~/Areas/IOData/Scripts/IOData/iodata.job.js"></script>
+<!--script src="~/Areas/IOData/Scripts/IOData/iodata.jobFactory.js"></script-->
+<script src="~/Areas/IOData/Scripts/IOData/iodata.httpService.js"></script>
+
+<div class="page-header">
+    <h1>
+        @ViewBag.Title
+    </h1>
+</div>
+
+<div ng-controller="IOData.Job">
+    <div class="panel panel-default">
+        <div class="row panel-body">            
+            <form class="form-inline" ng-submit="jobSubmit()">
+                <div class="col-md-5">
+                    <div class="form-group">
+                        <label for="jobs">Група вивантаження</label>
+                        <br />
+                        <select kendo-drop-down-list
+                                class="form-control"
+                                k-ng-model="JobObject.JobName"
+                                k-data-text-field="'Description'"
+                                k-data-value-field="'JobName'"
+                                k-options="jobOptions"
+                                k-data-source="jobsDataSource"
+                                style="width: 430px"></select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="date">за банківську дату</label>
+                        <br />
+                        <input kendo-date-picker
+                               class="form-control"
+                               k-ng-model="JobObject.JobDate"
+                               k-format="'dd/MM/yyyy'"
+                               k-options="jobDateOptions"
+                               style="width: 200px;" />
+                    </div>
+                </div>
+                
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-primary" ng-disabled="!isJobSelect" style="margin-left: 10px;">Виконати</button>
+                    </div>
+                    
+                
+                                
+            </form>
+        </div>
+        <div class="row panel-body">
+            <div class="col-md-7">
+                <input type="checkbox" class="k-checkbox" id="oneFileCheckbox" ng-model="oneFileChecked" ng-disabled="!isJobSelect">
+                <label class="k-checkbox-label" for="oneFileCheckbox" style="margin-left: 20px">Лише один файл</label>
+                <br />
+                <select kendo-drop-down-list="filesDropDown"
+                        class="form-control"
+                        k-ng-model="FileObject"                        
+                        k-data-text-field="'FileName'"
+                        k-data-value-field="'FileCode'"
+                        k-options="filesOptions"
+                        k-data-source="filesDataSource"
+                        style="width: 100%"
+                        ng-disabled="!isJobSelect || !oneFileChecked"
+                        ></select>
+            </div>
+        </div>
+    </div>
+
+</div>

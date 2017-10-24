@@ -1,0 +1,146 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="01/13/2017 15:29:31" ReportInfo.Modified="01/18/2017 16:45:05" ReportInfo.CreatorVersion="2014.3.2.0">
+  <Styles>
+    <Style Name="Style1" Fill.Color="Gray"/>
+  </Styles>
+  <Dictionary>
+    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoX3V4zY8FFHzkIAqmYIxZTf+gvpbNHwVPW6tQy2YDRJvw==">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select char00 okpo_otr,&#13;&#10;       char01 name_otr,&#13;&#10;       num00 clmn1,&#13;&#10;       num01 clmn2,&#13;&#10;       num02 clmn3,&#13;&#10;       char02 clmn4,&#13;&#10;       num03  clmn5,&#13;&#10;       char03 clmn6,&#13;&#10;       num04 clmn7,&#13;&#10;       num05 clmn8,&#13;&#10;       num06 clmn9,&#13;&#10;       dat00 dt1,&#13;&#10;       dat01 dt2&#13;&#10;  from rs_tmp_report_data &#13;&#10; where session_id=:session_id order by id">
+        <Column Name="OKPO_OTR" DataType="System.String"/>
+        <Column Name="NAME_OTR" DataType="System.String"/>
+        <Column Name="CLMN1" DataType="System.Decimal" Format="Number"/>
+        <Column Name="CLMN2" DataType="System.Decimal"/>
+        <Column Name="CLMN3" DataType="System.Decimal"/>
+        <Column Name="CLMN4" DataType="System.String"/>
+        <Column Name="CLMN5" DataType="System.Decimal"/>
+        <Column Name="CLMN6" DataType="System.String"/>
+        <Column Name="CLMN7" DataType="System.Decimal"/>
+        <Column Name="CLMN8" DataType="System.Decimal"/>
+        <Column Name="CLMN9" DataType="System.Decimal"/>
+        <Column Name="DT1" DataType="System.DateTime"/>
+        <Column Name="DT2" DataType="System.DateTime"/>
+        <CommandParameter Name="session_id" DataType="107" Expression="[session_id]" DefaultValue="-1"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="sFdat1" DataType="System.DateTime"/>
+    <Parameter Name="sFdat2" DataType="System.DateTime"/>
+    <Parameter Name="session_id" DataType="System.Decimal"/>
+  </Dictionary>
+  <ReportPage Name="Page1">
+    <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="75.6">
+      <TextObject Name="Text2" Left="132.3" Top="9.45" Width="481.95" Height="66.15" Text="                      Інформація щодо перерахування коштів з &#13;&#10;Оптового ринку електричної енергії України НАЕК &quot;Енергоатом&quot;, &#13;&#10;тепловим енергогенеруючим компаніям та іншим виробникам &#13;&#10;	електричної енергії з [sFdat1] по [sFdat2] " Font="Arial, 9pt"/>
+    </ReportTitleBand>
+    <PageHeaderBand Name="PageHeader1" Top="79.6" Width="718.2" Height="151.2">
+      <TableObject Name="Table1" Width="718.2" Height="151.2" CanBreak="false">
+        <TableColumn Name="Column1" Width="56.7"/>
+        <TableColumn Name="Column2" Width="151.2"/>
+        <TableColumn Name="Column3" Width="56.7"/>
+        <TableColumn Name="Column4" Width="56.7"/>
+        <TableColumn Name="Column5" Width="56.7"/>
+        <TableColumn Name="Column6" Width="56.7"/>
+        <TableColumn Name="Column7" Width="56.7"/>
+        <TableColumn Name="Column8" Width="56.7"/>
+        <TableColumn Name="Column9" Width="56.7"/>
+        <TableColumn Name="Column10" Width="56.7"/>
+        <TableColumn Name="Column11" Width="56.7"/>
+        <TableRow Name="Row1" Height="31.5">
+          <TableCell Name="Cell1" Border.Lines="All" Text="№" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" RowSpan="3"/>
+          <TableCell Name="Cell2" Border.Lines="All" Text="Найменування отримувача" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" RowSpan="3"/>
+          <TableCell Name="Cell3" Border.Lines="All" Text="Всього перераховано коштів з ОРЕ" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" ColSpan="9"/>
+          <TableCell Name="Cell4" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell5" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell26" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell27" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell28" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell29" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell30" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell31" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row2" Height="31.5">
+          <TableCell Name="Cell6" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell7" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell8" Border.Lines="All" Text="Сума, грн" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" RowSpan="2"/>
+          <TableCell Name="Cell9" Border.Lines="All" Text="в т.ч. по основному рахунку" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" ColSpan="5"/>
+          <TableCell Name="Cell10" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell32" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell33" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell34" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell35" Border.Lines="All" Text="в т.ч. по додаткових рахунках " HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" ColSpan="3"/>
+          <TableCell Name="Cell36" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell37" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row3" Height="88.2">
+          <TableCell Name="Cell11" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell12" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell13" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell14" Border.Lines="All" Text="Сума, грн" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell15" Border.Lines="All" Text="ВАТ &quot;Ощадбанк&quot;, грн" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell38" Border.Lines="All" Text="% коштів, що пішли на рахунки, відкритті в Ощадбанку від загальої суми перерахувань графи 2" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell39" Border.Lines="All" Text=" інший банк (ДКУ), грн" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell40" Border.Lines="All" Text="% коштів, що пішли на рахунки, відкритті в інших банках від загальої суми перерахувань графи 2" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell41" Border.Lines="All" Text="Сума, грн" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell42" Border.Lines="All" Text="ВАТ &quot;Ощадбанк&quot;, грн" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell43" Border.Lines="All" Text=" інший банк (ДКУ), грн" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+        </TableRow>
+      </TableObject>
+    </PageHeaderBand>
+    <DataBand Name="Data1" Top="234.8" Width="718.2" Height="18.9" CanGrow="true" CanShrink="true" Guides="75.6,18.9" DataSource="Table" KeepTogether="true">
+      <TextObject Name="Text1" Width="56.7" Height="18.9" Border.Lines="All" Text="[Table.OKPO_OTR]" Font="Arial, 9pt">
+        <Highlight>
+          <Condition Expression="[Row#]&lt;15&amp;!String.IsNullOrEmpty ([Table.OKPO_OTR])" Fill.Color="Gray" ApplyFill="true" ApplyTextFill="false"/>
+        </Highlight>
+      </TextObject>
+      <TextObject Name="Text3" Left="56.7" Width="151.2" Height="18.9" Border.Lines="All" Text="[Table.NAME_OTR]" Font="Arial, 9pt">
+        <Highlight>
+          <Condition Expression="[Row#]&lt;15&amp;!String.IsNullOrEmpty ([Table.OKPO_OTR])" Fill.Color="Gray" ApplyFill="true" ApplyTextFill="false"/>
+        </Highlight>
+      </TextObject>
+      <TextObject Name="Text5" Left="207.9" Width="56.7" Height="18.9" Border.Lines="All" Text="[Table.CLMN1]" Format="Number" Format.UseLocale="true" HorzAlign="Right" WordWrap="false" Font="Arial, 9pt" Trimming="EllipsisCharacter">
+        <Highlight>
+          <Condition Expression="[Row#]&lt;15&amp;!String.IsNullOrEmpty ([Table.OKPO_OTR])" Fill.Color="Gray" ApplyFill="true" ApplyTextFill="false"/>
+        </Highlight>
+      </TextObject>
+      <TextObject Name="Text7" Left="264.6" Width="56.7" Height="18.9" Border.Lines="All" Text="[Table.CLMN2]" Format="Number" Format.UseLocale="true" HorzAlign="Right" WordWrap="false" Font="Arial, 9pt" Trimming="EllipsisCharacter">
+        <Highlight>
+          <Condition Expression="[Row#]&lt;15&amp;!String.IsNullOrEmpty ([Table.OKPO_OTR])" Fill.Color="Gray" ApplyFill="true" ApplyTextFill="false"/>
+        </Highlight>
+      </TextObject>
+      <TextObject Name="Text9" Left="321.3" Width="56.7" Height="18.9" Border.Lines="All" Text="[Table.CLMN3]" Format="Number" Format.UseLocale="true" HorzAlign="Right" WordWrap="false" Font="Arial, 9pt" Trimming="EllipsisCharacter">
+        <Highlight>
+          <Condition Expression="[Row#]&lt;15&amp;!String.IsNullOrEmpty ([Table.OKPO_OTR])" Fill.Color="Gray" ApplyFill="true" ApplyTextFill="false"/>
+        </Highlight>
+      </TextObject>
+      <TextObject Name="Text11" Left="378" Width="56.7" Height="18.9" Border.Lines="All" Text="[Table.CLMN4]" Font="Arial, 9pt">
+        <Highlight>
+          <Condition Expression="[Row#]&lt;15&amp;!String.IsNullOrEmpty ([Table.OKPO_OTR])" Fill.Color="Gray" ApplyFill="true" ApplyTextFill="false"/>
+        </Highlight>
+      </TextObject>
+      <TextObject Name="Text13" Left="434.7" Width="56.7" Height="18.9" Border.Lines="All" Text="[Table.CLMN5]" Format="Number" Format.UseLocale="true" HorzAlign="Right" WordWrap="false" Font="Arial, 9pt" Trimming="EllipsisCharacter">
+        <Highlight>
+          <Condition Expression="[Row#]&lt;15&amp;!String.IsNullOrEmpty ([Table.OKPO_OTR])" Fill.Color="Gray" ApplyFill="true" ApplyTextFill="false"/>
+        </Highlight>
+      </TextObject>
+      <TextObject Name="Text15" Left="491.4" Width="56.7" Height="18.9" Border.Lines="All" Text="[Table.CLMN6]" Font="Arial, 9pt">
+        <Highlight>
+          <Condition Expression="[Row#]&lt;15&amp;!String.IsNullOrEmpty ([Table.OKPO_OTR])" Fill.Color="Gray" ApplyFill="true" ApplyTextFill="false"/>
+        </Highlight>
+      </TextObject>
+      <TextObject Name="Text17" Left="548.1" Width="56.7" Height="18.9" Border.Lines="All" Text="[Table.CLMN7]" Format="Number" Format.UseLocale="true" HorzAlign="Right" WordWrap="false" Font="Arial, 9pt" Trimming="EllipsisCharacter">
+        <Highlight>
+          <Condition Expression="[Row#]&lt;15&amp;!String.IsNullOrEmpty ([Table.OKPO_OTR])" Fill.Color="Gray" ApplyFill="true" ApplyTextFill="false"/>
+        </Highlight>
+      </TextObject>
+      <TextObject Name="Text18" Left="604.8" Width="56.7" Height="18.9" Border.Lines="All" Text="[Table.CLMN8]" Format="Number" Format.UseLocale="true" HorzAlign="Right" WordWrap="false" Font="Arial, 9pt" Trimming="EllipsisCharacter">
+        <Highlight>
+          <Condition Expression="[Row#]&lt;15&amp;!String.IsNullOrEmpty ([Table.OKPO_OTR])" Fill.Color="Gray" ApplyFill="true" ApplyTextFill="false"/>
+        </Highlight>
+      </TextObject>
+      <TextObject Name="Text19" Left="661.5" Width="56.7" Height="18.9" Border.Lines="All" Text="[Table.CLMN9]" Format="Number" Format.UseLocale="true" HorzAlign="Right" WordWrap="false" Font="Arial, 9pt" Trimming="EllipsisCharacter">
+        <Highlight>
+          <Condition Expression="[Row#]&lt;15&amp;!String.IsNullOrEmpty ([Table.OKPO_OTR])" Fill.Color="Gray" ApplyFill="true" ApplyTextFill="false"/>
+        </Highlight>
+      </TextObject>
+    </DataBand>
+    <PageFooterBand Name="PageFooter1" Top="257.7" Width="718.2" Height="18.9"/>
+  </ReportPage>
+</Report>

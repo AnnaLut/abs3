@@ -1,0 +1,304 @@
+﻿@{
+    Layout = null;
+    //ViewBag.Title = "";
+    var cusstype = Request.Params["custtype"];
+    var nd = "";
+}
+<div ng-controller="Credit.creditParamsCtrl" style="width: 100%">
+    <table border="0">
+        <tr>
+            <td>
+                <label>№ договору</label>
+            </td>
+            <td>
+                <label>Валюта</label>
+            </td>
+            <td>
+                <label>Ініціатива</label>  <a class='k-button' ng-click="showReferBranch('OUR_BRANCH','BRANCH,NAME','where date_closed is null')"><i class='pf-icon pf-16 pf-book'></i></a>
+            </td>
+            <td>
+                <input id="inptBranch" type="text" ng-model="credit.branchValue" ng-required="string" name="inptNum" class="k-textbox" style="width:350px" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <input id="inptNum" type="text" ng-model="credit.numValue" ng-required="string" name="inptNum" class="k-textbox" style="width:150px" />
+            </td>
+            <td>
+                <select kendo-drop-down-list name="ddlCur" id="ddlCur" style="width: 250px" k-ng-model="credit.curValue" k-options="ddlCurOptions"></select>
+            </td>
+            <td colspan="2" rowspan="6">
+                <div class="panel panel-default" style="display: inline-flex;width:100%">
+                    <div class="panel-body">
+                        <div class="form-group">
+                            <label><b>Пошук клієнта - позичальника</b></label>
+                            <table>
+                                <tr>
+                                    <td style="text-align:right">
+                                        <a class='k-button' ng-click="showReferCust('CUSTOMER','RNK,NMK,OKPO','')"><i class='pf-icon pf-16 pf-book'></i></a>
+                                    </td>
+                                    <td>
+                                        <label>OKPO</label>
+                                        <input ng-model="credit.custValue" id="refCust" name="refCust" class="k-textbox" ng-minlength="9" ng-maxlength="11" style="width:100px" />
+                                    </td>
+                                    <td>
+                                        <label>Реє. №</label>
+                                        <input id="inptRnk" type="text" ng-model="credit.rnkValue" name="inptRnk" class="k-textbox" ng-model-options="{ updateOn: 'blur' }" ng-chang="readVidd()" style="width:100px" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td colspan="2">
+                                        <input id="inptNmk" type="text" ng-model="credit.nmkValue" name="inptNmk" class="k-textbox" style="width:300px" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <label class="lbl-top">Ризик(S080)</label>
+                                    </td>
+                                    <td>
+                                        <label class="lbl-top">Кл.позичальника</label>
+                                    </td>
+                                    <td>
+                                        <label class="lbl-top">Обслуг.боргу</label>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <input id="inptSId" type="text" ng-model="credit.sIdValue" name="inptSId" class="k-textbox" style="width:30px" />
+                                        <input id="inptSCat" type="text" ng-model="credit.sCatValue" name="inptSCat" class="k-textbox" style="width:100px" />
+                                    </td>
+                                    <td>
+                                        <select kendo-drop-down-list name="ddlFin" id="ddlFin" style="width: 150px" k-ng-model="credit.finValue" k-options="ddlFinOptions"></select>
+                                    </td>
+                                    <td>
+                                        <select kendo-drop-down-list name="ddlObs" id="ddlObs" style="width: 150px" k-ng-model="credit.obsValue" k-options="ddlObsOptions"></select>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>
+                <label>Сума</label>
+            </td>
+            <td>
+                <input kendo-numeric-text-box k-min="0" k-max="999999999" k-ng-model="credit.sumValue" />
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>
+                <label>Дати:</label>
+            </td>
+            <td>
+                <table>
+                    <tr>
+                        <td width="120px"><label>Дата заключення</label></td>
+                        <td><input kendo-date-picker k-ng-model="credit.conslValue" id="dpConsl" k-options="dpConslOptions" /></td>
+                    </tr>
+                </table>
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>
+                <table>
+                    <tr>
+                        <td width="120px"><label>Дата початку</label></td>
+                        <td><input kendo-date-picker k-ng-model="credit.startValue" id="dpStart" k-options="dpConslOptions" /></td>
+                    </tr>
+                </table>
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>
+                <table>
+                    <tr>
+                        <td width="120px"><label>Дата видачі</label></td>
+                        <td><input kendo-date-picker="dpIssue" name="dpIssue" k-ng-model="credit.issueValue" k-options="dpConslOptions" data-issue-msg="Не коректна дата видачі" required /></td>
+                    </tr>
+                </table>
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>
+                <table>
+                    <tr>
+                        <td width="120px"><label>Дата завершення</label></td>
+                        <td><input kendo-date-picker="dpEnd" name="dpEnd" k-ng-model="credit.endValue" k-options="dpConslOptions" data-end-msg="Не коректна дата завершення" /></td>
+                    </tr>
+                </table>
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>
+                <label>Вид</label>
+            </td>
+            <td>
+                <label>Джерело залуч-ня коштів</label>
+            </td>
+            <td colspan="2" rowspan="8">
+                <div class="panel panel-default" style="display: inline-flex;width:100%">
+                    <div class="panel-body">
+                        <div class="form-group">
+                            <label><b>Відсотки</b></label>
+                            <table>
+                                <tr>
+                                    <td>
+                                        <label>Валюти і ставки</label>
+                                    </td>
+                                    <td>
+                                        <label class="lbl-top" ng-show="custtype==3">Базова ставка</label>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <input ng-model="credit.curValue.KV" class="k-textbox" style="width: 50px" />
+                                        <input kendo-numeric-text-box k-min="0" k-max="100" k-ng-model="credit.rateAValue" style="width: 70px" />
+                                    </td>
+                                    <td>
+                                        <input ng-model="credit.baseRateValue" ng-show="custtype==3" id="refBaseRate" name="refBaseRate" class="k-textbox" style="width: 70px" />
+                                        <a class='k-button' ng-click="showReferBRate('BRATES','BR_ID,NAME','where br_id in (select br_id from br_normal where kv=980) order by br_id desc')" ng-show="custtype==3"><i class='pf-icon pf-16 pf-book'></i></a>
+                                        <input ng-model="credit.baseRateNameValue" ng-show="custtype==3" id="refBaseNameRate" name="refBaseNameRate" class="k-textbox" style="width: 200px" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <input ng-model="credit.currBValue" class="k-textbox" style="width: 50px" />
+                                        <input kendo-numeric-text-box k-min="0" k-max="100" k-ng-model="credit.rateBValue" style="width: 70px" />
+                                    </td>
+                                    <td>
+                                        <label class="lbl-top">База нарахування</label>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <input ng-model="credit.currCValue" class="k-textbox" style="width: 50px" />
+                                        <input kendo-numeric-text-box k-min="0" k-max="100" k-ng-model="credit.rateCValue" style="width: 70px" />
+                                    </td>
+                                    <td>
+                                        <select kendo-drop-down-list name="ddlBAsey" id="ddlBAsey" style="width: 300px" k-ng-model="credit.baseyValue" k-options="ddlBaseyOptions"></select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <input ng-model="credit.currDValue" class="k-textbox" style="width: 50px" />
+                                        <input kendo-numeric-text-box k-min="0" k-max="100" k-ng-model="credit.rateDValue" style="width: 70px" />
+                                    </td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <input ng-model="credit.currEValue" class="k-textbox" style="width: 50px" />
+                                        <input kendo-numeric-text-box k-min="0" k-max="100" k-ng-model="credit.rateEValue" style="width: 70px" />
+                                    </td>
+                                    <td></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <select kendo-drop-down-list="ddlVidd" name="ddlVidd" id="ddlVidd" style="width: 200px" k-ng-model="credit.viddValue" k-options="ddlViddOptions"></select>
+            </td>
+            <td>
+                <select kendo-drop-down-list="ddlSour" name="ddlSour" id="ddlSour" style="width: 250px" k-ng-model="credit.sourValue" k-options="ddlSourOptions"></select>
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>
+                <label>Ціль</label>
+            </td>
+            <td>
+                <label>Продукт</label>
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>
+                <select kendo-drop-down-list name="ddlAim" id="ddlAim" style="width: 200px" k-ng-model="credit.aimValue" k-options="ddlAimOptions"></select>
+            </td>
+            <td>
+                <input ng-model="credit.prodValue" id="refProd" name="refProd" class="k-textbox" style="width: 200px" />
+                <a class='k-button' ng-click="showReferProd('CC_POTRA','ID,NAME')"><i class='pf-icon pf-16 pf-book'></i></a>
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <input ng-model="credit.prodNameValue" id="refProdName" name="refProdName" class="k-textbox" style="width:400px" />
+            </td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <input type="checkbox" ng-model="credit.serviceValue" id="chkService" name="chkService" />  <label>Обслуговування по схемі "Ануїтет"</label>
+            </td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td><br /></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td><br /></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td colspan="4">
+                <label>Платіжні інструкції</label>
+                <input type="text" ng-model="credit.mfoValue" ng-disabled="true" class="k-textbox" style="width: 100px" />
+                <a class='k-button' ng-click="showReferBanks('BANKS','MFO,SAB,NB','where blk!=4')"><i class='pf-icon pf-16 pf-book'></i></a>
+                <input type="text" name="nls" id="nls" ng-model="credit.nlsValue" class="k-textbox" style="width: 200px" data-nls-msg="Не вірний контрольний розряд рахунку"/>
+                <input type="text" ng-model="credit.branchNameValue" disabled="disabled" class="k-textbox" style="width: 400px" />
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <label class="lbl-top">Докладно: Опис мети</label>
+            </td>
+            <td colspan="2">
+                <label class="lbl-top">Докладно: Опис забезпечення</label>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <textarea id="taPurpose" name="taPurpose" ng-model="credit.purposeValue" rows="4" class="k-textbox" style="width: 400px"></textarea>
+            </td>
+            <td colspan="2">
+                <textarea id="taGuarantee" name="taGuarantee" ng-model="credit.guaranteeValue" rows="4" class="k-textbox" style="width: 400px"></textarea>
+            </td>
+        </tr>
+    </table>
+</div>

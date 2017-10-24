@@ -1,0 +1,313 @@
+@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+}
+
+<link rel="stylesheet" href="~/Areas/Crkr/Content/index.css" />
+<script src="~/Areas/Crkr/Scripts/DepositProfile/depositGrids.js"></script>
+<script src="~/Areas/Crkr/Scripts/ClientProfile/dropDownLists.js"></script>
+<script src="~/Areas/Crkr/Scripts/DepositProfile/depositInventory.js"></script>
+
+<div id="toolbarDepo"></div>
+<div id="tabstripMain">
+    <ul>
+        <li>Вклад</li>
+        <li>Документ</li>
+        <li>Загальна інформація</li>
+    </ul>
+    <div class="panels">
+        <div class="col-xs-11">
+            <div class="form-group">
+                <label for="FIO" class="col-xs-2 control-label">ПІБ Клієнта:</label>
+                <div class="col-xs-8">
+                    <input type="text" class="k-textbox" id="FIO" name="FIO" placeholder="ПІБ"/>
+                    <input type="hidden" id="depobdate" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="ost" class="col-xs-2 control-label">Залишок:</label>
+                <div class="col-xs-8">
+                    <input type="text" class="k-textbox" id="ost" placeholder="Залишок" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="KKNAME" class="col-xs-2 control-label">Назва вкладу:</label>
+                <div class="col-xs-8">
+                    <input type="text" class="k-textbox" id="KKNAME" placeholder="Назва вкладу" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="reasonDepo" class="col-xs-2 control-label">Причина блокування:</label>
+                <div class="col-xs-8">
+                    <input type="text" class="k-textbox" id="reasonDepo" name="reasonDepo" placeholder="Причина блокування" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="ob22" class="col-xs-2 control-label">OB22:</label>
+                <div class="col-xs-8">
+                    <input class="form-control" id="ob22" name="ob22" placeholder="OB22" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="NSC" class="col-xs-2 control-label">Номер рахунку:</label>
+                <div class="col-xs-8">
+                    <input type="text" class="k-textbox" id="NSC" placeholder="Номер рахунку" />
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="panels">
+        <div class="demo-section k-content">
+            @*<h4><strong>Спадкоємець:</strong></h4>*@
+            <h4>Спадкоємець:</h4>
+            <ul class="fieldlist">
+                <li>
+                    <input type="radio" name="heir" id="heirPerson" class="k-radio" value="0" onclick="changeRadio();">
+                    <label class="k-radio-label" for="heirPerson">Фізична особа</label>
+                </li>
+                <li>
+                    <input type="radio" name="heir" id="heirCompany" class="k-radio" value="1" onclick="changeRadio();">
+                    <label class="k-radio-label" for="heirCompany">Юридична особа</label>
+                </li>
+            </ul>
+        </div>
+        <form id="document">
+            <div class="form-group" id="doc">
+                <label class="col-xs-2 control-label">Тип документа:</label>
+                <div class="col-xs-5">
+                    <input class="form-control" id="docTypeDropList" name="doctype" placeholder="Тип документа" required />
+                </div>
+                <label class="col-xs-3 nonsight-label" id="newDocTypeDropList"></label>
+            </div>
+            <div class="form-group" id="serial">
+                <label for="docserial" class="col-xs-2 control-label">Серія:</label>
+                <div class="col-xs-5">
+                    <input type="text" class="k-textbox" id="docserial" name="docserial" placeholder="Серія"/>
+                </div>
+                <label class="col-xs-3 nonsight-label" id="newdocserial"></label>
+            </div>
+            <div class="form-group" id="numb">
+                <label for="docnumber" class="col-xs-2 control-label">Номер:</label>
+                <div class="col-xs-5">
+                    <input type="text" class="k-textbox" id="docnumber" name="docnumber" placeholder="Номер" required />
+                </div>
+                <label class="col-xs-3 nonsight-label" id="newdocnumber"></label>
+            </div>
+            <div class="form-group" id="dateout">
+                <label for="docdate" class="col-xs-2 control-label">Коли виданий:</label>
+                <div class="col-xs-5">
+                    <input type="date" class="datepicker" id="docdate" name="docdate" placeholder="Коли виданий" required />
+                </div>
+                <label class="col-xs-3 nonsight-label" id="newdocdate"></label>
+            </div>
+            <div class="form-group" id="organiz">
+                <label for="docorg" class="col-xs-2 control-label">Ким виданий:</label>
+                <div class="col-xs-5">
+                    <input type="text" class="k-textbox" id="docorg" name="docorg" placeholder="Ким виданий" required />
+                </div>
+                <label class="col-xs-3 nonsight-label" id="newdocorg"></label>
+            </div>
+
+            <div class="form-group" id="namePerson">
+                <label for="docNameCompany" class="col-xs-2 control-label">Назва юр.особи:</label>
+                <div class="col-xs-5">
+                    <input type="text" class="k-textbox" id="docNameCompany" name="name_person" placeholder="Назва юр.особи"/>
+                </div>
+                <label class="col-xs-3 nonsight-label" id="newdocNameCompany"></label>
+            </div>
+            <div class="form-group" id="edrpo">
+                <label for="docCodCompany" class="col-xs-2 control-label">ЄДРПОУ:</label>
+                <div class="col-xs-5">
+                    <input type="text" class="k-textbox" id="docCodCompany" name="edrpo_person" placeholder="ЄДРПОУ" />
+                </div>
+                <label class="col-xs-3 nonsight-label" id="newdocCodCompany"></label>
+            </div>
+
+            <div class="form-group">
+                <div class="col-xs-2"></div>
+                <div class="col-xs-8">
+                    <button type="button" class="k-button k-primary" id="saveDoc">Зберегти</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="panels">
+        <div class="col-xs-11">
+            <div class="form-group">
+                <label for="dato" class="col-xs-2 control-label">Дата книжки:</label>
+                <div class="col-xs-8">
+                    <input type="text" class="k-textbox" id="dato" placeholder="Дата книжки" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="registrydate" class="col-xs-2 control-label">Дата договору:</label>
+                <div class="col-xs-8">
+                    <input type="text" class="k-textbox" id="registrydate" placeholder="Дата договору" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="datl" class="col-xs-2 control-label">Дата видачі:</label>
+                <div class="col-xs-8">
+                    <input type="text" class="k-textbox" id="datl" placeholder="Дата видачі" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="attorney" class="col-xs-2 control-label">Спадщина:</label>
+                <div class="col-xs-8">
+                    <input type="text" class="k-textbox" id="attorney" placeholder="Спадщина" value="Не отримана" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="" class="col-xs-2 control-label">Дата валютування:</label>
+                <div class="col-xs-8">
+                    <input type="text" class="k-textbox" id="datval" placeholder="Дата валютування" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="" class="col-xs-2 control-label">Дата виплат:</label>
+                <div class="col-xs-8">
+                    <input type="text" class="k-textbox" id="datpay" placeholder="Дата виплат" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="percent" class="col-xs-2 control-label">Ставка, %:</label>
+                <div class="col-xs-8">
+                    <input type="text" class="k-textbox" id="percent" placeholder="Ставка, %" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="branch" class="col-xs-2 control-label">Код відділення:</label>
+                <div class="col-xs-8">
+                    <input type="text" class="k-textbox" id="branch" placeholder="Код відділення" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="mfo" class="col-xs-2 control-label">МФО:</label>
+                <div class="col-xs-8">
+                    <input class="form-control" name="mfo" id="mfo" placeholder="МФО" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<br />
+<div id="toolbarLegend"></div>
+<div id="tabstrip">
+    <ul>
+        <li>Історія операцій</li>
+        <li>Довірені особи</li>
+        <li>Заповідальне розпорядження</li>
+        <li>Історія клієнта ЦРВ</li>
+        <li>Історія вкладів ЦРВ</li>
+        <li>Історія платежів ЦРВ</li>
+    </ul>
+    <div class="panels">
+        <div id="clientHistoryGrid"></div>
+    </div>
+    <div class="panels">
+        <div id="willsGrid"></div>
+    </div>
+    <div class="panels">
+        <div id="powerOfAttorneyGrid"></div>
+    </div>
+    <div class="panels">
+        <div id="clientHistoryGridCrv"></div>
+    </div>
+    <div class="panels">
+        <div id="depoHistoryGrid"></div>
+    </div>
+    <div class="panels">
+        <div id="payHistoryGrid"></div>
+    </div>
+</div>
+
+<style>
+    #usersForm > .col-xs-5 > .form-group {
+        height: 25px;
+    }
+</style>
+
+<!--Вікно пошуку одержувача-->
+<div id="recipWindow">
+    <div class="col-xs-10" style="width: 840px">
+        <form id="usersForm">
+            <div class="col-xs-5">
+                <div class="form-group">
+                    <label for="name" class="col-xs-4 control-label">ПІБ:</label>
+                    <div class="col-xs-5">
+                        <input type="text" class="k-textbox" id="name" name="name" placeholder="Прізвище ім'я та побатькові одержувача'" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-5">
+                <div class="form-group">
+                    <label for="inn" class="col-xs-4 control-label">ІНН:</label>
+                    <div class="col-xs-5">
+                        <input type="text" class="k-textbox" id="inn" name="inn" placeholder="ІНН" />
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="passplist" class="col-xs-2 control-label">Тип документу:</label>
+                <div class="col-xs-8">
+                    <input type="text" class="form-control" id="passplist" name="passplist" />
+                </div>
+            </div>
+            <div class="col-xs-5">
+                <div class="form-group" id="serial">
+                    <label for="ser" class="col-xs-4 control-label">Серія:</label>
+                    <div class="col-xs-5">
+                        <input type="text" class="k-textbox" id="ser" name="ser" placeholder="Серія" />
+                    </div>
+                </div>
+                <div class="form-group" id="eddr">
+                    <label for="eddr_id" class="col-xs-4 control-label">ЄДДР:</label>
+                    <div class="col-xs-5">
+                        <input type="text" class="k-textbox" id="eddr_id" name="eddr_id" placeholder="Серія" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-xs-4"></div>
+                    <div class="col-xs-5">
+                        <button type="submit" class="k-button" id="searchUser" style="width: 145px"><span class="k-sprite pf-icon pf-16 pf-search" style="margin-bottom: 3px"></span> Знайти</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-5">
+                <div class="form-group">
+                    <label for="numdoc" class="col-xs-4 control-label">Номер:</label>
+                    <div class="col-xs-5">
+                        <input type="text" class="k-textbox" id="numdoc" name="numdoc" placeholder="Номер" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-xs-4"></div>
+                    <div class="col-xs-5">
+                        <button type="button" class="k-button" id="newUser" style="width: 145px"><span class="k-sprite pf-icon pf-16 pf-add" style="margin-bottom: 3px"></span> Новий одержувач</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xs-10" style="width: 840px">
+                <div id="actualusers"></div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!--Вікно введення причини блокування вкладу-->
+<div id="askReasonWindow">
+    <div id="window" class="contaiter">
+        <form class="form-horizontal">
+            <div class="col-xs-10">
+                <div class="form-group">
+                    <div class="col-xs-7">
+                        <input type="text" class="k-textbox" id="reason" name="reason" placeholder="Причина блокування">
+                    </div>
+                    <div class="col-xs-3">
+                        <button type="button" id="blockDepo" class="k-button" style="width: 120px"><span class="k-sprite pf-icon pf-16 pf-delete" style="margin-bottom: 3px"></span> Блокувати</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

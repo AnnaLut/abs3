@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="01/23/2014 16:06:12" ReportInfo.Modified="01/23/2014 16:39:53" ReportInfo.CreatorVersion="2013.2.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqD6nWZEExUJ9MEhdFZpB1A6ZfSeiTM+6WLeB8pW5aURqkGwhV134I2SUIQGUGXcXisFyZEA+vC7uIrazNfvYqtw==">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select rownum,  b.datd,  b.ref, v.bsd, v.kv, c.nmk,c.okpo &#13;&#10;from dpt_trustee d, (select ref, datd,nlsa,  value from (&#13;&#10;select o.ref, o.datd, o.nlsa, w.value   from oper o, operw w&#13;&#10;where o.ref=w.ref&#13;&#10;and w.tag='HERIT'&#13;&#10;and o.pdat&gt;=:dat1&#13;&#10;and o.pdat &lt;=:dat2&#13;&#10;and o.tt like 'DP%'&#13;&#10;))b, customer c, dpt_DEPOSIT DD, dpt_vidd v, dpt_payments ds&#13;&#10;where d.rnk_tr=b.value&#13;&#10;and d.rnk=c.rnk&#13;&#10;and d.dpt_id=dd.deposit_id&#13;&#10;and dd.vidd=v.vidd&#13;&#10;and d.fl_act=1&#13;&#10;and ds.dpt_id=d.dpt_id&#13;&#10;and b.ref=ds.ref">
+        <Column Name="ROWNUM" DataType="System.Decimal"/>
+        <Column Name="DATD" DataType="System.DateTime"/>
+        <Column Name="REF" DataType="System.Decimal"/>
+        <Column Name="BSD" DataType="System.String"/>
+        <Column Name="KV" DataType="System.Int16"/>
+        <Column Name="NMK" DataType="System.String"/>
+        <Column Name="OKPO" DataType="System.String"/>
+        <CommandParameter Name="dat1" DataType="106" Expression="[sFdat1]" DefaultValue="01.01.1900"/>
+        <CommandParameter Name="dat2" DataType="106" Expression="[sFdat2]" DefaultValue="01.01.1900"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="sFdat1" DataType="System.DateTime"/>
+    <Parameter Name="sFdat2" DataType="System.DateTime"/>
+  </Dictionary>
+  <ReportPage Name="Page1">
+    <DataBand Name="Data1" Top="42.1" Width="718.2" Height="18.9" DataSource="Table">
+      <TableObject Name="Table1" Left="9.45" Width="623.7" Height="18.9">
+        <TableColumn Name="Column1" Width="47.25"/>
+        <TableColumn Name="Column2" Width="103.95"/>
+        <TableColumn Name="Column3" Width="94.5"/>
+        <TableColumn Name="Column4" Width="94.5"/>
+        <TableColumn Name="Column5" Width="94.5"/>
+        <TableColumn Name="Column6" Width="122.85"/>
+        <TableColumn Name="Column7"/>
+        <TableRow Name="Row2">
+          <TableCell Name="Cell6" Text="[Table.ROWNUM]"/>
+          <TableCell Name="Cell7" Text="[Table.DATD]"/>
+          <TableCell Name="Cell8" Text="[Table.BSD]"/>
+          <TableCell Name="Cell9" Text="[Table.BSD]"/>
+          <TableCell Name="Cell10" Text="[Table.KV]"/>
+          <TableCell Name="Cell12" Text="[Table.NMK]"/>
+          <TableCell Name="Cell14" Text="[Table.OKPO]"/>
+        </TableRow>
+      </TableObject>
+      <DataHeaderBand Name="DataHeader1" Width="718.2" Height="37.8"/>
+    </DataBand>
+    <PageFooterBand Name="PageFooter1" Top="65.3" Width="718.2" Height="18.9"/>
+  </ReportPage>
+</Report>

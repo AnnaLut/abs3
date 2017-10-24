@@ -1,0 +1,2208 @@
+‘à ¢­¥­¨¥ ä ©«®¢ C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc ¨ C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+<!--
+Copyright (c) 2000-2001 Microsoft Corp. All rights reserved.
+Version 1.0.1.824
+-->
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+ï»¿<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (c) 2000-2002 Microsoft Corp. All rights reserved.
+Version 1.0.1.1121
+
+  Ð£ÐÐ˜Ð¢Ð˜-Ð‘ÐÐ Ð¡ 2005
+  Ð”Ð°Ñ‚Ð° Ð¿Ð¾ÑÐ»ÐµÐ´Ð½ÐµÐ³Ð¾ Ð¸Ð·Ð¼ÐµÐ½ÐµÐ½Ð¸Ñ: 29.05.2007
+-->
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+
+<PUBLIC:COMPONENT  ID=_webservice  Name="WEBSERVICE" >
+<PUBLIC:PROPERTY NAME="version"
+VALUE="Microsoft WebService Behavior 1.0.1.824" />
+<PUBLIC:PROPERTY NAME="showProgress" VALUE=false />
+<PUBLIC:METHOD   NAME="useService"/>
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+
+<PUBLIC:COMPONENT  ID="_webservice"  Name="WEBSERVICE">
+<PUBLIC:PROPERTY NAME="version"
+  VALUE="Microsoft WebService Behavior 1.0.1.1120" />
+<PUBLIC:PROPERTY NAME="showProgress" VALUE="false" />
+<PUBLIC:PROPERTY NAME="helperUtils" />
+<PUBLIC:METHOD   NAME="useService"/>
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+<PUBLIC:EVENT    ID="eventService" NAME="onserviceavailable"/>
+</PUBLIC:COMPONENT>
+<SCRIPT LANGUAGE="JSCRIPT">
+var _nextId  = 0;
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+<PUBLIC:EVENT    ID="eventService" NAME="onserviceavailable"/>
+
+<SCRIPT LANGUAGE="JSCRIPT">
+
+//<![CDATA[
+
+// mozilla requires CDATA tags for this script,
+// the code below contains the illegal xml entity "<"
+
+if( window.addEventListener ) {
+  window.addEventListener('resize',DoResize,false);
+}else if ( window.attachEvent ) {
+  window.attachEvent('onresize',DoResize);
+} else {
+  window.onresize = DoResize;
+}
+
+function DoResize()
+{ 
+  if (_mProg == null || _mProg.parentElement == null)
+  return;
+  var top = element.document.body.offsetHeight/2 - 15;
+  var left = element.document.body.offsetWidth/2 - 50;
+  _mProg.style.top = top;
+  _mProg.style.left = left; 
+}
+var _nextId  = 0;
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+var _st = {
+"negativeInteger" : 0,
+"unsignedShort"   : 0,
+"unsignedByte"    : 0,
+"unsignedLong"    : 0,
+"unsignedInt"     : 0,
+"decimal"         : 0,
+"boolean"         : 0,
+"integer"         : 0,
+"double"          : 0,
+"float"           : 0,
+"short"           : 0,
+"byte"            : 0,
+"long"            : 0,
+"int"             : 0,
+"QName"           : 1,
+"string"          : 1,
+"normalizedString": 2,
+"timeInstant"     : 3,
+"dateTime"        : 3,
+"date"            : 4,
+"time"            : 5,
+"base64Binary"    : 6,
+"base64"          : 7};
+function ErrDetail(errCode, errString, errRaw)
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+var _st = {
+  "negativeInteger" : 0,
+  "unsignedShort"   : 0,
+  "unsignedByte"    : 0,
+  "unsignedLong"    : 0,
+  "unsignedInt"     : 0,
+  "decimal"         : 0,
+  "boolean"         : 0,
+  "integer"         : 0,
+  "double"          : 0,
+  "float"           : 0,
+  "short"           : 0,
+  "byte"            : 0,
+  "long"            : 0,
+  "int"             : 0,
+  "QName"           : 1,
+  "string"          : 1,
+  "normalizedString": 2,
+  "timeInstant"     : 3,
+  "dateTime"        : 3,
+  "date"            : 4,
+  "time"            : 5,
+  "base64Binary"    : 6,
+  "base64"          : 7};
+function ErrDetail(errCode, errString, errRaw)
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+{
+this.code = errCode;
+this.string = errString;
+this.raw = errRaw;
+}
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+{
+  this.code = errCode;
+  this.string = errString;
+  this.raw = errRaw;
+}
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+var _aryError = new Array(
+_errInvalArg,
+_errNotReady,
+_errInvalRes,
+_errUnsupFun,
+_errUnknownS,
+_errAcDenied,
+_errSoapUnav,
+_errHtcInter,
+_errInvaPort,
+_errInvaHead
+);
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+var _aryError = new Array(
+  _errInvalArg,
+  _errNotReady,
+  _errInvalRes,
+  _errUnsupFun,
+  _errUnknownS,
+  _errAcDenied,
+  _errSoapUnav,
+  _errHtcInter,
+  _errInvaPort,
+  _errInvaHead
+);
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+{
+if (oCall.co != null && !oCall.co.async)
+return returnError(oCall, refError);
+var s = function(){returnError(oCall, refError);};
+setTimeout(s, 0);
+return oCall.id;
+}
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+{
+  if (oCall.co != null && !oCall.co.async)
+  return returnError(oCall, refError);
+  var s = function(){returnError(oCall, refError);};
+  setTimeout(s, 0);
+  return oCall.id;
+}
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+{
+hideProgress();
+var r = new Object();
+r.id = oCall.id;
+r.error = true;
+r.errorDetail = _aryError[refError];
+if (oCall.co != null && oCall.co.async == false)
+{
+return r;
+}
+var cb = oCall.cb;
+if (cb == null)
+{
+var evt = createEventObject();
+evt.result = r;
+try { eventResult.fire(evt); } catch(e) {};
+}
+else
+{
+try { cb(r); } catch(e) {};
+}
+return oCall.id;
+}
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+{
+  hideProgress();
+  var r = new Object();
+  r.id = oCall.id;
+  r.error = true;
+  r.errorDetail = _aryError[refError];
+  if (oCall.co != null && oCall.co.async == false)
+  {
+    return r;
+  }
+  var cb = oCall.cb;
+  if (cb == null)
+  {
+    var evt = createEventObject();
+    evt.result = r;
+  try { eventResult.fire(evt); } catch(e) {};
+  }
+  else
+  {
+  try { cb(r); } catch(e) {};
+  }
+  return oCall.id;
+}
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+{
+var o = new Object();
+o.funcName = fn;
+o.portName = pn;
+o.async    = cm;
+o.timeout  = to;
+o.userName = un;
+o.password = pw;
+o.SOAPHeader= hd;
+o.endpoint = ep;
+o.params   = pr;
+return o;
+}
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+{
+  var o = new Object();
+  o.funcName = fn;
+  o.portName = pn;
+  o.async    = cm;
+  o.timeout  = to;
+  o.userName = un;
+  o.password = pw;
+  o.SOAPHeader= hd;
+  o.endpoint = ep;
+  o.params   = pr;
+  return o;
+}
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+{
+var o = new Object();
+o.reuseConnection = rc == true;
+o.SOAPHeader = sh;
+return o;
+}
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+{
+  var o = new Object();
+  o.reuseConnection = rc == true;
+  o.SOAPHeader = sh;
+  return o;
+}
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+{
+var o = new Object();
+for (var x in co)
+o[x] = co[x];
+return o;
+}
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+{
+  var o = new Object();
+  for (var x in co)
+  o[x] = co[x];
+  return o;
+}
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+{
+if (!_fVBon)
+{
+var s1 =
+"Function VBGetArySize(a, d)\n"
++ "Dim x\n"
++ "Dim s\n"
++ "s=UBound(a, 1)\n"
++ "For x = 2 To d \n"
++ 's = s & "," & UBound(a, x)\n'
++ "Next\n"
++ "VBGetArySize=s\n"
++ "End Function";
+var o = document.createElement("script");
+o.language = "VBS";
+o.text = s1;
+document.body.appendChild(o);
+_fVBon = true;
+}
+var fn = "VBGetAryItem" + d;
+if (eval("typeof " + fn) != 'undefined')
+return;
+var a  = new Array();
+for (var i = 0; i < d; i++)
+a[i] = 'p' + i;
+var sp = a.join(",");
+var s2 = "Function " + fn + "(a," + sp + ")\n"
++ fn + "=a(" + sp + ")\n"
++ "End Function\n";
+var o = document.createElement("script");
+o.language = "VBS";
+o.text = s2;
+document.body.appendChild(o);
+}
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+{
+  if (!_fVBon)
+  {
+    var s1 =
+      "\nFunction VBGetArySize(a, d)\n"
+      + "Dim x\n"
+      + "Dim s\n"
+      + "s=UBound(a, 1)\n"
+      + "For x = 2 To d \n"
+      + 's = s & "," & UBound(a, x)\n'
+      + "Next\n"
+      + "VBGetArySize=s\n"
+      + "End Function\n";
+    var o = element.document.createElement("script");
+    o.language = "VBS";
+    o.text = s1;
+    element.document.body.appendChild(o);
+    _fVBon = true;
+  }
+  var fn = "VBGetAryItem" + d;
+  if (eval("typeof " + fn) != 'undefined')
+    return;
+  var a  = new Array();
+  for (var i = 0; i < d; i++)
+    a[i] = 'p' + i;
+  var sp = a.join(", ");
+  var s2 = "\nFunction " + fn + "(a, " + sp + ")\n"
+    + "x = VarType(a(" + sp + "))\n"
+    + "If x=9 Or x=12 Then\n"
+    + "Set " + fn + "=a(" + sp + ")\n"
+    + "Else\n"
+    + fn + "=a(" + sp + ")\n"
+    + "End If\n"
+    + "End Function\n";
+  var o = element.document.createElement("script");
+  o.language = "VBS";
+  o.text = s2;
+  element.document.body.appendChild(o);
+}
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+{
+var d = 0;
+for (var i = 0; i + iFrom <= iTo; i ++)
+d |= (fStr ? s.charCodeAt(i + iFrom) : s[i + iFrom]) << (16 - 8*i);
+for (var i = 0; i <= iTo - iFrom + 1; i ++)
+a[k++] = _b64.charAt(d>>>(18 - i*6)&0x3f);
+return k;
+}
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+{
+  var d = 0;
+  for (var i = 0; i + iFrom <= iTo; i ++)
+  d |= (fStr ? s.charCodeAt(i + iFrom) : s[i + iFrom]) << (16 - 8*i);
+  for (var i = 0; i <= iTo - iFrom + 1; i ++)
+  a[k++] = _b64.charAt(d>>>(18 - i*6)&0x3f);
+  return k;
+}
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+{
+var d = 0;
+var l = iTo - iFrom;
+for (var i = 0; i + iFrom <= iTo; i ++)
+d |= ca[i + iFrom] << (18 - 6*i);
+for (var i = 0; i < l; i ++)
+a[ai + i] = (d >>> (16 - i*8)) & 0xff;
+return ai + i;
+}
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+{
+  var d = 0;
+  var l = iTo - iFrom;
+  for (var i = 0; i + iFrom <= iTo; i ++)
+  d |= ca[i + iFrom] << (18 - 6*i);
+  for (var i = 0; i < l; i ++)
+  a[ai + i] = (d >>> (16 - i*8)) & 0xff;
+  return ai + i;
+}
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+{
+var fStr = typeof(s) == "string";
+var i;
+var l = s.length;
+var a = new Array();
+var k = 0;
+for (i = 2; i < l; i = i + 3)
+{
+k = encb64hlp(a, k, s, i - 2, i, fStr);
+if ((i+1) % 57 == 0)
+a[k++] = "\r\n";
+}
+var padd = l - i + 2;
+if (padd > 0)
+{
+k = encb64hlp(a, k, s, i - 2, l-1, fStr);
+a[k] = (padd > 1) ? "=" : "==";
+}
+return a.join("");
+}
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+{
+  var fStr = typeof(s) == "string";
+  var i;
+  var l = s.length;
+  var a = new Array();
+  var k = 0;
+  for (i = 2; i < l; i = i + 3)
+  {
+  k = encb64hlp(a, k, s, i - 2, i, fStr);
+  if ((i+1) % 57 == 0)
+  a[k++] = "\r\n";
+  }
+  var padd = l - i + 2;
+  if (padd > 0)
+  {
+  k = encb64hlp(a, k, s, i - 2, l-1, fStr);
+  a[k] = (padd > 1) ? "=" : "==";
+  }
+  return a.join("");
+}
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+{
+var i, j = 0;
+var ip = s.indexOf('=');
+var l = ip >= 0 ? ip : s.length;
+var ca = new Array();
+for (i = 0; i < l; i++)
+{
+var c = s.charAt(i);
+if (_b64rsc.indexOf(c) >= 0)
+continue;
+ca[j++] = _b64.indexOf(c);
+}
+var l = j;
+var a = new Array();
+var ai = 0;
+for (i = 3; i < l; i = i + 4)
+ai = decb64hlp(a, ai, ca, i-3, i);
+if (i-4 < l)
+ai = decb64hlp(a, ai, ca, i-3, l-1);
+if (!fStr)
+return a;
+var r = '';
+try
+{
+r = String.fromCharCode.apply(element, a);
+}
+catch (E)
+{
+for (i = 0; i < a.length; i++)
+r += String.fromCharCode(a[i]);
+}
+return r;
+}
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+{
+  var i, j = 0;
+  var ip = s.indexOf('=');
+  var l = ip >= 0 ? ip : s.length;
+  var ca = new Array();
+  for (i = 0; i < l; i++)
+  {
+    var c = s.charAt(i);
+    if (_b64rsc.indexOf(c) >= 0)
+    continue;
+    ca[j++] = _b64.indexOf(c);
+  }
+  var l = j;
+  var a = new Array();
+  var ai = 0;
+  for (i = 3; i < l; i = i + 4)
+  ai = decb64hlp(a, ai, ca, i-3, i);
+  if (i-4 < l)
+  ai = decb64hlp(a, ai, ca, i-3, l-1);
+  if (!fStr)
+  return a;
+  var r = '';
+  try
+  {
+    r = String.fromCharCode.apply(element, a);
+  }
+  catch (E)
+  {
+    for (i = 0; i < a.length; i++)
+    r += String.fromCharCode(a[i]);
+  }
+  return r;
+}
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+{
+if (szService.indexOf("://") > 0)
+return szService;
+var baseUrl = element.document.URL;
+var qi = baseUrl.lastIndexOf("?");
+var url2 = qi > 0 ? baseUrl.substr(0, qi) : baseUrl;
+return  url2.substr(0, baseUrl.lastIndexOf("/"))
++ "/" + szService + (szService.indexOf(".")>=0 ? "" : ".asmx?wsdl");
+}
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+{
+  if (szService.indexOf("://") > 0)
+    return szService;
+  var baseUrl = element.document.URL;
+  var qi = baseUrl.lastIndexOf("?");
+  var url2 = qi > 0 ? baseUrl.substr(0, qi) : baseUrl;
+  return  url2.substr(0, url2.lastIndexOf("/"))
+    + "/" + szService + (szService.indexOf(".")>=0 ? "" : ".asmx?wsdl");
+}
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+{
+var o = new Object();
+o.fDone = false;
+o.next = null;
+o.id = _nextId;
+_nextId++;
+return o;
+}
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+{
+  var o = new Object();
+  o.fDone = false;
+  o.next = null;
+  o.id = _nextId;
+  _nextId++;
+  return o;
+}
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+{
+if (_mProg == null)
+{
+var s = "<MARQUEE WIDTH=160 HEIGHT=20 BEHAVIOR=alternate SCROLLDELAY=1"
++ " STYLE='background:lightblue;position:absolute;top:0;left:0'>"
++ "</MARQUEE>";
+_mProg = element.document.createElement(s);
+_mProg.innerHTML = L_InProgress_Text;
+}
+if (_mProg.parentElement == null)
+element.document.body.insertAdjacentElement("beforeEnd",_mProg);
+}
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+{
+  if (_mProg == null)
+  {
+
+    var top = element.document.body.offsetHeight/2 - 15;
+    var left = element.document.body.offsetWidth/2 - 50;
+
+    var s = '<div style="position: absolute; top:'+top+'; background:white; left:'+left+'; width:101; height:33;" >'+
+    ''+
+    '</div>';
+    //var s = "<MARQUEE WIDTH=160 HEIGHT=20 BEHAVIOR=alternate SCROLLDELAY=1"
+    //+ " STYLE='background:lightblue;position:absolute;top:0;left:0'>"
+    //+ "</MARQUEE>";
+    _mProg = element.document.createElement(s);
+    _mProg.innerHTML = '<img src=/Common/Images/process.gif>';
+  }
+  _mProg.style.top = element.document.body.offsetHeight/2 - 15;
+  _mProg.style.left = element.document.body.offsetWidth/2 - 50;
+  if (_mProg.parentElement == null)
+  element.document.body.insertAdjacentElement("beforeEnd",_mProg);
+}
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+{
+return oschm == null || oschm.sTypes[t.type]!=null;
+}
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+{
+  return oschm == null || oschm.sTypes[t.type]!=null;
+}
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+{
+return os.ns[t.ns] == os.ns["xsd"];
+}
+function getSdl()
+{
+var szService = null;
+for (var aService in _sdl)
+{
+if (_sdl[aService] == null)
+continue;
+var xmlisld = _sdl[aService]._oXml;
+if (xmlisld == null)
+continue;
+if (   _sdl[aService].fPending
+&&  xmlisld.XMLDocument.readyState == 4)
+{
+_sdl[aService].fPending = false;
+szService = aService;
+break;
+}
+}
+if (szService == null)
+return;
+var oS = _sdl[szService];
+var fImportDone = loadImports(oS);
+if (fImportDone)
+processService(oS);
+}
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+{
+  return os.ns[t.ns] == os.ns["xsd"];
+}
+function getWsdl()
+{
+  var szService = null;
+  for (var aService in _sdl)
+  {
+    if (_sdl[aService] == null)
+      continue;
+    var xmlisld = _sdl[aService]._oXml;
+    if (xmlisld == null)
+      continue;
+    if (   _sdl[aService].fPending
+    &&  xmlisld.XMLDocument.readyState == 4)
+    {
+      _sdl[aService].fPending = false;
+      szService = aService;
+      break;
+    }
+  }
+  if (szService == null)
+    return;
+  var oS = _sdl[szService];
+  var fImportDone = loadImports(oS);
+  if (fImportDone)
+  processService(oS);
+}
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+{
+var xmlSdl = oS._oXml.documentElement;
+parseSdl(oS, xmlSdl);
+var evt = createEventObject();
+evt.serviceUrl = oS.url;
+evt.userName = oS._oXml.service;
+evt.serviceAvailable = xmlSdl != null;
+oS._oXml.removeNode(true);
+oS._oXml = null;
+if (xmlSdl == null)
+{
+for (var nc = oS.nextCall; nc != null; nc = nc.next)
+returnError(nc, 1);
+_sdl[oS.url] = null;
+eventService.fire(evt);
+return;
+}
+eventService.fire(evt);
+if (oS.fSeq)
+return callNext(oS);
+while (oS.nextCall != null)
+{
+var nc = oS.nextCall;
+oS.nextCall = oS.nextCall.next;
+_invoke(nc);
+}
+}
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+{
+  var xmlSdl = oS._oXml.documentElement;
+  try
+  {
+    parseWsdl(oS, xmlSdl);
+  }
+  catch(e)
+  {
+    xmlSdl = null;
+  }
+  var evt = createEventObject();
+  evt.serviceUrl = oS.url;
+  evt.userName = oS._oXml.service;
+  evt.serviceAvailable = xmlSdl != null;
+  evt.WSDL = xmlSdl;
+  oS._oXml.removeNode(true);
+  oS._oXml = null;
+  if (xmlSdl == null)
+  {
+    for (var nc = oS.nextCall; nc != null; nc = nc.next)
+    returnError(nc, 1);
+    _sdl[oS.url] = null;
+    eventService.fire(evt);
+    return;
+  }
+  eventService.fire(evt);
+  if (oS.fSeq)
+  return callNext(oS);
+  while (oS.nextCall != null)
+  {
+    var nc = oS.nextCall;
+    oS.nextCall = oS.nextCall.next;
+    _invoke(nc);
+  }
+}
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+{
+for (var i = 0; i < oS.imports.length; i++)
+{
+if (    oS.imports[i] == null
+||  !oS.imports[i].fPending
+||  oS.imports[i].XMLDocument.readyState!=4)
+continue;
+var oImp = oS.imports[i].documentElement;
+if (oImp == null)
+continue;
+oS.imports[i].fPending = false;
+oS.cImporting --;
+var xmlSdl = oS._oXml.documentElement;
+switch (oImp.baseName)
+{
+case "definitions" :
+for (var j = 0; j < oImp.attributes.length; j++)
+{
+var oAtt = oImp.attributes.item(j);
+if (oAtt.name == "xmlns")
+continue;
+var ii = oAtt.name.indexOf("xmlns:");
+if (ii != 0)
+continue;
+var nsn = oAtt.name.substring(6, oAtt.name.length);
+if (oS.ns[nsn] != null)
+continue;
+oS.ns[nsn] = oAtt.value;
+oS.nsalias[oAtt.value] = nsn;
+}
+for (var j = oImp.childNodes.length - 1; j >= 0; j --)
+xmlSdl.appendChild(oImp.childNodes[j]);
+break;
+case "types" :
+case "message" :
+case "portType" :
+case "binding" :
+case "service" :
+xmlSdl.appendChild(oImp);
+break;
+default :
+var nsq = getQualifier(xmlSdl.nodeName);
+nsq = nsq.length == 0 ? "" : (nsq + ":");
+var nt = oS._oXml.XMLDocument.createElement(nsq + "types");
+xmlSdl.appendChild(nt);
+nt.appendChild(oImp);
+}
+oS.imports[i].removeNode(true);
+oS.imports[i] = null;
+if (oS.cImporting == 0)
+{
+processService(oS);
+return;
+}
+}
+}
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+{
+  for (var i = 0; i < oS.imports.length; i++)
+  {
+    if (    oS.imports[i] == null
+    ||  !oS.imports[i].fPending
+    ||  oS.imports[i].XMLDocument.readyState!=4)
+      continue;
+    var oImp = oS.imports[i].documentElement;
+    if (oImp == null)
+      continue;
+    oS.imports[i].fPending = false;
+    oS.cImporting --;
+    var xmlSdl = oS._oXml.documentElement;
+    switch (oImp.baseName)
+    {
+    case "definitions" :
+      for (var j = 0; j < oImp.attributes.length; j++)
+      {
+        var oAtt = oImp.attributes.item(j);
+        if (oAtt.name == "xmlns")
+        continue;
+        var ii = oAtt.name.indexOf("xmlns:");
+        if (ii != 0)
+        continue;
+        var nsn = oAtt.name.substring(6, oAtt.name.length);
+        if (oS.ns[nsn] != null)
+        continue;
+        oS.ns[nsn] = oAtt.value;
+        oS.nsalias[oAtt.value] = nsn;
+      }
+      for (var j = oImp.childNodes.length - 1; j >= 0; j --)
+      xmlSdl.appendChild(oImp.childNodes[j]);
+      break;
+    case "types" :
+    case "message" :
+    case "portType" :
+    case "binding" :
+    case "service" :
+      xmlSdl.appendChild(oImp);
+      break;
+    default :
+      var nsq = getQualifier(xmlSdl.nodeName);
+      nsq = nsq.length == 0 ? "" : (nsq + ":");
+      var nt = oS._oXml.XMLDocument.createElement(nsq + "types");
+      xmlSdl.appendChild(nt);
+      nt.appendChild(oImp);
+    }
+    oS.imports[i].removeNode(true);
+    oS.imports[i] = null;
+    if (oS.cImporting == 0)
+    {
+      processService(oS);
+      return;
+    }
+  }
+}
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+{
+var xmlSdl = oS._oXml.documentElement;
+if (xmlSdl == null)
+return true;
+var nsq = getQualifier(xmlSdl.nodeName);
+nsq = nsq.length == 0 ? "" : (nsq + ":");
+var nImp     = xmlSdl.selectNodes(nsq + "import");
+if (nImp.length == 0)
+return true;
+oS.imports = new Array();
+oS.cImporting = 0;
+for (var i = 0; i < nImp.length; i++)
+{
+oImp = document.createElement("XML");
+document.body.appendChild(oImp);
+oImp.fPending = true;
+oImp.onreadystatechange = function() {onImportLoaded(oS)};
+var impUrl = getAttrib(nImp[i], "location");
+if (impUrl == null)
+continue;
+oS.imports[i] = oImp;
+oS.cImporting ++;
+oImp.src = impUrl;
+}
+return false;
+}
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+{
+  var xmlSdl = oS._oXml.documentElement;
+  if (xmlSdl == null)
+    return true;
+  var nsq = getQualifier(xmlSdl.nodeName);
+  nsq = nsq.length == 0 ? "" : (nsq + ":");
+  var nImp     = xmlSdl.selectNodes(nsq + "import");
+  if (nImp.length == 0)
+    return true;
+  oS.imports = new Array();
+  oS.cImporting = 0;
+  for (var i = 0; i < nImp.length; i++)
+  {
+    var oImp = window.document.createElement("XML");
+    window.document.body.appendChild(oImp);
+    oImp.fPending = true;
+    oS.imports[i] = oImp;
+    oImp.onreadystatechange = function() {onImportLoaded(oS)};
+    var impUrl = getAttrib(nImp[i], "location");
+    if (impUrl == null)
+      continue;
+    oS.cImporting ++;
+    oImp.src = impUrl;
+  }
+  return false;
+}
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+{
+var oS = _sdl[svcName];
+if (oS == null)
+return;
+var oC = oS.nextCall;
+if (oC == null)
+return null;
+oS.nextCall = oC.next;
+if (oS.nextCall == null)
+oS.lastCall = null;
+_invoke(oC);
+}
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+{
+  var oS = _sdl[svcName];
+  if (oS == null)
+    return;
+  var oC = oS.nextCall;
+  if (oC == null)
+    return null;
+  oS.nextCall = oC.next;
+  if (oS.nextCall == null)
+  oS.lastCall = null;
+  _invoke(oC);
+}
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+{
+if (oS.fSeq)
+setTimeout(element.uniqueID + '.invokeNext("' + oS.url + '")', 0);
+}
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+{
+  if (oS.fSeq)
+    setTimeout(element.uniqueID + '.invokeNext("' + oS.url + '")', 0);
+}
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+{
+if (o.attributes == null)
+return null;
+var a = o.attributes.getNamedItem(sAName);
+if (a != null)
+return a.value;
+return null;
+}
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+{
+  if (o.attributes == null)
+    return null;
+  var a = o.attributes.getNamedItem(sAName);
+  if (a != null)
+    return a.value;
+  return null;
+}
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+{
+var a = str.split(":");
+if (a.length > 1)
+return a[1];
+return str;
+}
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+{
+  var a = str.split(":");
+  if (a.length > 1)
+    return a[1];
+  return str;
+}
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+{
+var a = str.split(":");
+if (a.length > 1)
+return a[0];
+return '';
+}
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+{
+  var a = str.split(":");
+  if (a.length > 1)
+    return a[0];
+  return '';
+}
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+{
+var nsq1;
+do
+{
+nsq1 = "mswsb" + _nextNsQ;
+_nextNsQ ++;
+}
+while (oS.ns[nsq1] != null)
+return nsq1;
+}
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+{
+  var nsq1;
+  do
+  {
+    nsq1 = "mswsb" + _nextNsQ;
+    _nextNsQ ++;
+  }
+  while (oS.ns[nsq1] != null)
+  return nsq1;
+}
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+{
+if (litNsq == null || litNsq == '')
+return litNsq;
+var nsuri = getAttrib(o,'xmlns:'+litNsq);
+if (nsuri == null)
+return litNsq;
+var nsq1 = oS.nsalias[nsuri];
+if (nsq1 != null)
+return nsq1;
+litNsq = getNextNsq(oS);
+oS.ns[litNsq] = nsuri;
+oS.nsalias[nsuri] = litNsq;
+return litNsq;
+}
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+{
+  if (litNsq == null)
+    return litNsq;
+  var nsuri = null;
+  if (litNsq == '')
+  nsuri = o.namespaceURI;
+  else
+  {
+    var o1 = o;
+    while (o1 != null)
+    {
+      nsuri = getAttrib(o1, 'xmlns:'+litNsq);
+      if (nsuri != null)
+      break;
+      o1 = o1.parentNode;
+    }
+  }
+  if (nsuri == null)
+    return litNsq;
+  var nsq1 = oS.nsalias[nsuri];
+  if (nsq1 != null)
+    return nsq1;
+  litNsq = getNextNsq(oS);
+  oS.ns[litNsq] = nsuri;
+  oS.nsalias[nsuri] = litNsq;
+  return litNsq;
+}
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+{
+var ns = getQualifier(o.tagName);
+var o1 = o.firstChild;
+if (o1 == null)
+return null;
+var sn = getAttrib(o, "name");
+if (sn == null)
+return null;
+sn = getBaseName(sn);
+var ot = new Object();
+ot.name = sn;
+switch(o1.baseName)
+{
+case 'restriction' :
+var base = getAttrib(o1, "base");
+if (base == null)
+{
+ot.ns = "xsd";
+ot.type = "string";
+}
+else
+{
+ot.type = getBaseName(base);
+ot.ns = getQualifier(base);
+}
+oschm.sTypes[sn] = ot;
+break;
+case 'list' :
+case 'union' :
+ot.type = "string";
+ot.ns = "xsd";
+oschm.sTypes[sn] = ot;
+break;
+default:
+ot = null;
+}
+return ot;
+}
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+{
+  var ns = getQualifier(o.tagName);
+  var o1 = o.firstChild;
+  if (o1 == null)
+    return null;
+  var sn = getAttrib(o, "name");
+  if (sn == null)
+    return null;
+  sn = getBaseName(sn);
+  var ot = new Object();
+  ot.name = sn;
+  switch(o1.baseName)
+  {
+  case 'restriction' :
+    var base = getAttrib(o1, "base");
+    if (base == null)
+    {
+      ot.ns = "xsd";
+      ot.type = "string";
+    }
+    else
+    {
+      ot.type = getBaseName(base);
+      ot.ns = getQualifier(base);
+    }
+    oschm.sTypes[sn] = ot;
+    break;
+  case 'list' :
+  case 'union' :
+    ot.type = "string";
+    ot.ns = "xsd";
+    oschm.sTypes[sn] = ot;
+    break;
+  default:
+    ot = null;
+  }
+  return ot;
+}
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+{
+if (o == null)
+return null;
+switch(o.baseName)
+{
+case "complexType" :
+return parseComplexType(oS, oschm, o, ssffx);
+case "simpleType" :
+return parseSimpleType(oS, oschm, o, ssffx);
+}
+return null;
+}
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+{
+  if (o == null)
+  return null;
+
+  switch(o.baseName)
+  {
+    case "complexType" :
+    return parseComplexType(oS, oschm, o, ssffx);
+    case "simpleType" :
+    return parseSimpleType(oS, oschm, o, ssffx);
+  }
+  return null;
+}
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+var ns = getQualifier(o.tagName);
+if (!o.hasChildNodes())
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+var ns = getQualifier(o.tagName);
+
+if (!o.hasChildNodes())
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+var o1 = o.childNodes[j];
+switch(o1.baseName)
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+var o1 = o.childNodes[j];
+
+switch(o1.baseName)
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+var s = getAttrib(ao[i], "name");
+if (s == null)
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+var s = getAttrib(ao[i], "name");
+
+if (s == null)
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+var s = getAttrib(ao[i], "ref");
+if (s != null)
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+var s = getAttrib(ao[i], "ref");
+
+if (s != null)
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+var o2 = o1.firstChild;
+switch(o2.baseName)
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+var o2 = o1.firstChild;
+
+switch(o2.baseName)
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+case 'attribute' :
+var at=o1.attributes.getQualifiedItem("arrayType",oS.ns["wsdl"]);
+if (at == null)
+at=o1.attributes.getQualifiedItem("arrayType",oS.ns["soap"]);
+if (at == null)
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+case 'attribute' :
+
+var soapns = oS.ns[oS.qlt["soap"]];
+var wsdlns = oS.ns[oS.qlt["wsdl"]];
+var at=o1.attributes.getQualifiedItem("arrayType", wsdlns);
+
+if (at == null)
+  at=o1.attributes.getQualifiedItem("arrayType", soapns);
+if (at == null)
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+{
+if (ot == null)
+ot = new Array();
+ot[getAttrib(o1, "name")] = parseAttrib(o1);
+continue;
+}
+var tn = getBaseName(at.value);
+if (ot != null)
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+{
+  
+  if (ot == null)
+  {
+    ot = new Array();
+    
+  }
+  ot[getAttrib(o1, "name")] = parseAttrib(o1);
+  continue;
+}
+
+var tn = getBaseName(at.value);
+
+if (ot != null)
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+oe.type = a[0];
+oe.sizeArray = new Array();
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+oe.type = a[0];
+if (oe.type == "anyType" && oS.ns[oe.ns] == oS.ns["xsd"])
+oe.type = "string";
+oe.sizeArray = new Array();
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+continue;
+default:
+ot = null;
+}
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+continue;
+}
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+oe.ns = oschm.qdef;
+return oe;
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+oe.ns = oschm.qdef;
+if (oe.type == "anyType" && oS.ns[oe.ns] == oS.ns["xsd"])
+oe.type = "string";
+return oe;
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+}
+if (typeof ssffx != 'undefined')
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+}
+oe.ns = oS.nsalias[oschm.uri];
+if (typeof ssffx != 'undefined')
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+var oSuper = oSchm.types[t.base];
+if (oSuper == null)
+return;
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+var oSuper = oSchm.types[t.base];
+if (oSuper == null || t.derivedType == null)
+return;
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+{
+for (var j = 0; j < nSchemas.length; j ++)
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+{
+
+for (var j = 0; j < nSchemas.length; j ++)
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+{
+var oSchm = new Object();
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+{
+var schmUri = getAttrib(nSchemas[j], "targetNamespace");
+if (oS.schemas[schmUri] == null)
+{
+var oSchm = new Object();
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+oSchm.sTypes = new Array();
+var nElements = nSchemas[j].childNodes;
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+oSchm.sTypes = new Array();
+oS.schemas[oSchm.uri] = oSchm;
+}
+else
+oSchm = oS.schemas[schmUri];
+var nElements = nSchemas[j].childNodes;
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+var sn = getAttrib(nElements[k], "name");
+if (sn == null)
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+var sn = getAttrib(nElements[k], "name");
+
+if (sn == null)
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+oSchm.types[sn] = parseType(oS, oSchm, nElements[k]);
+break;
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+oSchm.types[sn] = parseType(oS, oSchm, nElements[k]);
+
+break;
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+}
+oS.schemas[oSchm.uri] = oSchm;
+}
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+}
+}
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+}
+function parseSdl(oS, xmlSdl)
+{
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+}
+function parseWsdl(oS, xmlSdl)
+{
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+nsq = nsq.length == 0 ? "" : (nsq + ":");
+var nMsgs    = xmlSdl.selectNodes(nsq + "message");
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+nsq = nsq.length == 0 ? "" : (nsq + ":");
+var nsqMsg = nsq;
+var nsqPort = nsq;
+var nsqBinding = nsq;
+var nsqService = nsq;
+var nsqTypes = nsq;
+var nMsgs    = xmlSdl.selectNodes(nsq + "message");
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+var nTypes   = xmlSdl.selectNodes(nsq + "types");
+var aMsgs    = new Array();
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+var nTypes   = xmlSdl.selectNodes(nsq + "types");
+if (nMsgs.length == 0)
+{
+nMsgs = xmlSdl.selectNodes("message");
+nsqMsg = "";
+}
+if (nPort.length == 0)
+{
+nPort = xmlSdl.selectNodes("portType");
+nsqPort = "";
+}
+if (nBinding.length == 0)
+{
+nBinding = xmlSdl.selectNodes("binding");
+nsqBinding = "";
+}
+if (nService.length == 0)
+{
+nService = xmlSdl.selectNodes("service");
+nsqService = "";
+}
+if (nTypes.length == 0)
+{
+nTypes = xmlSdl.selectNodes("types");
+nsqTypes = "";
+}
+var aMsgs    = new Array();
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+oS.ns["xsd"] = "http://www.w3.org/2001/XMLSchema";
+oS.ns["soapenc"] = "http://schemas.xmlsoap.org/soap/encoding/";
+oS.ns["wsdl"] = "http://schemas.xmlsoap.org/wsdl/";
+oS.ns["soap"] = "http://schemas.xmlsoap.org/wsdl/soap/";
+oS.ns["SOAP-ENV"] = 'http://schemas.xmlsoap.org/soap/envelope/';
+oS.schemas = new Array();
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+oS.ns["xsd"] = "http://www.w3.org/2001/XMLSchema";
+oS.schemas = new Array();
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+var nsn = oAtt.name.substring(6, oAtt.name.length);
+if (oS.ns[nsn] != null)
+continue;
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+var nsn = oAtt.name.substring(6, oAtt.name.length);
+if (oS.ns[nsn] != null && nsn != "xsd")
+continue;
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+}
+if (oS.ns["xsi"] == null)
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+}
+oS.qlt = new Array();
+oS.qlt["soapenc"] = "http://schemas.xmlsoap.org/soap/encoding/";
+oS.qlt["wsdl"] = "http://schemas.xmlsoap.org/wsdl/";
+oS.qlt["soap"] = "http://schemas.xmlsoap.org/wsdl/soap/";
+oS.qlt["SOAP-ENV"] = 'http://schemas.xmlsoap.org/soap/envelope/';
+for (var x in oS.qlt)
+{
+if (oS.nsalias[oS.qlt[x]] != null)
+{
+oS.qlt[x] = oS.nsalias[oS.qlt[x]];
+continue;
+}
+oS.ns[x] = oS.qlt[x];
+oS.nsalias[oS.qlt[x]] = x;
+oS.qlt[x] = x;
+}
+if (oS.ns["xsi"] == null)
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+aMsgs[sName] = new Object();
+var ps = nMsgs[i].selectNodes(nsq + "part");
+aMsgs[sName].args = new Array();
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+aMsgs[sName] = new Object();
+var ps = nMsgs[i].selectNodes(nsqMsg + "part");
+aMsgs[sName].args = new Array();
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+ap.ns = getUniqueNsq(oS, ps[j], ap.ns);
+aMsgs[sName].args[ap.name] = ap;
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+ap.ns = getUniqueNsq(oS, ps[j], ap.ns);
+if (ap.type == "anyType" && oS.ns[ap.ns] == oS.ns["xsd"])
+ap.type = "string";
+aMsgs[sName].args[ap.name] = ap;
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+aPort[sName] = new Object();
+var nops = nPort[i].selectNodes(nsq + "operation");
+var oops = new Array();
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+aPort[sName] = new Object();
+var nops = nPort[i].selectNodes(nsqPort + "operation");
+var oops = new Array();
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+var sOpName = getAttrib(nops[j], "name");
+var nInputs = nops[j].selectNodes(nsq + "input");
+var mInput = null;
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+var sOpName = getAttrib(nops[j], "name");
+var nInputs = nops[j].selectNodes(nsqPort + "input");
+var mInput = null;
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+mInput.fWrapped = mInput.argl == 1 && firstArg != null
+&& (firstArg.type == sOpName || firstArg.elem == sOpName);
+}
+var nOutputs = nops[j].selectNodes(nsq + "output");
+if (nOutputs.length > 0)
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+mInput.fWrapped = mInput.argl == 1 && firstArg != null
+&& (    firstArg.type == sOpName
+||  firstArg.elem == sOpName
+||  "parameters"  == firstArg.name.toLowerCase());
+}
+var nOutputs = nops[j].selectNodes(nsqPort + "output");
+if (nOutputs.length > 0)
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+aBinding[sName].msgs = aPort[stype].ops;
+var nops = nBinding[i].selectNodes(nsq + "operation");
+for (var j = 0; j < nops.length; j++)
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+aBinding[sName].msgs = aPort[stype].ops;
+var nops = nBinding[i].selectNodes(nsqBinding + "operation");
+for (var j = 0; j < nops.length; j++)
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+var sOpName = getAttrib(nops[j], "name");
+var input = nops[j].selectSingleNode(nsq + "input");
+if (input == null)
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+var sOpName = getAttrib(nops[j], "name");
+var input = nops[j].selectSingleNode(nsqBinding + "input");
+if (input == null)
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+oM.soapAction = getAttrib(nsoapops[0], "soapAction");
+var nsoapbody = nops[j].selectNodes(nsq + "input/soap:body");
+if (nsoapbody.length > 0)
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+oM.soapAction = getAttrib(nsoapops[0], "soapAction");
+var nsoapbody = nops[j].selectNodes(nsqBinding + "input/soap:body");
+if (nsoapbody.length > 0)
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+}
+var nheadIn = nops[j].selectNodes(nsq + "input/soap:header");
+oM.hdrsIn = new Array();
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+}
+var nheadIn = nops[j].selectNodes(nsqBinding + "input/soap:header");
+oM.hdrsIn = new Array();
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+oM.hdrsIn[k] = parseSoapHeader(oS, nheadIn[k])
+var nheadOut = nops[j].selectNodes(nsq + "output/soap:header");
+oM.hdrsOut = new Array();
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+oM.hdrsIn[k] = parseSoapHeader(oS, nheadIn[k])
+var nheadOut = nops[j].selectNodes(nsqBinding+"output/soap:header");
+oM.hdrsOut = new Array();
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+}
+var nports = nService[0].selectNodes(nsq + "port");
+for (var j = 0; j < nports.length; j++)
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+}
+var nports = nService[0].selectNodes(nsqService + "port");
+for (var j = 0; j < nports.length; j++)
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+{
+oM1 = new Object();
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+{
+if (typeof(sh) == "unknown")
+sh = vbArrayToJs(sh, 1);
+oM1 = new Object();
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+}
+return '<SOAP-ENV:Header>' + szHeader + "</SOAP-ENV:Header>\n";
+}
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+}
+var soapenvns = oS.qlt["SOAP-ENV"];
+return '<'+soapenvns+':Header>' + szHeader +"</"+soapenvns+":Header>\n";
+}
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+{
+var szS = oCall.service;
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+{
+
+var szS = oCall.service;
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+var co = oCall.co;
+if (oS == null)
+{
+return postError(oCall, 1);
+}
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+var co = oCall.co;
+if (oS == null){
+  return postError(oCall, 1);
+}
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+{
+callNext(oS);
+return returnError(oCall, 8);
+}
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+{
+  callNext(oS);
+  return returnError(oCall, 8);
+}
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+{
+szParams = encodeArgs(oS, oM, oM.args, args, j, co.params != null);
+}
+if (szParams == null)
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+{
+  szParams = encodeArgs(oS, oM, oM.args, args, j, co.params != null);
+}
+
+if (szParams == null)
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+{
+callNext(oS);
+return returnError(oCall, 0);
+}
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+{
+  callNext(oS);
+  return returnError(oCall, 0);
+}
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+var loc = co.endpoint == null ? oP.location : co.endpoint;
+if (loc == null)
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+var loc = co.endpoint == null ? oP.location : co.endpoint;
+var e_l = element.document.location.href;
+var start_pos_s = e_l.indexOf('(S(');
+var session_id = "";
+if(start_pos_s > 0)
+ session_id = e_l.substring(start_pos_s,2+e_l.indexOf('))',start_pos_s));
+var szPortNum = element.document.location.port;
+if(szPortNum.length>0 && "80"!=szPortNum){
+  var nAfterProtocolPos = loc.indexOf("://");
+  if ( nAfterProtocolPos > 0){
+    var nRootSlashPos = loc.indexOf("/",nAfterProtocolPos+3);   
+    if(nRootSlashPos > 0){
+      var str_dochost = element.document.location.hostname.toString().toUpperCase();
+      var str_svchost = loc.substring(nAfterProtocolPos+3,nRootSlashPos).toUpperCase();
+      if(str_dochost!=str_svchost)
+        loc = loc.substr(0,nAfterProtocolPos+3)+
+            element.document.location.host+
+            loc.substr(nRootSlashPos);
+    }
+  }
+}
+//„®¡ ¢«ï¥¬ ­®¬¥à á¥áá¨¨ ¤«ï cookieless session state
+if(session_id){
+  var parts = loc.split('/');
+  parts[3] += '/'+session_id;
+  loc = parts.join('/');
+}
+
+if (loc == null)
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+{
+callNext(oS);
+return returnError(oCall, 8);
+}
+try
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+{
+  callNext(oS);
+  return returnError(oCall, 8);
+}
+
+try
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+{
+if (co.userName == null)
+oXmlHttp.xmlHttp.open("POST", loc, co.async);
+else
+oXmlHttp.xmlHttp.open("POST", loc, co.async,
+co.userName, co.password == null ? "" : co.password);
+}
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+{
+  if (co.userName == null)
+    oXmlHttp.xmlHttp.open("POST", loc, co.async);
+  else
+    oXmlHttp.xmlHttp.open("POST", loc, co.async,
+    co.userName, co.password == null ? "" : co.password);
+}
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+{
+callNext(oS);
+return returnError(oCall, 5);
+}
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+{
+  callNext(oS);
+  return returnError(oCall, 5);
+}
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+if (szAction != null && szAction.length > 0)
+oXmlHttp.xmlHttp.setRequestHeader("SOAPAction", '"'+szAction+'"');
+oXmlHttp.xmlHttp.setRequestHeader("Content-Type", "text/xml");
+var sNS = ' xmlns=""';
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+if (szAction != null && szAction.length > 0)
+  oXmlHttp.xmlHttp.setRequestHeader("SOAPAction", '"'+szAction+'"');
+oXmlHttp.xmlHttp.setRequestHeader("Content-Type",
+'text/xml; charset="UTF-8"');
+var sNS = ' xmlns=""';
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+var szHeader = encodeHeader(oS, oM, oCall);
+var szPayload = "<?xml version='1.0'?>\n<SOAP-ENV:Envelope"
++ (oM.es == null ? '' : (' SOAP-ENV:encodingStyle="' + oM.es + '"'))
++ sNS + ">\n"
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+var szHeader = encodeHeader(oS, oM, oCall);
+var soapenvns = oS.qlt["SOAP-ENV"];
+var soapes = (oM.es==null?'':(' '+soapenvns+':encodingStyle="'+oM.es+'"'));
+var szPayload = "<?xml version='1.0' encoding='utf-8'?>\n<"
++ soapenvns + ":Envelope"
++ soapes
++ sNS + ">\n"
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
++ szHeader
++ '<SOAP-ENV:Body>'
++ szParams + "</SOAP-ENV:Body>\n"
++ "</SOAP-ENV:Envelope>\n";
+if (co.async)
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
++ szHeader
++ '<' + soapenvns + ':Body>'
++ szParams + "</" + soapenvns + ":Body>\n"
++ "</" + soapenvns + ":Envelope>\n";
+if (co.async)
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+oXmlHttp.xmlHttp.onreadystatechange = function() {getResult(oCall);};
+try
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+oXmlHttp.xmlHttp.onreadystatechange = function() {getResult(oCall);};
+
+try
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+{
+oProp=document.createElement("<PUBLIC:PROPERTY NAME="+userName+" />");
+_webservice.appendChild(oProp);
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+{
+oProp=window.document.createElement("<PUBLIC:PROPERTY NAME="+userName+" />");
+_webservice.appendChild(oProp);
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+}
+var oXml = document.createElement("XML");
+document.body.appendChild(oXml);
+oS = new Object();
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+}
+var oXml = window.document.createElement("XML");
+window.document.body.appendChild(oXml);
+oS = new Object();
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+oXml.service = userName;
+oXml.onreadystatechange = getSdl;
+oXml.src = url;
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+oXml.service = userName;
+oXml.onreadystatechange = getWsdl;
+oXml.src = url;
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+case 2 :
+sz = "<![CDATA[" + argVal + "]]>";
+break;
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+case 2 :
+sz = "<![CDATA[" + argVal + "]]>"; // <![CDATA[
+break;
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+try { szSize = VBGetArySize(a, d); } catch (e) {return new Array()}
+var aSize = szSize.split(",");
+var aszIndex = new Array();
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+try { szSize = VBGetArySize(a, d); } catch (e) {return new Array()}
+var aSize = szSize.toString().split(",");
+var aszIndex = new Array();
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+var ar = encodeVar(os, v[i], nt);
+sz += '\n<' + t + ar[1] + '>' + ar[0] + '</' + t + '>';
+}
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+var ar = encodeVar(os, v[i], nt);
+xt = ' xsi:type="' + (t.ns ==''?'':(t.ns + ':'))+t.type+'"';
+sz += '\n<' + t.type + ar[1] +xt+'>' + ar[0] + '</' + t.type + '>';
+}
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+{
+var ar = new Array("", "");
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+{
+
+var ar = new Array("", "");
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+var sArr = ae.sizeArray;
+var k = 1;
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+var sArr = ae.sizeArray;
+
+var k = 1;
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+v = vbArrayToJs(v, k);
+ar[0] += encodeArray(oS, ae.type, nt, v, k);
+return ar;
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+v = vbArrayToJs(v, k);
+ar[0] += encodeArray(oS, ae, nt, v, k);
+return ar;
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+}
+if (isSimpleType(oS, oschm, t))
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+}
+
+if (isSimpleType(oS, oschm, t))
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+var et = oschm.types[t.type];
+if (et == null)
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+var et = oschm.types[t.type];
+
+
+if (et == null)
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+var os = v.childNodes;
+for (var i = 0; i < os.length; i ++)
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+var os = v.childNodes;
+
+for (var i = 0; i < os.length; i ++)
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+}
+catch (e) {}
+return ar;
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+}
+catch (e)
+{
+ar[0] += v;
+}
+return ar;
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+var et1 = get1stAryItem(et);
+if (et1 == null)
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+var et1 = get1stAryItem(et);
+
+if (et1 == null)
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+}
+for (var k in et)
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+}
+
+for (var k in et)
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+var it = getAryElem(oS, getSchema(oS, et[k]), et[k]);
+if (it != null)
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+var it = getAryElem(oS, getSchema(oS, et[k]), et[k]);
+var soapencns = oS.qlt["soapenc"];
+if (it != null)
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+? "xsd:" : (et[k].ns + ":");
+asi = ' xsi:type="soapenc:Array"' + ' soapenc:arrayType="'
++ ts + it.type+'['+ asi +']"';
+}
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+? "xsd:" : (et[k].ns + ":");
+asi = ' xsi:type="' + soapencns + ':Array" '
++ soapencns + ':arrayType="' + ts + it.type+'['+ asi +']"';
+}
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+return oschm;
+for (var x in os.schemas)
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+return oschm;
+
+for (var x in os.schemas)
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+return os.schemas[x];
+return null;
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+return os.schemas[x];
+
+return null;
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+var aryItem = a.fArray ? a : getAryElem(oS, oschm, a);
+if (aryItem != null)
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+var aryItem = a.fArray ? a : getAryElem(oS, oschm, a);
+var soapencns = oS.qlt["soapenc"];
+if (aryItem != null)
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+aryItem.ns = oS.nsalias[oschm.uri];
+var ts = (isPrimitive(oS, aryItem) || aryItem.ns == "")
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+aryItem.ns = oS.nsalias[oschm.uri];
+
+var ts = (isPrimitive(oS, aryItem) || aryItem.ns == "")
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+? "xsd:" : (aryItem.ns + ":");
+szt = ' xsi:type="soapenc:Array"'
++ ' soapenc:arrayType="'+ts+aryItem.type+'['+sArr+']"';
+}
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+? "xsd:" : (aryItem.ns + ":");
+szt = ' xsi:type="' + soapencns + ':Array" '
++ soapencns + ':arrayType="'+ts+aryItem.type+'['+sArr+']"';
+}
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+var ar = encodeVar(oS, v, et);
+if (oM.fLiteral)
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+var ar = encodeVar(oS, v, et);
+
+if (oM.fLiteral)
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+var stn = 'mswsb:' + (oM.fRpc ? et.name : et.type);
+stn = aryItem == null ? stn : "soapenc:Array";
+n = "";
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+var stn = 'mswsb:' + (oM.fRpc ? et.name : et.type);
+stn = aryItem == null ? stn : (soapencns + ":Array");
+n = "";
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+n =' xmlns:mswsb="'+(a.ns==null?oS.targetns:oS.ns[a.ns])+'"';
+sz += '\n<' + stn + n + szt + ' xmlns=""' + ar[1] + '>' + ar[0];
+sz += '</' + stn + '>';
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+n =' xmlns:mswsb="'+(a.ns==null?oS.targetns:oS.ns[a.ns])+'"';
+sz += '\n<' + stn + n + szt + ar[1] + '>' + ar[0];
+sz += '</' + stn + '>';
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+{
+var l = fParam ? 0 : args.length;
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+{
+
+var l = fParam ? 0 : args.length;
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+var i = j;
+for (var pn in omargs)
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+var i = j;
+
+for (var pn in omargs)
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+continue;
+if (a.fAttrib)
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+continue;
+
+if (a.fAttrib)
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+sz += serPart(oS, oM, a, argi);
+}
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+sz += serPart(oS, oM, a, argi);
+
+}
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+}
+function returnResult(oCall, r)
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+}
+
+function returnResult(oCall, r)
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+case 0:
+r = eval(r);
+break;
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+case 0:
+try
+{
+r = eval(r);
+}
+catch(e)
+{
+}
+break;
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+{
+var oAtt = o.attributes.getQualifiedItem("arrayType", oS.ns["soapenc"]);
+if (oAtt == null)
+return null;
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+{
+var oAt=o.attributes.getQualifiedItem("arrayType",oS.ns[oS.qlt["soapenc"]]);
+if (oAt == null)
+return null;
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+var at = new Array();
+var asa= oAtt.value.split("[");
+if (asa.length > 1)
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+var at = new Array();
+var asa= oAt.value.split("[");
+if (asa.length > 1)
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+return decodePrimitive(os, e.type, v);
+var sr = getAttrib(v, "href");
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+return decodePrimitive(os, e.type, v);
+if (e.type == "anyType")
+return v;
+var sr = getAttrib(v, "href");
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+var ai = getAryInfo(os, o);
+o2 = o.childNodes;
+if (ai == null)
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+var ai = getAryInfo(os, o);
+var o2 = o.childNodes;
+if (ai == null)
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+}
+</SCRIPT>
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+}
+function getJsArrayItem(a)
+{
+var s = "a";
+for (var i = 1; i < arguments.length; i++)
+s += "[" + arguments[i] + "]";
+var ai = null;
+try {ai = eval(s) } catch(e) {};
+return ai;
+}
+function getJsArraySize(a)
+{
+return a.length;
+}
+function getJsArrayDimensions(a)
+{
+var x = a;
+var ai = new Array();
+var ia = 0;
+while (typeof(x) == "object" && x.length != null && x[x.length-1] != null)
+{
+ai[ia++] = x.length;
+x = x[0];
+}
+return ai;
+}
+helperUtils = new Object();
+helperUtils.getJsArrayItem = getJsArrayItem;
+helperUtils.getJsArraySize = getJsArraySize;
+helperUtils.getJsArrayDimensions = getJsArrayDimensions;
+
+//]]>
+
+</SCRIPT>
+*****
+
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\2WebService.htc
+***** C:\INETPUB\WWWROOT\COMMON\WEBSERVICE\JS\WEBSERVICE.HTC
+
+</PUBLIC:COMPONENT>
+*****
+

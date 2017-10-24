@@ -1,0 +1,15 @@
+﻿body {
+}
+.inline {
+  margin-right: 10px;
+  display: inline-block; 
+}
+.toolbar {
+    margin-top: 3px;
+    margin-bottom: 20px;
+    margin-left: 10px;
+}
+
+.toolbar h4 {
+    font-family: monospace;
+}

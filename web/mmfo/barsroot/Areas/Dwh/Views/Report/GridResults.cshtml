@@ -1,0 +1,71 @@
+﻿@{
+    Layout = null;
+}
+@using BarsWeb.Areas.Dwh.Models
+@using GridMvc.Html
+@*@model Infrastructure.Extensions.GridMvc<BarsWeb.Areas.Dwh.Models.V_DWH_CBIREP_QUERIES>*@
+
+@helper DownloadButton(V_DWH_CBIREP_QUERIES report)
+{
+    if (report.STATUS_ID == "createdfile")
+    {
+    <div class="action-buttons">
+        <a class="green" title="" href="@Url.Content("~/Dwh/report/downloadresults?id=" + @report.ID + "&moduleId=" + @ViewBag.ModuleID)">
+            <i class="icon-download bigger-130"></i>
+        </a>
+    </div>
+    }
+}
+
+@(Html.Kendo().Grid<V_DWH_CBIREP_QUERIES>().HtmlAttributes(new { style = "height: 60%" })
+        .Name("ReportResultsGrid")
+                .Pageable(pageable => pageable
+                        .Refresh(true)
+                        .PageSizes(false)
+                        .ButtonCount(5))
+    .EnableCustomBinding(true)
+    .Scrollable()
+    .Selectable()
+    .Columns(columns =>
+    {
+        columns.Command(command => command.Custom("Завантажити").Click("download")).Width(110);
+        columns.Command(command => command.Custom("Видалити").Click("drop")).Width(90);
+        columns.Bound(p => p.ID).Title("Ід.").Width(50);
+        columns.Bound(p => p.CREATION_TIME).Format("{0:dd/MM/yyyy HH:mm:ss}").Title("Дата та час створення").Width(170);
+        columns.Bound(p => p.REPORT_NAME).Title("Найменування").MinScreenWidth(150);
+        columns.Bound(p => p.STATUS_NAME).Title("Поточний статус").Width(150);
+    })
+    .Events(e => e.DataBound("onRowBound"))
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .PageSize(1000)
+            .Read(read => read.Action("GridResults_Read", "Report", new { moduleId = @ViewBag.Module }))
+    )
+)
+
+<script>
+    function drop(e) {
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+        reportsModule.setReportId(dataItem.ID);
+        reportsModule.dropReport(dataItem.ID);
+        return false;
+    }
+    function download(e) {
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+        /*$.get(bars.config.urlContent("/dwh/report/downloadresults"), { id: dataItem.ID, moduleId: "ViewBag.ModuleID" }).done(function (result) {
+            var a = result;
+        });*/
+        window.location = bars.config.urlContent("/dwh/report/downloadresults?id=" + dataItem.ID + "&moduleId=@ViewBag.ModuleID");
+    }
+
+    function onRowBound(e) {
+        //$(".k-button").find("span").addClass("k-icon k-i-gear");
+        //$(".k-button").style("background:green");
+
+        $(".k-grid-Видалити").css("background-color", "red");
+        $(".k-grid-Завантажити").css("background-color", "rgb(29, 160, 84)");
+        $(".k-grid-Виконати").css("background-color", "rgb(29, 160, 84)");
+        $(".k-button").css("color", "white");
+    }
+
+</script>

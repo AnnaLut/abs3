@@ -1,0 +1,97 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="02/27/2014 14:02:01" ReportInfo.Modified="03/24/2014 13:04:46" ReportInfo.CreatorVersion="2013.2.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqD6nWZEExUJ9MEhdFZpB1A6ZfSeiTM+6WLeB8pW5aURqkGwhV134I2SUIQGUGXcXiLj3HI0nwzhH32qcenDTraA==">
+      <TableDataSource Name="Table" Alias="ReestrClosedDPT" DataType="System.Int32" Enabled="true" SelectCommand="select Branch as &quot;Відділення&quot;,&#13;&#10;       nmk as &quot;Клієнт&quot;,&#13;&#10;       to_char(bday, 'dd.mm.yyyy') as &quot;Дата народження&quot;,&#13;&#10;       okpo as &quot;ЗКПО&quot;,&#13;&#10;       pass as &quot;Паспорт&quot;,&#13;&#10;       deposit_id as &quot;Номер депозитного договору&quot;,&#13;&#10;       to_char(dat_begin, 'dd.mm.yyyy') as &quot;Дата початку&quot;, &#13;&#10;       to_char(dat_end, 'dd.mm.yyyy') as &quot;Дата закінчення&quot;, &#13;&#10;       to_char(trunc(bdate), 'dd.mm.yyyy') as &quot;Дата розірвання&quot;, &#13;&#10;       lcv as &quot;Валюта&quot;, &#13;&#10;       fost(acc, trunc(when) - 1) / 100 as &quot;Залишок на момент розірвання&quot;, &#13;&#10;      BARS.get_deal_penalty(deposit_id ) as &quot;Сума штрафу&quot;       &#13;&#10;  from &#13;&#10;       (select dc.deposit_id, dc.datz as dat_begin, dc.dat_end, dc.bdate, dc.when, tv.lcv,dc.acc, dc.ref_dps, dc.branch, c.nmk, p.bday, c.okpo, p.ser || p.numdoc as pass&#13;&#10;          from dpt_deposit_clos dc, customer c, person p, tabval tv&#13;&#10;     where dc.action_id = 5 -- Під «втраченими процентами» мається на увазі сума штрафу утримана з клієнта в момент дострокового розірвання відповідно до умов договору (різні вклади мають різні умови дострокового розірвання) &#13;&#10;          and dc.rnk = c.rnk &#13;&#10;          and c.rnk = p.rnk&#13;&#10;          and dc.branch like :BRANCH&#13;&#10;          and tv.kv = dc.kv&#13;&#10;          and exists &#13;&#10;         (select 1 &#13;&#10;                  from dpt_deposit_clos dc1 &#13;&#10;                 where dc1.deposit_id =dc.deposit_id&#13;&#10;                   and dc1.action_id = 2) -- Під дію даних умов попадають вклади, які були повністю вилучені (залишки по тілу депозиту та відсотків дорівнюють нулю) &#13;&#10;           and fost(dc.acc, sysdate) / 100 = 0 -- 1. Під дію даних умов попадають вклади, які були повністю вилучені (залишки по тілу депозиту та відсотків дорівнюють нулю) &#13;&#10;           and (select bars.fost(ia.acra, sysdate) / 100 as int_bal &#13;&#10;                  from bars.int_accn ia &#13;&#10;                 where ia.acc = dc.acc &#13;&#10;                   and ia.id = 1) = 0 -- 2. Під дію даних умов попадають вклади, які були повністю вилучені (залишки по тілу депозиту та відсотків дорівнюють нулю) &#13;&#10;           and dc.vidd in (select v.vidd &#13;&#10;                             from bars.dpt_vidd v, bars.dpt_types t &#13;&#10;                            where v.type_id = t.type_id &#13;&#10;                              and t.type_id in (1, -- Авансовий &#13;&#10;                                                2, -- Депозитний Ощадного банку &#13;&#10;                                                4, -- Накопичувальний &#13;&#10;                                                5, -- Дитячий &#13;&#10;                                                9, -- Новий відсоток &#13;&#10;                                                10 -- Строковий пенсійний &#13;&#10;                                                -- ??? Майбутнє дітям &#13;&#10;                                                )) -- Акція стосується достроково вилучених вкладів «Депозитний», «Накопичувальний», «Строковий пенсійний», «Новий відсоток», «Авансовий», «Дитячий» та «Майбутнє дітям», які знов залучаються лише за умовою вкладу «Депозитний» &#13;&#10;                    and dc.bdate between&#13;&#10;               to_date(GetGlobalOption('PI_START'), 'dd.mm.yyyy') and&#13;&#10;               to_date(GetGlobalOption('PI_END'), 'dd.mm.yyyy') &#13;&#10;           and dc.branch like &#13;&#10;               sys_context('bars_context', 'user_branch_mask') -- Новий депозит має оформлюватись у тій же установі (бранчі), що і достроково розірваний &#13;&#10;        ) ">
+        <Column Name="Дата початку" DataType="System.DateTime"/>
+        <Column Name="Дата закінчення" DataType="System.DateTime"/>
+        <Column Name="Дата розірвання" DataType="System.DateTime"/>
+        <Column Name="Валюта" DataType="System.Int16"/>
+        <Column Name="Залишок на момент розірвання" DataType="System.Decimal"/>
+        <Column Name="Сума штрафу" DataType="System.Decimal"/>
+        <Column Name="Відділення" DataType="System.String"/>
+        <Column Name="Клієнт" DataType="System.String"/>
+        <Column Name="Дата народження" DataType="System.DateTime"/>
+        <Column Name="ЗКПО" DataType="System.String"/>
+        <Column Name="Паспорт" DataType="System.String"/>
+        <Column Name="NN" DataType="System.Int32" PropName="Column" Calculated="true" Expression="[Row#]"/>
+        <Column Name="Номер депозитного договору" DataType="System.Decimal"/>
+        <CommandParameter Name="branch" DataType="126" Expression="[branch]"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="branch" DataType="System.String" Expression="&quot;%&quot;"/>
+  </Dictionary>
+  <ReportPage Name="Page1" Landscape="true" PaperWidth="297" PaperHeight="210" RawPaperSize="9" FirstPageSource="15" OtherPagesSource="15">
+    <ReportTitleBand Name="ReportTitle1" Width="1047.06" Height="28.35">
+      <TextObject Name="Text1" Left="9.45" Top="9.45" Width="1020.6" Height="18.9" Text="Реєстр депозитів розірваних у період політичної нестабільності" Font="Arial, 14pt"/>
+    </ReportTitleBand>
+    <PageHeaderBand Name="PageHeader1" Top="30.35" Width="1047.06"/>
+    <GroupHeaderBand Name="GroupHeader1" Top="32.35" Width="1047.06" Height="103.95" Condition="[ReestrClosedDPT.Відділення]">
+      <TextObject Name="Text2" Left="9.45" Top="18.9" Width="113.4" Height="18.9" Text="Відділення:" Font="Arial, 12pt"/>
+      <TextObject Name="Text3" Left="103.95" Top="18.9" Width="378" Height="18.9" Text="[ReestrClosedDPT.Відділення]" Font="Arial, 12pt"/>
+      <TableObject Name="Table3" Left="9.45" Top="47.25" Width="1118.88" Height="56.7">
+        <TableColumn Name="Column19" Width="28.35"/>
+        <TableColumn Name="Column20" Width="255.15"/>
+        <TableColumn Name="Column21" Width="79.38"/>
+        <TableColumn Name="Column22" Width="85.05"/>
+        <TableColumn Name="Column23" Width="85.05"/>
+        <TableColumn Name="Column24" Width="75.6"/>
+        <TableColumn Name="Column25" Width="56.7"/>
+        <TableColumn Name="Column26" Width="75.6"/>
+        <TableColumn Name="Column27" Width="75.6"/>
+        <TableColumn Name="Column28" Width="75.6"/>
+        <TableColumn Name="Column29" Width="85.05"/>
+        <TableColumn Name="Column30" Width="75.6"/>
+        <TableColumn Name="Column31"/>
+        <TableRow Name="Row7" Height="56.7">
+          <TableCell Name="Cell64" Border.Lines="All" Fill.Color="WhiteSmoke" Text="№&#13;&#10;з/п" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell65" Border.Lines="All" Fill.Color="WhiteSmoke" Text="Клієнт" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell66" Border.Lines="All" Fill.Color="WhiteSmoke" Text="Дата народження" Padding="1, 1, 1, 1" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell67" Border.Lines="All" Fill.Color="WhiteSmoke" Text="ЗКПО" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell68" Border.Lines="All" Fill.Color="WhiteSmoke" Text="Паспорт" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell69" Border.Lines="All" Fill.Color="WhiteSmoke" Text="Номер &#13;&#10;договору" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell70" Border.Lines="All" Fill.Color="WhiteSmoke" Text="Валюта" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell71" Border.Lines="All" Fill.Color="WhiteSmoke" Text="Дата початку" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell72" Border.Lines="All" Fill.Color="WhiteSmoke" Text="Дата закінчення" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell73" Border.Lines="All" Fill.Color="WhiteSmoke" Text="Дата розірвання" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell74" Border.Lines="All" Fill.Color="WhiteSmoke" Text="Залишок на момент розірвання" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell75" Border.Lines="All" Fill.Color="WhiteSmoke" Text="Сума штрафу" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell76"/>
+        </TableRow>
+      </TableObject>
+      <DataBand Name="Data1" Top="138.3" Width="1047.06" Height="18.9" Guides="18.9" DataSource="Table">
+        <TableObject Name="Table1" Left="9.45" Width="1118.88" Height="18.9">
+          <TableColumn Name="Column8" Width="28.35"/>
+          <TableColumn Name="Column9" Width="255.15"/>
+          <TableColumn Name="Column1" Width="79.38"/>
+          <TableColumn Name="Column2" Width="85.05"/>
+          <TableColumn Name="Column3" Width="85.05"/>
+          <TableColumn Name="Column4" Width="75.6"/>
+          <TableColumn Name="Column13" Width="56.7"/>
+          <TableColumn Name="Column5" Width="75.6"/>
+          <TableColumn Name="Column6" Width="75.6"/>
+          <TableColumn Name="Column7" Width="75.6"/>
+          <TableColumn Name="Column10" Width="85.05"/>
+          <TableColumn Name="Column11" Width="75.6"/>
+          <TableColumn Name="Column12"/>
+          <TableRow Name="Row1">
+            <TableCell Name="Cell32" Border.Lines="All" Text="[ReestrClosedDPT.NN]" HorzAlign="Right" VertAlign="Center" Font="Arial, 9pt"/>
+            <TableCell Name="Cell33" Border.Lines="All" Text="[ReestrClosedDPT.Клієнт]" VertAlign="Center" Font="Arial, 9pt"/>
+            <TableCell Name="Cell1" Border.Lines="All" Text="[ReestrClosedDPT.Дата народження]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+            <TableCell Name="Cell2" Border.Lines="All" Text="[ReestrClosedDPT.ЗКПО]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+            <TableCell Name="Cell3" Border.Lines="All" Text="[ReestrClosedDPT.Паспорт]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+            <TableCell Name="Cell4" Border.Lines="All" Text="[ReestrClosedDPT.Номер депозитного договору]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+            <TableCell Name="Cell37" Border.Lines="All" Text="[ReestrClosedDPT.Валюта]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+            <TableCell Name="Cell5" Border.Lines="All" Text="[ReestrClosedDPT.Дата початку]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+            <TableCell Name="Cell26" Border.Lines="All" Text="[ReestrClosedDPT.Дата закінчення]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+            <TableCell Name="Cell31" Border.Lines="All" Text="[ReestrClosedDPT.Дата розірвання]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+            <TableCell Name="Cell34" Border.Lines="All" Text="[ReestrClosedDPT.Залишок на момент розірвання]" HorzAlign="Right" VertAlign="Center" Font="Arial, 9pt"/>
+            <TableCell Name="Cell35" Border.Lines="All" Text="[ReestrClosedDPT.Сума штрафу]" HorzAlign="Right" VertAlign="Center" Font="Arial, 9pt"/>
+            <TableCell Name="Cell38" Font="Arial, 9pt"/>
+          </TableRow>
+        </TableObject>
+      </DataBand>
+      <GroupFooterBand Name="GroupFooter1" Top="159.2" Width="1047.06" Height="9.45"/>
+    </GroupHeaderBand>
+  </ReportPage>
+</Report>

@@ -1,0 +1,10 @@
+﻿.k-widget.k-tooltip-validation.k-invalid-msg {
+  position: absolute;
+  bottom: 100%;
+  left: 5px;
+  width: auto;
+}
+
+.ob-selected {
+    color: green !important;
+}

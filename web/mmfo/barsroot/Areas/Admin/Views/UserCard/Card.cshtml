@@ -1,0 +1,53 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = "User Card";
+}
+<script language="javascript" src="~/Areas/Admin/Scripts/usercard/userCardCtrl.js" type="text/javascript"></script>
+<script language="javascript" src="~/Areas/Admin/Scripts/utils/tabs.js" type="text/javascript"></script>
+<link href="~/Areas/Admin/Css/userCard.css" rel="stylesheet">
+<script>
+    var login = "@ViewBag.Login";
+    bars.tabs.loadTemplate('@Url.Content("~/Areas/Admin/Scripts/usercard/tpl/Info.tpl.htm")');
+    bars.tabs.loadTemplate('@Url.Content("~/Areas/Admin/Scripts/usercard/tpl/AuthMode-ABS.tpl.htm")');
+    bars.tabs.loadTemplate('@Url.Content("~/Areas/Admin/Scripts/usercard/tpl/AuthMode-ORA.tpl.htm")');
+    bars.tabs.loadTemplate('@Url.Content("~/Areas/Admin/Scripts/usercard/tpl/AuthMode-AD.tpl.htm")');
+    bars.tabs.loadTemplate('@Url.Content("~/Areas/Admin/Scripts/usercard/tpl/Delegations.tpl.htm")');
+    bars.tabs.loadTemplate('@Url.Content("~/Areas/Admin/Scripts/usercard/tpl/Comments.tpl.htm")');
+</script>
+
+<div class="card-body">
+    <div class="page-header">
+        <h1>Картка користувача > <b>@ViewBag.Login</b>
+        </h1>
+    </div>
+    <div class="card-content">
+        <form>
+            <div id="card-tabstrip">
+                <ul>
+                    <li>Загальна інформація</li>
+                    <li>Доступні відділення</li>
+                    <li>Ролі користувача</li>
+                    <li>Делегування прав</li>
+                </ul>
+                <div id="info-tab">
+                    <div id="info-main"></div>
+                    <div class="separator"></div>
+                    <div id="info-auth"></div>
+                    <div id="info-comments"></div>
+                </div>
+                <div id="branch-tab">
+                    <div id="branches"></div>
+                </div>
+                <div id="role-tab">
+                    <div id="roles"></div>
+                </div>
+                <div id="delegation-tab">
+                    <div id="info-delegation"></div>
+                </div>
+            </div>
+        </form>
+    </div>
+    @*<div class="separator"></div>*@
+    @*<div class="btns-group">buttons</div>*@
+</div>
+

@@ -1,0 +1,47 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+}
+<script src="~/Areas/Crkr/Scripts/Rebranch/rebranch.js"></script>
+<style>
+    .res {
+        font-size: medium;
+        color: blue;
+    }
+</style>
+<div class="container-fluid">
+    <form class="form-horizontal" id="rebranch">
+        <div class="col-xs-8">
+            <div class="form-group">
+                <label for="frombranch" class="col-xs-2 control-label required">З бранчу:</label>
+                <div class="col-xs-8">
+                    <input type="text" class="k-textbox" id="frombranch" name="frombranch" required />
+                </div>
+                <div class="col-xs-2">
+                    <input type="button" class="k-button callBranchWindow" id="from" value="..." />
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="tobranch" class="col-xs-2 control-label required">На бранч:</label>
+                <div class="col-xs-8">
+                    <input type="text" class="k-textbox" id="tobranch" name="tobranch" required />
+                </div>
+                <div class="col-xs-2">
+                    <input type="button" class="k-button callBranchWindow" id="to" value="..." />
+                </div>
+            </div>
+            
+        </div>
+        <div class="col-xs-4">
+            <div class="form-group">
+                <div class="col-xs-12">
+                    <button type="submit" class="k-button" id="rebranBtn" style="margin-top: 20px">Виконати</button>
+                </div>
+            </div>
+        </div>
+    </form>
+    <label class="control-label res" id="result"></label>
+</div>
+
+<div id="branchWindow">
+    <div id="branches"></div>
+</div>

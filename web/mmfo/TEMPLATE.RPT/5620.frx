@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="12/01/2016 12:52:31" ReportInfo.Modified="12/01/2016 17:22:17" ReportInfo.CreatorVersion="2014.3.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqEjIkLfv5KVDVMQxm1pETYi2439uNkJphU7VV/DPLnHyLDt7PXXdlAdyT9WtYUl5mh0BzHq6JWc0xIKQ94T5Veg==">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select &#13;&#10;      &quot;П_дрозд_власник&quot;, &#13;&#10;       &quot;Назва_проекту&quot;,&#13;&#10;      &quot;Сума_платеж_в&quot;&#13;&#10; from(       &#13;&#10;       select   r.bu as &quot;12&quot; ,&#13;&#10;       nvl(branch.name,(decode( r.bu, null, 'Всього за підрозділами та проектами', 'Всього за підрозділом')))   &quot;П_дрозд_власник&quot; ,   &#13;&#10;       xoz_prg.name   &quot;Назва_проекту&quot; , &#13;&#10;      sum( r.s/100  )      &quot;Сума_платеж_в&quot;&#13;&#10;FROM xoz_prg,  branch,&#13;&#10;    (select bu, prg, sum(s0) S FROM xoz_ref where PRG is not null and BU is not null and fdat&gt;= :sFdat and fdat&lt;= :sFdat2 group by bu,prg) R &#13;&#10;where r.PRG = xoz_prg.PRG and r.BU = branch.branch&#13;&#10;GROUP BY GROUPING SETS( &#13;&#10;                      (r.bu, branch.name,  xoz_prg.name,  r.s/100),&#13;&#10;                      (r.bu), ()&#13;&#10;                      )&#13;&#10;    order by 1                  )">
+        <Column Name="П_дрозд_власник" DataType="System.String"/>
+        <Column Name="Назва_проекту" DataType="System.String"/>
+        <Column Name="Сума_платеж_в" DataType="System.Decimal"/>
+        <CommandParameter Name="sFdat2" DataType="106" Expression="[sFdat2]" DefaultValue="01/06/2016"/>
+        <CommandParameter Name="sFdat" DataType="106" Expression="[sFdat1]" DefaultValue="01/01/2015"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="sFdat1" DataType="System.DateTime"/>
+    <Parameter Name="sFdat2" DataType="System.DateTime"/>
+  </Dictionary>
+  <ReportPage Name="Page1">
+    <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="37.8">
+      <TextObject Name="Text7" Left="47.25" Width="670.95" Height="28.35" Text="Фактичні витрати ЦА в розрізі підрозділів і проектів за період з [sFdat1] по [sFdat2]"/>
+    </ReportTitleBand>
+    <PageHeaderBand Name="PageHeader1" Top="41.8" Width="718.2" Height="37.8">
+      <TextObject Name="Text2" Width="226.8" Height="37.8" Border.Lines="All" Text="Підрозділ" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="Text4" Left="226.8" Width="226.8" Height="37.8" Border.Lines="All" Text="Назва проекту" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="Text6" Left="453.6" Width="264.6" Height="37.8" Border.Lines="All" Text="Сума платежів" HorzAlign="Center" VertAlign="Center"/>
+    </PageHeaderBand>
+    <DataBand Name="Data1" Top="83.6" Width="718.2" Height="28.35" DataSource="Table">
+      <TextObject Name="Text1" Width="226.8" Height="18.9" Border.Lines="All" Text="[Table.П_дрозд_власник]" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="Text3" Left="226.8" Width="226.8" Height="18.9" Border.Lines="All" Text="[Table.Назва_проекту]" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="Text5" Left="453.6" Width="264.6" Height="18.9" Border.Lines="All" Text="[Table.Сума_платеж_в]" Format="Currency" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center" WordWrap="false" Trimming="EllipsisCharacter"/>
+    </DataBand>
+    <PageFooterBand Name="PageFooter1" Top="115.95" Width="718.2" Height="18.9"/>
+  </ReportPage>
+</Report>

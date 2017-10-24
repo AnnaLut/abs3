@@ -1,0 +1,36 @@
+begin
+umu.add_report2arm(31, '$RM_BVB ', 1 );
+umu.add_report2arm(61, '$RM_BVB ', 1 );
+umu.add_report2arm(267, '$RM_BVB ', 1 );
+umu.add_report2arm(481, '$RM_BVB ', 1 );
+umu.add_report2arm(881, '$RM_BVB ', 1 );
+umu.add_report2arm(1, '$RM_BVB ', 1 );
+umu.add_report2arm(2, '$RM_BVB ', 1 );
+umu.add_report2arm(3, '$RM_BVB ', 1 );
+umu.add_report2arm(4, '$RM_BVB ', 1 );
+umu.add_report2arm(5, '$RM_BVB ', 1 );
+umu.add_report2arm(6, '$RM_BVB ', 1 );
+umu.add_report2arm(7, '$RM_BVB ', 1 );
+umu.add_report2arm(107, '$RM_BVB ', 1 );
+umu.add_report2arm(276, '$RM_BVB ', 1 );
+umu.add_report2arm(764, '$RM_BUHG', 1 );
+umu.add_report2arm(767, '$RM_BUHG', 1 );
+umu.add_report2arm(11, '$RM_BVB ', 1 );
+umu.add_report2arm(35, '$RM_BVB ', 1 );
+umu.add_report2arm(43, '$RM_BVB ', 1 );
+umu.add_report2arm(125, '$RM_BVB ', 1 );
+umu.add_report2arm(999, '$RM_BVB ', 1 );
+umu.add_report2arm(1000, '$RM_BVB ', 1 );
+umu.add_report2arm(45, '$RM_BVB ', 1 );
+umu.add_report2arm(216, '$RM_BVB ', 1 );
+umu.add_report2arm(233, '$RM_BVB ', 1 );
+umu.add_report2arm(293, '$RM_BVB ', 1 );
+umu.add_report2arm(306, '$RM_BVB ', 1 );
+umu.add_report2arm(63, '$RM_BVB ', 1 );
+umu.add_report2arm(126, '$RM_BVB ', 1 );
+umu.add_report2arm(130, '$RM_BVB ', 1 );
+umu.add_report2arm(243, '$RM_BVB ', 1 );
+umu.add_report2arm(684, '$RM_BVB ', 1 );
+end;
+/
+commit;

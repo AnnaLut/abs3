@@ -1,0 +1,902 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="07/21/2015 16:10:52" ReportInfo.Modified="07/23/2015 18:00:33" ReportInfo.CreatorVersion="2013.2.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqD6nWZEExUJ9MEhdFZpB1A+RsALYQnkrx1bqUugr9bZmM+vm2A2A73LUw+BfeY2K4YNTQ+2haUdJ/bAWG6n6e8Q==">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select c.nmkv, &#13;&#10;       p.ser||' '||p.numdoc pasp,  &#13;&#10;       f_translate_kmu(p.organ) organ, &#13;&#10;       p.pdate, &#13;&#10;       c.adr, &#13;&#10;       okpo, &#13;&#10;       t.lcv, &#13;&#10;       a.nls, &#13;&#10;       a.kf, &#13;&#10;       a.ostc, &#13;&#10;       b.name branch_name,&#13;&#10;       w4.card_code card_tip,&#13;&#10;       sumpr_en.toword_currency(a.ostc, t.lcv)   spr     &#13;&#10;from   customer c, person p, &#13;&#10;       accounts a, branch b, &#13;&#10;       tabval t,   w4_acc w4 &#13;&#10;where c.rnk=p.rnk&#13;&#10;  and c.rnk=607061&#13;&#10;  and c.rnk=a.rnk&#13;&#10;  and a.nbs='2625'&#13;&#10;  and b.branch=a.branch&#13;&#10;  and t.kv=a.kv&#13;&#10;  and w4.acc_pk=a.acc">
+        <Column Name="NMKV" DataType="System.String"/>
+        <Column Name="PASP" DataType="System.String"/>
+        <Column Name="ORGAN" DataType="System.String"/>
+        <Column Name="PDATE" DataType="System.DateTime"/>
+        <Column Name="ADR" DataType="System.String"/>
+        <Column Name="OKPO" DataType="System.String"/>
+        <Column Name="NLS" DataType="System.String"/>
+        <Column Name="OSTC" DataType="System.Decimal"/>
+        <Column Name="LCV" DataType="System.String"/>
+        <Column Name="KF" DataType="System.String"/>
+        <Column Name="BRANCH_NAME" DataType="System.String"/>
+        <Column Name="CARD_TIP" DataType="System.String"/>
+        <Column Name="SPR" DataType="System.String"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="sFdat1" DataType="System.String"/>
+    <Parameter Name="sFdat2" DataType="System.String"/>
+  </Dictionary>
+  <ReportPage Name="Page2">
+    <ReportTitleBand Name="ReportTitle2" Width="718.2" Height="85.05">
+      <TextObject Name="Text2" Left="9.45" Width="670.95" Height="85.05" Text="C E R T I F I C A T E&#13;&#10;" HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 12pt, style=Bold"/>
+    </ReportTitleBand>
+    <DataBand Name="Data2" Top="89.17" Width="718.2" Height="519.75">
+      <TableObject Name="Table3" Left="9.45" Top="9.45" Width="676.4" Height="510.3">
+        <TableColumn Name="Column15" Width="27.53"/>
+        <TableColumn Name="Column20" Width="27.53"/>
+        <TableColumn Name="Column21" Width="10.45"/>
+        <TableColumn Name="Column16" Width="27.53"/>
+        <TableColumn Name="Column22" Width="27.53"/>
+        <TableColumn Name="Column23" Width="11.34"/>
+        <TableColumn Name="Column24" Width="27.53"/>
+        <TableColumn Name="Column17" Width="34.02"/>
+        <TableColumn Name="Column18" Width="27.53"/>
+        <TableColumn Name="Column19" Width="27.53"/>
+        <TableColumn Name="Column25" Width="27.53"/>
+        <TableColumn Name="Column26" Width="27.53"/>
+        <TableColumn Name="Column27" Width="27.53"/>
+        <TableColumn Name="Column28" Width="18.08"/>
+        <TableColumn Name="Column29" Width="27.53"/>
+        <TableColumn Name="Column30" Width="27.53"/>
+        <TableColumn Name="Column31" Width="27.53"/>
+        <TableColumn Name="Column32" Width="27.53"/>
+        <TableColumn Name="Column33" Width="27.53"/>
+        <TableColumn Name="Column34" Width="27.53"/>
+        <TableColumn Name="Column35" Width="27.53"/>
+        <TableColumn Name="Column36" Width="27.53"/>
+        <TableColumn Name="Column37" Width="27.59"/>
+        <TableColumn Name="Column38" Width="28.35"/>
+        <TableColumn Name="Column39" Width="51.03"/>
+        <TableRow Name="Row18" Height="28.35">
+          <TableCell Name="Cell190" Text="Issued to Mr./Mrs. " VertAlign="Bottom" Font="Times New Roman, 12pt" ColSpan="6"/>
+          <TableCell Name="Cell215" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell220" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell191" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell225" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell230" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell235" Border.Lines="Bottom" Text="[Table.NMKV]" VertAlign="Bottom" Font="Times New Roman, 12pt" ColSpan="19"/>
+          <TableCell Name="Cell192" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell193" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell194" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell240" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell245" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell250" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell255" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell260" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell265" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell270" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell275" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell280" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell285" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell290" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell295" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell300" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell305" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell310" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row19" Height="9.45">
+          <TableCell Name="Cell195" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell216" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell221" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell196" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell226" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell231" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell236" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell197" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell198" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell199" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell241" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell246" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell251" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell256" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell261" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell266" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell271" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell276" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell281" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell286" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell291" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell296" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell301" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell306" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell311" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row20">
+          <TableCell Name="Cell200" Text="Passport" Font="Times New Roman, 12pt" ColSpan="3"/>
+          <TableCell Name="Cell217" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell222" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell201" Border.Lines="Bottom" Text="[Table.PASP], [Table.ORGAN]," VertAlign="Bottom" Font="Times New Roman, 12pt" ColSpan="22"/>
+          <TableCell Name="Cell227" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell232" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell237" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell202" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell203" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell204" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell242" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell247" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell252" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell257" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell262" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell267" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell272" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell277" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell282" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell287" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell292" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell297" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell302" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell307" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell312" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row21" Height="9.45">
+          <TableCell Name="Cell205" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell218" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell223" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell206" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell228" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell233" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell238" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell207" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell208" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell209" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell243" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell248" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell253" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell258" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell263" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell268" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell273" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell278" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell283" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell288" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell293" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell298" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell303" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell308" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell313" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row22">
+          <TableCell Name="Cell210" Border.Lines="Bottom" Text="[Table.PDATE], [Table.ADR], [Table.OKPO]" Font="Times New Roman, 12pt" ColSpan="25">
+            <Formats>
+              <DateFormat/>
+              <GeneralFormat/>
+              <GeneralFormat/>
+            </Formats>
+          </TableCell>
+          <TableCell Name="Cell219" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell224" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell211" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell229" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell234" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell239" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell212" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell213" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell214" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell244" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell249" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell254" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell259" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell264" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell269" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell274" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell279" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell284" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell289" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell294" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell299" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell304" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell309" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell314" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row23" Height="9.45">
+          <TableCell Name="Cell315" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell316" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell317" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell318" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell319" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell320" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell321" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell322" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell323" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell324" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell325" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell326" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell327" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell328" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell329" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell330" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell331" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell332" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell333" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell334" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell335" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell336" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell337" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell338" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell339" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row24">
+          <TableCell Name="Cell340" Text="to hereby certify that at the  " Font="Times New Roman, 12pt" ColSpan="8"/>
+          <TableCell Name="Cell341" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell342" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell343" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell344" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell345" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell346" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell347" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell348" Border.Lines="Bottom" Text="[Table.BRANCH_NAME]" HorzAlign="Center" Font="Times New Roman, 12pt" ColSpan="10"/>
+          <TableCell Name="Cell349" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell350" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell351" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell352" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell353" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell354" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell355" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell356" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell357" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell358" Text="of Public Joint Stock Company" Font="Times New Roman, 12pt" ColSpan="7"/>
+          <TableCell Name="Cell359" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell360" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell361" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell362" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell363" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell364" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row25" Height="9.45">
+          <TableCell Name="Cell365" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell366" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell367" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell368" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell369" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell370" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell371" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell372" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell373" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell374" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell375" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell376" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell377" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell378" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell379" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell380" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell381" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell382" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell383" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell384" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell385" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell386" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell387" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell388" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell389" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row26">
+          <TableCell Name="Cell390" Text="&quot;State Savings Bank of Ukraine&quot;,  Bank’s sort code" Font="Times New Roman, 12pt" ColSpan="14"/>
+          <TableCell Name="Cell391" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell392" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell393" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell394" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell395" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell396" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell397" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell398" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell399" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell400" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell401" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell402" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell403" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell404" Border.Lines="Bottom" Text="[Table.KF]" HorzAlign="Center" Font="Times New Roman, 12pt" ColSpan="4"/>
+          <TableCell Name="Cell405" Border.Lines="Bottom" HorzAlign="Center" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell406" Border.Lines="Bottom" HorzAlign="Center" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell407" Border.Lines="Bottom" HorzAlign="Center" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell408" Text=",   the current account  " Font="Times New Roman, 12pt" ColSpan="7"/>
+          <TableCell Name="Cell409" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell410" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell411" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell412" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell413" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell414" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row27" Height="9.45">
+          <TableCell Name="Cell415" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell416" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell417" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell418" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell419" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell420" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell421" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell422" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell423" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell424" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell425" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell426" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell427" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell428" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell429" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell430" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell431" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell432" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell433" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell434" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell435" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell436" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell437" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell438" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell439" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row28">
+          <TableCell Name="Cell440" Text="№" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell441" Border.Lines="Bottom" Text="[Table.NLS]" HorzAlign="Center" Font="Times New Roman, 12pt" ColSpan="4"/>
+          <TableCell Name="Cell442" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell443" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell444" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell445" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell446" Text="is opened in his / her  name  in " Font="Times New Roman, 12pt" ColSpan="8"/>
+          <TableCell Name="Cell447" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell448" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell449" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell450" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell451" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell452" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell453" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell454" Border.Lines="Bottom" Text="[Table.LCV]" HorzAlign="Center" Font="Times New Roman, 12pt" ColSpan="4"/>
+          <TableCell Name="Cell455" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell456" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell457" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell458" Text="(currency),  under which the " Font="Times New Roman, 12pt" ColSpan="7"/>
+          <TableCell Name="Cell459" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell460" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell461" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell462" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell463" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell464" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row29" Height="9.45">
+          <TableCell Name="Cell465" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell466" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell467" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell468" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell469" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell470" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell471" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell472" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell473" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell474" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell475" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell476" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell477" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell478" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell479" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell480" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell481" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell482" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell483" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell484" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell485" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell486" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell487" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell488" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell489" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row30">
+          <TableCell Name="Cell490" Text="payment card of the international payment system" Font="Times New Roman, 12pt" ColSpan="14"/>
+          <TableCell Name="Cell491" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell492" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell493" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell494" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell495" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell496" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell497" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell498" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell499" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell500" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell501" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell502" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell503" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell504" Border.Lines="Bottom" Text="[Table.CARD_TIP]" Font="Times New Roman, 12pt" ColSpan="10"/>
+          <TableCell Name="Cell505" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell506" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell507" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell508" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell509" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell510" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell511" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell512" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell513" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell514" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row31" Height="9.45">
+          <TableCell Name="Cell515" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell516" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell517" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell518" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell519" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell520" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell521" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell522" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell523" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell524" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell525" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell526" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell527" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell528" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell529" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell530" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell531" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell532" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell533" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell534" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell535" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell536" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell537" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell538" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell539" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row32">
+          <TableCell Name="Cell540" Text="(card type) is issued." Font="Times New Roman, 12pt" ColSpan="7"/>
+          <TableCell Name="Cell541" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell542" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell543" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell544" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell545" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell546" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell547" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell548" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell549" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell550" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell551" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell552" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell553" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell554" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell555" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell556" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell557" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell558" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell559" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell560" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell561" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell562" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell563" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell564" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row33" Height="9.45">
+          <TableCell Name="Cell565" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell566" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell567" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell568" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell569" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell570" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell571" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell572" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell573" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell574" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell575" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell576" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell577" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell578" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell579" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell580" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell581" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell582" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell583" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell584" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell585" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell586" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell587" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell588" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell589" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row34">
+          <TableCell Name="Cell590" Text="As of  " Font="Times New Roman, 12pt" ColSpan="2"/>
+          <TableCell Name="Cell591" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell592" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell593" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell594" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell595" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell596" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell597" Text="(fill in the date)  the  balance of the own funds on the current account makes  " Font="Times New Roman, 12pt" ColSpan="18"/>
+          <TableCell Name="Cell598" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell599" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell600" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell601" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell602" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell603" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell604" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell605" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell606" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell607" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell608" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell609" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell610" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell611" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell612" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell613" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell614" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row35" Height="9.45">
+          <TableCell Name="Cell615" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell616" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell617" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell618" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell619" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell620" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell621" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell622" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell623" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell624" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell625" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell626" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell627" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell628" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell629" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell630" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell631" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell632" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell633" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell634" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell635" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell636" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell637" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell638" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell639" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row36">
+          <TableCell Name="Cell640" Border.Lines="Bottom" Text="[Table.SPR]" Font="Times New Roman, 12pt" ColSpan="24"/>
+          <TableCell Name="Cell641" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell642" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell643" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell644" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell645" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell646" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell647" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell648" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell649" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell650" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell651" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell652" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell653" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell654" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell655" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell656" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell657" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell658" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell659" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell660" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell661" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell662" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell663" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell664" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row37">
+          <TableCell Name="Cell665" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell666" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell667" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell668" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell669" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell670" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell671" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell672" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell673" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell674" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell675" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell676" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell677" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell678" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell679" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell680" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell681" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell682" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell683" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell684" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell685" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell686" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell687" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell688" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell689" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row38">
+          <TableCell Name="Cell690" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell691" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell692" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell693" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell694" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell695" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell696" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell697" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell698" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell699" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell700" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell701" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell702" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell703" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell704" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell705" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell706" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell707" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell708" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell709" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell710" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell711" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell712" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell713" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell714" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row39">
+          <TableCell Name="Cell715" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell716" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell717" Text="Account activity for the period from" Font="Times New Roman, 12pt" ColSpan="9"/>
+          <TableCell Name="Cell718" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell719" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell720" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell721" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell722" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell723" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell724" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell725" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell726" Border.Lines="Bottom" Font="Times New Roman, 12pt" ColSpan="4"/>
+          <TableCell Name="Cell727" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell728" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell729" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell730" Text="to" HorzAlign="Center" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell731" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell732" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell733" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell734" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell735" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell736" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell737" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell738" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell739" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row40">
+          <TableCell Name="Cell740" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell741" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell742" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell743" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell744" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell745" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell746" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell747" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell748" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell749" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell750" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell751" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell752" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell753" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell754" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell755" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell756" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell757" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell758" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell759" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell760" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell761" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell762" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell763" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell764" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row41">
+          <TableCell Name="Cell765" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell766" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell767" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell768" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell769" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell770" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell771" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell772" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell773" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell774" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell775" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell776" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell777" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell778" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell779" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell780" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell781" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell782" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell783" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell784" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell785" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell786" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell787" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell788" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell789" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row42">
+          <TableCell Name="Cell790" Border.Lines="All" Text="Account debit, UAH/USD/EUR" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 12pt" ColSpan="13" RowSpan="2"/>
+          <TableCell Name="Cell791" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell792" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell793" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell794" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell795" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell796" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell797" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell798" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell799" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell800" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell801" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell802" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell803" Border.Lines="All" Text="Account credit, UAH/USD/EUR" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 12pt" ColSpan="12" RowSpan="2"/>
+          <TableCell Name="Cell804" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell805" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell806" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell807" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell808" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell809" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell810" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell811" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell812" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell813" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell814" Border.Lines="All" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row43">
+          <TableCell Name="Cell815" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell816" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell817" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell818" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell819" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell820" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell821" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell822" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell823" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell824" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell825" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell826" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell827" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell828" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell829" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell830" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell831" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell832" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell833" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell834" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell835" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell836" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell837" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell838" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell839" Border.Lines="All" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row44">
+          <TableCell Name="Cell840" Border.Lines="All" Font="Times New Roman, 12pt" ColSpan="13" RowSpan="2"/>
+          <TableCell Name="Cell841" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell842" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell843" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell844" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell845" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell846" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell847" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell848" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell849" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell850" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell851" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell852" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell853" Border.Lines="All" Font="Times New Roman, 12pt" ColSpan="12" RowSpan="2"/>
+          <TableCell Name="Cell854" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell855" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell856" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell857" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell858" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell859" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell860" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell861" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell862" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell863" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell864" Border.Lines="All" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row45">
+          <TableCell Name="Cell865" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell866" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell867" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell868" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell869" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell870" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell871" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell872" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell873" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell874" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell875" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell876" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell877" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell878" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell879" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell880" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell881" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell882" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell883" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell884" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell885" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell886" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell887" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell888" Border.Lines="All" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell889" Border.Lines="All" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row46">
+          <TableCell Name="Cell890" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell891" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell892" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell893" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell894" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell895" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell896" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell897" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell898" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell899" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell900" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell901" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell902" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell903" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell904" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell905" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell906" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell907" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell908" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell909" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell910" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell911" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell912" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell913" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell914" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row47">
+          <TableCell Name="Cell915" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell916" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell917" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell918" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell919" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell920" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell921" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell922" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell923" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell924" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell925" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell926" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell927" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell928" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell929" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell930" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell931" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell932" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell933" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell934" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell935" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell936" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell937" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell938" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell939" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row48">
+          <TableCell Name="Cell940" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell941" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell942" Text="Head of the  Branch" Font="Times New Roman, 12pt" ColSpan="7"/>
+          <TableCell Name="Cell943" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell944" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell945" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell946" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell947" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell948" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell949" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell950" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell951" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell952" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell953" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell954" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell955" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell956" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell957" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell958" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell959" Border.Lines="Bottom" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell960" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell961" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell962" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell963" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell964" Font="Times New Roman, 12pt"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+    <PageFooterBand Name="PageFooter2" Top="613.05" Width="718.2" Height="18.9"/>
+  </ReportPage>
+</Report>

@@ -1,0 +1,59 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+}
+
+<link rel="stylesheet" href="~/Areas/Crkr/Content/sighting.css" />
+
+<script src="~/Areas/Crkr/Scripts/Sighting/sighting.js"></script>
+
+<div id="toolbar"></div>
+<div id="tabstrip">
+    <ul>
+        <li>Актуалізація вкладу <span class="badge" id="tab0"></span></li>
+        <li>Актуалізація на поховання <span class="badge" id="tab1"></span></li>
+        <li>Актуалізація по спадщині <span class="badge" id="tab2"></span></li>
+        <li>Оформлення спадщини <span class="badge" id="tab3"></span></li>
+        <li>Запити на відміну актуалізації <span class="badge" id="tab4"></span></li>
+        <li>Бенефіціари<span class="badge" id="tab5"></span></li>
+    </ul>
+    <div class="panels">
+        <div id="opersightact"></div>
+    </div>
+    <div class="panels">
+        <div id="opersightfun"></div>
+    </div>
+    <div class="panels">
+        <div id="opersighther"></div>
+    </div>
+    <div class="panels">
+        <div id="replenishment"></div>
+    </div>
+    <div class="panels">
+        <div id="cancelactual"></div>
+    </div>
+    <div class="panels">
+        <div id="benefactual"></div>
+    </div>
+</div>
+
+
+<!--Вікно введення причини сторнування-->
+<div id="reasonWindow">
+    <div id="window" class="contaiter">
+        <form class="form-horizontal">
+            <div class="col-xs-10">
+                <div class="form-group">
+                    <div class="col-xs-7">
+                        <input type="text" class="k-textbox" id="reason" name="reason" placeholder="Причина повернення">
+                    </div>
+                    <div class="col-xs-3">
+                        <button type="button" id="storno" class="k-button" style="width: 120px"><span class="k-sprite pf-icon pf-16 pf-arrow_left" style="margin-bottom: 3px"></span> Повернути</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+@Html.Partial("~/Areas/Crkr/PartialView/Error.cshtml")

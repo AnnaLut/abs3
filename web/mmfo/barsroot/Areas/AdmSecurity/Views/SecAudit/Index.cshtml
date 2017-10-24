@@ -1,0 +1,32 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = "Перегляд архіву журналу аудиту";
+}
+
+@Scripts.Render("~/bundles/AdmSecurity/SecAudit")
+
+<link href="~/Areas/AdmSecurity/Css/secAudit.css" rel="stylesheet"/>
+
+<div class="page-header">
+    <h1>@ViewBag.Title</h1>
+</div>
+
+<div class="toolbar">
+    <div class="inline"><h4><b>Дата з:</b></h4>
+    </div>
+    <div class="inline">
+        <input id="start"/>
+    </div>
+    <div class="inline"><h4><b>по:</b></h4>
+    </div>
+    <div class="inline">
+        <input id="end"/>
+    </div>
+    <div class="inline">
+        <button id="UsePeriod" class='btn btn-success'> Задати період </button>
+    </div>
+</div>
+
+<div id="AuditGrid"></div>
+
+

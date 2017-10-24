@@ -1,0 +1,544 @@
+﻿@using Areas.DptAdm.Models
+@using BarsWeb.Areas.DptAdm.Models
+@model pipe_DPT_VIDD_INFO
+
+<script src="@Url.Content("~/Areas/DptAdm/Scripts/AdmCtrl.js")"></script>
+<link href="~/Areas/DptAdm/Content/style.css" rel="stylesheet" />
+@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = "Адміністрування продуктів депозити фізичних осіб";
+    var vidd_style = new { @class = "vidd_style", style = "font-size: 0.9em; text-align: right; margin: 15px 15px 5px 15px;" };
+    var panel_headers = new { @class = "panel_headers", style = "font-size: 1.12em; margin: 15px 15px 5px 15px;" };
+}
+
+<h2>@ViewBag.Title</h2>
+
+<div id="splitter" style="height: 95%; overflow-y: hidden;">
+    <div class="panel panel-primary" style="height: 15%; overflow-y: hidden; border:none;" >
+        <div class="panel-heading">
+            <h3 class="panel-title">Перелік типів депозитних договорів</h3>
+        </div>
+        <div class="panel-body" style="height: 40%; padding: 0px;">
+            <div id="grid_dpt_types"></div>
+        </div>
+   </div>
+    <div  style="height: 15%; overflow-y: hidden;">
+        <div class="panel-heading"  style="height: 13px; overflow-y: hidden; background-color:lightskyblue">
+            <h3 class="panel-title">Види депозитних договорів</h3>
+        </div>
+       <div class="panel-body" style="height: 100%; padding: 0px; overflow-y: hidden;">
+            <div id="panel-body">
+                <div id="grid_dpt_vidd" style="padding: 0px;  overflow-x: hidden;"></div>
+            </div>
+       </div>
+    </div>
+</div>
+
+@(Html.Kendo().Window().Name("wnd_vidd_info")
+    .Title("Картка виду вкладу")
+    .Width(920)
+    .Height(560)
+    .Draggable()
+    .Modal(true)
+    .Visible(false)
+        .Content(@<text>
+        <div id="tabviddstrip">
+            <ul>
+                <li class="k-state-active">Загальні параметри</li>
+                <li>Параметри нарахування %%</li>
+                <li>Параметри повернення депозиту</li>
+                <li>Додаткові параметри</li>                
+            </ul>
+            <!--              первая вкладка  -->
+            <div>
+                <asp:Panel ID="panelbar" runat="server" GroupingText="Картка виду вкладу">
+                    <table class="InnerTable1" width="100%" cellpadding="3">
+                        <tr class="panel_headers">
+                            <td><div class="k-header" style="font-size:1.12em"></div></td>
+                        </tr>
+                        <tr class="vidd_style">
+                            <td class="vidd_style"><label style="margin-right: 10px; text-align: right;">Найменування вида вклада:</label></td>
+                            <td width="50">
+                                <input id="VIDD"/>
+                            </td>
+                            <td>
+                               <input id="TYPE_NAME" maxlength="50" style="width:350px"/>
+                               @(Html.Kendo().DropDownList().Name("TYPE_CODE").HtmlAttributes(new { style = "width:150px; font-size:0.9em;", @maxlength=5 }))
+                            </td>
+                        </tr>
+                        <tr class="vidd_style">
+                            <td class=" vidd_style">
+                            <label style="margin-right: 10px; text-align: right;">Валюта виду вклада:</label></td>
+                            <td>
+                                @(Html.Kendo().TextBox().Name("val_kv").HtmlAttributes(new { style = "width:100px"}).Enable(false))
+                            </td>
+                            <td>
+                                @(Html.Kendo().DropDownList().Name("kvlst").HtmlAttributes(new { style = "width:365px; font-size:0.9em;" }))
+                            </td>
+                        </tr>
+                        <tr class ="vidd_style">
+                            <td class="vidd_style"><label style="margin-right: 10px; text-align: right;">Мінімальна сума виду вклада:</label></td>
+                            <td>
+                                <input id="LIMIT" step="100" />
+                            </td>                           
+                            </tr>
+                    </table>
+                </asp:Panel>
+                <asp:Panel ID="panel2" runat="server" GroupingText="Термін дії вкладу">
+                    <table class="InnerTable1" width="100%" cellpadding="3" style="margin: 2px 15px 5px 15px">
+                        <tr class="panel_headers">
+                            <td><div class="k-header" style="font-size:1.12em">Тип терміну</div></td>
+                            <td><div class="k-header" style="font-size:1.12em">міс.+днів </div></td>
+                            <td><div class="k-header" style="font-size:1.12em">Період дії виду депозиту</div></td>
+                        </tr>
+                        <tr class="vidd_style">
+                            <td>
+                                @(Html.Kendo().RadioButton().Name("term1").Value(1).HtmlAttributes(new { @name = "term1" }))
+                                <label style="margin-left:25px">Фіксований</label>
+                            </td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr class="vidd_style">
+                            <td>
+                                @(Html.Kendo().RadioButton().Name("term2").Value(0).HtmlAttributes(new { @name = "term1" }))
+                                <label style="margin-left:25px">1,2,3...</label>
+                            </td>
+                            <td>
+                                @(Html.Kendo().NumericTextBox().Name("months").HtmlAttributes(new { style = "width:150px" }).Format("0").Min(0).Max(100))+
+                                @(Html.Kendo().NumericTextBox().Name("days").HtmlAttributes(new { style = "width:150px" }).Format("0").Min(0).Max(31))
+                            </td>
+                            <td></td>
+                        </tr>
+                        <tr class ="vidd_style">
+                            <td>
+                                @(Html.Kendo().RadioButton().Name("term3").Value(2).HtmlAttributes(new { @name = "term1" }))
+                                <label style="margin-left:25px">Діапазон</label>
+                            </td>
+                            <td>
+                            @(Html.Kendo().NumericTextBox().Name("months_max").HtmlAttributes(new { style = "width:150px" }).Format("0").Min(0).Max(100))+
+                            @(Html.Kendo().NumericTextBox().Name("days_max").HtmlAttributes(new { style = "width:150px" }).Format("0").Min(0).Max(31))                           
+                            </td>
+                            <td>
+                                @(Html.Kendo().DatePicker().Name("from").Format("dd.MM.yyyy")) -
+                                @(Html.Kendo().DatePicker().Name("till").Format("dd.MM.yyyy"))
+                            </td>
+                            </tr>
+                    </table>
+                </asp:Panel>
+                <asp:Panel ID="panel3" runat="server" GroupingText="Балансові рахунки">
+                    <table class="InnerTable1" width="100%" cellpadding="3" style="margin: 15px 15px 5px 15px; outline-offset:10px">
+                        <tr class="panel_headers">
+                            <div class="k-header" style="font-size:1.12em">Балансові рахунки</div>
+                        </tr>
+                        <tr class="vidd_style">
+                            <td style="margin: 5px 5px 5px 5px;"></td>
+                            <td>@(Html.Kendo().CheckBox().Name("avans"))<label style="margin-left:25px">Авансовий</label></td>
+                            <td></td>
+                        </tr>
+                        <tr class="vidd_style">
+                            <td style="text-align: right;"><label style="margin-right:10px">Балансовий рахунок депозита</label></td>
+                            <td>
+                                @(Html.Kendo().DropDownList().Name("bsdlst").HtmlAttributes(new { style = "width:450px; font-size:0.9em;" }))
+                            </td>
+                            <td></td>
+                        </tr>
+                        <tr class="vidd_style">
+                            <td style="text-align: right;"><label style="margin-right:10px">Балансовий рахунок нарахованих %%</label></td>
+                            <td>
+                                @(Html.Kendo().DropDownList().Name("bsnlst").HtmlAttributes(new { style = "width:450px; font-size:0.9em;" }))
+                            </td>
+                            <td></td>
+                        </tr>
+                        <tr class="vidd_style">
+                            <td style="text-align: right;"><label style="margin-right:10px">Балансовий рахунок амортизації</label></td>
+                            <td>
+                                @(Html.Kendo().DropDownList().Name("bsalst").HtmlAttributes(new { style = "width:450px; font-size:0.9em;" }))
+                            </td>
+                            <td></td>
+                        </tr>
+                    </table>
+                </asp:Panel>
+                <asp:Panel ID="panel4" runat="server" GroupingText="Поповнення вкладу">
+                    <table class="InnerTable1" width="100%" cellpadding="3" style="margin: 15px 15px 5px 15px; outline-offset:10px">
+                        <tr class="panel_headers">
+                            <div class="k-header" style="font-size:1.12em">Поповнення вкладу</div>
+                        </tr>
+                        <tr class="vidd_style">
+                            <td style="text-align: right;"><label style="margin-right:10px">Мінімальна сума поповнення</label></td>
+                            <td>@(Html.Kendo().NumericTextBox().Name("minadd").HtmlAttributes(new { style = "width:150px" }))</td>
+                            <td>@(Html.Kendo().CheckBox().Name("noadd"))<label style="margin-left:25px">Вклад без поповнення</label></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr class="vidd_style">
+                            <td style="text-align: right;"><label style="margin-right:10px">Максимальна сума поповнення</label></td>
+                            <td>@(Html.Kendo().NumericTextBox().Name("maxadd").HtmlAttributes(new { style = "width:150px" }))</td>
+                            <td>@(Html.Kendo().CheckBox().Name("autoadd"))<label style="margin-left:25px">Авто-поповнення</label></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr class="vidd_style">
+                            <td style="text-align: right;"><label style="margin-right:10px">Строк поповнення</label></td>
+                            <td>@(Html.Kendo().NumericTextBox().Name("termaddmin").HtmlAttributes(new { style="width:150px"}).Format("0"))<label>міс. +</label></td>
+                            <td>@(Html.Kendo().NumericTextBox().Name("termaddmax").Format("0"))<label>днів</label></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </table>
+                </asp:Panel>
+                <!--              первая вкладка закончилась -->
+            </div>
+            <!--              вторая вкладка  -->
+            <div>
+                <asp:Panel ID="panel5" runat="server" GroupingText="Нарахування %%">
+                    <table class="InnerTable1" width="100%" cellpadding="3" style="margin: 15px 15px 5px 15px; outline-offset:10px">
+                        <tr class="page-header">
+                            <div class="k-header" style="font-size:1.12em">Нарахування %%</div>
+                        </tr>
+                        <tr class="vidd_style">
+                            <td style="text-align: right;"><label style="margin-right:10px; width:250px;">Базові параметри</label></td>
+                            <td>@(Html.Kendo().TextBox().Name("basey").HtmlAttributes(new { style = "width:50px; font-size:10px" }).Enable(false))</td>
+                            <td>@(Html.Kendo().DropDownList().Name("baseyddl").HtmlAttributes(new { style = "width:350px; font-size:0.9em;" }))</td>
+                            <td style="width:50px"></td>
+                            <td style="width:100px"></td>
+                        </tr>
+                        <tr class="vidd_style">
+                            <td style="text-align: right;"><label style="margin-right: 10px">Періодичність нарахування %%</label></td>
+                            <td>@(Html.Kendo().TextBox().Name("freq_int").HtmlAttributes(new { style = "width:50px; font-size:10px" }).Enable(false))</td>
+                            <td>@(Html.Kendo().DropDownList().Name("freq_intddl").HtmlAttributes(new { style = "width:350px; font-size:0.9em;" }))</td>
+                            <td style="width:50px"></td>
+                            <td style="width:100px"></td>
+                        </tr>
+                        <tr class="vidd_style">
+                            <td style="text-align: right;"><label style="margin-right: 10px">Метод нарахування</label></td>
+                            <td>@(Html.Kendo().TextBox().Name("method").HtmlAttributes(new { style = "width:50px; font-size:10px" }).Enable(false))</td>
+                            <td>@(Html.Kendo().DropDownList().Name("methodddl").HtmlAttributes(new { style = "width:350px; font-size:0.9em;" }))</td>
+                            <td>@(Html.Kendo().TextBox().Name("tt").HtmlAttributes(new { style = "width:50px;" }))</td>
+                            <td style="width:100px"></td>
+                        </tr>
+                        <tr class="vidd_style">
+                            <td style="text-align: right;"><label style="margin-right: 10px;">Тип обчисленя залишку</label></td>
+                            <td>@(Html.Kendo().TextBox().Name("ost").HtmlAttributes(new { style = "width:50px; font-size:10px" }).Enable(false))</td>
+                            <td>@(Html.Kendo().DropDownList().Name("ostddl").HtmlAttributes(new { style = "width:350px; font-size:0.9em;" }))</td>
+                            <td style="width:50px"></td>
+                            <td style="width:100px"></td>
+                        </tr>
+                    </table>
+                </asp:Panel>
+                <asp:Panel ID="panel6" runat="server" GroupingText="Виплата %%">
+                    <table class="InnerTable1" width="100%" cellpadding="3" style="margin: 15px 15px 5px 15px; outline-offset:10px">
+                        <tr class="page-header">
+                            <div class="k-header" style="font-size:1.12em">Виплата %%</div>
+                        </tr>
+                        <tr class="vidd_style">
+                            <td style="text-align: right;"><label style="margin-right: 10px; width: 250px; ">Періодичність виплати</label></td>
+                            <td>@(Html.Kendo().TextBox().Name("pay").HtmlAttributes(new { style = "width:50px; font-size:10px" }).Enable(false))</td>
+                            <td>@(Html.Kendo().DropDownList().Name("payddl").HtmlAttributes(new { style = "width:350px; font-size:0.9em;" }))</td>
+                            <td style="width:50px"></td>
+                            <td style="width:100px"></td>
+                        </tr>
+                        <tr class="vidd_style">
+                            <td></td>
+                            <td></td>
+                            <td>@(Html.Kendo().CheckBox().Name("capddl").HtmlAttributes(new { style = "margin-top:5px" }))<label style="margin-left: 25px; margin-top:5px; ">Капіталізація нарахованих відсотків</label></td>
+                            <td style="width:50px"></td>
+                            <td style="width:100px"></td>
+                        </tr>
+                    </table>
+                </asp:Panel>
+                <asp:Panel ID="panel7" runat="server" GroupingText="%% ставка">
+                    <table class="InnerTable1" width="100%" cellpadding="3" style="margin: 15px 15px 5px 15px; outline-offset:10px">
+                        <tr class="panel_headers">
+                            <div class="k-header" style="font-size:1.12em">Відсоткова ставка</div>
+                        </tr>
+                        <tr class="vidd_style">
+                            <td style="text-align: right;"><label style="margin-right: 10px; width: 250px;">Відсоткова ставка</label></td>
+                            <td>@(Html.Kendo().TextBox().Name("intr").HtmlAttributes(new { style = "width:50px; font-size:10px" }).Enable(false))</td>
+                            <td>@(Html.Kendo().DropDownList().Name("intrddl").HtmlAttributes(new { style = "width:350px; font-size:0.9em;" }))</td>
+                            <td>@(Html.Kendo().TextBox().Name("PROC").HtmlAttributes(new { style = "width:50px", Title = "Актуальне значення основної %% ставки" }).Enable(false))</td>
+                            <td>@(Html.Kendo().TextBox().Name("DAT_BRAT").HtmlAttributes(new { style = "width:90px", Title = "Остання дата встановлення основної %% ставки" }).Enable(false))</td>                            
+                        </tr>
+                        <tr class="vidd_style">
+                            <td style="margin-right:10px"></td>
+                            <td></td>
+                            <td>@(Html.Kendo().CheckBox().Name("int_fix").HtmlAttributes(new { style = "margin-top:5px" }))<label style="margin-left: 25px; margin-top:5px; ">Фіксована %% ставка</label></td>
+                            <td style="width:50px"></td>
+                            <td><button id="buttonTierBrate" type="button">Ступ. ставка</button>
+                        </tr>
+                    </table>
+                </asp:Panel>
+                <asp:Panel ID="panel8" runat="server" GroupingText="Дострокове повернення">
+                    <table class="InnerTable1" width="100%" cellpadding="3" style="margin: 15px 15px 5px 15px; outline-offset:10px">
+                        <tr class="panel_headers">
+                            <div class="k-header" style="font-size:1.12em">Дострокове повернення</div>
+                        </tr>
+                        <tr class="vidd_style">
+                            <td style="text-align: right;"><label style="margin-right: 10px; width: 250px;">Штраф</label></td>
+                            <td>@(Html.Kendo().TextBox().Name("pen").HtmlAttributes(new { style = "width:50px; font-size:10px; readonly:true;" }).Enable(false))</td>
+                            <td>@(Html.Kendo().DropDownList().Name("penddl").HtmlAttributes(new { style = "width:350px; font-size:0.9em;" }))</td>
+                            <td style="width:50px"></td>
+                            <td style="width:100px"></td>
+                        </tr>
+                        <tr class="vidd_style">
+                            <td style="text-align: right;"><label style="margin-right: 10px; width: 250px;">Ставка часткового зняття</label></td>
+                            <td>@(Html.Kendo().TextBox().Name("part").HtmlAttributes(new { style = "width:50px; font-size:10px" }).Enable(false))</td>
+                            <td>@(Html.Kendo().DropDownList().Name("partddl").HtmlAttributes(new { style = "width:350px; font-size:0.9em;" }))</td>
+                            <td>@(Html.Kendo().TextBox().Name("partval").HtmlAttributes(new { style = "width:50px" }))</td>
+                            <td>@(Html.Kendo().TextBox().Name("partdate").HtmlAttributes(new { style = "width:90px" }))</td>
+                        </tr>
+                    </table>
+                </asp:Panel>
+            </div> <!--              вторая вкладка закончилась -->
+            <div> <!--              третья вкладка  -->
+                <asp:Panel ID="panel9" runat="server" GroupingText="повернення">
+                    <table class="InnerTable1" width="100%" cellpadding="3" style="margin: 15px 15px 5px 15px; outline-offset:10px">
+                        <tr class="panel_headers">
+                            <div class="k-header" style="font-size:1.12em">Параметри повернення</div>
+                        </tr>
+                        <tr class="vidd_style">
+                            <td>@(Html.Kendo().CheckBox().Name("teh2620").HtmlAttributes(new { style = "margin-top:10px" }))<label style="margin-left: 25px; margin-top:10px; ">Перенесення на технічний рахунок/вклад</label></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr class="vidd_style">
+                            <td>@(Html.Kendo().CheckBox().Name("auto_prol_flag1").HtmlAttributes(new { style = "margin-top:10px" }))<label style="margin-left: 25px; margin-top:10px; ">Авто-переоформлення</label></td>
+                            <td><label style="margin-left: 5px; margin-top:5px; ">Максимальна кількість</label></td>
+                            <td>@(Html.Kendo().TextBox().Name("count_double").HtmlAttributes(new { style = "width:50px" }))</td>
+                        </tr>
+                        <tr class="vidd_style">
+                            <td>@(Html.Kendo().CheckBox().Name("auto_prol_flag2").HtmlAttributes(new { style = "margin-top:10px" }))<label style="margin-left: 25px; margin-top:10px; ">Авто-переоформлення (WEB)</label></td>
+                            <td><label style="margin-left: 5px; margin-top:5px; ">Код методу переоформлення вкладу</label></td>
+                            <td>@(Html.Kendo().TextBox().Name("exten").HtmlAttributes(new { style = "width:50px" }).Enable(false))</td>
+                            <td>@(Html.Kendo().DropDownList().Name("extenddl").HtmlAttributes(new { style = "width:500px; font-size:0.9em;" }))</td>
+                        </tr>
+                        <tr class="vidd_style">
+                            <td>@(Html.Kendo().CheckBox().Name("rate_after").HtmlAttributes(new { style = "margin-top:10px" }))<label style="margin-left: 25px; margin-top:10px; ">Ставка після закінчення строку</label></td>
+                            <td><label style="margin-left: 5px; margin-top:5px; ">Ставка до</label></td>
+                            <td>@(Html.Kendo().TextBox().Name("rate_afterval").HtmlAttributes(new { style = "width:50px" }))</td>
+                            <td>@(Html.Kendo().DropDownList().Name("rate_afterddl").HtmlAttributes(new { style = "width:500px; font-size:0.9em;" }))</td>
+                        </tr>
+                        <tr class="vidd_style">
+                            <td>@(Html.Kendo().CheckBox().Name("fee").HtmlAttributes(new { style = "margin-top:10px" }))<label style="margin-left: 25px; margin-top:10px; ">Комісія за виплату коштів, що надійшли безготівково</label></td>
+                            <td><label style="margin-left: 5px; margin-top:5px; ">Код тарифу</label></td>
+                            <td>@(Html.Kendo().TextBox().Name("feeval").HtmlAttributes(new { style = "width:50px" }))</td>
+                            <td>@(Html.Kendo().DropDownList().Name("feeddl").HtmlAttributes(new { style = "width:500px; font-size:0.9em;" }))</td>
+                        </tr>
+                    </table>
+                </asp:Panel>
+            </div><!--              третья вкладка закончилась -->
+            <div><!--              четвертая вкладка -->
+                <asp:Panel ID="panelbar10" runat="server" GroupingText="Перекриття нарахованих відсотків">
+                    <table class="InnerTable1" width="100%" cellpadding="3">
+                        <tr style="font-size: 1.12em; margin: 15px 15px 5px 15px;">
+                            <div class="k-header" style="font-size:1.12em">Перекриття нарахованих відсотків</div>
+                        </tr>
+                        <tr style="font-size: 0.9em; margin: 15px 15px 5px 15px;">
+                            <td style="vidd_style width:250px"><label style="margin-right:10px">Група перекриття</label></td>
+                            <td>
+                                @(Html.Kendo().TextBox().Name("pere").HtmlAttributes(new { style = "width:100px" }))
+                                @(Html.Kendo().DropDownList().Name("pereddl").HtmlAttributes(new { style = "width:300px; font-size:0.9em;" }))
+                            </td>
+                        </tr>
+                        <tr style="font-size: 0.9em; margin: 15px 15px 5px 15px;">
+                            <td style="vidd_style width: 250px"><label style="margin-right:10px">Схема перекриття</label></td>
+                            <td>
+                                @(Html.Kendo().TextBox().Name("peresch").HtmlAttributes(new { style = "width:100px" }))
+                                @(Html.Kendo().DropDownList().Name("pereschddl").HtmlAttributes(new { style = "width:300px; font-size:0.9em;" }))
+                            </td>
+                        </tr>
+                    </table>
+                </asp:Panel>
+                <asp:Panel ID="panelbar11" runat="server" GroupingText="Друк виписки за вкладом">
+                    <table class="InnerTable1" width="100%" cellpadding="3">
+                        <tr style="font-size: 1.12em; margin: 15px 15px 5px 15px;">
+                            <div class="k-header" style="font-size:1.12em">Друк виписки за вкладом</div>
+                        </tr>
+                        <tr style="font-size: 0.9em; margin: 15px 15px 5px 15px;">
+                            <td style="vidd_style width: 250px;"><label style="margin-right:10px">Каталогізований запит</label></td>
+                            <td>
+                                @(Html.Kendo().TextBox().Name("kodz").HtmlAttributes(new { style = "width:100px" }))
+                                @(Html.Kendo().DropDownList().Name("kodzddl").HtmlAttributes(new { style = "width:300px; font-size:0.9em;" }))
+                            </td>
+                        </tr>
+                        <tr style="font-size: 0.9em; margin: 15px 15px 5px 15px;">
+                            <td style="vidd_style width: 250px;"><label style="margin-right:10px">Формат вигрузки</label></td>
+                            <td>
+                                @(Html.Kendo().TextBox().Name("format_kodz").HtmlAttributes(new { style = "width:100px" }))
+                                @(Html.Kendo().DropDownList().Name("format_kodzddl").HtmlAttributes(new { style = "width:300px; font-size:0.9em;" }))
+                            </td>
+                        </tr>
+                    </table>
+                </asp:Panel>
+                <asp:Panel ID="panelbar12" runat="server" GroupingText="Коментар">
+                    <table class="InnerTable1" width="100%" cellpadding="3">
+                        <tr style="font-size: 1.12em; margin: 15px 15px 5px 15px;">
+                            <div class="k-header" style="font-size:1.12em">Коментар</div>
+                        </tr>
+                        <tr style="font-size: 0.9em; margin: 15px 15px 5px 15px;">
+                            <td>
+                                @(Html.Kendo().TextBox().Name("COMMENT").HtmlAttributes(new { style = "width:95%" }))
+                            </td>
+                        </tr>
+                    </table>
+                </asp:Panel>
+            </div><!--              четвертая вкладка закончилась -->           
+        </div>
+        <div>            
+            <button id="buttonSave" type="button">Зберегти</button>
+        </div>
+        </text>))
+
+@(Html.Kendo().Window().Name("wnd_type_info")
+    .Title("Картка типу вкладу")
+    .Width(380)
+    .Height(260)
+    .Draggable()
+    .Modal(true)
+    .Visible(false)
+        .Content(@<text>
+            <table>
+                <tr style="font-size: 1.1em; margin: 15px 15px 5px 15px;">
+                    <td style="text-align: right;"><label style="margin-right: 10px; width: 150px;">Цифровий код типу</label></td>
+                    <td><input id="TYPEINFO_TYPE_ID" /></td></tr>
+                <tr style="font-size: 1.1em; margin: 15px 15px 5px 15px;">
+                    <td style="text-align: right;"><label style="margin-right: 10px; width: 150px;">Найменування</label></td>
+                    <td><input id="TYPEINFO_TYPE_NAME" /></td></tr>                
+                <tr style="font-size: 1.1em; margin: 15px 15px 5px 15px;">
+                    <td style="text-align: right;"><label style="margin-right: 10px; width: 150px;">Символьний код типу</label></td>
+                <td><input id="TYPEINFO_TYPE_CODE" /></td></tr>
+                <tr style="font-size: 1.1em; margin: 15px 15px 5px 15px;">
+                    <td style="text-align: right;"><label style="margin-right: 10px; width: 150px;">Тип строковості</label></td>
+                <td><input id="TYPEINFO_FL_DEMAND" /></td></tr>
+                <tr style="font-size: 1.1em; margin: 15px 15px 5px 15px;">
+                    <td style="text-align: right;"><label style="margin-right: 10px; width: 150px;">Флаг активності</label></td>
+                <td><input id="TYPEINFO_FL_ACTIVE" /></td></tr>
+                <tr style="font-size: 1.1em; margin: 15px 15px 5px 15px;">
+                    <td style="text-align: right;"><label style="margin-right: 10px; width: 150px;">Флаг використання в WEBBANKING</label></td>
+                    <td><input id="TYPEINFO_FL_WEBBANKING" /></td>
+                </tr>
+                <tr style="font-size: 1.1em; margin: 15px 15px 5px 15px;">
+                    <td style="text-align: right;"><label style="margin-right: 10px; width: 150px;">Пріоритет</label></td>
+                    <td><input id="TYPEINFO_SORT_ORD" /></td>
+                </tr>
+                <tr style="font-size: 1.1em; margin: 105px 15px 5px 15px;"><td></td><td><button id="buttonsavetype" type="button" style="align-content:center">Зберегти</button></td></tr>
+            </table>
+</text>))
+
+@(Html.Kendo().Window().Name("wnd_tts")
+    .Title("Операції виду вкладу")
+    .Width(1000)
+    .Height(580)
+    .Draggable()
+    .Modal(true)
+    .Resizable()
+    .Visible(false)
+        .Content(@<text><div id="grid_vidd_tts" style="padding: 0px 0px 0px 0px;"></div></text>))
+
+@(Html.Kendo().Window().Name("wnd_doc")
+    .Title("Шаблони договорів виду вкладу")
+    .Width(1200)
+    .Height(580)
+    .Draggable()
+    .Modal(true)
+    .Visible(false)
+        .Content(@<text><div id="grid_vidd_doc" style="padding: 0px 0px 0px 0px;"></div></text>))
+
+@(Html.Kendo().Window().Name("wnd_doc_add")
+    .Title("Додавання шаблону договорів виду вкладу")
+    .Width(500)
+    .Height(100)
+    .Draggable()
+    .Modal(true)
+    .Visible(false)
+        .Content(@<text><div id="grid_vidd_doc" style="padding: 0px 0px 0px 0px;"><table>
+        <tr style="font-size: 1.1em; margin: 15px 15px 5px 15px;">
+            <td style="text-align: right;"><label style="margin-right: 10px; width: 150px;">Доступні флаги</label></td>
+            <td><input id="Avaliable_FLG" /></td>
+        </tr>
+        <tr style="font-size: 1.1em; margin: 15px 15px 5px 15px;">
+            <td style="text-align: right;"><label style="margin-right: 10px; width: 150px;">Шаблон</label></td>
+            <td><input id="Avaliable_DOC" /></td>
+        </tr>
+        <tr style="font-size: 1.1em; margin: 15px 15px 5px 15px;">
+            <td style="text-align: right;"><label style="margin-right: 10px; width: 150px;">Шаблон FRX</label></td>
+            <td><input id="Avaliable_DOC_FR" /></td>
+        </tr>
+    <tr style="font-size: 1.1em; margin: 105px 15px 5px 15px;"><td></td><td><button id="buttonadddoc" type="button" style="align-content:center">Додати</button></td></tr>
+</table></div></text>))
+
+@(Html.Kendo().Window().Name("wnd_param")
+    .Title("Параметри виду вкладу")
+    .Width(800)
+    .Height(500)
+    .Draggable()
+    .Modal(true)
+    .Resizable()
+    .Visible(false)
+        .Content(@<text><div id="grid_vidd_param" style="padding: 0px 0px 0px 0px;"></div>
+ </text>))
+
+
+@(Html.Kendo().Window().Name("wnd_typedoc")
+    .Title("Шаблони типу вкладу")
+    .Width(1000)
+    .Height(600)
+    .Draggable()
+    .Modal(true)
+    .Resizable()
+    .Visible(false)
+        .Content(@<text><div id="grid_type_doc" style="padding: 0px 0px 0px 0px;"></div>
+        </text>))
+
+@(Html.Kendo().Window().Name("wnd_bratestier")
+        .Title("Ступінчата %% ставка")
+        .Width(400)
+        .Modal(true)
+        .Visible(false)
+        .Resizable()
+        .Draggable()
+        //.Position(settings => settings.Top(400).Left(1000))
+        .Content(@<text><div id="grid_br_tier" style="padding:0px 0px 0px 0px;"></div></text>)
+)
+
+
+<script>
+    $("#splitter").kendoSplitter({
+        orientation: "vertical",
+        panes: [{ size: "30%" }, {}]       
+    })
+  
+    $("#tabviddstrip").kendoTabStrip({
+        animation: {
+            close: {
+                duration: 0,
+                effects: "fadeOut"
+            },
+            open: {
+                duration: 0,
+                effects: "fadeIn"
+            }
+        }
+    })
+
+    $("#panelbar").kendoPanelBar()
+
+    var onSelect = function (e) {
+        $("#panelbar").data("kendoPanelBar").bind("select", onSelect);
+    }
+
+    $("#panelbar").data("kendoPanelBar").bind("select", onSelect);
+
+    $('#wnd_vidd_info').keypress(function (e) {
+        if (e.which == 13) {
+            $("#buttonSave").click();
+        }
+        if (e.which == 27) {           
+            $('#wnd_vidd_info').close;
+        }
+    })
+</script>

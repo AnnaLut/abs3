@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<xmlform caption="Історія зміни статусів" >
+  <grids>
+    <grid id="frmZayStat" pagesize="10" showpagesizebox="true" >
+      <datasource>
+        <sql>
+          select id, to_char(change_time, 'dd.mm.yyyy HH24:MI:SS') change_time, fio, viza_name from V_ZAY_TRACK where id = :id
+        </sql>
+        <parameters>
+          <parameter  type="QueryString" name="id" altname="id"/>
+        </parameters>
+      </datasource>
+      <fields>
+        <field name="id" datatype="Int64" key="true">
+          <column show="true" caption="ID заявки"  width="100"/>
+        </field>
+        <field name="change_time" datatype="String" key="false">
+          <column show="true" caption="Час зміни статусу заявки"  width="100"/>
+        </field>
+        <field name="fio" datatype="String" key="false">
+          <column show="true" caption="ПІБ користувача, що змінив стан заявки"  width="400"/>
+        </field>
+        <field name="viza_name" datatype="String" key="false">
+          <column show="true" caption="Статус заявки"  width="150"/>
+        </field>
+      </fields>
+    </grid>
+  </grids>
+</xmlform>

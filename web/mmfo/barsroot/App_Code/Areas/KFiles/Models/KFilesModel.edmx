@@ -1,0 +1,424 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="2.0" xmlns:edmx="http://schemas.microsoft.com/ado/2008/10/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="KFilesModel.Store" Provider="Oracle.DataAccess.Client" ProviderManifestToken="11.2" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/02/edm/ssdl">
+        <EntityType Name="OB_CORPORATION">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="number" Precision="5" Scale="0" Nullable="false" />
+          <Property Name="CORPORATION_CODE" Type="varchar2" MaxLength="15" />
+          <Property Name="CORPORATION_NAME" Type="varchar2" MaxLength="300" />
+          <Property Name="PARENT_ID" Type="number" Precision="5" Scale="0" />
+          <Property Name="STATE_ID" Type="number" Precision="5" Scale="0" />
+          <Property Name="EXTERNAL_ID" Type="varchar2" MaxLength="30" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'BARS.OB_CORPORATION_DATA' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="OB_CORPORATION_DATA">
+          <Key>
+            <PropertyRef Name="CORPORATION_ID" />
+            <PropertyRef Name="FILE_DATE" />
+            <PropertyRef Name="SESSION_ID" />
+          </Key>
+          <Property Name="CORPORATION_ID" Type="number" Precision="5" Scale="0" Nullable="false" />
+          <Property Name="FILE_DATE" Type="date" Nullable="false" />
+          <Property Name="ROWTYPE" Type="number" Precision="38" Scale="0" />
+          <Property Name="OURMFO" Type="varchar2" MaxLength="6" />
+          <Property Name="NLS" Type="varchar2" MaxLength="14" />
+          <Property Name="KV" Type="number" Precision="38" Scale="0" />
+          <Property Name="OKPO" Type="varchar2" MaxLength="14" />
+          <Property Name="OBDB" Type="number" Precision="38" Scale="0" />
+          <Property Name="OBDBQ" Type="number" Precision="38" Scale="0" />
+          <Property Name="OBKR" Type="number" Precision="38" Scale="0" />
+          <Property Name="OBKRQ" Type="number" Precision="38" Scale="0" />
+          <Property Name="OST" Type="number" Precision="38" Scale="0" />
+          <Property Name="OSTQ" Type="number" Precision="38" Scale="0" />
+          <Property Name="KOD_CORP" Type="number" Precision="38" Scale="0" />
+          <Property Name="KOD_USTAN" Type="number" Precision="38" Scale="0" />
+          <Property Name="KOD_ANALYT" Type="varchar2" MaxLength="4" />
+          <Property Name="DAPP" Type="date" />
+          <Property Name="POSTDAT" Type="date" />
+          <Property Name="DOCDAT" Type="date" />
+          <Property Name="VALDAT" Type="date" />
+          <Property Name="ND" Type="varchar2" MaxLength="10" />
+          <Property Name="VOB" Type="number" Precision="38" Scale="0" />
+          <Property Name="DK" Type="number" Precision="38" Scale="0" />
+          <Property Name="MFOA" Type="varchar2" MaxLength="6" />
+          <Property Name="NLSA" Type="varchar2" MaxLength="14" />
+          <Property Name="KVA" Type="number" Precision="38" Scale="0" />
+          <Property Name="NAMA" Type="varchar2" MaxLength="70" />
+          <Property Name="OKPOA" Type="varchar2" MaxLength="14" />
+          <Property Name="MFOB" Type="varchar2" MaxLength="6" />
+          <Property Name="NLSB" Type="varchar2" MaxLength="14" />
+          <Property Name="KVB" Type="number" Precision="38" Scale="0" />
+          <Property Name="NAMB" Type="varchar2" MaxLength="70" />
+          <Property Name="OKPOB" Type="varchar2" MaxLength="14" />
+          <Property Name="S" Type="number" Precision="38" Scale="0" />
+          <Property Name="DOCKV" Type="number" Precision="38" Scale="0" />
+          <Property Name="SQ" Type="number" Precision="38" Scale="0" />
+          <Property Name="NAZN" Type="varchar2" MaxLength="160" />
+          <Property Name="DOCTYPE" Type="number" Precision="38" Scale="0" />
+          <Property Name="POSTTIME" Type="date" />
+          <Property Name="NAMK" Type="varchar2" MaxLength="70" />
+          <Property Name="NMS" Type="varchar2" MaxLength="70" />
+          <Property Name="TT" Type="varchar2" MaxLength="3" />
+          <Property Name="SESSION_ID" Type="number" Precision="10" Scale="0" Nullable="false" />
+        </EntityType>
+        <EntityType Name="OB_CORPORATION_SESSION">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="number" Precision="10" Scale="0" Nullable="false" />
+          <Property Name="FILE_MFO" Type="number" Precision="6" Scale="0" Nullable="false" />
+          <Property Name="FILE_DATE" Type="date" Nullable="false" />
+          <Property Name="FILE_CORPORATION_ID" Type="number" Precision="5" Scale="0" />
+          <Property Name="FILE_DATA" Type="clob" />
+          <Property Name="STATE_ID" Type="number" Precision="5" Scale="0" Nullable="false" />
+          <Property Name="SYS_TIME" Type="date" Nullable="false" />
+          <Property Name="SYNC_TYPE" Type="varchar2" MaxLength="4" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_CORP_DATA_REF_CORPORATION">
+          <End Role="OB_CORPORATION" Type="Self.OB_CORPORATION" Multiplicity="1" />
+          <End Role="OB_CORPORATION_DATA" Type="Self.OB_CORPORATION_DATA" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="OB_CORPORATION">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="OB_CORPORATION_DATA">
+              <PropertyRef Name="CORPORATION_ID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_CORP_DATA_REF_SESSION">
+          <End Role="OB_CORPORATION_SESSION" Type="Self.OB_CORPORATION_SESSION" Multiplicity="1" />
+          <End Role="OB_CORPORATION_DATA" Type="Self.OB_CORPORATION_DATA" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="OB_CORPORATION_SESSION">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="OB_CORPORATION_DATA">
+              <PropertyRef Name="SESSION_ID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_OB_CORPO_REFERENCE_OB_CORPO">
+          <End Role="OB_CORPORATION" Type="Self.OB_CORPORATION" Multiplicity="0..1" />
+          <End Role="OB_CORPORATION1" Type="Self.OB_CORPORATION" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="OB_CORPORATION">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="OB_CORPORATION1">
+              <PropertyRef Name="PARENT_ID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="KFilesModelStoreContainer">
+          <EntitySet Name="OB_CORPORATION" EntityType="Self.OB_CORPORATION" Schema="BARS" store:Type="Tables" />
+          <EntitySet Name="OB_CORPORATION_SESSION" EntityType="Self.OB_CORPORATION_SESSION" Schema="BARS" store:Type="Tables" />
+          <EntitySet Name="OB_CORPORATION_DATA" EntityType="Self.OB_CORPORATION_DATA" store:Type="Tables" store:Schema="BARS">
+            <DefiningQuery>SELECT 
+"OB_CORPORATION_DATA"."CORPORATION_ID" AS "CORPORATION_ID", 
+"OB_CORPORATION_DATA"."FILE_DATE" AS "FILE_DATE", 
+"OB_CORPORATION_DATA"."ROWTYPE" AS "ROWTYPE", 
+"OB_CORPORATION_DATA"."OURMFO" AS "OURMFO", 
+"OB_CORPORATION_DATA"."NLS" AS "NLS", 
+"OB_CORPORATION_DATA"."KV" AS "KV", 
+"OB_CORPORATION_DATA"."OKPO" AS "OKPO", 
+"OB_CORPORATION_DATA"."OBDB" AS "OBDB", 
+"OB_CORPORATION_DATA"."OBDBQ" AS "OBDBQ", 
+"OB_CORPORATION_DATA"."OBKR" AS "OBKR", 
+"OB_CORPORATION_DATA"."OBKRQ" AS "OBKRQ", 
+"OB_CORPORATION_DATA"."OST" AS "OST", 
+"OB_CORPORATION_DATA"."OSTQ" AS "OSTQ", 
+"OB_CORPORATION_DATA"."KOD_CORP" AS "KOD_CORP", 
+"OB_CORPORATION_DATA"."KOD_USTAN" AS "KOD_USTAN", 
+"OB_CORPORATION_DATA"."KOD_ANALYT" AS "KOD_ANALYT", 
+"OB_CORPORATION_DATA"."DAPP" AS "DAPP", 
+"OB_CORPORATION_DATA"."POSTDAT" AS "POSTDAT", 
+"OB_CORPORATION_DATA"."DOCDAT" AS "DOCDAT", 
+"OB_CORPORATION_DATA"."VALDAT" AS "VALDAT", 
+"OB_CORPORATION_DATA"."ND" AS "ND", 
+"OB_CORPORATION_DATA"."VOB" AS "VOB", 
+"OB_CORPORATION_DATA"."DK" AS "DK", 
+"OB_CORPORATION_DATA"."MFOA" AS "MFOA", 
+"OB_CORPORATION_DATA"."NLSA" AS "NLSA", 
+"OB_CORPORATION_DATA"."KVA" AS "KVA", 
+"OB_CORPORATION_DATA"."NAMA" AS "NAMA", 
+"OB_CORPORATION_DATA"."OKPOA" AS "OKPOA", 
+"OB_CORPORATION_DATA"."MFOB" AS "MFOB", 
+"OB_CORPORATION_DATA"."NLSB" AS "NLSB", 
+"OB_CORPORATION_DATA"."KVB" AS "KVB", 
+"OB_CORPORATION_DATA"."NAMB" AS "NAMB", 
+"OB_CORPORATION_DATA"."OKPOB" AS "OKPOB", 
+"OB_CORPORATION_DATA"."S" AS "S", 
+"OB_CORPORATION_DATA"."DOCKV" AS "DOCKV", 
+"OB_CORPORATION_DATA"."SQ" AS "SQ", 
+"OB_CORPORATION_DATA"."NAZN" AS "NAZN", 
+"OB_CORPORATION_DATA"."DOCTYPE" AS "DOCTYPE", 
+"OB_CORPORATION_DATA"."POSTTIME" AS "POSTTIME", 
+"OB_CORPORATION_DATA"."NAMK" AS "NAMK", 
+"OB_CORPORATION_DATA"."NMS" AS "NMS", 
+"OB_CORPORATION_DATA"."TT" AS "TT", 
+"OB_CORPORATION_DATA"."SESSION_ID" AS "SESSION_ID"
+FROM "BARS"."OB_CORPORATION_DATA" "OB_CORPORATION_DATA"</DefiningQuery>
+          </EntitySet>
+          <AssociationSet Name="FK_CORP_DATA_REF_CORPORATION" Association="Self.FK_CORP_DATA_REF_CORPORATION">
+            <End Role="OB_CORPORATION" EntitySet="OB_CORPORATION" />
+            <End Role="OB_CORPORATION_DATA" EntitySet="OB_CORPORATION_DATA" />
+          </AssociationSet>
+          <AssociationSet Name="FK_CORP_DATA_REF_SESSION" Association="Self.FK_CORP_DATA_REF_SESSION">
+            <End Role="OB_CORPORATION_SESSION" EntitySet="OB_CORPORATION_SESSION" />
+            <End Role="OB_CORPORATION_DATA" EntitySet="OB_CORPORATION_DATA" />
+          </AssociationSet>
+          <AssociationSet Name="FK_OB_CORPO_REFERENCE_OB_CORPO" Association="Self.FK_OB_CORPO_REFERENCE_OB_CORPO">
+            <End Role="OB_CORPORATION" EntitySet="OB_CORPORATION" />
+            <End Role="OB_CORPORATION1" EntitySet="OB_CORPORATION" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="KFilesModel" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+        <EntityContainer Name="KFilesEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="OB_CORPORATION" EntityType="KFilesModel.OB_CORPORATION" />
+          <EntitySet Name="OB_CORPORATION_SESSION" EntityType="KFilesModel.OB_CORPORATION_SESSION" />
+          <EntitySet Name="OB_CORPORATION_DATA" EntityType="KFilesModel.OB_CORPORATION_DATA" />
+          <AssociationSet Name="FK_CORP_DATA_REF_CORPORATION" Association="KFilesModel.FK_CORP_DATA_REF_CORPORATION">
+            <End Role="OB_CORPORATION" EntitySet="OB_CORPORATION" />
+            <End Role="OB_CORPORATION_DATA" EntitySet="OB_CORPORATION_DATA" />
+          </AssociationSet>
+          <AssociationSet Name="FK_OB_CORPO_REFERENCE_OB_CORPO" Association="KFilesModel.FK_OB_CORPO_REFERENCE_OB_CORPO">
+            <End Role="OB_CORPORATION" EntitySet="OB_CORPORATION" />
+            <End Role="OB_CORPORATION1" EntitySet="OB_CORPORATION" />
+          </AssociationSet>
+          <AssociationSet Name="FK_CORP_DATA_REF_SESSION" Association="KFilesModel.FK_CORP_DATA_REF_SESSION">
+            <End Role="OB_CORPORATION_SESSION" EntitySet="OB_CORPORATION_SESSION" />
+            <End Role="OB_CORPORATION_DATA" EntitySet="OB_CORPORATION_DATA" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="OB_CORPORATION">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int16" Nullable="false" />
+          <Property Name="CORPORATION_CODE" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="CORPORATION_NAME" Type="String" MaxLength="300" FixedLength="false" Unicode="false" />
+          <Property Name="PARENT_ID" Type="Int16" />
+          <Property Name="STATE_ID" Type="Int16" />
+          <Property Name="EXTERNAL_ID" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="OB_CORPORATION_DATA" Relationship="KFilesModel.FK_CORP_DATA_REF_CORPORATION" FromRole="OB_CORPORATION" ToRole="OB_CORPORATION_DATA" />
+          <NavigationProperty Name="OB_CORPORATION1" Relationship="KFilesModel.FK_OB_CORPO_REFERENCE_OB_CORPO" FromRole="OB_CORPORATION" ToRole="OB_CORPORATION1" />
+          <NavigationProperty Name="OB_CORPORATION2" Relationship="KFilesModel.FK_OB_CORPO_REFERENCE_OB_CORPO" FromRole="OB_CORPORATION1" ToRole="OB_CORPORATION" />
+        </EntityType>
+        <EntityType Name="OB_CORPORATION_SESSION">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" />
+          <Property Name="FILE_MFO" Type="Int32" Nullable="false" />
+          <Property Name="FILE_DATE" Type="DateTime" Nullable="false" />
+          <Property Name="FILE_CORPORATION_ID" Type="Int16" />
+          <Property Name="FILE_DATA" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="STATE_ID" Type="Int16" Nullable="false" />
+          <Property Name="SYS_TIME" Type="DateTime" Nullable="false" />
+          <Property Name="SYNC_TYPE" Type="String" Nullable="false" MaxLength="4" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="OB_CORPORATION_DATA" Relationship="KFilesModel.FK_CORP_DATA_REF_SESSION" FromRole="OB_CORPORATION_SESSION" ToRole="OB_CORPORATION_DATA" />
+        </EntityType>
+        <EntityType Name="OB_CORPORATION_DATA">
+          <Key>
+            <PropertyRef Name="CORPORATION_ID" />
+            <PropertyRef Name="FILE_DATE" />
+            <PropertyRef Name="SESSION_ID" />
+          </Key>
+          <Property Name="CORPORATION_ID" Type="Int16" Nullable="false" />
+          <Property Name="FILE_DATE" Type="DateTime" Nullable="false" />
+          <Property Name="ROWTYPE" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="OURMFO" Type="String" MaxLength="6" FixedLength="false" Unicode="false" />
+          <Property Name="NLS" Type="String" MaxLength="14" FixedLength="false" Unicode="false" />
+          <Property Name="KV" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="OKPO" Type="String" MaxLength="14" FixedLength="false" Unicode="false" />
+          <Property Name="OBDB" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="OBDBQ" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="OBKR" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="OBKRQ" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="OST" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="OSTQ" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="KOD_CORP" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="KOD_USTAN" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="KOD_ANALYT" Type="String" MaxLength="4" FixedLength="false" Unicode="false" />
+          <Property Name="DAPP" Type="DateTime" />
+          <Property Name="POSTDAT" Type="DateTime" />
+          <Property Name="DOCDAT" Type="DateTime" />
+          <Property Name="VALDAT" Type="DateTime" />
+          <Property Name="ND" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="VOB" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="DK" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="MFOA" Type="String" MaxLength="6" FixedLength="false" Unicode="false" />
+          <Property Name="NLSA" Type="String" MaxLength="14" FixedLength="false" Unicode="false" />
+          <Property Name="KVA" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="NAMA" Type="String" MaxLength="70" FixedLength="false" Unicode="false" />
+          <Property Name="OKPOA" Type="String" MaxLength="14" FixedLength="false" Unicode="false" />
+          <Property Name="MFOB" Type="String" MaxLength="6" FixedLength="false" Unicode="false" />
+          <Property Name="NLSB" Type="String" MaxLength="14" FixedLength="false" Unicode="false" />
+          <Property Name="KVB" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="NAMB" Type="String" MaxLength="70" FixedLength="false" Unicode="false" />
+          <Property Name="OKPOB" Type="String" MaxLength="14" FixedLength="false" Unicode="false" />
+          <Property Name="S" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="DOCKV" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="SQ" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="NAZN" Type="String" MaxLength="160" FixedLength="false" Unicode="false" />
+          <Property Name="DOCTYPE" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="POSTTIME" Type="DateTime" />
+          <Property Name="NAMK" Type="String" MaxLength="70" FixedLength="false" Unicode="false" />
+          <Property Name="NMS" Type="String" MaxLength="70" FixedLength="false" Unicode="false" />
+          <Property Name="TT" Type="String" MaxLength="3" FixedLength="false" Unicode="false" />
+          <Property Name="SESSION_ID" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="OB_CORPORATION" Relationship="KFilesModel.FK_CORP_DATA_REF_CORPORATION" FromRole="OB_CORPORATION_DATA" ToRole="OB_CORPORATION" />
+          <NavigationProperty Name="OB_CORPORATION_SESSION" Relationship="KFilesModel.FK_CORP_DATA_REF_SESSION" FromRole="OB_CORPORATION_DATA" ToRole="OB_CORPORATION_SESSION" />
+        </EntityType>
+        <Association Name="FK_CORP_DATA_REF_CORPORATION">
+          <End Type="KFilesModel.OB_CORPORATION" Role="OB_CORPORATION" Multiplicity="1" />
+          <End Type="KFilesModel.OB_CORPORATION_DATA" Role="OB_CORPORATION_DATA" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="OB_CORPORATION">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="OB_CORPORATION_DATA">
+              <PropertyRef Name="CORPORATION_ID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_OB_CORPO_REFERENCE_OB_CORPO">
+          <End Type="KFilesModel.OB_CORPORATION" Role="OB_CORPORATION" Multiplicity="0..1" />
+          <End Type="KFilesModel.OB_CORPORATION" Role="OB_CORPORATION1" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="OB_CORPORATION">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="OB_CORPORATION1">
+              <PropertyRef Name="PARENT_ID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_CORP_DATA_REF_SESSION">
+          <End Type="KFilesModel.OB_CORPORATION_SESSION" Role="OB_CORPORATION_SESSION" Multiplicity="1" />
+          <End Type="KFilesModel.OB_CORPORATION_DATA" Role="OB_CORPORATION_DATA" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="OB_CORPORATION_SESSION">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="OB_CORPORATION_DATA">
+              <PropertyRef Name="SESSION_ID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2008/09/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="KFilesModelStoreContainer" CdmEntityContainer="KFilesEntities">
+          <EntitySetMapping Name="OB_CORPORATION">
+            <EntityTypeMapping TypeName="KFilesModel.OB_CORPORATION">
+              <MappingFragment StoreEntitySet="OB_CORPORATION">
+                <ScalarProperty Name="EXTERNAL_ID" ColumnName="EXTERNAL_ID" />
+                <ScalarProperty Name="STATE_ID" ColumnName="STATE_ID" />
+                <ScalarProperty Name="PARENT_ID" ColumnName="PARENT_ID" />
+                <ScalarProperty Name="CORPORATION_NAME" ColumnName="CORPORATION_NAME" />
+                <ScalarProperty Name="CORPORATION_CODE" ColumnName="CORPORATION_CODE" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="OB_CORPORATION_SESSION">
+            <EntityTypeMapping TypeName="KFilesModel.OB_CORPORATION_SESSION">
+              <MappingFragment StoreEntitySet="OB_CORPORATION_SESSION">
+                <ScalarProperty Name="SYNC_TYPE" ColumnName="SYNC_TYPE" />
+                <ScalarProperty Name="SYS_TIME" ColumnName="SYS_TIME" />
+                <ScalarProperty Name="STATE_ID" ColumnName="STATE_ID" />
+                <ScalarProperty Name="FILE_DATA" ColumnName="FILE_DATA" />
+                <ScalarProperty Name="FILE_CORPORATION_ID" ColumnName="FILE_CORPORATION_ID" />
+                <ScalarProperty Name="FILE_DATE" ColumnName="FILE_DATE" />
+                <ScalarProperty Name="FILE_MFO" ColumnName="FILE_MFO" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="OB_CORPORATION_DATA">
+            <EntityTypeMapping TypeName="KFilesModel.OB_CORPORATION_DATA">
+              <MappingFragment StoreEntitySet="OB_CORPORATION_DATA">
+                <ScalarProperty Name="SESSION_ID" ColumnName="SESSION_ID" />
+                <ScalarProperty Name="TT" ColumnName="TT" />
+                <ScalarProperty Name="NMS" ColumnName="NMS" />
+                <ScalarProperty Name="NAMK" ColumnName="NAMK" />
+                <ScalarProperty Name="POSTTIME" ColumnName="POSTTIME" />
+                <ScalarProperty Name="DOCTYPE" ColumnName="DOCTYPE" />
+                <ScalarProperty Name="NAZN" ColumnName="NAZN" />
+                <ScalarProperty Name="SQ" ColumnName="SQ" />
+                <ScalarProperty Name="DOCKV" ColumnName="DOCKV" />
+                <ScalarProperty Name="S" ColumnName="S" />
+                <ScalarProperty Name="OKPOB" ColumnName="OKPOB" />
+                <ScalarProperty Name="NAMB" ColumnName="NAMB" />
+                <ScalarProperty Name="KVB" ColumnName="KVB" />
+                <ScalarProperty Name="NLSB" ColumnName="NLSB" />
+                <ScalarProperty Name="MFOB" ColumnName="MFOB" />
+                <ScalarProperty Name="OKPOA" ColumnName="OKPOA" />
+                <ScalarProperty Name="NAMA" ColumnName="NAMA" />
+                <ScalarProperty Name="KVA" ColumnName="KVA" />
+                <ScalarProperty Name="NLSA" ColumnName="NLSA" />
+                <ScalarProperty Name="MFOA" ColumnName="MFOA" />
+                <ScalarProperty Name="DK" ColumnName="DK" />
+                <ScalarProperty Name="VOB" ColumnName="VOB" />
+                <ScalarProperty Name="ND" ColumnName="ND" />
+                <ScalarProperty Name="VALDAT" ColumnName="VALDAT" />
+                <ScalarProperty Name="DOCDAT" ColumnName="DOCDAT" />
+                <ScalarProperty Name="POSTDAT" ColumnName="POSTDAT" />
+                <ScalarProperty Name="DAPP" ColumnName="DAPP" />
+                <ScalarProperty Name="KOD_ANALYT" ColumnName="KOD_ANALYT" />
+                <ScalarProperty Name="KOD_USTAN" ColumnName="KOD_USTAN" />
+                <ScalarProperty Name="KOD_CORP" ColumnName="KOD_CORP" />
+                <ScalarProperty Name="OSTQ" ColumnName="OSTQ" />
+                <ScalarProperty Name="OST" ColumnName="OST" />
+                <ScalarProperty Name="OBKRQ" ColumnName="OBKRQ" />
+                <ScalarProperty Name="OBKR" ColumnName="OBKR" />
+                <ScalarProperty Name="OBDBQ" ColumnName="OBDBQ" />
+                <ScalarProperty Name="OBDB" ColumnName="OBDB" />
+                <ScalarProperty Name="OKPO" ColumnName="OKPO" />
+                <ScalarProperty Name="KV" ColumnName="KV" />
+                <ScalarProperty Name="NLS" ColumnName="NLS" />
+                <ScalarProperty Name="OURMFO" ColumnName="OURMFO" />
+                <ScalarProperty Name="ROWTYPE" ColumnName="ROWTYPE" />
+                <ScalarProperty Name="FILE_DATE" ColumnName="FILE_DATE" />
+                <ScalarProperty Name="CORPORATION_ID" ColumnName="CORPORATION_ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2008/10/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="True" />
+        <DesignerProperty Name="UseLegacyProvider" Value="true" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="Default" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

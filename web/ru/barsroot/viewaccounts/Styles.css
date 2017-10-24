@@ -1,0 +1,48 @@
+.webservice { behavior: url(/Common/WebService/js/WebService.htc); }
+
+.outset {BORDER-TOP-STYLE: outset; BORDER-RIGHT-STYLE: outset; BORDER-LEFT-STYLE: outset; BORDER-BOTTOM-STYLE: outset}
+
+.bt{font-family:Verdana; color:Navy;height:18px; font-size:xx-small}
+
+.frame { BORDER-RIGHT: black 1px solid; PADDING-RIGHT: 0px; BORDER-TOP: black 1px solid; DISPLAY: block; PADDING-LEFT: 0px; Z-INDEX: 2; BACKGROUND: #f7f6f6; VISIBILITY: hidden; PADDING-BOTTOM: 0px; BORDER-LEFT: black 1px solid; WIDTH: 0px; PADDING-TOP: 0px; BORDER-BOTTOM: black 1px solid; POSITION: absolute }
+
+.edit{BORDER-RIGHT: black 1px solid; PADDING-RIGHT: 0px; BORDER-TOP: black 1px solid; PADDING-LEFT: 0px; Z-INDEX:1000; BACKGROUND: #ffffe1;VISIBILITY: hidden; PADDING-BOTTOM: 0px; BORDER-LEFT: black 1px solid;PADDING-TOP: 0px; BORDER-BOTTOM: black 1px solid; POSITION: absolute;WIDTH : 100%;}
+
+.hint{FONT-SIZE:9px;COLOR:navy;FONT-FAMILY:Verdana;VISIBILITY:visible;} 
+
+BODY
+{
+	background-color : #f0f0f0;
+ 	margin-bottom : 0px;
+ 	margin-left : 5px;
+ 	margin-right : 5px;
+ 	margin-top : 2px;
+ }
+.TD{text-align : center;}
+.TD_Left{WIDTH: 300px; HEIGHT: 24px; text-align:right;}
+
+.CheckBox {font-family:Arial;font-size:12pt;}
+
+.BarsTextBox_ReadOnly {background-color:LightGrey;border-width:2px;border-style:Ridge;}
+
+.BarsTBI_RO {background-color:LightGrey;border-width:1px;color:Navy;border-style:Solid;border-color:Gray;font-weight:bold;text-align:center;}
+
+.BarsTBI_RO1 {background-color:LightGrey;border-width:1px;border-style:ridge;border-color:Gray;text-align:right;font-weight:bold;}
+
+.BarsTBI_RO3 {background-color:LightGrey;border-width:1px;border-style:ridge;border-color:Gray;text-align:center;}
+
+.BarsTBI_RO2 {background-color:White;border-width:1px;border-style:ridge;border-color:Gray;text-align:right;font-weight:bold;}
+
+.BarsTextBox {background-color:White;border-width:2px;border-style:Ridge;}
+
+.BarsLabel {font-family:Verdana;font-size:10pt;font-weight:bold;}
+
+.BarsButton {font-family:Verdana;font-size:10pt;font-weight:bold;width : 24px;height : 22px;}
+
+.BarsLabelItalic {font-family:Verdana;font-size:10pt;font-style:italic}
+
+.BarsPanel {border-style:outset;border-width:2px; height:94px;width:100%;}
+
+A:link {color:Navy;}
+A:active {color:Navy;}
+A:visited {color:Navy;}

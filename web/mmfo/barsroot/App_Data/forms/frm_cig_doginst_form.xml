@@ -1,0 +1,104 @@
+<xmlform>
+  <customforms>
+    <customform name="frmV_CIG_DOG_INSTALMENT" buttonsposition="Bottom" title="Фінансова інформація по стандартим кредитам" columnscount="1">
+      <!--
+      <buttons defaulttype="Button">
+        <button caption="Назад" hint="На попередню сторінку" id="btnBack">
+          <command type="Redirect" url="/barsroot/barsweb/dynform.aspx?form=frm_cig_doginst">
+            <parameters>
+              <parameter type="FormField" name="P_DOG_ID" altname="dog_id" ></parameter>
+            </parameters>
+          </command>
+        </button>
+      </buttons>
+      -->
+      <datasource>
+        <sql>
+          select a.ID,a.DOG_ID,a.BODY_SUM as BODY_SUM,a.BODY_CURR,a.BODY_TOTAL_CNT,
+          a.INSTALMENT_CURR,a.INSTALMENT_SUM as INSTALMENT_SUM,a.UPDATE_DATE,a.OUTSTAND_CNT,
+          a.OUTSTAND_CURR,a.OUTSTAND_SUM as OUTSTAND_SUM,a.OVERDUE_CNT,a.OVERDUE_CURR,a.OVERDUE_SUM as OVERDUE_SUM,a.BRANCH
+          from
+          (SELECT
+          C.ID,
+          C.DOG_ID,
+          C.BODY_SUM,
+          T.LCV as BODY_CURR,
+          C.BODY_TOTAL_CNT,
+          T1.LCV as INSTALMENT_CURR,
+          C.INSTALMENT_SUM,
+          C.UPDATE_DATE,
+          C.OUTSTAND_CNT,
+          T2.LCV as OUTSTAND_CURR,
+          C.OUTSTAND_SUM,
+          C.OVERDUE_CNT,
+          T3.LCV as OVERDUE_CURR,
+          C.OVERDUE_SUM,
+          C.BRANCH
+          from  cig_dog_instalment c,
+          TABVAL$GLOBAL t,
+          TABVAL$GLOBAL t1,
+          TABVAL$GLOBAL t2,
+          TABVAL$GLOBAL t3
+          WHERE
+          C.BODY_CURR_ID=T.KV
+          AND  C.INSTALMENT_CURR_ID=T1.KV
+          AND  C.OUTSTAND_CURR_ID=T2.KV
+          AND  C.OVERDUE_CURR_ID=T3.KV
+          ) a
+          Where a.id = :id and branch = :BRANCH
+        </sql>
+        <parameters>
+          <parameter name="id" datatype="Int64" type="QueryString"></parameter>
+          <parameter name="branch" datatype="String" type="QueryString"></parameter>
+        </parameters>
+      </datasource>
+      <customfields>
+        <customfield name="P_ID" label="Код" required="true" datatype="Int64" datasourcefield="ID" columnindex="1">
+          <uicontrol type="DecimalInput" align="Right" readonly="true" controlwidth="150" />
+        </customfield>
+        <customfield name="P_DOG_ID" label="Код таблиці договорів CIG" required="true" datatype="Int64" datasourcefield="DOG_ID" columnindex="1">
+          <uicontrol type="DecimalInput" align="Right" readonly="true" controlwidth="150" />
+        </customfield>
+        <customfield name="P_BODY_SUM" label="Загальна сума" required="true" datatype="Decimal" datasourcefield="BODY_SUM" columnindex="1">
+          <uicontrol type="DecimalInput" align="Right" readonly="true" controlwidth="150" />
+        </customfield>
+        <customfield name="P_BODY_CURR" label="Валюта" required="true" datatype="String" size="100" datasourcefield="BODY_CURR" columnindex="1">
+          <uicontrol type="TextBox" align="Right" readonly="true" controlwidth="150" />
+        </customfield>
+        <customfield name="P_BODY_TOTAL_CNT" label="Загальна кількість платежів" required="true" datatype="Int64" datasourcefield="BODY_TOTAL_CNT" columnindex="1">
+          <uicontrol type="DecimalInput" align="Right" readonly="true" controlwidth="150" />
+        </customfield>
+        <customfield name="P_INSTALMENT_CURR" label="Валюта щомісячного платежу" required="true" datatype="String" size="100" datasourcefield="INSTALMENT_CURR" columnindex="1">
+          <uicontrol type="TextBox" align="Right" readonly="true" controlwidth="150" />
+        </customfield>
+        <customfield name="P_INSTALMENT_SUM" label="Сума платежу кожного місяця" required="true" datatype="Decimal" datasourcefield="INSTALMENT_SUM" columnindex="1">
+          <uicontrol type="DecimalInput" align="Right" readonly="true" controlwidth="150" />
+        </customfield>
+        <customfield name="P_UPDATE_DATE" label="Дата оновлення" required="true" datatype="DateTime" datasourcefield="UPDATE_DATE" columnindex="1">
+          <uicontrol type="DateInput" align="Right" readonly="true" controlwidth="150" />
+        </customfield>
+        <customfield name="P_OUTSTAND_CNT" label="Кількість платежів, що підлягають сплаті в майбутньому" required="true" datatype="Int64" datasourcefield="OUTSTAND_CNT" columnindex="1">
+          <uicontrol type="DecimalInput" align="Right" readonly="true" controlwidth="150" />
+        </customfield>
+        <customfield name="P_OUTSTAND_CURR" label="Сума платежів, які підлягають сплаті в майбутньому (валюта)" required="true" datatype="String" size="100" datasourcefield="OUTSTAND_CURR" columnindex="1">
+          <uicontrol type="TextBox" align="Right" readonly="true" controlwidth="150" />
+        </customfield>
+        <customfield name="P_OUTSTAND_SUM" label="Сума платежів, які підлягають сплаті в майбутньому" required="true" datatype="Decimal" datasourcefield="OUTSTAND_SUM" columnindex="1">
+          <uicontrol type="DecimalInput" align="Right" readonly="true" controlwidth="150" />
+        </customfield>
+        <customfield name="P_OVERDUE_CNT" label="Кількість прострочених платежів" required="true" datatype="Int64" datasourcefield="OVERDUE_CNT" columnindex="1">
+          <uicontrol type="DecimalInput" align="Right" readonly="true" controlwidth="150" />
+        </customfield>
+        <customfield name="P_OVERDUE_CURR" label="Сума простроченої заборгованості (валюта)" required="true" datatype="String" size="100" datasourcefield="OVERDUE_CURR" columnindex="1">
+          <uicontrol type="TextBox" align="Right" readonly="true" controlwidth="150" />
+        </customfield>
+        <customfield name="P_OVERDUE_SUM" label="Сума простроченої заборгованості" required="true" datatype="Decimal" datasourcefield="OVERDUE_SUM" columnindex="1">
+          <uicontrol type="DecimalInput" align="Right" readonly="true" controlwidth="150" />
+        </customfield>
+        <customfield name="P_BRANCH" label="Відділення" required="true" datatype="String" size="100" datasourcefield="BRANCH" columnindex="1">
+          <uicontrol type="TextBox" align="Right" readonly="true" controlwidth="150" />
+        </customfield>
+      </customfields>
+    </customform>
+  </customforms>
+</xmlform>

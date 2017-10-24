@@ -1,0 +1,21 @@
+﻿@using Areas.DptAdm.Models
+
+<script src="@Url.Content("~/Areas/DptAdm/Scripts/dptarchive.js")"></script>
+<link href="~/Areas/DptAdm/Content/style.css" rel="stylesheet" />
+@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = "Архів депозитного портфелю";
+}
+
+<h2>@ViewBag.Title</h2>
+
+<div class="panel panel-primary" style="height: 15%;">
+    <div class=" panel-heading">
+        <h3 class="panel-title">Параметри архіву</h3>
+       @(Html.Kendo().DatePicker().Name("cdate").Format("dd.MM.yyyy"))
+        <input type="search" id="viddlistddl" style="width: 500px; font-size:small" /> 
+        <input type="search" id="branchlist" style="width: 500px; font-size:small" /> 
+        <button id="buttonArc" type="button">Зформувати архів</button>
+    </div>           
+</div>
+

@@ -1,0 +1,240 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = "Розрахунок відсотків активних залишків";
+}
+@model BarsWeb.Areas.Sep.Models.ProcCard
+<script src="~/Areas/Sep/Scripts/SepTechAccounts/sepTechAccountCtrl.js"></script>
+
+<script>
+    
+    function goBack() {
+        window.location = bars.config.urlContent('/sep/septechaccounts/Index?isBack=true');
+    };
+
+    function gridParams() {
+        return {
+            acc: @Model.ACC_SS,
+            dat0: 0
+        }
+    };
+
+    var objectBox = {};
+
+    function loadPercentFormTemplate() {
+        debugger;
+        // get form data from api?
+        
+        // open form
+        var form = kendo.template($("#PercentForm").html()),
+            container = $("#percentContainer");
+
+        container.html(form);
+
+        $("#gridBalance").kendoGrid({
+            autobind: true,
+            selectable: "row",
+            filterable: true,
+            sortable: true,
+            resizable: true,
+            pageable: {
+                refresh: true,
+                pageSizes: true,
+                buttonCount: 5
+            },
+            columns: [
+                {
+                    field: "FDAT",
+                    title: "Дата"
+                }, {
+                    field: "OST",
+                    title: "Ост.на ссуд сч"
+                }
+            ],
+            dataSource: {
+                type: 'aspnetmvc-ajax',
+                serverPaging: true,
+                serverSorting: true,
+                serverFiltering: true,
+                pageSize: 10,
+                transport: {
+                    read: {
+                        dataType: 'json',
+                        url: bars.config.urlContent('/sep//Data'),
+                        data: gridParams
+                    }
+                },
+                requestStart: function (e) {
+                    bars.ui.loader("body", true);
+                },
+                requestEnd: function (e) {
+                    bars.ui.loader("body", false);
+                },
+                schema: {
+                    data: "Data",
+                    total: "Total",
+                    errors: "Errors",
+                    model: {
+                        fields: {
+                            FDAT: { type: "string" },
+                            OST: { type: "string" }
+                        }
+                    }
+                }
+            }
+        });
+
+        objectBox = {
+            gridBalanceRef: $("#gridBalance").data("kendoGrid")
+        };
+    };
+
+    function openFilterAccountsWindow() {
+        var wFilterAccounts = $("#wFilterAccounts").data("kendoWindow");
+        initAccountsGrid();
+        wFilterAccounts.center();
+        wFilterAccounts.open();
+    };
+
+    function initAccountsGrid() {
+        $("#AccountsGrid").kendoGrid({
+            autobind: true,
+            selectable: "row",
+            filterable: true,
+            sortable: true,
+            resizable: true,
+            pageable: {
+                refresh: true,
+                pageSizes: true,
+                buttonCount: 5
+            },
+            columns: [
+                {
+                    field: "FDAT",
+                    title: "Дата"
+                }, {
+                    field: "OST",
+                    title: "Ост.на ссуд сч"
+                }
+            ],
+            dataSource: {
+                type: 'aspnetmvc-ajax',
+                serverPaging: true,
+                serverSorting: true,
+                serverFiltering: true,
+                pageSize: 10,
+                transport: {
+                    read: {
+                        dataType: 'json',
+                        url: bars.config.urlContent('/sep//Data')
+                    }
+                },
+                requestStart: function (e) {
+                    bars.ui.loader("body", true);
+                },
+                requestEnd: function (e) {
+                    bars.ui.loader("body", false);
+                },
+                schema: {
+                    data: "Data",
+                    total: "Total",
+                    errors: "Errors",
+                    model: {
+                        fields: {
+                            FDAT: { type: "string" },
+                            OST: { type: "string" }
+                        }
+                    }
+                }
+            }
+        });  
+    };
+
+</script>
+
+<h2>@ViewBag.Title</h2>
+
+<div id="Toolbar"></div>
+<div id="percentContainer"></div>
+
+<script type="text/x-kendo-template" id="PercentForm">
+    <div style="margin-top: 10px;margin-bottom: 10px;">
+        <div class="row">
+            <!-- title: Ссудный счет -->
+            <div class="col-md-12"><label> Ссудный счет </label></div>
+            <div class="col-md-6">
+                <div class="row" style="margin-top: 5px;">
+                    <div class="col-md-6"><input type="text" class="form-control" placeholder="Text input" name="NLS_SS" value="@Model.NLS_SS"></div> <!-- title: рахунок -->
+                    <div class="col-md-5"><input type="text" class="form-control" placeholder="Text input" name="KV_SS" value="@Model.KV_SS"></div> <!-- title: код валюти -->
+                    <div class="col-md-1"><button id='btnFilter' type='button' class='k-button' onclick="openFilterAccountsWindow()" title='Выбрать ссудный счет'><i class='pf-icon pf-16 pf-filter-ok'></i></button></div> <!-- title: button Довідник -->
+                </div>
+                <div class="row" style="margin-top: 5px;">
+                    <div class="col-md-12"><input type="text" class="form-control" placeholder="Text input" name="NMS_SS"></div>
+                </div>
+                <div class="row" style="margin-top: 5px;">
+                    <!-- title: % ставка на { Date } -->
+                    <div class="col-md-3"></div>
+                    <div class="col-md-3" style="text-align: right;"><label style="margin-top: 6px;"> % ставка на { Date } </label></div>
+                    <div class="col-md-6"><input type="text" class="form-control" placeholder="Text input" name="IR"></div>
+                </div>
+                <div class="row" style="margin-top: 5px;">
+                    <!-- title: базовий рік -->
+                    <div class="col-md-3"></div>
+                    <div class="col-md-3" style="text-align: right;"><label style="margin-top: 6px;"> базовий рік </label></div>
+                    <div class="col-md-6"><input type="text" class="form-control" placeholder="Text input" name="Basey_Name"></div>
+                </div>
+                <div class="row" style="margin-top: 5px;">
+                    <div class="col-md-6">
+                        <label> Счет начисленных %%</label>
+                    </div>
+                </div>
+                <div class="row" style="margin-top: 5px;">
+                    <!-- title: Счет начисленных %% -->
+                    <div class="col-md-6"><input type="text" class="form-control" placeholder="Text input" readonly name="NLS_SN"></div> <!-- title: рахунок -->
+                    <div class="col-md-5"><input type="text" class="form-control" placeholder="Text input" readonly name="KV_SN"></div> <!-- title: код валюти -->
+                    <div class="col-md-1"></div>
+                </div>
+            </div>
+
+            <!-- title: таблиця Дата/Ост. на ссуд сч -->
+            <div class="col-md-6">
+                <div id="gridBalance"></div>
+            </div>
+        </div>
+        <div class="row" style="margin-top: 10px;">
+            <div class="col-md-4"></div>
+            <!-- title: дата | Дата-0, по которую %% уже начислены -->
+            <div class="col-md-2"><input type="text" class="form-control" placeholder="Text input" readonly name="DAT0"></div>
+            <div class="col-md-4"></div>
+            <!-- title: тотал | Текущий остаток на счете начисленных %% -->
+            <div class="col-md-2"><input type="text" class="form-control" placeholder="Text input" readonly name="OST_SN0"></div>
+        </div>
+        <div class="row" style="margin-top: 10px;">
+            <div class="col-md-2"><input type="text" class="form-control" placeholder="Text input" readonly></div>
+            <div class="col-md-2"><input type="text" class="form-control" placeholder="Text input" readonly></div>
+            <div class="col-md-2"></div>
+            <div class="col-md-2"><input type="text" class="form-control" placeholder="Text input" readonly></div>
+            <div class="col-md-2"><input type="text" class="form-control" placeholder="Text input" readonly></div>
+            <div class="col-md-2"><input type="text" class="form-control" placeholder="Text input" readonly></div>
+        </div>
+        <div class="row" style="margin-top: 10px;">
+            <div class="col-md-2"><input type="text" class="form-control" placeholder="Text input" readonly></div>
+            <div class="col-md-2"><input type="text" class="form-control" placeholder="Text input" readonly></div>
+            <div class="col-md-2"><input type="text" class="form-control" placeholder="Text input" readonly></div>
+            <div class="col-md-2"><input type="text" class="form-control" placeholder="Text input" readonly></div>
+            <div class="col-md-2"><input type="text" class="form-control" placeholder="Text input" readonly></div>
+            <div class="col-md-2"><input type="text" class="form-control" placeholder="Text input" readonly></div>
+        </div>
+        <div class="row" style="margin-top: 10px;">
+            <div class="col-md-2"><input type="text" class="form-control" placeholder="Text input" readonly></div>
+            <div class="col-md-2"><input type="text" class="form-control" placeholder="Text input" readonly></div>
+            <div class="col-md-2"></div>
+            <div class="col-md-2"><input type="text" class="form-control" placeholder="Text input" readonly></div>
+            <div class="col-md-2"><input type="text" class="form-control" placeholder="Text input" readonly></div>
+            <div class="col-md-2"><input type="text" class="form-control" placeholder="Text input" readonly></div>
+        </div>
+    </div>
+</script>
+
+<div id="wFilterAccounts" style="display: none;">
+    <div id="AccountsGrid"></div>
+</div>

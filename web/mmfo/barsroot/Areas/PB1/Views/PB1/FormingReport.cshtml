@@ -1,0 +1,109 @@
+﻿@{
+    ViewBag.Title = "1_ПБ. Формування звіту";
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+}
+
+<link rel="stylesheet" href="~/Areas/PB1/Content/Css/Style.css" />
+<script src="~/Areas/PB1/Scripts/Controllers/FormingReportCtrl.js"></script>
+<script src="~/Scripts/BarsIE.js"></script>
+
+<div id="content" ng-app="BarsWeb.Controllers" ng-controller="FormingReportCtrl" style="margin-left: 20px; margin-right: 20px;" ng-init="Init()">
+    <h2>@ViewBag.Title</h2><br />
+    <div class="form-inline">
+        <div class="form-group">
+            <input style="width: 200px" id="dropdownlist" kendo-drop-down-list
+                   k-data-source="dropdowndata" k-data-text-field="'TEXT'" k-data-value-field="'VALUE'" k-on-change="OnChangeDate()" />
+        </div>
+        <div class="form-group" style="margin-left: 20px;">
+            <button id="btnCpbPrint" title="Виконати" ng-click="Run()" class="k-button" style="width: 100px; height: 63px">
+                <img src="~/Areas/PB1/Content/Images/RuningIcon.png" width="18" height="18" /><br />
+                Виконати
+            </button>
+        </div>
+        <div class="form-group" style="margin-left: 40px;">
+            <button id="btnDocument" title="Документ" ng-click="Details()" class="k-button" style="width: 100px; height: 63px">
+                <img src="~/Content/images/PureFlat/16/folder_open.png" width="18" height="18" /><br />
+                Документ
+            </button>
+            <button id="btnPrint" title="Друк" ng-click="printDoc()" class="k-button" style="width: 100px; height: 63px">
+                <img src="~/Content/images/PureFlat/16/print.png" width="18" height="18" /><br />
+                Друк
+            </button>
+            <button id="btnSave" title="Зберегти" ng-click="SavePrintGrid()" class="k-button" style="width: 100px; height: 63px">
+                <img src="~/Content/images/PureFlat/16/save.png" width="18" height="18" /><br />
+                Зберегти
+            </button>
+        </div>
+    </div><br />
+    <div id="mainGrid" kendo-grid="mainGrid" k-options="mainGridOptions" k-on-save-changes="saveChanges(kendoEvent)"></div>
+    <div id="mydiv">
+        <img id="loader" src="~/Areas/PB1/Content/Images/loader.gif" width="100" height="100" class="ajax-loader" />
+    </div>
+    <div kendo-window="SaveGridWindow" k-title="'Збереження таблиці'" k-visible="false"
+         k-modal="true">
+        <form id="export">
+            <table>
+                <tr>
+                    <td style="width: 50px"></td>
+                    <td style="width: 160px">
+                        <label>
+                            <input type="radio" name="export_type" value="excel" checked />
+                            Excel 2007
+                        </label>
+                    </td>
+                    <td style="width: 130px">
+                        <label>
+                            <input type="radio" name="export_type" value="word" />
+                            Word 2007
+                        </label>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 50px"></td>
+                    <td style="width: 160px">
+                        <label>
+                            <input type="radio" name="export_type" value="rtf" />
+                            RTF
+                        </label>
+                    </td>
+                    <td style="width: 130px">
+                        <label>
+                            <input type="radio" name="export_type" value="html" />
+                            HTML
+                        </label>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 50px"></td>
+                    <td style="width: 160px">
+                        <label>
+                            <input type="radio" name="export_type" value="xmlexcel" />
+                            MS XML
+                        </label>
+                    </td>
+                    <td style="width: 130px">
+                        <label>
+                            <input type="radio" name="export_type" value="text" />
+                            Text
+                        </label>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 50px"></td>
+                    <td style="width: 160px">
+                        <label>
+                            <input type="radio" name="export_type" value="pdf" />
+                            PDF
+                        </label>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3" align="center">
+                        <button class="k-button" ng-click="SaveFileAs()" style="background-color: #99CCFF">Зберегти</button>
+                    </td>
+                </tr>
+            </table>
+
+        </form><br />
+    </div>
+</div>

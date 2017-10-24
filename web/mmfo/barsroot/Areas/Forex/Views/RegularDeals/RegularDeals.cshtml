@@ -1,0 +1,372 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    if (ViewBag.DealTypeId == 0)
+    {
+        ViewBag.Title = "Введення угод ФОРЕКС (звичайний, 1 - нога)";
+    }
+    else if (ViewBag.DealTypeId == 1)
+    {
+        ViewBag.Title = "Введення угод ВАЛ-СВОП (2 ноги)";
+    }
+    else if (ViewBag.DealTypeId == 2)
+    {
+        ViewBag.Title = "Введення угод ДЕПО-СВОП (2 ноги)";
+    }
+
+
+}
+
+<link href="~/Areas/Forex/CSS/Index.css" rel="stylesheet" />
+<style>
+    .container {
+        /*width: 950px !important;*/
+        text-align: center;
+    }
+
+    .row {
+        margin-right: 0px !important;
+        margin-left: 0px !important;
+    }
+</style>
+
+<div class="conteiner" ng-controller="RegularDealsCtrl as RegDeal" ng-init="RegDeal.Initialization(@ViewBag.EnterDealTag)">
+    <div class="row">
+        <div class="form-group">
+            <div class="col-md-1 col-sm-1">
+            </div>
+            <div class="col-md-10 col-sm-10" style="margin-bottom: 10px;">
+                <h3 class="font-bold">@ViewBag.Title</h3>
+                <input type="hidden" value="@ViewBag.BankDate" id="GlBankDate" />
+                <input type="hidden" value="@ViewBag.DealTypeId" id="DealTypeId" />
+                <div class="k-loading-image k-overlay" ng-show="RegDeal.loading"></div>
+                <button type="button" class="k-button" ng-click="RegDeal.SaveGhanges($event)" ng-disabled="RegDeal.DisabledVars.OK == true" title="Зберегти"><i class="pf-icon pf-16 pf-ok"></i></button>
+                <button type="button" class="k-button" ng-click="RegDeal.emptyFields('clearAll')" ng-disabled="RegDeal.DisabledVars.ClearAll == true" title="Очистити"><i class="pf-icon pf-16 pf-reload_rotate"></i></button>
+
+                <select kendo-drop-down-list="RegDeal.INICD"
+                        k-data-text-field="'TXT'"
+                        k-auto-bind="false"
+                        k-data-value-field="'TXT'"
+                        k-value-primitive="true"
+                        k-data-source="RegDeal.INICDropDownDataSource" k-options="RegDeal.INICDropDownOptions" id="inicDropDown" k-ng-readonly="RegDeal.DisabledVars.INIC == true" style="width: 20%; margin-right: 5px;"></select>
+
+                <button type="button" class="k-button" title="Перегляд бухгалтерської моделі угоди" ng-disabled="RegDeal.DisabledVars.AccMod == true" ng-click="RegDeal.ForexAccMode()"><i class="pf-icon pf-16 pf-search"></i></button>
+
+
+                <button type="button" class="k-button" title="Друк Тікету" ng-click="RegDeal.printTicket()" ng-disabled="RegDeal.DisabledVars.Print == true"><i class="pf-icon pf-16 pf-print"></i></button>
+                <button type="button" class="k-button" title="Зберегти інформацію про партнера" ng-disabled="RegDeal.DisabledVars.SavePartner == true" ng-click="RegDeal.SavePartners()"><i class="pf-icon pf-16 pf-save"></i></button>
+                <button type="button" class="k-button" title="Сформувати SWIFT повідомлення" ng-click="RegDeal.CreateSWT()" ng-disabled="RegDeal.DisabledVars.CreateSWT">
+                    <i class="pf-icon pf-16 pf-mail" pf-mail></i>
+                </button>
+                <button type="button" class="k-button" title="Перегляд вихідного SWIFT повідомлення" ng-click="RegDeal.ViewSWT()" ng-disabled="RegDeal.DisabledVars.ViewSWT"><i class="pf-icon pf-16 pf-find" pf-find></i></button>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="form-group">
+            <div class="col-md-1 col-sm-1">
+            </div>
+            <div class="col-md-10 col-sm-10" style="margin-bottom: 10px;">
+                <label for="">№ тікету</label>
+                <input type="text" ng-model="RegDeal.NTIK" ng-disabled="RegDeal.DisabledVars.SWAP == true" id="ntik" class="k-textbox" style="width: 15%;" />
+                <span class="asterisk_input"></span>
+                <label for="" style="margin-left: 15px;">Дата</label>
+                <input type="text" class="k-textbox k-state-disabled inputReadOnly" style="width: 10%" ng-model="RegDeal.DAT" readonly />
+                <label for="fin_res" style="margin-left: 20px;">Фін. результат</label>
+                <input type="text" ng-model="RegDeal.finRes" ng-keydown="RegDeal.backSpaceEvent($event)" class="k-textbox k-state-disabled inputReadOnly" ng-readonly="true" style="width: 20%" />
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-1 col-sm-1">
+        </div>
+        <div class="col-md-5 col-sm-5">
+            <div class="panel panel-default ">
+                <div class="panel-body first_foot">
+                    <div class="form-group">
+
+                        <label for="" style="width: 15%; ">Валюта А</label>
+                        <input type="text" ng-model="RegDeal.KVA" maxlength="3" ng-keydown="RegDeal.checkKey($event)" ng-blur="RegDeal.getCurrencyNameA(RegDeal.KVA)" ng-disabled="RegDeal.DisabledVars.SWAP == true" class="k-textbox" style="width: 10%" title="Код покупної валюти" />
+                        <span class="asterisk_input"></span>
+                        <input type="text" ng-model="RegDeal.NameVA" class="k-textbox k-state-disabled inputReadOnly" style="margin-left: 5pt; width: 40%;" ng-keydown="RegDeal.backSpaceEvent($event)" ng-readonly="true" />
+
+                    </div>
+                    <div class="form-group">
+                        <label for="reg_deal_DATA">Дата надходження</label>
+                        <input id="datePicker1" kendo-date-picker k-format="'dd/MM/yyyy'" style="width: 29%; margin-right: 15pt;" k-ng-model="RegDeal.DATA" ng-keydown="RegDeal.checkKey($event)" ng-blur="RegDeal.setDatB()" />
+                        <span class="asterisk_input" style="margin: 0pt 0pt 0pt -1.5em; "></span>
+                        <input type="radio" id="BaseA" ng-model="RegDeal.Base" value="A" />
+                        <label for="BaseA">A-base</label>
+                        <input type="radio" id="BaseB" ng-model="RegDeal.Base" value="B" />
+                        <label for="BaseB" style="color:  #dd4343;">B-base</label>
+                    </div>
+                    <div class="form-group">
+                        <label for="" style="width: auto; ">Сума надходження</label>
+                        <input type="text" ng-model="RegDeal.SumA" class="k-textbox" style="width:25%" ng-blur="RegDeal.SumA = RegDeal.number_format(RegDeal.SumA, 2, '.', ' '); RegDeal.crossSum();" ng-keydown="RegDeal.checkKey($event, 'dot')" ng-disabled="RegDeal.KVA == null || RegDeal.KVA == '' || RegDeal.DisabledVars.DEPO == true" />
+                        <span class="asterisk_input"></span>
+                        <input type="text" ng-model="RegDeal.SUMOA" class="k-textbox k-state-disabled inputReadOnly" ng-readonly="true" style="width:20%" ng-keydown="RegDeal.backSpaceEvent($event)" />
+                        <input type="text" ng-model="RegDeal.KURSOA" class="k-textbox k-state-disabled inputReadOnly" style="width:20%" ng-keydown="RegDeal.backSpaceEvent($event)" ng-readonly="true" title="Кросс курс" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-5 col-sm-5">
+            <div class="panel panel-default second_foot">
+                <div class="panel-body">
+                    <div class="form-group">
+
+                        <label for="" style="width: 15%">Валюта B</label>
+                        <input type="text" maxlength="3" ng-model="RegDeal.KVB" ng-disabled="RegDeal.DisabledVars.SWAP == true" ng-keydown="RegDeal.checkKey($event)" ng-blur="RegDeal.getCurrencyNameB(RegDeal.KVB)" class="k-textbox" style="width: 10%" title="Код валюти на продаж" />
+                        <span class="asterisk_input"></span>
+                        <input type="text" ng-model="RegDeal.NameVB" class="k-textbox k-state-disabled inputReadOnly" style="margin-left: 5pt; width: 40%;" ng-keydown="RegDeal.backSpaceEvent($event)" ng-readonly="true" />
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label style="text-align: left">Дата відправки</label>
+                        <input id="datePicker2" kendo-date-picker k-format="'dd/MM/yyyy'" style="width: 29%; margin-right: 15pt;" k-ng-model="RegDeal.DATB" ng-keydown="RegDeal.checkKey($event)" />
+                        <span class="asterisk_input" style="margin: 0pt 0pt 0pt -1.5em;"></span>
+                        @*<input type="checkbox" ng-model="RegDeal.checkboxModel.cb2"  />
+                            <label>
+                               Розділити на 2 суми
+                            </label>*@
+                    </div>
+                    <div class="form-group">
+
+                        <label for="">Сума відправки</label>
+                        <input type="text" ng-model="RegDeal.SumB" class="k-textbox" style="width: 25%" ng-keydown="RegDeal.checkKey($event, 'dot')" ng-blur="RegDeal.SumB = RegDeal.number_format(RegDeal.SumB, 2, '.', ' '); RegDeal.crossSum()" ng-disabled="RegDeal.KVB == null || RegDeal.KVB == '' || RegDeal.DisabledVars.DEPO == true" />
+                        <span class="asterisk_input"></span>
+                        <input type="text" ng-model="RegDeal.SUMOB" class="k-textbox k-state-disabled inputReadOnly" ng-readonly="true" style="width: 20%" ng-keydown="RegDeal.backSpaceEvent($event)" />
+                        <input type="text" ng-model="RegDeal.KURSOB" class="k-textbox k-state-disabled inputReadOnly" ng-readonly="true" style="width: 20%" ng-keydown="RegDeal.backSpaceEvent($event)" title="Кросс курс" />
+
+                    </div>
+                    @*<div class="form-group" style="margin: 10px;">
+
+                            <label style="text-align: right; width: 20%;" >
+                                <b  >Лім-Акт</b>
+                            </label>
+                            <input type="text" ng-model="RegDeal.colLim"  style="width: 20%" class="k-textbox k-state-disabled inputReadOnly" readonly/>
+                            <label>
+                                <b>Л</b>
+                            </label>
+                        </div>
+                        <div class="form-group" style="margin: 10px;">
+
+                            <input type="text" ng-model="RegDeal.colPLBQ" class="k-textbox k-state-disabled inputReadOnly" style="width: 20%"  ng-keydown="RegDeal.backSpaceEvent($event)" readonly />
+                            <input type="text" ng-model="RegDeal.colOstPLBQ" class="k-textbox k-state-disabled inputReadOnly" style="width: 20%"ng-keydown="RegDeal.backSpaceEvent($event)"  readonly />
+                            <label>
+                                <b>А</b>
+                            </label>
+                        </div>*@
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-1 col-sm-1">
+        </div>
+        <div class="col-md-5 col-sm-5">
+            <div class="panel panel-default first_foot">
+                <div class="panel-body">
+                    <div class="form-group first_foot">
+                        <label for="">{{RegDeal.NBA}}</label>
+                        <div class="col-md-12 col-sm-12">
+                            <label for="" style="margin-bottom: 15pt"></label>
+                            <input type="text" ng-model="RegDeal.BiCA" class="k-textbox k-state-disabled inputReadOnly" ng-keydown="RegDeal.backSpaceEvent($event)" ng-readonly="true" style="width: 30%; margin-right: 5pt; color: blue !important;" title="BIC нашого банку-корреспонд" />
+                            <input type="text" ng-model="RegDeal.MFOA" class="k-textbox k-state-disabled inputReadOnly" ng-keydown="RegDeal.backSpaceEvent($event)" ng-readonly="true" style="width: 30%; margin-right: 5pt; color: blue !important;" title="МФО" />
+                            <input type="text" ng-model="RegDeal.KOD_BA" class="k-textbox k-state-disabled inputReadOnly" ng-keydown="RegDeal.backSpaceEvent($event)" ng-readonly="true" style="width: 28%; margin-right: 5pt; color: blue !important;" />
+                        </div>
+                    </div>
+
+                    <div class="form-group first_foot">
+                        <div class="col-md-12 col-sm-12">
+                            <label for="" style="margin-bottom: 15pt"></label>
+                            <input type="text" ng-model="RegDeal.OKPOA" class="k-textbox k-state-disabled inputReadOnly" ng-keydown="RegDeal.backSpaceEvent($event)" ng-readonly="true" style="width: 45%; margin-right: 5pt; color: blue !important;" title="ОКПО" />
+                            <input type="text" ng-model="RegDeal.NLSA" class="k-textbox k-state-disabled inputReadOnly" ng-keydown="RegDeal.backSpaceEvent($event)" ng-readonly="true" style="width: 45%; margin-right: 5pt; color: blue !important;" title="Рахунок VOSTRO у нашого банку-корреспонд" />
+                        </div>
+                    </div>
+                    <div class="form-group ">
+                        <div class="col-md-12 col-sm-12">
+                            <label for="" style="margin-bottom: 15pt"></label>
+                            <input type="text" ng-model="RegDeal.KOD_GA" class="k-textbox k-state-disabled inputReadOnly" ng-keydown="RegDeal.backSpaceEvent($event)" ng-readonly="true" style="width: 20%; margin-right: 5pt; color: blue !important;" />
+                            <input type="text" ng-model="RegDeal.NGA" class="k-textbox k-state-disabled inputReadOnly" ng-keydown="RegDeal.backSpaceEvent($event)" ng-readonly="true" style="width: 70%; margin-right: 5pt; color: blue !important;" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-12 col-sm-12" style="margin-top: 15px">
+                            <label></label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="col-md-5 col-sm-5">
+            <div class="panel panel-default second_foot">
+                <div class="panel-body">
+                    <div class="form-group">
+                        <label for="">Вибір партнера</label>
+                        <label style="float:right">
+                            <input type="checkbox" ng-model="RegDeal.checkboxModel.cb_KS" ng-change="RegDeal.checkboxModel.changeStraightKS()" /> Прямий КР
+                        </label>
+                        <div class="col-md-12 col-sm-12">
+                            <label for="" style="margin-bottom: 15pt"></label>
+                            <input type="text" ng-model="RegDeal.BicB" class="k-textbox" style="width: 33%; margin-right: 5pt;" ng-disabled="RegDeal.KVB == null || RegDeal.KVB == '' || RegDeal.DisabledVars.SWAP == true" title="BIC партнера" ng-blur="RegDeal.GetFortexPart('bic', RegDeal.BicB)" ng-keydown="RegDeal.backSpaceEvent($event)" />
+                            <input type="text" ng-model="RegDeal.MFOB" ng-blur="RegDeal.GetFortexPart('mfo', RegDeal.MFOB)" ng-keydown="RegDeal.checkKey($event) && RegDeal.backSpaceEvent($event) " class="k-textbox" style="width: 20%; margin-right: 5pt;" ng-disabled="RegDeal.KVB == null || RegDeal.KVB == '' || RegDeal.DisabledVars.SWAP == true" title="МФО партнера" />
+                            <input type="text" ng-model="RegDeal.KOD_B" ng-blur="RegDeal.GetFortexPart('KOD_B', RegDeal.KOD_B)" ng-keydown="RegDeal.checkKey($event) && RegDeal.backSpaceEvent($event)" class="k-textbox" style="width: 15%; margin-right: 5pt;" ng-disabled="RegDeal.KVB == null || RegDeal.KVB == '' || RegDeal.DisabledVars.SWAP == true" title="Код 1-ПБ партнера" />
+                            <button type="button" class="k-button" style="width: 10%;" ng-click="RegDeal.getForexTable()" ng-disabled="RegDeal.KVB == null || RegDeal.KVB == '' || RegDeal.PartGrid == true">
+                                <i class="pf-icon pf-16 pf-arrow_down"></i>
+                            </button>@*|| RegDeal.DisabledVars.SWAP == true*@
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-12 col-sm-12">
+                            <label for="" style="margin-bottom: 15pt"></label>
+                            <input type="text" ng-model="RegDeal.NBB" ng-keydown="RegDeal.backSpaceEvent($event)" class="k-textbox k-state-disabled inputReadOnly" readonly style="width: 95%" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-12 col-sm-12">
+                            <label for="" style="margin-bottom: 15pt"></label>
+                            <input type="text" ng-model="RegDeal.OKPOB" ng-blur="RegDeal.GetFortexPart('OKPO', RegDeal.OKPOB)" class="k-textbox" ng-disabled="RegDeal.KVB == null || RegDeal.KVB == '' || RegDeal.DisabledVars.SWAP == true" style="width: 30%; margin-right: 5pt;" ng-keydown="RegDeal.checkKey($event) && RegDeal.backSpaceEvent($event)" title="ЗКПО партнера" />
+                            <input type="text" ng-model="RegDeal.RNKB" ng-blur="RegDeal.GetFortexPart('rnk', RegDeal.RNKB)" class="k-textbox" ng-disabled="RegDeal.KVB == null || RegDeal.KVB == '' || RegDeal.DisabledVars.SWAP == true" style="width: 30%; margin-right: 5pt;" ng-keydown="RegDeal.checkKey($event) && RegDeal.backSpaceEvent($event)" title="РНК партнера" />
+                            <span class="asterisk_input" style="bottom: -2pt; left: -5pt; position: relative"></span>
+                            <input type="text" ng-model="RegDeal.NLSB" class="k-textbox" style="width: 30%" ng-disabled="RegDeal.KVB == null || RegDeal.KVB == ''" ng-keydown="RegDeal.checkKey($event) && RegDeal.backSpaceEvent($event)" title="Рахунок партнера" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-12 col-sm-12">
+                            <label for="" style="margin-bottom: 15pt"></label>
+                            <input type="text" ng-model="RegDeal.KOD_GB" ng-keydown="RegDeal.checkKey($event) && RegDeal.backSpaceEvent($event)" class="k-textbox" style="width: 20%; margin-right: 5pt;" ng-disabled="RegDeal.KVB == null || RegDeal.KVB == '' || RegDeal.DisabledVars.SWAP == true" title="Держ.партнера" ng-keydown="RegDeal.checkKey($event)" />
+                            <input type="text" ng-model="RegDeal.dfAgrNum" ng-keydown="RegDeal.checkKey($event) && RegDeal.backSpaceEvent($event)" class="k-textbox" ng-disabled="RegDeal.KVB == null || RegDeal.KVB == '' || RegDeal.DisabledVars.SWAP " style="width: 35%; margin-right: 5pt;" title="Номер ген.угоди" />
+                            <input id="datePicker3" kendo-date-picker k-format="'dd/MM/yyyy'" style="width: 30%; margin-right: 15pt;" ng-keydown="RegDeal.checkKey($event)" k-ng-model="RegDeal.dfAgrDate" ng-disabled="RegDeal.KVB == null || RegDeal.KVB == '' || RegDeal.DisabledVars.SWAP == true" title="Дата ген.угоди" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-1 col-sm-1">
+        </div>
+        <div class="col-md-5 col-sm-5">
+            <div class="panel panel-default first_foot">
+                <div id="panel_body_A" class="panel-body">
+                    <div>
+                        <label for="">Трасса по надходженню</label>
+                        <label style="float:right">
+                            <input type="checkbox" ng-disabled="true"
+                                   ng-model="RegDeal.VPSA" />ПС
+                        </label>
+                        <div class="col-md-12 col-sm-12">
+                            <input type="text" ng-model="RegDeal.BICKA" class="k-textbox" ng-blur="RegDeal.getOurTrassa('BICKA', RegDeal.BICKA)" style="width: 40%;" ng-disabled="RegDeal.KVA == null || RegDeal.KVA == ''" title="BIC нашого банку-корреспонд" />
+                            <input type="text" ng-model="RegDeal.SSLA" ng-blur="RegDeal.getOurTrassa('SSLA', RegDeal.SSLA)" class="k-textbox" style="width: 42%;" ng-disabled="RegDeal.KVA == null || RegDeal.KVA == ''" title="Рахунок VOSTRO у нашого банку-корреспонд" />
+                        </div>
+                    </div>
+                    <div>
+                        <div class="col-md-12 col-sm-12">
+                            <select kendo-drop-down-list
+                                    k-data-text-field="'ACC_NAME'"
+                                    k-ng-model="RegDeal.NLS"
+                                    k-auto-bind="false"
+                                    k-data-value-field="'NLS'"
+                                    k-value-primitive="true"
+                                    k-data-source="RegDeal.revenueDropDownDataSource" k-options="RegDeal.revenueDropDownOptions" id="revenueDropDown" style="width: 83%; margin-top: 3px;"></select>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="col-md-12 col-sm-12">
+                            <input type="text" ng-model="RegDeal.SSA" ng-blur="RegDeal.getOurTrassa('NLS', RegDeal.SSA)" class="k-textbox" ng-keydown="RegDeal.checkKey($event)" style="width:83%; margin-top:5pt;" ng-disabled="RegDeal.KVA == null || RegDeal.KVA == ''" title="Рахунок для входу вал-A" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" style="margin-top:35px;">
+                            Код призначення для PA
+                        </label>
+                        <div class="col-md-12 col-sm-12">
+                            <label for="" style="margin-bottom: 15pt"></label>
+                            <input type="text" ng-model="RegDeal.Kod_NA" ng-blur="RegDeal.setPayments.A(RegDeal.Kod_NA); RegDeal.setPayments.B(RegDeal.Kod_NA)" class="k-textbox" style="width: 40%; margin-right: 5pt;" ng-disabled="RegDeal.KVA == null || RegDeal.KVA == ''" ng-keydown="RegDeal.checkKey($event)" title="Код признач.для 1_ПБ" />
+                            <input type="text" ng-model="RegDeal.sKod_NA" class="k-textbox k-state-disabled inputReadOnly" style="width: 40%; margin-right: 5pt;" ng-keydown="RegDeal.backSpaceEvent($event)" readonly />
+                            <button type="button" class="k-button" style="width: 10%;" ng-click="RegDeal.getCodePurposeOfPayment('gridCodePurposeOfPaymentA')" ng-disabled="RegDeal.KVA == null || RegDeal.KVA == ''"><i class="pf-icon pf-16 pf-arrow_down"></i></button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="col-md-5 col-sm-5">
+            <div class="panel panel-default second_foot">
+                <div id="panel_body_B" class="panel-body">
+                    <div class="form-group">
+                        <label for="">Трасса платежу (вихідна)</label>
+                        <label style="float:right">
+                            <input type="checkbox" ng-disabled="true"
+                                   ng-model="RegDeal.VPSB" />ПС
+                        </label>
+                        <div class="col-md-12 col-sm-12">
+                            <label for="" style="margin-bottom: 15pt"></label>
+                            <input type="text" ng-model="RegDeal.BicKB" class="k-textbox" style="width: 40%; margin-right: 5pt;" ng-blur="RegDeal.getDefSwiftPartners(RegDeal.BicKB)" ng-disabled="RegDeal.KVB == null || RegDeal.KVB == ''" title="BIC банку-кореспонденту" />
+                            <input type="text" ng-model="RegDeal.SSB" class="k-textbox" style="width: 40%; margin-right: 5pt;" ng-disabled="RegDeal.KVB == null || RegDeal.KVB == ''" title="Рахунок VOSTRO партнера в його банку-корреспонд" />
+                            <button type="button" class="k-button" style="width: 10%;" ng-click="RegDeal.getBankSwiftParts(0)" ng-disabled="RegDeal.KVB == null || RegDeal.KVB == ''"><i class="pf-icon pf-16 pf-arrow_down"></i></button>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="col-md-12 col-sm-12">
+                            <label for="" style="margin-bottom: 15pt"></label>
+                            <input type="text" ng-model="RegDeal.NBKB" ng-keydown="RegDeal.backSpaceEvent($event)" class="k-textbox k-state-disabled inputReadOnly" readonly style="width: 80%" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-12 col-sm-12">
+                            <textarea ng-model="RegDeal.dfB57A" ng-disabled="RegDeal.KVB == null || RegDeal.KVB == ''" class="k-textbox" style="margin-top: 5pt; margin-right: 5pt; width: 82%; height: 60px;" ng-trim="true" onKeyPress="return ( this.value.length < 200 );" title="Вихідна траса Д"> </textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="col-md-12 col-sm-12 control-label">
+                            Код призначення для PB
+                        </label>
+                        <div class="col-md-12 col-sm-12">
+                            <label for="" style="margin-bottom: 15pt"></label>
+                            <input type="text" ng-model="RegDeal.Kod_NB" ng-blur="RegDeal.setPayments.B(RegDeal.Kod_NB); RegDeal.setPayments.A(RegDeal.Kod_NB);" class="k-textbox" style="width: 40%; margin-right: 5pt;" ng-disabled="RegDeal.KVB == null || RegDeal.KVB == ''" ng-keydown="RegDeal.checkKey($event)" title="Код признач.для 1_ПБ" />
+                            <input type="text" ng-model="RegDeal.sKod_NB" ng-keydown="RegDeal.backSpaceEvent($event)" class="k-textbox k-state-disabled inputReadOnly" style="width: 40%; margin-right: 5pt;" readonly />
+                            <button type="button" class="k-button" style="width: 10%;" ng-click="RegDeal.getCodePurposeOfPayment('gridCodePurposeOfPaymentB')" ng-disabled="RegDeal.KVB == null || RegDeal.KVB == ''"><i class="pf-icon pf-16 pf-arrow_down" )"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-1 col-sm-1">
+        </div>
+        <div class="col-md-5 col-sm-5">
+            <div class="panel panel-default second_foot">
+                <div id="panel_body_B" class="panel-body">
+                    <div class="form-group">
+                        <label style="width: 82%; height:80px;"></label>
+                        <div class="col-md-12 col-sm-12">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-5 col-sm-5">
+            <div class="panel panel-default second_foot">
+                <div id="panel_body_B" class="panel-body">
+                    <div class="form-group">
+                        <label for="">Посередник</label>
+                        <div class="col-md-12 col-sm-12">
+                            <textarea ng-model="RegDeal.dfB56A" class="k-textbox" ng-disabled="RegDeal.KVB == null || RegDeal.KVB == ''" style="width: 82%; height:80px; margin-right: 5pt;" ng-trim="true" onKeyPress="return ( this.value.length < 200 );"> </textarea>
+                            <button type="button" class="k-button" style="width: 10%; position: absolute;" ng-click="RegDeal.getBankSwiftParts(1)" ng-disabled="RegDeal.KVB == null || RegDeal.KVB == ''"><i class="pf-icon pf-16 pf-arrow_down"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+<script src="~/Areas/Forex/Scripts/Controllers/RegularDealsCtrl.js"></script>
+<script src="~/Areas/Forex/Scripts/Services/RegularDealService.js"></script>
+<script src="~/Areas/Forex/Scripts/Directive/Format.js"></script>

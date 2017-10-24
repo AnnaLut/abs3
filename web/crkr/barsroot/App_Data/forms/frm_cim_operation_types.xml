@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<xmlform caption="Типи операцій" captiontype="OnlyTitle">
+  <grids>
+    <grid id="gv" pagesize="10" showpagesizebox="true" title="Типи операцій">
+      <datasource>
+        <sql>
+          select * from cim_operation_types order by type_id
+        </sql>
+      </datasource>
+      <editform style="Dialog" title="Редагування типу"  width="600" height="180" >
+        <buttons defaulttype="Link">
+          <button id="cmdInsert" caption="Додати рядок|Зберегти|Вiдмiнити" hint="Додати рядок|Зберегти рядок|Вiдмiнити додавання">
+            <command type="Insert" successmessage="Дані збережено">
+               <sql>insert into cim_operation_types(type_id, type_name) values(:TYPE_ID, :TYPE_NAME)</sql>
+              <parameters>
+                <parameter type="DataField" name="TYPE_ID" />
+                <parameter type="DataField" name="TYPE_NAME" />
+              </parameters>
+            </command>
+          </button>
+          <button id="cmdEdit" caption="Редагувати|Зберегти|Вiдмiнити" hint="Редагувати|Зберегти|Вiдмiнити">
+            <command type="Edit">
+              <sql>update cim_operation_types set TYPE_NAME=:TYPE_NAME where TYPE_ID =:TYPE_ID</sql>
+              <parameters>
+                <parameter type="DataField" name="TYPE_NAME" />
+                <parameter type="DataField" name="TYPE_ID" />
+              </parameters>
+            </command>
+          </button>
+          <button id="cmdDel" caption="Видалити" hint="Видалити" confirmmessage="Ви дійсно хочете видалити тип ?">
+            <command type="Delete">
+              <sql>delete from cim_operation_types where TYPE_ID =:TYPE_ID</sql>
+              <parameters>
+                <parameter type="DataField" name="TYPE_ID" />
+              </parameters>
+            </command>
+          </button>
+          <button id="cmdClose" caption="Закрити" hint="Закрити форму">
+            <command type="Close"/>
+          </button>
+        </buttons>
+      </editform>
+      <fields>
+        <field datatype="Int64" name="TYPE_ID" key="true" >
+          <column show="true" caption="Код" />
+          <form rwmode="RW" required="true">
+            <uicontrol></uicontrol>
+          </form>
+        </field>
+        <field datatype="String" size="256" name="TYPE_NAME">
+          <column show="true" align="Left" caption="Назва" />
+          <form rwmode="RW" required="true">
+            <uicontrol controlwidth="500" linescount="3"></uicontrol>
+          </form>
+        </field>
+      </fields>
+      <rowselection method="SingleRow" />
+    </grid>
+  </grids>
+</xmlform>

@@ -1,0 +1,190 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = "Зміна параметрів угоди FOREX";
+}
+
+<link href="~/Areas/Forex/CSS/Index.css" rel="stylesheet" />
+
+<style>
+
+    .container {
+        /*width: 950px !important;*/
+        text-align: center;
+    }
+
+   .form-group .k-textbox{
+        width:44%;
+    }
+
+   .form-group .k-button{
+       width:10%;
+   }
+
+   .dealer{
+       height:140px;
+   }
+
+   .trassa {
+       height:220px
+   }
+
+   .form-group textarea{
+       height: 60px
+   }
+
+   .form-group .doubleWidth {
+       width: 90%;
+   }
+    .row {
+        margin-right: 0px !important;
+        margin-left: 0px !important;
+    }
+</style>
+
+<div class="conteiner" ng-controller="ChangeParamFXSDealCtrl as CngParFXSDeal">
+    <div class="row">        
+            <div class="form-group">
+                <div class="col-md-1 col-sm-1">
+                    <div class="k-loading-image k-overlay" ng-show="CngParFXSDeal.loading"></div>
+                    <input type="hidden" value="@ViewBag.FXUPD" id="dealFXS" />                    
+                </div>
+                <div class="col-md-10 col-sm-10" >
+                    <div class="form-group">
+                        <h3 class="font-bold">@ViewBag.Title</h3>
+                    </div>
+                    <div class="form-group">
+                        <button class="k-button" ng-click="CngParFXSDeal.SaveGhanges()" ng-disabled="CngParFXSDeal.isSaved == true" title="Зберегти"><i class="pf-icon pf-16 pf-ok"></i></button>
+                    </div>
+                    <div class="form-group" style="text-align:center;">
+                        <labal style="float:left" class="first_foot">Валюта А - ПОКУПКА</labal>
+                        <input type="text" class="k-textbox k-state-disabled inputReadOnly" style="width: 80px" ng-model="CngParFXSDeal.FXSDeal.DEAL_TAG" disabled title="Ідентифікатор угоди" ng-keydown="CngParFXSDeal.backSpaceEvent($event)"/>
+                        <input type="text" class="k-textbox k-state-disabled inputReadOnly" style="width: 80px" ng-model="CngParFXSDeal.DAT" disabled title="Дата угоди" ng-keydown="CngParFXSDeal.backSpaceEvent($event)"/>
+                        <labal style="float:right" class="second_foot">Валюта Б - ПРОДАЖА</labal>
+                    </div>                                        
+               </div>
+            </div>          
+    </div>
+    <div class="row">        
+            <div class="col-md-1 col-sm-1">
+            </div>
+            <div class="col-md-5 col-sm-5">
+                <div class="panel panel-default ">
+                    <div class="panel-body">   
+                        <div class="form-group ">                           
+                                <input type="number" ng-model="CngParFXSDeal.FXSDeal.KVA" maxlength="3" class="first_foot  k-textbox k-state-disabled inputReadOnly" style="width: 60px; " title="Код покупної валюти" disabled ng-keydown="CngParFXSDeal.backSpaceEvent($event)" />
+                                <input type="text" ng-model="CngParFXSDeal.FXSDeal.NAMEVA" class="first_foot k-textbox k-state-disabled inputReadOnly" disabled ng-keydown="CngParFXSDeal.backSpaceEvent($event)" />
+                        </div>
+                        <div class="form-group" >
+                            <input type="text" class="first_foot k-textbox k-state-disabled inputReadOnly" ng-model="CngParFXSDeal.DATA" disabled ng-keydown="CngParFXSDeal.backSpaceEvent($event)" title="Дата надходження"/> 
+                            <input type="text" ng-model="CngParFXSDeal.SUMA" class="first_foot k-textbox k-state-disabled inputReadOnly" disabled ng-keydown="CngParFXSDeal.backSpaceEvent($event)" title="Сума надходження"/>
+                        </div>
+                        <div class="form-group" >
+                            <input type="text" ng-model="CngParFXSDeal.FXSDeal.BICA" class="first_foot k-textbox k-state-disabled inputReadOnly" disabled title="BIC нашого банку-корреспонд" ng-keydown="CngParFXSDeal.backSpaceEvent($event)" />
+                            <input type="text" ng-model="CngParFXSDeal.FXSDeal.NBA" class="first_foot k-textbox k-state-disabled inputReadOnly"  disabled ng-keydown="CngParFXSDeal.backSpaceEvent($event)" />
+                        </div>                                                  
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-5 col-sm-5" >
+                <div class="panel panel-default">
+                    <div class="panel-body ">
+                        <div class="form-group">
+                            <input type="number" ng-model="CngParFXSDeal.FXSDeal.KVB" maxlength="3" class="second_foot k-textbox k-state-disabled inputReadOnly" style="width: 60px" title="Код валюти на продаж" disabled ng-keydown="CngParFXSDeal.backSpaceEvent($event)"/>
+                            <input type="text" ng-model="CngParFXSDeal.FXSDeal.NAMEVB" class="second_foot k-textbox k-state-disabled inputReadOnly"  disabled ng-keydown="CngParFXSDeal.backSpaceEvent($event)"/>
+                        </div>
+                        <div class="form-group" >
+                            <input type="text" class="second_foot k-textbox k-state-disabled inputReadOnly" ng-model="CngParFXSDeal.DATB" disabled ng-keydown="CngParFXSDeal.backSpaceEvent($event)" title="Дата відправки"/>
+                            <input type="text" ng-model="CngParFXSDeal.SUMB" class="second_foot k-textbox k-state-disabled inputReadOnly" disabled ng-keydown="CngParFXSDeal.backSpaceEvent($event)" title="Заг.Сума відправки"/>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" ng-model="CngParFXSDeal.FXSDeal.BICB" class="second_foot k-textbox k-state-disabled inputReadOnly" disabled title="BIC партнера" ng-keydown="CngParFXSDeal.backSpaceEvent($event)"/>
+                            <input type="text" ng-model="CngParFXSDeal.FXSDeal.NBB" class="second_foot k-textbox k-state-disabled inputReadOnly" disabled ng-keydown="CngParFXSDeal.backSpaceEvent($event)"/>
+                        </div>                        
+                    </div>
+                </div>
+            </div>      
+    </div>    
+    <div class="row">        
+        <div class="col-md-1 col-sm-1">
+        </div>
+        <div class="col-md-5 col-sm-5">
+            <div class="panel panel-default first_foot">
+                <div class="panel-body trassa">
+                    <div class="form-group">
+                        <label>
+                            Трасса по надходженню
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" ng-model="CngParFXSDeal.BICKA" ng-blur="CngParFXSDeal.getOurTrassa('BICKA', CngParFXSDeal.BICKA)" ng-disabled="CngParFXSDeal.isSaved == true" class="k-textbox" title="BIC нашого банку-корреспонд" />
+                        <input type="text" ng-model="CngParFXSDeal.SSLA" ng-blur="CngParFXSDeal.getOurTrassa('SSLA', CngParFXSDeal.SSLA)" ng-disabled="CngParFXSDeal.isSaved == true" class="k-textbox" title="Рахунок VOSTRO у нашого банку-корреспонд" />
+                    </div>
+                    <div class="form-group">
+                        <select id="revenueDropDown" class="doubleWidth"
+                                kendo-drop-down-list
+                                k-data-text-field="'ACC_NAME'"
+                                k-ng-model="CngParFXSDeal.NLS"
+                                k-data-value-field="'NLS'"
+                                k-value-primitive="true"
+                                k-data-source="CngParFXSDeal.revenueDropDownDataSource"
+                                k-options="CngParFXSDeal.revenueDropDownOptions"
+                                ng-disabled="CngParFXSDeal.isSaved == true"></select>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" ng-model="CngParFXSDeal.SSA" ng-blur="CngParFXSDeal.getOurTrassa('NLS', CngParFXSDeal.SSA)" ng-disabled="CngParFXSDeal.isSaved == true" ng-keydown="CngParFXSDeal.checkKey($event)" class="k-textbox doubleWidth" title="Рахунок для входу вал-A" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-5 col-sm-5">
+            <div class="panel panel-default ">
+                <div class="panel-body second_foot trassa">
+                    <div class="form-group">
+                        <label>
+                            Трасса платежу (вихідна)
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" ng-model="CngParFXSDeal.BICKB" ng-blur="CngParFXSDeal.getDefSwiftPartners(CngParFXSDeal.BICKB)" ng-disabled="CngParFXSDeal.isSaved == true" class="k-textbox" title="BIC банку-кореспонденту" />
+                        <input type="text" ng-model="CngParFXSDeal.SSB" ng-disabled="CngParFXSDeal.isSaved == true" class="k-textbox" title="Рахунок VOSTRO партнера в його банку-корреспонд" />
+                        <button class="k-button" ng-click="CngParFXSDeal.getBankSwiftParts('way')" ng-disabled="CngParFXSDeal.isSaved == true" style="position:absolute; margin-left: 1px;"><i class="pf-icon pf-16 pf-arrow_down"></i></button>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" ng-model="CngParFXSDeal.NBKB" class="k-textbox k-state-disabled inputReadOnly doubleWidth" disabled ng-keydown="CngParFXSDeal.backSpaceEvent($event)" />
+                    </div>
+                    <div class="form-group">
+                        <textarea ng-model="CngParFXSDeal.dfB57A" ng-disabled="CngParFXSDeal.isSaved == true" class="k-textbox doubleWidth" ng-trim="true" onKeyPress="return ( this.value.length < 200 );" title="Вихідна траса Д"> </textarea>
+                    </div>
+                </div>
+            </div>
+        </div>       
+    </div> 
+    <div class="row">        
+        <div class="col-md-1 col-sm-1">
+        </div>
+        <div class="col-md-5 col-sm-5">
+            <div class="panel panel-default ">
+                <div class="panel-body first_foot dealer">
+                    <div class="form-group">
+                        <label></label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-5 col-sm-5">
+            <div class="panel panel-default ">
+                <div class="panel-body second_foot dealer">
+                    <div class="form-group">
+                        <label for="">Посередник</label>
+                    </div>
+                    <div class="form-group">
+                        <textarea ng-model="CngParFXSDeal.dfB56A" ng-disabled="CngParFXSDeal.isSaved == true" class="k-textbox doubleWidth" ng-trim="true" onKeyPress="return ( this.value.length < 200 );"> </textarea>
+                        <button class="k-button" ng-click="CngParFXSDeal.getBankSwiftParts('dealer')" ng-disabled="CngParFXSDeal.isSaved == true" style="position:absolute; margin-left: 2px;"><i class="pf-icon pf-16 pf-arrow_down"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+       </div> 
+</div>
+<script src="~/Areas/Forex/Scripts/Controllers/ChangeParamFXSDealCtrl.js"></script>
+<script src="~/Areas/Forex/Scripts/Services/RegularDealService.js"></script>

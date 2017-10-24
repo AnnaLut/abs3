@@ -1,0 +1,21 @@
+﻿@{
+    ViewBag.Title = "Протокол помилок";
+}
+<script src="~/Areas/Cash/Scripts/MfoProtocol.js"></script>
+<style>
+    .critical {
+        background-color: #fdd;
+    }
+
+    .warning {
+        background-color: #fda;
+    }
+
+    .ok {
+        background-color: #ced;
+    }
+</style>
+<div ng-app="BarsWeb.Controllers" ng-controller="MfoProtocolCtrl">
+    <h2>@ViewBag.Title</h2>
+    <div id="grid" kendo-grid="grid" k-options="gridOptions('@ViewBag.id')" k-rebind="gridOptions" k-on-save-changes="saveChanges(kendoEvent)"></div>
+</div>

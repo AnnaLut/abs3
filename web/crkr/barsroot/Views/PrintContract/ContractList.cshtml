@@ -1,0 +1,12 @@
+﻿@model IEnumerable<BarsWeb.Models.DocSchemeReport>
+@{  
+    Layout = null;
+ }
+@foreach (var contract in Model)
+{
+  <tr id="@contract.Id" onclick="selectRow(this);">
+    <td>@contract.Id</td>
+    <td>@contract.Name</td>
+  </tr>
+}
+

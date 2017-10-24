@@ -1,0 +1,80 @@
+.webservice { behavior: url(/Common/WebService/js/WebService.htc); }
+.mainGradient 
+{
+	background-image: url(/common/images/skin/gradient_main.png); 
+	height: 25px;
+}
+.headTextbox
+{
+	border-width: 0px;
+	border-color: #94ABD9;
+	font-size: 8pt;
+	color: #1C4B75;
+	text-align: justify;
+	vertical-align: middle;
+	background-color: #CCD7ED;
+	font-weight: bold;
+}
+.headTitle
+{
+	vertical-align: middle;
+	text-align: justify;
+	DISPLAY: inline; 
+	FONT-SIZE: 8pt; 
+	WIDTH: 70px; 
+	COLOR: #1C4B75; 
+	FONT-FAMILY: Arial; 
+	HEIGHT: 15px;
+	text-align: right;
+}
+.headBody
+{
+	background-color: #CCD7ED;
+	margin: 0;
+}
+
+.applistBody
+{
+	font-family:Verdana;
+	font-size:8pt; 
+	background-color: #C6D3F7;
+}
+  b.rtop b {display:block; height: 1px; overflow: hidden; background: white;/*background: #F3F4FC;*/ }
+  b.r1{margin: 0 5px}
+  b.r2{margin: 0 3px}
+  b.r3{margin: 0 2px}
+  b.rtop b.r4 {margin: 0 1px;height: 2px; }
+  
+.menu {position:absolute; top:0px;}  
+
+.menuItemSelected 
+{
+	border: 1px solid;
+	border-color: #CCD9FF;
+	padding-top:3px;
+	padding-bottom:5px;	
+	padding-left: 5px;
+	padding-right: 5px;	
+	background-color: #EAF3FF;
+}
+.menuItem 
+{
+	background-color:white;
+	padding-top:3px;
+	padding-bottom:5px;	
+	padding-left: 5px;
+	padding-right: 5px;
+	cursor: hand;
+}
+
+.menuTitle
+{
+	margin-top : 0px; 
+	/*background-color: #F3F4FC; */
+	background-color: White;
+	padding-left: 5px; 
+	padding-right: 5px; 
+	padding-bottom: 5px; 
+	border-bottom: 1px dotted gray;
+}
+

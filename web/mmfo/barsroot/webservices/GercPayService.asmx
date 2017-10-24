@@ -1,0 +1,1 @@
+<%@ WebService Language="C#" CodeBehind="~/App_Code/webservices/GercPayService.cs" Class="Bars.WebServices.GercService" %>

@@ -1,0 +1,84 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = "Баланс-Рахунок-Документ";
+}
+<script src="~/Areas/FinView/Scripts/FinanceJS/BalanceCtrl.js"></script>
+<script src="@Url.Content("~/lib/jsZip/jszip.min.js")"></script>
+
+<div class="page-header">
+    <h1>
+        @ViewBag.Title
+    </h1>
+</div>
+<div ng-controller="FinanceView.BalanceCtrl">
+    <div kendo-toolbar k-options="balanceToolbarOptions"></div>
+    <div kendo-grid="balanceGrid" options="balanceGridOptions" style="margin-top: 10px" ng-show="gridState.balance"></div>
+
+    <div kendo-window="branchWindow" k-visible="false" k-modal="true">
+        <div kendo-toolbar k-options="branchesToolbaroptions"></div>
+        <div kendo-grid="branchGrid" options="branchesGridOptions" style="margin-top: 10px"></div>
+    </div>
+
+    <div class="accGrid" kendo-grid="accGrid" k-options="accGridOptions" ng-show="gridState.account" style="margin-top: 10px"></div>
+
+    <div class="docGrid" kendo-grid="docGrid" k-options="docGridOptions" ng-show="gridState.document" style="margin-top: 10px"></div>
+
+</div>
+
+<style>
+    
+    /** --- grid header ----*/
+
+    .k-grid-header th.k-with-icon .k-link {
+        margin-right: 0px;
+        font-size: 11px;
+    }
+
+    .k-header .k-link {
+        text-align: center;
+        font-size: 11px;
+    }
+
+    .k-grid-header th.k-header, .k-filter-row th {
+        text-align: center;
+        font-size: 11px;
+    }
+    .k-list-optionlabel{
+        font-size: 13px;
+    }
+
+     .custom-table {
+         width: 100%;
+         max-width: 100%;
+         margin-top: 2px;
+        
+     }
+    .custom-table > thead > tr > th,
+    .custom-table > tbody > tr > th,
+    .custom-table > tfoot > tr > th,
+    .custom-table > thead > tr > td,
+    .custom-table > tbody > tr > td,
+    .custom-table > tfoot > tr > td {
+        padding: 8px;
+        line-height: 1;
+        vertical-align: top;
+        border-bottom: 2px solid #f5f5f5;
+    }
+    .usd-cell {
+        background-color: #dff0d8 !important;
+    }
+    .eur-cell {
+        background-color: #a6e1ec!important;
+    }
+    .rub-cell {
+        background-color: #ebccd1 !important;
+    }
+    .xdr-cell {
+        background-color: #f7e1b5 !important;
+    }
+    .mode {
+        color: #0000FF;
+        text-align: center;
+        cursor: pointer;
+    }
+</style>

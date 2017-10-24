@@ -1,0 +1,23 @@
+﻿@using Areas.DptAdm.Models
+
+<script src="@Url.Content("~/Areas/DptAdm/Scripts/dptarchive.js")"></script>
+<link href="~/Areas/DptAdm/Content/style.css" rel="stylesheet" />
+@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = "Архів депозитного портфелю";
+}
+
+<h2>@ViewBag.Title</h2>
+
+        <div class="panel panel-primary" style="height: 15%;">
+            <div class=" panel-heading">
+                <h3 class="panel-title">Параметри архіву</h3>
+            </div>
+            <div class="panel-body" style="height: 25%; padding: 0px;">
+                <div id="DPTArch"></div>
+            </div>
+        </div>
+
+
+<script type="text/javascript">
+</script>

@@ -1,0 +1,162 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+}
+<script src="~/Areas/CRSOUR/Scripts/CreditAgreementCtrl.js"></script>
+<div ng-controller="crsour.CreditAgreementCtrl">
+    <h1>{{Title}}</h1>
+    <form kendo-validator="validator" k-options="mainValidationOptions">
+        <div kendo-tool-bar="tools" k-options="toolsOptions">
+            <a class='k-button' ng-click="saveDeal()" ng-disabled="isReadOnly"><i class='pf-icon pf-16 pf-save'></i> Зберегти</a>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div class="form-group">
+                    <label><b>Параметри угоди</b></label>
+                    <table border="0">
+                        <tr>
+                            <td>
+                                <label>Номер угоди</label>
+                            </td>
+                            <td>
+                                <input type="text" class="k-textbox" ng-model="model.nd" ng-disabled="isReadOnly || isUpdate" style="width: 100px" />
+                            </td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label>Вид угоди</label>
+                            </td>
+                            <td colspan="3">
+                                <select kendo-drop-down-list style="width: 395px" k-ng-model="model.vidd" k-options="viddOptions" k-ng-disabled="isReadOnly || isUpdate"></select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label>Дата початку</label>
+                            </td>
+                            <td>
+                                <input kendo-masked-date-picker name="dateStart" k-options="dateFormat" k-ng-model="model.dateStart" k-ng-disabled="isReadOnly || isUpdate" style="width: 150px" />
+                            </td>
+                            <td>
+                                <label>Дата погашення</label>
+                            </td>
+                            <td>
+                                <input kendo-masked-date-picker name="dateEnd" k-options="dateFormat" k-ng-model="model.dateEnd" k-ng-disabled="isReadOnly" style="width: 150px"
+                                       data-datediff-msg="Дата погашення меньша дати початку" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label>Сума угоди</label>
+                            </td>
+                            <td>
+                                <input kendo-numeric-text-box k-ng-model="model.sum" style="width: 150px" k-min="0" k-options="decimalFormat" k-ng-disabled="isReadOnly" />
+                            </td>
+                            <td>
+                                <label>Валюта</label>
+                            </td>
+                            <td>
+                                <select kendo-drop-down-list style="width: 250px" k-ng-model="model.curr" k-options="currOptions" k-ng-disabled="isReadOnly || isUpdate"></select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label>Відсоткова ставка</label>
+                            </td>
+                            <td>
+                                <input kendo-numeric-text-box k-ng-model="model.rate" style="width: 150px" k-min="0" k-max="100" k-options="decimalFormatRate" k-ng-disabled="isReadOnly" />
+                            </td>
+                            <td>
+                                <label>База відсотків</label>
+                            </td>
+                            <td>
+                                <select kendo-drop-down-list style="width: 250px" k-ng-model="model.basey" k-options="baseyOptions" k-ng-disabled="isReadOnly || isUpdate"></select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label>Сума відсотків</label>
+                            </td>
+                            <td>
+                                <input kendo-numeric-text-box k-ng-model="model.sumRate" style="width: 150px" k-min="0" k-options="decimalFormat" k-ng-disabled="true" />
+                            </td>
+                            <td>
+                                <a class='k-button' ng-click="getRateSum()" ng-disabled="isReadOnly" title="Вирахувати суму відсотків"><i class='pf-icon pf-16 pf-execute'></i></a>
+                            </td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label>Рахунки</label>
+                            </td>
+                            <td colspan="2">
+                                <input type="text" class="k-textbox" ng-model="model.nlsDA" ng-disabled="true" style="width: 200px" />
+                            </td>
+                            <td>
+                                <input type="text" class="k-textbox" ng-model="model.nlsDB" ng-disabled="true" style="width: 200px" />
+                                <a class='k-button' ng-click="getNls()" ng-disabled="isReadOnly || isUpdate" title="Отримати рахунки по угоді"><i class='pf-icon pf-16 pf-execute'></i></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label>Власник угоди</label>
+                            </td>
+                            <td>
+                                <input type="text" class="k-textbox" ng-model="model.mfoD" ng-disabled="true" style="width: 150px" />
+                            </td>
+                            <td colspan="2">
+                                <input type="text" class="k-textbox" ng-model="model.nameD" ng-disabled="true" style="width: 304px" />
+                                <a class='k-button' ng-click="showNameD('OUR_BRANCH','BRANCH,NAME','where date_closed is null')" ng-disabled="true" title="Вибрати власника"><i class='pf-icon pf-16 pf-book'></i></a>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div class="form-group">
+                    <label><b>Партнер по угоді</b></label>
+                    <table border="0">
+                        <tr>
+                            <td>
+                                Партнер по угоді
+                            </td>
+                            <td>
+                                <input type="text" class="k-textbox" ng-model="model.mfoP" ng-disabled="true" style="width: 150px" />
+
+                                <input type="text" class="k-textbox" ng-model="model.nameP" ng-disabled="true" style="width: 304px" />
+                                <a class='k-button' ng-click="showNameP('CUSTOMER','RNK,NMK')" ng-disabled="isReadOnly || isUpdate" title="Вибрати партнера"><i class='pf-icon pf-16 pf-book'></i></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Рахунки
+                            </td>
+                            <td>
+                                <input type="text" class="k-textbox" name="nlsPA"
+                                       ng-model="model.nlsPA" ng-disabled="isReadOnly"
+                                       ng-blur="checkVkrz(model.nlsPA)" data-nlsA-msg="Не вірний контрольний розряд рахунку" 
+                                       style="width: 200px;padding:5px" />
+                                <input type="text" class="k-textbox" name="nlsPB"
+                                       ng-model="model.nlsPB" ng-disabled="isReadOnly"
+                                       ng-blur="checkVkrz(model.nlsPB)" data-nlsB-msg="Не вірний контрольний розряд рахунку"
+                                       style="width: 200px" />
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<style>
+    table td {
+        padding: 5px;
+    }
+    span.k-tooltip {
+        display:inherit;
+    }
+</style>

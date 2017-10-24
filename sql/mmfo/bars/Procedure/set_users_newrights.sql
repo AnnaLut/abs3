@@ -1,0 +1,3281 @@
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/SET_USERS_NEWRIGHTS.sql =========*
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  procedure SET_USERS_NEWRIGHTS ***
+
+  CREATE OR REPLACE PROCEDURE BARS.SET_USERS_NEWRIGHTS IS
+BEGIN
+
+--==============================================================================
+--********** 216 - Євдокимов Сергій Едуардович **********
+--==============================================================================
+-- NUPR - АРМ_73 МБДК+FOREX
+-- SWKZ - АРМ_SWIFT_Казначейство
+-- PERD - АРМ_Звітність НБУ (2)
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- BOR1 - АРМ_Реєстр боржників (Банки)
+ update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+ where id=216 and codeapp in ('NUPR','SWKZ','PERD','PRIN','SBOP','BOR1');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=216 and IDG in (6,7,9,10,11,12,13,46,47);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=216 and IDG in (100);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=216 and KODF in ('C9','D5','D6','D8','E2','E8');
+
+--==============================================================================
+--********** 201 - Ігнатенко Наталія  Миколаївна **********
+-- 1AS1 - АРМ_71 Казначейство
+-- ATIM - АРМ_72 Позиционер
+-- NUPR - АРМ_73 МБДК+FOREX
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=201 and codeapp in ('1AS1','ATIM','NUPR','PRIN','SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=201 and IDG in (1,6,7,9,10,11,12,13,31,32,34,35,37,38,44,45,46,47,48,50);
+--==============================================================================
+--********** 118 - Ільченко Лариса Миколаївна **********
+-- TEST - АРМ_06 Операціоніст
+-- VIZA - АРМ_22 Візування операцій
+-- REGG - АРМ_23 Регистрация клиентов и счетов (ГОУ и ОУ)
+-- VNOT - АРМ_38 Звітність ОБ
+-- NALU - АРМ_49 Податковий облік
+-- NALO - АРМ_99 Податковий облік (виконавці)
+-- SEP  - АРМ_Картотека запросов
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- RAB1 - Дикари + Дебет Информационный
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=118 and codeapp in ('TEST','VIZA','REGG','VNOT','NALU','NALO','SEP ','SBOP','RAB1');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=118 and TT in ('007','096','229','240','403','405','406','407','F13','PKR','PO1','PO3');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=1
+-- where idu=118 and IDG in (55);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=118 and IDG in (8,9,10,12,13,15,16,19,21,23,25,26,34,36,39,40,44,46,47,50,80);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=5
+-- where idu=118 and IDG in (17,18);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=118 and IDG in (1,24,27,28,29,30,31,38,41);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=118 and CHKID in (3,34);
+--==============================================================================
+--********** 127 - Ісаєва Тетяна Пилипівна **********
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=127 and codeapp in ('PRIN','SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=127 and IDG in (20,21,31,33,34,35);
+--==============================================================================
+--********** 244 - Ісаков Володимир В'ячеславович **********
+-- BOSS - АРМ_05 Керівник-Аудитор-Аналітик
+-- AMEN - АРМ_47 Менеджер
+-- 1AS1 - АРМ_71 Казначейство
+-- 1AS2 - АРМ_72 Кредитне управління
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=244 and codeapp in ('BOSS','AMEN','1AS1','1AS2','PRIN','SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=244 and IDG in (1,2,3,4,5,6,7,8,9,10,11,12,13,14,25,31,32,33,34,35,37,38,44,45,46,47,48,50);
+--==============================================================================
+--********** 741 - Ісмаілов Роман Фідаілович **********
+--==============================================================================
+--********** 850 - Администратор WEB Клиент-Банк **********
+-- WADM - АРМ Администратора BarsWeb
+-- WMAL - Зв`язок з банком
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=850 and codeapp in ('WADM','WMAL');
+--==============================================================================
+--********** 116 - Анохін Андрій Борисович **********
+-- BIRZ - АРМ Биржевые операции
+-- KRE2 - АРМ Кредитний портфель ЮО (ЗАГАЛЬНИЙ)
+-- FMON - АРМ Уповноваженої особи ФМ
+-- MAIN - АРМ_01 Адміністратор АБС
+-- BCLI - АРМ_02k Технолог Клиент-Банк
+-- VNOT - АРМ_38 Звітність ОБ
+-- NALU - АРМ_49 Податковий облік
+-- VKLD - АРМ_56 Вклады населения
+-- NALS - АРМ_87 Податковий облiк ОБ
+-- FINI - АРМ_99_R
+-- OVR  - АРМ_Комерційні овердрафти юридичних осіб
+-- PCOR - АРМ_Корпус Мира
+-- KRE1 - АРМ_Кредиты физ.лиц
+-- CASH - АРМ_Підкріплення готівкової валюти
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- CHEK - АРМ_Чеки
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=116 and codeapp in ('BIRZ','KRE2','FMON','MAIN','BCLI','VNOT','NALU','VKLD','NALS','FINI','OVR ','PCOR','KRE1','CASH','PRIN','SBOP','CHEK');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=116 and IDG in (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,80);
+--==============================================================================
+--********** 255 - Атрохова  Олена Іванівна **********
+--==============================================================================
+--********** 90 - Бакуменко Оксана Андріївна **********
+-- KREU - АРМ_15 % Кредити
+-- OTCN - АРМ_16 Звітність НБУ
+-- PERE - АРМ_26 Перегляд спецпараметрів рахунків (НБУ та ОБУ)
+-- VNOT - АРМ_38 Звітність ОБ
+-- KRE3 - АРМ_КП ФИЗ. ЛИЦ банка (кред)
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- REZE - АРМ_Резервный фонд
+-- RAB1 - Дикари + Дебет Информационный
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=90 and codeapp in ('KREU','OTCN','PERE','VNOT','KRE3','PRIN','SBOP','REZE','RAB1');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=90 and IDG in (16,17,18,19,22,27,38,43,44,46,47,50);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=90 and CHKID in (35);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=90 and KODF in ('D5','D8','F6','F7','F8','F9');
+--==============================================================================
+--********** 239 - Батюк Лариса Анатоліївна **********
+-- 1AS1 - АРМ_71 Казначейство
+-- ATIM - АРМ_72 Позиционер
+-- NUPR - АРМ_73 МБДК+FOREX
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=239 and codeapp in ('1AS1','ATIM','NUPR','PRIN','SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=239 and IDG in (6,7,9,10,11,12,13,31,32,37,38,44,46,47,48,50);
+--==============================================================================
+--********** 235 - Бахчевнікова Любов Олександрівна **********
+-- 1AS1 - АРМ_71 Казначейство
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=235 and codeapp in ('1AS1','PRIN','SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=235 and IDG in (8,10,13,14,15,16,18,19,22,23,25,28,43,44,46,47);
+--==============================================================================
+--********** 318 - Баштова Ганна Олександрівна **********
+-- VIPV - АРМ СВО
+-- TEST - АРМ_06 Операціоніст
+-- REGG - АРМ_23 Регистрация клиентов и счетов (ГОУ и ОУ)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- RAB1 - Дикари + Дебет Информационный
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=318 and codeapp in ('VIPV','TEST','REGG','SBOP','RAB1');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=318 and TT in ('007','009','228','229','239','240','247','248','401','405','406','407','414','F13','PKR');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=1
+-- where idu=318 and IDG in (16,22,55);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=318 and IDG in (50);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=5
+-- where idu=318 and IDG in (17,18);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=318 and IDG in (1,24,27,28,29,30,31,32,38,39,56);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=318 and CHKID in (3,12,42);
+--==============================================================================
+--********** 120 - Бевзенко Галина Василівна **********
+-- TEST - АРМ_06 Операціоніст
+-- REGG - АРМ_23 Регистрация клиентов и счетов (ГОУ и ОУ)
+-- VNOT - АРМ_38 Звітність ОБ
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- RAB1 - Дикари + Дебет Информационный
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=120 and codeapp in ('TEST','REGG','VNOT','SBOP','RAB1');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=120 and TT in ('014','096','229','248','307','308','400','401','BLN');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=120 and IDG in (40);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=6
+-- where idu=120 and IDG in (24);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=120 and IDG in (1,13,26,27,28,29,30,31,34,36,38,39,41,43,48);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=120 and CHKID in (3);
+--==============================================================================
+--********** 209 - Безродна Світлана Василівна **********
+-- 1111 - Back Value
+-- EKPK - АРМ Економічні показники
+-- CINP - АРМ Цінні папери
+-- OTCN - АРМ_16 Звітність НБУ
+-- VIZA - АРМ_22 Візування операцій
+-- REGB - АРМ_23 Регистрация клиентов и счетов (БАНКИ)
+-- REGF - АРМ_23 Регистрация клиентов и счетов (ФЛ)
+-- REGU - АРМ_23 Регистрация клиентов и счетов (ЮЛ)
+-- OTLD - АРМ_25 Параметри клієнтів
+-- 1PN2 - АРМ_33 Операціоніст з процентами
+-- ATIM - АРМ_72 Позиционер
+-- SWKZ - АРМ_SWIFT_Казначейство
+-- MBDK - АРМ_Казначейство (МБДК+FOREX)
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- BOR1 - АРМ_Реєстр боржників (Банки)
+-- RAB1 - Дикари + Дебет Информационный
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=209 and codeapp in ('1111','EKPK','CINP','OTCN','VIZA','REGB','REGF','REGU','OTLD','1PN2','ATIM','SWKZ','MBDK','PRIN','SBOP','BOR1','RAB1');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=209 and TT in ('402','404');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=209 and IDG in (5,6,7,8,9,10,11,12,13,14,19,23,24,25,29,31,32,33,34,35,38,40,41,43,44,45,46,47,48,50);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=209 and IDG in (100);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=209 and CHKID in (3,14,15,16,35);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=209 and KODF in ('D5','D6','D8','D9','E0','E1','E2');
+--==============================================================================
+--********** 121 - Бережна Людмила Володимирівна **********
+-- SWF4 - SWIFT. Формирование сообщений
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- RAB1 - Дикари + Дебет Информационный
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=121 and codeapp in ('SWF4','PRIN','SBOP','RAB1');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=121 and TT in ('C11','C12');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=121 and IDG in (24,31,33);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=121 and IDG in (9,13);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=121 and CHKID in (50);
+--==============================================================================
+--********** 126 - Божкевич Аліна Анатоліївна **********
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=126 and codeapp in ('PRIN');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=126 and IDG in (4,9,11,13,21,23,24,25,31,33,34,35,38,43);
+--==============================================================================
+--********** 548 - Бойко Олена Василіївна **********
+-- OTCN - АРМ_16 Звітність НБУ
+-- VIZA - АРМ_22 Візування операцій
+-- REGF - АРМ_23 Регистрация клиентов и счетов (ФЛ)
+-- 1PN2 - АРМ_33 Операціоніст з процентами
+-- VNOT - АРМ_38 Звітність ОБ
+-- VKLD - АРМ_56 Вклады населения
+-- 1PN4 - АРМ_Керівник-4
+-- PCOR - АРМ_Корпус Мира
+-- SINI - АРМ_Кросс-курсы валют
+-- CASH - АРМ_Підкріплення готівкової валюти
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- CHEK - АРМ_Чеки
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=548 and codeapp in ('OTCN','VIZA','REGF','1PN2','VNOT','VKLD','1PN4','PCOR','SINI','CASH','PRIN','SBOP','CHEK');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=548 and TT in ('003','007','008','009','012','018','096','099','100','114','115','116','125','137','161','162','164','168','169','170','171','172','444','AA1','AA2','C02','C05','C10','CVO','D06','D07','D16','D17','I10','J30','J70','Z07','Z12','Z13','Z15','Z17','Z27','Z31','Z32');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=1
+-- where idu=548 and IDG in (29);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=548 and IDG in (40);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=5
+-- where idu=548 and IDG in (25);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=548 and IDG in (1,4,5,9,13,22,23,24,31,32,33,34,35,38,42,43,48);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=548 and CHKID in (3,9,12,35,42);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=548 and KODF in ('39','44','C9','E2');
+--==============================================================================
+--********** 257 - Бондаренко Ірина Михайлівна **********
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=257 and codeapp in ('PRIN','SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=257 and IDG in (5,13,23,24,32,34,35,38);
+--==============================================================================
+--********** 151 - Борисенко Олександр Олександрович **********
+-- 1ASC - АРМ_34 Каса
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=151 and codeapp in ('1ASC');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=151 and TT in ('KK1','KK2');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=151 and IDG in (1,38);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=151 and CHKID in (5);
+--==============================================================================
+--********** 207 - Бровкова Алла Степанівна **********
+-- UPRA - АРМ_07 СЕП. Управління коррахунком
+-- 1AS1 - АРМ_71 Казначейство
+-- ATIM - АРМ_72 Позиционер
+-- NUPR - АРМ_73 МБДК+FOREX
+-- 1PN3 - АРМ_Керівник-2
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=207 and codeapp in ('UPRA','1AS1','ATIM','NUPR','1PN3');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=207 and IDG in (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,43,44,45,46,47,48,50);
+--==============================================================================
+--********** 515 - Бусленко Марта Романівна **********
+-- STPF - АРМ "Швидка копійка"
+-- KMPS - АРМ Компенсація заощаджень
+-- SWF2 - АРМ_12 Обработка сообщений SWIFT
+-- OTCN - АРМ_16 Звітність НБУ
+-- DILI - АРМ_17 Клієнт-Банк
+-- RM11 - АРМ_18 Реєстр рахунків в ПО
+-- VIZA - АРМ_22 Візування операцій
+-- REGB - АРМ_23 Регистрация клиентов и счетов (БАНКИ)
+-- 1PN2 - АРМ_33 Операціоніст з процентами
+-- VNOT - АРМ_38 Звітність ОБ
+-- PBPB - АРМ_43 1_ПБ
+-- NALU - АРМ_49 Податковий облік
+-- 1GU1 - АРМ_74 Начальник відділу
+-- NALO - АРМ_99 Податковий облік (виконавці)
+-- REG2 - АРМ_Перегляд блокованих платежів
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- RAB1 - Дикари + Дебет Информационный
+-- MVPS - МВПС. Управление платежами
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=515 and codeapp in ('STPF','KMPS','SWF2','OTCN','DILI','RM11','VIZA','REGB','1PN2','VNOT','PBPB','NALU','1GU1','NALO','REG2','PRIN','SBOP','RAB1','MVPS');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=515 and TT in ('007','012','014','022','039','114','454','514','C00','C02','C06','C10','C11','C12','C14','CVB','CVO','CVS','D06','D07','F12','F13','F99','J31','PO1','PO3','PS3','SWD','SWK');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=515 and IDG in (9,33,50);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=515 and IDG in (11,13,23,24,29,31,32,34,35,38,41,43,48,52);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=515 and CHKID in (3,10,35,43);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=515 and KODF in ('40','C9','D4','D6','E2');
+--==============================================================================
+--********** 82 - Вінник Ксенія Валентинівна **********
+-- KRE4 - АРМ Кредитний портфель ЮО (КРЕДИТЧИК)
+-- KREU - АРМ_15 % Кредити
+-- PERE - АРМ_26 Перегляд спецпараметрів рахунків (НБУ та ОБУ)
+-- 1AS2 - АРМ_72 Кредитне управління
+-- OVR  - АРМ_Комерційні овердрафти юридичних осіб
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- BORG - АРМ_Реєстр боржників (Всі)
+-- REZE - АРМ_Резервный фонд
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=82 and codeapp in ('KRE4','KREU','PERE','1AS2','OVR ','PRIN','SBOP','BORG','REZE');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=82 and IDG in (9,11,13,14,15,19,21,23,25,27,28,31,38,43,44,46,47,50);
+--==============================================================================
+--********** 175 - Вареник Ольга Анатоліївна **********
+-- OTCN - АРМ_16 Звітність НБУ
+-- VIZA - АРМ_22 Візування операцій
+-- REGF - АРМ_23 Регистрация клиентов и счетов (ФЛ)
+-- 1PN2 - АРМ_33 Операціоніст з процентами
+-- PBPB - АРМ_43 1_ПБ
+-- VKLD - АРМ_56 Вклады населения
+-- NALO - АРМ_99 Податковий облік (виконавці)
+-- SINI - АРМ_Кросс-курсы валют
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- RAB1 - Дикари + Дебет Информационный
+-- OBPC - Интерфейс с процессинговым центром
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=175 and codeapp in ('OTCN','VIZA','REGF','1PN2','PBPB','VKLD','NALO','SINI','PRIN','SBOP','RAB1','OBPC');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=175 and TT in ('007','008','009','012','018','019','022','028','051','058','073','080','122','123','171','172','193','304','305','306','307','308','309','315','339','444','A03','A04','A05','A07','A09','A16','AA1','AA2','C02','C05','C10','CVB','CVO','CVS','D06','D07','D10','D16','D17','F06','F07','F08','F11','F13','F16','F17','F96','F97','F99','PKK','PKR');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=175 and IDG in (33,40,50);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=175 and IDG in (1,5,9,12,13,16,17,18,21,22,23,24,26,27,28,29,31,32,34,35,38,43,44,45,48,55);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=175 and CHKID in (3,9,12,35,42);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=175 and KODF in ('1A','73','C9','E2');
+--==============================================================================
+--********** 135 - Войтко Валентина Миколаївна **********
+-- 1AS1 - АРМ_71 Казначейство
+-- ATIM - АРМ_72 Позиционер
+-- NUPR - АРМ_73 МБДК+FOREX
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=135 and codeapp in ('1AS1','ATIM','NUPR','PRIN','SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=135 and IDG in (1,2,3,6,7,8,9,10,11,12,13,15,20,21,24,25,31,32,33,34,35,38,43,44,45,48,50);
+--==============================================================================
+--********** 128 - Вронська Олена Олегівна **********
+-- KREU - АРМ_15 % Кредити
+-- PERE - АРМ_26 Перегляд спецпараметрів рахунків (НБУ та ОБУ)
+-- KRE3 - АРМ_КП ФИЗ. ЛИЦ банка (кред)
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- REZE - АРМ_Резервный фонд
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=128 and codeapp in ('KREU','PERE','KRE3','PRIN','SBOP','REZE');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=128 and IDG in (16,18,22,27,38,43,44,46,47,50);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=128 and KODF in ('F6','F7','F8','F9');
+--==============================================================================
+--********** 306 - Гаврилюк Ірина Олегівна **********
+-- 1AS1 - АРМ_71 Казначейство
+-- ATIM - АРМ_72 Позиционер
+-- NUPR - АРМ_73 МБДК+FOREX
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=306 and codeapp in ('1AS1','ATIM','NUPR','PRIN','SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=306 and IDG in (6,7,9,10,11,12,13,31,32,37,38,44,46,47,48,50);
+--==============================================================================
+--********** 265 - Гавриляк Ольга Осипівна  **********
+-- ATIM - АРМ_72 Позиционер
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=265 and codeapp in ('ATIM','SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=265 and IDG in (20,21,31,33,34,35,38);
+--==============================================================================
+--********** 36 - Гайдай Юрій Васильович **********
+-- 1ASC - АРМ_34 Каса
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=36 and codeapp in ('1ASC');
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=36 and CHKID in (5);
+--==============================================================================
+--********** 346 - Гапонова Світлана Вікторівна **********
+-- MPPZ - АРМ "Київ-Дніпровський"
+-- RKOO - АРМ "Плата за РКО"
+-- POST - АРМ УКРПОШТА та ЕНЕРГОРИНОК
+-- OTCN - АРМ_16 Звітність НБУ
+-- DILI - АРМ_17 Клієнт-Банк
+-- RM11 - АРМ_18 Реєстр рахунків в ПО
+-- VIZA - АРМ_22 Візування операцій
+-- REGF - АРМ_23 Регистрация клиентов и счетов (ФЛ)
+-- REGU - АРМ_23 Регистрация клиентов и счетов (ЮЛ)
+-- PPKK - АРМ_30 СЕП Розбір запитів та незясованих сум
+-- 1PN2 - АРМ_33 Операціоніст з процентами
+-- KOMU - АРМ_351 Комунальні платежі (керівник)
+-- NALU - АРМ_49 Податковий облік
+-- ATIM - АРМ_72 Позиционер
+-- 1GU1 - АРМ_74 Начальник відділу
+-- NALO - АРМ_99 Податковий облік (виконавці)
+-- ENR  - АРМ_Взаиморасчеты по "Энергорынку"
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- RAB1 - Дикари + Дебет Информационный
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=346 and codeapp in ('MPPZ','RKOO','POST','OTCN','DILI','RM11','VIZA','REGF','REGU','PPKK','1PN2','KOMU','NALU','ATIM','1GU1','NALO','ENR ','PRIN','SBOP','RAB1');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=346 and TT in ('001','002','003','007','012','014','079','114','207','213','215','234','309','328','409','414','434','AA1','AA8','C00','C02','C09','CVO','D06','D07','F09','F10','F11','F13','F14','F99','NE3');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=1
+-- where idu=346 and IDG in (11,25);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=346 and IDG in (6,33,40,50);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=5
+-- where idu=346 and IDG in (13,29);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=6
+-- where idu=346 and IDG in (31);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=346 and IDG in (1,14,15,16,19,20,21,22,23,24,27,28,30,32,38,41,42,44,46,47,48,51);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=346 and CHKID in (3,6,12,35,36,40,42,62,63);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=346 and KODF in ('1A','27','C9','D3','D6','E2','E8');
+--==============================================================================
+--********** 162 - Гарматюк Людмила Володимирівна **********
+--==============================================================================
+--********** 505 - Гахович Наталія Георгіївна **********
+-- SWF3 - SWIFT. АБС -> Swift Alliance
+-- 1PN2 - АРМ_33 Операціоніст з процентами
+-- 1GU1 - АРМ_74 Начальник відділу
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- RAB1 - Дикари + Дебет Информационный
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=505 and codeapp in ('SWF3','1PN2','1GU1','PRIN','SBOP','RAB1');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=505 and TT in ('C11','C12');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=505 and IDG in (24,33);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=505 and IDG in (9,11,13,31);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=505 and CHKID in (3,35,50);
+--==============================================================================
+--********** 56 - Герасименко Ніна Дмитрівна **********
+-- MPPZ - АРМ "Київ-Дніпровський"
+-- KOBU - АРМ "Комісія Ощадбанку"
+-- KMPS - АРМ Компенсація заощаджень
+-- POST - АРМ УКРПОШТА та ЕНЕРГОРИНОК
+-- GLBU - АРМ_04 Головний Бухгалтер
+-- OTCN - АРМ_16 Звітність НБУ
+-- RM11 - АРМ_18 Реєстр рахунків в ПО
+-- VIZA - АРМ_22 Візування операцій
+-- REGF - АРМ_23 Регистрация клиентов и счетов (ФЛ)
+-- REGU - АРМ_23 Регистрация клиентов и счетов (ЮЛ)
+-- PPKK - АРМ_30 СЕП Розбір запитів та незясованих сум
+-- 1PN2 - АРМ_33 Операціоніст з процентами
+-- KOMU - АРМ_351 Комунальні платежі (керівник)
+-- VNOT - АРМ_38 Звітність ОБ
+-- NALU - АРМ_49 Податковий облік
+-- ATIM - АРМ_72 Позиционер
+-- 1GU1 - АРМ_74 Начальник відділу
+-- NALO - АРМ_99 Податковий облік (виконавці)
+-- ENR  - АРМ_Взаиморасчеты по "Энергорынку"
+-- VERI - АРМ_Підкріплення коррахунку
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=56 and codeapp in ('MPPZ','KOBU','KMPS','POST','GLBU','OTCN','RM11','VIZA','REGF','REGU','PPKK','1PN2','KOMU','VNOT','NALU','ATIM','1GU1','NALO','ENR ','VERI','PRIN','SBOP');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=56 and TT in ('003');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=1
+-- where idu=56 and IDG in (25);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=56 and IDG in (2,6,33,40,50);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=5
+-- where idu=56 and IDG in (13,18,23,29);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=6
+-- where idu=56 and IDG in (15);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=56 and IDG in (1,14,16,19,20,21,24,27,28,30,31,32,38,41,42,43,44,46,47,48,51,52);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=56 and CHKID in (3,6,9,12,14,35,36,40,42,43,62,63);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=56 and KODF in ('27','C9','D3','D6','E2','E8');
+--==============================================================================
+--********** 171 - Глущенко Людмила Василівна **********
+-- KODZ - АРМ_Державна Закупівля
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=171 and codeapp in ('KODZ');
+--==============================================================================
+--********** 340 - Гончарова Крістіна Георгієвна **********
+-- FMON - АРМ Уповноваженої особи ФМ
+-- AUDT - АРМ_75 Аудит
+-- PERD - АРМ_Звітність НБУ (2)
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=340 and codeapp in ('FMON','AUDT','PERD','PRIN','SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=340 and IDG in (1,3,4,5,6,8,9,10,11,12,13,15,17,18,19,21,22,23,24,25,31,32,34,35,38,43,44,45,48,50,51,55);
+--==============================================================================
+--********** 185 - Гончарук Ганна Іванівна **********
+-- OTCN - АРМ_16 Звітність НБУ
+-- 1ASA - АРМ_20 Грошовий обіг
+-- VNOT - АРМ_38 Звітність ОБ
+-- 1GU1 - АРМ_74 Начальник відділу
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=185 and codeapp in ('OTCN','1ASA','VNOT','1GU1','SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=185 and IDG in (1,2,4,5,13,34,35);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=185 and KODF in ('12','12','13','94');
+--==============================================================================
+--********** 32 - Гордієнко Ірина Михайлівна **********
+-- TEST - АРМ_06 Операціоніст
+-- VIZA - АРМ_22 Візування операцій
+-- REGG - АРМ_23 Регистрация клиентов и счетов (ГОУ и ОУ)
+-- VNOT - АРМ_38 Звітність ОБ
+-- NALU - АРМ_49 Податковий облік
+-- NALS - АРМ_87 Податковий облiк ОБ
+-- NALO - АРМ_99 Податковий облік (виконавці)
+-- SEP  - АРМ_Картотека запросов
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- RAB1 - Дикари + Дебет Информационный
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=32 and codeapp in ('TEST','VIZA','REGG','VNOT','NALU','NALS','NALO','SEP ','SBOP','RAB1');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=32 and TT in ('096','403','PO1','PO3');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=32 and IDG in (8,9,10,12,13,15,16,17,19,21,23,25,26,30,31,34,36,39,40,44,46,47,50,80);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=32 and IDG in (24,27,28,29,38,41);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=32 and CHKID in (3,34);
+--==============================================================================
+--********** 342 - Гордійчук Тетяна Петрівна **********
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=342 and codeapp in ('PRIN','SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=342 and IDG in (1,9,10,32,38,50);
+--==============================================================================
+--********** 197 - Горчанікова Алла Костянтинівна **********
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=197 and codeapp in ('PRIN','SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=197 and IDG in (5,7,8,13,25,27,37,38,43,46,50);
+--==============================================================================
+--********** 48 - Гріненко Наталія Анатоліївна **********
+-- OTCN - АРМ_16 Звітність НБУ
+-- VIZA - АРМ_22 Візування операцій
+-- OTL1 - АРМ_27 Грошового обігу
+-- 1ASC - АРМ_34 Каса
+-- VNOT - АРМ_38 Звітність ОБ
+-- 1GU1 - АРМ_74 Начальник відділу
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=48 and codeapp in ('OTCN','VIZA','OTL1','1ASC','VNOT','1GU1','SBOP');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=48 and TT in ('KK1','KK2');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=48 and IDG in (2,3,4,5,13,24,27,30,43,48);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=48 and IDG in (1,38);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=48 and CHKID in (5);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=48 and KODF in ('12','12','13');
+--==============================================================================
+--********** 38 - Грабарник Дана Аркадіївна **********
+-- REGF - АРМ_23 Регистрация клиентов и счетов (ФЛ)
+-- 1PN2 - АРМ_33 Операціоніст з процентами
+-- VKLD - АРМ_56 Вклады населения
+-- SINI - АРМ_Кросс-курсы валют
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- RAB1 - Дикари + Дебет Информационный
+-- OBPC - Интерфейс с процессинговым центром
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=38 and codeapp in ('REGF','1PN2','VKLD','SINI','PRIN','SBOP','RAB1','OBPC');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=38 and TT in ('007','008','009','012','014','018','019','022','028','051','058','073','080','114','115','171','172','304','305','306','307','308','309','315','339','444','A03','A04','A05','A07','A09','A16','A17','A18','AA1','AA2','C05','C10','CVB','CVO','CVS','D06','D07','D10','D16','D17','F06','F07','F08','F11','F13','F16','F17','F96','F97','F99','PKK','PKR');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=1
+-- where idu=38 and IDG in (21);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=38 and IDG in (33,50);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=38 and IDG in (1,5,9,12,13,16,18,22,23,24,26,27,28,29,31,32,34,35,38,43,44,46,48,55);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=38 and CHKID in (3);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=38 and KODF in ('E8');
+--==============================================================================
+--********** 523 - Грабовська Ольга Петрівна **********
+-- VALO - АРМ_10 Валютні операції
+-- OTCN - АРМ_16 Звітність НБУ
+-- VIZA - АРМ_22 Візування операцій
+-- REGB - АРМ_23 Регистрация клиентов и счетов (БАНКИ)
+-- 1PN2 - АРМ_33 Операціоніст з процентами
+-- NALU - АРМ_49 Податковий облік
+-- ATIM - АРМ_72 Позиционер
+-- NALO - АРМ_99 Податковий облік (виконавці)
+-- SWKZ - АРМ_SWIFT_Казначейство
+-- MBDK - АРМ_Казначейство (МБДК+FOREX)
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=523 and codeapp in ('VALO','OTCN','VIZA','REGB','1PN2','NALU','ATIM','NALO','SWKZ','MBDK','PRIN','SBOP');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=523 and TT in ('001','003','004','007','022','028','038','096','201','205','208','210','217','218','220','221','404','C04','D06','D07','F01','F02','F10','F11','F13','PO1','PO3','SW0','V07','V17');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=523 and IDG in (40,50);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=523 and IDG in (7,9,10,11,12,13,14,24,27,28,29,30,31,32,35,38,41,44,46,48,100);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=523 and CHKID in (1,3,7,15,35);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=523 and KODF in ('1A','2A','39','79','E0','S6');
+--==============================================================================
+--********** 561 - Грасюк Зоя Євгеніївна **********
+-- 1111 - Back Value
+-- KMPS - АРМ Компенсація заощаджень
+-- OTCN - АРМ_16 Звітність НБУ
+-- VIZA - АРМ_22 Візування операцій
+-- REGG - АРМ_23 Регистрация клиентов и счетов (ГОУ и ОУ)
+-- REGF - АРМ_23 Регистрация клиентов и счетов (ФЛ)
+-- 1PN2 - АРМ_33 Операціоніст з процентами
+-- PBPB - АРМ_43 1_ПБ
+-- VKLD - АРМ_56 Вклады населения
+-- 1GU1 - АРМ_74 Начальник відділу
+-- NALO - АРМ_99 Податковий облік (виконавці)
+-- 1RM2 - АРМ_Грасюк
+-- SINI - АРМ_Кросс-курсы валют
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=561 and codeapp in ('1111','KMPS','OTCN','VIZA','REGG','REGF','1PN2','PBPB','VKLD','1GU1','NALO','1RM2','SINI','PRIN','SBOP');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=561 and TT in ('007','008','009','012','350','351','352','353','444','AA1','AA2','D06','D07','D10','D16','D17','J71','PKK','PO1','PO3','Z07','Z12','Z13','Z15','Z17','Z27','Z31');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=561 and IDG in (33,40,50,56);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=561 and IDG in (1,3,4,5,9,12,13,16,17,18,22,23,24,27,28,31,32,34,35,38,41,42,43,44,45,48,52,55);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=561 and CHKID in (3,4,6,9,10,12,35,42,43);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=561 and KODF in ('39','44','E2','E8');
+--==============================================================================
+--********** 84 - Грицай Олена Юріївна **********
+-- KRE4 - АРМ Кредитний портфель ЮО (КРЕДИТЧИК)
+-- KREU - АРМ_15 % Кредити
+-- PERE - АРМ_26 Перегляд спецпараметрів рахунків (НБУ та ОБУ)
+-- 1AS2 - АРМ_72 Кредитне управління
+-- OVR  - АРМ_Комерційні овердрафти юридичних осіб
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- REZE - АРМ_Резервный фонд
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=84 and codeapp in ('KRE4','KREU','PERE','1AS2','OVR ','PRIN','SBOP','REZE');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=84 and IDG in (9,11,14,15,18,19,21,23,25,27,31,38,43,44,46,47,50);
+--==============================================================================
+--********** 705 - Гулей Анатолій Іванович **********
+--==============================================================================
+--********** 325 - Гуменюк Роман Іванович **********
+-- BUDG - АРМ_Бюджет (расширен.)
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=325 and codeapp in ('BUDG','PRIN','SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=325 and IDG in (7,8,9,10,11,12,13,14,15,16,18,19,20,21,23,24,25,26,27,28,29,30,36,37,38,39,44,46,50);
+--==============================================================================
+--********** 324 - Давіденко Олена Іванівна **********
+-- RZBS - АРМ_19 Роздрібний бізнес
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=324 and codeapp in ('RZBS');
+--==============================================================================
+--********** 332 - Давиденко Людмила Володимирівна **********
+--==============================================================================
+--********** 177 - Данильченко Юлія Валеріївна **********
+-- TEST - АРМ_06 Операціоніст
+-- DILI - АРМ_17 Клієнт-Банк
+-- REGF - АРМ_23 Регистрация клиентов и счетов (ФЛ)
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- RAB1 - Дикари + Дебет Информационный
+-- OBPC - Интерфейс с процессинговым центром
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=177 and codeapp in ('TEST','DILI','REGF','PRIN','SBOP','RAB1','OBPC');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=177 and TT in ('003','007','012','014','018','019','028','051','139','308','309','339','444','BP1','BP2','BP4','C09','D06','D07','F17','F98','F99','PKK','PKR');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=1
+-- where idu=177 and IDG in (30);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=177 and IDG in (33,40,50);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=5
+-- where idu=177 and IDG in (16,21,55);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=177 and IDG in (1,9,12,13,17,18,22,23,24,31,32,34,35,38,43,44,45,48);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=177 and CHKID in (3);
+--==============================================================================
+--********** 568 - Денков Дем"ян Іванович **********
+-- KREU - АРМ_15 % Кредити
+-- PERE - АРМ_26 Перегляд спецпараметрів рахунків (НБУ та ОБУ)
+-- 1AS2 - АРМ_72 Кредитне управління
+-- OVR  - АРМ_Комерційні овердрафти юридичних осіб
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- REZE - АРМ_Резервный фонд
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=568 and codeapp in ('KREU','PERE','1AS2','OVR ','PRIN','SBOP','REZE');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=568 and IDG in (13,14,15,19,21,23,25,27,28,31,38,43,44,46,47,50);
+--==============================================================================
+--********** 243 - Джус Людмила Петрівна **********
+-- ATIM - АРМ_72 Позиционер
+-- NUPR - АРМ_73 МБДК+FOREX
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=243 and codeapp in ('ATIM','NUPR','PRIN','SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=243 and IDG in (1,2,3,6,7,8,9,10,11,12,13,15,20,21,24,25,31,32,33,34,35,43,44,45,48);
+--==============================================================================
+--********** 67 - Динько Оксана Миколаївна **********
+-- VALO - АРМ_10 Валютні операції
+-- REGB - АРМ_23 Регистрация клиентов и счетов (БАНКИ)
+-- 1PN2 - АРМ_33 Операціоніст з процентами
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- RAB1 - Дикари + Дебет Информационный
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=67 and codeapp in ('VALO','REGB','1PN2','PRIN','SBOP','RAB1');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=67 and TT in ('003','007','014','114','201','204','205','208','210','217','218','220','221','233','234','250','404','514','C04','C10','C11','C12','D06','D07','F10','F11','F18');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=67 and IDG in (6,33,50);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=67 and IDG in (13,23,24,29,31,32,34,35,38);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=67 and CHKID in (3);
+--==============================================================================
+--********** 337 - Дмитрова Ольга Сергіївна **********
+-- FMON - АРМ Уповноваженої особи ФМ
+-- AUDT - АРМ_75 Аудит
+-- PERD - АРМ_Звітність НБУ (2)
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=337 and codeapp in ('FMON','AUDT','PERD','PRIN','SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=337 and IDG in (1,3,4,5,6,8,9,10,11,12,13,15,17,18,19,21,22,23,24,25,31,32,34,35,38,43,44,45,48,50,51,55);
+--==============================================================================
+--********** 206 - Дубік Ірина Олександрівна **********
+-- BIRD - АРМ Биржевые операции - Дилер
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=206 and codeapp in ('BIRD');
+--==============================================================================
+--********** 160 - Жадан Аліна Борисівна **********
+-- KODZ - АРМ_Державна Закупівля
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=160 and codeapp in ('KODZ','PRIN','SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=160 and IDG in (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,18,19,20,21,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,43,44,45,46,47,48,49,50,51,57);
+--==============================================================================
+--********** 351 - Жданов Антон Павлович **********
+-- KRE4 - АРМ Кредитний портфель ЮО (КРЕДИТЧИК)
+-- KREU - АРМ_15 % Кредити
+-- PERE - АРМ_26 Перегляд спецпараметрів рахунків (НБУ та ОБУ)
+-- 1AS2 - АРМ_72 Кредитне управління
+-- OVR  - АРМ_Комерційні овердрафти юридичних осіб
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- REZE - АРМ_Резервный фонд
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=351 and codeapp in ('KRE4','KREU','PERE','1AS2','OVR ','PRIN','SBOP','REZE');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=351 and IDG in (14,15,19,21,23,25,27,31,38,43,44,46,47,50);
+--==============================================================================
+--********** 17 - Журавльова Ірина Віталіївна **********
+-- WSEP - АРМ Розрахунки за СЕП
+-- TEST - АРМ_06 Операціоніст
+-- OTCN - АРМ_16 Звітність НБУ
+-- VIZA - АРМ_22 Візування операцій
+-- REGG - АРМ_23 Регистрация клиентов и счетов (ГОУ и ОУ)
+-- VNOT - АРМ_38 Звітність ОБ
+-- NALU - АРМ_49 Податковий облік
+-- 1GU1 - АРМ_74 Начальник відділу
+-- NALO - АРМ_99 Податковий облік (виконавці)
+-- KODZ - АРМ_Державна Закупівля
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- RAB1 - Дикари + Дебет Информационный
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=17 and codeapp in ('WSEP','TEST','OTCN','VIZA','REGG','VNOT','NALU','1GU1','NALO','KODZ','SBOP','RAB1');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=17 and TT in ('007','014','069','096','114','229','239','401','403','414','514','C02','CVO','D06','F13','PO1','PO3','ZG8');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=17 and IDG in (26,36,40,43,48);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=5
+-- where idu=17 and IDG in (18,21,22);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=17 and IDG in (1,13,14,19,24,27,28,29,30,31,32,34,37,38,39,41);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=17 and CHKID in (2,3,12,17,19,20,35);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=17 and KODF in ('D6','E2');
+--==============================================================================
+--********** 287 - Зємцова Ірина Михайлівна **********
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=287 and IDG in (2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,19,20,21,23,24,25,27,28,29,30,31,32,33,34,35,37,38,39,43,44,45,46,47,48,50,51);
+--==============================================================================
+--********** 137 - Забудська Інна Володимирівна **********
+-- OTCN - АРМ_16 Звітність НБУ
+-- DILI - АРМ_17 Клієнт-Банк
+-- VIZA - АРМ_22 Візування операцій
+-- REGF - АРМ_23 Регистрация клиентов и счетов (ФЛ)
+-- PPKK - АРМ_30 СЕП Розбір запитів та незясованих сум
+-- 1PN2 - АРМ_33 Операціоніст з процентами
+-- 1ASC - АРМ_34 Каса
+-- KOMM - АРМ_35 Комунальні платежі
+-- VNOT - АРМ_38 Звітність ОБ
+-- NALU - АРМ_49 Податковий облік
+-- ZAPR - АРМ_60 Обработка  информационных запросов
+-- NALO - АРМ_99 Податковий облік (виконавці)
+-- KRE5 - АРМ_КП ФИЗ. ЛИЦ (бухгалтер)
+-- KD88 - АРМ_Кредити-Депозити_888
+-- REG2 - АРМ_Перегляд блокованих платежів
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- RAB1 - Дикари + Дебет Информационный
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=137 and codeapp in ('OTCN','DILI','VIZA','REGF','PPKK','1PN2','1ASC','KOMM','VNOT','NALU','ZAPR','NALO','KRE5','KD88','REG2','PRIN','SBOP','RAB1');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=137 and TT in ('001','002','003','007','008','009','012','014','018','019','020','022','027','028','079','096','114','185','186','187','207','305','308','309','314','328','338','339','434','464','474','484','494','888','AA1','AA8','AB1','AB2','BPK','C00','C02','D06','D07','F13','F14','OVA','PO1','PO3');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=1
+-- where idu=137 and IDG in (11,29);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=137 and IDG in (40,50);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=5
+-- where idu=137 and IDG in (4,5);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=137 and IDG in (1,2,3,13,14,15,16,17,18,19,20,21,22,23,24,27,28,30,31,32,38,41,42,43,44,46,47,48,51);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=137 and CHKID in (3,12,35,36,42);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=137 and KODF in ('12','12','13','94');
+--==============================================================================
+--********** 312 - Захарчук Ірина Вікторівна **********
+-- NUPR - АРМ_73 МБДК+FOREX
+-- SWKZ - АРМ_SWIFT_Казначейство
+-- PERD - АРМ_Звітність НБУ (2)
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- BOR1 - АРМ_Реєстр боржників (Банки)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=312 and codeapp in ('NUPR','SWKZ','PERD','PRIN','SBOP','BOR1');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=312 and IDG in (6,7,10,11,12,13,46,47);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=312 and KODF in ('D5','D6','D8','E2','E8');
+--==============================================================================
+--********** 336 - Зуєв Олег Анатолійович **********
+--==============================================================================
+--********** 59 - Кікоть Галина Миколаївна **********
+-- MPPZ - АРМ "Київ-Дніпровський"
+-- RKOO - АРМ "Плата за РКО"
+-- POST - АРМ УКРПОШТА та ЕНЕРГОРИНОК
+-- OTCN - АРМ_16 Звітність НБУ
+-- DILI - АРМ_17 Клієнт-Банк
+-- VIZA - АРМ_22 Візування операцій
+-- 1PN2 - АРМ_33 Операціоніст з процентами
+-- ATIM - АРМ_72 Позиционер
+-- ENR  - АРМ_Взаиморасчеты по "Энергорынку"
+-- REG2 - АРМ_Перегляд блокованих платежів
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- RAB1 - Дикари + Дебет Информационный
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=59 and codeapp in ('MPPZ','RKOO','POST','OTCN','DILI','VIZA','1PN2','ATIM','ENR ','REG2','PRIN','SBOP','RAB1');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=59 and TT in ('001','002','003','007','012','014','018','019','022','028','079','114','308','309','328','401','414','434','C00','C02','C09','CVO','D06','D07','F09','F11','F13','NE3','PO1','PO3');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=1
+-- where idu=59 and IDG in (11);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=59 and IDG in (40,50);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=5
+-- where idu=59 and IDG in (29);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=59 and IDG in (1,13,14,15,19,20,21,22,23,24,27,28,30,31,32,38,41,43,44,46,47,48,51);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=59 and CHKID in (3,36,63);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=59 and KODF in ('C9','D3','E2');
+--==============================================================================
+--********** 144 - Калашник Софія Вікторівна **********
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=144 and IDG in (24);
+--==============================================================================
+--********** 157 - Калина Інна Анатоліївна **********
+-- MPPZ - АРМ "Київ-Дніпровський"
+-- RKOO - АРМ "Плата за РКО"
+-- POST - АРМ УКРПОШТА та ЕНЕРГОРИНОК
+-- OTCN - АРМ_16 Звітність НБУ
+-- DILI - АРМ_17 Клієнт-Банк
+-- VIZA - АРМ_22 Візування операцій
+-- PPKK - АРМ_30 СЕП Розбір запитів та незясованих сум
+-- 1PN2 - АРМ_33 Операціоніст з процентами
+-- NALO - АРМ_99 Податковий облік (виконавці)
+-- ENR  - АРМ_Взаиморасчеты по "Энергорынку"
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- RAB1 - Дикари + Дебет Информационный
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=157 and codeapp in ('MPPZ','RKOO','POST','OTCN','DILI','VIZA','PPKK','1PN2','NALO','ENR ','PRIN','SBOP','RAB1');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=157 and TT in ('001','002','003','007','012','014','018','019','022','028','079','096','114','207','213','234','309','328','401','409','414','434','C00','C02','C09','CVO','D06','D07','F09','F11','F13','NE3','PO1','PO3');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=157 and IDG in (40);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=5
+-- where idu=157 and IDG in (13,25,29,41);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=6
+-- where idu=157 and IDG in (31);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=157 and IDG in (1,14,15,19,20,21,23,24,27,32,38,43,44,46,47,48,51);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=157 and CHKID in (3,36,63);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=157 and KODF in ('27','C9','D3','E2');
+--==============================================================================
+--********** 734 - Карпенко Леонід Олександрович **********
+--==============================================================================
+--********** 330 - Кас'янова Ірина Іванівна **********
+-- FMON - АРМ Уповноваженої особи ФМ
+-- AUDT - АРМ_75 Аудит
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=330 and codeapp in ('FMON','AUDT','PRIN','SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=330 and IDG in (1,3,4,5,6,8,9,10,11,12,13,15,18,19,21,22,23,24,25,31,32,34,35,38,43,44,45,48,50,51,55);
+--==============================================================================
+--********** 91 - Кекух Аліна Вікторівна **********
+-- KREU - АРМ_15 % Кредити
+-- PERE - АРМ_26 Перегляд спецпараметрів рахунків (НБУ та ОБУ)
+-- VNOT - АРМ_38 Звітність ОБ
+-- KRE3 - АРМ_КП ФИЗ. ЛИЦ банка (кред)
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- REZE - АРМ_Резервный фонд
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=91 and codeapp in ('KREU','PERE','VNOT','KRE3','PRIN','SBOP','REZE');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=91 and IDG in (16,17,18,19,22,27,38,43,44,46,47,50);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=91 and KODF in ('F6','F7','F8','F9');
+--==============================================================================
+--********** 573 - Керч Оксана Миколаївна **********
+-- OTCN - АРМ_16 Звітність НБУ
+-- VIZA - АРМ_22 Візування операцій
+-- REGF - АРМ_23 Регистрация клиентов и счетов (ФЛ)
+-- 1PN2 - АРМ_33 Операціоніст з процентами
+-- PBPB - АРМ_43 1_ПБ
+-- VKLD - АРМ_56 Вклады населения
+-- SINI - АРМ_Кросс-курсы валют
+-- CASH - АРМ_Підкріплення готівкової валюти
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- RAB1 - Дикари + Дебет Информационный
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=573 and codeapp in ('OTCN','VIZA','REGF','1PN2','PBPB','VKLD','SINI','CASH','PRIN','SBOP','RAB1');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=573 and TT in ('003','007','008','009','012','014','018','019','027','037','051','058','059','062','073','080','096','114','193','304','305','306','307','308','309','339','444','A03','A04','A05','A07','A0A','A16','A17','A18','AA1','AA2','C02','C05','C09','C10','C11','C12','CVB','CVO','CVS','D03','D06','D07','D10','D16','D17','F06','F07','F08','F11','F13','F16','F17','F96','F97','F98','F99','I10','J30','J31','J70','J71','J72','PKK','PKR','SW0','SW3');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=1
+-- where idu=573 and IDG in (21,30);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=573 and IDG in (33,40,50);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=5
+-- where idu=573 and IDG in (16,55);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=573 and IDG in (1,3,9,12,13,17,22,23,24,26,27,28,29,31,32,34,35,38,42,43,44,45,48);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=573 and CHKID in (3,9,12,35,42);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=573 and KODF in ('39','73','C6','C9','E2','F1');
+--==============================================================================
+--********** 314 - Кирилюк Світлана Феодосіївна **********
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=314 and IDG in (21,38);
+--==============================================================================
+--********** 227 - Кириченко Олена Вікторівна **********
+-- 1AS1 - АРМ_71 Казначейство
+-- ATIM - АРМ_72 Позиционер
+-- NUPR - АРМ_73 МБДК+FOREX
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=227 and codeapp in ('1AS1','ATIM','NUPR','PRIN','SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=227 and IDG in (1,2,3,6,7,8,9,10,11,12,13,15,20,21,24,25,31,32,33,34,35,38,43,44,45,48,50);
+--==============================================================================
+--********** 327 - Кисельова Ольга Ігорівна **********
+-- RKOO - АРМ "Плата за РКО"
+-- BIRG - АРМ Биржевые операции - ГОУ
+-- OTCN - АРМ_16 Звітність НБУ
+-- DILI - АРМ_17 Клієнт-Банк
+-- VIZA - АРМ_22 Візування операцій
+-- 1PN2 - АРМ_33 Операціоніст з процентами
+-- 1ASC - АРМ_34 Каса
+-- KOMM - АРМ_35 Комунальні платежі
+-- VNOT - АРМ_38 Звітність ОБ
+-- ZAPR - АРМ_60 Обработка  информационных запросов
+-- NALO - АРМ_99 Податковий облік (виконавці)
+-- OVR  - АРМ_Комерційні овердрафти юридичних осіб
+-- REG2 - АРМ_Перегляд блокованих платежів
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- RAB1 - Дикари + Дебет Информационный
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=327 and codeapp in ('RKOO','BIRG','OTCN','DILI','VIZA','1PN2','1ASC','KOMM','VNOT','ZAPR','NALO','OVR ','REG2','PRIN','SBOP','RAB1');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=327 and TT in ('001','002','003','007','012','014','018','020','022','027','028','076','096','114','185','186','187','307','308','309','314','328','338','339','434','464','474','484','494','AA1','AA2','BPK','C00','C02','CVB','CVO','CVS','D06','F13','NE3','PKR','PO1','PO3');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=1
+-- where idu=327 and IDG in (11,22);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=327 and IDG in (40,50);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=327 and IDG in (1,2,13,15,18,19,20,21,23,24,27,28,29,30,31,32,38,41,43,44,46,47,48,51);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=327 and CHKID in (3,5,12,36,42,63);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=327 and KODF in ('12','12','13','94');
+--==============================================================================
+--********** 313 - Клименко Ірена Григорівна **********
+-- OTCN - АРМ_16 Звітність НБУ
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=313 and codeapp in ('OTCN');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=313 and IDG in (14,15,19,21,24,25,32,38,44,46,47);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=313 and KODF in ('1A');
+--==============================================================================
+--********** 122 - Климентьєв Олексій Володимирович **********
+-- 1111 - Back Value
+-- SWF3 - SWIFT. АБС -> Swift Alliance
+-- STPF - АРМ "Швидка копійка"
+-- KMPS - АРМ Компенсація заощаджень
+-- SPOP - АРМ Спец.вiдкриття рахункiв
+-- VALO - АРМ_10 Валютні операції
+-- SWF1 - АРМ_11 Обработка сообщений SWIFT (полная)
+-- RM11 - АРМ_18 Реєстр рахунків в ПО
+-- VIZA - АРМ_22 Візування операцій
+-- REGB - АРМ_23 Регистрация клиентов и счетов (БАНКИ)
+-- VNOT - АРМ_38 Звітність ОБ
+-- 1GU1 - АРМ_74 Начальник відділу
+-- REG2 - АРМ_Перегляд блокованих платежів
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- RAB1 - Дикари + Дебет Информационный
+-- MVPS - МВПС. Управление платежами
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=122 and codeapp in ('1111','SWF3','STPF','KMPS','SPOP','VALO','SWF1','RM11','VIZA','REGB','VNOT','1GU1','REG2','PRIN','SBOP','RAB1','MVPS');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=122 and TT in ('007','030','039','C00','C02','C04','C10','C14','CLI','CVB','CVO','CVS','D06','D07');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=122 and IDG in (6,9,10,11,12,18,23,24,29,31,32,33,35,38,40,41,44,48,50);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=122 and IDG in (13,34,52);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=122 and CHKID in (3,7,10,11,35,43,50);
+--==============================================================================
+--********** 567 - Коваленко Лідія Петрівна **********
+-- SWF3 - SWIFT. АБС -> Swift Alliance
+-- 1GU1 - АРМ_74 Начальник відділу
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- RAB1 - Дикари + Дебет Информационный
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=567 and codeapp in ('SWF3','1GU1','PRIN','SBOP','RAB1');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=567 and TT in ('C11','C12');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=567 and IDG in (24,33);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=567 and IDG in (9,11,13,31);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=567 and CHKID in (3,35,50);
+--==============================================================================
+--********** 141 - Коваленко Сергій Миколайович **********
+-- OTCN - АРМ_16 Звітність НБУ
+-- 1ASA - АРМ_20 Грошовий обіг
+-- VNOT - АРМ_38 Звітність ОБ
+-- 1GU1 - АРМ_74 Начальник відділу
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=141 and codeapp in ('OTCN','1ASA','VNOT','1GU1','SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=141 and IDG in (1,2,3,4,5,13,34,35);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=141 and KODF in ('12','12','13','94');
+--==============================================================================
+--********** 93 - Ковганич Гліб Миколайович **********
+-- ANKL - АРМ Аналіз клієнтів
+-- KRE4 - АРМ Кредитний портфель ЮО (КРЕДИТЧИК)
+-- KREU - АРМ_15 % Кредити
+-- PERE - АРМ_26 Перегляд спецпараметрів рахунків (НБУ та ОБУ)
+-- 1AS2 - АРМ_72 Кредитне управління
+-- OVR  - АРМ_Комерційні овердрафти юридичних осіб
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- BORG - АРМ_Реєстр боржників (Всі)
+-- REZE - АРМ_Резервный фонд
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=93 and codeapp in ('ANKL','KRE4','KREU','PERE','1AS2','OVR ','PRIN','SBOP','BORG','REZE');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=93 and IDG in (13,14,15,19,21,23,25,27,28,31,38,44,46,47,50);
+--==============================================================================
+--********** 113 - Козина Тетяна Юріївна **********
+-- MPPZ - АРМ "Київ-Дніпровський"
+-- RKOO - АРМ "Плата за РКО"
+-- POST - АРМ УКРПОШТА та ЕНЕРГОРИНОК
+-- OTCN - АРМ_16 Звітність НБУ
+-- DILI - АРМ_17 Клієнт-Банк
+-- VIZA - АРМ_22 Візування операцій
+-- PPKK - АРМ_30 СЕП Розбір запитів та незясованих сум
+-- 1PN2 - АРМ_33 Операціоніст з процентами
+-- NALO - АРМ_99 Податковий облік (виконавці)
+-- ENR  - АРМ_Взаиморасчеты по "Энергорынку"
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- RAB1 - Дикари + Дебет Информационный
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=113 and codeapp in ('MPPZ','RKOO','POST','OTCN','DILI','VIZA','PPKK','1PN2','NALO','ENR ','PRIN','SBOP','RAB1');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=113 and TT in ('001','002','003','007','012','014','018','019','022','028','079','096','114','207','213','234','309','328','401','409','414','434','C00','C02','C09','CVO','D06','D07','F09','F11','F13','NE3');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=113 and IDG in (40);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=5
+-- where idu=113 and IDG in (13,29,41);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=6
+-- where idu=113 and IDG in (31);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=113 and IDG in (1,14,15,19,20,21,23,24,25,27,32,38,43,44,46,47,48,51);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=113 and CHKID in (3,36,63);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=113 and KODF in ('27','C9','D3','E2');
+--==============================================================================
+--********** 202 - Коломієць Жанна  Григорівна  **********
+-- UPRA - АРМ_07 СЕП. Управління коррахунком
+-- VIZA - АРМ_22 Візування операцій
+-- 1AS1 - АРМ_71 Казначейство
+-- ATIM - АРМ_72 Позиционер
+-- NUPR - АРМ_73 МБДК+FOREX
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=202 and codeapp in ('UPRA','VIZA','1AS1','ATIM','NUPR','SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=202 and IDG in (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,19,20,21,23,24,25,27,28,29,30,31,32,33,34,35,36,37,38,39,44,45,48,50);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=202 and CHKID in (18);
+--==============================================================================
+--********** 254 - Кондратенко Євгеній В'ячеславович **********
+-- ZAPR - АРМ_60 Обработка  информационных запросов
+-- SPTZ - АРМ_Валютная позиция
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=254 and codeapp in ('ZAPR','SPTZ','PRIN','SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=254 and IDG in (1,5,9,11,13,23,24,32,34,35,38,43,48);
+--==============================================================================
+--********** 164 - Кондратова Наталія Володимирівна **********
+-- 1AS1 - АРМ_71 Казначейство
+-- 1AS2 - АРМ_72 Кредитне управління
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=164 and codeapp in ('1AS1','1AS2','PRIN','SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=164 and IDG in (6,32,33,34,35,38,50);
+--==============================================================================
+--********** 7 - Кононенко Емілія Михайлівна **********
+-- OTCN - АРМ_16 Звітність НБУ
+-- VIZA - АРМ_22 Візування операцій
+-- OTL1 - АРМ_27 Грошового обігу
+-- 1ASC - АРМ_34 Каса
+-- VNOT - АРМ_38 Звітність ОБ
+-- 1GU1 - АРМ_74 Начальник відділу
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=7 and codeapp in ('OTCN','VIZA','OTL1','1ASC','VNOT','1GU1','SBOP');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=7 and TT in ('KK1','KK2');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=7 and IDG in (2,3,4,5,13,24,27,30,43,48);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=7 and IDG in (1,38);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=7 and CHKID in (5);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=7 and KODF in ('12','12','13');
+--==============================================================================
+--********** 249 - Кононенко Наталія Олександрівна **********
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=249 and codeapp in ('SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=249 and IDG in (20,21,31,33,34,35);
+--==============================================================================
+--********** 246 - Конс Сергій Борисович **********
+-- BIRV - АРМ Биржевые операции - валютный контроль
+-- EKPK - АРМ Економічні показники
+-- OTCN - АРМ_16 Звітність НБУ
+-- VIZA - АРМ_22 Візування операцій
+-- PBPB - АРМ_43 1_ПБ
+-- SPUP - АРМ_55 Експортно-імпортні операції
+-- SPTZ - АРМ_Валютная позиция
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=246 and codeapp in ('BIRV','EKPK','OTCN','VIZA','PBPB','SPUP','SPTZ','PRIN','SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=246 and IDG in (1,3,5,6,9,10,11,12,13,15,19,21,23,24,31,32,34,35,38,44,45,48,50);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=246 and CHKID in (37);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=246 and KODF in ('1A','70','C9','D3','E2');
+--==============================================================================
+--********** 228 - Копитко Антоніна Всеволодівна **********
+-- VALO - АРМ_10 Валютні операції
+-- OTCN - АРМ_16 Звітність НБУ
+-- VIZA - АРМ_22 Візування операцій
+-- REGB - АРМ_23 Регистрация клиентов и счетов (БАНКИ)
+-- 1PN2 - АРМ_33 Операціоніст з процентами
+-- NALU - АРМ_49 Податковий облік
+-- NALO - АРМ_99 Податковий облік (виконавці)
+-- SWKZ - АРМ_SWIFT_Казначейство
+-- MBDK - АРМ_Казначейство (МБДК+FOREX)
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=228 and codeapp in ('VALO','OTCN','VIZA','REGB','1PN2','NALU','NALO','SWKZ','MBDK','PRIN','SBOP');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=228 and TT in ('001','003','004','007','014','022','028','038','201','205','208','210','217','218','220','221','404','D06','D07','F01','F02','F10','F11','F13','FX9','PO1','PO3','SW0','V07','V17','VP0');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=228 and IDG in (6,40,47,50);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=5
+-- where idu=228 and IDG in (11);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=228 and IDG in (7,9,10,12,13,19,24,27,29,31,32,35,38,41,44,45,46,48,100);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=228 and CHKID in (1,3,7,15,35);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=228 and KODF in ('2A','39','79','C9','E0','E2','E8','S6');
+--==============================================================================
+--********** 296 - Короневська Юлія Петрівна **********
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=296 and codeapp in ('SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=296 and IDG in (20,21,24,31,33,34,35,38);
+--==============================================================================
+--********** 887 - Корп.контроль (Енергоатом) **********
+--==============================================================================
+--********** 50 - Костенко Галина Степанівна  **********
+-- GLBU - АРМ_04 Головний Бухгалтер
+-- UPRA - АРМ_07 СЕП. Управління коррахунком
+-- REGI - АРМ_23 Регистрация клиентов и счетов (общая)
+-- NALU - АРМ_49 Податковий облік
+-- 1AS1 - АРМ_71 Казначейство
+-- ATIM - АРМ_72 Позиционер
+-- 1PN1 - АРМ_Керівник-1
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=50 and codeapp in ('GLBU','UPRA','REGI','NALU','1AS1','ATIM','1PN1','PRIN','SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=50 and IDG in (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,55,56);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=50 and CHKID in (1,2,3,4,5,6,7,8,9,10,11,17,19,20,35);
+--==============================================================================
+--********** 269 - Коцюруба Олена Анатоліївна **********
+-- VALO - АРМ_10 Валютні операції
+-- SWF1 - АРМ_11 Обработка сообщений SWIFT (полная)
+-- OTCN - АРМ_16 Звітність НБУ
+-- VIZA - АРМ_22 Візування операцій
+-- 1PN2 - АРМ_33 Операціоніст з процентами
+-- PBPB - АРМ_43 1_ПБ
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- RAB1 - Дикари + Дебет Информационный
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=269 and codeapp in ('VALO','SWF1','OTCN','VIZA','1PN2','PBPB','PRIN','SBOP','RAB1');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=269 and TT in ('003','007','014','030','424','C10','C11','C12','C14','CLI','D06','D07','D90','D91','F12','F13');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=3
+-- where idu=269 and IDG in (18);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=269 and IDG in (33,50);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=269 and IDG in (6,9,10,11,12,13,21,24,31,32,35,38);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=269 and CHKID in (3,7,11);
+--==============================================================================
+--********** 8 - Кравцова Олеся Леонідівна **********
+-- OTCN - АРМ_16 Звітність НБУ
+-- VIZA - АРМ_22 Візування операцій
+-- OTL1 - АРМ_27 Грошового обігу
+-- 1ASC - АРМ_34 Каса
+-- VNOT - АРМ_38 Звітність ОБ
+-- 1GU1 - АРМ_74 Начальник відділу
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=8 and codeapp in ('OTCN','VIZA','OTL1','1ASC','VNOT','1GU1','SBOP');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=8 and TT in ('KK1','KK2');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=8 and IDG in (2,3,4,5,13,24,27,30,43,48);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=8 and IDG in (1,38);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=8 and CHKID in (5);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=8 and KODF in ('12','12','13');
+--==============================================================================
+--********** 341 - Кравченко Оксана Олександрівна **********
+-- TEST - АРМ_06 Операціоніст
+-- REGG - АРМ_23 Регистрация клиентов и счетов (ГОУ и ОУ)
+-- KODZ - АРМ_Державна Закупівля
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- RAB1 - Дикари + Дебет Информационный
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=341 and codeapp in ('TEST','REGG','KODZ','SBOP','RAB1');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=341 and TT in ('007','014','096','229','239','240','401','403','414','514','C02','CVO');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=1
+-- where idu=341 and IDG in (18,21,22);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=341 and IDG in (1,14,27,28,29,30,31,32,34,37,38,39);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=341 and CHKID in (3);
+--==============================================================================
+--********** 182 - Краснощок Олег Петрович **********
+--==============================================================================
+--********** 732 - Кривий Петро Сазонович **********
+-- FMON - АРМ Уповноваженої особи ФМ
+-- AUDT - АРМ_75 Аудит
+-- PERD - АРМ_Звітність НБУ (2)
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=732 and codeapp in ('FMON','AUDT','PERD','PRIN','SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=732 and IDG in (1,3,4,5,6,8,9,10,11,12,13,15,18,19,21,22,23,24,25,31,32,34,35,38,43,44,45,48,50,51);
+--==============================================================================
+--********** 31 - Кудіна Зоя Павлівна **********
+-- BOSS - АРМ_05 Керівник-Аудитор-Аналітик
+-- NALU - АРМ_49 Податковий облік
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=31 and codeapp in ('BOSS','NALU','PRIN','SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=31 and IDG in (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,80);
+--==============================================================================
+--********** 154 - Кузьміч Юлія Олександрівна **********
+-- BUDG - АРМ_Бюджет (расширен.)
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=154 and codeapp in ('BUDG','PRIN','SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=154 and IDG in (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,50);
+--==============================================================================
+--********** 142 - Кулик Галина Петрівна **********
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=142 and IDG in (24);
+--==============================================================================
+--********** 21 - Курачанська Олена Валеріївна **********
+-- TEST - АРМ_06 Операціоніст
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- RAB1 - Дикари + Дебет Информационный
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=21 and codeapp in ('TEST','SBOP','RAB1');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=21 and TT in ('228','229','238','239','240','247','248','401','407','414');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=1
+-- where idu=21 and IDG in (16,21,55);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=21 and IDG in (50);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=5
+-- where idu=21 and IDG in (18);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=21 and IDG in (1,24,27,28,29,30,31,38,39);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=21 and CHKID in (3);
+--==============================================================================
+--********** 41 - Кучер Алла Борисівна **********
+-- WSEP - АРМ Розрахунки за СЕП
+-- TEST - АРМ_06 Операціоніст
+-- OTCN - АРМ_16 Звітність НБУ
+-- VIZA - АРМ_22 Візування операцій
+-- REGG - АРМ_23 Регистрация клиентов и счетов (ГОУ и ОУ)
+-- VNOT - АРМ_38 Звітність ОБ
+-- KODZ - АРМ_Державна Закупівля
+-- SEP  - АРМ_Картотека запросов
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- RAB1 - Дикари + Дебет Информационный
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=41 and codeapp in ('WSEP','TEST','OTCN','VIZA','REGG','VNOT','KODZ','SEP ','SBOP','RAB1');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=41 and TT in ('007','014','069','096','114','229','239','401','403','414','514','C02','CVO','F13','ZG8');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=41 and IDG in (26,36,40);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=5
+-- where idu=41 and IDG in (18,21,22);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=41 and IDG in (1,13,14,24,27,28,29,30,31,32,34,37,38,39,41,43,48);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=41 and CHKID in (2,3,17,35);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=41 and KODF in ('E2');
+--==============================================================================
+--********** 300 - Кушнір Олексій Орестович **********
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=300 and codeapp in ('SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=300 and IDG in (51);
+--==============================================================================
+--********** 316 - Ліпст Євген Володимирович **********
+-- BIRV - АРМ Биржевые операции - валютный контроль
+-- EKPK - АРМ Економічні показники
+-- OTCN - АРМ_16 Звітність НБУ
+-- VIZA - АРМ_22 Візування операцій
+-- PBPB - АРМ_43 1_ПБ
+-- SPUP - АРМ_55 Експортно-імпортні операції
+-- SPTZ - АРМ_Валютная позиция
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=316 and codeapp in ('BIRV','EKPK','OTCN','VIZA','PBPB','SPUP','SPTZ','PRIN','SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=316 and IDG in (1,3,5,6,9,10,11,12,13,15,19,21,23,24,31,32,34,35,38,44,45,48,50);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=316 and CHKID in (37);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=316 and KODF in ('1A','70','C9','D3','E2');
+--==============================================================================
+--********** 311 - Лисюченко Євгенія Якимівна **********
+-- BOSS - АРМ_05 Керівник-Аудитор-Аналітик
+-- VIZA - АРМ_22 Візування операцій
+-- REGG - АРМ_23 Регистрация клиентов и счетов (ГОУ и ОУ)
+-- VNOT - АРМ_38 Звітність ОБ
+-- NALU - АРМ_49 Податковий облік
+-- NALS - АРМ_87 Податковий облiк ОБ
+-- NALO - АРМ_99 Податковий облік (виконавці)
+-- KODZ - АРМ_Державна Закупівля
+-- SEP  - АРМ_Картотека запросов
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- RAB1 - Дикари + Дебет Информационный
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=311 and codeapp in ('BOSS','VIZA','REGG','VNOT','NALU','NALS','NALO','KODZ','SEP ','SBOP','RAB1');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=311 and IDG in (8,9,10,12,13,14,15,16,18,19,21,22,24,25,26,27,28,29,30,31,32,34,36,37,38,39,40,41,43,44,46,47,50);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=311 and CHKID in (2,12,17,19,20,34,35,42);
+--==============================================================================
+--********** 315 - Литвинов Олександр Сергійович **********
+-- BCLI - АРМ_02k Технолог Клиент-Банк
+-- TEST - АРМ_06 Операціоніст
+-- 1UHS - АРМ_Отчеты
+-- OBPC - Интерфейс с процессинговым центром
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=315 and codeapp in ('BCLI','TEST','1UHS','OBPC');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=315 and TT in ('003');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=315 and IDG in (22,24,38);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=315 and CHKID in (3);
+--==============================================================================
+--********** 44 - Лозицька Наталія Петрівна **********
+-- TEST - АРМ_06 Операціоніст
+-- REGG - АРМ_23 Регистрация клиентов и счетов (ГОУ и ОУ)
+-- KODZ - АРМ_Державна Закупівля
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- RAB1 - Дикари + Дебет Информационный
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=44 and codeapp in ('TEST','REGG','KODZ','SBOP','RAB1');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=44 and TT in ('007','014','069','096','229','239','240','248','307','308','400','401','403','414','514','BLN','C02','CVO');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=44 and IDG in (40);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=5
+-- where idu=44 and IDG in (21,22);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=6
+-- where idu=44 and IDG in (24);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=44 and IDG in (1,13,14,26,27,28,29,30,31,32,34,37,38,39,41,43);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=44 and CHKID in (3);
+--==============================================================================
+--********** 163 - Лук'янець Анна Іванівна **********
+--==============================================================================
+--********** 130 - Лясковська Світлана Володимирівна **********
+-- ZAPR - АРМ_60 Обработка  информационных запросов
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=130 and codeapp in ('ZAPR','PRIN','SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=130 and IDG in (11,23,24,31,35);
+--==============================================================================
+--********** 294 - Мілорадов Віталій Семенович **********
+--==============================================================================
+--********** 224 - Мінгазутдінова Марина Іванівна **********
+-- UPRA - АРМ_07 СЕП. Управління коррахунком
+-- VIZA - АРМ_22 Візування операцій
+-- 1AS1 - АРМ_71 Казначейство
+-- ATIM - АРМ_72 Позиционер
+-- NUPR - АРМ_73 МБДК+FOREX
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=224 and codeapp in ('UPRA','VIZA','1AS1','ATIM','NUPR','SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=224 and IDG in (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,19,20,21,23,24,25,27,28,29,30,31,32,33,34,35,36,37,38,39,44,45,49,50);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=224 and CHKID in (18);
+--==============================================================================
+--********** 166 - Міщенко Олександра Петрівна **********
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=166 and codeapp in ('SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=166 and IDG in (51);
+--==============================================================================
+--********** 507 - Маврієнко Людмила Миколаївна **********
+-- SWF4 - SWIFT. Формирование сообщений
+-- STPF - АРМ "Швидка копійка"
+-- KMPS - АРМ Компенсація заощаджень
+-- SWF2 - АРМ_12 Обработка сообщений SWIFT
+-- OTCN - АРМ_16 Звітність НБУ
+-- VIZA - АРМ_22 Візування операцій
+-- REGB - АРМ_23 Регистрация клиентов и счетов (БАНКИ)
+-- 1PN2 - АРМ_33 Операціоніст з процентами
+-- PBPB - АРМ_43 1_ПБ
+-- NALO - АРМ_99 Податковий облік (виконавці)
+-- REG2 - АРМ_Перегляд блокованих платежів
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- RAB1 - Дикари + Дебет Информационный
+-- MVPS - МВПС. Управление платежами
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=507 and codeapp in ('SWF4','STPF','KMPS','SWF2','OTCN','VIZA','REGB','1PN2','PBPB','NALO','REG2','PRIN','SBOP','RAB1','MVPS');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=507 and TT in ('007','012','014','022','039','096','114','454','514','C00','C02','C06','C10','C11','C12','C14','CVB','CVO','CVS','D06','D07','F12','F13','F99','SWD','SWK');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=507 and IDG in (33);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=507 and IDG in (9,11,13,23,24,31,32,34,38,43,48,50,52);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=507 and CHKID in (3,10,43,50);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=507 and KODF in ('D4');
+--==============================================================================
+--********** 706 - Магута Роман Миколайович **********
+--==============================================================================
+--********** 328 - Максименко Діна Володимирівна **********
+-- BIRV - АРМ Биржевые операции - валютный контроль
+-- EKPK - АРМ Економічні показники
+-- OTCN - АРМ_16 Звітність НБУ
+-- VIZA - АРМ_22 Візування операцій
+-- PBPB - АРМ_43 1_ПБ
+-- SPUP - АРМ_55 Експортно-імпортні операції
+-- SPTZ - АРМ_Валютная позиция
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=328 and codeapp in ('BIRV','EKPK','OTCN','VIZA','PBPB','SPUP','SPTZ','PRIN','SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=328 and IDG in (1,8,9,11,12,13,15,19,21,23,24,25,31,32,33,34,35,38,45,48,50);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=328 and CHKID in (37);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=328 and KODF in ('1A','70','C9','D3','E2');
+--==============================================================================
+--********** 303 - Малоголовець Оксана Олександрівна **********
+--==============================================================================
+--********** 331 - Маляренко Ірина Антонівна **********
+-- TEST - АРМ_06 Операціоніст
+-- DILI - АРМ_17 Клієнт-Банк
+-- REGF - АРМ_23 Регистрация клиентов и счетов (ФЛ)
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- RAB1 - Дикари + Дебет Информационный
+-- OBPC - Интерфейс с процессинговым центром
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=331 and codeapp in ('TEST','DILI','REGF','PRIN','SBOP','RAB1','OBPC');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=331 and TT in ('003','007','012','014','018','019','028','051','139','308','309','339','444','BP1','BP2','BP4','C09','D06','D07','F17','F98','F99','PKK','PKR');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=1
+-- where idu=331 and IDG in (30);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=331 and IDG in (33,40,50);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=5
+-- where idu=331 and IDG in (16,21,55);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=331 and IDG in (1,9,12,13,17,18,22,23,24,31,32,34,35,38,43,44,45,48);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=331 and CHKID in (3);
+--==============================================================================
+--********** 240 - Мамиркіна Ірина Володимирівна **********
+-- EKPK - АРМ Економічні показники
+-- 1AS1 - АРМ_71 Казначейство
+-- ATIM - АРМ_72 Позиционер
+-- NUPR - АРМ_73 МБДК+FOREX
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=240 and codeapp in ('EKPK','1AS1','ATIM','NUPR','PRIN','SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=240 and IDG in (6,7,9,10,11,12,13,31,32,37,38,44,46,47,48,50);
+--==============================================================================
+--********** 159 - Мамченко Ігор Вікторович **********
+-- KRE4 - АРМ Кредитний портфель ЮО (КРЕДИТЧИК)
+-- KREU - АРМ_15 % Кредити
+-- PERE - АРМ_26 Перегляд спецпараметрів рахунків (НБУ та ОБУ)
+-- 1AS2 - АРМ_72 Кредитне управління
+-- OVR  - АРМ_Комерційні овердрафти юридичних осіб
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- REZE - АРМ_Резервный фонд
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=159 and codeapp in ('KRE4','KREU','PERE','1AS2','OVR ','PRIN','SBOP','REZE');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=159 and IDG in (13,14,15,19,21,23,25,27,28,31,38,43,44,46,47,50);
+--==============================================================================
+--********** 338 - Мартинчук Світлана Миколаївна **********
+-- KRE4 - АРМ Кредитний портфель ЮО (КРЕДИТЧИК)
+-- KREU - АРМ_15 % Кредити
+-- OTCN - АРМ_16 Звітність НБУ
+-- PERE - АРМ_26 Перегляд спецпараметрів рахунків (НБУ та ОБУ)
+-- OVR  - АРМ_Комерційні овердрафти юридичних осіб
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- REZE - АРМ_Резервный фонд
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=338 and codeapp in ('KRE4','KREU','OTCN','PERE','OVR ','PRIN','SBOP','REZE');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=338 and IDG in (9,11,14,15,19,21,23,25,27,31,38,43,44,46,47,50);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=338 and KODF in ('D5','D8','D9','F6','F7','F8','F9');
+--==============================================================================
+--********** 329 - Маслова Наталія Іванівна **********
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=329 and codeapp in ('SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=329 and IDG in (38,43,44,45,46,47);
+--==============================================================================
+--********** 140 - Маташ Людмила Петрівна **********
+-- FMON - АРМ Уповноваженої особи ФМ
+-- AUDT - АРМ_75 Аудит
+-- PERD - АРМ_Звітність НБУ (2)
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=140 and codeapp in ('FMON','AUDT','PERD','PRIN','SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=140 and IDG in (1,3,4,5,6,8,9,10,11,12,13,15,18,19,21,22,23,24,25,31,32,34,35,38,43,44,45,48,50,51,55);
+--==============================================================================
+--********** 570 - Маякова Ганна В'ячеславівна **********
+-- KMPS - АРМ Компенсація заощаджень
+-- TEST - АРМ_06 Операціоніст
+-- VALO - АРМ_10 Валютні операції
+-- SWF1 - АРМ_11 Обработка сообщений SWIFT (полная)
+-- OTCN - АРМ_16 Звітність НБУ
+-- VIZA - АРМ_22 Візування операцій
+-- PBPB - АРМ_43 1_ПБ
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=570 and codeapp in ('KMPS','TEST','VALO','SWF1','OTCN','VIZA','PBPB','PRIN','SBOP');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=570 and TT in ('003','007','014','030','424','C06','C10','C11','C12','C14','CLI','D06','D07','D90','D91','F12','F13');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=3
+-- where idu=570 and IDG in (18);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=570 and IDG in (33,50);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=570 and IDG in (6,9,10,11,12,13,21,24,31,32,35,38,52);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=570 and CHKID in (3,7,11,43);
+--==============================================================================
+--********** 19 - Мельник Людмила Андріївна **********
+--==============================================================================
+--********** 29 - Мельник Ніна Василівна **********
+-- TEST - АРМ_06 Операціоніст
+-- VIZA - АРМ_22 Візування операцій
+-- REGG - АРМ_23 Регистрация клиентов и счетов (ГОУ и ОУ)
+-- PERE - АРМ_26 Перегляд спецпараметрів рахунків (НБУ та ОБУ)
+-- VNOT - АРМ_38 Звітність ОБ
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- RAB1 - Дикари + Дебет Информационный
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=29 and codeapp in ('TEST','VIZA','REGG','PERE','VNOT','SBOP','RAB1');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=29 and TT in ('096','097','229','248','307','308','400','401','514','BLN');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=29 and IDG in (40);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=29 and IDG in (1,13,24,26,27,28,29,30,31,34,36,37,38,39,41,43,46,48);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=29 and CHKID in (2,3,12,19,35);
+--==============================================================================
+--********** 344 - Микульська Наталія Петрівна **********
+-- KODZ - АРМ_Державна Закупівля
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=344 and codeapp in ('KODZ');
+--==============================================================================
+--********** 268 - Мришук Воломир Васильович **********
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=268 and codeapp in ('PRIN','SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=268 and IDG in (5,13,23,24,32,34,35,38,50);
+--==============================================================================
+--********** 10 - Мришук Лідія Миколаївна **********
+-- RKOO - АРМ "Плата за РКО"
+-- BIRG - АРМ Биржевые операции - ГОУ
+-- OTCN - АРМ_16 Звітність НБУ
+-- DILI - АРМ_17 Клієнт-Банк
+-- RM11 - АРМ_18 Реєстр рахунків в ПО
+-- VIZA - АРМ_22 Візування операцій
+-- REGG - АРМ_23 Регистрация клиентов и счетов (ГОУ и ОУ)
+-- REGF - АРМ_23 Регистрация клиентов и счетов (ФЛ)
+-- REGU - АРМ_23 Регистрация клиентов и счетов (ЮЛ)
+-- PPKK - АРМ_30 СЕП Розбір запитів та незясованих сум
+-- 1PN2 - АРМ_33 Операціоніст з процентами
+-- KOMU - АРМ_351 Комунальні платежі (керівник)
+-- NALU - АРМ_49 Податковий облік
+-- 1GU1 - АРМ_74 Начальник відділу
+-- NALO - АРМ_99 Податковий облік (виконавці)
+-- ENR  - АРМ_Взаиморасчеты по "Энергорынку"
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=10 and codeapp in ('RKOO','BIRG','OTCN','DILI','RM11','VIZA','REGG','REGF','REGU','PPKK','1PN2','KOMU','NALU','1GU1','NALO','ENR ','PRIN','SBOP');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=10 and TT in ('002','003','007','012','014','022','076','096','207','213','215','225','234','434','BPK','C00','C02','CVB','CVO','CVS','D06','D07','F09','F10','F11','F13','F14','F99','NE3');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=1
+-- where idu=10 and IDG in (25);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=10 and IDG in (2,6,33,40,50);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=5
+-- where idu=10 and IDG in (13,18,29);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=10 and IDG in (1,14,15,16,19,20,21,22,23,24,27,28,30,31,32,34,38,41,42,43,44,46,47,48,51);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=10 and CHKID in (3,6,12,35,36,40);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=10 and KODF in ('27','C9','D3','E2','E8');
+--==============================================================================
+--********** 555 - Мягка Тетяна Георгіївна **********
+-- OTCN - АРМ_16 Звітність НБУ
+-- VIZA - АРМ_22 Візування операцій
+-- REGF - АРМ_23 Регистрация клиентов и счетов (ФЛ)
+-- 1PN2 - АРМ_33 Операціоніст з процентами
+-- PBPB - АРМ_43 1_ПБ
+-- VKLD - АРМ_56 Вклады населения
+-- 1GU1 - АРМ_74 Начальник відділу
+-- NALO - АРМ_99 Податковий облік (виконавці)
+-- SINI - АРМ_Кросс-курсы валют
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- RAB1 - Дикари + Дебет Информационный
+-- OBPC - Интерфейс с процессинговым центром
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=555 and codeapp in ('OTCN','VIZA','REGF','1PN2','PBPB','VKLD','1GU1','NALO','SINI','PRIN','SBOP','RAB1','OBPC');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=555 and TT in ('007','008','009','012','018','019','022','028','051','058','073','080','096','122','123','171','172','193','304','305','306','307','308','309','315','339','444','A03','A04','A05','A07','A09','A16','AA1','AA2','C02','C05','C10','CVB','CVO','CVS','D06','D07','D10','D16','D17','F06','F07','F08','F11','F13','F16','F17','F96','F97','F99','PKK','PKR');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=555 and IDG in (33,40,50);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=555 and IDG in (1,5,9,12,13,16,17,18,21,22,23,24,26,27,28,29,31,32,34,35,38,43,44,45,46,48,55);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=555 and CHKID in (3,9,12,35,42);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=555 and KODF in ('1A','73','C9','D1','D3','E2');
+--==============================================================================
+--********** 723 - Нємченко Костянтин Іванович **********
+-- KRVN - АРМ_Керівник-3
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=723 and codeapp in ('KRVN');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=723 and IDG in (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,43,44,45,46,47,48,50);
+--==============================================================================
+--********** 326 - Нікітюк Людмила Володимирівна **********
+-- VIPV - АРМ СВО
+-- TEST - АРМ_06 Операціоніст
+-- REGG - АРМ_23 Регистрация клиентов и счетов (ГОУ и ОУ)
+-- KODZ - АРМ_Державна Закупівля
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- RAB1 - Дикари + Дебет Информационный
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=326 and codeapp in ('VIPV','TEST','REGG','KODZ','SBOP','RAB1');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=326 and TT in ('007','014','069','096','228','229','238','239','240','247','248','308','400','401','403','405','406','407','414','514','C02','CVO','PKR');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=1
+-- where idu=326 and IDG in (16,17,22,55);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=326 and IDG in (50);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=5
+-- where idu=326 and IDG in (18,21);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=326 and IDG in (1,13,14,24,26,27,28,29,30,31,32,34,37,38,39,40,41,43);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=326 and CHKID in (3);
+--==============================================================================
+--********** 720 - Немкович Тетяна Олександрівна **********
+-- BUDG - АРМ_Бюджет (расширен.)
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=720 and codeapp in ('BUDG','PRIN','SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=720 and IDG in (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,44,46,50,51,56,57);
+--==============================================================================
+--********** 165 - Нестеренко Тетяна Олексіївна **********
+-- MPPZ - АРМ "Київ-Дніпровський"
+-- RKOO - АРМ "Плата за РКО"
+-- POST - АРМ УКРПОШТА та ЕНЕРГОРИНОК
+-- OTCN - АРМ_16 Звітність НБУ
+-- DILI - АРМ_17 Клієнт-Банк
+-- VIZA - АРМ_22 Візування операцій
+-- PPKK - АРМ_30 СЕП Розбір запитів та незясованих сум
+-- 1PN2 - АРМ_33 Операціоніст з процентами
+-- NALO - АРМ_99 Податковий облік (виконавці)
+-- ENR  - АРМ_Взаиморасчеты по "Энергорынку"
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- RAB1 - Дикари + Дебет Информационный
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=165 and codeapp in ('MPPZ','RKOO','POST','OTCN','DILI','VIZA','PPKK','1PN2','NALO','ENR ','PRIN','SBOP','RAB1');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=165 and TT in ('001','002','003','007','012','014','018','019','022','028','079','096','114','207','213','234','309','328','401','409','414','434','C00','C02','C09','CVO','D06','D07','F09','F11','F13','NE3','PKR','PO1','PO3');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=1
+-- where idu=165 and IDG in (11);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=3
+-- where idu=165 and IDG in (18,22);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=165 and IDG in (40);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=5
+-- where idu=165 and IDG in (13,25,29);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=6
+-- where idu=165 and IDG in (31);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=165 and IDG in (1,14,15,19,20,21,23,24,27,32,38,41,43,44,46,47,48,51);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=165 and CHKID in (3,36,63);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=165 and KODF in ('27','C9','D3','E2');
+--==============================================================================
+--********** 302 - Никифорак Євгенія Володимирівна **********
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=302 and codeapp in ('SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=302 and IDG in (51);
+--==============================================================================
+--********** 170 - Овдієнко Ольга Ігорівна **********
+--==============================================================================
+--********** 134 - Овчиннікова Наталія Миколаївна **********
+-- 1ASC - АРМ_34 Каса
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=134 and codeapp in ('1ASC');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=134 and TT in ('KK1','KK2');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=134 and IDG in (1,38);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=134 and CHKID in (5);
+--==============================================================================
+--********** 345 - Омельчук Ярослав Анатолійович **********
+-- FMON - АРМ Уповноваженої особи ФМ
+-- SPUP - АРМ_55 Експортно-імпортні операції
+-- AUDT - АРМ_75 Аудит
+-- PERD - АРМ_Звітність НБУ (2)
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=345 and codeapp in ('FMON','SPUP','AUDT','PERD','PRIN','SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=345 and IDG in (1,3,4,5,6,8,9,10,11,12,13,15,17,18,19,21,22,23,24,25,31,32,34,35,38,43,44,45,48,50,51,55);
+--==============================================================================
+--********** 152 - Онищенко Людмила Василівна **********
+-- TEST - АРМ_06 Операціоніст
+-- OTCN - АРМ_16 Звітність НБУ
+-- DILI - АРМ_17 Клієнт-Банк
+-- VIZA - АРМ_22 Візування операцій
+-- REGF - АРМ_23 Регистрация клиентов и счетов (ФЛ)
+-- REGU - АРМ_23 Регистрация клиентов и счетов (ЮЛ)
+-- 1PN2 - АРМ_33 Операціоніст з процентами
+-- PBPB - АРМ_43 1_ПБ
+-- VKLD - АРМ_56 Вклады населения
+-- 1GU1 - АРМ_74 Начальник відділу
+-- NALO - АРМ_99 Податковий облік (виконавці)
+-- SINI - АРМ_Кросс-курсы валют
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- RAB1 - Дикари + Дебет Информационный
+-- OBPC - Интерфейс с процессинговым центром
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=152 and codeapp in ('TEST','OTCN','DILI','VIZA','REGF','REGU','1PN2','PBPB','VKLD','1GU1','NALO','SINI','PRIN','SBOP','RAB1','OBPC');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=152 and TT in ('007','008','009','012','014','018','019','022','028','051','073','080','114','122','123','171','172','193','304','305','306','307','308','309','315','339','444','A03','A04','A05','A07','A09','A16','AA1','AA2','C02','C05','C10','CVB','CVO','CVS','D06','D07','D10','D16','D17','F06','F07','F08','F11','F13','F16','F17','F96','F97','F99','PKK','PKR');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=1
+-- where idu=152 and IDG in (21);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=152 and IDG in (33,40,50);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=152 and IDG in (1,5,9,12,13,16,17,18,22,23,24,26,27,28,29,31,32,34,35,38,39,43,44,45,46,48,55);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=152 and CHKID in (3,9,12,35,42);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=152 and KODF in ('1A','73','C9','D1','D3','E2','E8');
+--==============================================================================
+--********** 131 - Онищенко Оксана Володимирівна **********
+-- VALO - АРМ_10 Валютні операції
+-- OTCN - АРМ_16 Звітність НБУ
+-- REGB - АРМ_23 Регистрация клиентов и счетов (БАНКИ)
+-- 1PN2 - АРМ_33 Операціоніст з процентами
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- RAB1 - Дикари + Дебет Информационный
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=131 and codeapp in ('VALO','OTCN','REGB','1PN2','PRIN','SBOP','RAB1');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=131 and TT in ('003','007','014','114','201','204','205','208','210','217','218','220','221','233','234','250','404','514','C04','C10','C11','C12','D06','D07','F10','F11','F18');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=131 and IDG in (6,13,23,24,29,31,32,33,34,35,38,50,52);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=131 and CHKID in (3);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=131 and KODF in ('2A');
+--==============================================================================
+--********** 347 - Осатюк Богдан Адольфович **********
+-- KODZ - АРМ_Державна Закупівля
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=347 and codeapp in ('KODZ');
+--==============================================================================
+--********** 181 - Охоненко Світлана Валеріївна **********
+-- CINP - АРМ Цінні папери
+-- OTCN - АРМ_16 Звітність НБУ
+-- ADCP - АРМ_ДЦП
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=181 and codeapp in ('CINP','OTCN','ADCP','SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=181 and IDG in (7,8,10,12,13,14,20,21,24,25,29,31,34,38,43,44,45,46,50,51);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=181 and KODF in ('07','20','84','E1');
+--==============================================================================
+--********** 293 - Підлубна Світлана Олександрівна **********
+-- FMON - АРМ Уповноваженої особи ФМ
+-- AUDT - АРМ_75 Аудит
+-- PERD - АРМ_Звітність НБУ (2)
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=293 and codeapp in ('FMON','AUDT','PERD','PRIN','SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=293 and IDG in (1,3,4,5,6,8,9,10,11,12,13,15,18,19,21,22,23,24,25,31,32,34,35,38,43,44,45,48,50,51,55);
+--==============================================================================
+--********** 323 - Павлюк Тетяна Григорівна **********
+-- RZBS - АРМ_19 Роздрібний бізнес
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=323 and codeapp in ('RZBS');
+--==============================================================================
+--********** 529 - Панасюк Тетяна Юріївна **********
+-- STPF - АРМ "Швидка копійка"
+-- KMPS - АРМ Компенсація заощаджень
+-- SWF2 - АРМ_12 Обработка сообщений SWIFT
+-- OTCN - АРМ_16 Звітність НБУ
+-- DILI - АРМ_17 Клієнт-Банк
+-- RM11 - АРМ_18 Реєстр рахунків в ПО
+-- VIZA - АРМ_22 Візування операцій
+-- REGB - АРМ_23 Регистрация клиентов и счетов (БАНКИ)
+-- 1PN2 - АРМ_33 Операціоніст з процентами
+-- VNOT - АРМ_38 Звітність ОБ
+-- PBPB - АРМ_43 1_ПБ
+-- NALU - АРМ_49 Податковий облік
+-- 1GU1 - АРМ_74 Начальник відділу
+-- NALO - АРМ_99 Податковий облік (виконавці)
+-- REG2 - АРМ_Перегляд блокованих платежів
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- RAB1 - Дикари + Дебет Информационный
+-- MVPS - МВПС. Управление платежами
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=529 and codeapp in ('STPF','KMPS','SWF2','OTCN','DILI','RM11','VIZA','REGB','1PN2','VNOT','PBPB','NALU','1GU1','NALO','REG2','PRIN','SBOP','RAB1','MVPS');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=529 and TT in ('007','012','014','022','039','114','454','514','C00','C02','C06','C10','C11','C12','C14','CVB','CVO','CVS','D06','D07','F12','F13','F99','J31','PO1','PO3','PS3','SWD','SWK');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=529 and IDG in (9,33,50);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=529 and IDG in (11,13,23,24,29,31,32,34,35,38,41,43,48,52);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=529 and CHKID in (3,10,35,43);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=529 and KODF in ('40','C9','D4','D6','E2');
+--==============================================================================
+--********** 503 - Петриченко Валентина Іванівна **********
+-- VALO - АРМ_10 Валютні операції
+-- OTCN - АРМ_16 Звітність НБУ
+-- VIZA - АРМ_22 Візування операцій
+-- REGB - АРМ_23 Регистрация клиентов и счетов (БАНКИ)
+-- 1PN2 - АРМ_33 Операціоніст з процентами
+-- NALO - АРМ_99 Податковий облік (виконавці)
+-- VERI - АРМ_Підкріплення коррахунку
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- RAB1 - Дикари + Дебет Информационный
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=503 and codeapp in ('VALO','OTCN','VIZA','REGB','1PN2','NALO','VERI','PRIN','SBOP','RAB1');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=503 and TT in ('003','007','014','038','096','114','201','204','205','208','210','217','218','220','221','233','234','250','404','514','C04','C09','C10','C11','C12','D06','D07','F10','F11','F18','I10');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=503 and IDG in (6,33,40,50);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=503 and IDG in (13,14,23,24,25,29,31,32,34,35,38,45,48,100);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=503 and CHKID in (3,14,35);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=503 and KODF in ('2A');
+--==============================================================================
+--********** 211 - Петруньок Наталія Анатоліївна **********
+-- VALO - АРМ_10 Валютні операції
+-- REGK - АРМ_24 Параметри рахунків
+-- 1PN2 - АРМ_33 Операціоніст з процентами
+-- NAL4 - АРМ_492 Податковий облік (виконавці)
+-- ATIM - АРМ_72 Позиционер
+-- SWKZ - АРМ_SWIFT_Казначейство
+-- ADCP - АРМ_ДЦП
+-- PERD - АРМ_Звітність НБУ (2)
+-- MBDK - АРМ_Казначейство (МБДК+FOREX)
+-- REG2 - АРМ_Перегляд блокованих платежів
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- BOR1 - АРМ_Реєстр боржників (Банки)
+-- RAB1 - Дикари + Дебет Информационный
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=211 and codeapp in ('VALO','REGK','1PN2','NAL4','ATIM','SWKZ','ADCP','PERD','MBDK','REG2','PRIN','SBOP','BOR1','RAB1');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=211 and TT in ('003','004','014','022','028','096','201','205','402','404','D06','D07','F01','F02','F10','F13','FX9','SW0','V07','V17','VP0');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=1
+-- where idu=211 and IDG in (29);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=211 and IDG in (6,47,50);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=5
+-- where idu=211 and IDG in (11);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=211 and IDG in (7,9,10,12,13,24,25,31,32,38,44,45,46,48,100);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=211 and CHKID in (3);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=211 and KODF in ('2A','39','C9','E0','E2','E8','S6');
+--==============================================================================
+--********** 248 - Пивовар Інна Михайлівна **********
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=248 and codeapp in ('SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=248 and IDG in (20,21,31,33,34,35);
+--==============================================================================
+--********** 701 - Пирогова Ірина Всеволодівна **********
+--==============================================================================
+--********** 350 - Плахотник Олексій Володмирович **********
+-- KRE4 - АРМ Кредитний портфель ЮО (КРЕДИТЧИК)
+-- KREU - АРМ_15 % Кредити
+-- PERE - АРМ_26 Перегляд спецпараметрів рахунків (НБУ та ОБУ)
+-- 1AS2 - АРМ_72 Кредитне управління
+-- OVR  - АРМ_Комерційні овердрафти юридичних осіб
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- BORG - АРМ_Реєстр боржників (Всі)
+-- REZE - АРМ_Резервный фонд
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=350 and codeapp in ('KRE4','KREU','PERE','1AS2','OVR ','PRIN','SBOP','BORG','REZE');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=350 and IDG in (13,14,15,19,21,23,25,27,28,31,38,44,46,47,50);
+--==============================================================================
+--********** 253 - Подовіннікова Світлана  Іванівна  **********
+-- BOSS - АРМ_05 Керівник-Аудитор-Аналітик
+-- AMEN - АРМ_47 Менеджер
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=253 and codeapp in ('BOSS','AMEN','PRIN','SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=253 and IDG in (6,9,10,11,12,13,31,35,38,50);
+--==============================================================================
+--********** 272 - Подрєзов Сергій Олександрович **********
+--==============================================================================
+--********** 259 - Половець Ганна Яківна **********
+-- VIZA - АРМ_22 Візування операцій
+-- PPKK - АРМ_30 СЕП Розбір запитів та незясованих сум
+-- 1PN2 - АРМ_33 Операціоніст з процентами
+-- 1ASC - АРМ_34 Каса
+-- KOMM - АРМ_35 Комунальні платежі
+-- VNOT - АРМ_38 Звітність ОБ
+-- NALU - АРМ_49 Податковий облік
+-- ZAPR - АРМ_60 Обработка  информационных запросов
+-- NALO - АРМ_99 Податковий облік (виконавці)
+-- KRE5 - АРМ_КП ФИЗ. ЛИЦ (бухгалтер)
+-- KD88 - АРМ_Кредити-Депозити_888
+-- REG2 - АРМ_Перегляд блокованих платежів
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- RAB1 - Дикари + Дебет Информационный
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=259 and codeapp in ('VIZA','PPKK','1PN2','1ASC','KOMM','VNOT','NALU','ZAPR','NALO','KRE5','KD88','REG2','PRIN','SBOP','RAB1');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=259 and TT in ('002','003','007','008','009','012','014','018','019','022','028','079','114','185','186','187','207','305','308','309','314','338','339','464','888','AA1','AA8','BPK','D06','D07','F13','F14','OVA','PO1','PO3');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=259 and IDG in (40);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=259 and IDG in (1,2,13,16,17,18,22,23,24,27,29,31,32,38,41,42,43,44,46,47,48,50);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=259 and CHKID in (3,36);
+--==============================================================================
+--********** 66 - Половинко Ірина Олександрівна **********
+-- MPPZ - АРМ "Київ-Дніпровський"
+-- RKOO - АРМ "Плата за РКО"
+-- POST - АРМ УКРПОШТА та ЕНЕРГОРИНОК
+-- OTCN - АРМ_16 Звітність НБУ
+-- DILI - АРМ_17 Клієнт-Банк
+-- RM11 - АРМ_18 Реєстр рахунків в ПО
+-- VIZA - АРМ_22 Візування операцій
+-- REGF - АРМ_23 Регистрация клиентов и счетов (ФЛ)
+-- REGU - АРМ_23 Регистрация клиентов и счетов (ЮЛ)
+-- PPKK - АРМ_30 СЕП Розбір запитів та незясованих сум
+-- 1PN2 - АРМ_33 Операціоніст з процентами
+-- KOMU - АРМ_351 Комунальні платежі (керівник)
+-- NALU - АРМ_49 Податковий облік
+-- ATIM - АРМ_72 Позиционер
+-- 1GU1 - АРМ_74 Начальник відділу
+-- NALO - АРМ_99 Податковий облік (виконавці)
+-- ENR  - АРМ_Взаиморасчеты по "Энергорынку"
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- RAB1 - Дикари + Дебет Информационный
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=66 and codeapp in ('MPPZ','RKOO','POST','OTCN','DILI','RM11','VIZA','REGF','REGU','PPKK','1PN2','KOMU','NALU','ATIM','1GU1','NALO','ENR ','PRIN','SBOP','RAB1');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=66 and TT in ('001','002','003','007','012','014','079','114','207','213','215','234','309','328','409','414','434','AA1','AA8','C00','C02','C09','CVO','D06','D07','F09','F10','F11','F13','F14','F99','NE3','PO1','PO3');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=1
+-- where idu=66 and IDG in (11,25);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=66 and IDG in (6,33,40,50);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=5
+-- where idu=66 and IDG in (13,29);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=6
+-- where idu=66 and IDG in (31);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=66 and IDG in (1,14,15,16,19,20,21,22,23,24,27,28,30,32,38,41,42,44,46,47,48,51);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=66 and CHKID in (3,6,12,35,36,40,42,62,63);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=66 and KODF in ('1A','27','C9','D3','D6','E2','E8');
+--==============================================================================
+--********** 333 - Почеп Юлія Василівна **********
+-- OTCN - АРМ_16 Звітність НБУ
+-- REGF - АРМ_23 Регистрация клиентов и счетов (ФЛ)
+-- 1PN2 - АРМ_33 Операціоніст з процентами
+-- PBPB - АРМ_43 1_ПБ
+-- VKLD - АРМ_56 Вклады населения
+-- NALO - АРМ_99 Податковий облік (виконавці)
+-- SINI - АРМ_Кросс-курсы валют
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- RAB1 - Дикари + Дебет Информационный
+-- OBPC - Интерфейс с процессинговым центром
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=333 and codeapp in ('OTCN','REGF','1PN2','PBPB','VKLD','NALO','SINI','PRIN','SBOP','RAB1','OBPC');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=333 and TT in ('007','008','009','012','018','019','022','028','051','058','073','080','122','123','171','172','193','304','305','306','307','308','309','339','444','A05','A07','A09','A16','AA1','AA2','C02','C05','C10','CVB','CVO','CVS','D06','D07','D10','D16','D17','F06','F07','F08','F11','F13','F16','F17','F96','F97','F99','PKK','PKR');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=1
+-- where idu=333 and IDG in (21);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=333 and IDG in (9,33,40,50);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=333 and IDG in (1,5,13,16,18,22,23,24,26,27,28,29,31,32,38,43,44,45,46,48,55);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=333 and CHKID in (3,9,12,35,42);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=333 and KODF in ('73','C9','D3','E2');
+--==============================================================================
+--********** 62 - Прилуцька Людмила Василівна **********
+-- KOBU - АРМ "Комісія Ощадбанку"
+-- RKOO - АРМ "Плата за РКО"
+-- BIRG - АРМ Биржевые операции - ГОУ
+-- KMPS - АРМ Компенсація заощаджень
+-- OTCN - АРМ_16 Звітність НБУ
+-- DILI - АРМ_17 Клієнт-Банк
+-- RM11 - АРМ_18 Реєстр рахунків в ПО
+-- VIZA - АРМ_22 Візування операцій
+-- REGG - АРМ_23 Регистрация клиентов и счетов (ГОУ и ОУ)
+-- REGF - АРМ_23 Регистрация клиентов и счетов (ФЛ)
+-- REGU - АРМ_23 Регистрация клиентов и счетов (ЮЛ)
+-- 1PN2 - АРМ_33 Операціоніст з процентами
+-- KOMU - АРМ_351 Комунальні платежі (керівник)
+-- VNOT - АРМ_38 Звітність ОБ
+-- NALU - АРМ_49 Податковий облік
+-- 1GU1 - АРМ_74 Начальник відділу
+-- NALO - АРМ_99 Податковий облік (виконавці)
+-- KRE5 - АРМ_КП ФИЗ. ЛИЦ (бухгалтер)
+-- KD88 - АРМ_Кредити-Депозити_888
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- RAB1 - Дикари + Дебет Информационный
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=62 and codeapp in ('KOBU','RKOO','BIRG','KMPS','OTCN','DILI','RM11','VIZA','REGG','REGF','REGU','1PN2','KOMU','VNOT','NALU','1GU1','NALO','KRE5','KD88','PRIN','SBOP','RAB1');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=62 and TT in ('002','003','007','008','009','012','014','018','019','020','022','028','076','079','096','187','207','215','225','308','309','434','AA1','AA8','C00','C02','CVB','CVO','CVS','D06','D07','F09','F13','F14','NE3','OVA','PO1','PO3','V38');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=62 and IDG in (6,40,50);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=62 and IDG in (1,2,13,14,15,16,17,18,19,20,21,22,23,24,27,28,29,30,31,32,38,41,42,43,44,46,47,48,51,52);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=62 and CHKID in (3,6,12,35,36,42,43);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=62 and KODF in ('1A','27','C9','D1','D3','E2','E8');
+--==============================================================================
+--********** 60 - Притуп Юрій Миколайович **********
+-- 1111 - Back Value
+-- KMPS - АРМ Компенсація заощаджень
+-- GLBU - АРМ_04 Головний Бухгалтер
+-- TEST - АРМ_06 Операціоніст
+-- KREU - АРМ_15 % Кредити
+-- OTCN - АРМ_16 Звітність НБУ
+-- REGI - АРМ_23 Регистрация клиентов и счетов (общая)
+-- PPKK - АРМ_30 СЕП Розбір запитів та незясованих сум
+-- KOMU - АРМ_351 Комунальні платежі (керівник)
+-- VNOT - АРМ_38 Звітність ОБ
+-- NALU - АРМ_49 Податковий облік
+-- NALS - АРМ_87 Податковий облiк ОБ
+-- NALO - АРМ_99 Податковий облік (виконавці)
+-- ENR  - АРМ_Взаиморасчеты по "Энергорынку"
+-- KRE3 - АРМ_КП ФИЗ. ЛИЦ банка (кред)
+-- 1UHS - АРМ_Отчеты
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=60 and codeapp in ('1111','KMPS','GLBU','TEST','KREU','OTCN','REGI','PPKK','KOMU','VNOT','NALU','NALS','NALO','ENR ','KRE3','1UHS','PRIN','SBOP');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=60 and TT in ('003','PO1','PO3');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=60 and IDG in (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,42,43,44,45,46,47,48,50,55,56,80);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=60 and IDG in (41,52);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=60 and CHKID in (1,2,3,4,5,6,7,8,9,10,11,12,14,15,18,20,34,35,40,42,43);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=60 and KODF in ('03','78');
+--==============================================================================
+--********** 295 - Прищенко Оксана Петрівна **********
+-- ATIM - АРМ_72 Позиционер
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=295 and codeapp in ('ATIM','PRIN','SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=295 and IDG in (20,21,31,33,34,35);
+--==============================================================================
+--********** 18 - Радіонова Марія Петрівна **********
+-- VIPV - АРМ СВО
+-- TEST - АРМ_06 Операціоніст
+-- VIZA - АРМ_22 Візування операцій
+-- REGG - АРМ_23 Регистрация клиентов и счетов (ГОУ и ОУ)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- RAB1 - Дикари + Дебет Информационный
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=18 and codeapp in ('VIPV','TEST','VIZA','REGG','SBOP','RAB1');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=18 and TT in ('007','096','228','229','238','239','240','247','248','405','406','407','414','F13','PKR','PO1','PO3');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=1
+-- where idu=18 and IDG in (16,55);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=18 and IDG in (40,50);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=5
+-- where idu=18 and IDG in (17,18);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=18 and IDG in (1,22,24,27,28,29,30,31,32,38,39,41,56);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=18 and CHKID in (3,12,20,35,42);
+--==============================================================================
+--********** 65 - Радченко Людмила Павлівна **********
+-- OTCN - АРМ_16 Звітність НБУ
+-- REGF - АРМ_23 Регистрация клиентов и счетов (ФЛ)
+-- 1PN2 - АРМ_33 Операціоніст з процентами
+-- PBPB - АРМ_43 1_ПБ
+-- VKLD - АРМ_56 Вклады населения
+-- CASH - АРМ_Підкріплення готівкової валюти
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- RAB1 - Дикари + Дебет Информационный
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=65 and codeapp in ('OTCN','REGF','1PN2','PBPB','VKLD','CASH','PRIN','SBOP','RAB1');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=65 and TT in ('007','008','009','012','018','019','027','037','059','062','073','114','304','305','306','307','309','315','444','A03','A04','A05','A07','A0A','A16','A17','AA1','AA2','C02','C05','C10','C11','C12','CVB','CVO','CVS','D06','D07','D16','D17','F06','F07','F08','F13','F97','F99','I10','J30','J31','J70','J71','J72','SW0','SW3');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=1
+-- where idu=65 and IDG in (21);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=65 and IDG in (33,40,50);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=65 and IDG in (1,9,12,13,22,23,24,26,27,29,31,32,34,35,38,43,48);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=65 and CHKID in (3);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=65 and KODF in ('39','73','C6','C9','E2','F1');
+--==============================================================================
+--********** 502 - Редько Любов Кахрамонівна **********
+-- ATIM - АРМ_72 Позиционер
+-- NUPR - АРМ_73 МБДК+FOREX
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=502 and codeapp in ('ATIM','NUPR','PRIN','SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=502 and IDG in (1,2,3,6,7,8,9,10,11,12,13,15,20,21,24,25,31,32,33,34,35,43,48);
+--==============================================================================
+--********** 146 - Роман Наталія Юріївна **********
+-- KODZ - АРМ_Державна Закупівля
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=146 and codeapp in ('KODZ');
+--==============================================================================
+--********** 349 - Романенко Юрій Анатолійович **********
+-- KRE4 - АРМ Кредитний портфель ЮО (КРЕДИТЧИК)
+-- KREU - АРМ_15 % Кредити
+-- PERE - АРМ_26 Перегляд спецпараметрів рахунків (НБУ та ОБУ)
+-- 1AS2 - АРМ_72 Кредитне управління
+-- OVR  - АРМ_Комерційні овердрафти юридичних осіб
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- REZE - АРМ_Резервный фонд
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=349 and codeapp in ('KRE4','KREU','PERE','1AS2','OVR ','PRIN','SBOP','REZE');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=349 and IDG in (14,15,19,21,23,25,27,31,38,43,44,46,47,50);
+--==============================================================================
+--********** 46 - Романюк Ганна Олександрівна **********
+--==============================================================================
+--********** 252 - Рощина Валентина Миколаївна **********
+-- OTCN - АРМ_16 Звітність НБУ
+-- VIZA - АРМ_22 Візування операцій
+-- SPUP - АРМ_55 Експортно-імпортні операції
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=252 and codeapp in ('OTCN','VIZA','SPUP','PRIN','SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=252 and IDG in (1,9,15,21);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=252 and CHKID in (37);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=252 and KODF in ('70');
+--==============================================================================
+--********** 722 - Рудзевич Валентина Василівна **********
+-- KODZ - АРМ_Державна Закупівля
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=722 and codeapp in ('KODZ','PRIN','SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=722 and IDG in (2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,18,19,20,21,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,43,44,45,46,47,48,49,50,51,57);
+--==============================================================================
+--********** 348 - Рябіхіна Олена Михайлівна **********
+-- ANKL - АРМ Аналіз клієнтів
+-- KRE4 - АРМ Кредитний портфель ЮО (КРЕДИТЧИК)
+-- KREU - АРМ_15 % Кредити
+-- PERE - АРМ_26 Перегляд спецпараметрів рахунків (НБУ та ОБУ)
+-- 1AS2 - АРМ_72 Кредитне управління
+-- OVR  - АРМ_Комерційні овердрафти юридичних осіб
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- BORG - АРМ_Реєстр боржників (Всі)
+-- REZE - АРМ_Резервный фонд
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=348 and codeapp in ('ANKL','KRE4','KREU','PERE','1AS2','OVR ','PRIN','SBOP','BORG','REZE');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=348 and IDG in (15,19,21,25,27,28,38,44,46);
+--==============================================================================
+--********** 167 - Рябушкіна Ольга Олексіївна **********
+-- 1AS1 - АРМ_71 Казначейство
+-- ATIM - АРМ_72 Позиционер
+-- NUPR - АРМ_73 МБДК+FOREX
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=167 and codeapp in ('1AS1','ATIM','NUPR','PRIN','SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=167 and IDG in (6,7,9,10,11,12,13,31,32,37,38,44,46,47,48,50);
+--==============================================================================
+--********** 557 - Савелова Ірина Броніславівна **********
+-- OTCN - АРМ_16 Звітність НБУ
+-- VIZA - АРМ_22 Візування операцій
+-- REGF - АРМ_23 Регистрация клиентов и счетов (ФЛ)
+-- 1PN2 - АРМ_33 Операціоніст з процентами
+-- VNOT - АРМ_38 Звітність ОБ
+-- PBPB - АРМ_43 1_ПБ
+-- VKLD - АРМ_56 Вклады населения
+-- SINI - АРМ_Кросс-курсы валют
+-- CASH - АРМ_Підкріплення готівкової валюти
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- RAB1 - Дикари + Дебет Информационный
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=557 and codeapp in ('OTCN','VIZA','REGF','1PN2','VNOT','PBPB','VKLD','SINI','CASH','PRIN','SBOP','RAB1');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=557 and TT in ('007','008','009','012','017','018','019','037','058','059','062','069','073','114','304','305','306','307','308','309','444','A03','A04','A05','A07','A09','A0A','A12','A14','A15','A16','A17','A18','A19','AA1','AA2','C02','C05','C10','C11','C12','CVB','CVO','CVS','D06','D07','D10','D16','D17','F06','F07','F08','F11','F13','F16','F17','F96','F97','F99','F9D','I10','J30','J31','J70','J71','J72','PKR','PO1','PO3','SW0','SW3','Z07','Z13','Z17','Z27','Z31');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=1
+-- where idu=557 and IDG in (21);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=557 and IDG in (33,40,50);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=557 and IDG in (1,3,5,9,12,13,22,23,24,26,27,28,29,31,32,34,35,38,43,45,48,55);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=557 and CHKID in (3,9,12,35,42);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=557 and KODF in ('1A','39','73','C9','D6','E2','F1');
+--==============================================================================
+--********** 321 - Сагалаєва Олена Вікторівна **********
+-- FMON - АРМ Уповноваженої особи ФМ
+-- AUDT - АРМ_75 Аудит
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=321 and codeapp in ('FMON','AUDT','PRIN','SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=321 and IDG in (1,3,4,5,6,8,9,10,11,12,13,15,18,19,21,22,23,24,25,31,32,34,35,38,43,44,45,48,50,51,55);
+--==============================================================================
+--********** 169 - Саленко Володимир Анатолійович **********
+-- EKPK - АРМ Економічні показники
+-- 1AS1 - АРМ_71 Казначейство
+-- NUPR - АРМ_73 МБДК+FOREX
+-- AUDI - АРМ_Аудитор-Аналітик
+-- 1UHS - АРМ_Отчеты
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=169 and codeapp in ('EKPK','1AS1','NUPR','AUDI','1UHS','SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=169 and IDG in (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,19,20,21,22,23,24,25,27,28,29,30,31,32,33,34,35,36,37,38,39,43,44,45,46,47,48,49,50);
+--==============================================================================
+--********** 521 - Саюк Олександра Петрівна **********
+-- DILI - АРМ_17 Клієнт-Банк
+-- VIZA - АРМ_22 Візування операцій
+-- REGF - АРМ_23 Регистрация клиентов и счетов (ФЛ)
+-- 1PN2 - АРМ_33 Операціоніст з процентами
+-- NALO - АРМ_99 Податковий облік (виконавці)
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- RAB1 - Дикари + Дебет Информационный
+-- OBPC - Интерфейс с процессинговым центром
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=521 and codeapp in ('DILI','VIZA','REGF','1PN2','NALO','PRIN','SBOP','RAB1','OBPC');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=521 and TT in ('003','007','012','014','018','019','022','028','051','114','139','308','309','339','444','BP1','BP2','BP4','C00','C09','D03','D06','D07','F13','F17','F98','F99','PKK','PKR','PO1','PO3');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=1
+-- where idu=521 and IDG in (26);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=521 and IDG in (33,40,50);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=5
+-- where idu=521 and IDG in (2,21);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=521 and IDG in (1,9,12,13,16,17,18,22,23,24,29,31,32,34,35,38,41,43,44,45,48,55);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=521 and CHKID in (3,6,9,12,35,42);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=521 and KODF in ('C9','D8');
+--==============================================================================
+--********** 147 - Свєчнікова Олена Георгіївна **********
+--==============================================================================
+--********** 92 - Свирська Марія Петрівна **********
+-- KREU - АРМ_15 % Кредити
+-- OTCN - АРМ_16 Звітність НБУ
+-- PERE - АРМ_26 Перегляд спецпараметрів рахунків (НБУ та ОБУ)
+-- VNOT - АРМ_38 Звітність ОБ
+-- KRE3 - АРМ_КП ФИЗ. ЛИЦ банка (кред)
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- REZE - АРМ_Резервный фонд
+-- RAB1 - Дикари + Дебет Информационный
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=92 and codeapp in ('KREU','OTCN','PERE','VNOT','KRE3','PRIN','SBOP','REZE','RAB1');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=92 and IDG in (16,17,18,22,27,38,43,44,46,47,50);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=92 and KODF in ('D5','D8');
+--==============================================================================
+--********** 307 - Сидорук Фавст Федорович **********
+-- BOSS - АРМ_05 Керівник-Аудитор-Аналітик
+-- AMEN - АРМ_47 Менеджер
+-- 1AS1 - АРМ_71 Казначейство
+-- 1AS2 - АРМ_72 Кредитне управління
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=307 and codeapp in ('BOSS','AMEN','1AS1','1AS2','PRIN','SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=307 and IDG in (1,2,3,4,5,6,7,8,9,10,11,12,13,14,25,31,32,33,34,35,37,38,44,45,46,47,48,50);
+--==============================================================================
+--********** 547 - Синицька Оксана Віталіївна **********
+-- KMPS - АРМ Компенсація заощаджень
+-- OTCN - АРМ_16 Звітність НБУ
+-- VIZA - АРМ_22 Візування операцій
+-- REGF - АРМ_23 Регистрация клиентов и счетов (ФЛ)
+-- 1PN2 - АРМ_33 Операціоніст з процентами
+-- VNOT - АРМ_38 Звітність ОБ
+-- VKLD - АРМ_56 Вклады населения
+-- 1GU1 - АРМ_74 Начальник відділу
+-- 1RM2 - АРМ_Грасюк
+-- PCOR - АРМ_Корпус Мира
+-- SINI - АРМ_Кросс-курсы валют
+-- CASH - АРМ_Підкріплення готівкової валюти
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- CHEK - АРМ_Чеки
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=547 and codeapp in ('KMPS','OTCN','VIZA','REGF','1PN2','VNOT','VKLD','1GU1','1RM2','PCOR','SINI','CASH','PRIN','SBOP','CHEK');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=547 and TT in ('003','007','008','009','012','018','019','031','044','051','059','061','096','099','100','114','115','116','125','137','161','162','164','168','169','171','172','304','305','306','307','444','A05','A07','A16','AA1','AA2','AA3','AA5','AA7','AA9','C02','C05','C10','C11','CVO','D06','D07','D16','D17','F07','F08','F13','F16','F17','F97','F98','F99','I10','J30','J31','J70','J71','J72','SW0','SW3','Z07','Z12','Z13','Z15','Z17','Z27','Z31','Z32');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=547 and IDG in (33,40,42,50);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=5
+-- where idu=547 and IDG in (11,25);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=547 and IDG in (1,3,4,5,9,12,13,16,17,18,22,23,24,26,27,29,31,32,34,35,38,41,43,44,45,48,52,55);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=547 and CHKID in (3,6,9,12,35,42,43);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=547 and KODF in ('39','44','C9','D6','E2');
+--==============================================================================
+--********** 508 - Синьогуб Юлія Миколаївна **********
+-- STPF - АРМ "Швидка копійка"
+-- KMPS - АРМ Компенсація заощаджень
+-- SWF2 - АРМ_12 Обработка сообщений SWIFT
+-- OTCN - АРМ_16 Звітність НБУ
+-- VIZA - АРМ_22 Візування операцій
+-- REGB - АРМ_23 Регистрация клиентов и счетов (БАНКИ)
+-- 1PN2 - АРМ_33 Операціоніст з процентами
+-- VNOT - АРМ_38 Звітність ОБ
+-- PBPB - АРМ_43 1_ПБ
+-- REG2 - АРМ_Перегляд блокованих платежів
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- RAB1 - Дикари + Дебет Информационный
+-- MVPS - МВПС. Управление платежами
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=508 and codeapp in ('STPF','KMPS','SWF2','OTCN','VIZA','REGB','1PN2','VNOT','PBPB','REG2','PRIN','SBOP','RAB1','MVPS');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=508 and TT in ('007','012','014','022','039','114','454','514','AA2','C00','C02','C06','C10','C11','C12','C14','CVB','CVO','CVS','D06','D07','F13','SWD','SWK');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=508 and IDG in (9,33);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=508 and IDG in (1,11,13,23,24,31,32,35,38,43,48,52);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=508 and CHKID in (3,10,43);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=508 and KODF in ('D4');
+--==============================================================================
+--********** 64 - Сміщенко Світлана Віталіївна **********
+-- CINP - АРМ Цінні папери
+-- OTCN - АРМ_16 Звітність НБУ
+-- REGB - АРМ_23 Регистрация клиентов и счетов (БАНКИ)
+-- REGU - АРМ_23 Регистрация клиентов и счетов (ЮЛ)
+-- 1PN2 - АРМ_33 Операціоніст з процентами
+-- ADCP - АРМ_ДЦП
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- RAB1 - Дикари + Дебет Информационный
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=64 and codeapp in ('CINP','OTCN','REGB','REGU','1PN2','ADCP','PRIN','SBOP','RAB1');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=64 and TT in ('003','007','014','028','096','114','404','408','504','PO1','PO3','SW0','SW4','Z08','Z14');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=1
+-- where idu=64 and IDG in (11,21,51);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=64 and IDG in (6,33);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=64 and IDG in (7,8,9,10,12,13,23,24,25,27,28,29,31,32,38,41,43,44,45,46,48);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=64 and CHKID in (3,14,35);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=64 and KODF in ('07','20','84','E1');
+--==============================================================================
+--********** 101 - Смолік Сергій Миколайович **********
+-- IADM - АРМ Адміністратора corp2
+-- BCLI - АРМ_02k Технолог Клиент-Банк
+-- TEST - АРМ_06 Операціоніст
+-- 1UHS - АРМ_Отчеты
+-- OBPC - Интерфейс с процессинговым центром
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=101 and codeapp in ('IADM','BCLI','TEST','1UHS','OBPC');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=101 and TT in ('003');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=101 and IDG in (22,24,38);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=101 and CHKID in (3);
+--==============================================================================
+--********** 173 - Соболєва Катерина Юріївна **********
+-- AMEN - АРМ_47 Менеджер
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=173 and codeapp in ('AMEN','PRIN','SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=173 and IDG in (6,9,10,11,12,13,35,38,50);
+--==============================================================================
+--********** 335 - Соболь Олексій Вікторович **********
+--==============================================================================
+--********** 320 - Солошенко Олексій Віталійович **********
+-- FMON - АРМ Уповноваженої особи ФМ
+-- AUDT - АРМ_75 Аудит
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=320 and codeapp in ('FMON','AUDT','PRIN','SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=320 and IDG in (1,3,4,5,6,8,9,10,11,12,13,15,18,19,21,22,23,24,25,31,32,34,35,38,43,44,45,48,50,51);
+--==============================================================================
+--********** 198 - Софіщенко Світлана Олександрівна **********
+-- BUDG - АРМ_Бюджет (расширен.)
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=198 and codeapp in ('BUDG','PRIN','SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=198 and IDG in (7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,23,24,25,26,27,28,29,30,32,36,37,38,39,44,46,50);
+--==============================================================================
+--********** 114 - Стешенко Алексей Андреевич **********
+-- MAIN - АРМ_01 Адміністратор АБС
+-- BCLI - АРМ_02k Технолог Клиент-Банк
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=114 and codeapp in ('MAIN','BCLI','PRIN','SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=114 and IDG in (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48);
+--==============================================================================
+--********** 735 - Строганов Віталій Юрійович **********
+--==============================================================================
+--********** 549 - Сушкевич Алла Володимирівна **********
+-- OTCN - АРМ_16 Звітність НБУ
+-- 1PN2 - АРМ_33 Операціоніст з процентами
+-- PBPB - АРМ_43 1_ПБ
+-- VKLD - АРМ_56 Вклады населения
+-- CASH - АРМ_Підкріплення готівкової валюти
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- RAB1 - Дикари + Дебет Информационный
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=549 and codeapp in ('OTCN','1PN2','PBPB','VKLD','CASH','PRIN','SBOP','RAB1');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=549 and TT in ('007','008','009','011','012','018','019','027','037','058','059','062','073','114','304','305','306','307','309','315','444','A03','A04','A05','A07','A0A','A16','A17','A18','A19','AA1','AA2','C02','C05','C10','C11','C12','CVB','CVO','CVS','D06','D07','D10','D16','D17','F06','F07','F08','F13','F97','F99','I10','J30','J31','J70','J71','J72','SW0','SW3');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=1
+-- where idu=549 and IDG in (21);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=549 and IDG in (33,40,50);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=549 and IDG in (1,9,12,13,18,22,23,24,26,27,29,31,32,34,35,38,43,45,48);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=549 and CHKID in (3);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=549 and KODF in ('39','73','C6','C9','E2','F1');
+--==============================================================================
+--********** 339 - Татьяненко Лариса Валеріївна **********
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=339 and IDG in (24);
+--==============================================================================
+--********** 267 - Терещенко Людмила Олексіївна **********
+-- KRE4 - АРМ Кредитний портфель ЮО (КРЕДИТЧИК)
+-- KREU - АРМ_15 % Кредити
+-- PERE - АРМ_26 Перегляд спецпараметрів рахунків (НБУ та ОБУ)
+-- 1AS2 - АРМ_72 Кредитне управління
+-- OVR  - АРМ_Комерційні овердрафти юридичних осіб
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- REZE - АРМ_Резервный фонд
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=267 and codeapp in ('KRE4','KREU','PERE','1AS2','OVR ','PRIN','SBOP','REZE');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=267 and IDG in (14,15,19,21,23,25,27,31,38,43,44,46,47,50);
+--==============================================================================
+--********** 186 - Терещенко Надія Олексіївна **********
+-- OTCN - АРМ_16 Звітність НБУ
+-- 1ASA - АРМ_20 Грошовий обіг
+-- VNOT - АРМ_38 Звітність ОБ
+-- 1GU1 - АРМ_74 Начальник відділу
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=186 and codeapp in ('OTCN','1ASA','VNOT','1GU1','SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=186 and IDG in (1,2,3,4,5,13,34,35);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=186 and KODF in ('12','12','13','94');
+--==============================================================================
+--********** 289 - Терещенко Тетяна Вікторівна **********
+-- ANKL - АРМ Аналіз клієнтів
+-- BUDG - АРМ_Бюджет (расширен.)
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=289 and codeapp in ('ANKL','BUDG','PRIN','SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=289 and IDG in (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,44,46,50);
+--==============================================================================
+--********** 334 - Тимко Вадим Іванович **********
+--==============================================================================
+--********** 88 - Тимофєєва Валентина Іванівна **********
+-- KRE4 - АРМ Кредитний портфель ЮО (КРЕДИТЧИК)
+-- KREU - АРМ_15 % Кредити
+-- PERE - АРМ_26 Перегляд спецпараметрів рахунків (НБУ та ОБУ)
+-- 1AS2 - АРМ_72 Кредитне управління
+-- OVR  - АРМ_Комерційні овердрафти юридичних осіб
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- BORG - АРМ_Реєстр боржників (Всі)
+-- REZE - АРМ_Резервный фонд
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=88 and codeapp in ('KRE4','KREU','PERE','1AS2','OVR ','PRIN','SBOP','BORG','REZE');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=88 and IDG in (9,11,13,14,15,18,19,21,23,25,27,28,31,38,40,41,43,44,46,47,50);
+--==============================================================================
+--********** 183 - Ткачук Ігор Степанович **********
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=183 and codeapp in ('SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=183 and IDG in (20,21,31,33,34,35);
+--==============================================================================
+--********** 139 - Товстоп'ят Віктор Миколайович **********
+--==============================================================================
+--********** 199 - Топчій Ольга Іванівна **********
+-- UPRA - АРМ_07 СЕП. Управління коррахунком
+-- ATIM - АРМ_72 Позиционер
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=199 and codeapp in ('UPRA','ATIM');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=199 and IDG in (1,2,3,4,5,6,8,9,10,11,12,13,14,15,19,20,21,23,24,25,27,28,29,30,31,32,33,34,35,37,38,50);
+--==============================================================================
+--********** 343 - Туркулець Любов Іванівна **********
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=343 and codeapp in ('PRIN','SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=343 and IDG in (1,9,10,32,38,50);
+--==============================================================================
+--********** 184 - Тютюннікова Лілія Олександрівна **********
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=184 and codeapp in ('PRIN','SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=184 and IDG in (2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,18,19,20,21,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,56,57);
+--==============================================================================
+--********** 309 - Уруймагова Олена Юріївна **********
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=309 and codeapp in ('SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=309 and IDG in (20,21,24,31,33,34,35,38,50);
+--==============================================================================
+--********** 155 - Фіалкович Олена Анатоліївна **********
+-- CINP - АРМ Цінні папери
+-- OTCN - АРМ_16 Звітність НБУ
+-- VIZA - АРМ_22 Візування операцій
+-- REGB - АРМ_23 Регистрация клиентов и счетов (БАНКИ)
+-- REGU - АРМ_23 Регистрация клиентов и счетов (ЮЛ)
+-- 1PN2 - АРМ_33 Операціоніст з процентами
+-- ADCP - АРМ_ДЦП
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- RAB1 - Дикари + Дебет Информационный
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=155 and codeapp in ('CINP','OTCN','VIZA','REGB','REGU','1PN2','ADCP','PRIN','SBOP','RAB1');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=155 and TT in ('003','007','014','028','096','114','404','408','504','PO1','PO3','SW0','SW4','Z08','Z14');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=1
+-- where idu=155 and IDG in (11,51);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=3
+-- where idu=155 and IDG in (21);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=155 and IDG in (6,33);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=155 and IDG in (7,8,9,10,12,13,23,24,25,27,28,29,30,31,32,38,41,43,44,45,46,48);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=155 and CHKID in (3,14,35);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=155 and KODF in ('07','20','84','E1');
+--==============================================================================
+--********** 501 - Фількіна Тамара Григорівна **********
+-- SWF3 - SWIFT. АБС -> Swift Alliance
+-- KMPS - АРМ Компенсація заощаджень
+-- VALO - АРМ_10 Валютні операції
+-- SWF1 - АРМ_11 Обработка сообщений SWIFT (полная)
+-- OTCN - АРМ_16 Звітність НБУ
+-- RM11 - АРМ_18 Реєстр рахунків в ПО
+-- VIZA - АРМ_22 Візування операцій
+-- REGB - АРМ_23 Регистрация клиентов и счетов (БАНКИ)
+-- 1PN2 - АРМ_33 Операціоніст з процентами
+-- PBPB - АРМ_43 1_ПБ
+-- 1GU1 - АРМ_74 Начальник відділу
+-- NALO - АРМ_99 Податковий облік (виконавці)
+-- PERD - АРМ_Звітність НБУ (2)
+-- REG2 - АРМ_Перегляд блокованих платежів
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- RAB1 - Дикари + Дебет Информационный
+-- MVPS - МВПС. Управление платежами
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=501 and codeapp in ('SWF3','KMPS','VALO','SWF1','OTCN','RM11','VIZA','REGB','1PN2','PBPB','1GU1','NALO','PERD','REG2','PRIN','SBOP','RAB1','MVPS');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=501 and TT in ('003','007','014','030','039','096','114','424','454','C00','C02','C06','C10','C11','C12','C14','CLI','CVB','CVO','CVS','D06','D07','D90','D91','F12','F13','F99','L07','PO1','PO3','SWD','SWK');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=3
+-- where idu=501 and IDG in (18);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=501 and IDG in (33,40,50);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=501 and IDG in (6,9,10,11,12,13,21,23,24,29,31,32,35,38,41,44,45,48,52);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=501 and CHKID in (3,7,10,11,35,43);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=501 and KODF in ('26','C9','D6','E2','S6','S7');
+--==============================================================================
+--********** 24 - Фоміна Ніна Миколаївна **********
+-- CINP - АРМ Цінні папери
+-- OTCN - АРМ_16 Звітність НБУ
+-- VIZA - АРМ_22 Візування операцій
+-- REGB - АРМ_23 Регистрация клиентов и счетов (БАНКИ)
+-- REGU - АРМ_23 Регистрация клиентов и счетов (ЮЛ)
+-- 1PN2 - АРМ_33 Операціоніст з процентами
+-- NALU - АРМ_49 Податковий облік
+-- NALS - АРМ_87 Податковий облiк ОБ
+-- NALO - АРМ_99 Податковий облік (виконавці)
+-- ADCP - АРМ_ДЦП
+-- VERI - АРМ_Підкріплення коррахунку
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- RAB1 - Дикари + Дебет Информационный
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=24 and codeapp in ('CINP','OTCN','VIZA','REGB','REGU','1PN2','NALU','NALS','NALO','ADCP','VERI','PRIN','SBOP','RAB1');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=24 and TT in ('003','007','014','028','097','114','402','404','408','504','C04','C12','D06','D07','F10','F11','F13','F14','F18','PO1','PO3','SW0','SW4','Z08','Z14','ZG8');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=1
+-- where idu=24 and IDG in (11);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=24 and IDG in (6,50);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=5
+-- where idu=24 and IDG in (14,20,29,30,34,51);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=24 and IDG in (7,8,9,10,12,13,19,21,23,24,25,27,28,31,32,33,37,38,40,41,43,44,45,46,48);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=24 and CHKID in (3,14,15,16,35);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=24 and KODF in ('07','20','84','E1');
+--==============================================================================
+--********** 6 - Фурман Віра Миколаївна **********
+-- CINP - АРМ Цінні папери
+-- TEST - АРМ_06 Операціоніст
+-- VIZA - АРМ_22 Візування операцій
+-- REGB - АРМ_23 Регистрация клиентов и счетов (БАНКИ)
+-- REGU - АРМ_23 Регистрация клиентов и счетов (ЮЛ)
+-- 1PN2 - АРМ_33 Операціоніст з процентами
+-- NALU - АРМ_49 Податковий облік
+-- NALO - АРМ_99 Податковий облік (виконавці)
+-- SBUP - АРМ_BACK-операций
+-- MBDK - АРМ_Казначейство (МБДК+FOREX)
+-- SEP  - АРМ_Картотека запросов
+-- VERI - АРМ_Підкріплення коррахунку
+-- REG2 - АРМ_Перегляд блокованих платежів
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- RAB1 - Дикари + Дебет Информационный
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=6 and codeapp in ('CINP','TEST','VIZA','REGB','REGU','1PN2','NALU','NALO','SBUP','MBDK','SEP ','VERI','REG2','PRIN','SBOP','RAB1');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=6 and TT in ('001','003','007','012','014','084','096','114','201','205','208','210','217','218','220','233','234','402','404','514','C04','C09','C10','C11','C12','D06','D07','F10','F18','I10','PO1','PO3');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=6 and IDG in (6,9,33,40,50);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=6 and IDG in (7,8,10,12,13,23,24,25,29,31,32,34,35,38,41,45,46,47,48,100);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=6 and CHKID in (3,14,15,16,18,35);
+--==============================================================================
+--********** 35 - Хайнацька Галина В'ячеславівна **********
+-- TEST - АРМ_06 Операціоніст
+-- VIZA - АРМ_22 Візування операцій
+-- REGG - АРМ_23 Регистрация клиентов и счетов (ГОУ и ОУ)
+-- VNOT - АРМ_38 Звітність ОБ
+-- NALU - АРМ_49 Податковий облік
+-- NALS - АРМ_87 Податковий облiк ОБ
+-- NALO - АРМ_99 Податковий облік (виконавці)
+-- SEP  - АРМ_Картотека запросов
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=35 and codeapp in ('TEST','VIZA','REGG','VNOT','NALU','NALS','NALO','SEP ','SBOP');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=35 and TT in ('096','403','PO1','PO3');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=35 and IDG in (8,9,10,12,13,15,16,17,19,21,23,25,26,30,31,34,36,39,44,46,47,50,80);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=35 and IDG in (24,27,28,29,38,40,41);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=35 and CHKID in (3,34);
+--==============================================================================
+--********** 317 - Харлан Анастасія Андріївна **********
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=317 and IDG in (13,14,15,19,21,23,25,27,28,31,38,44,46,47,50);
+--==============================================================================
+--********** 237 - Цурпал Людмила Федорівна **********
+-- BIRV - АРМ Биржевые операции - валютный контроль
+-- EKPK - АРМ Економічні показники
+-- OTCN - АРМ_16 Звітність НБУ
+-- VIZA - АРМ_22 Візування операцій
+-- PBPB - АРМ_43 1_ПБ
+-- SPUP - АРМ_55 Експортно-імпортні операції
+-- SPTZ - АРМ_Валютная позиция
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=237 and codeapp in ('BIRV','EKPK','OTCN','VIZA','PBPB','SPUP','SPTZ','PRIN','SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=237 and IDG in (1,9,10,11,12,15,21,24,30,31);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=237 and CHKID in (37);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=237 and KODF in ('70');
+--==============================================================================
+--********** 37 - Черкас Мирослава Михайлівна **********
+-- OTCN - АРМ_16 Звітність НБУ
+-- DILI - АРМ_17 Клієнт-Банк
+-- RM11 - АРМ_18 Реєстр рахунків в ПО
+-- VIZA - АРМ_22 Візування операцій
+-- REGG - АРМ_23 Регистрация клиентов и счетов (ГОУ и ОУ)
+-- REGF - АРМ_23 Регистрация клиентов и счетов (ФЛ)
+-- REGU - АРМ_23 Регистрация клиентов и счетов (ЮЛ)
+-- 1PN2 - АРМ_33 Операціоніст з процентами
+-- NALO - АРМ_99 Податковий облік (виконавці)
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- OBPC - Интерфейс с процессинговым центром
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=37 and codeapp in ('OTCN','DILI','RM11','VIZA','REGG','REGF','REGU','1PN2','NALO','PRIN','SBOP','OBPC');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=37 and TT in ('001','003','007','012','014','018','022','028','051','096','114','139','308','309','339','415','444','AA1','AA2','BP1','BP2','BP4','C00','C09','C20','D03','D06','D07','F13','F16','F17','F98','F99','F9D','PKK','PKR','PKW','PO1','PO3');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=1
+-- where idu=37 and IDG in (26,51);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=37 and IDG in (33,40,50);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=5
+-- where idu=37 and IDG in (21);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=6
+-- where idu=37 and IDG in (30);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=37 and IDG in (1,2,9,12,13,16,17,18,22,24,28,29,31,32,34,35,38,41,43,44,45,48,55);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=37 and CHKID in (3,6,9,12,35,42);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=37 and KODF in ('C9','D8');
+--==============================================================================
+--********** 176 - Чернишенко Оксана Олександрівна **********
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=176 and codeapp in ('PRIN','SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=176 and IDG in (20,21,31,33,34,35);
+--==============================================================================
+--********** 310 - Чернова Анна Сергіївна **********
+--==============================================================================
+--********** 217 - Чернявська Олена Вікторівна **********
+-- VALO - АРМ_10 Валютні операції
+-- REGK - АРМ_24 Параметри рахунків
+-- 1PN2 - АРМ_33 Операціоніст з процентами
+-- NAL4 - АРМ_492 Податковий облік (виконавці)
+-- ATIM - АРМ_72 Позиционер
+-- SWKZ - АРМ_SWIFT_Казначейство
+-- PERD - АРМ_Звітність НБУ (2)
+-- MBDK - АРМ_Казначейство (МБДК+FOREX)
+-- REG2 - АРМ_Перегляд блокованих платежів
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- BOR1 - АРМ_Реєстр боржників (Банки)
+-- RAB1 - Дикари + Дебет Информационный
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=217 and codeapp in ('VALO','REGK','1PN2','NAL4','ATIM','SWKZ','PERD','MBDK','REG2','PRIN','SBOP','BOR1','RAB1');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=217 and TT in ('003','004','007','201','205','402','404','D06','D07','F01','F02','F10','F13','V07','V17');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=217 and IDG in (6,24,50);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=5
+-- where idu=217 and IDG in (11);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=217 and IDG in (7,9,10,12,13,31,32,38,44,45,46,47,48,100);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=217 and CHKID in (3);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=217 and KODF in ('2A','39','E0','E2','S6');
+--==============================================================================
+--********** 744 - Чиста Світлана Валентинівна **********
+--==============================================================================
+--********** 554 - Шарій Людмила Олександрівна **********
+-- UPRA - АРМ_07 СЕП. Управління коррахунком
+-- 1AS1 - АРМ_71 Казначейство
+-- ATIM - АРМ_72 Позиционер
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=554 and codeapp in ('UPRA','1AS1','ATIM','PRIN','SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=554 and IDG in (6,7,8,9,10,11,12,13,14,15,19,20,21,23,24,25,29,31,32,33,34,35,38,39,49,50);
+--==============================================================================
+--********** 560 - Шафран Наталія Ігорівна **********
+-- KMPS - АРМ Компенсація заощаджень
+-- TEST - АРМ_06 Операціоніст
+-- VALO - АРМ_10 Валютні операції
+-- SWF1 - АРМ_11 Обработка сообщений SWIFT (полная)
+-- OTCN - АРМ_16 Звітність НБУ
+-- RM11 - АРМ_18 Реєстр рахунків в ПО
+-- VIZA - АРМ_22 Візування операцій
+-- REGB - АРМ_23 Регистрация клиентов и счетов (БАНКИ)
+-- PBPB - АРМ_43 1_ПБ
+-- NALO - АРМ_99 Податковий облік (виконавці)
+-- REG2 - АРМ_Перегляд блокованих платежів
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- RAB1 - Дикари + Дебет Информационный
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=560 and codeapp in ('KMPS','TEST','VALO','SWF1','OTCN','RM11','VIZA','REGB','PBPB','NALO','REG2','PRIN','SBOP','RAB1');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=560 and TT in ('003','007','014','030','096','114','424','454','C06','C10','C11','C12','C14','CLI','D06','D07','D90','D91','F12','F13');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=3
+-- where idu=560 and IDG in (18);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=560 and IDG in (33,40,50);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=560 and IDG in (6,9,10,11,12,13,21,23,24,29,31,32,35,38,41,44,45,48,52);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=560 and CHKID in (3,7,10,11,35,43);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=560 and KODF in ('26','C9','E2','S6','S7');
+--==============================================================================
+--********** 188 - Шершень Вікторія Миколаївна **********
+--==============================================================================
+--********** 172 - Шинкаренко Аннета Вікторівна **********
+-- EKPK - АРМ Економічні показники
+-- 1AS1 - АРМ_71 Казначейство
+-- NUPR - АРМ_73 МБДК+FOREX
+-- AUDI - АРМ_Аудитор-Аналітик
+-- 1UHS - АРМ_Отчеты
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=172 and codeapp in ('EKPK','1AS1','NUPR','AUDI','1UHS','SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=172 and IDG in (2,4,5,6,7,8,9,10,11,12,13,14,15,16,18,19,20,21,22,23,24,25,28,30,32,33,34,35,37,38,44,45,46,47,48,50);
+--==============================================================================
+--********** 210 - Широкова Ірина Миколаївна **********
+-- TEST - АРМ_06 Операціоніст
+-- VALO - АРМ_10 Валютні операції
+-- OTCN - АРМ_16 Звітність НБУ
+-- VIZA - АРМ_22 Візування операцій
+-- REGB - АРМ_23 Регистрация клиентов и счетов (БАНКИ)
+-- REGU - АРМ_23 Регистрация клиентов и счетов (ЮЛ)
+-- ATIM - АРМ_72 Позиционер
+-- SWKZ - АРМ_SWIFT_Казначейство
+-- MBDK - АРМ_Казначейство (МБДК+FOREX)
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- BOR1 - АРМ_Реєстр боржників (Банки)
+-- RAB1 - Дикари + Дебет Информационный
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=210 and codeapp in ('TEST','VALO','OTCN','VIZA','REGB','REGU','ATIM','SWKZ','MBDK','PRIN','SBOP','BOR1','RAB1');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=210 and TT in ('003','004','007','014','022','028','096','201','205','208','210','217','218','220','221','402','404','D06','D07','F01','F02','F10','F11','F13','SW0','V07','V17','VP0');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=210 and IDG in (6,40,41,50);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=5
+-- where idu=210 and IDG in (11);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=210 and IDG in (7,9,10,12,13,19,24,29,31,32,38,44,45,46,47,48,100);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=210 and CHKID in (3,14,15,35);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=210 and KODF in ('2A','39','79','D5','D6','D8','E0','E2','E8','S6');
+--==============================================================================
+--********** 180 - Шлєпов Павло Євгенійович **********
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=180 and IDG in (14,15,19,21,24,25,32,38,44,46,47);
+--==============================================================================
+--********** 700 - Шпирка Лариса Володимирівна **********
+-- 1111 - Back Value
+-- KMPS - АРМ Компенсація заощаджень
+-- GLBU - АРМ_04 Головний Бухгалтер
+-- KREU - АРМ_15 % Кредити
+-- OTCN - АРМ_16 Звітність НБУ
+-- REGI - АРМ_23 Регистрация клиентов и счетов (общая)
+-- PPKK - АРМ_30 СЕП Розбір запитів та незясованих сум
+-- 1PN2 - АРМ_33 Операціоніст з процентами
+-- KOMU - АРМ_351 Комунальні платежі (керівник)
+-- VNOT - АРМ_38 Звітність ОБ
+-- NALU - АРМ_49 Податковий облік
+-- 1AS1 - АРМ_71 Казначейство
+-- NALO - АРМ_99 Податковий облік (виконавці)
+-- ENR  - АРМ_Взаиморасчеты по "Энергорынку"
+-- KRE3 - АРМ_КП ФИЗ. ЛИЦ банка (кред)
+-- 1UHS - АРМ_Отчеты
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=700 and codeapp in ('1111','KMPS','GLBU','KREU','OTCN','REGI','PPKK','1PN2','KOMU','VNOT','NALU','1AS1','NALO','ENR ','KRE3','1UHS','PRIN','SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=700 and IDG in (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,50,55,56);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=700 and CHKID in (1,2,3,4,5,6,7,8,9,10,11,14,15,16,20,35,40);
+--==============================================================================
+--********** 187 - Шумейко Наталія Віталіївна **********
+-- VALO - АРМ_10 Валютні операції
+-- OTCN - АРМ_16 Звітність НБУ
+-- REGK - АРМ_24 Параметри рахунків
+-- 1PN2 - АРМ_33 Операціоніст з процентами
+-- NAL4 - АРМ_492 Податковий облік (виконавці)
+-- ATIM - АРМ_72 Позиционер
+-- NUPR - АРМ_73 МБДК+FOREX
+-- SWKZ - АРМ_SWIFT_Казначейство
+-- MBDK - АРМ_Казначейство (МБДК+FOREX)
+-- REG2 - АРМ_Перегляд блокованих платежів
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- BOR1 - АРМ_Реєстр боржників (Банки)
+-- RAB1 - Дикари + Дебет Информационный
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=187 and codeapp in ('VALO','OTCN','REGK','1PN2','NAL4','ATIM','NUPR','SWKZ','MBDK','REG2','PRIN','SBOP','BOR1','RAB1');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=187 and TT in ('003','004','014','022','028','096','201','205','402','404','D06','D07','F01','F02','F10','F13','FX9','SW0','V07','V17','VP0');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=1
+-- where idu=187 and IDG in (29);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=187 and IDG in (6,24,50);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=5
+-- where idu=187 and IDG in (11);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=187 and IDG in (7,9,10,12,13,25,31,32,38,43,44,45,46,47,48,100);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=187 and CHKID in (3);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=187 and KODF in ('2A','39','C9','E0','E2','E8','S6');
+--==============================================================================
+--********** 78 - Юрковська Ольга Володимирівна **********
+-- RKOO - АРМ "Плата за РКО"
+-- BIRG - АРМ Биржевые операции - ГОУ
+-- OTCN - АРМ_16 Звітність НБУ
+-- DILI - АРМ_17 Клієнт-Банк
+-- VIZA - АРМ_22 Візування операцій
+-- 1PN2 - АРМ_33 Операціоніст з процентами
+-- 1ASC - АРМ_34 Каса
+-- KOMM - АРМ_35 Комунальні платежі
+-- VNOT - АРМ_38 Звітність ОБ
+-- ZAPR - АРМ_60 Обработка  информационных запросов
+-- NALO - АРМ_99 Податковий облік (виконавці)
+-- OVR  - АРМ_Комерційні овердрафти юридичних осіб
+-- REG2 - АРМ_Перегляд блокованих платежів
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- RAB1 - Дикари + Дебет Информационный
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=78 and codeapp in ('RKOO','BIRG','OTCN','DILI','VIZA','1PN2','1ASC','KOMM','VNOT','ZAPR','NALO','OVR ','REG2','PRIN','SBOP','RAB1');
+-- update STAFF_TTS set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=78 and TT in ('001','002','003','007','012','014','018','022','028','076','096','114','185','186','187','308','309','314','328','338','339','434','464','474','484','494','BPK','C00','C02','C09','CVB','CVO','CVS','D06','F13','NE3','PKR','PO1','PO3');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=1
+-- where idu=78 and IDG in (11,25);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=78 and IDG in (40,50);
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=7
+-- where idu=78 and IDG in (1,2,13,15,18,19,20,21,22,23,24,27,28,29,30,31,32,38,41,43,44,46,47,48,51);
+-- update STAFF_CHK set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=78 and CHKID in (3,5,12,36,42,63);
+-- update STAFF_KLF00 set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=78 and KODF in ('12','12','13','94');
+--==============================================================================
+--********** 196 - Юрченко Оксана Володимирівна **********
+-- UPRA - АРМ_07 СЕП. Управління коррахунком
+-- 1AS1 - АРМ_71 Казначейство
+-- ATIM - АРМ_72 Позиционер
+-- NUPR - АРМ_73 МБДК+FOREX
+-- PRIN - АРМ_Печать отчетов (валюта)
+-- SBOP - АРМ_Печать отчетов (гривна)
+-- update APPLIST_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011'
+-- where id=196 and codeapp in ('UPRA','1AS1','ATIM','NUPR','PRIN','SBOP');
+-- update GROUPS_STAFF set adate1='01-JAN-2011', adate2='31-DEC-2011', secg=4
+-- where idu=196 and IDG in (1,2,3,6,7,8,9,10,11,12,13,15,20,21,24,25,31,32,33,34,35,43,44,45,48);
+--==============================================================================
+--********** 743 - Ясногор Лілія Ігорівна **********
+--==============================================================================
+END;
+/
+show err;
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/SET_USERS_NEWRIGHTS.sql =========*
+PROMPT ===================================================================================== 

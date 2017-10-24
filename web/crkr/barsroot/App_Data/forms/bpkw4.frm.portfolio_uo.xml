@@ -1,0 +1,155 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xmlform captiontype="OnlyTitle" caption="Дата видачі карти">
+  <grids>
+    <grid table="W4_DEAL_WEB_UO" id="gv" pagesize="10" showpagesizebox="true" title="Way4. Портфель БПК ЮО" showfilter="true">
+      <filters caption="Пошук угоди" buttontext="Знайти" columnscount="3" width ="100%">
+        <filter field="nd" caption="Номер угоди" columnindex="1" condition="Equal" id="fltrnd" >
+          <uicontrol></uicontrol>
+        </filter>
+        <filter field="acc_nls" caption="Картковий рахунок" columnindex="2" condition="Equal" id="fltrnls" >
+          <uicontrol></uicontrol>
+        </filter>
+        <filter field="cust_name" caption="ПІБ (назва) клієнта" columnindex="3" condition="LikeBoth" id="fltrnmk">
+          <uicontrol controlwidth="300"></uicontrol>
+        </filter>
+      </filters>
+     
+      <rowselection method="SingleRow" />
+     
+      <fields>
+        <field name="PRODUCT_CODE" key="true" datatype="String">
+          <column show="false" caption="PRODUCT_CODE" align="Left" />
+          <form show="false" rwmode="RW" required="false">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="DOC_ID" key="true" datatype="String">
+          <column show="false" caption="DOC_ID" align="Left" />
+          <form show="false" rwmode="RW" required="false">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="ND" key="true" datatype="Int64" sort="Desc">
+          <column show="true" caption="Номер договору" align="right" />
+          <form show="true" rwmode="RW" required="true">
+            <uicontrol type="Text" readonly="true" controlwidth="150" />
+          </form>
+        </field>
+        <field name="BRANCH" key="true" datatype="String" sort="default">
+          <column show="true" caption="Відділення" align="left" />
+          <form show="false" rwmode="RW" required="false">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="ACC_ACC" key="true" datatype="Decimal" sort="default">
+          <column show="false" caption="ACC" align="right" />
+          <form show="false" rwmode="RW" required="false">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="ACC_NLS" key="true" datatype="String" sort="default">
+          <column show="true" caption="Картковий рахунок" align="left" />
+          <form show="true" rwmode="RW" required="true">
+            <uicontrol type="Text" readonly="true" controlwidth="150" />
+          </form>
+        </field>
+        <field name="ACC_KV" key="true" datatype="Int64" sort="default">
+          <column show="false" caption="KV" align="right" />
+          <form show="false" rwmode="RW" required="false">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="ACC_LCV" key="false" datatype="String" sort="default">
+          <column show="true" caption="Вал." align="left" />
+          <form show="false" rwmode="RW" required="false">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="ACC_OB22" key="true" datatype="String" sort="default">
+          <column show="true" caption="ОБ22" align="left" />
+          <form show="false" rwmode="RW" required="false">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="ACC_TIP" key="false" datatype="String" sort="default">
+          <column show="false" caption="Tip" align="left" />
+          <form show="false" rwmode="RW" required="false">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="ACC_TIPNAME" key="false" datatype="String" sort="default">
+          <column show="true" caption="Субпродукт" align="left" />
+          <form show="false" rwmode="RW" required="false">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="CARD_CODE" key="false" datatype="String" sort="default">
+          <column show="true" caption="Тип картки" align="left" />
+          <form show="false" rwmode="RW" required="false">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="CARD_IDAT" key="false" datatype="DateTime" sort="default">
+          <column show="true" caption="Дата видачі карти" align="center" />
+          <form show="false" rwmode="RW" required="false">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="CARD_IDAT2" key="false" datatype="DateTime" sort="default">
+          <column show="false" caption="CARD_IDAT2" align="center" />
+          <form show="false" rwmode="RW" required="false">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="CARD_IDAT_BANKDATE" key="false" datatype="DateTime" sort="default">
+          <column show="false" caption="Дата видачі карти" align="center" />
+          <form show="true" rwmode="RW" required="true">
+            <uicontrol type="Text" controlwidth="159" />
+          </form>
+        </field>
+        <field name="ACC_OST" key="false" datatype="Decimal" sort="default">
+          <column show="true" caption="Залишок" align="right" />
+          <form show="false" rwmode="RW" required="false">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="CUST_RNK" key="true" datatype="Int64" sort="default">
+          <column show="true" caption="РНК" align="right" />
+          <form show="false" rwmode="RW" required="false">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="CUST_OKPO" key="true" datatype="String" sort="default">
+          <column show="true" caption="ЗКПО" align="left" />
+          <form show="false" rwmode="RW" required="false">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="CUST_NAME" key="true" datatype="String" sort="default">
+          <column show="true" caption="ПІБ (назва) клієнта" align="left" />
+          <form show="false" rwmode="RW" required="false">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="CUST_TYPE" key="false" datatype="Int64" sort="default">
+          <column show="false" caption="Custtype" align="right" />
+          <form show="false" rwmode="RW" required="false">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="ACC_DAOS" key="false" datatype="DateTime" sort="default">
+          <column show="true" caption="Дата відкриття" align="center" />
+          <form show="false" rwmode="RW" required="false">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="ACC_DAZS" key="false" datatype="DateTime" sort="default">
+          <column show="true" caption="Дата закриття" align="center" />
+          <form show="false" rwmode="RW" required="false">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+      </fields>
+    </grid>
+  </grids>
+</xmlform>

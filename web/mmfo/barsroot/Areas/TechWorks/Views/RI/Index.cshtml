@@ -1,0 +1,44 @@
+﻿<h1>Прийом XML файлів реєстру інсайдерів</h1>
+<div class="form-group" style="">
+
+    @using (Html.BeginForm("RecieveInsidersRegFile", "RI", FormMethod.Post, new { enctype = "multipart/form-data"}))
+    {
+        <div class="col-xs-6 col-sm-6 col-md-6">
+            <label class="control-label">Оберіть файл:</label>
+            <input type="file" name="upload" /><br>
+            <input type="submit" value="Завантажити" style="margin-bottom:20px"/>
+            @if (ViewBag.UploadResult != null)
+            {
+                <div class="alert alert-info" role="alert">
+                    <b>Результат виконання: </b>
+                    @ViewBag.Message
+                </div>
+            }
+            <script>
+                $(document).on('submit', 'form', function (event) {
+                    if (confirm('Виконати прийом файлу ' + $(this).find('input[type="file"]').val() + '?')) {
+                        var button = $(this).find('input[type="submit"]');
+                        setTimeout(function () {
+                            button.attr('disabled', 'disabled');
+                        }, 0);
+                    }
+                    else {
+                        event.preventDefault();
+                    }
+                });
+                function getUrl(urlPart)
+                {
+                    return bars.config.urlContent(urlPart);
+                }
+            </script>
+            @if (ViewBag.Result != null)
+            {                              
+                <p>@ViewBag.Result</p>
+                if (@ViewBag.FileName != null)
+                {
+                    <p>Завантажити файл-квитанцію:  @Html.ActionLink((string)@ViewBag.FileName, "GetReceiptFile", new { fileName = @ViewBag.FileName })</p>
+                }
+            }
+        </div>
+    }
+</div>

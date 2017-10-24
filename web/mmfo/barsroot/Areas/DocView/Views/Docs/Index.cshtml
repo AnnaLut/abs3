@@ -1,0 +1,60 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = "Перегляд документів користувача";
+}
+
+
+<script src="~/Areas/docview/Scripts/Docs/DocsCtrl.js?v1.0"></script>
+<script src="~/Scripts/placeholders.min.js"></script>
+<link href="~/Areas/docview/Css/Docs/DocsStyle.css" rel="stylesheet" />
+
+
+<script>
+    var urlToSearchRef = '@Url.Action("Item")';
+    var urlBackWeb = '@Url.Action("Storno")';
+</script>
+
+<div class="container-fluid">
+    <!--<h1>Виконання повернення операцій</h1>-->
+    <div class="row">
+        <div class="form-group">
+            <div class="col-lg-1 control-label">
+                <h3>Значення REF:</h3>
+            </div>
+            <div class="col-lg-6" id="col1">
+                <div class="input-group">
+                    <input id="searchInput" type="text" class="form-control" maxlength="38" placeholder="Значення REF...">
+                    <span class="input-group-btn">
+                        <button id="btnSearch" class="btn btn-default" type="button"><span class="k-sprite pf-icon pf-16 pf-find"></span></button>
+                    </span>
+                </div>
+                <div id="run">
+                    <span class="input-group-btn">
+                        <button id="btnBack" class="btn btn-default" type="button">BACK</button>
+                    </span>
+                </div>
+            </div>
+
+            <div class="col-lg-6" id="col2">
+                <div id="docInfoSection">
+                    <div id="loader" class="container">
+                        <button class="btn btn-lg btn-warning"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Пошук...</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script id="confirmationTemplate" type="text/x-kendo-template">
+    <div class="popupMessage">
+        <label class="category-label" for="grp">Причина:</label>
+        <input type="search" id="ConfirmReason" style="width: 330px" />
+    </div>
+    <hr />
+    <div class="dialog_buttons" style="float:right;">
+        <input type="button" class="confirm_yes k-button" value="Yes" style="width: 80px" />
+        &nbsp;
+        <input type="button" class="confirm_no k-button" value="No" style="width: 80px" />
+    </div>
+</script>

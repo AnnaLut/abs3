@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="08/23/2016 11:57:47" ReportInfo.Modified="09/06/2016 12:50:55" ReportInfo.CreatorVersion="2014.1.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="cobusup_abs_sup" ConnectionString="rijcmlq8+HCsj5mnfc2oQWOJAI1rOWOGv68sBpiXMxVx5dIqE4nOwox1a6zb8OjZvhDAnVmq5jjoccXiwbZ/NzLWmQ8UA==">
+      <TableDataSource Name="Table" Alias="vw_escr_errors" DataType="System.Int32" Enabled="true" SelectCommand="select * from vw_escr_errors">
+        <Column Name="DEAL_NUMB" DataType="System.Decimal"/>
+        <Column Name="TAG_VALUE" DataType="System.String"/>
+        <Column Name="TAG_NAME" DataType="System.String"/>
+        <Column Name="MFO" DataType="System.String"/>
+        <Column Name="CUSTOMER_ID" DataType="System.Decimal"/>
+        <Column Name="BRANCH" DataType="System.String"/>
+        <Column Name="ERR_TYPE" DataType="System.String"/>
+      </TableDataSource>
+    </OracleDataConnection>
+  </Dictionary>
+  <ReportPage Name="Page1" Guides="132.3">
+    <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="37.8">
+      <TextObject Name="Text8" Left="37.8" Top="9.45" Width="633.15" Height="18.9" Text="Перелік КД, які не включені до портфелю енергозберігіючих кредитів РУ, через наявні помилки"/>
+    </ReportTitleBand>
+    <PageHeaderBand Name="PageHeader1" Top="40.24" Width="718.2" Height="37.8">
+      <RichObject Name="Rich1" Width="113.4" Height="37.8" Border.Lines="All" Text="{\rtf1\ansi\ansicpg1251\deff0\nouicompat\deflang1058{\fonttbl{\f0\fnil\fcharset204{\*\fname Arial;}Arial CYR;}{\f1\fnil\fcharset204 Tahoma;}}&#13;&#10;{\*\generator Riched20 6.3.9600}\viewkind4\uc1 &#13;&#10;\pard\qc\f0\fs20\'cd\'ee\'ec\'e5\'f0 \'ca\'c4\f1\fs17\par&#13;&#10;}&#13;&#10;"/>
+      <RichObject Name="Rich2" Left="113.4" Width="94.5" Height="37.8" Border.Lines="All" Text="{\rtf1\ansi\ansicpg1251\deff0\nouicompat\deflang1058{\fonttbl{\f0\fnil\fcharset204{\*\fname Arial;}Arial CYR;}{\f1\fnil\fcharset204 Tahoma;}}&#13;&#10;{\*\generator Riched20 6.3.9600}\viewkind4\uc1 &#13;&#10;\pard\qc\f0\fs20\'c7\'ed\'e0\'f7\'e5\'ed\'ed\'ff \'e4\'ee\'ef\'e0\'f0\'e0\'ec\'e5\'f2\'f0\'f3\f1\fs17\par&#13;&#10;}&#13;&#10;"/>
+      <RichObject Name="Rich3" Left="207.9" Width="132.3" Height="37.8" Border.Lines="All" Text="{\rtf1\ansi\ansicpg1251\deff0\nouicompat\deflang1058{\fonttbl{\f0\fnil\fcharset204{\*\fname Arial;}Arial CYR;}{\f1\fnil\fcharset204 Tahoma;}}&#13;&#10;{\*\generator Riched20 6.3.9600}\viewkind4\uc1 &#13;&#10;\pard\qc\f0\fs20\'cd\'e0\'e7\'e2\'e0 \'e4\'ee\'ef\'ef\'e0\'f0\'e0\'ec\'e5\'f2\'f0\'f3\f1\fs17\par&#13;&#10;}&#13;&#10;"/>
+      <RichObject Name="Rich4" Left="340.2" Width="94.5" Height="37.8" Border.Lines="All" Text="{\rtf1\ansi\ansicpg1251\deff0\nouicompat\deflang1058{\fonttbl{\f0\fnil\fcharset204{\*\fname Arial;}Arial CYR;}{\f1\fnil\fcharset204 Tahoma;}}&#13;&#10;{\*\generator Riched20 6.3.9600}\viewkind4\uc1 &#13;&#10;\pard\qc\f0\fs20\'cc\'d4\'ce\f1\fs17\par&#13;&#10;}&#13;&#10;"/>
+      <RichObject Name="Rich5" Left="434.7" Width="94.5" Height="37.8" Border.Lines="All" Text="{\rtf1\ansi\ansicpg1251\deff0\nouicompat\deflang1058{\fonttbl{\f0\fnil\fcharset204{\*\fname Arial;}Arial CYR;}{\f1\fnil\fcharset204 Tahoma;}}&#13;&#10;{\*\generator Riched20 6.3.9600}\viewkind4\uc1 &#13;&#10;\pard\qc\f0\fs20\'d0\'cd\'ca \'ea\'eb\'b3\'ba\'ed\'f2\'e0\f1\fs17\par&#13;&#10;}&#13;&#10;"/>
+      <RichObject Name="Rich6" Left="529.2" Width="94.5" Height="37.8" Border.Lines="All" Text="{\rtf1\ansi\ansicpg1251\deff0\nouicompat\deflang1058{\fonttbl{\f0\fnil\fcharset204{\*\fname Arial;}Arial CYR;}{\f1\fnil\fcharset204 Tahoma;}}&#13;&#10;{\*\generator Riched20 6.3.9600}\viewkind4\uc1 &#13;&#10;\pard\qc\f0\fs20\'c1\'d0\'c0\'cd\'d7\f1\fs17\par&#13;&#10;}&#13;&#10;"/>
+      <RichObject Name="Rich7" Left="623.7" Width="94.5" Height="37.8" Border.Lines="All" Text="{\rtf1\ansi\ansicpg1251\deff0\nouicompat\deflang1058{\fonttbl{\f0\fnil\fcharset204{\*\fname Arial;}Arial CYR;}{\f1\fnil\fcharset204 Tahoma;}}&#13;&#10;{\*\generator Riched20 6.3.9600}\viewkind4\uc1 &#13;&#10;\pard\qc\f0\fs20\'d2\'e8\'ef \'ef\'ee\'ec\'e8\'eb\'ea\'e8\f1\fs17\par&#13;&#10;}&#13;&#10;"/>
+    </PageHeaderBand>
+    <DataBand Name="Data1" Top="80.48" Width="718.2" Height="18.9" DataSource="Table">
+      <TextObject Name="Text2" Width="113.4" Height="18.9" Border.Lines="All" Text="DEAL_NUMB"/>
+      <TextObject Name="Text1" Left="113.4" Width="94.5" Height="18.9" Border.Lines="All" Text="[vw_escr_errors.TAG_VALUE]"/>
+      <TextObject Name="Text3" Left="207.9" Width="132.3" Height="18.9" Border.Lines="All" Text="[vw_escr_errors.TAG_NAME]"/>
+      <TextObject Name="Text4" Left="340.2" Width="94.5" Height="18.9" Border.Lines="All" Text="[vw_escr_errors.MFO]"/>
+      <TextObject Name="Text5" Left="434.7" Width="94.5" Height="18.9" Border.Lines="All" Text="[vw_escr_errors.CUSTOMER_ID]" Format="Currency" Format.UseLocale="true" HorzAlign="Right" WordWrap="false" Trimming="EllipsisCharacter"/>
+      <TextObject Name="Text6" Left="529.2" Width="94.5" Height="18.9" Border.Lines="All" Text="[vw_escr_errors.BRANCH]"/>
+      <TextObject Name="Text7" Left="623.7" Width="94.5" Height="18.9" Border.Lines="All" Text="[vw_escr_errors.ERR_TYPE]"/>
+    </DataBand>
+    <PageFooterBand Name="PageFooter1" Top="101.82" Width="718.2"/>
+  </ReportPage>
+</Report>

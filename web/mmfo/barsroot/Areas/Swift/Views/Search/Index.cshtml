@@ -1,0 +1,54 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    //ViewBag.Title = "Way4Bpk";
+}
+
+<script src="~/lib/jsZip/jszip.js"></script>
+<script src="~/Scripts/respond.min.js"></script>
+
+<script src="~/Areas/Swift/Scripts/KendoCommon.js"></script>
+<script src="~/Areas/Swift/Scripts/Search/Search.js?1.0"></script>
+
+<div class="page-header">
+    <h3 id="title"></h3>
+</div>
+
+<div id="dvFilesFilter">
+    <div class="row">
+        <div class="col-md-2">
+            <div class="form-group">
+                <label for="startDate"><b>Дата поч.:</b></label>
+                <input type="text" class="form-control" id="startDate" placeholder="Вкажіть дату" style="display: inline;width: 180px" />
+            </div>
+        </div>
+        @*<div class="col-md-2">
+        <div class="form-group">
+            <label for="endDate"><b>Дата кін.:</b></label>
+            <input type="text" class="form-control" id="endDate" placeholder="Вкажіть дату" style="display: inline;width: 180px" />
+        </div>
+    </div>*@
+        <div class="col-md-2">
+            <div class="form-group">
+                <label for="tbText"><b>Містить слова:</b></label>
+                <input type="text" class="form-control" id="tbText" placeholder="Вкажіть слова" style="display: inline;width: 180px" />
+            </div>
+        </div>
+        <div class="col-md-2">
+            <button id="SearchBtn" type="button" class="btn btn-primary" style="margin-bottom:-60px">
+                <i class="fa fa-search"></i> Пошук
+            </button>
+        </div>
+    </div>
+    <div class="clearfix"></div>
+</div>
+
+<div id="gridMain"></div>
+<div class="search-main"></div>
+
+<script type="text/x-kendo-template" id="mainTitle-template">
+    <div class="toolbar">
+        <button title="Вигрузити в Excel" id="btnExcel" class='k-button' onclick="onClickBtn(this)">
+            <i class="pf-icon pf-16 pf-exel"></i>
+        </button>
+    </div>
+</script>

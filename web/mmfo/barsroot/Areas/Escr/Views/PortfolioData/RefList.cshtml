@@ -1,0 +1,22 @@
+﻿@using Kendo.Mvc.UI
+@{
+    string title = "Список на компенсацію";
+}
+<script src="~/Areas/Escr/Scripts/RefList.js"></script>
+<link href="~/Areas/Escr/Css/portfolio.css" rel="stylesheet" />
+<h1>@title</h1>
+<style>
+      .k-grid-header th.k-with-icon .k-link {
+        margin-right: 7px;
+    }
+
+     .k-grid table{
+          width: auto;
+      }
+
+     .k-grid-content {
+          max-height: 700px;
+      }
+</style>
+
+    <div id="gridRefList" class="fixed_headers" > </div >

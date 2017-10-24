@@ -1,0 +1,143 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = "Адміністрування типових користувачів";
+}
+<script src="~/Areas/Admin/Scripts/typicalUserCtrl.js"></script>
+
+<link href="~/Areas/Admin/Css/admu.css" rel="stylesheet">
+
+<h2>@ViewBag.Title</h2>
+
+<div id="example">
+    <div class="demo-section k-content" style="float: left;">
+        <h5>Tag Branches:</h5>
+        <div id="treeview"></div>
+    </div>
+
+    <div style="padding-top: 2em; float: left; margin-left: 1em;">
+        <h4>Status</h4>
+        <p id="result">No nodes checked.</p>
+        <div id="buttonsContainer">
+            <button class="k-button" data-bind="click: myClickHandler" type="button">Submit</button>
+        </div>
+    </div>
+    
+</div>
+
+<style>
+.demo-section.k-content {
+    box-shadow: 0 1px 2px 1px rgba(0,0,0,.08), 0 3px 6px rgba(0,0,0,.08);
+}
+.demo-section:not(.wide), #exampleWrap .box:not(.wide) {
+    max-width: 400px;
+}
+.demo-section {
+        margin-top: 0px;
+        margin-right: 0.5em;
+        margin-bottom: 0.5em;
+        margin-left: 1.5em;
+    padding: 3em;
+    border: 1px solid rgba(20,53,80,0.14);
+}
+.k-block, .k-widget, .k-popup, .k-content, .k-toolbar, .k-dropdown .k-input {
+    color: #444;
+}
+.k-content, .k-editable-area, .k-panelbar>li.k-item, .k-panel>li.k-item, .k-tiles {
+    background-color: #fff;
+}
+
+#treeview .k-sprite {
+            background-image: url("../content/web/treeview/coloricons-sprite.png");
+        }
+
+        .rootfolder { background-position: 0 0; }
+        .folder     { background-position: 0 -16px; }
+        .pdf        { background-position: 0 -32px; }
+        .html       { background-position: 0 -48px; }
+        .image      { background-position: 0 -64px; }
+
+</style>
+
+<!--
+    <div id="TypicalUsersGrid"></div>
+
+    <div id="tabstrip">
+        <ul>
+            <li>АРМи</li>
+            <li>Банківські операції</li>
+            <li>Групи контролю</li>
+            <li>Звіти НБУ</li>
+            <li>Групи користувачів</li>
+        </ul>
+        <div id="admTab">
+            <div id="panels">
+                <div id="grid1"></div>
+                <div id="commands">
+                    <div>
+                        <a href="#" id="copySelectedToGrid1" class="k-button">&lt;</a>
+                    </div>
+                    <div>
+                        <a href="#" id="copySelectedToGrid2" class="k-button">&gt;</a>
+                    </div>
+                </div>
+                <div id="grid2"></div>
+            </div>
+        </div>
+        <div id="ttsTab">
+            <div id="panels">
+                <div id="grid3"></div>
+                <div id="commands">
+                    <div>
+                        <a href="#" id="copySelectedToGrid3" class="k-button">&lt;</a>
+                    </div>
+                    <div>
+                        <a href="#" id="copySelectedToGrid4" class="k-button">&gt;</a>
+                    </div>
+                </div>
+                <div id="grid4"></div>
+            </div>
+        </div>
+        <div id="chkgrpsTab">
+            <div id="panels">
+                <div id="grid5"></div>
+                <div id="commands">
+                    <div>
+                        <a href="#" id="copySelectedToGrid5" class="k-button">&lt;</a>
+                    </div>
+                    <div>
+                        <a href="#" id="copySelectedToGrid6" class="k-button">&gt;</a>
+                    </div>
+                </div>
+                <div id="grid6"></div>
+            </div>
+        </div>
+        <div id="nburepsTab">
+            <div id="panels">
+                <div id="grid7"></div>
+                <div id="commands">
+                    <div>
+                        <a href="#" id="copySelectedToGrid7" class="k-button">&lt;</a>
+                    </div>
+                    <div>
+                        <a href="#" id="copySelectedToGrid8" class="k-button">&gt;</a>
+                    </div>
+                </div>
+                <div id="grid8"></div>
+            </div>
+        </div>
+        <div id="userGrpTab">
+            <div id="panels">
+                <div id="grid9"></div>
+                <div id="commands">
+                    <div>
+                        <a href="#" id="copySelectedToGrid9" class="k-button">&lt;</a>
+                    </div>
+                    <div>
+                        <a href="#" id="copySelectedToGrid10" class="k-button">&gt;</a>
+                    </div>
+                </div>
+                <div id="grid10"></div>
+            </div>
+        </div>
+    </div>
+    -->

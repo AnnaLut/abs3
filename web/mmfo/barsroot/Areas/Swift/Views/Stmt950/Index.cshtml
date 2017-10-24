@@ -1,0 +1,41 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+}
+
+<script src="~/lib/jsZip/jszip.js"></script>
+<script src="~/Scripts/respond.min.js"></script>
+<script src="~/Areas/Swift/Scripts/KendoCommon.js"></script>
+<script src="~/Areas/Swift/Scripts/Stmt950/Stmt950.js"></script>
+
+<link rel="stylesheet" href="~/Areas/Swift/Css/Swift/Main.css" />
+
+<div class="page-header">
+    <h1 id="title"></h1>
+</div>
+
+<div class="well">
+    <div class="row">
+        <div class="col-md-2">
+            <div class="form-group">
+                <label for="startDate"><b>Дата з:</b></label>
+                <input type="text" class="form-control" id="startDate" style="width: 150px;" />
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                <label for="endDate"><b>Дата по:</b></label>
+                <input type="text" class="form-control" id="endDate" style="width: 150px;" />
+            </div>
+        </div>
+        <div class="col-md-2">
+            <button id="FireBtn" type="button" class="btn btn-primary">
+                <i class="fa fa-recycle"></i> Формування
+            </button>
+        </div>
+    </div>
+    <div class="clearfix"></div>
+</div>
+
+
+<div id="gridMain" style="width:1280px;"></div>
+<div class="search-main"></div>

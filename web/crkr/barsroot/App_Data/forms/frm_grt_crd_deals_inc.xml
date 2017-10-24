@@ -1,0 +1,60 @@
+﻿<grids>
+  <grid table="V_GRT_CRD_DEALS" id="gv" pagesize="10" showpagesizebox="true" title="Кредитні договори за договором застави \QS[deal_id]" showfilter="true" tabindex="1">
+    <parameters>
+      <parameter type="QueryString" name="grt_deal_id" altname="deal_id" datatype="Int64"></parameter>
+    </parameters>
+    <fields>
+      <field name="GRT_DEAL_ID" key="false" datatype="Int64" sort="Default">
+        <column show="false" caption="ID договору забезпечення" align="Right" />
+      </field>
+      <field name="ND" key="false" datatype="Int64" sort="Default">
+        <column show="true" caption="ID кредитного договору" align="Right" />
+      </field>
+      <field name="SOS" key="false" datatype="Int64" sort="Default">
+        <column show="false" caption="ID стану" align="Right" />
+      </field>
+      <field name="SOS_NAME" key="false" datatype="String" sort="Default">
+        <column show="true" caption="Стан" align="Left" />
+      </field>
+      <field name="CC_ID" key="false" datatype="String" sort="Default">
+        <column show="true" caption="№" align="Left" />
+      </field>
+      <field name="SDATE" key="false" datatype="DateTime" sort="Default">
+        <column show="true" caption="Дата заключення" align="Center" />
+      </field>
+      <field name="WDATE" key="false" datatype="DateTime" sort="Default">
+        <column show="true" caption="Дата завершення" align="Center" />
+      </field>
+      <field name="RNK" key="false" datatype="Int64" sort="Default">
+        <column show="true" caption="RNK позичальника" align="Right" />
+      </field>
+      <field name="NMK" key="false" datatype="String" sort="Default">
+        <column show="true" caption="Позичальник" align="Left" />
+      </field>
+      <field name="CUSTTYPE" key="false" datatype="Int64" sort="Default">
+        <column show="false" caption="ID типу позичальника" align="Right" />
+      </field>
+      <field name="CUSTTYPE_NAME" key="false" datatype="String" sort="Default">
+        <column show="true" caption="Тип позичальника" align="Left" />
+      </field>
+      <field name="OKPO" key="false" datatype="String" sort="Default">
+        <column show="true" caption="Ідентифікаційний №" align="Left" />
+      </field>
+      <field name="VIDD" key="false" datatype="Int64" sort="Default">
+        <column show="false" caption="Код виду договора" align="Right" />
+      </field>
+      <field name="VIDD_NAME" key="false" datatype="String" sort="Default">
+        <column show="true" caption="Вид договора" align="Left" />
+      </field>
+      <field name="KV_LCV" key="false" datatype="String" sort="Default">
+        <column show="true" caption="Валюта" align="Center" />
+      </field>
+      <field name="S" key="false" datatype="Decimal" sort="Default">
+        <column show="true" caption="Сума" align="Right" />
+      </field>
+      <field name="BRANCH" key="false" datatype="String" sort="Default">
+        <column show="true" caption="Відділення" align="Left" />
+      </field>
+    </fields>
+  </grid>
+</grids>

@@ -1,0 +1,20 @@
+﻿<xmlform>
+  <customforms>
+    <customform name="frm_kp_inventar" buttonsposition="Bottom" title="Інвентаризація кредитних справ в сховищі-->Первинне (до)наповнення даними з КП">
+      <buttons defaulttype="Button">
+        <button id="btn" caption="Виконати наповнення даними" 
+                hint="Виконує первинне (до)наповнення даними з КП" confirmmessage="Підтвердіть операцію">
+          <command type="PlSqlBlock" successmessage="Наповнення даними з КП виконано" checkselectedrow="false">
+            <sql>
+              begin BARS.ICCK(0); end;
+            </sql>
+            <parameters/>
+          </command>
+        </button>
+      </buttons>
+      <datasource>
+        <sql>select * from dual</sql>
+      </datasource>
+    </customform>
+  </customforms>
+</xmlform>

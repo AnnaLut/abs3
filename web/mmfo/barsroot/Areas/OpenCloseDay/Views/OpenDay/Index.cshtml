@@ -1,0 +1,85 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+}
+<script>
+    $(document).ready(function () {
+
+        $("#confirm").click(function () {
+            var dd = new Date().getDate();
+            var mm = new Date().getMonth() + 1;
+            if (dd < 10) {
+                dd = '0' + dd;
+            }
+            if (mm < 10) {
+                mm = '0' + mm;
+            }
+            var datePass = mm.toString() + dd.toString();
+
+            var passValue = document.getElementById("pass").value;
+
+            $.ajax({
+                type: "GET",
+                url: bars.config.urlContent("/opencloseday/openday/createdate?passValue=" + passValue),
+                dateType: "json",
+                data: passValue,
+                success: function (data) {
+                    debugger;
+                    if (data.State == "Error") {
+                        bars.ui.error({ title: 'Помилка', text: data.Error });
+                        $("#pass").val("");
+                    } else {
+                        //$("#window").data("kendoWindow").close();
+                        //$("#pass").val("");
+                        debugger;
+                        $(".form-horizontal").remove();
+                        $(".container").append(data);
+                        //myWindow.data("kendoWindow").open();
+                        //$("#window").data("kendoWindow").open();
+                    }
+                }
+            });
+
+        });
+        $("#btnCancel").click(function () {
+            $(".container").remove();
+        });
+    });
+
+</script>
+
+<style>
+    @@media (min-width: 768px) {
+        .container {
+            width: 320px !important;
+        }
+    }
+</style>
+
+<div class="container">
+    <form class="form-horizontal">
+        <div class="panel panel-default" style="width:290px">
+            <div class="panel-heading">Відкриття банківського дня</div>
+            <div class="panel-body">
+
+
+                <div class="form-group">
+                    <div class="col-md-2">
+                        <label for="" class="control-label text-center">Пароль:</label>
+                    </div>
+                    <div class="col-md-10">
+                        <input type="password" class="k-textbox" id="pass" style="margin-bottom: 30px;">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-6">
+                        <button class="k-button" id="confirm"><span class="k-sprite pf-icon pf-16 pf-tool_pencil" style="margin-bottom: 3px"></span> Ввести</button>
+                    </div>
+                    <div class="col-md-6">
+                        <button class="k-button" id="btnCancel"><span class="k-sprite pf-icon pf-16 pf-delete_button_error" style="margin-bottom: 3px;"></span> Відмінити</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </form>
+</div>

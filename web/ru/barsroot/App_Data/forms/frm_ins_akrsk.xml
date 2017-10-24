@@ -1,0 +1,408 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<xmlform  caption="Акредитовані СК">
+  <tabcontainer id="tab" tabcount="2" title="title" visible="true">
+    <tab caption="СК та типи договорів" id="t1" index="0"></tab>
+    <tab caption="Додаткові реквізити" id="t2" index="1"></tab>
+  </tabcontainer>
+  <grids>
+    <grid table="V_INS_PARTNERS" id="gv" pagesize="5" showpagesizebox="true" title="Страхові компанії" showfilter="true" tabindex="0">
+      <rowselection method="SingleRowServer" />
+      <editform style="Dialog" title="Редагування реквізитів СК" height="540" width="700" columnscount="2">
+        <buttons defaulttype="button">
+          <button id="btnEdit" caption="Редагувати|Зберегти|Вiдмiнити" hint="Редагувати рядок|Зберегти рядок|Вiдмiнити редагування" confirmmessage="">
+            <command type="Edit">
+              <sql>
+                begin ins_pack.iu_partner(
+                :id,
+                :rnk,
+                :agr_no,
+                :agr_date,
+                :fee_min,
+                :fee_perc,
+                :fee_max,
+                :limit_sum,
+                :limit_sum_perc,
+                :active
+                );
+                end;
+              </sql>
+              <parameters>
+                <parameter type="DataField" name="id" altname="p_id" />
+                <parameter type="DataField" name="rnk" altname="p_rnk" />
+                <parameter type="DataField" name="agr_no" altname="p_agr_no" />
+                <parameter type="DataField" name="agr_date" altname="p_agr_date" />
+                <parameter type="DataField" name="fee_min" altname="p_fee_min" />
+                <parameter type="DataField" name="fee_perc" altname="p_fee_perc" />
+                <parameter type="DataField" name="fee_max" altname="p_fee_max" />
+                <parameter type="DataField" name="limit_sum" altname="p_limit_sum" />
+                <parameter type="DataField" name="limit_sum_perc" altname="p_limit_sum_perc" />
+                <parameter type="DataField" name="active" altname="p_active" />
+              </parameters>
+            </command>
+          </button>
+          <button id="btnInsert" caption="Додати|Зберегти|Вiдмiнити" hint="Додати рядок|Зберегти рядок|Вiдмiнити додавання" confirmmessage="">
+            <command type="Insert">
+              <sql>
+                begin ins_pack.iu_partner(
+                :id,
+                :rnk,
+                :agr_no,
+                :agr_date,
+                :fee_min,
+                :fee_perc,
+                :fee_max,
+                :limit_sum,
+                :limit_sum_perc,
+                :active
+                );
+                end;
+              </sql>
+              <parameters>
+                <parameter type="DataField" name="id" altname="p_id" />
+                <parameter type="DataField" name="rnk" altname="p_rnk" />
+                <parameter type="DataField" name="agr_no" altname="p_agr_no" />
+                <parameter type="DataField" name="agr_date" altname="p_agr_date" />
+                <parameter type="DataField" name="fee_min" altname="p_fee_min" />
+                <parameter type="DataField" name="fee_perc" altname="p_fee_perc" />
+                <parameter type="DataField" name="fee_max" altname="p_fee_max" />
+                <parameter type="DataField" name="limit_sum" altname="p_limit_sum" />
+                <parameter type="DataField" name="limit_sum_perc" altname="p_limit_sum_perc" />
+                <parameter type="DataField" name="active" altname="p_active" />
+              </parameters>
+            </command>
+          </button>
+          <button caption="Закрити" id="btnClose">
+            <command type="Close" />
+          </button>
+        </buttons>
+      </editform>
+      <fields>
+        <field name="ACTIVE" key="false" datatype="Int64" sort="Desc">
+          <column show="true" caption="Флаг активності відносин" align="Center" />
+          <form show="true" rwmode="RW" required="false">
+            <uicontrol type="CheckBox" falsevalue="0" truevalue="1" />
+          </form>
+        </field>
+        <field name="RNK" key="false" datatype="Int64" sort="default">
+          <column show="true" caption="РНК СК" align="right" />
+          <form show="true" rwmode="ROI" required="true">
+            <uicontrol type="ReadOnlyReference" controlwidth="150" formname="frm_ins_ref_customers" formfieldname="RNK" formheight="450" formwidth="650">
+              <rels>
+                <rel srcname="NMK" destname="NMK"/>
+              </rels>
+            </uicontrol>
+          </form>
+        </field>
+        <field name="NMK" key="false" datatype="String" sort="default">
+          <column show="true" caption="Назва СК" align="left" />
+          <form show="true" rwmode="RW">
+            <uicontrol type="Text" readonly="true" controlwidth="250" linescount="3" />
+          </form>
+        </field>
+        <field name="AGR_NO" key="false" datatype="String" sort="default">
+          <column show="true" caption="Номер договору про співробітництво" align="left" />
+          <form show="true" rwmode="RW">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="AGR_DATE" key="false" datatype="DateTime" sort="default">
+          <column show="true" caption="Дата договору про співробітництво" align="center" />
+          <form show="true" rwmode="RW">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="FEE_MIN" key="false" datatype="Decimal" sort="default">
+          <column show="true" caption="Мінімальний розмір агентської винагороди" align="right" />
+          <form show="true" rwmode="RW">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="FEE_PERC" key="false" datatype="Decimal" sort="default">
+          <column show="true" caption="Процентний розмір агентської винагороди" align="right" />
+          <form show="true" rwmode="RW">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="FEE_MAX" key="false" datatype="Decimal" sort="default">
+          <column show="true" caption="Максимальний розмір агентської винагороди" align="right" />
+          <form show="true" rwmode="RW">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="LIMIT_SUM" key="false" datatype="Decimal" sort="default">
+          <column show="true" caption="Ліміт максимальної суми всіх договорів страхування СК" align="right" />
+          <form show="true" rwmode="RW">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="LIMIT_SUM_PERC" key="false" datatype="Decimal" sort="default">
+          <column show="true" caption="Ліміт процентного відношення суми всіх договорів CK до загальної суми договорів" align="right" />
+          <form show="true" rwmode="RW">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="ID" key="true" datatype="Int64" sort="Desc">
+          <column show="false" caption="Ідентифікатор CK" align="right" />
+          <form show="true" rwmode="RO" required="false">
+            <uicontrol type="Text" readonly="true" />
+          </form>
+        </field>
+      </fields>
+    </grid>
+
+
+
+    <grid table="V_INS_PARTNER_TYPES" id="gvtypes" pagesize="10" showpagesizebox="true" title="Типи договорів обраної СК" showfilter="true" tabindex="0">
+      <parameters>
+        <parameter type="MasterGrid" masterid="gv" masterkeyfield="ID" name="partner_id" datatype="Int64"></parameter>
+      </parameters>
+      <rowselection method="SingleRow" />
+      <editform style="Dialog" title="Редагування типів договорів СК" height="350" width="550" columnscount="2">
+        <buttons defaulttype="button">
+          <button id="btnEdit1" caption="Редагувати|Зберегти|Вiдмiнити" hint="Редагувати рядок|Зберегти рядок|Вiдмiнити редагування" confirmmessage="">
+            <command type="Edit">
+              <sql>
+                begin
+                ins_pack.iu_partner_type(
+                :partner_id,
+                :type_id,
+                :limit_sum,
+                :limit_sum_perc,
+                :active);
+                end;
+              </sql>
+              <parameters>
+                <parameter type="DataField" name="PARTNER_ID" />
+                <parameter type="DataField" name="TYPE_ID" />
+                <parameter type="DataField" name="LIMIT_SUM" />
+                <parameter type="DataField" name="LIMIT_SUM_PERC" />
+                <parameter type="DataField" name="ACTIVE" />
+              </parameters>
+            </command>
+          </button>
+          <button id="btnInsert1" caption="Додати|Зберегти|Вiдмiнити" hint="Додати рядок|Зберегти рядок|Вiдмiнити додавання" confirmmessage="">
+            <command type="Insert">
+              <sql>
+                begin
+                ins_pack.iu_partner_type(
+                :partner_id,
+                :type_id,
+                :limit_sum,
+                :limit_sum_perc,
+                :active);
+                end;
+              </sql>
+              <parameters>
+                <parameter type="DataField" name="PARTNER_ID" />
+                <parameter type="DataField" name="TYPE_ID" />
+                <parameter type="DataField" name="LIMIT_SUM" />
+                <parameter type="DataField" name="LIMIT_SUM_PERC" />
+                <parameter type="DataField" name="ACTIVE" />
+              </parameters>
+            </command>
+          </button>
+          <button caption="Закрити" id="btnClose1">
+            <command type="Close" />
+          </button>
+        </buttons>
+      </editform>
+      <fields>
+        <field name="PARTNER_ID" key="true" datatype="Int64" sort="default" >
+          <column show="false" caption="Ідентифікатор СК" align="right"  />
+          <form show="true" rwmode="RO" required="true">
+            <uicontrol type="Text">
+              <defaultvalue type="SessionState" value="selecteddatakey_gv_0"></defaultvalue>
+            </uicontrol>
+          </form>
+        </field>
+        <field name="ACTIVE" key="false" datatype="Int64" sort="default">
+          <column show="true" caption="Флаг активності відносин по даному типу страхового договору" align="Center" />
+          <form show="true" rwmode="RW" required="false">
+            <uicontrol type="CheckBox" truevalue="1" falsevalue="0" />
+          </form>
+        </field>
+        <field name="TYPE_ID" key="true" datatype="Int64" sort="Asc">
+          <column show="false" caption="Тип страхового договору" align="right" />
+          <form show="true" rwmode="ROI" required="true">
+            <uicontrol type="DropDownList" addemptyitem="true" table="ins_types" keyfield="id" valuefield="name" />
+          </form>
+        </field>
+        <field name="TYPE_NAME" key="false" datatype="String" sort="default">
+          <column show="true" caption="Тип страхового договору" align="left" />
+          <form show="false" rwmode="RW" required="true">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="OBJECT_TYPE" key="false" datatype="Int64" sort="default">
+          <column show="false" caption="" align="right" />
+          <form show="false" rwmode="RW" required="true">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="OBJECT_NAME" key="false" datatype="String" sort="default">
+          <column show="true" caption="Тип об`єкту страхування" align="left" />
+          <form show="false" rwmode="RW">
+            <uicontrol type="Text"  />
+          </form>
+        </field>
+        <field name="LIMIT_SUM" key="false" datatype="Decimal" sort="default">
+          <column show="true" caption="Ліміт максимальної суми договорів страхування даного типу даної СК" align="right" />
+          <form show="true" rwmode="RW">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="LIMIT_SUM_PERC" key="false" datatype="Decimal" sort="default">
+          <column show="true" caption="Ліміт процентного відношення суми всіх договорів страхування даної СК даного типу до суми договорів страхування даної СК" align="right" />
+          <form show="true" rwmode="RW">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+      </fields>
+    </grid>
+
+    
+    <grid id="gv3" pagesize="5" showpagesizebox="true" title="Види договорів" showfilter="true" tabindex="1">
+      <datasource>
+        <sql>
+          select * from V_INS_PARTNER_TYPES where active = 1 order by partner_id, type_id
+        </sql>
+      </datasource>
+      <rowselection method="SingleRowServer" />
+      <fields>
+        <field name="RNK" key="false" datatype="Int64" sort="default">
+          <column show="false" caption="RNK СК" align="right" />
+        </field>
+        <field name="NMK" key="false" datatype="String" sort="default">
+          <column show="true" caption="Назва СК" align="left" />
+        </field>
+        <field name="OKPO" key="false" datatype="String" sort="default">
+          <column show="true" caption="Ід. код СК" align="left" />
+        </field>
+        <field name="PARTNER_ID" key="true" datatype="Int64" sort="default">
+          <column show="false" caption="Ідентифікатор СК" align="right" />
+        </field>
+        <field name="TYPE_ID" key="true" datatype="Int64" sort="default">
+          <column show="false" caption="Ідентифікатор типу страхового договору" align="right" />
+        </field>
+        <field name="TYPE_NAME" key="false" datatype="String" sort="default">
+          <column show="true" caption="Тип страхового договору" align="left" />
+        </field>
+        <field name="AGR_NO" key="false" datatype="String" sort="default">
+          <column show="true" caption="№ договору" align="left" />
+        </field>
+        <field name="AGR_DATE" key="false" datatype="DateTime" sort="default">
+          <column show="true" caption="Дата договору" align="center" />
+        </field>
+        <field name="OBJECT_TYPE" key="false" datatype="Int64" sort="default">
+          <column show="false" caption="" align="right" />
+        </field>
+        <field name="OBJECT_NAME" key="false" datatype="String" sort="default">
+          <column show="false" caption="Тип об`єкту страхування" align="left" />
+        </field>
+        <field name="LIMIT_SUM" key="false" datatype="Decimal" sort="default">
+          <column show="false" caption="Ліміт максимальної суми договорів страхування даного типу даної СК" align="right" />
+        </field>
+        <field name="LIMIT_SUM_PERC" key="false" datatype="Decimal" sort="default">
+          <column show="false" caption="Ліміт процентного відношення суми всіх договорів страхування даної СК даного типу до суми договорів страхування даної СК" align="right" />
+        </field>
+        <field name="ACTIVE" key="false" datatype="Int64" sort="default">
+          <column show="false" caption="Флаг активності відносин по даному типу страхового договору" align="right" />
+        </field>
+      </fields>
+    </grid>
+
+    <grid id="gv4" pagesize="10" showpagesizebox="true" width="100%" title="Додаткові реквізити" showfilter="true" tabindex="1">
+      <parameters>
+        <parameter type="MasterGrid" masterid="gv3" masterkeyfield="PARTNER_ID" name="partner_id" datatype="Int64"></parameter>
+        <parameter type="MasterGrid" masterid="gv3" masterkeyfield="TYPE_ID" name="type_id" datatype="Int64"></parameter>
+      </parameters>
+      <datasource>
+        <sql>
+          select t.*, g.txt from INS_PARTNER_ATTRS t, ins_deal_tags g where t.tag = g.tag
+        </sql>
+      </datasource>
+      
+      <rowselection method="SingleRow" />
+      <editform style="Dialog" title="" height="300" width="500" columnscount="1">
+        <buttons defaulttype="button">
+          <button id="btnEdit" caption="Редагувати|Зберегти|Вiдмiнити" hint="Редагувати рядок|Зберегти рядок|Вiдмiнити редагування" confirmmessage="">
+            <command type="Edit">
+              <sql>update INS_PARTNER_ATTRS set VALUE=:VALUE where PARTNER_ID = :PARTNER_ID and TYPE_ID=:TYPE_ID and TAG=:TAG</sql>
+              <parameters>
+                <parameter type="DataField" name="PARTNER_ID" />
+                <parameter type="DataField" name="TYPE_ID" />
+                <parameter type="DataField" name="TAG" />
+                <parameter type="DataField" name="VALUE" />
+              </parameters>
+            </command>
+          </button>
+          <button id="btnInsert" caption="Додати|Зберегти|Вiдмiнити" hint="Додати рядок|Зберегти рядок|Вiдмiнити додавання" confirmmessage="">
+            <command type="Insert">
+              <sql>insert into INS_PARTNER_ATTRS(PARTNER_ID, TYPE_ID, TAG, VALUE ) values (:PARTNER_ID, :TYPE_ID, :TAG, :VALUE)</sql>
+              <parameters>
+                <parameter type="DataField" name="PARTNER_ID" />
+                <parameter type="DataField" name="TYPE_ID" />
+                <parameter type="DataField" name="TAG" />
+                <parameter type="DataField" name="VALUE" />
+              </parameters>
+            </command>
+          </button>
+          <button id="btnDel" caption="Видалити|Зберегти|Вiдмiнити" hint="Видалити рядок|Зберегти рядок|Вiдмiнити видалення" confirmmessage="Необхідно підтвердити видалення рядка">
+            <command type="Delete">
+              <sql>delete from INS_PARTNER_ATTRS where DEAL_ID=:DEAL_ID and PARTNER_ID=:PARTNER_ID and TAG=:TAG</sql>
+              <parameters>
+                <parameter type="DataField" name="PARTNER_ID" />
+                <parameter type="DataField" name="TYPE_ID" />
+                <parameter type="DataField" name="TAG" />
+              </parameters>
+            </command>
+          </button>
+          <button caption="Закрити" id="btnClose">
+            <command type="Close" />
+          </button>
+        </buttons>
+      </editform>
+      <fields>
+        <field name="PARTNER_ID" key="true" datatype="Int64" sort="default">
+          <column show="false" caption="Код партнера" align="right" />
+          <form show="true" rwmode="RO" required="true">
+            <uicontrol type="Text">
+              <defaultvalue type="SessionState" value="selecteddatakey_gv3_0"></defaultvalue>
+            </uicontrol>
+          </form>
+        </field>
+        <field name="TYPE_ID" key="true" datatype="Int64" sort="default">
+          <column show="false" caption="Код типу договору" align="right" />
+          <form show="true" rwmode="RO" required="true">
+            <uicontrol type="Text">
+              <defaultvalue type="SessionState" value="selecteddatakey_gv3_1"></defaultvalue>
+            </uicontrol>
+          </form>
+        </field>
+        
+        <field name="TAG" key="true" datatype="String" sort="default">
+          <column show="true" caption="Код реквізиту" align="left" width="50" />
+          <form show="true" rwmode="ROI" required="true">
+            <uicontrol type="DropDownList" table="ins_deal_tags" keyfield="tag" valuefield="txt" addemptyitem="true" valueformat="{0} - {1}" />
+          </form>
+        </field>
+        
+        <field name="TXT" key="false" datatype="String" sort="default">
+          <column show="true" caption="Реквізит" align="left" width="200" />
+          <form show="false">
+          </form>
+        </field>
+
+        <field name="VALUE" key="false" datatype="String" sort="default">
+          <column show="true" caption="Значення" align="left" width="500" />
+          <form show="true" rwmode="RW" required="true">
+            <uicontrol type="Text"  controlwidth="250" linescount="2"/>
+          </form>
+        </field>
+      </fields>
+    </grid>    
+
+
+
+  </grids>
+</xmlform>

@@ -1,0 +1,42 @@
+﻿@inherits System.Web.Mvc.WebViewPage<IEnumerable<BarsWeb.Models.CUSTOMER_UPDATE_HISTORY>>
+@{
+    Layout = null;
+    //string styleSOS = "";
+    //int take = ViewBag.RowNumber;
+}
+@foreach (var item in Model)
+{         
+    <tr >
+        <td>@item.PAR</td>
+        <td>@item.OLD</td>
+        <td>@item.NEW</td>
+        <td>@item.DAT</td>
+        <td>@item.USR</td>
+        <td>@item.FIO</td>
+    </tr>            
+}
+@*<tr class="footerRow">
+    <td colspan="18">
+        <div class="footerDiv">
+            Сторінка:&nbsp;
+                        @if (ViewBag.PageNum > 1)
+                        {
+                            int page = Convert.ToInt32(ViewBag.PageNum) - 1;
+                            <img rd="@page" alt="@page" src="/Common/Images/default/16/navigate_left.png" />
+                        }
+            <span>
+                <span>@ViewBag.PageNum</span>
+            </span>
+            @if (Model.Count() > ViewBag.RowNumber)
+            {
+                int page = Convert.ToInt32(ViewBag.PageNum) + 1;
+                <img rd="@page" alt="@page" src="/Common/Images/default/16/navigate_right.png" />
+            }
+
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Рядків на сторінці:&nbsp;
+                                <input id="rowNumber" name="rowNumber" type="text" value="@ViewBag.RowNumber" 
+                                      style="width:30px;text-align:center;" />
+
+        </div>
+    </td>
+</tr>*@

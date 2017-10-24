@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="06/27/2013 10:37:54" ReportInfo.Modified="06/27/2013 11:03:16" ReportInfo.CreatorVersion="2013.2.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqD6nWZEExUJ9MEhdFZpB1A6ZfSeiTM+6WLeB8pW5aURqkGwhV134I2SUIQGUGXcXi3uLnJCmnSSHP1f6ms+VkNQ==">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select sysdate from dual">
+        <Column Name="SYSDATE" DataType="System.DateTime"/>
+      </TableDataSource>
+    </OracleDataConnection>
+  </Dictionary>
+  <ReportPage Name="Page1">
+    <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="37.8"/>
+    <PageHeaderBand Name="PageHeader1" Top="42.74" Width="718.2" Height="28.35"/>
+    <DataBand Name="Data1" Top="76.03" Width="718.2" Height="274.05" DataSource="Table">
+      <TextObject Name="Text1" Left="9.45" Top="9.45" Width="689.85" Height="37.8" Text="Тест FastReports" HorzAlign="Center" Font="Times New Roman, 20pt"/>
+      <RichObject Name="Rich1" Left="9.45" Top="47.25" Width="689.85" Height="37.8" Text="{\rtf1\ansi\ansicpg1251\deff0\deflang1049{\fonttbl{\f0\fnil\fcharset0 Arial;}{\f1\fnil\fcharset204 Tahoma;}}&#13;&#10;{\*\generator Msftedit 5.41.15.1515;}\viewkind4\uc1\pard\qc\lang1033\fs40 Rich text\lang1049\f1\fs17\par&#13;&#10;}&#13;&#10;"/>
+      <TableObject Name="Table1" Left="9.45" Top="103.95" Width="330.75" Height="94.5" Border.Lines="All">
+        <TableColumn Name="Column1"/>
+        <TableColumn Name="Column2"/>
+        <TableColumn Name="Column3"/>
+        <TableColumn Name="Column4"/>
+        <TableColumn Name="Column5"/>
+        <TableRow Name="Row1">
+          <TableCell Name="Cell1" Border.Lines="All" Text="table" HorzAlign="Center"/>
+          <TableCell Name="Cell2" Border.Lines="All" HorzAlign="Center"/>
+          <TableCell Name="Cell3" Border.Lines="All" Text="table" HorzAlign="Center"/>
+          <TableCell Name="Cell4" Border.Lines="All" HorzAlign="Center"/>
+          <TableCell Name="Cell5" Border.Lines="All" Text="table" HorzAlign="Center"/>
+        </TableRow>
+        <TableRow Name="Row2">
+          <TableCell Name="Cell6" Border.Lines="All" HorzAlign="Center"/>
+          <TableCell Name="Cell7" Border.Lines="All" Text="table" HorzAlign="Center"/>
+          <TableCell Name="Cell8" Border.Lines="All" HorzAlign="Center"/>
+          <TableCell Name="Cell9" Border.Lines="All" Text="table" HorzAlign="Center"/>
+          <TableCell Name="Cell10" Border.Lines="All" HorzAlign="Center"/>
+        </TableRow>
+        <TableRow Name="Row3">
+          <TableCell Name="Cell11" Border.Lines="All" Text="table" HorzAlign="Center"/>
+          <TableCell Name="Cell12" Border.Lines="All" HorzAlign="Center"/>
+          <TableCell Name="Cell13" Border.Lines="All" Text="table" HorzAlign="Center"/>
+          <TableCell Name="Cell14" Border.Lines="All" HorzAlign="Center"/>
+          <TableCell Name="Cell15" Border.Lines="All" Text="table" HorzAlign="Center"/>
+        </TableRow>
+        <TableRow Name="Row4">
+          <TableCell Name="Cell16" Border.Lines="All" HorzAlign="Center"/>
+          <TableCell Name="Cell17" Border.Lines="All" Text="table" HorzAlign="Center"/>
+          <TableCell Name="Cell18" Border.Lines="All" HorzAlign="Center"/>
+          <TableCell Name="Cell19" Border.Lines="All" Text="table" HorzAlign="Center"/>
+          <TableCell Name="Cell20" Border.Lines="All" HorzAlign="Center"/>
+        </TableRow>
+        <TableRow Name="Row5">
+          <TableCell Name="Cell21" Border.Lines="All" Text="table" HorzAlign="Center"/>
+          <TableCell Name="Cell22" Border.Lines="All" HorzAlign="Center"/>
+          <TableCell Name="Cell23" Border.Lines="All" Text="table" HorzAlign="Center"/>
+          <TableCell Name="Cell24" Border.Lines="All" HorzAlign="Center"/>
+          <TableCell Name="Cell25" Border.Lines="All" Text="table" HorzAlign="Center"/>
+        </TableRow>
+      </TableObject>
+      <TextObject Name="Text2" Left="359.1" Top="151.2" Width="340.2" Height="47.25" Fill.Color="RoyalBlue" Text="[Table.SYSDATE]" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 20pt"/>
+      <TextObject Name="Text3" Left="359.1" Top="103.95" Width="340.2" Height="47.25" Fill.Color="Yellow" Text="SYSDATE" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 20pt"/>
+    </DataBand>
+    <PageFooterBand Name="PageFooter1" Top="355.01" Width="718.2" Height="18.9"/>
+  </ReportPage>
+</Report>

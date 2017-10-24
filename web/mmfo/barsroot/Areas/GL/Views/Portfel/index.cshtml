@@ -1,0 +1,8 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+}
+<script src="~/Areas/GL/Scripts/Controllers/PotfelCtrl.js"></script>
+
+<div ng-controller="PortfelController as pf">
+    <div ng-init="Browselink(@ViewBag.MOD_ABS, @ViewBag.NBS_N)"></div>
+</div>

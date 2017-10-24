@@ -1,0 +1,15 @@
+﻿.k-grid {
+    font-size: 11px;
+}
+.k-grid td {
+    padding: 0;
+}
+
+.cell{    
+    text-align:center;
+}
+
+.cellReadonly{    
+    text-align:center;
+    background-color:darkgray;
+}

@@ -1,0 +1,37 @@
+BODY
+{
+	background-color : #f0f0f0;
+ 	margin-bottom : 0px;
+ 	margin-left : 0px;
+ 	margin-right : 5px;
+ 	margin-top : 0px;
+}
+.webservice { behavior: url(/Common/WebService/js/WebService.htc); }
+
+.outset {BORDER-TOP-STYLE: outset; BORDER-RIGHT-STYLE: outset; BORDER-LEFT-STYLE: outset; BORDER-BOTTOM-STYLE: outset}
+.inset {BORDER-TOP-STYLE: inset; BORDER-RIGHT-STYLE: inset; BORDER-LEFT-STYLE: inset; BORDER-BOTTOM-STYLE: inset;}
+
+.btoutset { FONT-SIZE: 8pt; WIDTH: 140px; COLOR: navy; FONT-FAMILY: Verdana }
+.btinset { FONT-SIZE: 8pt; WIDTH: 140px; COLOR: maroon; BORDER-TOP-STYLE: inset; FONT-FAMILY: Verdana; BORDER-RIGHT-STYLE: inset; BORDER-LEFT-STYLE: inset; BORDER-BOTTOM-STYLE: inset }
+
+.bt {font-family:Verdana; color:Navy;height:18px; font-size:xx-small}
+
+A:link {color:Navy;font-weight:bold;}
+A:active {color:Navy;font-weight:bold}
+A:visited {color:Navy;font-weight:bold}
+
+.frame { BORDER-RIGHT: gray 2px outset; BORDER-TOP: gray 2px outset; BORDER-LEFT: gray 2px outset; WIDTH: 600px; BORDER-BOTTOM: gray 2px outset; POSITION: absolute; HEIGHT: 350px; BACKGROUND-COLOR: gainsboro }
+
+.BarsTextBox {background-color:White;}
+
+.BarsTextBoxRO {background-color:lightgrey;}
+
+.BarsLabel {font-family:Verdana;font-size:10pt;font-weight:bold;}
+
+.BarsButton {font-family:Arial Cyr;font-size:12;}
+
+.BarsLabelItalic {font-family:Verdana;font-size:10pt;font-style:italic}
+
+.BarsPanel {border-style:outset;border-width:2px; height:300px;width:100%;}
+
+.BarsGroups {border-style:solid;border-width:1px;padding:3 3 3 3;}

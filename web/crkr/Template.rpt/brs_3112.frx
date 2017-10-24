@@ -1,0 +1,137 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="10/26/2016 10:52:28" ReportInfo.Modified="11/09/2016 09:39:50" ReportInfo.CreatorVersion="2013.2.2.0">
+  <Styles>
+    <Style Name="Gred" Border.Lines="All" Border.Color="Gainsboro" Border.Width="0.25" Fill.Color="WhiteSmoke" ApplyTextFill="false" ApplyFont="false"/>
+  </Styles>
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlq/aVeGBEd5IyArDSDpS1mnLTzM/JCSbvYfE1EFiwpVYBShK1LWQLyUAOwQaje1dCHjYNQY4vihteIjmxGBr+Jog==">
+      <TableDataSource Name="Table" Alias="Zap" DataType="System.Int32" Enabled="true" SelectCommand="  SELECT NUM00 RU,&#13;&#10;         CHAR00 NAME,&#13;&#10;         CHAR01 REGDATE,&#13;&#10;         NUM01 S1,&#13;&#10;         NUM02 S2,&#13;&#10;         NUM03 S3,&#13;&#10;         NUM04 S4&#13;&#10;    FROM rs_tmp_report_data&#13;&#10;   WHERE session_id = :session_id&#13;&#10;ORDER BY id">
+        <Column Name="RU" DataType="System.Decimal"/>
+        <Column Name="NAME" DataType="System.String"/>
+        <Column Name="REGDATE" DataType="System.String"/>
+        <Column Name="S1" DataType="System.Decimal"/>
+        <Column Name="S2" DataType="System.Decimal"/>
+        <Column Name="S3" DataType="System.Decimal"/>
+        <Column Name="S4" DataType="System.Decimal"/>
+        <CommandParameter Name="session_id" DataType="126" Expression="[session_id]"/>
+      </TableDataSource>
+      <TableDataSource Name="Table2" Alias="status" DataType="System.Int32" Enabled="true" SelectCommand=" select * from COMPEN_OPER_STATES where state_id = :p_status">
+        <Column Name="STATE_ID" DataType="System.Decimal"/>
+        <Column Name="STATE_NAME" DataType="System.String"/>
+        <CommandParameter Name="p_status" DataType="126" Expression="[p_status]"/>
+      </TableDataSource>
+      <TableDataSource Name="Table3" Alias="typeo" DataType="System.Int32" Enabled="true" SelectCommand="select * from COMPEN_OPER_TYPES where type_id = :p_type">
+        <Column Name="TYPE_ID" DataType="System.Decimal"/>
+        <Column Name="OPER_CODE" DataType="System.String"/>
+        <Column Name="TEXT" DataType="System.String"/>
+        <CommandParameter Name="p_type" DataType="126" Expression="[p_type]"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="session_id" DataType="System.String"/>
+    <Parameter Name="sFdat1" DataType="System.DateTime"/>
+    <Parameter Name="sFdat2" DataType="System.DateTime"/>
+    <Parameter Name="p_status" DataType="System.String"/>
+    <Parameter Name="p_type" DataType="System.String"/>
+  </Dictionary>
+  <ReportPage Name="Page1">
+    <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="66.15">
+      <TableObject Name="Table1" Width="717.82" Height="56.7">
+        <TableColumn Name="Column29" Width="37.8"/>
+        <TableColumn Name="Column30" Width="264.6"/>
+        <TableColumn Name="Column31" Width="75.6"/>
+        <TableColumn Name="Column32"/>
+        <TableColumn Name="Column33"/>
+        <TableColumn Name="Column34" Width="113.02"/>
+        <TableColumn Name="Column35" Width="94.5"/>
+        <TableRow Name="Row5" AutoSize="true">
+          <TableCell Name="Cell49" Text="[typeo.TEXT] в розрізі РУ - [status.STATE_NAME]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold" ColSpan="7"/>
+          <TableCell Name="Cell50" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell51" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell52" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell53" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell54" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell55" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row6">
+          <TableCell Name="Cell56" Text="з [FormatDateTime([sFdat1],&quot;Short Date&quot;)] по [FormatDateTime([sFdat2],&quot;Short Date&quot;)]" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold, Italic" ColSpan="7"/>
+          <TableCell Name="Cell57" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell58" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell59" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell60" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell61" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell62" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row7">
+          <TableCell Name="Cell63"/>
+          <TableCell Name="Cell64"/>
+          <TableCell Name="Cell65"/>
+          <TableCell Name="Cell66"/>
+          <TableCell Name="Cell67"/>
+          <TableCell Name="Cell68"/>
+          <TableCell Name="Cell69"/>
+        </TableRow>
+      </TableObject>
+    </ReportTitleBand>
+    <PageHeaderBand Name="PageHeader1" Top="70.15" Width="718.2" Height="49.14">
+      <TableObject Name="Table1" Width="717.82" Height="47.25">
+        <TableColumn Name="Column22" Width="37.8"/>
+        <TableColumn Name="Column23" Width="264.6"/>
+        <TableColumn Name="Column24" Width="75.6"/>
+        <TableColumn Name="Column25"/>
+        <TableColumn Name="Column26"/>
+        <TableColumn Name="Column27" Width="113.02"/>
+        <TableColumn Name="Column28" Width="94.5"/>
+        <TableRow Name="Row4" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell42" Border.Lines="All" Border.Width="0.5" Text="Код РУ" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt, style=Bold, Italic"/>
+          <TableCell Name="Cell43" Border.Lines="All" Border.Width="0.5" Text="Найменування РУ" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt, style=Bold, Italic"/>
+          <TableCell Name="Cell44" Border.Lines="All" Border.Width="0.5" Text="Дата" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt, style=Bold, Italic"/>
+          <TableCell Name="Cell45" Border.Lines="All" Border.Width="0.5" Text="Загальна &#13;&#10;к-ть" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt, style=Bold, Italic"/>
+          <TableCell Name="Cell46" Border.Lines="All" Border.Width="0.5" Text="Сума операції" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt, style=Bold, Italic"/>
+          <TableCell Name="Cell47" Border.Lines="All" Border.Width="0.5" Text="Сума залишків на вкладах" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt, style=Bold, Italic"/>
+          <TableCell Name="Cell48" Border.Lines="All" Border.Width="0.5" Text="К-ть вкладів" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt, style=Bold, Italic"/>
+        </TableRow>
+      </TableObject>
+    </PageHeaderBand>
+    <DataBand Name="Data1" Top="123.29" Width="718.2" Height="18.9" CanGrow="true" CanShrink="true" DataSource="Table">
+      <TableObject Name="Table1" Width="717.82" Height="18.9" EvenStyle="Gred" EvenStylePriority="UseAll">
+        <TableColumn Name="Column1" Width="37.8"/>
+        <TableColumn Name="Column2" Width="264.6"/>
+        <TableColumn Name="Column3" Width="75.6"/>
+        <TableColumn Name="Column4"/>
+        <TableColumn Name="Column5"/>
+        <TableColumn Name="Column6" Width="113.02"/>
+        <TableColumn Name="Column7" Width="94.5"/>
+        <TableRow Name="Row1" AutoSize="true">
+          <TableCell Name="Cell1" Border.Lines="All" Border.Color="Gainsboro" Border.Width="0.5" Text="[Zap.RU]" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell2" Border.Lines="All" Border.Color="Gainsboro" Border.Width="0.5" Text="[Zap.NAME]" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell3" Border.Lines="All" Border.Color="Gainsboro" Border.Width="0.5" Text="[Zap.REGDATE]" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell4" Border.Lines="All" Border.Color="Gainsboro" Border.Width="0.5" Text="[Zap.S1]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell5" Border.Lines="All" Border.Color="Gainsboro" Border.Width="0.5" Text="[Zap.S2]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell26" Border.Lines="All" Border.Color="Gainsboro" Border.Width="0.5" Text="[Zap.S3]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell27" Border.Lines="All" Border.Color="Gainsboro" Border.Width="0.5" Text="[Zap.S4]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+    <ColumnFooterBand Name="ColumnFooter1" Top="146.19" Width="718.2" Height="28.35"/>
+    <PageFooterBand Name="PageFooter1" Top="178.54" Width="718.2" Height="18.9">
+      <TableObject Name="Table1" Width="717.82" Height="18.9">
+        <TableColumn Name="Column36" Width="37.8"/>
+        <TableColumn Name="Column37" Width="264.6"/>
+        <TableColumn Name="Column38" Width="75.6"/>
+        <TableColumn Name="Column39"/>
+        <TableColumn Name="Column40"/>
+        <TableColumn Name="Column41" Width="113.02"/>
+        <TableColumn Name="Column42" Width="94.5"/>
+        <TableRow Name="Row8" AutoSize="true">
+          <TableCell Name="Cell70" Border.Lines="Top" Border.TopLine.Color="LightGray" Border.TopLine.Width="0.25" Border.BottomLine.Style="Double" Border.BottomLine.Width="0.5" Text="Централізований реєстр компенсаційних вкладів" VertAlign="Bottom" Font="Times New Roman, 5pt, style=Bold, Italic" TextFill.Color="DarkGray" ColSpan="3"/>
+          <TableCell Name="Cell71" Border.Lines="Top" Border.TopLine.Color="LightGray" Border.TopLine.Width="0.25" Border.BottomLine.Style="Double" Border.BottomLine.Width="0.5" VertAlign="Bottom" Font="Times New Roman, 5pt, style=Bold, Italic" TextFill.Color="DarkGray"/>
+          <TableCell Name="Cell72" Border.Lines="Top" Border.TopLine.Color="LightGray" Border.TopLine.Width="0.25" Border.BottomLine.Style="Double" Border.BottomLine.Width="0.5" VertAlign="Bottom" Font="Times New Roman, 5pt, style=Bold, Italic" TextFill.Color="DarkGray"/>
+          <TableCell Name="Cell73" Border.Lines="Top" Border.TopLine.Color="LightGray" Border.TopLine.Width="0.25" Border.BottomLine.Style="Double" Border.BottomLine.Width="0.5" Text="Звіт №3112" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" VertAlign="Bottom" Font="Times New Roman, 5pt, style=Bold, Italic" TextFill.Color="DarkGray"/>
+          <TableCell Name="Cell74" Border.Lines="Top" Border.TopLine.Color="LightGray" Border.TopLine.Width="0.25" Border.BottomLine.Style="Double" Border.BottomLine.Width="0.5" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 5pt, style=Bold, Italic" TextFill.Color="DarkGray"/>
+          <TableCell Name="Cell75" Border.Lines="Top" Border.TopLine.Color="LightGray" Border.TopLine.Width="0.25" Border.BottomLine.Style="Double" Border.BottomLine.Width="0.5" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" VertAlign="Bottom" Font="Times New Roman, 5pt, style=Bold, Italic" TextFill.Color="DarkGray"/>
+          <TableCell Name="Cell76" Border.Lines="Top" Border.TopLine.Color="LightGray" Border.TopLine.Width="0.25" Border.BottomLine.Style="Double" Border.BottomLine.Width="0.5" Text="Стор. [Page] з [TotalPages#]" HorzAlign="Right" VertAlign="Bottom" Font="Times New Roman, 5pt, style=Italic" TextFill.Color="DarkGray"/>
+        </TableRow>
+      </TableObject>
+    </PageFooterBand>
+  </ReportPage>
+</Report>

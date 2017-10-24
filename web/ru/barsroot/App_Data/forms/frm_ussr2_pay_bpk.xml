@@ -1,0 +1,105 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xmlform caption="Розробка реєстру виплат з БПК через касу(КОМПЕНСАЦІЯ)" captiontype="OnlyTitle">
+  <grids>
+     <grid id="gv1" pagesize="10" title="Розробка реєстру виплат з БПК через касу(КОМПЕНСАЦІЯ)" showpagesizebox="true">
+       <filters columnscount="3" buttontext="Пошук" caption="Фільтри">
+         <filter caption="Планова дата З" columnindex="1" field="P_DATA_beg" condition="Great" id="flt1">
+           <uicontrol type="DateInput"></uicontrol>
+         </filter>
+         <filter caption="Планова дата ПО" columnindex="2" field="P_DATA_end" condition="Less" id="flt2">
+           <uicontrol type="DateInput"></uicontrol>
+         </filter>
+         <filter caption="Відділення" columnindex="3" field="BRANCH" id="flt3" condition="LikeBoth">
+           <uicontrol type="DropDownList" controlwidth="200" table="(  select branch, name from v_user_branches  where length(branch)=22)" keyfield="BRANCH" valuefield="NAME"></uicontrol>
+         </filter>
+         <filter caption="Назва рахунку(клієнта)" columnindex="1" condition="LikeBoth" field="NMS" id="flt4">
+           <uicontrol type="TextBox"></uicontrol>
+         </filter>
+         <filter caption="ІНН" columnindex="2" condition="Equal" field="OKPO" id="flt5">
+           <uicontrol type="IntegerInput"></uicontrol>
+         </filter>
+         <filter caption="Документ" columnindex="3" condition="LikeBoth" field="SER_NUMDOC" id="flt6">
+           <uicontrol type="TextBox"></uicontrol>
+         </filter>
+       </filters>
+       <datasource>
+         <sql>
+           select * from V_PAY_CASH_BPK order by NMS
+         </sql>
+        </datasource>
+       <editform style="Dialog" title="Введіть фактичну дату" height="350" width="400" columnscount="1">
+         <buttons defaulttype="button">
+           <button id="btnEdit" caption="Редагувати|Зберегти|Вiдмiнити" hint="Редагувати рядок|Зберегти рядок|Вiдмiнити редагування" confirmmessage="">
+             <command type="Edit">
+               <sql>
+                 begin
+                 update V_PAY_CASH_BPK
+                 set F_DATA=:F_DATA
+                 where NLS=:NLS;
+                 end;
+               </sql>
+               <parameters>
+                 <parameter type="DataField" name="NLS"/>
+                 <parameter type="DataField" name="F_DATA"/>
+               </parameters>
+             </command>
+           </button>
+           <button caption="Закрити" id="btnClose">
+             <command type="Close"/>
+           </button>
+         </buttons>
+       </editform>
+      <rowselection method="SingleRow"></rowselection>
+       <fields>
+         <field datatype="DateTime" key="false" name="P_DATA" sort="Default">
+           <column caption="Планова дата"></column>
+           <form show="false"></form>
+         </field>
+         <field datatype="DateTime" key="false" name="P_DATA_beg">
+           <column caption="Це те ж саме що P_DATA+1(два фільтра не робить по одному полю!)" show="false"></column>
+           <form show="false"></form>
+         </field>
+         <field datatype="DateTime" key="false" name="P_DATA_end">
+           <column caption="Це те ж саме що P_DATA-1(два фільтра не робить по одному полю!)" show="false"></column>
+           <form show="false"></form>
+         </field>
+         <field datatype="DateTime" key="false" name="F_DATA">
+           <column caption="Фактична дата" show="false"></column>
+           <form rwmode="RW" required="true" show="true"></form>
+         </field>
+         <field datatype="Int64" key="true" name="ACC">
+           <form show="false"></form>
+           <column caption="ACC" show="false"></column>>
+         </field>
+         <field datatype="Int64" key="true" name="NLS">
+           <column caption="Номер рахунку" show="true"/>
+           <form show="true" rwmode="RO"></form>
+         </field>
+         <field datatype="String" key="false" name="NMS">
+           <column caption="Назва рахунку" show="true"/>
+           <form show="true" rwmode="RO"></form>
+         </field>
+         <field datatype="Decimal" key="false" name="OST">
+           <column caption="Фактичний залишок" show="true"/>
+           <form show="false"></form>
+         </field>
+         <field datatype="Int64" key="false" name="OKPO">
+           <column caption="ІНН клієнта" show="true"/>
+           <form show="false"></form>
+         </field>
+         <field datatype="Int64" key="false" name="RNK">
+           <column caption="РНК" show="false"></column>
+           <form show="false"></form>
+         </field>
+         <field datatype="String" key="false" name="SER_NUMDOC">
+           <column caption="Документ"/>
+           <form show="false"></form>
+         </field>
+         <field datatype="String" key="false" name="BRANCH">
+           <column caption="Відділення" show="false"/>
+           <form show="false"></form>
+         </field>
+        </fields>
+     </grid>
+    </grids>
+</xmlform>

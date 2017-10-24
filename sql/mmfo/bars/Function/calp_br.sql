@@ -1,0 +1,27 @@
+
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/function/calp_br.sql =========*** Run *** ==
+ PROMPT ===================================================================================== 
+ 
+  CREATE OR REPLACE FUNCTION BARS.CALP_BR 
+( s_   NUMBER, -- сумма капитала
+  int_ NUMBER, -- Ном.проц.ставка
+  dat1_ date , -- дата "С" вклбчительно
+  dat2_ date , -- дата "ПО" вклбчительно
+  basey_ int   -- код базы начисления
+  )   RETURN NUMBER as  --  05.03.2014 Sta С Банковским округлением  ( +0.5 дабы избезать заниженного прогноза процентов)
+BEGIN return round ( calp_NR (s_,int_,dat1_,dat2_,basey_) + (1/2), 0 ) ;
+END calp_BR  ;
+/
+ show err;
+ 
+PROMPT *** Create  grants  CALP_BR ***
+grant EXECUTE                                                                on CALP_BR         to BARS_ACCESS_DEFROLE;
+
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/function/calp_br.sql =========*** End *** ==
+ PROMPT ===================================================================================== 
+ 

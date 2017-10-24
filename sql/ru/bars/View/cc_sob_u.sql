@@ -1,0 +1,11 @@
+CREATE OR REPLACE FORCE VIEW BARS.cc_sob_u
+AS
+   SELECT *
+     FROM bars.CC_SOB
+    WHERE psys is not null;
+
+
+
+GRANT SELECT ON BARS.cc_sob_u TO BARS_ACCESS_DEFROLE;
+
+GRANT SELECT ON BARS.cc_sob_u TO START1;

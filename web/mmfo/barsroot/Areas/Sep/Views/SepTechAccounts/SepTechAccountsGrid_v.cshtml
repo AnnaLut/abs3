@@ -1,0 +1,271 @@
+﻿@{
+    Layout = null;
+}
+@model BarsWeb.Areas.Sep.Models.SepTechAccountsFilterParams
+    <div id="SepTechAccountsGridV2"></div>
+    <script>
+        $(document).ready(function () { 
+            $("#SepTechAccountsGridV2").kendoGrid({
+                columns: [
+                    {
+                        field: "ACC",
+                        hidden: true
+                    },
+                    {
+                        field: "TOBO",
+                        title: "Код безбал. відділення",
+                        width: "90px",
+                        headerAttributes: { style: "white-space: normal;" }
+                    },
+                    {
+                        field: "NLS",
+                        title: "Номер рахунку",
+                        headerAttributes: { style: "white-space: normal;" },
+                        width: "135px"
+                    },                    
+                    {
+                        field: "KV",
+                        title: "Код",
+                        headerAttributes: { style: "white-space: normal;" },
+                        width: "80px"
+                    },
+                    {
+                        field: "LCV",
+                        title: "Валюта",
+                        headerAttributes: { style: "white-space: normal;" },
+                        width: "70px"
+                    },
+                    {
+                        field: "NMS",
+                        title: "Назва рахунку",
+                        headerAttributes: { style: "white-space: normal;" },
+                        width: "205px"
+                    },
+                    {
+                        field: "ISF",
+                        title: "Вхідний залишок",
+                        headerAttributes: { style: "white-space: normal;" },
+                        template: "<div style='text-align:right'>#=CellPaint(ISF)#</div>",
+                        width: "150px"
+                    },
+                    {
+                        field: "DOSF",
+                        title: "Обороти Дебет",
+                        headerAttributes: { style: "white-space: normal;" },
+                        template: "<div style='text-align:right'>#=moneyFormat(DOSF)#</div>",
+                        width: "150px"
+                    },
+                    {
+                        field: "KOSF",
+                        title: "Обороти Кредит",
+                        headerAttributes: { style: "white-space: normal;" },
+                        template: "<div style='text-align:right'>#=moneyFormat(KOSF)#</div>",
+                        width: "150px"
+                    },
+                    {
+                        field: "OSTCF",
+                        title: "Фактичний залишок",
+                        headerAttributes: { style: "white-space: normal;" },
+                        template: "<div style='text-align:right'>#=CellPaint(OSTCF)#</div>",
+                        width: "150px"
+                    },
+                    {
+                        field: "OSTBF",
+                        title: "Плановий залишок",
+                        headerAttributes: { style: "white-space: normal;" },
+                        template: "<div style='text-align:right'>#=CellPaint(OSTBF)#</div>",
+                        width: "150px"
+                    },
+                    {
+                        field: "OSTFF",
+                        title: "Майбутній залишок",
+                        headerAttributes: { style: "white-space: normal;" },
+                        template: "<div style='text-align:right'>#=CellPaint(OSTFF)#</div>",
+                        width: "150px"
+                    },
+                    {
+                        field: "DAPP",
+                        title: "Дата останнього руху",
+                        headerAttributes: { style: "white-space: normal;" },
+                        template: "<div style='text-align:left;'>#=kendo.toString(DAPP,'dd/MM/yyyy') != null ? kendo.toString(DAPP,'dd/MM/yyyy') : '' #</div>",
+                        width: "100px"
+                    },
+                    {
+                        field: "NBS",
+                        title: "Баланс рахунок",
+                        attributes: { "class": "text-center" },
+                        headerAttributes: { style: "white-space: normal;" },
+                        width: "90px"
+                    },
+                    {
+                        field: "PAP",
+                        title: "Акт Пас",
+                        headerAttributes: { style: "white-space: normal;" },
+                        width: "70px",
+                        template: "#=PAPCaseHandle(PAP)#",
+                        attributes: { "class": "text-center" }
+                    },
+                    {
+                        field: "TIP",
+                        title: "Тип рахунку",
+                        headerAttributes: { style: "white-space: normal;" },
+                        width: "80px",                       
+                        attributes: { "class": "text-center" }
+                    },
+                    {
+                        field: "OB22",
+                        title: "ОБ22",
+                        attributes: { "class": "text-center" },
+                        headerAttributes: { style: "white-space: normal;" },
+                        width: "80px"
+                    },
+                    {
+                        field: "ISP",
+                        title: "ID виконавця",
+                        attributes: { "class": "text-center" },
+                        headerAttributes: { style: "white-space: normal;" },
+                        width: "90px"
+                    },
+                    {
+                        field: "FIO",
+                        title: "ФІО Виконавця",
+                        headerAttributes: { style: "white-space: normal;" },
+                        width: "190px"
+                    },
+                    {
+                        field: "DAOS",  
+                        title: "Дата відкриття",
+                        headerAttributes: { style: "white-space: normal;" },
+                        template: "<div style='text-align:left;'>#=kendo.toString(DAOS,'dd/MM/yyyy') != null ? kendo.toString(DAOS,'dd/MM/yyyy') : '' #</div>",
+                        width: "100px"
+                    },
+                    {
+                        field: "DAZS",
+                        title: "Дата закриття",
+                        headerAttributes: { style: "white-space: normal;" },
+                        template: "<div style='text-align:left;'>#=kendo.toString(DAZS,'dd/MM/yyyy') != null ? kendo.toString(DAZS,'dd/MM/yyyy') : '' #</div>",
+                        width: "100px",
+                        hidden: true
+                    },
+                    {
+                        field: "RNK",
+                        title: "РНК",
+                        attributes: { "class": "text-center" },
+                        headerAttributes: { style: "white-space: normal;" },
+                        width: "100px"
+                    }
+                ],
+                toolbar: [{ name: "excel", text: 'Друк' }],
+                excel: {
+                    fileName: "Tech_Documents_Data.xlsx",
+                    allPages: true,
+                    filterable: true,
+                    proxyURL: bars.config.urlContent("/sep/SepTechAccounts/TechDocumentsToExcelFile")
+                },
+                excelExport: function (e) {
+                    debugger;
+                    var sheet = e.workbook.sheets[0];
+                    for (var rowIndex = 1; rowIndex < sheet.rows.length; rowIndex++) {
+                        var row = sheet.rows[rowIndex];
+                        for (var cellIndex = 0; cellIndex < row.cells.length; cellIndex ++) {
+                            //row.cells[cellIndex].background = "#aabbcc";
+                            row.cells[cellIndex] = convert(row.cells[cellIndex]);
+                        }
+                    }
+                },
+                dataSource: {
+                    type: "aspnetmvc-ajax",
+                    serverPaging: true,
+                    serverSorting: true,
+                    serverFiltering: true,
+                    pageSize: 10,
+                    transport: {
+                        read: {
+                            dataType: 'json',
+                            url: bars.config.urlContent('/sep/SepTechAccounts/@Model.GridVariantString'),                     
+                            data: SepTechAccountsGridData
+                        }
+                    },
+                    schema: {
+                        data: "Data",
+                        total: "Total",
+                        errors: "Errors",
+                        model: {
+                            fields: {
+                                ACC: { type: "number" },
+                                TOBO: { type: "string" },
+                                NLS: { type: "string" },
+                                KV: { type: "string" },
+                                LCV: { type: "string" },
+                                NMS: { type: "string" },
+                                ISF: { type: "number" },
+                                DOSF: { type: "number" },
+                                KOSF: { type: "number" },
+                                OSTCF: { type: "number" },
+                                OSTBF: { type: "number" },
+                                OSTFF: { type: "number" },
+                                DAOS: { type: "date" },
+                                NBS: { type: "number" },
+                                PAP: { type: "string" },
+                                TIP: { type: "string" },
+                                ISP: { type: "number" },
+                                FIO: { type: "string" },
+                                DAPP: { type: "date" },
+                                DAZS: { type: "date" },
+                                RNK: { type: "number" }
+                            }
+                        }
+                    }                   
+                },
+                sortable: true,
+                filterable: true,
+                scrollable: true,
+                height: function () {
+                    return $(window).height() / 4 * 3;
+                },
+                resizable: true,
+                autobind: true,
+                selectable: "multiple",
+                pageable: {
+                    refresh: true,
+                    pageSizes: true,
+                    buttonCount: 5
+                },
+                change: SepTechAccountsGridonRowSelected,
+                dataBound: grid_dataBound
+            });
+ 
+              
+            if (GetCurrentSepTechAccountsGrid().id != "SepTechAccountsGridVQF") {
+                var state = JSON.parse($.cookie("sepTechState"));
+                var grid = GetCurrentGrid();
+                if (state) {
+                    if (state.filter) {
+                        // unknown, non-declared function parseFilterDates....
+                        //parseFilterDates(state.filter, grid.dataSource.options.schema.model.fields);
+                    }
+                    grid.dataSource.query(state);
+                }
+                else {
+                    grid.dataSource.read();
+                }
+            }
+
+        });
+         
+        function convert(cell) {
+
+            if (cell == null || cell.value == null) { return cell; }
+            if (cell.value && isNaN(cell.value) && cell.value.indexOf("Date") != -1) {
+                return parseDate(cell.value, 'dd.MM.yyyy HH:mm:ss');
+            }
+            if (!isNaN(cell.value))
+                cell.format = '#,##0.00';
+            return cell;
+        };
+
+        function refreshGrid() {
+            $('#SepTechAccountsGridV2').data('kendoGrid').dataSource.read();
+            $('#SepTechAccountsGridV2').data('kendoGrid').refresh();
+        };
+    </script>

@@ -1,0 +1,51 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = "Розбір картотек ";
+}
+<link rel="stylesheet" href="~/Areas/GL/CSS/nlStyle.css" />
+<script src="~/Areas/GL/Scripts/Services/NLService.js?v1.1"></script>
+<script src="~/Areas/GL/Scripts/Controllers/NLCtrl.js?v1.1"></script>
+
+<div ng-controller="NLController as nl">
+	<h1>@ViewBag.Title{{nl.tipTitle}}</h1>
+	<div class="panel panel-default">		
+	    <div class="panel-body">
+	    	<div data-kendo-toolbar="nl.fileToolbar" k-options="nl._fileToolbarOptions" ></div>
+			<div data-kendo-grid="nl.fileGrid"       k-options="nl._fileGridOptions"    ></div>
+	    </div>
+	</div>
+	<div class="panel panel-default" ng-show="nl.subFileDisplay === true">
+		<div class="panel-body">
+			<div data-kendo-toolbar="nl.subFileToolbar" k-options="nl._subFileToolbarOptions"></div>
+			<div data-kendo-grid="nl.subFileGrid"    	k-options="nl._subFileGridOptions"   ></div>
+			<div 
+				kendo-window="selectOperWindow" 
+				k-visible="false"
+				k-modal="true"
+				k-width="500" 
+				k-height="80"
+				k-resizable="false"
+				k-title="'Оберіть потрібну операцію'" 
+				k-on-open="winVisible = true" 
+				k-on-close="winVisible = false">
+            	<div style="margin-top:10px">            		
+            		<form name="form" ng-submit="nl.submit(value)">
+			        	<div>
+							<div class="col-md-9">
+								<select 
+					            	kendo-drop-down-list="nl.list"
+					            	style="width: 100%;"
+					            	k-ng-model="value"
+					            	k-options="nl._ttListOptions">
+					        	</select>
+							</div>
+							<div class="col-md-1">
+								<button type="submit" class="btn btn-default">Ok</button>
+							</div>
+						</div>				
+					</form>
+            	</div>
+        	</div>
+		</div>
+	</div>	
+</div>

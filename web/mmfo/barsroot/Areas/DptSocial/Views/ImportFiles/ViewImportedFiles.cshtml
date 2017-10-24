@@ -1,0 +1,17 @@
+﻿@{
+    ViewBag.Title = "Перегляд імпортованих фалів";
+}
+<script src="~/Areas/DptSocial/Scripts/app/controllers/ImportFiles/ViewFilesController.js"></script>
+<link rel="stylesheet" type="text/css" href="~/Areas/DptSocial/Content/css/ImportFiles/styles.css" />
+
+<div ng-app="BarsWeb.Controllers" ng-controller="AppController">
+    <h2>@ViewBag.Title</h2><br />
+    <input id="ddFileType" style="width: 175px;" value="@ViewBag.file_tp"/>
+    <input id="dpFileDate" required="required"/>
+    <button class="k-button" ng-click="filesGrid.dataSource.read()">Перечитати</button><br /><br />
+    <div kendo-grid="filesGrid" k-options="filesGridOptions"></div>
+    @* Лоадер(ожидание) *@
+    <div id="loader" hidden>
+        <img id="loader_gif" src="~/Areas/PB1/Content/Images/loader.gif" width="100" height="100" class="ajax-loader" />
+    </div>
+</div>

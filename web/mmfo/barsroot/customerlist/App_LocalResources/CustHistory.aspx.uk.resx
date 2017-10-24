@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+<xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+<xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+<xsd:element name="root" msdata:IsDataSet="true">
+<xsd:complexType>
+<xsd:choice maxOccurs="unbounded">
+<xsd:element name="metadata">
+<xsd:complexType>
+<xsd:sequence>
+<xsd:element name="value" type="xsd:string" minOccurs="0" />
+</xsd:sequence>
+<xsd:attribute name="name" use="required" type="xsd:string" />
+<xsd:attribute name="type" type="xsd:string" />
+<xsd:attribute name="mimetype" type="xsd:string" />
+<xsd:attribute ref="xml:space" />
+</xsd:complexType>
+</xsd:element>
+<xsd:element name="assembly">
+<xsd:complexType>
+<xsd:attribute name="alias" type="xsd:string" />
+<xsd:attribute name="name" type="xsd:string" />
+</xsd:complexType>
+</xsd:element>
+<xsd:element name="data">
+<xsd:complexType>
+<xsd:sequence>
+<xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+<xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+</xsd:sequence>
+<xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+<xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+<xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+<xsd:attribute ref="xml:space" />
+</xsd:complexType>
+</xsd:element>
+<xsd:element name="resheader">
+<xsd:complexType>
+<xsd:sequence>
+<xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+</xsd:sequence>
+<xsd:attribute name="name" type="xsd:string" use="required" />
+</xsd:complexType>
+</xsd:element>
+</xsd:choice>
+</xsd:complexType>
+</xsd:element>
+</xsd:schema>
+<resheader name="resmimetype">
+<value>text/microsoft-resx</value>
+</resheader>
+<resheader name="version">
+<value>2.0</value>
+</resheader>
+<resheader name="reader">
+<value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+</resheader>
+<resheader name="writer">
+<value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+</resheader>
+<data name="spFrom.InnerText" xml:space="preserve">
+<value>З </value>
+</data>
+<data name="spTill.InnerText" xml:space="preserve">
+<value>По </value>
+</data>
+<data name="Message12.Value" xml:space="preserve">
+<value>Історія зміни параметрів рахунку:</value>
+</data>
+<data name="Message13.Value" xml:space="preserve">
+<value>Історія зміни параметрів клієнта:</value>
+</data>
+<data name="forbtRefresh.Value" xml:space="preserve">
+<value>Перечитати дані</value>
+</data>
+<data name="forbtPrint.Value" xml:space="preserve">
+<value>Друк</value>
+</data>
+<data name="forbtClose.Value" xml:space="preserve">
+<value>Закрити рахунок</value>
+</data>
+<data name="currentPageCulture.Value" xml:space="preserve">
+<value>uk</value>
+</data>
+<data name="wgAscending.Value" xml:space="preserve">
+<value>У порядку зростання</value>
+</data>
+<data name="wgCancel.Value" xml:space="preserve">
+<value>Відміна</value>
+</data>
+<data name="wgDescending.Value" xml:space="preserve">
+<value>У порядку спадання</value>
+</data>
+<data name="wgNextPage.Value" xml:space="preserve">
+<value>Наступна сторінка</value>
+</data>
+<data name="wgPageSizeText.Value" xml:space="preserve">
+<value>Рядків на сторінці:</value>
+</data>
+<data name="wgPrevPage.Value" xml:space="preserve">
+<value>Попередня сторінка</value>
+</data>
+<data name="wgRowsInTable.Value" xml:space="preserve">
+<value>Кількість рядків в таблиці</value>
+</data>
+<data name="wgSave.Value" xml:space="preserve">
+<value>Зберегти</value>
+</data>
+<data name="wgSetFilter.Value" xml:space="preserve">
+<value>Встановити фільтр</value>
+</data>
+</root>

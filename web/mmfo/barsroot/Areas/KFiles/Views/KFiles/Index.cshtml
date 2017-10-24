@@ -1,0 +1,187 @@
+﻿@{
+    ViewBag.Title = "АРМ корпорації";
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    string theme = "bootstrap";
+    var cook = HttpContext.Current.Request.Cookies["theme"];
+    if (cook != null)
+    {
+        theme = cook.Value;
+    }
+}
+
+@*<div class="search-main"></div>*@
+
+
+
+<h1>АРМ Корпоративні клієнти</h1>
+<div ng-controller="KFiles.CorporationCtrl">
+
+  @*<div ng-hide="test">*@ 
+        
+        @*<div kendo-window="filterCorp"
+             k-modal="true"
+             k-title="'Виберіть коорпорацію'"
+             k-width="400"
+             k-resizable="false"
+             k-height="300"
+             k-visible="true">*@
+        
+    <div style="padding: 20px 0;">
+            <select kendo-drop-down-list="ddl"               
+                    @*k-option-label="'Виберіть корпорацію'"*@
+                    k-data-text-field="'CORPORATION_NAME'"
+                    k-data-value-field="'ID'"
+                    k-data-source="ddlDataSource"
+                    k-options="actualDropDownSettlementOptions"
+                    style="width:100%;"
+                     ></select>
+
+        @*</div>*@
+
+
+
+        
+    </div>
+    <div kendo-tab-strip="tabStrip" k-options="tabOptionsFilesCorporation" style="margin-top: 1px;">
+        <ul>
+            <li class="k-state-active" ng-class="lockTabCorporation  ? 'k-state-disabled': '' ">Корпорації</li>
+            <li ng-class="unLockTabFilesCorporation ? '': 'k-state-disabled'"> Файли корпорації</li>
+        </ul>
+
+        <div>
+            <div kendo-toolbar k-options="toolbarOptions"></div>
+            <kendo-tree-list k-options="treelistOptions" id="treeList" k-on-change="selectedRow(kendoEvent)" style="margin-top: 1px;"></kendo-tree-list>
+        </div>
+        <div ng-controller="KFiles.FilesCorporationCtrl">
+            <div kendo-toolbar k-options="toolbarOptionsFilesCorporation"></div>
+            <div kendo-grid="gridFilesCorporation" k-options="gridOptionsFilesCorporation" k-on-change="selectedRowFilesCorporation(data)" ng-show="ShowGridFilesCorporation"></div>
+            <div kendo-grid="gridDataFiles" k-options="gridOptionsDataFiles" ng-show="ShowGridDataFiles"></div>
+        </div>
+    </div>
+    <div ng-show="form">
+        <div class="k-overlay darkLayout"></div>
+        <div class="k-widget k-window " id="formAddCorporation">
+            <div class="k-window-titlebar k-header" style="margin-top: -30px;">
+                &nbsp;
+                <span ng-model="formTitle">{{formTitle}}</span>
+                <div class="k-window-actions">
+                    <a role="button" href="#" class="k-window-action k-link">
+                        <span class="k-icon k-i-close" ng-click="closeForm()">Close</span>
+                    </a>
+                </div>
+            </div>
+            <div class="k-popup-edit-form k-window-content k-content" tabindex="0">
+                <form name="formAddCorporation">
+                    <div class="k-edit-form-container">
+                        <div>
+                            <div ng-show="parentCorporation">
+                                <span style="margin-left: 5%;">Корпорація</span>
+                                <input type="text" class="k-input k-textbox" ng-model="parentCorporationName" style="margin-left: 8.5%" readonly="readonly" ng-keydown="blockBackSpace($event)" />
+                                <input type="hidden" ng-model="PARENT_ID" />
+                                <input type="hidden" ng-model="PARENT_NAME" />
+                                <input type="hidden" ng-model="parentNameForCheck" />
+                            </div>
+                            <div>
+                                <span style="margin-left: 5%;">Назва</span>
+                                <input type="text" class="k-input k-textbox" id="CorpName" ng-model="CORPORATION_NAME" name="CORPORATION_NAME" style="margin-left: 16.3%; margin-top: 1%;" required />
+                                <span ng-show="formAddCorporation.CORPORATION_NAME.$error.required" style="color:red"> * Поле обов'язкове </span>
+                            </div>
+                            <div>
+                                <span style="margin-left: 5%;">Код ЄДРПОУ</span>
+                                <input type="text" class="k-input k-textbox" id="CorpCode" ng-model="CORPORATION_CODE" style="margin-left: 5%; margin-top: 1%;" maxlength="15" />
+                            </div>
+                            <div>
+                                <span style="margin-left: 5%;">Код установи</span>
+                                <input class="k-input k-textbox required" id="EXTERNAL_ID" ng-model="EXTERNAL_ID" name="EXTERNAL_ID" style="margin-left: 5%; margin-top: 1%;" required />
+                                <span ng-show="formAddCorporation.EXTERNAL_ID.$error.required" style="color:red"> * Поле обов'язкове </span>
+                                <input ng-model="ID" type="hidden">
+                            </div>
+                        </div>
+                        <div class="k-edit-buttons k-state-default">
+                            <button class="k-button k-button-icontext k-primary k-grid-update" ng-show="showButtonAddNewCorporationOrSubCorporation" ng-disabled="formAddCorporation.$invalid" ng-click="addNewCorporationOrSubCorporation()"><span class="k-icon k-update"></span>Додати</button>
+                            <button class="k-button k-button-icontext k-primary k-grid-update" ng-show="showButtonEditCorporationOrSubCorporation" ng-disabled="formAddCorporation.$invalid" ng-click="sendEditCorporationOrSubCorpotation()"><span class="k-icon k-update"></span>Редагувати</button>
+                            <a class="k-button k-button-icontext k-grid-cancel" href="#" ng-click="closeForm()"><span class="k-icon k-cancel"></span>Скасувати</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div kendo-window="winChangeHierarchyCorporation" k-title="'Змінити рівень ієрархії'" k-visible="false" id="winChangeHierarchyCorporation" k-modal="true" class="formChangeCorporationLevel">
+        <div ng-controller="KFiles.changeHierarchyCorporationCtrl" class="col-sm-11 col-md-11 col-xs-11 col-lg-11">
+            <div class="col-lg-5 col-sm-5 col-md-5 col-xs-5 containerTextSubCorporation">
+                <span class="textSubCorporation">Під корпорація</span>
+            </div>
+            <div class="col-lg-5 col-sm-5 col-md-5 col-xs-5 containerSubCorporation">
+                <input type="text" class="k-input k-textbox" ng-model="CORPORATION_NAME" readonly="readonly" ng-keydown="blockBackSpace($event)" />
+            </div>
+            <div class="col-lg-5 col-sm-5 col-md-5 col-xs-5 containerTextChangeLevel">
+                <span class="textChangeHierarchyCorporation">Замінити підкорпорацію верхнього рівня на </span>
+            </div>
+            <div class="col-sm-5 col-md-5 col-xs-5 col-lg-5 containerChangeLevel">
+                <select kendo-drop-down-list
+                        ng-model="selectedParentId"
+                        k-ng-model="parentId"
+                        k-data-text-field="'CORPORATION_NAME'"
+                        k-value-primitive="true"
+                        k-data-value-field="'ID'"
+                        k-data-source="corporationDataSource"></select>
+            </div>
+            <div class="col-sm-5 col-md-5 col-xs-5 col-lg-5   containerButtonsChangeLevel">
+                <button class="k-button k-button-icontext k-primary k-grid-update" ng-click="changeLevel()"><span class="k-icon k-update"></span>Змінити</button>
+                <a class="k-button k-button-icontext k-grid-cancel" href="#" ng-click="closeFormChangeHierarchyCorporation()"><span class="k-icon k-cancel"></span>Скасувати</a>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+
+@Styles.Render("~/bundles/KFiles/styles")
+@Scripts.Render("~/bundles/KFiles/scripts")
+
+
+@*<link rel="stylesheet" href="http://cdn.kendostatic.com/2015.1.408/styles/kendo.common.min.css" />
+    <link rel="stylesheet" href="http://cdn.kendostatic.com/2015.1.408/styles/kendo.default.min.css" />
+    <link rel="stylesheet" href="http://cdn.kendostatic.com/2015.1.408/styles/kendo.dataviz.min.css" />
+    <link rel="stylesheet" href="http://cdn.kendostatic.com/2015.1.408/styles/kendo.dataviz.default.min.css" />*@
+
+
+
+
+@*<style>
+
+        .search-catalog {
+        background-color: rgba(20,53,80,0.038);
+        border: 1px solid rgba(20,53,80,0.05);
+        border-radius: 2px;
+    }
+
+    #tabstrip .k-content {
+        min-height: 10px !important;
+    }
+
+    #tabstrip h2 {
+        margin-left: 20px;
+        margin-top: 10px;
+    }
+
+    #gridFiles th.k-header {
+        text-align: center;
+    }
+
+    .search-box {
+        background-color: rgba(20,53,80,0.038);
+        border: 1px solid rgba(20,53,80,0.05);
+        border-radius: 2px;
+        padding: 10px;
+        max-width: 1111px;
+        position: relative;
+    }
+
+    </style>*@
+
+
+
+

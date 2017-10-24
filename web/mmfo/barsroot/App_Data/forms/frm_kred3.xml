@@ -1,0 +1,101 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xmlform captiontype="OnlyTitle" caption="Перегляд стану кредиту">
+    <customforms>
+    <customform name="frm_kred3" title="Перегляд стану кредиту" columnscount="3" buttonsposition="Bottom">
+      <startupcommand>
+        <datasource>
+          <sql>
+            begin
+            get_info_upb_tmp(
+            :CC_ID_,
+            :DAT1_);
+            end;
+          </sql>
+          <parameters>
+            <parameter name="CC_ID_" datatype="String" type="QueryString"></parameter>
+            <parameter name="DAT1_" datatype="DateTime" type="QueryString"></parameter>
+          </parameters>
+        </datasource>
+      </startupcommand>
+      <buttons>
+      <!--  <button caption="Назад" type="Button" hint="На попередню сторінку" id="btnback">
+          <command type="Redirect" url="/barsroot/barsweb/dynform.aspx?form=frm_cc_dp" checkselectedrow="false">
+            <parameters>
+              <parameter type="QueryString"></parameter> 
+            </parameters>
+            </command>
+        </button>-->
+      </buttons>
+       <datasource>
+        <sql>
+          select CC_ID_, DAT1_, nS_, nS1_, NMK_, KV_, nSS_,
+          nSS1_, nSN_, nSN1_, nSK_, nSK1_, nSP_,
+          nSSP_,nSSPN_,nSSPK_
+          from tmp_get_info_upb_ext
+          where CC_ID_ =:CC_ID_ and DAT1_ =:DAT1_
+        </sql>
+        <parameters>
+          <parameter name="CC_ID_" datatype="String" type="QueryString"></parameter>
+          <parameter name="DAT1_" datatype="DateTime" type="QueryString"></parameter>
+        </parameters>
+      </datasource>
+      <customfields>
+        <customfield name="P_CC_ID_" columnindex="1" datatype="String" index="1" label="Номер КД" required ="false" datasourcefield="CC_ID_">
+          <uicontrol readonly="true" align="Left"  table="tmp_get_info_upb_ext" keyfield="id" type="TextBox"></uicontrol>
+        </customfield>
+        <customfield name="P_DAT1_" columnindex="1" datatype="DateTime" index="2" label="Дата КД" required ="false" datasourcefield="DAT1_">
+          <uicontrol readonly="true" align="Center" keyfield="id" table="tmp_get_info_upb_ext" type="DateInput"></uicontrol>
+        </customfield>
+        <!-- <customfield name="P_RNK_" columnindex="1" datatype="Int64" index="3" label="РНК позичальника" required ="false" datasourcefield="RNK_">
+          <uicontrol readonly="true" align="Right" keyfield="id" table="tmp_get_info_upb_ext" type="IntegerInput"></uicontrol>
+        </customfield>-->
+        <customfield name="P_NMK_" columnindex="1" datatype="String" index="3" label="Назва клієнта" required ="false" datasourcefield="NMK_">
+          <uicontrol readonly="true" align="Left" keyfield="id" table="tmp_get_info_upb_ext" type="TextBox"></uicontrol>
+        </customfield>
+        <customfield name="P_KV_" columnindex="1" datatype="Int64" index="4" label="Код валюти" required ="false" datasourcefield="KV_">
+          <uicontrol readonly="true" align="Left" keyfield="id" table="tmp_get_info_upb_ext" type="IntegerInput"></uicontrol>
+        </customfield>
+        
+        <customfield name="P_nS_" columnindex="2" datatype="Decimal" index="1" label="Сума поточного платежа" required ="false" datasourcefield="nS_">
+          <uicontrol readonly="true" align="Right" keyfield="id" table="tmp_get_info_upb_ext" type="DecimalInput"></uicontrol>
+        </customfield>
+        <customfield name="P_nSS_" columnindex="2" datatype="Decimal" index="2" label="Поточна сума основного боргу" required ="false" datasourcefield="nSS_">
+          <uicontrol readonly="true" align="Right" keyfield="id" table="tmp_get_info_upb_ext" type="DecimalInput"></uicontrol>
+        </customfield>
+        <customfield name="P_nSN_" columnindex="2" datatype="Decimal" index="3" label="Сума нарахованих %%" required ="false" datasourcefield="nSN_">
+          <uicontrol readonly="true" align="Right" keyfield="id" table="tmp_get_info_upb_ext" type="DecimalInput"></uicontrol>
+        </customfield>
+        <customfield name="P_nSK_" columnindex="2" datatype="Decimal" index="4" label="Сума нарахованої комісії" required ="false" datasourcefield="nSK_">
+          <uicontrol readonly="true" align="Right" keyfield="id" table="tmp_get_info_upb_ext" type="DecimalInput"></uicontrol>
+        </customfield>
+        <customfield name="P_nSP_" columnindex="2" datatype="Decimal" index="5" label="Сума нарахованої пені" required ="false" datasourcefield="nSP_">
+          <uicontrol readonly="true" align="Right" keyfield="id" table="tmp_get_info_upb_ext" type="DecimalInput"></uicontrol>
+        </customfield>
+        <customfield name="P_nSSP_" columnindex="2" datatype="Decimal" index="6" label="Сума просроченого тіла" required ="false" datasourcefield="nSSP_">
+          <uicontrol readonly="true" align="Right" keyfield="id" table="tmp_get_info_upb_ext" type="DecimalInput"></uicontrol>
+        </customfield>
+        <customfield name="P_nSSPN_" columnindex="3" datatype="Decimal" index="1" label="Сума просрочених відсотків" required ="false" datasourcefield="nSSPN_">
+          <uicontrol readonly="true" align="Right" keyfield="id" table="tmp_get_info_upb_ext" type="DecimalInput"></uicontrol>
+        </customfield>
+        <customfield name="P_nSSPK_" columnindex="3" datatype="Decimal" index="2" label="Сума просроченої комісії" required ="false" datasourcefield="nSSPK_">
+          <uicontrol readonly="true" align="Right" keyfield="id" table="tmp_get_info_upb_ext" type="DecimalInput"></uicontrol>
+        </customfield>
+        
+        <customfield name="P_nS1_" columnindex="3" datatype="Decimal" index="3" label="Сума остаточного платежа" required ="false" datasourcefield="nS1_">
+          <uicontrol readonly="true" align="Right" keyfield="id" table="tmp_get_info_upb_ext" type="DecimalInput"></uicontrol>
+        </customfield>
+        <customfield name="P_nSS1_" columnindex="3" datatype="Decimal" index="4" label="Остаточна сума основного боргу" required ="false" datasourcefield="nSS1_">
+          <uicontrol readonly="true" align="Right" keyfield="id" table="tmp_get_info_upb_ext" type="DecimalInput"></uicontrol>
+        </customfield>
+        <customfield name="P_nSN1_" columnindex="3" datatype="Decimal" index="5" label="Остаточна сума відсоткового боргу" required ="false" datasourcefield="nSN1_">
+          <uicontrol readonly="true" align="Right" keyfield="id" table="tmp_get_info_upb_ext" type="DecimalInput"></uicontrol>
+        </customfield>
+        <customfield name="P_nSK1_" columnindex="3" datatype="Decimal" index="6" label="Остаточна сума комісійного боргу" required ="false" datasourcefield="nSK1_">
+          <uicontrol readonly="true" align="Right" keyfield="id" table="tmp_get_info_upb_ext" type="DecimalInput"></uicontrol>
+        </customfield>
+        
+      </customfields>
+
+    </customform>
+  </customforms>
+</xmlform>

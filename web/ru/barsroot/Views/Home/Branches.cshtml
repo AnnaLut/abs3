@@ -1,0 +1,32 @@
+﻿@inherits System.Web.Mvc.WebViewPage<IEnumerable<BarsWeb.Models.BRANCHES>>
+@{
+  Layout = null;
+}
+<div title="@ViewBag.selectedBranchName" style="text-align: center;width: 200px;background-color: #ffffff; color: #015386; height: 20px; padding: 1px 2px; margin-bottom: 1px; position: relative;">
+  <span style="margin-right: 18px;" title="@ViewBag.selectedBranchName">@ViewBag.selectedBranch</span>
+  @if (Model.Any())
+  {
+    <span style="float: right;margin: 2px 1px;position: absolute;right: 2px;" class="ico-select"></span>
+    <form method="POST" name="changeBranch" id="changeBranch" action="@Url.Content("~/home/changebranch/")"
+          style="position: absolute; left: 0; top: 0; cursor: pointer; -ms-opacity: 0; opacity: 0; filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0); zoom: 1; width: 205px; height: 30px; ">
+      <select id="branch" title="@ViewBag.selectedBranchName" style="width: 205px; cursor: pointer;" name="branch" onchange="$('body').loader(); document.getElementById('changeBranch').submit(); ">
+        @foreach (var item in Model)
+        {
+          if (item.BRANCH == ViewBag.selectedBranch)
+          {
+            <option value="@item.BRANCH" selected="selected">@item.NAME</option>
+          }
+          else
+          {
+            <option value="@item.BRANCH">@item.NAME</option>
+          }
+        }
+      </select>
+    </form>
+  }
+</div>
+<div style ="overflow: hidden;font-size: 10px; text-align: center; width: 200px; background-color: #ffffff; color: #015386; height: 29px; padding: 1px 2px 1px 2px; ">
+  <span style="font-size: 12px;line-height: 1" title="@ViewBag.selectedBranchName">@ViewBag.selectedBranchName</span>
+</div>
+
+

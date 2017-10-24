@@ -1,0 +1,1395 @@
+﻿@model  BarsWeb.Areas.Sep.Models.AccessType
+@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = "Розбір картотеки \"До з'ясування\" (СЕП_3720) ";
+}
+<script src="~/lib/jsZip/jszip.min.js"></script>
+<h2>
+    @ViewBag.Title @if (Model.Mode.Contains("hrivna"))
+    {<text>(ГРН)</text>}
+    else
+    {<text>(ВАЛ)</text>}
+</h2>
+
+Залишок на 3720<input type='text' style='text-align:right; font-weight: bold;' value='@(ViewBag.SumT902)' readonly>
+По док.3720<input type='text' style='text-align:right; font-weight: bold;' value='@(ViewBag.SumT902Docs3720)' readonly>
+
+<div id="sep3720ToolBar"></div>
+<div id="sep3720Grid"></div>
+<div id="sep3720RowInfo"></div>
+<div id="Sep3720Window"></div>
+<div id="Sep3720RegisterWindow">
+    <div id="registerOptions">
+        <div class="k-content k-window-content">
+            <div class="col-md-11" style="padding: 10px;">
+                <label>Оберіть тип:</label>
+                <input id="ddRegisterType" style="width: 500px;" /><br />
+            </div>
+            <div class="col-md-5" style="padding: 10px;">
+                <label>З:</label><br />
+                <input id="dpRegisterOptionFrom" style="width: 100%;" />
+            </div>
+            <div class="col-md-5" style="padding: 10px;">
+                <label>По:</label><br />
+                <input id="dpRegisterOptionTo" style="width: 100%;" />
+            </div>
+        </div>
+        <br />
+        <div class="k-content k-window-footer">
+            <button id="btnCancel" onclick="regWin.data('kendoWindow').close()" class="delete-confirm k-button" style="float:right;margin:7px 5px 7px 5px;">Відмінити</button>
+            <button id="btnOk" onclick="toRegister(1)" class="delete-confirm k-button k-primary" style="float:right;margin:7px 5px 7px 5px;"><span class="k-icon k-i-tick"></span> Ok</button>
+        </div>
+    </div>
+    <div id="registerGridContent">
+        <div id="registerTypeText"></div><br />
+        <div id="registerGrid"></div>
+    </div>
+    <div id="loader" hidden>
+        <img id="loader_gif" src="~/Areas/PB1/Content/Images/loader.gif" width="100" height="100" class="ajax-loader" />
+    </div>
+</div>
+@Html.Partial("~/Areas/Sep/Views/Shared/_sepDocViewer3720.cshtml")
+<script type="text/x-kendo-template" id="feedInfoTemplate">
+    <table>
+        <tr>
+            <td colspan="2"><b>Відправник:</b> #=NAMA#</td>
+        </tr>
+        <tr>
+            <td><b>МФО А: </b>#=MFOA#</td>
+            <td><b>Рахунок А: </b>#=NLSA#</td>
+        </tr>
+        <tr>
+            <td colspan="2"><b>Отримувач: </b>#=NAMB#</td>
+        </tr>
+        <tr>
+            <td><b>МФО Б: </b>#=MFOB#</td>
+            <td><b>Рахунок Б: </b>#=NLSB#</td>
+        </tr>
+        <tr>
+            <td colspan="2"><b>Призначення платежу: </b>#=NAZN#</td>
+        </tr>
+    </table>
+</script>
+
+<script>
+
+    var gridMode = "@Model.Mode";
+    var gridFlags = "@Model.AccessFlags" + "1111111";
+    var sep3720Grid = null;
+    var sep3720GridBinded = false;
+    var sOrd902 = "@ViewBag.Ord902Param";
+    //var refCount = "@ViewBag.RefCount";
+
+    //register start block
+    var regWin = $("#Sep3720RegisterWindow").kendoWindow({
+        modal: true,
+        visible: false,
+        title: "Реєстр всіх запитів",
+        width: "700px",
+        resizable: false,
+        actions: ["Close"]
+    })
+    var dpFrom = $("#dpRegisterOptionFrom").kendoDatePicker({ format: "dd.MM.yyyy" });
+    var dpTo = $("#dpRegisterOptionTo").kendoDatePicker({ format: "dd.MM.yyyy" });
+    var ddType = $("#ddRegisterType").kendoDropDownList({
+        dataTextField: "text",
+        dataValueField: "value",
+        dataSource: [{ value: 0, text: "ОТРИМАНИХ ЗАПИТІВ на УТОЧНЕННЯ РЕКВІЗИТІВ" }, { value: 1, text: "ВІДПРАВЛЕНИХ ЗАПИТІВ на УТОЧНЕННЯ РЕКВІЗИТІВ" }],
+        index: 0
+    });
+    var registerGrid = $("#registerGrid").kendoGrid({
+        autoBind: false,
+        toolbar: [
+            "excel",
+            {
+                template: "<button id='pbAnswer' type='button' class='k-button' onclick='printAnswer()' title='Повернути платнику'><i class='pf-icon pf-16 pf-print'></i></button>"
+            }
+        ],
+        excel: {
+            fileName: "Реєстр усіх запитів.xlsx",
+            allPages: true,
+            filterable: true,
+            proxyURL: bars.config.urlContent('/sep/sep3720/ConvertBase64ToFile/')
+        },
+        dataSource:
+        {
+            type: "aspnetmvc-ajax",
+            transport: {
+                read: {
+                    url: bars.config.urlContent('api/sep/Sep3720Api/GetSep3720RegisterList'),
+                    data: function () {
+                        return { rg_tp: ddType.data("kendoDropDownList").value(), rg_dt_from: dpFrom.data("kendoDatePicker").value(), rg_dt_to : dpTo.data("kendoDatePicker").value()}
+                    },
+                    type: "GET"
+                }
+            },
+            requestStart: function () {
+                $("#loader").show();
+            },
+            requestEnd: function () {
+                $("#loader").hide();
+            },
+            serverPaging: true,
+            serverSorting: true,
+            serverFiltering: true,
+            schema: {
+                data: "Data",
+                total: "Total",
+                errors: "Errors",
+                model: {
+                    fields: {
+                        REC: {
+                            type: "number"
+                        },
+                        DAT: {
+                            type: 'date'
+                        },
+                        MFOA: {
+                            type: 'string'
+                        },
+                        NLSA: {
+                            type: 'string'
+                        },
+                        MFOB: {
+                            type: 'string'
+                        },
+                        NLSB: {
+                            type: 'string'
+                        },
+                        DK: {
+                            type: 'number'
+                        },
+                        S: {
+                            type: 'number'
+                        },
+                        VOB: {
+                            type: 'number'
+                        },
+                        ND: {
+                            type: 'string'
+                        },
+                        KV: {
+                            type: 'number'
+                        },
+                        DATD: {
+                            type: 'date'
+                        },
+                        NAMA: {
+                            type: 'string'
+                        },
+                        NAMB: {
+                            type: 'string'
+                        },
+                        NAZN: {
+                            type: 'string'
+                        },
+                        DREC: {
+                            type: 'number'
+                        },
+                        ID_A: {
+                            type: 'number'
+                        },
+                        ID_B: {
+                            type: 'number'
+                        }
+                    }
+                }
+            },
+            pageSize: 10
+        },
+        selectable: 'single',
+        groupable: false,
+        sortable: {
+            mode: "single",
+            allowUnsort: true
+        },
+        resizable: true,
+        reorderable: true,
+        filterable: true,
+        scrollable: true,
+        pageable: {
+            refresh: true,
+            pageSizes: [5, 10, 20, 50],
+            buttonCount: 5
+        },
+        columns: [
+            {
+                field: "REC",
+                title: "Ід. документа",
+                attributes: { style: "text-align:center;" },
+                width: 110
+            },
+            {
+                field: "DAT",
+                title: "Дата",
+                attributes: { style: "text-align:center;" },
+                template: "#= kendo.toString(kendo.parseDate(DAT, 'yyyy/MM/dd'), 'dd/MM/yyyy') #",
+                width: 100
+            },
+            {
+                field: "MFOA",
+                title: "МФО А",
+                attributes: { style: "text-align:center;" },
+                width: 100
+            },
+            {
+                field: "NLSA",
+                title: "Рах. А",
+                attributes: { style: "text-align:center;" },
+                width: 150
+            },
+            {
+                field: "MFOB",
+                title: "МФО Б",
+                attributes: { style: "text-align:center;" },
+                width: 100
+            },
+            {
+                field: "NLSB",
+                title: "Рах. Б",
+                attributes: { style: "text-align:center;" },
+                width: 150
+            },
+            {
+                field: "DK",
+                title: "Дебет/кредит",
+                attributes: { style: "text-align:center;" },
+                width: 100
+            },
+            {
+                field: "S",
+                title: "Сума",
+                attributes: { style: "text-align:center;" },
+                width: 100
+            },
+            {
+                field: "VOB",
+                title: "Вид ОП",
+                attributes: { style: "text-align:center;" },
+                width: 100
+            },
+            {
+                field: "ND",
+                title: "Номер док.",
+                attributes: { style: "text-align:center;" },
+                width: 100
+            },
+            {
+                field: "KV",
+                title: "Вал.",
+                attributes: { style: "text-align:center;" },
+                width: 100
+            },
+            {
+                field: "DATD",
+                title: "Дата док.",
+                attributes: { style: "text-align:center;" },
+                template: "#= kendo.toString(kendo.parseDate(DAT, 'yyyy/MM/dd'), 'dd/MM/yyyy') #",
+                width: 100
+            },
+            {
+                field: "NAMA",
+                title: "Найм. А",
+                attributes: { style: "text-align:center;" },
+                width: 200
+            },
+            {
+                field: "NAMB",
+                title: "Найм. Б",
+                attributes: { style: "text-align:center;" },
+                width: 200
+            },
+            {
+                field: "NAZN",
+                title: "Призн.",
+                attributes: { style: "text-align:center;" },
+                width: 200
+            },
+            {
+                field: "DREC",
+                title: "Ід. корист.",
+                attributes: { style: "text-align:center;" },
+                width: 100
+            },
+            {
+                field: "ID_A",
+                title: "ОКПО А",
+                attributes: { style: "text-align:center;" },
+                width: 100
+            },
+            {
+                field: "ID_B",
+                title: "ОКПО Б",
+                attributes: { style: "text-align:center;" },
+                width: 100
+            }
+        ]
+    });
+    //register end block
+
+    function getSep3720Grid() {
+        if (sep3720Grid == null) {
+            sep3720Grid = $('#sep3720Grid').data('kendoGrid');
+        }
+        return sep3720Grid;
+    }
+
+    function rowInfo() {
+        var grid = getSep3720Grid();
+        var record = grid.dataItem(grid.select());
+        var d = $("#sep3720RowInfo");
+        if (record) {
+            d.show();
+            var template = kendo.template($("#feedInfoTemplate").html());
+            d.html(template(record));
+        }
+        else {
+            d.hide();
+        }
+    }
+
+    function backToPayer() {
+        var grid = getSep3720Grid();
+        var record = grid.dataItem(grid.select());
+        var accNumber = { accNumber: record.ACC };
+        funcSuite("backToPayer", accNumber);
+    }
+
+    function toAnotherAccount() {
+        var grid = getSep3720Grid();
+        var record = grid.dataItem(grid.select());
+        var accNumber = { accNumber: record.ACC };
+        funcSuite("toAnotherAccount", accNumber);
+    }
+
+    function toAnotherBank() {
+        var grid = getSep3720Grid();
+        var record = grid.dataItem(grid.select());
+        var accNumber = { accNumber: record.ACC };
+        funcSuite("toAnotherBank", accNumber);
+    }
+
+    function toUpdate() {
+        var grid = getSep3720Grid();
+        var record = grid.dataItem(grid.select());
+        var accNumber = { accNumber: record.ACC };
+        funcSuite("toUpdate", accNumber);
+    }
+
+    function toAlt() {
+        var grid = getSep3720Grid();
+        var record = grid.dataItem(grid.select());
+        var rowNum = grid.select().length;
+        if (rowNum == 1) {
+            var altParams = { nls: record.NLSALT, kv: record.KV };
+            funcSuite("toAlt", altParams)
+        }
+        else {
+            var docList = [];
+            for (i = 0; i < grid.select().length; i++) {
+                var record = grid.dataItem(grid.select()[i]);
+                docList[i] = record;
+            }
+            funcSuite("toAlts", docList);
+        }
+    }
+
+    function printAnswer() {
+        debugger;
+        grid = registerGrid.data("kendoGrid");
+        gridSelected = registerGrid.data("kendoGrid").select();
+        if (gridSelected.length > 0)
+        {
+            var dataItem = grid.dataItem(gridSelected[0]);
+            $.get('/barsroot/sep/SepFiles/PrintRecDoc/', { save_type: 'txt', rec: dataItem.REC, templateName: "IDDOC.frx", modelbuh: false },
+                function getRes(data) {
+                    if (data.status != 'error') {
+                        barsie$print(data.tempDir);
+                    }
+                    else { bars.ui.alert({ text: data.message }); }
+                });
+        }
+    }
+
+    function printDoc() {
+        var grid = getSep3720Grid();
+
+        grid.select().each(function () {
+            var dataItem = grid.dataItem($(this));
+            $.post('/barsroot/Documents/GetFileForPrint/', { id: dataItem.REF }, function getRes(data) {
+                if (data != 'error') {
+                    barsie$print(data);
+                }
+                else { return; }
+            });
+        });
+    }
+
+    function toRequest() {
+        var grid = getSep3720Grid();
+        var record = grid.dataItem(grid.select());
+        var atFirst = 'Сформувати запит на уточнення реквізитів';
+        bars.ui.confirm({ text: record.SOS !== 0 ? atFirst + ', ПОВТОРНО?' : atFirst + '?' }, function () {
+            var requestList = [];
+            for (i = 0; i < grid.select().length; i++) {
+                var record = grid.dataItem(grid.select()[i]);
+                if (record.OTM == true) {
+                    record.OTM = 1;
+                } else {
+                    record.OTM = 0;
+                }
+                requestList[i] = record;
+            }
+            funcSuite("toRequest", requestList);
+        });
+    }
+
+    function showDetails() {
+        var grid = getSep3720Grid();
+        var record = grid.dataItem(grid.select());
+        var docUrl = bars.config.urlContent("/documents/item/" + record.REF + "/");
+        window.showModalDialog(docUrl, null, 'dialogWidth:790px;dialogHeight:550px');
+    }
+
+    function toViewRequest()
+    {
+        var grid = getSep3720Grid();
+        var record = grid.dataItem(grid.select());
+        $.ajax({
+            url: bars.config.urlContent("/sep/sep3720/viewrequest"),
+            type: "GET",
+            dataType: "JSON",
+            data: {rec: record.REC, fname: record.FA_NAME, fln: record.FA_LN },
+            success: function (result) {
+                if (result.data === 0) {
+                    bars.ui.notify('Увага!', 'Інформаційний запит не сформовано.', 'error');
+                }
+                else {
+                    var docUrl = bars.config.urlContent("/documents/item/" + result.data + "/");
+                    window.showModalDialog(docUrl, null, 'dialogWidth:790px;dialogHeight:550px');
+                }
+            },
+            error: function (result) {
+                bars.ui.notify('Увага!', 'Сталася помилка.', 'error');
+            }
+        });
+    }
+
+    function toAnswer() {
+        var grid = getSep3720Grid();
+        var record = grid.dataItem(grid.select());
+        $.ajax({
+            url: bars.config.urlContent("/sep/sep3720/GetRefByRec?recId=" + record.RECO),
+            type: "GET",
+            dataType: "JSON",
+            success: function (model) {
+                if(model.data === null)
+                {
+                    bars.ui.notify('Увага!', 'Отримана відповідь не знайдена.', 'error');
+                }
+                else {
+                    var sepDocViewer = bars.sepfiles.sepDocViewer;
+                    sepDocViewer.loadFirstTab(model.data);
+                    sepDocViewer.loadSecondTab.part1(model.data);
+                    sepDocViewer.loadSecondTab.part2(model.data);
+                    sepDocViewer.show();
+                }
+            },
+            error: function (result) {
+                bars.ui.notify('Увага!', 'Сталася помилка.', 'error');
+            }
+        });
+    }
+
+    function toRegister(type)
+    {
+        if (type === 0)
+        {
+            $("#registerGridContent").hide();
+            $("#registerOptions").show();
+            dpFrom.data("kendoDatePicker").value(new Date());
+            dpTo.data("kendoDatePicker").value(new Date());
+            ddType.data("kendoDropDownList").select(0);
+            regWin.data("kendoWindow").setOptions({ width: 700 });
+            regWin.data("kendoWindow").center().open();
+        }
+        else
+        {
+            $("#registerTypeText").text(ddType.data("kendoDropDownList").text())
+            $("#registerOptions").hide();
+            $("#registerGridContent").show();
+            registerGrid.data("kendoGrid").dataSource.read();
+            width = $(window).width();
+            regWin.data("kendoWindow").setOptions({ width: document.documentElement.offsetWidth * 0.95 });
+            regWin.data("kendoWindow").center().open();
+            $('#Sep3720RegisterWindow').parent().css("top", "10%");
+        }
+    }
+
+    function encodeRFC5987ValueChars(str) {
+        return encodeURIComponent(str).
+            // Замечание: хотя RFC3986 резервирует "!", RFC5987 это не делает, так что нам не нужно избегать этого
+            replace(/['()]/g, escape). // i.e., %27 %28 %29
+            replace(/\*/g, '%2A').
+                // Следующее не требуется для кодирования процентов для RFC5987, так что мы можем разрешить немного больше читаемости через провод: |`^
+                replace(/%(?:7C|60|5E)/g, unescape);
+    };
+
+    function serializeData(data) {
+
+        if (typeof data !== 'object') {
+            return ((data == null) ? "" : data.toString());
+        }
+        var buffer = [];
+        // Serialize each key in the object.
+        for (var name in data) {
+            if (!data.hasOwnProperty(name)) {
+                continue;
+            }
+            var value = data[name];
+            buffer.push(
+                encodeRFC5987ValueChars(name) + "=" + encodeRFC5987ValueChars((value == null) ? "" : value)
+            );
+        }
+        // Serialize the buffer and clean it up for transportation.
+        var source = buffer.join("&").replace(/%20/g, "+");
+        return (source);
+    };
+
+	function GetSum(dk) {
+        var Sum = 0
+        var data = $("#sep3720Grid").data("kendoGrid").dataSource.data();
+        if (data.length > 0)
+        {
+            for (var i = 0; i < data.length; i++)
+            {
+                if (data[i].DK === dk)
+                    Sum += data[i].S;
+            }
+        }
+        return Sum;
+    };
+
+    function funcSuite(funcName, funcParam) {
+        ///tadada FUNCTIONNAMESWS
+        switch (funcName) {
+            case "backToPayer":
+                var grid = getSep3720Grid();
+                var record = grid.dataItem(grid.select());
+                var dk = { dk: record.DK };
+                var sum = record.S * 100;
+                bars.ui.confirm({ text: 'Увага!!! Повернути кошти платнику?' },
+                    function () {
+                        $.get('@Url.Action("GetAccount")', funcParam).done(function (result) {
+                            var docTarget = 'Повернення док №' + record.ND + ' від ' + kendo.toString(record.DATD, 'dd/MM/yyyy') + ' уточнення реквізитів одержувача ' + record.NAZN;
+                            if (docTarget.length > 160) {
+                                docTarget = docTarget.slice(0, 160);
+                            }
+
+                            var formParams = {
+                                tt: record.DK === 1 ? '902' : '901',
+
+                                Nls_A: result.data.NLS,
+                                mode_nam_a: 1,
+                                Kv_A: result.data.KV,
+                                reqv_Nam_A: result.data.NMS,
+
+                                Nls_B: record.NLSA,
+                                Mfo_B: record.MFOA,
+                                Kv_B: record.KV,
+                                Nam_B: record.NAMA,
+                                Id_B: record.OKPOA,
+
+                                SumC_t: sum.toFixed(2),
+                                nazn: docTarget,
+                                APROC: encodeURI("set role bars_access_defrole@begin sep.del_ref_t902(" + record.REF + "); end;")
+                            };
+
+                            $("#Sep3720Window").kendoWindow({
+                                width: "630px",
+                                height: "630px",
+                                //resizable: false,
+                                modal: true,
+                                visible: false,
+                                iframe: true,
+                                close: function (e) { refreshGrid(); },
+                                content: "/barsroot/docinput/docinput.aspx?" + serializeData(formParams)
+                            }).data("kendoWindow").center().open();
+                        })
+                    });
+                break
+            case "toAnotherAccount":
+                var grid = getSep3720Grid();
+                var record = grid.dataItem(grid.select());
+                var deb = 'ПЕРЕДЕБЕ';
+                var kred = 'ПЕРЕКРЕДИ';
+                var sum = record.S * 100;
+                bars.ui.confirm({ text: (record.DK = 0 ? deb : kred) + 'ТУВАТИ документ на інший рахунок?' },
+                    function () {
+                        $.get('@Url.Action("GetAccount")', funcParam).done(function (result) {
+                            var formParams = {
+                                //tt: dk = 1 ? '902' : '901',
+                                tt: record.DK === 1 ? '902' : '901',
+
+                                Nls_A: result.data.NLS,
+
+                                //Kv_A: result.data.KV,
+                                reqv_Nam_A: result.data.NMS,
+                                Dk: result.data.TIP == "90D" ? 0 : 1,
+                                Mfo_B: record.MFOB,
+                                Kv_B: record.KV,
+
+                                SumC_t: sum.toFixed(2),
+                                nazn: 'Док ' + record.ND + 'від ' + kendo.toString(record.DATD, 'dd/MM/yyyy') + ' ' + record.NAZN,
+                                APROC: encodeURI("set role bars_access_defrole@begin sep.del_ref_t902(" + record.REF + "); end;")
+                            };
+                            $("#Sep3720Window").kendoWindow({
+                                width: "630px",
+                                height: "630px",
+                                //resizable: false,
+                                modal: true,
+                                visible: false,
+                                iframe: true,
+                                close: function (e) { refreshGrid(); },
+                                content: "/barsroot/docinput/docinput.aspx?" + serializeData(formParams)
+                            }).data("kendoWindow").center().open();
+
+                            //window.location = '/barsroot/docinput/docinput.aspx?' + jQuery.param(formParams);
+                        })
+                    });
+                break
+            case "toAnotherBank":
+                var grid = getSep3720Grid();
+                var record = grid.dataItem(grid.select());
+                var sum = record.S * 100;
+                bars.ui.confirm({ text: 'ПЕРЕКРЕДИТУВАТИ в інший банк?' },
+                    function () {
+                        $.get('@Url.Action("GetAccount")', funcParam).done(function (result) {
+                            var formParams = {
+                                tt: record.DK === 1 ? '902' : '901',
+
+                                Nls_A: result.data.NLS,
+                                Kv_A: result.data.KV,
+                                reqv_Nam_A: result.data.NMS,
+                                Kv_B: record.KV,
+
+                                SumC_t: sum.toFixed(2),
+                                nazn: 'Перекр.док ' + record.ND + ' від ' + kendo.toString(record.DATD, 'dd/MM/yyyy') + '. Платник МФО ' + record.MFOA + ' Рах ' + record.NLSA + ' ' + record.NAMA + ' ' + record.NAZN,
+                                APROC: encodeURI("set role bars_access_defrole@begin sep.del_ref_t902(" + record.REF + "); end;")
+                            };
+
+                            $("#Sep3720Window").kendoWindow({
+                                width: "630px",
+                                height: "630px",
+                                //resizable: false,
+                                modal: true,
+                                visible: false,
+                                iframe: true,
+                                close: function (e) { refreshGrid(); },
+                                content: "/barsroot/docinput/docinput.aspx?" + serializeData(formParams)
+                            }).data("kendoWindow").center().open();
+
+                            //window.location = '/barsroot/docinput/docinput.aspx?' + jQuery.param(formParams);
+                        })
+                    });
+                break
+            case "toUpdate":
+                var grid = getSep3720Grid();
+                var record = grid.dataItem(grid.select());
+                var sum = record.S * 100;
+                var ss1 = 'ЗАРАХУВАТИ на рахунок ' + record.NLSB + ' ' + record.NAMB2 + '?<br/>' + 'Буде добавлено проводку в основну операцію';
+                var ss2 = 'ЗАРАХУВАТИ на рахунок ' + record.NLSB + ' ' + record.NAMB2 + '?<br/>' + 'Буде сформовано внутрішній мем.ордер';
+                var nazn1 = record.NAZN + record.DREC;
+                var nazn2 = 'Док ' + record.ND + ' від ' + kendo.toString(record.DATD, 'dd/MM/yyyy') + ' ' + record.NAZN;
+                bars.ui.confirm({ text: (sOrd902 == 'N' || sOrd902 == '0') ? ss1 : ss2 },
+                    function () {
+                        $.get('@Url.Action("GetAccount")', funcParam).done(function (result) {
+                            var formParams = {};
+                            formParams = {
+                                //tt: dk = 1 ? '902' : '901',
+                                tt: '901',
+
+                                Nls_A: result.data.NLS,
+                                Nls_B: record.NLSB,
+                                //Kv_A: result.data.KV,
+                                reqv_Nam_A: result.data.NMS,
+                                reqv_Nam_B: record.NAMB,
+                                Dk: result.data.TIP == "90D" ? 0 : 1,
+                                Mfo_B: record.MFOB,
+                                Kv_B: record.KV,
+
+                                SumC_t: sum.toFixed(2),
+                                nazn: 'Док ' + record.ND.trim() + ' від ' + kendo.toString(record.DATD, 'dd/MM/yyyy') + ' ' + record.NAZN,
+                                APROC: encodeURI("set role bars_access_defrole@begin sep.del_ref_t902(" + record.REF + "); end;")
+                            };
+                            //if (record.DK === 1) {
+                            //    formParams = {
+                            //        tt: '901',
+                            //        //tt: dk = 1 ? '901' : '902',
+
+                            //        Nls_A: record.NLSB,             // result.data.NLS
+                            //        Kv_A: record.KV,                // result.data.KV
+                            //        reqv_Nam_A: record.NAMB,        // result.data.NMS
+
+                            //        Nls_B: result.data.NLS,         //
+                            //        //Mfo_B: record.MFOA,
+                            //        //Kv_B: record.KV,
+                            //        Nam_B: result.data.NMS,         // record.NAMB
+                            //        //Id_B: record.OKPOB2,
+
+                            //        SumC_t: sum.toFixed(2),
+                            //        nazn: (sOrd902 == 'N' || sOrd902 == '0') ? nazn1 : nazn2,
+                            //        APROC: encodeURI("set role bars_access_defrole@begin sep.del_ref_t902(" + record.REF + "); end;")
+                            //    }
+                            //} else {
+                            //    formParams = {
+                            //        tt: '901',
+                            //        //tt: dk = 1 ? '901' : '902',
+
+                            //        Nls_B: result.data.NLS,
+                            //        //Kv_B: result.data.KV,
+                            //        reqv_Nam_B: result.data.NMS,
+
+                            //        Nls_A: record.NLSB,
+                            //        Mfo_A: record.MFOB,
+                            //        Kv_A: record.KV,
+                            //        Nam_A: record.NAMB2,
+                            //        Id_A: record.OKPOB2,
+
+                            //        SumC_t: sum.toFixed(2),
+                            //        nazn: (sOrd902 == 'N' || sOrd902 == '0') ? nazn1 : nazn2,
+                            //        APROC: encodeURI("set role bars_access_defrole@begin sep.del_ref_t902(" + record.REF + "); end;")
+                            //    }
+                            //}
+
+                            $("#Sep3720Window").kendoWindow({
+                                width: "630px",
+                                height: "630px",
+                                //resizable: false,
+                                modal: true,
+                                visible: false,
+                                iframe: true,
+                                close: function (e) { refreshGrid(); },
+                                content: "/barsroot/docinput/docinput.aspx?" + serializeData(formParams)
+                            }).data("kendoWindow").center().open();
+                        })
+                    });
+                break
+            case "toAlt":
+                var grid = getSep3720Grid();
+                var record = grid.dataItem(grid.select());
+                var deb = 'ПЕРЕДЕБЕ';
+                var kred = 'ПЕРЕКРЕДИ';
+                var sum = record.S * 100;
+                bars.ui.confirm({ text: (record.DK = 0 ? deb : kred) + 'ТУВАТИ документ на альтернативний рахунок?<br/>Буде сформовано внутрішній мем.ордер' },
+                    function () {
+                        $.get('@Url.Action("GetAltAccount")', { nls: record.NLSALT, kv: record.KV }).done(function (resultAlt) {  // { nls: $.extend({}, nls), kv: $.extend({}, kv) }
+                            if (resultAlt.data != null) {
+                                $.get('@Url.Action("GetAccount")', { accNumber: record.ACC }).done(function (result) {
+
+                                    var formParams = {
+                                        //tt: dk = 1 ? '902' : '901',
+                                        tt: '901',
+
+                                        Nls_B: result.data.NLS,
+                                        Kv_B: record.KV,
+
+                                        Nls_A: resultAlt.data.sNlsAlt,
+                                        Nam_A: resultAlt.data.sNamAlt,
+                                        //Id_B: resultAlt.data.sOKPOAlt,
+                                        //Mfo_A: record.MFOB,
+
+                                        SumC_t: sum.toFixed(2),
+                                        nazn: 'Док ' + record.ND + 'від ' + kendo.toString(record.DATD, 'dd/MM/yyyy') + ' ' + record.NAZN,
+                                        APROC: encodeURI("set role bars_access_defrole@begin sep.del_ref_t902(" + record.REF + "); end;")
+                                    };
+
+                                    $("#Sep3720Window").kendoWindow({
+                                        width: "630px",
+                                        height: "630px",
+                                        //resizable: false,
+                                        modal: true,
+                                        visible: false,
+                                        iframe: true,
+                                        close: function (e) { refreshGrid(); },
+                                        content: "/barsroot/docinput/docinput.aspx?" + serializeData(formParams)
+                                    }).data("kendoWindow").center().open();
+
+                                    //window.location = '/barsroot/docinput/docinput.aspx?' + jQuery.param(formParams);
+                                })
+                            } else {
+                                bars.ui.alert({ text: 'По заданій референції : ' + record.REF + '<br>НЕ знайдено альтернативний рахунок!' });
+                            }
+                        });
+                    });
+                break
+            case "toAlts":
+                var grid = getSep3720Grid();
+                var rowNumber = grid.select().length;
+                bars.ui.confirm({ text: 'Зарахувати на альтернативний рахунок ' + rowNumber + ' документів?' }, function () {
+                    $.post('@Url.Action("ToAltAccounts")', { docList: JSON.stringify(funcParam), rowSelected: rowNumber }).done(function (result) {
+                        bars.ui.alert({ text: result.message });
+                    });
+                });
+                break
+            case "toRequest":
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("SetRequest")',
+                    data: JSON.stringify({ requestList: funcParam }),
+                    success: function (result) {
+                        bars.ui.alert({ text: result.message });
+                        refreshGrid();
+                    },
+                    dataType: "json",
+                    contentType: "application/json"
+                });
+                break
+            default:
+        }
+    }
+
+    function onJsonSuccess(result) {
+        var grid = getSep3720Grid();
+        var record = grid.dataItem(grid.select());
+        if (result.message = 'Готово!') {
+            bars.ui.alert({ text: 'Рахунок ' + record.NLSALT + ' (альтернативний) НЕ знайдено !' });
+        }
+        else {
+            bars.ui.error({ text: '!' });
+        }
+    }
+
+    function refreshGrid() {
+        var grid = getSep3720Grid();
+        grid.dataSource.read();
+        grid.refresh();
+    }
+
+    function refreshToolbar() {
+        var grid = getSep3720Grid();
+        var currentRowData = null;
+
+        if (grid.select().length > 0) {
+            currentRowData = grid.dataItem(grid.select());
+        }
+
+        function showAlt() {
+            for (i = 0; i < grid.select().length; i++) {
+                if (grid.dataItem(grid.select()[i]).NLSALT == null) {
+                    return false;
+                }
+            }
+            return true;
+
+        }
+
+        enableButton('pbBackToSender', currentRowData != null && grid.select().length == 1);
+        enableButton('pbtoAnotherAccount', currentRowData != null && grid.select().length == 1);
+        enableButton('pbtoAnotherBank', currentRowData != null && grid.select().length == 1);
+        enableButton('pbDel', currentRowData != null);
+        enableButton('pbUpdate', currentRowData != null && (currentRowData.OTM != 0 && currentRowData.DAZS == null));
+        enableButton('pbAlt', currentRowData != null && showAlt());
+        enableButton('pbRequest', grid.select().length > 0)//currentRowData != null && grid.select().length == 1);
+        enableButton('pbDetails', currentRowData != null);
+        enableButton('pbPrint', currentRowData != null);
+        enableButton('pbGetAnswer', currentRowData != null && currentRowData.RECO != null);
+        enableButton('pbViewRequest', currentRowData != null && currentRowData.REC != null);
+        rowInfo();
+    }
+
+    function enableButton(buttonId, enabled) {
+        if (typeof (enabled) === 'undefined') {
+            enabled = true;
+        }
+        var $button = $('#' + buttonId);
+        $button.data('kendoButton').enable(enabled);
+        if (enabled) {
+            $button.find('i').removeClass("pf-disabled");
+        } else {
+            $button.find('i').addClass("pf-disabled");
+        }
+    }
+
+    function getGridSelectedRowsRef(grid) {
+        var arr = [];
+        grid.select().each(function () {
+            var dataItem = grid.dataItem($(this));
+            arr.push({ Ref: dataItem.REF });
+        });
+        return arr;
+    }
+
+    function deleteRecord() {
+        var grid = getSep3720Grid();
+
+        var references = getGridSelectedRowsRef(grid);
+
+        //var record = grid.dataItem(grid.select());
+        //var delSepREFnumber = { delSepREFnumber: record.REF };
+        bars.ui.confirm({ text: grid.select().length === 1 ? 'Видалити файл?' : 'Видалити файли?' },
+            function () {
+                $.post('@Url.Action("DeleteRecord")', { references: JSON.stringify(references) }).done(function (data) {
+                    if (data.status === 'ok') {
+                        refreshGrid();
+                        bars.ui.alert({ text: data.message });
+                    } else {
+                        bars.ui.error({ title: grid.select().length === 1 ? 'Помилка видалення файлу!' : 'Помилка видалення файлів!', text: data.message });
+                    }
+                });
+            });
+    }
+
+    function ifRowRequested() {
+        var grid = $("#sep3720Grid").data("kendoGrid");
+        var data = grid.dataSource.data();
+        var currentRow = grid.dataItem(grid.select());
+        grid.tbody.find('>tr').each(function () {
+            var dataItem = grid.dataItem(this);
+            if (dataItem.SOS == 1 && dataItem.SOS != currentRow) {
+                $(this).addClass('k-rowSOS_1');
+            }
+            if (dataItem.SOS == 2 && dataItem.SOS != currentRow) {
+                $(this).addClass('k-rowSOS_2');
+            }
+            if (dataItem.SOS == 3 && dataItem.SOS != currentRow) {
+                $(this).addClass('k-rowSOS_3');
+            }
+            if (dataItem.SOS == 4 && dataItem.SOS != currentRow) {
+                $(this).addClass('k-rowSOS_4');
+            }
+            if (dataItem.SOS == 5 && dataItem.SOS != currentRow) {
+                $(this).addClass('k-rowSOS_5');
+            }
+            if (dataItem.SOS == 6 && dataItem.SOS != currentRow) {
+                $(this).addClass('k-rowSOS_6');
+            }
+        });
+        $("#sep3720Grid td:has(.markNLSB_dazs)").addClass('markNLSB_dazs');
+        $("#sep3720Grid td:has(.markNLSB_blkk)").addClass('markNLSB_blkk');
+        $("#sep3720Grid td:has(.k-rowSOS_OKPOB2)").addClass('k-rowSOS_OKPOB2');
+        refreshToolbar();
+    }
+
+    $(document).ready(function () {
+        $("#sep3720Grid").kendoGrid({
+            autobind: true,
+            selectable: "multiple",
+            resizable: true,
+            pageable: {
+                refresh: true,
+                pageSizes: true,
+                buttonCount: 5
+            },
+            columns: [
+                // порядок колонок відрізняється
+                {
+                    field: "REF",
+                    title: "Референція",
+                    width: "120px",
+                    footerTemplate: "<div style='text-align:right;'>#=count#</div>"
+                },
+                {
+                    field: "KV",
+                    title: "Код вал",
+                    width: "90px"
+                },
+                {
+                    field: "BLK",
+                    title: "Причина",
+                    width: "100px"
+                },
+                {
+                    field: "MFOA",
+                    title: "МФО А",
+                    width: "90px"
+                },
+
+                {
+                    field: "NLSA",
+                    title: "Рахунок А",
+                    width: "130px"
+                },
+                {
+                    field: "NLSB",
+                    title: "Рахунок Б",
+                    width: "130px",
+                    template: "<div style='text-align:right;' #=OTM==true && DAZS!=null ? 'class=\"markNLSB_dazs\"' : OTM==true && BLKK!=null ? 'class=\"markNLSB_blkk\"' : '' #>#=NLSB#</div>"
+                },
+                {
+                    field: "MFOB",
+                    title: "МФО Б",
+                    width: "90px"
+                },
+                {
+                    field: "OKPOB",
+                    title: "ОКПО Б",
+                    width: "100px",
+                    template: "<div style='text-align:right;' #=OKPOB!=OKPOB2 ? 'class=\"k-rowSOS_OKPOB2\"' : '' #>#=OKPOB#</div>"
+                },
+                {
+                    field: "NAMB",
+                    title: "Отримувач",
+                    width: "300px"
+                },
+                {
+                    field: "S",
+                    title: "Сума док",
+                    width: "100px",
+                    template: "<div style='text-align:right;'>#=S.toFixed(2)#</div>",
+                    //footerTemplate: "<div style='text-align:right;'>#=sum.toFixed(2)#</div>"
+					footerTemplate: "<div style='text-align:left;'>D: #=GetSum(0).toFixed(2)# <br/>K: #=GetSum(1).toFixed(2)#</div>"
+                },
+                {
+                    field: "FDAT",
+                    title: "Дата зарахування",
+                    width: "150px",
+                    template: "<div style='text-align:right;'>#=kendo.toString(FDAT,'dd/MM/yyyy')#</div>"
+                },
+                {
+                    field: "OTM",
+                    title: "Відкр",
+                    width: "90px",
+                    filterable: false,
+                    template: "<div style='text-align:center'><input name='OTM' type='checkbox' disabled='disabled' data-bind='checked: OTM' #= OTM ? checked='checked' : '' #/></div>"
+                },
+                {
+                    field: "NAZN",
+                    title: "Призначення платежу",
+                    width: "1300px"
+                },
+                {
+                    field: "OKPOB2",
+                    title: "ОКПО рах",
+                    width: "120px"
+                },
+                {
+                    field: "NAMB2",
+                    title: "Назва рахунку",
+                    width: "300px"
+                },
+                {
+                    field: "STMP",
+                    title: "Дата/Час зарахування",
+                    width: "170px",
+                    template: "<div style='text-align:right;'>#= STMP == null ? ' - ' : kendo.toString(STMP,'dd.MM.yyyy HH:mm')#</div>",
+                    format: "{0:dd.MM.yyyy HH:mm}",
+                    filterable: {
+                        ui: "datetimepicker",
+                        "format": "{0:dd.MM.yyyy HH:mm}"
+                    }
+                },
+                {
+                    field: "ND",
+                    title: "N док",
+                    width: "100px"
+                },
+                {
+                    field: "NAMA",
+                    title: "Платник з документу",
+                    width: "300px"
+                },
+                {
+                    field: "VOB",
+                    title: "Вид ОП",
+                    width: "100px"
+                },
+                {
+                    field: "DATD",
+                    title: "Дата док",
+                    width: "100px",
+                    template: "<div style='text-align:right;'>#=kendo.toString(DATD,'dd/MM/yyyy')#</div>"
+                },
+                {
+                    field: "DATP",
+                    title: "Дата",
+                    width: "100px",
+                    hidden: true,
+                    template: "<div style='text-align:right;'>#=kendo.toString(DATP,'dd/MM/yyyy')#</div>"
+                }
+            ],
+            filterable: true,
+            dataSource: {
+                type: "aspnetmvc-ajax",
+                serverSorting: true,
+                serverPaging: true,
+                serverFiltering: true,
+                pageSize: 20,
+                transport: {
+                    read: {
+                        dataType: 'json',
+                        url: bars.config.urlContent('/sep/Sep3720/GetSep3720List'),
+                        data: { mode: gridMode, accessFlags: gridFlags }
+                    }
+                },
+                requestStart: function (e) {
+                    bars.ui.loader('body', true);
+                },
+                requestEnd: function (e) {
+                    bars.ui.loader('body', false);
+                },
+                schema: {
+                    data: "Data",
+                    total: "Total",
+                    errors: "Errors",
+                    model: {
+                        fields: {
+                            FDAT: { type: "date" },
+                            DATD: { type: "date" },
+                            DATP: { type: "date" },
+                            DAZS: { type: "date" },
+                            STMP: { type: "date" },
+                            S: { type: "number" },
+                            REF: { type: "number" },
+                            KV: { type: "number" },
+                            BLK: { type: "number" },
+                            VOB: { type: "number" },
+                            OTM: { type: "boolean" },
+                            FA_NAME: { type: "string" },
+                            FA_LN: {type: "number"}
+                        }
+                    }
+                },
+                sort: {
+                    field: "STMP",
+                    dir: "asc"
+                },
+                aggregate: [
+                    { field: "S", aggregate: "sum" },
+                    { field: "REF", aggregate: "count" }
+                ]
+            },
+            sortable: true,
+            autoBind: true,
+            scrollable: true,
+            navigatable: true,
+            height: function () {
+                return $(window).height() / 4 * 3;
+            },
+            change: refreshToolbar,
+            dataBound: ifRowRequested
+        });
+
+        $('#sep3720ToolBar').kendoToolBar({
+            items:
+            [
+                {
+                    template: "<button id='pbBackToSender' type='button' class='k-button' onclick='backToPayer()' title='Повернути платнику'><i class='pf-icon pf-16 pf-arrow_left'></i></button>"
+                },
+                {
+                    template: "<button id='pbtoAnotherAccount' type='button' class='k-button' onclick='toAnotherAccount()' title='На інший рахунок'><i class='pf-icon pf-16 pf-arrow_down'></i></button>"
+                },
+                {
+                    template: "<button id='pbtoAnotherBank' type='button' class='k-button' onclick='toAnotherBank()' title='В інший банк'><i class='pf-icon pf-16 pf-arrow_right'></i></button>"
+                },
+                {
+                    template: "<button id='pbDel' type='button' class='k-button' onclick='deleteRecord()' title='Видалити запис'><i class='pf-icon pf-16 pf-delete'></i></button>"
+                },
+                {
+                    template: "<button id='pbRefresh' type='button' class='k-button' onclick='refreshGrid()' title='Перечитати записи в таблиці'><i class='pf-icon pf-16 pf-reload_rotate'></i></button>"
+                },
+                {
+                    template: "<button id='pbUpdate' type='button' class='k-button' onclick='toUpdate()' title='Зарахувати'><i class='pf-icon pf-16 pf-list-ok'></i></button>"
+                },
+                {
+                    template: "<button id='pbAlt' type='button' class='k-button' onclick='toAlt()' title='На альтернативний рахунок'><i class='pf-icon pf-16 pf-list-arrow_right'></i></button>"
+                },
+                {
+                    template: "<button id='pbRequest' type='button' class='k-button' onclick='toRequest()' title='Сформувати запит на уточнення реквізитів'><i class='pf-icon pf-16 pf-mail-arrow_right'></i></button>"
+                },
+                {
+                    template: "<button id='pbViewRequest' type='button' class='k-button' onclick='toViewRequest()' title='Перегляд запиту на уточнення реквізитів'><i class='pf-icon pf-16 pf-report_open'></i></button>"
+                },
+                {
+                    template: "<button id='pbGetAnswer' type='button' class='k-button' onclick='toAnswer()' title='Отримана відповідь'><i class='pf-icon pf-16 pf-mail'></i></button>"
+                },
+                {
+                    template: "<button id='pbDetails' type='button' class='k-button' onclick='showDetails()' title='Детальна інформація для рядка таблиці'><i class='pf-icon pf-16 pf-info'></i></button>"
+                },
+                {
+                    template: "<button id='pbPrint' type='button' onclick='printDoc()' class='k-button' title='Друк'><i class='pf-icon pf-16 pf-print'></i></button>"
+                },
+                {
+                    template: "<button id='pbRegister' type='button' onclick='toRegister(0)' class='k-button' title='Реєстр всіх запитів'><i class='pf-icon pf-16 pf-book'></i></button>"
+                },
+                {
+                    template: "<div class='legend-query-sent' title='відправлено запит'></div>"
+                },
+                {
+                    template: "<div class='legend-new-inn' title='отримано новий ІНН'></div>"
+                },
+                {
+                    template: "<div class='legend-new-acc' title='отримано новий рахунок'></div>"
+                },
+                {
+                    template: "<div class='legend-need-back' title='отримано вимогу повернути'></div>"
+                },
+                {
+                    template: "<div class='legend-dazs' title='рахунок закритий'></div>"
+                },
+                {
+                    template: "<div class='legend-blkk' title='рахунок заблокований на кредит'></div>"
+                }
+            ]
+        });
+        $("#pbBackToSender").kendoButton();
+        $("#pbtoAnotherAccount").kendoButton();
+        $("#pbtoAnotherBank").kendoButton();
+        $("#pbDel").kendoButton();
+        $("#pbRefresh").kendoButton();
+        $("#pbUpdate").kendoButton();
+        $("#pbAlt").kendoButton();
+        $("#pbRequest").kendoButton();
+        $("#pbDetails").kendoButton();
+        $("#pbPrint").kendoButton();
+        $("#pbGetAnswer").kendoButton();
+        $("#pbViewRequest").kendoButton();
+        $("#sep3720Grid").on("dblclick", "tbody > tr", showDetails);
+
+        var data = $("#sep3720Grid").data('kendoGrid');
+        var arrows = [38, 40];
+        data.table.on("keydown", function (e) {
+            if (arrows.indexOf(e.keyCode) >= 0) {
+                var selected = $("#sep3720Grid tbody").find("tr.k-state-selected");
+                selected.removeClass("k-state-selected");
+
+                data.select($("#sep3720Grid_active_cell").closest("tr"));
+
+            }
+        });
+    });
+
+</script>
+<style>
+    /*Стилі для легенди*/
+    .legend-query-sent {
+        vertical-align: middle;
+        display: inline-block;
+        margin-left: 10px;
+        width: 20px;
+        height: 20px;
+        background-color: #f1ec99;
+        margin-left: 10px !important;
+    }
+
+    .legend-new-inn {
+        vertical-align: middle;
+        display: inline-block;
+        margin-left: 10px;
+        width: 20px;
+        height: 20px;
+        background-color: #00ff00;
+        margin-left: 10px !important;
+    }
+
+    .legend-new-acc {
+        vertical-align: middle;
+        display: inline-block;
+        margin-left: 10px;
+        width: 20px;
+        height: 20px;
+        background-color: #00b300;
+        margin-left: 10px !important;
+    }
+
+    .legend-need-back {
+        vertical-align: middle;
+        display: inline-block;
+        margin-left: 10px;
+        width: 20px;
+        height: 20px;
+        background-color: #ff0000;
+        margin-left: 10px !important;
+    }
+
+    .legend-dazs {
+        vertical-align: middle;
+        display: inline-block;
+        margin-left: 10px;
+        width: 20px;
+        height: 20px;
+        background-color: #ccccff;
+        margin-left: 10px !important;
+    }
+
+    .legend-blkk {
+        vertical-align: middle;
+        display: inline-block;
+        margin-left: 10px;
+        width: 20px;
+        height: 20px;
+        background-color: #fc8ffc;
+        margin-left: 10px !important;
+    }
+
+    .markNLSB_dazs {
+        background-color: #ccccff;
+    }
+
+    .markNLSB_blkk {
+        background-color: #fc8ffc;
+    }
+
+    .k-grid table tr.k-state-selected {
+        background-color: #428bca !important;
+    }
+
+        .k-grid table tr.k-state-selected td {
+            background-color: #428bca !important;
+        }
+
+            .k-grid table tr.k-state-selected td div {
+                background-color: #428bca !important;
+            }
+    /* ------ стилі для відображення різних станів рахунку */
+    .k-rowSOS_1 {
+        background-color: #f1ec99;
+    }
+
+    .k-rowSOS_2 {
+        background-color: #00ff00;
+    }
+
+    .k-rowSOS_3 {
+        background-color: #00b300;
+    }
+
+    .k-rowSOS_4 {
+        background-color: #ff8c69;
+    }
+
+    .k-rowSOS_5 {
+        background-color: #ff0000;
+    }
+
+    .k-rowSOS_6 {
+        background-color: #00ffff;
+    }
+
+    .k-rowSOS_OKPOB2 {
+        background-color: #f1ec99;
+    }
+    /* ------ */
+    .k-accClosed {
+        background-color: #ccccff;
+    }
+
+    #loader {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1000;
+        opacity: .8;
+        background-color: white;
+    }
+
+    #loader_gif {
+        position: absolute;
+        width: 64px;
+        height: 64px;
+        top: 28%;
+        left: 45%;
+    }
+</style>

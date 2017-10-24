@@ -1,0 +1,100 @@
+﻿<xmlform caption="Об'єднання клієнтів">   
+  <customforms>                      
+    <customform name="frm_rnk2rnk"   columnscount="2"  >
+	  <buttons defaulttype="Button">
+      <button id="run" caption="Виконати" hint="Виконати об'єднання клієнтів" confirmmessage="Виконати злиття карток?" >
+        
+        <command type="PlSqlBlock"  successmessage="Об‘єднання клієнтів виконано успішно!" >
+          <sql>
+            begin
+            rnk2rnk(:rnk, :rnk2);
+            end;
+          </sql>
+          <parameters>
+            <parameter name="rnk" datatype="String" type="FormField"/>
+            <parameter name="rnk2" datatype="String" type="FormField"/>
+          </parameters>
+        </command>
+      </button>
+         </buttons>
+		
+      
+      <customfields >
+                <customfield name="rnk" datatype="String" required="fulse" index="1" label="РНК, що закривається" columnindex="1" groupname="Реквізити клієнта 1">
+          
+                  <uicontrol controlwidth="135" type="ReadOnlyReference" formname="bpk.ref.customer" formfieldname="rnk" formwidth="700" formheight="400">
+            <rels>
+              <rel destname="OKPO" srcname="okpo"></rel>
+              <rel destname="CTYPE" srcname="ctype"></rel>
+              <rel destname="NMK" srcname="nmk"></rel>
+              <rel destname="ADR" srcname="adr"></rel>
+              <rel destname="DOC" srcname="doc"></rel>
+              <rel destname="ISSUER" srcname="issuer"></rel>
+              <rel destname="BDAY" srcname="bdayplace"></rel>
+             </rels>
+          </uicontrol>
+        </customfield>
+        <customfield name="OKPO" datatype="String" index="2" label="ЗКПО" columnindex="1" groupname="Реквізити клієнта 1">
+          <uicontrol controlwidth="170" readonly="true"></uicontrol>
+        </customfield>
+        <customfield name="CTYPE" datatype="String" index="3" label="Тип клієнта" columnindex="1" groupname="Реквізити клієнта 1">
+          <uicontrol controlwidth="170" readonly="true"></uicontrol>
+        </customfield>
+        <customfield name="NMK" datatype="String" index="4" label="ПІБ (назва)" columnindex="1" groupname="Реквізити клієнта 1">
+          <uicontrol controlwidth="170" readonly="true" linescount="2"></uicontrol>
+        </customfield>
+        <customfield name="ADR" datatype="String" index="5" label="Адреса" columnindex="1" groupname="Реквізити клієнта 1">
+          <uicontrol controlwidth="170" readonly="true" linescount="2"></uicontrol>
+        </customfield>
+        <customfield name="DOC" datatype="String" index="6" label="Документ" columnindex="1" groupname="Реквізити клієнта 1">
+          <uicontrol controlwidth="170" readonly="true" linescount="2"></uicontrol>
+        </customfield>
+        <customfield name="ISSUER" datatype="String" index="7" label="Виданий" columnindex="1" groupname="Реквізити клієнта 1">
+          <uicontrol controlwidth="170" readonly="true" linescount="2"></uicontrol>
+        </customfield>
+        <customfield name="BDAY" datatype="String" index="8" label="Дата, місце народження" columnindex="1" groupname="Реквізити клієнта 1">
+          <uicontrol controlwidth="170" readonly="true" linescount="2"></uicontrol>
+        </customfield>
+        
+        
+          <customfield name="rnk2" datatype="String" required="fulse" index="10" label="Діюче РНК" columnindex="2" groupname="Реквізити клієнта 2"> 
+          <uicontrol controlwidth="135" type="ReadOnlyReference" formname="bpk.ref.customer" formfieldname="rnk" formwidth="700" formheight="400">
+            <rels>
+              <rel destname="OKPO2" srcname="okpo"></rel>
+              <rel destname="CTYPE2" srcname="ctype"></rel>
+              <rel destname="NMK2" srcname="nmk"></rel>
+              <rel destname="ADR2" srcname="adr"></rel>
+              <rel destname="DOC2" srcname="doc"></rel>
+              <rel destname="ISSUER2" srcname="issuer"></rel>
+              <rel destname="BDAY2" srcname="bdayplace"></rel>
+
+            </rels>
+          </uicontrol>
+        </customfield>
+        <customfield name="OKPO2" datatype="String" index="11" label="ЗКПО" columnindex="2" groupname="Реквізити клієнта 2">
+          <uicontrol controlwidth="170" readonly="true"></uicontrol>
+        </customfield>
+        <customfield name="CTYPE2" datatype="String" index="12" label="Тип клієнта" columnindex="2" groupname="Реквізити клієнта 2">
+          <uicontrol controlwidth="170" readonly="true"></uicontrol>
+        </customfield>
+        <customfield name="NMK2" datatype="String" index="13" label="ПІБ (назва)" columnindex="2" groupname="Реквізити клієнта 2">
+          <uicontrol controlwidth="170" readonly="true" linescount="2"></uicontrol>
+        </customfield>
+        <customfield name="ADR2" datatype="String" index="14" label="Адреса" columnindex="2" groupname="Реквізити клієнта 2">
+          <uicontrol controlwidth="170" readonly="true" linescount="2"></uicontrol>
+        </customfield>
+        <customfield name="DOC2" datatype="String" index="15" label="Документ" columnindex="2" groupname="Реквізити клієнта 2">
+          <uicontrol controlwidth="170" readonly="true" linescount="2"></uicontrol>
+        </customfield>
+        <customfield name="ISSUER2" datatype="String" index="16" label="Виданий" columnindex="2" groupname="Реквізити клієнта 2">
+          <uicontrol controlwidth="170" readonly="true" linescount="2"></uicontrol>
+        </customfield>
+        <customfield name="BDAY1" datatype="String" index="18" label="Дата, місце народження" columnindex="2" groupname="Реквізити клієнта 2">
+          <uicontrol controlwidth="170" readonly="true" linescount="2"></uicontrol>
+		     
+        </customfield>
+		</customfields>
+    </customform>
+  </customforms>
+</xmlform>
+

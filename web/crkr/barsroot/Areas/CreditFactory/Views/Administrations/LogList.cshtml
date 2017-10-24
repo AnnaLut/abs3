@@ -1,0 +1,152 @@
+﻿@using Areas.CreditFactory.Models
+@using Kendo.Mvc.UI
+@model IQueryable<CF_REQUEST_LOG>
+
+@{
+    Layout = null;
+}
+<script type="text/javascript">
+    var model = {
+        logDir: null
+    };
+
+    function getLogDirFilter() {
+        return model
+    }
+
+    function formatLogStatus(item) {
+        return formatLogStatusBase(item, "IS_VALID");
+    }
+
+    function formatLogStatusBase(item, fieldName) {
+        var statusClass;
+        switch (item[fieldName]) {
+            case "SUCCESS":
+                statusClass = "success";
+                break;
+            case "ERROR":
+                statusClass = "error";
+                break;
+        }
+        return kendo.format("<div class='k-block k-{0}-colored statusField centerField' >{1}</div>", statusClass, item[fieldName]);
+    }
+
+    function formatDirectionRelative(item) {
+        return formatDirectionRelativeBase(item, "LOG_DIR");
+    }
+
+    function formatDirectionRelativeBase(item, fieldName) {
+        var text;
+        var arrow;
+        var color;
+        switch (item[fieldName]) {
+            case "I":
+                text = "Вхідний";
+                arrow = "right";
+                color = "success";
+                break;
+            case "O":
+                text = "Вихідний";
+                arrow = "left"
+                color = "info";
+                break;
+        }
+        return kendo.format("<div class='k-block k-{0}-colored statusField centerField' ><span class='pf-icon pf-16 pf-arrow_{1}'></span>  {2}</div>", color, arrow, text);
+    }
+
+    function getDataItem(e, gridId) {
+        var row = e.target.closest("tr");
+        var grid = $("#" + gridId).getKendoGrid();
+        var item = grid.dataItem(row);
+        return item;
+    }
+
+    function gridLog_getTooltipTransferType(e) {
+        return getDataItem(e, "grid_LogList").TransferTypeName;
+    }
+
+    $(document).ready(function () {
+        $("#buttonFilterRequest").click(function () {
+            model.logDir = "I";
+            $("#grid_LogList").data("kendoGrid").dataSource.read();
+            $(".nav-button").removeClass("k-primary");
+            $(this).addClass("k-primary")
+        });
+
+        $("#buttonFilterResponce").click(function () {
+            model.logDir = "O";
+            $("#grid_LogList").data("kendoGrid").dataSource.read();
+            $(".nav-button").removeClass("k-primary");
+            $(this).addClass("k-primary")
+        });
+
+        $("#buttonFilterAll").click(function () {
+            model.logDir = null;
+            $("#grid_LogList").data("kendoGrid").dataSource.read();
+            $(".nav-button").removeClass("k-primary");
+            $(this).addClass("k-primary")
+        });
+
+    })
+</script>
+<div id="tooltip-section">
+    @(Html.Kendo().Tooltip()
+         .For("#grid_LogList")
+            .Filter(".transferTypeField")
+            .ContentHandler("gridLog_getTooltipTransferType")
+    )
+
+</div>
+
+<div class="navigationBar">
+    <button id='buttonFilterRequest' class='k-button nav-button'>Вхідні повідомлення</button>
+    <button id='buttonFilterResponce' class='k-button nav-button'>Вихідні повідомлення</button>
+    <button id='buttonFilterAll' class='k-button nav-button k-primary'>Усі</button>
+    <br>
+</div>
+<div id="childRecordsLevel1">
+    @*Шаблон дочерней строки протокола*@
+    <script id="template_ChildLevel1" type="text/x-kendo-template">
+        @(Html.Kendo().TabStrip()
+                              .Name("tabstripChildRowsLevel1_#=ID#")
+                              .Items(tabstrip =>
+                              {
+                                  tabstrip.Add().Text("Тіло повідомлення")
+                                      .Selected(true)
+                                                .Content(@<text>
+                                        <div class='employee-details' style="word-wrap:break-word;width:800px">
+                                            <xmp>#= LOG_DATA #</xmp>
+                                        </div>
+                                                </text>);
+                              }).ToClientTemplate()
+        )
+    </script>
+</div>
+<div id="gvLogList">
+    @(Html.Kendo().Grid<CF_REQUEST_LOG>()
+          .Name("grid_LogList")
+          //.AutoBind(true)
+          .Columns(columns =>
+          {
+              columns.Bound(c => c.IS_VALID).Title("Статус запиту").ClientTemplate("#= formatLogStatus(data) #");
+              columns.Bound(c => c.ID).Title("Номер<br>в журналі");
+              columns.Bound(c => c.LOG_DIR).Title("Напрям<br>відносно АБС").ClientTemplate("#= formatDirectionRelative(data) #").Filterable(false);
+              columns.Bound(c => c.LOG_DATE).Title("Дата/час обробки").Format("{0:dd/MM/yyyy HH:mm:ss}");
+              columns.Bound(c => c.RESP_FOR).Title("Ідентифікатор<br>вхідного повідомлення");
+          })
+          .ClientDetailTemplateId("template_ChildLevel1")
+          .Resizable(resize => resize.Columns(true))
+          .Reorderable(reorder => reorder.Columns(true))
+          .Pageable(pager => pager
+                      .PageSizes(new[] { 10, 20, 50, 100 })
+              .Refresh(true))
+          .Filterable(ftb => ftb.Mode(GridFilterMode.Menu))
+          .Sortable()
+          .DataSource(dataSource => dataSource
+              .Ajax()
+              .Sort(sort => sort.Add(p => p.ID).Descending())
+              .Model(model => model.Id(p => p.ID))
+                  .Read(read => read.Action("GetLogList", "Administrations", new { area = "CreditFactory" }).Data("getLogDirFilter")))
+    )
+</div>
+

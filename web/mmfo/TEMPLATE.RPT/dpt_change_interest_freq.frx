@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="08/17/2015 11:36:45" ReportInfo.Modified="08/17/2015 11:40:16" ReportInfo.CreatorVersion="2014.3.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlq8+HCsj5mnfc2oQWOJAI1rOWOGv68sBpiXMxVx5dIqE7fZmMxoAeKqIz2gmiyZm0SgkZYiz90I7rWXHFwJvahFA=="/>
+  </Dictionary>
+  <ReportPage Name="Page1">
+    <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="37.8"/>
+    <PageHeaderBand Name="PageHeader1" Top="42.15" Width="718.2" Height="225.08">
+      <TextObject Name="Text1" Left="111.92" Top="4.93" Width="459.76" Height="150.44" Text="ДИТЯЧИЙ" HorzAlign="Center" Font="Arial, 18pt, style=Bold"/>
+    </PageHeaderBand>
+    <PageFooterBand Name="PageFooter1" Top="271.58" Width="718.2" Height="18.9"/>
+  </ReportPage>
+</Report>

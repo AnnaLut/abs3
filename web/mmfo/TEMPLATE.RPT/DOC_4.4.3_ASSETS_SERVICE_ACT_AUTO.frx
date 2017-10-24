@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="04/15/2011 18:11:20" ReportInfo.Modified="02/02/2012 16:12:24" ReportInfo.CreatorVersion="1.7.1.0">
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqD6nWZEExUJ9MEhdFZpB1A6ZfSeiTM+6WLeB8pW5aURqkGwhV134I2SUIQGUGXcXiaRBy0Hoyx7U7FVpVaHYtDA==">
+      <TableDataSource Name="Table2" Alias="WCS_BID_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select b.*,&#13;&#10;       wcs_utl.get_answ_formated(b.bid_id, 'CL_13') || ' ' ||&#13;&#10;       wcs_utl.get_answ_formated(b.bid_id, 'CL_14') || ' ' ||&#13;&#10;       wcs_utl.get_answ_formated(b.bid_id, 'CL_15') || ' ' ||&#13;&#10;       wcs_utl.get_answ_formated(b.bid_id, 'CL_16') as adr&#13;&#10;  from v_wcs_bids b&#13;&#10; where b.bid_id = :p_bid_id">
+        <Column Name="BID_ID" DataType="System.Decimal"/>
+        <Column Name="SUBPRODUCT_ID" DataType="System.String"/>
+        <Column Name="SUBPRODUCT_NAME" DataType="System.String"/>
+        <Column Name="CRT_DATE" DataType="System.DateTime"/>
+        <Column Name="F" DataType="System.String"/>
+        <Column Name="I" DataType="System.String"/>
+        <Column Name="O" DataType="System.String"/>
+        <Column Name="BDATE" DataType="System.DateTime"/>
+        <Column Name="INN" DataType="System.String"/>
+        <Column Name="SUMM" DataType="System.Decimal"/>
+        <Column Name="OWN_FUNDS" DataType="System.Decimal"/>
+        <Column Name="TERM" DataType="System.String"/>
+        <Column Name="CREDIT_CURRENCY" DataType="System.Decimal"/>
+        <Column Name="SINGLE_FEE" DataType="System.Decimal"/>
+        <Column Name="MONTHLY_FEE" DataType="System.Decimal"/>
+        <Column Name="INTEREST_RATE" DataType="System.Decimal"/>
+        <Column Name="REPAYMENT_METHOD" DataType="System.String"/>
+        <Column Name="REPAYMENT_DAY" DataType="System.Decimal"/>
+        <Column Name="GARANTEES" DataType="System.String"/>
+        <Column Name="MGR_ID" DataType="System.Decimal"/>
+        <Column Name="MGR_FIO" DataType="System.String"/>
+        <Column Name="BRANCH" DataType="System.String"/>
+        <Column Name="BRANCH_NAME" DataType="System.String"/>
+        <Column Name="STATES" DataType="System.String"/>
+        <Column Name="ADR" DataType="System.String"/>
+        <Column Name="REPAYMENT_METHOD_TEXT" DataType="System.String"/>
+        <Column Name="SUBPRODUCT_DESC" DataType="System.String"/>
+        <CommandParameter Name="p_bid_id" DataType="107" Expression="[p_bid_id]" DefaultValue="-1"/>
+      </TableDataSource>
+      <TableDataSource Name="Table4" Alias="WCS_BID_GARANTEES" DataType="System.Int32" Enabled="true" SelectCommand="select bg.*,&#13;&#10;       wcs_utl.get_answ_list_text(bg.bid_id,&#13;&#10;                                  'GRT_3_1',&#13;&#10;                                  bg.ws_id,&#13;&#10;                                  bg.garantee_num) as grt_3_1,&#13;&#10;       wcs_utl.get_answ(bg.bid_id, 'GRT_3_2', bg.ws_id, bg.garantee_num) as grt_3_2,&#13;&#10;       wcs_utl.get_answ_numb(bg.bid_id,&#13;&#10;                             'GRT_3_3',&#13;&#10;                             bg.ws_id,&#13;&#10;                             bg.garantee_num) as grt_3_3,&#13;&#10;       wcs_utl.get_answ_text(bg.bid_id,&#13;&#10;                             'GRT_3_4',&#13;&#10;                             bg.ws_id,&#13;&#10;                             bg.garantee_num) as grt_3_4,&#13;&#10;       wcs_utl.get_answ_list_text(bg.bid_id,&#13;&#10;                                  'GRT_3_4_0',&#13;&#10;                                  bg.ws_id,&#13;&#10;                                  bg.garantee_num) as grt_3_4_0,&#13;&#10;       wcs_utl.get_answ_numb(bg.bid_id,&#13;&#10;                             'GRT_3_5',&#13;&#10;                             bg.ws_id,&#13;&#10;                             bg.garantee_num) as grt_3_5,&#13;&#10;       wcs_utl.get_answ_text(bg.bid_id,&#13;&#10;                             'GRT_3_6',&#13;&#10;                             bg.ws_id,&#13;&#10;                             bg.garantee_num) as grt_3_6,&#13;&#10;       wcs_utl.get_answ_text(bg.bid_id,&#13;&#10;                             'GRT_3_7',&#13;&#10;                             bg.ws_id,&#13;&#10;                             bg.garantee_num) as grt_3_7,&#13;&#10;       wcs_utl.get_answ_text(bg.bid_id,&#13;&#10;                             'GRT_3_8',&#13;&#10;                             bg.ws_id,&#13;&#10;                             bg.garantee_num) as grt_3_8,&#13;&#10;       wcs_utl.get_answ_text(bg.bid_id,&#13;&#10;                             'GRT_3_9',&#13;&#10;                             bg.ws_id,&#13;&#10;                             bg.garantee_num) as grt_3_9,&#13;&#10;       wcs_utl.get_answ_text(bg.bid_id,&#13;&#10;                             'GRT_3_10',&#13;&#10;                             bg.ws_id,&#13;&#10;                             bg.garantee_num) as grt_3_10,&#13;&#10;       wcs_utl.get_answ_date(bg.bid_id,&#13;&#10;                             'GRT_3_10_0',&#13;&#10;                             bg.ws_id,&#13;&#10;                             bg.garantee_num) as grt_3_10_0,&#13;&#10;       wcs_utl.get_answ_text(bg.bid_id,&#13;&#10;                             'GRT_3_11',&#13;&#10;                             bg.ws_id,&#13;&#10;                             bg.garantee_num) as grt_3_11,&#13;&#10;       wcs_utl.get_answ_text(bg.bid_id,&#13;&#10;                             'GRT_3_12',&#13;&#10;                             bg.ws_id,&#13;&#10;                             bg.garantee_num) as grt_3_12,&#13;&#10;       wcs_utl.get_answ_text(bg.bid_id,&#13;&#10;                             'GRT_3_13',&#13;&#10;                             bg.ws_id,&#13;&#10;                             bg.garantee_num) as grt_3_13,&#13;&#10;       wcs_utl.get_answ_text(bg.bid_id,&#13;&#10;                             'GRT_3_14',&#13;&#10;                             bg.ws_id,&#13;&#10;                             bg.garantee_num) as grt_3_14,&#13;&#10;       wcs_utl.get_answ_text(bg.bid_id,&#13;&#10;                             'GRT_3_15',&#13;&#10;                             bg.ws_id,&#13;&#10;                             bg.garantee_num) as grt_3_15,&#13;&#10;       wcs_utl.get_answ_text(bg.bid_id,&#13;&#10;                             'GRT_3_16',&#13;&#10;                             bg.ws_id,&#13;&#10;                             bg.garantee_num) as grt_3_16,&#13;&#10;       decode(wcs_utl.get_answ(bg.bid_id,&#13;&#10;                               'GRT_0',&#13;&#10;                               bg.ws_id,&#13;&#10;                               bg.garantee_num),&#13;&#10;              '1',&#13;&#10;              wcs_utl.get_answ(bg.bid_id, 'CL_1') || ' ' ||&#13;&#10;              wcs_utl.get_answ(bg.bid_id, 'CL_2') || ' ' ||&#13;&#10;              wcs_utl.get_answ(bg.bid_id, 'CL_3'),&#13;&#10;              wcs_utl.get_answ(bg.bid_id, 'CL_1', bg.ws_id, bg.garantee_num) || ' ' ||&#13;&#10;              wcs_utl.get_answ(bg.bid_id, 'CL_2', bg.ws_id, bg.garantee_num) || ' ' ||&#13;&#10;              wcs_utl.get_answ(bg.bid_id, 'CL_3', bg.ws_id, bg.garantee_num)) as owner_fio&#13;&#10;  from v_wcs_bid_garantees bg&#13;&#10; where bid_id = :p_bid_id&#13;&#10;   and bg.garantee_id = 'VEHICLE'&#13;&#10;   and bg.garantee_num = :p_ws_number">
+        <Column Name="BID_ID" DataType="System.Decimal"/>
+        <Column Name="GARANTEE_ID" DataType="System.String"/>
+        <Column Name="GARANTEE_NAME" DataType="System.String"/>
+        <Column Name="GARANTEE_NUM" DataType="System.Decimal"/>
+        <Column Name="WS_ID" DataType="System.String"/>
+        <Column Name="TYPE_OBU_ID" DataType="System.String"/>
+        <Column Name="TYPE_OBU_NAME" DataType="System.String"/>
+        <Column Name="GRT_NAME" DataType="System.String"/>
+        <Column Name="GRT_COST" DataType="System.Decimal"/>
+        <Column Name="GARANTEE_NO" DataType="System.Decimal" PropName="Column" Calculated="true" Expression="[WCS_BID_GARANTEES.GARANTEE_NUM] + 1"/>
+        <Column Name="SUBJ_OBU_ID" DataType="System.String"/>
+        <Column Name="SUBJ_OBU_NAME" DataType="System.String"/>
+        <Column Name="STATUS_ID" DataType="System.Decimal"/>
+        <Column Name="STATUS_NAME" DataType="System.String"/>
+        <Column Name="AGR_NUMBER" DataType="System.String"/>
+        <Column Name="AGR_DATE" DataType="System.DateTime"/>
+        <Column Name="GRT_3_1" DataType="System.String"/>
+        <Column Name="GRT_3_2" DataType="System.String"/>
+        <Column Name="GRT_3_3" DataType="System.Decimal"/>
+        <Column Name="GRT_3_4" DataType="System.String"/>
+        <Column Name="GRT_3_4_0" DataType="System.String"/>
+        <Column Name="GRT_3_5" DataType="System.Decimal"/>
+        <Column Name="GRT_3_6" DataType="System.String"/>
+        <Column Name="GRT_3_7" DataType="System.String"/>
+        <Column Name="GRT_3_8" DataType="System.String"/>
+        <Column Name="GRT_3_9" DataType="System.String"/>
+        <Column Name="GRT_3_10" DataType="System.String"/>
+        <Column Name="GRT_3_10_0" DataType="System.DateTime"/>
+        <Column Name="GRT_3_11" DataType="System.String"/>
+        <Column Name="GRT_3_12" DataType="System.String"/>
+        <Column Name="GRT_3_13" DataType="System.String"/>
+        <Column Name="GRT_3_14" DataType="System.String"/>
+        <Column Name="GRT_3_15" DataType="System.String"/>
+        <Column Name="GRT_3_16" DataType="System.String"/>
+        <Column Name="OWNER_FIO" DataType="System.String"/>
+        <CommandParameter Name="p_bid_id" DataType="107" Expression="[p_bid_id]" DefaultValue="-1"/>
+        <CommandParameter Name="p_ws_number" DataType="107" Expression="[p_ws_number]" DefaultValue="0"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="p_bid_id" DataType="System.Decimal"/>
+    <Parameter Name="p_ws_id" DataType="System.String" Expression="&quot;MAIN&quot;"/>
+    <Parameter Name="p_ws_number" DataType="System.Decimal" Expression="0"/>
+  </Dictionary>
+  <ReportPage Name="Page1">
+    <DataBand Name="BndMain1" Width="718.2" Height="954.45" CanGrow="true">
+      <TextObject Name="Text1" Left="18.9" Top="9.45" Width="680.4" Height="28.35" Text="Додаток 5" HorzAlign="Right" Font="Arial, 11pt, style=Bold"/>
+      <TextObject Name="Text3" Left="18.9" Top="170.1" Width="680.4" Height="18.9" Text="1. Основні дані  про транспортний засіб і кредит" VertAlign="Center" Font="Arial, 11pt, style=Bold"/>
+      <TableObject Name="Table1" Left="18.9" Top="189" Width="684.18" Height="491.4" Border.Lines="All">
+        <TableColumn Name="Column1" Width="41.58"/>
+        <TableColumn Name="Column2" Width="289.17"/>
+        <TableColumn Name="Column5" Width="353.43"/>
+        <TableRow Name="Row1" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell1" Border.Lines="All" Text="1.1." HorzAlign="Center"/>
+          <TableCell Name="Cell2" Border.Lines="All" Text="Прізвище, ім’я, по батькові власника (заставодавця)" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell5" Border.Lines="All" Text="[WCS_BID_GARANTEES.OWNER_FIO]"/>
+        </TableRow>
+        <TableRow Name="Row17" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell76" Border.Lines="All" Text="1.2" HorzAlign="Center"/>
+          <TableCell Name="Cell77" Border.Lines="All" Text="Тип транспортного засобу" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell80" Border.Lines="All" Text="[WCS_BID_GARANTEES.GRT_3_1]"/>
+        </TableRow>
+        <TableRow Name="Row19" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell86" Border.Lines="All" Text="1.3" HorzAlign="Center"/>
+          <TableCell Name="Cell87" Border.Lines="All" Text="Марка транспортного засобу, модель" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell88" Border.Lines="All" Text="[WCS_BID_GARANTEES.GRT_3_2]"/>
+        </TableRow>
+        <TableRow Name="Row20" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell89" Border.Lines="All" Text="1.4" HorzAlign="Center"/>
+          <TableCell Name="Cell90" Border.Lines="All" Text="Реєстраційний № транспортного засобу" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell91" Border.Lines="All" Text="[WCS_BID_GARANTEES.GRT_3_4]"/>
+        </TableRow>
+        <TableRow Name="Row21" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell92" Border.Lines="All" Text="1.5" HorzAlign="Center"/>
+          <TableCell Name="Cell93" Border.Lines="All" Text="Рік випуску транспортного засобу" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell94" Border.Lines="All" Text="[WCS_BID_GARANTEES.GRT_3_5]"/>
+        </TableRow>
+        <TableRow Name="Row22" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell95" Border.Lines="All" Text="1.6" HorzAlign="Center"/>
+          <TableCell Name="Cell96" Border.Lines="All" Text="Колір транспортного засобу" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell97" Border.Lines="All" Text="[WCS_BID_GARANTEES.GRT_3_6]"/>
+        </TableRow>
+        <TableRow Name="Row23" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell98" Border.Lines="All" Text="1.7" HorzAlign="Center"/>
+          <TableCell Name="Cell99" Border.Lines="All" Text="№ шасі (кузову, рами, коляски)" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell100" Border.Lines="All" Text="[WCS_BID_GARANTEES.GRT_3_7]"/>
+        </TableRow>
+        <TableRow Name="Row24" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell101" Border.Lines="All" Text="1.8" HorzAlign="Center"/>
+          <TableCell Name="Cell102" Border.Lines="All" Text="№ свідоцтва про реєстрацію транспортного засобу, кім видано, дата" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell103" Border.Lines="All" Text="[WCS_BID_GARANTEES.GRT_3_10], [WCS_BID_GARANTEES.GRT_3_11], [FormatDateTime([WCS_BID_GARANTEES.GRT_3_10_0],&quot;Short Date&quot;)]"/>
+        </TableRow>
+        <TableRow Name="Row25" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell104" Border.Lines="All" Text="1.9" HorzAlign="Center"/>
+          <TableCell Name="Cell105" Border.Lines="All" Text="№ двигуна (при наявності в свідоцтві)" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell106" Border.Lines="All" Text="[WCS_BID_GARANTEES.GRT_3_8]"/>
+        </TableRow>
+        <TableRow Name="Row26" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell107" Border.Lines="All" Text="1.10" HorzAlign="Center"/>
+          <TableCell Name="Cell108" Border.Lines="All" Text="Адреса власника згідно свідоцтва про реєстрацію транспортного засобу" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell109" Border.Lines="All" Text="[WCS_BID_GARANTEES.GRT_3_12]"/>
+        </TableRow>
+        <TableRow Name="Row27" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell110" Border.Lines="All" Text="1.11" HorzAlign="Center"/>
+          <TableCell Name="Cell111" Border.Lines="All" Text="Особливі відмітки в свідоцтві про реєстрацію транспортного засобу" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell112" Border.Lines="All" Text="[WCS_BID_GARANTEES.GRT_3_13]"/>
+        </TableRow>
+        <TableRow Name="Row28" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell113" Border.Lines="All" Text="1.12" HorzAlign="Center"/>
+          <TableCell Name="Cell114" Border.Lines="All" Text="Місце стоянки транспортного засобу" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell115" Border.Lines="All" Text="[WCS_BID_GARANTEES.GRT_3_14]"/>
+        </TableRow>
+        <TableRow Name="Row18" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell81" Border.Lines="All" Text="1.13" HorzAlign="Center"/>
+          <TableCell Name="Cell82" Border.Lines="All" Text="Термін дії кредитного договору" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell85" Border.Lines="All" Text="[WCS_BID_DATA.TERM] (міс.)"/>
+        </TableRow>
+      </TableObject>
+      <TextObject Name="Text18" Left="18.9" Top="37.8" Width="680.4" Height="18.9" Text="Форма ЗМ-2 (версія 1)" HorzAlign="Right" Font="Arial, 9pt, style=Italic"/>
+      <TextObject Name="Text20" Left="18.9" Top="66.15" Width="680.4" Height="56.7" Text="АКТ &#13;&#10;перевірки за наявністю та станом&#13;&#10;транспортного засобу як предмета застави" HorzAlign="Center" VertAlign="Center" Font="Arial, 12pt, style=Underline"/>
+      <TextObject Name="Text45" Left="18.9" Top="141.75" Width="680.4" Height="18.9" Text="Дата перевірки транспортного засобу: __________" VertAlign="Center" Font="Arial, 11pt, style=Bold"/>
+      <TextObject Name="Text46" Left="18.9" Top="699.3" Width="680.4" Height="18.9" Text="2. Результати перевірки наявності та стану  майна" VertAlign="Center" Font="Arial, 11pt, style=Bold"/>
+      <TextObject Name="Text47" Left="18.9" Top="803.25" Width="680.4" Height="18.9" Text="3. Рекомендації" VertAlign="Center" Font="Arial, 11pt, style=Bold"/>
+      <TextObject Name="Text49" Left="18.9" Top="916.65" Width="94.5" Height="18.9" Text="Від Банку" VertAlign="Center" Font="Arial, 11pt, style=Bold"/>
+      <TextObject Name="Text50" Left="18.9" Top="718.2" Width="680.4" Height="75.6" Border.Lines="All" VertAlign="Center" Font="Arial, 11pt, style=Bold"/>
+      <TextObject Name="Text51" Left="18.9" Top="822.15" Width="680.4" Height="75.6" Border.Lines="All" VertAlign="Center" Font="Arial, 11pt, style=Bold"/>
+      <TextObject Name="Text52" Left="604.8" Top="916.65" Width="94.5" Height="18.9" Text="Від Клієнта" VertAlign="Center" Font="Arial, 11pt, style=Bold"/>
+    </DataBand>
+  </ReportPage>
+</Report>

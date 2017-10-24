@@ -1,0 +1,44 @@
+﻿@{
+    ViewBag.Title = "Портфель депозитних вкладів населення";
+}
+<script src="~/Areas/DptAdm/Scripts/DepositPopulation/DepositPopulation.js"></script>
+<link rel="stylesheet" href="~/Areas/Dpa/Content/Site.css" />
+
+<div id="content" ng-app="BarsWeb.Controllers" ng-controller="DepositPopulation">
+    <h2>@ViewBag.Title</h2><br />
+
+    <div class="form-inline" role="form">
+        <div class="form-group">
+            <button class="k-button" ng-click="" title="Наповнити таблицю даними">
+                <img src="~/Content/images/PureFlat/16/reload_rotate.png" />
+            </button>
+            <button class="k-button" ng-click="" title="Добавити запис">
+                <img src="~/Content/images/PureFlat/16/book.png" />
+            </button>
+            <button class="k-button" ng-click="" title="Помітити запис на видалення">
+                <img src="~/Content/images/PureFlat/16/table_row-delete2.png" />
+            </button>
+            <button class="k-button" ng-click="" title="Помітити запис на видалення">
+                <img src="~/Content/images/PureFlat/16/print.png" />
+            </button>
+            <button class="k-button" ng-click="" title="Сформувати файл" style="margin-left: 20px;">
+                <img src="~/Areas/Dpa/Content/Images/Cancel.png" width="17" height="17" />
+            </button><br /><br />
+            <form id="dates_period" style="width: 200px;">
+                <label>Дата з:</label>
+                <input id="start" name="start" style="width: 100%;" ng-model="date_grid_start" required />
+
+                <label>Дата по:</label>
+                <input id="end" name="end" style="width: 100%;" ng-model="date_grid_end" required />
+            </form>
+        </div>
+        <div class="form-group" style="width: 320px;">
+            <div id="DepositPopulationGrid1" kendo-grid="DepositPopulationGrid1" k-options="DepositPopulationGrid1Options" k-rebind="DepositPopulationGrid1Options" k-on-save-changes="saveChanges(kendoEvent)"></div>
+        </div>
+    </div><br />
+
+    @*<div id="mydiv">
+            <img src="~/Areas/Dpa/Content/Images/loader.gif" width="100" height="100" class="ajax-loader" />
+        </div>*@
+    <div id="DepositPopulationGrid" kendo-grid="DepositPopulationGrid" k-options="DepositPopulationGridOptions" k-rebind="DepositPopulationGridOptions" k-on-save-changes="saveChanges(kendoEvent)"></div>
+</div>

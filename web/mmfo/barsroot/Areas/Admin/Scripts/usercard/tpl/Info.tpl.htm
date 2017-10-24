@@ -1,0 +1,37 @@
+﻿<script id="Info" type="text/x-kendo-template">
+    <div class="container-fluid" id="container">
+        <div class="form-group-small">
+            <label for="login">Логін:</label>
+            <input type="text" id="login" class="form-control" readonly value="#=LoginName.toUpperCase()#">
+        </div>
+        <div class="form-group-small">
+            <label for="name">ПІБ:</label>
+            <input type="text" id="name" class="form-control" readonly value="#=UserName#">
+        </div>
+        <!--MainBranch-->
+        <div>
+            <label for="branchId" class="label-branchCode">Відділення:</label>
+            <div>
+                <input id="branchId" type="text" class="form-control" readonly value="#=BranchCode#">                    
+            </div>    
+        </div>
+        <div>
+            <input id="branchName" class="form-control" readonly value="#=BranchName#">
+        </div>
+        <div>
+            <button type="button" id="branchBtn" class="k-button" disabled>
+                <i class="pf-icon pf-16 pf-folder_open"></i>
+            </button>
+        </div>
+        <!--UserStatus-->
+        <div>
+            <label for="statusCode" class="label-statusCode">Статус користувача:</label>
+            <div>
+                <input id="statusCode" type="text" class="form-control" readonly value="#=UserStateCode#">
+            </div>             
+        </div>
+        <div>
+            <input id="statusName" class="form-control" readonly value="#=UserStateName#">
+        </div> 
+    </div>
+</script>

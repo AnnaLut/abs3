@@ -1,0 +1,149 @@
+﻿@{
+
+}
+<script src="~/Areas/BaseRates/Scripts/InterestRatesCtrl.js?v1.0.1"></script>
+<style>
+    span.k-tooltip {
+        position: absolute;
+        display: table;
+        border-width: 1px;
+        padding: 2px 5px 1px 6px;
+    }
+    #KF_NUM_validationMessage {
+        width: 30%;
+    }
+    #S_validationMessage, #NEW_RATE_validationMessage, #OLD_RATE_validationMessage {
+        position: static;
+    }
+    #interestRateGrid .k-dirty {
+        background-color: red;
+    }
+    .inserted {
+        background-color: lightpink;
+    }
+    .k-grid tr {
+    height: 15px;
+    padding: 0;
+}
+    .k-grid TD {
+    padding:0.1em;
+    height:15px;
+}
+</style>
+<div ng-app="BarsWeb.Controllers" ng-controller="InterestRatesCtrl" ng-init="Init()">
+    <h2>Проста процентна ставка {{archive_text}}</h2><br />
+    <div name="ControllPanel">
+        <div class="form-inline">
+            <button class="k-button" ng-click="AddInterestBrate()" title="Додати новий запис">
+                <img src="~/Content/images/PureFlat/16/table_row-add2.png" width="16" height="15" />
+            </button>
+            <button class="k-button" ng-click="deleteBrate()" title="Видалити запис">
+                <img src="~/Content/images/PureFlat/16/delete.png" width="16" height="15" />
+            </button>
+            <button class="k-button" ng-click="interestRateGrid.dataSource.read()" title="Оновити записи у таблиці">
+                <img src="~/Content/images/PureFlat/16/reload_rotate.png" width="16" height="15" />
+            </button>
+            <button class="k-button" ng-click="editRow()" title="Редагувати запис" style="margin-left: 20px">
+                <img src="~/Content/images/PureFlat/16/tool_pencil.png" width="16" height="15" />
+            </button>
+            <button class="k-button" ng-click="Archive()" title="Ставка за усі дні">
+                <img src="~/Content/images/PureFlat/16/folder_open.png" width="16" height="15" />
+            </button>
+        </div>
+        <br />
+        <div class="form-inline">
+            <input id="tbBRID" class="k-textbox" style="width: 100px" disabled/>
+            <input id="tbBRNAME" class="k-textbox" style="width: 400px" disabled/>
+            <button id="btnRate" ng-click="SelectBaseRate()" class="k-button" title="Фільтр">
+                <img src="~/Content/images/PureFlat/16/filter-ok.png" width="16" height="15" />
+            </button>
+        </div>
+        <div class="form-inline">
+            <input id="ddBranch" style="width: 538px; margin-top: 10px"/>
+        </div>
+    </div>
+    <br />
+    <div id="interestRateGrid" kendo-grid="interestRateGrid" k-options="interestRateGridOptions"></div>
+
+    <div id="baseRWin" kendo-window="baseRateWin" k-title="'Базові ставка'" k-visible="false"
+         k-modal="true" k-on-close="onCloseBaseRates()">
+        <div name="ControllPanel">
+            <div class="form-inline">
+                <button class="k-button" ng-click="addBaseRate()" title="Додати новий запис">
+                    <img src="~/Content/images/PureFlat/16/table_row-add2.png" width="16" height="15" />
+                </button>
+                <button class="k-button" ng-click="DublicateBRate()" title="Дублювати стрічку">
+                    <img src="~/Content/images/PureFlat/16/accept_doc.png" width="16" height="15" />
+                </button>
+            </div>
+        </div>
+        <br />
+        <div id="baseRateGrid" kendo-grid k-options="baseRateGridOptions"></div>
+    </div>
+
+
+    <div id="addInterestBrateWin" kendo-window="addInterestBrateWin" k-title="'Додавання процентної ставки'" k-visible="false"
+         k-modal="true" k-on-close="">
+        <h3>{{branch_text}}</h3>
+        <br />
+        <form id="addRateFrom">
+            <label>Базова ставка:</label><br />
+            <input id="addRate_tbBRNAME" class="k-textbox" style="width: 400px" disabled />
+            <div class="form-group" style="margin-top: 10px">
+                <label>Валюта:</label><br />
+                <input id="addRate_KF_NUM" name="KF_NUM" class="k-textbox" style="width: 97px" required/>
+                <input id="addRate_KF_DD" name="KF_DD" style="width: 300px" required/>
+            </div>
+            <div>
+                <label>Дата встановлення:</label><br />
+                <input id="addRate_DATE" class="k-input" style="width: 200px" kendo-date-picker data-k-format="'dd/MM/yyyy'" required/>
+            </div><br />
+            @*<div id="old_rate" style="margin-top: 10px">
+                <label id="label_for_old_rate">Стара ставка:</label><br />
+                <input id="addRate_OLD_RATE" name="OLD_RATE" class="k-textbox" style="width: 200px;" disabled />
+            </div>*@
+            <div id="new_rate" style="margin-top: 10px">
+                <label id="label_for_rate">Ставка:</label><br />
+                <input id="addRate_RATE" name="RATE" class="k-textbox" style="width: 200px" required />
+            </div>
+            <button id="addRate_add_row" class="k-button" ng-click="AddRow()" title="Додати новий запис">
+                <img src="~/Content/images/PureFlat/16/table_row-add2.png" width="16" height="15" />
+            </button>
+            <button id="addRate_delete_row" class="k-button" ng-click="DeleteRow()" title="Видалити запис">
+                <img src="~/Content/images/PureFlat/16/delete.png" width="16" height="15" />
+            </button><br /><br />
+            <div id="rateOptionsAddGrid" kendo-grid ="rateAddGrid" k-options="rateOptionsAddGridOptions" style="width: 450px"></div>
+            <div id="rateOptionsEditGrid" kendo-grid="rateEditGrid" k-options="rateOptionsEditGridOptions" style="width: 450px"></div>
+            <br />
+            <div class="k-content k-window-footer">
+                <button id="btnCancel" ng-click="addInterestBrateWin.close();" class="delete-confirm k-button" style="float:right;margin:7px 5px 7px 5px;">Відмінити</button>
+                <button id="btnOk" ng-click="AddEditInterestBrateToBD()" class="delete-confirm k-button k-primary" style="float:right;margin:7px 5px 7px 5px;"><span class="k-icon k-i-tick"></span> Ok</button>
+            </div>
+        </form>
+    </div>
+
+
+    <div id="addBaseRateWin" kendo-window="addBaseRateWin" k-title="'Додавання базової процентної ставки'" k-visible="false"
+         k-modal="true" k-on-close="">
+        <form id="addBaseRateWinFrom">
+            <div style="margin-top: 7px">
+                <label id="addBaseRate_NAME_label">Назва базової ставки:</label><br />
+                <input id="addBaseRate_NAME" name="NAME" class="k-textbox" style="width: 400px;" required/>
+            </div>
+            <div style="margin-top: 7px">
+                <label>Тип ставки:</label><br />
+                <input id="addBaseRate_BRTYPE" name="BRTYPE" class="k-textbox" style="width: 97px" required/>
+                <input id="addBaseRate_BRTYPE_NAME" name="BRTYPE_NAME" style="width: 300px" required/>
+            </div>
+            <div style="margin-top: 7px">
+                <label>Діюча/недіюча:</label><br />
+                <input id="addBaseRate_ACTIVE" name="ACTIVE" style="width: 400px" required/>
+            </div>
+            <br />
+            <div class="k-content k-window-footer">
+                <button id="btnCancel_BR" ng-click="addBaseRateWin.close();" class="delete-confirm k-button" style="float:right;margin:7px 5px 7px 5px;">Відмінити</button>
+                <button id="btnOk_BR" ng-click="AddBaseRateToBD()" class="delete-confirm k-button k-primary" style="float:right;margin:7px 5px 7px 5px;"><span class="k-icon k-i-tick"></span> Ok</button>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<xmlform caption="">
+  <grids>
+    <grid id="gv2" pagesize="5" showpagesizebox="true">
+      <filters caption="Вибір валюти" buttontext="Знайти" columnscount="2" width="100%">
+        <filter field="kv1" caption ="Код валюти-1" columnindex="1" condition="Equal" id="fltrkv1">
+          <uicontrol type="IntegerInput"></uicontrol>
+        </filter>
+        <filter field="kv2" caption ="Код валюти-2" columnindex="2" condition="Equal" id="fltrkv2">
+          <uicontrol type="IntegerInput"></uicontrol>
+        </filter>
+       </filters>
+      <datasource>
+        <sql>
+          select * from v_zay_kv_conv_kurs
+        </sql>
+      </datasource>
+      <fields>
+        <field name="name_kv1" datatype="String">
+          <column caption="Назва валюти-1" align="Left"></column>
+        </field>
+        <field name="kv1" datatype="Int64" key="true">
+          <column caption="Код валюти-1" align="Right"></column>
+        </field>
+        <field name="name_kv2" datatype="String">
+          <column caption="Назва валюти-2" align="Left"></column>
+        </field>
+        <field name="kv2" datatype="Int64" key="true">
+          <column caption="Код валюти-2" align="Right"></column>
+        </field>
+        <field name="kurs_i" datatype="Decimal">
+          <column caption="Індикативний курс" align="Right" formatstring="{0:N4}" ></column>
+        </field>
+        <field name="kurs_f" datatype="Decimal">
+          <column caption="Фактичний курс" align="Right" formatstring="{0:N4}" >"</column>
+        </field>
+      </fields>
+      <rowselection method="SingleRow"></rowselection>
+    </grid>
+  </grids>
+</xmlform>

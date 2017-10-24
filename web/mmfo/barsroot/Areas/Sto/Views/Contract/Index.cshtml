@@ -1,0 +1,188 @@
+﻿@model BarsWeb.Areas.Sto.Models.AccessMode
+@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = "Договора на регулярні платежі";
+    var vidd_style = new { @class = "vidd_style", style = "font-size: 0.8em; padding: 0 0 0 0; text-align: right; margin: 0px 0px 0px 0px;" };
+    var panel_headers = new { @class = "panel_headers", style = "font-size: 1em; margin: 0px 0px 0px 0px;" };
+}
+
+<script src="~/Areas/Sto/Scripts/Contract/ContractCtrl.js?v1.0.2"></script>
+<link href="~/Areas/Sto/Css/Sto.css" rel="stylesheet" />
+
+<script>
+    var urlClaim = '@Url.Action("GetClaim")';
+    var mode = '@Model.Mode';
+</script>
+
+<div id="splitter" style="overflow-y: hidden;">
+    <div class="panel panel-primary" style="overflow-y: hidden; border:none;">
+        <div class="panel-body" style="padding: 0px;">
+            <div id="Contract" style="padding: 0px;"></div>
+        </div>
+    </div>
+    <div class="panel panel-info" style="overflow-y: hidden; border:none;">
+        <div class="panel-body" style="padding: 0px;">
+            <div id="det-toolbar"></div>
+            <div id="ContractDet" style="padding: 0px;"></div>
+        </div>
+    </div>
+</div>
+
+<script type="text/x-kendo-template" id="template">
+        <div class="toolbar">
+            <label class="category-label" for="grp">Показувати договора групи:</label>
+            <input type="search" id="grp" style="width: 500px; font-size:small" />
+            <div id="sto-toolbar"></div>
+        </div>
+</script>
+
+    <script id="confirmationTemplate" type="text/x-kendo-template" hidden="hidden">
+        <div class="popupMessage">
+            <label class="category-label" for="grp">Причина:</label>
+            <input type="search" id="ConfirmReason" style="width: 220px" />
+        </div>
+        <hr />
+        <div class="dialog_buttons" style="float:right;">
+            <input type="button" class="confirm_yes k-button" value="Yes" style="width: 80px" />
+            &nbsp;
+            <input type="button" class="confirm_no k-button" value="No" style="width: 80px" />
+        </div>
+    </script>
+
+    <div id="info-window" hidden="hidden">
+        <div id="info-grid" style="padding: 0px;"></div>
+    </div>
+
+    @(Html.Kendo().Window().Name("wnd_stodet")
+    .Title("Новий регулярний платіж")
+    .Width(1000)
+    .Height(600)
+    .Draggable()
+    .Modal(true)
+    .Visible(false)
+        .Content(@<text>
+        <div>
+            <asp:Panel ID="panel1" runat="server" GroupingText="term">
+                <table class="InnerTable1" width="100%" cellpadding="3" style="margin: 2px 15px 5px 15px">
+                    <tr class="panel_headers">
+                        <div class="k-header" style="font-size:1.12em">Термін дії</div>
+                    </tr>
+                    <tr class="vidd_style">
+                        <td class="vidd_style"><label style="margin-right: 12px; width: 150px;">Порядок виконання</label><input id="NPP" /></td>
+                        <td class="vidd_style"><label style="margin-right: 12px; width: 150px;">Періодичність виконання</label><input id="freqddl" /></td>
+                    </tr>
+                    <tr class="vidd_style">
+                        <td class="vidd_style">
+                            <label style="margin-right: 10px; width: 150px;">Дата початку</label>
+                            @(Html.Kendo().DatePicker().Name("from").Format("dd.MM.yyyy"))
+                        </td>
+                        <td class="vidd_style">
+                            <label style="margin-right: 10px; width: 150px;">Дата закінчення </label>
+                            @(Html.Kendo().DatePicker().Name("till").Format("dd.MM.yyyy"))
+                        </td>
+                    </tr>
+                    <tr class="vidd_style">
+                        <td class="vidd_style">
+                            @(Html.Kendo().RadioButton().Name("week1").Value(-1).HtmlAttributes(new { @name = "week" }))
+                            <label style="margin-left:25px">-1 (перед вихідними)</label>
+                        </td>
+                    </tr>
+                    <tr class="vidd_style">
+                        <td class="vidd_style">
+                            @(Html.Kendo().RadioButton().Name("week2").Value(1).HtmlAttributes(new { @name = "week" }))
+                            <label style="margin-left:25px">+1 (після вихідних)</label>
+                        </td>
+                    </tr>
+                </table>
+            </asp:Panel>
+            <asp:Panel ID="panel2" runat="server" GroupingText="sender">
+                <table class="InnerTable1" width="100%" cellpadding="3" style="margin: 2px 15px 5px 15px">
+                    <tr class="panel_headers">
+                        <div class="k-header" style="font-size:1.12em">Реквізити платежу</div>
+                    </tr>
+                    <tr class="vidd_style">
+                        <td class="vidd_style"><label style="margin-right: 10px; width: 150px;">Валюта</label><input id="kvddl" style="width:550px; font-size:small" /></td>
+                    </tr>
+                    <tr class="vidd_style">
+                        <td class="vidd_style"><label style="margin-right: 10px; width: 150px;">Код операції</label><input id="ttsddl" style="width:550px; font-size:small" /></td>
+                    </tr>
+                    <tr class="vidd_style">
+                        <td class="vidd_style"><label style="margin-right: 10px; width: 150px;">Сума платежу</label><input id="summ" /></td>
+                    </tr>
+                    <tr class="vidd_style">
+                        <td class="vidd_style"><label style="margin-right: 10px; width: 150px;">Призначення платежу</label></td>
+                    </tr>
+                    <tr class="vidd_style">
+                        <td><input id="nazn" style="width:850px" /></td>
+                    </tr>
+                </table>
+            </asp:Panel>
+            <asp:Panel ID="panel2" runat="server" GroupingText="sender">
+                <table class="InnerTable1" width="100%" cellpadding="3" style="margin: 2px 15px 5px 15px">
+                    <tr class="panel_headers">
+                        <div class="k-header" style="font-size:1.12em">Відправник</div>
+                    </tr>
+                    <tr class="vidd_style">
+                        <td class="vidd_style"><label style="width: 100px;">Валюта платника</label><input style="width: 200px; font-size: small" id="kv_a" /></td>
+                        <td class="vidd_style"><label style="width: 100px;">Рахунок платника</label><input style="width: 200px; font-size: small" id="nls_a" /></td>
+                        <td class="vidd_style"><label style="width: 100px;">Найменування платника</label><input style="width:300px" id="name_a" /></td>
+                        <td class="vidd_style"></td>
+                        <td class="vidd_style"></td>
+                    </tr>
+                </table>
+            </asp:Panel>
+            <asp:Panel ID="panel2" runat="server" GroupingText="sender">
+                <table class="InnerTable1" width="100%" cellpadding="3" style="margin: 2px 15px 5px 15px">
+                    <tr class="panel_headers">
+                        <div class="k-header" style="font-size:1.12em">Отримувач</div>
+                    </tr>
+                    <tr class="vidd_style">
+                        <td class="vidd_style"><label style="width: 100px;">Валюта отримувача</label><input style="width: 200px; font-size: small" id="kv_b" /></td>
+                        <td class="vidd_style"><label style="width: 100px;">Рахунок отримувача</label><input style="width:200px" id="nls_b" /></td>
+                        <td class="vidd_style"><label style="width: 100px;">Найменування отримувача</label><input style="width:300px" id="name_b" /></td>
+                    </tr>
+                    <tr class="vidd_style">
+                        <td class="vidd_style"><label style="width: 150px;">ЗКПО отримувача</label><input id="okpo_b" /></td>
+                        <td class="vidd_style"><label style="width: 150px;">МФО отримувача</label><input id="mfo_b" /></td>
+                    </tr>
+                    <tr class="vidd_style">
+                        <td class="vidd_style"><button id="buttonsave" type="button" style="align-content:center">Зберегти</button></td>
+                    </tr>
+                </table>
+            </asp:Panel>
+        </div>
+        </text>))
+
+
+    @(Html.Kendo().Window().Name("wnd_stolst")
+    .Title("Новий клієнт в регулярних договорах")
+    .Width(500)
+    .Height(400)
+    .Draggable()
+    .Modal(true)
+    .Visible(false)
+        .Content(@<text><div>
+            <asp:Panel ID="panel1" runat="server" GroupingText="sender">
+                <table class="InnerTable1" width="100%" cellpadding="3" style="margin: 2px 15px 5px 15px">
+                    <tr class="vidd_style">
+                        <td class="vidd_style"><label style="margin-right: 10px; width: 150px;">ЗКПО(ІНН) поручителя</label><input id="RNK" style="width:250px" /></td>
+                    </tr>
+                    <tr class="vidd_style">
+                        <td><button id="buttonSearch" type="button" style="align-content:center">Пошук</button></td>
+                    </tr>
+                    <tr class="vidd_style">
+                        <td><input id="RNK_LIST" style="width:250px" /></td>
+                    </tr>
+                    <tr class="vidd_style">
+                        <td class="vidd_style"><label style="margin-right: 10px; width: 150px;">Найменування договору</label><input id="name_ids" style="width:450px" /></td>
+                    </tr>
+                    <tr class="vidd_style">
+                        <td class="vidd_style"><label style="margin-right: 10px; width: 150px;">Дата укладання</label>@(Html.Kendo().DatePicker().Name("from_ids").Format("dd.MM.yyyy"))</td>
+                    </tr>
+                    <tr class="vidd_style">
+                        <td><button id="buttonsaveids" type="button" style="align-content:center">Зберегти</button></td>
+                    </tr>
+                </table>
+            </asp:Panel>
+        </div>
+        </text>)) 

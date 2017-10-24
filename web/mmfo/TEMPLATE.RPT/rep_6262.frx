@@ -1,0 +1,272 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="02/10/2017 11:00:59" ReportInfo.Modified="04/24/2017 11:56:37" ReportInfo.CreatorVersion="2013.3.2.0">
+  <ScriptText>using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows.Forms;
+using System.Drawing;
+using System.Data;
+using FastReport;
+using FastReport.Data;
+using FastReport.Dialog;
+using FastReport.Barcode;
+using FastReport.Table;
+using FastReport.Utils;
+
+namespace FastReport
+{
+  public class ReportScript
+  {
+    public static void Main()
+    {
+      DateTime localDate = DateTime.Now;
+    }
+  
+  }
+  
+}
+</ScriptText>
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoX3V4zY8FFHzkIAqmYIxZTfj7DPv47O7Xrfao+f9wCtEg==">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select char00 fio,&#13;&#10;       char01 srt,&#13;&#10;       num00 dksrt,&#13;&#10;       num01 vobsrt,&#13;&#10;       char02 nmk,&#13;&#10;       char03 okpo,&#13;&#10;       num02 acc,&#13;&#10;       char04 nls,&#13;&#10;       num03 kv,&#13;&#10;       char05 lcv,&#13;&#10;       char06 fdat,&#13;&#10;       char07 dapp,&#13;&#10;       num04 ostf,&#13;&#10;       num05 ostfq,&#13;&#10;       char08 nms,&#13;&#10;       num06 s,&#13;&#10;       num07 sq,&#13;&#10;       num08 doss,&#13;&#10;       num09 koss,&#13;&#10;       num10 dossq,&#13;&#10;       num11 kossq,&#13;&#10;       char09 nd,&#13;&#10;       char10 mfo2,&#13;&#10;       char11 nb2,&#13;&#10;       char12 nls2,&#13;&#10;       char13 nmk2,&#13;&#10;       char14 okpo2,&#13;&#10;       char15 nazn,&#13;&#10;       num12 bis,&#13;&#10;       num13 dosr,&#13;&#10;       num14 kosr,&#13;&#10;       num15 ostfr,&#13;&#10;       num16 mincurs, &#13;&#10;       char16 mindat,&#13;&#10;       num17 maxcurs,&#13;&#10;       num18 bsum,&#13;&#10;       dat00 sysd,&#13;&#10;       char17 d1,&#13;&#10;       char18 d2,&#13;&#10;       char19 mfo,&#13;&#10;       char20 ourbank&#13;&#10;  from rs_tmp_report_data &#13;&#10; where session_id=:session_id order by id">
+        <Column Name="FIO" DataType="System.String"/>
+        <Column Name="SRT" DataType="System.String"/>
+        <Column Name="DKSRT" DataType="System.Decimal"/>
+        <Column Name="VOBSRT" DataType="System.Decimal"/>
+        <Column Name="NMK" DataType="System.String"/>
+        <Column Name="OKPO" DataType="System.String"/>
+        <Column Name="ACC" DataType="System.Decimal"/>
+        <Column Name="NLS" DataType="System.String"/>
+        <Column Name="KV" DataType="System.Decimal"/>
+        <Column Name="LCV" DataType="System.String"/>
+        <Column Name="FDAT" DataType="System.Char"/>
+        <Column Name="DAPP" DataType="System.Char"/>
+        <Column Name="OSTF" DataType="System.Decimal"/>
+        <Column Name="OSTFQ" DataType="System.Decimal"/>
+        <Column Name="NMS" DataType="System.String"/>
+        <Column Name="S" DataType="System.Decimal"/>
+        <Column Name="SQ" DataType="System.Decimal"/>
+        <Column Name="DOSS" DataType="System.Decimal"/>
+        <Column Name="KOSS" DataType="System.Decimal"/>
+        <Column Name="DOSSQ" DataType="System.Decimal"/>
+        <Column Name="KOSSQ" DataType="System.Decimal"/>
+        <Column Name="ND" DataType="System.String"/>
+        <Column Name="MFO2" DataType="System.String"/>
+        <Column Name="NB2" DataType="System.String"/>
+        <Column Name="NLS2" DataType="System.String"/>
+        <Column Name="NMK2" DataType="System.String"/>
+        <Column Name="NAZN" DataType="System.String"/>
+        <Column Name="BIS" DataType="System.Decimal"/>
+        <Column Name="DOSR" DataType="System.Decimal"/>
+        <Column Name="KOSR" DataType="System.Decimal"/>
+        <Column Name="OSTFR" DataType="System.Decimal"/>
+        <Column Name="MINCURS" DataType="System.Decimal"/>
+        <Column Name="MINDAT" DataType="System.Char"/>
+        <Column Name="MAXCURS" DataType="System.Decimal"/>
+        <Column Name="BSUM" DataType="System.Decimal"/>
+        <Column Name="SYSD" DataType="System.DateTime"/>
+        <Column Name="OKPO2" DataType="System.String"/>
+        <Column Name="D1" DataType="System.Char"/>
+        <Column Name="D2" DataType="System.Char"/>
+        <Column Name="MFO" DataType="System.String"/>
+        <Column Name="OURBANK" DataType="System.String"/>
+        <CommandParameter Name="session_id" DataType="107" Expression="[session_id]" DefaultValue="-1"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="session_id" DataType="System.Decimal"/>
+    <Parameter Name="sFdat1" DataType="System.DateTime"/>
+    <Parameter Name="sFdat2" DataType="System.DateTime"/>
+    <Total Name="Total" Expression="[Table.DOSS]" Evaluator="Data1" PrintOn="PageFooter1"/>
+    <Total Name="Total1" Expression="[Table.KOSS]" Evaluator="Data1" PrintOn="PageFooter1"/>
+    <Total Name="Total2" Expression="[Table.DOSSQ]" Evaluator="Data1" PrintOn="PageFooter1"/>
+    <Total Name="Total3" Expression="[Table.KOSSQ]" Evaluator="Data1" PrintOn="PageFooter1"/>
+    <Total Name="Total4" Expression="[Table.DOSR]" Evaluator="Data1" PrintOn="PageFooter1"/>
+    <Total Name="Total5" Expression="[Table.KOSR]" Evaluator="Data1" PrintOn="PageFooter1"/>
+  </Dictionary>
+  <ReportPage Name="Page1">
+    <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="170.1">
+      <TableObject Name="Table1" Width="718.08" Height="18.9">
+        <TableColumn Name="Column1" Width="359.04"/>
+        <TableColumn Name="Column2" Width="359.04"/>
+        <TableRow Name="Row1">
+          <TableCell Name="Cell1" Border.Lines="Bottom" Border.Style="Dash" Text="Printed: [Table.SYSD]" Font="Arial, 9pt"/>
+          <TableCell Name="Cell2" Border.Lines="Bottom" Border.Style="Dash"/>
+        </TableRow>
+      </TableObject>
+      <TableObject Name="Table2" Top="28.35" Width="717.36" Height="56.7">
+        <TableColumn Name="Column3" Width="381.9"/>
+        <TableColumn Name="Column4" Width="335.46"/>
+        <TableRow Name="Row2">
+          <TableCell Name="Cell3" Text="Account statement: [Table.D1] - [Table.D2]" Font="Arial, 9pt" ColSpan="2"/>
+          <TableCell Name="Cell4" Font="Arial, 9pt"/>
+        </TableRow>
+        <TableRow Name="Row3">
+          <TableCell Name="Cell8" Text="[Table.MFO] / [Table.OURBANK]" Font="Arial, 9pt" ColSpan="2"/>
+          <TableCell Name="Cell9" Font="Arial, 9pt"/>
+        </TableRow>
+        <TableRow Name="Row4">
+          <TableCell Name="Cell13" Border.Lines="Bottom" Border.Style="Dash" Text="Client:  [Table.NMK] ([Table.OKPO])" Font="Arial, 9pt" ColSpan="2"/>
+          <TableCell Name="Cell14" Border.Lines="Bottom" Border.Style="Dash" Font="Arial, 9pt"/>
+        </TableRow>
+      </TableObject>
+      <TableObject Name="Table3" Top="94.5" Width="717.28" Height="75.6">
+        <TableColumn Name="Column5" Width="381.9"/>
+        <TableColumn Name="Column6" Width="335.38"/>
+        <TableRow Name="Row5">
+          <TableCell Name="Cell15" Text="Account: [Table.NLS] ([Table.LCV] [Table.NMS])" Font="Arial, 9pt" ColSpan="2"/>
+          <TableCell Name="Cell16" Font="Arial, 9pt"/>
+        </TableRow>
+        <TableRow Name="Row6">
+          <TableCell Name="Cell20" Text="Latest transaction date: [Table.DAPP]" Font="Arial, 9pt" ColSpan="2"/>
+          <TableCell Name="Cell21" Font="Arial, 9pt"/>
+        </TableRow>
+        <TableRow Name="Row7">
+          <TableCell Name="Cell25" Text="Rate of exchange [Table.MINDAT]:   [Table.MINCURS] / [Table.BSUM]" Font="Arial, 9pt" ColSpan="2"/>
+          <TableCell Name="Cell26" Font="Arial, 9pt"/>
+        </TableRow>
+        <TableRow Name="Row8">
+          <TableCell Name="Cell27" Text="Opening balance: [Table.D1]  [Table.OSTF] [Table.LCV] ( [Table.OSTFQ] UAH)" Font="Arial, 9pt" ColSpan="2"/>
+          <TableCell Name="Cell28" Font="Arial, 9pt"/>
+        </TableRow>
+      </TableObject>
+    </ReportTitleBand>
+    <PageHeaderBand Name="PageHeader1" Top="174.1" Width="718.2" Height="38.8">
+      <TableObject Name="Table4" Width="718.12" Height="38.8" Border.Lines="All" Border.Width="0.25">
+        <TableColumn Name="Column7" Width="51.25"/>
+        <TableColumn Name="Column8" Width="98.46"/>
+        <TableColumn Name="Column9" Width="60.72"/>
+        <TableColumn Name="Column10" Width="41.81"/>
+        <TableColumn Name="Column11" Width="41.8"/>
+        <TableColumn Name="Column12" Width="70.17"/>
+        <TableColumn Name="Column13" Width="70.18"/>
+        <TableColumn Name="Column14" Width="70.17"/>
+        <TableColumn Name="Column30" Width="87.88"/>
+        <TableColumn Name="Column31" Width="125.68"/>
+        <TableRow Name="Row9" Height="38.8">
+          <TableCell Name="Cell29" Border.Lines="All" Border.Width="0.25" Text="Bank &#13;&#10;code" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell30" Border.Lines="All" Border.Width="0.25" Text="Account" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell31" Border.Lines="All" Border.Width="0.25" Text="Document num." HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell32" Border.Lines="All" Border.Width="0.25" Text=" Debit" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell33" Border.Lines="All" Border.Width="0.25" Text="Credit " HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell54" Border.Lines="All" Border.Width="0.25" Text="Debit &#13;&#10;(UAH equivalent)" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell55" Border.Lines="All" Border.Width="0.25" Text="Credit &#13;&#10;(UAH equivalent)" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell56" Border.Lines="All" Border.Width="0.25" Text=" Date of&#13;&#10;transaction " HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell104" Border.Lines="All" Text="Correspondent OKPO" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell105" Border.Lines="All" Text="Prescription" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+        </TableRow>
+      </TableObject>
+    </PageHeaderBand>
+    <DataBand Name="Data1" Top="216.9" Width="718.2" Height="113.4" CanGrow="true" DataSource="Table">
+      <TableObject Name="Table1" Width="718.13" Height="113.4" Border.Lines="All" Border.Width="0.25">
+        <TableColumn Name="Column15" Width="51.25"/>
+        <TableColumn Name="Column16" Width="98.47"/>
+        <TableColumn Name="Column17" Width="60.72"/>
+        <TableColumn Name="Column18" Width="41.81"/>
+        <TableColumn Name="Column19" Width="41.8"/>
+        <TableColumn Name="Column20" Width="70.17"/>
+        <TableColumn Name="Column21" Width="70.18"/>
+        <TableColumn Name="Column22" Width="70.17"/>
+        <TableColumn Name="Column32" Width="87.88"/>
+        <TableColumn Name="Column33" Width="125.68"/>
+        <TableRow Name="Row10" Height="113.4">
+          <TableCell Name="Cell57" Border.Lines="All" Border.Width="0.25" Text="[Table.MFO2]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt">
+            <Highlight>
+              <Condition Expression="String.IsNullOrEmpty([Table.MFO2]) == true" Visible="false" TextFill.Color="White" ApplyBorder="true" ApplyFill="true"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell58" Border.Lines="All" Border.Width="0.25" Text="[Table.NLS2]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt">
+            <Highlight>
+              <Condition Expression="String.IsNullOrEmpty([Table.MFO2]) == true" Visible="false" TextFill.Color="White" ApplyBorder="true" ApplyFill="true"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell59" Border.Lines="All" Border.Width="0.25" Text="[Table.ND]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt">
+            <Highlight>
+              <Condition Expression="String.IsNullOrEmpty([Table.MFO2]) == true" Visible="false" TextFill.Color="White" ApplyBorder="true" ApplyFill="true"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell60" Border.Lines="All" Border.Width="0.25" Text="[Table.DOSS]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt">
+            <Highlight>
+              <Condition Expression="String.IsNullOrEmpty([Table.MFO2]) == true" Visible="false" TextFill.Color="White" ApplyBorder="true" ApplyFill="true"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell61" Border.Lines="All" Border.Width="0.25" Text="[Table.KOSS]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt">
+            <Highlight>
+              <Condition Expression="String.IsNullOrEmpty([Table.MFO2]) == true" Visible="false" TextFill.Color="White" ApplyBorder="true" ApplyFill="true"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell62" Border.Lines="All" Border.Width="0.25" Text="[Table.DOSSQ]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt">
+            <Highlight>
+              <Condition Expression="String.IsNullOrEmpty([Table.MFO2]) == true" Visible="false" TextFill.Color="White" ApplyBorder="true" ApplyFill="true"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell63" Border.Lines="All" Border.Width="0.25" Text="[Table.KOSSQ]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt">
+            <Highlight>
+              <Condition Expression="String.IsNullOrEmpty([Table.MFO2]) == true" Visible="false" TextFill.Color="White" ApplyBorder="true" ApplyFill="true"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell64" Border.Lines="All" Border.Width="0.25" Text="[Table.FDAT]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt">
+            <Highlight>
+              <Condition Expression="String.IsNullOrEmpty([Table.MFO2]) == true" Visible="false" TextFill.Color="White" ApplyBorder="true" ApplyFill="true"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell106" Border.Lines="All" Text="[Table.OKPO2]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt">
+            <Highlight>
+              <Condition Expression="String.IsNullOrEmpty([Table.MFO2]) == true" Visible="false" TextFill.Color="White" ApplyBorder="true" ApplyFill="true"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell107" Border.Lines="All" Text="[Table.NAZN]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" Wysiwyg="true">
+            <Highlight>
+              <Condition Expression="String.IsNullOrEmpty([Table.MFO2]) == true" Visible="false" TextFill.Color="White" ApplyBorder="true" ApplyFill="true"/>
+            </Highlight>
+          </TableCell>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+    <ReportSummaryBand Name="ReportSummary1" Top="334.3" Width="718.2" Height="141.75">
+      <TableObject Name="Table5" Width="482.93" Height="141.75">
+        <TableColumn Name="Column23" Width="207.88"/>
+        <TableColumn Name="Column24" Width="48.25"/>
+        <TableColumn Name="Column25" Width="37.8"/>
+        <TableColumn Name="Column26" Width="75.6"/>
+        <TableColumn Name="Column27" Width="113.4"/>
+        <TableRow Name="Row11">
+          <TableCell Name="Cell65" Text="Rate of exchange  [Table.D2]:" Font="Arial, 9pt"/>
+          <TableCell Name="Cell66" Text="[Table.MAXCURS] / [Table.BSUM]" Font="Arial, 8pt" ColSpan="4"/>
+          <TableCell Name="Cell87" Font="Arial, 8pt"/>
+          <TableCell Name="Cell88" Font="Arial, 8pt"/>
+          <TableCell Name="Cell89" Font="Arial, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row12" Height="28.35">
+          <TableCell Name="Cell70" Text="Total turnover:" Font="Arial, 9pt"/>
+          <TableCell Name="Cell71" Text="[Total]" Format="Number" Format.UseLocale="true" Font="Arial, 8pt"/>
+          <TableCell Name="Cell90" Text="[Total1]" Format="Number" Format.UseLocale="true" Font="Arial, 8pt"/>
+          <TableCell Name="Cell91" Text="[Total2]" Format="Number" Format.UseLocale="true" Font="Arial, 8pt"/>
+          <TableCell Name="Cell92" Text="[Total3]" Format="Number" Format.UseLocale="true" Font="Arial, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row13" Height="37.8">
+          <TableCell Name="Cell75" Text="Balance revaluation(UAH):" Font="Arial, 9pt"/>
+          <TableCell Name="Cell76" Format="Number" Format.UseLocale="true" Font="Arial, 8pt"/>
+          <TableCell Name="Cell93" Format="Number" Format.UseLocale="true" Font="Arial, 8pt"/>
+          <TableCell Name="Cell94" Text="[[Total4]-[Total2]]" Format="Number" Format.UseLocale="true" Font="Arial, 8pt"/>
+          <TableCell Name="Cell95" Text="[[Total5]-[Total3]]" Format="Number" Format.UseLocale="true" Font="Arial, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row14" Height="28.35">
+          <TableCell Name="Cell80" Text="Total turnover(UAH):  " Font="Arial, 9pt"/>
+          <TableCell Name="Cell81" Format="Number" Format.UseLocale="true" Font="Arial, 8pt"/>
+          <TableCell Name="Cell96" Format="Number" Format.UseLocale="true" Font="Arial, 8pt"/>
+          <TableCell Name="Cell97" Text="[Total4]" Format="Number" Format.UseLocale="true" Font="Arial, 8pt"/>
+          <TableCell Name="Cell98" Text="[Total5]" Format="Number" Format.UseLocale="true" Font="Arial, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row15" Height="28.35">
+          <TableCell Name="Cell85" Text="Closing balance: [Table.D2]" Font="Arial, 9pt"/>
+          <TableCell Name="Cell86" Text="[[Table.OSTF]-[Total]+[Total1]] ([[Table.OSTFQ]-[Total4]+[Total5]])" Font="Arial, 8pt" ColSpan="4"/>
+          <TableCell Name="Cell99" Font="Arial, 8pt"/>
+          <TableCell Name="Cell100" Font="Arial, 8pt"/>
+          <TableCell Name="Cell101" Font="Arial, 8pt"/>
+        </TableRow>
+      </TableObject>
+    </ReportSummaryBand>
+    <PageFooterBand Name="PageFooter1" Top="480.05" Width="718.2" Height="9.45"/>
+  </ReportPage>
+</Report>

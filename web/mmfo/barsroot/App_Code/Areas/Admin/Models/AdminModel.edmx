@@ -1,0 +1,891 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="2.0" xmlns:edmx="http://schemas.microsoft.com/ado/2008/10/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="AdminModel.Store" Provider="Oracle.DataAccess.Client" ProviderManifestToken="11.2" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/02/edm/ssdl">
+        <EntityType Name="STAFF_CLASS">
+          <Key>
+            <PropertyRef Name="CLSID" />
+          </Key>
+          <Property Name="CLSID" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="NAME" Type="varchar2" MaxLength="35" Nullable="false" />
+          <Property Name="MARK" Type="number" Precision="10" Scale="0" Nullable="false" />
+        </EntityType>
+        <EntityType Name="STAFF_TIPS">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="number" Precision="22" Scale="0" Nullable="false" />
+          <Property Name="NAME" Type="varchar2" MaxLength="100" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'BARS.V_APPLIST_ADM' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="V_APPLIST_ADM">
+          <Key>
+            <PropertyRef Name="ARM_CODE" />
+            <PropertyRef Name="ARM_NAME" />
+          </Key>
+          <Property Name="ID" Type="number" Precision="38" Scale="0" />
+          <Property Name="ARM_CODE" Type="char" MaxLength="4" Nullable="false" />
+          <Property Name="ARM_NAME" Type="varchar2" MaxLength="140" Nullable="false" />
+          <Property Name="APPLICATION_TYPE" Type="varchar2" MaxLength="4000" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'BARS.V_APPROVABLE_RESOURCE' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="V_APPROVABLE_RESOURCE">
+          <Key>
+            <PropertyRef Name="ID" />
+            <PropertyRef Name="GRANTEE_TYPE_ID" />
+            <PropertyRef Name="RESOURCE_TYPE_NAME" />
+            <PropertyRef Name="ACTION_TIME" />
+          </Key>
+          <Property Name="ID" Type="number" Precision="10" Scale="0" Nullable="false" />
+          <Property Name="GRANTEE_TYPE_ID" Type="number" Precision="5" Scale="0" Nullable="false" />
+          <Property Name="GRANTEE_CODE" Type="varchar2" MaxLength="4000" />
+          <Property Name="GRANTEE_NAME" Type="varchar2" MaxLength="4000" />
+          <Property Name="RESOURCE_TYPE_NAME" Type="varchar2" MaxLength="300" Nullable="false" />
+          <Property Name="RESOURCE_CODE" Type="varchar2" MaxLength="4000" />
+          <Property Name="RESOURCE_NAME" Type="varchar2" MaxLength="4000" />
+          <Property Name="NEW_ACCESS_MODE" Type="varchar2" MaxLength="4000" />
+          <Property Name="CURRENT_ACCESS_MODE" Type="varchar2" MaxLength="4000" />
+          <Property Name="ACTION_TIME" Type="date" Nullable="false" />
+          <Property Name="ACTION_USER" Type="varchar2" MaxLength="333" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'BARS.V_APPROVABLE_RESOURCE_GROUP' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="V_APPROVABLE_RESOURCE_GROUP">
+          <Key>
+            <PropertyRef Name="ID" />
+            <PropertyRef Name="RESOURCE_CODE" />
+            <PropertyRef Name="RESOURCE_NAME" />
+          </Key>
+          <Property Name="ID" Type="number" Precision="5" Scale="0" Nullable="false" />
+          <Property Name="RESOURCE_CODE" Type="varchar2" MaxLength="30" Nullable="false" />
+          <Property Name="RESOURCE_NAME" Type="varchar2" MaxLength="300" Nullable="false" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'BARS.V_ARM_RESOURCE' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="V_ARM_RESOURCE">
+          <Key>
+            <PropertyRef Name="RESOURCE_TYPE_ID" />
+            <PropertyRef Name="RESOURCE_TYPE_NAME" />
+          </Key>
+          <Property Name="ARM_ID" Type="number" Precision="38" Scale="0" />
+          <Property Name="RESOURCE_TYPE_ID" Type="number" Precision="5" Scale="0" Nullable="false" />
+          <Property Name="RESOURCE_TYPE_NAME" Type="varchar2" MaxLength="300" Nullable="false" />
+          <Property Name="RESOURCE_ID" Type="number" Precision="38" Scale="0" />
+          <Property Name="RESOURCE_CODE" Type="varchar2" MaxLength="30" />
+          <Property Name="RESOURCE_NAME" Type="varchar2" MaxLength="300" />
+          <Property Name="IS_GRANTED" Type="number" Precision="38" Scale="0" />
+          <Property Name="IS_GRANTED_NAME" Type="varchar2" MaxLength="4000" />
+          <Property Name="IS_APPROVED" Type="number" Precision="38" Scale="0" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'BARS.V_ARM_RESOURCE_ACCESS_MODE' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="V_ARM_RESOURCE_ACCESS_MODE">
+          <Key>
+            <PropertyRef Name="ARM_CODE" />
+            <PropertyRef Name="ID" />
+            <PropertyRef Name="RESOURCE_CODE" />
+            <PropertyRef Name="RESOURCE_NAME" />
+            <PropertyRef Name="ACCESS_MODE_ID" />
+            <PropertyRef Name="ACCESS_MODE_CODE" />
+            <PropertyRef Name="ACCESS_MODE_NAME" />
+          </Key>
+          <Property Name="ARM_CODE" Type="char" MaxLength="4" Nullable="false" />
+          <Property Name="ID" Type="number" Precision="5" Scale="0" Nullable="false" />
+          <Property Name="RESOURCE_CODE" Type="varchar2" MaxLength="30" Nullable="false" />
+          <Property Name="RESOURCE_NAME" Type="varchar2" MaxLength="300" Nullable="false" />
+          <Property Name="ACCESS_MODE_ID" Type="number" Precision="5" Scale="0" Nullable="false" />
+          <Property Name="ACCESS_MODE_CODE" Type="varchar2" MaxLength="30" Nullable="false" />
+          <Property Name="ACCESS_MODE_NAME" Type="varchar2" MaxLength="150" Nullable="false" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'BARS.V_ARM_RESOURCE_TYPE_LOOKUP' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="V_ARM_RESOURCE_TYPE_LOOKUP">
+          <Key>
+            <PropertyRef Name="ARM_CODE" />
+            <PropertyRef Name="ID" />
+            <PropertyRef Name="RESOURCE_CODE" />
+            <PropertyRef Name="RESOURCE_NAME" />
+          </Key>
+          <Property Name="ARM_CODE" Type="char" MaxLength="4" Nullable="false" />
+          <Property Name="ID" Type="number" Precision="5" Scale="0" Nullable="false" />
+          <Property Name="RESOURCE_CODE" Type="varchar2" MaxLength="30" Nullable="false" />
+          <Property Name="RESOURCE_NAME" Type="varchar2" MaxLength="300" Nullable="false" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'BARS.V_ROLE_RESOURCE' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="V_ROLE_RESOURCE">
+          <Key>
+            <PropertyRef Name="ROLE_ID" />
+            <PropertyRef Name="RESOURCE_TYPE_ID" />
+            <PropertyRef Name="RESOURCE_TYPE_NAME" />
+          </Key>
+          <Property Name="ROLE_ID" Type="number" Precision="10" Scale="0" Nullable="false" />
+          <Property Name="RESOURCE_TYPE_ID" Type="number" Precision="5" Scale="0" Nullable="false" />
+          <Property Name="RESOURCE_TYPE_NAME" Type="varchar2" MaxLength="300" Nullable="false" />
+          <Property Name="RESOURCE_ID" Type="number" Precision="38" Scale="0" />
+          <Property Name="RESOURCE_CODE" Type="varchar2" MaxLength="30" />
+          <Property Name="RESOURCE_NAME" Type="varchar2" MaxLength="300" />
+          <Property Name="IS_GRANTED" Type="number" Precision="38" Scale="0" />
+          <Property Name="IS_GRANTED_NAME" Type="varchar2" MaxLength="4000" />
+          <Property Name="IS_APPROVED" Type="number" Precision="38" Scale="0" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'BARS.V_ROLE_RESOURCE_ACCESS_MODE' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="V_ROLE_RESOURCE_ACCESS_MODE">
+          <Key>
+            <PropertyRef Name="ID" />
+            <PropertyRef Name="RESOURCE_CODE" />
+            <PropertyRef Name="RESOURCE_NAME" />
+            <PropertyRef Name="ACCESS_MODE_ID" />
+            <PropertyRef Name="ACCESS_MODE_CODE" />
+            <PropertyRef Name="ACCESS_MODE_NAME" />
+          </Key>
+          <Property Name="ID" Type="number" Precision="5" Scale="0" Nullable="false" />
+          <Property Name="RESOURCE_CODE" Type="varchar2" MaxLength="30" Nullable="false" />
+          <Property Name="RESOURCE_NAME" Type="varchar2" MaxLength="300" Nullable="false" />
+          <Property Name="ACCESS_MODE_ID" Type="number" Precision="5" Scale="0" Nullable="false" />
+          <Property Name="ACCESS_MODE_CODE" Type="varchar2" MaxLength="30" Nullable="false" />
+          <Property Name="ACCESS_MODE_NAME" Type="varchar2" MaxLength="150" Nullable="false" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'BARS.V_ROLE_RESOURCE_TYPE_LOOKUP' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="V_ROLE_RESOURCE_TYPE_LOOKUP">
+          <Key>
+            <PropertyRef Name="ID" />
+            <PropertyRef Name="RESOURCE_CODE" />
+            <PropertyRef Name="RESOURCE_NAME" />
+          </Key>
+          <Property Name="ID" Type="number" Precision="5" Scale="0" Nullable="false" />
+          <Property Name="RESOURCE_CODE" Type="varchar2" MaxLength="30" Nullable="false" />
+          <Property Name="RESOURCE_NAME" Type="varchar2" MaxLength="300" Nullable="false" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'BARS.V_STAFF_ROLE_ADM' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="V_STAFF_ROLE_ADM">
+          <Key>
+            <PropertyRef Name="ID" />
+            <PropertyRef Name="ROLE_CODE" />
+            <PropertyRef Name="ROLE_NAME" />
+          </Key>
+          <Property Name="ID" Type="number" Precision="10" Scale="0" Nullable="false" />
+          <Property Name="ROLE_CODE" Type="varchar2" MaxLength="30" Nullable="false" />
+          <Property Name="ROLE_NAME" Type="varchar2" MaxLength="300" Nullable="false" />
+          <Property Name="STATE_NAME" Type="varchar2" MaxLength="4000" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'BARS.V_STAFF_USER_ADM' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="V_STAFF_USER_ADM">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="LOGIN_NAME" Type="varchar2" MaxLength="30" />
+          <Property Name="USER_NAME" Type="varchar2" MaxLength="300" />
+          <Property Name="BRANCH_CODE" Type="varchar2" MaxLength="30" />
+          <Property Name="BRANCH_NAME" Type="varchar2" MaxLength="4000" />
+          <Property Name="AUTHENTICATION_MODE_ID" Type="varchar2" MaxLength="4000" />
+          <Property Name="AUTHENTICATION_MODE_NAME" Type="varchar2" MaxLength="4000" />
+          <Property Name="STATE_ID" Type="number" Precision="5" Scale="0" />
+          <Property Name="STATE_NAME" Type="varchar2" MaxLength="4000" />
+          <Property Name="ADM_COMMENTS" Type="varchar2" MaxLength="4000" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'BARS.V_STAFF_USER_BRANCH_LOOKUP' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="V_STAFF_USER_BRANCH_LOOKUP">
+          <Key>
+            <PropertyRef Name="BRANCH" />
+          </Key>
+          <Property Name="BRANCH" Type="varchar2" MaxLength="30" Nullable="false" />
+          <Property Name="NAME" Type="varchar2" MaxLength="70" />
+          <Property Name="HAS_CHILD" Type="char" MaxLength="1" />
+          <Property Name="PARENT_BRANCH" Type="varchar2" MaxLength="30" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'BARS.V_STAFF_USER_ORA_ROLE_LOOKUP' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="V_STAFF_USER_ORA_ROLE_LOOKUP">
+          <Key>
+            <PropertyRef Name="ROLE_NAME" />
+          </Key>
+          <Property Name="ROLE_NAME" Type="varchar2" MaxLength="30" Nullable="false" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'BARS.V_STAFF_USER_ROLE' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="V_STAFF_USER_ROLE">
+          <Key>
+            <PropertyRef Name="USER_ID" />
+            <PropertyRef Name="ROLE_ID" />
+            <PropertyRef Name="ROLE_CODE" />
+          </Key>
+          <Property Name="USER_ID" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="ROLE_ID" Type="number" Precision="10" Scale="0" Nullable="false" />
+          <Property Name="ROLE_CODE" Type="varchar2" MaxLength="30" Nullable="false" />
+          <Property Name="ROLE_NAME" Type="varchar2" MaxLength="300" />
+          <Property Name="IS_GRANTED" Type="number" Precision="38" Scale="0" />
+          <Property Name="IS_APPROVED" Type="number" Precision="38" Scale="0" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'BARS.V_STAFF_USER_ROLE_LOOKUP' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="V_STAFF_USER_ROLE_LOOKUP">
+          <Key>
+            <PropertyRef Name="ID" />
+            <PropertyRef Name="ROLE_CODE" />
+          </Key>
+          <Property Name="ID" Type="number" Precision="10" Scale="0" Nullable="false" />
+          <Property Name="ROLE_CODE" Type="varchar2" MaxLength="30" Nullable="false" />
+          <Property Name="ROLE_NAME" Type="varchar2" MaxLength="300" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'BARS.V_USERADM_BRANCHES' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="V_USERADM_BRANCHES">
+          <Key>
+            <PropertyRef Name="BRANCH" />
+          </Key>
+          <Property Name="BRANCH" Type="varchar2" MaxLength="30" Nullable="false" />
+          <Property Name="NAME" Type="varchar2" MaxLength="70" />
+        </EntityType>
+        <Function Name="BARS_USERADM_GRANT_APP_RESOURCE" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="BARS" StoreFunctionName="BARS_USERADM.GRANT_APP_RESOURCE">
+          <Parameter Name="P_APPID" Type="char" Mode="In" />
+          <Parameter Name="P_RESID" Type="number" Mode="In" />
+        </Function>
+        <Function Name="BARS_USERADM_SET_APP_CONTEXT" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="BARS" StoreFunctionName="BARS_USERADM.SET_APP_CONTEXT">
+          <Parameter Name="P_CODEAPP" Type="char" Mode="In" />
+        </Function>
+        <EntityContainer Name="AdminModelStoreContainer">
+          <EntitySet Name="STAFF_CLASS" EntityType="Self.STAFF_CLASS" Schema="BARS" store:Type="Tables" />
+          <EntitySet Name="STAFF_TIPS" EntityType="Self.STAFF_TIPS" Schema="BARS" store:Type="Tables" />
+          <EntitySet Name="V_APPLIST_ADM" EntityType="Self.V_APPLIST_ADM" store:Type="Views" store:Schema="BARS">
+            <DefiningQuery>SELECT 
+"V_APPLIST_ADM"."ID" AS "ID", 
+"V_APPLIST_ADM"."ARM_CODE" AS "ARM_CODE", 
+"V_APPLIST_ADM"."ARM_NAME" AS "ARM_NAME", 
+"V_APPLIST_ADM"."APPLICATION_TYPE" AS "APPLICATION_TYPE"
+FROM "BARS"."V_APPLIST_ADM" "V_APPLIST_ADM"</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="V_APPROVABLE_RESOURCE" EntityType="Self.V_APPROVABLE_RESOURCE" store:Type="Views" store:Schema="BARS">
+            <DefiningQuery>SELECT 
+"V_APPROVABLE_RESOURCE"."ID" AS "ID", 
+"V_APPROVABLE_RESOURCE"."GRANTEE_TYPE_ID" AS "GRANTEE_TYPE_ID", 
+"V_APPROVABLE_RESOURCE"."GRANTEE_CODE" AS "GRANTEE_CODE", 
+"V_APPROVABLE_RESOURCE"."GRANTEE_NAME" AS "GRANTEE_NAME", 
+"V_APPROVABLE_RESOURCE"."RESOURCE_TYPE_NAME" AS "RESOURCE_TYPE_NAME", 
+"V_APPROVABLE_RESOURCE"."RESOURCE_CODE" AS "RESOURCE_CODE", 
+"V_APPROVABLE_RESOURCE"."RESOURCE_NAME" AS "RESOURCE_NAME", 
+"V_APPROVABLE_RESOURCE"."NEW_ACCESS_MODE" AS "NEW_ACCESS_MODE", 
+"V_APPROVABLE_RESOURCE"."CURRENT_ACCESS_MODE" AS "CURRENT_ACCESS_MODE", 
+"V_APPROVABLE_RESOURCE"."ACTION_TIME" AS "ACTION_TIME", 
+"V_APPROVABLE_RESOURCE"."ACTION_USER" AS "ACTION_USER"
+FROM "BARS"."V_APPROVABLE_RESOURCE" "V_APPROVABLE_RESOURCE"</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="V_APPROVABLE_RESOURCE_GROUP" EntityType="Self.V_APPROVABLE_RESOURCE_GROUP" store:Type="Views" store:Schema="BARS">
+            <DefiningQuery>SELECT 
+"V_APPROVABLE_RESOURCE_GROUP"."ID" AS "ID", 
+"V_APPROVABLE_RESOURCE_GROUP"."RESOURCE_CODE" AS "RESOURCE_CODE", 
+"V_APPROVABLE_RESOURCE_GROUP"."RESOURCE_NAME" AS "RESOURCE_NAME"
+FROM "BARS"."V_APPROVABLE_RESOURCE_GROUP" "V_APPROVABLE_RESOURCE_GROUP"</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="V_ARM_RESOURCE" EntityType="Self.V_ARM_RESOURCE" store:Type="Views" store:Schema="BARS">
+            <DefiningQuery>SELECT 
+"V_ARM_RESOURCE"."ARM_ID" AS "ARM_ID", 
+"V_ARM_RESOURCE"."RESOURCE_TYPE_ID" AS "RESOURCE_TYPE_ID", 
+"V_ARM_RESOURCE"."RESOURCE_TYPE_NAME" AS "RESOURCE_TYPE_NAME", 
+"V_ARM_RESOURCE"."RESOURCE_ID" AS "RESOURCE_ID", 
+"V_ARM_RESOURCE"."RESOURCE_CODE" AS "RESOURCE_CODE", 
+"V_ARM_RESOURCE"."RESOURCE_NAME" AS "RESOURCE_NAME", 
+"V_ARM_RESOURCE"."IS_GRANTED" AS "IS_GRANTED", 
+"V_ARM_RESOURCE"."IS_GRANTED_NAME" AS "IS_GRANTED_NAME", 
+"V_ARM_RESOURCE"."IS_APPROVED" AS "IS_APPROVED"
+FROM "BARS"."V_ARM_RESOURCE" "V_ARM_RESOURCE"</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="V_ARM_RESOURCE_ACCESS_MODE" EntityType="Self.V_ARM_RESOURCE_ACCESS_MODE" store:Type="Views" store:Schema="BARS">
+            <DefiningQuery>SELECT 
+"V_ARM_RESOURCE_ACCESS_MODE"."ARM_CODE" AS "ARM_CODE", 
+"V_ARM_RESOURCE_ACCESS_MODE"."ID" AS "ID", 
+"V_ARM_RESOURCE_ACCESS_MODE"."RESOURCE_CODE" AS "RESOURCE_CODE", 
+"V_ARM_RESOURCE_ACCESS_MODE"."RESOURCE_NAME" AS "RESOURCE_NAME", 
+"V_ARM_RESOURCE_ACCESS_MODE"."ACCESS_MODE_ID" AS "ACCESS_MODE_ID", 
+"V_ARM_RESOURCE_ACCESS_MODE"."ACCESS_MODE_CODE" AS "ACCESS_MODE_CODE", 
+"V_ARM_RESOURCE_ACCESS_MODE"."ACCESS_MODE_NAME" AS "ACCESS_MODE_NAME"
+FROM "BARS"."V_ARM_RESOURCE_ACCESS_MODE" "V_ARM_RESOURCE_ACCESS_MODE"</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="V_ARM_RESOURCE_TYPE_LOOKUP" EntityType="Self.V_ARM_RESOURCE_TYPE_LOOKUP" store:Type="Views" store:Schema="BARS">
+            <DefiningQuery>SELECT 
+"V_ARM_RESOURCE_TYPE_LOOKUP"."ARM_CODE" AS "ARM_CODE", 
+"V_ARM_RESOURCE_TYPE_LOOKUP"."ID" AS "ID", 
+"V_ARM_RESOURCE_TYPE_LOOKUP"."RESOURCE_CODE" AS "RESOURCE_CODE", 
+"V_ARM_RESOURCE_TYPE_LOOKUP"."RESOURCE_NAME" AS "RESOURCE_NAME"
+FROM "BARS"."V_ARM_RESOURCE_TYPE_LOOKUP" "V_ARM_RESOURCE_TYPE_LOOKUP"</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="V_ROLE_RESOURCE" EntityType="Self.V_ROLE_RESOURCE" store:Type="Views" store:Schema="BARS">
+            <DefiningQuery>SELECT 
+"V_ROLE_RESOURCE"."ROLE_ID" AS "ROLE_ID", 
+"V_ROLE_RESOURCE"."RESOURCE_TYPE_ID" AS "RESOURCE_TYPE_ID", 
+"V_ROLE_RESOURCE"."RESOURCE_TYPE_NAME" AS "RESOURCE_TYPE_NAME", 
+"V_ROLE_RESOURCE"."RESOURCE_ID" AS "RESOURCE_ID", 
+"V_ROLE_RESOURCE"."RESOURCE_CODE" AS "RESOURCE_CODE", 
+"V_ROLE_RESOURCE"."RESOURCE_NAME" AS "RESOURCE_NAME", 
+"V_ROLE_RESOURCE"."IS_GRANTED" AS "IS_GRANTED", 
+"V_ROLE_RESOURCE"."IS_GRANTED_NAME" AS "IS_GRANTED_NAME", 
+"V_ROLE_RESOURCE"."IS_APPROVED" AS "IS_APPROVED"
+FROM "BARS"."V_ROLE_RESOURCE" "V_ROLE_RESOURCE"</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="V_ROLE_RESOURCE_ACCESS_MODE" EntityType="Self.V_ROLE_RESOURCE_ACCESS_MODE" store:Type="Views" store:Schema="BARS">
+            <DefiningQuery>SELECT 
+"V_ROLE_RESOURCE_ACCESS_MODE"."ID" AS "ID", 
+"V_ROLE_RESOURCE_ACCESS_MODE"."RESOURCE_CODE" AS "RESOURCE_CODE", 
+"V_ROLE_RESOURCE_ACCESS_MODE"."RESOURCE_NAME" AS "RESOURCE_NAME", 
+"V_ROLE_RESOURCE_ACCESS_MODE"."ACCESS_MODE_ID" AS "ACCESS_MODE_ID", 
+"V_ROLE_RESOURCE_ACCESS_MODE"."ACCESS_MODE_CODE" AS "ACCESS_MODE_CODE", 
+"V_ROLE_RESOURCE_ACCESS_MODE"."ACCESS_MODE_NAME" AS "ACCESS_MODE_NAME"
+FROM "BARS"."V_ROLE_RESOURCE_ACCESS_MODE" "V_ROLE_RESOURCE_ACCESS_MODE"</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="V_ROLE_RESOURCE_TYPE_LOOKUP" EntityType="Self.V_ROLE_RESOURCE_TYPE_LOOKUP" store:Type="Views" store:Schema="BARS">
+            <DefiningQuery>SELECT 
+"V_ROLE_RESOURCE_TYPE_LOOKUP"."ID" AS "ID", 
+"V_ROLE_RESOURCE_TYPE_LOOKUP"."RESOURCE_CODE" AS "RESOURCE_CODE", 
+"V_ROLE_RESOURCE_TYPE_LOOKUP"."RESOURCE_NAME" AS "RESOURCE_NAME"
+FROM "BARS"."V_ROLE_RESOURCE_TYPE_LOOKUP" "V_ROLE_RESOURCE_TYPE_LOOKUP"</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="V_STAFF_ROLE_ADM" EntityType="Self.V_STAFF_ROLE_ADM" store:Type="Views" store:Schema="BARS">
+            <DefiningQuery>SELECT 
+"V_STAFF_ROLE_ADM"."ID" AS "ID", 
+"V_STAFF_ROLE_ADM"."ROLE_CODE" AS "ROLE_CODE", 
+"V_STAFF_ROLE_ADM"."ROLE_NAME" AS "ROLE_NAME", 
+"V_STAFF_ROLE_ADM"."STATE_NAME" AS "STATE_NAME"
+FROM "BARS"."V_STAFF_ROLE_ADM" "V_STAFF_ROLE_ADM"</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="V_STAFF_USER_ADM" EntityType="Self.V_STAFF_USER_ADM" store:Type="Views" store:Schema="BARS">
+            <DefiningQuery>SELECT 
+"V_STAFF_USER_ADM"."ID" AS "ID", 
+"V_STAFF_USER_ADM"."LOGIN_NAME" AS "LOGIN_NAME", 
+"V_STAFF_USER_ADM"."USER_NAME" AS "USER_NAME", 
+"V_STAFF_USER_ADM"."BRANCH_CODE" AS "BRANCH_CODE", 
+"V_STAFF_USER_ADM"."BRANCH_NAME" AS "BRANCH_NAME", 
+"V_STAFF_USER_ADM"."AUTHENTICATION_MODE_ID" AS "AUTHENTICATION_MODE_ID", 
+"V_STAFF_USER_ADM"."AUTHENTICATION_MODE_NAME" AS "AUTHENTICATION_MODE_NAME", 
+"V_STAFF_USER_ADM"."STATE_ID" AS "STATE_ID", 
+"V_STAFF_USER_ADM"."STATE_NAME" AS "STATE_NAME", 
+"V_STAFF_USER_ADM"."ADM_COMMENTS" AS "ADM_COMMENTS"
+FROM "BARS"."V_STAFF_USER_ADM" "V_STAFF_USER_ADM"</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="V_STAFF_USER_BRANCH_LOOKUP" EntityType="Self.V_STAFF_USER_BRANCH_LOOKUP" store:Type="Views" store:Schema="BARS">
+            <DefiningQuery>SELECT 
+"V_STAFF_USER_BRANCH_LOOKUP"."BRANCH" AS "BRANCH", 
+"V_STAFF_USER_BRANCH_LOOKUP"."NAME" AS "NAME", 
+"V_STAFF_USER_BRANCH_LOOKUP"."HAS_CHILD" AS "HAS_CHILD", 
+"V_STAFF_USER_BRANCH_LOOKUP"."PARENT_BRANCH" AS "PARENT_BRANCH"
+FROM "BARS"."V_STAFF_USER_BRANCH_LOOKUP" "V_STAFF_USER_BRANCH_LOOKUP"</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="V_STAFF_USER_ORA_ROLE_LOOKUP" EntityType="Self.V_STAFF_USER_ORA_ROLE_LOOKUP" store:Type="Views" store:Schema="BARS">
+            <DefiningQuery>SELECT 
+"V_STAFF_USER_ORA_ROLE_LOOKUP"."ROLE_NAME" AS "ROLE_NAME"
+FROM "BARS"."V_STAFF_USER_ORA_ROLE_LOOKUP" "V_STAFF_USER_ORA_ROLE_LOOKUP"</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="V_STAFF_USER_ROLE" EntityType="Self.V_STAFF_USER_ROLE" store:Type="Views" store:Schema="BARS">
+            <DefiningQuery>SELECT 
+"V_STAFF_USER_ROLE"."USER_ID" AS "USER_ID", 
+"V_STAFF_USER_ROLE"."ROLE_ID" AS "ROLE_ID", 
+"V_STAFF_USER_ROLE"."ROLE_CODE" AS "ROLE_CODE", 
+"V_STAFF_USER_ROLE"."ROLE_NAME" AS "ROLE_NAME", 
+"V_STAFF_USER_ROLE"."IS_GRANTED" AS "IS_GRANTED", 
+"V_STAFF_USER_ROLE"."IS_APPROVED" AS "IS_APPROVED"
+FROM "BARS"."V_STAFF_USER_ROLE" "V_STAFF_USER_ROLE"</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="V_STAFF_USER_ROLE_LOOKUP" EntityType="Self.V_STAFF_USER_ROLE_LOOKUP" store:Type="Views" store:Schema="BARS">
+            <DefiningQuery>SELECT 
+"V_STAFF_USER_ROLE_LOOKUP"."ID" AS "ID", 
+"V_STAFF_USER_ROLE_LOOKUP"."ROLE_CODE" AS "ROLE_CODE", 
+"V_STAFF_USER_ROLE_LOOKUP"."ROLE_NAME" AS "ROLE_NAME"
+FROM "BARS"."V_STAFF_USER_ROLE_LOOKUP" "V_STAFF_USER_ROLE_LOOKUP"</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="V_USERADM_BRANCHES" EntityType="Self.V_USERADM_BRANCHES" store:Type="Views" store:Schema="BARS">
+            <DefiningQuery>SELECT 
+"V_USERADM_BRANCHES"."BRANCH" AS "BRANCH", 
+"V_USERADM_BRANCHES"."NAME" AS "NAME"
+FROM "BARS"."V_USERADM_BRANCHES" "V_USERADM_BRANCHES"</DefiningQuery>
+          </EntitySet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="AdminModel" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+        <EntityContainer Name="Entities" annotation:LazyLoadingEnabled="true">
+          <FunctionImport Name="FUNC_MGR_ADD_APPLICATION">
+            <Parameter Name="P_CODEAPP" Mode="In" Type="String" />
+            <Parameter Name="P_NAME" Mode="In" Type="String" />
+            <Parameter Name="P_HOTKEY" Mode="In" Type="String" />
+            <Parameter Name="P_FRONTEND" Mode="In" Type="Decimal" />
+            <Parameter Name="P_ICON" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="BARS_USERADM_SET_APP_CONTEXT">
+          <Parameter Name="P_CODEAPP" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="BARS_USERADM_GRANT_APP_RESOURCE">
+            <Parameter Name="P_APPID" Mode="In" Type="String" />
+            <Parameter Name="P_RESID" Mode="In" Type="Decimal" />
+          </FunctionImport>
+          <EntitySet Name="STAFF_CLASS" EntityType="AdminModel.STAFF_CLASS" />
+          <EntitySet Name="STAFF_TIPS" EntityType="AdminModel.STAFF_TIPS" />
+          <EntitySet Name="V_USERADM_BRANCHES" EntityType="AdminModel.V_USERADM_BRANCHES" />
+          <EntitySet Name="V_STAFF_USER_BRANCH_LOOKUP" EntityType="AdminModel.V_STAFF_USER_BRANCH_LOOKUP" />
+          <EntitySet Name="V_STAFF_USER_ADM" EntityType="AdminModel.V_STAFF_USER_ADM" />
+          <EntitySet Name="V_STAFF_USER_ORA_ROLE_LOOKUP" EntityType="AdminModel.V_STAFF_USER_ORA_ROLE_LOOKUP" />
+          <EntitySet Name="V_STAFF_ROLE_ADM" EntityType="AdminModel.V_STAFF_ROLE_ADM" />
+          <EntitySet Name="V_ROLE_RESOURCE_ACCESS_MODE" EntityType="AdminModel.V_ROLE_RESOURCE_ACCESS_MODE" />
+          <EntitySet Name="V_ROLE_RESOURCE_TYPE_LOOKUP" EntityType="AdminModel.V_ROLE_RESOURCE_TYPE_LOOKUP" />
+          <EntitySet Name="V_ROLE_RESOURCE" EntityType="AdminModel.V_ROLE_RESOURCE" />
+          <EntitySet Name="V_STAFF_USER_ROLE_LOOKUP" EntityType="AdminModel.V_STAFF_USER_ROLE_LOOKUP" />
+          <EntitySet Name="V_APPLIST_ADM" EntityType="AdminModel.V_APPLIST_ADM" />
+          <EntitySet Name="V_STAFF_USER_ROLE" EntityType="AdminModel.V_STAFF_USER_ROLE" />
+          <EntitySet Name="V_ARM_RESOURCE" EntityType="AdminModel.V_ARM_RESOURCE" />
+          <EntitySet Name="V_ARM_RESOURCE_TYPE_LOOKUP" EntityType="AdminModel.V_ARM_RESOURCE_TYPE_LOOKUP" />
+          <EntitySet Name="V_ARM_RESOURCE_ACCESS_MODE" EntityType="AdminModel.V_ARM_RESOURCE_ACCESS_MODE" />
+          <EntitySet Name="V_APPROVABLE_RESOURCE" EntityType="AdminModel.V_APPROVABLE_RESOURCE" />
+          <EntitySet Name="V_APPROVABLE_RESOURCE_GROUP" EntityType="AdminModel.V_APPROVABLE_RESOURCE_GROUP" />
+          </EntityContainer>
+        <EntityType Name="STAFF_CLASS">
+          <Key>
+            <PropertyRef Name="CLSID" />
+          </Key>
+          <Property Name="CLSID" Type="Decimal" Nullable="false" Precision="38" Scale="0" />
+          <Property Name="NAME" Type="String" Nullable="false" MaxLength="35" FixedLength="false" Unicode="false" />
+          <Property Name="MARK" Type="Int64" Nullable="false" />
+        </EntityType>
+        <EntityType Name="STAFF_TIPS">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Decimal" Nullable="false" Precision="22" Scale="0" />
+          <Property Name="NAME" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="V_USERADM_BRANCHES">
+          <Key>
+            <PropertyRef Name="BRANCH" />
+          </Key>
+          <Property Name="BRANCH" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="NAME" Type="String" MaxLength="70" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="V_STAFF_USER_BRANCH_LOOKUP">
+          <Key>
+            <PropertyRef Name="BRANCH" />
+          </Key>
+          <Property Name="BRANCH" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="NAME" Type="String" MaxLength="70" FixedLength="false" Unicode="false" />
+          <Property Name="HAS_CHILD" Type="String" MaxLength="1" FixedLength="true" Unicode="false" />
+          <Property Name="PARENT_BRANCH" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="V_STAFF_USER_ADM">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Nullable="false" Precision="38" Scale="0" Type="Decimal" />
+          <Property Name="LOGIN_NAME" MaxLength="30" FixedLength="false" Unicode="false" Type="String" />
+          <Property Name="USER_NAME" MaxLength="300" FixedLength="false" Unicode="false" Type="String" />
+          <Property Name="BRANCH_CODE" MaxLength="30" FixedLength="false" Unicode="false" Type="String" />
+          <Property Name="AUTHENTICATION_MODE_ID" MaxLength="4000" FixedLength="false" Unicode="false" Type="String" />
+          <Property Name="AUTHENTICATION_MODE_NAME" MaxLength="4000" FixedLength="false" Unicode="false" Type="String" />
+          <Property Name="STATE_ID" Type="Int32" />
+          <Property Name="STATE_NAME" MaxLength="4000" FixedLength="false" Unicode="false" Type="String" />
+          <Property Name="BRANCH_NAME" Type="String" MaxLength="4000" FixedLength="false" Unicode="false" />
+          <Property Name="ADM_COMMENTS" Type="String" MaxLength="4000" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="V_STAFF_USER_ORA_ROLE_LOOKUP">
+          <Key>
+            <PropertyRef Name="ROLE_NAME" />
+          </Key>
+          <Property Name="ROLE_NAME" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="V_STAFF_ROLE_ADM">
+          <Key>
+            <PropertyRef Name="ID" />
+            <PropertyRef Name="ROLE_CODE" />
+            <PropertyRef Name="ROLE_NAME" />
+          </Key>
+          <Property Name="ID" Type="Int64" Nullable="false" />
+          <Property Name="ROLE_CODE" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="ROLE_NAME" Type="String" Nullable="false" MaxLength="300" FixedLength="false" Unicode="false" />
+          <Property Name="STATE_NAME" Type="String" MaxLength="4000" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="V_ROLE_RESOURCE_ACCESS_MODE">
+          <Key>
+            <PropertyRef Name="ID" />
+            <PropertyRef Name="RESOURCE_CODE" />
+            <PropertyRef Name="RESOURCE_NAME" />
+            <PropertyRef Name="ACCESS_MODE_ID" />
+            <PropertyRef Name="ACCESS_MODE_CODE" />
+            <PropertyRef Name="ACCESS_MODE_NAME" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" />
+          <Property Name="RESOURCE_CODE" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="RESOURCE_NAME" Type="String" Nullable="false" MaxLength="300" FixedLength="false" Unicode="false" />
+          <Property Name="ACCESS_MODE_ID" Type="Int32" Nullable="false" />
+          <Property Name="ACCESS_MODE_CODE" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="ACCESS_MODE_NAME" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="V_ROLE_RESOURCE_TYPE_LOOKUP">
+          <Key>
+            <PropertyRef Name="ID" />
+            <PropertyRef Name="RESOURCE_CODE" />
+            <PropertyRef Name="RESOURCE_NAME" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" />
+          <Property Name="RESOURCE_CODE" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="RESOURCE_NAME" Type="String" Nullable="false" MaxLength="300" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="V_ROLE_RESOURCE">
+          <Key>
+            <PropertyRef Name="ROLE_ID" />
+            <PropertyRef Name="RESOURCE_TYPE_ID" />
+            <PropertyRef Name="RESOURCE_TYPE_NAME" />
+          </Key>
+          <Property Name="ROLE_ID" Type="Int64" Nullable="false" />
+          <Property Name="RESOURCE_TYPE_ID" Type="Int32" Nullable="false" />
+          <Property Name="RESOURCE_TYPE_NAME" Type="String" Nullable="false" MaxLength="300" FixedLength="false" Unicode="false" />
+          <Property Name="RESOURCE_ID" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="RESOURCE_CODE" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="RESOURCE_NAME" Type="String" MaxLength="300" FixedLength="false" Unicode="false" />
+          <Property Name="IS_GRANTED" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="IS_APPROVED" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="IS_GRANTED_NAME" Type="String" MaxLength="4000" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="V_STAFF_USER_ROLE_LOOKUP">
+          <Key>
+            <PropertyRef Name="ID" />
+            <PropertyRef Name="ROLE_CODE" />
+          </Key>
+          <Property Name="ID" Type="Int64" Nullable="false" />
+          <Property Name="ROLE_CODE" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="ROLE_NAME" Type="String" MaxLength="300" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="V_APPLIST_ADM">
+          <Key>
+            <PropertyRef Name="ARM_CODE" />
+            <PropertyRef Name="ARM_NAME" />
+          </Key>
+          <Property Name="ID" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="ARM_CODE" Type="String" Nullable="false" MaxLength="4" FixedLength="true" Unicode="false" />
+          <Property Name="ARM_NAME" Type="String" Nullable="false" MaxLength="140" FixedLength="false" Unicode="false" />
+          <Property Name="APPLICATION_TYPE" Type="String" MaxLength="4000" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="V_STAFF_USER_ROLE">
+          <Key>
+            <PropertyRef Name="USER_ID" />
+            <PropertyRef Name="ROLE_ID" />
+            <PropertyRef Name="ROLE_CODE" />
+          </Key>
+          <Property Name="USER_ID" Type="Decimal" Nullable="false" Precision="38" Scale="0" />
+          <Property Name="ROLE_ID" Type="Int64" Nullable="false" />
+          <Property Name="ROLE_CODE" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="ROLE_NAME" Type="String" MaxLength="300" FixedLength="false" Unicode="false" />
+          <Property Name="IS_GRANTED" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="IS_APPROVED" Type="Decimal" Precision="38" Scale="0" />
+        </EntityType>
+        <EntityType Name="V_ARM_RESOURCE">
+          <Key>
+            <PropertyRef Name="RESOURCE_TYPE_ID" />
+            <PropertyRef Name="RESOURCE_TYPE_NAME" />
+          </Key>
+          <Property Name="ARM_ID" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="RESOURCE_TYPE_ID" Type="Int16" Nullable="false" />
+          <Property Name="RESOURCE_TYPE_NAME" Type="String" Nullable="false" MaxLength="300" FixedLength="false" Unicode="false" />
+          <Property Name="RESOURCE_ID" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="RESOURCE_CODE" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="RESOURCE_NAME" Type="String" MaxLength="300" FixedLength="false" Unicode="false" />
+          <Property Name="IS_GRANTED" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="IS_GRANTED_NAME" Type="String" MaxLength="4000" FixedLength="false" Unicode="false" />
+          <Property Name="IS_APPROVED" Type="Decimal" Precision="38" Scale="0" />
+        </EntityType>
+        <EntityType Name="V_ARM_RESOURCE_TYPE_LOOKUP">
+          <Key>
+            <PropertyRef Name="ARM_CODE" />
+            <PropertyRef Name="ID" />
+            <PropertyRef Name="RESOURCE_CODE" />
+            <PropertyRef Name="RESOURCE_NAME" />
+          </Key>
+          <Property Name="ARM_CODE" Type="String" Nullable="false" MaxLength="4" FixedLength="true" Unicode="false" />
+          <Property Name="ID" Type="Int32" Nullable="false" />
+          <Property Name="RESOURCE_CODE" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="RESOURCE_NAME" Type="String" Nullable="false" MaxLength="300" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="V_ARM_RESOURCE_ACCESS_MODE">
+          <Key>
+            <PropertyRef Name="ARM_CODE" />
+            <PropertyRef Name="ID" />
+            <PropertyRef Name="RESOURCE_CODE" />
+            <PropertyRef Name="RESOURCE_NAME" />
+            <PropertyRef Name="ACCESS_MODE_ID" />
+            <PropertyRef Name="ACCESS_MODE_CODE" />
+            <PropertyRef Name="ACCESS_MODE_NAME" />
+          </Key>
+          <Property Name="ARM_CODE" Type="String" Nullable="false" MaxLength="4" FixedLength="true" Unicode="false" />
+          <Property Name="ID" Type="Int32" Nullable="false" />
+          <Property Name="RESOURCE_CODE" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="RESOURCE_NAME" Type="String" Nullable="false" MaxLength="300" FixedLength="false" Unicode="false" />
+          <Property Name="ACCESS_MODE_ID" Type="Int32" Nullable="false" />
+          <Property Name="ACCESS_MODE_CODE" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="ACCESS_MODE_NAME" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="V_APPROVABLE_RESOURCE">
+          <Key>
+            <PropertyRef Name="ID" />
+            <PropertyRef Name="GRANTEE_TYPE_ID" />
+            <PropertyRef Name="RESOURCE_TYPE_NAME" />
+            <PropertyRef Name="ACTION_TIME" />
+          </Key>
+          <Property Name="ID" Type="Int64" Nullable="false" />
+          <Property Name="GRANTEE_TYPE_ID" Type="Int32" Nullable="false" />
+          <Property Name="GRANTEE_CODE" Type="String" MaxLength="4000" FixedLength="false" Unicode="false" />
+          <Property Name="GRANTEE_NAME" Type="String" MaxLength="4000" FixedLength="false" Unicode="false" />
+          <Property Name="RESOURCE_TYPE_NAME" Type="String" Nullable="false" MaxLength="300" FixedLength="false" Unicode="false" />
+          <Property Name="RESOURCE_CODE" Type="String" MaxLength="4000" FixedLength="false" Unicode="false" />
+          <Property Name="RESOURCE_NAME" Type="String" MaxLength="4000" FixedLength="false" Unicode="false" />
+          <Property Name="NEW_ACCESS_MODE" Type="String" MaxLength="4000" FixedLength="false" Unicode="false" />
+          <Property Name="CURRENT_ACCESS_MODE" Type="String" MaxLength="4000" FixedLength="false" Unicode="false" />
+          <Property Name="ACTION_TIME" Type="DateTime" Nullable="false" />
+          <Property Name="ACTION_USER" Type="String" MaxLength="333" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="V_APPROVABLE_RESOURCE_GROUP">
+          <Key>
+            <PropertyRef Name="ID" />
+            <PropertyRef Name="RESOURCE_CODE" />
+            <PropertyRef Name="RESOURCE_NAME" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" />
+          <Property Name="RESOURCE_CODE" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="RESOURCE_NAME" Type="String" Nullable="false" MaxLength="300" FixedLength="false" Unicode="false" />
+        </EntityType>
+        </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2008/09/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="AdminModelStoreContainer" CdmEntityContainer="Entities">
+          <FunctionImportMapping FunctionImportName="BARS_USERADM_SET_APP_CONTEXT" FunctionName="AdminModel.Store.BARS_USERADM_SET_APP_CONTEXT" />
+          <FunctionImportMapping FunctionImportName="BARS_USERADM_GRANT_APP_RESOURCE" FunctionName="AdminModel.Store.BARS_USERADM_GRANT_APP_RESOURCE" />
+          <EntitySetMapping Name="STAFF_CLASS">
+            <EntityTypeMapping TypeName="AdminModel.STAFF_CLASS">
+              <MappingFragment StoreEntitySet="STAFF_CLASS">
+                <ScalarProperty Name="MARK" ColumnName="MARK" />
+                <ScalarProperty Name="NAME" ColumnName="NAME" />
+                <ScalarProperty Name="CLSID" ColumnName="CLSID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="STAFF_TIPS">
+            <EntityTypeMapping TypeName="AdminModel.STAFF_TIPS">
+              <MappingFragment StoreEntitySet="STAFF_TIPS">
+                <ScalarProperty Name="NAME" ColumnName="NAME" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="V_USERADM_BRANCHES">
+            <EntityTypeMapping TypeName="AdminModel.V_USERADM_BRANCHES">
+              <MappingFragment StoreEntitySet="V_USERADM_BRANCHES">
+                <ScalarProperty Name="NAME" ColumnName="NAME" />
+                <ScalarProperty Name="BRANCH" ColumnName="BRANCH" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="V_STAFF_USER_BRANCH_LOOKUP">
+            <EntityTypeMapping TypeName="AdminModel.V_STAFF_USER_BRANCH_LOOKUP">
+              <MappingFragment StoreEntitySet="V_STAFF_USER_BRANCH_LOOKUP">
+                <ScalarProperty Name="PARENT_BRANCH" ColumnName="PARENT_BRANCH" />
+                <ScalarProperty Name="HAS_CHILD" ColumnName="HAS_CHILD" />
+                <ScalarProperty Name="NAME" ColumnName="NAME" />
+                <ScalarProperty Name="BRANCH" ColumnName="BRANCH" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="V_STAFF_USER_ADM">
+            <EntityTypeMapping TypeName="AdminModel.V_STAFF_USER_ADM">
+              <MappingFragment StoreEntitySet="V_STAFF_USER_ADM">
+                <ScalarProperty Name="ADM_COMMENTS" ColumnName="ADM_COMMENTS" />
+                <ScalarProperty Name="BRANCH_NAME" ColumnName="BRANCH_NAME" />
+                <ScalarProperty Name="STATE_NAME" ColumnName="STATE_NAME" />
+                <ScalarProperty Name="STATE_ID" ColumnName="STATE_ID" />
+                <ScalarProperty Name="AUTHENTICATION_MODE_NAME" ColumnName="AUTHENTICATION_MODE_NAME" />
+                <ScalarProperty Name="AUTHENTICATION_MODE_ID" ColumnName="AUTHENTICATION_MODE_ID" />
+                <ScalarProperty Name="BRANCH_CODE" ColumnName="BRANCH_CODE" />
+                <ScalarProperty Name="USER_NAME" ColumnName="USER_NAME" />
+                <ScalarProperty Name="LOGIN_NAME" ColumnName="LOGIN_NAME" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="V_STAFF_USER_ORA_ROLE_LOOKUP">
+            <EntityTypeMapping TypeName="AdminModel.V_STAFF_USER_ORA_ROLE_LOOKUP">
+              <MappingFragment StoreEntitySet="V_STAFF_USER_ORA_ROLE_LOOKUP">
+                <ScalarProperty Name="ROLE_NAME" ColumnName="ROLE_NAME" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="V_STAFF_ROLE_ADM">
+            <EntityTypeMapping TypeName="AdminModel.V_STAFF_ROLE_ADM">
+              <MappingFragment StoreEntitySet="V_STAFF_ROLE_ADM">
+                <ScalarProperty Name="STATE_NAME" ColumnName="STATE_NAME" />
+                <ScalarProperty Name="ROLE_NAME" ColumnName="ROLE_NAME" />
+                <ScalarProperty Name="ROLE_CODE" ColumnName="ROLE_CODE" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="V_ROLE_RESOURCE_ACCESS_MODE">
+            <EntityTypeMapping TypeName="AdminModel.V_ROLE_RESOURCE_ACCESS_MODE">
+              <MappingFragment StoreEntitySet="V_ROLE_RESOURCE_ACCESS_MODE">
+                <ScalarProperty Name="ACCESS_MODE_NAME" ColumnName="ACCESS_MODE_NAME" />
+                <ScalarProperty Name="ACCESS_MODE_CODE" ColumnName="ACCESS_MODE_CODE" />
+                <ScalarProperty Name="ACCESS_MODE_ID" ColumnName="ACCESS_MODE_ID" />
+                <ScalarProperty Name="RESOURCE_NAME" ColumnName="RESOURCE_NAME" />
+                <ScalarProperty Name="RESOURCE_CODE" ColumnName="RESOURCE_CODE" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="V_ROLE_RESOURCE_TYPE_LOOKUP">
+            <EntityTypeMapping TypeName="AdminModel.V_ROLE_RESOURCE_TYPE_LOOKUP">
+              <MappingFragment StoreEntitySet="V_ROLE_RESOURCE_TYPE_LOOKUP">
+                <ScalarProperty Name="RESOURCE_NAME" ColumnName="RESOURCE_NAME" />
+                <ScalarProperty Name="RESOURCE_CODE" ColumnName="RESOURCE_CODE" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="V_ROLE_RESOURCE">
+            <EntityTypeMapping TypeName="AdminModel.V_ROLE_RESOURCE">
+              <MappingFragment StoreEntitySet="V_ROLE_RESOURCE">
+                <ScalarProperty Name="IS_GRANTED_NAME" ColumnName="IS_GRANTED_NAME" />
+                <ScalarProperty Name="IS_APPROVED" ColumnName="IS_APPROVED" />
+                <ScalarProperty Name="IS_GRANTED" ColumnName="IS_GRANTED" />
+                <ScalarProperty Name="RESOURCE_NAME" ColumnName="RESOURCE_NAME" />
+                <ScalarProperty Name="RESOURCE_CODE" ColumnName="RESOURCE_CODE" />
+                <ScalarProperty Name="RESOURCE_ID" ColumnName="RESOURCE_ID" />
+                <ScalarProperty Name="RESOURCE_TYPE_NAME" ColumnName="RESOURCE_TYPE_NAME" />
+                <ScalarProperty Name="RESOURCE_TYPE_ID" ColumnName="RESOURCE_TYPE_ID" />
+                <ScalarProperty Name="ROLE_ID" ColumnName="ROLE_ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="V_STAFF_USER_ROLE_LOOKUP">
+            <EntityTypeMapping TypeName="AdminModel.V_STAFF_USER_ROLE_LOOKUP">
+              <MappingFragment StoreEntitySet="V_STAFF_USER_ROLE_LOOKUP">
+                <ScalarProperty Name="ROLE_NAME" ColumnName="ROLE_NAME" />
+                <ScalarProperty Name="ROLE_CODE" ColumnName="ROLE_CODE" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="V_APPLIST_ADM">
+            <EntityTypeMapping TypeName="AdminModel.V_APPLIST_ADM">
+              <MappingFragment StoreEntitySet="V_APPLIST_ADM">
+                <ScalarProperty Name="APPLICATION_TYPE" ColumnName="APPLICATION_TYPE" />
+                <ScalarProperty Name="ARM_NAME" ColumnName="ARM_NAME" />
+                <ScalarProperty Name="ARM_CODE" ColumnName="ARM_CODE" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="V_STAFF_USER_ROLE">
+            <EntityTypeMapping TypeName="AdminModel.V_STAFF_USER_ROLE">
+              <MappingFragment StoreEntitySet="V_STAFF_USER_ROLE">
+                <ScalarProperty Name="IS_APPROVED" ColumnName="IS_APPROVED" />
+                <ScalarProperty Name="IS_GRANTED" ColumnName="IS_GRANTED" />
+                <ScalarProperty Name="ROLE_NAME" ColumnName="ROLE_NAME" />
+                <ScalarProperty Name="ROLE_CODE" ColumnName="ROLE_CODE" />
+                <ScalarProperty Name="ROLE_ID" ColumnName="ROLE_ID" />
+                <ScalarProperty Name="USER_ID" ColumnName="USER_ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="V_ARM_RESOURCE">
+            <EntityTypeMapping TypeName="AdminModel.V_ARM_RESOURCE">
+              <MappingFragment StoreEntitySet="V_ARM_RESOURCE">
+                <ScalarProperty Name="IS_APPROVED" ColumnName="IS_APPROVED" />
+                <ScalarProperty Name="IS_GRANTED_NAME" ColumnName="IS_GRANTED_NAME" />
+                <ScalarProperty Name="IS_GRANTED" ColumnName="IS_GRANTED" />
+                <ScalarProperty Name="RESOURCE_NAME" ColumnName="RESOURCE_NAME" />
+                <ScalarProperty Name="RESOURCE_CODE" ColumnName="RESOURCE_CODE" />
+                <ScalarProperty Name="RESOURCE_ID" ColumnName="RESOURCE_ID" />
+                <ScalarProperty Name="RESOURCE_TYPE_NAME" ColumnName="RESOURCE_TYPE_NAME" />
+                <ScalarProperty Name="RESOURCE_TYPE_ID" ColumnName="RESOURCE_TYPE_ID" />
+                <ScalarProperty Name="ARM_ID" ColumnName="ARM_ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="V_ARM_RESOURCE_TYPE_LOOKUP">
+            <EntityTypeMapping TypeName="AdminModel.V_ARM_RESOURCE_TYPE_LOOKUP">
+              <MappingFragment StoreEntitySet="V_ARM_RESOURCE_TYPE_LOOKUP">
+                <ScalarProperty Name="RESOURCE_NAME" ColumnName="RESOURCE_NAME" />
+                <ScalarProperty Name="RESOURCE_CODE" ColumnName="RESOURCE_CODE" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="ARM_CODE" ColumnName="ARM_CODE" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="V_ARM_RESOURCE_ACCESS_MODE">
+            <EntityTypeMapping TypeName="AdminModel.V_ARM_RESOURCE_ACCESS_MODE">
+              <MappingFragment StoreEntitySet="V_ARM_RESOURCE_ACCESS_MODE">
+                <ScalarProperty Name="ACCESS_MODE_NAME" ColumnName="ACCESS_MODE_NAME" />
+                <ScalarProperty Name="ACCESS_MODE_CODE" ColumnName="ACCESS_MODE_CODE" />
+                <ScalarProperty Name="ACCESS_MODE_ID" ColumnName="ACCESS_MODE_ID" />
+                <ScalarProperty Name="RESOURCE_NAME" ColumnName="RESOURCE_NAME" />
+                <ScalarProperty Name="RESOURCE_CODE" ColumnName="RESOURCE_CODE" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="ARM_CODE" ColumnName="ARM_CODE" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="V_APPROVABLE_RESOURCE">
+            <EntityTypeMapping TypeName="AdminModel.V_APPROVABLE_RESOURCE">
+              <MappingFragment StoreEntitySet="V_APPROVABLE_RESOURCE">
+                <ScalarProperty Name="ACTION_USER" ColumnName="ACTION_USER" />
+                <ScalarProperty Name="ACTION_TIME" ColumnName="ACTION_TIME" />
+                <ScalarProperty Name="CURRENT_ACCESS_MODE" ColumnName="CURRENT_ACCESS_MODE" />
+                <ScalarProperty Name="NEW_ACCESS_MODE" ColumnName="NEW_ACCESS_MODE" />
+                <ScalarProperty Name="RESOURCE_NAME" ColumnName="RESOURCE_NAME" />
+                <ScalarProperty Name="RESOURCE_CODE" ColumnName="RESOURCE_CODE" />
+                <ScalarProperty Name="RESOURCE_TYPE_NAME" ColumnName="RESOURCE_TYPE_NAME" />
+                <ScalarProperty Name="GRANTEE_NAME" ColumnName="GRANTEE_NAME" />
+                <ScalarProperty Name="GRANTEE_CODE" ColumnName="GRANTEE_CODE" />
+                <ScalarProperty Name="GRANTEE_TYPE_ID" ColumnName="GRANTEE_TYPE_ID" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="V_APPROVABLE_RESOURCE_GROUP">
+            <EntityTypeMapping TypeName="AdminModel.V_APPROVABLE_RESOURCE_GROUP">
+              <MappingFragment StoreEntitySet="V_APPROVABLE_RESOURCE_GROUP">
+                <ScalarProperty Name="RESOURCE_NAME" ColumnName="RESOURCE_NAME" />
+                <ScalarProperty Name="RESOURCE_CODE" ColumnName="RESOURCE_CODE" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2008/10/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="False" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="True" />
+        <DesignerProperty Name="UseLegacyProvider" Value="true" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="Default" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

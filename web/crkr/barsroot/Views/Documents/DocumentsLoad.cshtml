@@ -1,0 +1,71 @@
+﻿@{
+    Layout = null;
+}
+@inherits System.Web.Mvc.WebViewPage<IEnumerable<Models.V_DOCS_TOBO_OUT>>
+
+@{string styleSOS = ""; int take = ViewBag.RowNumber;}
+     
+    @foreach (var item in Model)
+    {
+        switch (item.SOS)
+        {
+            case 0: styleSOS = "#008080"; break;
+            case 1: styleSOS = "#008000"; break;
+            case 3: styleSOS = "#0000FF"; break;
+            case 5: styleSOS = "#4c5967"; break;
+            case -1: styleSOS = "#FF0000"; break;
+            case -2: styleSOS = "#FF0000"; break;
+            default: styleSOS = "#4c5967"; break;
+        }
+<tr style="color:@styleSOS"  >
+    @*<td>
+            <input type="checkbox" value="@item.REF" name="id" />
+        </td>*@
+    <td>
+        <a style="border:0;" href="/barsroot/docinput/docinput.aspx?tt=@item.TT&refDoc=@item.REF">
+            <img border="0" onclick="addLoader($(body));" alt="" src="/Common/Images/default/16/copy.png" title="Продублювати документ" />
+        </a>
+    </td>
+    <td class="link" @*data-ref="@item.REF"*@ onClick="viewSelDocum(@item.REF);">@item.REF</td>
+    <td>@item.USERID</td>
+    <td>@item.ND</td>
+    <td>@item.NLSA</td>
+    <td>@(Convert.ToDouble(item.S_).ToString(barsroot.ServicesClass.GetNFormat(2)))</td>
+    <td>@item.LCV</td>
+    <td>@item.VDAT.ToShortDateString()</td>
+    <td>@(Convert.ToDouble(item.S2_).ToString(barsroot.ServicesClass.GetNFormat(2)))</td>
+    <td>@item.LCV2</td>
+    <td>@item.MFOB</td>
+    <td>@item.NLSB</td>
+    <td>@item.DK</td>
+    <td>@item.SK</td>
+    <td>@Convert.ToDateTime(item.DATD).ToShortDateString()</td>
+    <td>@item.NAZN</td>
+    <td>@item.SOS</td>
+    <td>@item.TOBO</td>
+</tr>}@*
+<tr class="footerRow">
+    <td colspan="18">
+        <div class="footerDiv">
+            Сторінка:&nbsp;
+            @if (ViewBag.PageNum>1)
+            {
+                int page =Convert.ToInt32(ViewBag.PageNum)-1;
+                <img rd="@page" alt="@page" src="/Common/Images/default/16/navigate_left.png" />
+            }
+			<span >
+				<span>@ViewBag.PageNum</span>
+			</span>
+            @if (Model.Count()>ViewBag.RowNumber)
+            {
+                int page = Convert.ToInt32(ViewBag.PageNum) + 1;
+                <img rd="@page" alt="@page" src="/Common/Images/default/16/navigate_right.png" />
+            }
+
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Рядків на сторінці:&nbsp;
+                    <input id="rowNumber" name="rowNumber" type="text" value="@ViewBag.RowNumber" 
+                          style="width:30px;text-align:center;" />
+
+        </div>
+    </td>
+</tr>*@

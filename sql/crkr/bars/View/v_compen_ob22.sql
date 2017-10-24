@@ -1,0 +1,7 @@
+CREATE OR REPLACE FORCE VIEW BARS.V_COMPEN_OB22 (OB22, TEXT) AS 
+  select c.ob22, c.text
+  from compen_ob22 c
+  with read only
+;
+   COMMENT ON TABLE BARS.V_COMPEN_OB22  IS 'Список кодів ob22';
+  GRANT SELECT ON BARS.V_COMPEN_OB22 TO BARS_ACCESS_DEFROLE;

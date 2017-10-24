@@ -1,0 +1,67 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+ }
+<script src="~/Areas/OpenCloseDay/Scripts/operProceedOCinfo.js" charset="utf-8"></script>
+
+<div id="sessionId" style="display: none;">default</div>
+
+<form class="form-horizontal">
+    <div class="panel panel-default"  style="width:1000px;float: none; margin-left: auto; margin-right: auto;"  >
+        <div class="panel-heading">Закриття банківського дня</div>
+        <div class="panel-body">
+            <div class="form-group">
+                <div align="center">
+                    <label for="" class="control-label">Поточна банківська дата</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <div align="center">
+                    <input type="text" id="date" class="k-textbox text-center" value="@ViewBag.date_old" style="margin-bottom: 30px; width: 220px" readonly>
+                </div>          
+            </div>
+            <div class="form-group">
+                <div align="center">
+                    <label for="" class="control-label">Наступна банківська дата</label>
+                </div>
+            </div>
+            <div class="form-group">            
+                <div align="center">
+                    <input type="text" id="dateNew" class="text-center" value="@ViewBag.date_new" style="width: 220px">
+                </div>
+            </div>
+            <div class="form-group" align="center">
+                <div class="col-md-6">
+                    <input type="button" class="k-button k-primary" id="alertInfo" value="Розпочати">
+                </div>
+                <div class="col-md-6">
+                    <input type="button" class="k-button k-block" id="btnCancelForm" value="Відмінити">
+                </div>
+            </div>
+            <div class="text-center text-danger" id="warningText"></div>
+        </div>
+        <div id="departmentReadyGrid">
+        </div> 
+    </div>
+    <div id="windowInfo">
+        <div class="row">
+            <div class="panel panel-default" style="width:70%;float: none; margin-left: auto; margin-right: auto;">
+                <div class="text-center text-danger" id="warningTextInfo">
+                    Не всі регіональні управління завершили виконання своїх операцій - 
+                    необхідно дочекатися від них підтвердження про готовність до закриття дня.
+                    Ви можете продовжити виконання процедури, але у разі продовження, 
+                    регламентні процедури по таких РУ за замовчанням не виконуються - виконання 
+                    процедур може бути включено технологом в індивідуальному порядку.
+                </div>              
+            </div>
+            <div class="form-group" align="center">
+                <div>
+                    <input type="button" class="k-button k-primary" id="getKeyId" value="Підтвердити">
+                </div>
+            </div>
+        </div>
+        
+</div>
+    
+</form>
+
+

@@ -1,0 +1,18 @@
+﻿@{
+    ViewBag.Title = "";
+}
+
+@Scripts.Render("~/bundles/doc/scripts/advertising/index")
+@*<script src="@Url.Content("~/Areas/Doc/Scripts/Advertising/Index.js")"></script>*@
+
+<div data-ng-controller="Advertising">
+    <h1 ng-bind="Title"></h1>
+    <div data-kendo-toolbar="" k-options="toolbarOptions"></div>
+    <div data-kendo-grid="adversitingGrid" data-options="adversitingGridOptions"></div>
+    <div data-kendo-window="advertisingWindow" id="advertisingWindow" data-options="advertisingWindowOptions" style="display: none">
+        @Html.Partial("Edit")
+    </div>     
+</div>
+
+<link href="@Url.Content("~/lib/cropper/cropper.min.css")" rel="stylesheet" />
+<script src="@Url.Content("~/lib/cropper/cropper.min.js")"></script>

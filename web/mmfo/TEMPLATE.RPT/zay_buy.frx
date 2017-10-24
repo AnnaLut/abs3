@@ -1,0 +1,225 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="05/11/2016 09:31:22" ReportInfo.Modified="01/04/2017 15:02:59" ReportInfo.CreatorVersion="2014.3.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlq8+HCsj5mnfc2oQWOJAI1rOWOGv68sBpiXMxVx5dIqE7fZmMxoAeKqIz2gmiyZm0SNN7mWgzghQ+3kF8R77nBIw==">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" TableName="1885" SelectCommand="select z.id ZAY_ID,  &#13;&#10;       nvl(z.nd, TO_CHAR(z.id)) ZAY_NUM,  &#13;&#10;       z.fdat ZAY_DAT,  &#13;&#10;       replace(substr(f_dat_lit(z.fdat), 1, 100),'&quot;','') ZAY_DATLIT,  &#13;&#10;       c.nmk CLIENTNAME,  &#13;&#10;       substr(f_custw(c.rnk,'FGIDX'),1,6)||' '||c.adr CLIENTADR,  &#13;&#10;       decode(c.custtype, 3, p.telw, nvl(co.telr,co.tel_fax)) CLIENTFAX,  &#13;&#10;       nvl(z.contact_fio,cz.fio) STAFFNAME,   &#13;&#10;       nvl(z.contact_tel,cz.tel) STAFFPHONE,   &#13;&#10;       substr(trim(z.comm)||decode(z.basis,null,'',' (')||trim(z.basis)||decode(z.basis,null,'',') '),1,254) BASIS,  &#13;&#10;       z.contract DEAL_NUM,  &#13;&#10;       z.dat2_vmd DEAL_DAT,  &#13;&#10;       z.meta AIM_ID,  &#13;&#10;       a.description AIM_NAME,  &#13;&#10;       a.description_eng AIM_NAMENG,  &#13;&#10;       z.dat_vmd  LTD_DAT,  &#13;&#10;       z.num_vmd LTD_NUM,  &#13;&#10;       z.dat5_vmd OTD_DAT,  &#13;&#10;       decode(z.dat_vmd, null, 1, 0) FL_AVANS,  &#13;&#10;       bnfc.name BENEFC,  &#13;&#10;       bnkc.name BANKC,  &#13;&#10;       z.bank_name BANKNAME,&#13;&#10;       z.kv2 CUR_KV,  &#13;&#10;       t.lcv CUR_ISO,  &#13;&#10;       t.name CUR_NAME,          &#13;&#10;       replace(to_char(z.s2/100,'fm99999999.00'),'.',',') CUR_AMOUNT,  &#13;&#10;       --nvl(replace(to_char(decode(nvl(z.fl_kursz, 0), 1, to_number(null), z.kurs_z),'fm99999999.0000'),'.',','),'Курс уповноваженого банку') RATE,  &#13;&#10;       nvl(replace(decode(nvl(z.fl_kursz, 0), 1, null, z.kurs_kl),'.',','),'Курс уповноваженого банку') RATE,  &#13;&#10;       replace(to_char(round(decode(nvl(z.fl_kursz, 0), 1, to_number(null), z.kurs_z)* z.s2)/100,'fm99999999.00'),'.',',') EQV_AMOUNT, &#13;&#10;       ag.nls ACC_NC,   &#13;&#10;       av.nls ACC_FC,  &#13;&#10;       nvl(z.mfo0,cz.mfov) MFO_REST,  &#13;&#10;       substr(case when b.mfo = f_ourmfo() then nvl((select substr(val,1,254) from birja where par = 'C_BNAME'),substr(getbankname(f_ourmfo()),1,254)) else substr(b.nb,1,254) end,1,254) BANK_REST,  &#13;&#10;       nvl(z.nls0,cz.nlsv) ACC_REST, &#13;&#10;       substr(substr(substr(fio(co.ruk,2),1,1) || '. ' || substr(fio(co.ruk,3),1,1) || '. ' || fio(co.ruk,1),1,254),1,254) RUK,  &#13;&#10;       substr(substr(substr(fio(co.buh,2),1,1) || '. ' || substr(fio(co.buh,3),1,1) || '. ' || fio(co.buh,1),1,254),1,254) BUH,  &#13;&#10;       decode(replace(to_char(z.kom,'fm999999990.00'),'.',',')||'(%)','(%)',z.skom||' грн.',replace(to_char(z.kom,'fm999999990.00'),'.',',')||'(%)') COMMISS, &#13;&#10;       substr(nvl((select substr(val,1,254) from birja where par = 'C_BADR'),substr(f_ouraddress(),1,100)),1,254) BADR,  &#13;&#10;       substr(nvl((select substr(val,1,254) from birja where par = 'C_BNAME'),substr(getbankname(f_ourmfo()),1,254)),1,254) BNAME,  &#13;&#10;       cz.nls29 ACC_TR  &#13;&#10;  from zayavka z, cust_zay cz, customer c, corps co, person p,&#13;&#10;       tabval t, zay_aims a, country bnfc, country bnkc,   &#13;&#10;       accounts ag, accounts av, banks b   &#13;&#10; where z.rnk = c.rnk  &#13;&#10;   and c.rnk = co.rnk(+)&#13;&#10;   and c.rnk = p.rnk(+)   &#13;&#10;   and z.kv2 = t.kv   &#13;&#10;   and z.acc0 = ag.acc  &#13;&#10;   and z.acc1 = av.acc  &#13;&#10;   and z.meta = a.aim(+)     &#13;&#10;   and c.rnk = cz.rnk(+)  &#13;&#10;   and nvl(z.mfo0,cz.mfov) = b.mfo  &#13;&#10;   and z.benefcountry = bnfc.country (+)  &#13;&#10;   and z.country = bnkc.country (+)   &#13;&#10;   and z.id =:ZAY_ID">
+        <Column Name="ZAY_ID" DataType="System.Decimal"/>
+        <Column Name="ZAY_NUM" DataType="System.String"/>
+        <Column Name="ZAY_DAT" DataType="System.DateTime"/>
+        <Column Name="ZAY_DATLIT" DataType="System.String"/>
+        <Column Name="CLIENTNAME" DataType="System.String"/>
+        <Column Name="CLIENTADR" DataType="System.String"/>
+        <Column Name="CLIENTFAX" DataType="System.String"/>
+        <Column Name="STAFFNAME" DataType="System.String"/>
+        <Column Name="STAFFPHONE" DataType="System.String"/>
+        <Column Name="BASIS" DataType="System.String"/>
+        <Column Name="DEAL_NUM" DataType="System.String"/>
+        <Column Name="DEAL_DAT" DataType="System.DateTime"/>
+        <Column Name="AIM_ID" DataType="System.Decimal"/>
+        <Column Name="AIM_NAME" DataType="System.String"/>
+        <Column Name="AIM_NAMENG" DataType="System.String"/>
+        <Column Name="LTD_DAT" DataType="System.DateTime"/>
+        <Column Name="LTD_NUM" DataType="System.String"/>
+        <Column Name="OTD_DAT" DataType="System.String"/>
+        <Column Name="FL_AVANS" DataType="System.Decimal"/>
+        <Column Name="BENEFC" DataType="System.String"/>
+        <Column Name="BANKC" DataType="System.String"/>
+        <Column Name="BANKNAME" DataType="System.String"/>
+        <Column Name="CUR_KV" DataType="System.Decimal"/>
+        <Column Name="CUR_ISO" DataType="System.String"/>
+        <Column Name="CUR_NAME" DataType="System.String"/>
+        <Column Name="CUR_AMOUNT" DataType="System.String"/>
+        <Column Name="RATE" DataType="System.String"/>
+        <Column Name="EQV_AMOUNT" DataType="System.String"/>
+        <Column Name="ACC_NC" DataType="System.String"/>
+        <Column Name="ACC_FC" DataType="System.String"/>
+        <Column Name="MFO_REST" DataType="System.String"/>
+        <Column Name="BANK_REST" DataType="System.String"/>
+        <Column Name="ACC_REST" DataType="System.String"/>
+        <Column Name="RUK" DataType="System.String"/>
+        <Column Name="BUH" DataType="System.String"/>
+        <Column Name="COMMISS" DataType="System.String"/>
+        <Column Name="BADR" DataType="System.String"/>
+        <Column Name="BNAME" DataType="System.String"/>
+        <Column Name="ACC_TR" DataType="System.String"/>
+        <CommandParameter Name=":ZAY_ID" DataType="107" Expression="[ZAY_ID]" DefaultValue="-1"/>
+      </TableDataSource>
+      <TableDataSource Name="Table8" Alias="bank_info" DataType="System.Int32" Enabled="true" SelectCommand="SELECT val OUR_BANK_NAME, f_ourmfo OUR_MFO  FROM params WHERE par='NAME'">
+        <Column Name="OUR_BANK_NAME" DataType="System.String"/>
+        <Column Name="OUR_MFO" DataType="System.String"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="ZAY_ID" DataType="System.Int32" Expression="1885"/>
+  </Dictionary>
+  <ReportPage Name="Page1" Guides="708.75,9.45">
+    <PageHeaderBand Name="PageHeader1" Width="718.2" Height="9.45"/>
+    <DataBand Name="Data1" Top="573.4" Width="718.2" Height="18.9" CanGrow="true" Guides="0" DataSource="Table">
+      <TableObject Name="Table3" Left="9.45" Width="699.3" Height="18.9" GrowToBottom="true">
+        <TableColumn Name="Column10" Width="173.88"/>
+        <TableColumn Name="Column11" Width="173.88"/>
+        <TableColumn Name="Column12" Width="173.88"/>
+        <TableColumn Name="Column13" Width="177.66"/>
+        <TableRow Name="Row5">
+          <TableCell Name="Cell20" Border.Lines="All" Text="[Table.CUR_NAME], [Table.CUR_KV]" HorzAlign="Center" Font="Times New Roman, 11pt"/>
+          <TableCell Name="Cell21" Border.Lines="All" Text="[Table.CUR_AMOUNT]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" Font="Times New Roman, 11pt"/>
+          <TableCell Name="Cell22" Border.Lines="All" Text="[Table.RATE]" HorzAlign="Right" Font="Times New Roman, 11pt"/>
+          <TableCell Name="Cell23" Border.Lines="All" Text="[Table.EQV_AMOUNT]" HorzAlign="Right" Font="Times New Roman, 11pt"/>
+        </TableRow>
+      </TableObject>
+      <DataHeaderBand Name="DataHeader1" Top="12.65" Width="718.2" Height="557.55" CanShrink="true" CanBreak="true">
+        <TableObject Name="Table1" Left="9.45" Top="472.5" Width="699.3" Height="85.05">
+          <TableColumn Name="Column1" Width="173.88"/>
+          <TableColumn Name="Column2" Width="173.88"/>
+          <TableColumn Name="Column3" Width="173.88"/>
+          <TableColumn Name="Column4" Width="177.66"/>
+          <TableRow Name="Row1" Height="85.05">
+            <TableCell Name="Cell1" Border.Lines="All" Text="Назва іноземної валюти або виду банківського металу, що купується, її/його код " HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 11pt, style=Bold"/>
+            <TableCell Name="Cell2" Border.Lines="All" Text="Сума купівлі іноземної валюти або маса банківських  металів " HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 11pt, style=Bold"/>
+            <TableCell Name="Cell3" Border.Lines="All" Text="Курс купівлі в грн./ курс уповноваженого банку " HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 11pt, style=Bold"/>
+            <TableCell Name="Cell4" Border.Lines="All" Text="Сума купівлі в грн. відповідно до  курсу, що зазначений у заяві " HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 11pt, style=Bold"/>
+          </TableRow>
+        </TableObject>
+        <TableObject Name="Table2" Left="9.45" Top="373.27" Width="699.3" Height="94.5">
+          <TableColumn Name="Column5" Width="136.08"/>
+          <TableColumn Name="Column6" Width="136.08"/>
+          <TableColumn Name="Column7" Width="154.98"/>
+          <TableColumn Name="Column8" Width="136.08"/>
+          <TableColumn Name="Column9" Width="136.08"/>
+          <TableRow Name="Row2">
+            <TableCell Name="Cell5" Text="Підстава для купівлі іноземної валюти на міжбанківському валютному ринку України:" Font="Times New Roman, 11pt" ColSpan="5"/>
+            <TableCell Name="Cell6" Font="Arial, 9pt"/>
+            <TableCell Name="Cell7" Font="Arial, 9pt"/>
+            <TableCell Name="Cell8" Font="Arial, 9pt"/>
+            <TableCell Name="Cell9" Font="Arial, 9pt"/>
+          </TableRow>
+          <TableRow Name="Row3" Height="56.7">
+            <TableCell Name="Cell10" Text="[Table.BASIS]" Font="Times New Roman, 11pt" ColSpan="5"/>
+            <TableCell Name="Cell11"/>
+            <TableCell Name="Cell12"/>
+            <TableCell Name="Cell13"/>
+            <TableCell Name="Cell14"/>
+          </TableRow>
+          <TableRow Name="Row4" Height="28.35">
+            <TableCell Name="Cell15" Text="Доручаємо купити іноземну валюту або банківскі метали на умовах, що зазначені нижче." Font="Times New Roman, 11pt" ColSpan="5"/>
+            <TableCell Name="Cell16"/>
+            <TableCell Name="Cell17"/>
+            <TableCell Name="Cell18"/>
+            <TableCell Name="Cell19"/>
+          </TableRow>
+        </TableObject>
+        <TableObject Name="Table6" Left="9.45" Top="170.1" Width="699.3" Height="47.24">
+          <TableColumn Name="Column22" Width="349.65"/>
+          <TableColumn Name="Column23" Width="349.65"/>
+          <TableRow Name="Row20" Height="23.62">
+            <TableCell Name="Cell84" Text="ЗАЯВА* ПРО КУПІВЛЮ ІНОЗЕМНОЇ ВАЛЮТИ АБО БАНКІВСЬКИХ МЕТАЛІВ" HorzAlign="Center" Font="Times New Roman, 11pt, style=Bold" ColSpan="2"/>
+            <TableCell Name="Cell85" HorzAlign="Center"/>
+          </TableRow>
+          <TableRow Name="Row21" Height="23.62">
+            <TableCell Name="Cell89" Text="№[Table.ZAY_NUM]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 11pt"/>
+            <TableCell Name="Cell90" Text="від [Table.ZAY_DATLIT]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 11pt"/>
+          </TableRow>
+        </TableObject>
+        <TableObject Name="Table7" Left="9.45" Width="699.3" Height="75.6">
+          <TableColumn Name="Column24"/>
+          <TableColumn Name="Column25"/>
+          <TableColumn Name="Column26"/>
+          <TableColumn Name="Column27" Width="255.15"/>
+          <TableColumn Name="Column28" Width="245.7"/>
+          <TableRow Name="Row22">
+            <TableCell Name="Cell91" ColSpan="4"/>
+            <TableCell Name="Cell92"/>
+            <TableCell Name="Cell93"/>
+            <TableCell Name="Cell94"/>
+            <TableCell Name="Cell95" Text="Додаток 1" Font="Times New Roman, 11pt"/>
+          </TableRow>
+          <TableRow Name="Row23">
+            <TableCell Name="Cell96" Text="[Table.BNAME]" HorzAlign="Center" Font="Times New Roman, 11pt" ColSpan="4"/>
+            <TableCell Name="Cell97"/>
+            <TableCell Name="Cell98"/>
+            <TableCell Name="Cell99"/>
+            <TableCell Name="Cell100" Text="до Положення про порядок та&#13;&#10;" Font="Times New Roman, 11pt"/>
+          </TableRow>
+          <TableRow Name="Row24">
+            <TableCell Name="Cell101" Text="[Table.BADR]" HorzAlign="Center" Font="Times New Roman, 11pt" ColSpan="4"/>
+            <TableCell Name="Cell102"/>
+            <TableCell Name="Cell103"/>
+            <TableCell Name="Cell104"/>
+            <TableCell Name="Cell105" Text="умови торгівлі іноземною валютою" Font="Times New Roman, 11pt"/>
+          </TableRow>
+          <TableRow Name="Row25">
+            <TableCell Name="Cell106" Text="(найменування та місцезнаходження уповноваженого банку)" HorzAlign="Center" Font="Times New Roman, 11pt" ColSpan="4"/>
+            <TableCell Name="Cell107" HorzAlign="Center" Font="Arial, 11pt"/>
+            <TableCell Name="Cell108" HorzAlign="Center" Font="Arial, 11pt"/>
+            <TableCell Name="Cell109" HorzAlign="Center" Font="Arial, 11pt"/>
+            <TableCell Name="Cell110">
+              <TextObject Name="Text4" Left="75.6" Top="9.45" Width="113.4" Height="28.35" Border.Lines="All" Text="0408006 " HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 11pt, style=Bold"/>
+            </TableCell>
+          </TableRow>
+        </TableObject>
+        <TextObject Name="Text5" Left="463.05" Top="94.5" Width="245.7" Height="66.15" Text="Прийнято&#13;&#10;Дата: ____Час:____&#13;&#10;Підпис: __________&#13;&#10;Штамп" Font="Arial, 11pt"/>
+        <TextObject Name="Text3" Left="9.45" Top="217.35" Width="699.3" Height="160.65" CanGrow="true" Text="Найменування клієнта/прізвище, ім'я, по батькові: &#13;&#10;&lt;b&gt;[Table.CLIENTNAME]&lt;/b&gt;&#13;&#10;Місцезнаходження / місце проживання:&#13;&#10; &lt;b&gt;[Table.CLIENTADR]&lt;/b&gt;&#13;&#10;№ тел./факсу: &lt;b&gt;[Table.CLIENTFAX]&lt;/b&gt;&#13;&#10;Прізвище, ім'я, по батькові   працівника, який уповноважений вирішувати питання щодо купівлі іноземної&#13;&#10;валюти або банківських металів: &lt;b&gt;[Table.STAFFNAME]&lt;/b&gt;&#13;&#10;№ тел.: &lt;b&gt;[Table.STAFFPHONE]&lt;/b&gt;&#13;&#10;(зразок підпису)" Font="Times New Roman, 11pt" HtmlTags="true"/>
+      </DataHeaderBand>
+      <DataFooterBand Name="DataFooter1" Top="595.5" Width="718.2" Height="415.8">
+        <TextObject Name="Text1" Left="9.45" Top="9.45" Width="699.3" Height="236.25" Text="Зобов'язуємося перерахувати на рахунок № &#13;&#10;&lt;b&gt;[Table.ACC_TR]&lt;/b&gt; у &lt;b&gt;[bank_info.OUR_BANK_NAME]&lt;/b&gt;, код банку &lt;b&gt;[bank_info.OUR_MFO]&lt;/b&gt; кошти в гривнях у розмірі, що потрібний для купівлі іноземної валюти або банківських металів за курсом, зазначеним у цій заяві.&#13;&#10;Якщо після виконання заяви залишаються невикористаними кошти в гривнях, просимо уповноважений банк перерахувати їх на поточний рахунок&#13;&#10;&lt;b&gt;[Table.ACC_REST]&lt;/b&gt; у &lt;b&gt;[Table.BANK_REST]&lt;/b&gt;, код банку &lt;b&gt;[Table.MFO_REST]&lt;/b&gt;.&#13;&#10;&#13;&#10;Доручаємо уповноваженому банку перерахувати придбану іноземну валюту або банківські метали на поточний рахунок в іноземній валюті № &#13;&#10;&lt;b&gt;[Table.ACC_FC]&lt;/b&gt; у &lt;b&gt;[bank_info.OUR_BANK_NAME]&lt;/b&gt;, код банку &lt;b&gt;[bank_info.OUR_MFO]&lt;/b&gt;.&#13;&#10;Якщо придбана на МВРУ іноземна валюта згідно з цією заявою не буде перерахована нами за призначенням у визначений законодавством України строк після зарахування на наш поточний рахунок, то доручаємо уповноваженому банку продати  цю іноземну валюту на МВРУ." Font="Times New Roman, 11pt" HtmlTags="true"/>
+        <TableObject Name="Table4" Left="9.45" Top="274.05" Width="699.3" Height="66.15">
+          <TableColumn Name="Column14" Width="141.75"/>
+          <TableColumn Name="Column15" Width="236.25"/>
+          <TableColumn Name="Column16" Width="321.3"/>
+          <TableRow Name="Row6">
+            <TableCell Name="Cell24" Text="    М.П." Font="Times New Roman, 11pt" HtmlTags="true"/>
+            <TableCell Name="Cell25" Text="Підписи:      ________________" HorzAlign="Right" Font="Times New Roman, 11pt" HtmlTags="true"/>
+            <TableCell Name="Cell26" Text="[Table.RUK]"/>
+          </TableRow>
+          <TableRow Name="Row7">
+            <TableCell Name="Cell29"/>
+            <TableCell Name="Cell30" Text="________________" HorzAlign="Right" Font="Times New Roman, 11pt" HtmlTags="true"/>
+            <TableCell Name="Cell31" Text="[Table.BUH]" VertAlign="Bottom"/>
+          </TableRow>
+          <TableRow Name="Row8">
+            <TableCell Name="Cell34"/>
+            <TableCell Name="Cell35"/>
+            <TableCell Name="Cell36"/>
+          </TableRow>
+        </TableObject>
+        <TableObject Name="Table5" Left="9.45" Top="340.2" Width="699.3" Height="75.6">
+          <TableColumn Name="Column17" Width="85.05"/>
+          <TableColumn Name="Column18" Width="264.6"/>
+          <TableColumn Name="Column19" Width="207.9"/>
+          <TableColumn Name="Column20"/>
+          <TableColumn Name="Column21" Width="75.6"/>
+          <TableRow Name="Row15">
+            <TableCell Name="Cell59"/>
+            <TableCell Name="Cell60" Text="Валютний контроль виконано:" Font="Times New Roman, 11pt" HtmlTags="true"/>
+            <TableCell Name="Cell61" Text="Відмітки про виконання:" Font="Times New Roman, 11pt" HtmlTags="true"/>
+            <TableCell Name="Cell62"/>
+            <TableCell Name="Cell63"/>
+          </TableRow>
+          <TableRow Name="Row16">
+            <TableCell Name="Cell64"/>
+            <TableCell Name="Cell65" Text="Дата ______________" Font="Times New Roman, 11pt" HtmlTags="true"/>
+            <TableCell Name="Cell66" Text="Дата ______________" Font="Times New Roman, 11pt" HtmlTags="true"/>
+            <TableCell Name="Cell67"/>
+            <TableCell Name="Cell68"/>
+          </TableRow>
+          <TableRow Name="Row17">
+            <TableCell Name="Cell69"/>
+            <TableCell Name="Cell70" Text="Підпис ____________" Font="Times New Roman, 11pt" HtmlTags="true"/>
+            <TableCell Name="Cell71" Text="Підпис ____________" Font="Times New Roman, 11pt" HtmlTags="true"/>
+            <TableCell Name="Cell72"/>
+            <TableCell Name="Cell73"/>
+          </TableRow>
+          <TableRow Name="Row18">
+            <TableCell Name="Cell74"/>
+            <TableCell Name="Cell75"/>
+            <TableCell Name="Cell76" Text="Штамп" Font="Times New Roman, 11pt" HtmlTags="true"/>
+            <TableCell Name="Cell77"/>
+            <TableCell Name="Cell78"/>
+          </TableRow>
+        </TableObject>
+      </DataFooterBand>
+    </DataBand>
+    <PageFooterBand Name="PageFooter1" Top="1014.5" Width="718.2" Height="18.9">
+      <TextObject Name="Text2" Left="9.45" Width="699.3" Height="18.9" Text="*Заповнюється юридичними особами та підприємцями." Font="Times New Roman, 10pt"/>
+    </PageFooterBand>
+  </ReportPage>
+</Report>

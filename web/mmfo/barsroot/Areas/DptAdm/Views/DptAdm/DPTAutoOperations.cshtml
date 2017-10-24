@@ -1,0 +1,50 @@
+﻿@using Areas.DptAdm.Models
+
+<script src="@Url.Content("~/Areas/DptAdm/Scripts/AdmCtrlAutoOper.js")"></script>
+<link href="~/Areas/DptAdm/Content/style.css" rel="stylesheet" />
+
+@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = "Автооперації депозити фізичних осіб";
+}
+
+<h2>@ViewBag.Title</h2>
+
+<div class="panel panel-primary" >
+    <div class="panel-heading">
+        <h3 class="panel-title" id="panel_title">Перелік автооперацій депозитних договорів </h3>        
+        <h3 class="panel-title" id="panel_proc_title" style="display: none;"><span id="proc_name"></span><span id="timer" class="timer"></span></h3>
+    </div>
+    <div id="loading"  style="display: none;">        
+        <img src="~/Content/Themes/ModernUI/css/images/loading.gif"
+              style="position: fixed; top: 50%; left: 45%;"/>
+    </div>
+    <div id="panel_body"  class="panel-body" style="padding: 0px;">
+        <div id="grid_job_list"></div>        
+    </div>   
+</div>
+
+<script type="text/x-kendo-template" id="template">
+    <div id="AutoOperTabstrip">
+        <ul>
+            <li class="k-state-active">
+                Подробиці процедури
+            </li>
+        </ul>
+        <div>
+            <div id="job_jrnl"></div>
+        </div>
+    </div>
+</script>
+
+<script type="text/x-kendo-template" id="templateLog">
+    <div id="AutoOperTabstripLog">   
+        <ul>
+            <li class="k-state-active">               
+            </li>
+        </ul>     
+        <div>
+            <div id="job_jrnl_log"></div>
+        </div>
+    </div>
+</script>

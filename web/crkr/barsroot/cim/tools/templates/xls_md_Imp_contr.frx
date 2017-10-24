@@ -1,0 +1,79 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="02/27/2014 10:25:54" ReportInfo.Modified="03/07/2014 09:43:56" ReportInfo.CreatorVersion="1.7.1.0">
+  <Dictionary>
+    <OracleDataConnection Name="Connection" ConnectionString="rijcmlq9SEZoacNJntaKIKp6mVF1+kSHs9h2FEASDb2ziQ1rMUybLG+C6jbSqka/GGQeZKaQSbrDjBY4KltUNuVSQtSEw==">
+      <TableDataSource Name="Table" Alias="v" DataType="System.Int32" Enabled="true" SelectCommand="select * from v_cim_bound_vmd where contr_id=to_number(:p_contr_id)">
+        <Column Name="BOUND_ID" DataType="System.Decimal"/>
+        <Column Name="CONTR_ID" DataType="System.Decimal"/>
+        <Column Name="DIRECT" DataType="System.Decimal"/>
+        <Column Name="TYPE_ID" DataType="System.Decimal"/>
+        <Column Name="S_VK" DataType="System.Decimal"/>
+        <Column Name="CONTROL_DATE" DataType="System.DateTime"/>
+        <Column Name="OVERDUE" DataType="System.Decimal"/>
+        <Column Name="VMD_ID" DataType="System.Decimal"/>
+        <Column Name="DOC_TYPE" DataType="System.String"/>
+        <Column Name="NUM" DataType="System.String"/>
+        <Column Name="DOC_DATE" DataType="System.DateTime"/>
+        <Column Name="ALLOW_DATE" DataType="System.DateTime"/>
+        <Column Name="VT" DataType="System.Decimal"/>
+        <Column Name="S_VT" DataType="System.Decimal"/>
+        <Column Name="RATE_VK" DataType="System.Decimal"/>
+        <Column Name="FILE_DATE" DataType="System.DateTime"/>
+        <Column Name="FILE_NAME" DataType="System.String"/>
+        <Column Name="CONTRACT_NUM" DataType="System.String"/>
+        <Column Name="CONTRACT_DATE" DataType="System.DateTime"/>
+        <Column Name="S_PL_VK" DataType="System.Decimal"/>
+        <Column Name="Z_VT" DataType="System.Decimal"/>
+        <Column Name="Z_VK" DataType="System.Decimal"/>
+        <Column Name="S_PL_AFTER_VK" DataType="System.Decimal"/>
+        <Column Name="COMMENTS" DataType="System.String"/>
+        <CommandParameter Name="p_contr_id" DataType="126" Expression="[p_contr_id]"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="p_contr_id" DataType="System.String"/>
+  </Dictionary>
+  <ReportPage Name="Page1" Landscape="true" PaperWidth="420.1" PaperHeight="296.9" RawPaperSize="8">
+    <ReportTitleBand Name="ReportTitle1" Width="1512.38" Height="94.5">
+      <TextObject Name="Text1" Width="1048.95" Height="18.9" Text="МД / Акти по імпортному контракту #[p_contr_id]" HorzAlign="Center" Font="Arial, 12pt, style=Bold"/>
+      <TextObject Name="Text15" Left="1209.6" Top="28.35" Width="66.15" Height="66.15" Border.Lines="All" Text="Примітка" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+      <TextObject Name="Text2" Top="28.35" Width="75.6" Height="66.15" Border.Lines="All" Text="Тип" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+      <TextObject Name="Text3" Left="75.6" Top="28.35" Width="94.5" Height="66.15" Border.Lines="All" Text="Номер" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+      <TextObject Name="Text4" Left="170.1" Top="28.35" Width="85.05" Height="66.15" Border.Lines="All" Text="Дата паперового носія" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+      <TextObject Name="Text5" Left="255.15" Top="28.35" Width="85.05" Height="66.15" Border.Lines="All" Text="Дата дозволу" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+      <TextObject Name="Text6" Left="340.2" Top="28.35" Width="47.25" Height="66.15" Border.Lines="All" Text="Валюта" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+      <TextObject Name="Text7" Left="387.45" Top="28.35" Width="113.4" Height="66.15" Border.Lines="All" Text="Сума у валюті МД\акту" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+      <TextObject Name="Text8" Left="500.85" Top="28.35" Width="113.4" Height="66.15" Border.Lines="All" Text="Курс" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+      <TextObject Name="Text9" Left="1067.85" Top="28.35" Width="56.7" Height="66.15" Border.Lines="All" Text="№ реєстру" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+      <TextObject Name="Text10" Left="614.25" Top="28.35" Width="113.4" Height="66.15" Border.Lines="All" Text="Сума у валюті контракту" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+      <TextObject Name="Text11" Left="727.65" Top="28.35" Width="113.4" Height="66.15" Border.Lines="All" Text="Сума пов’язаних платежів" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+      <TextObject Name="Text12" Left="841.05" Top="28.35" Width="113.4" Height="66.15" Border.Lines="All" Text="Заборгованість по платежах у валюті МД\акту" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+      <TextObject Name="Text13" Left="954.45" Top="28.35" Width="113.4" Height="66.15" Border.Lines="All" Text="Заборгованість по платежах у валюті контракту" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+      <TextObject Name="Text14" Left="1124.55" Top="28.35" Width="85.05" Height="66.15" Border.Lines="All" Text="Дата реєстру" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+      <TextObject Name="Text16" Left="1275.75" Top="28.35" Width="75.6" Height="66.15" Border.Lines="All" Text="Номер контракту" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+      <TextObject Name="Text32" Left="1351.35" Top="28.35" Width="85.05" Height="66.15" Border.Lines="All" Text="Дата контракту" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+      <TextObject Name="Text33" Left="1436.4" Top="28.35" Width="75.6" Height="66.15" Border.Lines="All" Text="Референс" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+    </ReportTitleBand>
+    <DataBand Name="Data1" Top="98.5" Width="1512.38" Height="37.8" Border.Lines="All" CanGrow="true" CanShrink="true" DataSource="Table">
+      <TextObject Name="Text17" Width="75.6" Height="37.8" Border.Lines="All" Text="[v.DOC_TYPE]" Font="Times New Roman, 10pt, style=Bold"/>
+      <TextObject Name="Text18" Left="75.6" Width="94.5" Height="37.8" Border.Lines="All" Text="[v.NUM]" Font="Times New Roman, 10pt, style=Bold"/>
+      <TextObject Name="Text19" Left="170.1" Width="85.05" Height="37.8" Border.Lines="All" Text="[v.DOC_DATE]" Format="Date" Format.Format="d" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+      <TextObject Name="Text20" Left="255.15" Width="85.05" Height="37.8" Border.Lines="All" Text="[v.ALLOW_DATE]" Format="Date" Format.Format="d" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+      <TextObject Name="Text21" Left="340.2" Width="47.25" Height="37.8" Border.Lines="All" Text="[v.VT]" Format="Number" Format.UseLocale="true" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+      <TextObject Name="Text22" Left="387.45" Width="113.4" Height="37.8" Border.Lines="All" Text="[v.S_VT]" Format="Number" Format.UseLocale="true" HorzAlign="Right" Font="Times New Roman, 10pt, style=Bold"/>
+      <TextObject Name="Text23" Left="500.85" Width="113.4" Height="37.8" Border.Lines="All" Text="[v.RATE_VK]" Format="Number" Format.UseLocale="true" HorzAlign="Right" Font="Times New Roman, 10pt, style=Bold"/>
+      <TextObject Name="Text24" Left="1067.85" Width="56.7" Height="37.8" Border.Lines="All" Text="[v.FILE_NAME]" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+      <TextObject Name="Text25" Left="614.25" Width="113.4" Height="37.8" Border.Lines="All" Text="[v.S_VK]" Format="Number" Format.UseLocale="true" HorzAlign="Right" Font="Times New Roman, 10pt, style=Bold"/>
+      <TextObject Name="Text26" Left="727.65" Width="113.4" Height="37.8" Border.Lines="All" Text="[v.S_PL_VK]" Format="Number" Format.UseLocale="true" HorzAlign="Right" Font="Times New Roman, 10pt, style=Bold"/>
+      <TextObject Name="Text27" Left="841.05" Width="113.4" Height="37.8" Border.Lines="All" Text="[v.Z_VT]" Format="Number" Format.UseLocale="true" HorzAlign="Right" Font="Times New Roman, 10pt, style=Bold"/>
+      <TextObject Name="Text28" Left="954.45" Width="113.4" Height="37.8" Border.Lines="All" Text="[v.Z_VK]" Format="Number" Format.UseLocale="true" HorzAlign="Right" Font="Times New Roman, 10pt, style=Bold"/>
+      <TextObject Name="Text29" Left="1124.55" Width="85.05" Height="37.8" Border.Lines="All" Text="[v.FILE_DATE]" Format="Date" Format.Format="d" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+      <TextObject Name="Text30" Left="1209.6" Width="66.15" Height="37.8" Border.Lines="All" Text="[v.COMMENTS]" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+      <TextObject Name="Text31" Left="1436.4" Width="75.6" Height="37.8" Border.Lines="All" Text="[v.BOUND_ID]" Format="Number" Format.UseLocale="true" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+      <TextObject Name="Text34" Left="1275.75" Width="75.6" Height="37.8" Border.Lines="All" Text="[v.CONTRACT_NUM]" Font="Times New Roman, 10pt, style=Bold"/>
+      <TextObject Name="Text35" Left="1351.35" Width="85.05" Height="37.8" Border.Lines="All" Text="[v.CONTRACT_DATE]" Format="Date" Format.Format="d" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+    </DataBand>
+    <ReportSummaryBand Name="ReportSummary1" Top="140.3" Width="1512.38" Height="37.8">
+      <TextObject Name="Text36" Width="1512" Height="37.8"/>
+    </ReportSummaryBand>
+  </ReportPage>
+</Report>

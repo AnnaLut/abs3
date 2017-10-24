@@ -1,0 +1,33 @@
+﻿@{
+  Layout = "~/Views/Shared/_LayoutExt.cshtml";
+}
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<script>
+    var tableId = "@ViewBag.TableId";
+    /* Table Modes List by META_ACCESS_CODES table 
+    0 - Update + Insert + Delete
+    1 - Read Only
+    2 - Update
+    3 - Insert
+    4 - Delete
+    5 - Update + Insert
+    6 - Update + Delete
+    7 - Insert + Delete
+    */
+    var tableMode = "@ViewBag.TableMode";
+    var conditions = "@Html.Raw(@ViewBag.Conditions)";
+    var sqlProc = "@Html.Raw(@ViewBag.sqlProc)";
+    var base64jsonSqlProcParams = "@Html.Raw(@ViewBag.base64jsonSqlProcParams)";
+    var CodeOper = "@ViewBag.CodeOper";
+    var sParColumn = "@ViewBag.sParColumn";
+    var isFuncOnly = "@ViewBag.isFuncOnly";
+    var nativeTabelId = "@ViewBag.nativeTabelId";
+    var nsiTableId = "@ViewBag.nsiTableId";
+    var nsiFuncId = "@ViewBag.nsiFuncId";
+    var filterCode = "@ViewBag.filterCode";
+    var hasCallbackFunction = "@ViewBag.hasCallbackFunction";
+    var getFiltersOnly = "@ViewBag.getFiltersOnly";
+</script>
+<script src="@Url.Content("~/Areas/Ndi/Scripts/ReferenceGrid.js")"></script>
+
+

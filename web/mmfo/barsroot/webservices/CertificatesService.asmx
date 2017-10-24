@@ -1,0 +1,1 @@
+<%@ WebService Language="C#" CodeBehind="~/App_Code/webservices/CertificatesService.cs" Class="Bars.Certificates.CertificatesService" %>

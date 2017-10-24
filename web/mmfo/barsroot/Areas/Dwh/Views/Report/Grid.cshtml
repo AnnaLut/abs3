@@ -1,0 +1,39 @@
+﻿@{
+    Layout = null;
+}
+@model GridMvc<V_DWH_REPORTS>
+    @helper ControlButtons(V_DWH_REPORTS report)
+{  
+    <div class="action-buttons">
+        <a class="green" title="@ReportResource.GetReport" href="@Url.Content("~/Dwh/report/display/" + report.ID)" onclick='reportsModule.setReportId("@report.ID");reportsModule.setReportType("@report.TYPE_VALUE");reportsModule.showReport(this); return false;' data-params="@report.PARAMS">
+            <i class="icon-gear bigger-130"></i>
+        </a>
+    </div>
+}
+    @Html.Grid(Model).Named("ReportsGrid").Columns(columns =>
+{
+    columns.Add()
+        .Encoded(false)
+        .Sanitized(false)
+        .SetWidth(110)
+        .RenderValueAs(o => ControlButtons(o));
+    columns.Add(o => o.ID)
+        .Encoded(false)
+        .Sanitized(false)
+        .Titled(ReportResource.Id)
+        .SetWidth(100);
+    columns.Add(o => o.NAME)
+        .Encoded(false)
+        .Sanitized(false)
+        .Titled(ReportResource.Name);
+    columns.Add(o => o.TYPE_NAME)
+        .Encoded(false)
+        .Sanitized(false)
+        .Titled(ReportResource.Type);
+    columns.Add(o => o.DESCRIPTION)
+        .Encoded(false)
+        .Sanitized(false)
+        .Titled(ReportResource.Description);
+    columns.Add(o => o.PARAMS)
+        .Css("hidden");
+}).WithPaging(10).Sortable().Filterable().WithMultipleFilters()

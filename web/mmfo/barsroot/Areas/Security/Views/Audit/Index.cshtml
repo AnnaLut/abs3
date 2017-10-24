@@ -1,0 +1,133 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = "Журнал подій банківського комплексу";
+}
+<style>
+    #gridAudit th {
+        white-space: normal;
+    }
+</style>
+
+<h2>@ViewBag.Title</h2>
+
+<div id="gridAudit">
+
+</div>
+
+<script>
+    $("#gridAudit").kendoGrid({
+        selectable: "row",
+        sortable: true,
+        filterable: true,
+        resizable: true,
+        pageable: {
+            refresh: true,
+            pageSizes: true,
+            buttonCount: 5
+        },
+        columns: [
+            {
+                field: "Id",
+                title: "ІД",
+                width: "70px",
+                filterable: {
+                    ui: function (element) {
+                        element.kendoNumericTextBox({
+                            format: "n0"
+                        });
+                    }
+                }
+            },
+            {
+                field: "Type",
+                title: "Тип події",
+                width: "80px"
+            },
+            {
+                field: "BankDate",
+                title: "Банківська дата",
+                width: "80px",
+                template: "<div style='text-align:right;'>#=BankDate == null ? '' : kendo.toString(BankDate,'dd/MM/yyyy')#</div>"
+            },
+            {
+                field: "SystemDate",
+                title: "Дата події",
+                width: "150px",
+                template: "<div style='text-align:right;'>#=SystemDate == null ? '' : kendo.toString(SystemDate,'dd/MM/yyyy HH:mm:ss')#</div>",
+                filterable: {
+                    ui: function (element) {
+                        element.kendoDateTimePicker({
+                            format: "dd/MM/yyyy HH:mm:ss",
+                            timeFormat: "HH:mm:ss"
+                        });
+                    }
+                }
+            },
+            {
+                field: "Message",
+                title: "Повідомлення",
+                width: "500px"
+            },
+            {
+                field: "UserName",
+                title: "Користувач",
+                width: "100px"
+            },
+            {
+                field: "Machine",
+                title: "Робоча станція",
+                width: "150px"
+            },
+            {
+                field: "UserProxy",
+                title: "Ім'я proxy-користувача",
+                width: "100px"
+            },
+            {
+                field: "Module",
+                title: "Модуль комплексу",
+                width: "100px"
+            },
+            {
+                field: "Object",
+                title: "Створив повідомлення",
+                width: "100px"
+            },
+            {
+                field: "Branch",
+                title: "Відділення",
+                width: "100px"
+            }
+
+        ],
+        dataSource: {
+            type: 'webapi',
+            transport: {
+                read: {
+                    dataType: 'json',
+                    url: bars.config.urlContent('/api/v1/security/secaudit')
+                }
+            },
+            schema: {
+                data: "Data",
+                total: "Total",
+                errors: "Errors",
+                model: {
+                    fields: {
+                        Id: { type: "number" },
+                        SystemDate: { type: "date" },
+                        BankDate: { type: "date" }
+                    }
+                }
+            },
+            sort: {
+                field: "Id",
+                dir: "desc"
+            },
+            serverPaging: true,
+            serverSorting: true,
+            serverFiltering: true,
+            pageSize: 10
+        }
+    });
+</script>

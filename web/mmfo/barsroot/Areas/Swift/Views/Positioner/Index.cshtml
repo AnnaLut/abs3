@@ -1,0 +1,37 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+}
+
+<script src="~/lib/jsZip/jszip.js"></script>
+<script src="~/Scripts/respond.min.js"></script>
+<script src="~/Areas/Swift/Scripts/KendoCommon.js"></script>
+<script src="~/Areas/Swift/Scripts/Positioner/Positioner.js"></script>
+<link rel="stylesheet" href="~/Areas/Swift/Css/Swift/Main.css" />
+<link rel="stylesheet" href="~/Areas/Swift/Css/Swift/Positioner.css" />
+
+<h3 id="title"></h3>
+<hr />
+
+<label>ДОКУМЕНТИ</label>
+<div id="gridMain"></div>
+<div class="search-main"></div>
+<label>КОРРАХУНКИ</label>
+<div id="gridCorrespondent"></div>
+
+<script type="text/x-kendo-template" id="gridCorrespondent-template">
+    <div class="toolbar">
+        <table border="1">
+            <tr>
+                <td width="200px">
+                    Рахунки: 
+                    <input onclick="onClicRadio(this)" type="radio" name="gender" value="1" checked> Активні 
+                    <input onclick="onClicRadio(this)" type="radio" name="gender" value="2"> Пасивні
+                </td>                
+                <td>
+                    <label for="chbxISO">ISO </label>
+                    <input id="chbxISO" type="checkbox" onclick="onClicCheckBox(this)" style="width: 25px" />
+                </td>
+            </tr>
+        </table>
+    </div>
+</script>

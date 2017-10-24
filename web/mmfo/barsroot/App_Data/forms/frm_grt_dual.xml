@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<xmlform caption="Картка договору забезпечення">
+  <!--#include(frm_grt_deal_tabs_inc.xml)-->
+  <customforms>
+    <customform name="frmV_GRT_DUAL" buttonsposition="Top" title="Гарантії"  tabindex="0">
+      <buttons defaulttype="Button">
+        <!--#include(frm_grt_btnback_inc.xml)-->
+      </buttons>
+      <!--#include(frm_grt_dual_ds_inc.xml)-->
+      <customfields>
+        <!--#include(frm_grt_deal_inc.xml)-->
+      </customfields>
+    </customform>
+  </customforms>
+  <!--#include(frm_grt_crd_deals_inc.xml)-->
+</xmlform>

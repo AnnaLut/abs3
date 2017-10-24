@@ -1,0 +1,288 @@
+set serveroutput on
+
+declare
+
+  type t_rec_extrnval is record (
+    tabid            meta_extrnval.tabid%type,
+    colid            meta_extrnval.colid%type,
+    srccolname       meta_columns.colname%type,
+    tab_alias        meta_extrnval.tab_alias%type,
+    tab_cond         meta_extrnval.tab_cond%type,
+    src_cond         meta_extrnval.src_cond%type,
+    col_dyn_tabname  varchar2(30));
+  type t_tab_extrnval is table of t_rec_extrnval;
+  l_extrnval     t_tab_extrnval := t_tab_extrnval();
+
+  type t_rec_browsetbl is record (
+    hosttabid   meta_browsetbl.hosttabid%type,
+    hostcolid   meta_browsetbl.hostcolkeyid%type,
+    addcolname  meta_columns.colname%type,
+    varcolname  meta_columns.colname%type,
+    addtabalias meta_browsetbl.addtabalias%type,
+    cond_tag    meta_browsetbl.cond_tag%type);
+  type t_tab_browsetbl is table of t_rec_browsetbl;
+  l_browsetbl    t_tab_browsetbl := t_tab_browsetbl();
+
+  type t_rec_filtertbl is record (
+    tabid       meta_filtertbl.tabid%type,
+    colid       meta_filtertbl.colid%type,
+    fltcode     meta_filtertbl.filter_code%type,
+    flag_ins    meta_filtertbl.flag_ins%type,
+    flag_del    meta_filtertbl.flag_del%type,
+    flag_upd    meta_filtertbl.flag_upd%type);
+  type t_tab_filtertbl is table of t_rec_filtertbl;
+  l_filtertbl    t_tab_filtertbl := t_tab_filtertbl();
+
+  type t_rec_dependency is record (
+    id               meta_dependency_cols.id%type,
+    tabid            meta_dependency_cols.tabid%type,
+    colid            meta_dependency_cols.colid%type,
+    event            meta_dependency_cols.event%type,
+    depcolid         meta_dependency_cols.depcolid%type,
+    action_type      meta_dependency_cols.action_type%type,
+    action_name      meta_dependency_cols.action_name%type,
+    default_value    meta_dependency_cols.default_value%type,
+    condition        meta_dependency_cols.condition%type);
+  type t_tab_dependency is table of t_rec_dependency;
+  l_dependency     t_tab_dependency := t_tab_dependency();
+
+  l_tabid        meta_tables.tabid%type;
+  l_tabname      meta_tables.tabname%type;
+  l_tabsemantic  meta_tables.semantic%type;
+  l_tablinesdef  varchar2(16);
+  l_newtabid     meta_tables.tabid%type;
+  l_newcolid     meta_columns.colid%type;
+  l_varcolid     meta_columns.colid%type;
+  l_colname      meta_columns.colname%type;
+
+begin
+
+  l_tabsemantic := 'V_CP_OBU8';
+  l_tablinesdef := '';
+  l_tabname     := 'V_CP_OBU8';
+
+  -- получаем код таблицы
+  l_tabid := bars_metabase.get_tabid(l_tabname);
+
+  -- если таблица не описана в БМД
+  if l_tabid is null then
+
+    -- получаем код для новой таблицы
+    l_tabid := bars_metabase.get_newtabid();
+
+    -- добавляем описание таблицы в БМД
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+
+  -- если таблица описана в БМД
+  else
+
+    -- обновляем семантику таблицы
+    bars_metabase.set_tabsemantic(l_tabid, l_tabsemantic);
+
+    -- обновляем linesdef таблицы
+    bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
+    select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
+      bulk collect
+      into l_extrnval
+      from meta_extrnval e, meta_columns c
+     where e.srctabid = l_tabid
+       and e.srctabid = c.tabid and e.srccolid = c.colid;
+
+    -- сохраняем ссылки для условий фильтра полей других таблиц на поля нашей таблицы
+    select b.hosttabid, b.hostcolkeyid, c.colname, v.colname, b.addtabalias, v.semantic
+      bulk collect
+      into l_browsetbl
+      from meta_browsetbl b, meta_columns c, meta_columns v
+     where b.addtabid = l_tabid
+       and b.addtabid = c.tabid and b.addcolkeyid = c.colid
+       and b.addtabid = v.tabid and b.var_colid = v.colid;
+
+    -- сохраняем ссылки полей других таблиц на нашу вложенную таблицу
+    select tabid, colid, filter_code, flag_ins, flag_del, flag_upd
+      bulk collect
+      into l_filtertbl
+      from meta_filtertbl
+     where filter_tabid = l_tabid and tabid <> l_tabid;
+
+    -- сохраняем зависимости между колонками таблицы
+    select id, tabid, colid, event, depcolid, action_type, action_name, default_value, condition
+      bulk collect
+      into l_dependency
+      from meta_dependency_cols
+     where tabid = l_tabid;
+
+    -- удаляем описание полей
+    bars_metabase.delete_metatables(l_tabid);
+
+  end if;
+
+  -- добавляем описание полей
+  bars_metabase.add_column(l_tabid, 1, 'AUKCION', 'C', 'CF008_008~AUKCION', null, 15, 8, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'BV1', 'N', 'CF008_011~бал. варт-ть~BV1', null, 22, 11, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'BV31', 'N', 'CF008_053~бал. варт-ть~BV31', null, 22, 53, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'CENA', 'N', 'ціна...~CENA', null, 22, 9, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'CENA0', 'N', 'CF008_012~ціна придбання~CENA0', null, 22, 12, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'CENA_K2', 'N', 'CF008_022~ціна купл.~CENA_K2', null, 22, 22, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'CENA_P2', 'N', 'CF008_031~ціна продажу~CENA_P2', null, 22, 31, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'CF008_019', 'N', 'CF008_019', null, 22, 19, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'CF008_023', 'C', 'CF008_023', null, 1, 23, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'CF008_028', 'C', 'CF008_028', null, 1, 28, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'CF008_042', 'D', 'CF008_042~DATA_AFERTY', null, 10, 42, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'CF008_045', 'C', 'CF008_045', null, 30, 45, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'CF008_055', 'C', 'CF008_055', null, 5, 55, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'CF008_056', 'N', 'CF008_056', null, 22, 56, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'CF008_057', 'N', 'CF008_057', null, 22, 57, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'CF008_058', 'N', 'CF008_058', null, 22, 58, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'CF008_059', 'C', 'CF008_059', null, 3, 59, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 21, 'CF008_060', 'N', 'CF008_060', null, 22, 60, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 22, 'CF008_061', 'C', 'CF008_061', null, 3, 61, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 23, 'CF008_062', 'C', 'CF008_062', null, 20, 62, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 24, 'CF008_063', 'N', 'CF008_063', null, 22, 63, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 25, 'CF008_065', 'C', 'CF008_065', null, 14, 65, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 26, 'CF008_066', 'C', 'CF008_066', null, 50, 66, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 27, 'D0', 'N', 'дисконт~D0', null, 22, 76, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 28, 'D1', 'N', 'CF008_016~дисконт~D1', null, 22, 16, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 29, 'D2', 'N', 'CF008_0..~дисконт~D2', null, 22, 33, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 30, 'D31', 'N', 'CF008_037~дисконт~D31', null, 22, 37, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 32, 'DAT_4', 'D', 'дата~DAT_4', null, 10, 95, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 33, 'DAT_IR', 'D', 'CF008_043~DAT_IR', null, 10, 43, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 34, 'DAT_K', 'D', 'CF008_009~дата куп-лі~DAT_K', null, 10, 9, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 35, 'DAT_K2', 'D', 'CF008_024~дата придбання~DAT_K2', null, 10, 24, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 36, 'DAT_KOT', 'D', 'CF008_046~дата~DAT_KOT', null, 10, 46, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 37, 'DAT_P', 'D', 'CF008_...~дата прод~DAT_P', null, 10, 29, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 38, 'DAT_P2', 'D', 'CF008_029~дата прод~DAT_P2', null, 10, 29, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 39, 'DAT_P4', 'D', 'CF008_047~дата~DAT_P4', null, 10, 47, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 40, 'DAT_PG', 'D', 'CF008_041~дата погаш.~DAT_PG', null, 10, 41, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 41, 'DAT_R', 'D', '~DAT_R', null, 10, 70, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 42, 'DNK', 'D', 'CF008_064~DNK', null, 10, 64, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 43, 'D_K', 'C', 'D_K', null, 1, 70, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 44, 'EMI', 'C', 'CF008_006~тип ем-та~EMI', null, 50, 6, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 45, 'FL', 'S', 'FL', null, 22, 90, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 46, 'ID', 'S', 'ID', null, 22, 70, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 48, 'IR31', 'N', 'CF008_040~% ставка~IR31', null, 22, 40, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 49, 'ISIN', 'C', 'ISIN-код', null, 20, 2, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 50, 'KL0', 'S', 'кількість~KL0', null, 22, 75, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 51, 'KL1', 'N', 'CF008_013~к-ть на 1/01/12~KL1', null, 22, 13, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 53, 'KL2_P', 'N', 'к-ть прод~KL2_P', null, 22, 27, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 54, 'KL31', 'N', 'CF008_034~кількість ~KL31', null, 22, 34, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 57, 'KOT31', 'N', 'CF008_044~котирування~KOT31', null, 22, 44, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 58, 'KV', 'S', 'CF008_067~валюта~KV', null, 22, 3, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 59, 'N0', 'S', 'CF008_...~номінал~N0', null, 22, 75, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 60, 'N1', 'S', 'CF008_014~номінал~N1', null, 22, 14, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 61, 'N2', 'S', 'CF008_020~номінал куплено~N2', null, 22, 20, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 62, 'N2_P', 'S', 'CF008_026~номінал продано~N2_P', null, 22, 26, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 63, 'N31', 'S', 'CF008_035~номінал~N31', null, 22, 35, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 64, 'N4', 'S', 'номінал~N4', null, 22, 95, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 66, 'NBS_OLD', 'S', 'CF008_001~NBS', null, 22, 1, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 67, 'NLS', 'C', 'NLS', null, 15, 70, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 68, 'NLS_P', 'C', 'new_nls~NLS_P', null, 15, 85, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 69, 'NLS_P1', 'C', 'new_nls.~NLS_P1', null, 15, 90, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 70, 'NLS_S', 'C', 'NLS_S', null, 15, 90, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 71, 'NMS', 'C', 'назва рах-ку~NMS', null, 38, 90, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 72, 'NM_POK', 'C', 'CF008_030~покупець~NM_POK', null, 50, 30, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 73, 'NM_POK4', 'C', 'CF008_049~покупець~NM_POK4', null, 50, 49, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 74, 'NM_PROD', 'C', 'CF008_010~продавець~NM_PROD', null, 50, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 75, 'NM_PROD2', 'C', 'CF008_025~назва продавця~NM_PROD2', null, 50, 25, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 76, 'OKPO', 'C', 'CF008_007~Код ЄДРПОУ~OKPO', null, 8, 7, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 78, 'OST_P', 'N', 'залишок~new_nls~OST_P', null, 22, 86, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 80, 'OST_V', 'N', 'залишок~на 1/01/12~OST_V', null, 22, 15, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 84, 'P0', 'N', 'премія~P0', null, 22, 76, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 85, 'P1', 'N', 'CF008_016~премія~P1', null, 22, 16, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 86, 'P2', 'N', 'премія~P2', null, 22, 33, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 87, 'P31', 'N', 'CF008_037~премія~P31', null, 22, 37, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 89, 'PAP', 'S', 'PAP', null, 22, 80, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 90, 'PF_NEW', 'S', 'PF_NEW', null, 22, 80, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 91, 'PF_OLD', 'S', 'CF008_004~код портфеля~PF_OLD', null, 22, 3, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 92, 'PV31', 'S', 'CF008_054~спр. вартість~PV31', null, 22, 54, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 93, 'R0', 'N', 'купон~R0', null, 22, 76, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 94, 'R1', 'N', 'CF008_015~купон~R1', null, 22, 15, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 95, 'R2', 'N', 'CF008_032~купон~R2', null, 22, 32, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 96, 'R31', 'N', 'CF008_036~купон~R31', null, 22, 36, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 97, 'R4', 'N', 'купон~R4', null, 22, 95, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 98, 'REF', 'S', 'REF~ реф-с куп-лі~bay', null, 22, 27, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 99, 'REF2', 'S', 'REF2~ sale/move', null, 22, 27, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 100, 'REPO', 'C', 'CF008_002~REPO', null, 5, 2, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 101, 'S0', 'N', 'переоцінка~S0', null, 22, 76, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 102, 'S1', 'N', 'CF008_018~переоцінка~S1', null, 22, 18, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 104, 'S31', 'N', 'CF008_038~зал-к переоцінки~S31', null, 22, 38, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 107, 'S_C', 'N', 'S_C', null, 22, 85, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 112, 'S_CP', 'N', 'S_CP', null, 22, 85, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 117, 'S_D', 'N', 'S_D', null, 22, 90, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 122, 'KL_K2', 'N', 'CF008_021~к-ть куплено~KL_K2', null, 22, 21, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 127, 'TR1_31', 'N', 'CF008_031~TR1_31', null, 22, 31, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 128, 'USERID', 'S', 'USERID', null, 22, 70, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 129, 'VID_R', 'C', 'VID_R', null, 2, 80, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 130, 'Z1', 'N', 'CF008_017~резерв~Z1', null, 22, 17, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 131, 'Z31', 'N', 'CF008_039~резерв~Z31', null, 22, 39, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 132, 'KL4', 'S', 'CF008_050~к-ть продано~KL4', null, null, 50, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 133, 'S2', 'C', 'CF008_033~переоцінка~S2', null, null, 33, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+
+  -- добавляем описание сортировки
+  bars_metabase.add_sortorder(l_tabid, 98, 1, 'ASC ');
+
+  -- очищаем описание функций на справочник
+  bars_metabase.delete_nsifunction(l_tabid);
+
+  -- восстанавливаем ссылки сложных полей других таблиц
+  for i in 1..l_extrnval.count loop
+    l_newcolid := bars_metabase.get_colid(l_tabid, l_extrnval(i).srccolname);
+    if (l_newcolid is not null) then
+      bars_metabase.add_extrnval(
+        l_extrnval(i).tabid,
+        l_extrnval(i).colid,
+        l_tabid,
+        l_newcolid,
+        l_extrnval(i).tab_alias,
+        l_extrnval(i).tab_cond,
+        l_extrnval(i).src_cond,
+        l_extrnval(i).col_dyn_tabname);
+    end if;
+  end loop;
+
+  -- восстанавливаем ссылки полей для условий фильтра других таблиц
+  for i in 1..l_browsetbl.count loop
+    l_newcolid := bars_metabase.get_colid(l_tabid, l_browsetbl(i).addcolname);
+    l_varcolid := bars_metabase.get_colid(l_tabid, l_browsetbl(i).varcolname);
+    if (l_newcolid is not null and l_varcolid is not null) then
+      bars_metabase.add_browsetbl( 
+        l_browsetbl(i).hosttabid,
+        l_tabid,
+        l_browsetbl(i).addtabalias,
+        l_browsetbl(i).hostcolid,
+        l_newcolid,
+        l_varcolid,
+        l_browsetbl(i).cond_tag);
+    end if;
+  end loop;
+
+  -- восстанавливаем ссылки полей других таблиц на нашу вложенную таблицу
+  for i in 1..l_filtertbl.count loop
+    bars_metabase.add_filtertbl(
+      l_filtertbl(i).tabid,
+      l_filtertbl(i).colid,
+      l_tabid,
+      l_filtertbl(i).fltcode,
+      l_filtertbl(i).flag_ins,
+      l_filtertbl(i).flag_del,
+      l_filtertbl(i).flag_upd);
+  end loop;
+
+  -- восстанавливаем зависимости между колонками таблицы
+  for i in 1..l_dependency.count loop
+    bars_metabase.add_dependency(
+      l_dependency(i).tabid,
+      l_dependency(i).colid,
+      l_dependency(i).event ,
+      l_dependency(i).depcolid  ,
+      l_dependency(i).action_type ,
+      l_dependency(i).action_name ,
+      l_dependency(i).default_value ,
+      l_dependency(i).condition );
+  end loop;
+
+end;
+/
+
+commit;
