@@ -1,0 +1,116 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="01/27/2017 16:18:32" ReportInfo.Modified="01/27/2017 17:11:26" ReportInfo.CreatorVersion="2014.3.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlq8+HCsj5mnfc2oQWOJAI1rOWOGv68sBpiXMxVx5dIqE7fZmMxoAeKqIz2gmiyZm0SrJWp1Cvo7PmDGqGdm82FHw==">
+      <TableDataSource Name="Table" Alias="Head" DataType="System.Int32" Enabled="true" SelectCommand="select fio from staff$base where id = user_id">
+        <Column Name="FIO" DataType="System.String"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqEjIkLfv5KVDVMQxm1pETYi2439uNkJphU7VV/DPLnHyGuoC1m6O406X9U6JZ3ZCCxUdPaCpbcXnsiZFUu56MwQ==">
+      <TableDataSource Name="Table2" Alias="DCP_P" DataType="System.Int32" Enabled="true" SelectCommand="SELECT DCP_P.MFOA as MFOA,    DCP_P.MDOA as MDOA,   DCP_P.MFOB as MFOB,  &#13;&#10;                                    DCP_P.MDOB as MDOB,   DCP_P.NLSB as NLSB, &#13;&#10;                                    DCP_P.OKPOB as OKPOB,   DCP_P.S / 100 as S,  DCP_P.ID_UG as ID_UG,&#13;&#10;                                    DCP_P.DAT_UG as DAT_UG, DCP_P.OZN_SP as OZN_SP, &#13;&#10;                                    DCP_P.FN as FN, substr(b.nb, 1, 38) as NAMB, DCP_P.acc as ACC,   &#13;&#10;                                    DCP_P.ID as ID, DCP_P.ref as REF, &#13;&#10;                                    DCP_P.OKPOA as OKPOA,   DCP_P.N_UG as N_UG,   DCP_P.D_UG as D_UG, &#13;&#10;                                                (SELECT nls FROM accounts WHERE acc=DCP_P.ACC) as NLSA,&#13;&#10;                                                (SELECT substr(nms,1,38) FROM accounts WHERE acc=DCP_P.ACC) as NAMA&#13;&#10;                                  FROM DCP_P, banks b&#13;&#10;                                  WHERE DCP_P.mfob = b.mfo&#13;&#10;ORDER BY DCP_P.MFOB, DCP_P.FN">
+        <Column Name="MFOA" DataType="System.String"/>
+        <Column Name="MDOA" DataType="System.String"/>
+        <Column Name="MFOB" DataType="System.String"/>
+        <Column Name="MDOB" DataType="System.String"/>
+        <Column Name="NLSB" DataType="System.String"/>
+        <Column Name="OKPOB" DataType="System.String"/>
+        <Column Name="S" DataType="System.Decimal"/>
+        <Column Name="ID_UG" DataType="System.String"/>
+        <Column Name="DAT_UG" DataType="System.DateTime"/>
+        <Column Name="OZN_SP" DataType="System.String"/>
+        <Column Name="FN" DataType="System.String"/>
+        <Column Name="NAMB" DataType="System.String"/>
+        <Column Name="ACC" DataType="System.Decimal"/>
+        <Column Name="ID" DataType="System.Decimal"/>
+        <Column Name="REF" DataType="System.Decimal"/>
+        <Column Name="OKPOA" DataType="System.String"/>
+        <Column Name="N_UG" DataType="System.String"/>
+        <Column Name="D_UG" DataType="System.DateTime"/>
+        <Column Name="NLSA" DataType="System.String"/>
+        <Column Name="NAMA" DataType="System.String"/>
+      </TableDataSource>
+    </OracleDataConnection>
+  </Dictionary>
+  <ReportPage Name="Page1" Landscape="true" PaperWidth="297" PaperHeight="210">
+    <PageHeaderBand Name="PageHeader1" Width="1047.06" Height="28.35"/>
+    <DataBand Name="Data1" Top="32.35" Width="1047.06" Height="141.75" DataSource="Table">
+      <TextObject Name="Text3" Left="18.9" Top="47.25" Width="642.6" Height="18.9" Text="Дата і час друку: [FormatDateTime([Date],&quot;dd/MM/yyyy hh:mm:ss&quot;)]"/>
+      <TextObject Name="Text2" Left="18.9" Top="28.35" Width="642.6" Height="18.9" Text="Пользователь: [Head.FIO]"/>
+      <TextObject Name="Text1" Left="18.9" Top="9.45" Width="642.6" Height="18.9" Text="АТ &quot;ОЩАДБАНК&quot;&#13;&#10;"/>
+      <TableObject Name="Table1" Left="18.9" Top="85.05" Width="1011.15" Height="56.7">
+        <TableColumn Name="Column1" Width="56.7"/>
+        <TableColumn Name="Column2" Width="56.7"/>
+        <TableColumn Name="Column3" Width="56.7"/>
+        <TableColumn Name="Column4"/>
+        <TableColumn Name="Column5" Width="56.7"/>
+        <TableColumn Name="Column6" Width="56.7"/>
+        <TableColumn Name="Column7" Width="56.7"/>
+        <TableColumn Name="Column8" Width="75.6"/>
+        <TableColumn Name="Column9"/>
+        <TableColumn Name="Column10"/>
+        <TableColumn Name="Column11" Width="75.6"/>
+        <TableColumn Name="Column12" Width="56.7"/>
+        <TableColumn Name="Column13"/>
+        <TableColumn Name="Column14"/>
+        <TableColumn Name="Column15"/>
+        <TableColumn Name="Column16"/>
+        <TableRow Name="Row1" Height="56.7">
+          <TableCell Name="Cell1" Border.Lines="All" Text="МФО А" VertAlign="Center"/>
+          <TableCell Name="Cell2" Border.Lines="All" Text="МДО А" VertAlign="Center"/>
+          <TableCell Name="Cell3" Border.Lines="All" Text="Рахунок А" VertAlign="Center"/>
+          <TableCell Name="Cell4" Border.Lines="All" Text="Платник" VertAlign="Center"/>
+          <TableCell Name="Cell5" Border.Lines="All" Text="ОКПО А" VertAlign="Center"/>
+          <TableCell Name="Cell26" Border.Lines="All" Text="МФО Б" VertAlign="Center"/>
+          <TableCell Name="Cell27" Border.Lines="All" Text="МДО Б" VertAlign="Center"/>
+          <TableCell Name="Cell28" Border.Lines="All" Text="Рахунок Б" VertAlign="Center"/>
+          <TableCell Name="Cell29" Border.Lines="All" Text="Отримувач" VertAlign="Center"/>
+          <TableCell Name="Cell30" Border.Lines="All" Text="ОКПО Б" VertAlign="Center"/>
+          <TableCell Name="Cell31" Border.Lines="All" Text="Сума пл." VertAlign="Center"/>
+          <TableCell Name="Cell32" Border.Lines="All" Text="Номер оплати" VertAlign="Center"/>
+          <TableCell Name="Cell33" Border.Lines="All" Text="Дата розр." VertAlign="Center"/>
+          <TableCell Name="Cell34" Border.Lines="All" Text="Номер угоди" VertAlign="Center"/>
+          <TableCell Name="Cell35" Border.Lines="All" Text="Дата угоди" VertAlign="Center"/>
+          <TableCell Name="Cell36" Border.Lines="All" Text="Файл &amp;P" VertAlign="Center"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+    <DataBand Name="Data2" Top="178.1" Width="1047.06" Height="85.05" DataSource="Table2">
+      <TableObject Name="Table3" Left="18.9" Width="1011.15" Height="85.05">
+        <TableColumn Name="Column17" Width="56.7"/>
+        <TableColumn Name="Column18" Width="56.7"/>
+        <TableColumn Name="Column19" Width="56.7"/>
+        <TableColumn Name="Column20"/>
+        <TableColumn Name="Column21" Width="56.7"/>
+        <TableColumn Name="Column22" Width="56.7"/>
+        <TableColumn Name="Column23" Width="56.7"/>
+        <TableColumn Name="Column24" Width="75.6"/>
+        <TableColumn Name="Column25"/>
+        <TableColumn Name="Column26"/>
+        <TableColumn Name="Column27" Width="75.6"/>
+        <TableColumn Name="Column28" Width="56.7"/>
+        <TableColumn Name="Column29"/>
+        <TableColumn Name="Column30"/>
+        <TableColumn Name="Column31"/>
+        <TableColumn Name="Column32"/>
+        <TableRow Name="Row2" Height="85.05">
+          <TableCell Name="Cell37" Border.Lines="All" Text="[DCP_P.MFOA]" VertAlign="Center"/>
+          <TableCell Name="Cell38" Border.Lines="All" Text="[DCP_P.MDOA]" VertAlign="Center"/>
+          <TableCell Name="Cell39" Border.Lines="All" Text="[DCP_P.NLSA]" VertAlign="Center"/>
+          <TableCell Name="Cell40" Border.Lines="All" Text="[DCP_P.NAMB]" VertAlign="Center"/>
+          <TableCell Name="Cell41" Border.Lines="All" Text="[DCP_P.OKPOA]" VertAlign="Center"/>
+          <TableCell Name="Cell62" Border.Lines="All" Text="[DCP_P.MFOB]" VertAlign="Center"/>
+          <TableCell Name="Cell63" Border.Lines="All" Text="[DCP_P.MDOB]" VertAlign="Center"/>
+          <TableCell Name="Cell64" Border.Lines="All" Text="[DCP_P.NLSB]" VertAlign="Center"/>
+          <TableCell Name="Cell65" Border.Lines="All" Text="[DCP_P.NAMA]" VertAlign="Center"/>
+          <TableCell Name="Cell66" Border.Lines="All" Text="[DCP_P.OKPOB]" VertAlign="Center"/>
+          <TableCell Name="Cell67" Border.Lines="All" Text="[DCP_P.S]" VertAlign="Center"/>
+          <TableCell Name="Cell68" Border.Lines="All" Text="[DCP_P.ID_UG]" VertAlign="Center"/>
+          <TableCell Name="Cell69" Border.Lines="All" Text="[DCP_P.DAT_UG]" VertAlign="Center"/>
+          <TableCell Name="Cell70" Border.Lines="All" Text="[DCP_P.N_UG]" VertAlign="Center"/>
+          <TableCell Name="Cell71" Border.Lines="All" Text="[DCP_P.D_UG]" VertAlign="Center"/>
+          <TableCell Name="Cell72" Border.Lines="All" Text="[DCP_P.FN]" VertAlign="Center"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+  </ReportPage>
+</Report>

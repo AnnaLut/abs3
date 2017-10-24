@@ -1,0 +1,53 @@
+@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+}
+<script>
+    var rnk = parseInt(@Session["rnk"]);
+</script>
+<script src="~/Areas/Crkr/Scripts/DepositProfile/replenishment.js"></script>
+<link rel="stylesheet" href="~/Areas/Crkr/Content/index.css" />
+
+<div class="container-fluid">
+    <div class="form-horizontal">
+        <form id="addDepo">
+            <div class="col-xs-8">
+                <div class="form-group">
+                    <label for="fromDepo" class="col-xs-4 control-label">На вклад:</label>
+                    <div class="col-xs-8">
+                        <input type="text" class="k-textbox" id="fromDepo" name="fromDepo" placeholder="На вкладу" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="toDepo" class="col-xs-4 control-label">З вкладу:</label>
+                    <div class="col-xs-8">
+                        <input type="text" class="k-textbox" id="toDepo" name="toDepo" placeholder="З вкладу" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="persent" class="col-xs-4 control-label">Відсоток:</label>
+                    <div class="col-xs-4">
+                        <input type="number" class="k-textbox" id="persent" name="amount" placeholder="Відсоток" validationMessage="Введіть відсоток поповнення" pattern="^(\d+)"/>
+                    </div>
+                    <div class="col-xs-4">
+                        <input type="number" class="k-textbox" id="amount" name="persent" placeholder="Сумма" required validationMessage="Введіть сумму поповнення" pattern="^(\d.+)"/>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-4">
+                <div class="form-group">
+                    <div class="col-xs-4"></div>
+                    <button type="button" class="k-button" id="add" style="width: 105px"><span class="k-sprite pf-icon pf-16 pf-money" style="margin-bottom: 3px"></span> Поповнити</button>
+                </div>
+                <div class="form-group">
+                    <div class="col-xs-4"></div>
+                    <button type="button" class="k-button" id="clientProfile" style="width: 105px"><span class="k-sprite pf-icon pf-16 pf-user" style="margin-bottom: 3px"></span> Клієнт</button>
+                </div>
+            </div>
+        </form>
+        
+    </div>
+</div>
+
+<br />
+<div id="depoGrid"></div>
+<br />

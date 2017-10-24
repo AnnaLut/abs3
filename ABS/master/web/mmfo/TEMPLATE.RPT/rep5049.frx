@@ -1,0 +1,244 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="02/21/2017 11:33:04" ReportInfo.Modified="02/21/2017 12:32:49" ReportInfo.CreatorVersion="2014.3.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoX3V4zY8FFHzkIAqmYIxZTf5TVG2tRGNgk4CxLS97BcKg==">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select * from ob_corporation_data ob&#13;&#10;where  kfile_pack.get_correct_session_id(ob.corporation_id,ob.kf,ob.session_id)=1&#13;&#10;and kfile_pack.get_correct_nbs(ob.corporation_id,substr(ob.nls,1,4))=1&#13;&#10;and rowtype in(0,1)&#13;&#10;and trunc(file_date) = :sFdat1&#13;&#10;and instr(decode(:nbs,'%',substr(nls,1,4),:nbs),substr(nls,1,4))&gt;0&#13;&#10;and instr(decode(:nls,'%',nls,:nls),nls)&gt;0">
+        <Column Name="CORPORATION_ID" DataType="System.Int32"/>
+        <Column Name="FILE_DATE" DataType="System.DateTime"/>
+        <Column Name="ROWTYPE" DataType="System.Decimal"/>
+        <Column Name="KF" DataType="System.String"/>
+        <Column Name="NLS" DataType="System.String"/>
+        <Column Name="KV" DataType="System.Decimal"/>
+        <Column Name="OKPO" DataType="System.String"/>
+        <Column Name="OBDB" DataType="System.Decimal"/>
+        <Column Name="OBDBQ" DataType="System.Decimal"/>
+        <Column Name="OBKR" DataType="System.Decimal"/>
+        <Column Name="OBKRQ" DataType="System.Decimal"/>
+        <Column Name="OST" DataType="System.Decimal"/>
+        <Column Name="OSTQ" DataType="System.Decimal"/>
+        <Column Name="KOD_CORP" DataType="System.Decimal"/>
+        <Column Name="KOD_USTAN" DataType="System.Decimal"/>
+        <Column Name="KOD_ANALYT" DataType="System.String"/>
+        <Column Name="DAPP" DataType="System.DateTime"/>
+        <Column Name="POSTDAT" DataType="System.DateTime"/>
+        <Column Name="DOCDAT" DataType="System.DateTime"/>
+        <Column Name="VALDAT" DataType="System.DateTime"/>
+        <Column Name="ND" DataType="System.String"/>
+        <Column Name="VOB" DataType="System.Decimal"/>
+        <Column Name="DK" DataType="System.Decimal"/>
+        <Column Name="MFOA" DataType="System.String"/>
+        <Column Name="NLSA" DataType="System.String"/>
+        <Column Name="KVA" DataType="System.Decimal"/>
+        <Column Name="NAMA" DataType="System.String"/>
+        <Column Name="OKPOA" DataType="System.String"/>
+        <Column Name="MFOB" DataType="System.String"/>
+        <Column Name="NLSB" DataType="System.String"/>
+        <Column Name="KVB" DataType="System.Decimal"/>
+        <Column Name="NAMB" DataType="System.String"/>
+        <Column Name="OKPOB" DataType="System.String"/>
+        <Column Name="S" DataType="System.Decimal"/>
+        <Column Name="DOCKV" DataType="System.Decimal"/>
+        <Column Name="SQ" DataType="System.Decimal"/>
+        <Column Name="NAZN" DataType="System.String"/>
+        <Column Name="DOCTYPE" DataType="System.Decimal"/>
+        <Column Name="POSTTIME" DataType="System.DateTime"/>
+        <Column Name="NAMK" DataType="System.String"/>
+        <Column Name="NMS" DataType="System.String"/>
+        <Column Name="TT" DataType="System.String"/>
+        <Column Name="SESSION_ID" DataType="System.Int64"/>
+        <CommandParameter Name="sFdat1" DataType="106" Expression="[sFdat1]" DefaultValue="03/03/2017"/>
+        <CommandParameter Name="nls" DataType="126" Expression="[nls]" DefaultValue="1"/>
+        <CommandParameter Name="nbs" DataType="126" Expression="[nbs]" DefaultValue="1"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="sFdat1" DataType="System.DateTime"/>
+    <Parameter Name="nbs" DataType="System.String"/>
+    <Parameter Name="nls" DataType="System.String"/>
+  </Dictionary>
+  <ReportPage Name="Page1" PaperWidth="800">
+    <ReportTitleBand Name="ReportTitle1" Width="2948.4" Height="47.25">
+      <TextObject Name="Text1" Left="18.9" Top="18.9" Width="321.3" Height="18.9" Text="Консолідована виписка за [Table.FILE_DATE]" Font="Arial, 10pt, style=Bold"/>
+    </ReportTitleBand>
+    <PageHeaderBand Name="PageHeader1" Top="50.45" Width="2948.4" Height="75.6">
+      <TableObject Name="Table1" Width="2760.4" Height="75.6" Border.Lines="All">
+        <TableColumn Name="Column43"/>
+        <TableColumn Name="Column44"/>
+        <TableColumn Name="Column45"/>
+        <TableColumn Name="Column46"/>
+        <TableColumn Name="Column47"/>
+        <TableColumn Name="Column48"/>
+        <TableColumn Name="Column49"/>
+        <TableColumn Name="Column50"/>
+        <TableColumn Name="Column51"/>
+        <TableColumn Name="Column52"/>
+        <TableColumn Name="Column53"/>
+        <TableColumn Name="Column54"/>
+        <TableColumn Name="Column55" Width="56.7"/>
+        <TableColumn Name="Column56" Width="57.7"/>
+        <TableColumn Name="Column57"/>
+        <TableColumn Name="Column58"/>
+        <TableColumn Name="Column59"/>
+        <TableColumn Name="Column60"/>
+        <TableColumn Name="Column61"/>
+        <TableColumn Name="Column62"/>
+        <TableColumn Name="Column63"/>
+        <TableColumn Name="Column64"/>
+        <TableColumn Name="Column65"/>
+        <TableColumn Name="Column66"/>
+        <TableColumn Name="Column67"/>
+        <TableColumn Name="Column68"/>
+        <TableColumn Name="Column69"/>
+        <TableColumn Name="Column70"/>
+        <TableColumn Name="Column71"/>
+        <TableColumn Name="Column72"/>
+        <TableColumn Name="Column73"/>
+        <TableColumn Name="Column74"/>
+        <TableColumn Name="Column75"/>
+        <TableColumn Name="Column76"/>
+        <TableColumn Name="Column77"/>
+        <TableColumn Name="Column78"/>
+        <TableColumn Name="Column79"/>
+        <TableColumn Name="Column80"/>
+        <TableColumn Name="Column81"/>
+        <TableColumn Name="Column82"/>
+        <TableColumn Name="Column83"/>
+        <TableColumn Name="Column84"/>
+        <TableRow Name="Row2" Height="75.6">
+          <TableCell Name="Cell63" Border.Lines="All" Text="Дата формування" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell64" Border.Lines="All" Text="Ознака Рахунок/документ" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell65" Border.Lines="All" Text="МФО банку" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell66" Border.Lines="All" Text="Особовий рахунок " HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell67" Border.Lines="All" Text="Валюта рахунку" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell68" Border.Lines="All" Text="Код ОКПО" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell69" Border.Lines="All" Text="Дебетові обороти в валюті" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell70" Border.Lines="All" Text="Дебетові обороти (еквівалент в національній валюті)" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell71" Border.Lines="All" Text="Кредитові обороти в валюті" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell72" Border.Lines="All" Text="Кредитові обороти (еквівалент в національній валюті)" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell73" Border.Lines="All" Text="Вихідний залишок в валюті" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell74" Border.Lines="All" Text="Вихідний залишок (еквівалент в національній валюті)" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell75" Border.Lines="All" Text="Код корпоративного клієнта" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell76" Border.Lines="All" Text="Код установи корпоративного клієнта" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell77" Border.Lines="All" Text="Код аналітичного обліку" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell78" Border.Lines="All" Text="Дата попереднього руху по рахунку" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell79" Border.Lines="All" Text="Дата проведення " HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell80" Border.Lines="All" Text="Дата документу" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell81" Border.Lines="All" Text="Дата валютування" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell82" Border.Lines="All" Text="Номер документу" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell83" Border.Lines="All" Text="Вид документу" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell84" Border.Lines="All" Text="Дебет/Кредит" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell85" Border.Lines="All" Text="МФО банку платника" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell86" Border.Lines="All" Text="Особовий рахунок платника" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell87" Border.Lines="All" Text="Валюта особового рахунку платника" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell88" Border.Lines="All" Text="Найменування клієнта платника" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell89" Border.Lines="All" Text="Ідентифікатор клієнта платника" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell90" Border.Lines="All" Text="МФО банку отримувача" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell91" Border.Lines="All" Text="Особовий рахунок отримувача" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell92" Border.Lines="All" Text="Валюта особового рахунку отримувача" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell93" Border.Lines="All" Text="Найменування клієнта отримувача" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell94" Border.Lines="All" Text="Ідентифікатор клієнта отримувача" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell95" Border.Lines="All" Text="Сума платежу в валюті" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell96" Border.Lines="All" Text="Валюта платежу" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell97" Border.Lines="All" Text="Сума платежу (еквівалент в національній валюті)" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell98" Border.Lines="All" Text="Призначення платежу" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell99" Border.Lines="All" Text="Ознака проводки" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell100" Border.Lines="All" Text="Час проведення в ОДБ" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell101" Border.Lines="All" Text="Найменування клієнта" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell102" Border.Lines="All" Text="Найменування рахунку" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell103" Border.Lines="All" Text="Код операции" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell104" Border.Lines="All" Text="Ідентифікатор сесії " HorzAlign="Center" VertAlign="Center"/>
+        </TableRow>
+      </TableObject>
+    </PageHeaderBand>
+    <DataBand Name="Data1" Top="129.25" Width="2948.4" Height="18.9" CanGrow="true" CanShrink="true" DataSource="Table">
+      <TableObject Name="Table1" Width="2760.4" Height="18.9" Border.Lines="All">
+        <TableColumn Name="Column1"/>
+        <TableColumn Name="Column2"/>
+        <TableColumn Name="Column3"/>
+        <TableColumn Name="Column4"/>
+        <TableColumn Name="Column5"/>
+        <TableColumn Name="Column6"/>
+        <TableColumn Name="Column7"/>
+        <TableColumn Name="Column8"/>
+        <TableColumn Name="Column9"/>
+        <TableColumn Name="Column10"/>
+        <TableColumn Name="Column11"/>
+        <TableColumn Name="Column12"/>
+        <TableColumn Name="Column13" Width="56.7"/>
+        <TableColumn Name="Column14" Width="57.7"/>
+        <TableColumn Name="Column15"/>
+        <TableColumn Name="Column16"/>
+        <TableColumn Name="Column17"/>
+        <TableColumn Name="Column18"/>
+        <TableColumn Name="Column19"/>
+        <TableColumn Name="Column20"/>
+        <TableColumn Name="Column21"/>
+        <TableColumn Name="Column22"/>
+        <TableColumn Name="Column23"/>
+        <TableColumn Name="Column24"/>
+        <TableColumn Name="Column25"/>
+        <TableColumn Name="Column26"/>
+        <TableColumn Name="Column27"/>
+        <TableColumn Name="Column28"/>
+        <TableColumn Name="Column29"/>
+        <TableColumn Name="Column30"/>
+        <TableColumn Name="Column31"/>
+        <TableColumn Name="Column32"/>
+        <TableColumn Name="Column33"/>
+        <TableColumn Name="Column34"/>
+        <TableColumn Name="Column35"/>
+        <TableColumn Name="Column36"/>
+        <TableColumn Name="Column37"/>
+        <TableColumn Name="Column38"/>
+        <TableColumn Name="Column39"/>
+        <TableColumn Name="Column40"/>
+        <TableColumn Name="Column41"/>
+        <TableColumn Name="Column42"/>
+        <TableRow Name="Row1">
+          <TableCell Name="Cell1" Border.Lines="All" Text="[Table.FILE_DATE]" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell2" Border.Lines="All" Text="[Table.ROWTYPE]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell3" Border.Lines="All" Text="[Table.KF]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell4" Border.Lines="All" Text="[Table.NLS]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell5" Border.Lines="All" Text="[Table.KV]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell26" Border.Lines="All" Text="[Table.OKPO]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell27" Border.Lines="All" Text="[Table.OBDB]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell28" Border.Lines="All" Text="[Table.OBDBQ]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell29" Border.Lines="All" Text="[Table.OBKR]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell30" Border.Lines="All" Text="[Table.OBKRQ]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell31" Border.Lines="All" Text="[Table.OST]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell32" Border.Lines="All" Text="[Table.OSTQ]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell33" Border.Lines="All" Text="[Table.KOD_CORP]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell34" Border.Lines="All" Text="[Table.KOD_USTAN]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell35" Border.Lines="All" Text="[Table.KOD_ANALYT]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell36" Border.Lines="All" Text="[Table.DAPP]" HideZeros="true" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell37" Border.Lines="All" Text="[Table.POSTDAT]" HideZeros="true" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell38" Border.Lines="All" Text="[Table.DOCDAT]" HideZeros="true" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell39" Border.Lines="All" Text="[Table.VALDAT]" HideZeros="true" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell40" Border.Lines="All" Text="[Table.ND]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell41" Border.Lines="All" Text="[Table.VOB]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell42" Border.Lines="All" Text="[Table.DK]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell43" Border.Lines="All" Text="[Table.MFOA]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell44" Border.Lines="All" Text="[Table.NLSA]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell45" Border.Lines="All" Text="[Table.KVA]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell46" Border.Lines="All" Text="[Table.NAMA]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell47" Border.Lines="All" Text="[Table.OKPOA]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell48" Border.Lines="All" Text="[Table.MFOB]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell49" Border.Lines="All" Text="[Table.NLSB]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell50" Border.Lines="All" Text="[Table.KVB]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell51" Border.Lines="All" Text="[Table.NAMB]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell52" Border.Lines="All" Text="[Table.OKPOB]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell53" Border.Lines="All" Text="[Table.S]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell54" Border.Lines="All" Text="[Table.DOCKV]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell55" Border.Lines="All" Text="[Table.SQ]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell56" Border.Lines="All" Text="[Table.NAZN]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell57" Border.Lines="All" Text="[Table.DOCTYPE]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell58" Border.Lines="All" Text="[Table.POSTTIME]" Format="Time" Format.Format="t" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell59" Border.Lines="All" Text="[Table.NAMK]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell60" Border.Lines="All" Text="[Table.NMS]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell61" Border.Lines="All" Text="[Table.TT]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell62" Border.Lines="All" Text="[Table.SESSION_ID]" HorzAlign="Center" VertAlign="Center"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+    <PageFooterBand Name="PageFooter1" Top="151.35" Width="2948.4" Height="18.9"/>
+  </ReportPage>
+</Report>

@@ -1,0 +1,20 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = "Зв'язок об'єктів адміністрування";
+}
+<link href="~/Areas/Admin/Css/CommObj.css" rel="stylesheet" />
+<div ng-controller="CommunicationObjectCtrl as commObjCtrl">
+    <div kendo-toolbar="commObjCtrl.commObjGridToolbar" k-options="commObjCtrl.commObjGridToolbarOptions">
+        <select kendo-drop-down-list
+                ng-model="commObjCtrl.selectedItem"
+                k-data-text-field="'DSC'"
+                k-value-primitive="true"
+                k-data-value-field="'ID'"
+                k-data-source="commObjCtrl.commObjDataSource"
+                k-options="commObjCtrl.commObjDropDownOptions" 
+                style="width: 300px; font-size: 13px;">
+        </select>
+    </div>
+    <div kendo-grid="commObjCtrl.commObjGrid" k-options="commObjCtrl.commObjGridOptions"></div>
+</div>
+<script src="~/Areas/Admin/Scripts/communicationObject/Controllers/CommunicationObjectCtrl.js"></script>

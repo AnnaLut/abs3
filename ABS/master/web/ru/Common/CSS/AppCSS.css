@@ -1,0 +1,124 @@
+﻿/* ----------------------------------------------
+ * Стиль страницы
+ */
+body
+{
+	font-size: 10pt;
+	font-family: Arial;
+}
+
+/* ----------------------------------------------
+ * Стили относящиеся к таблице
+ */
+table
+{
+	width: 100%;
+}
+
+/* Стиль заголовка страницы */
+th
+{
+	padding-right: 5px;
+	padding-left: 5px;
+	font-weight: bold;
+	background-color: lightgrey;
+	white-space: nowrap;
+}
+/* Стиль строки */
+tr
+{
+	height: 20px;
+}
+
+/* Стиль ячейки */
+td
+{
+	font-size: 10pt;
+	font-family: Arial;
+	white-space: nowrap;
+	padding-left: 3px;
+	padding-right: 3px;
+}
+/* Стиль ячейки с заглавным текстом */
+td.title
+{
+	font-size: 12pt;
+	font-style: italic;
+	font-weight: bold;
+	padding-right: 10px;
+	padding-left: 10px;
+	vertical-align: middle;
+	text-align: center;
+}
+/* Стиль ячейки с заглавным текстом (маленьким) */
+td.titleSmall
+{
+	font-size: 11pt;
+	font-weight: bold;
+	padding-right: 10px;
+	padding-left: 10px;
+	vertical-align: middle;
+	text-align: center;
+}
+/* Стиль ячейки с обычным текстом */
+td.text
+{
+	padding-right: 5px;
+	padding-left: 5px;
+}
+
+/* ----------------------------------------------
+ * Стиль контролов ввода
+ */
+input
+{
+	padding-left: 2px;
+	padding-right: 2px;
+	width: 150px;
+}
+input.link
+{  
+	background-color: White;
+	font-weight: bold;
+	font-style: italic;
+	color: darkgreen;
+	cursor: hand;
+	border: none 0px White;
+}
+textarea
+{
+	padding-left: 2px;
+	padding-right: 2px;
+}
+/* ----------------------------------------------
+ * Стиль контролов меток
+ */
+label.requiredMark
+{
+	padding-right: 3px;
+	padding-left: 3px;
+	font-weight: bold;
+	color: red;
+	font-style: italic;
+}
+/* ----------------------------------------------
+ * Стиль контролов ввода
+ */
+span
+{
+	font-size: 10pt;
+	font-family: Arial;
+}
+span.title
+{
+	font-weight: bold;
+}
+a
+{
+	font-size: 10pt;
+	font-family: Arial;
+}
+.GridViewHiddenCol
+{
+	display: none;
+}

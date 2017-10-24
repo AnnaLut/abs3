@@ -1,0 +1,71 @@
+﻿<xmlform captiontype="OnlyTitle">
+  <grids>
+    <grid table="V_DPT_POLITICAL_INSTABILITY" id="gv" pagesize="10" showpagesizebox="true" title="З`язані депозити" showfilter="true">
+      <rowselection method="SingleRow" />
+      <!--<buttons defaulttype="Button" >
+        <button id="btBack" caption="Додати" hint="Додати новий">
+          <command type="Redirect" url="/barsroot/barsweb/dynform.aspx?form=frm_dep_broken_period_serch" target="Self"></command>
+        </button>
+      </buttons>-->
+      <fields>
+        <field name="CRT_DATE" key="false" datatype="DateTime" sort="Default">
+          <column show="true" caption="Дата" align="Center" />
+        </field>
+        <field name="CRT_BRANCH" key="false" datatype="String" sort="Default">
+          <column show="true" caption="Відділення" align="Left" />
+        </field>
+        <field name="CRT_STAFF_ID" key="false" datatype="Int64" sort="Default">
+          <column show="true" caption="Ід. користувача" align="Right" />
+        </field>
+        <field name="FIO" key="false" datatype="String" sort="Default">
+          <column show="true" caption="ПІБ клієнта" align="Left" />
+        </field>
+        <field name="BIRTH_DATE" key="false" datatype="DateTime" sort="Default">
+          <column show="true" caption="Дата народження клієнта" align="Center" />
+        </field>
+        <field name="INN" key="false" datatype="String" sort="Default">
+          <column show="true" caption="ІПН клієнта" align="Left" />
+        </field>
+        <field name="DOC" key="false" datatype="String" sort="Default">
+          <column show="true" caption="Документ клієнта" align="Left" />
+        </field>
+        <field name="OLD_DPT_ID" key="false" datatype="Int64" sort="Default">
+          <column show="true" caption="Старий деп. - Ід." align="Right" />
+        </field>
+        <field name="OLD_DAT_BEGIN" key="false" datatype="DateTime" sort="Default">
+          <column show="true" caption="Старий деп. - Дата початку" align="Center" />
+        </field>
+        <field name="OLD_DAT_END" key="false" datatype="DateTime" sort="Default">
+          <column show="true" caption="Старий деп. - Дата закінчення" align="Center" />
+        </field>
+        <field name="OLD_TERMINATION_DATE" key="false" datatype="DateTime" sort="Default">
+          <column show="true" caption="Старий деп. - Дата розірвання" align="Center" />
+        </field>
+        <field name="OLD_KV" key="false" datatype="String" sort="Default">
+          <column show="true" caption="Старий деп. - Валюта" align="Right" />
+        </field>
+        <field name="OLD_BALANCE" key="false" datatype="Decimal" sort="Default">
+          <column show="true" caption="Старий деп. - Залишок на момент розірвання" align="Right" />
+        </field>
+        <field name="OLD_PENALTY_SUM" key="false" datatype="Decimal" sort="Default">
+          <column show="true" caption="Старий деп. - Сума штрафу" align="Right" />
+        </field>
+        <field name="NEW_DPT_ID" key="false" datatype="Int64" sort="Default">
+          <column show="true" caption="Новий деп. - Ід." align="Right" />
+        </field>
+        <field name="NEW_DAT_BEGIN" key="false" datatype="DateTime" sort="Default">
+          <column show="true" caption="Новий деп. - Дата початку" align="Center" />
+        </field>
+        <field name="NEW_DAT_END" key="false" datatype="DateTime" sort="Default">
+          <column show="true" caption="Новий деп. - Дата закінчення" align="Center" />
+        </field>
+        <field name="NEW_KV" key="false" datatype="String" sort="Default">
+          <column show="true" caption="Новий деп. - Валюта" align="Right" />
+        </field>
+        <field name="NEW_BALANCE" key="false" datatype="Decimal" sort="Default">
+          <column show="true" caption="Новий деп. - Початкова сума" align="Right" />
+        </field>
+      </fields>
+    </grid>
+  </grids>
+</xmlform>

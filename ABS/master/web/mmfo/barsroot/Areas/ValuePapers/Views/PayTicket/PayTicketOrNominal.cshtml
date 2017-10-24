@@ -1,0 +1,134 @@
+﻿@{
+    ViewBag.Title = "Сплата купону/номіналу по ЦП власного боргу згідно реєстру з депозитарія";
+}
+<script src="~/Areas/ValuePapers/app/controllers/PayTicketOrNominalCtrl.js"></script>
+<style>
+    .border-form {
+        background-color: lightgrey;
+        height: 40px;
+        width: 100%;
+        padding-top: 4px;
+        padding-left: 2%;
+    }
+
+    .border-sm {
+        height: 40px;
+    }
+
+    .border-lg {
+        height: 110px;
+    }
+
+    .k-grid .k-grid-header .k-header .k-link {
+        height: auto;
+    }
+
+    .k-grid .k-grid-header .k-header {
+        white-space: normal;
+    }
+
+    #sumk_validationMessage.k-widget.k-tooltip-validation {
+        position: fixed;
+    }
+
+    .padd {
+        margin: 4px;
+    }
+
+    .col-md-2, .col-md-3, .col-md-4, .col-md-6, .col-md-12 {
+        position: relative;
+        min-height: 1px;
+        padding-right: 5px;
+        padding-left: 5px;
+    }
+
+    #sumnk_validationMessage.k-widget.k-tooltip-validation {
+        position: fixed;
+    }
+
+    #sumrk_validationMessage.k-widget.k-tooltip-validation {
+        position: fixed;
+    }
+</style>
+<div id="content" ng-app="BarsWeb.Controllers" ng-controller="PayTicketOrNominalCtrl" ng-init="InitData('@ViewBag.strPar02', '@ViewBag.nGrp', '@ViewBag.nID', '@ViewBag.CP_ID')">
+    <h2>@ViewBag.Title</h2><br />
+
+    <div class="border-form border-lg">
+        <div class="col-md-3">
+            <div class="col-md-6">
+                <input id="cp_id" class="k-textbox padd k-state-disabled" style="width: 100%" disabled />
+            </div>
+            <div class="col-md-6">
+                <input id="dat_em" class="k-textbox padd k-state-disabled" style="width: 100%" disabled />
+            </div>
+            <div class="col-md-12">
+                <input id="sumnz" class="k-textbox padd k-state-disabled" style="width: 100%" disabled />
+            </div>
+            <div class="col-md-12">
+                <input id="sumrz" class="k-textbox padd k-state-disabled" style="width: 100%" disabled />
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="col-md-2">
+                <input id="rate" class="k-textbox padd k-state-disabled" style="width: 100%" disabled />
+            </div>
+            <div class="col-md-4">
+                <input id="kv" class="k-textbox padd k-state-disabled" style="width: 100%" disabled />
+            </div>
+            <div class="col-md-6">
+                <input id="datp" class="k-textbox padd k-state-disabled" style="width: 100%" disabled />
+            </div>
+            <div class="col-md-12">
+                <input id="sumni" class="k-textbox padd k-state-disabled" style="width: 100%" disabled />
+            </div>
+            <div class="col-md-12">
+                <input id="sumri" class="k-textbox padd k-state-disabled" style="width: 100%" disabled />
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="col-md-6">
+                <input id="cena" class="k-textbox padd k-state-disabled" style="width: 100%" disabled />
+            </div>
+            <div class="col-md-6">
+                <input id="nid" class="k-textbox padd k-state-disabled" style="width: 100%" disabled />
+            </div>
+            <div class="col-md-12">
+                <form id="sumnk_form">
+                    <input id="sumnk" name="sumnk" class="k-textbox padd" style="width: 100%" />
+                </form>
+            </div>
+            <div class="col-md-12">
+                <form id="sumrk_form">
+                    <input id="sumrk" name="sumrk" class="k-textbox padd" style="width: 100%" />
+                </form>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="col-md-12" style="margin-top: 4px; margin-left: 4px; margin-bottom: 4px;">
+                <button class="k-button"><i class="pf-icon pf-16 pf-folder_open"></i></button>
+                <button class="k-button"><i class="pf-icon pf-16 pf-save"></i></button>
+                <button class="k-button"><img src="~/Areas/ValuePapers/Content/Images/LOOK.png" style="margin-top: -5px;" /></button>
+                <button class="k-button"><i class="pf-icon pf-16 pf-reload_rotate"></i></button>
+                <button class="k-button"><i class="pf-icon pf-16 pf-print"></i></button>
+            </div>
+            <div class="col-md-12">
+                <div class="col-md-4" style="margin-top: 4px">
+                    <input id="cb_zo" class="padd" type="checkbox" style="width: 20px; height: 20px" />
+                    <label style="font-size: 15px">Kop.</label>
+                </div>
+                <div class="col-md-4" style="margin-top: 4px">
+                    <input id="cb_stp" class="padd" type="checkbox" style="width: 20px; height: 20px" />
+                    <label style="font-size: 15px">СТП</label>
+                </div>
+            </div>
+            <div class="col-md-12" style="margin-top: 2px">
+                <input style="width: 100%;" id="dropdownlist" kendo-drop-down-list
+                       k-data-source="drop_down_list_data" k-data-text-field="'TEXT'" k-data-value-field="'VAL'" k-on-change="onChange()" />
+            </div>
+        </div>
+    </div>
+    <div class="col-md-12" style="margin-top: 20px;">
+        <div id="grid" kendo-grid="grid" k-options="gridOptions" k-rebind="gridOptions"></div>
+    </div>
+</div>
+

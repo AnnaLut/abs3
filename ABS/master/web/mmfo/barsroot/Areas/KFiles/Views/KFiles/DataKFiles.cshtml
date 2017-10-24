@@ -1,0 +1,202 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+}
+<script src="~/Areas/KFiles/Scripts/DataKFilesCtrl.js"></script>
+<div ng-controller="kfiles.DataKFilesCtrl">
+    <h1>{{Title}}</h1>
+    <form>
+    <div class="panel-group panel-horizontal">
+        <div class="panel panel-default">
+            <div class="panel-heading">Номер документу:</div>
+            <div class="panel-body">
+                <input type="text" class="k-textbox" readonly ng-model="model.nd" />
+            </div>
+        </div>
+        <div class="panel panel-default none"></div>
+        <div class="panel panel-default">
+            <div class="panel-heading">Вид документу:</div>
+            <div class="panel-body">
+                <input type="text" class="k-textbox" readonly ng-model="model.vidd" />
+            </div>
+        </div>
+        <div class="panel panel-default none"></div>
+        <div class="panel panel-default">
+            <div class="panel-heading">Час:</div>
+            <div class="panel-body">
+                <input type="text" class="k-textbox" readonly ng-model="model.time"/>
+            </div>
+        </div>
+        <div class="panel panel-default none"></div>
+        <div class="panel panel-default">
+            <div class="panel-heading">Ознака проводки:</div>
+            <div class="panel-body">
+                <input type="text" class="k-textbox" readonly ng-model="model.record"/>
+            </div>
+        </div>
+        <div class="panel panel-default none"></div>
+        <div class="panel panel-default">
+            <div class="panel-heading">Валюта:</div>
+            <div class="panel-body">
+                <input type="text" class="k-textbox" readonly ng-model="model.curr"/>
+            </div>
+        </div>
+        <div class="panel panel-default none"></div>
+        <div class="panel panel-default">
+            <div class="panel-heading">Код операції:</div>
+            <div class="panel-body">
+                <input type="text" class="k-textbox" readonly ng-model="model.operation">
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">Реквізити платника:</div>
+        <div class="panel-body">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-2 col-ms-2 col-xs-2 col-lg-2">
+                        <label>Код банку:</label>
+                    </div>
+                    <div class="col-md-2 col-ms-2 col-xs-2 col-lg-2">
+                        <input type="text" class="k-textbox" readonly ng-model="model.mfopayer"/>
+                    </div>
+                    <div class="col-md-8 col-ms-8 col-xs-8 col-lg-8">
+                        <input type="text" class="k-textbox" readonly ng-model="model.bankpayer"/>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-2 col-ms-2 col-xs-2 col-lg-2">
+                        <label>Особовий рахунок:</label>
+                    </div>
+                    <div class="col-md-2 col-ms-2 col-xs-2 col-lg-2">
+                        <input type="text" class="k-textbox" readonly ng-model="model.accountpayer"/>
+                    </div>
+                    <div class="col-md-2 col-ms-2 col-xs-2 col-lg-2">
+                        <label>Валюта рахунку:</label>
+                    </div>
+                    <div class="col-md-2 col-ms-2 col-xs-2 col-lg-2">
+                        <input type="text" class="k-textbox" readonly ng-model="model.currpayer"/>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-2 col-ms-2 col-xs-2 col-lg-2">
+                        <label>Ідентифікатор:</label>
+                    </div>
+                    <div class="col-md-2 col-ms-2 col-xs-2 col-lg-2">
+                        <input type="text" class="k-textbox" readonly ng-model="model.edrpoupayer"/>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-2 col-ms-2 col-xs-2 col-lg-2">
+                        <label>Найменування:</label>
+                    </div>
+                    <div class="col-md-10 col-ms-10 col-xs-10 col-lg-10">
+                        <textarea rows="3" type="text" class="k-textbox" readonly ng-model="model.namepayer"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">Реквізити отримувача:</div>
+        <div class="panel-body">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-2 col-ms-2 col-xs-2 col-lg-2">
+                        <label>Код банку:</label>
+                    </div>
+                    <div class="col-md-2 col-ms-2 col-xs-2 col-lg-2">
+                        <input type="text" class="k-textbox" readonly ng-model="model.mforeceiver"/>
+                    </div>
+                    <div class="col-md-8 col-ms-8 col-xs-8 col-lg-8">
+                        <input type="text" class="k-textbox" readonly ng-model="model.bankreceiver"/>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-2 col-ms-2 col-xs-2 col-lg-2">
+                        <label>Особовий рахунок:</label>
+                    </div>
+                    <div class="col-md-2 col-ms-2 col-xs-2 col-lg-2">
+                        <input type="text" class="k-textbox" readonly ng-model="model.accountreceiver"/>
+                    </div>
+                    <div class="col-md-2 col-ms-2 col-xs-2 col-lg-2">
+                        <label>Валюта рахунку:</label>
+                    </div>
+                    <div class="col-md-2 col-ms-2 col-xs-2 col-lg-2">
+                        <input type="text" class="k-textbox" readonly ng-model="model.currreceiver"/>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-2 col-ms-2 col-xs-2 col-lg-2">
+                        <label>Ідентифікатор:</label>
+                    </div>
+                    <div class="col-md-2 col-ms-2 col-xs-2 col-lg-2">
+                        <input type="text" class="k-textbox" readonly ng-model="model.edrpoureceiver"/>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-2 col-ms-2 col-xs-2 col-lg-2">
+                        <label>Найменування:</label>
+                    </div>
+                    <div class="col-md-10 col-ms-10 col-xs-10 col-lg-10">
+                        <textarea rows="3" type="text" class="k-textbox" readonly ng-model="model.namereceiver"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-2 col-ms-2 col-xs-2 col-lg-2">
+                    <label>Сума платежу:</label>
+                </div>
+                <div class="col-md-3 col-ms-3 col-xs-3 col-lg-3">
+                    <input type="text" class="k-textbox" readonly ng-model="model.sum"/>
+                </div>
+                <div class="col-md-4 col-ms-4 col-xs-4 col-lg-4">
+                    <label>Сума платежу в еквіваленті нац.валюти:</label>
+                </div>
+                <div class="col-md-3 col-ms-3 col-xs-3 col-lg-3">
+                    <input type="text" class="k-textbox" readonly ng-model="model.sumua"/>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 col-ms-12 col-xs-12 col-lg-12">
+                    <input type="text" class="k-textbox" readonly ng-model="model.sumfull"/>
+                </div>               
+            </div>            
+        </div>
+    </div>
+
+</form>
+</div>
+<style>
+    .panel-group.panel-horizontal {
+            display:table;
+            width:100%;
+    }
+
+    .panel-group.panel-horizontal > .panel.panel-default{
+            display:table-cell;
+    }
+
+    .k-textbox{
+        width:100%;
+    }
+
+    .panel-group.panel-horizontal > .panel.panel-default.none{
+        border: none;
+        width: 8px;
+    }
+
+    .row{
+        margin: 8px;
+    }
+
+    form{
+        height: auto;
+    }
+</style>

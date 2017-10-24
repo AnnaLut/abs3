@@ -1,0 +1,76 @@
+﻿@{
+
+}
+@*<%--Extentions--%>*@
+@*<link rel="stylesheet" href="//kendo.cdn.telerik.com/2016.2.714/styles/kendo.common-material.min.css" />
+<link rel="stylesheet" href="//kendo.cdn.telerik.com/2016.2.714/styles/kendo.material.min.css" />
+<link rel="stylesheet" href="//kendo.cdn.telerik.com/2016.2.714/styles/kendo.default.mobile.min.css" />*@
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.3/css/bootstrap.min.css" integrity="sha384-MIwDKRSSImVFAZCVLtU0LMDdON6KVCrZHyVQQj6e8wIEJkW4tvwqXrbMIya1vriY" crossorigin="anonymous">
+<script src="//kendo.cdn.telerik.com/2016.2.714/js/jquery.min.js"></script>
+<script src="//kendo.cdn.telerik.com/2016.2.714/js/kendo.all.min.js"></script>
+<script src="@Url.Content("~/Areas/DocView/Scripts/Docs/DocFilter.js")"></script>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+<style>
+    th, td {
+        border-bottom: 4px solid !important;
+    }
+    .k-input {
+        font-weight: bold;
+    }
+</style>
+
+@*<%--end of extentions--%>*@
+
+<table class="table table-bordered" style="width: 55%; " align="center">
+     <div id="docType" hidden="true">@{@ViewBag.type}</div>
+    <div id="docTypeName" style="font-size: 150%;color: darkgrey;">Документи користувача</div>
+    <thead>
+        <tr>
+            <th class="text-center" style="width: 40%; align: center;"> </th>
+            <th class="text-center" style="width: 30%; align: center;">Всі документи</th>
+            <th class="text-center" style="width: 30%; align: center;">Отримані документи</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td  align="center">
+                <b id="currentDate"></b><b style="color: red;">*</b>  
+                
+            </td>
+            <td><button id="docsBtnDateAll" class="btn btn-primary" style="width:100%;height:90px;">Показати</button></tdalign="center">
+            <td><button id="docsBtnDateGet" class="btn btn-primary" style="width:100%;height:90px;align: center;">Показати</button></td>
+        </tr>
+        <tr>
+            <td style="height: 70px;">
+
+                <div id="m_datepiker">
+                    <div class="col-xs-2 text-right">
+                        <div align="right"><p>з:</p></div>
+                        <div align="right"><p>по:</p></div>
+                    </div>
+                        <div class="col-xs-10 text-left">
+                            <div class="demo-section k-content" align="right">
+                                <input style="width:100%;" id="dateNewBegin" />
+                            </div>
+                            <div class="demo-section k-content" align="right">
+                                <input style="width:100%;" id="dateNewEnd" />
+                            </div>
+                        </div>
+                    </div>
+
+            </td>
+            <td><button id="docsBtnFiltDateAll" class="btn btn-primary" style="width:100%;height:90px;">Показати</button></td>
+            <td><button id="docsBtnFiltDateGet" class="btn btn-primary" style="width:100%;height:90px;">Показати</button></td>
+        </tr>
+    </tbody>
+    
+</table>
+<table id="auxinfo" cellspacing="0" cellpadding="0" align="center" border="0" width: 55%;>
+    <tr>
+        <td style="font-size: 10pt; color: red;
+                            font-family: Arial" valign="middle" align="left" height="50">
+            * - використовується системна дата введення сервера
+        </td>
+    </tr>
+</table>

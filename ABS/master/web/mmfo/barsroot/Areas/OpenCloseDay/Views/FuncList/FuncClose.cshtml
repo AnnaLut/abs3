@@ -1,0 +1,37 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+}
+<script src="~/Areas/OpenCloseDay/Scripts/endDate.js"></script>
+<link href="~/Areas/OpenCloseDay/Content/bankDate.css" rel="stylesheet">
+
+<div class="block">
+    <div class="panel panel-default ">
+        <div class="panel-body" style="padding-bottom: 0px;">
+            <div class="form-group">
+                <label class="control-label">Група : </label>
+                <label id="groupEnd" class="control-label label-right"></label>
+
+                <label class="control-label">Старт групи : </label>
+                <label id="groupEndOnDate" class="control-labe label-right"></label>
+
+                <label class="control-label">Тривалість групи: </label>
+                <label id="groupdurationEnd" class="control-label label-right"></label>
+
+                <label class="control-label">Статус : </label>
+                <label id="statusEnd" class="control-label label-right"></label>
+            </div>
+        </div>
+    </div>
+    <div id="toolbar"></div>
+    <div id="funcListEnd"></div>
+
+    <script id="confirmationTemplate" type="text/x-kendo-template">
+        <div class="popupMessage1"></div>
+        <div class="popupMessage2" style="height: 130px"></div>
+        <div class="dialog_buttons">
+            <input type="button" class="confirm_yes k-button k-primary" value="Продовжити" style="width: 100px" />
+            &nbsp;
+            <input type="button" class="confirm_no k-button" value="Завершити" style="width: 80px; float: right;" />
+        </div>
+    </script>
+</div>

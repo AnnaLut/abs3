@@ -1,0 +1,37 @@
+﻿@{
+
+}
+<link href="~/Areas/IOData/CSS/style.css" rel="stylesheet" />
+<script src="~/Areas/IOData/Scripts/IOData/iodata.dailytasks.js"></script>
+<h1>Моніторинг процесу щоденного вивантаження</h1>
+<div ng-controller="IOData.dailyTasks as dailyTasks">
+    <div class="panel-body">
+
+        <div data-kendo-toolbar="dailyTasks.mainToolbar" k-options="dailyTasks.mainToolbarOptions">
+        </div>
+        
+        <div class="panel-heading"><h3>Існуючі завдання користувача {{dailyTasks.userName}}</h3></div>
+        <div data-kendo-grid="dailyTasks.existingJobsGrid" data-options="dailyTasks.existingJobsGridOptions">            
+        </div>
+
+        <div class="panel-heading"><h3>Статистика виконання завдань</h3></div>
+        <div kendo-grid="dailyTasks.jobsStatisticGrid" data-options="dailyTasks.jobsStatisticGridOptions">
+        </div>
+        
+        <div kendo-window="dailyTasks.editParamsWindow"  k-visible="false" k-modal="true" k-width="700">
+            <div kendo-grid="dailyTasks.jobParamsGrid" data-options="dailyTasks.jobParamsGridOptions">
+            </div>
+        </div>
+        <div kendo-window="dailyTasks.availableJobParamsWindow" k-title="'Доступні параметри для завдання'" k-visible="false" k-modal="true" k-width="700">
+            <div kendo-grid="dailyTasks.availableJobParamsGrid" data-options="dailyTasks.availableJobParamsGridOptions">
+            </div>
+        </div>
+        
+        <div kendo-window="dailyTasks.enableJobsWindow" k-title="'Доступні завдання для включення в автоматичне вивантаження'" k-visible="false" k-modal="true" k-width="700" >
+            <div kendo-grid="dailyTasks.enableJobsGrid" data-options="dailyTasks.enableJobsGridOptions">
+            </div>
+        </div>
+
+        
+    </div>
+</div>

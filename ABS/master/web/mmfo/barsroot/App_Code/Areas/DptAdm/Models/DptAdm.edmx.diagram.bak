@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="2.0" xmlns:edmx="http://schemas.microsoft.com/ado/2008/10/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2008/10/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="645c83babc404f6d8f5d45adf4c7f9f4" Name="Diagram1" ZoomLevel="72" >
+        <EntityTypeShape EntityType="BarsWeb.Areas.DptAdm.Models.DPT_TYPES" Width="1.5" PointX="1.25" PointY="1.375" />
+        <EntityTypeShape EntityType="BarsWeb.Areas.DptAdm.Models.DPT_EXTENSION" Width="1.5" PointX="6" PointY="1" />
+        <EntityTypeShape EntityType="BarsWeb.Areas.DptAdm.Models.DPT_EXTENSION_METHOD" Width="1.5" PointX="3.75" PointY="1.5" />
+        <EntityTypeShape EntityType="BarsWeb.Areas.DptAdm.Models.DPT_SHOST" Width="1.5" PointX="0.75" PointY="4.75" />
+        <EntityTypeShape EntityType="BarsWeb.Areas.DptAdm.Models.DPT_SHSROK" Width="1.5" PointX="2.75" PointY="4.75" />
+        <EntityTypeShape EntityType="BarsWeb.Areas.DptAdm.Models.DPT_SHTERM" Width="1.5" PointX="4.75" PointY="4.75" />
+        <EntityTypeShape EntityType="BarsWeb.Areas.DptAdm.Models.DPT_SHTYPE" Width="1.5" PointX="6.75" PointY="4.75" />
+        <AssociationConnector Association="BarsWeb.Areas.DptAdm.Models.FK_DPTEXT_DPTEXTMETHOD" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

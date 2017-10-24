@@ -1,0 +1,218 @@
+﻿body {
+}
+
+/*---------- RowBG Color -----*/
+.k-row-isRevoked {
+    background-color: #00ccff;
+}
+.k-row-isApproved {
+    background-color: #ccccff;
+}
+.k-row-isDisabled {
+    background-color: #ff0000;
+}
+/*---------- defaultSelectedRowColor ----*/
+.k-grid table tr.k-state-selected
+{
+    background-color: #428bca !important;
+}
+.k-grid table tr.k-state-selected td
+{
+    background-color: #428bca !important;
+}
+.k-grid table tr.k-state-selected td div
+{
+    background-color: #428bca !important;
+}
+/*-------------------------------------*/
+    
+/* Main grid color marks */
+.k-row-isNotActive {
+    color: red;
+}
+.k-row-isDisable {
+    color: brown;
+}
+.k-row-isExpired {
+    color: #ff00ff;
+}
+.error {
+    border: solid 1px #FF0000;  
+}
+
+
+.form-control {
+    display: block;
+    width: 95%;
+    height: 20px;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+            box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+    -webkit-transition: border-color ease-in-out .15s, -webkit-box-shadow ease-in-out .15s;
+        -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+            transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+}
+.form-control-in {
+    display: block;
+    width: 95%;
+    height: 20px;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+            box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+    -webkit-transition: border-color ease-in-out .15s, -webkit-box-shadow ease-in-out .15s;
+        -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+            transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+}
+.form-group {
+  margin-bottom: 10px;
+}
+.box-left {
+    float: left;
+    margin-right: 30px;
+    width: 30%;
+}
+.box-right {
+    float: left;
+    width: 62%;
+}
+.btn {
+    width: 90%;
+    display: inline-block;
+    padding: 6px 12px;
+    margin-bottom: 10px;
+    font-size: 14px;
+    font-weight: normal;
+    line-height: 1.42857143;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    -ms-touch-action: manipulation;
+        touch-action: manipulation;
+    cursor: pointer;
+    -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+            user-select: none;
+    background-image: none;
+    border: 1px solid transparent;
+    border-radius: 4px;
+}
+.well-abs {
+    height: 120px;
+    min-height: 20px;
+    padding: 19px;
+    margin-bottom: 20px;
+    background-color: #f5f5f5;
+    border: 1px solid #e3e3e3;
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .05);
+            box-shadow: inset 0 1px 1px rgba(0, 0, 0, .05);
+}
+.well-ora {
+    /*height: 120px;*/
+    min-height: 20px;
+    padding: 9px 19px 19px 19px;
+    margin-bottom: 20px;
+    background-color: #f5f5f5;
+    border: 1px solid #e3e3e3;
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .05);
+            box-shadow: inset 0 1px 1px rgba(0, 0, 0, .05);
+}
+.abs-left {
+    float: left;
+    margin-right: 30px;
+    width: 40%;
+}
+.abs-right {
+    float: left;
+    width: 52%;
+}
+#branchId {
+    margin-bottom: 10px;
+}
+#branchName {
+    width: 85%;
+    float: left;
+}
+#addBranchBtn {
+    float: right;
+    margin-top: 4px;
+    margin-right: 10px;
+}
+.container-fluid h4 {
+    color: #428bca;
+}
+.auth-left {
+    float: left;
+    width: 60%;
+    margin-top: 5px;
+}
+.auth-right {
+    float: left;
+    width: 40%;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.ora-top {
+    float: left;
+}
+.ora-left {
+    float: left;
+    /*width: 47%;*/
+    margin-right: 20px;
+}
+.ora-right {
+    /*width: 47%;*/
+    float: right;
+    margin-left: 35px;
+    margin-right: 10px;
+}
+.ora-bottom {
+    margin-top: 10px;
+}
+#ora-roles, #adLogin, #ed_ora-roles , #ed_adLogin {
+    width: 80%;
+    
+}
+#addOraRoleBtn {
+    margin-left: 10px;
+}
+
+
+
+
+.btnBlock {
+    /*padding-top: 20px;*/
+    padding-right: 20px;
+    float: right;
+}
+
+#ed_endDete + span.k-select{
+    display: none;
+}
+
+#digitalSign {
+    width: 95%;
+}
+
+.rez {
+    margin-left: 20px;
+    margin-top: 10px;
+    color: #ff0000;
+}

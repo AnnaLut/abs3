@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<filter>
+ <COL_NATIVE>
+  <DATA_RECORD>
+    <COLNAME>$ID</COLNAME>
+    <TAG>Код</TAG>
+    <COLTYPE>C</COLTYPE>
+  </DATA_RECORD>
+  <DATA_RECORD>
+    <COLNAME>$NAME</COLNAME>
+    <TAG>Опис</TAG>
+    <COLTYPE>C</COLTYPE>
+  </DATA_RECORD>
+ </COL_NATIVE>
+ </filter>

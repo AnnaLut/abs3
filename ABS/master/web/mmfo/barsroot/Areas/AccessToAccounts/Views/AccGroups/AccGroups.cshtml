@@ -1,0 +1,47 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = "АРМ Адміністрування доступу до рахунків";
+}
+
+<div ng-controller="AccessToAccounts.AccGroupsCtrl">
+    <form>
+        <table>
+            <tr>
+                <td colspan="3">
+                    <div kendo-grid="gridAccGroups" k-options="gridAccGroupsOptions" k-on-change="selectedAccountsGroup(data)"></div>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <p></p>
+                </td>
+            </tr>
+            <tr id="trChildGrids" ng-style="disableChildsGrids">
+                <td style="vertical-align:top">
+                    <div kendo-grid="gridIssuedAccounts" k-options="gridIssuedAccountsOptions" k-on-change="selectedIssuedAccount(data)"></div>
+                </td>
+                <td style="vertical-align:central;">
+                    <table>
+                        <tr>
+                            <td>
+                                <button ng-click="RemoveAccFromGroup()" ng-disabled='!buttonArrowRight' class='k-button' style="margin: 5px 5px 5px 5px"><i class='pf-icon pf-16 pf-arrow_right'></i></button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <button ng-click="addAccountToGroup()" ng-disabled='!buttonArrowLeft' class='k-button' style="margin: 5px 5px 5px 5px"><i class='pf-icon pf-16 pf-arrow_left'></i></button>
+
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+                <td style="vertical-align:top">
+                    <div kendo-grid="gridNotIssuedAccounts" k-options="gridNotIssuedAccountsOptions" k-on-change="selectedNotIssuedAccount(data)"></div>
+                </td>
+            </tr>
+        </table>
+    </form>
+</div>
+
+@Styles.Render("~/bundles/AccessToAccounts/styles")
+@Scripts.Render("~/bundles/AccessToAccounts/AccGroups")

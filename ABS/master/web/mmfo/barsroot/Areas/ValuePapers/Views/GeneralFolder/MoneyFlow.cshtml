@@ -1,0 +1,102 @@
+﻿@model InitParams
+@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = "Потоки грошових коштів, вартість, амортизація";
+}
+
+<script>
+
+    window.gridParams = {
+        nMode: +'@Model.nMode',
+        nGrp: +'@Model.nGrp',
+        strPar01: +'@Model.strPar01',
+        strPar02: +'@Model.strPar02',
+        p_active: +'@Model.p_active'
+    }
+    window.REF = '@ViewBag.REF'
+</script>
+
+
+
+<link href="~/Areas/ValuePapers/Css/styles.css" rel="stylesheet">
+
+
+<div class="page-header">
+    <h2>
+        @ViewBag.Title
+    </h2>
+</div>
+<script src="~/Areas/ValuePapers/scripts/jszip.js"></script>
+<div ng-controller="moneyFlowHomeController" >
+    @*<div kendo-window="moneyFlowWindow" k-visible="false" k-modal="false"
+         k-width="1050" k-height="750" k-title="'Потоки грошових коштів, вартість, амортизація'" style="background-color: #F2F2F2;">*@
+        @*ng-controller="moneyFlowController"*@
+        <form  class="container" style="width: 98%; ">
+            <div class="row">
+                <input type="text" kendo-date-picker k-options="datePickerOptions" disabled name="name" k-ng-model="vm.DAT_EM" style="width:100px;" />
+                <input type="text" kendo-date-picker k-options="datePickerOptions" disabled name="name" k-ng-model="vm.DATP" style="width:100px;" />
+                <input type="text" kendo-date-picker k-options="datePickerOptions" name="name" k-ng-model="vm.DAT_ROZ" style="width:100px;" ng-click="turnMoneyParam(vm.RB1,vm.RB2,vm.DAT_ROZ)" />
+
+                <button class="k-button" title="Вигрузка в Excel"><img src="~/Areas/ValuePapers/Content/Images/EXCEL.png"></button>
+
+                <input type="text" disabled name="name" class="k-textbox" ng-model="vm.CENA" style="width:100px;" />
+                <input type="text" disabled name="name" class="k-textbox" ng-model="vm.KOL" style="width:100px;" />
+                <input type="text" disabled name="name" class="k-textbox" ng-model="vm.IR" style="width:100px;" />
+                <input type="text" disabled name="name" class="k-textbox" ng-model="vm.SBASEY" style="width:100px;" />
+                <input type="text" disabled name="name" class="k-textbox" ng-model="vm.SBASEY1" style="width:100px;" />
+            </div>
+
+            <div class="row" style="margin-top: 10px;">
+
+                <fieldset style="display: inline-block;" ng-click="turnMoneyParam(vm.RB1,vm.RB2, vm.DAT_ROZ)">
+                    <legend></legend>
+                    <label>
+                        <input type="radio" ng-model="vm.RB1" name="rb1" ng-value="0" />
+                        <span>Всі дні (плат.+звіт.)</span>
+                    </label>
+                    <label>
+                        <input type="radio" ng-model="vm.RB1" name="rb1" ng-value="1" />
+                        <span>Тільки платеж. дні</span>
+                    </label>
+                    <label>
+                        <input type="radio" ng-model="vm.RB1" name="rb1" ng-value="2" />
+                        <span>Тільки звіт. дні</span>
+                    </label>
+                </fieldset>
+
+
+                <fieldset style="display: inline-block;" ng-click="turnMoneyParam(vm.RB1,vm.RB2, vm.DAT_ROZ)">
+                    <legend></legend>
+                    <label style="margin-left: 80px;">
+                        <input type="radio" ng-model="vm.RB2" name="rb2" ng-value="0" />
+                        <span>Сальдо рахунку переоцінки</span>
+                    </label>
+                    <label>
+                        <input type="radio" ng-model="vm.RB2" name="rb2" ng-value="1" />
+                        <span>Без переоцінки</span>
+                    </label>
+                </fieldset>
+
+            </div>
+            <div style="margin-top: 20px; " class="row">
+                <div kendo-grid="moneyFlowGrid" id="moneyFlowGrid" options="gridOptions" ></div>
+            </div>
+
+        </form>
+
+    @*</div>*@
+</div>
+
+<script src="~/Areas/ValuePapers/app/app.js"></script>
+@* ---- services ---- *@
+<script src="~/Areas/ValuePapers/app/services/paramsService.js"></script>
+<script src="~/Areas/ValuePapers/app/services/localStorage.js?v1.0.0"></script>
+@* ---- directives ---- *@
+<script src="~/Areas/ValuePapers/app/directives/onlyNumber.js"></script>
+<script src="~/Areas/ValuePapers/app/directives/onlyDecimal.js"></script>
+@* ---- controllers ---- *@
+<script src="~/Areas/ValuePapers/app/controllers/moneyFlowHomeController.js"></script>
+<script src="~/Areas/ValuePapers/app/controllers/dealController.js?1.0.0"></script>
+<script src="~/Areas/ValuePapers/app/controllers/specParamsController.js"></script>
+<script src="~/Areas/ValuePapers/app/controllers/moneyFlowController.js"></script>
+<script src="~/Areas/ValuePapers/app/controllers/planMoneyFlowController.js?1.0.0"></script>

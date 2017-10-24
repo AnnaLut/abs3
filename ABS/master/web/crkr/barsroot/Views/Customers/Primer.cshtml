@@ -1,0 +1,21 @@
+﻿@{
+  ViewBag.Title = "title";
+}
+<script type="text/javascript">
+  function viewScan1() {
+    var divDialog = $('<div/>');
+    var img = $('<img/>', { src: '/barsroot/customers/viewscan/' + $('#id1').val() });
+    divDialog.append(img);
+    divDialog.dialog({
+      width: 700,
+      height: 700,
+      modal: true,
+      title:'Перегляд сканованого документа'
+    });
+  }
+</script>
+<h2>Зразок перегляду сканів</h2>
+<div>
+  <input type="text" id="id1" value="10122"/>
+  <input type="button" value="Зразок 1" onclick="viewScan1();"/>
+</div>

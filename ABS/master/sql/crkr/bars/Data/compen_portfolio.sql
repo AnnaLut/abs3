@@ -1,0 +1,1 @@
+--update compen_portfolio set branch_crkr = branch where branch_crkr is null;

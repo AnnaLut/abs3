@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="03/27/2013 14:51:01" ReportInfo.Modified="04/08/2013 11:32:11" ReportInfo.CreatorVersion="1.9.1.0">
+  <Dictionary>
+    <OracleDataConnection Name="vinnbars" ConnectionString="rijcmlq9SEZoacNJntaKIKp6mVF1/AGuYvIoAMS3Xiow+EiNjSiBFpnGq+JCDIppOUFevKKBKBVVhu5fOo1sC+9IvseSyJFhJS4rmS3DjYIgB2Wyq8=">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select NUM00 ACC_W4, NUM01 RNKW, CHAR00 PRODUCT, CHAR01 ACC_BPK_ADDRESS, CHAR02 ACC_BPK_BDAY, CHAR03 ACC_BPK_BPLACE, CHAR04 ACC_BPK_COND_SET, CHAR05 ACC_BPK_DAOS, DAT00 WDAOS, CHAR06 ACC_BPK_DAOS_OLD, CHAR07 ACC_BPK_DOVER, CHAR08 ACC_BPK_F, CHAR09 ACC_BPK_I, CHAR10 ACC_BPK_ISP_NAME_S, CHAR11 ACC_BPK_LIM, CHAR12 ACC_BPK_LIM_LIT, CHAR13 ACC_BPK_LIM_LIT_OLD, CHAR14 ACC_BPK_LIM_OLD, CHAR15 ACC_BPK_M, CHAR16 ACC_BPK_MOB_TEL, NUM02 ACC_BPK_ND, NUM03 ACC_BPK_ND_OLD, CHAR17 ACC_BPK_NLS from rs_tmp_report_data where session_id=:session_id order by id">
+        <Column Name="RNKW" DataType="System.Decimal"/>
+        <Column Name="PRODUCT" DataType="System.String"/>
+        <Column Name="ACC_BPK_ADDRESS" DataType="System.String"/>
+        <Column Name="ACC_BPK_BDAY" DataType="System.String"/>
+        <Column Name="ACC_BPK_BPLACE" DataType="System.String"/>
+        <Column Name="ACC_BPK_COND_SET" DataType="System.String"/>
+        <Column Name="ACC_BPK_DAOS" DataType="System.String"/>
+        <Column Name="WDAOS" DataType="System.DateTime"/>
+        <Column Name="ACC_BPK_DAOS_OLD" DataType="System.String"/>
+        <Column Name="ACC_BPK_DOVER" DataType="System.String"/>
+        <Column Name="ACC_BPK_F" DataType="System.String"/>
+        <Column Name="ACC_BPK_I" DataType="System.String"/>
+        <Column Name="ACC_BPK_ISP_NAME_S" DataType="System.String"/>
+        <Column Name="ACC_BPK_LIM" DataType="System.String"/>
+        <Column Name="ACC_BPK_LIM_LIT" DataType="System.String"/>
+        <Column Name="ACC_BPK_LIM_LIT_OLD" DataType="System.String"/>
+        <Column Name="ACC_BPK_LIM_OLD" DataType="System.String"/>
+        <Column Name="ACC_BPK_M" DataType="System.String"/>
+        <Column Name="ACC_BPK_MOB_TEL" DataType="System.String"/>
+        <Column Name="ACC_BPK_ND" DataType="System.Decimal"/>
+        <Column Name="ACC_BPK_ND_OLD" DataType="System.Int64"/>
+        <Column Name="ACC_BPK_NLS" DataType="System.String"/>
+        <Column Name="ACC_W4" DataType="System.Decimal"/>
+        <CommandParameter Name="session_id" DataType="107" Expression="[session_id]" DefaultValue="-1"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="sFdat" DataType="System.DateTime"/>
+    <Parameter Name="sFdat2" DataType="System.DateTime"/>
+    <Parameter Name="OKPO" DataType="System.String"/>
+    <Parameter Name="session_id" DataType="System.Decimal"/>
+  </Dictionary>
+  <ReportPage Name="Page2">
+    <PageHeaderBand Name="PageHeader1" Width="718.2" Height="28.35"/>
+    <DataBand Name="Data2" Top="32.35" Width="718.2" Height="18.9" DataSource="Table">
+      <TableObject Name="Table2" Width="330.75" Height="18.9">
+        <TableColumn Name="Column1"/>
+        <TableColumn Name="Column2"/>
+        <TableColumn Name="Column3"/>
+        <TableColumn Name="Column4"/>
+        <TableColumn Name="Column5"/>
+        <TableRow Name="Row1">
+          <TableCell Name="Cell1" Text="[Table.RNKW]"/>
+          <TableCell Name="Cell2" Text="[Table.PRODUCT]"/>
+          <TableCell Name="Cell3" Text="[Table.ACC_BPK_ADDRESS]"/>
+          <TableCell Name="Cell4" Text="[Table.ACC_BPK_BDAY]"/>
+          <TableCell Name="Cell5" Text="[Table.ACC_BPK_BPLACE]"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+  </ReportPage>
+</Report>

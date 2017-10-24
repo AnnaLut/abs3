@@ -1,0 +1,680 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = "Адміністрування користувачів";
+}
+
+@Scripts.Render("~/bundles/Admin/admu")
+
+<script language="javascript" src="/Common/Script/Encrypt/sha1.js" type="text/javascript"></script>
+
+<link href="~/Areas/Admin/Css/admu.css" rel="stylesheet">
+
+<style>
+.sample-show-hide {
+  padding: 10px;
+  border: 1px solid black;
+  background: white;
+}
+
+.sample-show-hide {
+  transition: all linear 0.5s;
+}
+
+.sample-show-hide.ng-hide {
+  opacity: 0;
+}
+.button {
+    background-image: none;
+    padding-bottom: 10px;
+}
+.active {
+    color: #fff;
+    background-color: #32408f;
+    border-color: #32408f;
+}
+.disabled {
+    background: #eee;
+    color: #aaa;
+}
+</style>
+
+<script>
+    var proxy = "@ViewBag.Proxy";
+    var funcType = "none";
+</script>
+
+<div class="page-header">
+    <h1>@ViewBag.Title</h1>
+</div>
+
+
+<div id="UsersConfigToolBar"></div>
+<div id="ADMUGrid"></div>
+
+<div id="CreateUserWindow">
+    <div id="create-form">
+        <div id="create-form-tabs">
+            <ul>
+                <li>Загальна інформація</li>
+                <li>Налаштування аутентифікації</li>
+                @*<li>Доступні відділення</li>*@
+                <li>Ролі користувача</li>
+            </ul>
+            <div id="create-info-tab" style="height: 430px">
+                <div class="container-fluid" id="container-Create">
+                    <form>
+                        <div class="form-group">
+                            <div class="box-left">
+                                <label for="login">Логін:</label>
+                                <input type="text" id="login" class="form-control" placeholder="Логін">
+                            </div>
+                            <div class="box-right">
+                                <label for="name">ПІБ:</label>
+                                <input type="text" id="name" class="form-control" placeholder="Прізвище Ім'я...">
+                            </div>
+                        </div>
+                        <div class="form-group">
+
+                            <label for="branchId" style="margin-top: 5px;">Відділення:</label>
+
+                            <input id="branchId" type="text" class="form-control" name="branchId" readonly>
+                            <input id="branchName" class="form-control" readonly>
+                            <button type="button" id="addBranchBtn" class="k-button" title="Додати відділення">
+                                <b>...</b>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="container-fluid">
+                    <div class="checkbox">
+                        <div id="signBox" class="control-group well">
+                            <div>
+                                <label>
+                                    <input id="canSelectBranch" type="checkbox">Може обирати відділення
+                                </label>
+                            </div>
+                            <div>
+                                <label>
+                                    <input id="extendedAccess" type="checkbox">Користувач з розширеним доступом
+                                </label>
+                            </div>
+                            <div class="controls form-inline">
+                                <label for="digitalSign" style="margin-top: 20px; margin-right: 10px">Ключ цифрового підпису (<i>*Min 6 символів</i>)</label>
+                                <input type="text" class="form-control" id="digitalSign" maxlength="6" pattern=".{6,6}" required title="6 characters minimum">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="create-auth-tab">
+                <div class="form-group">
+                    <div class="container-fluid">
+
+                        <form class="">
+                            <div class="checkbox">
+                                <label>
+                                    <input id="useAbs" type="checkbox" value="1">ABS
+                                </label>
+                                <div id="absBox" class="control-group well">
+                                    <div class="controls form-inline">
+
+                                        <label for="abs-password" style="margin-right: 48px">Пароль</label>
+                                        <input type="password" class="input-small" id="abs-password" name="abs-password" placeholder="******" required>
+
+                                    </div>
+                                    <div class="controls form-inline" style="margin-top: 10px;">
+
+                                        <label for="abs-passConfirm">Підтвердження</label>
+                                        <input type="password" class="input-small" id="abs-passConfirm" name="abs-passConfirm" placeholder="******" required>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input id="useOra" type="checkbox" value="2">Oracle
+                                </label>
+                                <div id="oraBox" class="control-group well">
+                                    <div class="controls form-inline">
+                                        <label for="ora-password" style="margin-right: 48px">Пароль</label>
+                                        <input type="password" class="input-small" id="ora-password" name="ora-password" placeholder="******" required>
+                                    </div>
+                                    <div class="controls form-inline" style="margin-top: 10px;">
+                                        <label for="ora-passConfirm">Підтвердження</label>
+                                        <input type="password" class="input-small" id="ora-passConfirm" name="ora-passConfirm" placeholder="******" required>
+                                    </div>
+                                    <div class="row-fluid" style="margin-top: 10px;">
+                                        <div class="span12">
+                                            <label>Ролі</label>
+                                            <input class="inline" id="ora-roles" readonly name="ora-roles" placeholder="Оберіть потрібні ролі" required>
+                                            <button type="button" id="addOraRoleBtn" class="k-button" title="Додати роль Oracle">...</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input id="useAd" type="checkbox" value="3">Active Directory
+                                </label>
+                                <div id="adBox" class="control-group well">
+                                    <div class="controls form-inline">
+                                        <label for="adLogin">Логін</label>
+                                        <input type="text" class="input" placeholder="Логін" id="adLogin">
+                                        <p class="rez"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+            @*<div id="create-branch-tab">
+                <div class="form-group">
+                    <div style="padding-top: 2em;">
+                        <div id="treelist"></div>
+                    </div>
+                </div>
+            </div>*@
+            <div id="create-role-tab" style="height: 430px">
+                <div class="form-group">
+                    <div style="padding-top: 2em;">
+                        <div id="role-treelist"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="btnBlock">
+                <button id="btnSave-adding" type="submit" class="k-button btnSave">Зберегти</button>
+                <button id="btnCancel-adding" type="button" class="k-button btnCancel">Відмінити</button>
+            </div>
+            @*<button type="submit" class="btn btn-info" id="saveCreateRole-btn">Створити</button>
+                <button type="button" class="btn btn-danger" id="cencelCreateRole-btn">Відмінити</button>*@
+        </div>
+    </div>
+</div>
+
+@* ------  Users Branches -----------------------------------------------------------------------*@
+<div id="branchWindow">
+    <div id="branchToolBar"></div>
+    <div id="branchGrid"></div>
+</div>
+
+@* ------  Oracle Roles -----------------------------------------------------------------------*@
+<div id="ora-roles-Window">
+    <div id="ora-ToolBar"></div>
+    <div id="ora-roles-grid"></div>
+</div>
+
+
+<!-- Edit Region -->
+
+
+<div id="EditUserWindow">
+    <form id="edit-form">
+        <div id="edit-form-tabs">
+            <ul>
+                <li>Загальна інформація</li>
+                <li>Аутентифікація</li>
+                @*<li>Доступні відділення</li>*@
+                <li>Ролі користувача</li>
+                <li>Делегування прав</li>
+            </ul>
+            <div id="edit-info-tab">
+                <div id="mainPart"></div>
+                <div class="panels">
+                    <div class="" style="float:right;width: 20%;">
+                        @*<div>
+                            <button type="button" id="changePassword" class="k-button" style="margin:1px;width: 100px;">
+                                <h5 style="color: #428bca; margin-top: 3px; margin-bottom: 3px;">Змінити<br/>пароль</h5>
+                            </button>
+                        </div>*@
+                        <div>
+                            <button type="button" id="lock" class="k-button" style="margin:1px;width: 100px;">
+                                <h5 style="color: #428bca; margin-top: 3px; margin-bottom: 3px;">Блокувати</h5>
+                            </button>
+                        </div>
+                        <div>
+                            <button type="button" id="unlock" class="k-button" style="margin:1px;width: 100px;">
+                                <h5 style="color: #428bca; margin-top: 3px; margin-bottom: 3px;">Розблокувати</h5>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="well" style="float:left;width: 70%; padding-top: 0px;padding-bottom: 10px;margin-bottom: 10px;" id="authMode">
+                        <div class="checkbox">
+                            <div id="ed_signBox" class="control-group">
+                                <!-- content in template -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+                <div class="panels">
+                    <div style="float:left;width: 70%;"><h5 style="color: #428bca;">Примітки:</h5></div>
+                    <div class="well" style="float:left;width: 70%;" id="edComments">
+                        
+                    </div>
+                </div>
+            </div>
+            <div id="edit-branch-tab">
+                @*<div id="edit-branch-treelist"></div>*@
+                <div class="form-group">
+                    <div class="container-fluid">
+
+                        <form class="">
+                            <div class="checkbox">
+                                <label>
+                                    <input id="ed_useAbs" type="checkbox" value="1">ABS
+                                </label>
+                                <div id="ed_absBox" class="control-group well">
+                                    <div class="controls form-inline">
+
+                                        <label for="ed_abs-password" style="margin-right: 48px">Пароль</label>
+                                        <input type="password" class="input-small" id="ed_abs-password" name="ed_abs-password" placeholder="******" required>
+
+                                    </div>
+                                    <div class="controls form-inline" style="margin-top: 10px;">
+
+                                        <label for="ed_abs-passConfirm">Підтвердження</label>
+                                        <input type="password" class="input-small" id="ed_abs-passConfirm" name="ed_abs-passConfirm" placeholder="******" required>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input id="ed_useOra" type="checkbox" value="2">Oracle
+                                </label>
+                                <div id="ed_oraBox" class="control-group well">
+                                    <div class="controls form-inline">
+                                        <label for="ed_ora-password" style="margin-right: 48px">Пароль</label>
+                                        <input type="password" class="input-small" id="ed_ora-password" name="ed_ora-password" placeholder="******" required>
+                                    </div>
+                                    <div class="controls form-inline" style="margin-top: 10px;">
+                                        <label for="ed_ora-passConfirm">Підтвердження</label>
+                                        <input type="password" class="input-small" id="ed_ora-passConfirm" name="ed_ora-passConfirm" placeholder="******" required>
+                                    </div>
+                                    <div class="row-fluid" style="margin-top: 10px;">
+                                        <div class="span12">
+                                            <label>Ролі</label>
+                                            <input class="inline" id="ed_ora-roles" readonly name="ora-roles" placeholder="Оберіть потрібні ролі" required>
+                                            <button type="button" id="ed_addOraRoleBtn" class="k-button" title="Додати роль Oracle">...</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input id="ed_useAd" type="checkbox" value="3">Active Directory
+                                </label>
+                                <div id="ed_adBox" class="control-group well">
+                                    <div class="controls form-inline">
+                                        <div id="authTempBox"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+            <div id="edit-role-tab">
+     
+                    
+                        <div class="row">
+                            <div class="form-inline">
+                                <h3>Поле пошуку ролі</h3>
+                                <div id="custom-search-input">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="rCode" placeholder="Код ролі" style="height: 34px !important;" maxlength="15" size="25" />
+                                        <span class="input-group-btn">
+                                            <button id="showWindow" class="btn btn-info" type="button">
+                                                <i class="glyphicon glyphicon-search">Пошук</i>
+                                            </button>
+                                        </span>
+                                    </div>
+                                    <div class="control-group" style="width: 25px; float: right; margin-left: 30px;">
+                                        <button id="clearFilter" class="btn btn-default" type="button">
+                                            <i class="pf-icon pf-16 pf-filter-remove"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    
+                
+                <div id="edit-role-grid"></div>
+            </div>
+            <div id="edit-delegation-tab">
+                <div id="delegationBody"></div>
+                <div>
+                    <button type="button" id="delegate" class="k-button" style="margin: 1px; width: 100px;">
+                        <h5 style="color: #428bca; margin-top: 3px; margin-bottom: 3px;">Делегувати<br/>права</h5>
+                    </button>
+
+                    <button type="button" id="cencelDelegate" class="k-button" style="margin: 1px; width: 100px;">
+                        <h5 style="color: #428bca; margin-top: 3px; margin-bottom: 3px;">Відмінити<br/>делегування</h5>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="form-group" style="margin-bottom: 1px; float: right; margin-right: 20px;margin-top: 15px;">
+                <button id="btnSave-editing" type="submit" class="k-button btnSave">Зберегти</button>
+                <button id="btnCancel-editing" type="button" class="k-button btnCancel">Відмінити</button>
+        </div>
+    </form>
+</div>
+
+<script type="text/x-kendo-template" id="authTemp">
+   
+        <label for="ed_adLogin">Логін</label>
+        <input type="text" class="input" placeholder="Логін" id="ed_adLogin" value="#= AdName !== 'null' ? AdName : ''#">
+        <p class="rez"></p>
+ 
+</script>
+
+<!-- Edit template -->
+
+<script type="text/x-kendo-template" id="Edit">
+    <div class="container-fluid">
+        <div class="form-group">
+            <div class="box-left">
+                <label for="ed_login">Логін:</label>
+                <input type="text" id="ed_login" class="form-control" placeholder="Логін" readonly value="#=LoginName.toUpperCase()#">
+            </div>
+            <div class="box-right">
+                <label for="ed_name">ПІБ:</label>
+                <input type="text" id="ed_name" class="form-control" placeholder="Прізвище Ім'я..." value="#=UserName#">
+            </div>
+        </div>
+    </div>
+    <div class="panels">
+        <!--MainBranch-->
+        <div class="form-group" style="margin-left: 10px;">
+            <h5><label for="ed_branchId" style="padding-top: 10px; padding-right: 12px; float: left;">Відділення:</label></h5>
+            <input id="ed_branchId" type="text" class="form-control" readonly style="width: 120px; height: 20px; float: left;" value="#=BranchCode#">
+            <div class="form-group" style="margin-left: 10px; float: left">
+                <input id="ed_branch" class="form-control" readonly style="width: 210px; height: 20px; margin-left: 5px;" value="#=BranchName#">
+            </div>
+            <div>
+                <button type="button" id="editBranchBtn" class="k-button" title="" style="margin-top: 4px; margin-left: 5px;">
+                    <i class="pf-icon pf-16 pf-folder_open"></i>
+                </button>
+            </div>
+        </div>
+        <!--UserStatus-->
+        <div class="form-group" style="margin-left: 10px;">
+            <h5><label for="" style="padding-right: 20px; float: left;">Статус<br />користувача:</label></h5>
+            <input id="" type="text" class="form-control" readonly style="width: 100px; height: 20px; float: left;" value="#=UserStateCode#">
+            <div class="form-group" style="margin-left: 10px; float: left">
+                <input id="" class="form-control" readonly style="width: 250px; height: 20px; margin-left: 5px;" value="#=UserStateName#">
+            </div>
+        </div>        
+    </div>
+</script>
+
+<script type="text/x-kendo-template" id="Delegation">
+    <!--UserRights-->
+    <div class="form-group" style="margin-left: 10px;">
+        <h5><label for="" style="padding-right: 12px; float: left;">Права<br />делеговані до:</label></h5>
+        <input id="" type="text" class="form-control" readonly style="width: 100px; height: 20px; float: left;" value="#=DelegatedUserLogin === 'null' ? '-' : DelegatedUserLogin#">
+        <div class="form-group" style="margin-left: 10px; float: left">
+            <input id="" class="form-control" readonly style="width: 250px; height: 20px; margin-left: 5px;" value="#=DelegatedUserName === 'null' ? '-' : DelegatedUserName#">
+        </div>
+    </div>
+</script>
+
+<script type="text/x-kendo-template" id="edSignContent">
+    <div>
+        <label>
+            <input id="ed_canSelectBranch" type="checkbox" data-bind="checked:CanSelectBranch" #=CanSelectBranch ? checked='checked' : '' #>Може обирати відділення 
+
+        </label>
+    </div>
+    <div>
+        <label>
+            <input id="ed_extendedAccess" type="checkbox" data-bind="checked:ExtendetAccess" #=ExtendetAccess ? checked='checked' : '' #>Користувач з розширеним доступом
+        </label>
+    </div>
+    <div class="controls form-inline">
+        <label for="ed_digitalSign" style="margin-top: 20px; margin-right: 10px;">Ключ цифрового підпису</label>
+        <input type="text" class="form-control" id="ed_digitalSign" style="width: 92%;" value="#=SecurityTokenPass !== 'null' ? SecurityTokenPass : ''#">
+    </div>
+</script>
+
+@* ------ Edit Users Branches -----------------------------------------------------------------------*@
+<div id="editBranchWindow">
+    <div id="editBranchToolBar"></div>
+    <div id="editBranchGrid"></div>
+</div>
+@* ------ Edit Oracle Roles -----------------------------------------------------------------------*@
+<div id="edit-oraRoles-Window">
+    <div id="edit-ora-ToolBar"></div>
+    <div id="edit-oraRoles-grid"></div>
+</div>
+
+<!-- AuthMode switcher -->
+<script type="text/x-kendo-template" id="authMode-ABS">
+    <div id="absMode">
+        <h5><label for="ed_endDete" style="padding-top: 3px; padding-right: 12px; float: left;">Дата завершення<br />дії паролю:</label></h5>
+        <input id="ed_endDete" type="text" class="form-control" style="width: 200px; height: 20px; float: left;" value="#= kendo.parseDate(PasswordExpiresAt,'dd/MM/yyyy HH:mm') === null ? ' - ' : kendo.parseDate(PasswordExpiresAt,'dd/MM/yyyy HH:mm') #" readonly>
+    </div>
+</script>
+
+<script type="text/x-kendo-template" id="authMode-ORA">
+    <div class="form-group" style="margin-bottom: 0px;" id="oraMode">
+        <h5><label for="edit-ora-roles" style="padding-top: 6px; padding-right: 12px; float: left; margin-top: 5px;">Ролі Oracle:</label></h5>
+        <input type="text" class="form-control" id="edit-ora-roles" readonly name="ora-roles" placeholder="Оберіть потрібні ролі" required style="height: 20px; width: 60%; float: left;" value="#=UserOraRoles#" />
+
+        <div id="ora-sample">
+            <button type="button" id="editOraRoleBtn" class="k-button" title="Додати роль Oracle" style="margin-top: 4px; margin-left: 5px; ">
+                <i class="pf-icon pf-16 pf-add_button"></i>
+            </button>
+        </div>
+
+    </div>
+</script>
+
+<script type="text/x-kendo-template" id="authMode-AD">
+    <div id="adMode">
+        <p style="margin-top: 20px;">
+            Active Directory встановлено як основний режим автентифікації користувача.
+        </p>
+    </div>
+</script>
+
+<!-- Buttons -->
+<div id="changePass-ABS" style="display: none;">
+    <div>
+        <div>
+            <div class="panels">
+                <div class="form-group" style="margin-left: 20px;">
+                    <h5><label for="chPass-ABS" style="padding-top: 6px; padding-right: 12px; float: left; margin-top: 5px;margin-right: 48px;">Пароль:</label></h5>
+                    <input type="password" class="form-control" id="chPass-ABS" required style="height: 20px; width: 50%;" placeholder="Новий пароль" />
+                </div>
+            </div>
+            <div class="panels">
+                <div class="form-group" style="margin-left: 20px;">
+                    <h5><label for="chPassConfirm-ABS" style="padding-top: 6px; padding-right: 12px; float: left; margin-top: 5px;">Підтвердження:</label></h5>
+                    <input type="password" class="form-control" id="chPassConfirm-ABS" required style="height: 20px; width: 50%;" placeholder="Підтвердіть пароль"/>
+                </div>
+            </div>
+        </div>
+        <div style="float: right;">
+            <button id="saveChPass-ABS" type="submit" class="k-button btnSave">Зберегти</button>
+            <button id="cencelChPass-ABS" type="button" class="k-button btnCancel">Відмінити</button>
+        </div>
+    </div>
+</div>
+
+<div id="changePass-ORA" style="display: none;">
+    <div>
+        <div>
+            <div class="panels">
+                <div class="form-group" style="margin-left: 20px;">
+                    <h5><label for="chPass-ORA" style="padding-top: 6px; padding-right: 12px; float: left; margin-top: 5px; margin-right: 48px;">Пароль:</label></h5>
+                    <input type="password" class="form-control" id="chPass-ORA" required style="height: 20px; width: 50%;" placeholder="Новий пароль"/>
+                </div>
+            </div>
+            <div class="panels">
+                <div class="form-group" style="margin-left: 20px;">
+                    <h5><label for="chPassConfirm-ORA" style="padding-top: 6px; padding-right: 12px; float: left; margin-top: 5px;">Підтвердження:</label></h5>
+                    <input type="password" class="form-control" id="chPassConfirm-ORA" required style="height: 20px; width: 50%;" placeholder="Підтвердіть пароль"/>
+                </div>
+            </div>
+        </div>
+        <div style="float: right;">
+            <button id="saveChPass-ORA" type="submit" class="k-button btnSave">Зберегти</button>
+            <button id="cencelChPass-ORA" type="button" class="k-button btnCancel">Відмінити</button>
+        </div>
+    </div>
+</div>
+
+<div id="delegateUserRightsWindow" style="display: none;">
+    <div id="delegateBox"></div>
+    <div>
+        <div class="panels">
+            <div class="form-group" style="margin-left: 10px; margin-bottom: 20px;">
+                <h5><label style="padding-top: 6px; float: left; margin-top: 5px; margin-right: 10px;">Період делегування прав:</label></h5>
+                <input type="text" class="form-control" id="delegateDateFrom" required style="height: 20px; width: 30%; float: left; margin-bottom: 15px"/>
+                <h5><label for="delegateDateTo" style="padding-top: 6px; padding-right: 12px; padding-left: 10px; float: left;"></label></h5>
+                <input type="text" class="form-control" id="delegateDateTo" required style="height: 20px; width: 30%;"/>
+            </div>
+        </div>
+        <div class="panels">
+            <div class="form-group" style="margin-left: 10px; margin-bottom: 20px;">
+                <h5><label for="delegationComment" style="padding-top: 6px; float: left; margin-top: 5px; margin-right: 10px;">Причина делегування прав:</label></h5>
+                <textarea id="delegationComment" rows="5" cols="55" name="text" style="resize: none;"></textarea>
+            </div>
+        </div>
+    </div>
+    <div style="float: right;">
+        <button id="saveDelegateOptions" type="submit" class="k-button btnSave">Зберегти</button>
+        <button id="cencelDelegateOptions" type="button" class="k-button btnCancel">Відмінити</button>
+    </div>
+</div>
+<script type="text/x-kendo-template" id="delegate-template">
+    <div class="form-group" style="margin-left: 10px;">
+        <h5><label for="delegatedUserTarget" style="padding-right: 12px; float: left;">Передати права<br />користувачу:</label></h5>
+        <input id="delegatedUserTarget" type="text" class="form-control" readonly style="width: 120px; height: 20px; float: left;" value="#= DelegatedUserLogin !== 'null' ? DelegatedUserLogin : '-' #">
+        <div class="form-group" style="margin-left: 10px; float: left">
+            <input id="delegatedUserTargetName" class="form-control" readonly style="width: 210px; height: 20px; margin-left: 5px;" value="#= DelegatedUserName !== 'null' ? DelegatedUserName : '-' #">
+        </div>
+        <div>
+            <button type="button" id="findDalagate" class="k-button" title="Обрати користувача" style="margin-top: 4px; margin-left: 5px;">
+                <i class="pf-icon pf-16 pf-add_button"></i>
+            </button>
+        </div>
+    </div>
+</script>
+
+<div id="lockWindow" style="display: none;">
+    <div id="lockInfoBox"></div>
+    <div class="panels">
+        <div class="form-group" style="margin-left: 10px; margin-bottom: 20px;">
+            <h5><label for="lockComment" style="padding-top: 6px; float: left; margin-top: 5px; margin-right: 10px;">Причина блокування:</label></h5>
+            <textarea id="lockComment" rows="5" cols="55" name="text" style="resize: none;"></textarea>
+        </div>
+    </div>
+    <div style="float: right;">
+        <button id="saveLockOptions" type="submit" class="k-button btnSave">Зберегти</button>
+        <button id="cencelLockOptions" type="button" class="k-button btnCancel">Відмінити</button>
+    </div>
+</div>
+<script type="text/x-kendo-template" id="lockUser-template">
+    <div class="panels">
+        <div class="form-group" style="margin-left: 10px;">
+            <h5><label for="lock_login" style="padding-top: 6px; padding-right: 12px; float: left; margin-top: 5px;">Логін:</label></h5>
+            <input type="text" class="form-control" id="lock_login" style="width: 200px; height: 20px;" readonly value="#=LoginName.toUpperCase()#" />
+        </div>
+    </div>
+    <div class="panels">
+        <div class="form-group" style="margin-left: 10px;">
+            <h5><label for="lock_name" style="padding-top: 6px; padding-right: 12px; float: left; margin-top: 5px;">ПІБ:</label></h5>
+            <input type="text" class="form-control" id="lock_name" style="width: 50%; height: 20px;" value="#=UserName#" readonly />
+        </div>
+    </div>
+</script>
+
+<!-- Comments -->
+<script type="text/x-kendo-template" id="comments-template">
+    <p style="margin-bottom: 0px;">
+        #= AdmComments !== 'null' ? AdmComments : 'Відсутні'#
+    </p>
+</script>
+
+
+<style>
+    #create-form-tabs {
+        margin-bottom: 20px;
+    }
+    #create-form-tabs .k-content
+    {
+        height: 400px;
+        overflow: auto;
+    }
+    #tabstrip-left .k-tabstrip .k-content
+    {
+        height: 10px;
+    }
+
+    .fieldlist {
+        margin: 0 0 -1em;
+        padding: 0;
+    }
+
+    .fieldlist li {
+        list-style: none;
+        padding-bottom: 1em;
+    }
+
+    #tabstrip-left .k-content.k-state-active {
+        height: 180px !important;
+    }
+
+    
+    .isUse {
+        color: #468847;
+        background-color: #dff0d8;
+        border-color: #d6e9c6;
+    }
+    .outUse {
+        color: #3a87ad;
+        background-color: #d9edf7;
+        border-color: #bce8f1;
+    }
+
+
+    .switch-wrapper {
+        display: inline-block;
+        position: relative;
+        top: 3px;
+    }
+
+
+
+    /*Edit*/
+    .table {
+        display:table;
+        width:100%;
+        height:100%;
+    }
+    .cell {
+        display:table-cell;
+        width:50%;
+        height:50%;
+    }
+    .row {
+        display:table-row;
+    }
+
+
+</style>
+
+
+
+
+

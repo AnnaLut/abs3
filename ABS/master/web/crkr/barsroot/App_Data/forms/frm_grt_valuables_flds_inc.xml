@@ -1,0 +1,27 @@
+﻿<customfield name="P_NAME" label="Найменування" required="true" datatype="String" size="100" datasourcefield="NAME" columnindex="2" groupname="5. Предмет застави">
+  <uicontrol type="TextBox" controlwidth="250" linescount="5" />
+</customfield>
+<customfield name="P_DESCR" label="Опис" required="true" datatype="String" size="100" datasourcefield="DESCR" columnindex="2" groupname="5. Предмет застави">
+  <uicontrol type="TextBox"  controlwidth="250" linescount="5"  />
+</customfield>
+<customfield name="P_WEIGHT" label="Загальна вага" required="true" datatype="Int64" datasourcefield="WEIGHT" columnindex="2" groupname="5. Предмет застави">
+  <uicontrol type="DecimalInput" controlwidth="150" />
+</customfield>
+<customfield name="P_PART_CNT" label="Загальна кількість частин" datatype="Int64" datasourcefield="PART_CNT" columnindex="2" groupname="5. Предмет застави">
+  <uicontrol type="DecimalInput" controlwidth="150" />
+</customfield>
+<customfield name="P_PART_DISC_WEIG" label="Знижка на вагу вставок" datatype="Int64" datasourcefield="PART_DISC_WEIG" columnindex="2" groupname="5. Предмет застави">
+  <uicontrol type="DecimalInput" controlwidth="150" />
+</customfield>
+<customfield name="P_VALUE_WEIGHT" label="Вага дорогоцінного металу" datatype="Int64" datasourcefield="VALUE_WEIGHT" columnindex="2" groupname="5. Предмет застави">
+  <uicontrol type="DecimalInput" controlwidth="150" />
+</customfield>
+<customfield name="P_TARIFF_PRICE" label="Ціна за прейскурантом" required="true" datatype="Decimal" datasourcefield="TARIFF_PRICE" columnindex="2" groupname="5. Предмет застави">
+  <uicontrol type="DecimalInput" controlwidth="150" />
+</customfield>
+<customfield name="P_EXPERT_PRICE" label="Сума оцінки експертом" required="true" datatype="Decimal" datasourcefield="EXPERT_PRICE" columnindex="2" groupname="5. Предмет застави">
+  <uicontrol type="DecimalInput" controlwidth="150" />
+</customfield>
+<customfield name="P_ESTIMATE_PRICE" label="Орієнтовна ринкова вартість" datatype="Decimal" datasourcefield="ESTIMATE_PRICE" columnindex="2" groupname="5. Предмет застави">
+  <uicontrol type="DecimalInput" controlwidth="150" />
+</customfield>

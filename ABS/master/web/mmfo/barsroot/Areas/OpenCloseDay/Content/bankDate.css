@@ -1,0 +1,11 @@
+﻿   .label-right {
+        margin-right: 100px;
+    }
+
+    .hidden-label {
+        display: none;
+    }
+
+    .panels {
+        display: table-row;
+    }

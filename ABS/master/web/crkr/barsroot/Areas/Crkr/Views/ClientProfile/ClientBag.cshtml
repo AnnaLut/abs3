@@ -1,0 +1,405 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+}
+<link rel="stylesheet" href="~/Areas/Crkr/Content/index.css" />
+
+<div class="container-fluid">
+    <h4>Клієнти ЦРКР</h4>
+    <form class="form-horizontal" id="searchparam">
+        <div class="col-xs-6">
+            <div class="form-group">
+                <label for="fio" class="col-xs-4 control-label required">ПІБ Клієнта:</label>
+                <div class="col-xs-8">
+                    <input type="text" class="k-textbox" id="fio" name="fio" placeholder="ПІБ">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="doctype" class="col-xs-4 control-label">Вид документу:</label>
+                <div class="col-xs-8">
+                    <input class="form-control" id="doctype" name="doctype">
+                </div>
+            </div>
+            <div class="form-group">
+                <div id="serform">
+                    <label for="docserial" class="col-xs-4 control-label">Серія:</label>
+                    <div class="col-xs-3">
+                        <input type="text" class="k-textbox" id="docserial" name="docserial" placeholder="Серія:" />
+                    </div>
+                </div>
+                <div id="eddrform">
+                    <label for="eddrid" class="col-xs-4 control-label">ЄДДР:</label>
+                    <div class="col-xs-3">
+                        <input type="text" class="k-textbox" id="eddrid" name="eddrid" placeholder="ЄДДР:" />
+                    </div>
+                </div>
+                <label for="docnumber" class="col-xs-2 control-label">Номер:</label>
+                <div class="col-xs-3">
+                    <input type="text" class="k-textbox" id="docnumber" name="docnumber" placeholder="Номер:">
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xs-6">
+            <div class="form-group">
+                <label for="icod" class="col-xs-4 control-label">ІНН Клієнта:</label>
+                <div class="col-xs-8">
+                    <input type="text" class="k-textbox" id="icod" name="icod" placeholder="ІНН" pattern="\d{10}">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="rnk" class="col-xs-4 control-label">РНК:</label>
+                <div class="col-xs-8">
+                    <input type="text" class="k-textbox" id="rnk" name="rnk" placeholder="РНК">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-xs-4"></div>
+                <div class="col-xs-4">
+                    <button type="button" class="k-button" style="width: 130px" id="adduser"><span class="k-sprite pf-icon pf-16 pf-add" style="margin-bottom: 3px"></span> Новий клієнт</button>
+                </div>
+                <div class="col-xs-4">
+                    <button type="submit" class="k-button right-pos" style="width: 130px"><span class="k-sprite pf-icon pf-16 pf-search" style="margin-bottom: 3px"></span> Пошук клієнтів</button>
+                </div>
+
+            </div>
+        </div>
+
+    </form>
+</div>
+<div id="clients"></div>
+<script>
+    $("#eddrform").hide();
+    $("#doctype").kendoDropDownList({
+        optionLabel: " ",
+        dataTextField: "NAME",
+        dataValueField: "PASSP",
+        dataSource: {
+            transport: {
+                read: {
+                    dataType: "json",
+                    url: bars.config.urlContent("/api/crkr/dropdown/clientpassp")
+                }
+            }
+        }
+    });
+
+    (function onload() {
+        $("#clients").hide();
+        var control = bars.extension.getParamFromUrl("control", window.location.toString());
+        if (control === "1")
+            $("#adduser").hide();
+    })();
+
+    $("#clients").kendoGrid({
+        resizable: true,
+        autobind: false,
+        selectable: "row",
+        sortable: true,
+        filterable: true,
+        scrollable: true,
+        pageable: {
+            buttonCount: 5
+        },
+        columns: [
+            {
+                field: "RNK",
+                title: "РНК",
+                width: "6em",
+                headerAttributes: { style: "white-space: normal" },
+                filterable: {
+                    cell: {
+                        operator: "contains"
+                    }
+                }
+            },
+            {
+                field: "NAME",
+                title: "ПІБ Клієнта",
+                width: "16em",
+                headerAttributes: { style: "white-space: normal" },
+                filterable: {
+                    cell: {
+                        operator: "contains"
+                    }
+                }
+            },
+            {
+                field: "SEX",
+                title: "Стать",
+                width: "7em",
+                headerAttributes: { style: "white-space: normal" },
+                filterable: {
+                    cell: {
+                        operator: "contains"
+                    }
+                }
+            },
+             {
+                 field: "DOC_TYPE",
+                 title: "Тип документу",
+                 width: "16em",
+                 headerAttributes: { style: "white-space: normal" },
+                 filterable: {
+                     cell: {
+                         operator: "contains"
+                     }
+                 }
+             },
+            {
+                field: "SER",
+                title: "Серія",
+                headerAttributes: { style: "white-space: normal" },
+                width: "6em",
+                filterable: {
+                    cell: {
+                        operator: "contains"
+                    }
+                }
+            },
+            {
+                field: "EDDR_ID",
+                title: "ЄДДР",
+                headerAttributes: { style: "white-space: normal" },
+                width: "8em",
+                filterable: {
+                    cell: {
+                        operator: "contains"
+                    }
+                }
+            },
+            {
+                field: "NUMDOC",
+                title: "Номер",
+                headerAttributes: { style: "white-space: normal" },
+                width: "8em",
+                filterable: {
+                    cell: {
+                        operator: "contains"
+                    }
+                }
+            },
+            {
+                field: "ORGAN",
+                title: "Хто видав",
+                headerAttributes: { style: "white-space: normal" },
+                width: "12em",
+                filterable: {
+                    cell: {
+                        operator: "contains"
+                    }
+                }
+            },
+            {
+                field: "DATE_OF_ISSUE",
+                title: "Дата видачі",
+                template: "<div>#= kendo.toString(kendo.parseDate(DATE_OF_ISSUE),'dd.MM.yyyy') == null ? '' : kendo.toString(kendo.parseDate(DATE_OF_ISSUE),'dd.MM.yyyy')#</div>",
+                headerAttributes: { style: "white-space: normal" },
+                width: "7em",
+                filterable: {
+                    cell: {
+                        operator: "contains"
+                    }
+                }
+            },
+            {
+                field: "BIRTH_DATE",
+                title: "Дата народження",
+                template: "<div>#= kendo.toString(kendo.parseDate(BIRTH_DATE),'dd.MM.yyyy') == null ? '' : kendo.toString(kendo.parseDate(BIRTH_DATE),'dd.MM.yyyy')#</div>",
+                headerAttributes: { style: "white-space: normal" },
+                width: "7em",
+                filterable: {
+                    cell: {
+                        operator: "contains"
+                    }
+                }
+            },
+            {
+                field: "INN",
+                title: "ІНН",
+                width: "7em",
+                filterable: {
+                    cell: {
+                        operator: "contains"
+                    }
+                }
+            },
+             {
+                 field: "SECONDARY",
+                 title: "Представник",
+                 template: "<div>#= SECONDARY === 0 ? '' : 'X'#</div>",
+                 width: "9em",
+                 filterable: {
+                     cell: {
+                         operator: "contains"
+                     }
+                 }
+             },
+            {
+                field: "REZID",
+                title: "Резидент",
+                width: "7em",
+                filterable: {
+                    cell: {
+                        operator: "contains"
+                    }
+                }
+            },
+            {
+                field: "ADDRESS",
+                template: "<div>#= ADDRESS == ',' || ADDRESS == null ? '' : ADDRESS #</div>",
+                title: "Адреса",
+                width: "15em",
+                filterable: {
+                    cell: {
+                        operator: "contains"
+                    }
+                }
+            },
+            {
+                field: "NLS",
+                title: "Номер рахунку",
+                headerAttributes: { style: "white-space: normal" },
+                width: "10em",
+                filterable: {
+                    cell: {
+                        operator: "contains"
+                    }
+                }
+            },
+            {
+                field: "MFO",
+                title: "МФО",
+                headerAttributes: { style: "white-space: normal" },
+                width: "6em",
+                filterable: {
+                    cell: {
+                        operator: "contains"
+                    }
+                }
+            },
+            {
+                field: "BRANCH",
+                title: "Код відділення",
+                headerAttributes: { style: "white-space: normal" },
+                width: "16em",
+                filterable: {
+                    cell: {
+                        operator: "contains"
+                    }
+                }
+            },
+            {
+                field: "DATE_VAL_REG",
+                title: "Дата валютування",
+                template: "<div>#= kendo.toString(kendo.parseDate(DATE_VAL_REG),'dd.MM.yyyy') == null ? '' : kendo.toString(kendo.parseDate(DATE_VAL_REG),'dd.MM.yyyy')#</div>",
+                headerAttributes: { style: "white-space: normal" },
+                width: "8.2em",
+                filterable: {
+                    cell: {
+                        operator: "contains"
+                    }
+                }
+            }
+
+        ],
+        dataSource: {
+            pageSize: 15,
+            transport: {
+                read: {
+                    type: "GET",
+                    dataType: "json",
+                    url: bars.config.urlContent("/api/crkr/clientgrid/getcrkrbag")
+                }
+            },
+            schema: {
+                model: {
+                    fields: {
+                        RNK: { type: "string" },
+                        NAME: { type: "string" },
+                        SER: { type: "string" },
+                        SEX: { type: "string" },
+                        BIRTH_DATE: { type: "string" },
+                        REZID: { type: "string" },
+                        DOC_TYPE: { type: "string" },
+                        ORGAN: { type: "string" },
+                        MFO: { type: "string" },
+                        SECONDARY: { type: "string" },
+                        EDDR_ID: { nullable: true, type: "string" },
+                        NUMDOC: { type: "string" },
+                        DATE_OF_ISSUE: { type: "string" },
+                        INN: { type: "string" },
+                        BRANCH: { type: "string" },
+                        ADDRESS: { nullable: true, type: "string" },
+                        NLS: { type: "string" },
+                        DATE_VAL_REG: { type: "string" }
+                    }
+                }
+            }
+        }
+    });
+
+
+    var goToClient = function () {
+        var burial = bars.extension.getParamFromUrl("burial", window.location.toString()) === "true" ? "&burial=true" : "";
+        var herid = bars.extension.getParamFromUrl("herid", window.location.toString());
+        var control = bars.extension.getParamFromUrl("control", window.location.toString()) === "1" ? "&control=1" : "";
+        var button = bars.extension.getParamFromUrl("button", window.location.toString());
+        var grid = $("#clients").data("kendoGrid");
+        var row = grid.dataItem(grid.select());
+        if (button === "true") {
+            window.location = "/barsroot/crkr/clientprofile/index?rnk=" + row.RNK + "&button=true";
+        } else {
+            window.location = "/barsroot/crkr/clientprofile/index?rnk=" + row.RNK + control + burial + "&herid=" + herid;
+        }
+    };
+    $("#clients").on("dblclick", "tbody > tr", goToClient);
+
+
+    $("#doctype").change(function (e) {
+        if (this.value === "7") {
+            $("#serial").val("");
+            $("#eddrform").show();
+            $("#serform").hide();
+        }
+        else if (this.value !== "7") {
+            $("#eddrid").val("");
+            $("#eddrform").hide();
+            $("#serform").show();
+        }
+    });
+
+    $("#adduser").on("click", function (e) {
+        e.preventDefault();
+        //TODO винести окремо
+        var burial = bars.extension.getParamFromUrl("burial", window.location.toString()) === "true" ? "&burial=true" : "";
+        var funeral = bars.extension.getParamFromUrl("funeral", window.location.toString()) === "true" ? "&funeral=true" : "";
+        var herid = bars.extension.getParamFromUrl("herid", window.location.toString());
+        window.location = bars.config.urlContent("/crkr/clientprofile/index?rnk=" + burial + funeral + "&herid=" + herid);
+    });
+
+    $("#searchparam").submit(function (event) {
+        event.preventDefault();
+        var values = {};
+        $.each($('#searchparam').serializeArray(), function (i, field) {
+            values[field.name] = field.value;
+        });
+
+        bars.ui.loader("body", true);
+        $.ajax({
+            url: bars.config.urlContent("/api/crkr/clientgrid/searchclients"),
+            type: "POST",
+            dataType: "JSON",
+            data: values,
+            success: function (model) {
+                bars.ui.loader("body", false);
+                $("#clients").show();
+                $("#clients").data("kendoGrid").dataSource.data(model);
+            },
+            error: function (result) {
+                bars.ui.loader("body", false);
+                $("#clients").hide();
+                bars.ui.notify('Увага!', 'Клієнтів не знайдено. Змініть фільтр.', 'error');
+            }
+        });
+    });
+</script>

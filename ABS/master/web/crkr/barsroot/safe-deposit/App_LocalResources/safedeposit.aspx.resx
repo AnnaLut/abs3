@@ -1,0 +1,816 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="ACCOUNT_MANResource1.Text" xml:space="preserve">
+    <value />
+  </data>
+  <data name="ACCOUNT_MANResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="ADDRESSResource1.Text" xml:space="preserve">
+    <value />
+  </data>
+  <data name="ADDRESSResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="AMORTResource1.Text" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="AMORTResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="BAIL_SUMResource1.Text" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="BAIL_SUMResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="BANK_TRUSTEEResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="BANKResource1.Text" xml:space="preserve">
+    <value />
+  </data>
+  <data name="BANKResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="BDATEResource1.Text" xml:space="preserve">
+    <value>01/01/0001 00:00:00</value>
+  </data>
+  <data name="BDATEResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="BIRTH_PLACEResource1.Text" xml:space="preserve">
+    <value />
+  </data>
+  <data name="BIRTH_PLACEResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="btCloseContractResource1.Text" xml:space="preserve">
+    <value />
+  </data>
+  <data name="btCloseContractResource1.ToolTip" xml:space="preserve">
+    <value>Закрыть договор</value>
+  </data>
+  <data name="btDopReqv.Text" xml:space="preserve">
+    <value />
+  </data>
+  <data name="btDopReqv.ToolTip" xml:space="preserve">
+    <value>Дополнительные реквизиты</value>
+  </data>
+  <data name="btRefresh.Text" xml:space="preserve">
+    <value />
+  </data>
+  <data name="btRefresh.ToolTip" xml:space="preserve">
+    <value>Обновить</value>
+  </data>
+  <data name="btSave.Text" xml:space="preserve">
+    <value />
+  </data>
+  <data name="btSave.ToolTip" xml:space="preserve">
+    <value>Сохранить</value>
+  </data>
+  <data name="btSelectClientResource1.Text" xml:space="preserve">
+    <value />
+  </data>
+  <data name="btSelectClientResource1.ToolTip" xml:space="preserve">
+    <value>Выбрать клиента из перечня контрагентов банка</value>
+  </data>
+  <data name="CUR_PERIODResource1.Text" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="CUR_PERIODResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="DAT_BEGINResource1.Text" xml:space="preserve">
+    <value>01/01/0001 00:00:00</value>
+  </data>
+  <data name="DAT_BEGINResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="DAT_ENDResource1.Text" xml:space="preserve">
+    <value>01/01/0001 00:00:00</value>
+  </data>
+  <data name="DAT_ENDResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="DAY_TARIFResource1.Text" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="DAY_TARIFResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="DEAL_DATEResource1.Text" xml:space="preserve">
+    <value>01/01/0001 00:00:00</value>
+  </data>
+  <data name="DEAL_DATEResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="DEAL_NUMResource1.Text" xml:space="preserve">
+    <value />
+  </data>
+  <data name="DEAL_NUMResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="DEAL_REFResource1.Text" xml:space="preserve">
+    <value />
+  </data>
+  <data name="DEAL_REFResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="DISCOUNTResource1.Text" xml:space="preserve">
+    <value />
+  </data>
+  <data name="DISCOUNTResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="DOCResource1.Text" xml:space="preserve">
+    <value />
+  </data>
+  <data name="DOCResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="F_PDVResource1.Text" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="F_PDVResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="FACT_PAYResource1.Text" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="FACT_PAYResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="FIOResource1.Text" xml:space="preserve">
+    <value />
+  </data>
+  <data name="FIOResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="FLEFTResource1.Text" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="FLEFTResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="FUT_PERIODResource1.Text" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="FUT_PERIODResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="ISSUEDResource1.Text" xml:space="preserve">
+    <value />
+  </data>
+  <data name="ISSUEDResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="JOKPOResource1.Text" xml:space="preserve">
+    <value />
+  </data>
+  <data name="JOKPOResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="KEY_NUMResource1.Text" xml:space="preserve">
+    <value />
+  </data>
+  <data name="KEY_NUMResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="KEYS_GIVENResource1.Text" xml:space="preserve">
+    <value />
+  </data>
+  <data name="KEYS_GIVENResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbAddress.Text" xml:space="preserve">
+    <value>Адрес</value>
+  </data>
+  <data name="lbAddress.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbAmortFut.Text" xml:space="preserve">
+    <value>Аморт. дох. буд. периода</value>
+  </data>
+  <data name="lbAmortFut.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbBailSum.Text" xml:space="preserve">
+    <value>Сума залога</value>
+  </data>
+  <data name="lbBailSum.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbBankTrustee.Text" xml:space="preserve">
+    <value>Дов. лицо банка</value>
+  </data>
+  <data name="lbBankTrustee.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbBDATE.Text" xml:space="preserve">
+    <value>Дата рождения</value>
+  </data>
+  <data name="lbBDATE.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbBirthPlace.Text" xml:space="preserve">
+    <value>Место рождения</value>
+  </data>
+  <data name="lbBirthPlace.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbClient.Text" xml:space="preserve">
+    <value>Параметры клиента</value>
+  </data>
+  <data name="lbClient.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbCurPeriod.Text" xml:space="preserve">
+    <value>Доход тек. периода</value>
+  </data>
+  <data name="lbCurPeriod.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbDatLastPay.Text" xml:space="preserve">
+    <value>Дата последней проплаты</value>
+  </data>
+  <data name="lbDatLastPay.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbDayTarif.Text" xml:space="preserve">
+    <value>Дневной тариф</value>
+  </data>
+  <data name="lbDayTarif.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbDeal.Text" xml:space="preserve">
+    <value>Сист. № дог.</value>
+  </data>
+  <data name="lbDeal.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbDealDate.Text" xml:space="preserve">
+    <value>от</value>
+  </data>
+  <data name="lbDealDate.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbDealNum.Text" xml:space="preserve">
+    <value>№ договора</value>
+  </data>
+  <data name="lbDealNum.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbDealTitle.Text" xml:space="preserve">
+    <value>Параметры договора</value>
+  </data>
+  <data name="lbDealTitle.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbDiscount.Text" xml:space="preserve">
+    <value>% скидки</value>
+  </data>
+  <data name="lbDiscount.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbDoc.Text" xml:space="preserve">
+    <value>Документ</value>
+  </data>
+  <data name="lbDoc.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbEndDate.Text" xml:space="preserve">
+    <value>Завершение договора</value>
+  </data>
+  <data name="lbEndDate.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbFactPay.Text" xml:space="preserve">
+    <value>Фактическая оплата</value>
+  </data>
+  <data name="lbFactPay.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbFIO.Text" xml:space="preserve">
+    <value>ФИО</value>
+  </data>
+  <data name="lbFIO.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbFLeft.Text" xml:space="preserve">
+    <value>осталось</value>
+  </data>
+  <data name="lbFLeft.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbFPDV.Text" xml:space="preserve">
+    <value>НДС</value>
+  </data>
+  <data name="lbFPDV.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbFutPeriod.Text" xml:space="preserve">
+    <value>Доход буд. периода</value>
+  </data>
+  <data name="lbFutPeriod.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbIssued.Text" xml:space="preserve">
+    <value>Выдан</value>
+  </data>
+  <data name="lbIssued.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbJOKPO.Text" xml:space="preserve">
+    <value>Идентификационный код</value>
+  </data>
+  <data name="lbJOKPO.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbKeyNum.Text" xml:space="preserve">
+    <value>Номер ключа</value>
+  </data>
+  <data name="lbKeyNum.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbKeysGiven.Text" xml:space="preserve">
+    <value>Ключей выдано</value>
+  </data>
+  <data name="lbKeysGiven.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbLeft.Text" xml:space="preserve">
+    <value>осталось</value>
+  </data>
+  <data name="lbLeft.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbMFOK.Text" xml:space="preserve">
+    <value>МФО</value>
+  </data>
+  <data name="lbNLS.Text" xml:space="preserve">
+    <value>Счет залога</value>
+  </data>
+  <data name="lbNLS.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbNLSK.Text" xml:space="preserve">
+    <value>Расч. счет</value>
+  </data>
+  <data name="lbNLSK.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbNMK.Text" xml:space="preserve">
+    <value>Наименование ЮЛ</value>
+  </data>
+  <data name="lbNMK.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbOKPO.Text" xml:space="preserve">
+    <value>Идентификационный код</value>
+  </data>
+  <data name="lbOKPO.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbOstc.Text" xml:space="preserve">
+    <value>Текущий остаток</value>
+  </data>
+  <data name="lbOstc.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbpdv.Text" xml:space="preserve">
+    <value>НДС</value>
+  </data>
+  <data name="lbpdv.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbPeny.Text" xml:space="preserve">
+    <value>% пени</value>
+  </data>
+  <data name="lbPeny.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbPlanPay.Text" xml:space="preserve">
+    <value>Плановая оплата</value>
+  </data>
+  <data name="lbPlanPay.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbRent.Text" xml:space="preserve">
+    <value>Аренда</value>
+  </data>
+  <data name="lbRent.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbRentSum.Text" xml:space="preserve">
+    <value>Сумма аренды</value>
+  </data>
+  <data name="lbRentSum.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbSafeMan.Text" xml:space="preserve">
+    <value>Отв. исп. по сейфу</value>
+  </data>
+  <data name="lbSafeMan.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbSafeNum.Text" xml:space="preserve">
+    <value>Сейф № (сист.)</value>
+  </data>
+  <data name="lbSafeNum.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbShowTrustee.Text" xml:space="preserve">
+    <value>Довереное лицо</value>
+  </data>
+  <data name="lbShowTrustee.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbSize.Text" xml:space="preserve">
+    <value>Размер сейфа</value>
+  </data>
+  <data name="lbSize.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbSNUM.Text" xml:space="preserve">
+    <value>Сейф №</value>
+  </data>
+  <data name="lbStartDate.Text" xml:space="preserve">
+    <value>Начало договора</value>
+  </data>
+  <data name="lbStartDate.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbTarif.Text" xml:space="preserve">
+    <value>Тариф</value>
+  </data>
+  <data name="lbTarif.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbTechReqv.Text" xml:space="preserve">
+    <value>Технические реквизиты сейфа</value>
+  </data>
+  <data name="lbTechReqv.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbTEL.Text" xml:space="preserve">
+    <value>Телефон</value>
+  </data>
+  <data name="lbTEL.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbTerm.Text" xml:space="preserve">
+    <value>на срок (дней)</value>
+  </data>
+  <data name="lbTerm.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbTitle.Text" xml:space="preserve">
+    <value>Депозитные сейфы: Карточка сейфа</value>
+  </data>
+  <data name="lbTitle.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbTrusteeAddress.Text" xml:space="preserve">
+    <value>Адрес</value>
+  </data>
+  <data name="lbTrusteeAddress.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbTrusteeBDay.Text" xml:space="preserve">
+    <value>Дата рождения</value>
+  </data>
+  <data name="lbTrusteeBDay.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbTrusteeBPlace.Text" xml:space="preserve">
+    <value>Место рождения</value>
+  </data>
+  <data name="lbTrusteeBPlace.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbTrusteeDoc.Text" xml:space="preserve">
+    <value>Документ</value>
+  </data>
+  <data name="lbTrusteeDoc.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbTrusteeFIO.Text" xml:space="preserve">
+    <value>ФИО</value>
+  </data>
+  <data name="lbTrusteeFIO.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbTrusteeIssued.Text" xml:space="preserve">
+    <value>Выдан</value>
+  </data>
+  <data name="lbTrusteeIssued.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbTrusteeNum.Text" xml:space="preserve">
+    <value>Довереность (№, от, до)</value>
+  </data>
+  <data name="lbTrusteeNum.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbTrusteeOKPO.Text" xml:space="preserve">
+    <value>Идентификационный код</value>
+  </data>
+  <data name="lbTrusteeOKPO.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lbVVS.Text" xml:space="preserve">
+    <value>Ответ. исп. по счету</value>
+  </data>
+  <data name="lbVVS.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="listSafeSizeResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="listTarifResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="MDATEResource1.Text" xml:space="preserve">
+    <value />
+  </data>
+  <data name="MDATEResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="MFOResource1.Text" xml:space="preserve">
+    <value />
+  </data>
+  <data name="MFOResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="NLSKResource1.Text" xml:space="preserve">
+    <value />
+  </data>
+  <data name="NLSKResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="NLSResource1.Text" xml:space="preserve">
+    <value />
+  </data>
+  <data name="NLSResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="NMKResource1.Text" xml:space="preserve">
+    <value />
+  </data>
+  <data name="NMKResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="OKPOResource1.Text" xml:space="preserve">
+    <value />
+  </data>
+  <data name="OKPOResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="OSTCResource1.Text" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="OSTCResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="P_LEFTResource1.Text" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="P_LEFTResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="PageResource1.Title" xml:space="preserve">
+    <value>Депозитные сейфы: Карточка сейфа</value>
+  </data>
+  <data name="PDVResource1.Text" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="PDVResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="PENYResource1.Text" xml:space="preserve">
+    <value />
+  </data>
+  <data name="PENYResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="PLAN_PAYResource1.Text" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="PLAN_PAYResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="RENTSUMResource1.Text" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="RENTSUMResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="SAFE_IDResource1.Text" xml:space="preserve">
+    <value />
+  </data>
+  <data name="SAFE_IDResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="SAFE_MANResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Separator1Resource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Separator2Resource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Separator3Resource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="TELResource1.Text" xml:space="preserve">
+    <value />
+  </data>
+  <data name="TELResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="TERMResource1.Text" xml:space="preserve">
+    <value />
+  </data>
+  <data name="TERMResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="TRUSTEE_ADDRESSResource1.Text" xml:space="preserve">
+    <value />
+  </data>
+  <data name="TRUSTEE_ADDRESSResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="TRUSTEE_BDAYResource1.Text" xml:space="preserve">
+    <value>01/01/0001 00:00:00</value>
+  </data>
+  <data name="TRUSTEE_BDAYResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="TRUSTEE_BPLACEResource1.Text" xml:space="preserve">
+    <value />
+  </data>
+  <data name="TRUSTEE_BPLACEResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="TRUSTEE_DAT_BEGINResource1.Text" xml:space="preserve">
+    <value>01/01/0001 00:00:00</value>
+  </data>
+  <data name="TRUSTEE_DAT_BEGINResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="TRUSTEE_DAT_ENDResource1.Text" xml:space="preserve">
+    <value>01/01/0001 00:00:00</value>
+  </data>
+  <data name="TRUSTEE_DAT_ENDResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="TRUSTEE_DOCResource1.Text" xml:space="preserve">
+    <value />
+  </data>
+  <data name="TRUSTEE_DOCResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="TRUSTEE_FIOResource1.Text" xml:space="preserve">
+    <value />
+  </data>
+  <data name="TRUSTEE_FIOResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="TRUSTEE_ISSUEDResource1.Text" xml:space="preserve">
+    <value />
+  </data>
+  <data name="TRUSTEE_ISSUEDResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="TRUSTEE_NUMResource1.Text" xml:space="preserve">
+    <value />
+  </data>
+  <data name="TRUSTEE_NUMResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="TRUSTEE_OKPOResource1.Text" xml:space="preserve">
+    <value />
+  </data>
+  <data name="TRUSTEE_OKPOResource1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+</root>

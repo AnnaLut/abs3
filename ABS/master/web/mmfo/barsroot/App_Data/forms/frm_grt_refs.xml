@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<xmlform>
+  <grids>
+    <grid id="gv" title="Довідники" pagesize="10" showpagesizebox="true" width="500">
+      <datasource>
+        <sql>
+          select 'frm_grt_ref_vehtypes' as form, 'Типи ТЗ' as name from dual
+        </sql>
+      </datasource>
+      <fields>
+        <field datatype="String" name="NAME">
+          <column align="Left" caption="Довідник" width="500">
+            <link url="dynform.aspx">
+              <parameters>
+                <parameter type="DataField" name="form"></parameter>
+              </parameters>
+            </link>
+          </column>
+        </field>
+      </fields>      
+    </grid>
+  </grids>
+</xmlform>

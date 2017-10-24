@@ -1,0 +1,164 @@
+﻿<xmlform captiontype="OnlyTitle">
+  <grids>
+    <grid id="gv" pagesize="10" showpagesizebox="true" title="Архів заявок на КУПІВЛЮ валюти" showfilter="false" >
+      <editform style="Dialog" title="" height="600" width="800" columnscount="1"> </editform>
+
+      <filters caption="УВАГА!!! Дані відображено за останні 30 днів! За більш старішими даними зверніться до АДМІНІСТРАТОРА СИСТЕМИ!" width="100%" buttontext="Пошук" columnscount="3">
+        <filter caption="№ заявки" columnindex="1" field="ID" condition="Equal" id="fltrID">
+          <uicontrol type="TextBox"></uicontrol>
+        </filter>
+        <filter caption="Код валюти" columnindex="2" field="KV2"  condition="Equal" id="fltrKV2">
+          <uicontrol controlwidth="100" type="ReadOnlyReference" formname="/common/frm_ref_tabval" formfieldname="KV" valueformat="{0:D}" addemptyitem="true"  formwidth="600"> </uicontrol>
+        </filter>
+        <filter caption="Дата заявки" columnindex="3" field="FDAT" condition="Equal" id="fltrFDAT">
+          <uicontrol type="DateInput"> </uicontrol>
+        </filter>
+        <filter caption="Рег. № клієнта" columnindex="1" field="RNK"  condition="Equal" id="fltrRNK">
+          <uicontrol controlwidth="100" type="ReadOnlyReference" formname="/common/frm_ref_customer" formfieldname="RNK" addemptyitem="true"  formwidth="600"> </uicontrol>
+        </filter>
+        <filter caption="Відділення" columnindex="2" field="CUST_BRANCH"  condition="Equal" id="fltrCB">
+          <uicontrol controlwidth="100" type="ReadOnlyReference" formname="/common/frm_ref_branches" formfieldname="BRANCH" addemptyitem="true"  formwidth="600"> </uicontrol>
+        </filter>
+        <filter caption="Найменування клієна" columnindex="3" field="NMK"  condition="Equal" id="fltrNMK">
+          <uicontrol controlwidth="100" type="ReadOnlyReference" formname="/common/frm_ref_customer" formfieldname="NMK" addemptyitem="true"  formwidth="600"> </uicontrol>
+        </filter>
+       </filters>
+      <datasource>
+        <sql>
+          SELECT mfo, dk, id, ref, kv2, s2, grn_sum, rnk, nd_rnk, cust_branch, nmk, fdat, kurs_z, kurs_f, priorname, kom, skom, vdate,
+          sos, dig, nvl(obz,0) obz, identkb, kv_conv, aim_name, contract, dat2_vmd, num_vmd, dat_vmd, dat5_vmd, country, basis,
+          benefcountry, bank_code, product_group, s_pf, ref_pf, ref_sps, close_type_name
+          FROM v_zay_arc
+          ORDER BY ref desc
+        </sql>
+      </datasource>
+      <rowselection method="SingleRow"/>
+      <buttons>
+        <button caption="Друк заявки"  hint="Сформувати друковану форму заявки" id="btnrep"  type="Image" imagename="printer"   >
+          <command type="FastReport" frtemplate="zay_buy" checkselectedrow="true" target="blank" datakeynames="SOS" >
+            <parameters>
+              <parameter type="DataField" name="ID" altname="ZAY_ID"></parameter>
+            </parameters>
+          </command>
+        </button>
+        <button id="BT1" type="Image" caption="Перегляд" imagename="folder" hint="Перегляд заявки">
+          <command type="Redirect" url="/barsroot/documentview/default.aspx" target="Blank" >
+            <parameters>
+              <parameter name="REF" altname="ref"  type="DataField"></parameter>
+            </parameters>
+          </command>
+        </button>
+      </buttons>
+      <fields>
+        <field name="MFO" key="false" datatype="String" sort="Default">
+          <column show="true" caption="МФО" align="Right" />
+        </field>
+        <field name="DK" key="false" datatype="String" sort="Default">
+          <column show="true" caption="Купівля - 1 Продаж - 2 Конверсія - 3 та 4" align="Right" />
+        </field>
+        <field name="ID" key="true" datatype="String" sort="Default">
+          <column show="true" caption="№ заявки" align="Right" />
+        </field>
+        <field name="REF" key="true" datatype="String" sort="Asc">
+          <column show="true" caption="Реф операції" align="Right" />
+       </field>
+        <field name="KV2" key="false" datatype="Int64" sort="default">
+          <column show="true" caption="Код валюти" align="Right" />
+       </field>
+        <field name="KV_CONV" key="false" datatype="Int64" sort="default">
+          <column show="true" caption="За валюту" align="Right" />
+        </field>
+        <field name="RNK" key="false" datatype="String" sort="default">
+          <column show="true" caption="Рег. номер клієнта" align="Right" />
+        </field>
+        <field name="ND_RNK" key="false" datatype="String" sort="default">
+          <column show="true" caption="Номер клієнта (симв.)" align="Right" />
+        </field>
+        <field name="CUST_BRANCH" key="false" datatype="String" sort="default">
+          <column show="true" caption="Відділення клієнта" align="Left" />
+       </field>
+        <field name="NMK" key="false" datatype="String" sort="default">
+          <column show="true" caption="Найменування клієнта" align="Left" />
+       </field>
+        <field name="FDAT" key="false" datatype="DateTime" sort="default">
+          <column show="true" caption="Дата заявки" align="Center" />
+       </field>
+        <field name="S2" key="false" datatype="Decimal" sort="default">
+          <column show="true" caption="Сума заявленої валюти" align="Right" />
+       </field>
+        <field name="KURS_Z" key="false" datatype="Decimal" sort="default">
+          <column show="true" caption="Курс клієнта" formatstring="{0:F8}" align="Right" />
+       </field>
+        <field name="KURS_F" key="false" datatype="Decimal" sort="default">
+          <column show="true" caption="Курс дилера" formatstring="{0:F8}" align="Right" />
+       </field>
+        <field name="GRN_SUM" key="false" datatype="Decimal" sort="default">
+          <column show="true" caption="ГРН еквівалент по курсу дилера" align="Right" />
+       </field>
+        <field name="PRIORNAME" key="false" datatype="String" sort="default">
+          <column show="true" caption="Пріорітет заявки" align="Left" />
+       </field>
+        <field name="KOM" key="false" datatype="String" sort="default">
+          <column show="true" caption="% комісії" align="Right" />
+       </field>
+        <field name="SKOM" key="false" datatype="String" sort="default">
+          <column show="true" caption="або сума" align="Right" />
+       </field>
+        <field name="VDATE" key="false" datatype="DateTime" sort="default">
+          <column show="true" caption="Дата валютування" align="Center" />
+       </field>
+        <field name="SOS" key="false" datatype="String" sort="default">
+          <column show="true" caption="Стан заявки" align="Center" />
+        </field>
+        <field name="OBZ" key="false" datatype="Boolean" sort="default">
+          <column show="true" caption="ОБЗ" align="Center"/>
+          <form>
+            <uicontrol type="CheckBox" truevalue="1" falsevalue="0">  </uicontrol>
+          </form>
+        </field>
+        <field name="CONTRACT" key="false" datatype="String" sort="Default">
+          <column show="true" caption="№ контракта/ кред.договора" align="Right" />
+        </field>
+        <field name="DAT2_VMD" key="false" datatype="DateTime" sort="Default">
+          <column show="true" caption="Дата контракта/ кред.договора" align="Right" />
+        </field>
+        <field name="NUM_VMD" key="false" datatype="String" sort="Default">
+          <column show="true" caption="№ ост. ВМД" align="Right" />
+        </field>
+        <field name="DAT_VMD" key="false" datatype="DateTime" sort="Default">
+          <column show="true" caption="Дата ост. ВМД" align="Right" />
+        </field>
+        <field name="DAT5_VMD" key="false" datatype="DateTime" sort="Default">
+          <column show="true" caption="Дати ост. ВМД" align="Right" />
+        </field>
+        <field name="COUNTRY" key="false" datatype="String" sort="Default">
+          <column show="true" caption="Код країни перерахування" align="Right" />
+        </field>
+        <field name="BASIS" key="false" datatype="String" sort="Default">
+          <column show="true" caption="Код підстави" align="Right" />
+        </field>
+        <field name="BENEFCOUNTRY" key="false" datatype="String" sort="Default">
+          <column show="true" caption="Код країни бенефіціара" align="Right" />
+        </field>
+        <field name="BANK_CODE" key="false" datatype="String" sort="Default">
+          <column show="true" caption="Код банка перерахування" align="Right" />
+        </field>
+        <field name="PRODUCT_GROUP" key="false" datatype="String" sort="Default">
+          <column show="true" caption="Код товарної групи" align="Right" />
+        </field>
+        <field name="S_PF" key="false" datatype="String" sort="Default">
+          <column show="true" caption="Сума в ПФ" align="Right" />
+        </field>
+        <field name="REF_PF" key="false" datatype="String" sort="Default">
+          <column show="true" caption="Реф списання в ПФ" align="Right" />
+        </field>
+        <field name="REF_SPS" key="false" datatype="String" sort="Default">
+          <column show="true" caption="Реф списання" align="Right" />
+        </field>
+        <field name="CLOSE_TYPE_NAME" key="false" datatype="String" sort="Default">
+          <column show="true" caption="Тип закриття заявки" align="Right" />
+        </field>
+      </fields>
+    </grid>
+  </grids>
+</xmlform>

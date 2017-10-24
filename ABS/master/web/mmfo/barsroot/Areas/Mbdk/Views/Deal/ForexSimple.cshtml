@@ -1,0 +1,424 @@
+﻿
+<style>
+    .lable-low {
+        padding-top: 2px;
+    }
+
+    .col-without-pading {
+        margin-right: -25px !important
+    }
+    .col-without-pading2 {
+        margin-right: -12px !important
+    }
+</style>
+<script>
+    $(document).ready(function() {
+        $("#onks").click(function() {
+            if (this.checked) {
+                $("#leftroad").hide("slow");
+                $("#leftmediator").hide("slow");
+                $("#auto").hide("slow");
+            } else {
+                $("#leftroad").show("slow");
+                $("#leftmediator").show("slow");
+                $("#auto").show("slow");
+            }
+        });
+
+        $("#withks").click(function() {
+            if (this.checked) {
+                $("#rightroad").hide("slow");
+                $("#rightmediator").hide("slow");
+            } else {
+                $("#rightroad").show("slow");
+                $("#rightmediator").show("slow");
+            }
+
+        });
+    });
+</script>
+
+<div class="col-md-6">
+    <div class="form-group">
+        <div class="col-md-4">
+            <input type="text" class="k-textbox non-active mfo" readonly>
+        </div>
+        <div class="col-md-6">
+            <input type="text" class="k-textbox disable-solid" id="initTrans">
+        </div>
+        <div class="col-md-2">
+            <button class="k-button" style="margin-left: 25px;"><span class="k-sprite pf-icon pf-16 pf-save" style="margin-bottom: 3px"></span> </button>
+        </div>
+    </div>
+</div>
+<div class="col-md-6"></div>
+
+<div class="col-md-12">
+    <div class="col-md-6">
+        <div class="form-group">
+            <label for="" class="col-md-6 control-label" style="text-align: right;">Валюта А - ПОКУПКА</label>
+            <div class="col-md-6">
+                <input type="text" class="k-textbox" id="" name="" placeholder="">
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group ">
+            <div class="col-md-3">
+                <input type="text" class="k-textbox" id="" placeholder="">
+            </div>
+            <div class="col-md-3">
+                <input type="text" class="k-textbox" id="" placeholder="">
+            </div>
+            <label for="" class="col-md-6 control-label">Валюта Б - ПРОДАЖА</label>
+        </div>
+    </div>
+</div>
+
+<!--Ліва колонка значень-->
+<div class="col-md-6">
+    
+    <div class="panel panel-default">
+        <div class="panel-body">
+           
+            <div class="form-group">
+                <div class="col-md-2">
+                    <input type="text" class="k-textbox" id="" readonly>
+                </div>
+                <div class="col-md-2">
+                    <input type="text" class="k-textbox non-active" id="" readonly>
+                </div>
+                <div class="col-md-8">
+                    <input type="text" class="k-textbox non-active" id="" readonly>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-6">
+                    <input type="text" class="k-textbox" id="" readonly>
+                </div>
+
+                <input type="radio" name="engine" id="" class="k-radio col-md-4" checked="checked">
+                <label class="k-radio-label col-md-3 lable-low" for="engine1">A-base</label>
+
+                <input type="radio" name="engine3" id="engine3" class="k-radio col-md-4" checked="">
+                <label class="k-radio-label col-md-3 lable-low" for="engine3">B-base</label>
+            </div>
+            <div class="form-group">
+                <div class="col-md-6">
+                    <input type="text" class="k-textbox" id="" readonly>
+                </div>
+                <div class="col-md-3">
+                    <input type="text" class="k-textbox non-active" id="" readonly>
+                </div>
+                <div class="col-md-3">
+                    <input type="text" class="k-textbox non-active" id="" readonly>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-6">
+                    <input type="text" class="k-textbox" id="" readonly>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-6 col-without-pading">
+                    <input type="checkbox" id="eq2" class="k-checkbox col-md-1" checked="checked">
+                    <label class="k-checkbox-label col-md-11" for="eq2">Только Внебаланс</label>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-md-6">
+            <input type="checkbox" id="onks" class="k-checkbox col-md-1">
+            <label class="k-checkbox-label col-md-11" for="onks">Без поступления на КС</label>
+        </div>
+    </div>
+    <!--Реквізити банка-->
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="form-group">
+                <div class="col-md-5">
+                    <input type="text" class="k-textbox non-active" readonly>
+                </div>
+                <div class="col-md-4">
+                    <input type="text" class="k-textbox non-active" id="" readonly>
+                </div>
+                <div class="col-md-3">
+                    <input type="text" class="k-textbox non-active" id="" readonly>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-12">
+                    <input type="text" class="k-textbox non-active" id="okpo" readonly>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-5">
+                    <input type="text" class="k-textbox non-active" id="" readonly>
+                </div>
+                <div class="col-md-7">
+                    <input type="text" class="k-textbox non-active" id="" readonly>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-2">
+                    <input type="text" class="k-textbox non-active" id="" readonly>
+                </div>
+                <div class="col-md-10">
+                    <input type="text" class="k-textbox non-active" id="" readonly>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-group" id="auto">
+        <div class="col-md-12">
+            <input type="checkbox" id="qwe" class="k-checkbox col-md-1">
+            <label class="k-checkbox-label col-md-11" for="qwe">Автоматическое поступление из платежной системы</label>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-md-12">
+            <input type="checkbox" id="temp1" class="k-checkbox col-md-1">
+            <label class="k-checkbox-label col-md-11" for="temp1">ПС</label>
+        </div>
+    </div>
+
+    <div class="panel panel-default" id="leftroad">
+        <div class="panel-heading">Траса вхідного платежу</div>
+        <div class="panel-body">
+            <div class="form-group">
+                <div class="col-md-6">
+                    <input type="text" class="k-textbox" id="" name="" placeholder="" value="">
+                </div>
+                <div class="col-md-6">
+                    <input type="text" class="k-textbox" id="" name="" placeholder="" value="">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-12">
+                    <input type="text" class="k-textbox disable-solid" id="dealType">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-6"></div>
+                <div class="col-md-6">
+                    <input type="text" class="k-textbox" id="" name="" placeholder="" value="">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-2">
+                    <input type="text" class="k-textbox" id="" name="" placeholder="" value="">
+                </div>
+                <div class="col-md-8">
+                    <input type="text" class="k-textbox" id="" name="" placeholder="" value="">
+                </div>
+                <div class="col-md-2">
+                    <button class="k-button" style="margin-left: 25px;"><span class="k-sprite pf-icon pf-16 pf-search" style="margin-bottom: 3px"></span> </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-default" id="leftmediator">
+        <div class="panel-heading">Посредник</div>
+        <div class="panel-body">
+            <div class="form-group">
+                <div class="col-md-12">
+                    <input type="text" class="k-textbox" id="" name="" placeholder="" value="">
+                </div>
+            </div>
+        </div>
+    </div>
+    @*<div class="form-group">
+        <div class="col-md-4">
+        </div>
+        <div class="col-md-2">
+            <input type="text" class="k-textbox" id="" name="" placeholder="" value="">
+        </div>
+
+        <div class="col-md-3">
+            <input type="text" class="k-textbox">
+        </div>
+        <div class="col-md-3">
+            <input type="text" class="k-textbox" id="" name="" placeholder="" value="">
+        </div>
+    </div>*@
+</div>
+
+
+<!--Права колонка значень-->
+<div class="col-md-6">
+
+    <div class="panel panel-default">
+        @*<div class="panel-heading">% ставка</div>*@
+        <div class="panel-body" style="padding-bottom: 30px;">
+            <div class="form-group">
+                <div class="col-md-6">
+                    <input type="text" class="k-textbox" id="" readonly>
+                </div>
+                <input type="radio" name="engine" id="" class="col-md-1 col-without-pading" checked="checked">
+                <label class="col-md-5" for="engine1" style="padding-top: 2px;">Розбити на 2 суми</label>
+            </div>
+            <div class="form-group ">
+                <div class="col-md-6">
+                    <input type="text" class="k-textbox" id="" placeholder="">
+                </div>
+                <div class="col-md-3">
+                    <input type="text" class="k-textbox" id="" placeholder="">
+                </div>
+                <div class="col-md-3">
+                    <input type="text" class="k-textbox" id="" placeholder="">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-4">
+                    <input type="text" class="k-textbox" id="" readonly>
+                </div>
+                <label class="col-md-3" for="">Лім - Акт</label>
+                <div class="col-md-4">
+                    <input type="text" class="k-textbox" id="" readonly>
+                </div>
+                <label class="col-md-1" for="">Л</label>
+            </div>
+            <div class="form-group">
+                <div class="col-md-4">
+                    <input type="text" class="k-textbox" id="" readonly>
+                </div>
+                <div class="col-md-3">
+                    <input type="text" class="k-textbox" id="" readonly>
+                </div>
+                <div class="col-md-4">
+                    <input type="text" class="k-textbox" id="" readonly>
+                </div>
+                <label class="col-md-1" for="">Л</label>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="form-group" style="padding-left: 15px;">
+        <input type="checkbox" id="withks" class="k-checkbox col-md-1">
+        <label class="k-checkbox-label col-md-5" for="withks">Без списування з КС</label>
+        <input type="checkbox" id="temp2" class="k-checkbox col-md-1">
+        <label class="k-checkbox-label col-md-5" for="temp2">Прямий КС</label>
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="form-group">
+                <div class="col-md-4">
+                    <input type="text" class="k-textbox" id="" name="" value="">
+                </div>
+                <div class="col-md-4">
+                    <input type="text" class="k-textbox" id="" name="" value="">
+                </div>
+                <div class="col-md-2">
+                    <input type="text" class="k-textbox" id="" name="" value="">
+                </div>
+                <div class="col-md-2">
+                    <button class="k-button" style="margin-left: 25px;"><span class="k-sprite pf-icon pf-16 pf-search" style="margin-bottom: 3px"></span> </button>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-12">
+                    <input type="text" class="k-textbox" id="" name="" value="">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-3">
+                    <input type="text" class="k-textbox" id="" name="" value="">
+                </div>
+                <div class="col-md-4">
+                    <input type="text" class="k-textbox" id="" name="" value="">
+                </div>
+                <div class="col-md-5">
+                    <input type="text" class="k-textbox" id="" name="" value="">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-2">
+                    <input type="text" class="k-textbox" id="" name="" value="">
+                </div>
+                <div class="col-md-10">
+                    <input type="text" class="k-textbox" id="" name="" value="">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-5">
+                    <input type="text" class="k-textbox" id="" name="" value="">
+                </div>
+                <div class="col-md-5">
+                    <input type="text" class="k-textbox" id="" name="" value="">
+                </div>
+                <div class="col-md-2">
+                    <input type="checkbox" id="temp3" class="k-checkbox col-md-1">
+                    <label class="k-checkbox-label col-md-11" for="temp3">ПС</label>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-default" id="rightroad">
+        <div class="panel-heading">Траса вхідного платежу</div>
+        <div class="panel-body">
+            <div class="form-group">
+                <div class="col-md-5">
+                    <input type="text" class="k-textbox" id="" name="" placeholder="" value="">
+                </div>
+                <div class="col-md-5">
+                    <input type="text" class="k-textbox" id="" name="" placeholder="" value="">
+                </div>
+                <div class="col-md-2">
+                    <button class="k-button" style="margin-left: 25px;"><span class="k-sprite pf-icon pf-16 pf-search" style="margin-bottom: 3px"></span> </button>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-12">
+                    <input type="text" class="k-textbox">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-12">
+                    <input type="text" class="k-textbox" id="" name="" placeholder="" value="">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-2">
+                    <input type="text" class="k-textbox" id="" name="" placeholder="" value="">
+                </div>
+                <div class="col-md-8">
+                    <input type="text" class="k-textbox" id="" name="" placeholder="" value="">
+                </div>
+                <div class="col-md-2">
+                    <button class="k-button" style="margin-left: 25px;"><span class="k-sprite pf-icon pf-16 pf-search" style="margin-bottom: 3px"></span> </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-default" id="rightmediator">
+        <div class="panel-heading">Посредник</div>
+        <div class="panel-body">
+            <div class="form-group">
+                <div class="col-md-10">
+                    <input type="text" class="k-textbox" id="" name="" placeholder="" value="">
+                </div>
+                <div class="col-md-2">
+                    <button class="k-button" style="margin-left: 25px;"><span class="k-sprite pf-icon pf-16 pf-search" style="margin-bottom: 3px"></span> </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @*<div class="form-group">
+            <div class="col-md-3">
+                <input type="text" class="k-textbox" id="Norm7" name="" placeholder="">
+            </div>
+
+            <div class="col-md-3">
+                <input type="text" class="k-textbox">
+            </div>
+            <div class="col-md-3">
+                <input type="text" class="k-textbox" id="" name="" placeholder="" value="">
+            </div>
+            <div class="col-md-3">
+                <input type="text" class="k-textbox" id="" name="" placeholder="" value="">
+            </div>
+        </div>*@
+</div>

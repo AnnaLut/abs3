@@ -1,0 +1,49 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    //ViewBag.Title = "CustomerList";
+}
+
+<script src="~/Scripts/respond.min.js"></script>
+<script src="~/Areas/CustomerList/Scripts/KendoCommon.js"></script>
+<script src="~/Areas/CustomerList/Scripts/CustomerList/TotalCurrency.js"></script>
+<script src="~/lib/jsZip/jszip.min.js"></script>
+<link rel="stylesheet" href="~/Areas/CustomerList/Css/CustomerList/Main.css" />
+
+<div class="page-header">
+    <h1 id="title"></h1>
+    <h1 id="partialTitle"></h1>
+</div>
+<div>
+    @(Html.Kendo().Button().Name("btnChangeDate").HtmlAttributes(new { type = "button" }).Content("Вибрати іншу дату банківського дня").Events(ev => ev.Click("showDatePickerDialog")))
+    <br />
+    <br />
+</div>
+
+<div id="gridMain">
+    @*<div class="k-loading-mask" style="width: 100%; height: 100%">
+        <div class="k-loading-image">
+            <div class="k-loading-color"></div>
+        </div>
+    </div>*@
+</div>
+<div class="search-main"></div>
+<div id="dialog">
+    <div id="bankDateSelector" class="k-content" style="text-align:center">
+        <h4>Виберіть дату банківського дня:</h4>
+        <input id="datepicker" required="required" />
+        <br /><br />
+        @(Html.Kendo().Button()
+        .Name("continue")
+        .HtmlAttributes(new { type = "button", @class = "k-primary" })
+        .Content("Продовжити").
+        Events(ev => ev.Click("onContinueClick")))
+        &nbsp;
+
+        @(Html.Kendo().Button()
+        .Name("textButton")
+        .HtmlAttributes(new { type = "button" })
+        .Content("cancel")
+        .Events(ev => ev.Click("onCancelClick")))
+        <p>
+    </div>
+</div>

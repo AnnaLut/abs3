@@ -1,0 +1,265 @@
+<?xml version="1.0"?>
+<?mso-application progid="Excel.Sheet"?>
+<?fr-application created="FastReport"?>
+<?fr-application homesite="http://www.fast-report.com"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet" xmlns:html="http://www.w3.org/TR/REC-html40">
+<DocumentProperties xmlns="urn:schemas-microsoft-com:office:office">
+<Title></Title>
+<Author></Author>
+<Created>24.06.2015 0:00:00T17:18:36.7642852Z</Created>
+<Version></Version>
+</DocumentProperties>
+<ExcelWorkbook xmlns="urn:schemas-microsoft-com:office:excel">
+<ProtectStructure>False</ProtectStructure>
+<ProtectWindows>False</ProtectWindows>
+</ExcelWorkbook>
+<Styles>
+<Style ss:ID="s0">
+<Font ss:FontName="Arial" ss:Size="10" ss:Color="#000000" />
+
+<Alignment ss:Horizontal="Left" ss:Vertical="Top" ss:WrapText="1" />
+<Borders>
+</Borders>
+</Style>
+<Style ss:ID="s1">
+<Font ss:FontName="Arial" ss:Size="12" ss:Color="#3A5B8B" />
+<Interior ss:Color="#FFFFFF" ss:Pattern="Solid"/>
+<Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:WrapText="1" />
+<Borders>
+</Borders>
+</Style>
+<Style ss:ID="s2">
+<Font ss:FontName="Arial" ss:Size="10" ss:Color="#FFFFFF" ss:Bold="1" />
+<Interior ss:Color="#3C5A96" ss:Pattern="Solid"/>
+<Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:WrapText="1" />
+<Borders>
+<Border ss:Position="Left" ss:LineStyle="Dash" ss:Weight="1" ss:Color="#000000"/>
+<Border ss:Position="Top" ss:LineStyle="Dash" ss:Weight="1" ss:Color="#000000"/>
+<Border ss:Position="Bottom" 
+ss:LineStyle="Dash" ss:Weight="1" ss:Color="#000000"/>
+<Border ss:Position="Right" 
+ss:LineStyle="Dash" ss:Weight="1" ss:Color="#000000"/>
+</Borders>
+</Style>
+<Style ss:ID="s3">
+<Font ss:FontName="Arial" ss:Size="10" ss:Color="#FFFFFF" ss:Bold="1" />
+<Interior ss:Color="#3C5A96" ss:Pattern="Solid"/>
+<Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:WrapText="1" />
+<Borders>
+<Border ss:Position="Top" ss:LineStyle="Dash" ss:Weight="1" ss:Color="#000000"/>
+<Border ss:Position="Bottom" 
+ss:LineStyle="Dash" ss:Weight="1" ss:Color="#000000"/>
+<Border ss:Position="Right" 
+ss:LineStyle="Dash" ss:Weight="1" ss:Color="#000000"/>
+</Borders>
+</Style>
+<Style ss:ID="s4">
+<Font ss:FontName="Times New Roman" ss:Size="10" ss:Color="#000000" />
+<Interior ss:Color="#DCDCDC" ss:Pattern="Solid"/>
+<Alignment ss:Horizontal="Left" ss:Vertical="Center" ss:WrapText="1" />
+<Borders>
+<Border ss:Position="Left" ss:LineStyle="Dash" ss:Weight="1" ss:Color="#000000"/>
+<Border ss:Position="Top" ss:LineStyle="Dash" ss:Weight="1" ss:Color="#000000"/>
+<Border ss:Position="Bottom" 
+ss:LineStyle="Dash" ss:Weight="1" ss:Color="#000000"/>
+<Border ss:Position="Right" 
+ss:LineStyle="Dash" ss:Weight="1" ss:Color="#000000"/>
+</Borders>
+</Style>
+<Style ss:ID="s5">
+<Font ss:FontName="Times New Roman" ss:Size="10" ss:Color="#3A5B8B" />
+<Interior ss:Color="#FFFFFF" ss:Pattern="Solid"/>
+<Alignment ss:Horizontal="Left" ss:Vertical="Center" ss:WrapText="1" />
+<Borders>
+<Border ss:Position="Left" ss:LineStyle="Dash" ss:Weight="1" ss:Color="#000000"/>
+<Border ss:Position="Bottom" 
+ss:LineStyle="Dash" ss:Weight="1" ss:Color="#000000"/>
+<Border ss:Position="Right" 
+ss:LineStyle="Dash" ss:Weight="1" ss:Color="#000000"/>
+</Borders>
+</Style>
+<Style ss:ID="s6">
+<Font ss:FontName="Times New Roman" ss:Size="10" ss:Color="#3A5B8B" />
+<Interior ss:Color="#FFFFFF" ss:Pattern="Solid"/>
+<Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:WrapText="1" />
+<Borders>
+<Border ss:Position="Left" ss:LineStyle="Dash" ss:Weight="1" ss:Color="#000000"/>
+<Border ss:Position="Bottom" 
+ss:LineStyle="Dash" ss:Weight="1" ss:Color="#000000"/>
+<Border ss:Position="Right" 
+ss:LineStyle="Dash" ss:Weight="1" ss:Color="#000000"/>
+</Borders>
+</Style>
+<Style ss:ID="s7">
+<Font ss:FontName="Times New Roman" ss:Size="10" ss:Color="#3A5B8B" />
+<Interior ss:Color="#FFFFFF" ss:Pattern="Solid"/>
+<Alignment ss:Horizontal="Right" ss:Vertical="Center" ss:WrapText="1" />
+<Borders>
+<Border ss:Position="Left" ss:LineStyle="Dash" ss:Weight="1" ss:Color="#000000"/>
+<Border ss:Position="Bottom" 
+ss:LineStyle="Dash" ss:Weight="1" ss:Color="#000000"/>
+<Border ss:Position="Right" 
+ss:LineStyle="Dash" ss:Weight="1" ss:Color="#000000"/>
+</Borders>
+</Style>
+<Style ss:ID="s8">
+<Font ss:FontName="Times New Roman" ss:Size="10" ss:Color="#3A5B8B" />
+<Interior ss:Color="#FFFFFF" ss:Pattern="Solid"/>
+<Alignment ss:Horizontal="Right" ss:Vertical="Center" ss:WrapText="1" />
+<Borders>
+<Border ss:Position="Left" ss:LineStyle="Dash" ss:Weight="1" ss:Color="#000000"/>
+<Border ss:Position="Bottom" 
+ss:LineStyle="Dash" ss:Weight="1" ss:Color="#000000"/>
+<Border ss:Position="Right" 
+ss:LineStyle="Dash" ss:Weight="1" ss:Color="#000000"/>
+</Borders>
+<NumberFormat ss:Format="#,##0.00;-#,##0.00"/>
+</Style>
+<Style ss:ID="s9">
+<Font ss:FontName="Tahoma" ss:Size="8" ss:Color="#FFFFFF" />
+
+<Alignment ss:Horizontal="Left" ss:Vertical="Top" ss:WrapText="1" />
+<Borders>
+</Borders>
+</Style>
+</Styles>
+<Worksheet ss:Name="Page 1">
+<Table ss:ExpandedColumnCount="9" ss:ExpandedRowCount="17" x:FullColumns="1" x:FullRows="1">
+<Column ss:AutoFitWidth="0" ss:Width="110.19"/>
+<Column ss:AutoFitWidth="0" ss:Width="68.68"/>
+<Column ss:AutoFitWidth="0" ss:Width="83.28"/>
+<Column ss:AutoFitWidth="0" ss:Width="80.22"/>
+<Column ss:AutoFitWidth="0" ss:Width="74.17"/>
+<Column ss:AutoFitWidth="0" ss:Width="90.38"/>
+<Column ss:AutoFitWidth="0" ss:Width="82.69"/>
+<Column ss:AutoFitWidth="0" ss:Width="302.18"/>
+<Row ss:Height="0.78">
+<Cell ss:Index="1"/><Cell ss:Index="2"/><Cell ss:Index="3"/><Cell ss:Index="4"/><Cell ss:Index="5"/><Cell ss:Index="6"/><Cell ss:Index="7"/><Cell ss:Index="8"/><Cell ss:Index="9"/></Row>
+<Row ss:Height="27.47">
+<Cell ss:Index="1" ss:MergeAcross="7" ss:StyleID="s1">
+<Data ss:Type="String">Протокол виконання автоматичних операцій</Data></Cell><Cell ss:Index="9"/></Row>
+<Row ss:Height="48.25">
+<Cell ss:Index="1" ss:StyleID="s2">
+<Data ss:Type="String">Відділення </Data></Cell><Cell ss:Index="2" ss:StyleID="s3">
+<Data ss:Type="String">Статус&#10;виконання</Data></Cell><Cell ss:Index="3" ss:StyleID="s3">
+<Data ss:Type="String">РНК</Data></Cell><Cell ss:Index="4" ss:StyleID="s3">
+<Data ss:Type="String">Номер договору </Data></Cell><Cell ss:Index="5" ss:StyleID="s3">
+<Data ss:Type="String">Референс&#10;договору</Data></Cell><Cell ss:Index="6" ss:StyleID="s3">
+<Data ss:Type="String">Сума депозиту</Data></Cell><Cell ss:Index="7" ss:StyleID="s3">
+<Data ss:Type="String">Сума процентів</Data></Cell><Cell ss:Index="8" ss:StyleID="s3">
+<Data ss:Type="String">Повідомлення про помилки</Data></Cell><Cell ss:Index="9"/></Row>
+<Row ss:Height="13.74">
+<Cell ss:Index="1" ss:MergeAcross="7" ss:StyleID="s4">
+<Data ss:Type="String"> Автоматична операція: &quot;Автопереоформлення вкладів&quot;. Виконавець: 20094.  Період виконання: з &quot;19.06.2015 15:33:24&quot;  по &quot;19.06.2015 15:33:26&quot;.</Data></Cell><Cell ss:Index="9"/></Row>
+<Row ss:Height="14.36">
+<Cell ss:Index="1" ss:StyleID="s5">
+<Data ss:Type="String"></Data></Cell><Cell ss:Index="2" ss:StyleID="s6">
+<Data ss:Type="String">Виконано</Data></Cell><Cell ss:Index="3" ss:StyleID="s6">
+<Data ss:Type="String"></Data></Cell><Cell ss:Index="4" ss:StyleID="s6">
+<Data ss:Type="String"></Data></Cell><Cell ss:Index="5" ss:StyleID="s7">
+<Data ss:Type="String"></Data></Cell><Cell ss:Index="6" ss:StyleID="s8">
+<Data ss:Type="Number">0.00</Data></Cell><Cell ss:Index="7" ss:StyleID="s8">
+<Data ss:Type="Number">0.00</Data></Cell><Cell ss:Index="8" ss:StyleID="s5">
+<Data ss:Type="String"></Data></Cell><Cell ss:Index="9"/></Row>
+<Row ss:Height="13.74">
+<Cell ss:Index="1" ss:MergeAcross="7" ss:StyleID="s4">
+<Data ss:Type="String"> Автоматична операція: &quot;Закрытие непополненных вкладов&quot;. Виконавець: 20094.  Період виконання: з &quot;19.06.2015 11:25:44&quot;  по &quot;19.06.2015 11:30:36&quot;.</Data></Cell><Cell ss:Index="9"/></Row>
+<Row ss:Height="14.36">
+<Cell ss:Index="1" ss:StyleID="s5">
+<Data ss:Type="String"></Data></Cell><Cell ss:Index="2" ss:StyleID="s6">
+<Data ss:Type="String">Виконано</Data></Cell><Cell ss:Index="3" ss:StyleID="s6">
+<Data ss:Type="String"></Data></Cell><Cell ss:Index="4" ss:StyleID="s6">
+<Data ss:Type="String"></Data></Cell><Cell ss:Index="5" ss:StyleID="s7">
+<Data ss:Type="String"></Data></Cell><Cell ss:Index="6" ss:StyleID="s8">
+<Data ss:Type="Number">0.00</Data></Cell><Cell ss:Index="7" ss:StyleID="s8">
+<Data ss:Type="Number">0.00</Data></Cell><Cell ss:Index="8" ss:StyleID="s5">
+<Data ss:Type="String"></Data></Cell><Cell ss:Index="9"/></Row>
+<Row ss:Height="13.74">
+<Cell ss:Index="1" ss:MergeAcross="7" ss:StyleID="s4">
+<Data ss:Type="String"> Автоматична операція: &quot;Закрытие просроченных вкладов&quot;. Виконавець: 20094.  Період виконання: з &quot;19.06.2015 15:01:22&quot;  по &quot;19.06.2015 15:20:32&quot;.</Data></Cell><Cell ss:Index="9"/></Row>
+<Row ss:Height="25.92">
+<Cell ss:Index="1" ss:StyleID="s5">
+<Data ss:Type="String">/302076/000175/060175/</Data></Cell><Cell ss:Index="2" ss:StyleID="s6">
+<Data ss:Type="String">Помилка</Data></Cell><Cell ss:Index="3" ss:StyleID="s6">
+<Data ss:Type="String">187872</Data></Cell><Cell ss:Index="4" ss:StyleID="s6">
+<Data ss:Type="String">95850</Data></Cell><Cell ss:Index="5" ss:StyleID="s7">
+<Data ss:Type="String"></Data></Cell><Cell ss:Index="6" ss:StyleID="s8">
+<Data ss:Type="Number">0.00</Data></Cell><Cell ss:Index="7" ss:StyleID="s8">
+<Data ss:Type="Number">0.00</Data></Cell><Cell ss:Index="8" ss:StyleID="s5">
+<Data ss:Type="String">ORA-20097: DPT-00216 Знайдений необроблений запит (№ 448858) на видалення договору № 95850</Data></Cell><Cell ss:Index="9"/></Row>
+<Row ss:Height="25.92">
+<Cell ss:Index="1" ss:StyleID="s5">
+<Data ss:Type="String">/302076/000175/000186/</Data></Cell><Cell ss:Index="2" ss:StyleID="s6">
+<Data ss:Type="String">Помилка</Data></Cell><Cell ss:Index="3" ss:StyleID="s6">
+<Data ss:Type="String">803432</Data></Cell><Cell ss:Index="4" ss:StyleID="s6">
+<Data ss:Type="String">1120701</Data></Cell><Cell ss:Index="5" ss:StyleID="s7">
+<Data ss:Type="String"></Data></Cell><Cell ss:Index="6" ss:StyleID="s8">
+<Data ss:Type="Number">0.00</Data></Cell><Cell ss:Index="7" ss:StyleID="s8">
+<Data ss:Type="Number">0.00</Data></Cell><Cell ss:Index="8" ss:StyleID="s5">
+<Data ss:Type="String">ORA-20097: DPT-00216 Знайдений необроблений запит (№ 947909) на видалення договору № 1120701</Data></Cell><Cell ss:Index="9"/></Row>
+<Row ss:Height="25.92">
+<Cell ss:Index="1" ss:StyleID="s5">
+<Data ss:Type="String">/302076/000175/000179/</Data></Cell><Cell ss:Index="2" ss:StyleID="s6">
+<Data ss:Type="String">Помилка</Data></Cell><Cell ss:Index="3" ss:StyleID="s6">
+<Data ss:Type="String">752145</Data></Cell><Cell ss:Index="4" ss:StyleID="s6">
+<Data ss:Type="String">720101</Data></Cell><Cell ss:Index="5" ss:StyleID="s7">
+<Data ss:Type="String"></Data></Cell><Cell ss:Index="6" ss:StyleID="s8">
+<Data ss:Type="Number">0.00</Data></Cell><Cell ss:Index="7" ss:StyleID="s8">
+<Data ss:Type="Number">0.00</Data></Cell><Cell ss:Index="8" ss:StyleID="s5">
+<Data ss:Type="String">ORA-20097: DPT-00216 Знайдений необроблений запит (№ 937626) на видалення договору № 720101</Data></Cell><Cell ss:Index="9"/></Row>
+<Row ss:Height="25.92">
+<Cell ss:Index="1" ss:StyleID="s5">
+<Data ss:Type="String">/302076/000175/000185/</Data></Cell><Cell ss:Index="2" ss:StyleID="s6">
+<Data ss:Type="String">Помилка</Data></Cell><Cell ss:Index="3" ss:StyleID="s6">
+<Data ss:Type="String">759553</Data></Cell><Cell ss:Index="4" ss:StyleID="s6">
+<Data ss:Type="String">581346</Data></Cell><Cell ss:Index="5" ss:StyleID="s7">
+<Data ss:Type="String"></Data></Cell><Cell ss:Index="6" ss:StyleID="s8">
+<Data ss:Type="Number">0.00</Data></Cell><Cell ss:Index="7" ss:StyleID="s8">
+<Data ss:Type="Number">0.00</Data></Cell><Cell ss:Index="8" ss:StyleID="s5">
+<Data ss:Type="String">ORA-20097: DPT-00216 Знайдений необроблений запит (№ 935051) на видалення договору № 581346</Data></Cell><Cell ss:Index="9"/></Row>
+<Row ss:Height="13.74">
+<Cell ss:Index="1" ss:MergeAcross="7" ss:StyleID="s4">
+<Data ss:Type="String"> Автоматична операція: &quot;Начисление и выплата процентов по вкладам по инд.графику&quot;. Виконавець: 20094.  Період виконання: з &quot;19.06.2015 15:30:22&quot;  по &quot;19.06.2015 15:32:57&quot;.</Data></Cell><Cell ss:Index="9"/></Row>
+<Row ss:Height="14.36">
+<Cell ss:Index="1" ss:StyleID="s5">
+<Data ss:Type="String">/302076/000126/060126/</Data></Cell><Cell ss:Index="2" ss:StyleID="s6">
+<Data ss:Type="String">Виконано</Data></Cell><Cell ss:Index="3" ss:StyleID="s6">
+<Data ss:Type="String">520140</Data></Cell><Cell ss:Index="4" ss:StyleID="s6">
+<Data ss:Type="String">437346</Data></Cell><Cell ss:Index="5" ss:StyleID="s7">
+<Data ss:Type="String">38448036</Data></Cell><Cell ss:Index="6" ss:StyleID="s8">
+<Data ss:Type="Number">0.00</Data></Cell><Cell ss:Index="7" ss:StyleID="s8">
+<Data ss:Type="Number">56145</Data></Cell><Cell ss:Index="8" ss:StyleID="s5">
+<Data ss:Type="String"></Data></Cell><Cell ss:Index="9"/></Row>
+<Row ss:Height="13.74">
+<Cell ss:Index="1" ss:MergeAcross="7" ss:StyleID="s4">
+<Data ss:Type="String"> Автоматична операція: &quot;Окончательное начисление процентов по вкладам&quot;. Виконавець: 20094.  Період виконання: з &quot;19.06.2015 15:20:40&quot;  по &quot;19.06.2015 15:25:21&quot;.</Data></Cell><Cell ss:Index="9"/></Row>
+<Row ss:Height="14.36">
+<Cell ss:Index="1" ss:StyleID="s5">
+<Data ss:Type="String"></Data></Cell><Cell ss:Index="2" ss:StyleID="s6">
+<Data ss:Type="String">Виконано</Data></Cell><Cell ss:Index="3" ss:StyleID="s6">
+<Data ss:Type="String"></Data></Cell><Cell ss:Index="4" ss:StyleID="s6">
+<Data ss:Type="String"></Data></Cell><Cell ss:Index="5" ss:StyleID="s7">
+<Data ss:Type="String"></Data></Cell><Cell ss:Index="6" ss:StyleID="s8">
+<Data ss:Type="Number">0.00</Data></Cell><Cell ss:Index="7" ss:StyleID="s8">
+<Data ss:Type="Number">0.00</Data></Cell><Cell ss:Index="8" ss:StyleID="s5">
+<Data ss:Type="String"></Data></Cell><Cell ss:Index="9"/></Row>
+</Table>
+<WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">
+<PageSetup>
+<Layout x:Orientation="Landscape"/>
+<PageMargins x:Bottom="0.39" x:Left="0.39" x:Right="0.39" x:Top="0.39"/>
+</PageSetup>
+<Print>
+<ValidPrinterInfo/>
+<PaperSizeIndex>9</PaperSizeIndex>
+</Print>
+</WorksheetOptions>
+<PageBreaks xmlns="urn:schemas-microsoft-com:office:excel">
+<RowBreaks>
+<RowBreak>
+<Row>16</Row>
+</RowBreak>
+</RowBreaks>
+</PageBreaks>
+</Worksheet>
+</Workbook>

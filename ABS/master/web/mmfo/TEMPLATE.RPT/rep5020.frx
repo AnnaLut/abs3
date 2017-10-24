@@ -1,0 +1,259 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="02/22/2016 09:53:02" ReportInfo.Modified="05/05/2017 12:16:57" ReportInfo.CreatorVersion="2014.3.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXnNrQOkL+1JZFQRMNuUqwT1QR1y3Ocz8hGIFILQp2Qrw==">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="  SELECT c.ord, &#13;&#10;         c.name, &#13;&#10;         k.kf ourmfo, &#13;&#10;         k.nbs, &#13;&#10;         k.kv, &#13;&#10;         k.kod_analyt, &#13;&#10;         nvl(k.acc_count,0)acc_count, &#13;&#10;         nvl(k.balance_in,0)balance_in, &#13;&#10;         nvl(k.debit_turns,0)debit_turns, &#13;&#10;         nvl(k.credit_turns,0)credit_turns, &#13;&#10;         nvl(k.balance_out,0)balance_out, &#13;&#10;         nvl(k.debit_count,0)debit_count, &#13;&#10;         nvl(k.credit_count,0)credit_count, &#13;&#10;         nvl(k.doc_count,0)doc_count&#13;&#10;    FROM clim_mfo c,&#13;&#10;         (SELECT t1.kf,&#13;&#10;                 t1.nbs,&#13;&#10;                 t1.kv,&#13;&#10;                 t1.kod_analyt,&#13;&#10;                 nvl(t1.acc_count,0) acc_count,&#13;&#10;                 nvl(t1.balance_in,0) balance_in,&#13;&#10;                 nvl(t1.debit_turns,0) debit_turns,&#13;&#10;                 nvl(t1.credit_turns,0) credit_turns,&#13;&#10;                 nvl(t1.balance_out,0) balance_out,&#13;&#10;                 nvl(t2.debit_count,0) debit_count,&#13;&#10;                 nvl(t3.credit_count,0) credit_count,&#13;&#10;                 nvl(t4.doc_count,0) doc_count&#13;&#10;            FROM (  SELECT kf, nbs, kv, kod_analyt,&#13;&#10;                           COUNT (*) AS acc_count,&#13;&#10;                           SUM (ostq + obdbq - obkrq) / 100 AS balance_in,&#13;&#10;                           SUM (obdbq) / 100 AS debit_turns,&#13;&#10;                           SUM (obkrq) / 100 AS credit_turns,&#13;&#10;                           SUM (ostq) / 100 AS balance_out&#13;&#10;                      FROM (SELECT cd.kf,&#13;&#10;                                   SUBSTR (cd.nls, 1, 4) AS nbs,&#13;&#10;                                   cd.kv,&#13;&#10;                                   cd.obdbq,&#13;&#10;                                   cd.obkrq,&#13;&#10;                                   cd.ostq,&#13;&#10;                                   cd.kod_analyt&#13;&#10;                              FROM ob_corporation_data cd&#13;&#10;                             WHERE     cd.rowtype = 0&#13;&#10;                                   AND cd.corporation_id = :corp_code&#13;&#10;                                   and kfile_pack.get_correct_session_id(cd.corporation_id,cd.kf,cd.session_id)=1&#13;&#10;                                   and kfile_pack.get_correct_nbs(cd.corporation_id,substr(cd.nls,1,4))=1&#13;&#10;                                   AND trunc(cd.file_date) = TRUNC(:rpt_date, 'DDD') )&#13;&#10;                  GROUP BY kf, nbs, kv, kod_analyt) t1,&#13;&#10;                 (  SELECT kf, nbs, kv, kod_analyt, COUNT (*) AS debit_count&#13;&#10;                      FROM (SELECT cd.kf,&#13;&#10;                                   SUBSTR (cd.nls, 1, 4) AS nbs,&#13;&#10;                                   cd.kv,&#13;&#10;                                   cd.kod_analyt&#13;&#10;                              FROM ob_corporation_data cd&#13;&#10;                             WHERE     cd.rowtype = 1&#13;&#10;                                    and kfile_pack.get_correct_session_id(cd.corporation_id,cd.kf,cd.session_id)=1&#13;&#10;                                   and kfile_pack.get_correct_nbs(cd.corporation_id,substr(cd.nls,1,4))=1&#13;&#10;                                   AND trunc(cd.file_date) = TRUNC(:rpt_date, 'DDD') &#13;&#10;                                   AND cd.nls = cd.nlsa)&#13;&#10;                  GROUP BY kf, nbs, kv, kod_analyt) t2,&#13;&#10;                 (  SELECT kf, nbs, kv, kod_analyt, COUNT (*) AS credit_count&#13;&#10;                      FROM (SELECT cd.kf,&#13;&#10;                                   SUBSTR (cd.nls, 1, 4) AS nbs,&#13;&#10;                                   cd.kv,&#13;&#10;                                   cd.kod_analyt&#13;&#10;                              FROM ob_corporation_data cd&#13;&#10;                             WHERE     cd.ROWTYPE = 1&#13;&#10;                                   AND cd.corporation_id = :corp_code&#13;&#10;                                   and kfile_pack.get_correct_session_id(cd.corporation_id,cd.kf,cd.session_id)=1&#13;&#10;                                   and kfile_pack.get_correct_nbs(cd.corporation_id,substr(cd.nls,1,4))=1&#13;&#10;                                   AND trunc(cd.file_date) = TRUNC(:rpt_date, 'DDD') &#13;&#10;                                   AND cd.nls = cd.nlsb)&#13;&#10;                  GROUP BY kf, nbs, kv, kod_analyt) t3,&#13;&#10;                 (  SELECT kf, nbs, kv, kod_analyt, COUNT (*) doc_count&#13;&#10;                      FROM (SELECT cd.kf,&#13;&#10;                                   SUBSTR (cd.nls, 1, 4) AS nbs,&#13;&#10;                                   cd.kv,&#13;&#10;                                   cd.kod_analyt&#13;&#10;                              FROM ob_corporation_data cd&#13;&#10;                             WHERE     cd.ROWTYPE = 1&#13;&#10;                                   AND cd.corporation_id = :corp_code&#13;&#10;                                   and kfile_pack.get_correct_session_id(cd.corporation_id,cd.kf,cd.session_id)=1&#13;&#10;                                   and kfile_pack.get_correct_nbs(cd.corporation_id,substr(cd.nls,1,4))=1&#13;&#10;                                   AND trunc(cd.file_date) = TRUNC(:rpt_date, 'DDD') )&#13;&#10;                  GROUP BY kf, nbs, kv, kod_analyt) t4&#13;&#10;           WHERE     t1.kf = t2.kf(+) AND t1.nbs = t2.nbs(+) AND t1.kv = t2.kv(+) AND t1.kod_analyt = t2.kod_analyt(+)&#13;&#10;                 AND t1.kf = t3.kf(+) AND t1.nbs = t3.nbs(+) AND t1.kv = t3.kv(+) AND t1.kod_analyt = t3.kod_analyt(+)&#13;&#10;                 AND t1.kf = t4.kf(+) AND t1.nbs = t4.nbs(+) AND t1.kv = t4.kv(+) AND t1.kod_analyt = t4.kod_analyt(+)&#13;&#10;         ) k&#13;&#10;   WHERE c.mfo = k.kf(+)&#13;&#10;ORDER BY c.ord">
+        <Column Name="ORD" DataType="System.Int16"/>
+        <Column Name="NAME" DataType="System.String"/>
+        <Column Name="OURMFO" DataType="System.String"/>
+        <Column Name="NBS" DataType="System.String"/>
+        <Column Name="KV" DataType="System.Decimal"/>
+        <Column Name="KOD_ANALYT" DataType="System.String"/>
+        <Column Name="ACC_COUNT" DataType="System.Decimal"/>
+        <Column Name="BALANCE_IN" DataType="System.Decimal"/>
+        <Column Name="DEBIT_TURNS" DataType="System.Decimal"/>
+        <Column Name="CREDIT_TURNS" DataType="System.Decimal"/>
+        <Column Name="BALANCE_OUT" DataType="System.Decimal"/>
+        <Column Name="DEBIT_COUNT" DataType="System.Decimal"/>
+        <Column Name="CREDIT_COUNT" DataType="System.Decimal"/>
+        <Column Name="DOC_COUNT" DataType="System.Decimal"/>
+        <CommandParameter Name="rpt_date" DataType="106" Expression="[sFdat1]" DefaultValue="01.01.1900"/>
+        <CommandParameter Name="corp_code" DataType="112" Expression="[Param0]" DefaultValue="8"/>
+      </TableDataSource>
+      <TableDataSource Name="Table4" DataType="System.Int32" Enabled="true" SelectCommand="SELECT c.id, c.corporation_name&#13;&#10;  FROM ob_corporation c&#13;&#10; WHERE c.id = :corp_code">
+        <Column Name="ID" DataType="System.Int32"/>
+        <Column Name="CORPORATION_NAME" DataType="System.String"/>
+        <CommandParameter Name="corp_code" DataType="112" Expression="[Param0]" DefaultValue="8"/>
+      </TableDataSource>
+      <TableDataSource Name="Table5" DataType="System.Int32" Enabled="true" SelectCommand="SELECT   t1.nbs,&#13;&#10;                 t1.kv,&#13;&#10;                 t1.kod_analyt,&#13;&#10;                 nvl(t1.acc_count,0) acc_count,&#13;&#10;                 nvl(t1.balance_in,0) balance_in,&#13;&#10;                 nvl(t1.debit_turns,0) debit_turns,&#13;&#10;                 nvl(t1.credit_turns,0) credit_turns,&#13;&#10;                 nvl(t1.balance_out,0) balance_out,&#13;&#10;                 nvl(t2.debit_count,0) debit_count,&#13;&#10;                 nvl(t3.credit_count,0) credit_count,&#13;&#10;                 nvl(t4.doc_count,0) doc_count&#13;&#10;            FROM (  SELECT  nbs, kv, kod_analyt,&#13;&#10;                           COUNT (*) AS acc_count,&#13;&#10;                           SUM (ostq + obdbq - obkrq) / 100 AS balance_in,&#13;&#10;                           SUM (obdbq) / 100 AS debit_turns,&#13;&#10;                           SUM (obkrq) / 100 AS credit_turns,&#13;&#10;                           SUM (ostq) / 100 AS balance_out&#13;&#10;                      FROM (SELECT &#13;&#10;                                   SUBSTR (cd.nls, 1, 4) AS nbs,&#13;&#10;                                   cd.kv,&#13;&#10;                                   cd.obdbq,&#13;&#10;                                   cd.obkrq,&#13;&#10;                                   cd.ostq,&#13;&#10;                                   cd.kod_analyt&#13;&#10;                              FROM ob_corporation_data cd&#13;&#10;                             WHERE     cd.rowtype = 0&#13;&#10;                                   AND cd.corporation_id = :corp_code&#13;&#10;                                   and kfile_pack.get_correct_session_id(cd.corporation_id,cd.kf,cd.session_id)=1&#13;&#10;                                   and kfile_pack.get_correct_nbs(cd.corporation_id,substr(cd.nls,1,4))=1&#13;&#10;                                   AND trunc(cd.file_date) = TRUNC(:rpt_date, 'DDD') )&#13;&#10;                  GROUP BY  nbs, kv, kod_analyt) t1,&#13;&#10;                 (  SELECT  nbs, kv, kod_analyt, COUNT (*) AS debit_count&#13;&#10;                      FROM (SELECT &#13;&#10;                                   SUBSTR (cd.nls, 1, 4) AS nbs,&#13;&#10;                                   cd.kv,&#13;&#10;                                   cd.kod_analyt&#13;&#10;                              FROM ob_corporation_data cd&#13;&#10;                             WHERE     cd.rowtype = 1&#13;&#10;                                    and kfile_pack.get_correct_session_id(cd.corporation_id,cd.kf,cd.session_id)=1&#13;&#10;                                   and kfile_pack.get_correct_nbs(cd.corporation_id,substr(cd.nls,1,4))=1&#13;&#10;                                   AND trunc(cd.file_date) = TRUNC(:rpt_date, 'DDD') &#13;&#10;                                   AND cd.nls = cd.nlsa)&#13;&#10;                  GROUP BY  nbs, kv, kod_analyt) t2,&#13;&#10;                 (  SELECT  nbs, kv, kod_analyt, COUNT (*) AS credit_count&#13;&#10;                      FROM (SELECT &#13;&#10;                                   SUBSTR (cd.nls, 1, 4) AS nbs,&#13;&#10;                                   cd.kv,&#13;&#10;                                   cd.kod_analyt&#13;&#10;                              FROM ob_corporation_data cd&#13;&#10;                             WHERE     cd.ROWTYPE = 1&#13;&#10;                                   AND cd.corporation_id = :corp_code&#13;&#10;                                   and kfile_pack.get_correct_session_id(cd.corporation_id,cd.kf,cd.session_id)=1&#13;&#10;                                   and kfile_pack.get_correct_nbs(cd.corporation_id,substr(cd.nls,1,4))=1&#13;&#10;                                   AND trunc(cd.file_date) = TRUNC(:rpt_date, 'DDD') &#13;&#10;                                   AND cd.nls = cd.nlsb)&#13;&#10;                  GROUP BY  nbs, kv, kod_analyt) t3,&#13;&#10;                 (  SELECT  nbs, kv, kod_analyt, COUNT (*) doc_count&#13;&#10;                      FROM (SELECT &#13;&#10;                                   SUBSTR (cd.nls, 1, 4) AS nbs,&#13;&#10;                                   cd.kv,&#13;&#10;                                   cd.kod_analyt&#13;&#10;                              FROM ob_corporation_data cd&#13;&#10;                             WHERE     cd.ROWTYPE = 1&#13;&#10;                                   AND cd.corporation_id = :corp_code&#13;&#10;                                   and kfile_pack.get_correct_session_id(cd.corporation_id,cd.kf,cd.session_id)=1&#13;&#10;                                   and kfile_pack.get_correct_nbs(cd.corporation_id,substr(cd.nls,1,4))=1&#13;&#10;                                   AND trunc(cd.file_date) = TRUNC(:rpt_date, 'DDD') )&#13;&#10;                  GROUP BY  nbs, kv, kod_analyt) t4&#13;&#10;           WHERE      t1.nbs = t2.nbs(+) AND t1.kv = t2.kv(+) AND t1.kod_analyt = t2.kod_analyt(+)&#13;&#10;                  AND t1.nbs = t3.nbs(+) AND t1.kv = t3.kv(+) AND t1.kod_analyt = t3.kod_analyt(+)&#13;&#10;                  AND t1.nbs = t4.nbs(+) AND t1.kv = t4.kv(+) AND t1.kod_analyt = t4.kod_analyt(+)&#13;&#10;">
+        <Column Name="NBS" DataType="System.String"/>
+        <Column Name="KV" DataType="System.Decimal"/>
+        <Column Name="KOD_ANALYT" DataType="System.String"/>
+        <Column Name="ACC_COUNT" DataType="System.Decimal"/>
+        <Column Name="BALANCE_IN" DataType="System.Decimal"/>
+        <Column Name="DEBIT_TURNS" DataType="System.Decimal"/>
+        <Column Name="CREDIT_TURNS" DataType="System.Decimal"/>
+        <Column Name="BALANCE_OUT" DataType="System.Decimal"/>
+        <Column Name="DEBIT_COUNT" DataType="System.Decimal"/>
+        <Column Name="CREDIT_COUNT" DataType="System.Decimal"/>
+        <Column Name="DOC_COUNT" DataType="System.Decimal"/>
+        <CommandParameter Name="corp_code" DataType="112" Expression="[Param0]" DefaultValue="8"/>
+        <CommandParameter Name="rpt_date" DataType="106" Expression="[sFdat1]" DefaultValue="09.11.2015"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="sFdat1" DataType="System.DateTime"/>
+    <Parameter Name="Param0" DataType="System.Int32"/>
+    <Total Name="Total_Acc" Expression="[Table.ACC_COUNT]" Evaluator="Data1" PrintOn="GroupFooter1"/>
+    <Total Name="Total_Balance_IN" Expression="[Table.BALANCE_IN]" Evaluator="Data1" PrintOn="GroupFooter1"/>
+    <Total Name="Total_Debit" Expression="[Table.DEBIT_TURNS]" Evaluator="Data1" PrintOn="GroupFooter1"/>
+    <Total Name="Total_Credit" Expression="[Table.CREDIT_TURNS]" Evaluator="Data1" PrintOn="GroupFooter1"/>
+    <Total Name="Total_Balance_OUT" Expression="[Table.BALANCE_OUT]" Evaluator="Data1" PrintOn="GroupFooter1"/>
+    <Total Name="Total_Docs" Expression="[Table.DOC_COUNT]" Evaluator="Data1" PrintOn="GroupFooter1"/>
+    <Total Name="Total_Docs_Debit" Expression="[Table.DEBIT_COUNT]" Evaluator="Data1" PrintOn="GroupFooter1"/>
+    <Total Name="Total_Docs_Credit" Expression="[Table.CREDIT_COUNT]" Evaluator="Data1" PrintOn="GroupFooter1"/>
+    <Total Name="Total_Acc_Corp" Expression="[Table5.ACC_COUNT]" Evaluator="Data2"/>
+    <Total Name="Total_Balance_IN_Corp" Expression="[Table5.BALANCE_IN]" Evaluator="Data2"/>
+    <Total Name="Total_Debit_Corp" Expression="[Table5.DEBIT_TURNS]" Evaluator="Data2"/>
+    <Total Name="Total_Credit_Corp" Expression="[Table5.CREDIT_TURNS]" Evaluator="Data2"/>
+    <Total Name="Total_Balance_OUT_Corp" Expression="[Table5.BALANCE_OUT]" Evaluator="Data2"/>
+    <Total Name="Total_Docs_Corp" Expression="[Table5.DOC_COUNT]" Evaluator="Data2"/>
+    <Total Name="Total_Docs_Debit_Corp" Expression="[Table5.DEBIT_COUNT]" Evaluator="Data2"/>
+    <Total Name="Total_Credit_Docs_Corp" Expression="[Table5.CREDIT_COUNT]" Evaluator="Data2"/>
+  </Dictionary>
+  <ReportPage Name="Page1" Landscape="true" PaperWidth="297" PaperHeight="210" RawPaperSize="9" LeftMargin="12" FirstPageSource="15" OtherPagesSource="15">
+    <ReportTitleBand Name="ReportTitle1" Width="1039.5" Height="170.1">
+      <TextObject Name="Text1" Width="1039.5" Height="18.9" Text="Інформація" Format="Date" Format.Format="d" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TableObject Name="Table1" Top="66.15" Width="1039.5" Height="103.95">
+        <TableColumn Name="Column1" Width="18.9"/>
+        <TableColumn Name="Column2" Width="85.05"/>
+        <TableColumn Name="Column3"/>
+        <TableColumn Name="Column4" Width="56.7"/>
+        <TableColumn Name="Column5" Width="56.7"/>
+        <TableColumn Name="Column6" Width="132.3"/>
+        <TableColumn Name="Column7" Width="132.3"/>
+        <TableColumn Name="Column8" Width="132.3"/>
+        <TableColumn Name="Column9" Width="132.3"/>
+        <TableColumn Name="Column10" Width="75.6"/>
+        <TableColumn Name="Column11" Width="75.6"/>
+        <TableColumn Name="Column12" Width="75.6"/>
+        <TableRow Name="Row1" Height="66.15">
+          <TableCell Name="Cell1" Border.Lines="All" Border.Width="1.5" Fill.Color="Gray" Text="№" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold" RowSpan="2"/>
+          <TableCell Name="Cell2" Border.Lines="All" Border.Width="1.5" Fill.Color="Gray" Text="Регіональне управління/&#13;&#10;номер балансового рахунку" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold" RowSpan="2"/>
+          <TableCell Name="Cell3" Border.Lines="All" Border.Width="1.5" Fill.Color="Gray" Text="TRKK" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold" RowSpan="2"/>
+          <TableCell Name="Cell4" Border.Lines="All" Border.Width="1.5" Fill.Color="Gray" Text="Кількість рахунків" Padding="1, 1, 1, 1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold" RowSpan="2"/>
+          <TableCell Name="Cell5" Border.Lines="All" Border.Width="1.5" Fill.Color="Gray" Text="Валюта рахунків" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold" RowSpan="2"/>
+          <TableCell Name="Cell26" Border.Lines="Top" Border.Width="1.5" Fill.Color="Gray" Text="Залишок коштів ( в т.ч. еквівалент іноземних валют) на початок дня" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold" RowSpan="2"/>
+          <TableCell Name="Cell27" Border.Lines="All" Border.Width="1.5" Fill.Color="Gray" Text="Обороти коштів (в т.ч. еквівалент іноземних валют)" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold" ColSpan="2"/>
+          <TableCell Name="Cell28" Border.Lines="All" Border.Width="1.5" Fill.Color="Gray" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell29" Border.Lines="Top" Border.Width="1.5" Fill.Color="Gray" Text="Залишок коштів (в т.ч. еквівалент іноземних валют) на кінець дня" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold" RowSpan="2"/>
+          <TableCell Name="Cell30" Border.Lines="All" Border.Width="1.5" Fill.Color="Gray" Text="Кількість документів за операційний день" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold" RowSpan="2"/>
+          <TableCell Name="Cell31" Border.Lines="All" Border.Width="1.5" Fill.Color="Gray" Text="Кількість документів по дебету рахунку" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold" RowSpan="2"/>
+          <TableCell Name="Cell32" Border.Lines="All" Border.Width="1.5" Fill.Color="Gray" Text="Кількість документів по кредиту рахунку" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold" RowSpan="2"/>
+        </TableRow>
+        <TableRow Name="Row2">
+          <TableCell Name="Cell6" Border.Lines="All" Border.Width="1.5" Fill.Color="Gray" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell7" Border.Lines="All" Border.Width="1.5" Fill.Color="Gray" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell8" Border.Lines="All" Border.Width="1.5" Fill.Color="Gray" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell9" Border.Lines="All" Border.Width="1.5" Fill.Color="Gray" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell10" Border.Lines="All" Border.Width="1.5" Fill.Color="Gray" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell33" Fill.Color="Gray" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell34" Border.Lines="All" Border.Width="1.5" Fill.Color="Gray" Text="Д-т" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell35" Border.Lines="All" Border.Width="1.5" Fill.Color="Gray" Text="К-т" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell36" Fill.Color="Gray" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell37" Border.Lines="All" Border.Width="1.5" Fill.Color="Gray" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell38" Border.Lines="All" Border.Width="1.5" Fill.Color="Gray" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell39" Border.Lines="All" Border.Width="1.5" Fill.Color="Gray" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row3">
+          <TableCell Name="Cell40" Border.Lines="All" Border.Width="1.5" Fill.Color="Gray" Text="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell41" Border.Lines="All" Border.Width="1.5" Fill.Color="Gray" Text="2" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell42" Border.Lines="All" Border.Width="1.5" Fill.Color="Gray" Text="3" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell43" Border.Lines="All" Border.Width="1.5" Fill.Color="Gray" Text="4" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell44" Border.Lines="All" Border.Width="1.5" Fill.Color="Gray" Text="5" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell45" Border.Lines="All" Border.Width="1.5" Fill.Color="Gray" Text="6" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell46" Border.Lines="All" Border.Width="1.5" Fill.Color="Gray" Text="7" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell47" Border.Lines="All" Border.Width="1.5" Fill.Color="Gray" Text="8" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell48" Border.Lines="All" Border.Width="1.5" Fill.Color="Gray" Text="9" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell49" Border.Lines="All" Border.Width="1.5" Fill.Color="Gray" Text="10" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell50" Border.Lines="All" Border.Width="1.5" Fill.Color="Gray" Text="11" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell51" Border.Lines="All" Border.Width="1.5" Fill.Color="Gray" Text="12" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+        </TableRow>
+      </TableObject>
+      <TextObject Name="Text2" Top="18.9" Width="1039.5" Height="18.9" Text="щодо руху коштів по рахунках філій [Table4.CORPORATION_NAME], відкритих в ВАТ &quot;Ощадбанк&quot;" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+      <TextObject Name="Text3" Top="37.8" Width="1039.5" Height="18.9" Text="за [sFdat1]" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+    </ReportTitleBand>
+    <GroupHeaderBand Name="GroupHeader1" Top="174.1" Width="1039.5" Height="18.9" Condition="[Table.ORD]">
+      <TextObject Name="Text4" Width="1039.5" Height="18.9" Border.Lines="All" Border.Width="1.5" Fill.Color="LightGray" Text="[Table.ORD]. [Table.NAME]" VertAlign="Center" Font="Arial, 8pt, style=Bold" TextFill.Color="MediumBlue"/>
+      <DataBand Name="Data1" Top="197" Width="1039.5" Height="18.9" DataSource="Table">
+        <TableObject Name="Table2" Width="1039.5" Height="18.9">
+          <TableColumn Name="Column13" Width="18.9"/>
+          <TableColumn Name="Column14" Width="85.05"/>
+          <TableColumn Name="Column15"/>
+          <TableColumn Name="Column16" Width="56.7"/>
+          <TableColumn Name="Column17" Width="56.7"/>
+          <TableColumn Name="Column18" Width="132.3"/>
+          <TableColumn Name="Column19" Width="132.3"/>
+          <TableColumn Name="Column20" Width="132.3"/>
+          <TableColumn Name="Column21" Width="132.3"/>
+          <TableColumn Name="Column22" Width="75.6"/>
+          <TableColumn Name="Column23" Width="75.6"/>
+          <TableColumn Name="Column24" Width="75.6"/>
+          <TableRow Name="Row4">
+            <TableCell Name="Cell52" Border.Lines="Left, Right" Border.LeftLine.Width="1.5" Font="Arial, 8pt"/>
+            <TableCell Name="Cell53" Border.Lines="All" Text="[Table.NBS]" HorzAlign="Right" Font="Arial, 8pt"/>
+            <TableCell Name="Cell54" Border.Lines="All" Text="[Table.KOD_ANALYT]" HorzAlign="Right" Font="Arial, 8pt"/>
+            <TableCell Name="Cell55" Border.Lines="All" Text="[Table.ACC_COUNT]" HorzAlign="Right" Font="Arial, 8pt"/>
+            <TableCell Name="Cell56" Border.Lines="All" Text="[Table.KV]" HorzAlign="Right" Font="Arial, 8pt"/>
+            <TableCell Name="Cell77" Border.Lines="All" Text="[Table.BALANCE_IN]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" Font="Arial, 8pt"/>
+            <TableCell Name="Cell78" Border.Lines="All" Text="[Table.DEBIT_TURNS]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" Font="Arial, 8pt"/>
+            <TableCell Name="Cell79" Border.Lines="All" Text="[Table.CREDIT_TURNS]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" Font="Arial, 8pt"/>
+            <TableCell Name="Cell80" Border.Lines="All" Text="[Table.BALANCE_OUT]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" Font="Arial, 8pt"/>
+            <TableCell Name="Cell81" Border.Lines="All" Text="[Table.DOC_COUNT]" HorzAlign="Right" Font="Arial, 8pt"/>
+            <TableCell Name="Cell82" Border.Lines="All" Text="[Table.DEBIT_COUNT]" HorzAlign="Right" Font="Arial, 8pt"/>
+            <TableCell Name="Cell83" Border.Lines="All" Border.RightLine.Width="1.5" Text="[Table.CREDIT_COUNT]" HorzAlign="Right" Font="Arial, 8pt"/>
+          </TableRow>
+        </TableObject>
+        <Sort>
+          <Sort Expression="[Table.ORD]"/>
+          <Sort Expression="[Table.NBS]"/>
+          <Sort Expression="[Table.KOD_ANALYT]"/>
+        </Sort>
+      </DataBand>
+      <GroupFooterBand Name="GroupFooter1" Top="219.9" Width="1039.5" Height="18.9">
+        <TableObject Name="Table3" Width="1039.5" Height="18.9" Border.Lines="Left, Right" Border.Width="1.5">
+          <TableColumn Name="Column25" Width="18.9"/>
+          <TableColumn Name="Column26" Width="151.2"/>
+          <TableColumn Name="Column27" Width="56.7"/>
+          <TableColumn Name="Column28" Width="56.7"/>
+          <TableColumn Name="Column29" Width="132.3"/>
+          <TableColumn Name="Column30" Width="132.3"/>
+          <TableColumn Name="Column31" Width="132.3"/>
+          <TableColumn Name="Column32" Width="132.3"/>
+          <TableColumn Name="Column33" Width="75.6"/>
+          <TableColumn Name="Column34" Width="75.6"/>
+          <TableColumn Name="Column35" Width="75.6"/>
+          <TableRow Name="Row5">
+            <TableCell Name="Cell84" Font="Arial, 8pt"/>
+            <TableCell Name="Cell85" Border.Lines="All" Fill.Color="192, 255, 192" Text="Разом по регіону" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+            <TableCell Name="Cell86" Border.Lines="All" Fill.Color="192, 255, 192" Text="[Total_Acc]" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+            <TableCell Name="Cell87" Border.Lines="All" Fill.Color="192, 255, 192" Text="0" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+            <TableCell Name="Cell88" Border.Lines="All" Fill.Color="192, 255, 192" Text="[Total_Balance_IN]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+            <TableCell Name="Cell109" Border.Lines="All" Fill.Color="192, 255, 192" Text="[Total_Debit]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+            <TableCell Name="Cell110" Border.Lines="All" Fill.Color="192, 255, 192" Text="[Total_Credit]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+            <TableCell Name="Cell111" Border.Lines="All" Fill.Color="192, 255, 192" Text="[Total_Balance_OUT]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+            <TableCell Name="Cell112" Border.Lines="All" Fill.Color="192, 255, 192" Text="[Total_Docs]" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+            <TableCell Name="Cell113" Border.Lines="All" Fill.Color="192, 255, 192" Text="[Total_Docs_Debit]" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+            <TableCell Name="Cell114" Border.Lines="All" Fill.Color="192, 255, 192" Text="[Total_Docs_Credit]" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          </TableRow>
+        </TableObject>
+      </GroupFooterBand>
+    </GroupHeaderBand>
+    <DataBand Name="Data2" Top="265.7" Width="1039.5" Height="18.9" DataSource="Table5">
+      <TableObject Name="Table6" Width="1039.5" Height="18.9">
+        <TableColumn Name="Column36" Width="18.9"/>
+        <TableColumn Name="Column37" Width="85.05"/>
+        <TableColumn Name="Column38"/>
+        <TableColumn Name="Column39" Width="56.7"/>
+        <TableColumn Name="Column40" Width="56.7"/>
+        <TableColumn Name="Column41" Width="132.3"/>
+        <TableColumn Name="Column42" Width="132.3"/>
+        <TableColumn Name="Column43" Width="132.3"/>
+        <TableColumn Name="Column44" Width="132.3"/>
+        <TableColumn Name="Column45" Width="75.6"/>
+        <TableColumn Name="Column46" Width="75.6"/>
+        <TableColumn Name="Column47" Width="75.6"/>
+        <TableRow Name="Row6">
+          <TableCell Name="Cell115" Border.Lines="Left" Border.LeftLine.Width="1.5"/>
+          <TableCell Name="Cell116" Border.Lines="All" Text="[Table5.NBS]" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell117" Border.Lines="All" Text="[Table5.KOD_ANALYT]" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell118" Border.Lines="All" Text="[Table5.ACC_COUNT]" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell119" Border.Lines="All" Text="[Table5.KV]" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell140" Border.Lines="All" Text="[Table5.BALANCE_IN]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell141" Border.Lines="All" Text="[Table5.DEBIT_TURNS]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell142" Border.Lines="All" Text="[Table5.CREDIT_TURNS]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell143" Border.Lines="All" Text="[Table5.BALANCE_OUT]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell144" Border.Lines="All" Text="[Table5.DOC_COUNT]" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell145" Border.Lines="All" Text="[Table5.DEBIT_COUNT]" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell146" Border.Lines="All" Border.RightLine.Width="1.5" Text="[Table5.CREDIT_COUNT]" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt"/>
+        </TableRow>
+      </TableObject>
+      <DataHeaderBand Name="DataHeader1" Top="242.8" Width="1039.5" Height="18.9">
+        <TextObject Name="Text5" Width="1039.5" Height="18.9" Border.Lines="All" Border.Width="1.5" Fill.Color="LightGray" Text="Разом по рахункам клієнта:" VertAlign="Center" Font="Arial, 8pt, style=Bold" TextFill.Color="MediumBlue"/>
+      </DataHeaderBand>
+      <DataFooterBand Name="DataFooter1" Top="288.6" Width="1039.5" Height="18.9">
+        <TableObject Name="Table7" Width="1039.5" Height="18.9">
+          <TableColumn Name="Column48" Width="18.9"/>
+          <TableColumn Name="Column49" Width="85.05"/>
+          <TableColumn Name="Column50"/>
+          <TableColumn Name="Column51" Width="56.7"/>
+          <TableColumn Name="Column52" Width="56.7"/>
+          <TableColumn Name="Column53" Width="132.3"/>
+          <TableColumn Name="Column54" Width="132.3"/>
+          <TableColumn Name="Column55" Width="132.3"/>
+          <TableColumn Name="Column56" Width="132.3"/>
+          <TableColumn Name="Column57" Width="75.6"/>
+          <TableColumn Name="Column58" Width="75.6"/>
+          <TableColumn Name="Column59" Width="75.6"/>
+          <TableRow Name="Row7">
+            <TableCell Name="Cell147" Border.Lines="Left, Bottom" Border.LeftLine.Width="1.5" Border.BottomLine.Width="1.5"/>
+            <TableCell Name="Cell148" Border.Lines="All" Border.BottomLine.Width="1.5" Fill.Color="192, 255, 192" Text="Разом:" VertAlign="Center" Font="Arial, 8pt, style=Bold" ColSpan="2"/>
+            <TableCell Name="Cell149" Border.Lines="All" Fill.Color="192, 255, 192" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+            <TableCell Name="Cell150" Border.Lines="All" Border.BottomLine.Width="1.5" Fill.Color="192, 255, 192" Text="[Total_Acc_Corp]" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+            <TableCell Name="Cell151" Border.Lines="All" Border.BottomLine.Width="1.5" Fill.Color="192, 255, 192" Text="0" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+            <TableCell Name="Cell172" Border.Lines="All" Border.BottomLine.Width="1.5" Fill.Color="192, 255, 192" Text="[Total_Balance_IN_Corp]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+            <TableCell Name="Cell173" Border.Lines="All" Border.BottomLine.Width="1.5" Fill.Color="192, 255, 192" Text="[Total_Debit_Corp]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+            <TableCell Name="Cell174" Border.Lines="All" Border.BottomLine.Width="1.5" Fill.Color="192, 255, 192" Text="[Total_Credit_Corp]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+            <TableCell Name="Cell175" Border.Lines="All" Border.BottomLine.Width="1.5" Fill.Color="192, 255, 192" Text="[Total_Balance_OUT_Corp]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+            <TableCell Name="Cell176" Border.Lines="All" Border.BottomLine.Width="1.5" Fill.Color="192, 255, 192" Text="[Total_Docs_Corp]" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+            <TableCell Name="Cell177" Border.Lines="All" Border.BottomLine.Width="1.5" Fill.Color="192, 255, 192" Text="[Total_Docs_Debit_Corp]" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+            <TableCell Name="Cell178" Border.Lines="All" Border.RightLine.Width="1.5" Border.BottomLine.Width="1.5" Fill.Color="192, 255, 192" Text="[Total_Credit_Docs_Corp]" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          </TableRow>
+        </TableObject>
+      </DataFooterBand>
+      <Sort>
+        <Sort Expression="[Table5.NBS]"/>
+        <Sort Expression="[Table5.KOD_ANALYT]"/>
+      </Sort>
+    </DataBand>
+  </ReportPage>
+</Report>

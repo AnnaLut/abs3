@@ -1,0 +1,201 @@
+﻿@{
+    if (ViewBag.nPar == 1)
+    {
+        ViewBag.Title = "ДЦП. Прийом файлів &P";
+    }
+    else if (ViewBag.nPar == 2)
+    {
+        ViewBag.Title = "ДЦП. Обробка прийнятих файлів &P";
+    }
+    else if (ViewBag.nPar == 3)
+    {
+        ViewBag.Title = "ДЦП. Прийом і обробка файлів &P";
+    }
+}
+
+<style>
+    .k-header .k-link {
+        text-align: center;
+    }
+
+    .k-grid .k-grid-header .k-header .k-link {
+        height: auto;
+    }
+
+    .k-grid .k-grid-header .k-header {
+        white-space: normal;
+    }
+</style>
+
+<script src="~/Areas/Dcp/Scripts/Depositary/DepositaryCtrl.js"></script>
+
+<div id="content" ng-app="BarsWeb.Controllers" ng-controller="DepositaryCtrl" ng-init="Init('@ViewBag.nMode', '@ViewBag.nPar')">
+    <h2>@ViewBag.Title</h2><br />
+    <div class="form-inline">
+        <div class="form-group" style="width: 10%">
+            <input id="cur_date" class="k-textbox" style="margin-bottom: 8px; text-align: center;" readonly />
+            <input id="cur_time" class="k-textbox" style="text-align: center;" readonly />
+        </div>
+        <div class="form-group" style="width: 10%">
+            <button id="btnRef" title="Прийняти P файл" ng-click="AcceptFile()" class="k-button" style="width: 100%; height: 63px">
+                <img src="~/Areas/Dcp/Content/Images/DoorArrow.png" width="24" height="24" /><br />
+                Прийняти <ins>P</ins>
+            </button>
+        </div>
+        <div class="form-group" style="width: 50%">
+            <button id="btnDelete" class="k-button" ng-click="DeleteRow()" title="Вилучити необроблену строку файлу Р" style="margin-left: 8px">
+                <img src="~/Areas/Dcp/Content/Images/Cancel.png" width="16" height="16" />
+            </button>
+            <button id="btnPrint" class="k-button" ng-click="SavePrintGrid('1')" title="Друк таблиці">
+                <img src="~/Content/images/PureFlat/16/save.png" width="16" height="16" />
+            </button>
+            <button id="btnReload" class="k-button" ng-click="ReloadGrid()" title="Перечитати дані у таблиці">
+                <img src="~/Content/images/PureFlat/16/reload_rotate.png" width="16" height="16" />
+            </button>
+            <button id="btnOpl" class="k-button" title="Виконати платежі" ng-click="Pay()" style="margin-left: 8px">
+                <img src="~/Areas/Dcp/Content/Images/RuningIcon.png" width="16" height="16" />
+            </button>
+            <button id="btnArch" class="k-button" title="Архів усіх документів" ng-click="OpenArchive()">
+                <img src="~/Content/images/PureFlat/16/table.png" width="16" height="16" />
+            </button>
+        </div>
+    </div>
+    <br />
+    <div id="mainGrid" kendo-grid="mainGrid" k-options="mainGridOptions" k-on-save-changes="saveChanges(kendoEvent)"></div>
+
+    <div id="winArch" kendo-window="winArch" k-title="'Архів усіх документів'" k-visible="false"
+         k-modal="true">
+        <button id="btnDetails" class="k-button" ng-click="Details()" title="Перегляд сформованого документу">
+                <img src="~/Content/images/PureFlat/16/folder_open.png" width="16" height="16" />
+            </button>
+        <button id="btnPrint" class="k-button" ng-click="SavePrintGrid('archive')" title="Друк таблиці">
+            <img src="~/Content/images/PureFlat/16/save.png" width="16" height="16" />
+        </button>
+        <div id="archGrid" kendo-grid="archGrid" k-options="archGridOptions" k-on-save-changes="saveChanges(kendoEvent)"></div>
+        <br />
+        <button class="btn btn-primary" ng-click="winArch.close()" style="height: 40px; width: 150px; margin-left: 42%">Закрити</button>
+    </div>
+
+
+    <div id="winConfirm" kendo-window="winConfirm" k-title="'Підтверження!'" k-visible="false">
+        <div id="barsUiConfirmDialog" data-role="window" class="k-window-content k-content" tabindex="0" role="dialog" aria-labelledby="barsUiConfirmDialog_wnd_title">
+            <table>
+                <tbody>
+                    <tr>
+                        <td valign="top">
+                            <div style="margin:0 5px 0 0;display:inline-block;background-repeat:no-repeat;width:24px;height:24px;background-image:url(/barsroot/Content/images/PureFlat/24/Hot/help.png)">
+                            </div>
+                        </td>
+                        <td>ДЦП. Файл {{ fn }} вже було прийнято раніше.<br>Прийняти повторно?</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="k-content k-window-footer">
+            <button id="btnUpdateCancel" ng-click="winConfirm.close(); mainGrid.dataSource.read();" class="delete-confirm k-button" style="float:right;margin:7px 5px 7px 5px;">Відмінити</button>
+            <button id="btnUpdateOk" ng-click="ReAccept()" class="delete-confirm k-button k-primary" style="float:right;margin:7px 5px 7px 5px;"><span class="k-icon k-i-tick"></span> Ok</button>
+        </div>
+    </div>
+
+    <div id="winConfirmStorno" kendo-window="winConfirmStorno" k-title="'Підтверження!'" k-visible="false">
+        <div id="barsUiStornomDialog" data-role="window" class="k-window-content k-content" tabindex="0" role="dialog" aria-labelledby="barsUiStornoDialog_wnd_title">
+            <table>
+                <tbody>
+                    <tr>
+                        <td valign="top">
+                            <div style="margin:0 5px 0 0;display:inline-block;background-repeat:no-repeat;width:24px;height:24px;background-image:url(/barsroot/Content/images/PureFlat/24/Hot/help.png)">
+                            </div>
+                        </td>
+                        <td>ДЦП. Файл {{ fn }}: виконати BACK-операції для введених(не оплачених) платежів?</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="k-content k-window-footer">
+            <button id="btnStornoCancel" ng-click="winConfirmStorno.close(); mainGrid.dataSource.read();" class="delete-confirm k-button" style="float:right;margin:7px 5px 7px 5px;">Відмінити</button>
+            <button id="btnStornoOk" ng-click="ChooseReason()" class="delete-confirm k-button k-primary" style="float:right;margin:7px 5px 7px 5px;"><span class="k-icon k-i-tick"></span> Ok</button>
+        </div>
+    </div>
+
+    <div id="winReason" kendo-window="winReason" k-title="'Виберіть причину'" k-visible="false"
+         k-modal="true" style="height: 475px; width: 417px">
+        <div class="form-inline" align="center">
+                <button id="btnChoose" class="k-button" ng-click="Storno()" title="Обрати">
+                    <img src="~/Content/images/PureFlat/16/ok.png" width="16" height="16" />
+                </button>
+                <button id="btnCancel" class="k-button" ng-click="CancelStorno()" title="Завершити та закрити">
+                    <img src="~/Content/images/PureFlat/16/delete.png" width="16" height="16" />
+                </button>
+        </div>
+        <br />
+        <div id="reasonsGrid" kendo-grid="reasonsGrid" k-options="reasonsGridOptions" k-on-save-changes="saveChanges(kendoEvent)" style="width: 400px"></div>
+    </div>
+
+    <div kendo-window="SaveGridWindow" k-title="'Збереження таблиці'" k-visible="false"
+         k-modal="true">
+        <form id="export">
+            <table>
+                <tr>
+                    <td style="width: 50px"></td>
+                    <td style="width: 160px">
+                        <label>
+                            <input type="radio" name="export_type" value="excel" checked />
+                            Excel 2007
+                        </label>
+                    </td>
+                    <td style="width: 130px">
+                        <label>
+                            <input type="radio" name="export_type" value="word" />
+                            Word 2007
+                        </label>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 50px"></td>
+                    <td style="width: 160px">
+                        <label>
+                            <input type="radio" name="export_type" value="rtf" />
+                            RTF
+                        </label>
+                    </td>
+                    <td style="width: 130px">
+                        <label>
+                            <input type="radio" name="export_type" value="html" />
+                            HTML
+                        </label>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 50px"></td>
+                    <td style="width: 160px">
+                        <label>
+                            <input type="radio" name="export_type" value="xmlexcel" />
+                            MS XML
+                        </label>
+                    </td>
+                    <td style="width: 130px">
+                        <label>
+                            <input type="radio" name="export_type" value="text" />
+                            Text
+                        </label>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 50px"></td>
+                    <td style="width: 160px">
+                        <label>
+                            <input type="radio" name="export_type" value="pdf" />
+                            PDF
+                        </label>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3" align="center">
+                        <button class="k-button" ng-click="SaveFileAs()" style="background-color: #99CCFF">Зберегти</button>
+                    </td>
+                </tr>
+            </table>
+
+        </form><br />
+    </div>
+</div>

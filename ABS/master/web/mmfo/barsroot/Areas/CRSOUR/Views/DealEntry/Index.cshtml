@@ -1,0 +1,512 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+}
+
+<style>
+    .k-textbox .k-icon {
+        right: 5px;
+    }
+
+
+    .form-horizontal .control-label {
+        text-align: left;
+    }
+
+    .left-pos {
+        text-align: left;
+    }
+
+    .k-radio:checked + .k-radio-label:after {
+        top: 2px;
+        right: 4px;
+        left: 2px;
+    }
+
+
+    .panel-default {
+        border-color: #CCCCCC;
+    }
+
+    .panel {
+        border-radius: 5px;
+        background-color: #EFEFEF;
+    }
+
+    .margin-right-pos {
+        margin-right: 6%;
+    }
+
+    .margin-left-pos {
+        margin-left: 7%;
+    }
+
+    hr {
+        margin-top: 17px;
+        margin-bottom: 16px;
+        border: 0;
+        border-top: 1px solid #CCCCCC;
+    }
+
+    .panel-default .panel-heading {
+        background-color: #EFEFEF;
+    }
+
+    .panel-default > .panel-heading, .panel-default > .panel-footer {
+        border-color: #CCCCCC;
+    }
+
+    .disable-solid {
+        border-style: none;
+    }
+
+    .k-textbox .dateStart {
+        width: 100%;
+        /*padding-top: 6px;*/
+        padding-left: 10px;
+    }
+
+    .k-textbox .dateEnd {
+        width: 100%;
+        /*padding-top: 6px;*/
+        padding-left: 10px;
+    }
+
+    .non-active {
+        background-color: #C7C7C7 !important;
+    }
+</style>
+
+<script src="~/Areas/CRSOUR/Scripts/controls.js"></script>
+
+<script>
+    debugger;
+    var param = @ViewBag.NonEdit;
+
+</script>
+
+<br />
+<div class="container">
+
+    <form class="form-horizontal">
+        <!--p_party_id in integer, -- не відображати (але зберігати)-->
+        <div class="form-group">
+            <label for="" class="col-md-2 control-label">Номер угоди:</label>
+            <div class="col-md-4">
+                <input type="text" class="k-textbox">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="" class="col-md-2 control-label">Вид угоди:</label>
+            <div class="col-md-4">
+                <input type="text" class="k-textbox" id="dealType">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="" class="col-md-2 control-label">Валюта:</label>
+            <div class="col-md-4">
+                <input type="text" class="k-textbox" id="currency">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="" class="col-md-2 control-label">МФО партнера:</label>
+            <div class="col-md-4">
+                <input type="text" class="k-textbox">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="" class="col-md-2 control-label">Назва партнера:</label>
+            <div class="col-md-4">
+                <input type="text" class="k-textbox">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="" class="col-md-2 control-label">Дата початку дії:</label>
+            <div class="col-md-4">
+                <input type="text" class="k-textbox">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="" class="col-md-2 control-label">Дата завершення дії угоди:</label>
+            <div class="col-md-4">
+                <input type="text" class="k-textbox">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="" class="col-md-2 control-label">Поточна відсоткова ставка:</label>
+            <div class="col-md-4">
+                <input type="text" class="k-textbox" pattern="\d{4}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="summ" class="col-md-2 control-label">Сума угоди:</label>
+            <div class="col-md-4">
+                <input type="text" class="k-textbox" name="summ" id="summ" pattern="\d{2}" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="" class="col-md-2 control-label">Основний рахунок:</label>
+            <div class="col-md-4">
+                <input type="text" class="k-textbox">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="" class="col-md-2 control-label">Рахунок відсотків:</label>
+            <div class="col-md-4">
+                <input type="text" class="k-textbox">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="" class="col-md-2 control-label">Основний рахунок партнера:</label>
+            <div class="col-md-4">
+                <input type="text" class="k-textbox">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="" class="col-md-2 control-label">Рахунок відсотків партнера:</label>
+            <div class="col-md-4">
+                <input type="text" class="k-textbox">
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-2"></div>
+            <div class="col-md-4">
+                <input type="button" class="k-button k-primary" value="Створити" style="float: right">
+            </div>
+        </div>
+        @*
+            <div id="window">
+                <div id="gridClient"></div>
+                <div id="gridRoad"></div>
+            </div>
+
+            <!--Ліва колонка значень-->
+            <div class="col-md-6">
+
+                <div class="form-group">
+                    <div class="col-md-4">
+                        <input type="text" class="k-textbox non-active mfo" readonly>
+                    </div>
+                    <div class="col-md-6">
+                        <input type="text" class="k-textbox disable-solid" id="initTrans">
+                    </div>
+                    <div class="col-md-2">
+                        <button class="k-button" style="margin-left: 25px;"><span class="k-sprite pf-icon pf-16 pf-save" style="margin-bottom: 3px"></span> </button>
+                    </div>
+                </div>
+
+
+                <div class="panel panel-default" style="display: inline-flex;">
+                    <div class="panel-body">
+                        <div class="form-group">
+                            <label for="" class="col-md-12 control-label">Вид договора:</label>
+                            <div class="col-md-12">
+                                <input type="text" class="k-textbox disable-solid" id="dealType">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-1 control-label">Вал</label>
+                            <div class="col-md-3">
+                                <input type="text" class="k-textbox" id="currency" placeholder="Валюта">
+                            </div>
+                            <label for="" class="col-md-2 control-label">Сумма</label>
+                            <div class="col-md-6">
+                                <input type="text" class="k-textbox" id="" name="" placeholder="Сумма">
+                            </div>
+                        </div>
+                        <br/>
+                        <div class="form-group">
+                            <label for="" class="col-md-4 control-label left-pos">N тикета/договора</label>
+                            <label for="" class="col-md-4 control-label left-pos">Початок</label>
+                            <label for="" class="col-md-4 control-label left-pos">Кінець</label>
+
+                            <div class="col-md-4">
+                                <input type="text" class="k-textbox" id="" name="" placeholder="№ Договора" value="">
+                            </div>
+
+                            <div class="col-md-4">
+                                <input type="date" class="k-textbox dateStart disable-solid" id="" name="">
+                            </div>
+
+                            <div class="col-md-4">
+                                <input type="date" class="k-textbox dateEnd disable-solid" id="" name="">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--Реквізити банка-->
+
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div class="form-group">
+                            <label for="" class="col-md-4 control-label" id="bankName"></label>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-md-4">
+                                <input type="text" class="k-textbox non-active mfo" readonly>
+                            </div>
+                            <div class="col-md-4">
+                                <input type="text" class="k-textbox non-active" id="bicode" readonly>
+                            </div>
+                            <div class="col-md-4">
+                                <button class="k-button margin-right-pos" id="" name="" value=""><span class="k-sprite pf-icon pf-16 pf-accept_doc" style="margin-bottom: 3px"></span> </button>
+                                <button class="k-button margin-right-pos margin-left-pos" id="" name="" value=""><span class="k-sprite pf-icon pf-16 pf-report_open" style="margin-bottom: 3px"></span> </button>
+                                <button class="k-button margin-left-pos" id="" name="" value=""><span class="k-sprite pf-icon pf-16 pf-list-arrow_right" style="margin-bottom: 3px"></span> </button>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-4">
+                                <input type="text" class="k-textbox non-active" id="okpo" readonly>
+                            </div>
+                            <div class="col-md-4">
+                                <input type="text" class="k-textbox non-active" id="pb" readonly>
+                            </div>
+                            <div class="col-md-4">
+                                <input type="text" class="k-textbox non-active" id="outRnk" readonly>
+                            </div>
+
+                        </div>
+
+
+                        <div class="form-group">
+                            <label for="" class="col-md-6 control-label left-pos">Основний</label>
+                            <label for="" class="col-md-6 control-label left-pos">Нарахованих %</label>
+
+                            <div class="col-md-6">
+                                <input type="text" class="k-textbox" id="" name="" placeholder="Основний" value="">
+                            </div>
+
+                            <div class="col-md-6">
+                                <input type="text" class="k-textbox" id="" name="" placeholder="Нарахованих %" value="">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="" class="col-md-12 control-label left-pos" style="margin-top: 20px;">Трасса платежа входящего (57-ВІС, 58-Счет)</label>
+                            <div class="col-md-6">
+                                <input type="text" class="k-textbox" id="bicUser" placeholder="BIC банка кореспондента">
+                            </div>
+                            <div class="col-md-6">
+                                <input type="text" class="k-textbox" id="acc" placeholder="Рахунок VOSTRO">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-6">
+                                <input type="text" class="k-textbox disable-solid" id="scoreList">
+                            </div>
+                            <div class="col-md-6">
+                                <input type="text" class="k-textbox" id="nls" placeholder="Рахунок для входу валюти">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">Забезпечення</div>
+                    <div class="panel-body">
+                        <div class="form-group">
+                            <label for="" class="col-md-12 control-label">15. Назва із вибраного списку</label>
+                            <div class="col-md-2">
+                                <input type="text" class="k-textbox" id="" name="" placeholder="" value="">
+                            </div>
+                            <div class="col-md-3">
+                                <input type="text" class="k-textbox" id="" name="" placeholder="" value="">
+                            </div>
+
+                            <div class="col-md-3">
+                                <input type="text" class="k-textbox">
+                            </div>
+                            <div class="col-md-2">
+                                <input type="text" class="k-textbox" id="" name="" placeholder="" value="">
+                            </div>
+                            <div class="col-md-2">
+                                <button class="k-button" style="margin-left: 25px;"><span class="k-sprite pf-icon pf-16 pf-search" style="margin-bottom: 3px"></span> </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-4">
+                    </div>
+                    <div class="col-md-2">
+                        <input type="text" class="k-textbox" id="" name="" placeholder="" value="">
+                    </div>
+
+                    <div class="col-md-3">
+                        <input type="text" class="k-textbox">
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" class="k-textbox" id="" name="" placeholder="" value="">
+                    </div>
+                </div>
+            </div>
+
+            <!--Права колонка значень-->
+            <div class="col-md-6" style="margin-top: 45px;">
+
+                <div class="panel panel-default">
+
+                    <div class="panel-body" style="padding-left: 25px; padding-bottom: 30px;">
+                        <div class="form-group ">
+                            <input type="radio" name="engine" id="engine1" class="k-radio col-md-4" checked="checked">
+                            <label class="k-radio-label col-md-4" for="engine1">Fix</label>
+
+                            <div class="col-md-8">
+                                <input type="text" class="k-textbox" id="" placeholder="">
+                            </div>
+
+                            <input type="radio" name="engine" id="engine2" class="k-radio" checked="">
+                            <label class="k-radio-label col-md-2" for="engine2">Var</label>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="" class="col-md-4 control-label">% база</label>
+                            <div class="col-md-8">
+                                <input type="text" class="k-textbox disable-solid" id="listOfBase" name="">
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <label for="" class="col-md-4 control-label">Сумма %%</label>
+                            <div class="col-md-8">
+                                <input type="text" class="k-textbox" id="" name="" placeholder="" value="">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-default">
+
+                    <div class="panel-body" style="padding-left: 25px; padding-bottom: 6px;">
+                        <div class="form-group">
+                            <input type="radio" name="engine2" id="engine3" class="k-radio" checked="checked">
+                            <label class="k-radio-label col-md-2" for="engine3">Fix</label>
+                        </div>
+                        <div class="form-group">
+                            <input type="radio" name="engine2" id="engine4" class="k-radio" checked="">
+                            <label class="k-radio-label col-md-2" for="engine4">Var</label>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div class="form-group">
+                            <label id="nmk" class="col-md-4 control-label"></label>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-md-4">
+                                <input type="text" class="k-textbox" id="mfo" placeholder="МФО партнера">
+                            </div>
+                            <div class="col-md-4">
+                                <input type="text" class="k-textbox" id="bic" placeholder="ВІС партнера">
+                            </div>
+                            <div class="col-md-4" style="padding-right: 0px;">
+                                <input type="text" class="k-textbox" placeholder="№ дог." style="width: 81px;">
+                                <button class="k-button" id="callGridClient" style="/*margin-left: 25px;*/margin-left: 30px; padding-left: 7px;"><span class="k-sprite pf-icon pf-16 pf-search" style="margin-bottom: 3px"></span> </button>
+
+                            </div>
+
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-md-4">
+                                <input type="text" class="k-textbox" id="okpoUser" placeholder="ОКПО партнера">
+                            </div>
+                            <div class="col-md-4">
+                                <input type="text" class="k-textbox" id="kod_b" placeholder="Код 1-ПБ партнера">
+                            </div>
+                            <div class="col-md-4">
+                                <input type="text" class="k-textbox" id="rnk" placeholder="Рег № партнера">
+                            </div>
+                        </div>
+
+
+
+                        <div class="form-group">
+                            <label for="" class="col-md-6 control-label">Основний</label>
+                            <label for="" class="col-md-6 control-label">Начисленних %</label>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-6">
+                                <input type="checkbox" id="eq2" class="k-checkbox">
+                                <label class="k-checkbox-label" for="eq2">Внутрішній</label>
+                            </div>
+                            <div class="col-md-6">
+                                <input type="checkbox" id="eq3" class="k-checkbox">
+                                <label class="k-checkbox-label" for="eq3">Внутрішній</label>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-6">
+                                <input type="text" class="k-textbox" id="" name="" value="">
+                            </div>
+                            <div class="col-md-6">
+                                <input type="text" class="k-textbox" id="" name="" value="">
+                            </div>
+
+                        </div>
+
+                        <div class="form-group">
+                            <label for="" class="col-md-12 control-label">Траса платежу вихідного (57/ВІС, 58-Счет)</label>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-5">
+                                <input type="text" class="k-textbox" id="bicRoad">
+                            </div>
+                            <div class="col-md-5">
+                                <input type="text" class="k-textbox">
+                            </div>
+                            <div class="col-md-2">
+                                <button class="k-button" id="roadPay" style="margin-left: 25px;"><span class="k-sprite pf-icon pf-16 pf-search" style="margin-bottom: 3px"></span> </button>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-12">
+                                <input type="text" class="k-textbox" id="nameRoad">
+                            </div>
+
+                        </div>
+
+                        <div class="form-group">
+
+                            <div class="col-md-10">
+                                <input type="text/x-kendo-template" class="k-button" id="" name="" value="">
+                            </div>
+                            <div class="col-md-2">
+                                <button class="k-button" style="margin-left: 25px;"><span class="k-sprite pf-icon pf-16 pf-search" style="margin-bottom: 3px"></span> </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-3">
+                        <input type="text" class="k-textbox" id="Norm7" name="" placeholder="">
+                    </div>
+
+                    <div class="col-md-3">
+                        <input type="text" class="k-textbox">
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" class="k-textbox" id="" name="" placeholder="" value="">
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" class="k-textbox" id="" name="" placeholder="" value="">
+                    </div>
+                </div>
+
+            </div>
+        *@
+    </form>
+</div>

@@ -1,0 +1,60 @@
+﻿<customfield name="P_AREA" label="Площа земельної ділянки" required="true" datatype="Int64" datasourcefield="AREA"  columnindex="2" groupname="5. Предмет застави">
+  <uicontrol type="DecimalInput" controlwidth="150" />
+</customfield>
+<customfield name="P_LAND_PURPOSE" label="Цільове призначення земельної ділянки" required="true" datatype="String" size="100" datasourcefield="LAND_PURPOSE" columnindex="2" groupname="5. Предмет застави">
+  <uicontrol type="TextBox" controlwidth="250" linescount="5" />
+</customfield>
+<customfield name="P_BUILD_NUM" label="Номер дома" datatype="String" size="100" datasourcefield="BUILD_NUM" columnindex="2" groupname="5. Предмет застави">
+  <uicontrol type="TextBox" controlwidth="150" />
+</customfield>
+<customfield name="P_BUILD_LIT" label="Літера дома" datatype="String" size="100" datasourcefield="BUILD_LIT" columnindex="2" groupname="5. Предмет застави">
+  <uicontrol type="TextBox" controlwidth="150" />
+</customfield>
+<customfield name="P_OWNSHIP_DOC_SER" label="Серія державного акту на право власності на земельну ділянку" datatype="String" size="100" datasourcefield="OWNSHIP_DOC_SER" columnindex="2" groupname="5. Предмет застави">
+  <uicontrol type="TextBox" controlwidth="150" />
+</customfield>
+<customfield name="P_OWNSHIP_DOC_NUM" label="Номер державного акту на право власності на земельну ділянку" datatype="String" size="100" datasourcefield="OWNSHIP_DOC_NUM" columnindex="2" groupname="5. Предмет застави">
+  <uicontrol type="TextBox" controlwidth="150" />
+</customfield>
+<customfield name="P_OWNSHIP_DOC_DATE" label="Дата видачі державного акту на право власності на земельну ділянку" datatype="DateTime" datasourcefield="OWNSHIP_DOC_DATE" columnindex="2" groupname="5. Предмет застави">
+  <uicontrol type="DateInput" controlwidth="150" />
+</customfield>
+<customfield name="P_OWNSHIP_DOC_REASON" label="Підстава видачі державного акту на право власності на земельну ділянку" datatype="String" size="100" datasourcefield="OWNSHIP_DOC_REASON" columnindex="2" groupname="5. Предмет застави">
+  <uicontrol type="TextBox" controlwidth="250" linescount="7" />
+</customfield>
+<customfield name="P_OWNSHIP_REGBOOK_NUM" label="Номер в книзі записів реєстрації державних актів на право власності на землю" datatype="String" size="100" datasourcefield="OWNSHIP_REGBOOK_NUM" columnindex="2" groupname="5. Предмет застави">
+  <uicontrol type="TextBox" controlwidth="150" />
+</customfield>
+<customfield name="P_EXTRACT_REG_DATE" label="Дата витягу з реєстру прав власності на нерухоме майно" datatype="DateTime" datasourcefield="EXTRACT_REG_DATE" columnindex="2" groupname="5. Предмет застави">
+  <uicontrol type="DateInput" controlwidth="150" />
+</customfield>
+<customfield name="P_EXTRACT_REG_ORGAN" label="Назва органу, що надав витяг з реєстру прав власності на нерухоме майно" datatype="String" size="100" datasourcefield="EXTRACT_REG_ORGAN" columnindex="2" groupname="5. Предмет застави">
+  <uicontrol type="TextBox" controlwidth="250" linescount="7" />
+</customfield>
+<customfield name="P_EXTRACT_REG_NUM" label="Номер витягу з реєстру прав власності на нерухоме майно" datatype="String" size="100" datasourcefield="EXTRACT_REG_NUM" columnindex="2" groupname="5. Предмет застави">
+  <uicontrol type="TextBox" controlwidth="150" />
+</customfield>
+<customfield name="P_EXTRACT_REG_SUM" label="Вартість згідно витягу з реєстру прав власності на нерухоме майно" datatype="Decimal" datasourcefield="EXTRACT_REG_SUM" columnindex="2" groupname="5. Предмет застави">
+  <uicontrol type="DecimalInput" controlwidth="150" />
+</customfield>
+<customfield name="P_LESSEE_NUM" label="№ п.п орендаря" datatype="Int64" datasourcefield="LESSEE_NUM" columnindex="2" groupname="5. Предмет застави">
+  <uicontrol type="DecimalInput" controlwidth="150" />
+</customfield>
+<customfield name="P_LESSEE_NAME" label="Назва орендаря" datatype="String" size="100" datasourcefield="LESSEE_NAME" columnindex="2" groupname="5. Предмет застави">
+  <uicontrol type="TextBox" controlwidth="250" linescount="5" />
+</customfield>
+<customfield name="P_LESSEE_DOG_ENDDATE" label="Строк договору оренди" datatype="DateTime" datasourcefield="LESSEE_DOG_ENDDATE" columnindex="2" groupname="5. Предмет застави">
+  <uicontrol type="DateInput" controlwidth="150" />
+</customfield>
+<customfield name="P_LESSEE_DOG_NUM" label="Номер договору оренди" datatype="String" size="100" datasourcefield="LESSEE_DOG_NUM" columnindex="2" groupname="5. Предмет застави">
+  <uicontrol type="TextBox" controlwidth="150" />
+</customfield>
+<customfield name="P_LESSEE_DOG_DATE" label="Дата договору оренди" datatype="DateTime" datasourcefield="LESSEE_DOG_DATE" columnindex="2" groupname="5. Предмет застави">
+  <uicontrol type="DateInput" controlwidth="150" />
+</customfield>
+<customfield name="P_BANS_REG_NUM" label="Номер витягу з єдиного реєстру заборон відчуження об’єктів нерухомого майна" datatype="String" size="100" datasourcefield="BANS_REG_NUM" columnindex="2" groupname="5. Предмет застави">
+  <uicontrol type="TextBox" controlwidth="150" />
+</customfield>
+<customfield name="P_BANS_REG_DATE" label="Дата витягу з єдиного реєстру заборон відчуження об’єктів нерухомого майна" datatype="DateTime" datasourcefield="BANS_REG_DATE" columnindex="2" groupname="5. Предмет застави">
+  <uicontrol type="DateInput" controlwidth="150" />
+</customfield>

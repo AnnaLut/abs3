@@ -1,0 +1,107 @@
+﻿@model InitParams
+@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = "Портфель загальний";
+}
+
+<script>
+
+    window.gridParams = {
+        nMode: +'@Model.nMode',
+        nGrp: +'@Model.nGrp',
+        strPar01: +'@Model.strPar01',
+        strPar02: +'@Model.strPar02',
+        p_active: +'@Model.p_active'
+    }
+
+
+    @*var currencyOperationData = {
+        getNmkMethod: '@Url.Action("GetCustomerNmk", "currencyOperations")',
+        getTabvalNameMethod: '@Url.Action("GetTabvalName", "currencyOperations")',
+        GetApplicationMethod: '@Url.Action("GetApplication", "currencyOperations")',
+        deleteApplicationMethod: '@Url.Action("DeleteApplication", "currencyOperations")',
+        restoreApplicationMethod: '@Url.Action("RestoreApplication", "currencyOperations")',
+        getNrefSosMethod: '@Url.Action("GetNrefSos", "currencyOperations")'
+    }*@
+</script>
+
+
+
+<link href="~/Areas/ValuePapers/Css/styles.css" rel="stylesheet">
+
+
+<div class="page-header">
+    <h2>
+        @ViewBag.Title
+    </h2>
+</div>
+<script src="~/Areas/ValuePapers/scripts/jszip.js"></script>
+<div ng-controller="homeController">
+    <div>
+        <div class="col-sm-12">
+            <div class="row">
+                <button style="background: white;" kendo-tooltip k-content="'Коди ЦП'" k-position="'top'" class="k-button" ng-click="openBarsDialog('/barsroot/ndi/referencebook/GetRefBookData/?accessCode=0&tableName=CP_KOD')"><img src="~/Areas/ValuePapers/Content/Images/PACH.png"></button>
+                <button style="background: whitesmoke;" title="Проспекти емісії. Розміщення" class="k-button" ng-click="openBarsDialog('/barsroot/ndi/referencebook/GetRefBookData/?accessCode=0&tableName=V_CP_CODE_ROZ')"><img src="~/Areas/ValuePapers/Content/Images/LIST.png"></button>
+                <button style="background: lightgray;" title="Проспекти емісії. Залучення" class="k-button" ng-click="openBarsDialog('/barsroot/ndi/referencebook/GetRefBookData/?accessCode=0&tableName=V_CP_CODE_ZAL')"><img src="~/Areas/ValuePapers/Content/Images/LIST.png"></button>
+                <button style="background: white;" title="Фільтр" class="k-button" ng-click="getGridFilter()"><span class="k-icon k-i-funnel"></span></button>
+                <button style="background: white;" title="Показати Відкриті/Закриті угоди" class="k-button" ng-click="inversePActiveUpdateGrid()"><span class="k-icon" ng-class="{'k-i-unlock': gridParams.p_active, 'k-i-lock': !gridParams.p_active}"></span></button>
+                <button style="background: whitesmoke;" title="Нова угода КУПІВЛІ ЦП іншого емітенту" class="k-button" ng-click="newDeal(1,0,22)"><img src="~/Areas/ValuePapers/Content/Images/DOC_IN.png"></button>
+                <button style="background: whitesmoke;" title="Викуп ЦП власної емісії (по одному)" class="k-button" ng-click="newDeal(1,1,22)"><img src="~/Areas/ValuePapers/Content/Images/DOC_DOWN.png"></button>
+                <button style="background: whitesmoke; " title="Нова угода ПРОДАЖУ ЦП" class="k-button" ng-click="newDeal(2,0,22)"><img src="~/Areas/ValuePapers/Content/Images/DOC_M1.png"></button>
+                <button style="background: whitesmoke;" title="Погашення номіналу ЦП інших емітентів" class="k-button" ng-click="newDeal(2,1,22)"><img src="~/Areas/ValuePapers/Content/Images/DOC_OUT.png"></button>
+                <button style="background: whitesmoke;" title="Нова угода ПРОДАЖУ ЦП – РЕПО" class="k-button" ng-click="newDealRef(-1,0,22)"><img src="~/Areas/ValuePapers/Content/Images/BACK.png"></button>
+                <input type="text" kendo-date-picker k-ng-model="ADAT" k-options="datePickerOptions" title="Дата нарахування" ng-blur="grid.dataSource.read()" />
+                <button style="background: white;" title="Нарахування" class="k-button" ng-click="openBarsDialog('/barsroot/ndi/referencebook/GetRefBookData/?accessCode=0&tableName=V_CP_PREPARE')"><img src="~/Areas/ValuePapers/Content/Images/A_INTS.png"></button>
+                <button style="background: white;" title="Рахунки угоди" class="k-button" ng-click="openBarsDialogWithTableRow('/barsroot/customerlist/custacc.aspx?type=9&cp_ref=','REF')"><img src="~/Areas/ValuePapers/Content/Images/OPEN.png"></button>
+                <button style="background: white;" title="Резерви" class="k-button" ng-click="openBarsDialog('/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&tableName=NBU23_REZ',{filterCodeParameter : {Name: 'REF',Type: 'N'},filterCode: 'NBU23_REZ_FILTER_CODE'})"><img src="~/Areas/ValuePapers/Content/Images/LOGIN.png"></button>
+                <button style="background: yellow;" title="Архів угод" class="k-button" ng-click="openBarsDialog('/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&tableName=V_CP_ARCH_META')"><img src="~/Areas/ValuePapers/Content/Images/DOCVIEW.png"></button>
+                <button style="background: lightpink;" title="FORWARD - угоди ПРОДАЖУ ЦП" class="k-button" ng-click="openBarsDialog('/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&tableName=V_CP_ARCH_FORW')"><img src="~/Areas/ValuePapers/Content/Images/DOCVIEW.png"></button>
+                <button style="background: lightblue;" title="Аналіз ціни портфеля" class="k-button" ng-click="openBarsDialog('/barsroot/ndi/referencebook/GetRefBookData/?accessCode=0&tableName=V_CP_PRICES')"><img src="~/Areas/ValuePapers/Content/Images/DETAILS.png"></button>
+                <button style="background: whitesmoke;" title="Переміщення ЦП інших емітентів в другий портфель" class="k-button" ng-click="getBMD()"><img src="~/Areas/ValuePapers/Content/Images/ARROW.png"></button>
+                <button style="background: whitesmoke;" title="Куплено-Продано-Погашено" class="k-button" ng-click="openBarsDialog('/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&tableName=V_CP_TOTALS')"><img src="~/Areas/ValuePapers/Content/Images/LOOK.png"></button>
+                <button style="background: white;" title="Сплата купону" class="k-button" ng-click="payTicket('@Model.strPar02', '@Model.nGrp', 0)"><img src="~/Areas/ValuePapers/Content/Images/DESCEND.png"></button>
+                <button style="background: white; " title="Сплата купону однотипної групи" class="k-button" ng-click="payTicket('@Model.strPar02', '@Model.nGrp', 1)"><img src="~/Areas/ValuePapers/Content/Images/DESCEND2.png"></button>
+                <button title="Амортизація Дисконту/Премії на дату" class="k-button" ng-click="cpAmor()"><img src="~/Areas/ValuePapers/Content/Images/SELECT.png"></button>                
+                <button style="background: beige;" title="Гарантії по пакету цінних паперів від третіх осіб" class="k-button" ng-click="openBarsDialog('/barsroot/ndi/referencebook/GetRefBookData/?accessCode=0&tableName=V_CP_WARRANTY_WEB')"><img src="~/Areas/ValuePapers/Content/Images/A_ACCS.png"></button>
+                <button style="background: white;" title="Додаткові реквізити до портфелю ЦП" class="k-button" ng-click="openBarsDialog('/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&tableName=V_CP_EMI')"><img src="~/Areas/ValuePapers/Content/Images/CREATE.png"></button>
+                <button style="background: honeydew;" title="Кандидати на прострочку" class="k-button" ng-click="openBarsDialog('/barsroot/ndi/referencebook/GetRefBookData/?accessCode=2&tableName=V_CP_EXPCANDIDATES_NEW')"><img src="~/Areas/ValuePapers/Content/Images/LINKR.png"></button>
+                <button style="background: honeydew;" title="Погашення прострочки" class="k-button" ng-click="openBarsDialog('/barsroot/ndi/referencebook/GetRefBookData/?accessCode=2&tableName=V_CPDEAL_EXPPAY')"><img src="~/Areas/ValuePapers/Content/Images/LINK.png"></button>
+                <button style="background: linen;" title="Винос ФДЗ" class="k-button" ng-click="openBarsDialog('/barsroot/ndi/referencebook/GetRefBookData/?accessCode=2&tableName=V_CP_FINDEB')"><img src="~/Areas/ValuePapers/Content/Images/BOOK.png"></button>
+                <button style="background: linen;" title="Погашененя з ФДЗ" class="k-button" ng-click="openBarsDialog('/barsroot/ndi/referencebook/GetRefBookData/?accessCode=2&tableName=V_CP_FINDEB_PAY')"><img src="~/Areas/ValuePapers/Content/Images/BOOKS.png"></button>
+                <button style="background: mintcream;" title="Візування своїх операцій" class="k-button" ng-click="openBarsDialog('/barsroot/checkinner/default.aspx?type=0')"><img src="~/Areas/ValuePapers/Content/Images/ARR2TOR.png"></button>
+                <button style="background: mintcream; " title="Візування операцій підрозділу" class="k-button" ng-click="openBarsDialog('/barsroot/checkinner/documents.aspx?type=2&grpid=2')"><img src="~/Areas/ValuePapers/Content/Images/INTERS.png"></button>
+                <button style="background: mintcream; " title="Перегляд своїх операцій" class="k-button" ng-click="openBarsDialog('/barsroot/documentsview/documents.aspx?type=1&par=11')"><img src="~/Areas/ValuePapers/Content/Images/SEARCH.png"></button>
+                <button class=" k-button" title="План потоки" ng-click="openPlanMoneyFlow()"><img src="~/Areas/ValuePapers/Content/Images/A_FINS.png"></button>
+                <button style="background: whitesmoke;" title="Потоки" class="k-button" ng-click="openMoneyFlow()"><img src="~/Areas/ValuePapers/Content/Images/CHARTL.png"></button>
+            </div>
+            <div style="margin-top: 20px;" class="row">
+                <div id="grid" kendo-grid="grid" options="gridOptions"></div>
+            </div>
+
+        </div>
+        @Html.Partial("dWindows/dealWindow")
+        @Html.Partial("dWindows/specParamslWindow")
+        @Html.Partial("dWindows/moneyFlowWindow")
+        @Html.Partial("dWindows/planMoneyFlowWindow")
+    </div>
+
+</div>
+@*<div id="loader">
+        <img src="~/Areas/ValuePapers/Content/Images/loader.gif" width="65" height="65" class="ajax-loader"/>
+    </div>
+*@
+
+
+<script src="~/Areas/ValuePapers/app/app.js"></script>
+@* ---- services ---- *@
+<script src="~/Areas/ValuePapers/app/services/paramsService.js"></script>
+<script src="~/Areas/ValuePapers/app/services/localStorage.js?v1.0.0"></script>
+@* ---- directives ---- *@
+<script src="~/Areas/ValuePapers/app/directives/onlyNumber.js"></script>
+<script src="~/Areas/ValuePapers/app/directives/onlyDecimal.js"></script>
+@* ---- controllers ---- *@
+<script src="~/Areas/ValuePapers/app/controllers/homeController.js?v1.0.1"></script>
+<script src="~/Areas/ValuePapers/app/controllers/dealController.js?1.0.0"></script>
+<script src="~/Areas/ValuePapers/app/controllers/specParamsController.js"></script>
+<script src="~/Areas/ValuePapers/app/controllers/moneyFlowController.js"></script>
+<script src="~/Areas/ValuePapers/app/controllers/planMoneyFlowController.js?1.0.0"></script>

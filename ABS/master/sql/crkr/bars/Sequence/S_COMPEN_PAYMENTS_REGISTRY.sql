@@ -1,0 +1,15 @@
+BEGIN
+EXECUTE IMMEDIATE
+'create sequence S_COMPEN_PAYMENTS_REGISTRY
+minvalue 1
+maxvalue 999999999999999999999999999
+start with 1
+increment by 1
+nocache';
+EXCEPTION WHEN OTHERS THEN
+ IF (SQLCODE = -955)
+   THEN NULL;
+   ELSE RAISE;
+ END IF;
+END;
+/

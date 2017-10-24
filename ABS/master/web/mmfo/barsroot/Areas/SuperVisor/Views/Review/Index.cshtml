@@ -1,0 +1,66 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = "Перегляд балансу";
+}
+
+<!--[if IE]><link href="~/Areas/SuperVisor/Css/ie.css" rel="stylesheet" type="text/css"><![endif]-->
+<link href="~/Areas/SuperVisor/Css/style.css" rel="stylesheet" type="text/css">
+
+<script src="~/Areas/SuperVisor/Scripts/Review/engineCtrl.js"></script>
+<script src="~/Areas/SuperVisor/Scripts/Utils/utilsCtrl.js"></script>
+
+<script>
+    bars.utilsCtrl.loadGridTemplate('@Url.Content("~/Areas/SuperVisor/Scripts/Review/tpl/RegionsGrid.tpl.htm")');
+    bars.utilsCtrl.loadGridTemplate('@Url.Content("~/Areas/SuperVisor/Scripts/Review/tpl/CurrentRegionGrid.tpl.htm")');
+</script>
+
+<script type="text/x-kendo-template" id="template">
+    <div class="box"></div>
+</script>
+
+<script type="text/x-kendo-template" id="region-template">
+    <div class="region-box"></div>
+</script>
+
+<script>
+    var bDate = '@ViewBag.bDate';
+</script>
+
+<!-- html -->
+
+<div class="page-header">
+    <h1>
+        @ViewBag.Title
+    </h1>
+</div>
+<div class="container col-sm-8">
+    <form class="form-inline" role="form" >
+        <div id="divNbs" class="form-group">
+            <div class="controls">
+                <label for="nbs">Блансовий </label>
+                <div class="input-group ">
+                    <input class="k-textbox" id="nbs" maxlength="4" placeholder="*" style="width: 100px">
+                </div>
+            </div>
+        </div>
+        <div id="divKv" class="form-group">
+            <div class="controls">
+                <label for="kvDrop">Валюта  </label>
+                <div class="input-group">
+                    <input id="kvDrop" style="width: 200px" />
+                </div>
+            </div>
+        </div>
+        <div id="divDate" class="form-group" >
+            <div class="controls">
+                <label for="date">Дата  </label>
+                <div class="input-group">
+                    <input id="date" />
+                </div>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-default" id="btnFilter">Застосувати</button>
+    </form>
+</div>
+<div class="grid" id="grid"></div>
+

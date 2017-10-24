@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="04/04/2013 17:53:24" ReportInfo.Modified="05/07/2013 12:21:36" ReportInfo.CreatorVersion="1.9.1.0">
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqD6nWZEExUJ9MEhdFZpB1A6ZfSeiTM+6WLeB8pW5aURqkGwhV134I2SUIQGUGXcXif18samVEKlOgfN3dd/SrRQ==">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select NUM00 REF, DAT00 VDAT, CHAR00 NAZN from rs_tmp_report_data where session_id=:SESSION_ID order by id">
+        <Column Name="REF" DataType="System.Decimal"/>
+        <Column Name="VDAT" DataType="System.DateTime"/>
+        <Column Name="NAZN" DataType="System.String"/>
+        <CommandParameter Name="session_id" DataType="126" Expression="[Parameter.session_id]"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="Parameter" DataType="System.String">
+      <Parameter Name="session_id" DataType="System.Int32" Expression="173411"/>
+    </Parameter>
+  </Dictionary>
+  <ReportPage Name="Page1" Guides="9.45,103.95,141.75,236.25,330.75,425.25">
+    <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="37.8"/>
+    <PageHeaderBand Name="PageHeader1" Top="40.66" Width="718.2" Height="28.35" Guides="0,18.9">
+      <TextObject Name="Text2" Left="9.45" Width="94.5" Height="18.9" Text="REF"/>
+      <TextObject Name="Text4" Left="141.75" Width="94.5" Height="18.9" Text="VDAT"/>
+      <TextObject Name="Text6" Left="330.75" Width="94.5" Height="18.9" Text="NAZN"/>
+    </PageHeaderBand>
+    <DataBand Name="Data1" Top="71.86" Width="718.2" Height="18.9" Guides="18.9,37.8" DataSource="Table">
+      <TextObject Name="Text3" Left="141.75" Width="94.5" Height="18.9" Text="[Table.VDAT]" Format="Date" Format.Format="d"/>
+      <TextObject Name="Text5" Left="330.75" Width="94.5" Height="18.9" Text="[Table.NAZN]"/>
+      <TextObject Name="Text1" Left="9.45" Width="94.5" Height="18.9" Text="[Table.REF]" Format="Currency" Format.UseLocale="true" HorzAlign="Right" WordWrap="false" Trimming="EllipsisCharacter"/>
+    </DataBand>
+    <PageFooterBand Name="PageFooter1" Top="93.62" Width="718.2" Height="18.9"/>
+  </ReportPage>
+</Report>

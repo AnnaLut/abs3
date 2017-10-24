@@ -1,0 +1,329 @@
+<xmlform caption="\SQ[select 'Заява №'||v.id||' клієнта '||v.nmk ||' (РНК '|| v.rnk ||') на купівлю валюти '||v.kv||' за валюту '|| v.kv_conv from V_ZAY_BUYFORM v where id = \QS[p_id] ]" captiontype="Default">
+  <customforms>
+    <customform name="frmV_ZAY_BUYFORM" buttonsposition="Bottom" title="" columnscount="3">
+      <buttons defaulttype="Button">
+        <button caption="Зберегти" hint="Зберегти зміни" id="btnSave">
+          <command type="PlSqlBlock" successmessage="Дані збережено" successurl="/barsroot/barsweb/dynform.aspx?form=frm_zay_buy_add" target="Self">
+            <sql>
+              declare
+              l_id number := :P_ID;
+              l_s2s number := :P_S2S;
+              l_nd varchar2(64) := :P_ND;
+              l_fdat date := :P_FDAT;
+              l_kurs_z number := :P_KURS_Z;
+              l_nls varchar2(20) := :P_NLS;
+              l_nls_acc0 varchar2(36) := :P_NLS_ACC0;
+              l_nls0 varchar2(36) := :P_NLS0;
+              l_mfo0 varchar2(20) := :P_MFO0;
+              l_kom number := :P_KOM;
+              l_skom number := :P_SKOM;
+              l_meta number := :P_META;
+              l_contract varchar2(128) := :P_CONTRACT;
+              l_datc date := :P_DATC;
+              l_num_vmd varchar2(128) := :P_NUM_VMD;
+              l_vmd1 date := :P_VMD1;
+              l_vmd5 varchar2(128) := :P_VMD5;
+              l_basis varchar2(128) := :P_BASIS;
+              l_country number := :P_COUNTRY;
+              l_benefcountry number := :P_BENEFCOUNTRY;
+              l_bank_code varchar2(64) := :P_BANK_CODE;
+              l_bank_name varchar2(128) := :P_BANK_NAME;
+              l_product_group varchar2(128) := :P_PRODUCT_GROUP;
+              l_comm varchar2(256) := :P_COMM;
+              l_contact_fio varchar2(128) := :P_CONTACT_FIO;
+              l_contact_tel varchar2(64) := :P_CONTACT_TEL;
+              l_rnk number := :P_RNK;
+              l_nmk varchar2(128) := :P_NMK;
+              l_cust_branch varchar2(128) := :P_CUST_BRANCH;
+              l_ostc0 number := :P_OSTC0;
+              l_kv number := :P_KV;
+              l_kv_conv number := :P_KV_CONV;
+
+              begin
+              if (l_id is not null) then
+              bars_zay.upd_request
+              (p_id       => l_id,
+              p_s2s       => l_s2s,
+              p_nd        => l_nd,
+              p_fdat      => l_fdat,
+              p_kurs      => l_kurs_z,
+              p_kv_conv   => null,
+              p_nls       => l_nls,
+              p_nls_acc0  => l_nls_acc0,
+              p_nls0      => l_nls0,
+              p_mfo0      => l_mfo0,
+              p_kom       => l_kom,
+              p_skom      => l_skom,
+              p_meta      => l_meta,
+              p_contract  => l_contract,
+              p_dat2_vmd  => l_datc,
+              p_num_vmd   => l_num_vmd,
+              p_dat_vmd   => l_vmd1,
+              p_dat5_vmd  => l_vmd5,
+              p_basis     => l_basis,
+              p_country   => l_country,
+              p_benefcountry=> l_benefcountry,
+              p_bank_code => l_bank_code,
+              p_bank_name => l_bank_name,
+              p_product_group  => l_product_group,
+              p_comm      => l_comm,
+              p_contactfio         => l_contact_fio,
+              p_contacttel         => l_contact_tel);
+
+              else
+
+
+              if nvl(l_kv_conv,980) != 980 then
+
+              bars_zay.create_request_ex
+              (p_reqtype    => 3,
+              p_custid      => l_rnk,
+              p_curid       => l_kv,
+              p_curconvid   => l_kv_conv,
+              p_amount      => l_s2s,
+              p_reqnum      => l_nd,
+              p_reqdate     => l_fdat,
+              p_reqrate     => l_kurs_z,
+              p_nls_acc1    => l_nls,
+              p_nls_acc0    => l_nls_acc0,
+              p_nataccnum   => l_nls0,
+              p_natbnkmfo   => l_mfo0,
+              p_cmsprc      => l_kom,
+              p_cmssum      => l_skom,
+              p_taxflg      => 1,
+              p_taxacc      => null,
+              p_aimid       => l_meta,
+              p_contractid  => null,
+              p_contractnum => l_contract,
+              p_contractdat => l_datc,
+              p_custdeclnum => l_num_vmd,
+              p_custdecldat => l_vmd1,
+              p_prevdecldat => l_vmd5,
+              p_basis       => l_basis,
+              p_countryid   => l_country,
+              p_bnfcountryid=> l_benefcountry,
+              p_bnfbankcode => l_bank_code,
+              p_bnfbankname => l_bank_name,
+              p_productgrp  => l_product_group,
+              p_details     => l_comm,
+              p_flag        => 0,
+              p_fio         => l_contact_fio,
+              p_tel         => l_contact_tel,
+              p_branch      => null,
+              p_operid_nokk => null,
+              p_reqid       => l_id);
+
+              else
+
+              bars_zay.create_request_ex
+              (p_reqtype  => 1,
+              p_custid    => l_rnk,
+              p_curid     => l_kv,
+              p_curconvid => null,
+              p_amount    => l_s2s,
+              p_reqnum    => l_nd,
+              p_reqdate   => l_fdat,
+              p_reqrate   => l_kurs_z,
+              p_nls_acc1  => l_nls,
+              p_nls_acc0  => l_nls_acc0,
+              p_nataccnum => l_nls0,
+              p_natbnkmfo => l_mfo0,
+              p_cmsprc    => l_kom,
+              p_cmssum    => l_skom,
+              p_taxflg    => 1,
+              p_taxacc    => null,
+              p_aimid     => l_meta,
+              p_contractid=> null,
+              p_contractnum=> l_contract,
+              p_contractdat=> l_datc,
+              p_custdeclnum=> l_num_vmd,
+              p_custdecldat=> l_vmd1,
+              p_prevdecldat=> l_vmd5,
+              p_basis     => l_basis,
+              p_countryid => l_country,
+              p_bnfcountryid=> l_benefcountry,
+              p_bnfbankcode => l_bank_code,
+              p_bnfbankname => l_bank_name,
+              p_productgrp  => l_product_group,
+              p_details     => l_comm,
+              p_flag        => 0,
+              p_fio         => l_contact_fio,
+              p_tel         => l_contact_tel,
+              p_branch      => null,
+              p_operid_nokk => null,
+              p_reqid       => l_id);
+
+              end if;
+              end if;
+              end;
+            </sql>
+            <parameters>
+              <parameter type="FormField" name="P_ID"/>
+              <parameter type="FormField" name="P_S2S"/>
+              <parameter type="FormField" name="P_ND"/>
+              <parameter type="FormField" name="P_FDAT"/>
+              <parameter type="FormField" name="P_KURS_Z"/>
+              <parameter type="FormField" name="P_NLS"/>
+              <parameter type="FormField" name="P_NLS_ACC0"/>
+              <parameter type="FormField" name="P_NLS0" />
+              <parameter type="FormField" name="P_MFO0" />
+              <parameter type="FormField" name="P_KOM" />
+              <parameter type="FormField" name="P_SKOM" />
+              <parameter type="FormField" name="P_META" />
+              <parameter type="FormField" name="P_CONTRACT" />
+              <parameter type="FormField" name="P_DATC" />
+              <parameter type="FormField" name="P_NUM_VMD" />
+              <parameter type="FormField" name="P_VMD1" />
+              <parameter type="FormField" name="P_VMD5" />
+              <parameter type="FormField" name="P_BASIS" />
+              <parameter type="FormField" name="P_COUNTRY" />
+              <parameter type="FormField" name="P_BENEFCOUNTRY" />
+              <parameter type="FormField" name="P_BANK_CODE" />
+              <parameter type="FormField" name="P_BANK_NAME" />
+              <parameter type="FormField" name="P_PRODUCT_GROUP" />
+              <parameter type="FormField" name="P_COMM" />
+              <parameter type="FormField" name="P_CONTACT_FIO" />
+              <parameter type="FormField" name="P_CONTACT_TEL" />
+
+              <parameter type="FormField" name="P_RNK" />
+              <parameter type="FormField" name="P_NMK" />
+              <parameter type="FormField" name="P_CUST_BRANCH" />
+              <parameter type="FormField" name="P_OSTC0" />
+              <parameter type="FormField" name="P_KV" />
+              <parameter type="FormField" name="P_KV_CONV" />
+            </parameters>
+          </command>
+        </button>
+        <button caption="Відміна" hint="Відміна" id="btnBack" type="Button"  >
+          <command type="Redirect" url="/barsroot/barsweb/dynform.aspx?form=frm_zay_buy_add" target="Self">
+          </command>
+        </button>
+      </buttons>
+      <datasource>
+        <sql>SELECT * from V_ZAY_BUYFORM where id = :p_id</sql>
+        <parameters>
+          <parameter type="QueryString" name="p_id" datatype="Int64" >
+          </parameter>
+        </parameters>
+      </datasource>
+      <customfields>
+        <customfield name="P_ID" label="№ заявки" required="false" datatype="Int64" datasourcefield="ID" columnindex="1" index="0">
+          <uicontrol type="IntegerInput" readonly="true" controlwidth="150"  />
+        </customfield>
+        <customfield name="P_RNK" label="РНК" datatype="Int64" required="true" datasourcefield="RNK" columnindex="1" index="3">
+          <uicontrol type="EditableReference"  controlwidth="150" formname="frm.ref.cust_zay" formfieldname="drnk" formheight="700" formwidth="1100">
+            <rels>
+              <rel destname="P_CUST_BRANCH" srcname="branch"></rel>
+              <rel destname="P_NMK" srcname="nmk"></rel>
+              <rel destname="P_OSTC0" srcname="ostc"></rel>
+              <rel destname="P_NLS_ACC0" srcname="nls29"></rel>
+              <rel destname="P_NLS0" srcname="nlsv"></rel>
+              <rel destname="P_MFO0" srcname="mfov"></rel>
+              <rel destname="P_NLS" srcname="nls26"></rel>
+            </rels>
+          </uicontrol>
+        </customfield>
+        <customfield name="P_NMK" label="Назва клієнта" datatype="String" size="100" datasourcefield="NMK" columnindex="1" index="6">
+          <uicontrol type="TextBox" controlwidth="150" readonly="true" />
+        </customfield>
+        <customfield name="P_CUST_BRANCH" label="Відділення клієнта" required="false" datatype="String" size="100" datasourcefield="CUST_BRANCH" columnindex="1" index="7">
+          <uicontrol type="TextBox" controlwidth="150" readonly="true" />
+        </customfield>
+        <customfield name="P_KV" label="Валюта" datatype="Int64" required="true" datasourcefield="KV" columnindex="1" index="4">
+          <uicontrol type="EditableReference" controlwidth="150" formname="frm.ref.zay_kv_kurs" formfieldname="kv" formheight="450" formwidth="500">
+            <rels>
+              <rel destname="P_KURS_Z" srcname="kurs_b"></rel>
+            </rels>
+          </uicontrol>
+        </customfield>
+        <customfield name="P_KV_CONV" label="За валюту" datatype="Int64" datasourcefield="KV_CONV" columnindex="1" index="5">
+          <uicontrol type="EditableReference" controlwidth="150" formname="frm.ref.zay_kv_kurs" formfieldname="kv"  formheight="450" formwidth="500"/>
+        </customfield>
+        <customfield name="P_NLS_ACC0" label="Рахунок для списання коштів на купівлю" datatype="String" required="true" size="100" datasourcefield="NLS_ACC0" columnindex="1" index="8">
+          <uicontrol type="TextBox" controlwidth="150" />
+        </customfield>
+        <customfield name="P_OSTC0" label="Сальдо рахунку списання" datatype="Decimal" datasourcefield="OSTC0" columnindex="1" index="9">
+          <uicontrol type="DecimalInput" readonly="true" controlwidth="148" />
+        </customfield>
+        <customfield name="P_NLS" label="Рахунок для зарахування ВАЛ" datatype="String"  required="true" size="100" datasourcefield="NLS" columnindex="1" index="10">
+          <uicontrol type="TextBox" controlwidth="150" />
+        </customfield>
+        <customfield name="P_S2S" label="Сума заявл.ВАЛ" datatype="Decimal" required="true" datasourcefield="S2S" columnindex="1" index="2">
+          <uicontrol type="DecimalInput" controlwidth="150" />
+        </customfield>
+        <customfield name="P_MFO0" label="МФО повернення залишку" datatype="String" size="100" datasourcefield="MFO0" columnindex="1" index="11">
+          <uicontrol type="TextBox" controlwidth="150" />
+        </customfield>
+        <customfield name="P_NLS0" label="Рахунок повернення залишку" datatype="String" size="100" datasourcefield="NLS0" columnindex="1" index="12">
+          <uicontrol type="TextBox" controlwidth="150" />
+        </customfield>
+        <customfield name="P_FDAT" label="Дата заяви" datatype="DateTime" datasourcefield="FDAT" required="true" columnindex="1" index="1">
+          <uicontrol type="DateInput" controlwidth="150">
+            <defaultvalue type="SqlText" value="select gl.bd from dual" />
+          </uicontrol>
+        </customfield>
+        <customfield name="P_ND" label="Номер заявки(кл.)" datatype="String" size="100" datasourcefield="ND" columnindex="2" index="1">
+          <uicontrol type="TextBox" controlwidth="150" />
+        </customfield>
+        <customfield name="P_KOM" label="%% коміс." datatype="Decimal" datasourcefield="KOM" columnindex="2" index="2">
+          <uicontrol type="DecimalInput" controlwidth="148" />
+        </customfield>
+        <customfield name="P_SKOM" label="або сума коміс." datatype="Decimal" datasourcefield="SKOM" columnindex="2" index="3">
+          <uicontrol type="DecimalInput" controlwidth="148" />
+        </customfield>
+        <customfield name="P_KURS_Z" label="Курс заяви" datatype="Decimal" datasourcefield="KURS_Z" columnindex="2" index="4">
+          <uicontrol type="DecimalInput" controlwidth="148" />
+        </customfield>
+        <customfield name="P_META" label="Мета" datatype="Decimal" required="true" datasourcefield="META" columnindex="2" index="5">
+          <uicontrol type="DropDownList"  addemptyitem="true" keyfield="AIM" valuefield="NAME" table="( select AIM, to_char(aim,'09')||' '||NAME name from ZAY_AIMS where type = 1)" controlwidth="153"></uicontrol>
+        </customfield>
+        <customfield name="P_CONTRACT" label="Контракт/кред.договор №" datatype="String" size="100" datasourcefield="CONTRACT" columnindex="2" index="6">
+          <uicontrol type="TextBox" controlwidth="150" />
+        </customfield>
+        <customfield name="P_DATC" label="Дата контракта/кред.договора" datatype="DateTime" datasourcefield="DATC" columnindex="2" index="7">
+          <uicontrol type="DateInput" controlwidth="148" />
+        </customfield>
+        <customfield name="P_NUM_VMD" label="№ ост.ВМД" datatype="String" size="100" datasourcefield="NUM_VMD" columnindex="2" index="8">
+          <uicontrol type="TextBox" controlwidth="150" />
+        </customfield>
+        <customfield name="P_VMD1" label="Дата ост.ВМД" datatype="DateTime" datasourcefield="VMD1" columnindex="2" index="9">
+          <uicontrol type="DateInput" controlwidth="148" />
+        </customfield>
+        <customfield name="P_VMD5" label="Дата інших ВМД" datatype="String" size="100" datasourcefield="VMD5" columnindex="2" index="10">
+          <uicontrol type="TextBox" controlwidth="150" />
+        </customfield>
+        <customfield name="P_COUNTRY" label="Код країни перерахування" datatype="Decimal" datasourcefield="COUNTRY" columnindex="3" index="1">
+          <uicontrol type="DropDownList" addemptyitem="true" table="(select country, country||' '||name name from country order by 1)" keyfield="country" valuefield="NAME" controlwidth="157"></uicontrol>
+        </customfield>
+        <customfield name="P_BASIS" label="Код підстави для купівлі валюти" datatype="String" size="100" datasourcefield="BASIS" columnindex="3" index="2">
+          <uicontrol type="DropDownList" addemptyitem="true" table="(select p63,  p63||' '||substr(txt,1,100) name from kod_70_2 order by p63)" keyfield="p63" valuefield="name" controlwidth="157"></uicontrol>
+        </customfield>
+        <customfield name="P_BENEFCOUNTRY" label="Код країни бенеф." datatype="Decimal" datasourcefield="BENEFCOUNTRY" columnindex="3" index="3">
+          <uicontrol type="DropDownList" addemptyitem="true" table="(select country, country||' '||name name from country order by 1)" keyfield="country" valuefield="NAME" controlwidth="157"></uicontrol>
+        </customfield>
+        <customfield name="P_BANK_CODE" label="Код банку (B010)" datatype="String" size="100" datasourcefield="BANK_CODE" columnindex="3" index="4">
+          <uicontrol type="EditableReference" controlwidth="119" formname="frm.ref.zay_b010" formfieldname="b010" formheight="450" formwidth="500">
+            <rels>
+              <rel destname="P_BANK_NAME" srcname="name"></rel>
+            </rels>
+          </uicontrol>
+        </customfield>
+        <customfield name="P_BANK_NAME" label="Назва іноземного банку" datatype="String" size="100" datasourcefield="BANK_NAME" columnindex="3" index="5">
+          <uicontrol type="TextBox" controlwidth="150" />
+        </customfield>
+        <customfield name="P_PRODUCT_GROUP" label="Код тов.гр." datatype="String" size="100" datasourcefield="PRODUCT_GROUP" columnindex="3" index="6">
+          <uicontrol type="DropDownList" table="(select p70, to_char(p70,'09')||' '||txt txt from V_KOD_70_4 order by 1)" addemptyitem="true" keyfield="p70" valuefield="txt" controlwidth="157"></uicontrol>
+        </customfield>
+        <customfield name="P_COMM" label="Коментар(деталі)" datatype="String" size="100" datasourcefield="COMM" columnindex="3" index="7">
+          <uicontrol type="TextBox" controlwidth="150" linescount="4" />
+        </customfield>
+        <customfield name="P_CONTACT_FIO" label="ПІБ контактної особи" datatype="String" size="100" datasourcefield="CONTACT_FIO" columnindex="3" index="8">
+          <uicontrol type="TextBox" controlwidth="150" linescount="2"/>
+        </customfield>
+        <customfield name="P_CONTACT_TEL" label="ТЕЛ контактної особи" datatype="String" size="100" datasourcefield="CONTACT_TEL" columnindex="3" index="9">
+          <uicontrol type="TextBox" controlwidth="150" />
+        </customfield>
+      </customfields>
+    </customform>
+  </customforms>
+</xmlform>

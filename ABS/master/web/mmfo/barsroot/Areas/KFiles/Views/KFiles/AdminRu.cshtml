@@ -1,0 +1,82 @@
+﻿@{
+    ViewBag.Title = "Corporations";
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    string theme = "bootstrap";
+    var cook = HttpContext.Current.Request.Cookies["theme"];
+    if (cook != null)
+    {
+        theme = cook.Value;
+    }
+}
+
+<h1>Відправка даних по К-Файлам з РУ в ЦА</h1>
+
+<li>
+    <label for="fullname" class="required">Код корпорації</label>
+    <input type="text" id="fullname" value="%" name="fullname" class="k-textbox" placeholder="Full name" required validationMessage="Enter {0}" style="width: 220px;" />
+</li>
+<li>
+    <h4>Відправити дані за дату:</h4>
+    <input id="datepicker" style="width: 25%" />
+</li>
+<br>
+<li class="confirm">
+    <button class="k-button k-primary" id="sendData" type="submit">Відправити</button>
+</li>
+<br>
+<li class="confirm">
+    <button class="k-button k-primary" id="syncDictionary">Оновити довідник корпорацій</button>
+</li>
+
+<script>
+    $(document).ready(function () {
+        // create DatePicker from input HTML element
+        $("#datepicker").kendoDatePicker(
+            { format: "ddMMyyyy" });
+    });
+
+    //call webservice to get dictionary data from CA level
+    function syncDictionary(e) {
+       alert('Довідник оновлюється, дочекайтесь завершення виконання!');
+        $.ajax({
+                contentType: "application/json",
+                type: "POST",
+                url: '/barsroot/webservices/KFilesService.asmx/SyncDictionary',
+                async: true,
+                data: {},
+                success: function () { alert('Довідник оновлено!') },
+                failure: function (msg) { alert("OOOPS! We are sorry, but something went wrong!!! "); }
+            })
+        ;
+    }
+    //call webservice to send data from temp table to CA
+    function sendData(e) {
+        if (datepicker.value.length < 1)
+        { alert('Не вказано дату!'); return; }
+        if (fullname.value.length < 1)
+        { alert('Не вказано корпорацію!'); return; }
+        alert('Формування та відправка даних, для продовження натисніть ОК!');
+        $.ajax({
+            contentType: "application/json",
+            url: '/barsroot/webservices/KFilesService.asmx/SyncKFileData',
+            type: "POST",
+            async: true,
+            data: JSON.stringify({ pDate: datepicker.value,  pCorpCode: fullname.value }),
+            dataType: "json",
+            success: function () { alert('дані надіслано!') },
+            failure: function (msg) { alert("OOOPS! We are sorry, but something went wrong!!!"); }
+         })
+         ;
+    }
+    $("#syncDictionary").kendoButton({
+        click: syncDictionary
+    });
+    $("#sendData").kendoButton({
+        click: sendData
+    });
+</script>
+
+
+
+
+

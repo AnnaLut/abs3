@@ -1,0 +1,18 @@
+﻿#details-container
+{
+    padding: 10px;
+}
+
+#details-container h3
+{
+    margin: 0;
+}
+
+.letter {
+    color: darkblue;
+    font-size: 160%;
+}
+
+.destroyed {
+  color:blue;
+}

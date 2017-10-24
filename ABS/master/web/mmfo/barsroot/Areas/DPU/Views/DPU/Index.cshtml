@@ -1,0 +1,38 @@
+﻿<script type="text/javascript" src="~/Areas/DPU/Scripts/DPUController.js"></script>
+@{
+    ViewBag.Title = "Картотека надходжень на консолідовані балансові рахунки";
+}
+
+<h2>@ViewBag.Title</h2>
+
+
+<div id="content" ng-app="BarsWeb.Controllers" ng-controller="DPU" ng-init="BeforeStart()">
+
+    @*<div class="form-inline" role="form">
+        <button id="tablerowadd2" class="k-button" title="Додати налаштування" ng-click="AddRow('EditGrid')">
+            <img src="~/Content/images/PureFlat/16/table_row-add2.png" />
+        </button>
+        <button id="editdelete" class="k-button" title="Помітити для видалення" ng-click="DeleteRow()">
+            <img src="~/Content/images/PureFlat/16/delete.png" />
+        </button>
+        <button class="k-button" ng-click="ReloadEditGrid()" title="Оновити">
+            <img src="~/Content/images/PureFlat/16/reload_rotate.png" />
+        </button>
+        <button class="k-button" ng-click="SaveChangesEditGrid(selectedItem)" title="Зберегти зміни">
+            <img src="~/Content/images/PureFlat/16/save.png" />
+        </button>
+    </div><br />*@
+    <div id="popupNotification"></div>
+
+    @*<div id="FirstGrid" kendo-grid="FirstOptions" k-options="FirstOptions" k-rebind="FirstOptions" style="width:100%"></div>
+    <br />*@
+   
+
+    <div id="DocGrid" kendo-grid="DocGrid" k-options="DocGridOptions"  k-on-change="ReloadDownGrid(data)" style="width:100%" k-rebind="DocGridOptions"></div>
+    <br/>
+
+    <div id="Grid" kendo-grid="Grid" k-options="GridOptions" style="width:100%" k-rebind="GridOptions"></div>
+    <div id="window">
+    </div>
+    </div>
+

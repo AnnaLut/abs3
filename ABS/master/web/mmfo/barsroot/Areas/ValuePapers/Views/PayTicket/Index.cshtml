@@ -1,0 +1,112 @@
+﻿@{
+    ViewBag.Title = "Сплата купону";
+}
+<script src="~/Areas/ValuePapers/app/controllers/PayTicketCtrl.js"></script>
+<style>
+    .border-form {
+        background-color: lightgrey;
+        height: 40px;
+        width: 100%;
+        padding-top: 4px;
+        padding-left: 2%;
+    }
+
+    .border-sm {
+        height: 40px;
+    }
+
+    .border-lg {
+        height: 70px;
+    }
+
+    .k-grid .k-grid-header .k-header .k-link {
+        height: auto;
+    }
+
+    .k-grid .k-grid-header .k-header {
+        white-space: normal;
+    }
+        #sumk_validationMessage.k-widget.k-tooltip-validation {
+    position: fixed;
+}
+</style>
+<div id="content" ng-app="BarsWeb.Controllers" ng-controller="PayTicketCtrl" ng-init="InitData('@ViewBag.strPar01', '@ViewBag.strPar02', '@ViewBag.nGrp', '@ViewBag.nMode', '@ViewBag.nID', '@ViewBag.CP_ID')">
+    <h2>@ViewBag.Title</h2><br />
+    <div class="col-md-12">
+        <div class="col-md-6" border="1">
+            <div class="border-form border-sm">
+                <input class="k-textbox" ng-model="nID" style="width: 10%" disabled />
+                <input class="k-textbox" ng-model="CP_ID" style="width: 25%" disabled />
+                <input class="k-textbox" ng-model="inputs_data.p_DAT_EM" style="width: 16%" disabled />
+                <input class="k-textbox" ng-model="inputs_data.p_RATE" style="width: 13%" disabled />
+                <input class="k-textbox" ng-model="inputs_data.p_DATP" style="width: 16%" disabled />
+                <input class="k-textbox" ng-model="inputs_data.p_CENA" style="width: 14%" disabled />
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="border-form border-sm">
+                <input id="vidd" class="k-textbox" style="width: 29%" disabled />
+                <input class="k-textbox" ng-model="inputs_data.p_nEMI" style="width: 10%" disabled/>
+                <input id="pf_drop_down_list" style="width: 57%" />
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="border-form border-sm">
+                <input class="k-textbox" ng-model="inputs_data.p_KV" style="width: 19%" disabled/>
+                <input id="ryn_drop_down_list" style="width: 77%" />
+            </div>
+        </div>
+    </div>
+    <div class="col-md-12" style="padding-top: 10px; position: relative">
+        <div class="col-md-9">
+            <div class="border-form border-lg">
+                <div class="col-md-3">
+                    <input id="sumn2" class="k-textbox" style="width: 100%" disabled />
+                </div>
+                <div class="col-md-1" align="center">
+                    <text> + </text>
+                </div>
+                <div class="col-md-3">
+                    <input id="sumn" class="k-textbox" style="width: 100%" disabled />
+                </div>
+                <div class="col-md-1" align="center">
+                    <text> = </text>
+                </div>
+                <div class="col-md-3">
+                    <form id="sum_form">
+                        <input id="sumnk" name="sumk" class="k-textbox" style="width: 100%" />
+                    </form>
+                </div>
+                <br />
+                <div class="col-md-4">
+                    <input class="k-textbox" style="visibility: hidden" />
+                </div>
+                <div class="col-md-3">
+                    <input id="sumni" class="k-textbox" style="width: 100%" disabled />
+                </div>
+                <div class="col-md-1" align="center">
+                    <text> !!! </text>
+                </div>
+                <div class="col-md-3">
+                    <input id="sumni_all" class="k-textbox" style="width: 100%" />
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="border-form border-lg">
+                <button id="save" class="k-button" ng-click="Save()">
+                    <i class="pf-icon pf-16 pf-save"></i>
+                </button>
+                <button id="glasses" class="k-button" ng-click="ViewDoc()">
+                    <img src="~/Areas/ValuePapers/Content/Images/LOOK.png" style="margin-top: -5px;" />
+                </button><br />
+                <input id="kor" type="checkbox" style="width: 23px; height: 17px; margin-top: 5px" />
+                Кориг.
+            </div>
+        </div>
+    </div>
+    <div class="col-md-12" style="padding-top: 10px; position: relative">
+        <div id="mainGrid" kendo-grid="mainGrid" k-options="mainGridOptions" k-rebind="mainGridOptions" k-on-save-changes="saveChanges(kendoEvent)"></div>
+    </div>
+</div>
+

@@ -1,0 +1,332 @@
+﻿@model int?
+@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = "Фін. операції з готівкою без відкриття рахунку >= 150 000 грн.";
+}
+<h2>@ViewBag.Title</h2>
+<h3 id="partialTitle"></h3>
+
+<div id="toolbar"></div>
+<div id="grid"></div>
+<div id="filterWindow">
+    <div class="form-group">       
+        <div>
+            <label for="maskedDatePickerFrom" style="width:40%"><b>Початкова дата:</b></label>
+            <input id="maskedDatePickerFrom" placeholder="Вкажіть дату" style="width:40%" />
+        </div>          
+        <div style="margin-top:5px">
+            <label for="maskedDatePickerTo" style="width:40%"><b>Кінцева дата:</b></label>
+            <input id="maskedDatePickerTo" placeholder="Вкажіть дату" style="width:40%" />
+        </div>                            
+        <div style="text-align:center; margin-top:10px">
+            <button id='btnOk' type='button' class='k-button' onclick='finmon.search()' title='Виконати'>Виконати</button>
+            <button id='btnCancel' type='button' class='k-button' onclick='finmon.closeFilterWindow()' title='Відмінити'>Відмінити</button>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    var g_isMainGridInited = false;
+    var lastDays = @Model;
+
+    var maskedDatePickerFrom = $("#maskedDatePickerFrom").kendoMaskedDatePicker({ format: "dd/MM/yyyy", value: getPastDate()["pastDay"] });
+    var maskedDatePickerTo = $("#maskedDatePickerTo").kendoMaskedDatePicker({ format: "dd/MM/yyyy", value: getPastDate()["today"] });
+
+    function getPastDate() {
+        var temp_pastDay = new Date();
+        temp_pastDay.setDate(temp_pastDay.getDate() - 720);
+        var pastDay = kendo.toString(temp_pastDay, 'dd/MM/yyyy');
+        var today = kendo.toString(new Date(), 'dd/MM/yyyy');
+        return { "pastDay": pastDay, "today": today };
+    };
+
+
+
+    var finmon = {
+        firstLoad: true,
+
+        getDate: function () {
+            var fromDate = maskedDatePickerFrom[0].value; 
+            var toDate = maskedDatePickerTo[0].value; 
+            return { "fromDate": fromDate, "toDate": toDate};
+        },
+
+        showPartialTitle: function () {
+            var d1 = finmon.getDate()["fromDate"];
+            var d2 = finmon.getDate()["toDate"];
+            var d3 = getPastDate()["pastDay"];
+            var d4 = getPastDate()["today"];
+
+            var _fd = (d1 != "") ? d1 : d3; 
+            var _td = (d2 != "") ? d2 : d4;  
+
+            $("#partialTitle")[0].innerText = "за період: " + _fd + " по " + _td;
+        },
+
+        initFilterWindow: function () {
+            $("#filterWindow").kendoWindow({
+                width: "400px",
+                title: "Період операцій",
+                visible: false,
+                actions: [
+                    "Pin",
+                    "Minimize",
+                    "Maximize",
+                    "Close"
+                ]
+            }).data("kendoWindow").center().open();
+        },
+
+        closeFilterWindow: function () {
+            $("#filterWindow").data("kendoWindow").close();
+        },
+        search: function () {
+            if (g_isMainGridInited) {
+                finmon.updateGrid();
+            }
+            else {
+                g_isMainGridInited = true;
+                finmon.initGrid("#grid")
+            }
+
+            finmon.closeFilterWindow();
+            finmon.showPartialTitle();
+        },
+
+        fmData: new kendo.data.DataSource({
+            type: "aspnetmvc-ajax",
+            pageSize: 10,
+            autobind: false,
+            requestStart: function() {
+                if (finmon.firstLoad) {
+                    bars.ui.loader('#grid', true);
+                    finmon.firstLoad = false;
+                }
+            },
+            requestEnd: function () {
+                    bars.ui.loader('#grid', false);
+            },
+            transport: {
+                read: {
+                    dataType: 'json',
+                    url: bars.config.urlContent('/finmon/finmon/GetFmData'),
+                    data: function () { return { lastDays: lastDays, dateFrom: maskedDatePickerFrom[0].value, dateTo: maskedDatePickerTo[0].value } },
+                    //data: { lastDays: lastDays, dateFrom: maskedDatePickerFrom[0].value, dateTo: maskedDatePickerTo[0].value },
+                    type: "GET"
+                }
+            },
+            schema: {
+                data: "Data",
+                total: "Total",
+                model: {
+                    fields: {
+                        REF: { type: "number" },
+                        USERID: { type: "number" },
+                        PDAT: { type: "date" },
+                        S: { type: "number" },
+                        S2: { type: "number" },
+                        KV: { type: "number" },
+                        KV2: { type: "number" },
+                        DK: { type: "number" }
+                    }
+                }
+            },
+            serverPaging: true,
+            serverSorting: true,
+            serverFiltering: true
+        }),
+        enableButton: function (buttonId, enabled) {
+            if (typeof (enabled) === 'undefined') {
+                enabled = true;
+            }
+            var $button = $('#' + buttonId);
+            $button.data('kendoButton').enable(enabled);
+            if (enabled) {
+                $button.find('i').removeClass("pf-disabled");
+            } else {
+                $button.find('i').addClass("pf-disabled");
+            }
+        },
+        openDoc: function() {
+            var grid = $('#grid').data('kendoGrid');
+            var row = grid.dataItem(grid.select());
+            window.location = bars.config.urlContent("/documents/item/" + row.REF + "/");
+        },
+        initGrid: function(grid) {
+            $(grid).kendoGrid({
+                autobind: false,
+                selectable: true,
+                resizable: true,
+                sortable: true,
+                filterable: true,
+                pageable: {
+                    refresh: true,
+                    pageSizes: [20, 25, 50, 100, "All"],
+                    buttonCount: 5,
+                    messages: {
+                        empty: 'Немає даних',
+                        allPages: 'Всі'
+                    }
+                },
+                columns: [
+                    {
+                        field: "REF",
+                        title: "Референс",
+                        width: "100px"
+                    },
+                    {
+                        field: "PDAT",
+                        title: "Дата надходження",
+                        width: "120px",
+                        attributes: { "class": "text-nowrap" },
+                        format: "{0:dd.MM.yyyy HH:mm}",
+                        filterable: {
+                            ui: "datetimepicker",
+                            format: "{0:dd.MM.yyyy HH:mm}"
+                        },
+                        encoded: true
+                        //template: "<div style='text-align:right;'>#=kendo.toString(PDAT,'dd/MM/yyyy')#</div>"
+                    },
+                    {
+                        field: "ND",
+                        title: "Номер документу",
+                        width: "100px"
+                    },
+                    {
+                        field: "TT",
+                        title: "Код операції",
+                        width: "80px"
+                    },
+                    {
+                        field: "USERID",
+                        title: "Користувач",
+                        width: "90px"
+                    },
+                    {
+                        field: "MFOA",
+                        title: "МФО А",
+                        width: "100px"
+                    },
+                    {
+                        field: "ID_A",
+                        title: "ОКПО А",
+                        width: "100px"
+                    },
+                    {
+                        field: "NAM_A",
+                        title: "Найменування рахунку А",
+                        width: "300px"
+                    },
+                    {
+                        field: "NLSA",
+                        title: "Рахунок А",
+                        width: "200px"
+                    },
+                    {
+                        field: "KV",
+                        title: "Вал А",
+                        width: "70px"
+                    },
+                    {
+                        field: "S",
+                        title: "Сума в вал А",
+                        width: "100px",
+                        template: "<div style='text-align:right;'>#=S#</div>"
+                    },
+                    {
+                        field: "MFOB",
+                        title: "МФО Б",
+                        width: "100px"
+                    },
+                    {
+                        field: "ID_B",
+                        title: "ОКПО Б",
+                        width: "100px"
+                    },
+                    {
+                        field: "NAM_B",
+                        title: "Найменування рахунку Б",
+                        width: "300px"
+                    },
+                    {
+                        field: "NLSB",
+                        title: "Рахунок Б",
+                        width: "200px"
+                    },
+                    {
+                        field: "KV2",
+                        title: "Вал Б",
+                        width: "70px"
+                    },
+                    {
+                        field: "S2",
+                        title: "Сума в вал Б",
+                        width: "100px",
+                        template: "<div style='text-align:right;'>#=S#</div>"
+                    },
+                    {
+                        field: "DK",
+                        title: "Д/К",
+                        width: "50px",
+                        template: "<div style='text-align:right;'>#=DK#</div>"
+                    },
+                    {
+                        field: "NAZN",
+                        title: "Призначення платежу",
+                        width: "300px"
+                    },
+                    {
+                        field: "BRANCH",
+                        title: "Відділення",
+                        width: "160px"
+                    }
+
+                ],
+                dataSource: finmon.fmData,
+                change: finmon.refreshToolbar,
+                dataBound: finmon.refreshToolbar
+            });
+        },
+
+        updateGrid: function updateMainGrid(grid) {
+
+            var grid = $('#grid').data('kendoGrid');
+            if (grid) { grid.dataSource.fetch(); }
+        },
+
+        refreshToolbar: function () {
+            var grid = $('#grid').data('kendoGrid');
+            finmon.enableButton('btnPrint', grid && grid.select() && (grid.select().length > 0));
+            finmon.enableButton('btnOpenDoc', grid && grid.select() && (grid.select().length > 0));
+        },
+        initToolbar: function(toolbar) {
+            $(toolbar).kendoToolBar({
+                items: [
+                    {
+                        template: "<button id='btnPrint' type='button' class='k-button' disabled onclick='finmon.printform()' title='Друкувати анкету'><i class='pf-icon pf-16 pf-print pf-disabled'></i></button>"
+                    },
+                    {
+                        template: "<button id='btnOpenDoc' type='button' class='k-button' disabled onclick='finmon.openDoc()' title='Відкрити документ'><i class='pf-icon pf-16 pf-folder_open pf-disabled'></i></button>"
+                    },
+                    {
+                        template: "<button id='btnOpenFilter' type='button' class='k-button' onclick='finmon.initFilterWindow()' title='Відкрити фільтр'><i class='pf-icon pf-16 pf-filter-ok'></i></button>"
+                    }
+                ]
+            });
+            $(toolbar + " button").kendoButton();
+        },
+        printform: function() {
+            var grid = $('#grid').data('kendoGrid');
+            var row = grid.dataItem(grid.select());
+            window.location = bars.config.urlContent('/Finmon/Finmon/PrintFmForm') + '?refDoc=' + row.REF;
+        }
+    };
+
+    $(document).ready(function () {
+        finmon.initFilterWindow();
+        finmon.initToolbar('#toolbar');
+    });
+
+   
+</script>

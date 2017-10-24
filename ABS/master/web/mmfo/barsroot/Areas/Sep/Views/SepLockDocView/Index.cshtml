@@ -1,0 +1,252 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+}
+<script src="@Url.Content("~/Scripts/BarsIE.js")"></script>
+<script src="~/Areas/Sep/Scripts/SepLockDocViewCtrl.js"></script>
+<div ng-controller="Sep.SepLockDocViewCtrl" name="main">
+    <table id="tbMain" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+            <td style="padding-bottom: 5px;">
+                <h2>
+                    <span id="lb_refer" class="title">Номер документу - </span>
+                    <span id="lb_title" class="title">{{arc.recid}}</span>
+                </h2>
+            </td>
+            <td style="padding-bottom: 10px;" align="right">
+                <a onclick="SaveDoc('pdf')"> вигрузити(pdf) </a>
+                <a onclick="SaveDoc('txt')"> вигрузити(txt) </a>
+                <a id ="someID" onclick="printDoc('txt')">друк</a>
+            </td>
+        </tr>
+    </table>
+    <script>
+        var templateName = "IDDOC.frx";
+
+        function SaveDoc(save_type) {
+            window.open("/barsroot/sep/SepFiles/SaveFile" + "?save_type=" + save_type + "&rec=" + $("#lb_title").text() + "&templateName=" + templateName + "&modelbuh=" + false)
+        }
+        function printDoc(save_type) {
+            var rec = $("#lb_title").text()
+            var modelbuh = false;
+            debugger;
+            $.get('/barsroot/sep/SepFiles/PrintRecDoc/', { save_type: save_type, rec: rec, templateName: templateName, modelbuh: modelbuh },
+                function getRes(data) {
+                    if (data.status != 'error') {
+                        debugger;
+                        barsie$print(data.tempDir); //  "C:/Windows/Temp/RecReport.pdf"data.tempDir + data.name " D:\\file.pdf"
+                }
+                else { return; }
+            });
+           // win = window.open("/barsroot/sep/SepLockDocView/PrintDoc?rec=" + $("#lb_title").text())
+        }
+    </script>
+    <div kendo-tab-strip="mainTabStrip" k-options="mainTabStripOptions">
+        <ul>
+            <li class="k-state-active">Документ</li>
+            <li>Тех. реквізити</li>
+            <li>БІРи</li>
+            <li ng-show="false">Бух. модель</li>
+            <li ng-show="false">Доп. реквізити</li>
+            <li ng-show="false">Віза</li>
+        </ul>
+
+        <div style="padding: 1em;height:435px">
+            <table cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                    <td id="lbDoctitle" colspan="5" class="title">Документ {{arc.vobname}} №{{arc.recid}}</td>
+                </tr>
+                <tr>
+                    <td id="lbDocDate" colspan="5" class="title">від {{arc.datprop}}</td>
+                </tr>
+                <tr>
+                    <td id="Td1" class="title">Дата валютування :</td>
+
+                    <td colspan="3"><input name="edValueDate" type="text" id="edValueDate" style="text-align: center" readonly="readonly" value="{{arc.datp | date:'dd.MM.yyyy'}}" /></td>
+                    <td id="Td2" class="title">ДЕБЕТ</td>
+                </tr>
+                <tr>
+                    <td id="Td3" class="text">Відправник :</td>
+
+                    <td colspan="2"><input name="edSendreOKPO" type="text" id="edSendreOKPO" style="text-align: right" ng-model="arc.ida" readonly="readonly" /></td>
+                    <td id="Td4" class="text">Рахунок :</td>
+
+                    <td id="Td5" class="text">Валюта :</td>
+
+                </tr>
+                <tr>
+                    <td id="lbSender" class="text" style="color: Blue; padding-left: 10px" colspan="3">{{arc.nama}}</td>
+
+                    <td><input name="edAccA" type="text" id="edAccA" style="text-align: left" ng-model="arc.nlsa" readonly="readonly" /></td>
+                    <td><input name="edCcyA" type="text" id="edCcyA" style="text-align: center" ng-model="arc.lcv" readonly="readonly" /></td>
+                </tr>
+                <tr>
+                    <td id="Td6" class="text" colspan="3">Банк відправника :</td>
+
+                    <td id="Td7" class="text">МФО :</td>
+
+                    <td id="Td8" class="text">Сума :</td>
+
+                </tr>
+                <tr>
+                    <td id="lbBankA" class="text" style="color: Blue; padding-left: 10px" colspan="3">{{arc.banka}}</td>
+
+                    <td><input name="edMfoA" type="text" id="edMfoA" style="text-align: left" ng-model="arc.mfoa" readonly="readonly" /></td>
+                    <td><input name="edSumA" type="text" id="edSumA" style="text-align: right" value="{{arc.s | number:2}}" readonly="readonly" /></td>
+                </tr>
+                <tr>
+                    <td style="height: 20px" colspan="5"></td>
+                </tr>
+                <tr>
+                    <td colspan="4"></td>
+                    <td id="Td9" class="title">КРЕДИТ</td>
+
+                </tr>
+                <tr>
+                    <td id="Td10" class="text">Одержувач :</td>
+
+                    <td colspan="2"><input name="edReceiverOKPO" type="text" id="edReceiverOKPO" style="text-align: right" ng-model="arc.idb" readonly="readonly" /></td>
+                    <td id="Td11" class="text">Рахунок :</td>
+
+
+                </tr>
+                <tr>
+                    <td id="lbReceiver" class="text" style="color: Blue; padding-left: 10px" colspan="3">{{arc.namb}}</td>
+
+                    <td><input name="edAccB" type="text" id="edAccB" style="text-align: left" ng-model="arc.nlsb" readonly="readonly" /></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td id="Td12" class="text" colspan="3">Банк одержувача :</td>
+
+                    <td id="Td13" class="text">МФО :</td>
+
+
+                </tr>
+                <tr>
+                    <td id="lbBankB" class="text" style="color: Blue; padding-left: 10px" colspan="3">{{arc.bankb}}</td>
+
+                    <td><input name="edMfoB" type="text" id="edMfoB" style="text-align: left" ng-model="arc.mfob" readonly="readonly" /></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td style="height: 20px" colspan="5"></td>
+                </tr>
+                <tr>
+                    <td id="Td14" class="text" colspan="5">Сума прописом :</td>
+
+                </tr>
+                <tr>
+                    <td id="lbSumPr" class="text" style="color: Blue; padding-left: 10px" colspan="5">{{arc.sprop}}</td>
+
+                </tr>
+                <tr>
+                    <td id="Td15" class="text" colspan="5">Призначення платежу :</td>
+
+                </tr>
+                <tr>
+                    <td id="lbDetails" class="nazn" colspan="5">{{arc.nazn}}</td>
+
+                </tr>
+            </table>
+        </div>
+
+        <div style="padding: 1em;height:435px">
+            <table cellpadding="0" cellspacing="0" border="0" style="width: auto">
+                <tr>
+                    <td id="Td1" class="title" colspan="3"><span id="Label1" class="title">Основні</span></td>
+
+                </tr>
+                <tr>
+                    <td><span id="lbPostedTitle" title="Дата ввода">Дата вводу :</span></td>
+                    <td colspan="2"><input name="edPosted" type="text" id="edPosted" style="text-align: center" readonly="readonly" @*value="{{arc.data | date:'dd.MM.yyyy HH:mm:ss'}}"*@ /></td>
+                </tr>
+                <tr>
+                    <td colspan="3" class="title"><span id="lbSystElPl" class="title">Система електронних платежів</span></td>
+                </tr>
+                <tr>
+                    <td><span id="Label2">Поступив у банк А :</span></td>
+                    <td colspan="2"><input name="edArrived" type="text" id="edArrived" style="text-align: center" readonly="readonly" value="{{arc.datp | date:'dd.MM.yyyy HH:mm:ss'}}" /></td>
+                </tr>
+                <tr>
+                    <td><span id="lbReceivedTitle">Отримано у файлі :</span></td>
+                    <td><input name="edFile" type="text" id="edFile" style="text-align: center" readonly="readonly" ng-model="arc.fna" /></td>
+                    <td><input name="edFileDate" type="text" id="edFileDate" style="text-align: center" readonly="readonly" value="{{arc.data | date:'dd.MM.yyyy HH:mm:ss'}}" /></td>
+                </tr>
+                <tr>
+                    <td><span id="lbInFileReceived">Поступив у наш РЦ :</span></td>
+                    <td colspan="2"><input name="edInFileRec" type="text" id="edInFileRec" style="text-align: center" readonly="readonly" value="{{arc.dat_2 | date:'dd.MM.yyyy HH:mm:ss'}}" /></td>
+                </tr>
+                <tr>
+                    <td><span id="lbInFilePay">Зквитовано :</span></td>
+                    <td colspan="2"><input name="edInFilePay" type="text" id="edInFilePay" style="text-align: center" readonly="readonly" value="{{arc.datk | date:'dd.MM.yyyy HH:mm:ss'}}" /></td>
+                </tr>
+                <tr>
+                    <td class="text"><span id="lbSenderTitle">Відправлено :</span></td>
+                    <td><input name="edOutFile" type="text" id="edOutFile" style="text-align: center" readonly="readonly" /></td>
+                    <td><input name="edOutFileDate" type="text" id="edOutFileDate" style="text-align: center" readonly="readonly" /></td>
+                </tr>
+                <tr>
+                    <td><span id="lbCheckedDate">Зквитовано :</span></td>
+                    <td colspan="2"><input name="edCheckedDate" type="text" id="edCheckedDate" style="text-align: center" readonly="readonly" /></td>
+                </tr>
+            </table>
+        </div>
+
+        <div style="padding: 1em;height:435px">
+            <div id="BISGrid"></div>
+        </div>
+
+    </div>
+</div>
+<style>
+       /* ----------------------------------------------
+    * Стили относящиеся к таблице
+    */
+       table {
+           width: 100%;
+       }
+       /* Стиль заголовка страницы */
+       th {
+           padding-right: 5px;
+           padding-left: 5px;
+           font-weight: bold;
+           background-color: lightgrey;
+           white-space: nowrap;
+       }
+       /* Стиль строки */
+       tr {
+           height: 20px;
+       }
+
+       /* Стиль ячейки */
+       td {
+           font-size: 10pt;
+           font-family: Arial;
+           white-space: nowrap;
+           padding-left: 3px;
+           padding-right: 3px;
+       }
+           /* Стиль ячейки с заглавным текстом */
+           td.title {
+               font-weight: bold;
+               padding-right: 10px;
+               padding-left: 10px;
+               vertical-align: middle;
+               text-align: center;
+           }
+           /* Стиль ячейки с обычным текстом */
+           td.text {
+               padding-right: 5px;
+               padding-left: 5px;
+           }
+           /* Стиль ячейки с назначением */
+           td.nazn {
+               padding-right: 5px;
+               padding-left: 5px;
+               color: Blue;
+               padding-left: 10px;
+               word-wrap: break-word;
+               word-break: break-all;
+               table-layout: fixed;
+           }
+</style>

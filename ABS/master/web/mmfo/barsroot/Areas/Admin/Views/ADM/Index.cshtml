@@ -1,0 +1,172 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = "Конструктор АРМів";
+}
+
+@Scripts.Render("~/bundles/Admin/adm")
+@Styles.Render("~/bundles/Admin/admStyles")
+
+<script>
+    @*bars.tabs.loadTemplate('@Url.Content("~/Areas/Admin/Scripts/adm/tpl/admDetailsTabs.tpl.htm")');*@
+    bars.tabs.loadTemplate('@Url.Content("~/Areas/Admin/Scripts/adm/tpl/admResourcesTemplate.tpl.htm")');
+</script>
+
+<div class="page-header">
+    <h1>@ViewBag.Title</h1>
+</div>
+
+<div id="ADMToolBar"></div>
+<div id="ADMGrid"></div>
+
+<script id="admDetailsTabs" type="text/x-kendo-template">
+    <div class="AdmTabstrip"></div>
+</script>
+
+<!-- Create Form - START -->
+<div id="CreateAdm-Window">
+    <div class="container-fluid" id="container-Create">
+        <form>
+            <div class="form-group">
+                <label for="admCode">Код АРМу:</label>
+                <input type="text" id="admCode" class="form-control" placeholder="Код АРМу" maxlength="4">
+            </div>
+            <div class="form-group">
+                <label for="admName">Назва АРМу:</label>
+                <input type="text" id="admName" class="form-control" placeholder="Назва АРМу">
+            </div>
+            <div class="form-group">
+                <label for="admAppType">Тип програми-клієнта:</label>
+                <input id="admAppType" class="dropdown">
+            </div>
+            <div class="btns">
+                <button type="submit" class="k-button btnSave" id="saveCreateAdm-btn">Зберегти</button>
+                <button type="button" class="k-button btnCancel" id="cencelCreateAdm-btn">Відмінити</button>
+            </div>
+        </form>
+    </div>
+</div>
+<!-- Create Form - END -->
+
+<!-- Edit Form - START -->
+<div id="EditAdm-Window">
+    <div id="EditBoxAdm"></div>
+    <div class="container-fluid">
+        <div class="btns">
+            <button type="submit" class="k-button btnSave" id="saveEditAdm-btn">Зберегти</button>
+            <button type="button" class="k-button btnCancel" id="cencelEditAdm-btn">Відмінити</button>
+        </div>
+    </div>
+</div>
+
+<script type="text/x-kendo-template" id="EditAdm">
+    <div class="container-fluid" id="container-Edit">
+        <form>
+            <div class="form-group">
+                <label for="admCodeEdit">Код АРМу:</label>
+                <input type="text" id="admCodeEdit" class="form-control" readonly value="#= ARM_CODE #">
+            </div>
+            <div class="form-group">
+                <label for="admNameEdit">Назва АРМу:</label>
+                <input type="text" id="admNameEdit" class="form-control" placeholder="Назва АРМу" value="#= ARM_NAME #">
+            </div>
+            <div class="form-group">
+                <label for="admAppTypeEdit">Тип програми-клієнта:</label>
+                 @*data-bind="source: colors, value: dropDownListValue"*@
+                <input id="admAppTypeEdit" class="dropdown" value="#= APPLICATION_TYPE === 'Web Browser' ? 1 : 0 #">
+            </div>           
+        </form>
+    </div>
+</script>
+<!-- Create Form - END -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--
+<div id="tabstrip">
+    <ul>
+        <li>Функції</li>
+        <li>Довідники</li>
+        <li>Друковані звіти</li>
+    </ul>
+    <div id="funcTab">
+        <div id="panels">
+            <div id="grid1"></div>
+            <div id="commands">
+                <div><a href="#" id="copySelectedToGrid1" class="k-button">&lt;</a>
+                </div>
+                <div><a href="#" id="copySelectedToGrid2" class="k-button">&gt;</a>
+                </div>
+            </div>
+            <div id="grid2"></div>
+        </div>
+    </div>
+    <div id="RefTab">
+        <div id="panels">
+            <div id="grid3"></div>
+            <div id="commands">
+                <div><a href="#" id="copySelectedToGrid3" class="k-button">&lt;</a>
+                </div>
+                <div><a href="#" id="copySelectedToGrid4" class="k-button">&gt;</a>
+                </div>
+            </div>
+            <div id="grid4"></div>
+        </div>
+    </div>
+    <div id="RepTab">
+        <div id="panels">
+            <div id="grid5"></div>
+            <div id="commands">
+                <div><a href="#" id="copySelectedToGrid5" class="k-button">&lt;</a>
+                </div>
+                <div><a href="#" id="copySelectedToGrid6" class="k-button">&gt;</a>
+                </div>
+            </div>
+            <div id="grid6"></div>
+        </div>
+    </div>
+</div>
+
+<div id="AddWindow">
+    <form id="editForm">
+        <div class="form-group" style="margin-left: 20px;">
+            <h4><label for="ARMCode" style="padding-top: 6px; padding-right: 12px;">Код:</label></h4>
+            <input type="text" class="form-control" id="ARMCode" placeholder="Код АРМу" required style="width: 200px;height: 20px;" />
+        </div>
+        <div class="form-group" style="margin-left: 20px;">
+            <h4><label for="ARMName" style="padding-top: 6px; padding-right: 12px;">Назва:</label></h4>
+            <input type="text" class="form-control" id="ARMName" placeholder="Назва АРМу" required style="width: 200px;height: 20px;">
+        </div>
+        <div class="form-group" style="margin-left: 20px;">
+            <h4><label for="ARMFrontIntCode" style="padding-top: 6px; padding-right: 12px;">Код фронтального інтерфейсу:</label></h4>
+            <input id="ARMFrontIntCode" type="text" class="form-control" name="ARMFrontIntCode" disabled style="width: 20px; height: 20px;float: left">
+            <div class="form-group" style="margin-left: 20px;padding-top: 2px;">
+                <input id="dropdownlist" class="form-control" style="width: 150px; height: 20px; margin-left: 10px; ">
+            </div>
+        </div>
+
+        <div class="form-group" style="margin-top: 30px;">
+            <div id="btnBlock">
+                <button id="btnSave" type="submit" class="k-button btnSave">Зберегти</button>
+                <button id="btnCancel" type="button" class="k-button btnCancel">Відмінити</button>
+            </div>
+        </div>
+    </form>
+</div>
+-->

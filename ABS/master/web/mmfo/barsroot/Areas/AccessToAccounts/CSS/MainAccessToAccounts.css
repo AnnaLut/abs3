@@ -1,0 +1,64 @@
+﻿.containerGrids {
+    margin-top: 1%;
+    margin-left: 5%;
+}
+
+.buttonsGridRight, .buttonsGridLeft {
+    width: 75px;
+}
+
+.containerButtons {
+    text-align: center;
+}
+
+.buttonsGridLeft {
+    margin-top: 2%;
+}
+
+.groupServingAccount, .textAccessToAccounts, .groupUsers {
+    color: #465371;
+    font-weight: 300;
+    margin-left: 25%;
+}
+
+.k-window {
+    width: 27%;
+    height: 15%;
+}
+
+.containerDropDownGroup {
+    margin-left: 30%;
+    width: 300px;
+}
+
+.containerBtnGroup {
+    margin-top: 20%;
+    margin-left: 38%;
+}
+
+.k-item {
+    margin-top: 10px;
+    font-size: 0.8em;
+}
+
+.k-window-actions {
+    display: none;
+}
+
+.rowTemplateRed {
+    background-color: red;
+    color: white;
+}
+
+.rowTemplateGreen {
+    background-color: green;
+    color: white;
+}
+
+.rowTemplateWhite {
+    background-color: white;
+}
+
+.k-state-selected {
+    background: #428bca;
+}

@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<xmlform caption="">
+  <grids>
+    <grid id="gv2" pagesize="10" showpagesizebox="true">
+      <filters caption="Дані клієнта" buttontext="Знайти" columnscount="3" width="100%">
+        <filter field="drnk" caption ="РНК" columnindex="1" condition="Equal" id="fltrrnk">
+          <uicontrol></uicontrol>
+        </filter>
+        <filter field="okpo" caption ="ЗКПО" columnindex="2" condition="Equal" id="fltrokpo">
+          <uicontrol></uicontrol>
+        </filter>
+        <filter field="nmk" caption="ПІБ (назва)" columnindex="3" condition="LikeBoth" id="fltrname">
+          <uicontrol></uicontrol>
+        </filter>
+      </filters>
+      <datasource>
+        <sql>
+          select  rnkc drnk, nmk, okpo, branch, nls29, ostc, nlsv, mfov, nls26, mfo26 from v_cust_zay
+          order by nls29, nmk
+        </sql>
+      </datasource>
+      <fields>
+        <field name="drnk" datatype="Int64" key="true">
+          <column caption="РНК" align="Right"></column>
+        </field>
+        <field name="nmk" datatype="String">
+          <column caption="Назва" align="Left"></column>
+        </field>
+        <field name="okpo" datatype="String">
+          <column caption="ОКПО" align="Left"></column>
+        </field>
+        <field name="branch" datatype="String">
+          <form show="false"></form>
+          <column caption="Відділення" align="Left"></column>
+        </field>
+        <field name="nls29" datatype="Int64">
+          <form show="false"></form>
+          <column caption="Рахунок для списання" show="true"></column>
+        </field>
+        <field name="ostc" datatype="Decimal" key="true">
+           <column caption="Сальдо рах " show="true" formatstring="{0:F}"></column>
+        </field>
+        <field name="nlsv" datatype="Int64">
+          <form show="false"></form>
+          <column show="true" caption="Рахунок повернення залишку "></column>
+        </field>
+        <field name="mfov" datatype="Int64">
+          <form show="false"></form>
+          <column caption="МФО повернення залишку" show="true"></column>
+        </field>
+        <field name="nls26" datatype="Int64">
+          <form show="false"></form>
+          <column caption="Рахунок для зарахування " show="true"></column>
+        </field>
+        <field name="mfo26" datatype="Int64">
+          <form show="false"></form>
+          <column caption="МФО зарахування" show="true"></column>
+        </field>
+      </fields>
+      <rowselection method="SingleRow"></rowselection>
+    </grid>
+  </grids>
+</xmlform>

@@ -1,0 +1,21 @@
+﻿@{
+  var dateNow = DateTime.Now;
+  var imgBuilder = new CalendarImageBuilder(dateNow);
+  var imgInfo = imgBuilder.Draw();
+  //imgInfo.Image.Dispose();
+}
+<div class="holy-img" style="background-image: url(@Url.Content("~/Content/logo/"+ imgInfo.FileName))" title="@imgInfo.ImageDescription">
+@if (!imgInfo.IsHoliday)
+{
+  <div class="holy-img-month">@dateNow.ToString("MMMMM", imgInfo.CultureInfo)</div>
+  <div class="holy-img-day">@dateNow.Day</div>
+  <div class="holy-img-week-day">@dateNow.ToString("dddd", imgInfo.CultureInfo)</div>
+}
+else
+{
+  <div class="holy-span-date">@DateTime.Now.ToString("dd MMMMM, dddd", imgInfo.CultureInfo)</div>
+  <span class="holy-span">@imgInfo.ImageDescription</span>
+}
+</div>
+
+

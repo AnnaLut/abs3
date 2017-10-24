@@ -1,0 +1,17 @@
+﻿<script id="Delegations" type="text/x-kendo-template">
+    <div class="container-fluid" id="container">
+        <label for="delegationLogin" style="margin-top:10px;">Права делеговані до:</label>
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div class="form-group-small">
+                    <label for="delegationLogin">Логін:</label>
+                    <input id="delegationLogin" type="text" class="form-control" readonly value="#=DelegatedUserLogin === 'null' ? '-' : DelegatedUserLogin#">
+                </div>          
+                <div>
+                    <label for="delegationName" class="label-dalagetionName">ПІБ:</label>
+                    <input id="delegationName" class="form-control" readonly value="#=DelegatedUserName === 'null' ? '-' : DelegatedUserName#">
+                </div>
+            </div>            
+        </div>           
+    </div>
+</script>

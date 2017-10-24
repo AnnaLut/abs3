@@ -1,0 +1,41 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+}
+<script src="~/Areas/OpenCloseDay/Scripts/seitingsOClose.js" charset="utf-8"></script>
+
+
+
+<form class="form-horizontal">
+    <div id="sessionId" hidden>@ViewBag.RunId</div>
+
+    <div class="panel panel-default" style="width:800px;float: none; margin-left: auto; margin-right: auto;">
+        <div class="panel-heading">
+            <div class="text-center"><h2>Налаштування відкриття-закриття банківського дня</h2></div>        
+        </div>
+        <div class="panel-body">
+            <div class="col-md-6 text-center">
+                <label>
+                    <h3>Дата зактиття:</h3>
+                    <input type="text" id="dateOldVal" class="k-textbox text-center" value="@ViewBag.CloseDate" readonly />
+                </label>
+            </div>
+            <div class="col-md-6 text-center">
+                <label>
+                    <h3>Дата відктиття:</h3>
+                    <input type="text" id="dateNewVal" class="text-center" value="@ViewBag.OpenDate" />
+                </label>
+            </div>
+            <div class="text-center">
+                <input type="button" class="btn btn-primary" id="beginMonitoring" value="Розпочати"/>
+            </div>         
+        </div>
+        <div id="funcSeitingsGrid">
+
+        </div>    
+    </div>  
+</form>
+<div id="windowInfoSeitings">
+    <div id="funcSeitingsChildGrid">
+
+    </div>
+</div>    

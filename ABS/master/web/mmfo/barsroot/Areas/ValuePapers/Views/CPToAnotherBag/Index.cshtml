@@ -1,0 +1,122 @@
+﻿@{
+    ViewBag.Title = "Переведення ЦП в інший портфель";
+}
+<script src="~/Areas/ValuePapers/app/controllers/CPToAnotherBag.js"></script>
+<style>
+    .test {
+        border: inset;
+    }
+    #ticket_number_validationMessage.k-widget.k-tooltip-validation {
+    position: fixed;
+}
+</style>
+<div id="content" ng-app="BarsWeb.Controllers" ng-controller="CPToAnotherBag" ng-init="InitParams('@ViewBag.id')">
+    <h2>@ViewBag.Title</h2><br />
+    <div class="container">
+        <div class="col-md-2" align="center">
+            <label>Ідент. Код ЦП</label><br />
+            <input id="id_cp" disabled />
+        </div>
+        <div class="col-md-2" align="center">
+            <label>Вал</label><br />
+            <input id="val" disabled />
+        </div>
+        <div class="col-md-2" align="center">
+            <label>Випуск</label><br />
+            <input id="out" disabled />
+        </div>
+        <div class="col-md-2" align="center">
+            <label>% ст</label><br />
+            <input id="deposit" disabled />
+        </div>
+        <div class="col-md-2" align="center">
+            <label>Погашення</label><br />
+            <input id="cancell" disabled />
+        </div>
+        <div class="col-md-2" align="center">
+            <label>Номінальна вартість</label><br />
+            <input id="unnamed" disabled />
+        </div>
+    </div>
+    <br /><br />
+    <div class="container">
+        <div class="col-md-3">
+            <input id="dropdownlistfirst" style="width: 100%;" />
+            <input id="dropdownlistsecond" style="width: 100%;" />
+        </div>
+        <div class="col-md-3" align="center">
+            <input id="vidd" disabled style="width: 100%;" />
+            <input id="nlsa" disabled style="width: 100%; margin-top: 8px" />
+        </div>
+        <div class="col-md-3" align="center">
+            <input id="ostb" disabled style="width: 100%; margin-top: 31px" pattern="\d+(\.\d{2})?"/>
+        </div>
+        <div class="col-md-3" align="center">
+            <input id="ostc" disabled style="width: 100%; margin-top: 31px" />
+        </div>
+    </div>
+    <br /><br />
+    <div class="container">
+        <div class="col-md-3">
+            <input id="dropdownlistthird" style="width: 100%;" />
+            <input id="dropdownlistfourth" style="width: 100%;" />
+        </div>
+        <div class="col-md-3" align="center">
+            <input id="_vidd" disabled style="width: 100%;" />
+            <input id="_nlsa" disabled style="width: 100%; margin-top: 8px" />
+        </div>
+    </div>
+    <br /><br />
+    <div class="container">
+        <div class="col-sm-1" align="right">
+            <div class="form-group">
+                <button id="get_some" class="k-button" style="height: 23px" ng-click="getDealWindowFilter()">
+                    <i class="pf-icon pf-16 pf-arrow_download"></i>
+                </button>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <input id="ref" style="width: 100%;" disabled />
+            <form id="sum_form">
+                <input id="sum" name="sum" style="width: 100%; margin-top: 8px" required />
+            </form>
+        </div>
+        <div class="col-md-3">
+            <form id="ticket_form">
+                <input id="ticket_number" name="ticket_number" style="width: 100%;" required/>
+            </form>
+            <div class="form-inline" style="margin-top: 7px">
+                <div class="form-group">
+                    <button id="send" class="k-button" style="height: 23px" ng-click="SendPaper()">
+                        <i class="pf-icon pf-16 pf-report_open-import"></i>
+                    </button>
+                </div>
+                <div class="form-group">
+                    <input id="kor" type="checkbox" style="width: 23px; height: 17px" />
+                </div>
+                <div class="form-group">
+                    Кориг.
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-2">
+            <div class="form-horizontal">
+                <div class="form-group">
+                </div>
+                <div class="form-group" style="margin-top: 30px">
+                    <button id="glasses" class="k-button" style="height: 23px" ng-click="ViewDoc()">
+                        <img src="~/Areas/ValuePapers/Content/Images/LOOK.png" style="margin-top: -5px;"/>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div kendo-window="SendPaperWindow" k-title="'Увага!'" k-visible="false"
+         k-modal="true" width="400" height="200">
+        <textarea style="width: 98%; height: 80%" ng-model="ticket_text"></textarea>
+        <br />
+        <button class="k-button" ng-click="InsertValuePaper()">Так</button>
+        <button class="k-button" ng-click="closeWin()">Ні</button>
+    </div>
+</div>
+

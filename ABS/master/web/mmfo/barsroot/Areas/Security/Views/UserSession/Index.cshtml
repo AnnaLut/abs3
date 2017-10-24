@@ -1,0 +1,136 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = "Активні сесії";
+}
+<style>
+    #gridSessions th {
+        white-space: normal;
+    }
+</style>
+
+<h2>@ViewBag.Title</h2>
+
+<div id="gridSessions">
+
+</div>
+
+<script>
+    $("#gridSessions").kendoGrid({
+        selectable: "row",
+        sortable: true,
+        filterable: true,
+        resizable: true,
+        pageable: {
+            refresh: true,
+            pageSizes: true,
+            buttonCount: 5
+        },
+        columns: [
+            {
+                field: "UId",
+                title: "ІД сесії",
+                width: "300px",
+                template: "<div><button type='button' tabindex='-1' title='Видалити сесію' class='k-button del-session' style='min-width:20px;display:inline-block;' data-sessid='#=UId#'><i class='pf-icon pf-16 pf-table_row-delete2'></i></button>#=UId# </div>"
+            },
+            {
+                field: "UserLogin",
+                title: "Логін",
+                width: "80px"
+            },
+            {
+                field: "UserName",
+                title: "Ім'я користувача",
+                width: "110px"
+            },
+            {
+                field: "LoginTime",
+                title: "Час входу",
+                width: "150px",
+                template: "<div style='text-align:right;'>#=LoginTime == null ? '' : kendo.toString(LoginTime,'dd/MM/yyyy HH:mm:ss')#</div>"
+            },
+            {
+                field: "Machine",
+                title: "Робоча станція",
+                width: "150px"
+            },
+            {
+                field: "ProgramName",
+                title: "Програма",
+                width: "100px"
+            },
+        {
+            field: "Sid", 
+            title: "Oracle Parameters",
+            columns: [
+                {
+                    field: "Sid",
+                    title: "SID",
+                    width: "55px"
+                },
+            {
+                field: "SerialNumber",
+                title: "SERIAL#",
+                width: "90px"
+            },
+            {
+                field: "Status",
+                title: "STATUS",
+                width: "100px"
+            }
+            ]
+        }],
+        dataSource: {
+            type: 'webapi',
+            transport: {
+                read: {
+                    dataType: 'json',
+                    url: bars.config.urlContent('/api/v1/security/UserSession')
+                }
+            },
+            schema: {
+                data: "Data",
+                total: "Total",
+                errors: "Errors",
+                model: {
+                    fields: {
+                        Sid: { type: "number" },
+                        SerialNumber: { type: "number" },
+                        LoginTime: { type: "date" }
+                    }
+                }
+            },
+            sort: {
+                field: "LoginTime",
+                dir: "desc"
+            },
+            serverPaging: true,
+            serverSorting: true,
+            serverFiltering: true,
+            pageSize: 10
+        },
+        dataBound: function (e) {
+            
+            $('.del-session').unbind('click').on('click', function (e) { 
+                debugger;
+                var sessionId = $(this).attr('data-sessid');
+                bars.ui.confirm({
+                    text: 'Ви дійсно бажаєте видалити обрану сесію?'
+                }, function () {
+                    $.ajax({
+                        type: 'DELETE',
+                        url: bars.config.urlContent('/api/v1/security/UserSession/' + sessionId),
+                        //data: JSON.stringify({ id: sessionId }),
+                        //dataType: "json",
+                        //contentType: "application/xml;charset='utf-8'",
+                        success: function (data) {
+                            $("#gridSessions").data("kendoGrid").dataSource.read();
+                        }
+                    });
+                });
+            });
+        }
+    });
+
+
+
+</script>

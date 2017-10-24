@@ -1,0 +1,99 @@
+﻿
+<script src="~/Areas/DptAdm/Scripts/EditingFinesDFO.js"></script>
+@{
+    ViewBag.Title = "Редагування штрафів ДФО";
+}
+
+<h2>@ViewBag.Title</h2>
+<link rel="stylesheet" href="~/Areas/DptAdm/Content/style.css" />
+<script src="~/lib/jsZip/jszip.min.js"></script>
+
+
+<div id="content" ng-app="BarsWeb.Controllers" ng-controller="EditingFinesDFO" ng-init="InitValues()">
+
+   
+    <div kendo-window="EditWindow" id="EditWindow" k-visible="false" k-modal="true" style="max-width: 800px;">
+        <div id="popupNotification" class="element1"></div>
+        <br />
+        <div class="form-inline" role="form">
+            <button id="tablerowadd2" class="k-button" title="Додати налаштування" ng-click="AddRow('EditGrid')">
+                <img src="~/Content/images/PureFlat/16/table_row-add2.png" />
+            </button>
+            <button id="editdelete" class="k-button" title="Помітити для видалення" ng-click="MarkAsDelete('EditGrid')">
+                <img src="~/Content/images/PureFlat/16/delete.png" />
+            </button>
+            <button class="k-button" ng-click="ReloadEditGrid()" title="Оновити">
+                <img src="~/Content/images/PureFlat/16/reload_rotate.png" />
+            </button>
+            <button class="k-button" ng-click="SaveChangesEditGrid(selectedItem)" title="Зберегти зміни">
+                <img src="~/Content/images/PureFlat/16/save.png" />
+            </button>
+
+        </div><br />
+
+
+        <div class="form-group border">
+            <div class="form-inline">
+                <div class="form-group" style="width: 47%;padding-left:0.2cm">
+                    <label>Тип обрахування залишку:</label>
+                    <input id="type_count_rest" kendo-drop-down-list
+                           k-data-source="TypesShost" k-data-text-field="'NAME'" k-data-value-field="'ID'" />
+                </div>
+
+                <div class="form-group" style="width: 48%;padding-left:0.2cm">
+                    <label>Термін обраховується в:</label>
+                    <input id="term_count_type" kendo-drop-down-list
+                           k-data-source="TypesShsrok" k-data-text-field="'NAME'" k-data-value-field="'ID'" />
+                </div>
+            </div><br />
+            <div class="form-group" style="padding-left:0.2cm">
+                <label><input id="ifsh_proc" ng-model="ifsh_proc" type="checkbox" /> Якщо вклад не "вилежав" повний місяць - проценти не виплачуються</label>
+            </div>
+        </div>
+
+
+        <div class="border">
+            <div class="form-inline">
+                <div class="form-group" style="width: 47%;padding-left:0.2cm">
+                    <label>Тип штрафа:</label>
+                    <input id="type_fine" kendo-drop-down-list 
+                           k-data-source="TypesShtype" k-data-text-field="'NAME'" k-data-value-field="'ID'"/>
+                </div>
+                <div class="form-group" style="width: 48%;padding-left:0.2cm;padding-top:0.7cm;">
+                    <label>
+                        <input id="type_fine_depend" type="checkbox" ng-click="AddColumns('type_fine')" />
+                        Тип штрафа залежить від терміну вкладу
+                    </label>
+                </div>
+            </div>
+            <br />
+            <div class="form-inline">
+                <div class="form-group" style="width: 47%;padding-left:0.2cm">
+                    <label>Термін штрафної ставки:</label>
+                    <input id="term_fine" kendo-drop-down-list 
+                           k-data-source="TypesShterm" k-data-text-field="'NAME'" k-data-value-field="'ID'" k-on-change="onChange()" />
+                </div>
+                <div class="form-group" style="width: 48%;padding-left:0.2cm;padding-top:0.7cm;">
+                    <label>
+                        <input id="term_fine_depend" type="checkbox" ng-click="AddColumns('term_fine')" />
+                        Термін штрафної ставки залежить від терміну вкладу
+                    </label>
+                </div>
+            </div><br />
+            <div class="form-group">
+                <div id="EditGrid" style="width:99%;margin: auto" kendo-grid="EditGrid" k-options="EditGridOptions" k-rebind="EditGridOptions"
+                     k-on-save-changes="saveChanges(kendoEvent)">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="mydiv">
+        <img src="~/Areas/DptAdm/Content/Images/loader.gif" width="100" height="100" class="ajax-loader" />
+    </div>
+    <div>
+        <div id="Grid" kendo-grid="Grid" k-options="GridOptions(@ViewBag.read_only, @ViewBag.mod_cod)" style="height:100%"></div>
+
+    </div>
+</div>
+

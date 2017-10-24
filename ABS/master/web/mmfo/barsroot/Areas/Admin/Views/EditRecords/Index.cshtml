@@ -1,0 +1,66 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = "Редагування звітних груп для виписок";
+}
+<script src="~/Areas/Admin/Scripts/editrecords/editorCtrl.js"></script>
+
+<style>
+    html,
+    body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+    }
+
+    #vertical,
+    #horizontal {
+        height: 100%;
+    }
+
+    #vertical {
+        border-width: 0;
+    }
+    .k-splitbar {
+    background-color: #CCCCCC;
+}
+</style>
+
+<div id="vertical">
+    <div>
+        <p>
+            <button class="k-button"><span class="k-sprite pf-icon pf-16 pf-add" style="margin-bottom: 3px"></span></button>
+            <input class="form-control" id="someList" name="">
+        </p>
+    </div>
+    <div>
+        <div id="horizontal">
+            <div>
+                <div id="leftGrid"></div>
+
+            </div>
+            
+            <div>
+                <div id="rightGrid"></div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function() {
+        $("#vertical").kendoSplitter({
+            orientation: "vertical",
+            panes: [
+                { collapsible: false, resizable: false, size: "35px" }
+            ]
+        });
+
+        $("#horizontal").kendoSplitter({
+            panes: [
+                { collapsible: false, size: "50%" }
+            ]
+        });
+    });
+</script>

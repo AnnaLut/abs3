@@ -1,0 +1,8 @@
+﻿@{
+  bool isPartial = false;
+  var getPartial = HttpContext.Current.Request.Params.GetValues("partial");
+  if (getPartial != null)
+  {
+    isPartial = Convert.ToBoolean(getPartial[0]);
+  }
+}

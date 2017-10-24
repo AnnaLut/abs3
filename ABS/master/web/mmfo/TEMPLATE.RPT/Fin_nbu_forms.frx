@@ -1,0 +1,406 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="12/06/2012 19:41:00" ReportInfo.Modified="04/16/2014 16:26:11" ReportInfo.CreatorVersion="1.9.1.0">
+  <ScriptText>using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows.Forms;
+using System.Drawing;
+using System.Data;
+using FastReport;
+using FastReport.Data;
+using FastReport.Dialog;
+using FastReport.Barcode;
+using FastReport.Table;
+using FastReport.Utils;
+
+namespace FastReport
+{
+  public class ReportScript
+  {
+
+    private void Data1_BeforePrint(object sender, EventArgs e)
+    {
+      if ( ((String)Report.GetColumnValue(&quot;forma1.KOD&quot;)) == &quot;&quot; )
+      {Text1.Visible = false;
+        Text3.Visible = false;
+        Text5.Visible = false;                                                             
+        Text6.Visible = false;
+        Text8.Visible = false;
+        Text10.Visible = false;
+        Text2.FillColor = Color.Silver;
+      }
+      else{
+        Text1.Visible = true;
+        Text3.Visible = true;
+        Text5.Visible = true;
+        Text6.Visible = true;
+        Text8.Visible = true;
+        Text10.Visible = true;
+        Text2.FillColor = Color.White;
+      }
+      
+      
+      
+      if (((String)Report.GetColumnValue(&quot;forma1.OBOV&quot;)) == &quot;1&quot; )
+      {
+        Text1.FillColor = Color.Gainsboro;
+        Text2.FillColor = Color.Gainsboro;
+        Text3.FillColor = Color.Gainsboro;
+        Text5.FillColor = Color.Gainsboro;
+        Text6.FillColor = Color.Gainsboro;
+        Text8.FillColor = Color.Gainsboro;
+        Text10.FillColor = Color.Gainsboro;
+      }
+      else{
+
+        Text1.FillColor = Color.White;
+        Text3.FillColor = Color.White;
+        Text5.FillColor = Color.White;
+        Text6.FillColor = Color.White;
+        Text8.FillColor = Color.White;
+        Text10.FillColor = Color.White;
+      }
+     
+      if ( Convert.ToString((Decimal)Report.GetColumnValue(&quot;forma1.F1&quot;))== &quot;0&quot;
+        &amp;&amp;(
+        ((String)Report.GetColumnValue(&quot;forma1.FM&quot;))==&quot; &quot;      ||
+        ((String)Report.GetColumnValue(&quot;forma1.FM&quot;))==&quot;M&quot;
+        )
+        )
+
+      {Text3.Text = &quot;&quot;;}
+      if ( Convert.ToString((Decimal)Report.GetColumnValue(&quot;forma1.F2&quot;))== &quot;0&quot;
+        &amp;&amp;(
+        ((String)Report.GetColumnValue(&quot;forma1.FM&quot;))==&quot; &quot;      ||
+        ((String)Report.GetColumnValue(&quot;forma1.FM&quot;))==&quot;M&quot;
+        )
+        )
+
+      {Text5.Text = &quot;&quot;;} 
+      if ( Convert.ToString((Decimal)Report.GetColumnValue(&quot;forma1.F3&quot;))== &quot;0&quot;
+        &amp;&amp;(
+        ((String)Report.GetColumnValue(&quot;forma1.FM&quot;))==&quot; &quot;      ||
+        ((String)Report.GetColumnValue(&quot;forma1.FM&quot;))==&quot;M&quot;
+        )
+        )
+
+      {Text6.Text = &quot;&quot;;} 
+      if ( Convert.ToString((Decimal)Report.GetColumnValue(&quot;forma1.F4&quot;))== &quot;0&quot;           
+           &amp;&amp;(
+        ((String)Report.GetColumnValue(&quot;forma1.FM&quot;))==&quot; &quot;      ||
+        ((String)Report.GetColumnValue(&quot;forma1.FM&quot;))==&quot;M&quot;
+        )
+        )
+
+      {Text8.Text = &quot;&quot;;} 
+      if ( Convert.ToString((Decimal)Report.GetColumnValue(&quot;forma1.F5&quot;))== &quot;0&quot;
+           &amp;&amp;(
+              ((String)Report.GetColumnValue(&quot;forma1.FM&quot;))==&quot; &quot;      ||
+              ((String)Report.GetColumnValue(&quot;forma1.FM&quot;))==&quot;M&quot;
+              )
+          )
+      {Text10.Text = &quot;&quot;;} 
+      
+      if   (((String)Report.GetColumnValue(&quot;forma1.NAME&quot;)).Length &gt;= 55)
+      {Text2.Text =  ((String)Report.GetColumnValue(&quot;forma1.NAME&quot;)).Substring(0,55);
+      }
+      
+      
+ }
+    
+        
+    private void Data2_BeforePrint(object sender, EventArgs e)
+    {
+      if ( ((String)Report.GetColumnValue(&quot;Forma2.KOD&quot;)) == &quot;&quot; )
+      { Text86.Visible = false;      
+        Text88.Visible = false;
+        Text89.Visible = false;                                                             
+        Text90.Visible = false;
+        Text91.Visible = false;
+        Text92.Visible = false;
+        Text87.FillColor = Color.Silver;
+      }
+      else{
+        Text86.Visible = true;
+        Text88.Visible = true;
+        Text89.Visible = true;
+        Text90.Visible = true;
+        Text91.Visible = true;
+        Text92.Visible = true;
+        Text87.FillColor = Color.White;
+      }
+      
+      
+      if (((String)Report.GetColumnValue(&quot;Forma2.OBOV&quot;)) == &quot;1&quot; )
+      {
+        Text86.FillColor = Color.Gainsboro;
+        Text87.FillColor = Color.Gainsboro;
+        Text88.FillColor = Color.Gainsboro;
+        Text89.FillColor = Color.Gainsboro;
+        Text90.FillColor = Color.Gainsboro;
+        Text91.FillColor = Color.Gainsboro;
+        Text92.FillColor = Color.Gainsboro;
+      }
+      else{
+
+        Text86.FillColor = Color.White;
+        Text88.FillColor = Color.White;
+        Text89.FillColor = Color.White;
+        Text90.FillColor = Color.White;
+        Text91.FillColor = Color.White;
+        Text92.FillColor = Color.White;
+      }
+      
+      if ( Convert.ToString((Decimal)Report.GetColumnValue(&quot;Forma2.F1&quot;))== &quot;0&quot;&amp;&amp;((String)Report.GetColumnValue(&quot;Forma2.FM&quot;))!=&quot;N&quot;)
+      {Text92.Text = &quot;&quot;;}
+      if ( Convert.ToString((Decimal)Report.GetColumnValue(&quot;Forma2.F2&quot;))== &quot;0&quot;&amp;&amp;((String)Report.GetColumnValue(&quot;Forma2.FM&quot;))!=&quot;N&quot;)
+      {Text91.Text = &quot;&quot;;} 
+      if ( Convert.ToString((Decimal)Report.GetColumnValue(&quot;Forma2.F3&quot;))== &quot;0&quot;&amp;&amp;((String)Report.GetColumnValue(&quot;Forma2.FM&quot;))!=&quot;N&quot;)
+      {Text90.Text = &quot;&quot;;} 
+      if ( Convert.ToString((Decimal)Report.GetColumnValue(&quot;Forma2.F4&quot;))== &quot;0&quot;&amp;&amp;((String)Report.GetColumnValue(&quot;Forma2.FM&quot;))!=&quot;N&quot;)
+      {Text89.Text = &quot;&quot;;} 
+      if ( Convert.ToString((Decimal)Report.GetColumnValue(&quot;Forma2.F5&quot;))== &quot;0&quot;&amp;&amp;((String)Report.GetColumnValue(&quot;Forma2.FM&quot;))!=&quot;N&quot;)
+      {Text88.Text = &quot;&quot;;} 
+     
+      if   (((String)Report.GetColumnValue(&quot;Forma2.NAME&quot;)).Length &gt;= 60)
+      {Text87.Text =  ((String)Report.GetColumnValue(&quot;Forma2.NAME&quot;)).Substring(0,60);
+      }
+      
+    }
+
+    private void Data6_BeforePrint(object sender, EventArgs e)
+    {
+      if ( ((String)Report.GetColumnValue(&quot;Forma2m.KOD&quot;)) == &quot;&quot; )
+         { Text103.Visible = false;          
+           Text105.Visible = false;
+           Text106.Visible = false;                                                             
+           Text107.Visible = false;
+           Text108.Visible = false;
+           Text109.Visible = false;
+           Text104.FillColor = Color.Silver;
+      }
+      else{
+        Text103.Visible = true;              
+        Text105.Visible = true;              
+        Text106.Visible = true;              
+        Text107.Visible = true;              
+        Text108.Visible = true;              
+        Text109.Visible = true;              
+        Text104.FillColor = Color.White;
+      }
+      
+     
+      if (((String)Report.GetColumnValue(&quot;Forma2m.OBOV&quot;)) == &quot;1&quot; )
+      {
+        Text103.FillColor = Color.Gainsboro;
+        Text104.FillColor = Color.Gainsboro;
+        Text105.FillColor = Color.Gainsboro;
+        Text106.FillColor = Color.Gainsboro;
+        Text107.FillColor = Color.Gainsboro;
+        Text108.FillColor = Color.Gainsboro;
+        Text109.FillColor = Color.Gainsboro;
+      }
+      else{
+
+        Text103.FillColor = Color.White;
+        Text105.FillColor = Color.White;
+        Text106.FillColor = Color.White;
+        Text107.FillColor = Color.White;
+        Text108.FillColor = Color.White;
+        Text109.FillColor = Color.White;
+      }
+      
+      if ( Convert.ToString((Decimal)Report.GetColumnValue(&quot;Forma2m.F1&quot;))== &quot;0&quot; &amp;&amp;((String)Report.GetColumnValue(&quot;Forma2m.FM&quot;))==&quot;M&quot;)
+      {Text109.Text = &quot;&quot;;}
+      if ( Convert.ToString((Decimal)Report.GetColumnValue(&quot;Forma2m.F2&quot;))== &quot;0&quot; &amp;&amp;((String)Report.GetColumnValue(&quot;Forma2m.FM&quot;))==&quot;M&quot;)
+      {Text108.Text = &quot;&quot;;} 
+      if ( Convert.ToString((Decimal)Report.GetColumnValue(&quot;Forma2m.F3&quot;))== &quot;0&quot; &amp;&amp;((String)Report.GetColumnValue(&quot;Forma2m.FM&quot;))==&quot;M&quot;)
+      {Text107.Text = &quot;&quot;;} 
+      if ( Convert.ToString((Decimal)Report.GetColumnValue(&quot;Forma2m.F4&quot;))== &quot;0&quot; &amp;&amp;((String)Report.GetColumnValue(&quot;Forma2m.FM&quot;))==&quot;M&quot;)
+      {Text106.Text = &quot;&quot;;} 
+      if ( Convert.ToString((Decimal)Report.GetColumnValue(&quot;Forma2m.F5&quot;))== &quot;0&quot; &amp;&amp;((String)Report.GetColumnValue(&quot;Forma2m.FM&quot;))==&quot;M&quot;)
+      {Text105.Text = &quot;&quot;;}
+      
+      if   (((String)Report.GetColumnValue(&quot;Forma2m.NAME&quot;)).Length &gt;= 65)
+      {Text104.Text =  ((String)Report.GetColumnValue(&quot;Forma2m.NAME&quot;)).Substring(0,65);
+      }
+      
+      
+    }
+
+    private void Data1_BeforePrint2(object sender, EventArgs e)
+    {
+      //  для річна форма   сховаемо лишне
+      if (((String)Report.GetColumnValue(&quot;CUSTOMER.P_ZVT&quot;)) == &quot;12&quot;)
+      {
+        Text8.Text=&quot;-&quot;;
+        Text6.Text=&quot;-&quot;;
+        Text5.Text=&quot;-&quot;;
+      }
+      else if (((String)Report.GetColumnValue(&quot;CUSTOMER.P_ZVT&quot;)) == &quot;6&quot;)
+      {
+        Text8.Text=&quot;-&quot;;
+        //Text6.Text=&quot;-&quot;;
+        Text5.Text=&quot;-&quot;;
+      }
+    }
+
+    private void Data7_BeforePrint(object sender, EventArgs e)
+    {
+      //  для річна форма   сховаемо лишне
+      if (((String)Report.GetColumnValue(&quot;CUSTOMER.P_ZVT&quot;)) == &quot;12&quot;)
+      {
+        Text106.Text=&quot;-&quot;;
+        Text107.Text=&quot;-&quot;;
+        Text108.Text=&quot;-&quot;;
+      }
+      else if (((String)Report.GetColumnValue(&quot;CUSTOMER.P_ZVT&quot;)) == &quot;6&quot;)
+      {
+        Text106.Text=&quot;-&quot;;
+        //Text107.Text=&quot;-&quot;;
+        Text108.Text=&quot;-&quot;;
+      }
+    }
+  }
+}
+</ScriptText>
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlq9SEZoacNJntaKIKp6mVF18t3N5WTocA0ARXAZ2I9tsWXIzJIjgbJJkgk1z81PCerpAaCuJqbPlTHYfzfmcJtLRxdApmrhgPSB3i9eaxvkL0=">
+      <TableDataSource Name="Table" Alias="forma1" DataType="System.Int32" Enabled="true" TableName="forma_1" SelectCommand="select * from (&#13;&#10;       select  k.kod, trim(pob) as obov, k.name, &#13;&#10;fin_nbu.ZN_rep(k.kod, 1, add_months(trunc(fdat),-12), r.okpo) s0, add_months(trunc(fdat),-12) dat0, decode(fin_nbu.F_FM(r.OKPO, add_months(trunc(fdat),-12) ), k.FM, 1,0) f5,&#13;&#10;fin_nbu.ZN_rep(k.kod, 1, add_months(trunc(fdat),-9), r.okpo) s1, add_months(trunc(fdat),-9) dat1, decode(fin_nbu.F_FM(r.OKPO, add_months(trunc(fdat),-9) ), k.FM, 1,0) f4,&#13;&#10;fin_nbu.ZN_rep(k.kod, 1, add_months(trunc(fdat),-6), r.okpo) s2, add_months(trunc(fdat),-6) dat2, decode(fin_nbu.F_FM(r.OKPO, add_months(trunc(fdat),-6) ), k.FM, 1,0) f3,&#13;&#10;fin_nbu.ZN_rep(k.kod, 1, add_months(trunc(fdat),-3), r.okpo) s3,  add_months(trunc(fdat),-3) dat3, decode(fin_nbu.F_FM(r.OKPO, add_months(trunc(fdat),-3) ), k.FM, 1,0) f2,&#13;&#10;fin_nbu.ZN_rep(k.kod, 1, add_months(trunc(fdat),0), r.okpo) s4, add_months(trunc(fdat),0) dat4, decode(fin_nbu.F_FM(r.OKPO, add_months(trunc(fdat),-0) ), k.FM, 1,0) f1 , k.fm, k.ord&#13;&#10;                    from  fin_forma1 k, (select to_date(:fdat, 'dd.mm.yyyy') as fdat, :okpo as okpo from dual ) r&#13;&#10;WHERE  K.FM in   ( fin_nbu.F_FM(r.OKPO, add_months(trunc(fdat),-0) ), fin_nbu.F_FM(r.OKPO, add_months(trunc(fdat),-3) ), fin_nbu.F_FM(r.OKPO, add_months(trunc(fdat),-6) ), fin_nbu.F_FM(r.OKPO, add_months(trunc(fdat),-9) ), fin_nbu.F_FM(r.OKPO, add_months(trunc(fdat),-12) ) )  and K.FM = 'N'&#13;&#10;union all&#13;&#10;       select  k.kod, trim(pob) as obov, k.name, &#13;&#10;          fin_nbu.ZN_rep(k.kod, 1, add_months(trunc(fdat),-12), r.okpo) s0, add_months(trunc(fdat),-12) dat0, decode(fin_nbu.F_FM(r.OKPO, add_months(trunc(fdat),-12) ), k.FM, 1,0) f5,&#13;&#10;          fin_nbu.ZN_rep(k.kod, 1, add_months(trunc(fdat),-9), r.okpo) s1, add_months(trunc(fdat),-9) dat1, decode(fin_nbu.F_FM(r.OKPO, add_months(trunc(fdat),-9) ), k.FM, 1,0) f4,&#13;&#10;          fin_nbu.ZN_rep(k.kod, 1, add_months(trunc(fdat),-6), r.okpo) s2, add_months(trunc(fdat),-6) dat2, decode(fin_nbu.F_FM(r.OKPO, add_months(trunc(fdat),-6) ), k.FM, 1,0) f3,&#13;&#10;          fin_nbu.ZN_rep(k.kod, 1, add_months(trunc(fdat),-3), r.okpo) s3,  add_months(trunc(fdat),-3) dat3, decode(fin_nbu.F_FM(r.OKPO, add_months(trunc(fdat),-3) ), k.FM, 1,0) f2,&#13;&#10;          fin_nbu.ZN_rep(k.kod, 1, add_months(trunc(fdat),0), r.okpo) s4, add_months(trunc(fdat),0) dat4, decode(fin_nbu.F_FM(r.OKPO, add_months(trunc(fdat),-0) ),  k.FM, 1,0) f1, k.fm, k.ord&#13;&#10;                    from  (select m.* from fin_forma1m m) k, (select to_date(:fdat, 'dd.mm.yyyy') as fdat, :okpo as okpo from dual ) r&#13;&#10;WHERE  k.FM  in  ( fin_nbu.F_FM(r.OKPO, add_months(trunc(fdat),-0) ), fin_nbu.F_FM(r.OKPO, add_months(trunc(fdat),-3) ), fin_nbu.F_FM(r.OKPO, add_months(trunc(fdat),-6) ), fin_nbu.F_FM(r.OKPO, add_months(trunc(fdat),-9) ), fin_nbu.F_FM(r.OKPO, add_months(trunc(fdat),-12) ) )&#13;&#10;)&#13;&#10;where :frm = 1&#13;&#10;          order by  fm, ord">
+        <Column Name="KOD" DataType="System.String"/>
+        <Column Name="NAME" DataType="System.String"/>
+        <Column Name="S0" DataType="System.Decimal"/>
+        <Column Name="DAT0" DataType="System.DateTime"/>
+        <Column Name="S1" DataType="System.Decimal"/>
+        <Column Name="DAT1" DataType="System.DateTime"/>
+        <Column Name="S2" DataType="System.Decimal"/>
+        <Column Name="DAT2" DataType="System.DateTime"/>
+        <Column Name="S3" DataType="System.Decimal"/>
+        <Column Name="DAT3" DataType="System.DateTime"/>
+        <Column Name="S4" DataType="System.Decimal"/>
+        <Column Name="DAT4" DataType="System.DateTime"/>
+        <Column Name="OBOV" DataType="System.String"/>
+        <Column Name="F5" DataType="System.Decimal"/>
+        <Column Name="F4" DataType="System.Decimal"/>
+        <Column Name="F3" DataType="System.Decimal"/>
+        <Column Name="F2" DataType="System.Decimal"/>
+        <Column Name="F1" DataType="System.Decimal"/>
+        <Column Name="FM" DataType="System.String"/>
+        <Column Name="ORD" DataType="System.Decimal"/>
+        <CommandParameter Name="fdat" DataType="126" Expression="[datf]"/>
+        <CommandParameter Name="okpo" DataType="126" Expression="[okpo]"/>
+        <CommandParameter Name="fdat" DataType="126" Expression="[datf]"/>
+        <CommandParameter Name="okpo" DataType="126" Expression="[okpo]"/>
+        <CommandParameter Name="frm" DataType="126" Expression="[frm]"/>
+      </TableDataSource>
+      <TableDataSource Name="Table1" Alias="Forma2" DataType="System.Int32" Enabled="true" SelectCommand="select * from (select  k.kod, trim(pob) as obov, k.name, &#13;&#10;fin_nbu.ZN_rep(k.kod, 2, add_months(trunc(fdat),-12), r.okpo) s0, add_months(trunc(fdat),-12) dat0, decode(fin_nbu.F_FM(r.OKPO, add_months(trunc(fdat),-12) ),K.FM, 1,0) f5,&#13;&#10;fin_nbu.ZN_rep(k.kod, 2, add_months(trunc(fdat),-9), r.okpo) s1, add_months(trunc(fdat),-9) dat1, decode(fin_nbu.F_FM(r.OKPO, add_months(trunc(fdat),-9) ), K.FM, 1,0) f4,&#13;&#10;fin_nbu.ZN_rep(k.kod, 2, add_months(trunc(fdat),-6), r.okpo) s2, add_months(trunc(fdat),-6) dat2, decode(fin_nbu.F_FM(r.OKPO, add_months(trunc(fdat),-6) ), K.FM, 1,0) f3,&#13;&#10;fin_nbu.ZN_rep(k.kod, 2, add_months(trunc(fdat),-3), r.okpo) s3,  add_months(trunc(fdat),-3) dat3, decode(fin_nbu.F_FM(r.OKPO, add_months(trunc(fdat),-3) ), K.FM, 1,0) f2,&#13;&#10;fin_nbu.ZN_rep(k.kod, 2, add_months(trunc(fdat),0), r.okpo) s4, add_months(trunc(fdat),0) dat4, ord, decode(fin_nbu.F_FM(r.OKPO, add_months(trunc(fdat),-0) ), K.FM, 1,0) f1,k.fm&#13;&#10;                    from  fin_forma2 k, (select to_date(:datf, 'dd.mm.yyyy') as fdat, :okpo as okpo from dual ) r&#13;&#10;               WHERE  K.FM in  ( fin_nbu.F_FM(r.OKPO, add_months(trunc(fdat),-0) ), fin_nbu.F_FM(r.OKPO, add_months(trunc(fdat),-3) ), fin_nbu.F_FM(r.OKPO, add_months(trunc(fdat),-6) ), fin_nbu.F_FM(r.OKPO, add_months(trunc(fdat),-9) ), fin_nbu.F_FM(r.OKPO, add_months(trunc(fdat),-12) ) ) and k.fm = 'N'&#13;&#10;          order by k.fm, ord)&#13;&#10;          where f1+f2+f3+f4+f5 != 0 and :frm = 2&#13;&#10;">
+        <Column Name="KOD" DataType="System.String"/>
+        <Column Name="OBOV" DataType="System.String"/>
+        <Column Name="NAME" DataType="System.String"/>
+        <Column Name="S0" DataType="System.Decimal"/>
+        <Column Name="DAT0" DataType="System.DateTime"/>
+        <Column Name="S1" DataType="System.Decimal"/>
+        <Column Name="DAT1" DataType="System.DateTime"/>
+        <Column Name="S2" DataType="System.Decimal"/>
+        <Column Name="DAT2" DataType="System.DateTime"/>
+        <Column Name="S3" DataType="System.Decimal"/>
+        <Column Name="DAT3" DataType="System.DateTime"/>
+        <Column Name="S4" DataType="System.Decimal"/>
+        <Column Name="DAT4" DataType="System.DateTime"/>
+        <Column Name="ORD" DataType="System.Decimal"/>
+        <Column Name="F5" DataType="System.Decimal"/>
+        <Column Name="F4" DataType="System.Decimal"/>
+        <Column Name="F3" DataType="System.Decimal"/>
+        <Column Name="F2" DataType="System.Decimal"/>
+        <Column Name="F1" DataType="System.Decimal"/>
+        <Column Name="Column" Enabled="false" DataType="System.Int32" Calculated="true" Expression=""/>
+        <Column Name="FM" DataType="System.String"/>
+        <CommandParameter Name="datf" DataType="126" Expression="[datf]" DefaultValue="01.07.2012"/>
+        <CommandParameter Name="okpo" DataType="126" Expression="[okpo]"/>
+        <CommandParameter Name="frm" DataType="126" Expression="[frm]"/>
+      </TableDataSource>
+      <TableDataSource Name="Table6" Alias="Forma2m" DataType="System.Int32" Enabled="true" SelectCommand="select * from (select  k.kod, trim(pob) as obov, k.name, &#13;&#10;          fin_nbu.ZN_rep(k.kod, 2, add_months(trunc(fdat),-12), r.okpo) s0, add_months(trunc(fdat),-12) dat0, decode(fin_nbu.F_FM(r.OKPO, add_months(trunc(fdat),-12) ), k.FM, 1,0) f5,&#13;&#10;          fin_nbu.ZN_rep(k.kod, 2, add_months(trunc(fdat),-9), r.okpo) s1, add_months(trunc(fdat),-9) dat1, decode(fin_nbu.F_FM(r.OKPO, add_months(trunc(fdat),-9) ), k.FM, 1,0) f4,&#13;&#10;          fin_nbu.ZN_rep(k.kod, 2, add_months(trunc(fdat),-6), r.okpo) s2, add_months(trunc(fdat),-6) dat2, decode(fin_nbu.F_FM(r.OKPO, add_months(trunc(fdat),-6) ), k.FM, 1,0) f3,&#13;&#10;          fin_nbu.ZN_rep(k.kod, 2, add_months(trunc(fdat),-3), r.okpo) s3,  add_months(trunc(fdat),-3) dat3, decode(fin_nbu.F_FM(r.OKPO, add_months(trunc(fdat),-3) ), k.FM, 1,0) f2,&#13;&#10;          fin_nbu.ZN_rep(k.kod, 2, add_months(trunc(fdat),0), r.okpo) s4, add_months(trunc(fdat),0) dat4, ord, decode(fin_nbu.F_FM(r.OKPO, add_months(trunc(fdat),-0) ), k.FM, 1,0) f1, k.fm&#13;&#10;                 from  fin_forma2m k, (select to_date(:datf, 'dd.mm.yyyy') as fdat, :okpo as okpo from dual ) r&#13;&#10;               WHERE  K.FM in  ( fin_nbu.F_FM(r.OKPO, add_months(trunc(fdat),-0) ), fin_nbu.F_FM(r.OKPO, add_months(trunc(fdat),-3) ), fin_nbu.F_FM(r.OKPO, add_months(trunc(fdat),-6) ), fin_nbu.F_FM(r.OKPO,add_months(trunc(fdat),-9) ), fin_nbu.F_FM(r.OKPO, add_months(trunc(fdat),-12) ) ) --and k.fm = 'R'&#13;&#10;          order by k.fm, ord)&#13;&#10;          where f1+f2+f3+f4+f5 != 0 and :frm = 2">
+        <Column Name="KOD" DataType="System.String"/>
+        <Column Name="OBOV" DataType="System.String"/>
+        <Column Name="NAME" DataType="System.String"/>
+        <Column Name="S0" DataType="System.Decimal"/>
+        <Column Name="DAT0" DataType="System.DateTime"/>
+        <Column Name="F5" DataType="System.Decimal"/>
+        <Column Name="S1" DataType="System.Decimal"/>
+        <Column Name="DAT1" DataType="System.DateTime"/>
+        <Column Name="F4" DataType="System.Decimal"/>
+        <Column Name="S2" DataType="System.Decimal"/>
+        <Column Name="DAT2" DataType="System.DateTime"/>
+        <Column Name="F3" DataType="System.Decimal"/>
+        <Column Name="S3" DataType="System.Decimal"/>
+        <Column Name="DAT3" DataType="System.DateTime"/>
+        <Column Name="F2" DataType="System.Decimal"/>
+        <Column Name="S4" DataType="System.Decimal"/>
+        <Column Name="DAT4" DataType="System.DateTime"/>
+        <Column Name="ORD" DataType="System.Decimal"/>
+        <Column Name="F1" DataType="System.Decimal"/>
+        <Column Name="FM" DataType="System.String"/>
+        <CommandParameter Name="datf" DataType="126" Expression="[datf]"/>
+        <CommandParameter Name="okpo" DataType="126" Expression="[okpo]"/>
+        <CommandParameter Name="frm" DataType="126" Expression="[frm]"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="datf" DataType="System.String"/>
+    <Parameter Name="okpo" DataType="System.Int32"/>
+    <Parameter Name="frm" DataType="System.String"/>
+  </Dictionary>
+  <ReportPage Name="F1" Guides="350.75,422.57,37.8,349.65,-1,36.8,493.5,565.32,422.35,494.17,565.1,636.92,636.49,708.31,350.65,422.47,422.25,494.07,493.85,565.67,566.45,638.27,638.05,709.87,42.8,723.2,0,421.47,493.29,493.43,565.25,565,636.82,636.58,708.4,350.11,421.93,421.8,493.62,493.4,565.22,636.6,708.42,85.05,708.75,349.91,421.73,421.6,493.2,565.02,564.8,636.62,636.4,708.22" Watermark.ImageSize="Stretch" Watermark.Text="ORIGINAL" Watermark.TextRotation="Vertical">
+    <DataBand Name="Data1" Top="59.93" Width="718.2" Height="18.9" BeforePrintEvent="Data1_BeforePrint2" AfterDataEvent="Data1_BeforePrint" Guides="0,18.9" DataSource="Table">
+      <TextObject Name="Text10" Left="350.75" Width="71.82" Height="18.9" Border.Lines="All" Border.Width="0.5" Text="[forma1.S0]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" WordWrap="false" Font="Arial, 7pt" Trimming="EllipsisCharacter"/>
+      <TextObject Name="Text2" Left="37.8" Width="311.85" Height="18.9" Border.Lines="All" Border.Width="0.5" Text="[forma1.NAME]" VertAlign="Center" Font="Arial, 7pt"/>
+      <TextObject Name="Text1" Left="-1" Width="37.8" Height="18.9" Border.Lines="All" Border.Width="0.5" Text="[forma1.KOD]" VertAlign="Center" Font="Arial, 7pt"/>
+      <TextObject Name="Text6" Left="493.5" Width="71.82" Height="18.9" Border.Lines="All" Border.Width="0.5" Text="[forma1.S2]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" WordWrap="false" Font="Arial, 7pt" Trimming="EllipsisCharacter"/>
+      <TextObject Name="Text8" Left="422.35" Width="71.82" Height="18.9" Border.Lines="All" Border.Width="0.5" Text="[forma1.S1]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" WordWrap="false" Font="Arial, 7pt" Trimming="EllipsisCharacter"/>
+      <TextObject Name="Text5" Left="565.1" Width="71.82" Height="18.9" Border.Lines="All" Border.Width="0.5" Text="[forma1.S3]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" WordWrap="false" Font="Arial, 7pt" Trimming="EllipsisCharacter"/>
+      <TextObject Name="Text3" Left="636.49" Width="71.82" Height="18.9" Border.Lines="All" Border.Width="0.5" Text="[forma1.S4]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" WordWrap="false" Font="Arial, 7pt" Trimming="EllipsisCharacter" FirstTabOffset="37.8"/>
+      <DataHeaderBand Name="DataHeader2" Width="718.2" Height="56.7" CanGrow="true" Guides="37.8,56.7,0,18.9">
+        <TextObject Name="Text12" Left="350.65" Top="37.8" Width="71.82" Height="18.9" Border.Lines="All" Border.Width="0.5" Text="[forma1.DAT0]" Format="Date" Format.Format="d" Font="Arial, 7pt"/>
+        <TextObject Name="Text11" Left="422.25" Top="37.8" Width="71.82" Height="18.9" Border.Lines="All" Border.Width="0.5" Text="[forma1.DAT1]" Format="Date" Format.Format="d" Font="Arial, 7pt"/>
+        <TextObject Name="Text9" Left="493.85" Top="37.8" Width="71.82" Height="18.9" Border.Lines="All" Border.Width="0.5" Text="[forma1.DAT2]" Format="Date" Format.Format="d" Font="Arial, 7pt"/>
+        <TextObject Name="Text7" Left="566.45" Top="37.8" Width="71.82" Height="18.9" Border.Lines="All" Border.Width="0.5" Text="[forma1.DAT3]" Format="Date" Format.Format="d" Font="Arial, 7pt"/>
+        <TextObject Name="Text4" Left="638.05" Top="37.8" Width="71.82" Height="18.9" Border.Lines="All" Border.Width="0.5" Text="[forma1.DAT4]" Format="Date" Format.Format="d" Font="Arial, 7pt"/>
+        <TextObject Name="Text49" Left="42.8" Width="680.4" Height="18.9" Text="Баланс” (ф. 1)" HorzAlign="Center"/>
+      </DataHeaderBand>
+    </DataBand>
+    <DataBand Name="Data7" Top="132.53" Width="718.2" Height="18.9" AfterDataEvent="Data2_BeforePrint" Guides="0,18.9" DataSource="Table1">
+      <TextObject Name="Text86" Width="37.8" Height="18.9" Border.Lines="All" Border.Width="0.5" Text="[Forma2.KOD]" VertAlign="Center" Font="Arial, 7pt"/>
+      <TextObject Name="Text87" Left="37.8" Width="311.85" Height="18.9" Border.Lines="All" Border.Width="0.5" Text="[Forma2.NAME]" Format="Currency" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.CurrencySymbol="" Format.PositivePattern="1" Format.NegativePattern="5" VertAlign="Center" Font="Arial, 7pt"/>
+      <TextObject Name="Text88" Left="349.65" Width="71.82" Height="18.9" Border.Lines="All" Border.Width="0.5" Text="[Forma2.S0]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" WordWrap="false" Font="Arial, 7pt" Trimming="EllipsisCharacter"/>
+      <TextObject Name="Text89" Left="421.47" Width="71.82" Height="18.9" Border.Lines="All" Border.Width="0.5" Text="[Forma2.S1]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" WordWrap="false" Font="Arial, 7pt" Trimming="EllipsisCharacter"/>
+      <TextObject Name="Text90" Left="493.43" Width="71.82" Height="18.9" Border.Lines="All" Border.Width="0.5" Text="[Forma2.S2]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" WordWrap="false" Font="Arial, 7pt" Trimming="EllipsisCharacter"/>
+      <TextObject Name="Text91" Left="565" Width="71.82" Height="18.9" Border.Lines="All" Border.Width="0.5" Text="[Forma2.S3]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" WordWrap="false" Font="Arial, 7pt" Trimming="EllipsisCharacter"/>
+      <TextObject Name="Text92" Left="636.58" Width="71.82" Height="18.9" Border.Lines="All" Border.Width="0.5" Text="[Forma2.S4]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" WordWrap="false" Font="Arial, 7pt" Trimming="EllipsisCharacter"/>
+      <DataHeaderBand Name="DataHeader7" Top="82.05" Width="718.2" Height="47.25" Guides="28.35,47.25,0,18.9">
+        <TextObject Name="Text93" Left="350.11" Top="28.35" Width="71.82" Height="18.9" Border.Lines="All" Border.Width="0.5" Text="[Forma2.DAT0]" Format="Date" Format.Format="d" Font="Arial, 7pt"/>
+        <TextObject Name="Text94" Left="421.8" Top="28.35" Width="71.82" Height="18.9" Border.Lines="All" Border.Width="0.5" Text="[Forma2.DAT1]" Format="Date" Format.Format="d" Font="Arial, 7pt"/>
+        <TextObject Name="Text95" Left="493.4" Top="28.35" Width="71.82" Height="18.9" Border.Lines="All" Border.Width="0.5" Text="[Forma2.DAT2]" Format="Date" Format.Format="d" Font="Arial, 7pt"/>
+        <TextObject Name="Text96" Left="565" Top="28.35" Width="71.82" Height="18.9" Border.Lines="All" Border.Width="0.5" Text="[Forma2.DAT3]" Format="Date" Format.Format="d" Font="Arial, 7pt"/>
+        <TextObject Name="Text97" Left="636.6" Top="28.35" Width="71.82" Height="18.9" Border.Lines="All" Border.Width="0.5" Text="[Forma2.DAT4]" Format="Date" Format.Format="d" Font="Arial, 7pt"/>
+        <TextObject Name="Text14" Left="85.05" Width="623.7" Height="18.9" Text="Звіт про фінансові результати” (ф. 2)" HorzAlign="Center"/>
+      </DataHeaderBand>
+    </DataBand>
+    <DataBand Name="Data8" Top="214.58" Width="718.2" Height="15.8" AfterDataEvent="Data6_BeforePrint" Guides="-3.1,15.8" DataSource="Table6">
+      <TextObject Name="Text103" Top="-3.1" Width="37.8" Height="18.9" Border.Lines="All" Border.Width="0.5" Text="[Forma2m.KOD]" VertAlign="Center" Font="Arial, 7pt"/>
+      <TextObject Name="Text104" Left="37.8" Top="-3.1" Width="311.85" Height="18.9" Border.Lines="All" Border.Width="0.5" Text="[Forma2m.NAME]" Format="Currency" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.CurrencySymbol="" Format.PositivePattern="1" Format.NegativePattern="5" VertAlign="Center" Font="Arial, 7pt"/>
+      <TextObject Name="Text105" Left="349.65" Top="-3.1" Width="71.82" Height="18.9" Border.Lines="All" Border.Width="0.5" Text="[Forma2m.S0]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" WordWrap="false" Font="Arial, 7pt" Trimming="EllipsisCharacter"/>
+      <TextObject Name="Text106" Left="421.47" Top="-3.1" Width="71.82" Height="18.9" Border.Lines="All" Border.Width="0.5" BeforePrintEvent="Data7_BeforePrint" Text="[Forma2m.S1]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" WordWrap="false" Font="Arial, 7pt" Trimming="EllipsisCharacter"/>
+      <TextObject Name="Text107" Left="493.43" Top="-3.1" Width="71.82" Height="18.9" Border.Lines="All" Border.Width="0.5" Text="[Forma2m.S2]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" WordWrap="false" Font="Arial, 7pt" Trimming="EllipsisCharacter"/>
+      <TextObject Name="Text108" Left="565" Top="-3.1" Width="71.82" Height="18.9" Border.Lines="All" Border.Width="0.5" Text="[Forma2m.S3]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" WordWrap="false" Font="Arial, 7pt" Trimming="EllipsisCharacter"/>
+      <TextObject Name="Text109" Left="636.58" Top="-3.1" Width="71.82" Height="18.9" Border.Lines="All" Border.Width="0.5" Text="[Forma2m.S4]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" WordWrap="false" Font="Arial, 7pt" Trimming="EllipsisCharacter"/>
+      <DataHeaderBand Name="DataHeader8" Top="154.65" Width="718.2" Height="56.7" Guides="37.8,56.7,0,18.9">
+        <TextObject Name="Text98" Left="349.91" Top="37.8" Width="71.82" Height="18.9" Border.Lines="All" Border.Width="0.5" Text="[Forma2m.DAT0]" Format="Date" Format.Format="d" Font="Arial, 7pt"/>
+        <TextObject Name="Text99" Left="421.6" Top="37.8" Width="71.82" Height="18.9" Border.Lines="All" Border.Width="0.5" Text="[Forma2m.DAT1]" Format="Date" Format.Format="d" Font="Arial, 7pt"/>
+        <TextObject Name="Text100" Left="493.2" Top="37.8" Width="71.82" Height="18.9" Border.Lines="All" Border.Width="0.5" Text="[Forma2m.DAT2]" Format="Date" Format.Format="d" Font="Arial, 7pt"/>
+        <TextObject Name="Text101" Left="564.8" Top="37.8" Width="71.82" Height="18.9" Border.Lines="All" Border.Width="0.5" Text="[Forma2m.DAT3]" Format="Date" Format.Format="d" Font="Arial, 7pt"/>
+        <TextObject Name="Text102" Left="636.4" Top="37.8" Width="71.82" Height="18.9" Border.Lines="All" Border.Width="0.5" Text="[Forma2m.DAT4]" Format="Date" Format.Format="d" Font="Arial, 7pt"/>
+        <TextObject Name="Text13" Left="85.05" Width="623.7" Height="18.9" Text="Звіт про фінансові результати” (ф. 2)м" HorzAlign="Center"/>
+      </DataHeaderBand>
+    </DataBand>
+  </ReportPage>
+</Report>

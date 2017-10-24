@@ -1,0 +1,36 @@
+<xmlform captiontype="OnlyTitle" caption="Пошук депозитів розірваних в період політичної нестабільності" >
+  <customforms >
+    <customform name="frm" buttonsposition="Bottom" width="600" title="Пошук депозитів розірваних в період політичної нестабільності" columnscount="2"  showborder="false"  >
+      <buttons defaulttype="Button" >
+        <button caption="Далі" hint="Далі" id="btnNext">
+          <command type="PlSqlBlock" successurl="/barsroot/barsweb/dynform_sqlstub.aspx"  target="Self" >
+            <sql>
+              begin
+                null;
+              end;
+            </sql>
+           <parameters>
+             <parameter type="FormField" datatype="String" name="DEP_NUM" altname="dep_num" add2successurl="true"></parameter>
+             <parameter type="FormField" datatype="String" name="DEP_DATE" altname="dep_date" add2successurl="true"></parameter>
+             </parameters>
+            <!--<validateproc name="p_dpt_pi_find_terminated" rescodeparname="result_code" restextparname="result_text">
+              <parameters>
+                <parameter type="FormField" datatype="String" name="DEP_NUM" altname="dep_num" add2successurl="true"></parameter>
+                <parameter type="FormField" datatype="String" name="DEP_DATE" altname="dep_date" add2successurl="true"></parameter>
+              </parameters>
+            </validateproc>-->
+          </command> 
+        </button>
+      </buttons>
+      <customfields >
+        <customfield name="DEP_NUM" label="№" required="false" datatype="String" columnindex="1"  >
+          <uicontrol controlwidth="120" type="TextBox" >
+          </uicontrol>
+        </customfield>
+        <customfield name="DEP_DATE" datatype="DateTime" label="Дата" columnindex="2" index="1">
+          <uicontrol controlwidth="120" type="DateInput"></uicontrol>
+        </customfield>
+       </customfields>
+    </customform>
+  </customforms>
+</xmlform>

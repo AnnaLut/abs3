@@ -1,0 +1,21 @@
+﻿body {
+}
+.k-grid .k-detail-cell .k-grid-header {
+    display: none;
+}
+
+.k-grid td {
+    border-width: 0;
+}
+
+.box {
+    padding-left: 8%;
+}
+.region-box {
+    padding-left: 5%;
+}
+
+.grid {
+    float: left; 
+    margin-top: 10px;   
+}

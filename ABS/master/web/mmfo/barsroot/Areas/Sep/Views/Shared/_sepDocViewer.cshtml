@@ -1,0 +1,173 @@
+﻿<div id="detailsWindow">
+    <div id="details-toolbar"></div>
+    <div id="sepDocTabs">
+        <ul>
+            <li>Документ</li>
+            <li>Тех.реквізити</li>
+        </ul>
+        <div id="tab1">
+            <div id="tab1RowDetails"></div>
+        </div>
+        <div id="tab2">
+            <div id="tab2RowDetailsA"></div>
+            <div id="tab2RowDetailsB"></div>
+        </div>
+    </div>
+</div>
+<script src="~/Scripts/BarsIE.js"></script>
+<script>
+    bars.sepfiles = bars.sepfiles || {};
+    bars.sepfiles.sepDocViewer = {
+        tabstrip: $("#sepDocTabs").kendoTabStrip().data("kendoTabStrip"),
+        loadFirstTab: function(data) {
+            var templateTab1 = kendo.template($("#Tab1DetailsTemplate").html());
+            $("#tab1RowDetails").html(templateTab1(data));
+        },
+        loadSecondTab: {
+            part1: function (data) {
+                var templateTab2A = kendo.template($("#Tab2DetailsTemplateA").html());
+                if (data) {
+                    $("#tab2RowDetailsA").html(templateTab2A(data));
+                } 
+
+            },
+            part2: function (data) {
+                var templateTab2B = kendo.template($("#Tab2DetailsTemplateB").html());
+                if (data) {
+                    $("#tab2RowDetailsB").html(templateTab2B(data));
+                } 
+            }
+        },
+        show: function() {
+            var win = $("#detailsWindow").data("kendoWindow");
+            win.center().open();
+        }
+    };
+
+    function printDoc() {
+        bars.ui.loader('#detailsWindow', true);
+        var rec = $("#rec").text()
+        var modelbuh = false;
+        $.get('/barsroot/sep/SepFiles/PrintRecDoc/', { save_type: 'txt', rec: rec, templateName: 'IDDOC2.frx', modelbuh: modelbuh },
+            function getRes(data) {
+                bars.ui.loader('#detailsWindow', false);
+                if (data.status != 'error') {
+                    barsie$print(data.tempDir); //  "C:/Windows/Temp/RecReport.pdf"data.tempDir + data.name " D:\\file.pdf"
+                    //{ bars.ui.alert({ text: 'Файл збережено до ' + data.tempDir }); }
+                }
+                else { bars.ui.alert({ text: data.message }); }
+            });
+        // win = window.open("/barsroot/sep/SepLockDocView/PrintDoc?rec=" + $("#lb_title").text())
+    }
+
+    $('#details-toolbar').kendoToolBar({
+        items: [
+            {
+                template: "<button id='pbPrint' type='button' onclick='printDoc()' class='k-button' title='Друк'><i class='pf-icon pf-16 pf-print'></i></button>"
+            }
+        ]
+    });
+
+    $("#pbPrint").kendoButton();    
+
+    $("#detailsWindow").kendoWindow({
+        visible: false,
+        width: "700px",
+        resizable: false,
+        actions: ["Close"]
+    });
+    bars.sepfiles.sepDocViewer.tabstrip.select(0);
+
+</script>
+
+<script type="text/x-kendo-template" id="Tab1DetailsTemplate">
+    <table style="width:100%;" class="table">
+        <tr>
+            <td colspan="3"><b>#=VOB_NAME === null ? 'ПЛАТІЖНЕ ДОРУЧЕННЯ № ' : VOB_NAME + ' '#</b>#=ND#</td>
+            <td><b>REC № </b><span id="rec">#=REC#</span></td>
+        </tr>
+        <tr>
+            <td colspan="2"><b>Дата валютування: &nbsp</b>#=kendo.toString(kendo.parseDate(DAT_A),'dd.MM.yyyy')#</td>
+            <td colspan="2"><b>ДЕБЕТ</b></td>
+        </tr>
+        <tr style="border-top: 1px solid;" class="well">
+            <td><b>Відправник: </b><br /> #=NAM_A || NAMA#</td>
+            <td><b>Код ОКПО: </b><br /> #=ID_A#</td>
+            <td><b>Рахунок: </b><br /> #=NLSA#</td>
+            <td><b>Валюта: </b><br />#=KV#</td>
+        </tr>
+        <tr class="well">
+            <td colspan="2"><b>Банк відправника: </b><br /> #=NBA# </td>
+            <td><b>МФО: </b><br /> #=MFOA#</td>          
+            <td><b>Сума: </b>#=(S/100).toFixed(2)#</td>
+        </tr>
+        <tr>
+            <td colspan="2"></td>
+            <td colspan="2"><b>КРЕДИТ</b></td>
+        </tr>
+        <tr style="border-top: 1px solid;" class="well">
+            <td><b>Одержувач: </b><br /> #=NAM_B || NAMB#</td>
+            <td><b>Код ОКПО: </b><br /> #=ID_B#</td>
+            <td><b>Рахунок: </b><br /> #=NLSB#</td>           
+            <td rowspan="2"></td>
+        </tr>
+        <tr class="well">
+            <td colspan="2"><b>Банк одержувача: </b><br>#=NB#</td>
+            <td><b>МФО: </b><br /> #=MFOB#</td>             
+        </tr>
+        <tr style="border-top: 1px solid;" class="well">
+            <td colspan="4"><b>Назначення платежу: </b><br />#=NAZN#</td>
+        </tr>
+    </table>
+</script>
+
+<script type="text/x-kendo-template" id="Tab2DetailsTemplateA">
+    <table style="width:100%;" class="table">
+        <tr>
+            <td colspan="3">Основні</td>
+        </tr>
+        <tr style="border-top: 1px solid;" class="well">
+            <td><b>Дата вводу: </b></td>
+            <td colspan="2">#=DAT_B ? kendo.toString(kendo.parseDate(DAT_B),'dd.MM.yyyy HH:mm:ss') : ''#</td>
+        </tr>
+        <tr class="well">
+            <td><b>Дата останнього візування: </b></td>
+            <td colspan="2"></td>
+        </tr>
+        <tr>
+            <td colspan="3">Система електронних платежів</td>
+        </tr>
+        <tr style="border-top: 1px solid;" class="well">
+            <td><b>Надійшов до банку А: </b></td>
+            <td colspan="2">#=DATP ? kendo.toString(kendo.parseDate(DATP),'dd.MM.yyyy HH:mm:ss') : ''#</td>
+        </tr>
+    </table>
+</script>
+
+<script type="text/x-kendo-template" id="Tab2DetailsTemplateB">
+    <table style="width:100%;" class="table">
+        <tr class="well">
+            <td><b>Отримано у файлі: </b></td>
+            <td>#=FN_A#</td>
+            <td>#=DAT_A ? kendo.toString(kendo.parseDate(DAT_A),'dd.MM.yyyy HH:mm:ss') : ''#</td>
+        </tr>
+        <tr class="well">
+            <td><b>Надійшов до нашого РЦ: </b></td>
+            <td colspan="2">#=DAT_2 ? kendo.toString(kendo.parseDate(DAT_2),'dd.MM.yyyy HH:mm:ss') : ''#</td>
+        </tr>
+        <tr class="well">
+            <td><b>Зквитований: </b></td>
+            <td colspan="2">#=DATK ? kendo.toString(kendo.parseDate(DATK),'dd.MM.yyyy HH:mm:ss') : ''#</td>
+        </tr>
+        <tr>
+            <td><b>Відправлений: </b></td>
+            <td>#=FN_B ? FN_B : ''#</td>
+            <td>#=FN_B ? kendo.toString(kendo.parseDate(DAT_B),'dd.MM.yyyy HH:mm:ss') : ''#</td>
+        </tr>
+        <tr>
+            <td><b>Зквитований: </b></td>
+            <td colspan="2">#=DATKB ? kendo.toString(kendo.parseDate(DATKB),'dd.MM.yyyy HH:mm:ss') : ''#</td>
+        </tr>
+    </table>
+</script>
+

@@ -1,0 +1,182 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="05/09/2014 11:31:59" ReportInfo.Modified="06/11/2014 09:37:53" ReportInfo.CreatorVersion="2013.2.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqD6nWZEExUJ9MEhdFZpB1A6ZfSeiTM+6WLeB8pW5aURqkGwhV134I2SUIQGUGXcXiTVWiPbL7IcGZKasmOgzAkw==">
+      <TableDataSource Name="Table" Alias="DPT_C_LIST" DataType="System.Int32" Enabled="true" SelectCommand="select   distinct&#13;&#10;           t1.name                                      RU,&#13;&#10;           substr(t1.tobo, 2,6)                      MFO,&#13;&#10;           dc.branch                                    BR,&#13;&#10;           C.NMK                                        FIO,&#13;&#10;           c.rnk                                          RNK,&#13;&#10;           c.okpo                                        OKPO,&#13;&#10;           DV.TYPE_NAME                           VIDD,&#13;&#10;           dc.nd,&#13;&#10;           dc.kv,&#13;&#10;           dc.action_id,&#13;&#10;           to_char(dc.dat_begin,'dd/mm/yyyy') dat_begin,&#13;&#10;           to_char(dc.dat_end,'dd/mm/yyyy')   dat_end,&#13;&#10;           dc.dat_end-dc.dat_begin                DURATIONDAYS,&#13;&#10;           to_char(dc.when,'dd/mm/yyyy')    dat_real,&#13;&#10;           round(dc.when-dc.dat_begin,0)-1    DURATIONREAL,&#13;&#10;           dc.limit/100                                         summ,           &#13;&#10;           max(i.ir)    RATE,&#13;&#10;           p.cellphone,&#13;&#10;           P.teld,&#13;&#10;           p.telw                      &#13;&#10;from    dpt_deposit_clos dc,&#13;&#10;           tobo t1,&#13;&#10;           customer c,&#13;&#10;           dpt_vidd dv,&#13;&#10;           int_ratn i,&#13;&#10;           person p&#13;&#10;where T1.TOBO = DC.BRANCH--substr(DC.BRANCH,  1, 15)&#13;&#10;and &#13;&#10;C.RNK = dc.rnk&#13;&#10;and DV.VIDD = dc.vidd&#13;&#10;and I.ACC = dc.acc&#13;&#10;and P.RNK = c.rnk&#13;&#10;and dc.when between :sFdat1 and :sFdat2&#13;&#10;and dc.action_id in (1,2)&#13;&#10;and DV.BSD in (2630,2635)&#13;&#10;and not exists (select 1 &#13;&#10;                      from  dpt_deposit_clos &#13;&#10;                      where rnk = dc.rnk&#13;&#10;                      and   action_id in (0,3) &#13;&#10;                      and when &gt;= dc.when-1&#13;&#10;--                      and  p_icurval(kv, limit, datz) between 1000000 and 50000000&#13;&#10;                      )&#13;&#10;and   p_icurval(dc.kv,dc.limit,dc.when-1) between 1000000 and 50000000                 &#13;&#10;and dc.branch like decode(:BRANCH, 'Поточне',  sys_context ('bars_context', 'user_branch'),:BRANCH)||'%'&#13;&#10;group by t1.name,&#13;&#10;           substr(t1.tobo, 2,6),&#13;&#10;           dc.branch,&#13;&#10;           C.NMK,&#13;&#10;           c.rnk,&#13;&#10;           c.okpo,&#13;&#10;           DV.TYPE_NAME,&#13;&#10;           dc.nd,&#13;&#10;           dc.kv,&#13;&#10;           dc.action_id,&#13;&#10;           to_char(dc.dat_begin,'dd/mm/yyyy'),&#13;&#10;           to_char(dc.dat_end,'dd/mm/yyyy'),&#13;&#10;           dc.dat_end-dc.dat_begin,&#13;&#10;           to_char(dc.when,'dd/mm/yyyy'),&#13;&#10;           round(dc.when-dc.dat_begin,0)-1,          &#13;&#10;           dc.limit,&#13;&#10;           p.cellphone,&#13;&#10;           P.teld,&#13;&#10;           p.telw           &#13;&#10;order by 3,7,11">
+        <Column Name="RU" DataType="System.String"/>
+        <Column Name="MFO" DataType="System.String"/>
+        <Column Name="BR" DataType="System.String"/>
+        <Column Name="FIO" DataType="System.String"/>
+        <Column Name="RNK" DataType="System.Decimal"/>
+        <Column Name="OKPO" DataType="System.String"/>
+        <Column Name="VIDD" DataType="System.String"/>
+        <Column Name="ND" DataType="System.String"/>
+        <Column Name="KV" DataType="System.Int16"/>
+        <Column Name="ACTION_ID" DataType="System.Int16"/>
+        <Column Name="DAT_BEGIN" DataType="System.String"/>
+        <Column Name="DAT_END" DataType="System.String"/>
+        <Column Name="DURATIONDAYS" DataType="System.Decimal"/>
+        <Column Name="DAT_REAL" DataType="System.String"/>
+        <Column Name="DURATIONREAL" DataType="System.Decimal"/>
+        <Column Name="SUMM" DataType="System.Decimal"/>
+        <Column Name="RATE" DataType="System.Decimal"/>
+        <Column Name="CELLPHONE" DataType="System.String"/>
+        <Column Name="TELD" DataType="System.String"/>
+        <Column Name="TELW" DataType="System.String"/>
+        <CommandParameter Name="sFdat1" DataType="106" Expression="[sFdat1]"/>
+        <CommandParameter Name="sFdat2" DataType="106" Expression="[sFdat2]"/>
+        <CommandParameter Name="BRANCH" DataType="126" Expression="[BRANCH]"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="sFdat1" DataType="System.DateTime"/>
+    <Parameter Name="BRANCH" DataType="System.String"/>
+    <Parameter Name="sFdat2" DataType="System.DateTime"/>
+  </Dictionary>
+  <ReportPage Name="Page1" Landscape="true" PaperWidth="550" PaperHeight="210" FirstPageSource="15" OtherPagesSource="15">
+    <ReportTitleBand Name="ReportTitle1" Width="2003.4" Height="109.62">
+      <TextObject Name="Text1" Left="9.45" Top="3.78" Width="1064.07" Height="105.84" Text="Інформація щодо клієнтів фізичних осіб,&#13;&#10;які достроково розірвали, або не переуклали депозитний договір на новий строк,&#13;&#10;у сумі, що більше, або дорівнює, 10 000 грн, та менше, або дорівнює, 500 000 грн. (або в еквіваленті іноземної валюти) &#13;&#10;за період з [FormatDateTime([sFdat1])] по [FormatDateTime([sFdat2])] року.		&#13;&#10;																			&#13;&#10;																			&#13;&#10;" HorzAlign="Center" Font="Arial, 12pt"/>
+    </ReportTitleBand>
+    <PageHeaderBand Name="PageHeader1" Top="111.91" Width="2003.4" Height="100.17" PrintOn="FirstPage" KeepChild="true">
+      <TableObject Name="Table1" Left="9.45" Top="88.83" Width="1830.23" Height="11.34" Border.Lines="All" Border.Width="0.25">
+        <TableColumn Name="Column43" Width="24.57"/>
+        <TableColumn Name="Column44" Width="226.8"/>
+        <TableColumn Name="Column45" Width="60.48"/>
+        <TableColumn Name="Column46" Width="119.07"/>
+        <TableColumn Name="Column47" Width="166.32"/>
+        <TableColumn Name="Column48" Width="73.71"/>
+        <TableColumn Name="Column49" Width="73.71"/>
+        <TableColumn Name="Column50" Width="247.59"/>
+        <TableColumn Name="Column51" Width="56.7"/>
+        <TableColumn Name="Column52" Width="45.36"/>
+        <TableColumn Name="Column53" Width="105.84"/>
+        <TableColumn Name="Column54" Width="60.48"/>
+        <TableColumn Name="Column55" Width="56.7"/>
+        <TableColumn Name="Column56" Width="58.73"/>
+        <TableColumn Name="Column57" Width="73.71"/>
+        <TableColumn Name="Column58" Width="56.7"/>
+        <TableColumn Name="Column59"/>
+        <TableColumn Name="Column60" Width="58.59"/>
+        <TableColumn Name="Column61"/>
+        <TableColumn Name="Column62" Width="66.72"/>
+        <TableColumn Name="Column63"/>
+        <TableRow Name="Row3" Height="11.34">
+          <TableCell Name="Cell63" Border.Lines="All" Border.Width="0.25" CanBreak="false" Text="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt" TextFill.Color="DimGray"/>
+          <TableCell Name="Cell64" Border.Lines="All" Border.Width="0.25" Text="2" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt" TextFill.Color="DimGray" TabWidth="59"/>
+          <TableCell Name="Cell65" Border.Lines="All" Border.Width="0.25" Text="3" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt" TextFill.Color="DimGray"/>
+          <TableCell Name="Cell66" Border.Lines="All" Border.Width="0.25" Text="4" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt" TextFill.Color="DimGray"/>
+          <TableCell Name="Cell67" Border.Lines="All" Border.Width="0.25" Text="5" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt" TextFill.Color="DimGray"/>
+          <TableCell Name="Cell68" Border.Lines="All" Border.Width="0.25" Text="6" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt" TextFill.Color="DimGray"/>
+          <TableCell Name="Cell69" Border.Lines="All" Border.Width="0.25" Text="7" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt" TextFill.Color="DimGray"/>
+          <TableCell Name="Cell70" Border.Lines="All" Border.Width="0.25" Text="8" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt" TextFill.Color="DimGray"/>
+          <TableCell Name="Cell71" Border.Lines="All" Border.Width="0.25" Text="9" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt" TextFill.Color="DimGray"/>
+          <TableCell Name="Cell72" Border.Lines="All" Border.Width="0.25" Text="10" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt" TextFill.Color="DimGray"/>
+          <TableCell Name="Cell73" Border.Lines="All" Border.Width="0.25" Text="11" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt" TextFill.Color="DimGray"/>
+          <TableCell Name="Cell74" Border.Lines="All" Border.Width="0.25" Text="12" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt" TextFill.Color="DimGray"/>
+          <TableCell Name="Cell75" Border.Lines="All" Border.Width="0.25" Text="13" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt" TextFill.Color="DimGray"/>
+          <TableCell Name="Cell76" Border.Lines="All" Border.Width="0.25" Text="14" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt" TextFill.Color="DimGray"/>
+          <TableCell Name="Cell77" Border.Lines="All" Border.Width="0.25" Text="15" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt" TextFill.Color="DimGray"/>
+          <TableCell Name="Cell78" Border.Lines="All" Border.Width="0.25" Text="16" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt" TextFill.Color="DimGray"/>
+          <TableCell Name="Cell79" Border.Lines="All" Border.Width="0.25" Text="17" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt" TextFill.Color="DimGray"/>
+          <TableCell Name="Cell80" Border.Lines="All" Border.Width="0.25" Text="18" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt" TextFill.Color="DimGray"/>
+          <TableCell Name="Cell81" Border.Lines="All" Border.Width="0.25" Text="19" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt" TextFill.Color="DimGray"/>
+          <TableCell Name="Cell82" Border.Lines="All" Border.Width="0.25" Text="20" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt" TextFill.Color="DimGray"/>
+          <TableCell Name="Cell83" Border.Lines="All" Border.Width="0.25" Text="21" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt" TextFill.Color="DimGray"/>
+        </TableRow>
+      </TableObject>
+      <TableObject Name="Table1" Left="9.62" Top="4.36" Width="1831.52" Height="85.05" Border.Lines="All" Border.Width="0.25">
+        <TableColumn Name="Column1" Width="24.57"/>
+        <TableColumn Name="Column2" Width="226.8"/>
+        <TableColumn Name="Column3" Width="60.48"/>
+        <TableColumn Name="Column4" Width="119.07"/>
+        <TableColumn Name="Column5" Width="166.32"/>
+        <TableColumn Name="Column6" Width="73.71"/>
+        <TableColumn Name="Column7" Width="73.71"/>
+        <TableColumn Name="Column8" Width="247.59"/>
+        <TableColumn Name="Column9" Width="56.7"/>
+        <TableColumn Name="Column10" Width="45.36"/>
+        <TableColumn Name="Column11" Width="105.84"/>
+        <TableColumn Name="Column12" Width="60.48"/>
+        <TableColumn Name="Column13" Width="56.7"/>
+        <TableColumn Name="Column14" Width="58.59"/>
+        <TableColumn Name="Column15" Width="73.71"/>
+        <TableColumn Name="Column16" Width="56.7"/>
+        <TableColumn Name="Column17"/>
+        <TableColumn Name="Column18" Width="58.71"/>
+        <TableColumn Name="Column19"/>
+        <TableColumn Name="Column20" Width="67.46"/>
+        <TableColumn Name="Column21" Width="66.72"/>
+        <TableRow Name="Row1" Height="85.05">
+          <TableCell Name="Cell1" Border.Lines="All" Border.Width="0.25" Fill.Color="WhiteSmoke" CanBreak="false" Text="№" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell22" Border.Lines="All" Border.Width="0.25" Fill.Color="WhiteSmoke" Text="Назва регіонального управління" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell23" Border.Lines="All" Border.Width="0.25" Fill.Color="WhiteSmoke" Text="МФО балансової установи" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell24" Border.Lines="All" Border.Width="0.25" Fill.Color="WhiteSmoke" Text="№ ТВБВ&#13;&#10;" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell25" Border.Lines="All" Border.Width="0.25" Fill.Color="WhiteSmoke" Text="Прізвище Ім`я &#13;&#10;По-батькові клієнта" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell26" Border.Lines="All" Border.Width="0.25" Fill.Color="WhiteSmoke" Text="Реєстраційний номер клієнта &#13;&#10;" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell27" Border.Lines="All" Border.Width="0.25" Fill.Color="WhiteSmoke" Text="Реєстраційний номер облікової картки клієнта&#13;&#10;" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell28" Border.Lines="All" Border.Width="0.25" Fill.Color="WhiteSmoke" Text="Назва виду вкладу (продукта)" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell29" Border.Lines="All" Border.Width="0.25" Fill.Color="WhiteSmoke" Text="Номер договору" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell30" Border.Lines="All" Border.Width="0.25" Fill.Color="WhiteSmoke" Text="Валюта рахунку" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell31" Border.Lines="All" Border.Width="0.25" Fill.Color="WhiteSmoke" Text="Ознака припинення дії договору (планове вилучення коштів -1, дострокове вилучення  коштів -2)" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell32" Border.Lines="All" Border.Width="0.25" Fill.Color="WhiteSmoke" Text="Дата відкриття рахунку (початку дії договору)" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell33" Border.Lines="All" Border.Width="0.25" Fill.Color="WhiteSmoke" Text="Дата закінчення строку дії договору" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell34" Border.Lines="All" Border.Width="0.25" Fill.Color="WhiteSmoke" Text="Строк дії  вкладу відповідно до умов договору (у днях)" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell35" Border.Lines="All" Border.Width="0.25" Fill.Color="WhiteSmoke" Text="Фактична дата вилучення коштів" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell36" Border.Lines="All" Border.Width="0.25" Fill.Color="WhiteSmoke" Text="Фактичний строк дії вкладу до дати вилучення (у днях)" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell37" Border.Lines="All" Border.Width="0.25" Fill.Color="WhiteSmoke" Text="Сума вкладу за договором у валюті  договору &#13;&#10;" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell38" Border.Lines="All" Border.Width="0.25" Fill.Color="WhiteSmoke" Text="Відсоткова ставка за  договором, %" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell39" Border.Lines="All" Border.Width="0.25" Fill.Color="WhiteSmoke" Text="Телефон мобільний" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell40" Border.Lines="All" Border.Width="0.25" Fill.Color="WhiteSmoke" Text="Телефон домашній" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell41" Border.Lines="All" Border.Width="0.25" Fill.Color="WhiteSmoke" Text="Телефон робочий" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt"/>
+        </TableRow>
+      </TableObject>
+    </PageHeaderBand>
+    <DataBand Name="Data1" Top="214.36" Width="2003.4" Height="11.34" DataSource="Table">
+      <TableObject Name="Table1" Left="9.45" Width="1830.23" Height="11.34" Border.Lines="All" Border.Width="0.25">
+        <TableColumn Name="Column64" Width="24.57"/>
+        <TableColumn Name="Column65" Width="226.8"/>
+        <TableColumn Name="Column66" Width="60.48"/>
+        <TableColumn Name="Column67" Width="119.07"/>
+        <TableColumn Name="Column68" Width="166.32"/>
+        <TableColumn Name="Column69" Width="73.71"/>
+        <TableColumn Name="Column70" Width="73.71"/>
+        <TableColumn Name="Column71" Width="247.59"/>
+        <TableColumn Name="Column72" Width="56.7"/>
+        <TableColumn Name="Column73" Width="45.36"/>
+        <TableColumn Name="Column74" Width="105.84"/>
+        <TableColumn Name="Column75" Width="60.48"/>
+        <TableColumn Name="Column76" Width="56.7"/>
+        <TableColumn Name="Column77" Width="58.73"/>
+        <TableColumn Name="Column78" Width="73.71"/>
+        <TableColumn Name="Column79" Width="56.7"/>
+        <TableColumn Name="Column80"/>
+        <TableColumn Name="Column81" Width="58.59"/>
+        <TableColumn Name="Column82"/>
+        <TableColumn Name="Column83" Width="66.72"/>
+        <TableColumn Name="Column84"/>
+        <TableRow Name="Row4" Height="11.34">
+          <TableCell Name="Cell84" Border.Lines="All" Border.Width="0.25" CanBreak="false" Text="[Row#]" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt" TextFill.Color="DimGray"/>
+          <TableCell Name="Cell85" Border.Lines="All" Border.Width="0.25" Text="[DPT_C_LIST.RU]" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt" TextFill.Color="DimGray" TabWidth="59"/>
+          <TableCell Name="Cell86" Border.Lines="All" Border.Width="0.25" Text="[DPT_C_LIST.MFO]" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt" TextFill.Color="DimGray"/>
+          <TableCell Name="Cell87" Border.Lines="All" Border.Width="0.25" Text="[DPT_C_LIST.BR]" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt" TextFill.Color="DimGray"/>
+          <TableCell Name="Cell88" Border.Lines="All" Border.Width="0.25" Text="[DPT_C_LIST.FIO]" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt" TextFill.Color="DimGray"/>
+          <TableCell Name="Cell89" Border.Lines="All" Border.Width="0.25" Text="[DPT_C_LIST.RNK]" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt" TextFill.Color="DimGray"/>
+          <TableCell Name="Cell90" Border.Lines="All" Border.Width="0.25" Text="[DPT_C_LIST.OKPO]" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt" TextFill.Color="DimGray"/>
+          <TableCell Name="Cell91" Border.Lines="All" Border.Width="0.25" Text="[DPT_C_LIST.VIDD]" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt" TextFill.Color="DimGray"/>
+          <TableCell Name="Cell92" Border.Lines="All" Border.Width="0.25" Text="[DPT_C_LIST.ND]" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt" TextFill.Color="DimGray"/>
+          <TableCell Name="Cell93" Border.Lines="All" Border.Width="0.25" Text="[DPT_C_LIST.KV]" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt" TextFill.Color="DimGray"/>
+          <TableCell Name="Cell94" Border.Lines="All" Border.Width="0.25" Text="[DPT_C_LIST.ACTION_ID]" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt" TextFill.Color="DimGray"/>
+          <TableCell Name="Cell95" Border.Lines="All" Border.Width="0.25" Text="[DPT_C_LIST.DAT_BEGIN]" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt" TextFill.Color="DimGray"/>
+          <TableCell Name="Cell96" Border.Lines="All" Border.Width="0.25" Text="[DPT_C_LIST.DAT_END]" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt" TextFill.Color="DimGray"/>
+          <TableCell Name="Cell97" Border.Lines="All" Border.Width="0.25" Text="[DPT_C_LIST.DURATIONDAYS]" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt" TextFill.Color="DimGray"/>
+          <TableCell Name="Cell98" Border.Lines="All" Border.Width="0.25" Text="[DPT_C_LIST.DAT_REAL]" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt" TextFill.Color="DimGray"/>
+          <TableCell Name="Cell99" Border.Lines="All" Border.Width="0.25" Text="[DPT_C_LIST.DURATIONREAL]" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt" TextFill.Color="DimGray"/>
+          <TableCell Name="Cell100" Border.Lines="All" Border.Width="0.25" Text="[DPT_C_LIST.SUMM]" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt" TextFill.Color="DimGray"/>
+          <TableCell Name="Cell101" Border.Lines="All" Border.Width="0.25" Text="[DPT_C_LIST.RATE]" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt" TextFill.Color="DimGray"/>
+          <TableCell Name="Cell102" Border.Lines="All" Border.Width="0.25" Text="[DPT_C_LIST.CELLPHONE]" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt" TextFill.Color="DimGray"/>
+          <TableCell Name="Cell103" Border.Lines="All" Border.Width="0.25" Text="[DPT_C_LIST.TELD]" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt" TextFill.Color="DimGray"/>
+          <TableCell Name="Cell104" Border.Lines="All" Border.Width="0.25" Text="[DPT_C_LIST.TELW]" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt" TextFill.Color="DimGray"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+  </ReportPage>
+</Report>

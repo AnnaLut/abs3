@@ -1,0 +1,42 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+}
+<script src="~/Areas/OpenCloseDay/Scripts/dataScript.js" charset="utf-8"></script>
+@*<script src="~/Areas/OpenCloseDay/Scripts/closeDay.js"></script>*@
+
+<style>
+    @@media (min-width: 768px) {
+        .container {
+            width: 320px !important;
+        }
+    }
+</style>
+
+<div class="container">
+    <form class="form-horizontal">
+        <div class="panel panel-default"  style="width:290px">
+            <div class="panel-heading">Закриття банківського дня</div>
+            <div class="panel-body">
+
+
+                <div class="form-group">
+                    <div class="col-md-2">
+                        <label for="" class="control-label text-center">Пароль:</label>
+                    </div>
+                    <div class="col-md-10">
+                        <input type="password" class="k-textbox" id="pass" style="margin-bottom: 30px;">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-6">
+                        <button class="k-button" id="confirm"><span class="k-sprite pf-icon pf-16 pf-tool_pencil" style="margin-bottom: 3px"></span> Ввести</button>
+                    </div>
+                    <div class="col-md-6">
+                        <button class="k-button" id="btnCancel"><span class="k-sprite pf-icon pf-16 pf-delete_button_error" style="margin-bottom: 3px"></span> Відмінити</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </form>
+</div>

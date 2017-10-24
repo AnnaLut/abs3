@@ -1,0 +1,68 @@
+<xmlform captiontype="OnlyTitle">
+  <grids>
+    <grid id="gv" pagesize="10" showpagesizebox="true" title="Перекриття сальдо торгових рахунків" showfilter="false" >
+      <filters caption="Фільтри" buttontext="Знайти" columnscount="2">
+        <filter caption="РНК клієнта" columnindex="1" field="rnk"  condition="Equal" id="fltrRnk">
+          <uicontrol type="TextBox" addemptyitem="false"/>
+        </filter>
+        <filter caption="ОКПО клієнта" columnindex="2" field="okpo" condition="Equal" id="fltrOkpo">
+          <uicontrol type="TextBox" addemptyitem="false"/>
+        </filter>
+        <filter caption="Торговий рахунок" columnindex="1" field="nls" condition="Equal" id="fltrnls">
+          <uicontrol type="TextBox" addemptyitem="false"/>
+        </filter>
+        <filter caption="Розрахунковий рахунок" columnindex="2" field="nlsv" condition="Equal" id="fltrnlsv">
+          <uicontrol type="TextBox" addemptyitem="false"/>
+        </filter>
+      </filters>
+      <datasource>
+        <sql>
+          select rnk, nmk, okpo, kv, nls, dapp, ostc, nlsv, mfov from v_zayp
+        </sql>
+      </datasource>
+      <rowselection method="SingleRow"/>
+      <buttons defaulttype="Button">
+        <button caption="Перекрити" hint="Перекриття сальдо торгових рахунків" id="btnp"  type="Image" imagename="checks" >
+          <command type="Redirect" url="dynform.aspx?form=frm_zay_p_tt" checkselectedrow="true" target="Blank">
+            <parameters>
+              <parameter type="DataField" name="RNK" altname="RNK"></parameter>
+              <parameter type="DataField" name="MFOV" altname="MFOV"></parameter>
+              <parameter type="DataField" name="NLSV" altname="NLSV"></parameter>
+              <parameter type="DataField" name="NLS" altname="NLS"></parameter>
+              <parameter type="DataField" name="KV" altname="KV"></parameter>
+            </parameters>
+          </command>
+        </button>
+      </buttons>
+      <fields>
+        <field datatype="Int64" key="true" name="RNK">
+          <column align="Left" caption="РНК клієнта"  show="true" width="80"/>
+        </field>
+        <field datatype="String" key="true" name="NMK">
+          <column align="Left" caption="Назва клієнта" show="true" width="300"/>
+        </field>
+        <field datatype="String" key="false" name="OKPO" >
+          <column align="Center" caption="ОКПО клієнта" show="true" width="100"/>
+        </field>
+        <field datatype="String" key="true" name="MFOV">
+          <column align="Center" caption="МФО" show="true" width="40"/>
+        </field>
+        <field datatype="String" key="true" name="NLSV">
+          <column align="Left" caption="Розрахунковий рахунок" show="true" width ="90"/>
+        </field>
+        <field datatype="String" key="true" name="NLS">
+          <column align="Left" caption="Торговий рахунок" show="true" width="90"/>
+        </field>
+        <field datatype="String" key="true" name="KV">
+          <column align="Center" caption="Валюта" show="true" width="50"/>
+        </field>
+        <field datatype="DateTime" key="true" name="DAPP">
+          <column align="Center" caption="Дата останнього руху" show="true" width ="70" formatstring="{0:dd.MM.yyyy}"/>
+        </field>
+        <field datatype="Int64" key="false" name="OSTC">
+          <column align="Right" caption="Фактичний залишок" show="true" width ="70"/>
+        </field>
+      </fields>
+    </grid>
+  </grids>
+</xmlform>

@@ -1,0 +1,194 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    //ViewBag.Title = "SWIFT.CLAIMS. Обробка прийнятих повідомлень";
+}
+
+<script src="~/Scripts/respond.min.js"></script>
+<script src="~/Areas/Swift/Scripts/KendoCommon.js"></script>
+<script src="/barsroot/Scripts/jquery/jquery.iecors.js"></script>
+<script src="/barsroot/Scripts/crypto/barsCrypto.js?v1.0.0"></script>
+<script src="~/Areas/Swift/Scripts/SignHelper.js"></script>
+<script src="~/Areas/Swift/Scripts/Swift/SwiftClaims.js?v1.9"></script>
+
+<link rel="stylesheet" href="~/Areas/Swift/Css/Swift/Main.css" />
+<link rel="stylesheet" href="~/Areas/Swift/Css/Swift/SwiftKGrid.css" />
+
+@*<div class="page-header">
+    <h1 id="title"></h1>
+</div>*@
+
+<div  id="dvFilesFilter">    
+    <div class="row">
+        <div class="col-md-4">
+            <h2 id="title" style="color:darkolivegreen;"></h2>
+        </div>
+
+        <div class="col-md-5">
+            <div class="form-group">
+                <label for="searchDate"><b>Початкова дата повідомлення:</b></label>
+                <input type="text" class="form-control" id="searchDate" placeholder="Вкажіть дату" style="width:250px" />
+            </div>
+        </div>
+        <div class="col-md-3">
+            <button id="SearchBtn" type="button" class="btn btn-primary" style="margin-left: -60px">
+                <i class="fa fa-search"></i> Пошук
+            </button>
+        </div>
+    </div>
+    <div class="clearfix"></div>
+</div>
+
+
+
+
+<div id="gridMain" style="width:1280px;"></div>
+<div class="search-main"></div>
+
+<textarea readonly style="background-color:#c7f5f9;display:none" id="textAreaClaimsRow" cols="150"></textarea>
+
+<script type="text/x-kendo-template" id="mainTitle-template">
+    <div class="toolbar">
+        <button title="Розподілити по вибраних рядках" id="pbApplyToAll" class='k-button' onclick="onClickBtn(this)">
+            <i class="pf-icon pf-16 pf-ok"></i>            
+        </button>
+        <button title="Розподілити по вибраних користувачах" id="pbApplyToAllUsers" class='k-button' onclick="onClickBtn(this)">
+            <i class="pf-icon pf-16 pf-table"></i>
+        </button>
+        <button title="Видалити вибрані записи" id="pbDelete" class='k-button' onclick="onClickBtn(this)">
+            <i class="pf-icon pf-16 pf-delete"></i>
+        </button>
+        <button title="Підбір документу для квитовки" id="pbFindMatch" class='k-button' onclick="onClickBtn(this)">
+            <i class="pf-icon pf-16 pf-business_report"></i>
+        </button>
+        <button title="Підбір документу для квитовки по даті або РНК" id="pbFindMatch2" class='k-button' onclick="onClickBtn(this)">
+            <i class="pf-icon pf-16 pf-report_open"></i>
+        </button>
+        <button title="Обробити повідомлення" id="SAM_DoubleClick" class='k-button' onclick="onClickBtn(this)">
+            <i class="pf-icon pf-16 pf-folder"></i>
+        </button>
+        <button title="Редагувати користувачів, які працюють із SWIFT" id="pbUserList" class='k-button' onclick="onClickBtn(this)">
+            <i class="pf-icon pf-16 pf-user_group"></i>
+        </button>
+        <button title="Зміна Вх-Вих O->I або I->O" id="pbSwitch" class='k-button' onclick="onClickBtn(this)">
+            <i class="pf-icon pf-16 pf-gears"></i>
+        </button>
+        <button title="Роздрукувати вибрані повідомлення" id="pbPrint" class='k-button' onclick="onClickBtn(this)">
+            <i class="pf-icon pf-16 pf-print"></i>
+        </button>
+        <button title="Вкл/вик автоматичне оновлення" id="pbTimerOn" style="opacity:0.3;filter:alpha(opacity=30)" class='k-button' onclick="onClickBtn(this)">
+            <i class="pf-icon pf-16 pf-clock"></i>
+        </button>
+        @*<button title="Внести зміни в базу даних" id="pbUpdate" class='k-button' onclick="onClickBtn(this)">
+            <i class="pf-icon pf-16 pf-save"></i>
+        </button>*@
+    </div>
+</script>
+
+<script type="text/x-kendo-template" id="mainUserTitle-template">
+    <div class="toolbar">
+        <button title="Відмовитись від розподілених повідомлень" id="pbReject" class='k-button' onclick="onClickBtn(this)">
+            <i class="pf-icon pf-16 pf-reload_rotate"></i>
+        </button>
+        <button title="Видалити вибрані записи" id="pbDelete" class='k-button' onclick="onClickBtn(this)">
+            <i class="pf-icon pf-16 pf-delete"></i>
+        </button>
+        <button title="Підбір документу для квитовки" id="pbFindMatch" class='k-button' onclick="onClickBtn(this)">
+            <i class="pf-icon pf-16 pf-business_report"></i>
+        </button>
+        <button title="Підбір документу для квитовки по даті або РНК" id="pbFindMatch2" class='k-button' onclick="onClickBtn(this)">
+            <i class="pf-icon pf-16 pf-report_open"></i>
+        </button>
+        <button title="Обробити повідомлення" id="SAM_DoubleClick" class='k-button' onclick="onClickBtn(this)">
+            <i class="pf-icon pf-16 pf-folder"></i>
+        </button>
+        <button title="Зміна Вх-Вих O->I або I->O" id="pbSwitch" class='k-button' onclick="onClickBtn(this)">
+            <i class="pf-icon pf-16 pf-gears"></i>
+        </button>
+        <button title="Роздрукувати вибрані повідомлення" id="pbPrint" class='k-button' onclick="onClickBtn(this)">
+            <i class="pf-icon pf-16 pf-print"></i>
+        </button>
+        <button title="Вкл/вик автоматичне оновлення" id="pbTimerOn" style="filter:alpha(opacity='30');opacity:0.3" class='k-button' onclick="onClickBtn(this)">
+            <i class="pf-icon pf-16 pf-clock"></i>
+        </button>
+        @*<button title="Внести зміни в базу даних" id="pbUpdate" class='k-button' onclick="onClickBtn(this)">
+            <i class="pf-icon pf-16 pf-save"></i>
+        </button>*@
+    </div>
+</script>
+
+<script type="text/x-kendo-template" id="docForKvitTitle-template">
+    <div class="toolbar">
+        @*<h2 style="margin: 5px">Підбір документу для квитовки</h2>*@
+
+        <button title="Прив'язка документа до імпортованого повідомленням" id="impmsg_document_link" class='k-button' onclick="onClickDocKvitBtn(this)">
+            <i class="pf-icon pf-16 pf-view_options"></i>
+        </button>
+        <button title="Переглянути реквізити документу" id="pbViewDoc" class='k-button' onclick="onClickDocKvitBtn(this)">
+            <i class="pf-icon pf-16 pf-folder"></i>
+        </button>
+
+        <!--<label for="pbPreFilter">Фільтр по сумі та рахункам</label>-->
+        <!--<input id="pbPreFilter" style="width: 25px" type="checkbox" checked="checked" onclick="onClickDocKvitCheckBox(this)" />-->
+        <!--<label for="pbFilterSwRef">Знайти по полю 20</label>-->
+        <!--<input id="pbFilterSwRef" style="width: 25px" type="checkbox" onclick="onClickDocKvitCheckBox(this)" />-->
+    </div>
+</script>
+
+<div id="gridUserList"></div>
+
+<div id="dialogSelectOpCode">
+    <div id="gridSelectOpCode"></div>
+    <div style="margin-top: 4px;text-align: center;">
+        <button id="confirmSelectOpCode" class="k-button k-primary">Вибрати операцію?</button>
+    </div>
+</div>
+
+<div id="dialogLinkUsers">
+    <div id="gridLinkUsers"></div>
+    <div style="margin-top: 4px;text-align: center;">
+        <button id="confirmLinkUsers" class="k-button k-primary">Розподілити все в таблиці по вибраному користувачу?</button>
+    </div>
+</div>
+
+
+<div id="dialogDocForKvit">
+    <div class="search-docForKvit"></div>
+
+    <div class="row" id="searchDocForKvit2">
+        <div class="col-md-3">
+            <label for="searchDate1">Дата з:</label>
+            <input type="text" class="form-control" id="searchDate1" />
+        </div>
+        <div class="col-md-3">
+            <label for="searchDate2">Дата по:</label>
+            <input type="text" class="form-control" id="searchDate2"/>
+        </div>
+        <div class="col-md-2">
+            <label for="searchRef" >РНК:</label>
+            <input type="text" class="form-control" id="searchRef" style="display: inline" />
+        </div>
+        <div class="col-md-1">
+            <button id="SearchDocForKvitBtn2" type="button" class="btn btn-primary">
+                <i class="fa fa-search"></i> Пошук
+            </button>
+        </div>
+    </div>
+
+    <div class="row" id="searchDocForKvit1">
+        <div class="col-md-2">
+            <label for="pbPreFilter">По сумі та рахункам</label>
+            <input id="pbPreFilter" style="width: 25px" type="checkbox" checked="checked" />
+        </div>
+        <div class="col-md-1">
+            <label for="pbFilterSwRef">По полю 20</label>
+            <input id="pbFilterSwRef" style="width: 25px" type="checkbox" />
+        </div>
+        <div class="col-md-2">
+            <button id="SearchDocForKvitBtn1" type="button" class="btn btn-primary">
+                <i class="fa fa-search"></i> Пошук
+            </button>
+        </div>
+    </div>
+
+    <div id="gridDocForKvit"></div>
+</div>

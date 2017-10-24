@@ -1,0 +1,382 @@
+﻿@model Models.OPER
+
+<script type="text/javascript">
+  $(document).ready(function() {
+    $("#tabsDocum").tabs();
+  });
+    function onPrint(id) {
+        $.post('/barsroot/Documents/GetFileForPrint/', { id: id }, function getRes(data) {
+            if (data != 'error') {
+                barsie$print(data);
+            }
+            else { return;}
+        });      
+    }
+    function loadToHtml(ref) {
+        var newPrintHtml = $('<div/>');
+        newPrintHtml.attr('id', 'newPrintHtmlDialog');
+        newPrintHtml.load('/barsroot/Documents/LoadHTML/?id=' + ref + '&printModel=' + document.getElementById("cbPrintModel").checked, { }, function () { removeLoader($('#newPrintHtmlDialog')); $('#newPrintHtmlDialog input[type="button"]').button(); })
+                    .dialog({ autoOpen: true, position: 'top', title: 'Друк HTML-форми дукумента', modal: true, resizable: false, minWidth: '600', minHeight: '500', close: function () { $('#newPrintHtmlDialog').remove(); } });
+        addLoader($('#newPrintHtmlDialog'));
+    }
+
+    function loadToTxt(ref) {
+        document.location.href('/barsroot/Documents/LoadTXT/?id=' + ref + '&printModel=' + document.getElementById("cbPrintModel").checked);
+    }
+</script>
+<h1>Перегляд докумнта референс - @Model.REF</h1>
+
+<div style="margin-left:370px;margin-bottom:5px;white-space:nowrap;">
+    @*<span style="margin-right:100px;">Референс - <b>@Model.REF</b></span>*@
+    <input id="cbPrintModel" style="" type="checkbox" onclick="" title="Друкувати бух. модель документа" />
+    <label for="cbPrintModel" style="white-space: nowrap;" title="Друкувати бух. модель документа">друк бух. моделі</label><span>&nbsp;</span>
+    <a style="font-size:16px;" onclick="loadToHtml(@Model.REF);return false;" href="/barsroot/documents/loadhtml/@Model.REF">вигрузити(html)</a><span>&nbsp;</span>
+    <a style="font-size:16px;"  onclick="loadToTxt(@Model.REF);return false;" href="/barsroot/documents/loadtxt/@Model.REF">вигрузити(txt)</a><span>&nbsp;</span>
+    <a style="font-size:16px;"  onclick="onPrint(@Model.REF);return false;" href="/barsroot/documents/getfileforprint/@Model.REF">друк</a>
+</div>
+
+<div id="tabsDocum" style="width: 800px;">
+  <ul>
+    <li><a href="#tabsDocum-1">Загальні</a></li>
+    <li><a href="#tabsDocum-2">Тех.реквізити</a></li>
+    <li><a href="#tabsDocum-3">Бух.модель</a></li>
+    <li><a href="#tabsDocum-4">Доп.реквізити</a></li>
+    <li><a href="#tabsDocum-5">Візи</a></li>
+  </ul>
+  <div id="tabsDocum-1" style="overflow:auto;">
+        @{var name= "Документ"; if(Model.DK==2){name="Інформаційний запит:".ToUpper();} if(Model.DK>2){name="Інформаційне повідомлення:".ToUpper();}}
+      	<table cellpadding="0" cellspacing="0" border="0" style="width:auto;">
+			<tr>
+				<td id="lbDoctitle" colspan="5" class="title" style="text-align:center;">
+                    <b>@name @Model.VOB1.NAME.ToUpper() № @Model.ND</b>
+				</td>
+			</tr>
+			<tr>
+				<td id="lbDocDate" colspan="5" class="title" style="text-align:center;">
+                    <b>від @Convert.ToDateTime(Model.DATD).Day @barsroot.ServicesClass.GetMonthPr(Convert.ToDateTime(Model.DATD).Month) @Convert.ToDateTime(Model.DATD).Year</b>
+				</td>
+			</tr>
+			<tr>
+				<td id="Td1" class="title"><b>Дата валютування</b></td>
+				<td colspan="3"><input name="edValueDate" type="text" id="edValueDate" style="text-align: center" readonly="readonly" value="@Model.VDAT.ToShortDateString()" /></td>
+				<td id="Td2" class="title"><b>ДЕБЕТ</b></td>
+			</tr>
+			<tr>
+				<td id="Td3" class="text">Відправник: </td>
+				<td colspan="2"><input name="edSendreOKPO" type="text" id="edSendreOKPO" style="text-align: right" value="@(Model.DK==1?Model.ID_A:Model.ID_B)" readonly="readonly" /></td>
+				<td id="Td4" class="text">Рахунок: </td>
+				<td id="Td5" class="text">Валюта: </td>
+			</tr>
+			<tr>
+				<td id="lbSender" class="text" style="color: Blue; padding-left: 10px" colspan="3">@(Model.DK==1?Model.NAM_A:Model.NAM_B)</td>
+				<td><input name="edAccA" type="text" id="edAccA" style="text-align: left" value="@(Model.DK==1?Model.NLSA:Model.NLSB)" readonly="readonly" /></td>
+				<td><input name="edCcyA" type="text" id="edCcyA" style="text-align: center" value="@(Model.DK==1?Model.KV:Model.KV2)" readonly="readonly" /></td>
+			</tr>
+			<tr>
+				<td id="Td6" class="text" colspan="3">Банк відправника: </td>
+				<td id="Td7" class="text">МФО: </td>
+				<td id="Td8" class="text">Сума: </td>
+			</tr>
+			<tr>
+				<td id="lbBankA" class="text" style="color: Blue; padding-left: 10px" colspan="3">@(Model.DK==1?Model.BANKS_BASE.NB:Model.BANKS_BASE1.NB)</td>
+				<td><input name="edMfoA" type="text" id="edMfoA" style="text-align: left" value="@(Model.DK==1?Model.MFOA:Model.MFOB)" readonly="readonly" /></td>
+				<td><input name="edSumA" type="text" id="edSumA" style="text-align: right" value="@(Model.DK==1?(Convert.ToDouble(Model.S/100).ToString(barsroot.ServicesClass.GetNFormat(2))):(Convert.ToDouble(Model.S2/100).ToString(barsroot.ServicesClass.GetNFormat(2))))" readonly="readonly" /></td>
+			</tr>
+			<tr>
+			    <td style="height: 20px" colspan="5"></td>
+			</tr>
+			<tr>
+				<td colspan="4"></td>
+				<td id="Td9" class="title"><b>КРЕДИТ</b></td>
+			</tr>
+			<tr>
+				<td id="Td10" class="text">Одержувач: </td>
+				<td colspan="2"><input name="edReceiverOKPO" type="text" id="edReceiverOKPO" style="text-align: right" value="@(Model.DK!=1?Model.ID_A:Model.ID_B)" readonly="readonly" /></td>
+				<td id="Td11" class="text">Рахунок: </td>		
+			</tr>
+			<tr>
+				<td id="lbReceiver" class="text" style="color: Blue; padding-left: 10px" colspan="3">@(Model.DK!=1?Model.NAM_A:Model.NAM_B)</td>
+				<td><input name="edAccB" type="text" id="edAccB" style="text-align: left" value="@(Model.DK!=1?Model.NLSA:Model.NLSB)" readonly="readonly" /></td>
+				<td>
+                    @if (Model.KV != Model.KV2) {
+                        <input name="edCcyA" type="text" id="edCcyB" style="text-align: center" value="@(Model.DK!=1?Model.KV:Model.KV2)" readonly="readonly" />
+                    }
+				</td>
+			</tr>
+			<tr>
+				<td id="Td12" class="text" colspan="3">Банк одержувача: </td>
+				<td id="Td13" class="text">МФО: </td>			
+			</tr>
+			<tr>
+				<td id="lbBankB" class="text" style="color: Blue; padding-left: 10px" colspan="3">@(Model.DK!=1?Model.BANKS_BASE.NB:Model.BANKS_BASE1.NB)</td>
+				<td><input name="edMfoB" type="text" id="edMfoB" style="text-align: left" value="@(Model.DK!=1?Model.MFOA:Model.MFOB)" readonly="readonly" /></td>
+				<td>
+                    @if (Model.KV != Model.KV2) {
+                        <input name="edSumA" type="text" id="edSumB" style="text-align: right" value="@(Model.DK!=1?(Convert.ToDouble(Model.S/100).ToString(barsroot.ServicesClass.GetNFormat(2))):(Convert.ToDouble(Model.S2/100).ToString(barsroot.ServicesClass.GetNFormat(2))))" readonly="readonly" />
+                    }
+				</td>
+			</tr>
+			<tr>
+			    <td style="height: 20px" colspan="5"></td>
+			</tr>
+			<tr>
+				<td id="Td14" class="text" colspan="5">Сума прописом:</td>
+			</tr>
+			<tr>
+				<td id="lbSumPr" class="text" style="color: Blue; padding-left: 10px" colspan="5">@ViewBag.Sumpr</td>
+			</tr>
+			<tr>
+				<td id="Td15" class="text" colspan="5">Призначення платежу: </td>
+			</tr>
+			<tr>
+				<td id="lbDetails" class="text" style="color: Blue; padding-left: 10px" colspan="5">@Model.NAZN</td>
+			</tr>
+		</table>           
+  </div>
+  <div id="tabsDocum-2" style="overflow:auto;">
+		<table cellpadding="0" cellspacing="0" border="0" style="width: auto">
+			<tr>
+				<td id="" class="title" colspan="3" style="text-align:center;"><b>Основні</b></td>
+			</tr>
+			<tr>
+				<td><span id="lbPostedTitle" title="Дата вводу">Дата вводу: </span></td>
+				<td colspan="2"><input class="date" name="edPosted" type="text" id="edPosted" style="text-align: center" readonly="readonly" value="@Model.PDAT" /></td>
+			</tr>
+			<tr>
+				<td colspan="3" class="title" style="text-align:center;"><b>Система електронних платежів</b></td>
+			</tr>
+		    <tr>
+			    <td><span id="Label2">Поступив у банк А: </span></td>
+			    <td colspan="2"><input name="edArrived" type="text" id="edArrived" style="text-align: center" value="@Model.DATP" readonly="readonly" /></td>
+		    </tr>
+		    <tr>
+			    <td><span id="lbReceivedTitle">Отримано у файлі: </span></td>
+			    <td><input name="edFile" type="text" id="edFile" style="text-align: center" value="@ViewBag.FN_A" readonly="readonly" /></td>
+			    <td><input name="edFileDate" type="text" id="edFileDate" style="text-align: center" value="@ViewBag.DAT_A" readonly="readonly" /></td>
+		    </tr>
+		    <tr>
+			    <td><span id="lbInFileReceived">Поступив у наш РЦ: </span></td>
+			    <td colspan="2"><input name="edInFileRec" type="text" id="edInFileRec" style="text-align: center" value="@ViewBag.DATK_A" readonly="readonly" /></td>
+		    </tr>
+		    <tr>
+			    <td><span id="lbInFilePay">Заквитовано: </span></td>
+			    <td colspan="2"><input name="edInFilePay" type="text" id="edInFilePay" style="text-align: center" value="@ViewBag.DAT_2_A" readonly="readonly" /></td>
+		    </tr>
+		    <tr>
+			    <td class="text"><span id="lbSenderTitle">Відправлено: </span></td>
+			    <td><input name="edOutFile" type="text" id="edOutFile" style="text-align: center" value="@ViewBag.FN_B" readonly="readonly" /></td>
+			    <td><input name="edOutFileDate" type="text" id="edOutFileDate" style="text-align: center" value="@ViewBag.DAT_B" readonly="readonly" /></td>
+		    </tr>
+		    <tr>
+			    <td><span id="lbCheckedDate">Заквитовано: </span></td>
+			    <td colspan="2"><input name="edCheckedDate" type="text" id="edCheckedDate" style="text-align: center" value="@ViewBag.DATK_B" readonly="readonly" /></td>
+		    </tr>
+		</table>
+  </div>
+  <div id="tabsDocum-3" style="overflow:auto;">
+      <table class="miniSimpleTable" cellpadding="0" cellspacing="0">
+          <thead>
+            <tr>
+              <td>Дата</td>
+              <td>Опер.</td>
+              <td>Рахунок</td>
+              <td>Вал.</td>
+              <td>Дебет</td>
+              <td>Кредит</td>
+              <td>Назва рахунка</td>
+              <td>Деталі платежа</td> 
+              <td>Код підрозділа</td>             
+            </tr>
+          </thead>
+          <tbody>
+            @foreach (var item in Model.OPLDOKs)
+            {
+                <tr>
+                    <td>@item.FDAT.ToShortDateString()</td>
+                    <td>@item.TT</td>
+                    <td>@item.ACCOUNT.NLS</td>
+                    <td>@item.ACCOUNT.KV</td>
+                    @if (item.DK == 0)
+                    {
+                        <td>@(Convert.ToDouble(item.S/100).ToString(barsroot.ServicesClass.GetNFormat(2)))</td>
+                        <td>&nbsp;</td>
+                    }
+                    else
+                    {
+                        <td>&nbsp;</td>
+                        <td>@(Convert.ToDouble(item.S/100).ToString(barsroot.ServicesClass.GetNFormat(2)))</td>                         
+                    }
+                    <td>@item.ACCOUNT.NMS</td>
+                    <td>@item.TXT&nbsp;</td>
+                    <td>@item.ACCOUNT.BRANCH</td>
+                </tr>
+            }
+          </tbody>
+      </table>
+  </div>
+  <div id="tabsDocum-4" style="overflow:auto;">
+    
+    <table class="miniSimpleTable" cellpadding="0" cellspacing="0">
+        <thead>
+            <tr>
+                <td>Ревізит</td>
+                <td>Значення</td>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach(var item in Model.OPERWs)
+            {
+                <tr>
+                    <td>
+                        @item.OP_FIELD.NAME&nbsp;
+                    </td>
+                    <td>
+                        @item.VALUE&nbsp;
+                    </td>
+                </tr>
+            }
+            @foreach (var item in ViewBag.DopRecv)
+            {
+                <tr>
+                    <td>
+                        @item[0]&nbsp;
+                    </td>
+                    <td>
+                        @item[1]&nbsp;
+                    </td>
+                </tr>                 
+            }
+        </tbody>
+    </table>
+
+  </div>
+  <div id="tabsDocum-5" style="overflow:auto;">
+    <div style="margin:0 0 5px 0">Перевірка підпису СЕП:&nbsp;&nbsp;&nbsp;
+        <img src="/Common/Images/CheckSign.gif" id="Img1" alt="Ext Sign Check" title="Перевірка зовнішнього підпису" height="20" width="20" onclick="CheckExtSign()" style="cursor:pointer" />
+    </div>
+    <table class="miniSimpleTable" cellpadding="0" cellspacing="0">
+        <thead>
+            <tr>
+                <td>Внутр.</td>
+                <td>Відмітка</td>
+                <td>Група</td>
+                <td>Користувач</td>
+                <td>Дата</td>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in ViewBag.Visa)
+            {
+                <tr>
+                    <td>
+                    @if (item.MARKID != 4) {<img alt="Int Sign Check" title="Перевірка внутрішнього підпису" height="20" width="20" src="/Common/Images/CheckSign.gif" onclick="CheckIntSign(this)" style="cursor: pointer" />}
+                        <input type="hidden" name="SIGN_FLAG" value="@item.SIGN_FLAG">
+                        <input type="hidden" name="BUFINT" value="@item.BUFINT">
+                    </td>
+                    @if (item.MARKID == 0) {<td>Ввів документ</td>}
+                    @if (item.MARKID == 1) {<td>Візував документ</td>}
+                    @if (item.MARKID == 2) {<td>Оплатив документ</td>}
+                    @if (item.MARKID == 3) {<td>Повернув документ</td>}
+                    @if (item.MARKID == 4) {<td>Очікує</td>}
+                    <td>@item.CHECKGROUP&nbsp;</td>
+                    <td>@item.USERNAME&nbsp;</td>
+                    <td>@item.DAT&nbsp;</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+  </div>
+</div>
+<div style="display:none;">
+    <input name="SEPNUM" type="hidden" id="SEPNUM" value="@ViewBag.DtSystemSignParams.SEPNUM" style="width: 1px" />
+    <input name="SIGNTYPE" type="hidden" id="SIGNTYPE" value="@ViewBag.DtSystemSignParams.SIGNTYPE" style="width: 1px" />
+    <input name="SIGNLNG" type="hidden" id="SIGNLNG" value="@ViewBag.DtSystemSignParams.SIGNLNG" style="width: 1px" />
+    <input name="DOCKEY" type="hidden" id="DOCKEY" value="@ViewBag.DtSystemSignParams.DOCKEY" style="width: 1px" />
+    <input name="BDATE" type="hidden" id="BDATE" value="@ViewBag.DtSystemSignParams.BDATE" style="width: 1px" />
+    <input name="INTSIGN" type="hidden" id="INTSIGN" value="@ViewBag.DtSystemSignParams.INTSIGN" style="width: 1px" />
+    <input name="REGNCODE" type="hidden" id="REGNCODE" value="@ViewBag.DtSystemSignParams.REGNCODE" style="width: 1px" />
+    <input name="VISASIGN" type="hidden" id="VISASIGN" value="@ViewBag.DtSystemSignParams.VISASIGN" style="width: 1px" />
+    <input name="EXTSIGNBUFF" type="hidden" id="EXTSIGNBUFF" value="@ViewBag.DtSystemSignParams.EXTSIGNBUFF" style="width: 1px" />
+</div>
+    <script type="text/javascript">
+        // перевірка внутрішнього підпису 
+        function CheckIntSign(elem) {
+            var params = new Array();
+            params['INTSIGN'] = $('#INTSIGN').val();
+            params['VISASIGN'] = $('#VISASIGN').val();
+            params['SEPNUM'] = $('#SEPNUM').val();
+            params['SIGNTYPE'] = $('#SIGNTYPE').val();
+            params['SIGNLNG'] = $('#SIGNLNG').val();
+            params['DOCKEY'] = $('#DOCKEY').val();
+            params['REGNCODE'] = $('#REGNCODE').val();
+            params['BDATE'] = $('#BDATE').val();
+
+            // конструктор класу підпису
+            var signDoc = new obj_Sign();
+
+            if (signDoc.initObject(params)) {
+                var params1 = new Array();
+                // перевіряємо тільки зовнішній підпис
+                var fSign = $(elem).parent().find('input[name="SIGN_FLAG"]').val(); 
+                if (fSign != '1' && fSign != '3') {
+                    alert('Підпис відсутній.');
+                    return;
+                }
+                else fSign = '1';
+                params1['SIGN_FLAG'] = fSign;
+                // ініціалізація системних параметрів
+                signDoc.initSystemParams(params1);
+                var params2 = new Array();
+                params2['BUFFER_INT'] = $(elem).parent().find('input[name="BUFINT"]').val() ;
+                // ініціалізація параметрів документа
+                signDoc.initDocParams(params2);
+                // перевірка ЄЦП
+                var verify_res = signDoc.VerifySignature();
+                if (verify_res)
+                    // якщо все ок
+                    alert('Підпис вірний.');
+                else
+                    //якщо помилка виводимо діалог
+                    signDoc.showErrorsDialog();
+            }
+        }
+
+        // перевірка зовн підпису
+        function CheckExtSign() {
+            var params = new Array();
+            params['INTSIGN'] = $('#INTSIGN').val();
+            params['VISASIGN'] = $('#VISASIGN').val();
+            params['SEPNUM'] = $('#SEPNUM').val();
+            params['SIGNTYPE'] = $('#SIGNTYPE').val();
+            params['SIGNLNG'] = $('#SIGNLNG').val();
+            params['DOCKEY'] = $('#DOCKEY').val();
+            params['REGNCODE'] = $('#REGNCODE').val();
+            params['BDATE'] = $('#BDATE').val();
+            // конструктор класа підпису
+            var signDoc = new obj_Sign();
+            if (signDoc.initObject(params)) {
+                // якщо ЄЦП не включено то виходимо
+                if ($('#EXTSIGNBUFF').val() == '0') {
+                    alert('Підпис відсутній.');
+                    return;
+                }
+                var params1 = new Array();
+                // перевірка тільки зовн. підпису
+                params1['SIGN_FLAG'] = '2';
+                // ініціалізація системних параметрів
+                signDoc.initSystemParams(params1);
+                var params2 = new Array();
+                params2['BUFFER'] = $('#EXTSIGNBUFF').val();
+                // ініціалізація параметрів докамента
+                signDoc.initDocParams(params2);
+                // перевірка ЄЦП
+                var verify_res = signDoc.VerifySignature();
+                if (verify_res)
+                    // якщо все ок
+                    alert('Підпис вірний.');
+                else
+                    //якщо помилка виводимо діалог
+                    signDoc.showErrorsDialog();
+            }
+        }
+    </script>

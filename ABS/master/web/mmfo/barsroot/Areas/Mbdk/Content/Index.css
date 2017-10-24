@@ -1,0 +1,92 @@
+﻿.k-textbox .k-icon {
+    right: 5px;
+}
+
+textarea {
+    resize: none;
+}
+
+.form-horizontal .control-label {
+    text-align: left;
+}
+
+.left-pos {
+    text-align: left;
+}
+
+.k-radio:checked + .k-radio-label:after {
+    top: 2px;
+    right: 4px;
+    left: 2px;
+}
+
+
+.panel-default {
+    border-color: #CCCCCC;
+}
+
+.panel {
+    border-radius: 5px;
+    background-color: #EFEFEF;
+}
+
+.margin-right-pos {
+    margin-right: 6%;
+}
+
+.margin-left-pos {
+    margin-left: 7%;
+}
+
+hr {
+    margin-top: 17px;
+    margin-bottom: 16px;
+    border: 0;
+    border-top: 1px solid #CCCCCC;
+}
+
+.panel-default .panel-heading {
+    background-color: #EFEFEF;
+}
+
+.panel-default > .panel-heading, .panel-default > .panel-footer {
+    border-color: #CCCCCC;
+}
+
+.disable-solid {
+    border-style: none;
+}
+
+.k-textbox .dateStart {
+    width: 100%;
+    /*padding-top: 6px;*/
+    padding-left: 10px;
+}
+
+.k-textbox .dateEnd {
+    width: 100%;
+    /*padding-top: 6px;*/
+    padding-left: 10px;
+}
+
+.non-active {
+    background-color: #C7C7C7 !important;
+}
+
+.left-bank {
+    color: darkblue;
+    height:400px;
+}
+
+.right-bank {
+    color: #720303;
+    height:400px;
+}
+
+.left-bank .k-textbox {
+    color: darkblue;
+}
+
+.right-bank .k-textbox {
+    color: #720303;
+}

@@ -1,0 +1,187 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="02/23/2017 11:16:20" ReportInfo.Modified="02/23/2017 12:11:20" ReportInfo.CreatorVersion="2014.3.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoX3V4zY8FFHzkIAqmYIxZTf2eGIujLe4MW/reHdinm4JA==">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select &#13;&#10;       char00 srt,&#13;&#10;       char01 kf,&#13;&#10;       char02 name,&#13;&#10;       num00 cnt_acc,    &#13;&#10;       char03 okpo,&#13;&#10;       char04 namk,&#13;&#10;       char05 nbs,&#13;&#10;       char06 kod_analyt,&#13;&#10;       num01 in_ost,&#13;&#10;       num02 out_ost,&#13;&#10;       num03 sred,&#13;&#10;       num04 dbq,   &#13;&#10;       num05 dbqobu,   &#13;&#10;       num06 dbqnotobu,   &#13;&#10;       num07 dkq,   &#13;&#10;       num08 cnt_doc,   &#13;&#10;       num09 cnt_doc_db,   &#13;&#10;       num10 cnt_doc_cr,   &#13;&#10;       char07 dt1,&#13;&#10;       char08 dt2,&#13;&#10;       char09 nbss  &#13;&#10;  from rs_tmp_report_data &#13;&#10; where session_id=:session_id order by id">
+        <Column Name="SRT" DataType="System.String"/>
+        <Column Name="KF" DataType="System.String"/>
+        <Column Name="NAME" DataType="System.String"/>
+        <Column Name="CNT_ACC" DataType="System.Decimal"/>
+        <Column Name="OKPO" DataType="System.String"/>
+        <Column Name="NAMK" DataType="System.String"/>
+        <Column Name="NBS" DataType="System.String"/>
+        <Column Name="KOD_ANALYT" DataType="System.String"/>
+        <Column Name="IN_OST" DataType="System.Decimal"/>
+        <Column Name="OUT_OST" DataType="System.Decimal"/>
+        <Column Name="SRED" DataType="System.Decimal"/>
+        <Column Name="DBQ" DataType="System.Decimal"/>
+        <Column Name="DBQOBU" DataType="System.Decimal"/>
+        <Column Name="DBQNOTOBU" DataType="System.Decimal"/>
+        <Column Name="DKQ" DataType="System.Decimal"/>
+        <Column Name="CNT_DOC" DataType="System.Decimal"/>
+        <Column Name="CNT_DOC_DB" DataType="System.Decimal"/>
+        <Column Name="CNT_DOC_CR" DataType="System.Decimal"/>
+        <Column Name="DT1" DataType="System.String"/>
+        <Column Name="DT2" DataType="System.String"/>
+        <Column Name="NBSS" DataType="System.String"/>
+        <CommandParameter Name="session_id" DataType="126" Expression="[session_id]"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="session_id" DataType="System.Decimal"/>
+    <Total Name="Total" Expression="[Table.IN_OST]" Evaluator="Data1" PrintOn="ReportSummary1"/>
+    <Total Name="Total1" Expression="[Table.OUT_OST]" Evaluator="Data1" PrintOn="ReportSummary1"/>
+    <Total Name="Total2" Expression="[Table.SRED]" Evaluator="Data1" PrintOn="ReportSummary1"/>
+    <Total Name="Total3" Expression="[Table.DBQ]" Evaluator="Data1" PrintOn="ReportSummary1"/>
+    <Total Name="Total4" Expression="[Table.DBQOBU]" Evaluator="Data1" PrintOn="ReportSummary1"/>
+    <Total Name="Total5" Expression="[Table.DBQNOTOBU]" Evaluator="Data1" PrintOn="ReportSummary1"/>
+    <Total Name="Total6" Expression="[Table.DKQ]" Evaluator="Data1" PrintOn="ReportSummary1"/>
+    <Total Name="Total7" Expression="[Table.CNT_DOC]" Evaluator="Data1" PrintOn="ReportSummary1"/>
+    <Total Name="Total8" Expression="[Table.CNT_DOC_DB]" Evaluator="Data1" PrintOn="ReportSummary1"/>
+    <Total Name="Total9" Expression="[Table.CNT_DOC_CR]" Evaluator="Data1" PrintOn="ReportSummary1"/>
+  </Dictionary>
+  <ReportPage Name="Page1" PaperWidth="450">
+    <ReportTitleBand Name="ReportTitle1" Width="1625.4" Height="66.15">
+      <TextObject Name="Text1" Left="245.7" Width="406.35" Height="66.15" Text="Показники діяльності&#13;&#10;Клієнта №05 &quot;ДП &quot;Енергоринок&quot;&quot;&#13;&#10;[Table.NBSS]&#13;&#10;з [Table.DT1] по [Table.DT2]" HorzAlign="Center"/>
+    </ReportTitleBand>
+    <PageHeaderBand Name="PageHeader1" Top="71.48" Width="1625.4" Height="56.7">
+      <TableObject Name="Table1" Width="1587.6" Height="56.7">
+        <TableColumn Name="Column1"/>
+        <TableColumn Name="Column2"/>
+        <TableColumn Name="Column3" Width="75.6"/>
+        <TableColumn Name="Column4"/>
+        <TableColumn Name="Column5" Width="75.6"/>
+        <TableColumn Name="Column6"/>
+        <TableColumn Name="Column7" Width="56.7"/>
+        <TableColumn Name="Column8" Width="122.85"/>
+        <TableColumn Name="Column9" Width="103.95"/>
+        <TableColumn Name="Column10" Width="113.4"/>
+        <TableColumn Name="Column11"/>
+        <TableColumn Name="Column12" Width="94.5"/>
+        <TableColumn Name="Column13" Width="85.05"/>
+        <TableColumn Name="Column14" Width="103.95"/>
+        <TableColumn Name="Column15" Width="141.75"/>
+        <TableColumn Name="Column16" Width="141.75"/>
+        <TableColumn Name="Column17" Width="141.75"/>
+        <TableRow Name="Row1" Height="37.8">
+          <TableCell Name="Cell1" Border.Lines="All" Fill.Color="Gray" Text="Код регіону&#13;&#10;" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+          <TableCell Name="Cell2" Border.Lines="All" Fill.Color="Gray" Text="Назва регіону" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+          <TableCell Name="Cell8" Border.Lines="All" Fill.Color="Gray" Text="Код установи" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+          <TableCell Name="Cell9" Border.Lines="All" Fill.Color="Gray" Text="Код ЄДРПОУ" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+          <TableCell Name="Cell10" Border.Lines="All" Fill.Color="Gray" Text="Назва установи" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+          <TableCell Name="Cell11" Border.Lines="All" Fill.Color="Gray" Text="Рахунок" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+          <TableCell Name="Cell12" Border.Lines="All" Fill.Color="Gray" Text="ТРКК" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+          <TableCell Name="Cell13" Border.Lines="All" Fill.Color="Gray" Text="Залишок на початок періоду" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+          <TableCell Name="Cell14" Border.Lines="All" Fill.Color="Gray" Text="Залишок на кінець періоду" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+          <TableCell Name="Cell15" Border.Lines="All" Fill.Color="Gray" Text="Середньоденні залишки" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+          <TableCell Name="Cell16" Border.Lines="All" Fill.Color="Gray" Text="Дебітові обороти" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+          <TableCell Name="Cell17" Border.Lines="All" Fill.Color="Gray" Text="в т.ч. в систему ОБУ" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+          <TableCell Name="Cell18" Border.Lines="All" Fill.Color="Gray" Text="в т.ч. за межі ОБУ" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+          <TableCell Name="Cell19" Border.Lines="All" Fill.Color="Gray" Text="Кредитові обороти" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+          <TableCell Name="Cell20" Border.Lines="All" Fill.Color="Gray" Text="Кількість документів всього" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+          <TableCell Name="Cell21" Border.Lines="All" Fill.Color="Gray" Text="Кількість документів по дебету" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+          <TableCell Name="Cell22" Border.Lines="All" Fill.Color="Gray" Text="Кількість документів по кредиту" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row2">
+          <TableCell Name="Cell6" Border.Lines="All" Fill.Color="Gray" Text="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+          <TableCell Name="Cell7" Border.Lines="All" Fill.Color="Gray" Text="2" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+          <TableCell Name="Cell23" Border.Lines="All" Fill.Color="Gray" Text="3" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+          <TableCell Name="Cell24" Border.Lines="All" Fill.Color="Gray" Text="4" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+          <TableCell Name="Cell25" Border.Lines="All" Fill.Color="Gray" Text="5" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+          <TableCell Name="Cell26" Border.Lines="All" Fill.Color="Gray" Text="6" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+          <TableCell Name="Cell27" Border.Lines="All" Fill.Color="Gray" Text="7" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+          <TableCell Name="Cell28" Border.Lines="All" Fill.Color="Gray" Text="8" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+          <TableCell Name="Cell29" Border.Lines="All" Fill.Color="Gray" Text="9" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+          <TableCell Name="Cell30" Border.Lines="All" Fill.Color="Gray" Text="10" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+          <TableCell Name="Cell31" Border.Lines="All" Fill.Color="Gray" Text="11" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+          <TableCell Name="Cell32" Border.Lines="All" Fill.Color="Gray" Text="12" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+          <TableCell Name="Cell33" Border.Lines="All" Fill.Color="Gray" Text="13" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+          <TableCell Name="Cell34" Border.Lines="All" Fill.Color="Gray" Text="14" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+          <TableCell Name="Cell35" Border.Lines="All" Fill.Color="Gray" Text="15" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+          <TableCell Name="Cell36" Border.Lines="All" Fill.Color="Gray" Text="16" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+          <TableCell Name="Cell37" Border.Lines="All" Fill.Color="Gray" Text="17" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+        </TableRow>
+      </TableObject>
+    </PageHeaderBand>
+    <DataBand Name="Data1" Top="133.52" Width="1625.4" Height="18.9" DataSource="Table">
+      <TableObject Name="Table1" Width="1587.6" Height="18.9">
+        <TableColumn Name="Column18"/>
+        <TableColumn Name="Column19"/>
+        <TableColumn Name="Column20" Width="75.6"/>
+        <TableColumn Name="Column21"/>
+        <TableColumn Name="Column22" Width="75.6"/>
+        <TableColumn Name="Column23"/>
+        <TableColumn Name="Column24" Width="56.7"/>
+        <TableColumn Name="Column25" Width="122.85"/>
+        <TableColumn Name="Column26" Width="103.95"/>
+        <TableColumn Name="Column27" Width="113.4"/>
+        <TableColumn Name="Column28"/>
+        <TableColumn Name="Column29" Width="94.5"/>
+        <TableColumn Name="Column30" Width="85.05"/>
+        <TableColumn Name="Column31" Width="103.95"/>
+        <TableColumn Name="Column32" Width="141.75"/>
+        <TableColumn Name="Column33" Width="141.75"/>
+        <TableColumn Name="Column34" Width="141.75"/>
+        <TableRow Name="Row3">
+          <TableCell Name="Cell38" Border.Lines="All" Text="[Table.KF]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell39" Border.Lines="All" Text="[Table.NAME]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell40" Border.Lines="All" Text="[Table.CNT_ACC]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell41" Border.Lines="All" Text="[Table.OKPO]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell42" Border.Lines="All" Text="[Table.NAMK]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell43" Border.Lines="All" Text="[Table.NBS]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell44" Border.Lines="All" Text="[Table.KOD_ANALYT]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell45" Border.Lines="All" Text="[Table.IN_OST]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell46" Border.Lines="All" Text="[Table.OUT_OST]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell47" Border.Lines="All" Text="[Table.SRED]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell48" Border.Lines="All" Text="[Table.DBQ]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell49" Border.Lines="All" Text="[Table.DBQOBU]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell50" Border.Lines="All" Text="[Table.DBQNOTOBU]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell51" Border.Lines="All" Text="[Table.DKQ]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell52" Border.Lines="All" Text="[Table.CNT_DOC]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell53" Border.Lines="All" Text="[Table.CNT_DOC_DB]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell54" Border.Lines="All" Text="[Table.CNT_DOC_CR]" HorzAlign="Center" VertAlign="Center"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+    <ReportSummaryBand Name="ReportSummary1" Top="157.75" Width="1625.4" Height="24">
+      <TableObject Name="Table1" Width="1587.6" Height="18.9">
+        <TableColumn Name="Column35"/>
+        <TableColumn Name="Column36"/>
+        <TableColumn Name="Column37" Width="75.6"/>
+        <TableColumn Name="Column38"/>
+        <TableColumn Name="Column39" Width="75.6"/>
+        <TableColumn Name="Column40"/>
+        <TableColumn Name="Column41" Width="56.7"/>
+        <TableColumn Name="Column42" Width="122.85"/>
+        <TableColumn Name="Column43" Width="103.95"/>
+        <TableColumn Name="Column44" Width="113.4"/>
+        <TableColumn Name="Column45"/>
+        <TableColumn Name="Column46" Width="94.5"/>
+        <TableColumn Name="Column47" Width="85.05"/>
+        <TableColumn Name="Column48" Width="103.95"/>
+        <TableColumn Name="Column49" Width="141.75"/>
+        <TableColumn Name="Column50" Width="141.75"/>
+        <TableColumn Name="Column51" Width="141.75"/>
+        <TableRow Name="Row4">
+          <TableCell Name="Cell55" Border.Lines="All" Fill.Color="MediumSpringGreen" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell56" Border.Lines="All" Fill.Color="MediumSpringGreen" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell57" Border.Lines="All" Fill.Color="MediumSpringGreen" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell58" Border.Lines="All" Fill.Color="MediumSpringGreen" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell59" Border.Lines="All" Fill.Color="MediumSpringGreen" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell60" Border.Lines="All" Fill.Color="MediumSpringGreen" Text="Всього" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell61" Border.Lines="All" Fill.Color="MediumSpringGreen" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell62" Border.Lines="All" Fill.Color="MediumSpringGreen" Text="[Total]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell63" Border.Lines="All" Fill.Color="MediumSpringGreen" Text="[Total1]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell64" Border.Lines="All" Fill.Color="MediumSpringGreen" Text="[Total2]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell65" Border.Lines="All" Fill.Color="MediumSpringGreen" Text="[Total3]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell66" Border.Lines="All" Fill.Color="MediumSpringGreen" Text="[Total4]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell67" Border.Lines="All" Fill.Color="MediumSpringGreen" Text="[Total5]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell68" Border.Lines="All" Fill.Color="MediumSpringGreen" Text="[Total6]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell69" Border.Lines="All" Fill.Color="MediumSpringGreen" Text="[Total7]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell70" Border.Lines="All" Fill.Color="MediumSpringGreen" Text="[Total8]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell71" Border.Lines="All" Fill.Color="MediumSpringGreen" Text="[Total9]" HorzAlign="Center" VertAlign="Center"/>
+        </TableRow>
+      </TableObject>
+    </ReportSummaryBand>
+    <PageFooterBand Name="PageFooter1" Top="187.08" Width="1625.4" Height="18.9"/>
+  </ReportPage>
+</Report>

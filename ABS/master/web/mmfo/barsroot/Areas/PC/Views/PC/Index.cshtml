@@ -1,0 +1,41 @@
+﻿@{
+    ViewBag.Title = "Формування файлів";
+}
+
+<script src="~/Areas/PC/Scripts/PCCtrl.js"></script>
+<link rel="stylesheet" href="~/Areas/Dpa/Content/Site.css" />
+
+<div id="content" ng-app="BarsWeb.Controllers" ng-controller="PCCtrl">
+    <h2>@ViewBag.Title</h2>
+    <div class="header">
+        <div class="form-inline">
+            <div class="form-group" style="width: 400px">
+                <fieldset>
+                    <legend>Операція</legend>
+                    <kendo-drop-down-list id="operations" options="operationsOptions">
+                    </kendo-drop-down-list>
+                </fieldset>
+            </div>
+            <button class="k-button" ng-click="RunSelectedProcedure()" style="margin-top: 14px; margin-right: 20px; width: 32px; height: 27px;" title="Виконати">
+                <img src="~/Areas/Dpa/Content/Images/RuningIcon.png" width="16" height="16" />
+            </button>
+            <div class="form-group" style="width: 210px">
+                <fieldset>
+                    <legend>Дата з:</legend>
+                    <input id="select_date_from" name="select_date_from" />
+                </fieldset>
+            </div>
+            <div class="form-group" style="width: 210px">
+                <fieldset>
+                    <legend>Дата по:</legend>
+                    <input id="select_date_to" name="select_date_to" />
+                </fieldset>
+            </div>
+            <button class="k-button" ng-click="SearchGridData()" style="margin-top: 14px" title="Пошук">Пошук</button>
+        </div>
+    </div>
+    <br />
+    <div class="body">
+        <kendo-grid id="mainGrid" options="mainGridOptions" k-rebind="mainGridOptions" style="width: 935px"></kendo-grid>
+    </div>
+</div>

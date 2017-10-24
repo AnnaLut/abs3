@@ -1,0 +1,88 @@
+﻿@inherits System.Web.Mvc.WebViewPage<IEnumerable<BarsWeb.Models.BP_REASON>>
+@{
+  ViewBag.Title = "Видалення документів";
+}
+@* ReSharper disable once AssignedValueIsNeverUsed *@
+<script type="text/javascript">
+  $(function () {
+    $('#inpSearchDocum').numberMask({ beforePoint: 10, pattern: /^[0-9]*$/ });
+    $('#btSearchDoc').on('click', function () {
+      searchDoc();
+    });
+    $('#inpSearchDocum').on('keypress', function (e) {
+      if(e.keyCode==13){
+        searchDoc();
+      }
+    });
+  });
+
+  function searchDoc() {
+    var delRef = $('#inpSearchDocum').val();
+    $('#body').loader();
+    $('#document').load('/barsroot/documents/document/ #tabsDocum',       
+      {
+        id: delRef,
+        partial:true
+      }, 
+      function (data) {
+        if (data.split('notFound').length > 1) {
+          $('#document').html(data);
+          $('#selectedMenu').hide();
+          $('#body').loader('remove');
+          return;
+        }
+        $("#tabsDocum").tabs();
+        $('#body').loader('remove');
+        $('#selectedMenu').show();
+        $('#delRef').val(delRef);
+        $('#ddlReason option:first').attr('selected','selected');
+      });
+    return false;
+  }
+
+  function deleteDoc() {
+    var reason = $('#ddlReason option:selected').val();
+    if (reason == '') {
+      barsUiAlert('Вкажіть причину видалення!', '', 'warning');
+    } else {
+     $('#body').loader();
+     var post = $.post('/barsroot/documents/storno/',
+        {
+          id: $('#delRef').val(),
+          reason:reason
+        },
+        function (data, textStatus) {
+          if (textStatus == 'success') {
+            if (data.status == 'ok') {
+              barsUiAlert(data.message);
+              $('#delRef').val('');
+              $('#document').html('');
+              $('#selectedMenu').hide();
+            }
+            if (data.status == 'error') {
+              barsUiAlert(data.message, 'Помилка', 'error');
+            }
+          }
+          $('#body').loader('remove');
+          post = null;
+        }, 'json');
+    }
+  }
+</script>
+<h1>Видалення документів</h1>
+<div id="storno">
+  <span>Введіть референс документу: </span><input type="text" id="inpSearchDocum" name="id" />
+  <input type="button" id="btSearchDoc" value="Пошук" onclick="searchDoc();return false;" />
+</div>
+<div style="margin-top: 20px;" id="document"></div>
+<div style="margin-top: 20px;display: none;" id="selectedMenu">
+  <select id="ddlReason">
+    <option value=""></option>
+    @foreach (var item in Model)
+    {
+      <option value="@item.ID">@item.REASON</option>      
+    }
+  </select>
+  <input type="button" id="btDeleteDoc" value="Видалити" onclick="deleteDoc();return false;" /> 
+  <input type="hidden" id="delRef" value=""/>
+</div>

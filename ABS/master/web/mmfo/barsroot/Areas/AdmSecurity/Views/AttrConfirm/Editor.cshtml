@@ -1,0 +1,29 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = "DEMO_editor_types_switcher";
+}
+<script language="javascript" src="~/Areas/AdmSecurity/Scripts/AttrConfirm/editorCtrl.js" type="text/javascript"></script>
+<script language="javascript" src="~/Areas/AdmSecurity/Scripts/utils/tabs.js" type="text/javascript"></script>
+<script>
+    bars.tabs.loadTemplate('@Url.Content("~/Areas/AdmSecurity/Scripts/AttrConfirm/tpl/number.tpl.htm")');
+    bars.tabs.loadTemplate('@Url.Content("~/Areas/AdmSecurity/Scripts/AttrConfirm/tpl/string.tpl.htm")');
+    bars.tabs.loadTemplate("@Url.Content("~/Areas/AdmSecurity/Scripts/AttrConfirm/tpl/date.tpl.htm")");
+    bars.tabs.loadTemplate("@Url.Content("~/Areas/AdmSecurity/Scripts/AttrConfirm/tpl/dropdown.tpl.htm")");
+    bars.tabs.loadTemplate("@Url.Content("~/Areas/AdmSecurity/Scripts/AttrConfirm/tpl/grid.tpl.htm")");
+</script>
+<link href="~/Areas/Admin/Css/editor.css" rel="stylesheet">
+
+<h2>@ViewBag.Title</h2>
+
+<div id="EditorGrid"></div>
+
+<div id="EditorWindow">
+    <div id="EditBox"></div>
+    <div class="btns-group">
+        <button id="Save" type="submit" class="k-button btnSave">Зберегти</button>
+        <button id="Cancel" type="button" class="k-button btnCancel">Відмінити</button>
+    </div>
+</div>
+
+
+

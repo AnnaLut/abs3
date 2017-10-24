@@ -1,0 +1,90 @@
+;; Gupta/Centura initialization file
+
+;; Informix
+[infogtwy]
+remotedbname=bars98, DATABASE "bars98", -hbars -sonbars
+remotedbname=tbars,  DATABASE "bars",   -hbars -sonbars
+longbuffer=655360
+defconnect=off
+
+;; ODBC
+[odbcrtr]
+odbctrace=off
+odbctracefile=c:\sql.log
+
+;; Oracle
+[oragtwy]
+remotedbname=MBANK,    @TNS:MBANK
+remotedbname=BARSTST,  @TNS:BARSTST
+remotedbname=NBUTST,   @TNS:NBUTST
+remotedbname=NBUASPO,  @TNS:NBUASPO
+remotedbname=BARS,     @TNS:BARS
+remotedbname=BANKIEV,  @TNS:BANKIEV
+remotedbname=IGR_LIN,  @TNS:IGR_LIN
+remotedbname=STOLYTSA, @TNS:STOLYTSA
+remotedbname=PKBTST  , @TNS:PKBTST
+remotedbname=NBG,      @TNS:NBG
+remotedbname=ASP9,     @TNS:ASP9
+remotedbname=ASP1,     @TNS:ASP1
+remotedbname=ASP2,     @TNS:ASP2
+remotedbname=IGR,      @TNS:IGR
+remotedbname=DELLIGR,  @TNS:DELLIGR
+remotedbname=VABANK,   @TNS:VABANK
+remotedbname=ETL,      @TNS:ETL
+remotedbname=TREASURY, @TNS:TREASURY
+remotedbname=DEMO,     @TNS:DEMO
+remotedbname=STAND,    @TNS:STAND
+remotedbname=CKTR,     @TNS:CKTR
+remotedbname=DEMARKTS, @TNS:DEMARKTS
+remotedbname=CKTR3,    @TNS:CKTR3
+remotedbname=XER,      @TNS:XER
+remotedbname=DNTR,     @TNS:DNTR
+remotedbname=DNTR-LIN, @TNS:DNTR-LIN
+remotedbname=SEVA,     @TNS:SEVA
+remotedbname=GATE,     @TNS:GATE
+remotedbname=DNTRGATE, @TNS:DNTRGATE
+remotedbname=DELLIGR,  @TNS:DELLIGR
+remotedbname=SERG,     @TNS:SERG
+remotedbname=TEST,     @TNS:TEST
+remotedbname=CHNBU,    @TNS:CHNBU
+remotedbname=RNBU,     @TNS:RNBU
+remotedbname=CHER,     @TNS:CHER
+remotedbname=IGRHP,    @TNS:IGRHP
+remotedbname=IGRLIN,   @TNS:IGRLIN
+remotedbname=KAZNA,    @TNS:KAZNA
+remotedbname=RNBUtest, @TNS:RNBUtest
+remotedbname=PODOL,    @TNS:PODOL
+remotedbname=NBURTEST, @TNS:NBURTEST
+remotedbname=SOFT,     @TNS:SOFT
+remotedbname=VABANK2,  @TNS:VABANK2
+remotedbname=DNTR8,    @TNS:DNTR8
+remotedbname=ODES3,    @TNS:ODES3
+remotedbname=BARSRN,   @TNS:BARSRN
+remotedbname=UKOPTST,  @TNS:UKOPTST
+remotedbname=DNTR9T,   @TNS:DNTR9T
+remotedbname=DNTR9,    @TNS:DNTR9
+remotedbname=BARSUKOP, @TNS:BARSUKOP
+remotedbname=UKOPHM,   @TNS:UKOPHM
+remotedbname=TRKIEV,   @TNS:TRKIEV
+remotedbname=UKOPLVOV, @TNS:UKOPLVOV
+remotedbname=UKOPHRSN, @TNS:UKOPHRSN
+remotedbname=UKOPGTMR, @TNS:UKOPGTMR
+remotedbname=DNEPRTST, @TNS:DNEPRTST
+remotedbname=UKOPHRSN, @TNS:UKOPNIK
+remotedbname=DMBARS,   @TNS:DMBARS
+
+longbuffer=16777216
+fetchrow=20
+substitute=",
+substitute=SYSSQL.,
+
+[win32client.dll]
+comdll=sqlora32
+comdll=sqlodb32
+;; comdll=sqlifx32
+
+[SQLEdit]
+win32client.realname=0
+
+[win32client]
+clientname=Win32User

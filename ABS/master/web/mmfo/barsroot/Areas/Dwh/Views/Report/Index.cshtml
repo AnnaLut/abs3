@@ -1,0 +1,180 @@
+﻿@{
+    ViewBag.Title = "Звіти";
+}
+
+
+@Html.Action("GridByModule", new { moduleId = @ViewBag.Module })
+
+<div class="modal fade" id="paramsModal" tabindex="-1" role="dialog" aria-labelledby="paramsModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width: 50%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only"></span></button>
+                <h4 class="modal-title" id="myModalLabel">Параметри звіту</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-horizontal" role="form">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" onclick="reportsModule.showReportWithParams()" class="btn btn-sm btn-primary">
+                    <i class="icon-ok default"></i>Виконати
+                </button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Відмінити</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="paramsTemplate" style="display: none;">
+    <div class="form-group">
+        <label class="col-sm-3 control-label no-padding-right" for="{1}">{0}</label>
+        <div class="col-sm-9">
+            <input name="{1}" id="{1}" data-type="{3}" class="col-xs-10 col-sm-5" type="text" value="{2}" />
+            <button style="display: none" class="k-icon k-i-search" name="ShowControlBook" type="button" data-rel="tooltip" data-placement="bottom">
+                <i class="icon-book default"></i>
+            </button>
+            <span class="field-validation-valid label arrowed"></span>
+        </div>
+    </div>
+</div>
+
+
+
+@Html.Action("GridResults", new { moduleId = @ViewBag.Module })
+@*@Html.Action("GridResults","GridResults")*@
+
+<script>
+    var reportsModule = {
+
+        _reportId: null,
+        _reportType: "FRX",
+        _reportUrl: function () {
+            return bars.config.appName + "/dwh/report/display?id=" + this._reportId + "&moduleId=@ViewBag.Module" + "?partial=true";
+        },
+        setReportId: function (id) {
+            this._reportId = id;
+        },
+        setReportType: function (type) {
+            this._reportType = type;
+        },
+        showReport: function (params) {
+            if (params) {
+                this.showReportParams(params);
+            } else {
+                barsFullScreenDialogModal({
+                    url: this._reportUrl()
+                });
+            }
+        },
+        showReportWithParams: function () {
+            $('#paramsModal').modal('hide');
+            var newParams = this.getDataFromForm();
+            if (this._reportType == "DBF") {
+                $.post(bars.config.urlContent("/dwh/report/enqueue?id=") + this._reportId + "&moduleId=@ViewBag.Module",
+                    newParams,
+                    function () {
+                        $('#ReportResultsGrid').data('kendoGrid').dataSource.read();
+                        $('#ReportResultsGrid').data('kendoGrid').refresh();
+                    });
+            } else {
+                newParams.id = this._reportId;
+                document.location.href = bars.config.appName + '/dwh/report/download?id=' + $.param(newParams) + "&moduleId=@ViewBag.Module";
+            }
+        },
+        showReportParams: function (elem) {
+            var array = $.parseJSON(elem);
+            var template = $('#paramsTemplate').html();
+            var modal = $('#paramsModal');
+            modal.find('[role="form"]').html('');
+            for (var i = 0; i < array.length; i++) {
+                var param = $(String.format(
+                    template,
+                    array[i].Label,
+                    array[i].Name,
+                    array[i].Value,
+                    array[i].Type));
+                this.bindTypeTemplate(array[i].Type, param.find('input'));
+                if (array[i].Control) {
+                    this.bindControl(array[i].Control, param);
+                }
+                modal.find('[role="form"]').append(param);
+            }
+            $('#paramsModal').modal('show');
+        },
+        getDataFromForm: function () {
+
+            var result = {};
+            var form = $('#paramsModal').find('input[type="text"],select');
+            for (var i = 0; i < form.length; i++) {
+                var input = form.eq(i);
+                result[input.attr('name')] = input.val();
+                var prop = "undefined";
+                delete result[prop];
+            }
+
+            return result;
+        },
+        bindTypeTemplate: function (type, elem) {
+            switch (type) {
+                case 'Date':
+                    elem.kendoDatePicker({ format: 'dd/MM/yyyy', value: new Date() });
+                    break;
+                case 'Decimal':
+                    elem.kendoNumericTextBox({
+                        decimals: 0,
+                        format: '#'
+                    }); //({ beforePoint: 10, pattern: /^[0-9]*$/ });
+                    break;
+                default:
+                    break;
+            }
+            return elem;
+        },
+        bindControl: function (control, elem) {
+            var input = elem.find('input[type="text"]');
+            if (control.Type == 'book') {
+                var button = elem.find('button[name="ShowControlBook"]');
+                button.show();
+                input.attr('disabled', 'disabled');
+                button.on('click', function () {
+                    var result = window.showModalDialog('/barsroot/reference/dwh_references.aspx?p_view=' + control.Data, window, 'center:{yes};dialogheight:650px;dialogwidth:780px');;
+
+                    if (result.id != -1) {
+                        input.val(result.id);
+                    }
+                });
+            };
+
+            if (control.Type == 'select') {
+                var id = input.attr('id');
+                var select = $('<select id="' + id + '" name="' + id + '"></select>');
+                var options = '';
+                for (var i = 0; i < control.Data.length; i++) {
+                    options += '<option value="' + control.Data[i].Value + '">' + control.Data[i].Text + '</option>';
+                }
+                select.html(options);
+                input.after(select);
+                input.remove();
+            }
+        },
+        dropReport: function () {
+            $.get(bars.config.urlContent("/dwh/report/dropresult?id=") + this._reportId,
+                function () {
+                    $('#ReportResultsGrid').data('kendoGrid').dataSource.read();
+                    $('#ReportResultsGrid').data('kendoGrid').refresh();
+                });
+        }
+    }
+</script>
+
+<style>
+    .form-group .k-widget, .form-group .k-textbox {
+        width: 80%;
+        background-color: transparent;
+    }
+
+    .k-numerictextbox .k-input, .k-datepicker .k-invalid {
+        margin-right: 0px;
+    }
+</style>

@@ -1,0 +1,62 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = "Редагування таблиць, що синхронізуються";
+}
+
+<script src="~/Scripts/respond.min.js"></script>
+<script src="~/Areas/SyncTablesEditor/Scripts/KendoCommon.js"></script>
+<script src="~/Areas/SyncTablesEditor/Scripts/SyncTablesEditor/Main.js"></script>
+
+
+<link rel="stylesheet" href="~/Areas/SyncTablesEditor/Css/SyncTablesEditor/Main.css" />
+
+<meta charset="utf-8" />
+
+<script id="cell-edit-form" type="text/x-kendo-template">
+    <div class="row" style="height:90%;margin:0px 0px 0px 0px;">
+        <textarea id="sqlText" class="col-md-12 k-textbox">#=data#</textarea>
+    </div>
+
+    <div class="row" style="height:10%;margin:0px 0px 0px 0px;">
+        <div class="col-md-1 col-md-offset-9">
+            <button id="btnCancel" class="k-primary k-modal-btn" style="margin:20px;">Відмінити</button>
+        </div>
+        <div class="col-md-1">
+            <button id="btnSave" class="k-primary k-modal-btn" style="margin:20px;">Зберегти</button>
+        </div>
+        @*<div class="btn-group col-md-2 col-md-offset-10" style="margin-top:10px;">
+                <button type="button" id="btnCancel" class="btn btn-primary "> Відмінити </button>
+                <button type="button" id="btnSave" class="btn btn-primary "> Зберегти </button>
+            </div>*@
+    </div>
+</script>
+
+<script id="text-info" type="text/x-kendo-template">
+    <div class="row" style="height:90%;margin:0px 0px 0px 0px;">
+        <textarea id="some-text" class="col-md-12 k-textbox">#=data#</textarea>
+    </div>
+
+    <div class="row bottom-right" style="height:10%;margin:0px 0px 0px 0px;">
+        <div class="col-md-1 col-md-offset-10">
+            <button id="btnCancel" class="k-primary k-modal-btn" style="margin:20px;">Закрити</button>
+        </div>
+    </div>
+</script>
+
+<script id="diff-form" type="text/x-kendo-template">
+    <div id="modalGrid" />
+    <div class="row bottom-right">
+        <div class="col-md-1 col-md-offset-10">
+            <button id="btnCancel" class="k-primary k-modal-btn" style="margin:20px;">Закрити</button>
+        </div>
+    </div>
+</script>
+
+<div class="page-header">
+    <h1 id="title"></h1>
+</div>
+
+<input type="file" style="display:none;position:center;" id="FileBrowserDialog" />
+
+<div id="gridMain"></div>
+<div class="search-main"></div>

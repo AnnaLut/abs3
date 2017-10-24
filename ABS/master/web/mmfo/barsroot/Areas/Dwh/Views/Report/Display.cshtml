@@ -1,0 +1,35 @@
+﻿@using FastReport.Web
+@model WebReport
+@{
+    Model.RtfAutoSize = true;
+    Model.CssClass = "frPanelBlock";
+    //Model.AutoHeight = true;
+    //Model.AutoWidth = true;
+    //Model.Height = 800;
+}
+@WebReportGlobals.ScriptsWOjQuery()
+@WebReportGlobals.StylesWOjQuery()
+<style>
+     .frtoolbar .space {
+         margin: 3px 0;
+     }
+     .frPanelBlock {
+         width: 100% !important;
+         height: 100% !important;
+     }
+     .frPanelBlock > div > div {
+         width: 100% !important;
+         height: 100% !important;
+     }
+     .frPanelBlock > div > div > .frtoolbar {
+         min-width: auto;
+     }
+     .frPanelBlock > div > div > div#frbody {
+         width: 100% !important;
+         height: 100% !important;
+     }
+</style>
+<div>
+    @Model.GetHtml()
+</div>
+

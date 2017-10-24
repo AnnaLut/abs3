@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<xmlform caption="Довідник відділень">
+  <grids>
+    <grid id="gBranch" pagesize="10">
+      <datasource>
+        <sql>
+          select branch, name from our_branch where length(branch)>=15 order by branch
+        </sql>
+      </datasource>
+      <fields>
+        <field name="branch" datatype="String" key="true" sort="Asc">
+          <column caption="Відділення" align="Left"></column>
+        </field>
+        <field name="name" datatype="String">
+          <column caption="Назва" align="Left"></column>
+        </field>.
+      </fields>
+      <rowselection method="SingleRow"></rowselection>
+    </grid>
+  </grids>
+</xmlform>

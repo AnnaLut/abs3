@@ -1,0 +1,73 @@
+﻿
+<script>
+    $(document).ready(function() {
+        $("#btnCreateDate").click(function() {
+            var currentDate = $("#date").val();
+            $.ajax({
+                type: "GET",
+                url: bars.config.urlContent("/opencloseday/openday/createday?currentDate=" + currentDate),
+                dateType: "json",
+                data: currentDate,
+                success: function(data) {
+                    debugger;
+                    if (data.State == "Error") {
+                        bars.ui.error({ title: "Помилка", text: data.Error });
+                    } else {
+                        $(".form-horizontal").remove();
+                        bars.ui.alert({ title: "Увага!", text: "Банківський день відкрито!" });
+                    }
+                }
+            });
+        });
+
+        $("#date").kendoDatePicker({
+            value: new Date(),
+            format: "dd/MM/yyyy",
+            animation: {
+                open: {
+                    effects: "zoom:in",
+                    duration: 300
+                }
+            }
+        });
+    });
+
+
+</script>
+
+<style>
+    .k-picker-wrap .k-state-default {
+        height: 25px;
+    }
+</style>
+<div class="container">
+    <form class="form-horizontal">
+        <div class="panel panel-default"  style="width:290px">
+            <div class="panel-heading">Відкриття банківського дня</div>
+            <div class="panel-body">
+
+                <div class="form-group">
+                    <div class="col-md-10">
+                        <label for="" class="control-label">Відкрити банківську дату</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-10">
+                        <input type="date" id="date" class="k-textbox text-center" value="@ViewBag.date" style="width: 220px">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-6">
+                        <input type="button" class="k-button k-primary" id="btnCreateDate" value="Відкрити">
+                    </div>
+                    <div class="col-md-6">
+                        
+                        <input type="button" class="k-button k-block" id="btnCancel" value="Відмінити">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+

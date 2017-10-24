@@ -1,0 +1,326 @@
+﻿
+<div kendo-window="contactSaleWindow" k-visible="false" k-modal="true"
+     k-width="1050" k-height="650" k-title="contractModel.WndTitle" style="background-color: #F2F2F2;">
+
+    <div ng-controller="dealController">
+
+        <div class="container" style="width: 950px;">
+            <form class="form-inline" id="dealform" name="reasonForm" ng-submit="reasonForm.$valid" novalidate>
+
+                <div class="row">
+                    <div>
+                        <label for="radio-choice-1" ng-show="contractModel.RB_AKT_VISIBLE" ng-value="!contractModel.RB_AKT_ENABLED">
+                            <input type="radio" ng-model="contractModel.RB_AKT_PAS" name="RB_AKT_PAS" id="radio-choice-1" ng-value="0"  />
+                            <span>Інших емітентів</span>
+                        </label>
+                        <label for="radio-choice-2">
+                            <input type="radio" ng-model="contractModel.RB_AKT_PAS" name="RB_AKT_PAS" id="radio-choice-2" ng-value="1" style="margin-left: 10px;" />
+                            <span>Власної емісії</span>
+                        </label>
+
+                        <div style="float: right; margin-right: 40px;">                            
+                            <button class="k-button" ng-disabled="contractModel.REF_MAIN" title="Створити" ng-click="createDeal()"><img src="~/Areas/ValuePapers/Content/Images/EXECUTE.png"></button>
+                            <button class="k-button" ng-disabled="!contractModel.REF_MAIN" ng-click="openBarsDialog('/barsroot/tools/load_tikets_cp.aspx?REF='+contractModel.REF_MAIN)"><img src="~/Areas/ValuePapers/Content/Images/PRINT_X.png"></button>
+                            <button class="k-button" ng-disabled="!contractModel.REF_MAIN" ng-click="openBarsDialog('/barsroot/documentview/default.aspx?ref=' + contractModel.REF_MAIN)"><img src="~/Areas/ValuePapers/Content/Images/LOOK.png"></span></button>                            
+                        </div>
+                    </div>
+                </div>
+                <div class="row" style="margin-top: 5px;">
+                    <div class="col-sm-5">
+                        <div class="row">
+                            <input type="text" disabled class="k-textbox" title="№ пп ЦП" ng-model="contractModel.NID" style="width: 45px;" />
+                            <input type="text" disabled class="k-textbox" title="Ідент.код ЦП" ng-model="contractModel.CP_ID" style="width: 102px;" />
+                            <input type="text" disabled class="k-textbox" title="Код вал. ЦП" ng-model="contractModel.NKV" style="width: 45px;" />
+                            <input type="text" disabled kendo-date-picker k-options="datePickerOptions" title="Дата Випуску ЦП / Ост.виплати Купону" k-ng-model="contractModel.DAT_EMI" style="width: 95px;" />
+                            <input type="text" disabled kendo-date-picker k-options="datePickerOptions" title="Дата погашення ЦП" k-ng-model="contractModel.DAT_P" style="width: 98px;" />
+                        </div>
+                        <div class="row">
+                            <input type="text" disabled title="Бал. рах. обліку ЦП" class="k-textbox" ng-model="contractModel.NVIDD" style="width: 45px;" />
+                            <input type="text" disabled title="Бал. рах. обліку ЦП" class="k-textbox" ng-model="contractModel.NLS_A" style="width: 102px;" />
+                            <input type="text" disabled title="Вид обліку ЦП" class="k-textbox" ng-model="contractModel.SVIDD" style="width: 143px;" />
+                            <input type="text" disabled class="k-textbox"  value="{{getFailP()}}" style="width: 98px;" />
+                        </div>
+
+                        <div class="row" style="margin-top: 30px;">
+                            <input type="text" disabled class="k-textbox" ng-model="contractModel.P_CENA_KUP" style="width: 114px;" />
+                            <input type="text" disabled title="% ставка (купон)" class="k-textbox" ng-model="contractModel.P_RATE" style="width: 75px;" />
+                            <input type="text" disabled title="Кількість сплат купону в році" class="k-textbox" ng-model="contractModel.P_KY" style="width: 100px;" />
+                            <input type="text" disabled title="% база" class="k-textbox" ng-model="contractModel.P_SBASEY" style="width: 100px;" />
+                        </div>
+                        <div class="row">
+                            <input type="text" disabled title="Номінал 1 ЦП" class="k-textbox" ng-model="contractModel.P_CENA" style="width: 80px;" />
+                            <input type="text" disabled kendo-date-picker k-options="datePickerOptions" title="Дата Випуску ЦП / Ост.виплати Купону" k-ng-model="contractModel.P_DOK" style="width: 110px;" />
+                            <input type="text" disabled title="Дата об'явлення емітентом отримувача купону" class="k-textbox" ng-model="contractModel.P_DAT_RP" style="width: 100px;" />
+                            <input type="text" disabled kendo-date-picker k-options="datePickerOptions" title="Дата наступної сплати купону" k-ng-model="contractModel.P_DAT_DNK" style="width: 100px;" />
+                        </div>
+                        <div class="row">
+                            <input type="text" disabled title="Сума номіналу" class="k-textbox" ng-model="contractModel._A" ng-show="contractModel.A__VISIBLE" style="width: 192px;" />
+                            <input type="text" disabled class="k-textbox" ng-model="contractModel.D_TIP" style="width: 100px;" />
+                            <input type="text" disabled class="k-textbox" ng-model="contractModel.DFOEF" style="width: 100px;" />
+                        </div>
+                        <div class="row">
+                            <input type="text" title="Сума Дисконту / Премії" class="k-textbox" ng-model="contractModel.DP_" ng-show="contractModel.DP__VISIBLE" style="width: 192px;" />
+                            <input type="text" title="Сума накопиченого купону" class="k-textbox" ng-model="contractModel.R_" ng-show="contractModel.R__VISIBLE" style="width: 203px;" />
+                        </div>
+
+
+                        <div class="row" style="margin-top: 100px;">
+                            <input type="text" title="МФО нашого банку" class="k-textbox" ng-model="contractModel.MFOA" style="width: 114px;" />
+                            <input type="text" title="ЗКПО нашого банку" class="k-textbox" ng-model="contractModel.OKPOA" style="width: 140px;" />
+                            <input type="text" title="Рах-Транзит нашого банку" class="k-textbox" ng-model="contractModel.NLST" style="width: 139px;" />
+                        </div>
+                        <div class="row">
+                            <input type="text" title="Назва нашого банку" class="k-textbox" ng-model="contractModel.NMKA" style="width: 114px;" />
+                            <label ng-show="contractModel.TRASSA_PL_VISIBLE">{{contractModel.TRASSA_PL_TITLE}}</label>
+                        </div>
+                        <div class="row">
+                            <input type="text" class="k-textbox" ng-model="contractModel.BICA" ng-show="contractModel.BICA_VISIBLE" style="width: 114px;" />
+                            <input type="text" kendo-drop-down-list k-filter="'contains'" ng-model="contractModel.NBKA" ng-show="contractModel.NBKA_VISIBLE" style="width: 282px;" />
+                        </div>
+                        <div class="row">
+                            <input type="text" class="k-textbox" ng-model="contractModel.BICKA" ng-show="contractModel.BICKA_VISIBLE" style="width: 114px;" />
+                            <input type="text" class="k-textbox" ng-model="contractModel.SSLA" ng-show="contractModel.SSLA_VISIBLE" style="width: 140px;" />
+                            <input type="text" class="k-textbox" ng-model="contractModel.SSA" ng-show="contractModel.SSA_VISIBLE" style="width: 139px;" />
+                        </div>
+
+                        <div class="row" style="margin-top: 20px;">
+                            <label>
+                                <input type="checkbox"  ng-model="contractModel.CB_SWIFT" ng-true-value="1" ng-false-value="0" />
+                                Автоматичне надходження з платіжної системи
+                            </label>
+                        </div>
+
+                        <div class="row" style="margin-top: 20px;">
+                            <input type="text" title="" class="k-textbox" ng-model="contractModel.KOD_NB" ng-show="contractModel.KOD_NB_VISIBLE" style="width: 114px;" />
+                            <input type="text" title="" class="k-textbox" ng-model="contractModel.S_KOD_NB" ng-show="contractModel.S_KOD_NB_VISIBLE" style="width: 282px;" />
+                        </div>
+                        <div class="row">
+                            <input type="text" title="" class="k-textbox" ng-model="contractModel.KOD_NB_" style="width: 114px;" />
+                            <input type="text" title="" class="k-textbox" ng-model="contractModel.S_KOD_NB_" style="width: 282px;" />
+                        </div>
+                    </div>
+
+
+                    @* ---------------------------------------3/4------------------------------------------------------- *@
+                    <div class="col-sm-6">
+                        <div class="row">
+                            <input type="text" title="" kendo-drop-down-list="cmb_pf" k-filter="'contains'" k-options="cmb_pf_options" ng-model="contractModel.NVIDD" style="width: 250px;" />
+                            <input type="text" title="" kendo-drop-down-list="cmb_ryn" k-filter="'contains'" k-options="cmb_ryn_options" ng-model="contractModel.NRYN" style="width: 250px;" />
+                        </div>
+                        <div class="row" style="margin-top: 4px;">
+                            <label for="radio-choice-3" ng-disabled="contractModel.RB_K_ENABLED" ng-show="contractModel.RB_K_VISIBLE">
+                                <input type="radio" ng-model="contractModel.RB_K_P" name="rb_K" id="radio-choice-3" ng-value="0"
+                                       style="margin-left: 38px;" />
+                                <span>{{contractModel.RB_K_TITLE}}</span>
+                            </label>
+                            <label for="radio-choice-4" ng-show="contractModel.RB_P_VISIBLE" ng-disabled="!contractModel.RB_P_ENABLED">
+                                <input type="radio" ng-model="contractModel.RB_K_P" name="rb_K" id="radio-choice-4" ng-value="1" style="margin-left: 53px;" />
+                                <span>{{contractModel.RB_P_TITLE}}</span>
+                            </label>
+                            <label ng-show="contractModel.CB_ZO_VISIBLE" ng-disabled="!contractModel.CB_ZO_ENABLED">
+                                <input type="checkbox" ng-model="contractModel.CB_ZO" ng-true-value="1" ng-false-value="0"  style="margin-left: 127px;" />
+                                Кориг.
+                            </label>
+
+                        </div>
+
+                        <div class="row" style="text-align: center; margin-top: 10px;">
+                            <div style="display: inline-block; width: 121px; height: 20px">№ тикета</div>
+                            <div style="display: inline-block; width: 125px; height: 20px">Угода</div>
+                            <div style="display: inline-block; width: 123px; height: 20px">Оплата</div>
+                            <div style="display: inline-block; width: 125px; height: 20px">Розрах</div>
+                        </div>
+
+                        <div class="row">
+                            <input type="text" id="NTIK" class="k-textbox" ng-model="contractModel.NTIK" style="width: 121px;" />
+                            <input type="text" id="DAT_UG" kendo-date-picker k-options="datePickerOptions" k-ng-model="contractModel.DAT_UG" style="width: 125px;" />
+                            <input type="text" id="DAT_OPL" kendo-date-picker k-options="datePickerOptions" k-ng-model="contractModel.DAT_OPL" style="width: 123px;" />
+                            <input type="text" id="DAT_ROZ" kendo-date-picker k-options="datePickerOptions" k-ng-model="contractModel.DAT_ROZ" style="width: 125px;" />
+                        </div>
+
+                        <div class="row" style="margin-top: 18px;">
+                                <label ng-show="contractModel.RB_A_VISIBLE">
+                                    <input type="radio" ng-model="contractModel.CP_AI" name="rb_A" id="radio-choice-5" ng-value="0" checked="checked"/>
+                                    Операції з акціонерами
+                                </label>
+                                <label  style="margin-left: 10px;"  ng-show="contractModel.RB_I_VISIBLE">
+                                    <input type="radio" ng-model="contractModel.CP_AI" name="rb_A" id="radio-choice-6" ng-value="1" />
+                                    Операції з регулювання ліквідності
+                                </label>
+                        </div>
+
+                        <div class="row" style="margin-top: 13px;">
+                            <input type="text" class="k-textbox" ng-model="contractModel.KOL" ng-blur="calcSUMBN()" style="width: 121px;" only-number/>
+                            <label>
+                                <input type="text" class="k-textbox" ng-model="contractModel.SUMBN" ng-blur="calcKOL()" style="width: 252px;" only-decimal/>
+                                <span style="margin-left: 10px;">Номінал</span>
+                            </label>
+                        </div>
+
+                        <div class="row">
+                            <div align="left" style="display: inline-block; width: 121px;">
+                                <button title="Koeff. 'D' or 'Y'" class="k-button"><span class="k-icon k-i-sum"></span></button>
+                            </div>
+                            <label>
+                                <input type="text" class="k-textbox" ng-model="contractModel.SUMB" style="width: 252px; margin-left: 0px;" only-decimal/>
+                                <span style="margin-left: 10px;">Сума угоди</span>
+                            </label>
+                        </div>
+
+                        <div class="row">
+                            <div align="left" style="display: inline-block; width: 121px;">
+                            </div>
+                            <label>
+                                <input type="text" class="k-textbox" ng-model="contractModel.RR_" style="width: 252px; margin-left: 0px;" />
+                                <span style="margin-left: 10px;">Накоп. %</span>
+                            </label>
+                        </div>
+
+                        <div class="row" style="margin-top: 4px;">
+                            <div style="display: inline-block; width: 121px;">
+                                <button title="Пошук партнера" class="k-button" ng-click="searchPartner()"><span class="k-icon k-i-search"></span></button>
+                            </div>
+                            <div style="display: inline-block; width: 125px;">
+                                <label for="cb_KS">
+                                    <input type="checkbox" ng-model="contractModel.CB_KS" ng-true-value="1" ng-false-value="0" id="cb_KS" />
+                                    Прямий КР
+                                </label>
+                            </div>
+                            <div style="display: inline-block; width: 123px;">
+                                <label ng-show="contractModel.CB_STP_VISIBLE"  ng-disabled="!contractModel.CB_STP_ENABLED">
+                                    <input type="checkbox" ng-model="contractModel.CB_STP" checked="checked"/>
+                                    CTП
+                                </label>
+                            </div>
+                            <div style="display: inline-block; width: 125px;">
+                                <label ng-disabled="!contractModel.CB_NO_PAY_ENABLE" ng-show="contractModel.CB_NO_PAY_VISIBLE">
+                                    <input type="checkbox" ng-model="contractModel.CB_NO_PAY" ng-true-value="1" ng-false-value="0"/>
+                                    Без оплати
+                                </label>
+                            </div>
+                        </div>
+                        <div class="row" style="margin-top: 0px;">
+                            <input type="text" class="k-textbox" ng-model="contractModel.SNLS_FXC" ng-show="contractModel.SNLS_FXC_VISIBLE" ng-disabled="contractModel.SNLS_FXC_ENABLE" style="width: 251px;" />
+                            <input type="text" class="k-textbox" ng-model="contractModel.SNMS_FXC" ng-show="contractModel.SNMS_FXC_VISIBLE" ng-disabled="contractModel.SNMS_FXC_ENABLE" style="width: 248px;" 
+                                   title ="FXC - Транзитні рахунки для кредитових сум, що не були підтверджені фiлiями банкiв, розташованими в Україні"/>                            
+                        </div>
+                        <div class="row">
+                            <input type="text" class="k-textbox" ng-model="contractModel.MFOB" ng-blur="checkMFOB('MFOB');getPartnFieldSet('MFOB');" style="width: 121px;" only-number/>
+                            <input type="text" class="k-textbox" ng-model="contractModel.OKPOB" ng-blur="checkOKPO('OKPOB');getPartnFieldSet('OKPOB');" style="width: 123px;" only-number/>
+                            <input type="text" class="k-textbox" ng-model="contractModel.NLSB" ng-disabled="!contractModel.MFOB"
+                                   ng-blur="checkNLSB();getPartnFieldSet('NLSB');"
+                                   ng-show="contractModel.NLSB_VISIBLE" style="width: 252px;" only-number/>
+                        </div>
+                        <div class="row">
+                            <input type="text" class="k-textbox" ng-model="contractModel.NBB" style="width: 504px;" />
+                        </div>
+                        <div class="row">
+                            <input type="text" class="k-textbox" ng-model="contractModel.BICB" ng-show="contractModel.BICB_VISIBLE" style="width: 121px;" />
+                            <input type="text" class="k-textbox" ng-model="contractModel.KOD_BB" ng-show="contractModel.KOD_BB_VISIBLE" style="width: 60px;" />
+                            <input type="text" class="k-textbox" ng-model="contractModel.KOD_GB" ng-show="contractModel.KOD_GB_VISIBLE" style="width: 60px;" />
+                            <input type="text" class="k-textbox" ng-model="contractModel.NGB" ng-show="contractModel.NGB_VISIBLE" style="width: 251px;" />
+                        </div>
+                        <div class="row">
+                            <input type="text" class="k-textbox" ng-model="contractModel.BICKB" ng-show="contractModel.BICKB_VISIBLE" style="width: 121px;" />
+                            <input type="text" class="k-textbox" ng-model="contractModel.SSB" ng-show="contractModel.SSB_VISIBLE" style="width: 123px;" />
+                            <input type="text" class="k-textbox" ng-model="contractModel.NBKB" ng-show="contractModel.NBKB_VISIBLE" style="width: 252px;" />
+                        </div>
+                        @* --------------------------------4/4------------------------- *@
+                        <div class="row" style="text-align: center; margin-top: 1px;">
+                            <div style="display: inline-block; width: 101px; height: 20px">Оплата</div>
+                            <div style="display: inline-block; width: 36px; height: 20px">Вал</div>
+                            <div style="display: inline-block; width: 80px; height: 20px">Витрати</div>
+                            <div style="display: inline-block; width: 252px; height: 20px"></div>
+                        </div>
+                        <div class="row">
+                            <input type="text" kendo-date-picker k-options="datePickerOptions" k-ng-model="contractModel.DAT_KOM" style="width: 121px;" />
+                            <input type="text" class="k-textbox" ng-model="contractModel.VKV" style="width: 41px;" />
+                            <input type="text" class="k-textbox" ng-model="contractModel.SUMBK" style="width: 80px;" />
+                            
+                        </div>
+
+                            <div class="row">
+                                <div style="display: inline-block; width: 252px;">
+                                    <button title="Пошук посередника" ng-click="searchPartner_()" class="k-button"><span class="k-icon k-i-search"></span></button>
+                                    <label>
+                                        <input type="checkbox" ng-model="contractModel.CB_KS_" style="margin-left: 94px;" />
+                                        Прямий КР
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <input type="text" class="k-textbox" ng-model="contractModel.MFOB_" ng-blur="checkMFOB('MFOB_');getPartnFieldSet_('MFOB_');" style="width: 121px;" only-number/>
+                                <input type="text" class="k-textbox" ng-model="contractModel.OKPOB_" ng-blur="checkOKPO('OKPOB_');getPartnFieldSet_('OKPOB_');" style="width: 125px;" only-number/>
+                                <input type="text" class="k-textbox" ng-model="contractModel.NLSB_" ng-disabled="!contractModel.MFOB_"
+                                       ng-blur="checkNLSB_();getPartnFieldSet_('NLSB_');" style="width: 250px;" only-number/>
+                            </div>
+                            <div class="row">
+                                <input type="text" class="k-textbox" ng-model="contractModel.NBB_" style="width: 504px;" />
+                            </div>
+
+                        
+                        <div class="row">
+                            <input type="text" class="k-textbox" ng-model="contractModel.BICB_" ng-show="contractModel.BICB__VISIBLE" style="width: 121px;" />
+                            <input type="text" class="k-textbox" ng-model="contractModel.KOD_BB_" ng-show="contractModel.KOD_BB__VISIBLE" style="width: 60px;" />
+                            <input type="text" class="k-textbox" ng-model="contractModel.KOD_GB_" ng-show="contractModel.KOD_GB__VISIBLE" style="width: 60px;" />
+                            <input type="text" class="k-textbox" ng-model="contractModel.NGB_" ng-show="contractModel.NGB__VISIBLE" style="width: 250px;" />
+                        </div>
+                        <div class="row">
+                            <input type="text" class="k-textbox" ng-model="contractModel.BICKB_" ng-show="contractModel.BICKB__VISIBLE" style="width: 121px;" />
+                            <input type="text" class="k-textbox" ng-model="contractModel.SSB_" ng-show="contractModel.SSB__VISIBLE" style="width: 124px;" />
+                            <input type="text" class="k-textbox" ng-model="contractModel.NBKB_" ng-show="contractModel.NBKB__VISIBLE" style="width: 250px;" />
+                        </div>
+                        @*col-xs-4
+                            col-xs-3
+                            col-xs-2*@
+
+                    </div>
+                </div>
+
+
+
+                @*<div>
+                        <label for="viza">Режим повернення:</label>
+                        <input id="viza" type="text" class="form-control" ng-model="contractModel.transport.backReasonModel.viza" readonly>
+                    </div>
+                    <div>
+                        <label for="id">Ід. заявки:</label>
+                        <input id="id" type="text" class="form-control" ng-model="contractModel.transport.backReasonModel.id" readonly>
+                    </div>
+                    <div style="margin-bottom: 5px;">
+                        <label for="reason">Причина:</label>
+                        <select kendo-drop-down-list style="width: 385px"
+                                ng-model="contractModel.transport.backReasonModel.reasonType"
+                                k-options="reasonsOptions"
+                                k-option-label="'-- Оберіть причину --'" required></select>
+                    </div>
+                    <div>
+                        <label for="comment">Коментар:</label>
+                        <textarea class="form-control vresize" ng-model="contractModel.transport.backReasonModel.comment" id="comment" rows="5" maxlength="500" required></textarea>
+                    </div>
+                    <div class="btns-group">
+                        <button type="submit" class="k-button btnSave" id="save-reason-btn" ng-disabled="reasonForm.$invalid">Зберегти</button>
+                    </div>*@
+            </form>
+        </div>
+
+        
+        <div kendo-window="naznEditWindow" k-visible="false" k-modal="true"
+             k-width="400" k-height="210" k-title="contractModel.WndTitle" style="background-color: #F2F2F2;">
+
+            <form name="naznEditForm" style="height: 140px;">
+                {{successMessage}}
+                <br />
+                <label>Призначення:</label>
+                <textarea cols="10" rows="3" name="nazn" ng-model="contractModel.NAZN" class="k-textbox" style="width: 100%" required></textarea>
+                <div style="float:right; margin-top: 50px;">
+                    <button ng-click="setNazn(contractModel.REF_MAIN,contractModel.NAZN)">Підтвердити</button>
+                    <button  ng-click="naznEditWindow.close()">Відмінити</button>
+                </div>
+            </form> 
+            
+        </div>
+
+        </div>
+</div>
+

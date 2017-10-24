@@ -1,0 +1,334 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = "Заблоковані документи СЕП (перегляд)";
+}
+
+<script src="~/lib/jsZip/jszip.min.js"></script>
+
+<h2>@ViewBag.Title</h2>
+
+<style>
+    .k-textbox.small {
+        width: 50px !important;
+    }
+
+    .k-textbox.medium {
+        width: 120px !important;
+    }
+
+    .k-textbox.large {
+        width: 320px !important;
+    }
+
+    .tb_container {
+        width: 100%;
+        padding: .333em 0 .333em .250em;
+        margin-right: 15px;
+    }
+    .tb-col-1 {
+        float: left;
+        width: 40%;
+    }
+    .tb-col-3 {
+        float: left;
+        width: 60%;
+    }
+    .tb_row {
+        width: 100%;
+        height: 30px;
+        margin: 3px;
+    }
+
+        /** --- grid header ----*/
+
+    .k-grid-header th.k-with-icon .k-link {
+        margin-right: 0px;
+        font-size: 11px;
+    }
+
+    .k-header .k-link {
+        text-align: center;
+        font-size: 11px;
+    }
+
+    .k-grid-header th.k-header, .k-filter-row th {
+        text-align: center;
+        font-size: 11px;
+    }
+    .k-list-optionlabel{
+        font-size: 13px;
+    }
+</style>
+
+<div id="SepLockDocsGrid"></div>
+
+
+    <script>
+
+        function getUrlParameter(param) {
+            debugger;
+            var PageURL = window.location.search.substring(1);
+            var URLVariables = PageURL.split('&');
+            for (var i = 0; i < URLVariables.length; i++) {
+                var ParameterName = URLVariables[i].split('=');
+                if (ParameterName[0] == param) {
+                    return ParameterName[1];
+                }
+            }
+        };
+
+        paramObj = { urlParams: '' };
+        var numberFormat = '#,###.00';
+
+        var grid = $("#SepLockDocsGrid").kendoGrid({
+            columns: [
+                {
+                    field: "blk",
+                    title: "Код блокування",
+                    width: 100,
+                    headerAttributes: {
+                        style: "white-space: normal;"
+                    }
+                },
+                {
+                    field: "prty",
+                    title: "Ознака терміновості",
+                    headerTemplate: "Ознака терміновості",
+                    width: 100, 
+                    template: "<input class='prty' name='prty' disabled type='checkbox' #: prty === 1 ? 'checked=checked' : '' # ></input>",
+                    headerAttributes: {
+                        style: "white-space: normal;"
+                    }
+                },
+                {
+                    field: "mfoa",
+                    title: "МФО банка Платника",
+                    width: 115,
+                    headerAttributes: {
+                        style: "white-space: normal;"
+                    }
+                },
+                {
+                    field: "nlsa",
+                    title: "Рахунок Платника",
+                    width: 115,
+                    headerAttributes: {
+                        style: "white-space: normal;"
+                    }
+                },
+                {
+                    field: "nam_a",
+                    title: "Назва Платника",
+                    width: 110,
+                    headerAttributes: {
+                        style: "white-space: normal;"
+                    }
+                },
+                {
+                    field: "kv",
+                    title: "Код Вал",
+                    width: 45,
+                    headerAttributes: {
+                        style: "white-space: normal;"
+                    }
+                },
+                {
+                    field: "dk",
+                    title: "Дб Кр",
+                    width: 45,
+                    headerAttributes: {
+                        style: "white-space: normal;"
+                    }
+                },
+                {
+                    field: "s",
+                    title: "Сума",
+                    width: 70,
+                    template: "#=kendo.toString((s / 100), numberFormat)#",
+                    headerAttributes: {
+                        style: "white-space: normal;"
+                    },
+                    attributes: { 'class': "text-right" }
+                },
+                {
+                    field: "mfob",
+                    title: "МФО банка Одержувача",
+                    width: 85,
+                    headerAttributes: {
+                        style: "white-space: normal;"
+                    }
+                },
+                {
+                    field: "nlsb",
+                    title: "Рахунок Одержувача",
+                    width: 105,
+                    headerAttributes: {
+                        style: "white-space: normal;"
+                    }
+                },
+                {
+                    field: "nam_b",
+                    title: "Назва Одержувача",
+                    width: 105,
+                    headerAttributes: {
+                        style: "white-space: normal;"
+                    }
+                },
+                {
+                    field: "nazn",
+                    title: "Призначення платежу",
+                    width: 135,
+                    headerAttributes: {
+                        style: "white-space: normal;"
+                    },
+                    attributes: {
+                        style: "text-overflow: ellipsis; white-space: nowrap;"
+                    }
+                },
+                {
+                    field: "datd",//datd dat_a
+                    title: "Дата платіжного документа",
+                    format: "{0:dd.MM.yyyy}",
+                    width: 120,
+                    headerAttributes: {
+                        style: "white-space: normal;"
+                    }
+                },
+                {
+                    title: "Обрати",
+                    template: "<input type='checkbox' class='checkbox' />",
+                    width: "2%"
+                }
+            ],
+            toolbar: [{ name: "excel", text: 'Друк' }],
+            scrollable: true,
+            height: function () {
+                return $(window).height() / 4 * 3;
+            },
+            excel: {
+                fileName: "Blocked_Documents_Data.xlsx",
+                allPages: true,
+                filterable: true,
+                proxyURL: bars.config.urlContent("/sep/seplockdocs/BlockedDocumentsToExcelFile")
+            },
+            filterable: true,
+            columnMenu: true,
+            dataSource: {
+                type: "aspnetmvc-ajax",
+                sort: {
+                    field: "blk",
+                    dir: "asc"
+                },
+                transport: {
+                    read: {
+                        dataType: 'json',
+                        url: bars.config.urlContent('/sep/SepLockDocs/GetSepLockDoc'),
+                        data: {
+                            "DefCode": getUrlParameter('DefinedCode'), "parameters": function () {
+                                debugger;
+                                return paramObj.urlParams || '';
+                            }, "swt": getUrlParameter('swt') || null
+                        }
+                    }
+                },
+                requestStart: function (e) {
+                    bars.ui.loader("body", true);
+                },
+                requestEnd: function (e) {
+                    bars.ui.loader("body", false);
+                },
+                schema: {
+                    data: "Data",
+                    total: "Total",
+                    model: {
+                        fields: {
+                            s: { type: "number" },
+                            prty: { type: "number" },
+                            datd: { type: "date" }
+                        }
+                    }
+                },
+                pageSize: 15,
+                serverPaging: true,
+                serverFiltering: true,
+                serverSorting: true
+            },
+            pageable: {
+                refresh: true
+            },
+            sortable: { allowUnsort: false },
+            resizable: true,
+            selectable: "multiple row",
+            dataBound: function (e) {
+                debugger;
+
+                var elm = e;
+
+                var data = this.dataSource.data();
+                $('#tmldocCount').val(data.length);
+
+                var Sum = 0;
+                for (var i = 0; i < data.length; i++) {
+                    if (data[i].dk == 0 || data[i].dk == 1)
+                        Sum += data[i].s;
+                }
+
+                $('#tmlGlobalSum').val(kendo.toString((Sum / 100), numberFormat));
+
+                $(e.sender.wrapper).find('input[name="prty"]').on("change", function () {
+                    var key = false;
+                    debugger;
+                    var grid = $("#SepLockDocsGrid").data("kendoGrid");
+                    var row = $(this).closest("tr");
+                    var dataItem = grid.dataItem(row);
+
+                    if (this.checked) {
+                        dataItem.prty = 1;
+                    } else {
+                        dataItem.prty = 0;
+                    }
+
+                    var obj = [];
+                    obj.push({
+                        rec: dataItem.rec,
+                        blk: dataItem.blk,
+                        prty: dataItem.prty
+                    });
+                    
+                    $.ajax({
+                        type: "POST",
+                        url: bars.config.urlContent("/api/sep/docspriority/post"),
+                        dataType: "json",
+                        contentType: 'application/json',
+                        data: JSON.stringify(obj)
+                    }).done(function (result) {
+
+                        var data = result,
+                        successResults = [],
+                        errorResults = [];
+
+                        for (var j = 0; j < data.length; j++) {
+                            data[j].Status === 1 ? successResults.push(data[j]) : errorResults.push(data[j]);
+                        }
+
+                        if (errorResults.length > 0) {
+                            bars.ui.alert({
+                                text: 'Зміни збережено (кіл-ть): ' + successResults.length + '.<br/>' +
+                                    'Не збережено (кіл-ть): ' + errorResults.length + '.<br/>' +
+                                    'Причина: ' + errorResults[0].Msg
+                            });
+                        } else {
+                            bars.ui.alert({
+                                text: 'Зміни збережено (кіл-ть): ' + successResults.length + '.<br/>'
+                            });
+                        }
+
+                        grid.dataSource.read();
+
+                    });
+
+                });
+            }
+        });
+        
+    </script>

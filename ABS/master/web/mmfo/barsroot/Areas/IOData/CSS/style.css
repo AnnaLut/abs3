@@ -1,0 +1,8 @@
+﻿.k-grid-header th.k-header {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.k-grid td {
+    white-space: nowrap;
+}

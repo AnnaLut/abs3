@@ -1,0 +1,51 @@
+﻿
+<script>
+
+    $("#closeDay").click(function () {
+        debugger;
+        var currentDate = $("#date").val();
+        $.ajax({
+            type: "GET",
+            url: bars.config.urlContent("/opencloseday/closeday/closeday?currentDate=" + currentDate),
+            dateType: "json",
+            data: currentDate,
+            success: function (data) {
+                debugger;
+                if (data.State == "Error") {
+                    bars.ui.error({ title: "Помилка", text: data.Error });
+                } else {
+                    $(".form-horizontal").remove();
+                    bars.ui.alert({ title: "Увага!", text: "Банківський день закрито" });
+                }
+            }
+        });
+    });
+</script>
+
+<form class="form-horizontal">
+    <div class="panel panel-default"  style="width:290px">
+        <div class="panel-heading">Закриття банківського дня</div>
+        <div class="panel-body">
+
+            <div class="form-group">
+                <div class="col-md-10">
+                    <label for="" class="control-label">Поточна банківська дата</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-10">
+                    <input type="text" id="date" class="k-textbox text-center" value="@ViewBag.date" style="margin-bottom: 30px; width: 220px" readonly>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-6">
+                    <input type="button" class="k-button k-primary" id="closeDay" value="Закрити">
+                </div>
+                <div class="col-md-6">
+                    <input type="button" class="k-button k-block" id="btnCancel" value="Відмінити">
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+

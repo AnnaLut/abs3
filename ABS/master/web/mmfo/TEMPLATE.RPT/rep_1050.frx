@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="10/10/2016 11:23:38" ReportInfo.Modified="10/10/2016 18:33:03" ReportInfo.CreatorVersion="2014.1.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqEjIkLfv5KVDVMQxm1pETYi2439uNkJphU7VV/DPLnHyGuoC1m6O406X9U6JZ3ZCCrmpIKsTV61l0uaM2Rf3N3A==">
+      <TableDataSource Name="Table" Alias="zvit_696" DataType="System.Int32" Enabled="true" SelectCommand="select CHAR00 BAL_ACC, NUM00 KV1, CHAR01 DEBET, CHAR02 KRED from rs_tmp_report_data where session_id= :SESSION_ID order by id">
+        <Column Name="KV1" DataType="System.Int16"/>
+        <Column Name="DEBET" DataType="System.String"/>
+        <Column Name="KRED" DataType="System.String"/>
+        <Column Name="BAL_ACC" DataType="System.String"/>
+        <CommandParameter Name="SESSION_ID" DataType="126" Expression="[session_id]"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="session_id" DataType="System.Int32" Expression="198596"/>
+    <Parameter Name="sFdat1" DataType="System.DateTime" Expression="[Date]"/>
+    <Parameter Name="sFdat2" DataType="System.DateTime" Expression="[Date]"/>
+  </Dictionary>
+  <ReportPage Name="Page1">
+    <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="24.5" CanGrow="true" CanShrink="true">
+      <TableObject Name="Table1" Left="0.31" Top="-0.32" Width="335.7" Height="24.82">
+        <TableColumn Name="Column17" Width="93.26"/>
+        <TableColumn Name="Column18" Width="66.62"/>
+        <TableColumn Name="Column19" Width="83.64"/>
+        <TableColumn Name="Column20" Width="92.18"/>
+        <TableRow Name="Row5" Height="24.82">
+          <TableCell Name="Cell37" Text="ОБОРОТИ ПО РАХУНКАМ&#13;&#10;за період з [sFdat1] по [sFdat2]" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt" ColSpan="4">
+            <Formats>
+              <DateFormat/>
+              <DateFormat/>
+            </Formats>
+          </TableCell>
+          <TableCell Name="Cell38" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell39" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell40" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt"/>
+        </TableRow>
+      </TableObject>
+    </ReportTitleBand>
+    <PageHeaderBand Name="PageHeader1" Top="25.98" Width="718.2" Height="27.31" CanGrow="true" CanShrink="true">
+      <TableObject Name="Table1" Left="0.37" Top="0.01" Width="335.7" Height="27.3">
+        <TableColumn Name="Column13" Width="93.26"/>
+        <TableColumn Name="Column14" Width="66.62"/>
+        <TableColumn Name="Column15" Width="83.64"/>
+        <TableColumn Name="Column16" Width="92.18"/>
+        <TableRow Name="Row4" Height="27.3">
+          <TableCell Name="Cell33" Border.Lines="All" Text="БАЛАНСОВИЙ РАХУНОК" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+          <TableCell Name="Cell34" Border.Lines="All" Text="КОД ВАЛЮТИ" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+          <TableCell Name="Cell35" Border.Lines="All" Text="ОБОРОТИ ПО ДЕБЕТУ" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+          <TableCell Name="Cell36" Border.Lines="All" Text="ОБОРОТИ ПО КРЕДИТУ" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt, style=Bold"/>
+        </TableRow>
+      </TableObject>
+    </PageHeaderBand>
+    <DataBand Name="Data1" Top="54.77" Width="718.2" Height="22.57" CanGrow="true" CanShrink="true" CanBreak="true" DataSource="Table">
+      <TableObject Name="Table1" Left="0.27" Top="-0.03" Width="335.7" Height="22.6">
+        <TableColumn Name="Column5" Width="93.26"/>
+        <TableColumn Name="Column6" Width="66.62"/>
+        <TableColumn Name="Column7" Width="83.64"/>
+        <TableColumn Name="Column8" Width="92.18"/>
+        <TableRow Name="Row2" Height="22.6">
+          <TableCell Name="Cell25" Border.Lines="All" Border.Width="0.5" Text="[zvit_696.BAL_ACC]" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell26" Border.Lines="All" Border.Width="0.5" Text="[zvit_696.KV1]" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell27" Border.Lines="All" Border.Width="0.5" Text="[zvit_696.DEBET]" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell28" Border.Lines="All" Border.Width="0.5" Text="[zvit_696.KRED]" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+    <PageFooterBand Name="PageFooter1" Top="78.82" Width="718.2" Height="9.28"/>
+  </ReportPage>
+</Report>

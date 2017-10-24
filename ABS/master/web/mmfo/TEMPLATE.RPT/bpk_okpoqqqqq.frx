@@ -1,0 +1,85 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="03/27/2013 14:51:01" ReportInfo.Modified="04/05/2013 10:57:14" ReportInfo.CreatorVersion="1.9.1.0">
+  <Dictionary>
+    <OracleDataConnection Name="vinnbars" ConnectionString="rijcmlq9SEZoacNJntaKIKp6mVF1/AGuYvIoAMS3Xiow+EiNjSiBFpnGq+JCDIppOUFevKKBKBVVhu5fOo1sC+9IvseS7ZFp8YPPR15fcpILBpThvo=">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select NUM00 ACC_W4, NUM01 RNKW, CHAR00 PRODUCT, CHAR01 ACC_BPK_ADDRESS, CHAR02 ACC_BPK_BDAY, CHAR03 ACC_BPK_BPLACE, CHAR04 ACC_BPK_COND_SET, CHAR05 ACC_BPK_DAOS, DAT00 WDAOS, CHAR06 ACC_BPK_DAOS_OLD, CHAR07 ACC_BPK_DOVER, CHAR08 ACC_BPK_F, CHAR09 ACC_BPK_I, CHAR10 ACC_BPK_ISP_NAME_S, CHAR11 ACC_BPK_LIM, CHAR12 ACC_BPK_LIM_LIT, CHAR13 ACC_BPK_LIM_LIT_OLD, CHAR14 ACC_BPK_LIM_OLD, CHAR15 ACC_BPK_M, CHAR16 ACC_BPK_MOB_TEL, NUM02 ACC_BPK_ND, NUM03 ACC_BPK_ND_OLD, CHAR17 ACC_BPK_NLS, CHAR18 ACC_BPK_NMK, CHAR19 ACC_BPK_NMKK, CHAR20 ACC_BPK_O, CHAR21 ACC_BPK_OKPO, CHAR22 ACC_BPK_PASP_ATRT, CHAR23 ACC_BPK_PASP_DATE, CHAR24 ACC_BPK_PASP_NO, CHAR25 ACC_BPK_PHON_BRANCH, CHAR26 ACC_BPK_PHONE, CHAR27 ACC_BPK_POSADA_R, CHAR28 ACC_BPK_PROC, CHAR29 ACC_BPK_PROC_LIT, CHAR30 ACC_BPK_PSGR, CHAR31 ACC_BPK_PSGR_LIT, CHAR32 ACC_BPK_PSKR, CHAR33 ACC_BPK_PSKR_LIT, CHAR34 ACC_BPK_PSMZ, CHAR35 ACC_BPK_PSMZ_LIT, CHAR36 ACC_BPK_PSNO, CHAR37 ACC_BPK_PSNO_LIT, CHAR38 ACC_BPK_PSNVK, CHAR39 ACC_BPK_PSNVK_LIT, CHAR40 ACC_BPK_PSYS, CHAR41 ACC_BPK_REZID, CHAR42 ACC_BPK_TDK, CHAR43 ACC_BPK_TIP, NUM04 ACC_BPK_TOVR_RATE, CHAR44 ACC_BPK_TOWN, CHAR45 ACC_BPK_TRANSF, CHAR46 ACC_BPK_TRANSI, CHAR47 ACC_BPK_TRANZIT, CHAR48 ACC_BPK_TRWAY4, CHAR49 ACC_BPK_ZPASP_ATRT, CHAR50 ACC_BPK_ZPASP_NO, CHAR51 ACC_BPK_ZPASP_STOP_DATE, CHAR52 ZORG, CHAR53 BR from rs_tmp_report_data where session_id=:SESSION_ID order by id">
+        <Column Name="RNKW" DataType="System.Decimal"/>
+        <Column Name="PRODUCT" DataType="System.String"/>
+        <Column Name="ACC_BPK_ADDRESS" DataType="System.String"/>
+        <Column Name="ACC_BPK_BDAY" DataType="System.String"/>
+        <Column Name="ACC_BPK_BPLACE" DataType="System.String"/>
+        <Column Name="ACC_BPK_COND_SET" DataType="System.String"/>
+        <Column Name="ACC_BPK_DAOS" DataType="System.String"/>
+        <Column Name="WDAOS" DataType="System.DateTime"/>
+        <Column Name="ACC_BPK_DAOS_OLD" DataType="System.String"/>
+        <Column Name="ACC_BPK_DOVER" DataType="System.String"/>
+        <Column Name="ACC_BPK_F" DataType="System.String"/>
+        <Column Name="ACC_BPK_I" DataType="System.String"/>
+        <Column Name="ACC_BPK_ISP_NAME_S" DataType="System.String"/>
+        <Column Name="ACC_BPK_LIM" DataType="System.String"/>
+        <Column Name="ACC_BPK_LIM_LIT" DataType="System.String"/>
+        <Column Name="ACC_BPK_LIM_LIT_OLD" DataType="System.String"/>
+        <Column Name="ACC_BPK_LIM_OLD" DataType="System.String"/>
+        <Column Name="ACC_BPK_M" DataType="System.String"/>
+        <Column Name="ACC_BPK_MOB_TEL" DataType="System.String"/>
+        <Column Name="ACC_BPK_ND" DataType="System.Decimal"/>
+        <Column Name="ACC_BPK_ND_OLD" DataType="System.Int64"/>
+        <Column Name="ACC_BPK_NLS" DataType="System.String"/>
+        <Column Name="ACC_BPK_NMK" DataType="System.String"/>
+        <Column Name="ACC_BPK_NMKK" DataType="System.String"/>
+        <Column Name="ACC_BPK_O" DataType="System.String"/>
+        <Column Name="ACC_BPK_OKPO" DataType="System.String"/>
+        <Column Name="ACC_BPK_PASP_ATRT" DataType="System.String"/>
+        <Column Name="ACC_BPK_PASP_DATE" DataType="System.String"/>
+        <Column Name="ACC_BPK_PASP_NO" DataType="System.String"/>
+        <Column Name="ACC_BPK_PHON_BRANCH" DataType="System.String"/>
+        <Column Name="ACC_BPK_PHONE" DataType="System.String"/>
+        <Column Name="ACC_BPK_POSADA_R" DataType="System.String"/>
+        <Column Name="ACC_BPK_PROC" DataType="System.String"/>
+        <Column Name="ACC_BPK_PROC_LIT" DataType="System.String"/>
+        <Column Name="ACC_BPK_PSGR" DataType="System.String"/>
+        <Column Name="ACC_BPK_PSGR_LIT" DataType="System.String"/>
+        <Column Name="ACC_BPK_PSKR" DataType="System.String"/>
+        <Column Name="ACC_BPK_PSKR_LIT" DataType="System.String"/>
+        <Column Name="ACC_BPK_PSMZ" DataType="System.String"/>
+        <Column Name="ACC_BPK_PSMZ_LIT" DataType="System.String"/>
+        <Column Name="ACC_BPK_PSNO" DataType="System.String"/>
+        <Column Name="ACC_BPK_PSNO_LIT" DataType="System.String"/>
+        <Column Name="ACC_BPK_PSNVK" DataType="System.String"/>
+        <Column Name="ACC_BPK_PSNVK_LIT" DataType="System.String"/>
+        <Column Name="ACC_BPK_PSYS" DataType="System.String"/>
+        <Column Name="ACC_BPK_REZID" DataType="System.String"/>
+        <Column Name="ACC_BPK_TDK" DataType="System.String"/>
+        <Column Name="ACC_BPK_TIP" DataType="System.String"/>
+        <Column Name="ACC_BPK_TOVR_RATE" DataType="System.Decimal"/>
+        <Column Name="ACC_BPK_TOWN" DataType="System.String"/>
+        <Column Name="ACC_BPK_TRANSF" DataType="System.String"/>
+        <Column Name="ACC_BPK_TRANZIT" DataType="System.String"/>
+        <Column Name="ACC_BPK_TRWAY4" DataType="System.String"/>
+        <Column Name="ACC_BPK_ZPASP_ATRT" DataType="System.String"/>
+        <Column Name="ACC_BPK_ZPASP_NO" DataType="System.String"/>
+        <Column Name="ACC_BPK_ZPASP_STOP_DATE" DataType="System.String"/>
+        <Column Name="BR" DataType="System.String"/>
+        <Column Name="ACC_W4" DataType="System.Decimal"/>
+        <Column Name="ACC_BPK_TRANSI" DataType="System.String"/>
+        <Column Name="ZORG" DataType="System.String"/>
+        <CommandParameter Name="session_id" DataType="126" Expression="[session_id]"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="p_dat1" DataType="System.String"/>
+    <Parameter Name="p_dat2" DataType="System.String"/>
+    <Parameter Name="p_okpo" DataType="System.String"/>
+    <Parameter Name="session_id" DataType="System.String"/>
+  </Dictionary>
+  <ReportPage Name="Page1" Landscape="true" PaperWidth="4605" PaperHeight="210" LeftMargin="0" TopMargin="0" FirstPageSource="15" OtherPagesSource="15" Guides="28.35,122.85,217.35,311.85,406.35,500.85,595.35">
+    <ReportTitleBand Name="ReportTitle1" Width="17369.1" Height="18.9"/>
+    <DataBand Name="Data1" Top="22.9" Width="17369.1" Height="236.25" Guides="0,18.9" DataSource="Table">
+      <TextObject Name="Text1" Left="28.35" Width="94.5" Height="18.9" Text="[Table.RNKW]" Format="Currency" Format.UseLocale="true" HorzAlign="Right" WordWrap="false" Trimming="EllipsisCharacter"/>
+      <TextObject Name="Text2" Left="122.85" Width="94.5" Height="18.9" Text="[Table.PRODUCT]"/>
+      <TextObject Name="Text3" Left="217.35" Width="94.5" Height="18.9" Text="[Table.ACC_BPK_ADDRESS]"/>
+      <TextObject Name="Text4" Left="311.85" Width="94.5" Height="18.9" Text="[Table.ACC_BPK_BDAY]"/>
+      <TextObject Name="Text5" Left="406.35" Width="94.5" Height="18.9" Text="[Table.ACC_BPK_PSNVK]"/>
+      <TextObject Name="Text6" Left="500.85" Width="94.5" Height="18.9" Text="[Table.ACC_BPK_PSNO_LIT]"/>
+    </DataBand>
+  </ReportPage>
+</Report>

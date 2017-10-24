@@ -1,0 +1,89 @@
+@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    //ViewBag.Title = "RequestsProcessing";
+}
+
+<script src="~/lib/jsZip/jszip.js"></script>
+<script src="~/Scripts/respond.min.js"></script>
+<script src="~/Areas/RequestsProcessing/Scripts/KendoCommon.js"></script>
+<script src="~/Areas/RequestsProcessing/Scripts/RequestsProcessing/Main.js?v1.0"></script>
+<link rel="stylesheet" href="~/Areas/RequestsProcessing/Css/RequestsProcessing/Main.css" />
+
+<div class="page-header">
+    <h1 id="title"></h1>
+</div>
+
+<div id="gridMain"></div>
+<div class="search-main"></div>
+
+<script type="text/x-kendo-template" id="mainTitle-template">
+    <div class="toolbar">
+        <button title="Виконати запит" id="requestResult" class='k-button' onclick="onClickRequestResult(this)">
+            <i class="pf-icon pf-16 pf-document_sql"></i>
+        </button>
+    </div>
+</script>
+
+<div id="dialogDynamicRequest">
+    <div id="gridDynamicRequestParams"></div>
+    <div style="margin-top: 4px;text-align: center;">
+        <button id="confirmDynamicRequest" class="k-button k-primary">Виконати запит?
+        </button>
+    </div>
+
+    <div id="dialogDict">
+        <div id="gridDict"></div>  
+        <br />
+    </div>
+
+    <label for="openDict">Довідник</label>
+    <button title="Довідник" id="openDict" disabled class='k-button' onclick="onClickOpenDict(this)">
+        <i class="pf-icon pf-16 pf-folder"></i>
+    </button>
+    <div id="dictTextSuccess" class="text-success">Довідник дозволено (дабл-клік)</div>
+    <div id="dictTextMuted" class="text-muted">Довідник недоступний</div>
+
+    <br />
+    <label for="datePicker">Календар</label>
+    <div id="datePicker" style="width:10px"></div>
+    <div id="datePickerTextSuccess" class="text-success">Календар дозволено</div>
+    <div id="datePickerTextMuted" class="text-muted">Календар недоступний</div>
+</div>
+
+<br />
+<div id="gridDynamicRequestResult"></div>
+
+<script type="text/x-kendo-template" id="requestResultTitle-template">
+    <div class="toolbar">
+        <button title="Вигрузити в Excel" id="requestResultExcel" class='k-button' onclick="onClickExport2Excel(this)">
+            <i class="pf-icon pf-16 pf-exel"></i>
+        </button>
+
+        <button title="Вигрузити в Txt" id="requestResultText" class='k-button' onclick="onClickExport2Text(this)">
+            <i class="pf-icon pf-16 pf-business_report"></i>
+        </button>
+    </div>
+</script>
+
+
+<div id="dialogExport2Text" style="display:none">
+    <h3>
+        <label for="fNameTxt">Ім'я файлу</label>
+        <input type="text" id="fNameTxt" style="width:250px" />
+    </h3>
+    
+    <br />
+    <h3>
+        <label for="separatorText">Розділювач колонок</label>
+        <input type="text" id="separatorText" value=";" maxlength="1" style="width:10px" />
+    </h3>
+    <br />
+    <h3>
+        <label for="isAllPages">Всі сторінки</label>
+        <input type="checkbox" id="isAllPages" checked />
+    </h3>
+    <hr />
+    <button id="confirmExport2Text" type="button" class="btn btn-primary" style="margin-left: 158px">
+        <i class="fa fa-file-text"></i> Вигрузити?
+    </button>
+</div>

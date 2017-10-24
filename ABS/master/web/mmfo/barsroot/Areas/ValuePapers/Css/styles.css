@@ -1,0 +1,68 @@
+﻿    .k-grid-header th.k-header {
+        text-align: center;
+      /*  padding: 0px;*/
+    }
+
+    #grid.k-grid .k-grid-content tr {
+        height: 2px;        
+        padding: 1px;
+        font-size: small;
+    }
+    .k-grid tr td {
+        white-space:nowrap;
+        line-height:1em;
+        padding: 1px;
+        border-bottom: 1px solid lightgray;
+        }
+
+    .col-xs-1, .col-xs-2, .col-xs-3 {
+        padding: 0px;
+        margin: 0px;
+    }
+    .white-row {
+        background-color: #ffffff;
+    }
+        .white-row:hover {
+        background-color: #e6e6e6;
+    }
+    .gray-row {
+        background-color: #FFF8DC;
+    }
+        .gray-row:hover {
+        background-color: #e6e6e6;
+    }
+    .yellow-row {
+        background-color: #FFFF00;
+    }
+        .yellow-row:hover {
+        background-color: #FF8C00;
+    }
+    .red-row {
+        background-color: #ffcccc;
+    }
+        .red-row:hover {
+        background-color: #ff9999;
+    }
+    .green-row {
+        background: #daf1da;
+    }
+        .green-row:hover {
+       background: #b5e3b5;
+    }
+
+    .k-grid tr.k-state-selected {
+        color: #fff;
+        background-color: #428bca;
+        border-color: #428bca;
+    }
+
+    #loader {
+    position: absolute;
+    top: 50%;
+    left: 45%;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    opacity: .8;
+    background-color: none;
+}

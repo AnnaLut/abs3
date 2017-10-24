@@ -1,0 +1,359 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    //ViewBag.Title = "";
+}
+<script src="~/Areas/Mbdk/Scripts/parTransactionCtrl.js"></script>
+<div ng-controller="Mbdk.parTransactionCtrl">
+    <h1>{{Title}}</h1>
+
+    <div kendo-window="wndBuhModel" k-options="wndBuhModelOption" k-position="{ top: 100, left: 15 }">
+        <div kendo-grid="grdAccModel" k-options="grdAccModelOptions"></div>
+    </div>
+    <div kendo-window="wndHistory" k-options="wndHistoryOption" k-position="{ top: 100, left: 15 }">
+        <div kendo-grid="grdHistory" k-options="grdHistoryOptions"></div>
+    </div>
+    <div kendo-window="wndSwift" k-options="wndSwiftOptions" k-position="{ top: 100, left: 100 }">
+        <div class="panel panel-default" style="display: flex; min-width:800px">
+            <div class="col-lg-6">
+                <div class="row" style="padding:2px">Посередник А</div>
+                <div class="row">
+                    <textarea id="ourIntermediaryArea" style="margin:2px" ng-model="model.brokerA" class="col-lg-9" rows="4"></textarea>
+                    <a class='k-button' style="margin:2px" ng-click="showReferMultiSwift('brokerA','SW_BANKS','BIC,NAME,CITY,COUNTRY',null)"><i class='pf-icon pf-16 pf-book'></i></a>
+                </div>
+                <div class="row" style="padding:10px 2px 2px 2px">Повернення відсотків А</div>
+                <div class="row">
+                    <textarea id="ourInterestBankCorrespondentArea" style="margin:2px" ng-model="model.backIntA" class="col-lg-9" rows="4"></textarea>
+                    <a class='k-button' style="margin:2px" ng-click="showReferMultiSwift('backIntA','SW_BANKS','BIC,NAME,CITY,COUNTRY',null)"><i class='pf-icon pf-16 pf-book'></i></a>
+                </div>
+                <div class="row" style="padding:10px 2px 2px 2px">Посередник для повернення відсотків А</div>
+                <div class="row">
+                    <textarea id="ourInterestIntermediaryArea" style="margin:2px" ng-model="model.backBrokerA" class="col-lg-9" rows="4"></textarea>
+                    <a class='k-button' style="margin:2px" ng-click="showReferMultiSwift('backBrokerA','SW_BANKS','BIC,NAME,CITY,COUNTRY',null)"><i class='pf-icon pf-16 pf-book'></i></a>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="row" style="padding:2px">Посередник Б</div>
+                <div class="row">
+                    <textarea id="ourIntermediaryArea" style="margin:2px" ng-model="model.brokerB" class="col-lg-9" rows="4"></textarea>
+                    <a class='k-button' style="margin:2px" ng-click="showReferMultiSwift('brokerB','SW_BANKS','BIC,NAME,CITY,COUNTRY',null)"><i class='pf-icon pf-16 pf-book'></i></a>
+                </div>
+                <div class="row" style="padding:10px 2px 2px 2px">Повернення відсотків Б</div>
+                <div class="row">
+                    <textarea id="ourInterestBankCorrespondentArea" style="margin:2px" ng-model="model.backIntB" class="col-lg-9" rows="4"></textarea>
+                    <a class='k-button' style="margin:2px" ng-click="showReferMultiSwift('backIntB','SW_BANKS','BIC,NAME,CITY,COUNTRY',null)"><i class='pf-icon pf-16 pf-book'></i></a>
+                </div>
+                <div class="row" style="padding:10px 2px 2px 2px">Посередник для повернення відсотків Б</div>
+                <div class="row">
+                    <textarea id="ourInterestIntermediaryArea" style="margin:2px" ng-model="model.backBrokerB" class="col-lg-9" rows="4"></textarea>
+                    <a class='k-button' style="margin:2px" ng-click="showReferMultiSwift('backBrokerB','SW_BANKS','BIC,NAME,CITY,COUNTRY',null)"><i class='pf-icon pf-16 pf-book'></i></a>
+                </div>
+            </div>
+        </div>
+        <div style="width:100%;text-align:center">
+            <button class="k-button margin-right-pos" id="" name="" value="" ng-click="wndSwift.close()"><span class="k-sprite pf-icon pf-16 pf-ok" style="margin-bottom: 3px"></span> Затвердити</button>
+            <button class="k-button margin-right-pos" id="" name="" value="" ng-click="closeSwift()"><span class="k-sprite pf-icon pf-16 pf-delete_button_error" style="margin-bottom: 3px"></span> Відмінити</button>
+        </div>
+    </div>
+    <div kendo-window="wndViewSwift" k-options="wndViewSwiftOptions" k-position="{ top: 100, left: 15 }"></div>
+    <div kendo-toolbar="toolbarMain" k-options="toolbarOptions" style="width:90%"></div>
+    <div class="panel panel-default" style="width:90%">
+        <div class="panel-body">
+            <div class="form-group">
+                <table width="100%" border="0">
+                    <tr>
+                        <td>
+                            <input type="text" class="k-textbox" ng-model="model.rnk" ng-disabled="true" style="width: 100px" />
+                            <input type="text" class="k-textbox" ng-model="model.mfo" ng-disabled="true" style="width: 70px" />
+                        </td>
+                        <td colspan="3">
+                            <input type="text" class="k-textbox" ng-model="model.nmk" ng-disabled="true" style="width: 300px" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label>№ ген. договора та дата</label>
+                        </td>
+                        <td></td>
+                        <td>
+                            <label>Пролонгацій</label>
+                        </td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <input kendo-date-picker k-ng-model="model.genAgreeDate" k-options="dpDateFormatOptions" k-ng-disabled="true" style="width: 150px" />
+                        </td>
+                        <td>
+                            <input type="text" class="k-textbox" ng-model="model.genAgreeNum" ng-disabled="true" style="width: 100px" />
+                        </td>
+                        <td>
+                            <input type="text" class="k-textbox" ng-model="model.cntChange" ng-disabled="true" style="width: 50px" />
+                            <input type="text" class="k-textbox" ng-model="model.curr" ng-disabled="true" style="width: 100px" />
+                        </td>
+                        <td>
+                            <input type="text" class="k-textbox" ng-model="model.currName" ng-disabled="true" style="width: 200px" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label>№ пот. угоди та дата</label>
+                        </td>
+                        <td></td>
+                        <td colspan="2">
+                            <input type="text" class="k-textbox" ng-model="model.typeTrCode" ng-disabled="true" style="width: 50px" />
+                            <input type="text" class="k-textbox" ng-model="model.typeTrName" ng-disabled="true" style="width: 300px" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <input kendo-date-picker k-ng-model="model.prevHolderDate" k-options="dpDateFormatOptions" k-ng-disabled="true" style="width: 150px" />
+                        </td>
+                        <td>
+                            <input type="text" class="k-textbox" ng-model="model.prevHolderNum" ng-disabled="true" style="width: 100px" />
+                            <input type="text" class="k-textbox" ng-model="model.prevHolderRef" ng-disabled="true" style="width: 100px" />
+                            <button class="k-button margin-right-pos" id="" name="" value="" title="Перегляд бух. моделі угоди" ng-click="wndBuhModel.open()"><span class="k-sprite pf-icon pf-16 pf-calendar" style="margin-bottom: 3px"></span> </button>
+                        </td>
+                        <td>
+                            <input type="text" class="k-textbox" ng-model="model.mainAcc" ng-disabled="true" style="width: 150px" />
+                        </td>
+                        <td>
+                            <input kendo-numeric-text-box k-ng-model="model.mainAccBal" ng-disabled="true" style="width: 150px" k-options="decimalFormat" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <input type="checkbox" ng-model="model.newNextTr" id="chkDiffDays" name="chkDiffDays" ng-change="changeNewDeal()" />
+                            <label>Нова угода</label>
+                        </td>
+                        <td>
+                            <input type="text" class="k-textbox" ng-model="model.newHolderNum" ng-disabled="!model.newNextTr" style="width: 100px" />
+                            <input type="text" class="k-textbox" ng-model="model.newHolderRef" ng-disabled="true" style="width: 100px" />
+                            <button class="k-button margin-right-pos" id="" name="" value="" ng-disabled="true"><span class="k-sprite pf-icon pf-16 pf-calendar" style="margin-bottom: 3px"></span> </button>
+                        </td>
+                        <td>
+                            <input type="text" class="k-textbox" ng-model="model.interestAcc" ng-disabled="true" style="width: 150px" />
+                        </td>
+                        <td>
+                            <input kendo-numeric-text-box k-ng-model="model.interestAccBal" ng-disabled="true" style="width: 150px" k-options="decimalFormat" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <input type="text" class="k-textbox" ng-disabled="true" ng-model="model.ctNazn" style="width: 300px;text-align: center" />
+                        </td>
+                        <td>
+                            <input type="text" class="k-textbox" ng-model="model.receivableAcc" ng-disabled="true" style="width: 150px" />
+                        </td>
+                        <td>
+                            <input kendo-numeric-text-box k-ng-model="model.receivableAccBal" ng-disabled="true" style="width: 150px" k-options="decimalFormat" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><br /></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <label>Попередні</label>
+                        </td>
+                        <td>
+                            <label>Нові</label>
+                        </td>
+                        <td>
+                            <label>Різниця</label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label>Дата початку</label>
+                        </td>
+                        <td>
+                            <input kendo-date-picker k-ng-model="model.dateStartPrev" k-options="dpDateFormatOptions" k-ng-disabled="true" style="width: 150px" />
+                        </td>
+                        <td>
+                            <input kendo-date-picker k-ng-model="model.dateStartNew" k-options="dpDateFormatOptions" k-ng-disabled="!model.newNextTr" k-ng-change="changeStartDate()" ng-blur="changeInterest()" style="width: 150px" />
+                        </td>
+                        <td>
+                            <input type="text" class="k-textbox" ng-model="model.dateStartDiff" ng-disabled="true" style="width: 150px" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label>Дата завершення</label>
+                        </td>
+                        <td>
+                            <input kendo-date-picker k-ng-model="model.dateEndPrev" k-options="dpDateFormatOptions" k-ng-disabled="true" style="width: 150px" />
+                        </td>
+                        <td>
+                            <input kendo-date-picker k-ng-model="model.dateEndNew" k-options="dpDateFormatOptions" style="width: 150px" ng-blur="changeInterest()" />
+                        </td>
+                        <td>
+                            <input type="text" class="k-textbox" ng-model="model.dateEndDiff" ng-disabled="true" style="width: 150px" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label>Сума договору</label>
+                        </td>
+                        <td>
+                            <input kendo-numeric-text-box k-ng-model="model.dealSumPrev" ng-disabled="true" style="width: 150px" k-options="decimalFormat" />
+                        </td>
+                        <td>
+                            <input kendo-numeric-text-box k-ng-model="model.dealSumNew" style="width: 150px" k-options="decimalFormat" ng-blur="changeInterest()" />
+                        </td>
+                        <td>
+                            <input kendo-numeric-text-box k-ng-model="model.dealSumDiff" ng-disabled="true" style="width: 150px" k-options="decimalFormat" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label>% ставка</label>
+                        </td>
+                        <td>
+                            <input kendo-numeric-text-box k-ng-model="model.intRatePrev" ng-disabled="true" style="width: 150px" k-options="decimalFormat" />
+                        </td>
+                        <td>
+                            <input kendo-numeric-text-box k-ng-model="model.intRateNew" style="width: 150px" k-options="decimalFormat" ng-blur="changeInterest()" />
+                        </td>
+                        <td>
+                            <input kendo-numeric-text-box k-ng-model="model.intRateDiff" ng-disabled="true" style="width: 150px" k-options="decimalFormat" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label>Сума відсотків</label>
+                        </td>
+                        <td>
+                            <input kendo-numeric-text-box k-ng-model="model.intSumPrev" ng-disabled="true" style="width: 150px" k-options="decimalFormat" />
+                        </td>
+                        <td>
+                            <input kendo-numeric-text-box k-ng-model="model.intSumNew" ng-disabled="true" style="width: 150px" k-options="decimalFormat" />
+                        </td>
+                        <td>
+                            <input kendo-numeric-text-box k-ng-model="model.intSumDiff" ng-disabled="true" style="width: 150px" k-options="decimalFormat" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label>Вид договору</label>
+                        </td>
+                        <td>
+                            <input type="text" class="k-textbox" ng-model="model.dealViddPrev" ng-disabled="true" style="width: 150px" />
+                        </td>
+                        <td>
+                            <input type="text" class="k-textbox" ng-model="model.dealViddNew" style="width: 115px" />
+                            <button class="k-button margin-right-pos" id="btnSerchAcc" name="btnSerchAcc" value="" ng-disabled="model.dealViddPrev == model.dealViddNew" ng-click="getAccNumber()"><span class="k-sprite pf-icon pf-16 pf-find" style="margin-bottom: 3px"></span> </button>
+                        </td>
+                        <td>
+                            <input type="text" class="k-textbox" ng-model="model.dealViddAcc" ng-disabled="true" style="width: 150px" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label>Забезпечення</label>
+                        </td>
+                        <td colspan="2">
+                            <input type="text" class="k-textbox" ng-model="model.zal" ng-disabled="true" style="width: 390px" />
+                        </td>
+                        <td>
+                            <input type="text" class="k-textbox" ng-model="model.nlsn" ng-disabled="true" style="width: 150px" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: right;padding: 5px">
+                            <label>Основний</label>
+                        </td>
+                        <td>
+                            <input type="checkbox" ng-model="model.innerCore" ng-change="changeInnerCore()" />
+                            <label>Внутрішній</label>
+                        </td>
+                        <td style="text-align: right;padding: 5px">
+                            <label ng-show="model.tipd">Нарахованих %</label>
+                        </td>
+                        <td>
+                            <input type="checkbox" ng-model="model.intInner" ng-show="model.tipd" />
+                            <label ng-show="model.tipd">Внутрішній</label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <input type="text" class="k-textbox" ng-model="model.nlsnb_new" style="width: 150px" ng-blur="checkVkrz()" ng-show="model.innerCore || !model.tipd" />
+                        </td>
+                        <td></td>
+                        <td>
+                            <input type="text" class="k-textbox" ng-model="model.nlsnb_newb" style="width: 150px" ng-show="model.intInner" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <label>Траса вхідного платежа (57-BIC, 58-рахунок)</label>
+                        </td>
+                        <td>
+                            <input type="text" class="k-textbox" ng-model="model.bicBank" ng-disabled="true" style="width: 150px" />
+                        </td>
+                        <td>
+                            <input type="text" class="k-textbox" ng-model="model.accVostro" ng-disabled="true" style="width: 150px" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td colspan="2">
+                            <select kendo-drop-down-list style="width: 395px" k-ng-model="model.accNameToCurr" k-options="ddlNbkOptions"></select>
+                        </td>
+                        <td>
+                            <input type="text" class="k-textbox" ng-model="model.accNameToCurr.NLS" ng-disabled="true" style="width: 150px" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <label>Траса вихідного платежа (57-BIC, 58-рахунок)</label>
+                        </td>
+                        <td>
+                            <input type="text" class="k-textbox" ng-model="model.bicBankPar" ng-disabled="true" style="width: 150px" />
+                        </td>
+                        <td>
+                            <input type="text" class="k-textbox" ng-model="model.accPartner" ng-disabled="true" style="width: 150px" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td colspan="3">
+                            <input ng-model="model.bankSwift.NAME" class="k-textbox" style="width: 510px" />
+                            <a class='k-button' ng-click="showReferBankSwift('SW_BANKS','BIC,NAME,CITY,COUNTRY',null)"><i class='pf-icon pf-16 pf-book'></i></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td colspan="3">
+                            <input ng-model="model.bankSwiftMulti" class="k-textbox" style="width: 510px" />
+                            <a class='k-button' ng-click="showReferMultiSwift('bankSwiftMulti','SW_BANKS','BIC,NAME,CITY,COUNTRY',null)"><i class='pf-icon pf-16 pf-book'></i></a>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+    table td {
+        padding: 3px;
+    }
+
+    input:disabled {
+        background-color: #eee;
+        color: #808080;
+    }
+
+        input:disabled:hover {
+            background-color: #eee;
+            color: #808080;
+        }
+
+    .k-state-disabled {
+        opacity: 1;
+    }
+</style>

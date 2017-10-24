@@ -1,0 +1,50 @@
+{
+  "settings": {
+    "port": 31139,
+    "logDir": "./logs",
+    "logLevel": "info",
+    "logWrite": true,
+    "Service": false
+  },
+  "updateServer": {
+    "host": "10.10.10.96",
+    "port": "10556",
+    "login": "corp2",
+    "password": "qwerty",
+    "tempFolder": "updates"
+  },
+  "cryptoSettings": {
+    "modules": [
+      "./tokens/token.vega.js", 
+      "./tokens/token.vega2.js"
+    ],
+    "vega": {
+      "libPath": "cryptoLibs\\Vega\\",
+      "secretPath": "Key\\secret",
+      "openPath": "Key\\public",
+      "deviceType": "Disk",
+      "CardReader": ""
+    },
+    "vega2": {
+      "Providers": [
+        {
+          "Name": "Vega DSTU PlasticCard Crypto Provider",
+          "Type": "81"
+        },
+        {
+          "Name": "Vega DSTU Cryptographic Provider",
+          "Type": "81"
+        },
+        {
+          "Name": "Vega RSA Cryptographic Provider",
+          "Type": "1"
+        },
+        {
+          "Name": "Avtor Cryptographic Provider",
+          "Type": "226"
+        }        
+      ]
+    }
+  },
+  "users": {}
+}

@@ -1,0 +1,154 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="07/11/2013 09:55:31" ReportInfo.Modified="02/17/2015 12:36:53" ReportInfo.CreatorVersion="2013.3.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqcFv7/QVsbsa1pDpr21P0mHXdl2BpgMbYS4w+AnBeGDddnQ5MuNy1h3sM21aiXmM/G7FWOYBEDhOioAV5QJM8uQ==">
+      <TableDataSource Name="Table6" Alias="kred_info" DataType="System.Int32" Enabled="true" SelectCommand="select decode((select s.PRODUCT_ID from WCS_SUBPRODUCTS s where s.ID=b.SUBPRODUCT_ID),&#13;&#10;       'PRD_MORTGAGE','Договір про іпотечний кредит',&#13;&#10;       'PRD_HULL_INSURANCE','Договір відновлюваної кредитної лінії',&#13;&#10;       case when b.SUBPRODUCT_ID in('SBP_CONSUMER_0_5_2_EP','SBP_CONSUMER_5_10_2_EP') &#13;&#10;            then 'Договір відновлюваної кредитної лінії'&#13;&#10;            else 'Кредитний договір' &#13;&#10;       end) as vyd_cred,&#13;&#10;       d.cc_id as deal_number, &#13;&#10;       d.sdate crt_date,&#13;&#10;       substr(f_dat_lit(d.sdate),1,25) as   crt_date_pr,&#13;&#10;       b.summ &#13;&#10; from  v_wcs_bids b, cc_deal d &#13;&#10;where  b.bid_id = :p_bid_id&#13;&#10;  and  b.bid_id = d.nd(+)">
+        <Column Name="VYD_CRED" DataType="System.String"/>
+        <Column Name="DEAL_NUMBER" DataType="System.String"/>
+        <Column Name="CRT_DATE" DataType="System.DateTime"/>
+        <Column Name="CRT_DATE_PR" DataType="System.String"/>
+        <Column Name="SUMM" DataType="System.Decimal"/>
+        <CommandParameter Name="p_bid_id" DataType="126" Expression="[p_bid_id]"/>
+      </TableDataSource>
+      <TableDataSource Name="Table7" Alias="list_dog" DataType="System.Int32" Enabled="true" SelectCommand="select INN,MAX(fio) FIO ,MAX(fio_o) fio_o,MAX(fio_r) fio_r,MAX(pasp) PASP,&#13;&#10;       listagg(dog_info, ', ') WITHIN GROUP(ORDER BY n) as list_d&#13;&#10;from(&#13;&#10;select  B.INN , 1 n,&#13;&#10;        wcs_utl.get_answ (b.bid_id,'CL_1') || ' ' || &#13;&#10;        wcs_utl.get_answ (b.bid_id,'CL_2') || ' ' || &#13;&#10;        wcs_utl.get_answ (b.bid_id,'CL_3') AS fio,&#13;&#10;        wcs_utl.get_answ (b.bid_id,'CL_123_O') fio_o,&#13;&#10;        wcs_utl.get_answ (b.bid_id,'CL_123_R') fio_r,                                &#13;&#10;        'паспорт серії: '|| wcs_utl.get_answ (b.bid_id,'CL_7')|| &#13;&#10;        ' № '|| wcs_utl.get_answ (b.bid_id,'CL_8')|| &#13;&#10;        ' виданий '|| trim(wcs_utl.get_answ (b.bid_id,'CL_9'))|| &#13;&#10;        ' '|| wcs_utl.get_answ (b.bid_id,'CL_11')||' р.' AS pasp,&#13;&#10;       decode((select s.PRODUCT_ID from WCS_SUBPRODUCTS s where s.ID=b.SUBPRODUCT_ID),&#13;&#10;       'PRD_MORTGAGE','Договору про іпотечний кредит',&#13;&#10;       'PRD_HULL_INSURANCE','Договору відновлюваної кредитної лінії',&#13;&#10;       case when b.SUBPRODUCT_ID in('SBP_CONSUMER_0_5_2_EP','SBP_CONSUMER_5_10_2_EP') &#13;&#10;            then 'Договору відновлюваної кредитної лінії'&#13;&#10;            else 'Кредитного договору' &#13;&#10;       end)||' №'|| &#13;&#10;       d.cc_id||' від '|| &#13;&#10;--       d.sdate crt_date,&#13;&#10;       substr(f_dat_lit(d.sdate),1,25) dog_info&#13;&#10; from  v_wcs_bids b, cc_deal d &#13;&#10;where  b.bid_id = :p_bid_id&#13;&#10;  and  b.bid_id = d.nd(+)&#13;&#10;union all  &#13;&#10;select distinct &#13;&#10;       decode(nvl(wcs_utl.get_answ(b.bid_id, 'GRT_0', b.ws_id , B.GARANTEE_NUM),0),&#13;&#10;       0,&#13;&#10;       wcs_utl.get_answ(b.bid_id, 'CODE_002', b.ws_id , B.GARANTEE_NUM),&#13;&#10;       wcs_utl.get_answ(b.bid_id, 'CODE_002')) inn, 2 n,&#13;&#10;       wcs_utl.get_answ(b.bid_id,'CL_1',b.ws_id , B.GARANTEE_NUM)|| ' ' || &#13;&#10;       wcs_utl.get_answ (b.bid_id,'CL_2',b.ws_id , B.GARANTEE_NUM)|| ' ' || &#13;&#10;       wcs_utl.get_answ (b.bid_id,'CL_3',b.ws_id , B.GARANTEE_NUM) AS fio,&#13;&#10;       wcs_utl.get_answ (b.bid_id,'CL_123_O',b.ws_id , B.GARANTEE_NUM) fio_o,&#13;&#10;       wcs_utl.get_answ (b.bid_id,'CL_123_R',b.ws_id , B.GARANTEE_NUM) fio_r,                                &#13;&#10;       'паспорт серії: ' || wcs_utl.get_answ (:p_bid_id,'CL_7',b.ws_id , B.GARANTEE_NUM)|| &#13;&#10;       ' № ' || wcs_utl.get_answ (b.bid_id,'CL_8',b.ws_id , B.GARANTEE_NUM)|| &#13;&#10;       ' виданий ' || trim(wcs_utl.get_answ (b.bid_id,'CL_9',b.ws_id , B.GARANTEE_NUM))||&#13;&#10;       ' '|| wcs_utl.get_answ (b.bid_id,'CL_11',b.ws_id , B.GARANTEE_NUM)||' р.' AS pasp,              &#13;&#10;       decode(B.GARANTEE_ID,'GUARANTOR','Договору поруки','VEHICLE','Договору забезпечення','Іпотечного договору')||' №'|| &#13;&#10;       B.AGR_NUMBER||' від '|| &#13;&#10;       substr(f_dat_lit(B.AGR_DATE),1,25) dog_info&#13;&#10;from   V_WCS_BID_GARANTEES b&#13;&#10;where  b.bid_id = :p_bid_id  &#13;&#10;) dog&#13;&#10;--where dog.inn= wcs_utl.get_answ(:p_bid_id, 'CODE_002', :p_ws_id, :p_ws_number)   &#13;&#10;group by inn">
+        <Column Name="INN" DataType="System.String"/>
+        <Column Name="LIST_D" DataType="System.String"/>
+        <Column Name="FIO" DataType="System.String"/>
+        <Column Name="FIO_O" DataType="System.String"/>
+        <Column Name="FIO_R" DataType="System.String"/>
+        <Column Name="PASP" DataType="System.String"/>
+        <CommandParameter Name="p_bid_id" DataType="126" Expression="[p_bid_id]"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="p_bid_id" DataType="System.Int32" Expression="3548521"/>
+    <Parameter Name="p_ws_id" DataType="System.String" Expression="&quot;MAIN&quot;"/>
+    <Parameter Name="p_ws_number" DataType="System.Int32" Expression="0"/>
+  </Dictionary>
+  <ReportPage Name="Page1" Guides="9.45,708.76,242.54,485.08,251.99,233.13">
+    <DataBand Name="Data2" Width="718.2" Height="1247.4" CanGrow="true" CanShrink="true" DataSource="Table7">
+      <TableObject Name="Table5" Left="9.45" Width="699.31" Height="1209.6">
+        <TableColumn Name="Column4" Width="233.09"/>
+        <TableColumn Name="Column5" Width="242.54"/>
+        <TableColumn Name="Column6" Width="223.68"/>
+        <TableRow Name="Row27">
+          <TableCell Name="Cell90" HorzAlign="Right" Font="Times New Roman, 10pt" HtmlTags="true"/>
+          <TableCell Name="Cell91"/>
+          <TableCell Name="Cell92" Text="Додаток 17 " HorzAlign="Right" Font="Times New Roman, 10pt, style=Italic" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row46">
+          <TableCell Name="Cell147"/>
+          <TableCell Name="Cell148"/>
+          <TableCell Name="Cell149" Text="[kred_info.VYD_CRED]" HorzAlign="Right" Font="Times New Roman, 10pt, style=Italic" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row47">
+          <TableCell Name="Cell150"/>
+          <TableCell Name="Cell151"/>
+          <TableCell Name="Cell152" Text="№[kred_info.DEAL_NUMBER]  від [kred_info.CRT_DATE_PR]" HorzAlign="Right" Font="Times New Roman, 10pt, style=Italic" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row28" Height="66.15">
+          <TableCell Name="Cell93" Border.Lines="All" Fill.Color="Silver" Text="Згода на обробку персональних даних, &#13;&#10;засвідчення, гарантії та зобов’язання, пов’язані зі згодою на обробку персональних даних, що надаються при укладенні договорів, що супроводжують кредитну операцію&#13;&#10;" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold" HtmlTags="true" ColSpan="3"/>
+          <TableCell Name="Cell94" HorzAlign="Center" Font="Times New Roman, 10pt" HtmlTags="true"/>
+          <TableCell Name="Cell95"/>
+        </TableRow>
+        <TableRow Name="Row29" Height="56.7" AutoSize="true">
+          <TableCell Name="Cell96" Border.Lines="Left, Right" Text="1. Я, [list_dog.FIO], [list_dog.PASP], реєстраційний номер облікової картки платника податку [list_dog.INN] враховуючи вимоги Закону України &quot;Про захист персональних даних” (надалі – Закон), одночасно з укладенням (підписанням) [list_dog.LIST_D] (надалі - Договір(-ори)), надаю АТ „Ощадбанк” (надалі - Банк):" HorzAlign="Justify" Font="Times New Roman, 10pt, style=Bold" HtmlTags="true" ColSpan="3"/>
+          <TableCell Name="Cell97" HorzAlign="Center" Font="Times New Roman, 10pt" HtmlTags="true"/>
+          <TableCell Name="Cell98"/>
+        </TableRow>
+        <TableRow Name="Row30" Height="151.2" AutoSize="true">
+          <TableCell Name="Cell99" Border.Lines="Left, Right" Text="&lt;b&gt;1) Необмежену строком письмову згоду на обробку моїх персональних даних&lt;/b&gt;, які були або будуть передані Банку, у тому числі, третіми особами, у зв’язку з виконанням Договору(-ів) та виконанням будь-яких інших договорів, що були або будуть укладені з Банком, з &lt;b&gt;метою організації та надання Банком мені&lt;/b&gt; будь-яких банківських послуг і операцій, укладення мною Договору(ів), а також здійснення Банком іншої діяльності у відповідності до вимог та в порядку, визначеному чинним законодавством України, зокрема, але не обмежуючись, виконання зобов’язання щодо ідентифікації клієнтів, отримання кредиту, надання поруки/майнової поруки та/або виконання Договору(-ів) в обсязі, що міститься в Договорі(-ах), та інших документах, підписаних/ засвідчених та поданих/ які будуть подані мною, та/або які буде отримано Банком під час обслуговування мене як клієнта Банку та/або строку дії Договору(-ів), від мене та/або третіх осіб, у тому числі, змінювати персональні дані за інформацією третіх осіб. " Padding="30, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 9.5pt, style=Bold" HtmlTags="true" ColSpan="3"/>
+          <TableCell Name="Cell100" HorzAlign="Center" Font="Times New Roman, 10pt" HtmlTags="true"/>
+          <TableCell Name="Cell101"/>
+        </TableRow>
+        <TableRow Name="Row31" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell102" Border.Lines="Left, Right" Text="&lt;b&gt;2) Необмежену строком письмову згоду поширювати мої персональні дані та/або здійснювати їх передачу чи надання доступу до них третім особам у випадках&lt;/b&gt;, передбачених чинним законодавством України та/або Договором(ми), іншими договорами, що укладені (будуть укладені) між мною та Банком, " Padding="30, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 9.5pt, style=Bold" HtmlTags="true" ColSpan="3"/>
+          <TableCell Name="Cell103" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+          <TableCell Name="Cell104"/>
+        </TableRow>
+        <TableRow Name="Row32" Height="66.15" AutoSize="true">
+          <TableCell Name="Cell105" Border.Lines="Left, Right" Text="&lt;b&gt;3) Необмежене строком право без отримання будь-якої моєї додаткової письмової згоди передавати мої персональні дані&lt;/b&gt; для обробки третім особам та здійснювати відносно вказаних персональних даних будь-які інші дії, якщо це пов’язано із виконанням укладених між мною та Банком договорів, у тому числі Договору(-ів) та/або із захистом прав Банку за ними, або необхідно для реалізації повноважень Банку за чинним законодавством України." Padding="30, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 9.5pt, style=Bold" HtmlTags="true" ColSpan="3"/>
+          <TableCell Name="Cell106" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+          <TableCell Name="Cell107"/>
+        </TableRow>
+        <TableRow Name="Row33" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell108" Border.Lines="Left, Right" Text="2. Надана мною [list_dog.FIO_O] відповідно до п.1 письмова згода поширюється, у тому числі на обробку Банком персональних даних з метою:" HorzAlign="Justify" Font="Times New Roman, 10pt, style=Bold" HtmlTags="true" ColSpan="3"/>
+          <TableCell Name="Cell109" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+          <TableCell Name="Cell110"/>
+        </TableRow>
+        <TableRow Name="Row34" Height="75.6" AutoSize="true">
+          <TableCell Name="Cell111" Border.Lines="Left, Right" Text="&lt;b&gt;1)&lt;/b&gt; Надання мені інформації, яка містить рекламно-інформаційний характер (в тому числі щодо нових продуктів та послуг Банку або інших осіб) або будь-якої іншої інформації, зокрема про стан будь-якого мого рахунку, відкритого у Банку або про стан моєї заборгованості за будь-яким договором, що укладений/буде укладений з Банком, шляхом відправлення Банком текстового повідомлення (SMS) на наданий мною номер мобільного телефону та/або засобами поштового зв’язку чи іншими засобами (в тому числі за допомогою третіх осіб), обраними на власний розсуд Банком;" Padding="30, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 9.5pt, style=Bold" HtmlTags="true" ColSpan="3"/>
+          <TableCell Name="Cell112" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+          <TableCell Name="Cell113"/>
+        </TableRow>
+        <TableRow Name="Row35" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell114" Border.Lines="Left, Right" Text="&lt;b&gt;2)&lt;/b&gt; Перевірки достовірності наданих мною персональних даних, в тому числі за допомогою послуг інших осіб, та їх використання і поширення в процесі здійснення будь-яких дій, спрямованих на повернення (погашення) існуючої моєї заборгованості за будь-яким договором, укладеним з Банком." Padding="30, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 9.5pt, style=Bold" HtmlTags="true" ColSpan="3"/>
+          <TableCell Name="Cell115" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+          <TableCell Name="Cell116"/>
+        </TableRow>
+        <TableRow Name="Row36" AutoSize="true">
+          <TableCell Name="Cell117" Border.Lines="Left, Right" Text="3. Підписанням цієї Згоди, враховуючи вимоги Закону, я [list_dog.FIO] також:" HorzAlign="Justify" Font="Times New Roman, 10pt, style=Bold" HtmlTags="true" ColSpan="3"/>
+          <TableCell Name="Cell118" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+          <TableCell Name="Cell119"/>
+        </TableRow>
+        <TableRow Name="Row37" Height="66.15" AutoSize="true">
+          <TableCell Name="Cell120" Border.Lines="Left, Right" Text="&lt;b&gt;1) Засвідчую та гарантую&lt;/b&gt;, що будь-які персональні дані про будь-яких фізичних осіб (у тому числі найманих працівників), які були або будуть передані мною Банку у зв'язку або на виконання будь-яких договорів, що були або будуть укладені з Банком, були отримані та знаходяться у мене правомірно відповідно до вимог чинного законодавства України;" Padding="30, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 9.5pt, style=Bold" HtmlTags="true" ColSpan="3"/>
+          <TableCell Name="Cell121" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+          <TableCell Name="Cell122"/>
+        </TableRow>
+        <TableRow Name="Row38" Height="122.85" AutoSize="true">
+          <TableCell Name="Cell123" Border.Lines="Left, Right" Text="&lt;b&gt;2) Засвідчую та гарантую&lt;/b&gt;, що маю всі необхідні правові підстави для передачі вищевказаних  персональних даних Банку для їх подальшої обробки Банком з метою організації та надання мені будь-яких банківських послуг і операцій, без будь-якого обмеження строком та способом, у т.ч. для їх використання і поширення, зміни, передачі чи надання доступу до них третім особам у порядку, визначеному Банком з урахуванням вимог, передбачених чинним законодавством України, та/або банківськими договорами, (зокрема, Договором(и)), що укладені або будуть укладені між мною та Банком, а також для передачі Банком персональних даних для обробки третім особам та здійснення відносно них будь-яких інших дій, якщо це пов'язано із виконанням укладених з Банком договорів та/або із захистом прав Банку за ними, або якщо це необхідно для реалізації Банком прав та обов'язків, передбачених законом; " Padding="30, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 9.5pt, style=Bold" HtmlTags="true" ColSpan="3"/>
+          <TableCell Name="Cell124" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+          <TableCell Name="Cell125"/>
+        </TableRow>
+        <TableRow Name="Row39" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell126" Border.Lines="Left, Right" Text="&lt;b&gt;3) Засвідчую та гарантую&lt;/b&gt;, що право на передачу Банку моїх персональних даних жодним чином не обмежене та не порушує права будь-яких інших осіб;" Padding="30, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 9.5pt, style=Bold" HtmlTags="true" ColSpan="3"/>
+          <TableCell Name="Cell127" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+          <TableCell Name="Cell128"/>
+        </TableRow>
+        <TableRow Name="Row48" Height="75.6">
+          <TableCell Name="Cell153" Border.Lines="Left, Right" Text="&lt;b&gt;4) Підтверджую&lt;/b&gt;, що повідомлений(-а) (проінформований(-а)) Банком в момент підписання цієї Згоди про те, що Банк є володільцем персональних даних щодо мене, зібраних відповідно до умов цієї Згоди, про склад та зміст зібраних Банком персональних даних щодо мене, мету збору Банком персональних даних щодо мене, та осіб, яким такі персональні дані передаються/будуть передаватися, а також про мене права як суб’єкта персональних даних, визначені Законом (в т.ч. ст.ст.8, 16, 20, 29 Закону)." Padding="30, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 9.5pt, style=Bold" HtmlTags="true" ColSpan="3"/>
+          <TableCell Name="Cell154" Border.Lines="Left, Right" HorzAlign="Justify" Font="Times New Roman, 9.5pt, style=Bold" HtmlTags="true"/>
+          <TableCell Name="Cell155" Border.Lines="Left, Right" HorzAlign="Justify" Font="Times New Roman, 9.5pt, style=Bold" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row40" Height="66.15" AutoSize="true">
+          <TableCell Name="Cell129" Border.Lines="Left, Right" Text="&lt;b&gt;5) Звільняю&lt;/b&gt; Банк від будь-якої відповідальності, у тому числі за будь-яку моральну шкоду, майнові збитки, неотримані доходи (вигоду), завдані будь-яким особам внаслідок будь-яких суперечок, претензій, вимог або судових спорів щодо або у зв'язку з персональними даними та приймаю на себе повну відповідальність перед такими третіми особами, у тому числі за відшкодування збитків та шкоди." Padding="30, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 9.5pt, style=Bold" HtmlTags="true" ColSpan="3"/>
+          <TableCell Name="Cell130" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+          <TableCell Name="Cell131"/>
+        </TableRow>
+        <TableRow Name="Row41" Height="66.15" AutoSize="true">
+          <TableCell Name="Cell132" Border.Lines="Left, Right" Text="&lt;b&gt;6) Зобов'язуюся&lt;/b&gt; підтримувати дійсність зазначених вище засвідчень і гарантій, а також відшкодувати Банку будь-які майнові збитки, моральну шкоду, неотримані доходи (вигоди), в т.ч. судові витрати та витрати на консультаційні послуги, що виникли внаслідок порушення мною зазначених вище засвідчень і гарантій, або у разі задоволення судом позову до Банку про відшкодування збитків або шкоду у зв'язку з переданими персональними даними." Padding="30, 1, 2, 1" HorzAlign="Justify" Font="Times New Roman, 9.5pt, style=Bold" HtmlTags="true" ColSpan="3"/>
+          <TableCell Name="Cell133" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+          <TableCell Name="Cell134"/>
+        </TableRow>
+        <TableRow Name="Row42">
+          <TableCell Name="Cell135" Border.Lines="Left, Right, Bottom" HorzAlign="Justify" Font="Times New Roman, 10pt, style=Bold" HtmlTags="true" ColSpan="3"/>
+          <TableCell Name="Cell136" Border.Lines="Left, Right" HorzAlign="Justify" Font="Times New Roman, 10pt, style=Bold" HtmlTags="true"/>
+          <TableCell Name="Cell137" Border.Lines="Left, Right" HorzAlign="Justify" Font="Times New Roman, 10pt, style=Bold" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row43" Height="56.7" AutoSize="true">
+          <TableCell Name="Cell138" Border.Lines="Left, Right, Top" Text="Вищенаведені згода на обробку Банком персональних даних, права Банку, засвідчення, гарантії та зобов’язання, пов’язані зі згодою на обробку персональних даних, є необмеженими строком, безумовними і безвідкличними." HorzAlign="Justify" Font="Times New Roman, 10pt, style=Bold" HtmlTags="true" ColSpan="3"/>
+          <TableCell Name="Cell139" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+          <TableCell Name="Cell140"/>
+        </TableRow>
+        <TableRow Name="Row49">
+          <TableCell Name="Cell156" Border.Lines="Left, Right" HorzAlign="Justify" Font="Times New Roman, 9.5pt, style=Bold" HtmlTags="true" ColSpan="3"/>
+          <TableCell Name="Cell157" Border.Lines="Left, Right" HorzAlign="Justify" Font="Times New Roman, 9.5pt, style=Bold" HtmlTags="true"/>
+          <TableCell Name="Cell158" Border.Lines="Left, Right" HorzAlign="Justify" Font="Times New Roman, 9.5pt, style=Bold" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row44" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell141" Border.Lines="Left" Text="_________________20__року*" Padding="30, 1, 2, 1" HorzAlign="Center" Font="Times New Roman, 10pt" HtmlTags="true"/>
+          <TableCell Name="Cell142" Text=" ___________________________&#13;&#10;      (підпис)" HorzAlign="Center" Font="Times New Roman, 8pt, style=Italic" HtmlTags="true"/>
+          <TableCell Name="Cell143" Border.Lines="Right" Text="[list_dog.FIO] [list_dog.PASP]&#13;&#10;" VertAlign="Center" Font="Times New Roman, 8pt, style=Italic" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row45">
+          <TableCell Name="Cell144" Border.Lines="Left, Right, Bottom" ColSpan="3"/>
+          <TableCell Name="Cell145"/>
+          <TableCell Name="Cell146"/>
+        </TableRow>
+      </TableObject>
+      <Sort>
+        <Sort Expression="[list_dog.INN]"/>
+      </Sort>
+    </DataBand>
+  </ReportPage>
+</Report>

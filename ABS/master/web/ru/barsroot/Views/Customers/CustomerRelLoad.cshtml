@@ -1,0 +1,67 @@
+﻿@{
+    Layout = null;
+}
+@using barsroot
+@using System.Web.Mvc.Html
+@inherits System.Web.Mvc.WebViewPage<IEnumerable<BarsWeb.Models.V_CUST_RELATIONS>>
+@*if (Model.Count()!=0)
+{*@
+    @foreach (var item in Model)
+    {
+    <tr onclick="LoadCustomerRelType(@item.RNK,@(item.RELCUST_RNK==null?item.RELEXT_ID:item.RELCUST_RNK),@item.REL_INTEXT);">
+        <td>@item.RELCUST_RNK</td>
+        <td>@item.RELEXT_ID</td>
+        <td>@item.CUSTTYPE</td>
+        <td>@item.NAME</td>
+        <td>@item.DOC_NAME</td>
+        <td>@item.DOC_SERIAL</td>
+        <td>@item.DOC_NUMBER</td>
+        <td>@(item.DOC_DATE==null?"":Convert.ToDateTime(item.DOC_DATE).ToShortDateString())</td>
+        <td>@item.DOC_ISSUER</td>
+        <td>@(item.BIRTHDAY==null?"":Convert.ToDateTime(item.BIRTHDAY).ToShortDateString())</td>
+        <td>@item.BIRTHPLACE</td>
+        <td>@item.SEX_NAME</td>
+        <td>@item.ADR</td>
+        <td>@item.TEL</td>
+        <td>@item.EMAIL</td>
+        <td>@item.OKPO</td>
+        <td>@item.COUNTRY_NAME</td>
+        <td>@item.REGION</td>
+        <td>@item.FS</td>
+        <td>@item.VED</td>
+        <td>@item.SED</td>
+        <td>@item.ISE</td>
+        <td>@item.NOTES</td>
+    </tr>            
+    }
+@*}
+else
+{
+    <tr class="footerRow" style="text-align:center;"><td colspan="23">Відсутні данні для відображення</td></tr>
+}
+
+            <tr class="footerRow">
+                <td colspan="23">
+                    <div class="footerDiv">
+                        Сторінка:&nbsp;
+                        @*if (ViewBag.PageNum>1)
+                        {
+                            int page =Convert.ToInt32(ViewBag.PageNum)-1;
+                            <img rd="@page" alt="@page" src="/Common/Images/default/16/navigate_left.png" />
+                        }
+						<span >
+							<span>@ViewBag.PageNum</span>
+						</span>
+                        @if (customerRelEx.Count() > ViewBag.RowNumber)
+                        {
+                            int page = Convert.ToInt32(ViewBag.PageNum) + 1;
+                            <img rd="@page" alt="@page" src="/Common/Images/default/16/navigate_right.png" />
+                        }
+
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Рядків на сторінці:&nbsp;
+                                <input id="rowNumber" name="rowNumber" type="text" value="@ViewBag.RowNumber" 
+                                      style="width:30px;text-align:center;" />
+                        * @
+                    </div>
+                </td>
+			</tr>*@

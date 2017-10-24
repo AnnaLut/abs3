@@ -1,0 +1,55 @@
+﻿@{
+    Layout = null;
+}
+@using System.Web.Mvc.Html
+@using System.Web.Mvc
+@inherits System.Web.Mvc.WebViewPage<IEnumerable<BarsWeb.Models.V_CUST_REL_TYPES>>
+@{ string cont="";
+   if (Model.Count()!=0)
+   {
+        foreach(var item in Model)
+        {
+            cont += "<tr onclick=\"LoadCustomerRelTypeOpt(" + ViewBag.RNK + "," + ViewBag.RELRNK + "," + ViewBag.RELINTEXT + "," + item.ID + ")\" id=\"" + item.ID + "\"><td>" + item.NAME + "</td></tr>";       
+        }
+   }else{
+       cont = "<tr class=\"footerRow\"><td>Немає даних для відображення</td></tr>";
+   }
+ }
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#tableCustRelType').jungGridView({ updateTableUrl: '/barsroot/customers/customerrelload/' + customerType, userUpdateParamFunc: updateParam });
+    });
+    /*function LoadCustomerRelTypeOpt(rnk, relRnk,relIntext,relId) {
+        addLoader($('#CustomerRelType'));
+        $('#CustomerRelType').load('/barsroot/customers/customerreltypeoptions/', { 'id': rnk, 'relRnk': relRnk }, function () { removeLoader($('#CustomerRelType')); })
+    }
+    */
+    function LoadCustomerRelTypeOpt(rnk, relRnk, relIntext,relId) {
+        addLoader($('#CustomerRelType'));
+        $.post('/barsroot/customers/customerreltypeoptions/',
+               { 'id': rnk, 'relRnk': relRnk, 'relIntext': relIntext, 'relId': relId },
+               function (data) {
+                   if (data != 'error') {
+                       $('#tableCustomerRelType #tdCustomerRelTypeOpt').html(data);
+                   }
+                   else {
+                       $('#CustomerRelType').html('Помилка завантаження даних');
+                   }
+                   removeLoader($('#CustomerRelType'));
+               });
+    }
+</script>
+<table id="tableCustomerRelType">
+    <tr>
+        <td style="vertical-align:top;">
+            @BarsWeb.HtmlHelpers.HtmlHelpers.CreateTable(capTableBtn: new string[,] {/*{"rfr",""},{"xls","exportToExel();"},{"prn","printSelectDocum();"}*/},
+                                columnName: new string[,] { { "Ознака пов'язаності", "" } },
+                                preTableDivId: "tableCustRelType",
+                                tableContent: cont)
+
+        </td>
+        <td id="tdCustomerRelTypeOpt">
+
+        </td>
+    </tr>
+</table>

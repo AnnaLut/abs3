@@ -1,0 +1,92 @@
+﻿
+<script src="~/Areas/Way/Scripts/InstantCards/InstantCards.js"></script>
+@{
+    ViewBag.Title = "Запит на миттєві картки";
+}
+
+<h2>@ViewBag.Title</h2>
+<div id="content" ng-app="BarsWeb.Controllers" ng-controller="InstantCards"  ng-init="GetProduct()" align="center">
+    <div kendo-window="Form" id="Form" k-visible="true" k-modal="true" style="width:575px">
+        <div id="popupNotification"></div>
+        <div class="form-group">
+            <form class="form-horizontal" style="width:550px; border-style: solid; border-width: 2px;border-color: #bbbbbb;">
+                <br />
+                <div>
+                    <div class="row">
+                        <div class="col-md-4" style="left:25%;">
+                            <label>Продукт:</label>
+                        </div>
+                        <div>
+                            <input ng-model="selected_product" id ="product" kendo-drop-down-list  k-data-source="Product" k-data-text-field="'NAME'" k-data-value-field="'CODE'" style="width:50%" k-on-change="onSelect()">
+                        </div>
+                        <br />
+                    </div>
+                    <br />
+                    <div class="row">
+                        <div class="col-md-4" style="left:23%;">
+                            <label>Тип картки:</label>
+                        </div>
+                        <div>
+                            <input id ="card_type" ng-model="selected_card_type" kendo-drop-down-list  k-data-source="CardType" k-data-text-field="'SUB_NAME'" k-data-value-field="'CODE'" style="width:50%">
+                        </div>
+                        <br />
+                    </div>
+                    <br />
+                    <div class="row">
+                        <div class="col-md-4" style="left:17%;">
+                            <label>Кількість карток:</label>
+                        </div>
+                        <div>
+                            <input class="col-md-2" ng-model="card_amount">
+                            <br />
+                        </div>
+                        <br />
+                    </div>
+                    <br />
+                </div>
+            </form>
+        </div>
+        <div class="form-group">
+            <form class="form-horizontal" style="width:550px; border-style: solid; border-width: 2px;border-color: #bbbbbb;">
+                <br />
+                <div>
+                    <div class="row">
+                        <div class="col-md-4" style="left:13%;">
+                            <label>Балансовий рахцнок:</label>
+                        </div>
+                        <div>
+                            <label>{{nbs}}</label>
+                        </div>
+                        <br />
+                    </div>
+                    <br />
+                    <div class="row">
+                        <div class="col-md-4" style="left:26%;">
+                            <label>Валюта:</label>
+                        </div>
+                        <div>
+                            <label>{{valuta}}</label>
+                            <br />
+                        </div>
+                        <br />
+                    </div>
+                    <br />
+                </div>
+            </form>
+        </div>
+        <div class="form-group" style="width:550px; border-style: solid; border-width: 2px;border-color: #bbbbbb;">
+            <form class="form-horizontal">
+                <br />
+                <div align="right" style="margin-right:8%">
+                    <button id="tablerowadd2" class="k-button" title="Додати налаштування" ng-click="Open()">
+                        Відкрити
+                    </button>
+                    <button id="tablerowadd2" class="k-button" title="Додати налаштування" ng-click="CloseForm()">
+                        Відмінити
+                    </button>
+                    <br /><br />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

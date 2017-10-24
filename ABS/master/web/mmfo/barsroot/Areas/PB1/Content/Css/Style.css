@@ -1,0 +1,40 @@
+﻿.k-header .k-link {
+    text-align: center;
+}
+
+.k-grid .k-grid-header .k-header .k-link {
+    height: auto;
+}
+
+.k-grid .k-grid-header .k-header {
+    white-space: normal;
+}
+
+#mydiv {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    opacity: .8;
+    background-color: white;
+}
+
+#loader {
+    position: absolute;
+    top: 40%;
+    left: 50%;
+}
+
+.red {
+    color: red;
+}
+
+.lightgreen {
+    background-color: greenyellow;
+}
+
+.green {
+    background-color: lightgreen;
+}

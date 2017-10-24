@@ -1,0 +1,112 @@
+﻿<!--Вікно додавання бенефіціара-->
+<div id="addAttorneyWindow">
+    <div id="window" class="contaiter">
+        <form id="benefProfile" class="form-horizontal">
+            <div class="col-xs-10">
+                <div class="form-group">
+                    <label for="benefFio" class="col-xs-3 control-label">ПІБ:</label>
+                    <div class="col-xs-7">
+                        <input type="text" class="k-textbox" id="benefFio" name="benefFio" placeholder="ПІБ" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="benefCode" class="col-xs-3 control-label">Бенефіціар:</label>
+                    <div class="col-xs-7">
+                        <input class="form-control" id="benefCode" name="benefCode" placeholder="Код" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="benefCountry" class="col-xs-3 control-label">Країна:</label>
+                    <div class="col-xs-7">
+                        <input class="form-control" id="benefCountry" name="benefCountry" placeholder="Країна">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="benefAddress" class="col-xs-3 control-label">Адреса:</label>
+                    <div class="col-xs-7">
+                        <input type="text" class="k-textbox" id="benefAddress" name="benefAddress" placeholder="Адреса">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="benefIcod" class="col-xs-3 control-label">ІНН:</label>
+                    <div class="col-xs-7">
+                        <input type="text" class="k-textbox" id="benefIcod" name="benefIcod" placeholder="ІНН" required />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="benefPercent" class="col-xs-3 control-label">Відсоток спадщини:</label>
+                    <div class="col-xs-7">
+                        <input type="number" class="k-textbox" id="benefPercent" name="benefPercent" placeholder="Відсоток спадщини">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="benefDoctype" class="col-xs-3 control-label">Тип документу:</label>
+                    <div class="col-xs-7">
+                        <input class="form-control" id="benefDoctype" name="benefDoctype" placeholder="Тип документу" required />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div id="serialBlock">
+                        <label for="benefDocserial" class="col-xs-3 control-label">Серія:</label>
+                        <div class="col-xs-3">
+                            <input type="text" class="k-textbox" id="benefDocserial" name="benefDocserial" placeholder="Серія" required />
+                        </div>
+                    </div>
+                    <div id="eddrBlock">
+                        <label for="eddridbenef" class="col-xs-3 control-label">ЄДДР:</label>
+                        <div class="col-xs-3">
+                            <input type="text" class="k-textbox" id="eddridbenef" name="eddridbenef" placeholder="ЄДДР:" />
+                        </div>
+                    </div>
+                    <div class="col-xs-3">
+                        <input type="text" class="k-textbox" id="benefDocnumber" name="benefDocnumber" placeholder="Номер" required />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="benefDocorgb" class="col-xs-3 control-label">Ким виданий:</label>
+                    <div class="col-xs-7">
+                        <input type="text" class="k-textbox" id="benefDocorgb" name="benefDocorgb" placeholder="Ким виданий" required />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="benefDocdate" class="col-xs-3 control-label">Дата видачі:</label>
+                    <div class="col-xs-7">
+                        <input type="date" class="datepicker" id="benefDocdate" name="benefDocdate" placeholder="Дата видачі" pattern="\d{1,2}.\d{1,2}.\d{4}" style="color: red" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="benefBirth" class="col-xs-3 control-label">Дата народження:</label>
+                    <div class="col-xs-7">
+                        <input type="date" class="datepicker" id="benefBirth" name="benefBirth" placeholder="Дата народження" pattern="\d{1,2}.\d{1,2}.\d{4}" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="benefSex" class="col-xs-3 control-label">Стать:</label>
+                    <div class="col-xs-7">
+                        <input class="form-control" id="benefSex" name="benefSex" placeholder="Стать" required />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="benefPhone" class="col-xs-3 control-label">Телефон:</label>
+                    <div class="col-xs-7">
+                        <input type="text" class="k-textbox" id="benefPhone" name="benefPhone" placeholder="Телефон">
+                    </div>
+                </div>
+                <br />
+                <div class="form-group">
+                    <div class="col-xs-5">
+                        <button type="button" class="k-button" id="saveBenef" style="text-align: center"><span class="k-sprite pf-icon pf-16 pf-save" style="margin-bottom: 3px"></span> Зберегти</button>
+
+                    </div>
+                    <div class="col-xs-5">
+                        <button type="button" id="delAttorneyWills" class="k-button right-pos" style="width: 120px"><span class="k-sprite pf-icon pf-16 pf-delete" style="margin-bottom: 3px"></span> Видалити</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-xs-5">
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,116 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = "Вихідні та свята";
+}
+
+<script src="~/Areas/Kernel/Scripts/Calendar/CulturaUA.js"></script>
+<script src="~/Areas/Kernel/Scripts/Calendar/CrtrlCalendar.js"></script>
+
+<h2>@ViewBag.Title</h2>
+
+<style>
+
+
+    .k-weekend {
+        background: #e58282;
+    }
+
+
+    .k-header {
+        display: none !important;
+    }
+    .k-footer {
+        display: none !important;
+    }
+    /*.k-widget.k-datepicker.k-header.form-control{
+        display: inline!important;
+    }*/
+    .k-state-selected.k-state-focused {
+        background: #e58282;
+        color:#e58282;
+    }
+    .k-state-selected{
+        background: #e58282;
+        color:#e58282;
+    }
+    .k-other-month {
+        visibility: hidden !important;
+    }
+    .demo-section {
+        text-align: center;
+    }
+
+    .col-md-3 {
+        width: 22% !important;
+    }
+
+</style>
+<div>
+    <div>
+        <div class="col-md-6">
+            <div class="col-md-11">
+                <button  id='run' class="k-button" onclick="InitHolidays()" title="Зберегти зміни у Базі Даних" style="width: 32px; height: 27px;">
+                    <img src="~/Areas/Dcp/Content/Images/RuningIcon.png" width="16" height="16" />
+                </button>
+                <button id='reload' onclick="reload()" type='button' class='k-button'><i class='pf-icon pf-16 pf-reload_rotate'></i></button>
+                <button id='save' onclick="SaveCalendar()" type='button' class='k-button'><i class='pf-icon pf-16 pf-save'></i></button>
+                <label></label>
+                    <input type="checkbox" id="kv_all" class="k-checkbox">
+                    <label class="k-checkbox-label" for="kv_all">Для всіх валют</label>
+                <br /><br />
+            </div>
+            <div class="form-inline" style="margin-bottom:10%">
+                <div class="col-md-5">
+                    <div class="form-group">
+                        <label><b>Валюта</b> &nbsp;</label>
+                    </div>
+                    <div class="form-group">
+                        <input class="form-control" id="kv" />
+                    </div>
+                </div>
+                <div class="col-md-5">
+                    <div class="form-group">
+                        <label><b>Рік</b> &nbsp;</label>
+                    </div>
+                    <div class="form-group">
+                        <input class="form-control" type = "number" id="yearpicker" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3"><div>Січень</div><div id="jan"></div></div>
+            <div class="col-md-3"><div>Лютий</div><div id="feb"></div></div>
+            <div class="col-md-3"><div>Березень</div><div id="mar"></div></div>
+            <div class="col-md-3"><div>Квітень</div><div id="apr"></div></div>
+            <div class="col-md-3"><div>Травень</div><div id="may"></div></div>
+            <div class="col-md-3"><div>Червень </div><div id="jun"></div></div>
+            <div class="col-md-3"><div>Липень</div><div id="jul"></div></div>
+            <div class="col-md-3"><div>Серпень</div><div id="aug"></div></div>
+            <div class="col-md-3"><div>Вересень</div><div id="sep"></div></div>
+            <div class="col-md-3"><div>Жовтень</div><div id="oct"></div></div>
+            <div class="col-md-3"><div>Листопад</div><div id="nov"></div></div>
+            <div class="col-md-3"><div>Грудень</div><div id="dec"></div></div>
+            <div id="cal"></div>
+        </div>
+    </div>
+</div>
+<div id="popupNotification"></div>
+
+<div id="winCalendarConfirm" kendo-window="winConfirm" k-title="'Підтверження!'" k-visible="false" k-modal="true" style=" width: 420px;">
+    <div id="barsUiConfirmDialog" data-role="window" class="k-window-content k-content" tabindex="0" role="dialog" aria-labelledby="barsUiConfirmDialog_wnd_title">
+        <table>
+            <tbody>
+                <tr>
+                    <td valign="top">
+                        <div style="margin:0 5px 0 0;display:inline-block;background-repeat:no-repeat;width:24px;height:24px;background-image:url(/barsroot/Content/images/PureFlat/24/Hot/help.png)">
+                        </div>
+                    </td>
+                    <td>Помітити день <text id="dayforOFF"></text>  як <text id="dayname" value ="вихідний"  ></text>?</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="k-content k-window-footer">
+        <button  onclick="CloseConfirmWin();" class="delete-confirm k-button" style="float:right;margin:7px 5px 7px 5px;">Відмінити</button>
+        <button  onclick="SetDayState()" class="delete-confirm k-button k-primary" style="float:right;margin:7px 5px 7px 5px;"><span class="k-icon k-i-tick"></span> Ok</button>
+    </div>
+</div>

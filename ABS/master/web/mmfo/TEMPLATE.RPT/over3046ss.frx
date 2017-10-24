@@ -1,0 +1,170 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="05/18/2016 12:57:51" ReportInfo.Modified="07/07/2016 13:22:29" ReportInfo.CreatorVersion="2014.1.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="grc" ConnectionString="rijcmlq8+HCsj5mnfc2oQWOJAI1rOWOGv68sBpiXMxVx5dIqE5D/0R4GFMb8rMrJxqWpgOviRP5M12xAYEJBCwe0z5UxQ==">
+      <TableDataSource Name="Table" Alias="OVR_REP_ZAG1" DataType="System.Int32" Enabled="true" SelectCommand="select txt from OVR_REP_ZAG where acc = :ACC and npp =1">
+        <Column Name="TXT" DataType="System.String"/>
+        <CommandParameter Name=":ACC" DataType="113" DefaultValue="0"/>
+      </TableDataSource>
+      <TableDataSource Name="Table1" Alias="OVR_REP_ZAG2" DataType="System.Int32" Enabled="true" SelectCommand="select txt from OVR_REP_ZAG where acc = :ACC and npp =2">
+        <Column Name="TXT" DataType="System.String"/>
+        <CommandParameter Name=":ACC" DataType="113" Expression="[ACC]" DefaultValue="0"/>
+      </TableDataSource>
+      <TableDataSource Name="Table2" Alias="OVR_REP_ZAG3" DataType="System.Int32" Enabled="true" SelectCommand="select c.nmk from customer c, accounts a where a.rnk=c.rnk and a.acc = :ACC">
+        <Column Name="NMK" DataType="System.String"/>
+        <CommandParameter Name=":ACC" DataType="113" Expression="[ACC]" DefaultValue="0"/>
+      </TableDataSource>
+      <TableDataSource Name="Table3" Alias="OVR_REP_ZAG4" DataType="System.Int32" Enabled="true" SelectCommand="select txt from OVR_REP_ZAG where acc = :ACC and npp =4">
+        <Column Name="TXT" DataType="System.String"/>
+        <CommandParameter Name=":ACC" DataType="113" Expression="[ACC]" DefaultValue="0"/>
+      </TableDataSource>
+      <TableDataSource Name="Table4" Alias="OVR_REP_ZAG5" DataType="System.Int32" Enabled="true" SelectCommand="select txt from OVR_REP_ZAG where acc = :ACC and npp =5    ">
+        <Column Name="TXT" DataType="System.String"/>
+        <CommandParameter Name=":ACC" DataType="113" DefaultValue="0"/>
+      </TableDataSource>
+      <TableDataSource Name="Table5" Alias="OVR_REP_ZAG6" DataType="System.Int32" Enabled="true" SelectCommand="select txt from OVR_REP_ZAG where acc = :ACC and npp =6">
+        <Column Name="TXT" DataType="System.String"/>
+        <CommandParameter Name=":ACC" DataType="113" Expression="[ACC]" DefaultValue="0"/>
+      </TableDataSource>
+      <TableDataSource Name="Table6" Alias="OVR_REP_ZAG8" DataType="System.Int32" Enabled="true" SelectCommand="select txt from OVR_REP_ZAG where acc = :ACC and npp =8    ">
+        <Column Name="TXT" DataType="System.String"/>
+        <CommandParameter Name=":ACC" DataType="113" Expression="[ACC]" DefaultValue="0"/>
+      </TableDataSource>
+      <TableDataSource Name="Table7" Alias="contract_cond" DataType="System.Int32" Enabled="true" SelectCommand="select '№ '||d.cc_id ||' від '||to_char(d.sdate, 'dd.mm.yyyy')||' року ' cont from cc_deal d,nd_acc n where n.acc=:ACC and n.nd= d.nd and d.vidd = OVRN.vidd">
+        <Column Name="CONT" DataType="System.String"/>
+        <CommandParameter Name=":ACC" DataType="113" Expression="[ACC]" DefaultValue="0"/>
+      </TableDataSource>
+      <TableDataSource Name="Table8" Alias="new_over" DataType="System.Int32" Enabled="true" SelectCommand="select c.nmk , l.LIM/100 size_over &#13;&#10;from customer c, &#13;&#10;    (select a2.* from accounts a2, accounts a1 where a1.acc =:ACC and a2.accc = a1.accc ) a, &#13;&#10;  --  (select * from ovr_lim where fdat = trunc(gl.bd,'MM') +20 ) L&#13;&#10;   (select * from ovr_lim ) L&#13;&#10;where c.rnk = a.rnk and a.acc = l.acc  and a.lim &lt;&gt; l.lim&#13;&#10;">
+        <Column Name="NMK" DataType="System.String"/>
+        <Column Name="SIZE_OVER" DataType="System.Decimal"/>
+        <CommandParameter Name=":ACC" DataType="113" Expression="[ACC]" DefaultValue="0"/>
+      </TableDataSource>
+      <TableDataSource Name="Table13" Alias="adjusted_over" DataType="System.Int32" Enabled="true" SelectCommand="select l.lim ,&#13;&#10;         trim( to_char(l.lim/100, '999,999,999,999.99') )||' ('|| &#13;&#10;         f_sumpr (l.lim, 980,'*',  NULL, NULL ) || ')'  adjusted&#13;&#10;from accounts a8, accounts a26,  (select * from ovr_lim where fdat = trunc(gl.bd,'MM') +20 ) L &#13;&#10;where a26.acc =:ACC and a8.acc = a26.accc and a8.acc = l.acc  and a8.lim &lt;&gt; l.lim&#13;&#10;">
+        <Column Name="LIM" DataType="System.Decimal"/>
+        <Column Name="ADJUSTED" DataType="System.String"/>
+        <CommandParameter Name=":ACC" DataType="113" Expression="[ACC]" DefaultValue="0"/>
+      </TableDataSource>
+      <TableDataSource Name="Table14" Alias="responsible_user" DataType="System.Int32" Enabled="true" SelectCommand="select fio from staff where id = user_id">
+        <Column Name="FIO" DataType="System.String"/>
+      </TableDataSource>
+      <TableDataSource Name="Table15" Alias="glbd" DataType="System.Int32" Enabled="true" SelectCommand="select to_char(trunc(gl.bd,'MM') +19,'dd.mm.yyyy') bd from dual">
+        <Column Name="BD" DataType="System.String"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="ACC" DataType="System.Int32" Expression="0"/>
+  </Dictionary>
+  <ReportPage Name="Page1" Guides="708.75">
+    <PageHeaderBand Name="PageHeader1" Width="718.2" Height="359.1" CanGrow="true">
+      <TableObject Name="Table11" Top="28.35" Width="708.75" Height="330.75" GrowToBottom="true">
+        <TableColumn Name="Column5" Width="20.79"/>
+        <TableColumn Name="Column6" Width="257.04"/>
+        <TableColumn Name="Column7" Width="143.64"/>
+        <TableColumn Name="Column8" Width="143.64"/>
+        <TableColumn Name="Column9" Width="143.64"/>
+        <TableRow Name="Row3" Height="135.45" AutoSize="true">
+          <TableCell Name="Cell5" Text="[OVR_REP_ZAG1.TXT]&#13;&#10;[OVR_REP_ZAG2.TXT]&#13;&#10;[OVR_REP_ZAG3.NMK]&#13;&#10;[OVR_REP_ZAG4.TXT]&#13;&#10;[OVR_REP_ZAG5.TXT]&#13;&#10;[OVR_REP_ZAG6.TXT]&#13;&#10;" HorzAlign="Right" Font="Times New Roman, 14pt" ColSpan="5"/>
+          <TableCell Name="Cell6" HorzAlign="Right" Font="Times New Roman, 14pt"/>
+          <TableCell Name="Cell7" HorzAlign="Right" Font="Times New Roman, 14pt"/>
+          <TableCell Name="Cell8" HorzAlign="Right" Font="Times New Roman, 14pt"/>
+          <TableCell Name="Cell9" HorzAlign="Right" Font="Times New Roman, 14pt"/>
+        </TableRow>
+        <TableRow Name="Row11" Height="47.25">
+          <TableCell Name="Cell45" Text="[OVR_REP_ZAG8.TXT]!" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 14pt, style=Bold" ColSpan="5"/>
+          <TableCell Name="Cell46"/>
+          <TableCell Name="Cell47"/>
+          <TableCell Name="Cell48"/>
+          <TableCell Name="Cell49"/>
+        </TableRow>
+        <TableRow Name="Row4" Height="107.1" AutoSize="true">
+          <TableCell Name="Cell10" Text="	Згідно з умовами Договору Овердрафту Холдингу [contract_cond.CONT]  (далі – Договір Овердрафту Холдингу) Банк щомісячно проводить перегляд Індивідуального(-их) Ліміту(-ів) Овердрафту(-ів)/Загального Ліміту Овердрафту. За результатами проведення такого перегляду у поточному місяці, Банк з 21.06.2016 року встановлює: " HorzAlign="Justify" Font="Times New Roman, 14pt" ColSpan="5"/>
+          <TableCell Name="Cell11" HorzAlign="Right" Font="Times New Roman, 14pt"/>
+          <TableCell Name="Cell12" HorzAlign="Right" Font="Times New Roman, 14pt"/>
+          <TableCell Name="Cell13" HorzAlign="Right" Font="Times New Roman, 14pt"/>
+          <TableCell Name="Cell14" HorzAlign="Right" Font="Times New Roman, 14pt"/>
+        </TableRow>
+        <TableRow Name="Row5" Height="40.95" AutoSize="true">
+          <TableCell Name="Cell15" Text="	новий(-і) (скоригований(-і)) Індивідуальний(-і) Ліміт(-и) Овердрафту(-ів) у розмірі: " HorzAlign="Justify" Font="Times New Roman, 14pt" ColSpan="5">
+            <CheckBoxObject Name="CheckBox1" Left="37.8" Width="18.9" Height="18.9" CheckedSymbol="Fill"/>
+          </TableCell>
+          <TableCell Name="Cell16" VertAlign="Bottom" Font="Times New Roman, 14pt"/>
+          <TableCell Name="Cell17" HorzAlign="Right" Font="Times New Roman, 14pt"/>
+          <TableCell Name="Cell18" HorzAlign="Right" Font="Times New Roman, 14pt"/>
+          <TableCell Name="Cell19" HorzAlign="Right" Font="Times New Roman, 14pt"/>
+        </TableRow>
+      </TableObject>
+    </PageHeaderBand>
+    <DataBand Name="Data1" Top="433.25" Width="718.2" Height="18.9" CanGrow="true">
+      <TableObject Name="Table9" Width="708.76" Height="18.9" GrowToBottom="true">
+        <TableColumn Name="Column1" Width="354.38"/>
+        <TableColumn Name="Column2" Width="354.38"/>
+        <TableRow Name="Row1">
+          <TableCell Name="Cell1" Border.Lines="Left, Top, Bottom" Text="[new_over.NMK]" VertAlign="Center" Font="Times New Roman, 14pt"/>
+          <TableCell Name="Cell2" Border.Lines="All" Text="[new_over.SIZE_OVER]" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 14pt"/>
+        </TableRow>
+      </TableObject>
+      <DataHeaderBand Name="DataHeader1" Top="363.1" Width="718.2" Height="66.15">
+        <TableObject Name="Table10" Top="9.45" Width="708.76" Height="56.7">
+          <TableColumn Name="Column3" Width="354.38"/>
+          <TableColumn Name="Column4" Width="354.38"/>
+          <TableRow Name="Row2" Height="56.7">
+            <TableCell Name="Cell3" Border.Lines="Left, Right, Top" Text="Позичальник" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 14pt" HtmlTags="true"/>
+            <TableCell Name="Cell4" Border.Lines="Left, Right, Top" Text="Розмір Скоригованого Ліміту Овердрафту, грн." HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 14pt" HtmlTags="true"/>
+          </TableRow>
+        </TableObject>
+      </DataHeaderBand>
+      <DataFooterBand Name="DataFooter1" Top="456.15" Width="718.2" Height="397.9" CanGrow="true" CanShrink="true" CanBreak="true">
+        <TableObject Name="Table12" Top="9.45" Width="708.75" Height="385.32" GrowToBottom="true">
+          <TableColumn Name="Column10"/>
+          <TableColumn Name="Column11"/>
+          <TableColumn Name="Column12"/>
+          <TableColumn Name="Column13" Width="444.15"/>
+          <TableColumn Name="Column14"/>
+          <TableRow Name="Row6" Height="48.83" AutoSize="true">
+            <TableCell Name="Cell20" Text="	Новий (скоригований) Загальний Ліміт Овердрафту у розмірі &lt;b&gt;[adjusted_over.ADJUSTED]&lt;/b&gt;" HorzAlign="Justify" Font="Times New Roman, 14pt" HtmlTags="true" ColSpan="5"/>
+            <TableCell Name="Cell21"/>
+            <TableCell Name="Cell22"/>
+            <TableCell Name="Cell23"/>
+            <TableCell Name="Cell24"/>
+          </TableRow>
+          <TableRow Name="Row7" Height="218.93" AutoSize="true">
+            <TableCell Name="Cell25" Text="	Відповідно до умов Договору Овердрафту Позичальники ГК зобов’язані станом на кінець 20 числа поточного місяця забезпечити підтримання розміру заборгованості за Овердрафтом Холдингу на рівні не більшому нового(-их) (скоригованого(-их)) Індивідуального(-их) Ліміту(-ів) Овердрафту(-ів)/Загального Ліміту Овердрафту.&#13;&#10;	В іншому випадку &lt;b&gt;з 21 числа поточного місяця&lt;/b&gt; Банк Призупиняє надання Овердрафту Холдингу. &#13;&#10;	У зв’язку з вищевикладеним просимо Вас забезпечитистаном на кінець  [glbd.BD]  року підтримання розміру заборгованості за Овердрафтом Холдингу на рівні не більше ніж вказано вище.&#13;&#10;" HorzAlign="Justify" Font="Times New Roman, 14pt" HtmlTags="true" ColSpan="5"/>
+            <TableCell Name="Cell26" Font="Times New Roman, 14pt"/>
+            <TableCell Name="Cell27" Font="Times New Roman, 14pt"/>
+            <TableCell Name="Cell28" Font="Times New Roman, 14pt"/>
+            <TableCell Name="Cell29" Font="Times New Roman, 14pt"/>
+          </TableRow>
+          <TableRow Name="Row8" Height="39.38">
+            <TableCell Name="Cell30"/>
+            <TableCell Name="Cell31"/>
+            <TableCell Name="Cell32"/>
+            <TableCell Name="Cell33"/>
+            <TableCell Name="Cell34"/>
+          </TableRow>
+          <TableRow Name="Row9" Height="37.8">
+            <TableCell Name="Cell35" Text="Заступник голови правління                                                                               " HorzAlign="Justify" VertAlign="Bottom" Font="Times New Roman, 14pt, style=Bold" HtmlTags="true" ColSpan="4"/>
+            <TableCell Name="Cell36"/>
+            <TableCell Name="Cell37"/>
+            <TableCell Name="Cell38" HorzAlign="Justify" Font="Times New Roman, 14pt" HtmlTags="true"/>
+            <TableCell Name="Cell39"/>
+          </TableRow>
+          <TableRow Name="Row12" Height="37.8">
+            <TableCell Name="Cell50" Text="&lt;i&gt;Вик. [responsible_user.FIO]&lt;/i&gt;" HorzAlign="Justify" VertAlign="Bottom" Font="Times New Roman, 12pt" HtmlTags="true" ColSpan="5" RowSpan="2">
+              <LineObject Name="Line1" Left="274.05" Width="368.55"/>
+            </TableCell>
+            <TableCell Name="Cell51"/>
+            <TableCell Name="Cell52"/>
+            <TableCell Name="Cell53"/>
+            <TableCell Name="Cell54"/>
+          </TableRow>
+          <TableRow Name="Row10" Height="2.58">
+            <TableCell Name="Cell40"/>
+            <TableCell Name="Cell41"/>
+            <TableCell Name="Cell42"/>
+            <TableCell Name="Cell43"/>
+            <TableCell Name="Cell44"/>
+          </TableRow>
+        </TableObject>
+      </DataFooterBand>
+    </DataBand>
+  </ReportPage>
+</Report>

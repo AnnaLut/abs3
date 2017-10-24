@@ -1,0 +1,68 @@
+﻿@using Areas.DptAdm.Models
+
+<script src="@Url.Content("~/Areas/DptAdm/Scripts/dptViddCard.js")"></script>
+<script src="@Url.Content("~/Areas/DptAdm/Scripts/AdmCtrl.js")"></script>
+<link href="~/Areas/DptAdm/Content/style.css" rel="stylesheet" />
+@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = "Картка виду вкладу";
+}
+
+<h2>@ViewBag.Title</h2>
+
+<div class="panel panel-primary">
+    
+</div>
+
+@(Html.Kendo().TabStrip()
+    .Name("pages_panel")
+    .Items(pages =>
+    {
+     pages.Add().Text("Загальні параметри")
+                .Selected(true)
+                .Content(@<text>}
+                    <form id="card_vidd_main">
+                        <table>
+                            <tr>
+                                <td style="width: 150px; text-align: right;">
+                                    @Html.Label("VIDD_NAME", "Найменування вида вкладу", new { @class = searchLabelClass })
+                                </td>
+                                <td style="padding-left: 4px;">
+                                    <select id="VIDD_NAME" name="VIDD_NAME">
+                                    </select>
+                                </td>
+                                <td style="width: 200px; text-align: right;"></td>
+                                <td style="padding-left: 4px;"></td>
+                                </tr>
+</table>
+</form>
+</text>);
+
+    <script type="text/javascript">
+        $("#VIDD_NAME").kendoDropDownList();
+        
+        var openViddDialog = function (read_only) {
+            var grid = $('#grid_dpt_vidd').data('kendoGrid');
+            var row = grid.dataItem(grid.select());
+            $.get(bars.config.urlContent('/DptAdm/DptAdm/GetViddInfo'), { vidd: row.vidd }).done(function (result) {
+                if (result.status === 'ok') {
+                    alert("1");
+                }
+            });
+            }
+
+        var viewViddDialog = function() {          
+            $("#card_vidd_main .k-input").each(function () {
+                $(this).addClass("k-state-disabled");
+            });
+            openViddDialog(true);
+        };   
+
+        var editViddDialog = function () {
+            $("#card_vidd_main .k-input").each(function () {
+                $(this).addClass("k-state-enabled");
+            });
+            openViddDialog(false);
+        };
+        $("card_vidd_main").bind("open", viewViddDialog);
+    </script>

@@ -1,0 +1,270 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="04/15/2011 18:11:20" ReportInfo.Modified="10/27/2014 14:21:16" ReportInfo.CreatorVersion="2013.3.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="khrsn72" ConnectionString="rijcmlqcFv7/QVsbsa1pDpr21P0mHXdl2BpgMbYS4w+AnBeGDddnQ5MuNy1h3sM21aiXmM/zMOpd1Pwx1wPopRC3w7L4g==">
+      <TableDataSource Name="BANK_NAME" Alias="BRANCH_NAME" DataType="System.Int32" Enabled="true" SelectCommand="select nvl( f_doc_attr('BRANCH_NAME', :p1, :p2), 'null') as VAL from dual">
+        <Column Name="VAL" DataType="System.String"/>
+        <CommandParameter Name="p1" DataType="113" Expression="[p_bid_id]" DefaultValue="-1"/>
+        <CommandParameter Name="p2" DataType="113" DefaultValue="0"/>
+      </TableDataSource>
+      <TableDataSource Name="STAFF_FIO" DataType="System.Int32" Enabled="true" SelectCommand="select nvl( f_doc_attr('STAFF_FIO', :p1, :p2), 'null') as VAL from dual">
+        <Column Name="VAL" DataType="System.String"/>
+        <CommandParameter Name="p1" DataType="113" Expression="[p_bid_id]" DefaultValue="-1"/>
+        <CommandParameter Name="p2" DataType="113" DefaultValue="0"/>
+      </TableDataSource>
+      <TableDataSource Name="Table" Alias="WCS_IQ_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select wcs_utl.get_answ_date(b.id, 'IQ_CC_DECISION_Q1', w.id, 0) as q1,&#13;&#10;       wcs_utl.get_answ_text(b.id, 'IQ_CC_DECISION_Q2', w.id, 0) as q2,&#13;&#10;       wcs_utl.get_answ_list_text(b.id, 'IQ_CC_DECISION_Q3', w.id, 0) as q3,&#13;&#10;       wcs_utl.get_answ_text(b.id, 'IQ_CC_DECISION_Q4', w.id, 0) as q4,&#13;&#10;       wcs_utl.get_answ_text(b.id, 'IQ_CC_DECISION_Q5', w.id, 0) as q5,&#13;&#10;       wcs_utl.get_answ_text(b.id, 'IQ_CC_DECISION_Q6', w.id, 0) as q6,&#13;&#10;       wcs_utl.get_answ_text(b.id, 'IQ_CC_DECISION_Q7', w.id, 0) as q7,&#13;&#10;       trim(wcs_utl.get_answ_text(b.id, 'IQ_CC_DECISION_Q8', w.id, 0)) as q8,&#13;&#10;       decode(trim(wcs_utl.get_answ_text(b.id, 'IQ_CC_DECISION_Q8', w.id, 0)),&#13;&#10;              null,&#13;&#10;              0,&#13;&#10;              1) as has_addconds&#13;&#10;  from wcs_bids b, wcs_workspaces w&#13;&#10; where b.id = :p_bid_id&#13;&#10;   and w.id = :p_ws_id">
+        <Column Name="Q2" DataType="System.String"/>
+        <Column Name="Q3" DataType="System.String"/>
+        <Column Name="Q4" DataType="System.String"/>
+        <Column Name="Q1" DataType="System.DateTime"/>
+        <Column Name="Q5" DataType="System.String"/>
+        <Column Name="Q6" DataType="System.String"/>
+        <Column Name="Q7" DataType="System.String"/>
+        <Column Name="Q8" DataType="System.String"/>
+        <Column Name="HAS_ADDCONDS" DataType="System.Decimal"/>
+        <CommandParameter Name="p_bid_id" DataType="107" Expression="[p_bid_id]" DefaultValue="-1"/>
+        <CommandParameter Name="p_ws_id" DataType="126" Expression="[p_ws_id]"/>
+      </TableDataSource>
+      <TableDataSource Name="Table2" Alias="WCS_BID_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select b.*,&#13;&#10;       decode(wcs_utl.get_answ(b.bid_id, 'PI_CASH_SELECTED'),&#13;&#10;              1,&#13;&#10;              'готівкою',&#13;&#10;              'безготівково') form_cred,&#13;&#10;       wcs_utl.get_answ(b.bid_id, 'CL_2_0_01') as CREDIT_TARGET,&#13;&#10;       wcs_utl.get_answ(b.bid_id, 'CL_2_0_02') AS CREDIT_DESCRIPTION,&#13;&#10;       (select trim(dbms_lob.substr(wm_concat(' ' ||&#13;&#10;                                              case bg.garantee_id&#13;&#10;                                                when 'DEPOSIT' then&#13;&#10;                                                 bg.garantee_name || ': №' ||&#13;&#10;                                                 wcs_utl.get_answ_text(bg.bid_id,&#13;&#10;                                                                       'GRT_6_1',&#13;&#10;                                                                       bg.ws_id,&#13;&#10;                                                                       bg.garantee_num) ||&#13;&#10;                                                 ' від ' ||&#13;&#10;                                                 to_char(wcs_utl.get_answ_date(bg.bid_id,&#13;&#10;                                                                               'GRT_6_2',&#13;&#10;                                                                               bg.ws_id,&#13;&#10;                                                                               bg.garantee_num),&#13;&#10;                                                         'dd.mm.yyyy')&#13;&#10;                                                when 'GUARANTOR' then&#13;&#10;                                                 bg.garantee_name || ': ' ||&#13;&#10;                                                 wcs_utl.get_answ(bg.bid_id,&#13;&#10;                                                                         'CL_123_R',&#13;&#10;                                                                         bg.ws_id,&#13;&#10;                                                                         bg.garantee_num) &#13;&#10;                                                when 'VEHICLE' then&#13;&#10;                                                 bg.garantee_name || ': ' ||&#13;&#10;                                                 bg.grt_name&#13;&#10;                                                when 'MORTGAGE' then&#13;&#10;                                                 bg.garantee_name || ': ' ||&#13;&#10;                                                 wcs_utl.get_answ(bg.bid_id,&#13;&#10;                                                                  'GRT_4_6',&#13;&#10;                                                                  bg.ws_id,&#13;&#10;                                                                  bg.garantee_num) ||&#13;&#10;                                                 decode(wcs_utl.get_answ(bg.bid_id,&#13;&#10;                                                                         'GRT_0',&#13;&#10;                                                                         bg.ws_id,&#13;&#10;                                                                         bg.garantee_num),&#13;&#10;                                                        0,&#13;&#10;                                                        ', власник: ' ||&#13;&#10;                                                        wcs_utl.get_answ(bg.bid_id,&#13;&#10;                                                                         'CL_1',&#13;&#10;                                                                         bg.ws_id,&#13;&#10;                                                                         bg.garantee_num) || ' ' ||&#13;&#10;                                                        wcs_utl.get_answ(bg.bid_id,&#13;&#10;                                                                         'CL_2',&#13;&#10;                                                                         bg.ws_id,&#13;&#10;                                                                         bg.garantee_num) || ' ' ||&#13;&#10;                                                        wcs_utl.get_answ(bg.bid_id,&#13;&#10;                                                                         'CL_3',&#13;&#10;                                                                         bg.ws_id,&#13;&#10;                                                                         bg.garantee_num))&#13;&#10;                                                when 'MORTGAGE_LAND' then&#13;&#10;                                                 bg.garantee_name || ': ' ||&#13;&#10;                                                 wcs_utl.get_answ(bg.bid_id,&#13;&#10;                                                                  'GRT_5_3',&#13;&#10;                                                                  bg.ws_id,&#13;&#10;                                                                  bg.garantee_num) ||&#13;&#10;                                                 decode(wcs_utl.get_answ(bg.bid_id,&#13;&#10;                                                                         'GRT_0',&#13;&#10;                                                                         bg.ws_id,&#13;&#10;                                                                         bg.garantee_num),&#13;&#10;                                                        0,&#13;&#10;                                                        ', власник: ' ||&#13;&#10;                                                        wcs_utl.get_answ(bg.bid_id,&#13;&#10;                                                                         'CL_1',&#13;&#10;                                                                         bg.ws_id,&#13;&#10;                                                                         bg.garantee_num) || ' ' ||&#13;&#10;                                                        wcs_utl.get_answ(bg.bid_id,&#13;&#10;                                                                         'CL_2',&#13;&#10;                                                                         bg.ws_id,&#13;&#10;                                                                         bg.garantee_num) || ' ' ||&#13;&#10;                                                        wcs_utl.get_answ(bg.bid_id,&#13;&#10;                                                                         'CL_3',&#13;&#10;                                                                         bg.ws_id,&#13;&#10;                                                                         bg.garantee_num))&#13;&#10;                                              end),&#13;&#10;                                    4000,&#13;&#10;                                    1))&#13;&#10;          from v_wcs_bid_garantees bg&#13;&#10;         where bg.bid_id = b.bid_id) as garantees_desc&#13;&#10;  from v_wcs_bids b&#13;&#10; where b.bid_id = :p_bid_id">
+        <Column Name="BID_ID" DataType="System.Decimal"/>
+        <Column Name="SUBPRODUCT_ID" DataType="System.String"/>
+        <Column Name="SUBPRODUCT_NAME" DataType="System.String"/>
+        <Column Name="CRT_DATE" DataType="System.DateTime"/>
+        <Column Name="F" DataType="System.String"/>
+        <Column Name="I" DataType="System.String"/>
+        <Column Name="O" DataType="System.String"/>
+        <Column Name="BDATE" DataType="System.DateTime"/>
+        <Column Name="INN" DataType="System.String"/>
+        <Column Name="SUMM" DataType="System.Decimal"/>
+        <Column Name="OWN_FUNDS" DataType="System.Decimal"/>
+        <Column Name="TERM" DataType="System.String"/>
+        <Column Name="CREDIT_CURRENCY" DataType="System.String"/>
+        <Column Name="SINGLE_FEE" DataType="System.Decimal"/>
+        <Column Name="MONTHLY_FEE" DataType="System.Decimal"/>
+        <Column Name="INTEREST_RATE" DataType="System.Decimal"/>
+        <Column Name="REPAYMENT_METHOD" DataType="System.String"/>
+        <Column Name="REPAYMENT_DAY" DataType="System.Decimal"/>
+        <Column Name="GARANTEES" DataType="System.String"/>
+        <Column Name="MGR_ID" DataType="System.Decimal"/>
+        <Column Name="MGR_FIO" DataType="System.String"/>
+        <Column Name="BRANCH" DataType="System.String"/>
+        <Column Name="BRANCH_NAME" DataType="System.String"/>
+        <Column Name="STATES" DataType="System.String"/>
+        <Column Name="SUBPRODUCT_DESC" DataType="System.String"/>
+        <Column Name="REPAYMENT_METHOD_TEXT" DataType="System.String"/>
+        <Column Name="CREDIT_TARGET" DataType="System.String"/>
+        <Column Name="CREDIT_DESCRIPTION" DataType="System.String"/>
+        <Column Name="FORM_CRED" DataType="System.String"/>
+        <Column Name="FIO" DataType="System.String"/>
+        <Column Name="BRANCH_HIERARCHY" DataType="System.String"/>
+        <Column Name="GARANTEES_DESC" DataType="System.String"/>
+        <Column Name="RNK" DataType="System.Decimal"/>
+        <Column Name="INIT_PAYMENT_MTD" DataType="System.String"/>
+        <CommandParameter Name="p_bid_id" DataType="107" Expression="[p_bid_id]" DefaultValue="-1"/>
+      </TableDataSource>
+      <TableDataSource Name="Table3" Alias="Branch_Info" DataType="System.Int32" Enabled="true" SelectCommand="select *  &#13;&#10;  from (select &#13;&#10;               poa.ord as br_boss_ord,&#13;&#10;               poa.fio as br_boss, &#13;&#10;               poa.fio_r as br_boss_r, &#13;&#10;               poa.post_r as post_r, &#13;&#10;               poa.branch_adr as adr_branch,&#13;&#10;               poa.poa_doc as br_boss_doc_r,&#13;&#10;               poa.poa_notary_num as br_boss_doc,&#13;&#10;               substr(f_dat_lit(POA.POA_CERT), 1, 25) as br_bos_doc_cert_d, &#13;&#10;               poa_notary as br_boss_doc_n,&#13;&#10;               POA.DISTRICT_NAME as br_boss_doc_name_not,&#13;&#10;               poa_notary_num as br_boss_doc_n_r,&#13;&#10;               poa_date br_boss_doc_date,&#13;&#10;               substr(f_dat_lit(poa_date), 1, 25) as br_boss_doc_d,&#13;&#10;               branch_loc as br_location,&#13;&#10;               branch_name as name_branch,&#13;&#10;               f_ourmfo_g as mfo,&#13;&#10;               (select val from params$base where par = 'OKPO') as okpo,&#13;&#10;               f_doc_attr('BANK_NAME', :p_bid_id) as bank_name&#13;&#10;          from wcs_bids b, &#13;&#10;               wcs_power_of_attorneys poa&#13;&#10;         where b.id = :p_bid_id&#13;&#10;           and b.branch = poa.branch&#13;&#10;           and poa.active = 1&#13;&#10;      order by poa.ord) &#13;&#10; where rownum = 1">
+        <Column Name="BR_BOSS_ORD" DataType="System.Decimal"/>
+        <Column Name="BR_BOSS" DataType="System.String"/>
+        <Column Name="BR_BOSS_R" DataType="System.String"/>
+        <Column Name="POST_R" DataType="System.String"/>
+        <Column Name="ADR_BRANCH" DataType="System.String"/>
+        <Column Name="BR_BOSS_DOC_R" DataType="System.String"/>
+        <Column Name="BR_BOSS_DOC" DataType="System.String"/>
+        <Column Name="BR_BOS_DOC_CERT_D" DataType="System.String"/>
+        <Column Name="BR_BOSS_DOC_N" DataType="System.String"/>
+        <Column Name="BR_BOSS_DOC_NAME_NOT" DataType="System.String"/>
+        <Column Name="BR_BOSS_DOC_N_R" DataType="System.String"/>
+        <Column Name="BR_BOSS_DOC_DATE" DataType="System.DateTime"/>
+        <Column Name="BR_BOSS_DOC_D" DataType="System.String"/>
+        <Column Name="BR_LOCATION" DataType="System.String"/>
+        <Column Name="NAME_BRANCH" DataType="System.String"/>
+        <Column Name="MFO" DataType="System.String"/>
+        <Column Name="OKPO" DataType="System.String"/>
+        <Column Name="BANK_NAME" DataType="System.String"/>
+        <CommandParameter Name="p_bid_id" DataType="126" Expression="[p_bid_id]"/>
+      </TableDataSource>
+      <TableDataSource Name="Table4" Alias="DataSubProdukt" DataType="System.Int32" Enabled="true" SelectCommand="select b.*,&#13;&#10;       wcs_utl.get_answ_formated(b.bid_id, 'CL_13') || ' ' ||&#13;&#10;       wcs_utl.get_answ_formated(b.bid_id, 'CL_14') || ' ' ||&#13;&#10;       wcs_utl.get_answ_formated(b.bid_id, 'CL_15') || ' ' ||&#13;&#10;       wcs_utl.get_answ_formated(b.bid_id, 'CL_16') as adr,&#13;&#10;       wcs_utl.get_answ_formated(b.bid_id, 'REPAYMENT_METHOD') as REPAYMENT_METHOD_P,&#13;&#10;       wcs_utl.get_answ_formated(b.bid_id, 'CREDIT_CURRENCY') as CREDIT_CURRENCY_P,&#13;&#10;       f_sumpr(b.summ * 100, t.kv, T.GENDER) as ssum_pr,&#13;&#10;       B.OWN_FUNDS + b.summ as all_sum_t,&#13;&#10;       f_sumpr((B.OWN_FUNDS + b.summ) * 100, t.kv, T.GENDER) as ALL_ssum_pr,&#13;&#10;       f_sumpr(B.OWN_FUNDS * 100, t.kv, T.GENDER) as OWN_FUNDS_pr,&#13;&#10;       d.sdate,&#13;&#10;       substr(f_dat_lit(d.sdate), 1, 25) as dat_dog_pr,&#13;&#10;       d.wdate,&#13;&#10;       substr(f_dat_lit(d.wdate), 1, 25) dat_dog_ret_pr,&#13;&#10;       substr(f_sumpr(interest_rate, '', 'M'), 1, 100) interest_rate_pr,&#13;&#10;       substr(f_sumpr(term, '', 'M'), 1, 100) term_pr,&#13;&#10;       substr(f_sumpr(SINGLE_FEE, '', 'M'), 1, 100) SINGLE_FEE_PR,&#13;&#10;       substr(f_sumpr(MONTHLY_FEE, '', 'M'), 1, 100) MONTHLY_FEE_PR,&#13;&#10;       d.cc_id as deal_number,&#13;&#10;      decode(substr(b.SUBPRODUCT_ID,1,7),'SBP_AIS',1,'SBP_UAL',2,0) as SUBPRis_AIS_UAL&#13;&#10;  from v_wcs_bids b, tabval t, cc_deal d&#13;&#10; where b.bid_id = :p_bid_id&#13;&#10;   and b.bid_id = d.nd(+)&#13;&#10;   and B.CREDIT_CURRENCY = T.lcv">
+        <Column Name="BID_ID" DataType="System.Decimal"/>
+        <Column Name="SUBPRODUCT_ID" DataType="System.String"/>
+        <Column Name="SUBPRODUCT_NAME" DataType="System.String"/>
+        <Column Name="SUBPRODUCT_DESC" DataType="System.String"/>
+        <Column Name="CRT_DATE" DataType="System.DateTime"/>
+        <Column Name="RNK" DataType="System.Decimal"/>
+        <Column Name="F" DataType="System.String"/>
+        <Column Name="I" DataType="System.String"/>
+        <Column Name="O" DataType="System.String"/>
+        <Column Name="FIO" DataType="System.String"/>
+        <Column Name="BDATE" DataType="System.DateTime"/>
+        <Column Name="INN" DataType="System.String"/>
+        <Column Name="SUMM" DataType="System.Decimal"/>
+        <Column Name="OWN_FUNDS" DataType="System.Decimal"/>
+        <Column Name="TERM" DataType="System.String"/>
+        <Column Name="CREDIT_CURRENCY" DataType="System.String"/>
+        <Column Name="SINGLE_FEE" DataType="System.Decimal"/>
+        <Column Name="MONTHLY_FEE" DataType="System.Decimal"/>
+        <Column Name="INTEREST_RATE" DataType="System.Decimal"/>
+        <Column Name="REPAYMENT_METHOD" DataType="System.String"/>
+        <Column Name="REPAYMENT_METHOD_TEXT" DataType="System.String"/>
+        <Column Name="REPAYMENT_DAY" DataType="System.Decimal"/>
+        <Column Name="GARANTEES" DataType="System.String"/>
+        <Column Name="MGR_ID" DataType="System.Decimal"/>
+        <Column Name="MGR_FIO" DataType="System.String"/>
+        <Column Name="BRANCH" DataType="System.String"/>
+        <Column Name="BRANCH_NAME" DataType="System.String"/>
+        <Column Name="BRANCH_HIERARCHY" DataType="System.String"/>
+        <Column Name="STATES" DataType="System.String"/>
+        <Column Name="INIT_PAYMENT_MTD" DataType="System.String"/>
+        <Column Name="ADR" DataType="System.String"/>
+        <Column Name="REPAYMENT_METHOD_P" DataType="System.String"/>
+        <Column Name="CREDIT_CURRENCY_P" DataType="System.String"/>
+        <Column Name="SSUM_PR" DataType="System.String"/>
+        <Column Name="ALL_SUM_T" DataType="System.Decimal"/>
+        <Column Name="ALL_SSUM_PR" DataType="System.String"/>
+        <Column Name="OWN_FUNDS_PR" DataType="System.String"/>
+        <Column Name="SDATE" DataType="System.DateTime"/>
+        <Column Name="DAT_DOG_PR" DataType="System.String"/>
+        <Column Name="WDATE" DataType="System.DateTime"/>
+        <Column Name="DAT_DOG_RET_PR" DataType="System.String"/>
+        <Column Name="INTEREST_RATE_PR" DataType="System.String"/>
+        <Column Name="TERM_PR" DataType="System.String"/>
+        <Column Name="SINGLE_FEE_PR" DataType="System.String"/>
+        <Column Name="MONTHLY_FEE_PR" DataType="System.String"/>
+        <Column Name="DEAL_NUMBER" DataType="System.String"/>
+        <Column Name="SUBPRIS_AIS_UAL" DataType="System.Decimal"/>
+        <CommandParameter Name="p_bid_id" DataType="126" Expression="[p_bid_id]"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="p_bid_id" DataType="System.Int32" Expression="3552821"/>
+    <Parameter Name="p_ws_id" DataType="System.String" Expression="&quot;SRV_RU&quot;"/>
+    <Parameter Name="p_ws_number" DataType="System.Decimal" Expression="0"/>
+  </Dictionary>
+  <ReportPage Name="Page1">
+    <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="113.4" CanGrow="true" CanShrink="true" CanBreak="true">
+      <TableObject Name="Table1" Left="9.45" Width="699.3" Height="113.4">
+        <TableColumn Name="Column1" MaxWidth="1134" Width="699.3"/>
+        <TableRow Name="Row1" AutoSize="true">
+          <TableCell Name="Cell1" Text="Банківська таємниця" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row2" Height="56.7" AutoSize="true">
+          <TableCell Name="Cell6" Text="Витяг з протоколу &#13;&#10;засідання кредитного комітету №[WCS_IQ_DATA.Q2] від [FormatDateTime([WCS_IQ_DATA.Q1],&quot;Short Date&quot;)] року" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row3" AutoSize="true">
+          <TableCell Name="Cell11" Text="&lt;b&gt;[Branch_Info.NAME_BRANCH]&lt;/b&gt;" HorzAlign="Center" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row4" AutoSize="true">
+          <TableCell Name="Cell16" Text="(установи)" HorzAlign="Center" Font="Times New Roman, 10pt, style=Italic"/>
+        </TableRow>
+      </TableObject>
+    </ReportTitleBand>
+    <DataBand Name="Data1" Top="116.43" Width="718.2" Height="897.75" CanGrow="true" CanShrink="true" CanBreak="true" Guides="245.7">
+      <TableObject Name="Table5" Left="9.45" Width="699.17" Height="604.8">
+        <TableColumn Name="Column3" Width="236.2"/>
+        <TableColumn Name="Column4" Width="462.97"/>
+        <TableRow Name="Row18" AutoSize="true">
+          <TableCell Name="Cell46" Text="Присутні:" Font="Times New Roman, 10pt, style=Bold, Underline"/>
+          <TableCell Name="Cell47"/>
+        </TableRow>
+        <TableRow Name="Row19" AutoSize="true">
+          <TableCell Name="Cell51" Text="Голова кредитного комітету:" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell52" Text="[WCS_IQ_DATA.Q5]" Font="Times New Roman, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row20" AutoSize="true">
+          <TableCell Name="Cell56" Text="Члени кредитного комітету:" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell57" Text="[WCS_IQ_DATA.Q6]" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row21" AutoSize="true">
+          <TableCell Name="Cell61" Text="Секретар кредитного комітету: " Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell62"/>
+        </TableRow>
+        <TableRow Name="Row22" AutoSize="true">
+          <TableCell Name="Cell66" Text="Доповідач:" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell67" Text="[WCS_IQ_DATA.Q7]" Font="Times New Roman, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row23" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell68"/>
+          <TableCell Name="Cell69"/>
+        </TableRow>
+        <TableRow Name="Row24" Height="66.15" AutoSize="true">
+          <TableCell Name="Cell70" Text="Розглянули питання:" Font="Times New Roman, 10pt, style=Bold, Underline"/>
+          <TableCell Name="Cell71" Text="&lt;b&gt;щодо надання кредиту фізичній особі&lt;/b&gt; [DataSubProdukt.FIO] [WCS_BID_DATA.CREDIT_TARGET] (об`єкт кредитування: [WCS_BID_DATA.CREDIT_DESCRIPTION])." HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row25" AutoSize="true">
+          <TableCell Name="Cell72" Text="Вирішили:" Font="Times New Roman, 10pt, style=Bold, Underline"/>
+          <TableCell Name="Cell73"/>
+        </TableRow>
+        <TableRow Name="Row26" AutoSize="true">
+          <TableCell Name="Cell74" Text="Надати кредит [DataSubProdukt.FIO] на наступних умовах:" HorzAlign="Justify" Font="Times New Roman, 10pt, style=Bold" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell75"/>
+        </TableRow>
+        <TableRow Name="Row33" AutoSize="true">
+          <TableCell Name="Cell88" Text="&lt;b&gt;сума кредиту -&lt;/b&gt; [DataSubProdukt.SUMM] ([DataSubProdukt.SSUM_PR])" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell89" Font="Times New Roman, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row32" AutoSize="true">
+          <TableCell Name="Cell86" Text="&lt;b&gt;валюта кредиту -&lt;/b&gt; [DataSubProdukt.CREDIT_CURRENCY] ([DataSubProdukt.CREDIT_CURRENCY_P])" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell87" Font="Times New Roman, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row31" AutoSize="true">
+          <TableCell Name="Cell84" Text="&lt;b&gt;форма кредитування -&lt;/b&gt; [WCS_BID_DATA.FORM_CRED];" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell85" Font="Times New Roman, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row30" AutoSize="true">
+          <TableCell Name="Cell82" Text="&lt;b&gt;максимальний строк кредитування, місяців -&lt;/b&gt; [WCS_BID_DATA.TERM]" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell83" Font="Times New Roman, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row28" AutoSize="true">
+          <TableCell Name="Cell78" Text="&lt;b&gt;процентна ставка -&lt;/b&gt; [DataSubProdukt.INTEREST_RATE]% " Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell79" Font="Times New Roman, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row29" AutoSize="true">
+          <TableCell Name="Cell80" Text="&lt;b&gt;цільове призначення -&lt;/b&gt; [WCS_BID_DATA.CREDIT_TARGET]" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell81" Font="Times New Roman, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row27" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell76" Text="&lt;b&gt;форма повернення кредиту -&lt;/b&gt; [IIf([DataSubProdukt.REPAYMENT_METHOD]== &quot;2&quot;, &quot;рівними платежами&quot;,&quot;ануїтетними платежами&quot;)]" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell77" Font="Times New Roman, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row34" AutoSize="true">
+          <TableCell Name="Cell90" Text="&lt;b&gt;комісії -&lt;/b&gt;разова: [WCS_BID_DATA.SINGLE_FEE] (грн.), щомісячна: [WCS_BID_DATA.MONTHLY_FEE] (%);" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell91" Font="Times New Roman, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row35" AutoSize="true">
+          <TableCell Name="Cell92" Text="&lt;b&gt;забезпечення -&lt;/b&gt;[WCS_BID_DATA.GARANTEES_DESC]." Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell93" Font="Times New Roman, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row36" AutoSize="true">
+          <TableCell Name="Cell94" Text="&lt;b&gt;додаткове забезпечення (за необхідності) -&lt;/b&gt; " Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell95" Font="Times New Roman, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row38">
+          <TableCell Name="Cell98"/>
+          <TableCell Name="Cell99"/>
+        </TableRow>
+        <TableRow Name="Row37" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell96" Text="Інші умови: " Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell97" Text="[IIf([WCS_IQ_DATA.HAS_ADDCONDS] &gt; 0, &quot;&quot;+[WCS_IQ_DATA.Q8]+&quot;&quot;,&quot;відсутні&quot;)]" Font="Times New Roman, 10pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row39">
+          <TableCell Name="Cell100"/>
+          <TableCell Name="Cell101"/>
+        </TableRow>
+        <TableRow Name="Row40">
+          <TableCell Name="Cell102"/>
+          <TableCell Name="Cell103"/>
+        </TableRow>
+        <TableRow Name="Row41">
+          <TableCell Name="Cell104"/>
+          <TableCell Name="Cell105"/>
+        </TableRow>
+        <TableRow Name="Row42" AutoSize="true">
+          <TableCell Name="Cell106" Text="&lt;b&gt;Голова кредитного комітету&lt;/b&gt; " Font="Times New Roman, 10pt" HtmlTags="true"/>
+          <TableCell Name="Cell107" Text="__________________________ ([WCS_IQ_DATA.Q5])" Font="Times New Roman, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row43" AutoSize="true">
+          <TableCell Name="Cell108" Text="&lt;b&gt;Секретар кредитного комітету&lt;/b&gt; " Font="Times New Roman, 10pt" HtmlTags="true"/>
+          <TableCell Name="Cell109" Text="__________________________ ([STAFF_FIO.VAL])" Font="Times New Roman, 10pt"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+  </ReportPage>
+</Report>

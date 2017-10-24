@@ -1,0 +1,1 @@
+<%@ WebService Language="C#" CodeBehind="~/App_Code/webservices/XRMIntegrationCustomer.cs" Class="Bars.WebServices.XRMIntegrationCustomer" %>

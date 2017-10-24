@@ -1,0 +1,13 @@
+﻿.k-grid-content {
+    max-height: 500px;
+}
+
+.k-item {
+    font-size: 13px;
+}
+
+.inputReadOnly {
+    background-color: #C7C7C7 !important;
+    color: black !important;
+    font-weight: bold;
+}

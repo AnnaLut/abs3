@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="2.0" xmlns:edmx="http://schemas.microsoft.com/ado/2008/10/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2008/10/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="dee5802cbc064a57a5a875e01971a015" Name="Diagram1" ZoomLevel="90">
+        <EntityTypeShape EntityType="AdminModel.STAFF_CLASS" Width="1.5" PointX="21.875" PointY="2.625" />
+        <EntityTypeShape EntityType="AdminModel.STAFF_TIPS" Width="1.5" PointX="21.875" PointY="1.125" />
+        <EntityTypeShape EntityType="AdminModel.V_USERADM_BRANCHES" Width="2.5" PointX="3.75" PointY="1" FillColor="Red" />
+        <EntityTypeShape EntityType="AdminModel.V_STAFF_USER_BRANCH_LOOKUP" Width="2.5" PointX="3.75" PointY="2.5" FillColor="Red" />
+        <EntityTypeShape EntityType="AdminModel.V_STAFF_USER_ADM" PointX="0.75" PointY="1" Width="2.75" FillColor="Red" />
+        <EntityTypeShape EntityType="AdminModel.V_STAFF_USER_ORA_ROLE_LOOKUP" Width="2.5" PointX="6.375" PointY="3.375" FillColor="Red" />
+        <EntityTypeShape EntityType="AdminModel.V_STAFF_ROLE_ADM" Width="1.875" PointX="0.75" PointY="5.375" FillColor="Lime" />
+        <EntityTypeShape EntityType="AdminModel.V_ROLE_RESOURCE_ACCESS_MODE" Width="2.625" PointX="5.25" PointY="5.375" FillColor="Lime" />
+        <EntityTypeShape EntityType="AdminModel.V_ROLE_RESOURCE_TYPE_LOOKUP" Width="2.625" PointX="5.25" PointY="7.75" FillColor="Lime" />
+        <EntityTypeShape EntityType="AdminModel.V_ROLE_RESOURCE" Width="2.375" PointX="2.75" PointY="5.375" FillColor="Lime" />
+        <EntityTypeShape EntityType="AdminModel.V_STAFF_USER_ROLE_LOOKUP" Width="2.5" PointX="9" PointY="1" FillColor="Red" />
+        <EntityTypeShape EntityType="AdminModel.V_APPLIST_ADM" Width="1.75" PointX="0.625" PointY="10" FillColor="Silver" />
+        <EntityTypeShape EntityType="AdminModel.V_STAFF_USER_ROLE" Width="2.5" PointX="6.375" PointY="1" FillColor="Red" />
+        <EntityTypeShape EntityType="AdminModel.V_ARM_RESOURCE" Width="1.875" PointX="2.5" PointY="10" FillColor="Silver" />
+        <EntityTypeShape EntityType="AdminModel.V_ARM_RESOURCE_TYPE_LOOKUP" Width="3.5" PointX="4.5" PointY="10" FillColor="Silver" />
+        <EntityTypeShape EntityType="AdminModel.V_ARM_RESOURCE_ACCESS_MODE" Width="3.5" PointX="4.5" PointY="11.875" FillColor="Silver" />
+        <EntityTypeShape EntityType="AdminModel.V_APPROVABLE_RESOURCE" Width="2.5" PointX="8.375" PointY="5.75" />
+        <EntityTypeShape EntityType="AdminModel.V_APPROVABLE_RESOURCE_GROUP" Width="2.875" PointX="11" PointY="5.75" />
+        </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

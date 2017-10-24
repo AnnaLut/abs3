@@ -1,0 +1,160 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="2.0" xmlns:edmx="http://schemas.microsoft.com/ado/2008/10/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="SecurityModel.Store" Provider="Oracle.DataAccess.Client" ProviderManifestToken="11.2" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/02/edm/ssdl">
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'BARS.V_APPROVABLE_RESOURCE' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="V_APPROVABLE_RESOURCE">
+          <Key>
+            <PropertyRef Name="ID" />
+            <PropertyRef Name="GRANTEE_TYPE_ID" />
+            <PropertyRef Name="RESOURCE_TYPE_NAME" />
+            <PropertyRef Name="ACTION_TIME" />
+          </Key>
+          <Property Name="ID" Type="number" Precision="10" Scale="0" Nullable="false" />
+          <Property Name="GRANTEE_TYPE_ID" Type="number" Precision="5" Scale="0" Nullable="false" />
+          <Property Name="GRANTEE_CODE" Type="varchar2" MaxLength="4000" />
+          <Property Name="GRANTEE_NAME" Type="varchar2" MaxLength="4000" />
+          <Property Name="RESOURCE_TYPE_NAME" Type="varchar2" MaxLength="300" Nullable="false" />
+          <Property Name="RESOURCE_CODE" Type="varchar2" MaxLength="4000" />
+          <Property Name="RESOURCE_NAME" Type="varchar2" MaxLength="4000" />
+          <Property Name="NEW_ACCESS_MODE" Type="varchar2" MaxLength="4000" />
+          <Property Name="CURRENT_ACCESS_MODE" Type="varchar2" MaxLength="4000" />
+          <Property Name="ACTION_TIME" Type="date" Nullable="false" />
+          <Property Name="ACTION_USER" Type="varchar2" MaxLength="333" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'BARS.V_APPROVABLE_RESOURCE_GROUP' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="V_APPROVABLE_RESOURCE_GROUP">
+          <Key>
+            <PropertyRef Name="ID" />
+            <PropertyRef Name="RESOURCE_CODE" />
+            <PropertyRef Name="RESOURCE_NAME" />
+          </Key>
+          <Property Name="ID" Type="number" Precision="5" Scale="0" Nullable="false" />
+          <Property Name="RESOURCE_CODE" Type="varchar2" MaxLength="30" Nullable="false" />
+          <Property Name="RESOURCE_NAME" Type="varchar2" MaxLength="300" Nullable="false" />
+        </EntityType>
+        <EntityContainer Name="SecurityModelStoreContainer">
+          <EntitySet Name="V_APPROVABLE_RESOURCE" EntityType="Self.V_APPROVABLE_RESOURCE" store:Type="Views" store:Schema="BARS">
+            <DefiningQuery>SELECT 
+"V_APPROVABLE_RESOURCE"."ID" AS "ID", 
+"V_APPROVABLE_RESOURCE"."GRANTEE_TYPE_ID" AS "GRANTEE_TYPE_ID", 
+"V_APPROVABLE_RESOURCE"."GRANTEE_CODE" AS "GRANTEE_CODE", 
+"V_APPROVABLE_RESOURCE"."GRANTEE_NAME" AS "GRANTEE_NAME", 
+"V_APPROVABLE_RESOURCE"."RESOURCE_TYPE_NAME" AS "RESOURCE_TYPE_NAME", 
+"V_APPROVABLE_RESOURCE"."RESOURCE_CODE" AS "RESOURCE_CODE", 
+"V_APPROVABLE_RESOURCE"."RESOURCE_NAME" AS "RESOURCE_NAME", 
+"V_APPROVABLE_RESOURCE"."NEW_ACCESS_MODE" AS "NEW_ACCESS_MODE", 
+"V_APPROVABLE_RESOURCE"."CURRENT_ACCESS_MODE" AS "CURRENT_ACCESS_MODE", 
+"V_APPROVABLE_RESOURCE"."ACTION_TIME" AS "ACTION_TIME", 
+"V_APPROVABLE_RESOURCE"."ACTION_USER" AS "ACTION_USER"
+FROM "BARS"."V_APPROVABLE_RESOURCE" "V_APPROVABLE_RESOURCE"</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="V_APPROVABLE_RESOURCE_GROUP" EntityType="Self.V_APPROVABLE_RESOURCE_GROUP" store:Type="Views" store:Schema="BARS">
+            <DefiningQuery>SELECT 
+"V_APPROVABLE_RESOURCE_GROUP"."ID" AS "ID", 
+"V_APPROVABLE_RESOURCE_GROUP"."RESOURCE_CODE" AS "RESOURCE_CODE", 
+"V_APPROVABLE_RESOURCE_GROUP"."RESOURCE_NAME" AS "RESOURCE_NAME"
+FROM "BARS"."V_APPROVABLE_RESOURCE_GROUP" "V_APPROVABLE_RESOURCE_GROUP"</DefiningQuery>
+          </EntitySet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema xmlns="http://schemas.microsoft.com/ado/2008/09/edm" xmlns:cg="http://schemas.microsoft.com/ado/2006/04/codegeneration" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" Namespace="SecurityModel" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" >
+        <EntityContainer Name="Entities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="V_APPROVABLE_RESOURCE" EntityType="SecurityModel.V_APPROVABLE_RESOURCE" />
+          <EntitySet Name="V_APPROVABLE_RESOURCE_GROUP" EntityType="SecurityModel.V_APPROVABLE_RESOURCE_GROUP" />
+        </EntityContainer>
+        <EntityType Name="V_APPROVABLE_RESOURCE">
+          <Key>
+            <PropertyRef Name="ID" />
+            <PropertyRef Name="GRANTEE_TYPE_ID" />
+            <PropertyRef Name="RESOURCE_TYPE_NAME" />
+            <PropertyRef Name="ACTION_TIME" />
+          </Key>
+          <Property Name="ID" Type="Int64" Nullable="false" />
+          <Property Name="GRANTEE_TYPE_ID" Type="Int32" Nullable="false" />
+          <Property Name="GRANTEE_CODE" Type="String" MaxLength="4000" FixedLength="false" Unicode="false" />
+          <Property Name="GRANTEE_NAME" Type="String" MaxLength="4000" FixedLength="false" Unicode="false" />
+          <Property Name="RESOURCE_TYPE_NAME" Type="String" Nullable="false" MaxLength="300" FixedLength="false" Unicode="false" />
+          <Property Name="RESOURCE_CODE" Type="String" MaxLength="4000" FixedLength="false" Unicode="false" />
+          <Property Name="RESOURCE_NAME" Type="String" MaxLength="4000" FixedLength="false" Unicode="false" />
+          <Property Name="NEW_ACCESS_MODE" Type="String" MaxLength="4000" FixedLength="false" Unicode="false" />
+          <Property Name="CURRENT_ACCESS_MODE" Type="String" MaxLength="4000" FixedLength="false" Unicode="false" />
+          <Property Name="ACTION_TIME" Type="DateTime" Nullable="false" />
+          <Property Name="ACTION_USER" Type="String" MaxLength="333" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="V_APPROVABLE_RESOURCE_GROUP">
+          <Key>
+            <PropertyRef Name="ID" />
+            <PropertyRef Name="RESOURCE_CODE" />
+            <PropertyRef Name="RESOURCE_NAME" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" />
+          <Property Name="RESOURCE_CODE" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="RESOURCE_NAME" Type="String" Nullable="false" MaxLength="300" FixedLength="false" Unicode="false" />
+        </EntityType>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping xmlns="http://schemas.microsoft.com/ado/2008/09/mapping/cs" Space="C-S">
+        <Alias Key="Model" Value="SecurityModel" />
+        <Alias Key="Target" Value="SecurityModel.Store" />
+        <EntityContainerMapping CdmEntityContainer="Entities" StorageEntityContainer="SecurityModelStoreContainer">
+          <EntitySetMapping Name="V_APPROVABLE_RESOURCE">
+            <EntityTypeMapping TypeName="SecurityModel.V_APPROVABLE_RESOURCE">
+              <MappingFragment StoreEntitySet="V_APPROVABLE_RESOURCE">
+                <ScalarProperty Name="ACTION_USER" ColumnName="ACTION_USER" />
+                <ScalarProperty Name="ACTION_TIME" ColumnName="ACTION_TIME" />
+                <ScalarProperty Name="CURRENT_ACCESS_MODE" ColumnName="CURRENT_ACCESS_MODE" />
+                <ScalarProperty Name="NEW_ACCESS_MODE" ColumnName="NEW_ACCESS_MODE" />
+                <ScalarProperty Name="RESOURCE_NAME" ColumnName="RESOURCE_NAME" />
+                <ScalarProperty Name="RESOURCE_CODE" ColumnName="RESOURCE_CODE" />
+                <ScalarProperty Name="RESOURCE_TYPE_NAME" ColumnName="RESOURCE_TYPE_NAME" />
+                <ScalarProperty Name="GRANTEE_NAME" ColumnName="GRANTEE_NAME" />
+                <ScalarProperty Name="GRANTEE_CODE" ColumnName="GRANTEE_CODE" />
+                <ScalarProperty Name="GRANTEE_TYPE_ID" ColumnName="GRANTEE_TYPE_ID" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="V_APPROVABLE_RESOURCE_GROUP">
+            <EntityTypeMapping TypeName="SecurityModel.V_APPROVABLE_RESOURCE_GROUP">
+              <MappingFragment StoreEntitySet="V_APPROVABLE_RESOURCE_GROUP">
+                <ScalarProperty Name="RESOURCE_NAME" ColumnName="RESOURCE_NAME" />
+                <ScalarProperty Name="RESOURCE_CODE" ColumnName="RESOURCE_CODE" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2008/10/edmx">
+    <edmx:Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </edmx:Connection>
+    <edmx:Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="False" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="Default" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="True" />
+        <DesignerProperty Name="UseLegacyProvider" Value="True" />
+      </DesignerInfoPropertySet>
+    </edmx:Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

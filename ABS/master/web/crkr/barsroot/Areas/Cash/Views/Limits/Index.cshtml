@@ -1,0 +1,1327 @@
+﻿@using BarsWeb.Areas.Cash.ViewModels
+@using Kendo.Mvc.UI
+@model List<Mfo>
+
+
+@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    const string title = "Ліміти";
+    const string changeLimit = "Змінити";
+    bool itIsCenter = ViewBag.ItIsCenter;
+    ViewBag.Region = !itIsCenter;
+}
+<script src="@Url.Content("~/lib/jsZip/jszip.min.js")"></script>
+<h1 id="title">@title</h1>
+<table class="lim-table">
+    <tr>
+        <td>
+            @(Html.Kendo().TreeView()
+              .Name("treeview")
+              .Events(events => events
+                  .Select("onSelect")
+              )
+              .Items(root =>
+              {
+                  const string mfoId = "mfo";
+                  const string accId = "acc";
+                  const string сashId = "cash";
+                  const string atmId = "atm";
+                  root.Add().Text("МФО").Id(mfoId)
+                      .Expanded(true)
+                      .Items(items =>
+                      {
+                          items.Add().Text("Каса").Id(string.Format("{0}_{1}", mfoId, сashId));
+                          //items.Add().Text("Банкомати").Id(string.Format("{0}_{1}", mfoId, atmId));
+                      });
+
+
+                  root.Add().Text("Рахунки").Id(accId)
+                      .Expanded(true)
+                      .Items(items =>
+                      {
+                          items.Add().Text("Каса").Id(string.Format("{0}_{1}", accId, сashId));
+                          items.Add().Text("Банкомати").Id(string.Format("{0}_{1}", accId, atmId));
+                      });
+              })
+            )
+            @if (itIsCenter)
+            {
+                @*Частичное представление добавляет на страницу объект mfoFilter, в котором можно подписаться на событие изменения перечня выбранных МФО*@
+                Html.RenderPartial("MfoFilter", Model);
+            }
+        </td>
+        <td>
+            <div id="divMfoCash" class="grid-section">
+                <div id="grid_mfo_cash"></div>
+
+                @*@(Html.Kendo().Grid<MfoLimit>()
+                    .Name("grid_mfo_cash")
+                    .AutoBind(false)
+                    .Columns(columns =>
+                    {
+                        if (itIsCenter)
+                        {
+                            columns.Bound(c => c.Mfo);
+                        }
+                        columns.Bound(c => c.LimitTypeName);
+                        columns.Bound(c => c.CurrencyCode);
+                        columns.Bound(c => c.CurrentLimit)
+                            .ClientTemplate("#= formatCurrentLimit(data) #")
+                            .HtmlAttributes(new { @class = "rightField" });
+                        columns.Bound(c => c.MaxLimit)
+                            .ClientTemplate("#= formatMaxLimit(data) #")
+                            .HtmlAttributes(new { @class = "rightField" });
+                        columns.Bound(c => c.Balance)
+                            .ClientTemplate("#= formatBalance(data) #")
+                            .HtmlAttributes(new { @class = "rightField" });
+                        columns.Bound(c => c.LimitViolated)
+                            .ClientTemplate("#= formatLimitViolated(data) #");
+                        if (itIsCenter)
+                        {
+                            columns.Command(command => command.Edit().Text(changeLimit )).Title("").Width("200px");
+                        }
+                    })
+                    .Editable(editable => editable.Mode(GridEditMode.InLine))
+                    .Resizable(resize => resize.Columns(true))
+                    .Reorderable(reorder => reorder.Columns(true))
+                    .Pageable(pager => pager
+                        .PageSizes(new[] { 10, 20, 50, 100 })
+                        .Refresh(true))
+                    .Sortable()
+                    .Filterable(ftb => ftb.Mode(GridFilterMode.Menu))
+                    .Groupable()
+                    .DataSource(dataSource => dataSource
+                        .Ajax()
+                        .Model(model =>
+                        {
+                            model.Id(p => p.Mfo);
+                            model.Id(p => p.LimitType);
+                            model.Id(p => p.CurrencyCode);
+
+                            model.Field(p => p.Mfo).Editable(false);
+                            model.Field(p => p.LimitTypeName).Editable(false);
+                            model.Field(p => p.CurrencyCode).Editable(false);
+                            model.Field(p => p.Balance).Editable(false);
+                            model.Field(p => p.LimitViolated).Editable(false);
+                        })
+                        .Read(read => read.Action("GetMfoLimits", "Limits").Data("getMfoCashFilter"))
+                        .Update(read => read.Action("UpdateMfoLimit", "Limits"))
+                        .Events(e => e.Error("onError"))
+                    ))*@
+            </div>
+            <div id="divMfoAtm" class="grid-section">
+                <div id="grid_mfo_atm"></div>
+                @*@(Html.Kendo().Grid<MfoLimit>
+                    ()
+                    .Name("grid_mfo_atm")
+                    .AutoBind(false)
+                    .Columns(columns =>
+                    {
+                        if (itIsCenter)
+                        {
+                            columns.Bound(c => c.Mfo);
+                        }
+                        columns.Bound(c => c.LimitTypeName);
+                        columns.Bound(c => c.CurrencyCode);
+                        columns.Bound(c => c.CurrentLimit)
+                            .ClientTemplate("#= formatCurrentLimit(data) #")
+                            .HtmlAttributes(new { @class = "rightField" })
+                            .Title("Ліміт макс. загрузки");
+                        columns.Bound(c => c.Balance)
+                            .ClientTemplate("#= formatBalance(data) #")
+                            .HtmlAttributes(new { @class = "rightField" });
+                        columns.Bound(c => c.LimitViolated)
+                            .ClientTemplate("#= formatLimitViolated(data) #");
+                        if (itIsCenter)
+                        {
+                            columns.Command(command => command.Edit().Text(changeLimit )).Title("").Width("200px");
+                        }
+                    })
+                    .Editable(editable => editable.Mode(GridEditMode.InLine))
+                    .Resizable(resize => resize.Columns(true))
+                    .Reorderable(reorder => reorder.Columns(true))
+                    .Pageable(pager => pager
+                        .PageSizes(new[] { 10, 20, 50, 100 })
+                        .Refresh(true))
+                    .Sortable()
+                    .Filterable(ftb => ftb.Mode(GridFilterMode.Menu))
+                    .Groupable()
+                    .DataSource(dataSource => dataSource
+                        .Ajax()
+                        .Model(model =>
+                        {
+                            model.Id(p => p.Mfo);
+                            model.Id(p => p.LimitType);
+                            model.Id(p => p.CurrencyCode);
+
+                            model.Field(p => p.Mfo).Editable(false);
+                            model.Field(p => p.LimitTypeName).Editable(false);
+                            model.Field(p => p.CurrencyCode).Editable(false);
+                            model.Field(p => p.Balance).Editable(false);
+                            model.Field(p => p.LimitViolated).Editable(false);
+                        })
+                        .Read(read => read.Action("GetMfoLimits", "Limits").Data("getMfoAtmFilter"))
+                        .Update(read => read.Action("UpdateMfoLimit", "Limits"))
+                        .Events(e => e.Error("onError"))
+
+                    ))*@
+            </div>
+            <div id="divAccCash" class="grid-section">
+                <div id="grid_acc_cash"></div>
+                @*@(Html.Kendo().Grid<AccountLimit>()
+                    .Name("grid_acc_cash")
+                    .AutoBind(false)
+                    .Columns(columns =>
+                    {
+                        if (itIsCenter)
+                        {
+                            columns.Bound(c => c.Mfo);
+                        }
+                        columns.Bound(c => c.Branch);
+                        columns.Bound(c => c.CashTypeName);
+                        columns.Bound(c => c.PrivateAccount);
+                        columns.Bound(c => c.CurrencyCode);
+                        columns.Bound(c => c.AccountName);
+                        columns.Bound(c => c.CurrentLimit)
+                            .ClientTemplate("#= formatCurrentLimit(data) #")
+                            .HtmlAttributes(new { @class = "rightField" });
+                        columns.Bound(c => c.MaxLimit)
+                            .ClientTemplate("#= formatMaxLimit(data) #")
+                            .HtmlAttributes(new { @class = "rightField" });
+                        columns.Bound(c => c.Balance)
+                            .ClientTemplate("#= formatBalance(data) #")
+                            .HtmlAttributes(new { @class = "rightField" });
+                        columns.Bound(c => c.LimitViolated)
+                            .ClientTemplate("#= formatLimitViolated(data) #");
+                        if (itIsCenter)
+                        {
+                            columns.Command(command => command.Edit().Text(changeLimit )).Title("").Width("200px");
+                        }
+                    })
+                    .Editable(editable => editable.Mode(GridEditMode.InLine))
+                    .Resizable(resize => resize.Columns(true))
+                    .Reorderable(reorder => reorder.Columns(true))
+                    .Pageable(pager => pager
+                        .PageSizes(new[] { 10, 20, 50, 100 })
+                        .Refresh(true))
+                    .Sortable()
+                    .Filterable(ftb => ftb.Mode(GridFilterMode.Menu))
+                    .Groupable()
+                    .DataSource(dataSource => dataSource
+                        .Ajax()
+                        .Model(model =>
+                        {
+                            model.Id(p => p.AccountId);
+
+                            model.Field(p => p.Mfo).Editable(false);
+                            model.Field(p => p.Branch).Editable(false);
+                            model.Field(p => p.CashTypeName).Editable(false);
+                            model.Field(p => p.PrivateAccount).Editable(false);
+                            model.Field(p => p.CurrencyCode).Editable(false);
+                            model.Field(p => p.AccountName).Editable(false);
+                            model.Field(p => p.Balance).Editable(false);
+                            model.Field(p => p.LimitViolated).Editable(false);
+                        })
+                        .Read(read => read.Action("GetAccountLimits", "Limits").Data("getAccCashFilter"))
+                        .Update(read => read.Action("UpdateAccountLimit", "Limits"))
+                        .Events(e => e.Error("onError"))
+
+                    ))*@
+            </div>
+            <div id="divAccAtm" class="grid-section">
+                <div id="grid_acc_atm"></div>
+
+                @*@(Html.Kendo().Grid<AccountLimit>()
+                    .Name("grid_acc_atm")
+                    .AutoBind(false)
+                    .Columns(columns =>
+                    {
+                        if (itIsCenter)
+                        {
+                            columns.Bound(c => c.Mfo);
+                        }
+                        columns.Bound(c => c.Branch);
+                        columns.Bound(c => c.PrivateAccount).Title("Рахунок банкомату");
+                        columns.Bound(c => c.AccountName).Title("Назва рахунку");
+                        columns.Bound(c => c.CurrentLimit)
+                            .ClientTemplate("#= formatCurrentLimit(data) #")
+                            .HtmlAttributes(new { @class = "rightField" })
+                            .Title("Ліміт макс. загрузки");
+                        columns.Bound(c => c.Balance)
+                            .ClientTemplate("#= formatBalance(data) #")
+                            .HtmlAttributes(new { @class = "rightField" });
+                        columns.Bound(c => c.LimitViolated)
+                            .ClientTemplate("#= formatLimitViolated(data) #");
+                        if (itIsCenter)
+                        {
+                            columns.Command(command => command.Edit().Text(changeLimit)).Title("").Width("200px");
+                        }
+                    })
+                    .Editable(editable => editable.Mode(GridEditMode.InLine))
+                    .Resizable(resize => resize.Columns(true))
+                    .Reorderable(reorder => reorder.Columns(true))
+                    .Pageable(pager => pager
+                        .PageSizes(new[] { 10, 20, 50, 100 })
+                        .Refresh(true))
+                    .Sortable()
+                    .Filterable(ftb => ftb.Mode(GridFilterMode.Menu))
+                    .Groupable()
+                    .DataSource(dataSource => dataSource
+                        .Ajax()
+                        .Model(model =>
+                        {
+                            model.Id(p => p.AccountId);
+
+                            model.Field(p => p.Mfo).Editable(false);
+                            model.Field(p => p.Branch).Editable(false);
+                            model.Field(p => p.PrivateAccount).Editable(false);
+                            model.Field(p => p.AccountName).Editable(false);
+                            model.Field(p => p.Balance).Editable(false);
+                            model.Field(p => p.LimitViolated).Editable(false);
+                        })
+                        .Read(read => read.Action("GetAccountLimits", "Limits").Data("getAccAtmFilter"))
+                        .Update(read => read.Action("UpdateAccountLimit", "Limits"))
+                        .Events(e => e.Error("onError"))
+
+                    ))*@
+            </div>
+        </td>
+    </tr>
+</table>
+
+<script type="text/javascript">
+    var isCenter = @ViewBag.ItIsCenter.ToString().ToLower() ;
+    
+    function uploadMfoExcel() {
+        var filter = $.param(getMfoCashFilter());
+        document.location.href = bars.config.urlContent( '/Cash/Limits/GetMfoLimitsFile/') + '?' + filter;
+        return false;            
+    }
+
+    function uploadCashExcel() {
+        var filter = $.param(getAccCashFilter());
+        document.location.href = bars.config.urlContent( '/Cash/Limits/GetAccountLimitsFile/') + '?' + filter;
+        return false;            
+    }
+
+    function uploadAtmExcel() {
+        var filter = $.param(getAccAtmFilter());
+        document.location.href = bars.config.urlContent( '/Cash/Limits/GetAtmLimitsFile/') + '?' + filter;
+        return false;            
+    }
+
+    $(function () {
+        var currentLimValidation = function(input) {
+            if (input.is("[name='CurrentLimit']") && input.val() != "") {
+                var maxLim = input.parentsUntil('tr').parent().find('[name="MaxLimit"]').val();
+                if (parseInt(input.val(), 10) > parseInt(maxLim, 10)) {
+                    input.attr("data-currentlimitvalidation-msg", "перевищення макс. ліміту");
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+            return true;
+        };
+        var maxLimValidation = function (input) {
+            if (input.is('[name="MaxLimit"]') && input.val() != "") {
+                var currLim = input.parentsUntil('tr').parent().find('[name="CurrentLimit"]').val();
+                if (parseInt(input.val(), 10) < parseInt(currLim, 10)) {
+                    input.attr("data-maxlimitvalidation-msg", "макс. ліміт < поточного");
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+            return true;
+        };
+
+        var mfoCashParam = {
+            columns: [{
+                "title": "МФО",
+                "field": "Mfo",
+                "encoded": true
+            }, {
+                "title": "Назва РУ",
+                "field": "MfoName",
+                "encoded": true
+            }, {
+                "title": "Типу ліміту",
+                "field": "LimitTypeName",
+                "encoded": true
+            }, {
+                "title": "Код валюти",
+                "field": "CurrencyCode",
+                "encoded": true
+            }, {
+                "title": "Поточний ліміт",
+                "attributes": { "class": "rightField" },
+                "template": "#= formatCurrentLimit(data) #",
+                "field": "CurrentLimit",
+                "encoded": true,
+                format: "{0:n0}"
+                //"editor": "\u003cinput class=\"text-box single-line\" data-val=\"true\" data-val-number=\"The field Поточний ліміт must be a number.\" id=\"CurrentLimit\" name=\"CurrentLimit\" type=\"text\" value=\"\" /\u003e\u003cspan class=\"field-validation-valid\" data-valmsg-for=\"CurrentLimit\" data-valmsg-replace=\"true\"\u003e\u003c/span\u003e"
+            }, {
+                "title": "Максимальний ліміт",
+                "attributes": { "class": "rightField" },
+                "template": "#= formatMaxLimit(data) #",
+                "field": "MaxLimit",
+                "encoded": true,
+                format: "{0:n0}"
+                //"editor": "\u003cinput class=\"text-box single-line\" data-val=\"true\" data-val-number=\"The field Максимальний ліміт must be a number.\" id=\"MaxLimit\" name=\"MaxLimit\" type=\"text\" value=\"\" /\u003e\u003cspan class=\"field-validation-valid\" data-valmsg-for=\"MaxLimit\" data-valmsg-replace=\"true\"\u003e\u003c/span\u003e"
+            }, {
+                "title": "Баланс рахунку",
+                "attributes": { "class": "rightField" },
+                "template": "#= formatBalance(data) #",
+                "field": "Balance",
+                "encoded": true
+            }, {
+                "title": "Ліміт порушений",
+                "template": "#= formatLimitViolated(data) #",
+                "field": "LimitViolatedName",
+                "encoded": true
+            }/*,  (function () {
+                if (isCenter) {
+                    return {
+                        "width": "200px",
+                        "command": [
+                            {
+                                "name": "edit",
+                                "buttonType": "ImageAndText",
+                                "text": { "edit": "Змінити" }
+                            }
+                        ]
+                    }
+                } else {
+                    return {}
+                }
+            })()*/
+            ],
+            schema:  {
+                "data": "Data",
+                "total": "Total",
+                "errors": "Errors",
+                "model": {
+                    "id": "CurrencyCode",
+                    "fields": {
+                        "Mfo": {
+                            "editable": false,
+                            "type": "string"
+                        },
+                        MfoName: {
+                            "editable": false,
+                            "type": "string"
+                        },
+                        "LimitType": {
+                            "type": "string"
+                        },
+                        "LimitTypeName": {
+                            "editable": false,
+                            "type": "string"
+                        },
+                        "CurrencyCode": {
+                            "editable": false,
+                            "type": "number"
+                        },
+                        CurrentLimit: {
+                            type: "number",
+                            defaultValue: null,
+                            validation: {
+                                min:0,
+                                required: true,
+                                currentlimitvalidation: currentLimValidation
+                            }
+                        },
+                        MaxLimit: {
+                            type: "number",
+                            defaultValue: null,
+                            validation: {
+                                min:0,
+                                required: true,
+                                maxlimitvalidation: maxLimValidation
+                            }
+                        },
+                        "Balance": {
+                            "editable": false,
+                            "type": "number",
+                            "defaultValue": null
+                        },
+                        "CurrentLimitViolated": {
+                            "editable": false,
+                            "type": "boolean"
+                        },
+                        "MaxLimitViolated": {
+                            "editable": false,
+                            "type": "boolean"
+                        },
+                        "LimitViolated": {
+                            "editable": false,
+                            "type": "boolean"
+                        },
+                        "LimitViolatedName": {
+                            "editable": false,
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        };
+
+        $("#grid_mfo_cash").kendoGrid({
+            toolbar:[
+                {
+                    name: "UploadExcel",
+                    template:'<button class="k-button" onclick="uploadMfoExcel();"><i class="pf-icon pf-16 pf-exel"></i> Вигрузити в EXCEL</button>'
+                }
+            ],
+            /*toolbar: ["excel"],
+            excel: {
+                fileName: "cashLimitsMfo.xlsx",
+                allPages: true,
+                filterable: true,
+                proxyURL: bars.config.urlContent('/cash/limits/ConvertBase64ToFile/')
+            },*/
+            "columns": mfoCashParam.columns,
+            //"groupable": {},
+            "pageable": {
+                "autoBind": false,
+                "refresh": true,
+                "pageSizes": [10, 20, 50, 100,200],
+                "buttonCount": 10
+            },
+            "sortable": true,
+            "filterable": true,
+            "resizable": true,
+            "reorderable": true,
+            "scrollable": false,
+            "editable": {
+                "confirmation": "Are you sure you want to delete this record?",
+                "confirmDelete": "Delete",
+                "cancelDelete": "Cancel",
+                "mode": "inline",
+                "create": true,
+                "update": true,
+                "destroy": true
+            },
+            "autoBind": false,
+            "dataSource": {
+                "type": 'aspnetmvc-ajax',
+                "transport": {
+                    "read": {
+                        "url": bars.config.urlContent( '/Cash/Limits/GetMfoLimits/'),
+                        "data": getMfoCashFilter
+                    },
+                    "prefix": "",
+                    "update": { "url": "/barsroot/Cash/Limits/UpdateMfoLimit" }
+                },
+                "pageSize": 10,
+                "page": 1,
+                "total": 0,
+                "serverPaging": true,
+                "serverSorting": true,
+                "serverFiltering": true,
+                "serverGrouping": true,
+                "serverAggregates": true,
+                "filter": [],
+                "error": onError,
+                schema: mfoCashParam.schema
+            }
+        });
+
+        $("#grid_mfo_atm").kendoGrid({
+            toolbar: ["excel"],
+            excel: {
+                fileName: "cashLimitsAtm.xlsx",
+                allPages: true,
+                filterable: true,
+                proxyURL: bars.config.urlContent('/cash/limits/ConvertBase64ToFile/')
+            },
+            "columns": [{
+                "title": "МФО",
+                "field": "Mfo",
+                "encoded": true
+            }, {
+                "title": "Типу ліміту",
+                "field": "LimitTypeName",
+                "encoded": true
+            }, {
+                "title": "Код валюти",
+                "field": "CurrencyCode",
+                "encoded": true
+            }, {
+                "title": "Ліміт макс. загрузки",
+                "attributes": { "class": "rightField" },
+                "template": "#= formatCurrentLimit(data) #",
+                "field": "CurrentLimit",
+                "encoded": true,
+                format: "{0:n0}"
+                //"editor": "\u003cinput class=\"text-box single-line\" data-val=\"true\" data-val-number=\"The field Поточний ліміт must be a number.\" id=\"CurrentLimit\" name=\"CurrentLimit\" type=\"text\" value=\"\" /\u003e\u003cspan class=\"field-validation-valid\" data-valmsg-for=\"CurrentLimit\" data-valmsg-replace=\"true\"\u003e\u003c/span\u003e"
+            }, {
+                "title": "Баланс рахунку",
+                "attributes": { "class": "rightField" },
+                "template": "#= formatBalance(data) #",
+                "field": "Balance",
+                "encoded": true
+            }, {
+                "title": "Ліміт порушений",
+                "template": "#= formatLimitViolated(data) #",
+                "field": "LimitViolatedName",
+                "encoded": true
+            }/*, (function () {
+                if (isCenter) {
+                    return {
+                        "width": "200px",
+                        "command": [
+                            {
+                                "name": "edit",
+                                "buttonType": "ImageAndText",
+                                "text": { "edit": "Змінити" }
+                            }
+                        ]
+                    }
+                } else {
+                    return {}
+                }
+            })()*/],
+            //"groupable": {},
+            "pageable": {
+                "autoBind": false,
+                "refresh": true,
+                "pageSizes": [10, 20, 50, 100,200],
+                "buttonCount": 10
+            },
+            "sortable": true,
+            "filterable": true,
+            "resizable": true,
+            "reorderable": true,
+            "scrollable": false,
+            "editable": {
+                "confirmation": "Are you sure you want to delete this record?",
+                "confirmDelete": "Delete",
+                "cancelDelete": "Cancel",
+                "mode": "inline",
+                "create": true,
+                "update": true,
+                "destroy": true
+            },
+            "autoBind": false,
+            "dataSource": {
+                "type":  'aspnetmvc-ajax',
+                "transport": {
+                    "read": {
+                        "url": "/barsroot/Cash/Limits/GetMfoLimits",
+                        "data": getMfoAtmFilter
+                    },
+                    "prefix": "",
+                    "update": { "url": "/barsroot/Cash/Limits/UpdateMfoLimit" }
+                },
+                "pageSize": 10,
+                "page": 1,
+                "total": 0,
+                "serverPaging": true,
+                "serverSorting": true,
+                "serverFiltering": true,
+                "serverGrouping": true,
+                "serverAggregates": true,
+                "filter": [],
+                "error": onError,
+                "schema": {
+                    "data": "Data",
+                    "total": "Total",
+                    "errors": "Errors",
+                    "model": {
+                        "id": "CurrencyCode",
+                        "fields": {
+                            "Mfo": {
+                                "editable": false,
+                                "type": "string"
+                            },
+                            MfoName: {
+                                "editable": false,
+                                "type": "string"
+                            },
+                            "LimitType": {
+                                "editable": false,
+                                "type": "string"
+                            },
+                            "LimitTypeName": {
+                                "editable": false,
+                                "type": "string"
+                            },
+                            "CurrencyCode": {
+                                "editable": false,
+                                "type": "number"
+                            },
+                            "CurrentLimit": {
+                                "type": "number",
+                                "defaultValue": null,
+                                validation: {
+                                    min:0,
+                                    required: true
+                                }
+                            },
+                            "MaxLimit": {
+                                "type": "number",
+                                "defaultValue": null
+                            },
+                            "Balance": {
+                                "editable": false,
+                                "type": "number",
+                                "defaultValue": null
+                            },
+                            "CurrentLimitViolated": {
+                                "editable": false,
+                                "type": "boolean"
+                            },
+                            "MaxLimitViolated": {
+                                "editable": false,
+                                "type": "boolean"
+                            },
+                            "LimitViolated": {
+                                "editable": false,
+                                "type": "boolean"
+                            },
+                            LimitViolatedName: {
+                                "editable": false,
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        $("#grid_acc_cash").kendoGrid({
+            toolbar:[
+                {
+                    name: "UploadCashExcel",
+                    template:'<button class="k-button" onclick="uploadCashExcel();"><i class="pf-icon pf-16 pf-exel"></i> Вигрузити в EXCEL</button>'
+                }
+            ],
+            /*toolbar: ["excel"],
+            excel: {
+                fileName: "cashLimitsAcc.xlsx",
+                allPages: true,
+                filterable: true,
+                proxyURL: bars.config.urlContent('/cash/limits/ConvertBase64ToFile/')
+            },*/
+            "columns": [{
+                "title": "МФО",
+                "field": "Mfo",
+                "encoded": true
+            }, {
+                "title": "Назва РУ",
+                "field": "MfoName",
+                "encoded": true
+            }, {
+                "title": "Відділення",
+                "field": "Branch",
+                "encoded": true
+            }, {
+                "title": "Тип рахунку",
+                "field": "CashTypeName",
+                "encoded": true
+            }, {
+                "title": "Рахунок",
+                "field": "PrivateAccount",
+                "encoded": true
+            }, {
+                "title": "Код валюти",
+                "field": "CurrencyCode",
+                "encoded": true
+            }, {
+                "title": "Назва рахунку",
+                "field": "AccountName",
+                "encoded": true
+            }, {
+                "title": "Поточний ліміт",
+                "attributes": { "class": "rightField" },
+                "template": "#= formatCurrentLimit(data) #",
+                "field": "CurrentLimit",
+                "encoded": true,
+                format: "{0:n0}"
+                //"editor": "\u003cinput class=\"text-box single-line\" data-val=\"true\" data-val-number=\"The field Поточний ліміт must be a number.\" id=\"CurrentLimit\" name=\"CurrentLimit\" type=\"text\" value=\"\" /\u003e\u003cspan class=\"field-validation-valid\" data-valmsg-for=\"CurrentLimit\" data-valmsg-replace=\"true\"\u003e\u003c/span\u003e"
+            }, {
+                "title": "Максимальний ліміт",
+                "attributes": { "class": "rightField" },
+                "template": "#= formatMaxLimit(data) #",
+                "field": "MaxLimit",
+                "encoded": true,
+                format: "{0:n0}"
+                //"editor": "\u003cinput class=\"text-box single-line\" data-val=\"true\" data-val-number=\"The field Максимальний ліміт must be a number.\" id=\"MaxLimit\" name=\"MaxLimit\" type=\"text\" value=\"\" /\u003e\u003cspan class=\"field-validation-valid\" data-valmsg-for=\"MaxLimit\" data-valmsg-replace=\"true\"\u003e\u003c/span\u003e"
+            }, {
+                "title": "Баланс рахунку",
+                "attributes": { "class": "rightField" },
+                "template": "#= formatBalance(data) #",
+                "field": "Balance",
+                "encoded": true
+            }, {
+                "title": "Ліміт порушений",
+                "template": "#= formatLimitViolated(data) #",
+                "field": "LimitViolatedName",
+                "encoded": true
+            }/*,  (function () {
+                if (isCenter) {
+                    return {
+                        "width": "200px",
+                        "command": [
+                            {
+                                "name": "edit",
+                                "buttonType": "ImageAndText",
+                                "text": { "edit": "Змінити" }
+                            }
+                        ]
+                    }
+                } else {
+                    return {}
+                }
+            })()*/
+            ],
+            //"groupable": {},
+            "pageable": {
+                "autoBind": false,
+                "refresh": true,
+                "pageSizes": [10, 20, 50, 100,200],
+                "buttonCount": 10
+            },
+            "sortable": true,
+            "filterable": true,
+            "resizable": true,
+            "reorderable": true,
+            "scrollable": false,
+            "editable": {
+                "confirmation": "Are you sure you want to delete this record?",
+                "confirmDelete": "Delete",
+                "cancelDelete": "Cancel",
+                "mode": "inline",
+                "create": true,
+                "update": true,
+                "destroy": true
+            },
+            "autoBind": false,
+            "dataSource": {
+                "type": 'aspnetmvc-ajax',
+                "transport": {
+                    "read": {
+                        "url": "/barsroot/Cash/Limits/GetAccountLimits",
+                        "data": getAccCashFilter
+                    },
+                    "prefix": "",
+                    "update": { "url": "/barsroot/Cash/Limits/UpdateAccountLimit" }
+                },
+                "pageSize": 10,
+                "page": 1,
+                "total": 0,
+                "serverPaging": true,
+                "serverSorting": true,
+                "serverFiltering": true,
+                "serverGrouping": true,
+                "serverAggregates": true,
+                "filter": [],
+                "error": onError,
+                "schema": {
+                    "data": "Data",
+                    "total": "Total",
+                    "errors": "Errors",
+                    "model": {
+                        "id": "AccountId",
+                        "fields": {
+                            "AccountId": {
+                                "type": "number"
+                            },
+                            CurrentLimit: {
+                                type: "number",
+                                defaultValue: null,
+                                validation: {
+                                    min:0,
+                                    required: true,
+                                    currentlimitvalidation: currentLimValidation
+                                }
+                            },
+                            MaxLimit: {
+                                type: "number",
+                                defaultValue: null,
+                                validation: {
+                                    min:0,
+                                    required: true,
+                                    maxlimitvalidation: maxLimValidation
+                                }
+                            },
+                            "Branch": {
+                                "editable": false,
+                                "type": "string"
+                            },
+                            "CashType": {
+                                "editable": false,
+                                "type": "string"
+                            },
+                            "CashTypeName": {
+                                "editable": false,
+                                "type": "string"
+                            },
+                            "PrivateAccount": {
+                                "editable": false,
+                                "type": "string"
+                            },
+                            "AccountName": {
+                                "editable": false,
+                                "type": "string"
+                            },
+                            "CurrencyCode": {
+                                "editable": false,
+                                "type": "number"
+                            },
+                            "Mfo": {
+                                "editable": false,
+                                "type": "string"
+                            },                            
+                            MfoName: {
+                                "editable": false,
+                                "type": "string"
+                            },
+                            "Balance": {
+                                "editable": false,
+                                "type": "number",
+                                "defaultValue": null
+                            },
+                            "CurrentLimitViolated": {
+                                "editable": false,
+                                "type": "boolean"
+                            },
+                            "MaxLimitViolated": {
+                                "editable": false,
+                                "type": "boolean"
+                            },
+                            "LimitViolated": {
+                                "editable": false,
+                                "type": "boolean"
+                            } ,          
+                            "LimitViolatedName": {
+                                "editable": false,
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        $("#grid_acc_atm").kendoGrid({
+            toolbar:[
+                {
+                    name: "UploadAtmExcel",
+                    template:'<button class="k-button" onclick="uploadAtmExcel();"><i class="pf-icon pf-16 pf-exel"></i> Вигрузити в EXCEL</button>'
+                }
+            ],
+            /*toolbar: ["excel"],
+            excel: {
+                fileName: "cashLimitsAccAtm.xlsx",
+                allPages: true,
+                filterable: true,
+                proxyURL: bars.config.urlContent('/cash/limits/ConvertBase64ToFile/')
+            },*/
+            columns: [
+                {
+                    "title": "МФО",
+                    "field": "Kf",
+                    "encoded": true
+                }, {
+                    "title": "Назва РУ",
+                    "field": "MfoName",
+                    "encoded": true
+                },{
+                    "title": "Відділення",
+                    "field": "Branch",
+                    "encoded": true
+                }, {
+                    "title": "Код банкомату",
+                    "field": "AtmCode",
+                    "encoded": true
+                },{
+                    "title": "Рахунок банкомату",
+                    "field": "AccNumber",
+                    "encoded": true
+                },{
+                    "title": "Код валюти",
+                    "field": "Currency",
+                    "encoded": true
+                }, {
+                    "title": "Назва рахунку",
+                    "field": "Name",
+                    "encoded": true
+                }, {
+                    "title": "Баланс рахунку",
+                    "attributes": { "class": "money" },
+                    "field": "Balance",
+                    "encoded": true,
+                    format: "{0:n2}"
+                }, {
+                    "title": "Ліміт макс. загрузки",
+                    "attributes": { "class": "money" },
+                    "field": "LimitMaxLoad",
+                    "encoded": true,
+                    format: "{0:n2}"
+                }, {
+                    "title": "Ліміт порушений",
+                    "field": "LimitViolatedName",
+                    filterable: false,
+                    sortable: false,
+                    "template": "#= formatLimitViolated(data) #",
+                    "encoded": true
+                }],
+            "pageable": {
+                "autoBind": false,
+                "refresh": true,
+                "pageSizes": [10, 20, 50,100,200],
+                "buttonCount": 10
+            },
+            "sortable": true,
+            "filterable": true,
+            "resizable": true,
+            "reorderable": true,
+            "scrollable": false,
+            "editable": {
+                "confirmation": "Are you sure you want to delete this record?",
+                "confirmDelete": "Delete",
+                "cancelDelete": "Cancel",
+                "mode": "inline",
+                "create": true,
+                "update": true,
+                "destroy": true
+            },
+            "autoBind": false,
+            "dataSource": {
+                "type": 'aspnetmvc-ajax',
+                "transport": {
+                    "read": {
+                        url: bars.config.urlContent('/Cash/Limits/GetAtmLimits'),
+                        "data": getAccAtmFilter
+                    },
+                    "prefix": "",
+                    "update": { "url": "/barsroot/Cash/Limits/UpdateAccountLimit" }
+                },
+                "pageSize": 10,
+                "page": 1,
+                "total": 0,
+                "serverPaging": true,
+                "serverSorting": true,
+                "serverFiltering": true,
+                "serverGrouping": true,
+                "serverAggregates": true,
+                "filter": [],
+                "error": onError,
+                "schema": {
+                    "data": "Data",
+                    "total": "Total",
+                    "errors": "Errors",
+                    "model": {
+                        "id": "Id",
+                        "fields": {
+                            Id: {
+                                "type": "number"
+                            },
+                            AtmCode: {
+                                type: "string"
+                            },
+                            Branch: {
+                                "editable": false,
+                                "type": "string"
+                            },
+                            Kf: {
+                                "editable": false,
+                                "type": "string"
+                            },
+                            MfoName: {
+                                "editable": false,
+                                "type": "string"
+                            },
+                            AccNumber: {
+                                type: "string"
+                            },
+                            Currency: {
+                                "editable": false,
+                                "type": "number"
+                            },
+                            Name: {
+                                "editable": false,
+                                "type": "string"
+                            },
+
+                            Balance: {
+                                "editable": false,
+                                "type": "number",
+                                "defaultValue": null
+                            },
+                            LimitMaxLoad: {
+                                "type": "number"
+                            },
+                            CashType: {
+                                "editable": false,
+                                "type": "string"
+                            },
+                            ClosedDate: {
+                                type:'date'
+                            },
+                            Colour: {
+                                type: "string"
+                            },
+                            LimitViolated: {
+                                type: "string"
+                            },
+                            LimitViolatedName: {
+                                type: "string"
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+
+
+        // если страница открыта из региона, то фильтра на МФО нет
+        if (window.mfoFilter) {
+            window.mfoFilter.registerObserver(function (filterList) {
+                model.filterList = filterList;
+                model.rereadCurrentGrid();
+            });
+        }
+
+        setCurrentFunction("mfo_cash");
+    });
+
+    /*(function ($, kendo) {
+        $.extend(true, kendo.ui.validator, {
+            rules: { // custom rules
+                productnamevalidation: function (input, params) {
+                    debugger
+                    //check for the rule attribute
+                    if (input.filter("#CurrentLimit").length && input.val()) {
+
+                        return /^[0-9]*\.?[0-9]$/.test(input.val());
+                    }
+                    return true;
+                }
+            },
+            messages: { //custom rules messages
+                productnamevalidation: function (input) {
+                    // return the message text
+                    return input.attr("data-val-productnamevalidation");
+                }
+            }
+        });
+    })(jQuery, kendo);*/
+
+
+    function formatBalance(item) {
+        return getFormattedValue(item.Balance, item.LimitViolated);
+    }
+
+    function formatCurrentLimit(item) {
+        return getFormattedValue(item.CurrentLimit, item.CurrentLimitViolated);
+    }
+
+    function formatMaxLimit(item) {
+        return getFormattedValue(item.MaxLimit, item.MaxLimitViolated);
+    }
+
+    function formatLimitViolated(item) {
+        return item.LimitViolated
+            ? "<div class='k-block k-error-colored centerField'>"+item.LimitViolatedName+"</div>"
+            : "<div class='k-block k-success-colored centerField'>"+item.LimitViolatedName+"</div>";
+    }
+
+    // Получить отформатированное значения для лимита (html)
+    //  limitValue - значение колонки
+    //  limitViolated - признак превышения лимита
+    function getFormattedValue(limitValue, limitViolated) {
+        if (limitValue == null) {
+            return "";
+        }
+
+        var columnValue = kendo.toString(limitValue, "n");
+        var html;
+        if (limitViolated) {
+            html = kendo.format("<span class='badSum'>{0}<span>",
+                columnValue
+            );
+        } else {
+            html = columnValue;
+        }
+        return html;
+    }
+
+
+    /* Хранит состояние страницы и позволяет переключаться между функциями*/
+    var model = {
+        // текущий грид
+        currentGridId: undefined,
+        // ассоциативный массив отмеченных МФО (код - true/false)
+        filterList: {},
+        // массив отмеченных МФО
+        getMfoList: function () {
+            var mfos = [];
+            for (key in model.filterList) {
+                if (model.filterList[key] == true) {
+                    mfos.push(key);
+                }
+            }
+            return mfos;
+        },
+
+        // перечитать грид
+        rereadCurrentGrid: function () {
+            if (this.currentGridId != undefined) {
+                var curGrid = $("#" + this.currentGridId);
+                if (curGrid.length != 0) {
+                    curGrid.data("kendoGrid").dataSource.read();
+                }
+            }
+        },
+
+        /* Установить текущую функцию */
+        setCurrentGrid: (function () {
+            var isChangeProcess;
+            // используем вложенную функцию для хранения приватных переменных в замыкании
+            return function (newGridId) {
+                if (isChangeProcess) {
+                    return;
+                }
+                isChangeProcess = true;
+                var newGrid = $("#" + newGridId);
+                if (newGrid.length != 0) {
+                    // перечитать грид
+                    newGrid.data("kendoGrid").dataSource.read();
+                    var curGrid = $("#" + this.currentGridId);
+
+                    this.currentGridId = newGridId;
+
+                    var showNewGrid = function () {
+                        newGrid.closest(".grid-section").fadeIn();
+                    };
+
+                    if (curGrid.length != 0) {
+                        curGrid.closest(".grid-section").fadeOut(function () {
+                            showNewGrid();
+                            isChangeProcess = false;
+                        });
+                    }
+                        // случай первичной загрузки страницы
+                    else {
+                        showNewGrid();
+                        isChangeProcess = false;
+                    }
+                }
+            };
+        })()
+    };
+
+    function getMfoCashFilter() {
+        return {
+            limType: "CASH",
+            mfoList: model.getMfoList()
+        };
+    }
+
+    function getMfoAtmFilter() {
+        return {
+            limType: "ATM",
+            mfoList: model.getMfoList()
+        };
+    }
+
+    function getAccCashFilter() {
+        return {
+            limType: "CASH",
+            mfoList: model.getMfoList()
+        };
+    }
+
+    function getAccAtmFilter() {
+        return {
+            limType: "ATM",
+            mfoList: model.getMfoList()
+        };
+    }
+
+    // выбор пункта в дереве
+    function onSelect(e) {
+        var checkBox = $('#treeview').data('kendoTreeView').dataItem(e.node);
+        setCurrentFunction(checkBox.id);
+    }
+
+    function setCurrentFunction(checkBoxId) {
+        var newGridId = undefined;
+        switch (checkBoxId) {
+            case "mfo_cash":
+                newGridId = "grid_mfo_cash";
+                setPageTitle("Ліміти - МФО - Каса");
+                break;
+            case "mfo_atm":
+                newGridId = "grid_mfo_atm";
+                setPageTitle("Ліміти - МФО - Банкомати");
+                break;
+            case "acc_cash":
+                newGridId = "grid_acc_cash";
+                setPageTitle("Ліміти - Рахунки - Каса");
+                break;
+            case "acc_atm":
+                newGridId = "grid_acc_atm";
+                setPageTitle("Ліміти - Рахунки - Банкомати");
+                break;
+        }
+        if (newGridId != undefined) {
+            model.setCurrentGrid(newGridId);
+        }
+    }
+
+    function setPageTitle(title) {
+        $("#title").text(title);
+    }
+
+    function onError(e) {
+        if (e.status == "customerror") {
+            var exception = e.errors;
+            showModalWindow(exception.message);
+        }
+        else {
+            alert("Generic server error.");
+        }
+    }
+
+    function showModalWindow(content) {
+        bars.ui.error({text:content, width:500, height:300});
+        /*var wnd = $("#Details").data("kendoWindow");
+        wnd.content(content);
+        wnd.center().open();*/
+    }
+
+</script>
+
+
+<style>
+    table.lim-table tr td {
+        vertical-align: top;
+    }
+
+    .grid-section {
+        display: none;
+    }
+
+    .centerField {
+        text-align: center;
+    }
+
+    .rightField {
+        text-align: right;
+    }
+
+    .badSum {
+        font-style: italic;
+        font-weight: bold;
+    }
+
+    .test {
+        width: 2000px;
+    }
+</style>

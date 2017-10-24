@@ -1,0 +1,101 @@
+﻿@{
+    Layout = null;
+}
+@inherits System.Web.Mvc.WebViewPage<Models.CORPS>
+<table cellspacing="0" border="0">
+    <tr>
+        <td>Найменування за статутом</td>
+        <td>
+            <input value="@Model.NMKU" class="edit long" id="ed_NMKU" tabindex="1" type="text" maxlength="70"
+                                        onchange="ToDoOnChange();" />
+        </td>
+        <td rowspan="7" valign="middle" align="center" width="100%">
+            <img alt="" id="img_picture" height="100" src="/barsroot/customers/picturefile/@Model.SEAL_ID" />
+        </td>
+    </tr>
+    <tr>
+        <td>Керівник</td>
+        <td>
+            <input value="@Model.RUK" class="edit long" id="ed_RUK" tabindex="2" type="text" maxlength="70" onchange="ToDoOnChange()"/>
+        </td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Гол. бухгалтер підприємства</td>
+        <td>
+            <input value="@Model.BUH" class="edit long" id="ed_BUH" tabindex="3" type="text" maxlength="70" onchange="ToDoOnChange();"/>
+        </td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Телефон керівника</td>
+        <td>
+            <input value="@Model.TELR" class="edit centered" id="ed_TELR" tabindex="4" type="text" maxlength="20" onchange="ToDoOnChange();" />
+        </td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Телефон гол. бухгалтеру</td>
+        <td>
+            <input value="@Model.TELB" class="edit centered" id="ed_TELB" tabindex="5" type="text" maxlength="20" onchange="ToDoOnChange();" />
+        </td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>E-mail</td>
+        <td>
+            <input value="@Model.E_MAIL" class="edit centered" id="ed_E_MAIL" tabindex="6" type="text" onchange="ToDoOnChange();" />
+        </td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Факс</td>
+        <td>
+            <input value="@Model.TEL_FAX" class="edit centered" id="ed_TEL_FAX" tabindex="7" type="text" maxlength="20" onchange="ToDoOnChange();" />
+        </td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Ід. графічного образу друку</td>
+        <td>
+            <input value="@Model.SEAL_ID" class="edit centered" id="ed_SEAL_ID" onclick="ShowSealHelp()" tabindex="7" disabled="disabled" type="text" />
+        </td>
+        <td></td>
+    </tr>
+    <tr>
+        <td colspan="3" style="FONT-WEIGHT: bold; FONT-SIZE: 10pt; COLOR: darkblue; FONT-FAMILY: Arial; TEXT-ALIGN: center">Поточні рахунки</td>
+    </tr>
+    <tr>
+        <td colspan="3">
+            <span id="td_add_accs" style="FONT-SIZE: 10pt; WIDTH: 64px; CURSOR: hand; COLOR: darkgreen; FONT-FAMILY: Arial; TEXT-DECORATION: underline" onclick="MyAddRow(&#39;grdACCS&#39;);ToDoOnChange();">Додати</span>
+            <span id="td_del_accs" style="FONT-SIZE: 10pt; CURSOR: hand; COLOR: darkred; FONT-FAMILY: Arial; TEXT-DECORATION: underline" onclick="MyDeleteRow(&#39;grdACCS&#39;);ToDoOnChange();">Видалити</span>     
+        </td>
+    </tr>
+    <tr>
+        <td colspan="3" valign="top">
+            <table id="G_grdACCS" class="miniSimpleTable" cellpadding="0" cellspacing="0">
+                <thead>
+                    <tr>
+                        <td></td>
+                        <td>МФО банку</td>
+                        <td>Номер рахунку</td>
+                        <td>Код валюти</td>
+                        <td>Коментар</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.CORPS_ACC)
+                    {
+                    <tr data-id="@item.ID">
+                        <td></td>
+                        <td>@item.MFO</td>
+                        <td>@item.NLS</td>
+                        <td>@item.KV</td>
+                        <td>@item.COMMENTS</td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </td>
+    </tr>
+</table>

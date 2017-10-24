@@ -1,0 +1,242 @@
+﻿@using Areas.DptAdm.Models
+
+<script src="@Url.Content("~/Areas/DptAdm/Scripts/AdmDicts.js")"></script>
+<link href="~/Areas/DptAdm/Content/style.css" rel="stylesheet" />
+<script src="~/Areas/DptAdm/Scripts/jquery.maskedinput.js"></script>
+<script src="@Url.Content("~/Areas/DptAdm/Scripts/mdWinTermDepCorr.js")"></script>
+<script src="@Url.Content("~/Areas/DptAdm/Scripts/mdWinReportForPnFond.js")"></script>
+
+@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = "Налаштування довідників модуля депозити фізичних осіб";
+}
+<link rel="stylesheet" href="~/Areas/DptAdm/Content/AdmAdditionalFun.css" />
+<h2>@ViewBag.Title</h2>
+<link rel="stylesheet" href="~/Areas/DptAdm/Content/style.css" />
+
+ <!-- Тулбар -->
+ <div id="toolbar"></div>
+
+
+<!-- Модальное окно "Коррекция срока вклада" -->
+<div id="mdWinTermDepCorr">
+
+    <form id="FormTermDepCorr" class="form-group">
+        <fieldset>
+            <legend>Задайте параметри:</legend>
+
+            <div style="margin-left: 10px">
+                <div>
+                    <label for="DepositNumber" style="width: 110px">№ Вкладу:</label>
+                    <input class="k-input" type="number" id="DepositNumber" name="DepositNumber" validationMessage="Необхідно ввести номер вкладу" required style="width: 248px" maxlength="15" />
+                    <span class="k-invalid-msg" data-for="DepositNumber"></span>
+                    <span id="DepositNumberValidate"></span>
+                </div>
+
+                <div>
+                    <label for="DepositStartDate" style="width: 110px">Дата початку:</label>
+                    <input id="DepositStartDate" style="width: 250px" readonly />
+
+                </div>
+                <div>
+                    <label for="DepositEndDate" style="width: 110px">Дата закінчення:</label>
+                    <input id="DepositEndDate" style="width: 250px" readonly />
+                </div>
+
+            </div>
+
+        </fieldset>
+
+        <br />
+        <fieldset>
+            <legend>Вкажіть новий срок вкладу:</legend>
+            <div>
+
+                <div style="margin-left: 10px">
+                    <div>
+                        <label for="NewDepositStartDate" style="width: 110px">Дата початку:</label>
+                        <input id="NewDepositStartDate" style="width: 250px" />
+                    </div>
+                    <div>
+                        <span id="NewDepositStartDateValidate"></span>
+                    </div>
+                    <div>
+                        <label for="NewDepositEndDate" style="width: 110px">Дата закінчення:</label>
+                        <input id="NewDepositEndDate" style="width: 250px" />
+                    </div>
+                    <div>
+                        <span id="NewDepositEndDateValidate"></span>
+                    </div>
+                </div>
+                <br />
+                <div class="form-inline" align="center">
+                    <label for="ProlongationNumber">К-сть пролонгацій:</label>
+                    <input type="number" class="k-input" id="ProlongationNumber" style="width: 30px">
+                    <br />
+                    <span id="ProlongationNumberValidate"></span>
+                </div>
+
+            </div>
+
+        </fieldset>
+
+        <br />
+        <div align="center">
+            <div class="confirm">
+                <button class="k-button k-primary" type="submit" id="formValidate">Виконати</button>
+                <button class="k-button k-primary" id="cancelForm">Відмінити</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Модальное окно Формування звiту для ПФ "Рах,по яким не отрим.персiонери" -->
+<div id="mdWinReportForPnFond">
+    <form id="FormReportForPnFond" class="form-group">
+        <fieldset>
+            <legend>Задайте параметри для формування звiту:</legend>
+
+            <div style="margin-left: 90px">
+
+                <div>
+                    <label for="ReportPeriodNumber" style="width: 150px">Звiтний перiод/мiс:</label>
+                    <input class="k-input" type="number" id="ReportPeriodNumber" name="ReportPeriodNumber" required style="width: 200px" maxlength="10" /><br />
+                    <span id="ReportPeriodValidate"></span>
+                </div>
+
+
+                <div>
+                    <label for="ReportDate" style="width: 150px">Звiтна дата:</label>
+                    <input id="ReportDate" style="width: 200px" required /><br />
+                    <span id="ReportDateValidate"></span>
+                </div>
+            </div>
+
+        </fieldset>
+
+        <br />
+        <div align="center">
+            <div class="confirm">
+                <button class="k-button k-primary" type="submit" id="ValidateFormReportForPnFond">Виконати</button>
+                <button class="k-button k-primary" id="CancelFormReportForPnFond">Відмінити</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div id="mdWinExportBaseInsRates">
+    <form id="FormExpDate" class="form-group">
+        <fieldset>
+            <legend>Оберіть дату експорту:</legend>
+            <div>
+                <div style="margin-left: 10px">
+                    <div>
+                        <label for="BratesExportData" style="width: 100px">Дата</label>
+                        <input id="BratesExportData" class="k-datepicker" name="DateBratesExport"
+                               style="width: 250px" pattern="^[0-3]?[0-9].[0-3]?[0-9].(?:[0-9]{2})?[0-9]{2}$" />
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+        <br />
+        <div align="center">
+            <div class="confirm">
+                <button class="k-button k-primary" id="confirmSendDateToBratesExport" type="submit">Виконати</button>
+                <button class="k-button k-primary" id="cnclSendDateToBratesExport">Відхилити</button>
+            </div>
+        </div>
+
+
+        <div class="status">
+        </div>
+
+    </form>
+</div>
+
+
+
+<div id="loading" style="z-index:9999"></div>
+
+<div kendo-window="SynchronizeDeposits" k-visible="false" id="SynchronizeDeposits">
+
+
+    <form id="FormExpDate" class="form-group">
+
+        <fieldset>
+            <label>Виконати Синхронізацю % ставок по змігрованим депозитам? </label>
+        </fieldset>
+        <br />
+        <div align="center">
+            <div class="confirm">
+                <button class="k-button k-primary" id="confirmSynchronizeDeposits" type="submit">Виконати</button>
+                <button class="k-button k-primary" id="cncldep">Відхилити</button>
+            </div>
+        </div>
+        <div class="status">
+        </div>
+
+    </form>
+</div>
+
+<div id="UpdatedDepositsFL">
+    <form id="FormExpDate" class="form-group">
+        <fieldset>
+            <label>DPT Оновити базові ставоки по видам депозитів ФО? </label>
+        </fieldset>
+        <br />
+        <div align="center">
+            <div class="confirm">
+                <button class="k-button k-primary" id="confirmUpdatedDepositsFL" type="submit">Виконати</button>
+                <button class="k-button k-primary" id="cnclUpdatedDepositsFL">Відхилити</button>
+            </div>
+
+        </div>
+
+        <div class="status">
+        </div>
+
+    </form>
+</div>
+<div id="mydiv" style="z-index:99999">
+    <img src="~/Areas/DptAdm/Content/Images/loader.gif" width="100" height="100" class="ajax-loader" />
+</div>
+<div id="TransferSrokdeposits">
+    <div id="popupNotification"></div>
+
+    <div class="form-group">
+
+        <button class="k-button k-primary" id="DialogTransdepositsButtton" type="submit" style="margin-left: 7px;">Перенести строк.вклади</button>
+        <br />
+        <div id="grid" style="width:99%;margin: auto;margin-top: 10px;" kendo-grid="ViewGrid" k-options="ViewGridOptions" k-rebind="ViewGridOptions"
+             k-on-save-changes="saveChanges(kendoEvent)">
+        </div>
+    </div>
+
+</div>
+
+
+<div id="DialogTransdeposits">
+    <form id="FormExpDate" class="form-group">
+
+        <fieldset>
+            <label> </label>Виберіть операцію для перенесення строкових вкладів на вклади до запитання.
+        </fieldset>
+        <br />
+        <div align="center">
+
+            <div class="row">
+                        <div class="col-md-4" style="left:7%;">
+                            <label>Операція:</label>
+                        </div>
+                        <div>
+                            <input id="operations" kendo-drop-down-list k-data-source="Operations" k-data-text-field="'NAME'" k-data-value-field="'TT'" style="width:40%;right:15%;" k-on-change="onSelect()">
+                        </div>
+                        <br />
+                    </div>
+            <div class="confirm">
+                <button class="k-button k-primary" id="confirmTransferSrokdeposits" type="submit">Виконати</button>
+                <button class="k-button k-primary" id="cnclTransferSrokdeposits">Відхилити</button>
+            </div>
+        </div>
+    </form>
+</div>

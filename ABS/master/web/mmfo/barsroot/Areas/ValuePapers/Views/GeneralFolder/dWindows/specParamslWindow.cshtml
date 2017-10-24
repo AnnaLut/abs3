@@ -1,0 +1,17 @@
+﻿
+<div kendo-window="specParamsWindow" k-visible="false" k-modal="true"
+     k-width="830" k-height="400" k-title="'Спец.параметри для внесистемних рахунків'" style="background-color: #F2F2F2;">
+
+    <div ng-controller="specParamsController">
+        <div style="width: 400px; display: inline-block;">
+            <div kendo-grid="grid1" k-options="grid1Options"></div>
+            <button style="float:right;" ng-disabled="lock.length!=2" ng-click="setSpecparams()">Зберегти</button>
+        </div>
+        <div style="width: 400px; display: inline-block;">
+            <div kendo-grid="grid2" k-options="grid2Options"></div>
+            <button style="float:left;" ng-click="changeBillWindow.close()">Відмінити</button>
+        </div>
+    </div>
+
+</div>
+

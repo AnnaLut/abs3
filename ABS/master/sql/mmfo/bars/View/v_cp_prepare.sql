@@ -1,0 +1,18 @@
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_CP_PREPARE.sql =========*** Run *** =
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  view V_CP_PREPARE ***
+
+  CREATE OR REPLACE FORCE VIEW BARS.V_CP_PREPARE ("RUNN", "ACC", "NMSA", "NLSA", "KVA", "ID_A", "NMSB", "NLSB", "KVB", "ID_B", "FDAT", "TDAT", "IR", "OSTT", "INT", "OST", "NAZN", "TT") AS 
+  SELECT "RUNN","ACC","NMSA","NLSA","KVA","ID_A","NMSB","NLSB","KVB","ID_B","FDAT","TDAT","IR","OSTT","INT","OST","NAZN","TT"
+     FROM TABLE (value_paper.make_int_prepare);
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_CP_PREPARE.sql =========*** End *** =
+PROMPT ===================================================================================== 

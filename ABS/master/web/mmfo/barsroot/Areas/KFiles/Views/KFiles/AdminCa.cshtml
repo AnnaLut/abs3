@@ -1,0 +1,179 @@
+﻿@{
+    ViewBag.Title = "Corporations";
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    string theme = "bootstrap";
+    var cook = HttpContext.Current.Request.Cookies["theme"];
+    if (cook != null)
+    {
+        theme = cook.Value;
+    }
+}
+
+<h1>АРМ адміністратора даних по К-Файлам рівня ЦА</h1>
+<link href="~/Areas/KFiles/CSS/mainKFiles.css" rel="stylesheet" />
+@*<div id="SyncGrid"></div>*@
+<div id="mainGrid" ></div>
+
+<script type="text/javascript">
+    //grid for V_OB_CORPORATION_SESSION
+    $(function () {
+        //var grid = $("#SyncGrid");
+
+        debugger;
+
+        var gridDataSource = new kendo.data.DataSource({
+            type: 'aspnetmvc-ajax',
+            transport: {
+                read: {
+                    url: bars.config.urlContent("/kfiles/kfiles/GetSyncData"),
+                    dataType: "json",
+                    cache: false
+                }
+            },
+            schema: {
+                data: "Data",
+                total: "Total",
+                model: {
+                    fields: {
+                        ID: { type: "number" },
+                        MFO: { type: "string", },
+                        FILE_DATE: { type: "string" },
+                        CORPORATION: { type: "string" },
+                        STATE: { type: "string" },
+                        SYNCTIME: { type: "string" }
+                    }
+                }
+            },
+            pageSize: 20,
+            serverPaging: true,
+            serverFiltering: true,
+            serverSorting: true
+        });
+
+
+        var mainGridOptions = {
+            autoBind: true,
+            scrollable: true,
+            dataSource: gridDataSource,
+            sortable: true,
+            reorderable: true,
+            selectable: 'single',           
+            pageable: {
+                refresh: true,
+                pageSizes: [20, 25, 50, 100, "All"],
+                buttonCount: 5,
+                messages: {
+                    empty: 'Немає даних',
+                    allPages: 'Всі'
+                }
+            },
+            dataBound: function () {
+                grid = this;
+            },
+            height: 600,
+            scrollable: true,
+            filterable: true,
+            columns: [
+                {
+                    field: "ID",
+                    title: "Номер синхронізації"
+                },
+                {
+                    field: "MFO",
+                    title: "МФО даних синхронізації"
+                },
+                {
+                    field: "FILE_DATE",
+                    title: "Дата даних"
+                },
+                {
+                    field: "CORPORATION",
+                    title: "Номер корпорації"
+                },
+                {
+                    field: "SYNCTIME",
+                    title: "Дата та час синхронізації"
+                },
+                {
+                    field: "STATE",
+                    title: "Статус"
+                }
+            ]
+        };
+
+        $("#mainGrid").kendoGrid(mainGridOptions);
+
+
+      //grid.kendoGrid({
+      //  dataSource: {
+      //    type:'json',
+      //    transport: {
+      //        read: '/barsroot/kfiles/kfiles/GetSyncData'
+      //    },
+      //    schema: {
+      //      data: "Data",
+      //      total: "Total",
+      //      errors: "Errors",
+      //      model: {
+      //        fields: {
+      //            ID: {type: "number"},
+      //            MFO: { type: "string", },
+      //            FILE_DATE: { type: "string" },
+      //            CORPORATION: { type: "string" },
+      //            STATE: { type: "string" },
+      //            SYNCTIME: { type: "string" }
+                  
+      //        }
+      //      }
+      //    },
+      //    pageSize: 20
+          
+      //  },
+      //  groupable: false,
+      //  sortable: true,
+      //  filterable: true,
+      //  pageable: {
+      //      refresh: true,
+      //      pageSizes: true,
+      //      previousNext: true,
+      //      info: true
+      //  },
+      //  columns: [
+      //    {
+      //        field: "ID",
+      //        title: "Номер синхронізації"
+      //    },
+      //    {
+      //        field: "MFO",
+      //        title: "МФО даних синхронізації"
+      //    },
+      //    {
+      //        field: "FILE_DATE",
+      //        title: "Дата даних"
+      //    },
+      //    {
+      //        field: "CORPORATION",
+      //        title: "Номер корпорації"
+      //    },
+      //    {
+      //        field: "SYNCTIME",
+      //        title: "Дата та час синхронізації"
+      //    },
+      //    {
+      //        field: "STATE",
+      //        title: "Статус"
+      //    }
+      //  ]
+      //});
+    });
+    
+</script>
+
+
+
+
+
+
+
+
+

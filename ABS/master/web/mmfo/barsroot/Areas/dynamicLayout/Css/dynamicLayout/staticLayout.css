@@ -1,0 +1,39 @@
+﻿.row {
+    margin-left: 5px;
+    margin-bottom: 5px;
+}
+
+.inline-div {
+    display: inline-block;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+.k-numerictextbox .k-input {
+    border-radius: 0px !important;
+}
+
+.k-grid td {
+    white-space: pre-wrap !important;
+}
+
+.k-grid .k-grid-header .k-header .k-link {
+    height: auto;
+}
+
+.k-grid-header th.k-header {
+    white-space: normal;
+}
+
+.k-header > .k-grid-filter {
+    opacity: 0.3;
+    filter: alpha(opacity=30);
+}
+
+.invisible-row {
+    display: none;
+}
+
+.coloredRow {
+    background-color: #C8FFC8;
+}

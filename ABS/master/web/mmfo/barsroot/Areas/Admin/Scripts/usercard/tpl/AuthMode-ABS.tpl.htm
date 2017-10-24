@@ -1,0 +1,8 @@
+﻿<script id="AuthMode-ABS" type="text/x-kendo-template">
+    <div class="container-fluid" id="container">
+        <div id="absMode">
+            <label for="DateEnd">Дата завершення дії паролю:</label>
+            <input id="DateEnd" type="text" class="form-control" value="#= kendo.toString(kendo.parseDate(PasswordExpiresAt), 'dd/MM/yyyy HH:mm') === null ? ' Не задано значення. ' : kendo.toString(kendo.parseDate(PasswordExpiresAt), 'dd/MM/yyyy HH:mm') #" readonly>
+        </div>
+    </div>
+</script>

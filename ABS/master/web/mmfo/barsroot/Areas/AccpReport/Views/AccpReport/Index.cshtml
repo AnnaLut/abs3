@@ -1,0 +1,54 @@
+﻿@{
+    ViewBag.Title = "Підготовка данних для формування актів виконаних робіт на відшкодування комісійної винагороди банку";
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    string theme = "bootstrap";
+    var cook = HttpContext.Current.Request.Cookies["theme"];
+    if (cook != null)
+    {
+        theme = cook.Value;
+    }
+}
+<script src="~/Scripts/respond.min.js"></script>
+<script src="~/Areas/Swift/Scripts/KendoCommon.js"></script>
+<script src="~/Areas/AccpReport/Scripts/AccpReport.js"></script>
+
+
+<h1>Формування актів виконаних робіт на відшкодування комісійної винагороди банку</h1>
+
+<div id="AccountsGrid"></div>
+<div class="box-col">
+    <br>
+</div>
+
+<div>
+    <input id="datepickerFrom" value="10/10/2015" />
+    <input id="datepickerTo" />
+    <button id="createReport" class="k-button">Create Report</button>
+</div>
+<div class="box-col">
+    <br>
+</div>
+
+<div id="AccountsToReportGrid"></div>
+<div class="box-col">
+    <br>
+</div>
+<div class="box-col">
+    <br>
+</div>
+
+<div>
+    <a href="/barsroot/cbirep/rep_list.aspx?codeapp=3771" id="lnktoreports">Перейти до формування звітів</a>
+</div>
+<div class="box-col">
+    <br>
+</div>
+<div class="box-col">
+    <br>
+</div>
+
+
+
+
+
+

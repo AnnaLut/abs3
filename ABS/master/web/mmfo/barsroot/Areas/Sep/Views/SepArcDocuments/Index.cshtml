@@ -1,0 +1,36 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = "СЕП Архів документів";
+}
+@Html.Partial("~/Areas/Sep/Views/Shared/_sepDocViewer.cshtml")
+
+<script src="~/Areas/Sep/Scripts/SepArcDocuments.js"></script>
+<script src="~/Areas/Sep/Scripts/sep.documents.js"></script>
+<script src="~/lib/jsZip/jszip.min.js"></script>
+<h2>@ViewBag.Title</h2>
+<div>
+    <div class="form-inline" >
+        <div class="form-group">
+            <label><b></b></label>
+            <br />
+            <label><b>СЕП. Дата файлу</b> &nbsp;</label>
+        </div>
+        <div class="form-group">
+            <label for="dateStart"><b>Початок періоду:</b></label>
+            <br />
+            <input class="form-control" id="dateStart" />
+        </div>
+        <div class="form-group">
+            <label for="dateEnd"><b>Завершення періоду:</b></label><br />
+            <input class="form-control" id="dateEnd" />
+        </div>
+        <div class="form-group">
+            <label><b></b></label><br />
+            <input type="button" class="form-control" id="submit" onclick="reloadGrid()" value="Пошук" />
+        </div>
+    </div>
+    <br />
+</div>
+<div id="SepArcDocumentsToolBar"></div>
+<div id="SepArcDocumentsGrid"></div>
+

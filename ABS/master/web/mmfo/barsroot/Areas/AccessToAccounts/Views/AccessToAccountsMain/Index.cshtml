@@ -1,0 +1,58 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = "Встановлення доступу до рахунків";
+}
+
+<div ng-controller="AccessToAccounts.MainCtrl">
+    <div class="row">
+        <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12 ">
+            <h2 class="text textAccessToAccounts">Перегляд та встановлення доступу до рахунків</h2>
+            <div kendo-grid="gridMain" k-options="mainOptions" k-on-change="selectedAccount(data)">
+                <div class="k-loading-mask" style="width:100%;height:100%" ng-show="loading">
+                    <span class="k-loading-text">Loading...</span>
+                    <div class="k-loading-image">
+                        <div class="k-loading-color">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12 ">
+            <h2 class="text groupServingAccount">Група обслуговуюча рахунок</h2>
+            <div kendo-toolbar k-options="groupAccountToolbarOptions"></div>
+            <div kendo-grid="gridGroupServingAccount" k-options="groupServingAccountOptions" k-on-change="selectedGroupServingAccount(data)"></div>
+
+            <h2 class="text groupUsers">Група користувачів, обслуговуюча групу рахунків <br> << <span id="groupUserName" ng-bind="groupUsersName"></span> >></h2>
+            <div kendo-toolbar k-options="groupUsersToolbarOptions"></div>
+            <div kendo-grid="gridGroupUsers" k-options="usersGroupOptions" k-on-change="selectedGroupUsers(data)"></div>
+
+            <h2 class="text groupUsers"> Склад групи <br> << <span id="theGroup" ng-bind="theGroup"></span> >></h2>
+            <div kendo-toolbar k-options="theGroupToolbarOptions"></div>
+            <div kendo-grid="gridTheGroup" k-options="theGroupOptions" k-on-change="selectedTheGroup(data)"></div>
+        </div>
+    </div>
+    <div kendo-window="winAddGroup" k-visible="false" k-modal="true">
+        <div ng-controller="AccessToAccounts.AddGroupCtrl" id="windowAddGroup" class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
+            <div class="containerDropDownGroup">
+                <select kendo-combo-box
+                        ng-model="selectedID"
+                        k-ng-model="ID"
+                        k-filter="'contains'"
+                        k-data-text-field="'NAME'"
+                        k-value-primitive="true"
+                        k-data-value-field="'ID'"
+                        k-data-source="winAddGroupDataSource" style="width: 230px;">
+                </select>
+            </div>
+            <div class="containerBtnGroup">
+                <button class="k-button k-button-icontext k-primary k-grid-update" ng-click="AddAccountGroup()" ng-disabled="selectedID === null " ng-show="btnAddAccountGroup"><i class='pf-icon pf-16 pf-add_button'></i>Додати</button>
+                <button class="k-button k-button-icontext k-primary k-grid-update" ng-click="AddGroupUsers()" ng-disabled="selectedID === null " ng-show="btnAddGroupUsers"><i class='pf-icon pf-16 pf-add_button'></i>Додати</button>
+                <button class="k-button k-button-icontext k-primary k-grid-update" ng-click="AddUser()" ng-disabled="selectedID === null " ng-show="btnAddUser"><i class='pf-icon pf-16 pf-add_button'></i>Додати</button>
+                <a class="k-button k-button-icontext k-grid-cancel" href="#" ng-click="closeWinAddGroup()"><span class="k-icon k-cancel"></span>Скасувати</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@Styles.Render("~/bundles/AccessToAccounts/styles")
+@Scripts.Render("~/bundles/AccessToAccounts/scriptsMain")

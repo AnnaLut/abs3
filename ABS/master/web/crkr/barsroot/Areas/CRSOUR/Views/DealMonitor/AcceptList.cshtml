@@ -1,0 +1,1130 @@
+﻿@*
+    Страничка содержит все функции (таблицы) для работы с Кредитными ресурсами
+    Логика функционирования страницы:
+     - Все таблицы создаются при загрузке страницы и делаются невидимыми, автозагрузка данных в таблицы отключена;
+     - В один момент времени видимой может быть только одна таблица;
+     - Страница имеет состояние - набор переменных, от которых зависит логика работы функций;
+     - Состояние страницы хранится в переменной model;
+     - Состояние страницы изменяется посредством изменения атрибутов переменной model;
+     - Переход между функциями осуществляется посредством вызова setCurrentGrid/SetState метода model;
+*@
+@using BarsWeb.Areas.CRSOUR.ViewModels
+@using Kendo.Mvc.UI
+@model StartOptions
+
+@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    // заголовки для функций
+    //
+    const string titleClaims = "Cписок заявок від Аллегро";
+    const string titleTransactions = "Cписок транзакцій АБС";
+    const string titleClaimHistory = "Історія обробки заявок";
+    const string titleTransactionHistory = "Історія обробки транзакцій";
+    const string contains = "містять";
+    const string doesNotContains = "не містять";
+
+    // общий toolbar для функций деталей
+    const string detailsToolbar =
+            @"<button onclick='cancelProcessClaim()' class='k-button'><span class='k-sprite k-icon  k-i-cancel'></span> Відмінити обробку заявки</button>
+            <button onclick='repeatProcessClaim()' class='k-button'><span class='k-sprite k-icon  k-i-refresh'></span> Повторно виконати заявку</button>
+            <button onclick='showClaimHistory()' class='k-button'><span class='k-sprite k-icon  k-i-clock'></span> Перегляд історії обробки заявки</button>
+            <button onclick='showTransactionList()' class='k-button'>Список транзакцій АБС</button>";
+}
+
+<div id="table">
+    <div class="pageTitle">@Model.FunctionName</div>
+
+    @*Окна уведомления*@
+    <div>
+        @(Html.Kendo().Notification()
+    .Name("notification")
+    .Position(p => p.Pinned(true).Top(30).Right(30))
+    .Stacking(NotificationStackingSettings.Down)
+    .AutoHideAfter(1000)
+    .Templates(t =>
+    {
+        t.Add().Type("upload-success").ClientTemplateID("successTemplate");
+        t.Add().Type("upload-unsuccess").ClientTemplateID("unsuccessTemplate");
+    })
+        )
+
+        <script id="successTemplate" type="text/x-kendo-template">
+            <div class="upload-success">
+                <img src="/barsroot/content/images/notify/success-icon.png" />
+                <h3>#= message #</h3>
+            </div>
+        </script>
+
+        <script id="unsuccessTemplate" type="text/x-kendo-template">
+            <div class="upload-unsuccess">
+                <img src="/barsroot/content/images/notify/error-icon.png" />
+                <h3>#= message #</h3>
+            </div>
+        </script>
+
+        @(Html.Kendo().Window().Name("Details")
+        .Title("Неуспішно")
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .Width(600)
+        )
+    </div>
+
+    @*Панель навигации по ранее выбранным функциями. Наполняется динамически*@
+    <div id="navigationBar">
+        <div id="navigationScope">
+        </div>
+    </div>
+    <br>
+
+    @*Заявки*@
+    <div id="divClaims" class="grid-section" data-title="@titleClaims">
+        @(Html.Kendo().Grid<ComplexClaim>
+          ()
+          .Name("grid_Claims")
+          .Columns(columns =>
+          {
+              columns.Bound(c => c.Mfo)
+                    .Filterable(filter => filter
+                        .Operators(o => o.ForString(f => f.Clear()
+                            .Contains(contains)
+                            .DoesNotContain(doesNotContains)
+                            )));
+              columns.Bound(c => c.Id);
+              columns.Bound(c => c.Type)
+                   .Filterable(filter => filter
+                      .Operators(o => o.ForString(f => f.Clear()
+                          .Contains(contains)
+                          .DoesNotContain(doesNotContains)
+                          )));
+              columns.Bound(c => c.DealNumber)
+                   .Filterable(filter => filter
+                      .Operators(o => o.ForString(f => f.Clear()
+                          .Contains(contains)
+                          .DoesNotContain(doesNotContains)
+                          )));
+              columns.Bound(c => c.State)
+                   .Filterable(filter => filter
+                      .Operators(o => o.ForString(f => f.Clear()
+                          .Contains(contains)
+                          .DoesNotContain(doesNotContains)
+                          )));
+              columns.Bound(c => c.Comment)
+                   .Filterable(filter => filter
+                      .Operators(o => o.ForString(f => f.Clear()
+                          .Contains(contains)
+                          .DoesNotContain(doesNotContains)
+                          )));
+          })
+          .ToolBar(toolbar => toolbar.Template(
+              "<button id='showClaimDetailsFromClaimList'class='k-button'><span class='k-sprite k-icon  k-i-insert-n'></span> Перегляд деталей заявки</button>" +
+              "<button id='cancelProcessClaimFromClaimList'class='k-button'><span class='k-sprite k-icon  k-i-cancel'></span> Відмінити обробку заявки</button>" +
+              "<button id='repeatProcessClaimFromClaimList'class='k-button'><span class='k-sprite k-icon  k-i-refresh'></span> Повторно виконати заявку</button>" +
+              "<button id='showClaimHistoryFromClaimList'class='k-button'><span class='k-sprite k-icon  k-i-clock'></span> Перегляд історії обробки заявки</button>" +
+              "<button id='showTransactionListFromClaimList'class='k-button'>Список транзакцій АБС</button>"))
+          .Resizable(resize => resize.Columns(true))
+          .Reorderable(reorder => reorder.Columns(true))
+          .Selectable()
+          .Pageable(pager => pager
+              .PageSizes(true))
+          .Sortable()
+          .Filterable(ftb => ftb.Mode(GridFilterMode.Row))
+          .Events(events => events.Change("grid_ClaimsOnChange").DataBinding("grid_ClaimsOnDataBinding"))
+          .AutoBind(false)
+          .DataSource(dataSource => dataSource
+              .Ajax()
+              .Sort(sort => sort.Add(c => c.Id).Ascending())
+                        .Read(read => read.Action("GetComplexClaims", "DealMonitor")
+                      ).Events(e => e.Error("onError"))
+          ))
+    </div>
+
+    @*Транзакции*@
+    <div id="divTransactions" class="grid-section" data-title="@titleTransactions">
+        @(Html.Kendo().Grid<Transaction>
+          ()
+          .Name("grid_Transactions")
+          .Columns(columns =>
+          {
+              columns.Bound(c => c.TransactionId).Filterable(ftb => ftb.Cell(cell => cell.InputWidth(70)));
+              columns.Bound(c => c.ClaimId).Filterable(ftb => ftb.Cell(cell => cell.InputWidth(70)));
+              columns.Bound(c => c.ClaimType)
+                   .Filterable(filter => filter
+                      .Operators(o => o.ForString(f => f.Clear()
+                          .Contains(contains)
+                          .DoesNotContain(doesNotContains)
+                          )));
+              columns.Bound(c => c.MfoCode).Filterable(ftb => ftb.Cell(cell => cell.InputWidth(70)))
+                   .Filterable(filter => filter
+                      .Operators(o => o.ForString(f => f.Clear()
+                          .Contains(contains)
+                          .DoesNotContain(doesNotContains)
+                          )));
+              columns.Bound(c => c.TransactionType)
+                   .Filterable(filter => filter
+                      .Operators(o => o.ForString(f => f.Clear()
+                          .Contains(contains)
+                          .DoesNotContain(doesNotContains)
+                          )));
+              columns.Bound(c => c.Object)
+                   .Filterable(filter => filter
+                      .Operators(o => o.ForString(f => f.Clear()
+                          .Contains(contains)
+                          .DoesNotContain(doesNotContains)
+                          )));
+              columns.Bound(c => c.Priority).Filterable(ftb => ftb.Cell(cell => cell.InputWidth(70)));
+              columns.Bound(c => c.FailCounter).Filterable(ftb => ftb.Cell(cell => cell.InputWidth(70)));
+              columns.Bound(c => c.TransactionState).Filterable(ftb => ftb.Cell(cell => cell.InputWidth(90)))
+                   .Filterable(filter => filter
+                      .Operators(o => o.ForString(f => f.Clear()
+                          .Contains(contains)
+                          .DoesNotContain(doesNotContains)
+                          )));
+              columns.Bound(c => c.Comment)
+                   .Filterable(filter => filter
+                      .Operators(o => o.ForString(f => f.Clear()
+                          .Contains(contains)
+                          .DoesNotContain(doesNotContains)
+                          )));
+          })
+          .ToolBar(toolbar => toolbar.Template(
+              "<button id='showClaimDetailsFromTransactionList' class='k-button'><span class='k-sprite k-icon  k-i-insert-n'></span> Перегляд деталей заявки</button>" +
+              "<button id='cancelProcessTransaction' class='k-button'><span class='k-sprite k-icon  k-i-cancel'></span> Відмінити обробку транзакції</button>" +
+              "<button id='repeatSendingTransactionToAbs' class='k-button'><span class='k-sprite k-icon  k-i-refresh'></span> Повторно відправити транзакцію в АБС</button>" +
+              "<button id='showTransactionHistory' class='k-button'><span class='k-sprite k-icon  k-i-clock'></span> Перегляд історії обробки транзакції</button>"))
+          .Resizable(resize => resize.Columns(true))
+          .Reorderable(reorder => reorder.Columns(true))
+          .Selectable()
+          .Pageable(pager => pager
+              .PageSizes(true))
+          .Sortable()
+          .Filterable(ftb => ftb.Mode(GridFilterMode.Row))
+          .Events(events => events.Change("grid_TransactionsOnChange").DataBinding("grid_TransactionsOnDataBinding"))
+          .AutoBind(false)
+          .DataSource(dataSource => dataSource
+              .Ajax()
+              .Sort(sort => sort.Add(c => c.TransactionId).Ascending())
+              .Read(read => read.Action("GetTransactions", "DealMonitor")
+                  .Data("getCurrentClaimId"))
+              .Events(e => e.Error("onError"))
+          )
+        )
+    </div>
+
+    @*История заявок*@
+    <div id="divClaimHistory" class="grid-section" data-title="@titleClaimHistory">
+        @(Html.Kendo().Grid<ClaimHistory>
+          ()
+          .Name("grid_claimHistory")
+          .Columns(columns =>
+          {
+              columns.Bound(c => c.Id);
+              columns.Bound(c => c.SysTime).Format("{0:dd.MM.yyyy hh:mm:ss}");
+              columns.Bound(c => c.ClaimState)
+                   .Filterable(filter => filter
+                      .Operators(o => o.ForString(f => f.Clear()
+                          .Contains(contains)
+                          .DoesNotContain(doesNotContains)
+                          )));
+              columns.Bound(c => c.Comment)
+                   .Filterable(filter => filter
+                      .Operators(o => o.ForString(f => f.Clear()
+                          .Contains(contains)
+                          .DoesNotContain(doesNotContains)
+                          )));
+          })
+          .Resizable(resize => resize.Columns(true))
+          .Reorderable(reorder => reorder.Columns(true))
+          .Pageable(pager => pager
+              .PageSizes(true))
+          .Sortable()
+          .Selectable()
+          .Filterable(ftb => ftb.Mode(GridFilterMode.Row))
+          .AutoBind(false)
+          .DataSource(dataSource => dataSource
+              .Ajax()
+              .Sort(sort => sort.Add(c => c.SysTime).Descending())
+              .Read(read => read.Action("GetClaimHistory", "DealMonitor")
+                  .Data("getCurrentClaimId")
+              ).Events(e => e.Error("onError"))
+          )
+        )
+    </div>
+
+    @*История транзакций*@
+    <div id="divTransactionHistory" class="grid-section" data-title="@titleTransactionHistory">
+        @(Html.Kendo().Grid<TransactionHistory>
+          ()
+          .Name("grid_transactionHistory")
+          .Columns(columns =>
+          {
+              columns.Bound(c => c.Id);
+              columns.Bound(c => c.SysTime).Format("{0:dd.MM.yyyy hh:mm:ss}");
+              columns.Bound(c => c.TransactionState)
+                   .Filterable(filter => filter
+                      .Operators(o => o.ForString(f => f.Clear()
+                          .Contains(contains)
+                          .DoesNotContain(doesNotContains)
+                          )));
+              columns.Bound(c => c.Comment)
+                   .Filterable(filter => filter
+                      .Operators(o => o.ForString(f => f.Clear()
+                          .Contains(contains)
+                          .DoesNotContain(doesNotContains)
+                          )));
+          })
+          .Resizable(resize => resize.Columns(true))
+          .Reorderable(reorder => reorder.Columns(true))
+          .Pageable(pager => pager
+              .PageSizes(true))
+          .Sortable()
+          .Selectable()
+          .Filterable(ftb => ftb.Mode(GridFilterMode.Row))
+          .AutoBind(false)
+          .DataSource(dataSource => dataSource
+              .Ajax()
+              .Sort(sort => sort.Add(c => c.SysTime).Descending())
+              .Read(read => read.Action("GetTransactionHistory", "DealMonitor")
+                  .Data("getCurrentTransactionId")
+              ).Events(e => e.Error("onError"))
+          )
+        )
+    </div>
+
+    @*В зависимости от типа выбранной заявки в списке заявок нужно получить данные из определенного представления БД*@
+    @*Детали заявки типа...*@
+    <div id="divClaimDetailsNewDeal" class="grid-section">
+        @(Html.Kendo().Grid<ClaimDetailsNewDeal>
+          ()
+          .Name("grid_ClaimDetailsNewDeal")
+          .Columns(columns =>
+          {
+              columns.Bound(c => c.Id);
+              columns.Bound(c => c.DealNumber);
+              columns.Bound(c => c.StartDate).Format("{0:dd.MM.yyyy}").Width(200);
+              columns.Bound(c => c.EndDate).Format("{0:dd.MM.yyyy}").Width(200);
+              columns.Bound(c => c.LenderCode);
+              columns.Bound(c => c.LenderName);
+              columns.Bound(c => c.BorrowerCode);
+              columns.Bound(c => c.BorrowerName);
+              //columns.Bound(c => c.Sum).Format("{0:n}"); ;
+              //columns.Bound(c => c.Currency);
+              //columns.Bound(c => c.InterestRate).Format("{0:n4}"); ;
+              //columns.Bound(c => c.InterestCalendar);
+              //columns.Bound(c => c.AllegroComment);
+              //columns.Bound(c => c.AllegroId);
+              //columns.Bound(c => c.SysTime).Format("{0:dd.MM.yyyy hh:mm:ss}").Width(200);
+              //columns.Bound(c => c.ClaimState);
+          })
+          .ToolBar(toolbar => toolbar.Template(@detailsToolbar))
+          .Resizable(resize => resize.Columns(true))
+          .ClientDetailTemplateId("template_ClaimDetailsNewDeal")
+          .HtmlAttributes(new { style = "height:630px;" })
+          .Events(events => events.DataBound("claimDetailsDataBound"))
+          .AutoBind(false)
+          .DataSource(dataSource => dataSource
+              .Ajax()
+              .Sort(sort => sort.Add(c => c.Id).Ascending())
+              .Read(read => read.Action("GetClaimDetailsNewDeal", "DealMonitor")
+                  .Data("getCurrentClaimId")
+              ).Events(e => e.Error("onError"))
+          ))
+
+        <script id="template_ClaimDetailsNewDeal" type="text/x-kendo-template">
+            <div class='employee-details'>
+                <ul>
+                    <li><label>ID заявки</label>#= Id #</li>
+                    <li><label>Номер угоди</label>#= DealNumber #</li>
+                    <li><label>Дата укладення угоди</label>#= kendo.toString(StartDate,"dd.MM.yyyy") #</li>
+                    <li><label>Дата погашення угоди</label>#= kendo.toString(EndDate,"dd.MM.yyyy") #</li>
+                    <li><label>Код (МФО) кредитора</label>#= LenderCode #</li>
+                    <li><label>Назва кредитора</label>#= LenderName #</li>
+                    <li><label>Код (МФО) позичальника</label>#= BorrowerCode #</li>
+                    <li><label>Назва позичальника</label>#= BorrowerName #</li>
+                    <li><label>Сума угоди</label>#= kendo.toString(Sum,"n") #</li>
+                    <li><label>Валюта угоди</label>#= Currency #</li>
+                    <li><label>Відсоткова ставка</label>#= kendo.toString(InterestRate,"n4") #</li>
+                    <li><label>Тип календаря відсотків</label>#= InterestCalendar #</li>
+                    <li><label>Коментар Аллегро</label>#= AllegroComment #</li>
+                    <li><label>Ідентифікатор заявки в системі Аллегро</label>#= AllegroId #</li>
+                    <li><label>Системний час створення заявки</label>#= kendo.toString(SysTime,"dd.MM.yyyy hh:mm:ss") #</li>
+                    <li><label>Статус обробки заявки</label>#= ClaimState #</li>
+                </ul>
+            </div>
+        </script>
+    </div>
+
+    @*Детали заявки типа...*@
+    <div id="divClaimDetailsChangeExpireDate" class="grid-section">
+        @(Html.Kendo().Grid<ClaimDetailsChangeExpireDate>
+          ()
+          .Name("grid_ClaimDetailsChangeExpireDate")
+          .Columns(columns =>
+          {
+              columns.Bound(c => c.Id);
+              columns.Bound(c => c.DealNumber);
+              columns.Bound(c => c.ExpireDate).Format("{0:dd.MM.yyyy}").Width(200);
+              columns.Bound(c => c.AllegroComment);
+              columns.Bound(c => c.AllegroId);
+              columns.Bound(c => c.SysTime).Format("{0:dd.MM.yyyy hh:mm:ss}").Width(200);
+              columns.Bound(c => c.ClaimState);
+          })
+          .ToolBar(toolbar => toolbar.Template(@detailsToolbar))
+          .Resizable(resize => resize.Columns(true))
+          .ClientDetailTemplateId("template_ClaimDetailsChangeExpireDate")
+          .HtmlAttributes(new { style = "height:630px;" })
+          .Events(events => events.DataBound("claimDetailsDataBound"))
+          .AutoBind(false)
+          .DataSource(dataSource => dataSource
+              .Ajax()
+              .Sort(sort => sort.Add(c => c.Id).Ascending())
+              .Read(read => read.Action("GetClaimDetailsChangeExpireDate", "DealMonitor")
+
+                  .Data("getCurrentClaimId")
+              ).Events(e => e.Error("onError"))
+          ))
+
+        <script id="template_ClaimDetailsChangeExpireDate" type="text/x-kendo-template">
+            <div class='employee-details'>
+                <ul>
+                    <li><label>ID заявки</label>#= Id #</li>
+                    <li><label>Номер угоди</label>#= DealNumber #</li>
+                    <li><label>Дата погашення угоди</label>#= kendo.toString(ExpireDate,"dd.MM.yyyy") #</li>
+                    <li><label>Коментар Аллегро</label>#= AllegroComment #</li>
+                    <li><label>Ідентифікатор заявки в системі Аллегро</label>#= AllegroId #</li>
+                    <li><label>Системний час створення заявки</label>#= kendo.toString(SysTime,"dd.MM.yyyy hh:mm:ss") #</li>
+                    <li><label>Статус обробки заявки</label>#= ClaimState #</li>
+                </ul>
+            </div>
+        </script>
+    </div>
+
+    @*Детали заявки типа...*@
+    <div id="divClaimDetailsChangeRate" class="grid-section">
+        @(Html.Kendo().Grid<ClaimDetailsChangeRate>
+          ()
+          .Name("grid_ClaimDetailsChangeRate")
+          .Columns(columns =>
+          {
+              columns.Bound(c => c.Id);
+              columns.Bound(c => c.DealNumber);
+              columns.Bound(c => c.StartDate).Format("{0:dd.MM.yyyy}").Width(200);
+              columns.Bound(c => c.Rate).Format("{0:n4}");
+              columns.Bound(c => c.AllegroComment);
+              columns.Bound(c => c.AllegroId);
+              columns.Bound(c => c.SysTime).Format("{0:dd.MM.yyyy hh:mm:ss}").Width(200);
+              columns.Bound(c => c.ClaimState);
+          })
+          .ToolBar(toolbar => toolbar.Template(@detailsToolbar))
+          .Resizable(resize => resize.Columns(true))
+          .ClientDetailTemplateId("template_ClaimDetailsChangeRate")
+          .HtmlAttributes(new { style = "height:630px;" })
+          .Events(events => events.DataBound("claimDetailsDataBound"))
+          .AutoBind(false)
+          .DataSource(dataSource => dataSource
+              .Ajax()
+              .Sort(sort => sort.Add(c => c.Id).Ascending())
+              .Read(read => read.Action("GetClaimDetailsChangeRate", "DealMonitor")
+
+                  .Data("getCurrentClaimId")
+              ).Events(e => e.Error("onError"))
+          ))
+
+        <script id="template_ClaimDetailsChangeRate" type="text/x-kendo-template">
+            <div class='employee-details'>
+                <ul>
+                    <li><label>ID заявки</label>#= Id #</li>
+                    <li><label>Номер угоди</label>#= DealNumber #</li>
+                    <li><label>Дата початку дії ставки</label>#= kendo.toString(StartDate,"dd.MM.yyyy") #</li>
+                    <li><label>Відсоткова ставка</label>#= kendo.toString(Rate,"n4") #</li>
+                    <li><label>Коментар Аллегро</label>#= AllegroComment #</li>
+                    <li><label>Ідентифікатор заявки в системі Аллегро</label>#= AllegroId #</li>
+                    <li><label>Системний час створення заявки</label>#= kendo.toString(SysTime,"dd.MM.yyyy hh:mm:ss") #</li>
+                    <li><label>Статус обробки заявки</label>#= ClaimState #</li>
+                </ul>
+            </div>
+        </script>
+    </div>
+
+    @*Детали заявки типа...*@
+    <div id="divClaimDetailsChangeSum" class="grid-section">
+        @(Html.Kendo().Grid<ClaimDetailsChangeSum>
+          ()
+          .Name("grid_ClaimDetailsChangeSum")
+          .Columns(columns =>
+          {
+              columns.Bound(c => c.Id);
+              columns.Bound(c => c.DealNumber);
+              columns.Bound(c => c.NewSum).Format("{0:n}");
+              columns.Bound(c => c.AllegroComment);
+              columns.Bound(c => c.AllegroId);
+              columns.Bound(c => c.SysTime).Format("{0:dd.MM.yyyy hh:mm:ss}").Width(200);
+              columns.Bound(c => c.ClaimState);
+          })
+          .ToolBar(toolbar => toolbar.Template(@detailsToolbar))
+          .Resizable(resize => resize.Columns(true))
+          .ClientDetailTemplateId("template_ClaimDetailsChangeSum")
+          .HtmlAttributes(new { style = "height:630px;" })
+          .Events(events => events.DataBound("claimDetailsDataBound"))
+          .AutoBind(false)
+          .DataSource(dataSource => dataSource
+              .Ajax()
+              .Sort(sort => sort.Add(c => c.Id).Ascending())
+              .Read(read => read.Action("GetClaimDetailsChangeSum", "DealMonitor")
+                  .Data("getCurrentClaimId")
+              ).Events(e => e.Error("onError"))
+          ))
+
+        <script id="template_ClaimDetailsChangeSum" type="text/x-kendo-template">
+            <div class='employee-details'>
+                <ul>
+                    <li><label>ID заявки</label>#= Id #</li>
+                    <li><label>Номер угоди</label>#= DealNumber #</li>
+                    <li><label>Сума зменшення/збільшення угоди</label>#= kendo.toString(NewSum,"n") #</li>
+                    <li><label>Коментар Аллегро</label>#= AllegroComment #</li>
+                    <li><label>Ідентифікатор заявки в системі Аллегро</label>#= AllegroId #</li>
+                    <li><label>Системний час створення заявки</label>#= kendo.toString(SysTime,"dd.MM.yyyy hh:mm:ss") #</li>
+                    <li><label>Статус обробки заявки</label>#= ClaimState #</li>
+                </ul>
+            </div>
+        </script>
+    </div>
+
+    @*Детали заявки типа...*@
+    <div id="divClaimDetailsCloseDeal" class="grid-section">
+        @(Html.Kendo().Grid<ClaimDetailsCloseDeal>
+          ()
+          .Name("grid_ClaimDetailsCloseDeal")
+          .Columns(columns =>
+          {
+              columns.Bound(c => c.Id);
+              columns.Bound(c => c.DealNumber);
+              columns.Bound(c => c.CloseDate).Format("{0:dd.MM.yyyy}").Width(200);
+              columns.Bound(c => c.AllegroComment);
+              columns.Bound(c => c.AllegroId);
+              columns.Bound(c => c.SysTime).Format("{0:dd.MM.yyyy hh:mm:ss}").Width(200);
+              columns.Bound(c => c.ClaimState);
+          })
+          .ToolBar(toolbar => toolbar.Template(@detailsToolbar))
+          .Resizable(resize => resize.Columns(true))
+          .ClientDetailTemplateId("template_ClaimDetailsCloseDeal")
+          .HtmlAttributes(new { style = "height:630px;" })
+          .Events(events => events.DataBound("claimDetailsDataBound"))
+          .AutoBind(false)
+          .DataSource(dataSource => dataSource
+              .Ajax()
+              .Sort(sort => sort.Add(c => c.Id).Ascending())
+              .Read(read => read.Action("GetClaimDetailsCloseDeal", "DealMonitor")
+                  .Data("getCurrentClaimId")
+              ).Events(e => e.Error("onError"))
+          ))
+
+        <script id="template_ClaimDetailsCloseDeal" type="text/x-kendo-template">
+            <div class='employee-details'>
+                <ul>
+                    <li><label>ID заявки</label>#= Id #</li>
+                    <li><label>Номер угоди</label>#= DealNumber #</li>
+                    <li><label>Дата закриття угоди</label>#= kendo.toString(CloseDate,"dd.MM.yyyy") #</li>
+                    <li><label>Коментар Аллегро</label>#= AllegroComment #</li>
+                    <li><label>Ідентифікатор заявки в системі Аллегро</label>#= AllegroId #</li>
+                    <li><label>Системний час створення заявки</label>#= kendo.toString(SysTime,"dd.MM.yyyy hh:mm:ss") #</li>
+                    <li><label>Статус обробки заявки</label>#= ClaimState #</li>
+                </ul>
+            </div>
+        </script>
+    </div>
+</div>
+
+
+
+<script type="text/javascript">
+    /* Хранит состояние страницы и позволяет переключаться между функциями*/
+    var model = {
+        // Переменные состояния
+        //
+        currentClaimId: undefined,
+        currentClaimType: undefined,
+        currentClaimTypeId: undefined,
+        currentTransactionId: undefined,
+        currentGridId: undefined,
+
+        /* Установить текущую функцию */
+        setCurrentGrid: function (newGridId) {
+            var newGrid = $("#" + newGridId);
+            if (newGrid.length != 0) {
+
+                // перечитать грид
+                newGrid.data("kendoGrid").dataSource.read();
+                var curGrid = $("#" + this.currentGridId);
+
+                this.currentGridId = newGridId;
+
+                var showNewGrid = function () {
+                    newGrid.closest(".grid-section").fadeIn();
+                    // после перехода в новую функцию сохранить ее в панель навигации
+                    navigationBar.saveState();
+                };
+
+                if (curGrid.length != 0) {
+                    curGrid.closest(".grid-section").fadeOut(function () {
+                        showNewGrid();
+                    });
+                }
+                    // случай первичной загрузки страницы
+                else {
+                    showNewGrid();
+                }
+            }
+        },
+
+        /* Получить состояние */
+        getState: function () {
+            return {
+                currentClaimId: this.currentClaimId,
+                currentClaimType: this.currentClaimType,
+                currentClaimTypeId: this.currentClaimTypeId,
+                currentTransactionId: this.currentTransactionId,
+                currentGridId: this.currentGridId,
+            }
+        },
+
+        /* Установить состояние */
+        setState: function (state) {
+            this.currentClaimId = state.currentClaimId;
+            this.currentClaimType = state.currentClaimType;
+            this.currentClaimTypeId = state.currentClaimTypeId;
+            this.currentTransactionId = state.currentTransactionId;
+            this.setCurrentGrid(state.currentGridId);
+        }
+    };
+
+
+    /* Хранит последовательность перехода между функциями (состояниями), позволяет переключаться между ними */
+    var navigationBar = {
+        /* последовательность состояний
+        Массив, который хранит пары (ID кнопки на панели навигации, состояние страницы)
+        {   buttonId : buttonId
+            modelState
+                {
+                currentClaimId: undefined,
+                currentClaimType: undefined,
+                currentClaimTypeId: undefined,
+                currentTransactionId: undefined,
+                currentGridId: undefined,
+                }
+        }
+        */
+        seq: [],
+        /* Индекс текущего состояния в массиве состояний
+           Для чего нужно, пример:
+            вызов функции 1 -> добавить состояние 1 в массив, индекс = 0
+            вызов функции 2 -> добавить состояние 2 в массив, индекс = 1
+            вызов функции 3 -> добавить состояние 3 в массив, индекс = 2
+            вызов функции 1 -> ничего не добавляем, индекс = 0
+            вызов функции 4 -> удалить елементы массива после индекса 0, добавить состояние 4 в массив, индекс = 1
+            Т.е
+                - если просто вернулись назад - позволяем вернуться вперед
+                - если вернулись назад, перешли в функцию, отличную от истории (изменили историю) - удаляем старую историю с состояния, в которое перешли, когда возвращались назад
+        */
+        indexOfCurrentButton: undefined,
+        /* сохранить состояние модели */
+        saveState: function () {
+            // получим текущее состояние модели
+            var modelState = model.getState();
+
+            // найдем в списке навигации состояние с текущим gridId
+            var subSeq = $.grep(this.seq, function (e) { return e.modelState.currentGridId == modelState.currentGridId; });
+
+            var addNewButtonAfterCurrent = true;
+            // нашли - можно переключиться на существующую кнопку на панели навигации
+            if (subSeq != 0) {
+                // индекс состояния с текущим gridId
+                var newStateIndex = $.inArray(subSeq[0], this.seq);
+                // если выбрано действие, которое дальше в истории более чем на один элемент (что-то перескакиваем)
+                if (newStateIndex - this.indexOfCurrentButton > 1) {
+                    addNewButtonAfterCurrent = true;
+                }
+                    // если выбрано действие, которое дальше в истории на один элемент или ранее по истории
+                else {
+                    $(".nav-button").removeClass("k-primary");
+                    $("#" + subSeq[0].buttonId).addClass("k-primary");
+                    this.indexOfCurrentButton = this.seq.indexOf(subSeq[0]);
+                    addNewButtonAfterCurrent = false;
+                }
+            }
+
+            // если не нашли - добавляем
+            if (addNewButtonAfterCurrent) {
+                // если после текущего состояния есть уже история (ранее вернулись назад) - удаляем все после текущего состояния
+                //
+                if (this.indexOfCurrentButton != undefined) {
+                    var countButtonsToRemove = this.seq.length - 1 - this.indexOfCurrentButton;
+                    if (countButtonsToRemove != 0) {
+                        var deletedItems = this.seq.splice(-countButtonsToRemove, countButtonsToRemove);
+                        $.each(deletedItems, function (i, val) {
+                            $("#" + val.buttonId).remove();
+                        });
+                    }
+                }
+
+                // создадим кнопку на панели навигации
+                //
+                var date = new Date();
+                var now = date.getTime();
+                var buttonId = "nav" + now;
+
+                // добавляем состояние в историю
+                this.seq[this.seq.length] = {
+                    buttonId: buttonId,
+                    modelState: modelState
+                };
+                this.indexOfCurrentButton = this.seq.length - 1;
+
+                var buttonTitle = $("#" + modelState.currentGridId).closest(".grid-section").data("title");
+                if (buttonTitle == undefined) {
+                    buttonTitle = modelState.currentGridId;
+                }
+                var buttonAction = "navigationBar.navigateTo(" + this.indexOfCurrentButton + ")";
+
+                var buttonHtml = getButtonHtml(buttonId, buttonTitle, buttonAction);
+                $("#navigationScope").append(buttonHtml);
+                $(".nav-button").removeClass("k-primary");
+                var newButton = $("#" + buttonId);
+                newButton.addClass("k-primary");
+                newButton.fadeIn();
+            }
+        },
+        /* Перейти в сохраненное состояние
+           Метод привязан к кнопкам навигации
+        */
+        navigateTo: function (stateIndex) {
+            model.setState(this.seq[stateIndex].modelState);
+        },
+    }
+
+    /*Для динамического создания кнопок навигации по посещенным функциям*/
+    function getButtonHtml(id, text, onclick) {
+        return "<button id='" + id + "' onclick=\"" + onclick + "\" class='k-button nav-button'><span class='k-sprite k-icon k-i-arrow-e'></span>" + text + "</button>";
+    }
+
+    /* обработчик ошибок загрузки данных в таблицы */
+    function onError(e) {
+        if (e.status == "customerror") {
+            var exception = e.errors;
+            showModalWindow(exception.message);
+        }
+        else {
+            alert("Generic server error.");
+        }
+    }
+
+    /* Грид при перечитке обращается к этой функции */
+    function getCurrentClaimId() {
+        return { claimId: model.currentClaimId }
+    }
+
+    /* Грид при перечитке обращается к этой функции */
+    function getCurrentTransactionId() {
+        return { transactionId: model.currentTransactionId }
+    }
+
+    /* Изменение текущей строки */
+    function grid_ClaimsOnChange() {
+        var curRow = this.dataItem(this.select());
+        model.currentClaimId = curRow.Id;
+        model.currentClaimType = curRow.Type;
+        model.currentClaimTypeId = curRow.ClaimTypeId;
+    }
+
+    /* После привязки данных */
+    function grid_ClaimsOnDataBinding() {
+        model.currentClaimId = undefined;
+        model.currentClaimType = undefined;
+        model.currentClaimTypeId = undefined;
+    }
+
+    /* Изменение текущей строки */
+    function grid_TransactionsOnChange() {
+        var curRow = this.dataItem(this.select());
+        model.currentTransactionId = curRow.TransactionId;
+        model.currentClaimId = curRow.ClaimId;
+        model.currentClaimType = curRow.ClaimType;
+        model.currentClaimTypeId = curRow.ClaimTypeId;
+    }
+
+    /* После привязки данных */
+    function grid_TransactionsOnDataBinding() {
+        //model.currentTransactionId = undefined;
+        //model.currentClaimId = undefined;
+        //model.currentClaimType = undefined;
+        //model.currentClaimTypeId = undefined;
+    }
+
+    // общая функция для всех окон деталей
+    function claimDetailsDataBound() {
+        // распахнуть окно деталей для строки
+        this.expandRow(this.tbody.find("tr.k-master-row").first());
+    }
+
+    /* ставит в соотв. типу заявки грид, который нужно отобразить с деталями*/
+    function getClaimDetailsGridIdByClaimTypeId(typeId) {
+        var newGridId = undefined;
+        switch (typeId) {
+            case 1: //"Реєстація нової угоди":
+                newGridId = "grid_ClaimDetailsNewDeal";
+                break;
+            case 2: //"Зміна суми угоди":
+                newGridId = "grid_ClaimDetailsChangeSum";
+                break;
+            case 3: //"Зміна відсоткової ставки":
+                newGridId = "grid_ClaimDetailsChangeRate";
+                break;
+            case 4: //"Зміна дати завершення угоди":
+                newGridId = "grid_ClaimDetailsChangeExpireDate";
+                break;
+            case 5: //"Закриття угоди":
+                newGridId = "grid_ClaimDetailsCloseDeal";
+                break;
+        }
+        return newGridId;
+    }
+
+    function cancelProcessClaim() {
+        if (model.currentClaimId != undefined) {
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("CancelProcessClaim", "DealMonitor")',
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify({ claimId: model.currentClaimId }),
+                dataType: "json",
+                success: successFunc,
+                error: errorFunc
+            });
+        } else {
+            showUnsuccessNotification("Оберіть рядок");
+        }
+    }
+
+    function repeatProcessClaim() {
+        if (model.currentClaimId != undefined) {
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("RepeatClaim", "DealMonitor")',
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify({ claimId: model.currentClaimId }),
+                dataType: "json",
+                success: successFunc,
+                error: errorFunc
+            });
+        } else {
+            showUnsuccessNotification("Оберіть рядок");
+        }
+    }
+
+    function showTransactionList() {
+        if (model.currentClaimId != undefined) {
+            model.setCurrentGrid("grid_Transactions");
+        } else {
+            showUnsuccessNotification("Оберіть рядок");
+        }
+    }
+
+    function showClaimHistory() {
+        if (model.currentClaimId != undefined) {
+            model.setCurrentGrid("grid_claimHistory");
+        } else {
+            showUnsuccessNotification("Оберіть рядок");
+        }
+    }
+
+    /* После успешного выполнения ajax-запроса */
+    function successFunc(data) {
+        if (data.success == true) {
+            $("#" + model.currentGridId).data("kendoGrid").dataSource.read();
+            showSuccessNotification(data.message);
+        } else {
+            showModalWindow(data.message);
+        }
+    }
+
+    /* После неуспешного выполнения ajax-запроса */
+    function errorFunc() {
+        showModalWindow('<b>Неуспішно</b>');
+    }
+
+    function showModalWindow(content) {
+        var wnd = $("#Details").data("kendoWindow");
+        wnd.content(content);
+        wnd.center().open();
+    }
+
+    function showSuccessNotification(message) {
+        var notification = $("#notification").data("kendoNotification");
+        notification.show({
+            message: message
+        }, "upload-success");
+    }
+
+    function showUnsuccessNotification(message) {
+        var notification = $("#notification").data("kendoNotification");
+        notification.show({
+            message: message
+        }, "upload-unsuccess");
+    }
+
+    $(document).ready(function () {
+        model.setCurrentGrid(getStartGrid('@Model.StartWindow'));
+
+        /* ставит в соответствие типу окна ID грида */
+        function getStartGrid(startWnd) {
+            switch (startWnd) {
+                case "FullAcceptList":
+                    return "grid_Claims";
+                case "FullTransactionList":
+                    return "grid_Transactions";
+            }
+            return undefined;
+        }
+
+        $('#showClaimDetailsFromClaimList').click(function (e) {
+            e.stopPropagation();
+            showClaimDetails();
+        });
+
+        $('#showClaimDetailsFromTransactionList').click(function (e) {
+            e.stopPropagation();
+            showClaimDetails();
+        });
+
+        function showClaimDetails() {
+            if (model.currentClaimId != undefined) {
+                var newGridId = getClaimDetailsGridIdByClaimTypeId(model.currentClaimTypeId);
+                if (newGridId != undefined) {
+                    $("#" + newGridId).closest(".grid-section").data("title", "Деталі заявки '" + model.currentClaimType + "'");
+                    model.setCurrentGrid(newGridId);
+                }
+            } else {
+                showUnsuccessNotification("Оберіть рядок");
+            }
+        }
+
+        // ClaimList
+        //
+
+        $('#cancelProcessClaimFromClaimList').click(function (e) {
+            e.preventDefault();
+            cancelProcessClaim();
+        });
+
+        $('#repeatProcessClaimFromClaimList').click(function (e) {
+            e.preventDefault();
+            repeatProcessClaim();
+        });
+
+        $('#showTransactionListFromClaimList').click(function (e) {
+            e.stopPropagation();
+            showTransactionList();
+        });
+
+        $('#showClaimHistoryFromClaimList').click(function (e) {
+            e.stopPropagation();
+            showClaimHistory();
+        });
+
+        $('#cancelProcessClaimFromDetails').click(function (e) {
+            e.preventDefault();
+            cancelProcessClaim();
+        });
+
+        $('#repeatProcessClaimFromDetails').click(function (e) {
+            e.preventDefault();
+            repeatProcessClaim();
+        });
+
+        $('#showTransactionListFromDetails').click(function (e) {
+            e.stopPropagation();
+            showTransactionList();
+        });
+
+        $('#showClaimHistoryFromDetails').click(function (e) {
+            e.stopPropagation();
+            showClaimHistory();
+        });
+
+        // TransactionList
+        //
+
+        $('#cancelProcessTransaction').click(function (e) {
+            e.preventDefault();
+            if (model.currentTransactionId != undefined) {
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("CancelTransaction", "DealMonitor")',
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify({ transactionId: model.currentTransactionId }),
+                    dataType: "json",
+                    success: successFunc,
+                    error: errorFunc
+                });
+            }
+            else {
+                showUnsuccessNotification("Оберіть рядок");
+            }
+        });
+
+        $('#repeatSendingTransactionToAbs').click(function (e) {
+            e.preventDefault();
+            if (model.currentTransactionId != undefined) {
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("RepeatTransactionSending", "DealMonitor")',
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify({ transactionId: model.currentTransactionId }),
+                    dataType: "json",
+                    success: successFunc,
+                    error: errorFunc
+                });
+            }
+            else {
+                showUnsuccessNotification("Оберіть рядок");
+            }
+        });
+
+        $('#showTransactionHistory').click(function (e) {
+            e.stopPropagation();
+            if (model.currentTransactionId != undefined) {
+                model.setCurrentGrid("grid_transactionHistory");
+            } else {
+                showUnsuccessNotification("Оберіть рядок");
+            }
+        });
+    });
+
+    // для IE8. в нем нет функции Array.indexOf()
+    if (!Array.prototype.indexOf) {
+        Array.prototype.indexOf = function (obj, start) {
+            for (var i = (start || 0), j = this.length; i < j; i++) {
+                if (this[i] === obj) { return i; }
+            }
+            return -1;
+        }
+    }
+</script>
+
+<style scoped>
+    #table {
+        display: table;
+    }
+
+    .pageTitle {
+        font-size: 1.5em;
+        margin-bottom: 30px;
+        margin-top: 30px;
+        margin-left: 30px;
+    }
+
+    .nav-button {
+        display: none;
+    }
+
+    .grid-section {
+        display: none;
+    }
+
+    .k-grid-toolbar {
+        padding: .6em 1.3em;
+    }
+
+    .k-notification {
+        border: 0;
+    }
+
+    /* Success template */
+    .k-notification-upload-success.k-group {
+        background: rgba(0%,60%,0%,.7);
+        color: #fff;
+    }
+    /*.k-notification-upload-success.k-group {
+                        background: rgba(0%,0%,0%,.7);
+                        color: #fff;
+                    }*/
+
+    .upload-success {
+        width: 300px;
+        height: 100px;
+        padding: 0 30px;
+        line-height: 100px;
+    }
+
+        .upload-success h3 {
+            font-size: 1.5em;
+            font-weight: normal;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .upload-success img {
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 10px;
+        }
+
+    /* error template */
+    .k-notification-upload-unsuccess.k-group {
+        background: #ff0000;
+        background: rgba(100%,0%,0%,.7);
+        color: #ffffff;
+    }
+
+    /*.k-notification-upload-unsuccess.k-group {
+                        background: rgba(0%,0%,0%,.7);
+                        color: #fff;
+                    }*/
+
+    .upload-unsuccess {
+        width: 300px;
+        height: 100px;
+        padding: 0 30px;
+        line-height: 100px;
+    }
+
+        .upload-unsuccess h3 {
+            font-size: 1.3em;
+            font-weight: normal;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .upload-unsuccess img {
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 10px;
+        }
+
+    /*details styles*/
+    .k-detail-cell .k-tabstrip .k-content {
+        padding: 0.2em;
+    }
+
+    .employee-details ul {
+        list-style: none;
+        font-style: italic;
+        margin: 15px;
+        padding: 0;
+    }
+
+        .employee-details ul li {
+            margin: 0;
+            line-height: 1.7em;
+        }
+
+    .employee-details label {
+        display: inline-block;
+        width: 250px;
+        padding-right: 10px;
+        text-align: right;
+        font-style: normal;
+        font-weight: bold;
+    }
+</style>

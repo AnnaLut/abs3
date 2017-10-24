@@ -1,0 +1,24 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = "Підтвердження виконання операцій";
+}
+
+<script src="~/Areas/AdmSecurity/Scripts/Confirm/SecConfirmCtrl.js"></script>
+<script src="~/Areas/AdmSecurity/Scripts/utils/tabs.js"></script>
+
+<link href="~/Areas/AdmSecurity/Css/Confirm.css" rel="stylesheet"/>
+
+<div class="page-header">
+    <h1>@ViewBag.Title</h1>
+</div>
+<div id="ConfirmTabstrip"></div>
+
+<div id="ConfirmWindow">
+    <div id="box"></div>
+</div>
+
+<script>
+    bars.tabs.loadTemplate('@Url.Content("~/Areas/AdmSecurity/Scripts/Confirm/tpl/confirmResources.tpl.htm")');
+    bars.tabs.loadTemplate('@Url.Content("~/Areas/AdmSecurity/Scripts/Confirm/tpl/gridToolbar.tpl.htm")');
+    bars.tabs.loadTemplate('@Url.Content("~/Areas/AdmSecurity/Scripts/Confirm/tpl/comment.tpl.htm")');
+</script>

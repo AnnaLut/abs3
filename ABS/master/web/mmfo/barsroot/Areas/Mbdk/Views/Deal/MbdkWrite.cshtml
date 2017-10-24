@@ -1,0 +1,330 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+}
+<link rel="stylesheet" href="~/Areas/Mbdk/Content/index.css" />
+@*------------------------------------------------------------------------------------------------------------------------------------------------*@
+
+<script src="~/Areas/Mbdk/Scripts/userControls.js"></script>
+<h1>Введення угоди МБДК</h1>
+<form id="deal" autocomplete="off">
+    <div id="clientPasportWindow">
+    </div>
+    <div id="clientOpenAccountsWindow">
+    </div>
+    <div id="windowAccounts">
+        <div id="gridAccounts"></div>
+    </div>
+    <div class="row">
+        <div class="form-group hidden-id-read">
+            <div class="col-md-3 col-sm-3">
+                <input type="text" style="margin-left: 15px" class="k-textbox non-active mfo" readonly value="">
+            </div>
+
+            <div class="col-md-7 col-sm-7">
+                <button type="button" class="k-button" id="partnersResidentsBtn" title="Партнери-Резиденти"><span class="k-sprite pf-icon pf-16 pf-16 pf-report_open-import" style="margin-bottom: 3px"></span> </button>
+                <button type="button" class="k-button" id="partnersNonResidentsBtn" title="Партнери-НеРезиденти"><span class="k-sprite pf-icon pf-16 pf-business_report" style="margin-bottom: 3px"></span> </button>
+                <button type="button" class="k-button" id="dealsArchive" title="Архів Угод"><span class="k-sprite pf-icon pf-16 pf-book" style="margin-bottom: 3px"></span> </button>
+
+                <button type="button" class="k-button" id="clientPasportBtn" title="Паспорт клієнта-контрагента" style="margin-left: 20px"><span class="k-sprite pf-icon pf-16 pf-user" style="margin-bottom: 3px"></span> </button>
+                <button type="button" class="k-button" id="clientOpenAccountsBtn" title="Відкриті рахунки контрагента"><span class="k-sprite pf-icon pf-16 pf-address_book-design" style="margin-bottom: 3px"></span> </button>
+
+                <button type="button" class="k-button" id="printDeal" disabled title="Друк" style="margin-left: 20px"><span class="k-sprite pf-icon pf-16 pf-print  pf-disabled" style="margin-bottom: 3px"></span> </button>
+                <button type="button" class="k-button" id="saveDeal" title="Зберегти угоду"><span class="k-sprite pf-icon pf-16 pf-ok" style="margin-bottom: 3px"></span> </button>
+                <button type="button" class="k-button" id="saveRoad" disabled title="Зберегти параметри траси"><span class="k-sprite pf-icon pf-16 pf-save pf-disabled" style="margin-bottom: 3px"></span> </button>
+                <button type="button" class="k-button" id="reloadBtn" title="Очистити форму"><span class="k-sprite pf-icon pf-16 pf-reload_rotate" style="margin-bottom: 3px"></span> </button>
+
+                <button type="button" class="k-button" id="createDocuments" disabled title="Сформувати документи" style="margin-left: 20px"><span class="k-sprite pf-icon pf-16 pf-tabs-export  pf-disabled" style="margin-bottom: 3px"></span> </button>
+                <button type="button" class="k-button" id="createSwift" disabled title="Сформувати SWIFT повідомлення"><span class="k-sprite pf-icon pf-16 pf-mail pf-disabled" style="margin-bottom: 3px"></span> </button>
+                <button type="button" class="k-button" id="showSwift" disabled title="Переглянути SWIFT повідомлення"><span class="k-sprite pf-icon pf-16 pf-mail-arrow_right pf-disabled" style="margin-bottom: 3px"></span> </button>
+            </div>
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-5 col-sm-5">
+            <div class="form-group">
+                <input type="text" style="margin-left: 15px" class="k-textbox disable-solid" id="initTrans" required validationMessage="Оберіть значення" />
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 col-sm-6">
+            <div class="panel panel-default">
+                <div class="panel-body" style="height:210px">
+                    <div class="form-group">
+                        <label for="" class="col-md-12 col-sm-12 control-label">Вид договору</label>
+                        <div class="col-md-12 col-sm-12">
+                            <input type="text" class="k-textbox disable-solid" id="dealType" required validationMessage="Оберіть вид договору" tabindex="1"/>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-md-2 col-sm-2 control-label">Валюта</label>
+                        <div class="col-md-4 col-sm-4">
+                            <input id="currency" title="Валюта" placeholder="Валюта" style="width: 65px" required pattern="\d*" validationMessage="Введіть код валюти"  tabindex="2"/>
+                            <button type="button" id="callCurrencyHandBook" title="Довідник валют" style="margin-left: 10px" class="k-button" tabindex="7">
+                                <span class="k-sprite pf-icon pf-16 pf-search" style="margin-bottom: 3px"></span>
+                            </button>
+                        </div>                        
+                        <label for="" class="col-md-1 col-sm-1 control-label">Сума</label>
+                        <div class="col-md-5 col-sm-5">
+                            <input type="text" placeholder="Сума" name="inSum" id="inSum" k-options="decimalFormat" required validationMessage="Введіть cуму" tabindex="3"/>
+                        </div>
+                    </div>                    
+                    <div class="form-group">
+                        <label for="" class="col-md-4 col-sm-4 control-label left-pos">N тікета/договору</label>
+                        <label for="" class="col-md-4 col-sm-4 control-label left-pos">Початок</label>
+                        <label for="" class="col-md-4 col-sm-4 control-label left-pos">Завершення</label>
+
+                        <div class="col-md-4 col-sm-4">
+                            <input type="text" class="k-textbox" placeholder="№ Договору" title="№ тікета/договору" id="ccid" required validationMessage="Введіть номер договору"  tabindex="4"/>
+                        </div>
+
+                        <div class="col-md-4 col-sm-4">
+                            <input type="date" class="k-textbox dateStart disable-solid" title="Початок" id="dateStart"  tabindex="5"/>
+                        </div>
+
+                        <div class="col-md-4 col-sm-4">
+                            <input type="date" class="k-textbox dateEnd disable-solid" title="Закінчення" id="dateEnd"  tabindex="6"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-sm-6">
+            <div class="panel panel-default">
+                <div class="panel-body" style="padding-left: 25px; height:210px">
+                    <div class="form-group hidden-id-read">
+                        <label for="" class="col-md-4 col-sm-4 control-label">% ставка</label>
+                        <div class="col-md-8 col-sm-8">
+                            <input type="text" class="k-textbox" id="procStav" title="% ставка" name="procStav" required placeholder="Відсоткова ставка" pattern="\d+(\.\d{1,6})?" validationMessage="Введіть відсоток" tabindex="7"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="col-md-4 col-sm-4 control-label">% база</label>
+                        <div class="col-md-8 col-sm-8">
+                            <input type="text" class="k-textbox disable-solid" required id="listOfBase" title="% база" tabindex="8">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="col-md-4 col-sm-4 control-label">Сума %%</label>
+                        <div class="col-md-8 col-sm-8">
+                            <input type="text" class="non-active" id="outSum" title="Сума %%" placeholder="Сума угоди" required" />
+                        </div>
+                    </div>
+                    <hr />
+                    <div style="padding-left: 25px;" id="scoreNLS">
+                        <div class="form-group">
+                            <label class="k-label col-md-10">Рахунок доходів не обрано</label>
+                        </div>
+                    </div>
+                </div>
+            </div>          
+
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 col-sm-6">
+            <div class="panel panel-default">
+                <div class="panel-body left-bank">
+                    <div class="form-group">
+                        <label for="" class="col-md-4 col-sm-4 control-label" id="bankName">    </label>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-md-4 col-sm-4">
+                            <input type="text" class="k-textbox non-active mfo" value="" readonly title="МФО нашого Банку">
+                        </div>
+                        <div class="col-md-4 col-sm-4">
+                            <input type="text" class="k-textbox non-active" id="bicode" readonly value="" title="BIC нашого Банку">
+                        </div>
+                        <div class="col-md-4 col-sm-4">
+                            <button type="button" class="k-button" id="accountsInBriefcase" title="Всі вільні рахунки із залишком у портфелі"><span class="k-sprite pf-icon pf-16 pf-accept_doc" style="margin-bottom: 3px"></span> </button>
+                            <button type="button" class="k-button" id="accountsOutsideBriefcase" title="Всі вільні рахунки (у т. ч. із залишком) поза портфелем"><span class="k-sprite pf-icon pf-16 pf-report_open" style="margin-bottom: 3px"></span> </button>
+                            <button type="button" class="k-button" id="accountsWithoutBalance" title="Вільні рахунки без залишку"><span class="k-sprite pf-icon pf-16 pf-list-arrow_right" style="margin-bottom: 3px"></span> </button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-4 col-sm-4">
+                            <input type="text" class="k-textbox non-active" id="okpo" value="" readonly title="ОКПО нашого банку">
+                        </div>
+                        <div class="col-md-4 col-sm-4">
+                            <input type="text" class="k-textbox non-active" id="pb" value="OKPO_BA" readonly title="Код 1-ПБ нашого банку">
+                        </div>
+                        <div class="col-md-4 col-sm-4">
+                            <input type="text" class="k-textbox non-active" id="outRnk" value="" readonly title="Рег.№ нашого банку">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="" class="col-md-6 col-sm-6 control-label left-pos">Основний</label>
+                        <label for="" class="col-md-6 col-sm-6 control-label left-pos">Нарахованих %</label>
+
+                        <div class="col-md-6 col-sm-6">
+                            <input type="text" class="k-textbox non-active" id="baseScore" placeholder="Основний" readonly />
+                        </div>
+
+                        <div class="col-md-6 col-sm-6">
+                            <input type="text" class="k-textbox non-active" id="assessedScore" placeholder="Нарахованих %" readonly />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="" class="col-md-12 col-sm-12 control-label left-pos">Траса вхідного платежу (57-ВІС, 58-Рахунок)</label>
+                        <div class="col-md-6 col-sm-6">
+                            <input type="text" class="k-textbox non-active" id="bicUser" title="ВІС нашого банку-кореспондента" placeholder="BIC банку кореспондента" />
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <input type="text" class="k-textbox non-active" id="acc" title="Рахунок VOSTRO у нашого банку-кореспондента" placeholder="Рахунок VOSTRO" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-6 col-sm-6">
+                            <input type="text" class="k-textbox disable-solid" id="scoreList" title="Назва рахунку для входу валюти" placeholder="Назва рахунку для входу валюти" />
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <input type="text" class="k-textbox non-active" id="nls" title="Рахунок для входу валюти" placeholder="Рахунок для входу валюти" readonly />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        
+                        <label for="" class="col-md-10 col-sm-10 control-label" id="providName">Забезпечення</label>                       
+                        
+                        <div class="col-md-4 col-sm-4">
+                            <input type="text" id="provSum" title="Сума забезпечення" placeholder="Сума" readonly />
+                        </div>
+                        <div class="col-md-2 col-sm-2">
+                            <input type="text" class="k-textbox non-active" id="provKv" title="Валюта забезпечення" placeholder="Валюта" readonly />
+                        </div>
+                        <div class="col-md-5 col-sm-5">
+                            <input type="text" class="k-textbox non-active" id="provScore" title="Рахунок забезпечення" placeholder="Рахунок" readonly />
+                        </div>                        
+                        <div class="col-md-1 col-sm-1">
+                            <div type="button" class="k-button" title="Вибір виду забезпечення" id="providing" style="margin-left: -20px">
+                                <span class="k-sprite pf-icon pf-16 pf-search" style="margin-bottom: 3px"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-4 col-sm-4">
+                </div>
+                <div class="col-md-2 col-sm-2">
+                    <input type="text" class="k-textbox non-active" id="kv" title="Валюта рахунку-транзиту" readonly />
+                </div>
+
+                <div class="col-md-3 col-sm-3">
+                    <input type="text" class="k-textbox non-active" id="multiScore" title="Рахунок-транзит" readonly />
+                </div>
+                <div class="col-md-3 col-sm-3">
+                    <input type="text" class="k-textbox non-active" id="ostat" title="Залишок на рахунку транзиті" readonly />
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-sm-6">
+            <div class="panel panel-default">
+                <div class="panel-body right-bank">
+                    <div class="form-group" style="height:24px">
+                        <label id="nmk" class="col-md-12 col-sm-12     control-label"></label>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-4 col-sm-4">
+                            <input type="text" class="k-textbox" id="mfo" title="МФО партнера" placeholder="МФО партнера"  tabindex="13"/>
+                        </div>
+                        <div class="col-md-4 col-sm-4">
+                            <input type="text" class="k-textbox" id="bic" title="ВІС партнера" placeholder="ВІС партнера"  tabindex="14"/>
+                        </div>
+                        <div class="col-md-3 col-sm-2">
+                            <input type="text" class="k-textbox" id="numNd" placeholder="№ дог." title="№ ген. договору"  tabindex="15" />
+
+                        </div>
+                        <div class="col-md-1 col-sm-1">
+                            <div type="button" id="callGridClient" title="Пошук контрагента" class="k-button" style="margin-left: -20px" tabindex="9">
+                                <span class="k-sprite pf-icon pf-16 pf-search" style="margin-bottom: 3px"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-md-4 col-sm-4">
+                            <input type="text" class="k-textbox" id="okpoUser" title="ОКПО партнера" placeholder="ОКПО партнера"  tabindex="12"/>
+                        </div>
+                        <div class="col-md-4 col-sm-4">
+                            <input type="text" class="k-textbox" id="kod_b" title="Код 1-ПБ партнера" placeholder="Код 1-ПБ партнера"  tabindex="16"/>
+                        </div>
+                        <div class="col-md-4 col-sm-4">
+                            <input type="text" class="k-textbox" id="rnk" title="Рег № партнера" placeholder="Рег № партнера"  tabindex="11" />
+                        </div>
+                    </div>
+                    <div id="disableGroup">
+                        <div class="form-group" style="margin-bottom:0">
+                            <div class="col-md-6 col-sm-6">
+                                <label for="" class="control-label">Основний</label>
+                                <input type="checkbox" id="eq2" class="k-checkbox" style="margin-top: 9px;"  tabindex="17">
+                                <label class="control-label" style="margin-left: 20px" for="eq2">Внутрішній</label>
+                            </div>
+                            <div class="col-md-6 col-sm-6">
+                                <label for="" class="control-label">Нарахованих %</label>
+                                <input type="checkbox" id="eq3" class="k-checkbox" style="margin-top: 9px;"  tabindex="18">
+                                <label class="control-label" style="margin-left: 20px" for="eq3">Внутрішній</label>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-6 col-sm-6">
+                                <input type="text" class="k-textbox" id="s1"  tabindex="19"/>
+                            </div>
+                            <div class="col-md-6 col-sm-6">
+                                <input type="text" class="k-textbox" id="s3"  tabindex="20"/>
+                            </div>
+                        </div>
+                    </div>                    
+                    <div class="form-group">
+                        <label for="" class="col-md-12 col-sm-12 control-label">Траса вихідного платежу (57/ВІС, 58-Рахунок)</label>
+                        <div class="col-xs-5">
+                            <input type="text" class="k-textbox non-active" id="bicRoad" title="ВІС банку-кореспондента партнера" />
+                        </div>
+                        <div class="col-xs-6">
+                            <input type="text" class="k-textbox non-active" title="Рахунок VOSTRO партнера у його банку-кореспондента" placeholder="Рахунок VOSTRO партнера" id="sslb" />
+                        </div>
+                        <div class="col-xs-1 hidden-id-read">
+                            <div type="button" id="roadPay" title="Пошук учасника SWIFT" class="k-button" style="margin-left: -20px" tabindex="10">
+                                <span class="k-sprite pf-icon pf-16 pf-search" style="margin-bottom: 3px"></span>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-12">
+                            <input type="text" class="k-textbox non-active" title="Назва траси платежу" id="nameRoad" readonly />
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="padding-top:8px">
+                        <div class="col-md-11">
+                            <textarea id="area" class="col-md-12 col-sm-12" title="57D - Альтернативне заповнення вихідної траси" rows="3"></textarea>
+                        </div>
+                        <div class="form-group hidden-id-read">
+                            <div class="col-xs-1">
+                                <div type="button" id="comments" title="Пошук учасника SWIFT" class="k-button" style="margin-left: -20px">
+                                    <span class="k-sprite pf-icon pf-16 pf-search" style="margin-bottom: 3px"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="s58DfieldWindow">
+        <section>
+            <h1>Підтвердіть поле 58D</h1>
+            <textarea id="58D" rows="5" style="width:98%; margin:0 5px 0 0;"></textarea>
+            <button class="k-button k-primary" id="confirm58DBtn" style="float:right;margin:7px 5px 7px 5px;"><span>OK</span> </button>
+        </section>
+    </div>
+</form>
+<div id="backupRnk" style="display:none"></div>
+<div id="backupMfo" style="display:none"></div>

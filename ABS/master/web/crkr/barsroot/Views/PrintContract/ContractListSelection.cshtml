@@ -1,0 +1,13 @@
+﻿@model IEnumerable<BarsWeb.Models.DocSchemeReport>
+@{  
+    Layout = null;
+ }
+@foreach (var contract in Model)
+{
+  <tr id="@contract.Id" name="@contract.Name">
+    <td><input type="checkbox" onclick="selectRow(this);" /></td>
+    <td>@contract.Id</td>
+    <td>@contract.Name</td>
+  </tr>
+}
+

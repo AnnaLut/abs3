@@ -1,0 +1,213 @@
+﻿@{
+    ViewBag.Title = "1_ПБ. Додреквізити документів";
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+}
+<link rel="stylesheet" href="~/Areas/PB1/Content/Css/Style.css" />
+<link rel="stylesheet" href="~/Content/fonts/" />
+<link rel="stylesheet" href="styles/kendo.default.min.css" />
+<link rel="stylesheet" href="styles/kendo.default.mobile.min.css" />
+<script src="~/Areas/PB1/Scripts/Controllers/AddRequisitesCtrl.js?v.2"></script>
+<style>
+    td {
+        vertical-align: central; /* Выравнивание по верхнему краю ячеек */
+    }
+    #loroGrid tr {
+        height: 50px
+    }
+    .k-tooltip {
+    position: static;
+    display: inline-block;
+  }
+    #mainGrid > div.toolbar > table > tbody > tr  {
+        background-color: #f5f5f5;
+        color: black;
+    }
+
+    .info tr td {
+        border-style: solid;
+        border-color: #f5f5f5;
+    }
+</style>
+<div id="content" ng-app="BarsWeb.Controllers" ng-controller="AddRequisitesCtrl" style="margin-left: 20px; margin-right: 20px;" ng-init="Init()">
+    <h2>@ViewBag.Title</h2>
+    <br />
+    <div class="form-inline">
+        <div class="form-group">
+            <input id="BankDateIntput" class="k-input" ng-model="bankdate" name="BankDateIntput" kendo-date-picker data-k-format="'dd/MM/yyyy'"/>
+        </div>
+        <div class="form-group">
+            <button class="k-button" ng-click="mainGrid.dataSource.read();" title="Оновити дані" style="width: 32px; height: 27px; margin-left: 7px;">
+                <img src="~/Content/images/PureFlat/16/reload_rotate.png" width="16" height="15" />
+            </button>
+            <button id="btnDebet" class="k-button" ng-click="" title="Тільки дебет" style="width: 32px; height: 27px;">
+                <text style="color: red"><ins><h2>D</h2></ins></text>
+            </button>
+            <button id="btnDebetCredit" class="k-button" ng-click="" title="Усі документи" style="height: 27px;">
+                <text><ins><h2>D + С</h2></ins></text>
+            </button>
+            <button id="btnCredit" class="k-button" ng-click="" title="Тільки кредит" style="width: 32px; height: 27px;">
+                <text style="color: blue"><ins><h2>C</h2></ins></text>
+            </button>
+            <button class="k-button" ng-click="Save()" title="Зберегти зміни у Базі Даних" style="width: 32px; height: 27px;">
+                <img src="~/Content/images/PureFlat/16/save.png" width="16" height="16" />
+            </button>
+            <button class="k-button" ng-click="Details()" title="Оригінал документа" style="width: 32px; height: 27px; margin-right: 145px; ">
+                <img src="~/Content/images/PureFlat/16/folder_open.png" width="16" height="16" />
+            </button>
+            <input id="dcinput" style="width: 200px" class="k-textbox" value="{{dc}}" readonly />
+        </div>
+    </div>
+    <br />
+    
+    <br />
+    <div id="mainGrid" kendo-grid="mainGrid" k-options="mainGridOptions" k-on-save-changes="saveChanges(kendoEvent)">
+        <div class="toolbar">
+            <table class="info">
+                <tr>
+                    <td>
+                        <div class="form-inline" style="margin-top: 13px">
+                            Референс
+                        </div><br />
+                        <div class="form-inline">
+                            Рахунок А
+                        </div><br />
+                        <div class="form-inline">
+                            Рахунок Б
+                        </div><br />
+                        <div class="form-inline">
+                            Признач
+                        </div><br />
+                    </td>
+                    <td>
+                        <div class="form-inline" style="padding-bottom: 10px">
+                            <input id="ref" style="margin-left: 15px; width: 200px" class="k-textbox" value="" readonly />
+                            <input id="tt" style="margin-left: 5px; width: 100px" class="k-textbox" value="" readonly />
+                            <input id="stt" style="margin-left: 5px; width: 390px" class="k-textbox" value="" readonly />
+                        </div>
+                        <div class="form-inline" style="padding-bottom: 10px">
+                            <input id="nlsa" style="margin-left: 15px; width: 200px" class="k-textbox" value="" readonly />
+                            <input id="kva" style="margin-left: 5px; width: 100px" class="k-textbox" value="" readonly />
+                            <input id="nama" style="margin-left: 5px; width: 390px" class="k-textbox" value="" readonly />
+                        </div>
+                        <div class="form-inline" style="padding-bottom: 10px">
+                            <input id="nlsb" style="margin-left: 15px; width: 200px" class="k-textbox" value="" readonly />
+                            <input id="kvb" style="margin-left: 5px; width: 100px" class="k-textbox" value="" readonly />
+                            <input id="namb" style="margin-left: 5px; width: 390px" class="k-textbox" value="" readonly />
+                        </div>
+                        <div class="form-inline" style="padding-left: 10px">
+                            <input id="nazn" style="margin-left: 5px; width: 705px" class="k-textbox" value="" readonly />
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+
+    @* Лоадер(ожидание) *@
+    <div id="mydiv">
+        <img id="loader" src="~/Areas/PB1/Content/Images/loader.gif" width="100" height="100" class="ajax-loader" />
+    </div>
+
+    @* Сохранение *@
+    <div kendo-window="SaveGridWindow" k-title="'Збереження таблиці'" k-visible="false"
+         k-modal="true">
+        <form id="export">
+            <table>
+                <tr>
+                    <td style="width: 50px"></td>
+                    <td style="width: 160px">
+                        <label>
+                            <input type="radio" name="export_type" value="excel" checked />
+                            Excel 2007
+                        </label>
+                    </td>
+                    <td style="width: 130px">
+                        <label>
+                            <input type="radio" name="export_type" value="word" />
+                            Word 2007
+                        </label>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 50px"></td>
+                    <td style="width: 160px">
+                        <label>
+                            <input type="radio" name="export_type" value="rtf" />
+                            RTF
+                        </label>
+                    </td>
+                    <td style="width: 130px">
+                        <label>
+                            <input type="radio" name="export_type" value="html" />
+                            HTML
+                        </label>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 50px"></td>
+                    <td style="width: 160px">
+                        <label>
+                            <input type="radio" name="export_type" value="xmlexcel" />
+                            MS XML
+                        </label>
+                    </td>
+                    <td style="width: 130px">
+                        <label>
+                            <input type="radio" name="export_type" value="text" />
+                            Text
+                        </label>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 50px"></td>
+                    <td style="width: 160px">
+                        <label>
+                            <input type="radio" name="export_type" value="pdf" />
+                            PDF
+                        </label>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3" align="center">
+                        <button class="k-button" ng-click="SaveFileAs()" style="background-color: #99CCFF">Зберегти</button>
+                    </td>
+                </tr>
+            </table>
+        </form><br />
+    </div>
+
+    <div id="loroWin" kendo-window="loroWin" k-title="'Клієнти ЛОРО-банків для декларування платежів у 1-ПБ'" k-visible="false"
+         k-modal="true" style="width: 800px; height: 500px" k-on-close="console.log('dadadad')">
+        <div class="form-inline">
+            <div class="form-group">
+                <input id="okpo1"  class="k-textbox" disabled style="width: 120px"/>
+                <input id="name1"  class="k-textbox" disabled style="width: 250px"/>
+                <input id="status1"  class="k-textbox" disabled style="width: 30px"/>
+                <input id="ref" class="k-textbox" style="visibility: hidden; width: 0px;" />
+            </div>
+            <div class="form-group">
+                <button class="k-button" ng-click="AddRow()" title="Додати" style="width: 32px; height: 27px; margin-left: 7px;">
+                    <img src="~/Content/images/PureFlat/16/table_row-add2.png" width="16" height="15" />
+                </button>
+                <button class="k-button" ng-click="DeleteLoro()" title="Видалити" style="width: 32px; height: 27px;">
+                    <img src="~/Content/images/PureFlat/16/delete.png" width="16" height="15" />
+                </button>
+                <button class="k-button" ng-click="loroGrid.dataSource.data([]); loroGrid.dataSource.read();" title="Оновити" style="width: 32px; height: 27px;">
+                    <img src="~/Content/images/PureFlat/16/reload_rotate.png" width="16" height="15" />
+                </button>
+                <button class="k-button" ng-click="SaveLoro()" title="Зберегти" style="width: 32px; height: 27px;">
+                    <img src="~/Content/images/PureFlat/16/save.png" width="16" height="15" />
+                </button>
+                @*<button class="k-button" ng-click="" title="Друк" style="width: 32px; height: 27px; margin-left: 7px;">
+                    <img src="~/Content/images/PureFlat/16/print.png" width="16" height="15" />
+                </button>*@
+                <button class="k-button" ng-click="OK()" title="Ок" style="width: 32px; height: 27px; margin-left: 7px;">
+                    <img src="~/Content/images/PureFlat/16/ok.png" width="16" height="15" />
+                </button>
+            </div>
+        </div>
+        <br />
+        <div id="loroGrid" kendo-grid="loroGrid" k-options="loroGridOptions" k-on-save-changes="saveChanges(kendoEvent)"></div>
+    </div>
+</div>

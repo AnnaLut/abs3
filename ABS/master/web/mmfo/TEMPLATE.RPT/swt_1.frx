@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="04/12/2017 12:36:56" ReportInfo.Modified="04/12/2017 14:56:13" ReportInfo.CreatorVersion="2014.1.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqEjIkLfv5KVDVMQxm1pETYi2439uNkJphU7VV/DPLnHyLDt7PXXdlAdyT9WtYUl5mJx6zWcVWKWOzNI1tDVFufg==">
+      <TableDataSource Name="Table" Alias="v_sw_mvps_paydocs" DataType="System.Int32" Enabled="true" SelectCommand="select :sFdat1 DAT,&#13;&#10;       bank_name, &#13;&#10;       currency, &#13;&#10;       amount/100 amount&#13;&#10;  from v_sw_mvps_paydocs &#13;&#10; where fdat = to_date(:sFdat1,'dd.mm.yyyy')&#13;&#10; order by bank_name, currency, amount">
+        <Column Name="Column" DataType="System.Int32" Calculated="true" Expression=""/>
+        <Column Name="DAT" DataType="System.String"/>
+        <Column Name="BANK_NAME" DataType="System.String"/>
+        <Column Name="CURRENCY" DataType="System.String"/>
+        <Column Name="AMOUNT" DataType="System.Decimal"/>
+        <CommandParameter Name="sFdat1" DataType="126" Expression="[sFdat1]" DefaultValue="22.03.2016"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="sFdat1" DataType="System.String"/>
+    <Total Name="TotalRows" TotalType="Count" Evaluator="Data1" PrintOn="GroupFooter1"/>
+  </Dictionary>
+  <ReportPage Name="Page1">
+    <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="75.6">
+      <TextObject Name="Text4" Left="9.45" Top="18.9" Width="699.3" Height="28.35" Text="Реєстр сформованих повідомлень" HorzAlign="Center" Font="Segoe UI Semibold, 14pt, style=Bold"/>
+      <TextObject Name="Text5" Left="9.45" Top="40.8" Width="699.3" Height="18.9" Text="[v_sw_mvps_paydocs.DAT]" HorzAlign="Center" Font="Segoe UI Semibold, 12pt"/>
+      <LineObject Name="Line5" Left="670.95" Top="-28.35" Border.Style="Double" Border.Width="1.5"/>
+      <TextObject Name="Text7" Left="548.1" Width="122.85" Height="18.9" Text="[Date]" Format="Date" Format.Format="dd.MM.yyyy HH:mm" Font="Segoe UI, 10pt"/>
+    </ReportTitleBand>
+    <GroupHeaderBand Name="GroupHeader1" Top="78.57" Width="718.2" Height="30.24" Condition="[v_sw_mvps_paydocs.BANK_NAME]">
+      <TextObject Name="Text2" Left="9.45" Width="699.3" Height="18.9" Text="Обласне управління: [v_sw_mvps_paydocs.BANK_NAME]" Font="Segoe UI Semibold, 10pt" HtmlTags="true"/>
+      <LineObject Name="Line1" Left="141.75" Top="18.9" Width="500.85" Border.Style="Dash" Border.Width="1.5"/>
+      <LineObject Name="Line6" Left="141.75" Top="21.24" Width="500.85" Border.Style="Dash" Border.Width="1.5"/>
+      <GroupHeaderBand Name="GroupHeader2" Top="111.77" Width="718.2" Height="21.9" Condition="[v_sw_mvps_paydocs.CURRENCY]">
+        <TextObject Name="Text8" Left="139.75" Top="-2" Width="500.85" Height="18.9" Text="Валюта: [v_sw_mvps_paydocs.CURRENCY]" Font="Segoe UI Semibold, 10pt"/>
+        <LineObject Name="Line7" Left="141.75" Top="16.9" Width="500.85" Border.Style="Dot" Border.Width="1.5"/>
+        <DataBand Name="Data1" Top="136.64" Width="718.2" Height="18.9" DataSource="Table">
+          <TextObject Name="Text1" Left="245.7" Width="274.05" Height="18.9" Text="[v_sw_mvps_paydocs.AMOUNT]" Format="Currency" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.CurrencySymbol="" Format.PositivePattern="1" Format.NegativePattern="8" HorzAlign="Right" WordWrap="false" Trimming="EllipsisCharacter"/>
+        </DataBand>
+      </GroupHeaderBand>
+      <GroupFooterBand Name="GroupFooter1" Top="158.51" Width="718.2" Height="37.8">
+        <TextObject Name="Text6" Left="139.75" Top="4.45" Width="189" Height="18.9" Text="Кількість: [TotalRows]" Font="Segoe UI Semibold, 10pt"/>
+        <LineObject Name="Line8" Left="141.75" Width="500.85" Border.Style="Dash" Border.Width="1.5"/>
+        <LineObject Name="Line9" Left="141.75" Top="2.65" Width="500.85" Border.Style="Dash" Border.Width="1.5"/>
+      </GroupFooterBand>
+    </GroupHeaderBand>
+  </ReportPage>
+</Report>

@@ -1,0 +1,105 @@
+﻿   .k-textbox .k-icon {
+        right: 5px;
+    }
+    textarea {
+    resize: none;
+}
+
+    .form-horizontal .control-label {
+        text-align: left;
+    }
+
+    .left-pos {
+        text-align: left;
+    }
+
+    .k-radio:checked + .k-radio-label:after {
+        top: 2px;
+        right: 4px;
+        left: 2px;
+    }
+
+
+    .panel-default {
+        border-color: #CCCCCC;
+
+    }
+
+    .panel {
+        border-radius: 5px;
+        background-color: #EFEFEF;
+         margin: 5px -10px 5px -10px;
+    }
+
+    .margin-right-pos {
+        margin-right: 6%;
+    }
+
+    .margin-left-pos {
+        margin-left: 7%;
+    }
+
+    hr {
+        margin-top: 17px;
+        margin-bottom: 16px;
+        border: 0;
+        border-top: 1px solid #CCCCCC;
+    }
+
+    .panel-default .panel-heading {
+        background-color: #EFEFEF;       
+    }
+
+    .panel-default > .panel-heading, .panel-default > .panel-footer {
+        border-color: #CCCCCC;
+    }
+
+    .disable-solid {
+        border-style: none;
+    }
+
+    .k-textbox .dateStart {
+        width: 100%;
+        /*padding-top: 6px;*/
+        padding-left: 10px;
+    }
+
+    .k-textbox .dateEnd {
+        width: 100%;
+        /*padding-top: 6px;*/
+        padding-left: 10px;
+    }
+    .non-active {
+        background-color: #C7C7C7 !important;
+    }
+    .my_row_sos1 {
+         color: #70e091;
+    }
+    .my_row_sos3 {
+         color: #4f5250;
+    }
+    .my_row_sos5 {
+         color: #65acbf;
+    }
+
+     .asterisk_input:after {
+        content:" *"; 
+        color: #e32;
+        position: absolute; 
+        margin: 0px 0px 0px -20px; 
+         
+        padding: 0 5px 0 0;
+     }
+
+     .first_foot{
+         color: blue !important;
+     }
+
+     .second_foot{
+         color: red !important;
+     }
+
+.inputReadOnly {
+    background-color: #C7C7C7 !important;
+    color: black ;
+}

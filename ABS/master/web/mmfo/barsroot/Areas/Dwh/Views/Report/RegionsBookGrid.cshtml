@@ -1,0 +1,23 @@
+﻿@{
+    Layout = null;
+}
+
+@(Html.Kendo().Grid<BarsWeb.Areas.Dwh.Models.V_REGIONS>()
+    .Name("ReportGrid")
+    .Pageable(pageable => pageable
+            .Refresh(true)
+            .PageSizes(true)
+            .ButtonCount(5))
+    .Scrollable()
+    .Selectable()
+    .Columns(columns =>
+            {
+                columns.Bound(p => p.REGION_ID).Title("REGION_ID");
+                columns.Bound(p => p.REGION_NAME).Title("REGION_NAME");
+                columns.Bound(p => p.REGION_KF).Title("REGION_KF");
+            })
+    .DataSource(dataSource => dataSource
+        .Ajax()
+            .Read(read => read.Action("RegionsBookGrid", "Report"))
+    )
+)

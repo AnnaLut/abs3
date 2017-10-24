@@ -1,0 +1,121 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="01/11/2016 15:43:43" ReportInfo.Modified="04/25/2017 14:21:38" ReportInfo.CreatorVersion="2014.3.2.0">
+  <ScriptText>using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows.Forms;
+using System.Drawing;
+using System.Data;
+using FastReport;
+using FastReport.Data;
+using FastReport.Dialog;
+using FastReport.Barcode;
+using FastReport.Table;
+using FastReport.Utils;
+
+namespace FastReport
+{
+  public class ReportScript
+  {
+    public String Data_Exists
+    {
+      get
+      {
+        return (string.IsNullOrEmpty(Report.GetColumnValueNullable(&quot;Table.OURMFO&quot;).ToString())) ? &quot;відсутній&quot; : (String.Empty);
+      }
+    }
+  }
+}
+</ScriptText>
+  <Dictionary>
+    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoX3V4zY8FFHzkIAqmYIxZTfhjnw0iMVk0YjYK1Ztlx8Ig==">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="SELECT t1.name, t1.ord, t2.kf ourmfo, nvl(t2.sum_post,0)sum_post, nvl(t3.sum_gu_pf,0)sum_gu_pf,t1.kod_s&#13;&#10;    FROM clim_mfo t1&#13;&#10;         LEFT JOIN&#13;&#10;         (  SELECT cd.kf, SUM (nvl(cd.sq,0)) / 100 sum_post&#13;&#10;              FROM ob_corporation_data cd&#13;&#10;             WHERE     cd.corporation_id = 1&#13;&#10;                   and kfile_pack.get_correct_session_id(cd.corporation_id,cd.kf,cd.session_id)=1&#13;&#10;                   and kfile_pack.get_correct_nbs(cd.corporation_id,substr(cd.nls,1,4))=1&#13;&#10;                   AND cd.rowtype = 1&#13;&#10;                   AND cd.nlsa LIKE '2560%'&#13;&#10;                   AND cd.nlsb LIKE '2604%'&#13;&#10;                   AND trunc(cd.file_date) &gt;= TRUNC(:rpt_date, 'DDD') AND trunc(cd.file_date) &lt; TRUNC(:rpt_date + 1, 'DDD')&#13;&#10;          GROUP BY cd.kf) t2&#13;&#10;            ON t1.mfo = t2.kf&#13;&#10;         LEFT JOIN&#13;&#10;         (  SELECT cd.kf, SUM (nvl(cd.sq,0)) / 100 sum_gu_pf&#13;&#10;              FROM  ob_corporation_data cd&#13;&#10;             WHERE     cd.corporation_id = 1&#13;&#10;                   and kfile_pack.get_correct_session_id(cd.corporation_id,cd.kf,cd.session_id)=1&#13;&#10;                   and kfile_pack.get_correct_nbs(cd.corporation_id,substr(cd.nls,1,4))=1&#13;&#10;                   AND cd.rowtype = 1&#13;&#10;                   and okpob in (select corporation_code from ob_corporation where parent_id=1 )&#13;&#10;                   and nlsb in (select nls from ob_corporation_data a where rowtype = 0 and a.kf=cd.kf and trunc(a.file_date) &gt;= TRUNC(:rpt_date, 'DDD') AND trunc(a.file_date) &lt; TRUNC(:rpt_date + 1, 'DDD')  and kod_analyt=40 )&#13;&#10;                   --AND cd.kod_analyt = '40'&#13;&#10;                   AND trunc(cd.file_date) &gt;= TRUNC(:rpt_date, 'DDD') AND trunc(cd.file_date) &lt; TRUNC(:rpt_date + 1, 'DDD')&#13;&#10;          GROUP BY cd.kf) t3&#13;&#10;            ON t1.mfo = t3.kf&#13;&#10;ORDER BY t1.ord">
+        <Column Name="NAME" DataType="System.String"/>
+        <Column Name="ORD" DataType="System.Int16"/>
+        <Column Name="OURMFO" DataType="System.String"/>
+        <Column Name="SUM_POST" DataType="System.Decimal"/>
+        <Column Name="SUM_GU_PF" DataType="System.Decimal"/>
+        <Column Name="KOD_S" DataType="System.String"/>
+        <CommandParameter Name="rpt_date" DataType="106" Expression="[sFdat1]" DefaultValue="01.01.1900"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="sFdat1" DataType="System.DateTime"/>
+    <Total Name="Total_Post" Expression="[Table.SUM_POST]" Evaluator="Data1" PrintOn="ReportSummary1"/>
+    <Total Name="Total_GU_PF" Expression="[Table.SUM_GU_PF]" Evaluator="Data1" PrintOn="ReportSummary1"/>
+  </Dictionary>
+  <ReportPage Name="Page1" RawPaperSize="9" LeftMargin="12" TopMargin="20" RightMargin="12" BottomMargin="15" FirstPageSource="15" OtherPagesSource="15">
+    <ReportTitleBand Name="ReportTitle1" Width="703.08" Height="160.65">
+      <TextObject Name="Text1" Top="9.45" Width="699.3" Height="18.9" Text="Інформація" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text2" Top="28.35" Width="699.3" Height="37.8" Text="щодо фінансування пенсійних виплат&#13;&#10;за [sFdat1]" Format="Date" Format.Format="d" HorzAlign="Center"/>
+      <TableObject Name="Table1" Top="75.6" Width="699.3" Height="85.05" Border.Lines="All">
+        <TableColumn Name="Column1" Width="56.7"/>
+        <TableColumn Name="Column2" Width="170.1"/>
+        <TableColumn Name="Column3" Width="85.05"/>
+        <TableColumn Name="Column4" Width="94.5"/>
+        <TableColumn Name="Column5" Width="151.2"/>
+        <TableColumn Name="Column6" Width="141.75"/>
+        <TableRow Name="Row1">
+          <TableCell Name="Cell1" Border.Lines="All" Fill.Color="Silver" Text="№ регіону" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold" RowSpan="2"/>
+          <TableCell Name="Cell2" Border.Lines="All" Fill.Color="Silver" Text="Регіональне управління" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold" RowSpan="2"/>
+          <TableCell Name="Cell3" Border.Lines="All" Fill.Color="Silver" Text="Код (назва) файлу" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold" RowSpan="2"/>
+          <TableCell Name="Cell4" Border.Lines="All" Fill.Color="Silver" Text="Наявність файлу від регіону" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold" RowSpan="2"/>
+          <TableCell Name="Cell5" Border.Lines="All" Fill.Color="Silver" Text="Перерахування на:" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold" ColSpan="2"/>
+          <TableCell Name="Cell26" Border.Lines="All" Fill.Color="Silver" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row2" Height="47.25">
+          <TableCell Name="Cell6" Fill.Color="Silver" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell7" Border.Lines="All" Fill.Color="Silver" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell8" Border.Lines="All" Fill.Color="Silver" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell9" Border.Lines="All" Fill.Color="Silver" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell10" Border.Lines="All" Fill.Color="Silver" Text="рахунки 2604 УДППЗ &quot;Укрпошта&quot;" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell27" Border.Lines="All" Fill.Color="Silver" Text="рахунки &quot;40&quot; головних управлінь ПФ" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row3">
+          <TableCell Name="Cell11" Border.Lines="All" Fill.Color="Silver" Text="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell12" Border.Lines="All" Fill.Color="Silver" Text="2" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell13" Border.Lines="All" Fill.Color="Silver" Text="3" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell14" Border.Lines="All" Fill.Color="Silver" Text="4" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell15" Border.Lines="All" Fill.Color="Silver" Text="5" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell28" Border.Lines="All" Fill.Color="Silver" Text="6" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+        </TableRow>
+      </TableObject>
+    </ReportTitleBand>
+    <DataBand Name="Data1" Top="163.85" Width="703.08" Height="18.9" DataSource="Table">
+      <TableObject Name="Table2" Width="699.3" Height="18.9">
+        <TableColumn Name="Column7" Width="56.7"/>
+        <TableColumn Name="Column8" Width="170.1"/>
+        <TableColumn Name="Column9" Width="85.05"/>
+        <TableColumn Name="Column10" Width="94.5"/>
+        <TableColumn Name="Column11" Width="151.2"/>
+        <TableColumn Name="Column12" Width="141.75"/>
+        <TableRow Name="Row4">
+          <TableCell Name="Cell29" Border.Lines="All" Text="[Table.ORD]" HorzAlign="Right"/>
+          <TableCell Name="Cell30" Border.Lines="All" Text="[Table.NAME]"/>
+          <TableCell Name="Cell31" Border.Lines="All" Text="[Table.KOD_S]"/>
+          <TableCell Name="Cell32" Border.Lines="All" Text="[Data_Exists]"/>
+          <TableCell Name="Cell33" Border.Lines="All" Text="[Table.SUM_POST]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator="" Format.NegativePattern="1" HorzAlign="Right"/>
+          <TableCell Name="Cell54" Border.Lines="All" Text="[Table.SUM_GU_PF]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator="" Format.NegativePattern="1" HorzAlign="Right"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+    <ReportSummaryBand Name="ReportSummary1" Top="185.95" Width="703.08" Height="18.9">
+      <TableObject Name="Table3" Width="699.3" Height="18.9" Border.Lines="All">
+        <TableColumn Name="Column13" Width="56.7"/>
+        <TableColumn Name="Column14" Width="170.1"/>
+        <TableColumn Name="Column15" Width="85.05"/>
+        <TableColumn Name="Column16" Width="94.5"/>
+        <TableColumn Name="Column17" Width="151.2"/>
+        <TableColumn Name="Column18" Width="141.75"/>
+        <TableRow Name="Row5">
+          <TableCell Name="Cell55" Border.Lines="All"/>
+          <TableCell Name="Cell56" Border.Lines="All" Fill.Color="Aquamarine" Text="Разом"/>
+          <TableCell Name="Cell57" Border.Lines="All" Fill.Color="Aquamarine"/>
+          <TableCell Name="Cell58" Border.Lines="All" Fill.Color="Aquamarine"/>
+          <TableCell Name="Cell59" Border.Lines="All" Fill.Color="Aquamarine" Text="[Total_Post]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator="" Format.NegativePattern="1" HorzAlign="Right"/>
+          <TableCell Name="Cell80" Border.Lines="All" Fill.Color="Aquamarine" Text="[Total_GU_PF]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator="" Format.NegativePattern="1" HorzAlign="Right"/>
+        </TableRow>
+      </TableObject>
+    </ReportSummaryBand>
+  </ReportPage>
+</Report>

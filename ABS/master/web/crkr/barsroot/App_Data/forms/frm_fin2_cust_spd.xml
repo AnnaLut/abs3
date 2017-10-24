@@ -1,0 +1,101 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xmlform caption="Розрахунок фінансового стану юридичних осіб"  captiontype="OnlyTitle" version="1.0.0">
+  <grids>
+    <grid id="id1" title="Розрахунок фінансового стану юридичних осіб(Постанова НБУ №23)" showpagesizebox="true" pagesize="15" >
+            
+          <!--Фільтри-->
+      <filters buttontext="Пошук" columnscount="3" caption="Пошук клієнтів">
+        <filter id="fId1" caption="РНК"           field="RNK"  condition="Equal"    columnindex="1"></filter>
+        <filter id="fId2" caption="OKPO"          field="OKPO" condition="Equal"    columnindex="2"></filter>
+        <filter id="fId3" caption="Назва клієнта" field="NMK"  condition="LikeBoth" columnindex="3"></filter> 
+      </filters>
+      
+      <datasource>
+        <!-- Запрос на відображення клієнтів по доступу до рахунків-->
+        <sql>
+          SELECT  2 as n, customer.rnk, customer.rnkp as isp,
+          customer.okpo, customer.nmk, p.RUK, s.NAME,
+          f0.FDAT as f0,f1.FDAT as f1,f2.FDAT as f2,f3.FDAT as f3,f4.FDAT as f4
+          FROM customer, corps p,  stan_fin S,
+          (select OKPO, max(FDAT) FDAT from FIN_RNK where IDF=0 group by OKPO) F0,
+          (select OKPO, max(FDAT) FDAT from FIN_RNK where IDF=1 group by OKPO) F1,
+          (select OKPO, max(FDAT) FDAT from FIN_RNK where IDF=2 group by OKPO) F2,
+          (select OKPO, max(FDAT) FDAT from FIN_RNK where IDF=3 group by OKPO) F3,
+          (select OKPO, max(FDAT) FDAT from FIN_RNK where IDF=4 group by OKPO) F4
+          WHERE customer.OKPO = f0.OKPO(+) and customer.OKPO = f1.OKPO(+) and
+          customer.OKPO = f2.OKPO(+) and customer.OKPO = f3.OKPO(+) and
+          customer.OKPO = f4.OKPO(+) and customer.RNK = p.RNK (+) and
+          customer.DATE_OFF is null and
+          NVL(customer.crisk,0) = s.FIN (+) and
+          (customer.custtype =3 and NVL(customer.k050,0) = '910')
+          --and exists (select 1 from cc_deal where rnk = customer.rnk and  15 > sos)
+          --and exists (select 1 from v_gl where dazs is null and rnk = customer.rnk and substr(nbs,1,1) in ('2', '3') )
+          ORDER BY 1,2,3
+        </sql>
+      </datasource>
+
+      <rowselection method ="SingleRow"/>
+<!-- botons-->
+      <buttons>
+        <button id="Bt1" type="Image" imagename="id_cards" hint="Карточка фінстану" >
+          <command type="Redirect" url="/barsroot/barsweb/dynform.aspx?form=frm_fin2_kart_kl_fl">
+            <parameters>
+              <parameter name="RNK" altname="rnk" datatype="Int64" type="DataField"></parameter>
+            </parameters>  
+          </command>
+        </button>
+      </buttons>
+      
+      
+      
+      
+     <!--Опис колонок-->
+      
+      <fields>
+        <field name="RNK" datatype="Int64" key="true" >
+          <column caption="РНК"  show="true" />
+        </field>
+
+        <field name="OKPO" datatype="String" key="false" >
+          <column caption="ОКПО"  show="true" />
+        </field>
+        
+        <field name="NMK" datatype="String" key="false" >
+          <column caption="Назва клієнта"  show="true" />
+        </field>
+
+        <field name="RUK" datatype="String" key="false" >
+          <column caption="Керівник"  show="true" />
+        </field>
+
+        <field name="NAME" datatype="String" key="false" >
+          <column caption="Фін.стан з БД"  show="true" />
+        </field>
+
+        <field name="F0" datatype="DateTime" key="false" >
+          <column caption="Форма №0"  show="false" />
+        </field>
+
+        <field name="F1" datatype="DateTime" key="false" >
+          <column caption="Форма №1"  show="true" />
+        </field>
+
+        <field name="F2" datatype="DateTime" key="false" >
+          <column caption="Форма №2"  show="true" />
+        </field>
+
+        <field name="F3" datatype="DateTime" key="false" >
+          <column caption="Форма №3"  show="false" />
+        </field>
+
+        <field name="F4" datatype="DateTime" key="false" >
+          <column caption="Форма №4"  show="false" />
+        </field>
+        
+      </fields>
+      
+      
+    </grid>
+    
+  </grids>
+</xmlform>

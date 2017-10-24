@@ -1,0 +1,12 @@
+﻿@{
+    ViewBag.Title = "Журнал імпортованих файлів";
+}
+<script src="~/Areas/Sberutl/Scripts/app/controllers/Archive/AppController.js"></script>
+<script src="~/lib/jsZip/jszip.min.js"></script>
+<link rel="stylesheet" type="text/css" href="~/Areas/Sberutl/Content/css/Archive/styles.css" />
+
+<div ng-app="BarsWeb.Controllers" ng-controller="AppController" ng-init="onInit('@ViewBag.param')">
+    <h2>@ViewBag.Title</h2><br />
+    <br />
+    <div id="archiveGrid" kendo-grid="archiveGrid" k-options="gridOptions"></div>
+</div>

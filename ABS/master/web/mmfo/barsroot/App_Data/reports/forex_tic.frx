@@ -1,0 +1,293 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Oracle.DataAccess&#13;&#10;FastReport.Oracle" ReportInfo.Created="10/04/2016 11:42:06" ReportInfo.Modified="10/27/2016 20:50:43" ReportInfo.CreatorVersion="2013.2.2.0">
+  <ScriptText>using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.ComponentModel;
+using System.Windows.Forms;
+using System.Drawing;
+using System.Data;
+using FastReport;
+using FastReport.Data;
+using FastReport.Dialog;
+using FastReport.Barcode;
+using FastReport.Table;
+using FastReport.Utils;
+using System.Data.Sql;
+using Oracle.DataAccess.Client;
+using Oracle.DataAccess.Types;
+
+namespace FastReport
+{
+  public class ReportScript
+  {
+   
+  }
+}
+</ScriptText>
+  <Dictionary>
+    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqEjIkLfv5KVDVMQxm1pETYi2439uNkJphU7VV/DPLnHyLDt7PXXdlAdyT9WtYUl5mMNsgTKjBptGgtHU2B+Gwhw==">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select  v.NTIK,&#13;&#10;        v.ref, -- tic&#13;&#10;        v.dat, -- дата угоди&#13;&#10;        v.kva prod_val, &#13;&#10;        v.kvb kup_val,&#13;&#10;        v.kvb, &#13;&#10;        v.sumb, &#13;&#10;        v.dat_b,&#13;&#10;        v.kodb,&#13;&#10;        v.nb,&#13;&#10;        v.okpo okpob,  &#13;&#10;        v.mfo, &#13;&#10;        v.kva,&#13;&#10;        v.suma, &#13;&#10;        v.dat_a,   &#13;&#10;        f_ourmfo ,&#13;&#10;        round( v.sumb/suma, 8) kursb,&#13;&#10;        round( v.suma/sumb, 8) kursa,&#13;&#10;        kodb,&#13;&#10;       (select nb from banks where mfo=v.mfo)  nb2,&#13;&#10;       v.okpo okpo2,&#13;&#10;       (select nlsb from fx_deal where deal_tag = v.deal_tag) nls2,&#13;&#10;       (SELECT nls  FROM opl WHERE ref=v.ref and kv=v.KVA and tt='FX2' and dk=0) NLSA,&#13;&#10;       ( SELECT substr(s.NAME,1,32) FROM sw_banks s, operw w&#13;&#10;                      WHERE w.ref=v.REFB and w.tag='54' and w.value=s.bic) NBKB,&#13;&#10;       (SELECT substr(NAM_A,1,32)  FROM OPER where ref=v.REFA) NBKA,&#13;&#10;       ( SELECT o.nlsb  FROM oper o WHERE o.ref=v.refb) NLSB,&#13;&#10;        (SELECT o.ID_B  FROM oper o WHERE o.ref=v.refb) IDB,&#13;&#10;       (select val from params where par='OKPO')  okpo,&#13;&#10;        case when kva=980 then   f_ourmfo  else (select val from params where par='BICCODE')  end BIC,&#13;&#10;       (select val from params where par='NAME2') nam2&#13;&#10; from V_FXS_ARCHIVE v&#13;&#10; where v.ref=:p_ref&#13;&#10;&#13;&#10;">
+        <Column Name="REF" DataType="System.Decimal"/>
+        <Column Name="DAT" DataType="System.DateTime"/>
+        <Column Name="PROD_VAL" DataType="System.Decimal"/>
+        <Column Name="KUP_VAL" DataType="System.Decimal"/>
+        <Column Name="KVB" DataType="System.Decimal"/>
+        <Column Name="SUMB" DataType="System.Decimal"/>
+        <Column Name="DAT_B" DataType="System.DateTime"/>
+        <Column Name="KODB" DataType="System.String"/>
+        <Column Name="NB" DataType="System.String"/>
+        <Column Name="OKPOB" DataType="System.String"/>
+        <Column Name="MFO" DataType="System.String"/>
+        <Column Name="SUMA" DataType="System.Decimal"/>
+        <Column Name="DAT_A" DataType="System.DateTime"/>
+        <Column Name="F_OURMFO" DataType="System.String"/>
+        <Column Name="NTIK" DataType="System.String"/>
+        <Column Name="NB2" DataType="System.String"/>
+        <Column Name="OKPO2" DataType="System.String"/>
+        <Column Name="NLS2" DataType="System.String"/>
+        <Column Name="KURSB" DataType="System.Decimal"/>
+        <Column Name="KURSA" DataType="System.Decimal"/>
+        <Column Name="KVA" DataType="System.Decimal"/>
+        <Column Name="NLSA" DataType="System.String"/>
+        <Column Name="OKPO" DataType="System.String"/>
+        <Column Name="BIC" DataType="System.String"/>
+        <Column Name="NAM2" DataType="System.String"/>
+        <Column Name="KODB1" DataType="System.String"/>
+        <Column Name="NLSB" DataType="System.String"/>
+        <Column Name="IDB" DataType="System.String"/>
+        <Column Name="NBKA" DataType="System.String"/>
+        <Column Name="NBKB" DataType="System.String"/>
+        <CommandParameter Name="p_ref" DataType="107" Expression="[p_ref]" DefaultValue="57311051301"/>
+      </TableDataSource>
+      <TableDataSource Name="Table2" Alias="acc" DataType="System.Int32" Enabled="true" SelectCommand="select tt, fdat, kv, amnt_db, amnt_cr, deal_tag, ref, nls, 0 sq  from V_FOREX_ACCOUNT_MODEL where deal_tag=:p_deal_tag">
+        <Column Name="TT" DataType="System.String"/>
+        <Column Name="FDAT" DataType="System.DateTime"/>
+        <Column Name="KV" DataType="System.Int16"/>
+        <Column Name="AMNT_DB" DataType="System.Decimal"/>
+        <Column Name="AMNT_CR" DataType="System.Decimal"/>
+        <Column Name="DEAL_TAG" DataType="System.Decimal"/>
+        <Column Name="REF" DataType="System.Decimal"/>
+        <Column Name="NLS" DataType="System.String"/>
+        <Column Name="SQ" DataType="System.Decimal"/>
+        <CommandParameter Name="p_deal_tag" DataType="107" Expression="[p_deal_tag]" DefaultValue="0"/>
+      </TableDataSource>
+      <TableDataSource Name="Table6" Alias="pdat" DataType="System.Int32" Enabled="true" SelectCommand="SELECT pdat FROM oper WHERE ref=:p_ref">
+        <Column Name="PDAT" DataType="System.DateTime"/>
+        <CommandParameter Name="p_ref" DataType="113" Expression="[p_ref]" DefaultValue="0"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="p_deal_tag" DataType="System.Int32" Expression="21497901"/>
+    <Parameter Name="p_buh" DataType="System.Decimal" Expression="1"/>
+    <Parameter Name="ref_b" DataType="System.Decimal" Expression="57311628201"/>
+    <Parameter Name="p_ref" DataType="System.Int64" Expression="57311628001"/>
+    <Parameter Name="ref_a" DataType="System.String" Expression="57311628101"/>
+  </Dictionary>
+  <ReportPage Name="Page1">
+    <DataBand Name="Data1" Width="718.2" Height="604.8">
+      <TableObject Name="Table1" Left="9.45" Top="226.8" Width="648.27" Height="355.3">
+        <TableColumn Name="Column1" Width="139.86"/>
+        <TableColumn Name="Column3" Width="160.65"/>
+        <TableColumn Name="Column5" Width="56.7"/>
+        <TableColumn Name="Column2" Width="139.86"/>
+        <TableColumn Name="Column4" Width="151.2"/>
+        <TableRow Name="Row18">
+          <TableCell Name="Cell102"/>
+          <TableCell Name="Cell103"/>
+          <TableCell Name="Cell104"/>
+          <TableCell Name="Cell105"/>
+          <TableCell Name="Cell106"/>
+        </TableRow>
+        <TableRow Name="Row1" Height="23.62">
+          <TableCell Name="Cell1" Text="РЕКВІЗИТИ" HorzAlign="Center" ColSpan="5"/>
+          <TableCell Name="Cell23"/>
+          <TableCell Name="Cell45"/>
+          <TableCell Name="Cell2" HorzAlign="Center"/>
+          <TableCell Name="Cell28"/>
+        </TableRow>
+        <TableRow Name="Row2" Height="23.62">
+          <TableCell Name="Cell6" Text="ПЛАТЕЖУ" HorzAlign="Center" ColSpan="2"/>
+          <TableCell Name="Cell24"/>
+          <TableCell Name="Cell46"/>
+          <TableCell Name="Cell7" Text="НАДХОДЖЕННЯ" HorzAlign="Center" ColSpan="2"/>
+          <TableCell Name="Cell29"/>
+        </TableRow>
+        <TableRow Name="Row3" Height="39.69">
+          <TableCell Name="Cell11" Border.Lines="Top" Border.Width="0.5" Text="Валюта" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell25" Border.Lines="Top" Border.Width="0.5" Text="[Table.KVB]" HorzAlign="Right" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell47" Font="Arial, 9pt"/>
+          <TableCell Name="Cell12" Border.Lines="Top" Border.Width="0.5" Text="Валюта" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell30" Border.Lines="Top" Border.Width="0.5" Text="[Table.KVA]" HorzAlign="Right" VertAlign="Center" Font="Arial, 9pt"/>
+        </TableRow>
+        <TableRow Name="Row4" Height="39.69">
+          <TableCell Name="Cell16" Border.Lines="Top" Border.Width="0.5" Text="Сума" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell26" Border.Lines="Top" Border.Width="0.5" Text="[Table.SUMB]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell48" Font="Arial, 9pt"/>
+          <TableCell Name="Cell17" Border.Lines="Top" Border.Width="0.5" Text="Сума" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell31" Border.Lines="Top" Border.Width="0.5" Text="[Table.SUMA]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Arial, 9pt"/>
+        </TableRow>
+        <TableRow Name="Row5" Height="39.69">
+          <TableCell Name="Cell21" Border.Lines="Top, Bottom" Border.Width="0.5" Text="Дата валютування" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell27" Border.Lines="Top, Bottom" Border.Width="0.5" Text="[Table.DAT_B]" Format="Date" Format.Format="d" HorzAlign="Right" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell49" Font="Arial, 9pt"/>
+          <TableCell Name="Cell22" Border.Lines="Top, Bottom" Border.Width="0.5" Text="Дата валютування" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell32" Border.Lines="Top, Bottom" Border.Width="0.5" Text="[Table.DAT_A]" Format="Date" Format.Format="d" HorzAlign="Right" VertAlign="Center" Font="Arial, 9pt"/>
+        </TableRow>
+        <TableRow Name="Row26" Height="47.25">
+          <TableCell Name="Cell148" Text="Банк посередник&#13;&#10;[Table.NBKB]" VertAlign="Center" ColSpan="2"/>
+          <TableCell Name="Cell149" VertAlign="Center"/>
+          <TableCell Name="Cell150" VertAlign="Center"/>
+          <TableCell Name="Cell151" Text="Банк посередник&#13;&#10;[Table.NBKA]" VertAlign="Center" ColSpan="2"/>
+          <TableCell Name="Cell152" VertAlign="Center"/>
+        </TableRow>
+        <TableRow Name="Row7" Height="42.52">
+          <TableCell Name="Cell37" Border.Lines="Top" Border.Width="0.5" Text="Банк одержувач&#13;&#10;[Table.NB2]" VertAlign="Center" Font="Arial, 9pt" ColSpan="2"/>
+          <TableCell Name="Cell38" Border.Lines="Top" Border.Width="0.5" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell51" Font="Arial, 9pt"/>
+          <TableCell Name="Cell39" Border.Lines="Top" Border.Width="0.5" Text="Банк одержувач&#13;&#10;[Table.NAM2]" VertAlign="Center" Font="Arial, 9pt" ColSpan="2"/>
+          <TableCell Name="Cell40" Border.Lines="Top" Border.Width="0.5" HorzAlign="Right" Font="Arial, 9pt"/>
+        </TableRow>
+        <TableRow Name="Row8" Height="61.42">
+          <TableCell Name="Cell41" Border.Lines="Top, Bottom" Border.Width="0.5" Text="№ рахунку&#13;&#10;МФО/BIC&#13;&#10;ОКПО" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell42" Border.Lines="Top, Bottom" Border.Width="0.5" Text="[Table.NLSB]&#13;&#10;[Table.KODB]&#13;&#10;[Table.IDB]" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell52" Font="Arial, 9pt"/>
+          <TableCell Name="Cell43" Border.Lines="Top, Bottom" Border.Width="0.5" Text="№ рахунку&#13;&#10;МФО/BIC&#13;&#10;ОКПО" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell44" Border.Lines="Top, Bottom" Border.Width="0.5" Text="[Table.NLSA]&#13;&#10;[Table.BIC]&#13;&#10;[Table.OKPO]" VertAlign="Center" Font="Arial, 9pt"/>
+        </TableRow>
+        <TableRow Name="Row19">
+          <TableCell Name="Cell107"/>
+          <TableCell Name="Cell108"/>
+          <TableCell Name="Cell109"/>
+          <TableCell Name="Cell110"/>
+          <TableCell Name="Cell111"/>
+        </TableRow>
+      </TableObject>
+      <TableObject Name="Table5" Left="9.45" Top="9.45" Width="653.94" Height="218.35">
+        <TableColumn Name="Column16" Width="143.64"/>
+        <TableColumn Name="Column17" Width="134.19"/>
+        <TableColumn Name="Column18" Width="134.19"/>
+        <TableColumn Name="Column19" Width="96.39"/>
+        <TableColumn Name="Column20" Width="145.53"/>
+        <TableRow Name="Row11" Height="56.7">
+          <TableCell Name="Cell63" Text="ТІКЕТ &lt;b&gt;[Table.NTIK]&lt;/b&gt;&#13;&#10;НА ВАЛЮТООБМІННУ ОПЕРАЦІЮ" HorzAlign="Center" VertAlign="Center" HtmlTags="true" ColSpan="5"/>
+          <TableCell Name="Cell64"/>
+          <TableCell Name="Cell65"/>
+          <TableCell Name="Cell66"/>
+          <TableCell Name="Cell67"/>
+        </TableRow>
+        <TableRow Name="Row12">
+          <TableCell Name="Cell68" Text="РЕФ. ПЛАТЕЖУ"/>
+          <TableCell Name="Cell69"/>
+          <TableCell Name="Cell70" Text="ДАТА УГОДИ" HorzAlign="Center"/>
+          <TableCell Name="Cell71"/>
+          <TableCell Name="Cell72" Text="ЧАС ВВОДУ В АБС" HorzAlign="Center"/>
+        </TableRow>
+        <TableRow Name="Row13" Height="28.35">
+          <TableCell Name="Cell73" Text="[Table.REF]"/>
+          <TableCell Name="Cell74"/>
+          <TableCell Name="Cell75" Text="[Table.DAT]" Format="Date" Format.Format="d" HorzAlign="Center"/>
+          <TableCell Name="Cell76"/>
+          <TableCell Name="Cell77" Text="[pdat.PDAT]" HorzAlign="Center"/>
+        </TableRow>
+        <TableRow Name="Row14" Height="28.35">
+          <TableCell Name="Cell78" Text="ВАЛЮТА ПРОДАНА" VertAlign="Center"/>
+          <TableCell Name="Cell79" VertAlign="Center"/>
+          <TableCell Name="Cell80" Text="КУРС" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell81" VertAlign="Center"/>
+          <TableCell Name="Cell82" Text="ВАЛЮТА КУПЛЕНА" HorzAlign="Center" VertAlign="Center"/>
+        </TableRow>
+        <TableRow Name="Row15" Height="47.25">
+          <TableCell Name="Cell83" Text="[Table.KVB]" HorzAlign="Center"/>
+          <TableCell Name="Cell84"/>
+          <TableCell Name="Cell85" Text="[Table.KURSB]&#13;&#10;[Table.KURSA]" HorzAlign="Center">
+            <Formats>
+              <NumberFormat UseLocale="false" DecimalDigits="8" GroupSeparator=" " NegativePattern="1"/>
+              <NumberFormat UseLocale="false" DecimalDigits="8"/>
+            </Formats>
+          </TableCell>
+          <TableCell Name="Cell86"/>
+          <TableCell Name="Cell87" Text="[Table.KVA]" HorzAlign="Center"/>
+        </TableRow>
+        <TableRow Name="Row16" Height="28.35">
+          <TableCell Name="Cell88" Border.Lines="Top, Bottom" Border.Width="0.5" Text="КОНТАРГЕНТ: [Table.NB2]" VertAlign="Center" ColSpan="5" RowSpan="2"/>
+          <TableCell Name="Cell89" Border.Lines="Top" Border.Width="0.5"/>
+          <TableCell Name="Cell90" Border.Lines="Top" Border.Width="0.5"/>
+          <TableCell Name="Cell91" Border.Lines="Top" Border.Width="0.5"/>
+          <TableCell Name="Cell92" Border.Lines="Top" Border.Width="0.5"/>
+        </TableRow>
+        <TableRow Name="Row17" Height="10.45">
+          <TableCell Name="Cell93" Border.Lines="Bottom"/>
+          <TableCell Name="Cell94"/>
+          <TableCell Name="Cell95"/>
+          <TableCell Name="Cell96"/>
+          <TableCell Name="Cell97"/>
+        </TableRow>
+      </TableObject>
+      <SubreportObject Name="Subreport1" Top="585.9" Width="94.5" Height="18.9" ReportPage="Page3"/>
+    </DataBand>
+  </ReportPage>
+  <ReportPage Name="Page3">
+    <GroupHeaderBand Name="GroupHeader1" Width="718.2" Condition="[acc.REF]" SortOrder="None">
+      <DataBand Name="Data3" Top="94.05" Width="718.2" Height="18.9" DataSource="Table2">
+        <TableObject Name="Table3" Left="9.45" Width="706.86" Height="18.9">
+          <TableColumn Name="Column6"/>
+          <TableColumn Name="Column7" Width="94.5"/>
+          <TableColumn Name="Column24" Width="113.4"/>
+          <TableColumn Name="Column22"/>
+          <TableColumn Name="Column8" Width="122.85"/>
+          <TableColumn Name="Column9" Width="122.85"/>
+          <TableColumn Name="Column10" Width="120.96"/>
+          <TableRow Name="Row9">
+            <TableCell Name="Cell53" Border.Lines="All" Border.Style="Dash" Text="[acc.TT]" HorzAlign="Center"/>
+            <TableCell Name="Cell54" Border.Lines="All" Border.Style="Dash" Text="[acc.FDAT]" Format="Date" Format.Format="d" HorzAlign="Center"/>
+            <TableCell Name="Cell101" Border.Lines="All" Border.Style="Dash" Text="[acc.NLS]"/>
+            <TableCell Name="Cell99" Border.Lines="All" Border.Style="Dash" Text="[acc.KV]" HorzAlign="Center"/>
+            <TableCell Name="Cell55" Border.Lines="All" Border.Style="Dash" Text="[acc.AMNT_DB]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right"/>
+            <TableCell Name="Cell56" Border.Lines="All" Border.Style="Dash" Text="[acc.AMNT_CR]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right"/>
+            <TableCell Name="Cell57" Border.Lines="All" Border.Style="Dash" Text="[acc.SQ]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right"/>
+          </TableRow>
+        </TableObject>
+        <DataHeaderBand Name="DataHeader1" Top="4.49" Width="718.2" Height="85.06" CanGrow="true" CanShrink="true">
+          <TableObject Name="Table4" Left="9.45" Width="706.86" Height="85.06">
+            <TableColumn Name="Column11"/>
+            <TableColumn Name="Column12" Width="94.5"/>
+            <TableColumn Name="Column23" Width="113.4"/>
+            <TableColumn Name="Column21"/>
+            <TableColumn Name="Column13" Width="122.85"/>
+            <TableColumn Name="Column14" Width="122.85"/>
+            <TableColumn Name="Column15" Width="120.96"/>
+            <TableRow Name="Row23" Height="22.05">
+              <TableCell Name="Cell131"/>
+              <TableCell Name="Cell132"/>
+              <TableCell Name="Cell133"/>
+              <TableCell Name="Cell134"/>
+              <TableCell Name="Cell135"/>
+              <TableCell Name="Cell136"/>
+              <TableCell Name="Cell137"/>
+            </TableRow>
+            <TableRow Name="Row22" Height="22.05">
+              <TableCell Name="Cell124" Text="Перелік транзакцій для докемента #[acc.REF]" ColSpan="6"/>
+              <TableCell Name="Cell125"/>
+              <TableCell Name="Cell126"/>
+              <TableCell Name="Cell127"/>
+              <TableCell Name="Cell128"/>
+              <TableCell Name="Cell129"/>
+              <TableCell Name="Cell130"/>
+            </TableRow>
+            <TableRow Name="Row10" Height="40.96">
+              <TableCell Name="Cell58" Border.Lines="All" Border.Width="0.25" Text="Тип&#13;&#10;операції" HorzAlign="Center" VertAlign="Center"/>
+              <TableCell Name="Cell59" Border.Lines="All" Border.Width="0.25" Text="Дата &#13;&#10;валютування" HorzAlign="Center" VertAlign="Center"/>
+              <TableCell Name="Cell100" Border.Lines="All" Border.Width="0.25" Text="Рахунок" HorzAlign="Center" VertAlign="Center"/>
+              <TableCell Name="Cell98" Border.Lines="All" Border.Width="0.25" Text="Валюта" HorzAlign="Center" VertAlign="Center"/>
+              <TableCell Name="Cell60" Border.Lines="All" Border.Width="0.25" Text="Дебет" HorzAlign="Center" VertAlign="Center"/>
+              <TableCell Name="Cell61" Border.Lines="All" Border.Width="0.25" Text="Кредит" HorzAlign="Center" VertAlign="Center"/>
+              <TableCell Name="Cell62" Border.Lines="Right, Top, Bottom" Text="Еквівалент" HorzAlign="Center" VertAlign="Center"/>
+            </TableRow>
+          </TableObject>
+        </DataHeaderBand>
+      </DataBand>
+      <GroupFooterBand Name="GroupFooter1" Top="117.44" Width="718.2"/>
+    </GroupHeaderBand>
+  </ReportPage>
+</Report>

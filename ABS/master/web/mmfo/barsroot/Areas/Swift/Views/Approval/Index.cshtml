@@ -1,0 +1,68 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    //ViewBag.Title = "SWIFT.CLAIMS. Обробка прийнятих повідомлень";
+}
+
+
+<script src="/Common/Script/BarsIe.js" type="text/javascript"></script>
+
+<script src="~/Scripts/respond.min.js"></script>
+<script src="~/Areas/Swift/Scripts/KendoCommon.js"></script>
+<script src="~/Areas/Swift/Scripts/Approval/SwiftApproval.js"></script>
+<link rel="stylesheet" href="~/Areas/Swift/Css/Swift/Main.css" />
+
+<div class="page-header">
+    <h1 id="title"></h1>
+</div>
+
+<div id="gridMain"></div>
+<div class="search-main"></div>
+<br />
+<div id="gridDocForKvit"></div>
+
+
+<script type="text/x-kendo-template" id="mainTitle-template">
+    <div class="toolbar">
+        <button title="Вибір візи" id="pbFindMatch" class='k-button' onclick="onClickBtn(this)">            
+            <i class="pf-icon pf-16 pf-reload_rotate"></i>
+        </button>
+        <button title="Віза" id="pbApplyToAll" class='k-button' onclick="onClickBtn(this)">
+            <i class="pf-icon pf-16 pf-ok"></i>
+        </button>
+        <button title="Повернути (сторно)" id="pbStorno" class='k-button' onclick="onClickBtn(this)">
+            <i class="pf-icon pf-16 pf-delete"></i>
+        </button>
+        <button title="Повернути (на попередню візу)" id="pbPrevVisa" class='k-button' onclick="onClickBtn(this)">
+            <i class="pf-icon pf-16 pf-delete_button_error"></i>
+        </button>
+        <button title="Перегляд/друк повідомлення" id="btnView" class='k-button' onclick="onClickBtn(this)">
+            <i class="pf-icon pf-16 pf-view_options"></i>
+        </button>
+        <button title="Перегляд документу" id="btnViewDoc" class='k-button' onclick="onClickBtn(this)">
+            <i class="pf-icon pf-16 pf-business_report"></i>
+        </button>
+        <button title="Редагування повідомлення" id="btnEdit" class='k-button' onclick="onClickBtn(this)">
+            <i class="pf-icon pf-16 pf-gears"></i>
+        </button>
+        <button title="Друк виділених документів" id="btnPrint" class='k-button' onclick="onClickBtn(this)">
+            <i class="pf-icon pf-16 pf-print"></i>
+        </button>
+        <label for="chbxPrintModel">Друк бухмоделі</label>
+        <input id="chbxPrintModel" style="width: 25px" type="checkbox" checked="checked" onclick="onClickBtn(this)" />
+
+    </div>
+</script>
+
+<div id="dialogSelectOpCode">
+    <div id="gridSelectOpCode"></div>
+    <div style="margin-top: 4px;text-align: center;">
+        <button id="confirmSelectOpCode" class="k-button k-primary">Вибрати?</button>
+    </div>
+</div>
+
+<div id="dialogCanselApproveReason">
+    <div id="gridCanselApproveReason"></div>
+    <div style="margin-top: 4px;text-align: center;">
+        <button id="confirmCanselApproveReason" class="k-button k-primary">Повернути (сторно)?</button>
+    </div>
+</div>

@@ -1,0 +1,245 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ConvertNulls="false" ReportInfo.Created="03/04/2016 14:10:47" ReportInfo.Modified="05/05/2017 12:35:56" ReportInfo.CreatorVersion="2014.3.2.0">
+  <ScriptText>using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows.Forms;
+using System.Drawing;
+using System.Data;
+using FastReport;
+using FastReport.Data;
+using FastReport.Dialog;
+using FastReport.Barcode;
+using FastReport.Table;
+using FastReport.Utils;
+
+namespace FastReport
+{
+  public class ReportScript
+  {
+    public String PERIOD
+    {
+      get 
+      {
+        DateTime DateFrom = ((DateTime)Report.GetParameterValue(&quot;sFdat1&quot;));
+        DateTime DateTo = ((DateTime)Report.GetParameterValue(&quot;sFdat2&quot;));
+      
+        TimeSpan ts = DateTo - DateFrom; // Difference in days, hours, and minutes.
+        int differenceInDays = ts.Days; // Difference in days.
+        if (differenceInDays == 0)
+        {
+          return (&quot;за &quot; + ((DateTime)Report.GetParameterValue(&quot;sFdat1&quot;)).ToString(&quot;dd.MM.yyyy&quot;));
+        }
+        else
+        {
+          return (&quot;за період з &quot; + ((DateTime)Report.GetParameterValue(&quot;sFdat1&quot;)).ToString(&quot;dd.MM.yyyy&quot;) + &quot; по &quot; + ((DateTime)Report.GetParameterValue(&quot;sFdat2&quot;)).ToString(&quot;dd.MM.yyyy&quot;));
+        }
+      }
+    }
+
+    private void Data1_BeforePrint(object sender, EventArgs e)
+    {
+      if (((String)Report.GetColumnValue(&quot;Table.NBS&quot;)).Length &gt; 0)
+        Data1.Visible = true;
+    }
+  }
+}
+</ScriptText>
+  <Dictionary>
+    <OracleDataConnection Name="Conn" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXawgQMNksAJZokM+/w71Mdo3odtO/GLj1xEAWNRCddEg==">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand=" SELECT c.ord, c.name, k.kf ourmfo, k.nbs, nvl(k.debit_turns,0)debit_turns, nvl(k.credit_turns,0)credit_turns, nvl(k.doc_count,0)doc_count, nvl(k.debit_count,0)debit_count, nvl(k.credit_count,0)credit_count&#13;&#10;    FROM clim_mfo c,&#13;&#10;         (SELECT t1.kf, t1.nbs, t1.debit_turns, t1.credit_turns, t2.debit_count, t3.credit_count, t4.doc_count&#13;&#10;            FROM (  SELECT kf, nbs, SUM (obdbq) / 100 AS debit_turns, SUM (obkrq) / 100 AS credit_turns&#13;&#10;                      FROM (SELECT cd.kf, SUBSTR (cd.nls, 1, 4) AS nbs, cd.obdbq, cd.obkrq&#13;&#10;                              FROM ob_corporation_data cd&#13;&#10;                             WHERE     cd.rowtype = 0&#13;&#10;                                   AND cd.corporation_id = :corp_code&#13;&#10;                                   and kfile_pack.get_correct_session_id(cd.corporation_id,cd.kf,cd.session_id)=1&#13;&#10;                                   and kfile_pack.get_correct_nbs(cd.corporation_id,substr(cd.nls,1,4))=1&#13;&#10;                                   AND cd.file_date BETWEEN TRUNC(:rpt_date_start, 'DDD') AND TRUNC(:rpt_date_end, 'DDD'))&#13;&#10;                  GROUP BY kf, nbs) t1,&#13;&#10;                 (  SELECT kf, nbs, COUNT (*) AS debit_count&#13;&#10;                      FROM (SELECT cd.kf, SUBSTR (cd.nls, 1, 4) AS nbs&#13;&#10;                              FROM ob_corporation_data cd&#13;&#10;                             WHERE     cd.rowtype = 1&#13;&#10;                                   AND cd.corporation_id = :corp_code&#13;&#10;                                  and kfile_pack.get_correct_session_id(cd.corporation_id,cd.kf,cd.session_id)=1&#13;&#10;                                   and kfile_pack.get_correct_nbs(cd.corporation_id,substr(cd.nls,1,4))=1&#13;&#10;                                   AND cd.file_date BETWEEN TRUNC(:rpt_date_start, 'DDD') AND TRUNC(:rpt_date_end, 'DDD')&#13;&#10;                                   and doctype=0&#13;&#10;                                   AND cd.nls = cd.nlsa)&#13;&#10;                  GROUP BY kf, nbs) t2,&#13;&#10;                 (  SELECT kf, nbs, COUNT (*) AS credit_count&#13;&#10;                      FROM (SELECT cd.kf, SUBSTR (cd.nls, 1, 4) AS nbs&#13;&#10;                              FROM ob_corporation_data cd&#13;&#10;                             WHERE     cd.rowtype = 1&#13;&#10;                                   AND cd.corporation_id = :corp_code&#13;&#10;                                  and kfile_pack.get_correct_session_id(cd.corporation_id,cd.kf,cd.session_id)=1&#13;&#10;                                   and kfile_pack.get_correct_nbs(cd.corporation_id,substr(cd.nls,1,4))=1&#13;&#10;                                   AND cd.file_date BETWEEN TRUNC(:rpt_date_start, 'DDD') AND TRUNC(:rpt_date_end, 'DDD')&#13;&#10;                                   and doctype=1&#13;&#10;                                   AND cd.nls = cd.nlsb)&#13;&#10;                  GROUP BY kf, nbs) t3,&#13;&#10;                 (  SELECT kf, nbs, COUNT (*) doc_count&#13;&#10;                      FROM (SELECT cd.kf, SUBSTR (cd.nls, 1, 4) AS nbs&#13;&#10;                              FROM ob_corporation_data cd&#13;&#10;                             WHERE     cd.rowtype = 1&#13;&#10;                                   AND cd.corporation_id = :corp_code&#13;&#10;                                   and kfile_pack.get_correct_session_id(cd.corporation_id,cd.kf,cd.session_id)=1&#13;&#10;                                   and kfile_pack.get_correct_nbs(cd.corporation_id,substr(cd.nls,1,4))=1&#13;&#10;                                   AND cd.file_date BETWEEN TRUNC(:rpt_date_start, 'DDD') AND TRUNC(:rpt_date_end, 'DDD'))&#13;&#10;                  GROUP BY kf, nbs) t4&#13;&#10;           WHERE     t1.kf = t2.kf(+) AND t1.nbs = t2.nbs(+)&#13;&#10;                 AND t1.kf = t3.kf(+) AND t1.nbs = t3.nbs(+)&#13;&#10;                 AND t1.kf = t4.kf(+) AND t1.nbs = t4.nbs(+)&#13;&#10;                 AND ',' || DECODE (REPLACE (:nbs, ' ', ''), '%', t1.nbs,  REPLACE (:nbs, ' ', '')) || ',' LIKE '%,' || t1.nbs || ',%'&#13;&#10;                 AND ',' || DECODE (REPLACE (:mfo, ' ', ''), '%', t1.kf,  REPLACE (:mfo, ' ', '')) || ',' LIKE '%,' || t1.kf || ',%'&#13;&#10;                 ) k&#13;&#10;   WHERE c.mfo = k.kf(+)&#13;&#10;  order by c.ord    ">
+        <Column Name="ORD" DataType="System.Int16"/>
+        <Column Name="NAME" DataType="System.String"/>
+        <Column Name="OURMFO" DataType="System.String"/>
+        <Column Name="NBS" DataType="System.String"/>
+        <Column Name="DEBIT_TURNS" DataType="System.Decimal"/>
+        <Column Name="CREDIT_TURNS" DataType="System.Decimal"/>
+        <Column Name="DOC_COUNT" DataType="System.Decimal"/>
+        <Column Name="DEBIT_COUNT" DataType="System.Decimal"/>
+        <Column Name="CREDIT_COUNT" DataType="System.Decimal"/>
+        <CommandParameter Name="corp_code" DataType="112" Expression="[Param0]" DefaultValue="0"/>
+        <CommandParameter Name="rpt_date_start" DataType="106" Expression="[sFdat1]" DefaultValue="01.01.1900"/>
+        <CommandParameter Name="rpt_date_end" DataType="106" Expression="[sFdat2]" DefaultValue="01.01.1900"/>
+        <CommandParameter Name="corp_code" DataType="112" Expression="[Param0]" DefaultValue="0"/>
+        <CommandParameter Name="rpt_date_start" DataType="106" Expression="[sFdat1]" DefaultValue="01.01.1900"/>
+        <CommandParameter Name="rpt_date_end" DataType="106" Expression="[sFdat2]" DefaultValue="01.01.1900"/>
+        <CommandParameter Name="corp_code" DataType="112" Expression="[Param0]" DefaultValue="0"/>
+        <CommandParameter Name="rpt_date_start" DataType="106" Expression="[sFdat1]" DefaultValue="01.01.1900"/>
+        <CommandParameter Name="rpt_date_end" DataType="106" Expression="[sFdat2]" DefaultValue="01.01.1900"/>
+        <CommandParameter Name="corp_code" DataType="112" Expression="[Param0]" DefaultValue="0"/>
+        <CommandParameter Name="rpt_date_start" DataType="106" Expression="[sFdat1]" DefaultValue="01.01.1900"/>
+        <CommandParameter Name="rpt_date_end" DataType="106" Expression="[sFdat2]" DefaultValue="01.01.1900"/>
+        <CommandParameter Name="nbs" DataType="126" Expression="[NBS]" DefaultValue="%"/>
+        <CommandParameter Name="nbs" DataType="126" Expression="[NBS]" DefaultValue="%"/>
+        <CommandParameter Name="mfo" DataType="126" Expression="[KF]" DefaultValue="%"/>
+        <CommandParameter Name="mfo" DataType="126" Expression="[KF]" DefaultValue="%"/>
+      </TableDataSource>
+      <TableDataSource Name="Table1" DataType="System.Int32" Enabled="true" SelectCommand="SELECT c.corporation_name FROM ob_corporation c WHERE c.id = :corp_code">
+        <Column Name="CORPORATION_NAME" DataType="System.String"/>
+        <CommandParameter Name="corp_code" DataType="112" Expression="[Param0]" DefaultValue="0"/>
+      </TableDataSource>
+      <TableDataSource Name="Table2" DataType="System.Int32" Enabled="true" SelectCommand="&#13;&#10;SELECT t1.nbs, nvl(t1.debit_turns,0) debit_turns, nvl(t1.credit_turns,0)credit_turns, nvl(t2.debit_count,0)debit_count, nvl(t3.credit_count,0)credit_count, nvl(t4.doc_count,0)doc_count&#13;&#10;  FROM (  SELECT nbs, SUM (obdbq) / 100 AS debit_turns, SUM (obkrq) / 100 AS credit_turns&#13;&#10;            FROM (SELECT SUBSTR (cd.nls, 1, 4) AS nbs, cd.obdbq, cd.obkrq&#13;&#10;                    FROM ob_corporation_data cd&#13;&#10;                   WHERE     cd.ROWTYPE = 0&#13;&#10;                         AND cd.corporation_id = :corp_code&#13;&#10;                         AND ',' || DECODE (REPLACE (:mfo, ' ', ''), '%', cd.kf,  REPLACE (:mfo, ' ', '')) || ',' LIKE '%,' || cd.kf || ',%'&#13;&#10;                          and kfile_pack.get_correct_session_id(cd.corporation_id,cd.kf,cd.session_id)=1&#13;&#10;                                   and kfile_pack.get_correct_nbs(cd.corporation_id,substr(cd.nls,1,4))=1&#13;&#10;                                   AND cd.file_date BETWEEN TRUNC(:rpt_date_start, 'DDD') AND TRUNC(:rpt_date_end, 'DDD'))&#13;&#10;        GROUP BY nbs) t1,&#13;&#10;       (  SELECT nbs, COUNT (*) AS debit_count&#13;&#10;            FROM (SELECT SUBSTR (cd.nls, 1, 4) AS nbs&#13;&#10;                    FROM ob_corporation_data cd&#13;&#10;                   WHERE     cd.ROWTYPE = 1&#13;&#10;                         AND cd.corporation_id = :corp_code&#13;&#10;                         AND ',' || DECODE (REPLACE (:mfo, ' ', ''), '%', cd.kf,  REPLACE (:mfo, ' ', '')) || ',' LIKE '%,' || cd.kf || ',%'&#13;&#10;                          and kfile_pack.get_correct_session_id(cd.corporation_id,cd.kf,cd.session_id)=1&#13;&#10;                                   and kfile_pack.get_correct_nbs(cd.corporation_id,substr(cd.nls,1,4))=1&#13;&#10;                                   AND cd.file_date BETWEEN TRUNC(:rpt_date_start, 'DDD') AND TRUNC(:rpt_date_end, 'DDD')&#13;&#10;                         AND cd.nls = cd.nlsa&#13;&#10;                         and doctype=0)&#13;&#10;        GROUP BY nbs) t2,&#13;&#10;       (  SELECT nbs, COUNT (*) AS credit_count&#13;&#10;            FROM (SELECT SUBSTR (cd.nls, 1, 4) AS nbs&#13;&#10;                    FROM ob_corporation_data cd&#13;&#10;                   WHERE     cd.ROWTYPE = 1&#13;&#10;                         AND cd.corporation_id = :corp_code&#13;&#10;                         AND ',' || DECODE (REPLACE (:mfo, ' ', ''), '%', cd.kf,  REPLACE (:mfo, ' ', '')) || ',' LIKE '%,' || cd.kf || ',%'&#13;&#10;                          and kfile_pack.get_correct_session_id(cd.corporation_id,cd.kf,cd.session_id)=1&#13;&#10;                                   and kfile_pack.get_correct_nbs(cd.corporation_id,substr(cd.nls,1,4))=1&#13;&#10;                                   AND cd.file_date BETWEEN TRUNC(:rpt_date_start, 'DDD') AND TRUNC(:rpt_date_end, 'DDD')&#13;&#10;                         AND cd.nls = cd.nlsb&#13;&#10;                         and doctype=1)&#13;&#10;        GROUP BY nbs) t3,&#13;&#10;       (  SELECT nbs, COUNT (*) doc_count&#13;&#10;            FROM (SELECT SUBSTR (cd.nls, 1, 4) AS nbs&#13;&#10;                    FROM ob_corporation_data cd&#13;&#10;                   WHERE     cd.ROWTYPE = 1&#13;&#10;                         AND cd.corporation_id = :corp_code&#13;&#10;                         AND ',' || DECODE (REPLACE (:mfo, ' ', ''), '%', cd.kf,  REPLACE (:mfo, ' ', '')) || ',' LIKE '%,' || cd.kf || ',%'&#13;&#10;                          and kfile_pack.get_correct_session_id(cd.corporation_id,cd.kf,cd.session_id)=1&#13;&#10;                                   and kfile_pack.get_correct_nbs(cd.corporation_id,substr(cd.nls,1,4))=1&#13;&#10;                                   AND cd.file_date BETWEEN TRUNC(:rpt_date_start, 'DDD') AND TRUNC(:rpt_date_end, 'DDD'))&#13;&#10;        GROUP BY nbs) t4&#13;&#10; WHERE     t1.nbs = t2.nbs(+)&#13;&#10;       AND t1.nbs = t3.nbs(+)&#13;&#10;       AND t1.nbs = t4.nbs(+)&#13;&#10;       AND ',' || DECODE (REPLACE (:nbs, ' ', ''), '%', t1.nbs,  REPLACE (:nbs, ' ', '')) || ',' LIKE '%,' || t1.nbs || ',%'">
+        <Column Name="NBS" DataType="System.String"/>
+        <Column Name="DEBIT_TURNS" DataType="System.Decimal"/>
+        <Column Name="CREDIT_TURNS" DataType="System.Decimal"/>
+        <Column Name="DEBIT_COUNT" DataType="System.Decimal"/>
+        <Column Name="CREDIT_COUNT" DataType="System.Decimal"/>
+        <Column Name="DOC_COUNT" DataType="System.Decimal"/>
+        <CommandParameter Name="corp_code" DataType="112" Expression="[Param0]" DefaultValue="0"/>
+        <CommandParameter Name="mfo" DataType="126" Expression="[KF]" DefaultValue="%"/>
+        <CommandParameter Name="mfo" DataType="126" Expression="[KF]" DefaultValue="%"/>
+        <CommandParameter Name="rpt_date_start" DataType="106" Expression="[sFdat1]" DefaultValue="01.01.1900"/>
+        <CommandParameter Name="rpt_date_end" DataType="106" Expression="[sFdat2]" DefaultValue="01.01.1900"/>
+        <CommandParameter Name="corp_code" DataType="112" Expression="[Param0]" DefaultValue="0"/>
+        <CommandParameter Name="mfo" DataType="126" Expression="[KF]" DefaultValue="%"/>
+        <CommandParameter Name="mfo" DataType="126" Expression="[KF]" DefaultValue="%"/>
+        <CommandParameter Name="rpt_date_start" DataType="106" Expression="[sFdat1]" DefaultValue="01.01.1900"/>
+        <CommandParameter Name="rpt_date_end" DataType="106" Expression="[sFdat2]" DefaultValue="01.01.1900"/>
+        <CommandParameter Name="corp_code" DataType="112" Expression="[Param0]" DefaultValue="0"/>
+        <CommandParameter Name="mfo" DataType="126" Expression="[KF]" DefaultValue="%"/>
+        <CommandParameter Name="mfo" DataType="126" Expression="[KF]" DefaultValue="%"/>
+        <CommandParameter Name="rpt_date_start" DataType="106" Expression="[sFdat1]" DefaultValue="01.01.1900"/>
+        <CommandParameter Name="rpt_date_end" DataType="106" Expression="[sFdat2]" DefaultValue="01.01.1900"/>
+        <CommandParameter Name="corp_code" DataType="112" Expression="[Param0]" DefaultValue="0"/>
+        <CommandParameter Name="mfo" DataType="126" Expression="[KF]" DefaultValue="%"/>
+        <CommandParameter Name="mfo" DataType="126" Expression="[KF]" DefaultValue="%"/>
+        <CommandParameter Name="rpt_date_start" DataType="106" Expression="[sFdat1]" DefaultValue="01.01.1900"/>
+        <CommandParameter Name="rpt_date_end" DataType="106" Expression="[sFdat2]" DefaultValue="01.01.1900"/>
+        <CommandParameter Name="nbs" DataType="126" Expression="[NBS]" DefaultValue="%"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="sFdat1" DataType="System.DateTime"/>
+    <Parameter Name="sFdat2" DataType="System.DateTime"/>
+    <Parameter Name="KF" DataType="System.String"/>
+    <Parameter Name="NBS" DataType="System.String"/>
+    <Parameter Name="Param0" DataType="System.Int32"/>
+    <Total Name="Total_RU_Debit_Turns" Expression="[Table.DEBIT_TURNS]" Evaluator="Data1" PrintOn="GroupFooter1" ResetOnReprint="true" IncludeInvisibleRows="true"/>
+    <Total Name="Total_RU_Credit_Turns" Expression="[Table.CREDIT_TURNS]" Evaluator="Data1" PrintOn="GroupFooter1" ResetOnReprint="true" IncludeInvisibleRows="true"/>
+    <Total Name="Total_RU_Docs" Expression="[Table.DOC_COUNT]" Evaluator="Data1" PrintOn="GroupFooter1" ResetOnReprint="true" IncludeInvisibleRows="true"/>
+    <Total Name="Total_RU_Debit_Count" Expression="[Table.DEBIT_COUNT]" Evaluator="Data1" PrintOn="GroupFooter1" ResetOnReprint="true" IncludeInvisibleRows="true"/>
+    <Total Name="Total_RU_Credit_Count" Expression="[Table.CREDIT_COUNT]" Evaluator="Data1" PrintOn="GroupFooter1" ResetOnReprint="true" IncludeInvisibleRows="true"/>
+    <Total Name="Total_All_Debit_Turns" Expression="[Table2.DEBIT_TURNS]" Evaluator="Data2"/>
+    <Total Name="Total_All_Credit_Turns" Expression="[Table2.CREDIT_TURNS]" Evaluator="Data2"/>
+    <Total Name="Total_All_Docs" Expression="[Table2.DOC_COUNT]" Evaluator="Data2"/>
+    <Total Name="Total_All_Debit_Count" Expression="[Table2.DEBIT_COUNT]" Evaluator="Data2"/>
+    <Total Name="Total_All_Credit_Count" Expression="[Table2.CREDIT_COUNT]" Evaluator="Data2"/>
+  </Dictionary>
+  <ReportPage Name="Page1">
+    <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="85.05">
+      <TableObject Name="Table3" Top="28.35" Width="718.2" Height="56.7">
+        <TableColumn Name="Column1" Width="189"/>
+        <TableColumn Name="Column2" Width="151.2"/>
+        <TableColumn Name="Column3" Width="151.2"/>
+        <TableColumn Name="Column4" Width="75.6"/>
+        <TableColumn Name="Column5" Width="75.6"/>
+        <TableColumn Name="Column6" Width="75.6"/>
+        <TableRow Name="Row1">
+          <TableCell Name="Cell1" Border.Lines="All" Fill.Color="DarkGray" Text="Регіон/рахунок" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold" RowSpan="2"/>
+          <TableCell Name="Cell2" Border.Lines="All" Fill.Color="DarkGray" Text="Списання з рахунку" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold" RowSpan="2"/>
+          <TableCell Name="Cell3" Border.Lines="All" Fill.Color="DarkGray" Text="Зарахування на рахунок" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold" RowSpan="2"/>
+          <TableCell Name="Cell4" Border.Lines="All" Fill.Color="DarkGray" Text="Операції" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold" ColSpan="3"/>
+          <TableCell Name="Cell5" Border.Lines="All" Fill.Color="DarkGray" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell26" Border.Lines="All" Fill.Color="DarkGray" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row2">
+          <TableCell Name="Cell6" Border.Lines="All" Fill.Color="DarkGray" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell7" Border.Lines="All" Fill.Color="DarkGray" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell8" Border.Lines="All" Fill.Color="DarkGray" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell9" Border.Lines="All" Fill.Color="DarkGray" Text="Разом" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell10" Border.Lines="All" Fill.Color="DarkGray" Text="по Д-ту" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell27" Border.Lines="All" Fill.Color="DarkGray" Text="по К-ту" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row3">
+          <TableCell Name="Cell11" Border.Lines="All" Fill.Color="DarkGray" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell12" Border.Lines="All" Fill.Color="DarkGray" Text="№1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell13" Border.Lines="All" Fill.Color="DarkGray" Text="№2" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell14" Border.Lines="All" Fill.Color="DarkGray" Text="№3" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell15" Border.Lines="All" Fill.Color="DarkGray" Text="№4" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell28" Border.Lines="All" Fill.Color="DarkGray" Text="№5" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+        </TableRow>
+      </TableObject>
+      <TextObject Name="Text1" Width="718.2" Height="28.35" Text="Накопичувальна інформація по рахунках [Table1.CORPORATION_NAME] [PERIOD]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+    </ReportTitleBand>
+    <GroupHeaderBand Name="GroupHeader1" Top="89.05" Width="718.2" Height="18.9" Condition="[Table.ORD]">
+      <TableObject Name="Table7" Width="718.2" Height="18.9">
+        <TableColumn Name="Column25" Width="189"/>
+        <TableColumn Name="Column26" Width="151.2"/>
+        <TableColumn Name="Column27" Width="151.2"/>
+        <TableColumn Name="Column28" Width="75.6"/>
+        <TableColumn Name="Column29" Width="75.6"/>
+        <TableColumn Name="Column30" Width="75.6"/>
+        <TableRow Name="Row8">
+          <TableCell Name="Cell93" Border.Lines="All" Fill.Color="Aquamarine" Text="[Table.NAME]" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell94" Border.Lines="All" Fill.Color="Aquamarine" Text="[Total_RU_Debit_Turns]" ProcessAt="GroupFinished" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell95" Border.Lines="All" Fill.Color="Aquamarine" Text="[Total_RU_Credit_Turns]" ProcessAt="GroupFinished" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell96" Border.Lines="All" Fill.Color="Aquamarine" Text="[Total_RU_Docs]" ProcessAt="GroupFinished" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell97" Border.Lines="All" Fill.Color="Aquamarine" Text="[Total_RU_Debit_Count]" ProcessAt="GroupFinished" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell118" Border.Lines="All" Fill.Color="Aquamarine" Text="[Total_RU_Credit_Count]" ProcessAt="GroupFinished" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+        </TableRow>
+      </TableObject>
+      <DataBand Name="Data1" Top="111.95" Width="718.2" Height="18.9" Visible="false" BeforePrintEvent="Data1_BeforePrint" BeforeLayoutEvent="Data1_BeforePrint" DataSource="Table" RowCount="0">
+        <TableObject Name="Table4" Width="718.2" Height="18.9">
+          <TableColumn Name="Column7" Width="189"/>
+          <TableColumn Name="Column8" Width="151.2"/>
+          <TableColumn Name="Column9" Width="151.2"/>
+          <TableColumn Name="Column10" Width="75.6"/>
+          <TableColumn Name="Column11" Width="75.6"/>
+          <TableColumn Name="Column12" Width="75.6"/>
+          <TableRow Name="Row4">
+            <TableCell Name="Cell29" Border.Lines="All" Text="[Table.NBS]" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt"/>
+            <TableCell Name="Cell30" Border.Lines="All" Text="[Table.DEBIT_TURNS]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt"/>
+            <TableCell Name="Cell31" Border.Lines="All" Text="[Table.CREDIT_TURNS]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt"/>
+            <TableCell Name="Cell32" Border.Lines="All" Text="[Table.DOC_COUNT]" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt"/>
+            <TableCell Name="Cell33" Border.Lines="All" Text="[Table.DEBIT_COUNT]" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt"/>
+            <TableCell Name="Cell34" Border.Lines="All" Text="[Table.CREDIT_COUNT]" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt"/>
+          </TableRow>
+        </TableObject>
+        <Sort>
+          <Sort Expression="[Table.ORD]"/>
+          <Sort Expression="[Table.NBS]"/>
+        </Sort>
+      </DataBand>
+      <GroupFooterBand Name="GroupFooter1" Top="134.85" Width="718.2"/>
+    </GroupHeaderBand>
+    <DataBand Name="Data2" Top="161.75" Width="718.2" Height="18.9" DataSource="Table2">
+      <TableObject Name="Table6" Width="718.2" Height="18.9">
+        <TableColumn Name="Column19" Width="189"/>
+        <TableColumn Name="Column20" Width="151.2"/>
+        <TableColumn Name="Column21" Width="151.2"/>
+        <TableColumn Name="Column22" Width="75.6"/>
+        <TableColumn Name="Column23" Width="75.6"/>
+        <TableColumn Name="Column24" Width="75.6"/>
+        <TableRow Name="Row6">
+          <TableCell Name="Cell61" Border.Lines="All" Fill.Color="LightGray" Text="[Table2.NBS]" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell62" Border.Lines="All" Fill.Color="LightGray" Text="[Table2.DEBIT_TURNS]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell63" Border.Lines="All" Fill.Color="LightGray" Text="[Table2.CREDIT_TURNS]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell64" Border.Lines="All" Fill.Color="LightGray" Text="[Table2.DOC_COUNT]" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell65" Border.Lines="All" Fill.Color="LightGray" Text="[Table2.DEBIT_COUNT]" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell86" Border.Lines="All" Fill.Color="LightGray" Text="[Table2.CREDIT_COUNT]" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt"/>
+        </TableRow>
+      </TableObject>
+      <DataHeaderBand Name="DataHeader2" Top="138.85" Width="718.2" Height="18.9">
+        <TableObject Name="Table5" Width="718.2" Height="18.9">
+          <TableColumn Name="Column13" Width="189"/>
+          <TableColumn Name="Column14" Width="151.2"/>
+          <TableColumn Name="Column15" Width="151.2"/>
+          <TableColumn Name="Column16" Width="75.6"/>
+          <TableColumn Name="Column17" Width="75.6"/>
+          <TableColumn Name="Column18" Width="75.6"/>
+          <TableRow Name="Row5">
+            <TableCell Name="Cell35" Border.Lines="All" Fill.Color="LightGray" Text="РАЗОМ" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+            <TableCell Name="Cell36" Border.Lines="All" Fill.Color="LightGray" Text="[Total_All_Debit_Turns]" ProcessAt="DataFinished" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+            <TableCell Name="Cell37" Border.Lines="All" Fill.Color="LightGray" Text="[Total_All_Credit_Turns]" ProcessAt="DataFinished" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+            <TableCell Name="Cell38" Border.Lines="All" Fill.Color="LightGray" Text="[Total_All_Docs]" ProcessAt="DataFinished" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+            <TableCell Name="Cell39" Border.Lines="All" Fill.Color="LightGray" Text="[Total_All_Debit_Count]" ProcessAt="DataFinished" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+            <TableCell Name="Cell60" Border.Lines="All" Fill.Color="LightGray" Text="[Total_All_Credit_Count]" ProcessAt="DataFinished" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          </TableRow>
+        </TableObject>
+      </DataHeaderBand>
+      <Sort>
+        <Sort Expression="[Table2.NBS]"/>
+      </Sort>
+    </DataBand>
+  </ReportPage>
+</Report>

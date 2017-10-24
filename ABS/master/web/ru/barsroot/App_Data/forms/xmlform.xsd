@@ -1,0 +1,1080 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="xmlform">
+    <xs:complexType>
+      <xs:all>
+        <xs:element ref="tabcontainer" minOccurs="0"/>
+        <xs:element ref="grids" minOccurs="0"/>
+        <xs:element ref="customforms" minOccurs="0"/>
+      </xs:all>
+      <xs:attribute name="caption" use="optional">
+        <xs:simpleType>
+          <xs:restriction base="xs:string"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="minwidth" use="optional">
+        <xs:simpleType>
+          <xs:restriction base="xs:short"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="maxwidth" use="optional">
+        <xs:simpleType>
+          <xs:restriction base="xs:short"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="modalformsrc" type="XmlModalFormSrc" use="optional"/>
+      <xs:attribute name="debugxml" type="xs:boolean" use="optional"/>
+      <xs:attribute name="version" use="optional">
+        <xs:simpleType>
+          <xs:restriction base="xs:string"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="captiontype" use="optional">
+        <xs:simpleType>
+          <xs:restriction base="XmlCaptionTypes"/>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="uicontrol">
+    <xs:complexType>
+      <xs:sequence minOccurs="0">
+        <xs:element ref="defaultvalue" minOccurs="0"/>
+        <xs:element ref="rels" minOccurs="0"/>
+      </xs:sequence>
+      <xs:attribute name="readonly">
+        <xs:simpleType>
+          <xs:restriction base="xs:boolean"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="align">
+        <xs:simpleType>
+          <xs:restriction base="XmlHorisontalPosition"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="type" type="XmlUiControlType"/>
+      <xs:attribute name="table">
+        <xs:simpleType>
+          <xs:restriction base="xs:string"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="keyfield">
+        <xs:simpleType>
+          <xs:restriction base="xs:string"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="valuefield">
+        <xs:simpleType>
+          <xs:restriction base="xs:string"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="valueformat">
+        <xs:simpleType>
+          <xs:restriction base="xs:string"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="addemptyitem" type="xs:boolean"/>
+      <xs:attribute name="linescount">
+        <xs:simpleType>
+          <xs:restriction base="xs:byte"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="formname">
+        <xs:simpleType>
+          <xs:restriction base="xs:string"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="formwidth">
+        <xs:simpleType>
+          <xs:restriction base="xs:short"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="formheight">
+        <xs:simpleType>
+          <xs:restriction base="xs:short"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="formfieldname">
+        <xs:simpleType>
+          <xs:restriction base="xs:string"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="truevalue">
+        <xs:simpleType>
+          <xs:restriction base="xs:string"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="falsevalue">
+        <xs:simpleType>
+          <xs:restriction base="xs:string"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="controlwidth">
+        <xs:simpleType>
+          <xs:restriction base="xs:short"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="titlewidth" type="xs:short"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="sql" type="xs:string"/>
+  <xs:element name="rowselection">
+    <xs:complexType>
+      <xs:attribute name="method" type="XmlRowSelectionMethod" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="rels">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="rel" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="rel">
+    <xs:complexType>
+      <xs:attribute name="srcname" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:string"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="destname" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:string"/>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="sessionVariables">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="variable" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="variable">
+    <xs:complexType>
+      <xs:attribute name="name" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:string"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="field" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:string"/>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="parameters">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="parameter" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="parameter">
+    <xs:complexType>
+      <xs:sequence minOccurs="0">
+        <xs:element ref="defaultvalue" minOccurs="0"/>
+      </xs:sequence>
+      <xs:attribute name="name" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:string"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="type" use="required">
+        <xs:simpleType>
+          <xs:restriction base="XmlParameterType"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="datatype" use="optional">
+        <xs:simpleType>
+          <xs:restriction base="XmlDataType"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="masterid" use="optional">
+        <xs:simpleType>
+          <xs:restriction base="xs:string"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="masterkeyfield" use="optional">
+        <xs:simpleType>
+          <xs:restriction base="xs:string"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="altname" use="optional">
+        <xs:simpleType>
+          <xs:restriction base="xs:string"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="controlid" use="optional">
+        <xs:simpleType>
+          <xs:restriction base="xs:string"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="add2successurl" use="optional">
+        <xs:simpleType>
+          <xs:restriction base="xs:boolean"/>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="link">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="parameters"/>
+      </xs:sequence>
+      <xs:attribute name="url" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:string"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="target" type="XmlTargets" use="optional"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="grids">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="grid" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="grid" abstract="false">
+    <xs:complexType mixed="false">
+      <xs:all>
+        <xs:element ref="datasource" minOccurs="0"/>
+        <xs:element ref="startupcommand" minOccurs="0"/>
+        <xs:element ref="filters" minOccurs="0"/>
+        <xs:element ref="fields" minOccurs="1"/>
+        <xs:element ref="rowselection" minOccurs="0"/>
+        <xs:element ref="parameters" minOccurs="0"/>
+        <xs:element ref="editform" minOccurs="0"/>
+        <xs:element ref="buttons" minOccurs="0"/>
+      </xs:all>
+      <xs:attribute name="id" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:string"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="table" use="optional">
+        <xs:simpleType>
+          <xs:restriction base="xs:string"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="title" use="optional">
+        <xs:simpleType>
+          <xs:restriction base="xs:string"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="width" type="xs:short"/>
+      <xs:attribute name="showpagesizebox" type="xs:boolean" use="optional"/>
+      <xs:attribute name="showfilter" type="xs:boolean" use="optional"/>
+      <xs:attribute name="pagesize" use="optional">
+        <xs:simpleType>
+          <xs:restriction base="xs:byte"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="tabindex" use="optional">
+        <xs:simpleType>
+          <xs:restriction base="xs:int"/>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="filters">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="filter" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="caption" type="xs:string" use="optional"/>
+      <xs:attribute name="buttontext" type="xs:string" use="required"/>
+      <xs:attribute name="width" type="xs:string" use="optional"/>
+      <xs:attribute name="columnscount" type="xs:int" use="optional"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="filter">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="uicontrol" minOccurs="0" maxOccurs="unbounded" />
+      </xs:sequence>
+      <xs:attribute name="caption" type="xs:string" use="required"/>
+      <xs:attribute name="field" type="xs:string" use="required"/>
+      <xs:attribute name="id" type="xs:string" use="required"/>
+      <xs:attribute name="columnindex" type="xs:int" use="optional"/>
+      <xs:attribute name="index" type="xs:int" use="optional"/>
+      <xs:attribute name="groupname" type="xs:string" use="optional"/>
+      <xs:attribute name="condition" type="XmlFilterConditions">
+      </xs:attribute>
+      <xs:attribute name="allowemptyvalue" type="xs:boolean" use="optional"/>
+      <xs:attribute name="useupperfunc" type="xs:boolean" use="optional"/>      
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="form">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="uicontrol" minOccurs="0"/>
+      </xs:sequence>
+      <xs:attribute name="show" type="xs:boolean" use="optional"/>
+      <xs:attribute name="rwmode" type="XmlRwMode" use="optional" />
+      <xs:attribute name="required" type="xs:boolean" use="optional"/>
+      <xs:attribute name="titleindex">
+        <xs:simpleType>
+          <xs:restriction base="xs:byte"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="groupname" use="optional">
+        <xs:simpleType>
+          <xs:restriction base="xs:string"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="columnindex" use="optional">
+        <xs:simpleType>
+          <xs:restriction base="xs:byte"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="index" use="optional">
+        <xs:simpleType>
+          <xs:restriction base="xs:byte"/>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="fields">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="field" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="field">
+    <xs:complexType>
+      <xs:all>
+        <xs:element ref="column" minOccurs="0"/>
+        <xs:element ref="form" minOccurs="0"/>
+        <xs:element ref="layout" minOccurs="0"/>
+      </xs:all>
+      <xs:attribute name="name" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="datatype" type="XmlDataType" use="required"/>
+      <xs:attribute name="size">
+        <xs:simpleType>
+          <xs:restriction base="xs:short"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="sort" type="XmlSortDirection"/>
+      <xs:attribute name="key" type="xs:boolean" use="optional"/>
+      <xs:attribute name="lobtable" type="xs:string" use="optional"/>
+      <xs:attribute name="lobfilename" type="xs:string" use="optional"/>
+      <xs:attribute name="lobfilenamefield" type="xs:string" use="optional"/>
+      <xs:attribute name="lobrowtext" type="xs:string" use="optional"/>
+      <xs:attribute name="sortindex">
+        <xs:simpleType>
+          <xs:restriction base="xs:byte"/>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="editform">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="buttons"/>
+      </xs:sequence>
+      <xs:attribute name="title" use="optional">
+        <xs:simpleType>
+          <xs:restriction base="xs:string"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="style" type="XmlFormStyle"/>
+      <xs:attribute name="width" use="optional">
+        <xs:simpleType>
+          <xs:restriction base="xs:short"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="height" use="optional">
+        <xs:simpleType>
+          <xs:restriction base="xs:short"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="columnscount" use="optional">
+        <xs:simpleType>
+          <xs:restriction base="xs:byte"/>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="defaultvalue">
+    <xs:complexType>
+      <xs:attribute name="value" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:string"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="type" type="XmlDefaultValue" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="customfields">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="customfield" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="title" use="optional">
+        <xs:simpleType>
+          <xs:restriction base="xs:string"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="oktext" use="optional">
+        <xs:simpleType>
+          <xs:restriction base="xs:string"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="canceltext" use="optional">
+        <xs:simpleType>
+          <xs:restriction base="xs:string"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="columnscount" use="optional">
+        <xs:simpleType>
+          <xs:restriction base="xs:byte"/>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="customfield">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="uicontrol" minOccurs="0"/>
+      </xs:sequence>
+      <xs:attribute name="name" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:string"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="label" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:string"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="usecookie" type="xs:boolean"/>
+      <xs:attribute name="datasourcefield" use="optional">
+        <xs:simpleType>
+          <xs:restriction base="xs:string"/>
+        </xs:simpleType>
+      </xs:attribute>      
+      <xs:attribute name="datatype" type="XmlDataType" use="required"/>
+      <xs:attribute name="required" type="xs:boolean" use="optional"/>
+      <xs:attribute name="size" type="xs:short"/>
+      <xs:attribute name="groupname">
+        <xs:simpleType>
+          <xs:restriction base="xs:string"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="columnindex">
+        <xs:simpleType>
+          <xs:restriction base="xs:byte"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="index">
+        <xs:simpleType>
+          <xs:restriction base="xs:byte"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="titleindex">
+        <xs:simpleType>
+          <xs:restriction base="xs:byte"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="altname">
+        <xs:simpleType>
+          <xs:restriction base="xs:string"/>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="datasource">
+    <xs:complexType>
+      <xs:sequence minOccurs="0">
+        <xs:element ref="sql" minOccurs="0"/>
+        <xs:element ref="parameters" minOccurs="0"/>
+      </xs:sequence>
+      <xs:attribute name="autofillparams" type="xs:boolean" use="optional"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="startupcommand">
+    <xs:complexType>
+      <xs:sequence minOccurs="0" maxOccurs="1">
+        <xs:element ref="datasource" minOccurs="0"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>  
+  <xs:element name="command">
+    <xs:complexType>
+      <xs:sequence minOccurs="0">
+        <xs:element ref="sql" minOccurs="0"/>
+        <xs:element ref="parameters" minOccurs="0"/>
+        <xs:element ref="customfields" minOccurs="0"/>
+        <xs:element ref="validateproc" minOccurs="0"/>
+        <xs:element ref="sessionVariables" minOccurs="0"/>
+      </xs:sequence>
+      <xs:attribute name="type" type="XmlCommandType" use="required"/>
+      <xs:attribute name="datakeynames">
+        <xs:simpleType>
+          <xs:restriction base="xs:string"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="successmessage">
+        <xs:simpleType>
+          <xs:restriction base="xs:string"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="successurl">
+        <xs:simpleType>
+          <xs:restriction base="xs:string"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="checkselectedrow">
+        <xs:simpleType>
+          <xs:restriction base="xs:boolean"/>
+        </xs:simpleType>
+      </xs:attribute>      
+      <xs:attribute name="url">
+        <xs:simpleType>
+          <xs:restriction base="xs:string"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="frtemplate">
+        <xs:simpleType>
+          <xs:restriction base="xs:string"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="target" type="XmlTargets" use="optional"/>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="column">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="link" minOccurs="0"/>
+      </xs:sequence>
+      <xs:attribute name="caption" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:string"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="align" type="XmlHorisontalPosition" use="optional"/>
+      <xs:attribute name="width">
+        <xs:simpleType>
+          <xs:restriction base="xs:short"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="formatstring">
+        <xs:simpleType>
+          <xs:restriction base="xs:string"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="usedefaultformat" use="optional">
+        <xs:simpleType>
+          <xs:restriction base="xs:boolean"/>
+        </xs:simpleType>
+      </xs:attribute>      
+      <xs:attribute name="show" use="optional">
+        <xs:simpleType>
+          <xs:restriction base="xs:boolean"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="htmlencode" use="optional">
+        <xs:simpleType>
+          <xs:restriction base="xs:boolean"/>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="layout">
+    <xs:complexType>
+      <xs:sequence minOccurs="1" maxOccurs="1">
+        <xs:element ref="colors" minOccurs="0"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="colors">
+    <xs:complexType>
+      <xs:sequence minOccurs="0">
+        <xs:element ref="color" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="scope" type="XmlLayoutScope" use="optional"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="color">
+    <xs:complexType>
+      <xs:attribute name="operation" type="XmlMathOperations" use="required"/>
+      <xs:attribute name="value" type="xs:string" use="required"/>
+      <xs:attribute name="color" type="XmlColors" use="required"/>
+      <xs:attribute name="bold" type="xs:boolean" use="optional"/>
+      <xs:attribute name="columnindex" type="xs:int" use="optional"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name ="tabcontainer">
+    <xs:complexType>
+
+      <xs:sequence>
+        <xs:element ref="tab" maxOccurs="unbounded"/>
+      </xs:sequence>
+      
+      <xs:attribute name="id" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:string"/>
+        </xs:simpleType>
+      </xs:attribute>
+      
+      <xs:attribute name="tabcount" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:int"/>
+        </xs:simpleType>
+      </xs:attribute>
+
+      <xs:attribute name="title" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:string"/>
+        </xs:simpleType>
+      </xs:attribute>
+
+      <xs:attribute name="visible" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:boolean"/>
+        </xs:simpleType>
+      </xs:attribute>
+
+
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name ="tab">
+    <xs:complexType>
+      <xs:attribute name="id" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:string"/>
+        </xs:simpleType>
+      </xs:attribute>
+
+      <xs:attribute name="index" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:int"/>
+        </xs:simpleType>
+      </xs:attribute>
+
+      <xs:attribute name="caption" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:string"/>
+        </xs:simpleType>
+      </xs:attribute>
+
+      <xs:attribute name="visible" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:boolean"/>
+        </xs:simpleType>
+      </xs:attribute>
+
+    </xs:complexType>
+  </xs:element>
+
+
+
+  <xs:element name="buttons">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="button" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="defaulttype" type="XmlButtonType" use="optional"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="button">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="command"/>
+      </xs:sequence>
+      <xs:attribute name="id" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:string"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="caption" type="xs:string" use="required"/>
+      <xs:attribute name="type" type="XmlButtonType"/>
+      <xs:attribute name="hint" type="xs:string" use="optional"/>
+      <xs:attribute name="confirmmessage">
+        <xs:simpleType>
+          <xs:restriction base="xs:string"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="linebreak" type="xs:boolean"/>
+      <xs:attribute name="imagename" type="XmlImageNames"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="customforms">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="customform" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="inputformfields">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="inputformfield" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="inputformfield">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="uicontrol" minOccurs="0"/>
+      </xs:sequence>
+      <xs:attribute name="required" type="xs:boolean" use="required"/>
+      <xs:attribute name="name" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:string"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="label" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:string"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="index" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:byte"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="groupname" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:string"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="datatype" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:string"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="columnindex" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:byte"/>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="customform">
+    <xs:complexType>
+      <xs:all>
+        <xs:element ref="datasource" minOccurs="0"/>
+        <xs:element ref="startupcommand" minOccurs="0"/>
+        <xs:element ref="customfields" minOccurs="0"/>
+        <xs:element ref="buttons" minOccurs="0"/>
+      </xs:all>
+      <xs:attribute name="name" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:string"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="title" type="xs:string"/>
+      <xs:attribute name="height">
+        <xs:simpleType>
+          <xs:restriction base="xs:short"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="width">
+        <xs:simpleType>
+          <xs:restriction base="xs:short"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="columnscount">
+        <xs:simpleType>
+          <xs:restriction base="xs:byte"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="readonly">
+        <xs:simpleType>
+          <xs:restriction base="xs:boolean"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="showborder">
+        <xs:simpleType>
+          <xs:restriction base="xs:boolean"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="tabindex" use="optional">
+        <xs:simpleType>
+          <xs:restriction base="xs:int"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="buttonsposition" type="XmlVerticalPosition"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="validateproc">
+    <xs:complexType>
+      <xs:all>
+        <xs:element ref="parameters" minOccurs="0"/>
+      </xs:all>
+      <xs:attribute name="name" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:string"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="rescodeparname" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:string"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="restextparname" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:string"/>
+        </xs:simpleType>
+      </xs:attribute>
+
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:simpleType name="XmlFormStyle">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Inline"/>
+      <xs:enumeration value="Dialog"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="XmlModalFormSrc">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="AppRoot"/>
+      <xs:enumeration value="CurrentFolder"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="XmlButtonType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Button"/>
+      <xs:enumeration value="Link"/>
+      <xs:enumeration value="Image"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="XmlCommandType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="PlSqlBlock"/>
+      <xs:enumeration value="Insert"/>
+      <xs:enumeration value="Edit"/>
+      <xs:enumeration value="Delete"/>
+      <xs:enumeration value="View"/>
+      <xs:enumeration value="Close"/>
+      <xs:enumeration value="Select"/>
+      <xs:enumeration value="Redirect"/>
+      <xs:enumeration value="FastReport"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="XmlParameterType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="MasterGrid"/>
+      <xs:enumeration value="SessionState"/>
+      <xs:enumeration value="QueryString"/>
+      <xs:enumeration value="DataField"/>
+      <xs:enumeration value="FormField"/>
+      <xs:enumeration value="Constant"/>
+      <xs:enumeration value="ControlValue"/>
+      <xs:enumeration value="DataSourceField"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="XmlDataType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="String"/>
+      <xs:enumeration value="Int64"/>
+      <xs:enumeration value="Decimal"/>
+      <xs:enumeration value="DateTime"/>
+      <xs:enumeration value="Boolean"/>
+      <xs:enumeration value="Blob"/>
+      <xs:enumeration value="Clob"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="XmlDefaultValue">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Constant"/>
+      <xs:enumeration value="PlSqlFunction"/>
+      <xs:enumeration value="QueryString"/>
+      <xs:enumeration value="SqlText"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="XmlRowSelectionMethod">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="None"/>
+      <xs:enumeration value="SingleRow"/>
+      <xs:enumeration value="MultiRow"/>
+      <xs:enumeration value="CheckBox"/>
+      <xs:enumeration value="SingleRowServer"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="XmlUiControlType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="AutoDetect"/>
+      <xs:enumeration value="TextBox"/>
+      <xs:enumeration value="Label"/>
+      <xs:enumeration value="IntegerInput"/>
+      <xs:enumeration value="DecimalInput"/>
+      <xs:enumeration value="DateInput"/>
+      <xs:enumeration value="CheckBox"/>
+      <xs:enumeration value="DropDownList"/>
+      <xs:enumeration value="EditableReference"/>
+      <xs:enumeration value="ReadOnlyReference"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="XmlHorisontalPosition">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="NotSet"/>
+      <xs:enumeration value="Left"/>
+      <xs:enumeration value="Center"/>
+      <xs:enumeration value="Right"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="XmlCaptionTypes">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Default"/>
+      <xs:enumeration value="OnlyTitle"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="XmlSortDirection">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Disable"/>
+      <xs:enumeration value="Default"/>
+      <xs:enumeration value="Asc"/>
+      <xs:enumeration value="Desc"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="XmlVerticalPosition">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Default"/>
+      <xs:enumeration value="Top"/>
+      <xs:enumeration value="Bottom"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="XmlRwMode">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="RO"/>
+      <xs:enumeration value="RW"/>
+      <xs:enumeration value="ROI"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="XmlControlMode">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="ReadOnly"/>
+      <xs:enumeration value="Edit"/>
+      <xs:enumeration value="Insert"/>
+      <xs:enumeration value="Empty"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="XmlEditMode">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="View"/>
+      <xs:enumeration value="Full"/>
+      <xs:enumeration value="OnlyEdit"/>
+      <xs:enumeration value="OnlyInsert"/>
+      <xs:enumeration value="OnlyDelete"/>
+      <xs:enumeration value="EditInsert"/>
+      <xs:enumeration value="EditDelete"/>
+      <xs:enumeration value="InsertDelete"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="XmlFilterConditions">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Equal"/>
+      <xs:enumeration value="GreatEqual"/>
+      <xs:enumeration value="LessEqual"/>
+      <xs:enumeration value="Great"/>
+      <xs:enumeration value="Less"/>
+      <xs:enumeration value="In"/>
+      <xs:enumeration value="LikeRight"/>
+      <xs:enumeration value="LikeLeft"/>
+      <xs:enumeration value="LikeBoth"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="XmlMathOperations">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Equal"/>
+      <xs:enumeration value="Great"/>
+      <xs:enumeration value="Less"/>
+      <xs:enumeration value="GreatEqual"/>
+      <xs:enumeration value="LessEqual"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="XmlLayoutScope">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="EntireRow"/>
+      <xs:enumeration value="Column"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="XmlColors">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="clNone"/>
+      <xs:enumeration value="clRed"/>
+      <xs:enumeration value="clBlue"/>
+      <xs:enumeration value="clGreen"/>
+      <xs:enumeration value="clPlum"/>
+      <xs:enumeration value="clYellow"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="XmlTargets">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Self"/>
+      <xs:enumeration value="Blank"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="XmlImageNames">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="arrow_down"/>
+      <xs:enumeration value="arrow_left"/>
+      <xs:enumeration value="arrow_right"/>
+      <xs:enumeration value="arrow_up"/>
+      <xs:enumeration value="chart"/>
+      <xs:enumeration value="check"/>
+      <xs:enumeration value="check2"/>
+      <xs:enumeration value="checks"/>
+      <xs:enumeration value="contract"/>
+      <xs:enumeration value="data"/>
+      <xs:enumeration value="data_add"/>
+      <xs:enumeration value="delete2"/>
+      <xs:enumeration value="disk_blue"/>
+      <xs:enumeration value="document"/>
+      <xs:enumeration value="document_add"/>
+      <xs:enumeration value="document_delete"/>
+      <xs:enumeration value="document_gear"/>
+      <xs:enumeration value="document_view"/>
+      <xs:enumeration value="document_zoom_in"/>
+      <xs:enumeration value="folder"/>
+      <xs:enumeration value="gear_ok"/>
+      <xs:enumeration value="moneybag_dollar"/>
+      <xs:enumeration value="note"/>
+      <xs:enumeration value="printer"/>
+      <xs:enumeration value="refresh"/>
+      <xs:enumeration value="row"/>
+      <xs:enumeration value="table"/>
+      <xs:enumeration value="view"/>
+      <xs:enumeration value="send"/>
+      <xs:enumeration value="book_open"/>
+      <xs:enumeration value="calculator"/>
+      <xs:enumeration value="magic_wand"/>
+      <xs:enumeration value="notebook_preferences"/>
+      <xs:enumeration value="form_blue"/>
+      <xs:enumeration value="document_find"/>
+      <xs:enumeration value="edit"/>
+      <xs:enumeration value="id_cards"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+
+
+</xs:schema>

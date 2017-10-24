@@ -1,0 +1,34 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+}
+<script src="~/Areas/OpenCloseDay/Scripts/funcMonitor.js" charset="utf-8"></script>
+
+<div id="sessionId" style="display: none;">@ViewBag.deploy_id</div>
+
+
+<div class="panel panel-default" style="width:100%;float: none; margin-left: auto; margin-right: auto;">
+    <div class="panel-heading text-center">Перегляд виконання Закриття-Відкриття банковського дня</div>
+    <div class="panel-body">
+        <div class="col-xs-4 text-center">
+            Попередня дата<input type="text" id="dateOldM" class="k-textbox text-center" readonly>
+        </div>
+        <div class="col-xs-4 text-center">
+            Наступна дата<input type="text" id="dateNewM" class="k-textbox text-center" readonly>
+        </div>
+        <div class="col-xs-4 text-center">
+            Статус<input type="text" id="monitorStatus" class="k-textbox text-center" readonly>
+        </div>
+    </div>
+    <div id="toolbar"></div>
+    <div id="monitorGrid">
+
+        
+    </div>
+    <div id="extraInfo">
+        <textarea style="width:100%;height:100%;" id="extext" readonly>
+
+        </textarea>
+    </div>
+</div>
+       
+

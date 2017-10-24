@@ -1,0 +1,103 @@
+﻿@inherits System.Web.Mvc.WebViewPage<IEnumerable<Models.TABVAL_GLOBAL>>
+@{
+  ViewBag.Title = "title";
+  Layout = null;
+  var valFrom = Model.FirstOrDefault(i => i.KV == 840);
+  var valTo = Model.FirstOrDefault(i => i.KV == 980);
+}
+<script src="@Url.Content("~/Scripts/jquery/jqConverter.js")"></script>
+<script>
+  $(function () {
+    $('#barsConverter').converter({serviceUrl:'/barsroot/webservices/converter/'});
+  })
+</script>
+<div class="converter">
+  <div class="cc-main" style="visibility: hidden" id="barsConverter">
+    <div id="s-source" data-value="98">
+      <div class="cc-input cc-input-source" data-hover-class="cc-input-source-hover">
+        <b><span class="cc-input-source-label">Гот.</span> <small>▼</small></b>
+      </div>
+      <div class="cc-input-source-dd" style="display:none" id="s-source-dd">
+        <div class="b-source">
+          <b class="cc-input-source-dd-label">
+            <span class="cc-input-source-label">Гот.</span> <small>▼</small>
+          </b>
+          <ul id="source">
+            <li data-value="98" data-short-name="Гот."><u>Готівка</u></li>
+            <li data-value="1" data-short-name="НБУ"><u>НБУ</u></li>
+            @*<li data-value="3" data-short-name="ЦБР"><u>ЦБР</u></li>
+            <li data-value="4" data-short-name="НБРБ"><u>НБРБ</u></li>
+            <li data-value="99" data-short-name="Forex"><u>Forex</u></li>*@
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="cc-date">
+      <span id="s-date" data-value="@ViewBag.Date" class="cc-date-label">@ViewBag.Date</span>
+    </div>
+    <label class="cc-from-label" for="f-amount-from">Міняю</label>
+    <div class="cc-input cc-input-amount cc-input-amount-from" data-error-class="cc-input-amount-error" data-hover-class="cc-input-amount-hover">
+      <input class="f-amount-s1" id="f-amount-from" maxlength="14" value="0.00" />
+    </div>
+    <div id="s-currency-from" data-value="@valFrom.KV">
+      <div class="cc-input cc-input-currency cc-input-currency-from" data-hover-class="cc-input-currency-hover">
+        <b><span class="cc-input-currency-from-label">@valFrom.LCV</span> <small>▼</small></b>
+      </div>
+      <div class="cc-input-currency-dd cc-input-currency-dd-from" style="display:none" id="s-currency-from-dd">
+        <div class="b-ccdd-01">
+          <b class="cc-input-currency-dd-label cc-input-currency-dd-from-label">
+            <span class="cc-input-currency-from-label">@valFrom.LCV</span> <small>▼</small>
+          </b>
+          <div class="scroll">
+            <div class="scrollcontent">
+              <ul>
+                @foreach (var item in Model)
+                {
+                  <li data-value="@item.KV" data-lcv="@item.LCV"><u>@item.LCV</u> - <i>@item.NAME</i></li>
+                }
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="cc-input cc-button-equality" data-click-class="cc-button-equality-click" data-hover-class="cc-button-equality-hover" title="Розрахувати"></div>
+    <div class="cc-input cc-button-reverse" id="reverse" data-click-class="cc-button-reverse-click" data-hover-class="cc-button-reverse-hover" title="Поміняти валюти місцями"></div>
+    <label class="cc-to-label" for="f-amount-to">Отримую</label>
+    <div class="cc-input cc-input-amount cc-input-amount-to" data-error-class="cc-input-amount-error" data-hover-class="cc-input-amount-hover">
+      <input class="f-amount-s1" id="f-amount-to" maxlength="14" value="0.00" />
+    </div>
+    <div id="s-currency-to" data-value="@valTo.KV">
+      <div class="cc-input cc-input-currency cc-input-currency-to" data-hover-class="cc-input-currency-hover">
+        <b><span class="cc-input-currency-to-label">@valTo.LCV</span> <small>▼</small></b>
+      </div>
+      <div class="cc-input-currency-dd cc-input-currency-dd-to" style="display:none" id="s-currency-to-dd">
+        <div class="b-ccdd-02">
+          <div class="scroll">
+            <div class="scrollcontent">
+              <ul>
+                @foreach (var item in Model)
+                {
+                  <li data-value="@item.KV" data-lcv="@item.LCV"><u>@item.LCV</u> - <i>@item.NAME</i></li>
+                }
+              </ul>
+            </div>
+          </div>
+          <b class="cc-input-currency-dd-label cc-input-currency-dd-to-label">
+            <span class="cc-input-currency-to-label">@valTo.LCV</span> <small>▼</small>
+          </b>
+        </div>
+      </div>
+    </div>
+    <div id="converterErrorMessage"></div>
+  </div>
+  <div class="cc-unsupported" style="display:none">
+    <div>
+      <h4>К сожалению<br />Ваш браузер - устаревший.</h4>
+      Пользоваться новым<br /><b>Конвертером валют 2.0</b><br />
+      Вы сможете в браузерах<br />
+      - Internet Explorer 7+<br />
+      - Firefox 3+<br />- Opera 9+<br />- Safari 4+
+    </div>
+  </div>
+</div>

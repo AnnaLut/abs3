@@ -1,0 +1,81 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = "Відкрити дебеторську заборгованість";
+}
+
+@*Hiddeninfo*@
+<div style="display:none">
+    <div id="get_id">@ViewBag.ID</div>
+    <div id="get_date">@ViewBag.date</div>
+    <div id="get_sum">@ViewBag.sum</div>
+    <div id="get_rs">@ViewBag.reason</div>
+</div>
+<div style="margin: 0.5%;">
+    <div class="">
+        <label>
+            <h2><b>Розкрити дебіторську заборгованість:</b></h2>
+        </label>
+    </div>
+    <div class="">
+        <div>
+            <label>
+                <b>Дата</b><br>
+                <input id="date" type="text" name="lastname" />
+            </label>
+
+            <label>
+                <b>Сума</b><br>
+                <input id="sum" type="text" name="lastname" class="k-textbox" />
+            </label>
+
+            <button id='save' type='button' class='k-button' title='Додаткова інформація'><i class='pf-icon pf-16 pf-ok'></i></button>
+        </div>
+    </div>
+    <label style="width: 100%;">
+        <b>Призначення платежу</b><br>
+        <textarea id="reason" class="form-control" style="width: 100%;height:100px;" name="text"></textarea>
+    </label>
+</div>
+
+<script>
+    $(document).ready(function() {
+        
+        var date = kendo.parseDate($("#get_date").text(), "dd.MM.yyyy");
+    
+        $("#date").kendoDatePicker({
+            value: date,
+            format: "dd.MM.yyyy"
+        }).closest(".k-widget")
+       .attr("id", "datepicker_wrapper");
+
+        $("#sum").val((parseInt($("#get_sum").text()) / 100).toFixed(2));
+
+        $("#reason").text($("#get_rs").text());
+
+        $("#save").click(function () {
+            $.ajax({
+                type: "POST",
+                async: false,
+                data :{
+                    id: parseInt($("#get_id").text()),
+                    date: $("#date").val(),
+                    sum: parseInt($("#sum").val().split('.').join('')),
+                    text: $("#reason").val()
+                },
+                url: bars.config.urlContent("/api/mbdk/mbdkurlgenerator/getgeneneratedurl"),
+                dateType: "json",
+                success: function (data) {
+                    debugger;
+                    //window.location.replace(data);
+                    window.open(data, "ФІВ");
+                }
+            })
+        });
+    });
+</script>
+
+<style>
+    body {
+        background-color: #f0f0f0;
+    }
+</style>

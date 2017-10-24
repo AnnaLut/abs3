@@ -1,0 +1,231 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = "Макети Юридичних Осіб";
+}
+
+<script src="~/Scripts/respond.min.js"></script>
+<script src="~/Areas/DynamicLayoutLegalEntities/Scripts/KendoCommon.js"></script>
+<script src="~/Areas/DynamicLayoutLegalEntities/Scripts/DynamicLayoutLegalEntities/calcStatic.js?v29.05.2017.20:00"></script>
+<script src="~/lib/jsZip/jszip.min.js"></script>
+
+<link rel="stylesheet" href="~/Areas/DynamicLayoutLegalEntities/Css/DynamicLayoutLegalEntities/Main.css" />
+<link rel="stylesheet" href="~/Areas/DynamicLayoutLegalEntities/Css/DynamicLayoutLegalEntities/staticLayout.css" />
+
+
+@*<link rel="stylesheet" href="https://kendo.cdn.telerik.com/2017.2.504/styles/kendo.common-material.min.css" />
+    <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2017.2.504/styles/kendo.material.min.css" />
+    <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2017.2.504/styles/kendo.material.mobile.min.css" />*@
+
+
+<meta charset="utf-8" />
+
+<div class="page-header">
+    <h1 id="title"></h1>
+</div>
+
+<div id="allControls">
+    <div class="row">
+        <div class="btn-group">
+            <button id="btCalc" type="button" class="btn btn-primary" title="Розрахувати"><img src="/common/images/default/16/gear_ok.png" /> Розрахувати</button>
+            <button id="btPay" type="button" class="btn btn-primary" title="Сплатити" disabled><img src="/common/images/default/16/money_calc.png" /> Сплатити</button>
+            <button id="btPaySelected" type="button" class="btn btn-primary" title="Сплатити обраний рядок" disabled><img src="/common/images/default/16/money_calc.png" /> Сплатити обраний рядок</button>
+            <button id="btOpenDocument" type="button" class="btn btn-primary" title="Преглянути документ" disabled><img src="/common/images/default/16/document_view.png" /> Преглянути</button>
+            <button id="btNew" type="button" class="btn btn-primary" title="Створити новий розподіл"><img src="/common/images/default/16/new.png" /> Створити новий</button>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="inline-div">
+            <input id="dk1_rb" type="radio" name="dkRb" value="1" />
+            <label for="dk1_rb"> ДТ рах/DK=1,3</label>
+
+            <input id="dk2_rb" type="radio" name="dkRb" value="0" />
+            <label for="dk2_rb"> КТ рах/DK=0,2</label>
+        </div>
+
+        <div class="inline-div">
+            <Label title="Загальна сума розподілу" for="tbTotalSum">Сума </Label>
+            <input id="tbTotalSum" style="background-color:lightgreen;" onchange="this.value = this.value == '' ? 0 : this.value;">
+        </div>
+        <div class="inline-div">
+            <Label for="tbRef">РЕФ </Label>
+            <input id="tbRef" disabled style="background-color:lightgreen;">
+        </div>
+        <div class="inline-div">
+            <Label for="tbTypedPercents">Набрано % </Label>
+            <input id="tbTypedPercents" disabled style="width:85px;">
+        </div>
+        <div class="inline-div">
+            <Label for="tbTypedSum">Набрано суму </Label>
+            <input id="tbTypedSum" disabled>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="inline-div">
+            <input type="checkbox" id="cbInfo">
+            <label for="cbInfo">Інформаційно </label>
+        </div>
+
+        <div class="inline-div">
+            <input type="text" class="k-textbox" id="tbNlsA" disabled title="№ рахунку А" style="background-color:lightyellow;">
+        </div>
+
+        <div class="inline-div">
+            <Label for="tbOstC">Факт.Зал.на Рах-А </Label>
+            <input id="tbOstC" title="Фактичний залишок на разунку А" disabled style="background-color:lightyellow;">
+        </div>
+
+        <div class="inline-div">
+            <Label for="tbKvA" title="Код валюти рахунку А">Код вал-А </Label>
+            <input type="text" class="k-textbox" disabled id="tbKvA" title="№ рахунку А" style="width:75px;">
+            @*select KV, NAME from TABVAL where d_close is null order by kv desc*@
+        </div>
+
+        <div class="inline-div">
+            <Label for="tbNlsAName">Назва Рах-А </Label>
+            <input type="text" class="k-textbox" id="tbNlsAName" title="Назва рахунку А" disabled style="background-color:lightyellow;width:250px;">
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="inline-div">
+            <label for="tbNazn">Призначення платежу </label>
+            <input type="text" class="k-textbox" id="tbNazn" title="Призначення платежу" style="width:800px;">
+        </div>
+    </div>
+
+    <div class="row" id="hereIsKendoDatepicers">
+        <div class="inline-div">
+            <Label for="tbNd" title="Номер документу(розпорядження)">№ док </Label>
+            <input type="text" class="k-textbox" id="tbNd">
+        </div>
+
+        <div class="inline-div">
+            <Label for="diDatD">Дата док </Label>
+            <input id="diDatD" title="Дата документу(розпорядження)">
+        </div>
+
+        <div class="inline-div">
+            <Label for="diDateFrom">З </Label>
+            <input id="diDateFrom" title="Дата 'З'">
+        </div>
+
+        <div class="inline-div">
+            <Label for="diDateTo">По </Label>
+            <input id="diDateTo" title="Дата 'По'">
+        </div>
+
+        <div class="inline-div">
+            <input type="checkbox" id="cbDatesToNazn">
+            <label for="cbDatesToNazn">+ Дати в призн.пл.</label>
+        </div>
+    </div>
+</div>
+
+<div id="_gridMain"></div>
+<div class="search-main"></div>
+
+<script id="popup_editor" type="text/x-kendo-template">
+    # var _mfob = checkValForEdit(data.MFOB, ''); #
+    # var _nlsB = checkValForEdit(data.NLS_B, ''); #
+    # var _namB = checkValForEdit(data.NAMB, ''); #
+    # var _okpoB = checkValForEdit(data.OKPOB, ''); #
+
+    # var _percent = checkValForEdit(data.PERCENT, 0); #
+    # if (_percent > 100) _percent = 100; #
+
+    # var _delta = checkValForEdit(data.DELTA, 0); #
+    # var _nazn = checkValForEdit(data.NAZN, ''); #
+    # var _summA = checkValForEdit(data.SUMM_A, 0); #
+    # if (_summA < 0) _summA = 0; #
+    # var _tt = checkValForEdit(data.TT, ''); #
+    # var _ord = checkValForEdit(data.ORD, 0); #
+    # var _vob = checkValForEdit(data.VOB, 0); #
+    # var _kv = checkValForEdit(data.KV, ''); #
+    # var _nlsA = checkValForEdit(data.NLS_A, ''); #
+
+    # var _firstRowClass = data.isA ? 'invisible-row' : 'row'; #
+
+    <div class="#=_firstRowClass#">
+        <div class="col-md-3" style="margin:3px;">
+            <label class="k-label" for="kv_editor">Валюта А</label><br />
+            <input type="text" class="k-textbox" value="#=_kv#" name="kv_editor" id="kv_editor" tabindex="1">
+        </div>
+
+        <div class="col-md-3" style="margin:3px;">
+            <label class="k-label" for="nls_a_editor">№ рахунку А</label><br />
+            <input type="text" class="k-textbox" value="#=_nlsA#" name="nls_a_editor" id="nls_a_editor" maxlength="14" tabindex="2">
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-3" style="margin:3px;">
+            <label class="k-label" for="mfob_editor">Код МФО-Б</label><br />
+            <input type="text" class="k-textbox" value="#=_mfob#" name="mfob_editor" id="mfob_editor" maxlength="6" tabindex="3">
+        </div>
+
+        <div class="col-md-3" style="margin:3px;">
+            <label class="k-label" for="nls_b_editor">Рах.Б в МФО-Б</label><br />
+            <input type="text" class="k-textbox" value="#=_nlsB#" name="nls_b_editor" id="nls_b_editor" maxlength="14" tabindex="4">
+        </div>
+
+        <div class="col-md-3" style="margin:3px;">
+            <label class="k-label" for="namb_editor">Назва отримувача</label><br />
+            <input type="text" class="k-textbox" value="#=_namB#" name="namb_editor" id="namb_editor" maxlength="38" tabindex="5">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3" style="margin:3px;">
+            <label class="k-label" for="okpob_editor">Ід Код-Б</label><br />
+            <input type="text" class="k-textbox" value="#=_okpoB#" name="okpob_editor" id="okpob_editor" maxlength="14" tabindex="6">
+        </div>
+
+        <div class="col-md-3" style="margin:3px;">
+            <label class="k-label" for="percent_editor">% від заг. суми</label><br />
+            <input value="#=_percent#" name="percent_editor" id="percent_editor" tabindex="7">
+        </div>
+
+        <div class="col-md-3" style="margin:3px;">
+            <label class="k-label" for="delta_editor">+ або - Константа</label><br />
+            <input value="#=_delta#" name="delta_editor" id="delta_editor" tabindex="8">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-10" style="margin:3px;">
+            <label class="k-label" for="nazn_editor">Особливе признач. платежу</label>
+            <input type="text" class="k-textbox" value="#=_nazn#" name="nazn_editor" id="nazn_editor" maxlength="160" style="width:100%;" tabindex="9">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3" style="margin:3px;">
+            <label class="k-label" for="vob_editor">Вид док</label><br />
+            <input value="#=_vob#" name="vob_editor" id="vob_editor" tabindex="10">
+        </div>
+
+        <div class="col-md-3" style="margin:3px;">
+            <label class="k-label" for="tt_editor">Код операції</label><br />
+            <input type="text" class="k-textbox" value="#=_tt#" name="tt_editor" id="tt_editor" maxlength="3" tabindex="11">
+        </div>
+
+        <div class="col-md-3" style="margin:3px;">
+            <label class="k-label" for="ord_editor">№ пп</label><br />
+            <input value="#=_ord#" name="ord_editor" id="ord_editor" tabindex="12">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3" style="margin:3px;">
+            <label class="k-label" for="summ_a_editor">Сума проводки</label><br />
+            <input value="#=_summA#" name="summ_a_editor" id="summ_a_editor" tabindex="13">
+        </div>
+        <div class="col-md-6" style="margin:3px;">
+            <label id="helpMsg"><br />Коли введено загальну суму розподілу, редагування сум вручну заборонено.</label>
+        </div>
+    </div>
+
+    <div class="k-edit-buttons k-state-default">
+        <a id="btnCancel" class="k-button k-button-icontext k-grid-cancel" style="float:right;margin:7px 5px 7px 5px;" tabindex="15"><span class="k-icon k-cancel"></span>Скасувати</a>
+        <a id="btnSave" class="k-button k-button-icontext k-primary k-grid-update" style="float:right;margin:7px 5px 7px 5px;" tabindex="14"><span class="k-icon k-update"></span> #=data.saveBtnText#</a>
+        <a id="btnClearSums" class="k-button" style="float:right;margin:7px 5px 7px 5px;" tabindex="16">Очистити суми</a>
+    </div>
+</script>
