@@ -82,6 +82,7 @@ namespace cim
             Fields.Add(new BbField("DIRECT_NAME", OracleDbType.Varchar2, true, false, false, false, false, "V_CIM_OUT_UNBOUND_PAYMENTS", ObjectTypes.View, "Нерозібрані вихідні (імпортні) платежі", ""));
             Fields.Add(new BbField("TT", OracleDbType.Char, true, false, false, false, false, "V_CIM_OUT_UNBOUND_PAYMENTS", ObjectTypes.View, "Нерозібрані вихідні (імпортні) платежі", "Код операції"));
             Fields.Add(new BbField("BACKGROUND_COLOR", OracleDbType.Decimal, true, false, false, false, false, "V_CIM_OUT_UNBOUND_PAYMENTS", ObjectTypes.View, "Нерозібрані вихідні (імпортні) платежі", "Колір фону (1 - жовтий, 0 - колір по замовчуванню)"));
+            Fields.Add(new BbField("ATTACHMENTS_COUNT", OracleDbType.Decimal, true, false, false, false, false, "V_CIM_OUT_UNBOUND_PAYMENTS", ObjectTypes.View, "Нерозібрані вихідні (імпортні) платежі", "Клієнт надав супровідні док. в CORP"));
         }
         public Decimal? REF { get { return (Decimal?)FindField("REF").Value; } set { SetField("REF", value); } }
         public Decimal? CUST_RNK { get { return (Decimal?)FindField("CUST_RNK").Value; } set { SetField("CUST_RNK", value); } }

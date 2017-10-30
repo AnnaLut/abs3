@@ -368,38 +368,50 @@ public partial class DepositAgreement2 : Bars.BarsPage
         }
         // текущие ДУ
         sdsCA.ConnectionString = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnectionString();
-        sdsCA.SelectCommand = @"select v.agrmnt_num as adds,
-                                       v.agrmnt_date as version,
-                                       v.agrmnt_type as agr_id,
-                                       v.agrmnt_typename as agr_name,
-                                       v.template_id as template,
-                                       v.trustee_id as rnk_tr,
-                                       v.trustee_name as nmk,
-                                       v.comments as comm,
-                                       1 as txt, -- !!! доделать на просмотр документов ЕА
-                                       v.agrmnt_id as agr_uid,
-                                       v.fl_activity as status,
-                                       V.DPT_ID AS dpt_id,
-                                       EBP.GET_TEMPLATE(V.DPT_ID,V.agrmnt_type,1) AS template_id,
-                                       (CASE
-                                            WHEN V.agrmnt_type = 7 THEN 222
-                                            WHEN V.agrmnt_type = 8 THEN 223
-                                            WHEN V.agrmnt_type = 9 THEN 226
+        sdsCA.SelectCommand = @"SELECT v.agrmnt_num AS adds,
+                                    v.agrmnt_date AS version,
+                                    v.agrmnt_type AS agr_id,
+                                    v.agrmnt_typename AS agr_name,
+                                    v.template_id AS template,
+                                    v.trustee_id AS rnk_tr,
+                                    v.trustee_name AS nmk,
+                                    v.comments AS comm,
+                                    1 AS txt,                   -- !!! доделать на просмотр документов ЕА
+                                    v.agrmnt_id AS agr_uid,
+                                    v.fl_activity AS status,
+                                    V.DPT_ID AS dpt_id,
+                                    EBP.GET_TEMPLATE (V.DPT_ID, V.agrmnt_type, 1) AS template_id,
+                                    (CASE
+                                        WHEN v.wb = 'Y'
+                                        THEN
+                                        CASE
+                                            WHEN V.agrmnt_type IN (17, 40) THEN 612
+                                            WHEN V.agrmnt_type IN (11, 39) THEN 613
+                                            WHEN V.agrmnt_type = 38        THEN 611
+                                            ELSE 61
+                                        END
+                                        WHEN v.wb = 'N'
+                                        THEN
+                                        CASE
+                                            WHEN V.agrmnt_type = 17 THEN 220
+                                            WHEN V.agrmnt_type = 7  THEN 222
+                                            WHEN V.agrmnt_type = 8  THEN 223
+                                            WHEN V.agrmnt_type = 9  THEN 226
                                             WHEN V.agrmnt_type = 12 THEN 222
                                             WHEN V.agrmnt_type = 13 THEN 225
                                             WHEN V.agrmnt_type = 18 THEN 211
-                                            WHEN V.agrmnt_type = 38 THEN 611
-                                            WHEN V.agrmnt_type = 39 THEN 612
-                                            WHEN V.agrmnt_type = 40 THEN 613
-                                            ELSE case when v.wb = 'N' then 213 end
-                                       END)  AS eastructID,
-                                       V.OWNER_ID  as rnk 
-                                  from v_dpt_agreements v, cc_docs c
-                                 where v.dpt_id = :p_dpt_id
-                                   and c.id(+) = v.template_id
-                                   and c.nd(+) = v.dpt_id
-                                   and c.adds(+) = v.agrmnt_num
-                                 order by adds";
+                                            WHEN V.agrmnt_type = 11 THEN 219
+                                            ELSE 213
+                                        END
+                                    END)
+                                    AS eastructID,
+                                    V.OWNER_ID AS rnk
+                            FROM v_dpt_agreements v, cc_docs c
+                            WHERE     v.dpt_id = :p_dpt_id
+                                    AND c.id(+) = v.template_id
+                                    AND c.nd(+) = v.dpt_id
+                                    AND c.adds(+) = v.agrmnt_num
+                        ORDER BY adds";
         sdsCA.SelectParameters.Clear();
         sdsCA.SelectParameters.Add("p_dpt_id", DbType.Decimal, Convert.ToString(dpt_id));
     }

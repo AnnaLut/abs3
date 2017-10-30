@@ -565,7 +565,7 @@
                                                                                 <asp:Label ID="OKPOTitle" runat="server" Text="Ідент. код / Код за ЕДРПОУ: "></asp:Label>
                                                                             </td>
                                                                             <td>
-                                                                                <bars:TextBoxString ID="OKPO" runat="server" MaxLength="10" IsRequired="true" ValidationGroup="Params"
+                                                                                <bars:TextBoxString ID="OKPO" runat="server" MaxLength="14" IsRequired="true" ValidationGroup="Params"
                                                                                     Value='<%# Bind("OKPO") %>' />
                                                                             </td>
                                                                         </tr>

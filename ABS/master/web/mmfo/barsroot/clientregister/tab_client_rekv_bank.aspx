@@ -5,8 +5,8 @@
 		<title>Реквизиты клиента "Банк"</title>
 		<LINK href="DefaultStyleSheet.css" type="text/css" rel="stylesheet">
 		<script language="javascript" src="/Common/Script/Localization.js"></script>
-		<script language="javascript" src="additionalFuncs.js"></script>
-		<script language="javascript" src="JScriptFortab_client_rekv_bank.js"></script>
+		<script language="javascript" src="additionalFuncs.js?v1.0.1"></script>
+		<script language="javascript" src="JScriptFortab_client_rekv_bank.js?v1.0.2"></script>
 	</HEAD>
 	<body onload="InitObjects()">
 			<div id="main">
@@ -22,7 +22,7 @@
 					</TR>
 					<TR>
 						<TD runat="server" meta:resourcekey="tdTop">Рейтинг банка</TD>
-						<TD><INPUT class="tab_main_rekv_ed_style" id="ed_RATING" tabIndex="1" type="text" maxLength="1" onchange="ToDoOnChange();"></TD>
+						<TD><INPUT class="tab_main_rekv_ed_style" id="ed_RATING" tabIndex="1" type="text" maxLength="5" onchange="ToDoOnChange();"></TD>
 					</TR>
 					<TR>
 						<TD runat="server" meta:resourcekey="tdMFO">Код банка - МФО</TD>

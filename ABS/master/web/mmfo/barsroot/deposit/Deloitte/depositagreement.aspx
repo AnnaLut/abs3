@@ -304,6 +304,7 @@
                                 <td>
                                     <uc:EADoc ID="EADDocPrint" runat="server" Enabled='<%# (Convert.ToInt16(Eval("EASTRUCTID")) < 600) %>'
                                         CausesValidation="true" ValidationGroup="Params"
+                                        TitleText =" "
                                         AgrID = '<%# Convert.ToDecimal(Eval("DPT_ID")) %>'  
                                         EAStructID='<%# Convert.ToInt32(Eval("EASTRUCTID")) %>' 
                                         TemplateID ='<%# (String)Eval("TEMPLATE_ID") %>' 
