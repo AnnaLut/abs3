@@ -1,80 +1,81 @@
 create or replace procedure rebranch
-( p_oldbranch in branch.branch%type,
-  p_newbranch in branch.branch%type
+( p_oldbranch in branch.branch%type
+, p_newbranch in branch.branch%type
 ) is
-    ----------------------------------------------------------------------------
-    --
-    -- REBRANCH - выполняет миграцию данных из старого бранча в новый
-    --
-    -- version 1.11    17.02.2016
-    --
-    --
-    -- ВАЖНО! Предполагается, что оба бранча уже заведены в таблице BRANCH 
-    --
-    -- ВАЖНО! Выполнять миграцию можно только в нерабочее время, т.к. блокируется большое кол-во таблиц 
-    --
-    -- ВАЖНО! SEC_AUDIT не трогаем! 
-    --
-    ----------------------------------------------------------------------------
-    -- маска формата для преобразования char <--> number
-    g_number_format     constant varchar2(128) := 'FM999999999999999999999999999990.0999999999999999999999999999999';
-    -- маска формата для преобразования char <--> number
-    g_integer_format    constant varchar2(128) := 'FM999999999999999999999999999990';
-    -- параметры преобразования char <--> number
-    g_number_nlsparam   constant varchar2(30)  := 'NLS_NUMERIC_CHARACTERS = ''. ''';
-    -- маска формата для преобразования char <--> date
-    g_date_format       constant varchar2(30)  := 'DD.MM.YYYY HH24:MI:SS';
-    -- максимальный размер строки, которую может прочесть SQL*Plus 
-    g_max_line_size 	  constant number := 2450;
-    --
-    l_script          clob;
-    l_table           varchar2(30);
-    l_refsync         varchar2(30);       
-    l_temp            varchar2(32767);
-    l_temp2           varchar2(32767);
-    l_stmt            varchar2(32767);
-    l_table_fields    varchar2(32767);
-    l_pk_fields       varchar2(32767);
-    l_cursor          integer;
-    l_d               integer;
-    l_rectab          dbms_sql.desc_tab3;
-    l_colcnt          number;
-    l_prefix          varchar2(32767);
-    l_suffix          varchar2(32767);
-    --                
-    l_number          number;
-    l_date            date;
-    l_varchar2        varchar2(32767);
-    l_len			        number;
-    l_total_len	      number;
-    --
-    l_oldbranch_info  branch%rowtype;
-    l_newbranch_info  branch%rowtype;
-    l_newbranch_inuse boolean;
-    --
-    l_tablist         dbms_utility.uncl_array;
-	
- -- l_tablist_fk      dbms_utility.uncl_array; -- таблиці з форенкей на поле бранч
-    type t_tablist_fk is table of user_constraints%rowtype index by binary_integer;
-    l_tablist_fk      t_tablist_fk;
-    
-	  l_columnlist      dbms_utility.uncl_array;
-    l_msglist         dbms_utility.lname_array;
-    --
-    is_cons_deferred  boolean := false;
-    l_tablen          binary_integer;
-    l_rows_updated    number;
-    l_start_time      date;
-    l_finish_time     date;
-    l_delta_time      number;
-    l_num             number;
+  ----------------------------------------------------------------------------
+  --
+  -- REBRANCH - выполняет миграцию данных из старого бранча в новый
+  --
+  -- version 1.12    26.10.2017
+  --
+  --
+  -- ВАЖНО! Предполагается, что оба бранча уже заведены в таблице BRANCH 
+  --
+  -- ВАЖНО! Выполнять миграцию можно только в нерабочее время, т.к. блокируется большое кол-во таблиц 
+  --
+  -- ВАЖНО! SEC_AUDIT не трогаем! 
+  --
+  ----------------------------------------------------------------------------
+  -- маска формата для преобразования char <--> number
+  g_number_format     constant varchar2(128) := 'FM999999999999999999999999999990.0999999999999999999999999999999';
+  -- маска формата для преобразования char <--> number
+  g_integer_format    constant varchar2(128) := 'FM999999999999999999999999999990';
+  -- параметры преобразования char <--> number
+  g_number_nlsparam   constant varchar2(30)  := 'NLS_NUMERIC_CHARACTERS = ''. ''';
+  -- маска формата для преобразования char <--> date
+  g_date_format       constant varchar2(30)  := 'DD.MM.YYYY HH24:MI:SS';
+  -- максимальный размер строки, которую может прочесть SQL*Plus 
+  g_max_line_size 	  constant number := 2450;
+  --
+  l_script          clob;
+  l_table           varchar2(30);
+  l_refsync         varchar2(30);
+  l_temp            varchar2(32767);
+  l_temp2           varchar2(32767);
+  l_stmt            varchar2(32767);
+  l_table_fields    varchar2(32767);
+  l_pk_fields       varchar2(32767);
+  l_cursor          integer;
+  l_d               integer;
+  l_rectab          dbms_sql.desc_tab3;
+  l_colcnt          number;
+  l_prefix          varchar2(32767);
+  l_suffix          varchar2(32767);
+  --                
+  l_number          number;
+  l_date            date;
+  l_varchar2        varchar2(32767);
+  l_len			        number;
+  l_total_len	      number;
+  --
+  l_oldbranch_info  branch%rowtype;
+  l_newbranch_info  branch%rowtype;
+  l_newbranch_inuse boolean;
+  --
+  l_tablist         dbms_utility.uncl_array;
+  
+  -- таблиці з форенкей на поле бранч
+  type t_tablist_fk is table of user_constraints%rowtype index by binary_integer;
+  l_tablist_fk      t_tablist_fk;
+  
+  l_columnlist      dbms_utility.uncl_array;
+  l_msglist         dbms_utility.lname_array;
+  --
+  is_cons_deferred  boolean := false;
+  l_tablen          binary_integer;
+  l_rows_updated    number;
+  l_start_time      date;
+  l_finish_time     date;
+  l_delta_time      number;
+  l_num             number;
 
-----
--- pre_job - выполняет предварительную работу
--- (отключение триггеров, констрейнтов и перевод проверки констрейнтов в отложенный режим)
---
-procedure pre_job is
-begin
+  ----
+  -- pre_job - выполняет предварительную работу
+  -- (отключение триггеров, констрейнтов и перевод проверки констрейнтов в отложенный режим)
+  --
+  procedure PRE_JOB
+  is
+  begin
     -- фиксируем время начала ребранчинга
     l_start_time := sysdate;
     l_temp := 'Время начала: '||to_char(l_start_time, 'DD.MM.YYYY HH24:MI:SS');
@@ -92,28 +93,28 @@ begin
     -- execute immediate l_temp;
     -- l_msglist(l_msglist.last+1) := l_temp;
     -- dbms_output.put_line(l_temp);
-	
-	  -- выключаем тригер TU_DPTFILEROW
+
+    -- выключаем тригер TU_DPTFILEROW
     l_temp := 'alter trigger TU_DPTFILEROW disable';
     execute immediate l_temp;
     l_msglist(l_msglist.last+1) := l_temp;
     dbms_output.put_line(l_temp);
-    
-	  -- отключаем контроль branch=tobo на oper, т.к. валится ORA-600
+
+    -- отключаем контроль branch=tobo на oper, т.к. валится ORA-600
 /*    l_temp := 'alter table oper disable constraint cc_oper_branch_tobo_cc';
     execute immediate l_temp;
     l_msglist(l_msglist.last+1) := l_temp;
     dbms_output.put_line(l_temp);
-*/    
-    -- Отключаем политики на таблицы    
+*/
+    -- Отключаем политики на таблицы
     l_temp := 'Отключаем политики на таблицы:';
-    l_msglist(l_msglist.last+1) := l_temp;    
+    l_msglist(l_msglist.last+1) := l_temp;
     dbms_output.put_line(l_temp);
-    for i in l_tablist.first..l_tablist.last 
-    loop        
-      bpa.disable_policies(l_tablist(i));                
+    for i in l_tablist.first..l_tablist.last
+    loop
+      BPA.DISABLE_POLICIES( l_tablist(i) );
     end loop;
-    
+
     -- Отключаем констреінт на таблицы  CIG  
     select c.* 
       bulk collect 
@@ -125,7 +126,7 @@ begin
        and r_constraint_name!='PK_BRANCH' 
        and c.table_name like 'CIG%'
      order by c.table_name;
-	
+
     l_temp := 'Отключаем констреінт на таблицы: CIG';
     l_msglist(l_msglist.last+1) := l_temp;    
     dbms_output.put_line(l_temp);
@@ -150,19 +151,19 @@ begin
     -- входим внутрь МФО
     bc.subst_mfo(bc.extract_mfo(p_oldbranch));
     --
-end pre_job;
+  end pre_job;
 
-function get_elapsed_time
-( p_delta_time  in   number
-) return varchar
-is
-  l_elapsed  varchar2(100);
-begin
-  l_elapsed := trunc(mod(p_delta_time * 24, 24)) ||' год, ' ||
-               trunc(mod(p_delta_time * 24 * 60, 60)) ||' хв, ' ||
-               round(mod(p_delta_time * 24 * 60 * 60, 60)) || ' с';
-  return l_elapsed;
-end get_elapsed_time;
+  function get_elapsed_time
+  ( p_delta_time  in   number
+  ) return varchar
+  is
+    l_elapsed  varchar2(100);
+  begin
+    l_elapsed := trunc(mod(p_delta_time * 24, 24)) ||' год, ' ||
+                 trunc(mod(p_delta_time * 24 * 60, 60)) ||' хв, ' ||
+                 round(mod(p_delta_time * 24 * 60 * 60, 60)) || ' с';
+    return l_elapsed;
+  end get_elapsed_time;
 
 ---
 -- 
@@ -250,7 +251,8 @@ end p_upd_table;
 -- включаем все триггера, ограничения целостности переводим  врежим немедленной проверки 
 -- и т.п.
 --
-procedure post_job is
+procedure POST_JOB
+is
 begin
     -- восстанавливаем контекст
     bc.set_context;
@@ -335,7 +337,6 @@ begin
     dbms_application_info.set_client_info('');
     
 end post_job;
---    
 
 ----
 -- check_global_name - проверка глобального имени базы в таблице DDBS
@@ -442,11 +443,11 @@ begin
     begin
       select 1
         into l_num
-        from branch_parameters
-       where branch = p_newbranch
+        from BRANCH_PARAMETERS
+       where BRANCH = p_newbranch
          and rownum = 1;
       l_newbranch_inuse := true;
-      l_temp := 'Новый бранч '||p_newbranch||' уже используется.';                  
+      l_temp := 'Новый бранч '||p_newbranch||' уже используется.';
       l_msglist(l_msglist.last+1) := l_temp;
       dbms_output.put_line(l_temp); dbms_output.new_line;
       l_temp := 'Данные некоторых таблиц переноситься не будут во избежание задвоения.';
@@ -477,9 +478,10 @@ begin
                                  'ACCOUNTS', 'ACCOUNTS_UPDATE', 'CUSTOMER', 'CUSTOMER_UPDATE',
                                  'CC_DEAL_UPDATE','DPT_DEPOSIT_CLOS','DPU_DEAL_UPDATE',
                                  'DPT_FILE_SUBST','DPT_FILE_AGENCY','DPT_FILE_ROW','DPT_FILE_HEADER',
-                                 'DPT_FILE_ROW_ACCUM','DPT_POAS', 'DPT_POA_BRANCHES',
-                                 'CUR_RATES$BASE','BRANCH_PARAMETERS','PROC_DR$BASE', 'KAS_S', 'WCS_SUBPRODUCT_MACS',
-                                 'CASH_BRANCH_LIMIT','CASH_OPEN','CASH_SNAPSHOT' ) 
+                                 'DPT_FILE_ROW_ACCUM', 'DPT_POAS', 'DPT_POA_BRANCHES',
+                                 'CUR_RATES$BASE', 'BRANCH_PARAMETERS', 'BRANCH_ATTRIBUTE_VALUE', 'PROC_DR$BASE', 'KAS_S'
+                               , 'WCS_SUBPRODUCT_MACS', 'WCS_USER_RESPOSIBILITY'
+                               , 'CASH_BRANCH_LIMIT', 'CASH_OPEN', 'CASH_SNAPSHOT' )
        order by table_name;
     else
       select unique table_name 
@@ -487,14 +489,14 @@ begin
         into l_tablist 
         from user_constraints 
        where constraint_type='R' 
-         and r_constraint_name='PK_BRANCH' 
+         and r_constraint_name='PK_BRANCH'
          and table_name not in ( 'SEC_AUDIT', 'STAFF$BASE', 'OPER', 'ASVO_DPTCONSACC',
                                  'ACCOUNTS', 'ACCOUNTS_UPDATE', 'CUSTOMER', 'CUSTOMER_UPDATE',
                                  'CC_DEAL_UPDATE','DPT_DEPOSIT_CLOS','DPU_DEAL_UPDATE',
                                  'DPT_FILE_SUBST' )
        order by table_name;
     end if;
-		
+
     -- выполняем предварительную работу
     -- (отключение триггеров, констрейнтов и перевод проверки констрейнтов в отложенный режим)
     pre_job();

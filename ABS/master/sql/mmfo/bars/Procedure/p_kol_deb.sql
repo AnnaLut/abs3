@@ -1,10 +1,14 @@
 CREATE OR REPLACE PROCEDURE p_kol_deb(p_dat01 date, p_mode integer, p_deb integer) IS 
 
-/* Версия 7.0 04-08-2017  11-07-2017   26-04-2017  09-03-2017   15-02-2017  24-01-2017   05-10-2016
+/* Версия 7.4  25-10-2017  25-09-2017  18-09-2017  04-08-2017  11-07-2017   26-04-2017  09-03-2017   15-02-2017  24-01-2017   05-10-2016
    Визначення Кількості днів прострочки та фін. стану по дебіторці
    p_deb = 0 - Звичайна дебіторка 
            1 - Нова хоз.дебіторка 
    ------------------------------------
+12) 25-10-2017(7.4) - Хоз.дебиторка из архива XOZ_REF ==> XOZ_REF_ARC
+11) 17-10-2017(7.3) - При поиске других активов исключила сам счет 
+10) 25-09-2017(7.2) - В ND_VAL запись по ND, а не по ACC (в связи с хоз.дебиторкой)
+ 9) 18-09-2017 - S180 в ND_VAL
  8) 04-08-2017 - Убрала LOGGER
  7) 14-07-2017 - Хоз.дебиторка из модуля
  6) 26-04-2017 - По ЦБ уточнение условия (d.active=1 or d.active = -1 and d.dazs >= p_dat01)
@@ -37,7 +41,10 @@ begin
       END;
    end if;
    l_xoz_new := nvl(F_Get_Params('XOZ_NEW', 0) ,0);
-   if p_deb = 1 and l_xoz_new = 0 THEN RETURN; end if;
+   if p_deb = 1 and l_xoz_new = 0 THEN 
+      z23.to_log_rez (user_id , 351 , p_dat01 ,'Конец Кол-во дней прострочки (дебиторка) 351 - l_xoz_new = 0' || l_time || ' мин.');
+      RETURN; 
+   end if;
    if p_deb = 0 THEN l_tx := ' (фін.+госп.звичайна) ';
    else              l_tx := ' (госп.з модуля) ';
    end if;
@@ -68,7 +75,7 @@ begin
       begin
          for k in ( select * from   (select  a.*, x.acc1, x.s --count(*)  count_Err
                                      from (select acc, OST_KORR(acc, l_dat31, null,nbs) OST, nls, kv  from accounts where  tip in ('XOZ','W4X')) a,
-                                          (select acc acc1, -sum(s0) S ,null nls1, null kv1  from xoz_ref  where   ( ref2 is null  OR  datz > l_dat31)  group by acc ) x
+                                          (select acc acc1, -sum(s0) S ,null nls1, null kv1  from xoz_ref_arc  where mdat = p_dat01 and  ( ref2 is null  OR  datz > l_dat31)  group by acc ) x
                                     where a.acc = x.acc1 (+) and a.OST < 0 and a.ost <> nvl(x.S,0) order by a.acc    )
                    where acc1 is null )
          loop
@@ -90,9 +97,10 @@ begin
       else 
          OPEN c0 FOR
             select 21 tip, decode(c.custtype,3,3,2) custtype, c.custtype cus, a.nbs, a.nls, a.kv, a.acc, a.rnk, a.branch,-ost_korr(a.acc,l_dat31,null,a.nbs) bv, 3 deb, 
-                   nvl(x.mdate,xoz_mdate(a.acc,x.fdat, a.nbs, a.ob22, a.MDATE )) mdate, x.id nd 
-            from   xoz_ref x, accounts a, customer c, rez_deb d 
-            where  a.nbs = d.nbs and d.deb in (2) and d.deb is not null and x.fdat < p_dat01 and (datz >= p_dat01 or datz is null) and s0<>0 and s<>0 and x.acc=a.acc  
+                   x.fdat mdate,  --nvl(x.mdate,xoz_mdate(a.acc,x.fdat, a.nbs, a.ob22, a.MDATE )) mdate, 
+                   x.id nd 
+            from   xoz_ref_arc x, accounts a, customer c, rez_deb d 
+            where  mdat = p_dat01 and a.nbs = d.nbs and d.deb in (2) and d.deb is not null and x.fdat < p_dat01 and (datz >= p_dat01 or datz is null) and s0<>0 and s<>0 and x.acc=a.acc  
                    and  ( a.tip in ('W4X', 'XOZ')  and  l_xoz_new = 1 ) and a.rnk=c.rnk;
       end if;       
       loop
@@ -110,7 +118,6 @@ begin
             if l_s180 in ('7','8','9','A','B','C','D','E','F','G','H') THEN
 
                if k.deb = 1 THEN     --nbs in ('3570','3578','3579') THEN Для всей фин. дебиторки > 3 месяцев
-      
                   -- Кредитный портфель  
                   begin
                      select d.* into cd from cc_deal d, nd_open n 
@@ -126,32 +133,32 @@ begin
                   EXCEPTION  WHEN NO_DATA_FOUND  THEN 
                      -- Новый процессинг
                      begin 
-                        select * into w4 from rez_w4_bpk where rnk = k.rnk and rownum = 1;               l_tip := 1; l_f := 60;
-                        if k.cus = 2 Then                                                                l_tip := 2; l_f := 56; end if;
+                        select * into w4 from rez_w4_bpk where rnk = k.rnk and acc<>k.acc and rownum = 1;    l_tip := 1; l_f := 60;
+                        if k.cus = 2 Then                                                                    l_tip := 2; l_f := 56; end if;
                         l_fin23 := w4.fin23;
                         l_nd    := w4.nd; 
                      EXCEPTION  WHEN NO_DATA_FOUND  THEN 
                         begin 
                            select d.* into ov from acc_over d , nd_acc n ,accounts a, nd_open o
                            where  n.acc  = a.acc   and n.nd = d.nd and a.rnk  = k.rnk and 
-                                  o.fdat = p_dat01 and d.nd = o.nd and rownum = 1;                       l_tip := 2; l_f := 56;         
-                           if    k.cus = 1   THEN                                                        l_tip := 1; l_f := 80; 
-                           elsif k.cus = 3   THEN                                                        l_tip := 1; l_f := 60; 
+                                  o.fdat = p_dat01 and d.nd = o.nd and a.acc <> k.acc and rownum = 1;        l_tip := 2; l_f := 56;         
+                           if    k.cus = 1   THEN                                                            l_tip := 1; l_f := 80; 
+                           elsif k.cus = 3   THEN                                                            l_tip := 1; l_f := 60; 
                            end if;
                            l_fin23 := w4.fin23;
                            l_nd    := ov.nd;
-                        EXCEPTION  WHEN NO_DATA_FOUND  THEN                                              l_tip := 0;
+                        EXCEPTION  WHEN NO_DATA_FOUND  THEN                                                  l_tip := 0;
                         end;
                      end;
                   end; 
                   if k.cus in (1,3) THEN l_tip_30 := 1;
                   else                   l_tip_30 := 2;
                   end if;
-               else                                                                                      l_tip := 0;
+               else                                                                                          l_tip := 0;
                end if;
             
             end if;
-
+            --logger.info('DEBF 17 1 : acc = ' || k.acc || ' k.rnk = '|| k.rnk || ' l_tip = '|| l_tip || ' l_tip_30 = '|| l_tip_30 || ' l_fin = '|| l_fin  || ' k.nd = '|| k.nd ) ;
             if k.custtype = 2 and k.deb = 1 THEN l_del := 50000;
             elsif                 k.deb = 1 THEN l_del := 25000;
             else                                 l_del := 0;
@@ -161,9 +168,9 @@ begin
             else               l_del_kv := p_ncurval(k.kv,l_del,l_dat31);
             end if;
             --logger.info('DEB_351 1 : acc = ' || k.acc  ) ;
-            if k.bv <= l_del_kv THEN l_kol := 0;
-            elsif k.deb = 3     THEN l_kol := greatest (nvl(p_dat01 - k.mdate,0) , 0);
-            else                     l_kol := f_days_past_due (p_dat01, k.acc, l_del_kv);
+            if k.bv <= l_del_kv and k.deb <> 3 THEN l_kol := 0;
+            elsif k.deb = 3                    THEN l_kol := greatest (nvl(p_dat01 - k.mdate,0) , 0);
+            else                                    l_kol := f_days_past_due (p_dat01, k.acc, l_del_kv);
             end if;
             --logger.info('DEB_351 2 : acc = ' || k.acc  ) ;
             --l_tip := 0;
@@ -175,9 +182,11 @@ begin
                if (l_fin is null or l_fin = 0) and k.cus = 2 THEN 
                    l_txt := 'Дебіторка.';
                    p_error_351( P_dat01, l_nd, user_id,15, k.acc, k.cus, k.kv, k.branch, l_txt, k.rnk, k.nls); 
-                   l_fin := l_fin23;
+                   if k.nd <> l_nd THEN l_fin := 10;
+                   else                 l_fin := l_fin23;
+                   end if;
                end if;
-               l_fin := nvl(l_fin,f_fin23_fin351(l_fin23,l_kol));
+               l_fin := nvl(l_fin,5);
             end if;
             if l_fin is null or l_fin = 0 THEN l_fin := l_fin23;  End if;
             if k.nbs in ('2805','2806') THEN 
@@ -191,6 +200,7 @@ begin
             end if; 
             if l_tip = 99 THEN l_tip := 2; end if;
             l_tip  := nvl(l_tip_30,l_tip);
+            --logger.info('DEBF 17 2 : acc = ' || k.acc || ' k.rnk = '|| k.rnk || ' l_tip = '|| l_tip || ' l_tip_30 = '|| l_tip_30 || ' l_fin = '|| l_fin  || ' k.nd = '|| k.nd ) ;
             if sys_context('bars_context','user_mfo') = '324805' and k.deb = 1 THEN -- COBUSUPABS-5846 (Крым)
                if    l_tip = 1 THEN l_fin :=  5;
                elsif l_tip = 2 THEN l_fin := 10;
@@ -198,14 +208,16 @@ begin
                end if;
             end if;
             l_s080 := f_get_s080(p_dat01, l_tip, l_fin);
-            --logger.info('XOZ 5 : acc = ' || k.acc || ' k.rnk = '|| k.rnk || ' l_nd = '|| l_nd || ' k.tip = '|| k.tip || ' l_fin = '|| l_fin ) ;
-            p_get_nd_val(p_dat01, l_nd, k.tip, l_kol, k.rnk, l_tip, l_fin, l_s080);
+            --logger.info('DEBF 17 5 : acc = ' || k.acc || ' k.rnk = '|| k.rnk || ' l_tip = '|| l_tip || ' k.tip = '|| k.tip || ' l_fin = '|| l_fin  || ' k.nd = '|| k.nd ) ;
+            p_get_nd_val(p_dat01, k.nd, k.tip, l_kol, k.rnk, l_tip, l_fin, l_s080, l_s180);  --nd = k.acc в nd_val по дебиторке всегда  acc
             l_commit := l_commit + 1; 
             If l_commit >= 1000 then  commit;  l_commit:= 0 ; end if;
          end if; 
       END loop;
       l_time := round((sysdate - l_d1) * 24 * 60 , 2 ); 
-      z23.to_log_rez (user_id , 351 , p_dat01 ,'Конец Кол-во дней прострочки (дебиторка) 351 - ' || l_time || ' мин.');
+      if p_deb=1 THEN
+         z23.to_log_rez (user_id , 351 , p_dat01 ,'Конец Кол-во дней прострочки (дебиторка) 351 - ' || l_time || ' мин.');
+      end if;
    end;
 --   if p_mode = 0 THEN  p_nbu23_cr(p_dat01); end if;
 end;   

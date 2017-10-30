@@ -1,31 +1,17 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/dpt_web.sql =========*** Run *** ===
- PROMPT ===================================================================================== 
-
-create or replace package dpt_web is
+create or replace package DPT_WEB
+is
   --
   -- основной пакет процедур для работы модуля "Вклады населения-WEB"
   --
-  g_header_version  constant varchar2(64) := 'version 40.01 05.07.2017';
-  g_awk_header_defs constant varchar2(512) := '' ||
-                                              '  расширенный функционал: ' ||
-                                              chr(10) ||
-                                              '  - учет доп.соглашений' ||
-                                              chr(10) ||
-                                              '  - формирование запросов' ||
-                                              chr(10) ||
-                                              '  - выполнение автомат.заданий' ||
-                                              chr(10) ||
-                                              '  - учет техн.счетов' ||
-                                              chr(10) ||
-                                              '  - выплата наследникам' ||
-                                              chr(10) ||
-                                              '  - поддержка хранилища документов по договорам' ||
-                                              chr(10) ||
-                                              'EBP - обслуговування вкдадників згідно ЕБП (Ощадбанк)' ||
-                                              chr(10) ||
+  g_header_version  constant varchar2(32)  := 'version 40.01  05.07.2017';
+  g_awk_header_defs constant varchar2(512) := 'расширенный функционал: '                              || chr(10) ||
+                                              '  - учет доп.соглашений'                               || chr(10) ||
+                                              '  - формирование запросов'                             || chr(10) ||
+                                              '  - выполнение автомат.заданий'                        || chr(10) ||
+                                              '  - учет техн.счетов'                                  || chr(10) ||
+                                              '  - выплата наследникам'                               || chr(10) ||
+                                              '  - поддержка хранилища документов по договорам'       || chr(10) ||
+                                              'EBP - обслуговування вкдадників згідно ЕБП (Ощадбанк)' || chr(10) ||
                                               'SMS - віддправка SMS повідомлень';
 
   request_allowed    constant number(1) := 1;
@@ -1051,17 +1037,18 @@ create or replace package dpt_web is
 
 end dpt_web;
 /
-create or replace package body dpt_web is
-  g_body_version  constant varchar2(64) := 'version 48.054 11.09.2017';
-  g_awk_body_defs constant varchar2(512) := '' || 'Сбербанк' || chr(10) ||
-                                            'KF - мульти-МФО схема с доступом по филиалам' ||
-                                            chr(10) ||
-                                            'MULTIFUNC - расширенный функционал' ||
-                                            chr(10) ||
-                                            'HO - обслуживание вклада в выходные и праздничные дни' ||
-                                            chr(10) ||
-                                            'EBP - обслуговування вкдадників згідно ЕБП (Ощадбанк)' ||
-                                            chr(10) ||
+
+show errors;
+
+create or replace package body DPT_WEB
+is
+
+  g_body_version  constant varchar2(32)  := 'version 48.06  25.10.2017';
+  g_awk_body_defs constant varchar2(512) := 'Сбербанк' || chr(10) ||
+                                            'KF - мульти-МФО схема с доступом по филиалам' || chr(10) ||
+                                            'MULTIFUNC - расширенный функционал' || chr(10) ||
+                                            'HO - обслуживание вклада в выходные и праздничные дни' || chr(10) ||
+                                            'EBP - обслуговування вкдадників згідно ЕБП (Ощадбанк)' || chr(10) ||
                                             'SMS - віддправка SMS повідомлень';
 
   g_modcode            constant varchar2(3) := 'DPT';
@@ -2419,6 +2406,10 @@ create or replace package body dpt_web is
     l_ea_blob        blob := utl_raw.cast_to_raw(''); -- пустой BLOB для отправки в ЕА (идет не скан-документ, а сообщение о его необходимости)
     l_archdocid      number;
   begin
+    bars_audit.info('Дебаг помилки COBUMMFO-5060. Початок процедури створення депозиту - '||l_title ||chr(10)||
+                            'Вхідні дані: vidd = ' ||to_char(p_vidd) || ' rnk = ' || to_char(p_rnk)||
+                          ' wb = ' || to_char(p_wb));
+                          
     l_valid_mobphone := bars.verify_cellphone_byrnk(p_rnk);
     if (p_datbegin is null) then
       l_datbegin := gl.bdate;
@@ -2565,7 +2556,10 @@ create or replace package body dpt_web is
                        l_title,
                        to_char(l_termm),
                        to_char(l_termd));
-    
+      bars_audit.info('Дебаг помилки COBUMMFO-5060. Передача даних до dpt.p_open_vklad_ex: '||chr(10)||
+                            ' vidd = ' ||to_char(p_vidd) || ' rnk = ' || to_char(p_rnk)||
+                          ' wb = ' || to_char(p_wb));
+                          
       dpt.p_open_vklad_ex(p_vidd        => p_vidd,
                           p_rnk         => p_rnk,
                           p_nd          => p_nd,
@@ -2675,6 +2669,7 @@ create or replace package body dpt_web is
       end if;
     end if;
     cust_insider(p_rnk);
+    bars_audit.info('Дебаг помилки COBUMMFO-5060. Перевірка ознаки on-line: wb = ' || to_char(p_wb));
     if (p_wb = 'Y') then
       begin
         update dpt_deposit set wb = 'Y' where deposit_id = l_dpt;
@@ -5518,6 +5513,20 @@ create or replace package body dpt_web is
         bars_error.raise_nerror(g_modcode,
                                 'AGREEMENT_NOT_FOUND',
                                 to_char(p_agrid));
+      else
+        -- возобновление РП (COBUMMFO-4543)
+        for rec in (select sd.idd
+                      from dpt_agreements da, sto_det_agr a, sto_det sd
+                     where da.agrmnt_id = p_agrid
+                       and da.agrmnt_id = a.agr_id
+                       and a.idd = sd.idd
+                       and nvl(sd.status_id, 1) = -1)
+        
+         loop
+          sto_all.claim_idd(p_idd        => rec.idd,
+                            p_statusid   => 0,
+                            p_disclaimid => 0);
+        end loop;
       end if;
       bars_audit.trace('%s восстановлено доп.соглашение № %s',
                        l_title,
@@ -5854,6 +5863,23 @@ create or replace package body dpt_web is
       bars_error.raise_nerror(g_modcode,
                               'AGREEMENT_NOT_FOUND',
                               to_char(p_agr_id));
+    
+    else
+    
+      -- ШАГ 4 - сторнирование РП (COBUMMFO-4543)
+      for rec in (select sd.idd
+                    from dpt_agreements da, sto_det_agr a, sto_det sd
+                   where da.agrmnt_id = p_agr_id
+                     and da.agrmnt_id = a.agr_id
+                     and a.idd = sd.idd
+                     and nvl(sd.status_id, 1) <> -1)
+      
+       loop
+        sto_all.claim_idd(p_idd        => rec.idd,
+                          p_statusid   => -1,
+                          p_disclaimid => 2);
+      end loop;
+    
     end if;
   
     bars_audit.trace('%s выполнена процедура сторнирования доп.соглашения № %s',
@@ -7021,28 +7047,28 @@ create or replace package body dpt_web is
                                   decode(nvl(d.cnt_dubl, 0), 0, 0, 1),
                                   1) = l_plandate;
     
-      insert into dpt_int_queue
-        select bars_sqnc.get_nextval('S_DPTINT'),
-               kf,
-               branch,
-               int_id,
-               acc_id,
-               acc_num,
-               acc_cur,
-               acc_nbs,
-               acc_name,
-               acc_iso,
-               acc_open,
-               acc_amount,
-               int_details,
-               int_tt,
-               deal_id,
-               deal_num,
-               deal_dat,
-               cust_id,
-               mod_code,
-               sysdate
-          from int_queue;
+      /*insert into dpt_int_queue
+      select bars_sqnc.get_nextval('S_DPTINT'),
+             kf,
+             branch,
+             int_id,
+             acc_id,
+             acc_num,
+             acc_cur,
+             acc_nbs,
+             acc_name,
+             acc_iso,
+             acc_open,
+             acc_amount,
+             int_details,
+             int_tt,
+             deal_id,
+             deal_num,
+             deal_dat,
+             cust_id,
+             mod_code,
+             sysdate
+        from int_queue;*/
     
       bars_audit.trace('%s make_int for %s...', c_title, p_branch);
     
@@ -8973,7 +8999,23 @@ create or replace package body dpt_web is
       bars_audit.trace('%s exit', title);
     else
       -- если сумма остатка депозита меньше минимальной суммы вида вклада, то пролонгации не будет
-      p_errmsg := 'Сума остатка на депозитному рахунку меньша за мінімальну суму виду вкладу';
+      --p_errmsg := 'Сума остатка на депозитному рахунку меньша за мінімальну суму виду вкладу';
+      
+      -- COBUMMFO-5162
+      begin
+      bars_audit.trace('%s встановлення ознаки дозволу на закриття вкладу до запитання dpt_id = %s',
+                     title, to_char(p_dptdata.dptid));
+      dpt.fill_dptparams(p_dptid => p_dptdata.dptid,
+                         p_tag => '2CLOS',
+                         p_val => 'Y');
+      bars_audit.trace('%s Возврат депозита и начисленных процентов по окончанию депозитных договоров dpt_id = %s',
+                     title, to_char(p_dptdata.dptid));         
+                               
+      auto_maturity_payoff(p_dptdata.dptid, 0, sys_context('bars_context','user_branch'), p_bdate);            
+                         
+      exception when others then
+        p_errmsg := 'Не вдалося встановити ознаку дозволу на закриття вкладу та зробити возврат депозита та нарахування відсотків';
+      end;
     end if;
   
   exception
@@ -9465,7 +9507,8 @@ create or replace package body dpt_web is
                               p_kv     in accounts.kv%type,
                               p_branch in accounts.branch%type,
                               p_ob22   in accounts.ob22%type)
-      return accounts.nls%type is
+      return accounts.nls%type
+    is
       l_nls    accounts.nls%type;
       l_ob22   accounts.ob22%type;
       l_branch accounts.branch%type;
@@ -9481,14 +9524,10 @@ create or replace package body dpt_web is
         exception
           when no_data_found then
             l_ob22 := case p_nbs
-                        when '2620' then
-                         '30'
-                        when '2630' then
-                         '46'
-                        when '2635' then
-                         '38'
-                        else
-                         null
+                        when '2620' then '30'
+                        when '2630' then '46'
+                        when '2635' then '38'
+                        else null
                       end;
         end;
       
@@ -9497,7 +9536,7 @@ create or replace package body dpt_web is
       end if;
     
       -- котлові рах. тільки на 2-му рівні
-      l_branch := substr(p_branch, 1, 15);
+      l_branch := substr(p_branch,1,15);
     
       begin
         select a.nls
@@ -9513,9 +9552,7 @@ create or replace package body dpt_web is
         when no_data_found then
           begin
           
-            bars_error.raise_nerror(g_modcode,
-                                    'CONSACC_NOT_FOUND',
-                                    p_nbs || '/' || p_kv || '|' || l_ob22);
+            bars_error.raise_nerror( g_modcode, 'CONSACC_NOT_FOUND', p_nbs || '/' || p_kv || '|' || l_ob22 );
           
             -- -- 1) Установить код вал
             -- pul.Set_Mas_Ini('OP_BSOB_KV', to_char(p_kv) , 'Код вал для открытия счета');
@@ -9536,7 +9573,8 @@ create or replace package body dpt_web is
     -- перевірка наявності руху коштів протягом трьох останніх років
     ---
     function check_conditions(p_dptid in dpt_deposit.deposit_id%type)
-      return number is
+      return number
+    is
       l_checked number;
     begin
     
@@ -9571,7 +9609,8 @@ create or replace package body dpt_web is
     l_mfo    := gl.amfo;
     l_branch := sys_context('bars_context', 'user_branch');
   
-    if (p_bdate is null) then
+    if (p_bdate is null)
+    then
       l_bdate := gl.bdate;
     else
       l_bdate := p_bdate;
@@ -9660,9 +9699,11 @@ create or replace package body dpt_web is
             -- сума списання (тіло + відсотки)
             l_sum := (r_immobile.ost_dep + r_immobile.ost_int);
           
-            if (l_sum > 0) then
+            if (l_sum > 0) 
+            then
             
-              if (l_branch != r_immobile.branch) then
+              if (l_branch != r_immobile.branch)
+              then
                 l_branch := r_immobile.branch;
                 bars_context.subst_branch(l_branch);
               end if;
@@ -9692,10 +9733,7 @@ create or replace package body dpt_web is
                          s_     => l_sum,
                          nam_a_ => r_immobile.nms_dep,
                          id_a_  => r_immobile.okpo,
-                         nazn_  => substr('Списання в нерухомі коштів по договору № ' ||
-                                          f_nazn('U', r_immobile.dpt_id),
-                                          1,
-                                          160),
+                         nazn_  => substr( 'Списання в нерухомі коштів по договору № ' || f_nazn('U', r_immobile.dpt_id), 1, 160 ),
                          mfob_  => l_mfo,
                          nlsb_  => l_nls,
                          kv2_   => r_immobile.kv,
@@ -9711,20 +9749,21 @@ create or replace package body dpt_web is
                          uid_   => null);
             
               -- 1) Капіталізація нарахованих відсотків
-              if (r_immobile.ost_int > 0) then
+              if (r_immobile.ost_int > 0)
+              then
                 -- DP5 - Виплата відсотків в нац.валюті (внутр)
                 -- DPL - Виплата відсотків в ін.валюті (внутр)
-                paytt(null,
-                      l_ref,
-                      l_bdate,
-                      l_tt,
-                      l_dk,
-                      r_immobile.kv,
-                      r_immobile.nls_int,
-                      r_immobile.ost_int,
-                      r_immobile.kv,
-                      r_immobile.nls_dep,
-                      r_immobile.ost_int);
+                PAYTT( null
+                     , l_ref
+                     , l_bdate
+                     , case when ( r_immobile.kv = gl.baseval ) then 'DP5' else 'DPL' end
+                     , l_dk
+                     , r_immobile.kv
+                     , r_immobile.nls_int
+                     , r_immobile.ost_int
+                     , r_immobile.kv
+                     , r_immobile.nls_dep
+                     , r_immobile.ost_int );
               end if;
             
               -- 2) Списання в нерухомі
@@ -9805,9 +9844,10 @@ create or replace package body dpt_web is
             end if;
           
             -- Для вкладів "До запитання" проставляємо відмітку про закриття
-            if (r_immobile.dat_end is null) then
+            if (r_immobile.dat_end is null)
+            then
             
-              dpt.fill_dptparams(p_dptid(i), '2CLOS', 'Y');
+              DPT.FILL_DPTPARAMS(p_dptid(i), '2CLOS', 'Y');
             
             end if;
           
@@ -9818,22 +9858,17 @@ create or replace package body dpt_web is
       exception
         when others then
         
-          bars_audit.info(title || ' депозит #' ||
-                          to_char(r_immobile.dpt_id) || ' error: ' ||
-                          nvl(l_errmsg,
-                              sqlerrm || chr(10) ||
-                              dbms_utility.format_error_backtrace()));
+          bars_audit.info( title || ' депозит #' ||  to_char(r_immobile.dpt_id) || ' error: ' ||
+                          nvl( l_errmsg, sqlerrm || chr(10) || dbms_utility.format_error_backtrace() ) );
         
-          if (p_runid > 0) then
-          
-            --  для автооперації записати помилку в журнал виконання автоматичних завдань
+          if (p_runid > 0)
+          then --  для автооперації записати помилку в журнал виконання автоматичних завдань
+
             null;
-          
+
           else
           
-            l_outmsg := (l_outmsg || '<BR> депозит # ' ||
-                        to_char(r_immobile.dpt_id) || '(' ||
-                        nvl(l_errmsg, sqlerrm) || ');');
+            l_outmsg := ( l_outmsg || '<BR> депозит # ' || to_char(r_immobile.dpt_id) || '(' || nvl(l_errmsg, sqlerrm) || ');' );
           
           end if;
         
@@ -9844,12 +9879,13 @@ create or replace package body dpt_web is
     end loop;
   
     -- виклик процедури з WEB
-    if (web_utl.is_web_user = 1) then
+    if ( web_utl.is_web_user = 1 )
+    then
     
-      if (l_outmsg is not null) then
+      if (l_outmsg is not null)
+      then
       
-        l_outmsg := 'Перенесення депозитів у картотеку нерухомих виконано з помилками:' ||
-                    l_outmsg;
+        l_outmsg := 'Перенесення депозитів у картотеку нерухомих виконано з помилками:' || l_outmsg;
       
       end if;
     
@@ -19043,11 +19079,14 @@ create or replace package body dpt_web is
         left join dpt_extrefusals er
           on (er.dptid = d.deposit_id and er.req_state = 1 and
              er.req_bnkdat <= sysdate)
+        left join dpt_depositw dw -- COBUMMFO-5162
+          on (dw.dpt_id = d.deposit_id and dw.tag = '2CLOS' and dw.value = 'Y')     
        where d.deposit_id = p_dptid
          and (v.fl_dubl = 2 or ec.dpt_id is not null)
          and er.dptid is null
          and (nvl(d.cnt_dubl, 0) < nvl(v.term_dubl, 0) or
-             nvl(v.term_dubl, 0) = 0);
+             nvl(v.term_dubl, 0) = 0)
+         and dw.dpt_id is null;
     exception
       when no_data_found then
         l_out := 0;
@@ -19058,20 +19097,13 @@ create or replace package body dpt_web is
 
 end dpt_web;
 /
- show err;
- 
-PROMPT *** Create  grants  DPT_WEB ***
-grant EXECUTE                                                                on DPT_WEB         to ABS_ADMIN;
-grant EXECUTE                                                                on DPT_WEB         to BARSUPL;
-grant EXECUTE                                                                on DPT_WEB         to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on DPT_WEB         to DPT;
-grant EXECUTE                                                                on DPT_WEB         to DPT_ADMIN;
-grant EXECUTE                                                                on DPT_WEB         to DPT_ROLE;
-grant EXECUTE                                                                on DPT_WEB         to VKLAD;
-grant EXECUTE                                                                on DPT_WEB         to WR_ALL_RIGHTS;
 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/dpt_web.sql =========*** End *** ===
- PROMPT ===================================================================================== 
+show errors;
+
+grant EXECUTE on DPT_WEB to ABS_ADMIN;
+grant EXECUTE on DPT_WEB to BARSUPL;
+grant EXECUTE on DPT_WEB to BARS_ACCESS_DEFROLE;
+grant EXECUTE on DPT_WEB to DPT;
+grant EXECUTE on DPT_WEB to DPT_ADMIN;
+grant EXECUTE on DPT_WEB to DPT_ROLE;
+grant EXECUTE on DPT_WEB to WR_ALL_RIGHTS;

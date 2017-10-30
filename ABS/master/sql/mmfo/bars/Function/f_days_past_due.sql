@@ -1,5 +1,3 @@
-
- 
  PROMPT ===================================================================================== 
  PROMPT *** Run *** ========== Scripts /Sql/BARS/function/f_days_past_due.sql =========*** Ru
  PROMPT ===================================================================================== 
@@ -7,8 +5,10 @@
   CREATE OR REPLACE FUNCTION BARS.F_DAYS_PAST_DUE (p_dat date, p_acc number, p_DEL number) RETURN integer is
 -- Определение к-ва дней просрочки по счету (с учетом параметров просрочки по договору для кредитов)
 
-/* Версия 4.0 10-03-2017  04-10-2016 (2) 22-08-2016 --  (1) 29-07-2016
+/* Версия 4.2   06-10-2017  10-03-2017  04-10-2016 (2) 22-08-2016 --  (1) 29-07-2016
 
+   06-10-2017(4.2) - Балансовые счета через ф-цию rez_f_deb
+   06-10-2017(4.1) - Ускорила расчет
    10-03-2017 - Попадала отчетная дата включительно
    05-10-2016 - Убрала ACCOUNTS в sum(s.kos)+s.FDAT BETWEEN l_daos AND p_dat (ускорилось)
    04-10-2016 - MDATE только для фин. дебиторки
@@ -62,12 +62,8 @@ begin
          l_s180k := 0;
       end if;
 
-      if l_mdate is not null and l_nbs in (--'3510','3519','3550','3551','3552','3559', -- хоз.дебиторка (убрала по непоняткам с НЕмченко)
-                                           '1811','1819','2800','2801','2805','2806','2809',
-                                           '3540','3541','3548','3570','3578','3579','3710') THEN -- фин.дебиторка
-         l_KOL := greatest(0,p_DAT - l_mdate);
-      elsif l_datvz is not null THEN
-         l_KOL := greatest(0,p_DAT - l_datvz);
+      if    l_mdate is not null and rez_f_deb (l_nbs) = 1 THEN  l_KOL := greatest(0,p_DAT - l_mdate);
+      elsif l_datvz is not null                           THEN  l_KOL := greatest(0,p_DAT - l_datvz);
       else 
          If l_ostc >= 0 THEN l_KOL := 0;  
             begin 
@@ -81,10 +77,10 @@ begin
             END;
             -- узнаем сумму всех кредитовых оборотов
             select nvl(sum(s.kos),0) + p_del into l_KOS  from saldoa s where s.acc = p_acc and s.FDAT BETWEEN l_daos AND p_dat-1;
-            for p in (select s.fdat,sum((case when fdat=(select min(fdat) from saldoa where acc=a.acc) then greatest(-s.ostf,s.dos)
+            for p in (select s.fdat,sum((case when fdat=(select min(fdat) from saldoa where acc=s.acc) then greatest(-s.ostf,s.dos)
                                          else s.dos end)) DOS
-                      from   saldoa s,accounts a
-                      where  p_acc = a.acc and a.acc=s.acc and s.FDAT < p_DAT
+                      from   saldoa s
+                      where  p_acc = s.acc and s.FDAT < p_DAT
                       group  by s.fdat
                       order  by s.fdat)
             loop
@@ -104,11 +100,8 @@ end;
 /
  show err;
  
-PROMPT *** Create  grants  F_DAYS_PAST_DUE ***
 grant EXECUTE                                                                on F_DAYS_PAST_DUE to BARS_ACCESS_DEFROLE;
 grant EXECUTE                                                                on F_DAYS_PAST_DUE to START1;
-
- 
  
  PROMPT ===================================================================================== 
  PROMPT *** End *** ========== Scripts /Sql/BARS/function/f_days_past_due.sql =========*** En

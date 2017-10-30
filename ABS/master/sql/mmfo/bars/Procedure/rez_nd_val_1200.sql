@@ -22,7 +22,8 @@ begin
                      c.OKPO, DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6', 2, 1) RZ, case when d.tipa in (12, 93) then 1 else 0 end PD_0,
                      d.tipa, a.*, d.tipa_FV  
               from accounts a, customer c, rez_deb d 
-              where d.tipa in (12, 30, 92, 93) and ost_korr(a.acc,l_dat31,null,a.nbs) < 0 and a.rnk = c.rnk and d.nbs = a.nbs )
+              where d.tipa in (12, 30, 92, 93) and ost_korr(a.acc,l_dat31,null,a.nbs) < 0 and a.rnk = c.rnk and a.nbs = d.nbs and (a.dazs is null or  a.dazs>= p_dat01)
+            )
    LOOP
       l_tip_fin:= f_pd ( p_dat01, k.rnk, k.acc, k.custtype, k.kv, k.nbs, 1, 1);
       l_s080   := f_get_s080 (p_dat01, l_tip_fin, k.fin);

@@ -119,3 +119,7 @@ end;
 
 commit;
 /
+prompt fix bpk_plt
+delete from upl_filegroups_rln t where t.group_id in (10, 11) and t.file_id = 10051;
+insert into upl_filegroups_rln (group_id, file_id, sql_id) values (10, 10051, 10052);
+commit;

@@ -7,9 +7,10 @@ PROMPT *** Create  procedure P_KOL_ND_BPK ***
 
   CREATE OR REPLACE PROCEDURE BARS.P_KOL_ND_BPK (p_dat01 date, p_mode integer) IS 
 
-/* Версия 4.0 08-02-2017   24-01-2017  03-10-2016
+/* Версия 4.1 08-02-2017   24-01-2017  03-10-2016
    К_льк_сть дн_в прострочки по договорам БПК
    -------------------------------------
+ 6) 24-10-2017(4.2) - 2625,2627 - и нет др. задолженности - fin = 5, VKR = 'ГГГ', PD = 1
  5) 08-02-2017 - Изменено условие пересчета к-ва дней по БПК
  4) 08-02-2017 - Портфельный метод через функцию f_get_port (k.nd, k.rnk);
  3) 08-02-2017 - if l_fin = 0 THEN  l_fin:= null; end if;  --  фин. стан не определен - по l_fin:= null, будет определен по переходным полож.
@@ -21,7 +22,7 @@ PROMPT *** Create  procedure P_KOL_ND_BPK ***
  l_rnk   accounts.rnk%type; l_custtype customer.custtype%type; l_s080  specparam.s080%type; l_s250 w4_acc.s250%type; 
 
  KOL_    integer; l_fin    integer; l_f    integer; OPEN_    integer; l_TIP    integer; l_vidd  integer; 
- l_fin23 integer; l_grp    integer; l_cls  integer;
+ l_fin23 integer; l_grp    integer; l_cls  integer; l_nd     integer;
  PR_     number ; FL_      NUMBER ;  
 
  DATSP_  varchar2(30); DASPN_   varchar2(30); l_txt  varchar2(1000); 
@@ -40,27 +41,11 @@ begin
       END;
    end if;
 
-   --if p_bpk = 0 THEN l_bpk := ' W4_ACC';
-   --else              l_bpk := ' BPK_ACC';
-   --end if;
-
    z23.to_log_rez (user_id , 351 , p_dat01 ,'Начало К-во дней БПК 351');
    l_dat31 := Dat_last_work (p_dat01 - 1);  -- последний рабочий день месяца
 
-/*
-   DECLARE
-      TYPE r0Typ IS RECORD 
-         ( nd        w4_acc.nd%type,
-           rnk       accounts.rnk%type,
-           kol       number,
-           fin23     integer,
-           custtype  customer.custtype%type
-          );
-      k r0Typ;
-*/
    begin
 
-      --ПРОВЕРИТЬ!!!
       FOR k in (select nd, rnk, max(kol) kol, fin23, custtype,tipa 
                 from (select r.nd, r.fin23, r.rnk, r.nbs, r.nls, r.kv, r.tip,c.custtype, r.tip_kart tipa, 
                              case WHEN r.tip in ('SS ', 'CR9', 'SK0', 'SN ') THEN 0
@@ -72,39 +57,7 @@ begin
                              and r.NBS not in ('3570','3578','3579','3550','3551')
                      )
                 group by nd, rnk, custtype,fin23,tipa )
-/*      
-      if p_bpk = 0 THEN
-         OPEN c0 FOR
-            select nd, rnk, max(kol) kol, fin23, custtype 
-            from  (select b.nd, b.fin23, a.rnk, a.nbs, a.nls, a.kv, t.tip,c.custtype,  
-                          case WHEN t.tip in ('SS ', 'CR9', 'SK0', 'SN ') THEN 0
-                          else f_days_past_due(p_DAT01, a.acc,decode(c.custtype,3,25000,50000))
-                          end  kol 
-                   from ( select nd, acc, fin23 from v_w4_acc UNPIVOT (ACC FOR KOD IN (ACC_PK, ACC_OVR, ACC_9129, ACC_3570, ACC_2208, ACC_2627, 
-                                 ACC_2207, ACC_3579, ACC_2209,  ACC_2625X, ACC_2627X, ACC_2625D, ACC_2203) ) ) b , 
-                          accounts a, bpk_nbs_tip t,customer c
-                   where  b.acc = a.acc and a.nbs = t.nbs (+) and t.tip in  ('SP ', 'SPN', 'SK9', 'SL ', 'CR9', 'SS ', 'SK0', 'SN ') and 
-                          a.rnk = c.rnk and ost_korr(a.acc,l_dat31,null,a.nbs) < 0 )
-            group by nd, rnk, custtype ;
-         
-      else
-         OPEN c0 FOR
-            select nd, rnk, max(kol) kol, fin23, custtype
-            from  (select b.nd, b.fin23, a.rnk, a.nbs, a.nls, a.kv, t.tip,c.custtype,  
-                          case WHEN t.tip in ('SS ', 'CR9', 'SK0', 'SN ') THEN 0
-                          else f_days_past_due(p_DAT01, a.acc,decode(c.custtype,3,25000,50000))
-                          end  kol 
-                   from ( select nd, acc, fin23 from v_bbpk_acc UNPIVOT (ACC FOR KOD IN ( ACC_PK, ACC_OVR, ACC_9129, ACC_TOVR, ACC_3570, ACC_2208, 
-                                 ACC_2207, ACC_3579, ACC_2209 ) )) b , accounts a, bpk_nbs_tip t,customer c
-                   where  b.acc = a.acc and a.nbs = t.nbs (+) and t.tip in  ('SP ', 'SPN', 'SK9', 'SL ', 'CR9', 'SS ', 'SK0', 'SN ') and 
-                          a.rnk = c.rnk and ost_korr(a.acc,l_dat31,null,a.nbs) < 0 )
-            group by nd, rnk, custtype ;    
-         l_tipa := 41;
-      end if;                  
-*/
       loop
-         --      FETCH c0 INTO k;
-         --      EXIT WHEN c0%NOTFOUND;
          l_fin   := null;
          l_fin23 := k.fin23; 
 
@@ -121,7 +74,13 @@ begin
             l_fin := f_fin_pd_grupa (1, k.kol);
          else
             l_cls := nvl(fin_nbu.zn_p_nd('CLS',  l_f, p_dat01, k.nd, k.rnk),0);
-            if l_cls = 0 THEN l_fin := NULL; --end if;
+            if l_cls = 0 THEN 
+               begin 
+                  select nd into l_nd from rez_w4_bpk where nd = k.nd and nbs in ('2625','2627') and rownum=1;   --COBUMMFO-5208
+                  l_fin := 5; 
+                  FIN_ZP.SET_ND_VNCRR(k.nd, k.rnk, 'ГГГ');
+               EXCEPTION WHEN NO_DATA_FOUND THEN  l_fin := NULL;
+               end;
             else
                if l_f = 56 THEN
                   Case
@@ -130,7 +89,7 @@ begin
                      when k.kol >  90             then  l_fin := greatest(l_cls, 10 ); 
                   else                                  l_fin := l_cls;                
                   end case;
-                  fin_nbu.record_fp_nd('CLSP', l_fin, l_f, p_dat01, k.nd, k.rnk); -- ф_н.стан зкоригований на к-ть дн_в прострочки     
+                  --fin_nbu.record_fp_nd('CLSP', l_fin, l_f, p_dat01, k.nd, k.rnk); -- ф_н.стан зкоригований на к-ть дн_в прострочки     
                else
                   Case
                      when k.kol between  8 and 30 then  l_fin := greatest(l_cls,  2 ); 
@@ -149,7 +108,6 @@ begin
             l_fin := nvl(l_fin23,1);                  
          ELSIF (l_fin is null or l_fin = 0) and k.custtype = 3  THEN 
             l_fin := nvl(l_fin,f_fin23_fin351(l_fin23,k.kol));
-            --l_pd  := fin_nbu.get_pd(s.rnk, d.nd, p_dat01,l_fin, VKR_,l_fp);
          END IF; 
          if l_fin is null or l_fin=0 THEN 
             l_fin := nvl(l_fin23,1);                  

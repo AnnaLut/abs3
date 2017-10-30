@@ -2745,7 +2745,7 @@ CREATE OR REPLACE package body BARS.ow_files_proc is
          chk.put_visa_out(p_ref, l_oper.tt, null, 0, null ,null , null, l_rec_id);
 
          --уточнить, нужно ли
-         p_fm_intdoccheck(p_ref);
+         --p_fm_intdoccheck(p_ref);
          if (l_oper.mfoa <> l_oper.mfob ) then
             sgn_mgr.store_sep_sign(p_ref       => p_ref,
                                    p_sign_type => 'VG2',
@@ -2785,7 +2785,7 @@ CREATE OR REPLACE package body BARS.ow_files_proc is
        
 
         --уточнить, нужно ли
-         p_fm_extdoccheck(rec_);
+         --p_fm_extdoccheck(rec_);
          end if;
             
          update ow_oic_ref
