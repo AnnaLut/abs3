@@ -235,9 +235,16 @@ END Z23;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.Z23 IS
 
-  G_BODY_VERSION  CONSTANT VARCHAR2(64)  := 'version 21. 04-04-2017';
+  G_BODY_VERSION  CONSTANT VARCHAR2(64)  := 'version 23.4 26-10-2017'; 
 
 /*
+
+112) 26-10-2017(23.4) - финансовый лизинг (207*) - обеспечение само на себя по параметру кредитного договора ZAL_LIZ 
+111) 11-09-2017 -    Очистка  errors_351 в start_rez
+110) 08-08-2017 -    При отметка закрытых W4 - остатки с корректирующими
+109) 31-07-2017 -    ОВЕР из CC_DEAL по условию VIDD = 110
+108) 06-06-2017 -    Залоги по ОВЕРАМ ХОЛДИНГА
+107) 11-04-2017 -    Очистка  nd_val,  nd_kol в start_rez
 106) 04-04-2017 -    + залоги по ЦБ
 105) 15-03-2017 -    в привязке залогов ограничение (ostc < 0)
 104) 09-03-2017 -    p_DELTA
@@ -1716,17 +1723,28 @@ BEGIN
       vid_zal := null;
 
       begin
+         if f_mmfo THEN
+            select nvl(n.acc,c.acc),nvl(n.nd,c.nd) into accs_,nds_ 
+            from  (select n.acc, max(n.nd) nd from nd_acc n,cc_deal d  
+                   where  acc=k.acc and n.nd=d.nd and d.sdate < dat01_ and vidd<>10 group by acc) n,
+                  (select a.acc,c.ref nd from cp_deal c,accounts a 
+                   where c.active=1 and a.acc in (c.acc,c.accd,c.accp,c.accr,c.accs,c.accr2,c.accs5,c.accs6,c.accexpn,c.accexpr,c.accr3,c.accunrec)) c,
+                   accounts a
+            where a.acc= k.acc and a.acc=n.acc (+) and a.acc = c.acc(+) and ROWNUM = 1;
 
-         select nvl(n.acc,nvl(o.acc,c.acc)),nvl(n.nd,nvl(o.nd,c.nd)) into accs_,nds_ 
-         from (select acco acc,nd  from acc_over where acco=k.acc union all 
-               select acc_9129, nd from acc_over where acc_9129= k.acc union all
-               select k.acc,nd from acc_over where acc in (select acc from int_accn where acra=k.acc and id=0)) o,
-              (select n.acc, max(n.nd) nd from nd_acc n,cc_deal d  
-               where  acc=k.acc and n.nd=d.nd and d.sdate < dat01_ group by acc) n,
-              (select a.acc,c.ref nd from cp_deal c,accounts a 
-               where c.active=1 and a.acc in (c.acc,c.accd,c.accp,c.accr,c.accs,c.accr2,c.accs5,c.accs6,c.accexpn,c.accexpr,c.accr3,c.accunrec)) c,
-               accounts a
-         where a.acc= k.acc  and a.acc=o.acc (+)  and a.acc=n.acc (+) and a.acc = c.acc(+) and ROWNUM = 1;
+         else
+
+            select nvl(n.acc,nvl(o.acc,c.acc)),nvl(n.nd,nvl(o.nd,c.nd)) into accs_,nds_ 
+            from (select acco acc,nd  from acc_over where acco=k.acc union all 
+                  select acc_9129, nd from acc_over where acc_9129= k.acc union all
+                  select k.acc,nd from acc_over where acc in (select acc from int_accn where acra=k.acc and id=0)) o,
+                 (select n.acc, max(n.nd) nd from nd_acc n,cc_deal d  
+                  where  acc=k.acc and n.nd=d.nd and d.sdate < dat01_ and vidd<>10 group by acc) n,
+                 (select a.acc,c.ref nd from cp_deal c,accounts a 
+                  where c.active=1 and a.acc in (c.acc,c.accd,c.accp,c.accr,c.accs,c.accr2,c.accs5,c.accs6,c.accexpn,c.accexpr,c.accr3,c.accunrec)) c,
+                  accounts a
+            where a.acc= k.acc  and a.acc=o.acc (+)  and a.acc=n.acc (+) and a.acc = c.acc(+) and ROWNUM = 1;
+         end if;
 
       EXCEPTION WHEN NO_DATA_FOUND THEN nds_:=null ;  
       end;
@@ -1885,19 +1903,22 @@ PROCEDURE start_rez
   ------------------------------------------------
 
   -- переменные
-  aa accounts%rowtype;
-  kol_max  int    ;
-  nd_      number ;
-  accs_    number ;
-  dat31_   date   ; 
+  aa        accounts%rowtype;
+  kol_max   int    ;  dat31_    date  ; s_dat01  varchar2(10);
+  nd_       number ;  accs_    number ;
 
 begin
 
-  dat01_ := p_dat01;
-  dat31_ := Dat_last_work (dat01_ - 1 );
+  dat01_  := p_dat01;
+  dat31_  := Dat_last_work (dat01_ - 1 );
+
+  s_dat01 := to_char(p_dat01, 'dd.mm.yyyy')  ;  
+  pul_dat(s_dat01, null ) ;
 
   If nvl(p_mode ,0) = 0 then
-     delete from nd_val where fdat = p_dat01; 
+     update rez_log set fdat = dat01_+1 where fdat = dat01_;
+     delete from nd_val     where fdat = p_dat01; 
+     delete from errors_351 where fdat = p_dat01; 
      delete from nd_kol; 
      -- Портфель БПК
      z23.to_log_rez (user_id , 351 , p_dat01 ,' реанимация BPK, если были реанимированы счета');
@@ -1955,7 +1976,7 @@ begin
               from  accounts a
               where acc  in (k.acc_2203, k.acc_2207, k.acc_2209, k.acc_2627, k.acc_2208, k.acc_2625X, k.acc_2627X, k.acc_2625D, k.acc_3570, k.acc_3579,
                              k.ACC_OVR , k.ACC_PK  , k.ACC_9129)  and (a.dazs is null or a.dazs>=dat01_) 
-                and a.ostc < 0 and a.nbs not in ('3551','3550') and rownum=1;
+                and ost_korr(a.acc,dat31_,null,a.nbs) < 0 and a.nbs not in ('3551','3550') and rownum=1;
            EXCEPTION WHEN NO_DATA_FOUND THEN 
               update W4_acc set NOT_USE_REZ23 = k.dazs where rowid = k.RI;
            end;
@@ -1972,20 +1993,43 @@ begin
 
      z23.to_log_rez (user_id , 351 , p_dat01 ,' cck_arc_cc_lim');
      cck_arc_cc_lim (P_DAT =>gl.bd,P_ND =>0 ); 
+     -- архив по хоз.дебиторке
+     insert into xoz_ref_arc (REF1, STMT1, REF2, ACC, MDATE, S, FDAT, S0, NOTP, PRG, BU, DATZ, REFD, ID, KF, mdat)
+     select t.REF1, t.STMT1, t.REF2, t.ACC, t.MDATE, t.S, t.FDAT, t.S0, t.NOTP, t.PRG, t.BU, t.DATZ, t.REFD, t.ID, t.KF, p_dat01
+     from xoz_ref t
+     where not exists (select 1 from xoz_ref_arc cl where cl.mdat= p_dat01 and rownum=1);
      commit; 
-
---     begin
---        EXECUTE IMMEDIATE 'alter trigger TBI_ACCP_PROD disable';
---     exception when others then
-        -- ORA-04080: trigger 'TBI_ACCP_PR111' does not exist
---        if SQLCODE = -04080 then null;   else raise; end if; 
---     end;
 
   end if;  
 --------------------------------------
 
   If nvl(p_mode ,0) in ( 0,1) then
-    
+
+     begin
+        for k in (select to_number(nvl(cck_app.Get_ND_TXT (nd, 'ZAL_LIZ'),'0')) pawn,n.nd ,  a.acc from nd_acc n, accounts a
+                  where a.nbs like '207%' and ost_korr(a.acc,dat31_,null,a.nbs)<>0 and a.acc = n.acc 
+                 )
+        LOOP
+           if k.pawn <>0 THEN
+              begin
+                 insert into cc_accp (ACC,  ACCS, ND, PR_12, IDZ) values ( k.acc, k.acc, k.nd, 0, k.nd);
+              exception when others then
+                 --ORA-00001: unique constraint (BARS.PK_NBU23REZ_ID) violated
+                 if SQLCODE = -00001 then NULL;
+                 else raise;
+                 end if;
+              end;
+              begin
+                 insert into pawn_acc  (acc, pawn,mpawn ) values (k.acc, k.pawn, 1);
+              exception when others then
+                 --ORA-00001: unique constraint (BARS.PK_NBU23REZ_ID) violated
+                 if SQLCODE = -00001 then NULL;
+                 else raise;
+                 end if;
+              end;
+           end if;
+        end LOOP;
+     end;
      -- заполнение номера кредитного договора 
      -- (25-04-2016 добавлен 9129 в рамках заявок COBUPRVN-271,COBUSUPABS-4459)
     z23.to_log_rez (user_id , 351 , p_dat01 ,' заполнение номера кредитного договора в залогах ');
@@ -2050,22 +2094,35 @@ begin
      end loop; -- K2
       z23.to_log_rez (user_id , 351 , p_dat01 ,' Допривязка обеспечения ко всем сч ОВР ');
      --Допривязка обеспечения ко всем сч ОВР
-     for KO in (select o.acc_9129, o.nd, o.acco, z.ACCS, z.ACC, z.PR_12, z.IDZ, i.acra 
-                from acc_over o, cc_accp z,  (select * from int_accn where id =0 and acra is not null ) i
-                where o.acc= z.accs and o.acco = i.acc (+) 
-               )
-     loop    
-        FOR O in (select KO.acco from dual where KO.acco <> KO.accs    -- просрочка
-                  union all 
-                  select KO.acra from dual where KO.acra is not null   -- нач %
-                  union all 
-                  select a.acc  from accounts a, nd_acc n where a.acc=n.acc and a.nbs='2069' and n.nd = KO.nd  --леваки 2069 из мешка
-                 )
-        LOOP
-           Z23.ins_accp ( p_ACC => KO.ACC, p_ACCS => O.acco, p_ND => KO.ND, p_PR_12 => KO.pr_12, p_IDZ => KO.idz);
-        end loop; -- O
-     end loop; -- KO
-     -------------------
+
+     if f_MMFO  THEN
+
+        for KO in ( SELECT distinct z.acc, c.nd, z.idz, z.pr_12 from cc_deal c,  nd_acc n, nd_open o, cc_accp z 
+                    where c.vidd in (110) and o.fdat=p_dat01 and c.nd=o.nd and c.nd=n.nd and n.acc = z.accs  ) 
+        LOOP  
+           for O in ( select a.acc acco from  nd_acc n, accounts a where n.nd=ko.nd  and n.acc=a.acc and ost_korr(a.acc,dat31_,null,a.nbs) <0 ) 
+           LOOP
+              Z23.ins_accp ( p_ACC => KO.ACC, p_ACCS => O.acco, p_ND => KO.ND, p_PR_12 => KO.pr_12, p_IDZ => KO.idz);
+           end loop; -- O
+        end loop; -- KO
+     else              
+        for KO in (select o.acc_9129, o.nd, o.acco, z.ACCS, z.ACC, z.PR_12, z.IDZ, i.acra 
+                   from acc_over o, cc_accp z,  (select * from int_accn where id =0 and acra is not null ) i
+                   where o.acc= z.accs and o.acco = i.acc (+) 
+                  )
+        loop    
+           FOR O in (select KO.acco from dual where KO.acco <> KO.accs    -- просрочка
+                     union all 
+                     select KO.acra from dual where KO.acra is not null   -- нач %
+                     union all 
+                     select a.acc  from accounts a, nd_acc n where a.acc=n.acc and a.nbs='2069' and n.nd = KO.nd  --леваки 2069 из мешка
+                    )
+           LOOP
+              Z23.ins_accp ( p_ACC => KO.ACC, p_ACCS => O.acco, p_ND => KO.ND, p_PR_12 => KO.pr_12, p_IDZ => KO.idz);
+           end loop; -- O
+        end loop; -- KO
+     end if;
+     ------------------
      z23.to_log_rez (user_id , 351 , p_dat01 ,'Допривязка обеспечения ко всем сч. W4-карточки ');  
      --Допривязка обеспечения ко всем сч. W4-карточки
      for KO in ( select distinct b.nd, z.acc, z.pr_12, z.idz from rez_w4_bpk b, cc_accp z  where b.acc = z.accs )
@@ -2075,6 +2132,26 @@ begin
            Z23.ins_accp ( p_ACC => KO.ACC, p_ACCS => O.acc, p_ND => KO.ND, p_PR_12 => KO.pr_12, p_IDZ => KO.idz);
         end loop; -- O
      end loop; -- KO
+     z23.to_log_rez (user_id , 351 , p_dat01 ,'Допривязка обеспечения по ЦБ ');  
+     --Допривязка обеспечения по ЦП
+     for KO in ( select distinct b.ref, z.acc, z.pr_12, z.idz from cp_deal b, cc_accp z  
+                 where  z.accs in (b.acc,b.accs,b.accr,accexpn , accexpr, accp, accr2 , accr3) 
+                )
+     loop    
+        FOR O in ( select acc  acc    from cp_deal b where ref = KO.ref and acc     is not null union all 
+                   select accs        from cp_deal b where ref = KO.ref and accs    is not null union all 
+                   select accr        from cp_deal b where ref = KO.ref and accr    is not null union all 
+                   select accexpn     from cp_deal b where ref = KO.ref and accexpn is not null union all 
+                   select accexpr     from cp_deal b where ref = KO.ref and accexpr is not null union all 
+                   select accp        from cp_deal b where ref = KO.ref and accp    is not null union all 
+                   select accr2       from cp_deal b where ref = KO.ref and accr2   is not null union all
+                   select accr3       from cp_deal b where ref = KO.ref and accr3   is not null 
+                  )
+        LOOP
+           Z23.ins_accp ( p_ACC => KO.ACC, p_ACCS => O.acc, p_ND => KO.ref, p_PR_12 => KO.pr_12, p_IDZ => KO.idz);
+        end loop; -- O
+     end loop; -- KO
+
   end if;
   z23.to_log_rez (user_id , 351 , p_dat01 ,'  delete from acc_nlo;  ');
   If nvl(p_mode ,0) = 0 then
@@ -2426,10 +2503,10 @@ end kontrol1;
 
 PROCEDURE CHEK_modi (p_dat01 in  date) is
    -- проверяет возможность модификации протокола.
-   fl_    int;
-   FV_    int;
-   sess_  varchar2(64) :=bars_login.get_session_clientid;
-   sid_   varchar2(64) ;
+   fl_       int;           FV_       int;
+   sess_     varchar2(64) :=bars_login.get_session_clientid;
+   sid_      varchar2(64) ;
+   l_res_kf  varchar2(13);
 begin
    IF p_DAT01 IS NULL THEN
       raise_application_error(-20000,'Укажiть звiтну дату !');
@@ -2449,9 +2526,9 @@ begin
                                  Виконана загрузка данних в FINEVARE за '|| to_char(p_DAT01,'dd.mm.yyyy'));
       end if;
    END;
-
+   l_res_kf := trim('RESERVE'||sys_context('bars_context','user_mfo')); 
    SYS.DBMS_SESSION.CLEAR_IDENTIFIER;
-   sid_:=SYS_CONTEXT('BARS_GLPARAM','RESERVE');
+   sid_:=SYS_CONTEXT('BARS_GLPARAM',l_res_kf);
    SYS.DBMS_SESSION.SET_IDENTIFIER(sess_);
 
    begin
@@ -5695,23 +5772,24 @@ end PUL_DAT_cp;
 PROCEDURE Rez_23( dat_   in date ) is
 
   -- Вставки в общий протокол
-  sdat01_  char(10)         ;
-  sd01_    varchar2(40)     ;
-  sSql_    varchar2(4000)   ;
-  n00_     char(4)          ;
-  ACC_     NUMBER           ;
-  REZ_KAT_ NUMBER  DEFAULT 0; 
-  A01_     date             ;
-  q01_     varchar2(55)     ;
+  sdat01_   char(10)         ;
+  l_res_kf  varchar2(13);
+  sd01_     varchar2(40)     ;
+  sSql_     varchar2(4000)   ;
+  n00_      char(4)          ;
+  ACC_      NUMBER           ;
+  REZ_KAT_  NUMBER  DEFAULT 0; 
+  A01_      date             ;
+  q01_      varchar2(55)     ;
   --------------------------
   -- Снимки
-  sid_     varchar2(64)     ;
-  sess_    varchar2(64)     :=bars_login.get_session_clientid;
-  l_GET_SNP_RUNNING number  ;
+  sid_      varchar2(64)     ;
+  sess_     varchar2(64)     :=bars_login.get_session_clientid;
+  l_GET_SNP_RUNNING  number  ;
   --------------------------
-  Z_koef  number            ; -- отношение PVZ(приведенный залог) / ZAL(ликвидный залог) в целом по КД. 
-  sss_    varchar2 (200)    ;
-  l_kol   int               ;
+  Z_koef    number           ; -- отношение PVZ(приведенный залог) / ZAL(ликвидный залог) в целом по КД. 
+  sss_      varchar2 (200)   ;
+  l_kol     int              ;
 
 BEGIN
   RETURN;
@@ -5721,9 +5799,10 @@ BEGIN
   -----------------------
   z23.CHEK_modi(DAT01_) ;
   -----------------------
+  l_res_kf := trim('RESERVE'||sys_context('bars_context','user_mfo')); 
   -- проверка на повторный запуск резерва
   SYS.DBMS_SESSION.CLEAR_IDENTIFIER;
-  sid_:=SYS_CONTEXT('BARS_GLPARAM','RESERVE');
+  sid_:=SYS_CONTEXT('BARS_GLPARAM',l_res_kf);
   SYS.DBMS_SESSION.SET_IDENTIFIER(sess_);
 
   begin
@@ -5735,7 +5814,7 @@ BEGIN
   end;
 
   -- установка флага
-  gl.setp('RESERVE',SYS_CONTEXT ('USERENV', 'SID'),NULL);
+  gl.setp(l_res_kf,SYS_CONTEXT ('USERENV', 'SID'),NULL);
 
   -- Снимки проверка
   begin
@@ -5883,7 +5962,7 @@ BEGIN
    logger.info ('REZ23 КОНЕЦ' || sysdate );
    execute immediate 'truncate table tmp_rnk_kat';  
    -- снятие флага
-   gl.setp('RESERVE','',NULL);
+   gl.setp(l_res_kf,'',NULL);
    BARS_UTL_SNAPSHOT.stop_running;
 end Rez_23;
 ------------------------------------

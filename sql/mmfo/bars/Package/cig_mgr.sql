@@ -9,7 +9,7 @@ create or replace package cig_mgr is
   --
 
   -- Public constant declarations
-  g_header_version  constant varchar2(64) := 'version 1.7 16/12/2013';
+  g_header_version  constant varchar2(64) := 'version 1.8 11/10/2017';
   g_awk_header_defs constant varchar2(512) := '';
 
   --------------------------------------------------------------------------------
@@ -55,7 +55,9 @@ create or replace package cig_mgr is
   -- @p_interval - интервал
   --
   procedure job_interval(p_job_id in varchar2, p_interval in varchar2);
-
+  
+  procedure create_job_cig_mmfo;
+  
 end cig_mgr;
 /
 create or replace package body cig_mgr is
@@ -69,7 +71,7 @@ create or replace package body cig_mgr is
   --
 
   -- Private constant declarations
-  g_body_version constant varchar2(64) := 'version 2.6.5.2 27/05/2017';
+  g_body_version constant varchar2(64) := 'version 2.7 11/10/2017';
 
   g_awk_body_defs constant varchar2(512) := '' || 'для Ощадного банку ' || chr(13) || chr(10);
 
@@ -1566,7 +1568,7 @@ create or replace package body cig_mgr is
     dbms_application_info.set_action('Query...');
     if (p_dtype = 1) then
       OPEN p_recordset FOR
-        select q.nd,
+         select q.nd,
                q.rnk,
                q.start_date,
                q.end_date,
@@ -1848,12 +1850,13 @@ create or replace package body cig_mgr is
                  where cd.nd = cda.nd
                    and cd.rnk = c.rnk
                    and cd.nd = ow.nd
+                   and ow.cig_13 > 0
                    and cda.kv = val.kv
                    and c.custtype = 2
                    and cd.rnk = c1.rnk(+)
                    and cd.nd = n.nd
                    and n.acc = a8.acc
-                   and a8.tip = 'LIM'
+                   and a8.tip = 'LIM'           
                    --and to_number(substr(cd.prod, 1, 1)) < 9 #COBUSUPABS-4018
                    and substr(cd.prod, 1, 1) ='2'
                 --and not exists (select nd from cig_dog_general where nd = cd.nd)
@@ -1867,7 +1870,7 @@ create or replace package body cig_mgr is
                    val.kv   AS currency_id,
                    val.lcv  AS currency,
                    cd.rnk,
-                   
+
                    cd.sdate  AS bdate,
                    ow.cig_13,
                    NULL      AS cig_16,
@@ -1875,52 +1878,55 @@ create or replace package body cig_mgr is
                    5         AS credit_period,
                    1         AS cig_19,
                    ow.cig_20,
-                   
+
                    a.dazs     AS dazs,
                    c.custtype,
                    3          AS contract_type,
                    1          AS role_id,
                    
-                   NULL AS firstname,
-                   NULL AS surname,
-                   NULL AS fathers_name,
-                   NULL AS gender,
-                   NULL AS classification,
-                   NULL AS birth_surname,
-                   NULL AS date_birth,
-                   
-                   NULL AS place_birth,
-                   NULL AS residency,
-                   NULL AS citizenship,
+ ----------------http://jira.unity-bars.com.ua:11000/browse/COBUMMFO-4056                 
+ case when c.custtype = 3 then fio(REGEXP_REPLACE (c.nmk,'^ФОП'), 2) else null end firstname,     --  NULL AS firstname, 
+ case when c.custtype = 3 then fio(REGEXP_REPLACE (c.nmk,'^ФОП'), 1) else null end surname, --  NULL AS surname,
+                   NULL AS fathers_name,                 
+ case when c.custtype = 3 then decode(to_number(p.sex),1,1,2,2,null) else null end gender, --  NULL AS gender,                 
+ case when c.custtype = 3 then /*x*/ case when to_number(nvl(c.sed, 0)) = 91 then  2   else 1    end 
+                                                                                          else null end classification,    --  NULL AS classification,               
+                   NULL AS birth_surname,                
+ case when c.custtype = 3 then p.bday  else null end  date_birth,    -- NULL AS date_birth,               
+                   NULL AS place_birth,                 
+ case when c.custtype = 3 then /*x*/   case when c.codcagent = 5 then 1 else 2 end 
+                                                                          else null end  residency,     -- NULL AS residency,            
+ case when c.custtype = 3 then /*x*/   case when cty.k040 = '011' then 'UA' else cty.a2 end
+                                                                           else null end citizenship,    -- NULL AS citizenship,             
                    NULL AS neg_status,
                    NULL AS education,
-                   NULL AS marital_status,
-                   NULL AS position,
-                   
-                   NULL AS okpo,
-                   NULL AS cust_key,
-                   NULL AS ser,
-                   NULL AS numdoc,
-                   NULL AS passp_iss_date,
-                   NULL AS passp_exp_date,
-                   NULL AS passp_organ,
-                   
+                   NULL AS marital_status,                
+ case when c.custtype = 3 then decode(w.value,'0','0','1','1','2','2','3','3',
+                                              '4','4','5','5','6','6','7','7','8','8','9') else null end position,   --  NULL AS position,
+ case when c.custtype = 3 then c.okpo   else null  end okpo,     --  NULL AS okpo,                            
+ case when c.custtype = 3 then fio(c.nmk, 2) || fio(c.nmk, 1) || to_char(p.bday, 'ddmmyyyy') else null end cust_key,   --  NULL AS cust_key,                               
+ case when c.custtype = 3 then p.ser    else null end ser,    --  NULL AS ser,                            
+ case when c.custtype = 3 then p.numdoc else null end numdoc,    --  NULL AS numdoc,                      
+ case when c.custtype = 3 then p.pdate  else null end passp_iss_date,      --   NULL AS passp_iss_date,              
+                   NULL AS passp_exp_date,                
+ case when c.custtype = 3 then p.organ  else null end passp_organ, -- NULL AS passp_organ,  
+
                    c1.telr AS phone_office,
                    NULL    AS phone_mobile,
                    NULL    AS phone_fax,
                    NULL    AS email,
                    NULL    AS website,
                    1       status_id,
-                   
+
                    'uk-UA' lang_name,
                    c.nmk name,
                    'uk-UA' lang_abbreviation,
                    c.nmkk abbreviation,
-                   
+
                    CASE
                      WHEN c.sed IN ('00', '91', '34') THEN
                       0
-                   
+
                      WHEN c.sed IN ('08',
                                     '09',
                                     '10',
@@ -1935,34 +1941,34 @@ create or replace package body cig_mgr is
                                     '33',
                                     '20') THEN
                       1
-                   
+
                      WHEN c.sed IN ('23', '24', '25', '26', '27') THEN
                       2
-                   
+
                      WHEN c.sed IN ('61', '62', '63', '64', '65', '66', '18') THEN
                       3
-                   
+
                      WHEN c.sed IN ('40', '41', '42', '43', '44') THEN
                       4
-                   
+
                      WHEN c.sed IN ('70', '28', '29', '30', '31', '32') THEN
                       5
-                   
+
                      WHEN c.sed IN ('80', '50', '51', '52') THEN
                       6
-                   
+
                      WHEN c.sed IN
                           ('45', '46', '47', '48', '49', '53', '54', '55', '56', '57') THEN
                       8
-                   
+
                      ELSE
                       9
-                   
+
                    END AS ownership,
-                   
+
                    c.datea registr_date,
                    NULL    economic_activity,
-                   
+
                    DECODE(DECODE(TRANSLATE(TRANSLATE(TRIM(f_get_custw_h(c.rnk,
                                                                         'FSKPR',
                                                                         TRUNC(SYSDATE))),
@@ -1970,7 +1976,7 @@ create or replace package body cig_mgr is
                                                      '-'),
                                            '0123456789',
                                            '__________'),
-                                 
+
                                  '_',
                                  1,
                                  '__',
@@ -1991,27 +1997,27 @@ create or replace package body cig_mgr is
                                  1,
                                  0),
                           1,
-                          
+
                           CASE
                             WHEN TO_NUMBER(TRIM(f_get_custw_h(c.rnk, 'FSKPR', TRUNC(SYSDATE)))) BETWEEN 1 AND 5 THEN
                              1
-                          
+
                             WHEN TO_NUMBER(TRIM(f_get_custw_h(c.rnk, 'FSKPR', TRUNC(SYSDATE)))) BETWEEN 6 AND 30 THEN
                              2
-                          
+
                             WHEN TO_NUMBER(TRIM(f_get_custw_h(c.rnk, 'FSKPR', TRUNC(SYSDATE)))) BETWEEN 31 AND 100 THEN
                              3
-                          
+
                             WHEN TO_NUMBER(TRIM(f_get_custw_h(c.rnk, 'FSKPR', TRUNC(SYSDATE)))) BETWEEN 101 AND 500 THEN
                              4
-                          
+
                             WHEN TO_NUMBER(TRIM(f_get_custw_h(c.rnk, 'FSKPR', TRUNC(SYSDATE)))) > 500 THEN
                              5
-                          
+
                           END,
-                          
+
                           NULL) emplote_count,
-                   
+
                    c.okpo     cust_code,
                    NULL       reg_num,
                    c1.tel_fax,
@@ -2023,11 +2029,14 @@ create or replace package body cig_mgr is
 
               FROM cc_deal  cd,
                    customer c,
+                   customerw w,
+                   person   p,
+                   kl_k040 cty,
                    tabval   val,
                    corps    c1,
                    nd_acc   n,
                    accounts a,
-                   
+
                    (SELECT nd, MAX(cig_13) cig_13, MAX(cig_20) cig_20
                       FROM (SELECT nd,
                                    DECODE(tag, 'CIG_D13', VALUE) cig_13,
@@ -2037,7 +2046,12 @@ create or replace package body cig_mgr is
                      GROUP BY nd) ow
 
              WHERE cd.rnk = c.rnk
+               and p.rnk  = c.rnk
+               and c.country = cty.k040(+)
+               and a.rnk = w.rnk(+)
+               and w.tag(+) = 'CIGPO'               
                AND cd.nd = ow.nd
+               and ow.cig_13 > 0
                AND a.kv = val.kv
                AND c.custtype in (2, 3)
                AND cd.rnk = c1.rnk(+)
@@ -5047,10 +5061,7 @@ select           aa.nd,
     --dbms_job.run(job => p_job_id);
     select case when s.STATE = 'RUNING' then 1 else 0 end into l_is_run
     from sys.dba_scheduler_jobs s
-    where job_name = case when f_ourmfo = '300465' then 'J2248'   
-                      when f_ourmfo = '322669' then 'J2249'
-                      when f_ourmfo = '324805' then 'J2250'
-                 else null end;
+    where job_name = (select  'CIG_PVBKI_MMFO_'||kf.kf from MV_KF kf  where kf.kf = f_ourmfo);
     if l_is_run != 1 then
     DBMS_SCHEDULER.run_job(p_job_id, false);
     add_event(G_WITHOUT_ERRORS,
@@ -5088,6 +5099,34 @@ select           aa.nd,
   
     bars_audit.trace('%s: done', l_th);
   end job_interval;
+  
+    -- Создает Джобы по формированию данных для ПЫБКИ для регионов которые уже переведены на ММФО.
+  -- http://jira.unity-bars.com.ua:11000/browse/COBUMMFO-4381
+ procedure create_job_cig_mmfo is 
+      
+  begin  
+    for rec in (select m.kf from mv_kf m where not exists ( select j.job_name from DBA_SCHEDULER_JOBS j where j.job_name like 'CIG_PVBKI_MMFO_'||m.kf))
+    
+    loop  
+        begin
+          sys.dbms_scheduler.create_job(job_name        => 'BARS.CIG_PVBKI_MMFO_'||rec.kf,
+                                        job_type        => 'PLSQL_BLOCK',
+                                        job_action      => 'begin cig_mgr.collect_data(sysdate,'''||rec.kf||'''); end;',
+                                        start_date      => to_date(null),
+                                        repeat_interval => 'Freq=Monthly;Interval=1;ByMonthDay=01;ByHour=00;ByMinute=01;BySecond=00',
+                                        end_date        => to_date(null),
+                                        job_class       => 'DEFAULT_JOB_CLASS',
+                                        enabled         => TRUE,
+                                        auto_drop       => false,
+                                        comments        => 'Выполняет сбор данных для передачи в ПВБКИ/МБКИ');
+         exception when others then
+                  if (sqlcode = -27477) then null;
+                  else raise; 
+                   end if;         
+    end;
+        end loop; 
+        
+ end;
 
 begin
   -- Initialization

@@ -48,19 +48,19 @@ begin
     l_zpr.default_vars := '';
     l_zpr.bind_sql     := '';
     l_zpr.xml_encoding := 'CL8MSWIN1251';
-    l_zpr.txt          := 'select distinct
-(select '' 20: ''||s.value from sw_operw s where s.tag = 20 and s.swref = so.swref and rownum = 1 ) S_20,
-(select '' 32: ''||s.value from sw_operw s where s.tag = 32 and s.swref = so.swref and rownum = 1 ) S_32,
-(select '' 50: ''||s.value from sw_operw s where s.tag = 50 and s.swref = so.swref and rownum = 1 ) S_50,
-(select '' 52: ''||s.value from sw_operw s where s.tag = 52 and s.swref = so.swref and rownum = 1 ) S_52,
-(select '' 53: ''||s.value from sw_operw s where s.tag = 53 and s.swref = so.swref and rownum = 1 ) S_53,
-(select '' 54: ''||s.value from sw_operw s where s.tag = 54 and s.swref = so.swref and rownum = 1 ) S_54,
-(select '' 59: ''||s.value from sw_operw s where s.tag = 59 and s.swref = so.swref and rownum = 1 ) S_59,
-(select '' 70: ''||s.value from sw_operw s where s.tag = 70 and s.swref = so.swref and rownum = 1 ) S_70,
-(select '' 71: ''||s.value from sw_operw s where s.tag = 71 and s.swref = so.swref and rownum = 1 ) S_71,
-o.branch, o.ref, o.tt, o.nd, o.vdat, o.kv, o.s, o.sq, o.nlsa, o.nam_a, o.mfoa, o.nlsb, o.nam_b, o.mfob, o.nazn from oper o, sw_oper so where o.ref = so.ref and o.kv != ''980'' 
+    l_zpr.txt          := 'select 
+(select ''#F20:''||s.value||''#'' from sw_operw s where s.tag = 20 and s.swref = so.swref and rownum = 1) S_20,
+(select ''#F32A:''||s.value||''#'' from sw_operw s where s.tag = 32 and s.opt = ''A'' and s.swref = so.swref and rownum = 1) S_32A,
+(select ''#F33B:''||s.value||''#'' from sw_operw s where s.tag = 33 and s.opt = ''B'' and s.swref = so.swref and rownum = 1) S_33B,
+(select ''#F50F:''||replace(s.value,chr(13)||chr(10), ''#''||chr(13)||chr(10)||''#'')||''#'' from sw_operw s where s.tag = 50 and s.opt = ''F'' and s.swref = so.swref and rownum = 1) S_50F,
+(select ''#F52A:''||s.value||''#'' from sw_operw s where s.tag = 52 and s.opt = ''A'' and s.swref = so.swref and rownum = 1) S_52A,
+(select ''#F57A:''||s.value||''#'' from sw_operw s where s.tag = 57 and s.opt = ''A'' and s.swref = so.swref and rownum = 1) S_57A,
+(select ''#F59:''||replace(s.value,chr(13)||chr(10), ''#''||chr(13)||chr(10)||''#'')||''#'' from sw_operw s where s.tag = 59 and s.swref = so.swref and rownum = 1) S_59,
+(select ''#F70:''||s.value||''#'' from sw_operw s where s.tag = 70 and s.swref = so.swref and rownum = 1) S_70,
+(select ''#F71A:''||s.value||''#'' from sw_operw s where s.tag = 71 and s.opt = ''A'' and s.swref = so.swref and rownum = 1) S_71A,
+o.branch, o.ref, o.tt, o.nd, to_date(o.pdat, ''dd.mm.yy'') pdat, o.kv, o.s, o.sq, o.nlsa, o.nam_a, o.mfoa, o.nlsb, o.nam_b, o.mfob, o.nazn from oper o, sw_oper so where o.ref = so.ref and o.kv != 980 
 and (o.nlsa like ''1500%'' or o.nlsa like ''1600%'') 
-and o.nlsb = decode(o.mfob, ''302076'', ''29090100010082'',
+and (o.nlsb = decode(o.mfob, ''302076'', ''29090100010082'',
 decode(o.mfob, ''303398'', ''29093100020082'',
 decode(o.mfob, ''305482'', ''29098100030082'',
 decode(o.mfob, ''335106'', ''29093100040082'',
@@ -83,8 +83,9 @@ decode(o.mfob, ''315784'', ''29093100220082'',
 decode(o.mfob, ''354507'', ''29097100230082'',
 decode(o.mfob, ''353553'', ''29097100230082'', 
 decode(o.mfob, ''356334'', ''29096100250082'',
-decode(o.mfob, ''322669'', ''29092100260082'' ))))))))))))))))))))))))  
-and (o.vdat between to_date(:sFdat1,''dd.mm.yyyy'') and to_date(:sFdat2,''dd.mm.yyyy'') )';
+decode(o.mfob, ''322669'', ''29092100260082'' )))))))))))))))))))))))) or 
+o.nlsb in (select a.nls from accounts a where a.nbs = ''2909'' and a.ob22 = ''56'' and a.kv = o.kv and o.mfob = a.kf) )
+and (to_date(o.pdat, ''dd.mm.yy'') between to_date(:sFdat1,''dd.mm.yyyy'') and to_date(:sFdat2,''dd.mm.yyyy'') )';
     l_zpr.xsl_data     := '';
     l_zpr.xsd_data     := '';
 

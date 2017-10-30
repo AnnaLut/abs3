@@ -1,21 +1,20 @@
-
-
 PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/CCK_351.sql =========*** Run *** =
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/CCK_351.sql =========*** 
 PROMPT ===================================================================================== 
 
 
-PROMPT *** Create  procedure CCK_351 ***
+CREATE OR REPLACE PROCEDURE BARS.CCK_351 (p_dat01 date, p_nd integer, p_mode integer  default 0 ) IS
 
-  CREATE OR REPLACE PROCEDURE BARS.CCK_351 (p_dat01 date, p_nd integer, p_mode integer  default 0 ) IS
-
-/* Версия 13.0 25-07-2017   20-06-2017  05-04-2017  06-03-2017  03-03-2017  23-02-2017  01-02-2017  24-01-2017 10-01-2017  21-12-2016  04-10-2016
+/* Версия 14.3   17-10-2017  03-10-2017  06-09-2017  30-08-2017  12-06-2017 16-05-2017 05-04-2017  06-03-2017  03-03-2017  23-02-2017  01-02-2017  24-01-2017 
    Розрахунок кредитного ризику по кредитах + БПК
-
    ----------------------------------------------
+24) 17-10-2017(14.3) - При удалении из таблицы добавила tipa = 90 - 9129 по оверам и 94 - 9129 по БПК
+23) 03-10-2017(14.2) - Тип счета по БПК из REZ_W4_BPK 
 22) 06-09-2017 - Товары в обороте S240 - если срок действия договора < 1 года, иначе не учитывать 
+21) 30-08-2017 - ОВЕР из CC_DEAL по условию VIDD = 110
 21) 25-07-2017 - Для бюджетних установ PD не через перехідні положення (IDF = 70)
 20) 20-06-2017 - S240 - по дате окончания договора
+20) 16-05-2017 - Параметр'UUDV' - при любой ошибке l_dv := 0; + проверка R013 в кавычках ('9') 
 19) 05-04-2017 - rnk = 90931101
 18) 06-03-2017 - Исключен из кредитов 9601
 17) 06-03-2017 - LGD (округление 8 знаков)
@@ -39,10 +38,14 @@ PROMPT *** Create  procedure CCK_351 ***
 
   TIPA:
        3 - кредиты
-       9 - фінансові зобов`язання
        4 - бюджет
+       9 - фінансові зобов`язання - кредиты (9129)
+      10 - ОВЕРДРАФТЫ
       41 - старый процессинг (карточки)
       42 - новый  процессинг (карточки)
+      90 - фінансові зобов`язання - ОВЕРДРАФТЫ (9129)
+      94 - фінансові зобов`язання - БПК (9129)
+
 
   l_tip_fin:
        0 --> 1 - 2
@@ -79,10 +82,11 @@ begin
       p_kol_nd_bpk(p_dat01, 0); 
    end if;
    delete from ex_kl351; 
-   delete from REZ_CR where fdat=p_Dat01 and tipa in ( 3, 9, 41, 42, 4);
-   for d in (SELECT e.nd, e.cc_id, e.vidd, e.fin23, 3 tipa, sdate, wdate, e.prod, e.rnk, e.pd,cck_app.get_nd_txt(e.nd, 'VNCRR') vkr   
+   delete from REZ_CR where fdat=p_Dat01 and tipa in ( 3, 9, 41, 42, 4, 10, 90, 94);
+   for d in (SELECT e.nd, e.cc_id, e.vidd, e.fin23, decode(e.vidd, 110, 10, 3) tipa, sdate, wdate, e.prod, e.rnk, e.pd,
+                    cck_app.get_nd_txt(e.nd, 'VNCRR') vkr   
              FROM CC_DEAL e, nd_open n
-             WHERE  e.VIDD IN (1,2,3,11,12,13)  AND e.SDATE  <  p_DAT01 and  p_nd in (0, e.nd)
+             WHERE  e.VIDD IN (1,2,3,110,11,12,13)  AND e.SDATE  <  p_DAT01 and  p_nd in (0, e.nd)
                and  n.fdat = p_dat01 and e.nd = n.nd -- действующие
              union all
              select distinct nd, null cc_id, 11, fin23, tip_kart tipa, null dat_begin, null dat_end, '2202' prod, null RNK, null pd, vkr 
@@ -93,6 +97,7 @@ begin
       vkr_:= d.vkr;
       if d.prod like '21%' THEN d.tipa := 4; l_tip_fin := 1; end if;
       if d.tipa in (41,42) THEN l_VKR  :='БПК ';       
+      elsif d.tipa in (10) THEN l_VKR  :='ОВЕР';
       else                      l_VKR  :='Кредит ';
                                 l_real := substr(trim(cck_app.get_nd_txt(d.nd, 'REAL')),1,3);
       end if;
@@ -124,9 +129,18 @@ begin
                where  n.nd = d.nd and n.acc = a.acc and nls not like '3%' and a.nbs not in ('2620','9611','9601') 
                  and  a.tip in  ('SNO','SN ','SL ','SLN','SPN','SS ','SP ','SK9','SK0','CR9','SNA','SDI')
                  and  ost_korr(a.acc,l_dat31,null,a.nbs) <>0 and a.rnk = c.rnk;
+
+         elsif d.tipa in ( 10 )  THEN
+            OPEN c0 FOR
+               select a.tip, a.ob22,  a.nls, a.acc, a.kv,  a.nbs, - ost_korr(a.acc,l_dat31,null,a.nbs) S, a.rnk, 
+                      substr( decode(c.custtype,3, c.nmk, nvl(c.nmkk,c.nmk) ) , 1,35) NMK, decode(trim(c.sed),'91',3,c.custtype) custtype,
+                      a.branch, DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6', 2, 1) RZ,trim(c.sed) sed         --, n.nd,a.* 
+               from   nd_acc n,accounts a , customer c
+               where  n.nd = d.nd and n.acc=a.acc and a.nbs in ('2067','2069' ,'2600','2607','2608' ,'9129') 
+                 and  ost_korr(a.acc,l_dat31,null,a.nbs) <>0 and a.rnk = c.rnk;
          else 
             OPEN c0 FOR
-               select a.tip, a.ob22, a.nls, a.acc, a.kv,  a.nbs, - ost_korr(a.acc,l_dat31,null,a.nbs) S, a.rnk, 
+               select b.tip, a.ob22, a.nls, a.acc, a.kv,  a.nbs, - ost_korr(a.acc,l_dat31,null,a.nbs) S, a.rnk, 
                       substr( decode(c.custtype,3, c.nmk, nvl(c.nmkk,c.nmk) ) , 1,35) NMK, c.custtype, 
                       a.branch, DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6', 2, 1) RZ, '00' sed        
                from   rez_w4_bpk b, accounts a, customer c 
@@ -147,7 +161,7 @@ begin
             l_pdef := null; --f_pdef(s.rnk,d.nd); --    події дефолту;
             l_ovd  := null; --f_ovd (s.rnk,d.nd); --    ознаки визнання дефолту;
             l_opd  := null; --f_opd (s.rnk,d.nd); --    ознаки припинення дефолту;
-            l_kol  := f_get_nd_val(d.nd, p_dat01, d.tipa, s.rnk);
+            l_kol  := f_get_nd_val_n('KOL', d.nd, p_dat01, d.tipa, s.rnk);
             l_s240 := case when (p_dat01 >= d.wdate ) THEN 'Z' else  F_SROK (D.SDATE, d.wdate, 2) end;  
             --l_s240 := Fs240 (p_dat01, s.acc );
 
@@ -194,7 +208,7 @@ begin
                           ELSE 0 END
                           INTO l_dv 
                   FROM customerw WHERE rnk=s.rnk AND trim(tag)='UUDV';
-               EXCEPTION WHEN NO_DATA_FOUND THEN l_dv := 0;  
+               EXCEPTION WHEN OTHERS THEN l_dv := 0;  
                END; 
             end if;
             if    s.custtype = 2 and d.tipa = 4 THEN l_tip_fin := 1;  -- Бюджетные 
@@ -234,9 +248,9 @@ begin
                --l_fin := null;     
                l_ccf := 100; l_pd_0 := 0; l_text := NULL; 
                --logger.info('REZ_351 44 : nd = ' || d.nd || ' z.pawn = '|| z.pawn || ' d.vidd='||d.vidd ) ;
-               if     d.tipa in (41,42) and s.custtype = 2 THEN d.vidd := 1 ;
-               elsif  d.tipa in (41,42)                    THEN d.vidd := 11; 
-               elsif  s.sed = '91'                         THEN d.vidd := 11;       
+               if     d.tipa in (41,42,10) and s.custtype = 2 THEN d.vidd := 1 ;
+               elsif  d.tipa in (41,42,10)                    THEN d.vidd := 11; 
+               elsif  s.sed = '91'                            THEN d.vidd := 11;       
                end if; 
                if    d.vidd in ( 1, 2, 3) and d.prod like '21%'                THEN l_idf:=70; l_f := 76; l_fp := 48;
                elsif d.vidd in ( 1, 2, 3)                                      THEN l_idf:=50; l_f := 56;  
@@ -248,10 +262,11 @@ begin
                else                                                                 l_idf:=65; l_f := 60; l_fp := 45;  
                end if;
 
-               if s.nbs like '9%' THEN l_tipa := 9;
-               else                    l_tipa := d.tipa;
+               if    s.nbs like '9%' and d.tipa = 10 THEN l_tipa := 90;
+               elsif s.nbs like '9%'                 THEN l_tipa := 9;
+               else                                       l_tipa := d.tipa;
                end if;     
-               if s.nbs in ('9129','9122') and l_r013 = 1 THEN  -- 351 (п.104)
+               if s.nbs in ('9129','9122') and l_r013 = '1' THEN  -- 351 (п.104)
                   if d.wdate is not null and d.sdate is not null THEN
                      l_srok := d.wdate-d.sdate;
                      if    l_srok <  365 THEN l_CCF :=  20;
@@ -295,7 +310,7 @@ begin
                l_RC      := 0;
                l_RCQ     := 0;
                --logger.info('REZ_351 40 : nd = ' || d.nd || ' l_idf =' || l_idf || ' l_pd =' || l_pd || ' s.rnk=' ||s.rnk ) ;
-               if (( l_ead = 0 or l_ead is null ) and z.sall is null and d.tipa in (41,42) ) or s.nbs='9129'  THEN 
+               if (( l_ead = 0 or l_ead is null ) and z.sall is null and d.tipa in (41,42,10) ) or s.nbs='9129'  THEN 
                   l_EAD  := nvl(z.bv_all,z.bv02);
                end if;
                l_EAD     := greatest(l_EAD,0);
@@ -312,7 +327,7 @@ begin
                l_EADQ    := p_icurval(s.kv,l_EAD*100,l_dat31)/100;                  
                if (l_ead = 0 and z.pawn is null) or nvl(l_s,0) + nvl(L_RC,0) = 0 THEN L_LGD := 1;
                    --logger.info('REZ_351 41 : nd = ' || d.nd || ' l_zal_lgd =' || l_zal_lgd || ' l_s =' || l_s || ' l_LGD =' || l_LGD ) ;
-               else                                                                 l_LGD := round(greatest(0,1 - (l_zal_lgd + L_RC) / l_s),8); 
+               else                                                                   l_LGD := round(greatest(0,1 - (l_zal_lgd + L_RC) / l_s),8); 
                    --logger.info('REZ_351 42 : nd = ' || d.nd || ' l_zal_lgd =' || l_zal_lgd || ' l_s =' || l_s || ' l_LGD =' || l_LGD ) ;    
                end if;
 
@@ -329,7 +344,7 @@ begin
                END IF; 
 
                --logger.info('REZ_351 34 : nd = ' || d.nd || ' l_fp =' || l_fp || ' l_pd =' || l_pd  ) ;    
-               if (s.nbs in ('9129','9122') and l_r013 = 9) or s.nbs in ('9023') and l_r013 = 1 THEN 
+               if (s.nbs in ('9129','9122') and l_r013 = '9') or s.nbs in ('9023') and l_r013 = '1' THEN 
                   l_pd := 0; l_fin := 1; l_pd_0 := 1;  
                   l_s080    := f_get_s080 (p_dat01,l_tip_fin, l_fin);
                end if;
@@ -347,8 +362,8 @@ begin
                l_CR_LGD  := l_ead*l_pd*l_lgd;
                l_zal_bv  := z.sall/100;
                l_zal_bvq := p_icurval(s.kv,l_zal_bv*100,l_dat31)/100;      
-               if (l_tipa = 9 and l_r013 = 9) or l_tipa <> 9  THEN l_ccf := NULL; end if;
-               if  l_tipa = 9 THEN l_s250 := NULL; l_grp := NULL; end if;
+               if (l_tipa in ( 9, 90) and  l_r013  = '9') or l_tipa not in (9,90) THEN l_ccf := NULL; end if;
+               if  l_tipa in ( 9, 90) THEN l_s250 := NULL; l_grp := NULL; end if;
                --logger.info('REZ_351 4 : nd = ' || d.nd || ' l_fin = '|| l_fin || ' l_pd = ' || l_pd  ) ;   
                INSERT INTO REZ_CR (fdat   , RNK      , NMK    , ND     , KV     , NLS   , ACC       , EAD     , EADQ    , FIN     , PD       , 
                                    CR     , CRQ      , bv     , bvq    , VKR    , IDF   , KOL       , FIN23   , TEXT    , tipa    , pawn     , 
@@ -390,18 +405,15 @@ begin
       end;
    End LOOP;
    z23.to_log_rez (user_id , 351 , p_dat01 ,'Конец Кредиты + БПК 351 ');
-   over_351 (p_dat01,1);
+   if not f_mmfo THEN over_351 (p_dat01,1); end if;
 end;
 /
 show err;
 
-PROMPT *** Create  grants  CCK_351 ***
-grant EXECUTE                                                                on CCK_351         to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on CCK_351         to RCC_DEAL;
-grant EXECUTE                                                                on CCK_351         to START1;
-
-
+grant EXECUTE   on CCK_351  to BARS_ACCESS_DEFROLE;
+grant EXECUTE   on CCK_351  to RCC_DEAL;
+grant EXECUTE   on CCK_351  to START1;
 
 PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/CCK_351.sql =========*** End *** =
+PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/CCK_351.sql =========*** 
 PROMPT ===================================================================================== 

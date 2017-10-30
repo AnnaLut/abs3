@@ -82,7 +82,7 @@ show errors
 
 create or replace package body PRVN_FLOW
 is
-  g_body_version  constant varchar2(64) := 'version 9.6  22.07.2017';
+  g_body_version  constant varchar2(64) := 'version 9.7  26.10.2017';
   
   individuals_shd signtype := 1; -- 1/0 - формувати графіки для ФО
   
@@ -182,15 +182,15 @@ procedure DRAPS02( p_dat31 date  )  is      l_dat31 date;
  end DRAPS02 ;
 
 procedure REC_23  ( p_dat01 date)  is
-   sid_    varchar2(64);   sess_   varchar2(64) :=bars_login.get_session_clientid;
-   l_dat31 date ; l_msg varchar2(250);
+   l_res_kf  varchar2(13); sid_    varchar2(64) ;   sess_   varchar2(64) :=bars_login.get_session_clientid;
+   l_dat31   date        ; l_msg   varchar2(250);
 begin
    l_msg:= '3) CR-351: *Пере-Формування Кредитного ризику НБУ-351';
    PRVN_FLOW.SeND_MSG (p_txt => 'BEG:'||l_msg );
-
+   l_res_kf := trim('RESERVE'||sys_context('bars_context','user_mfo')); 
    -- защита от двойного старта
    SYS.DBMS_SESSION.CLEAR_IDENTIFIER;
-   sid_:=SYS_CONTEXT('BARS_GLPARAM','RESERVE');
+   sid_:=SYS_CONTEXT('BARS_GLPARAM',l_res_kf);
    SYS.DBMS_SESSION.SET_IDENTIFIER(sess_);
 
    begin
@@ -201,12 +201,12 @@ begin
 
    l_dat31 := p_dat01-1 ;
    PRVN_FLOW.SeND_MSG (p_txt => 'BEG DRAPS:'||l_dat31||l_msg );
-   MDRAPS ( l_dat31 ) ;
+   --MDRAPS ( l_dat31 ) ;
    PRVN_FLOW.SeND_MSG (p_txt => 'END DRAPS:'||l_dat31||l_msg );
 
    -------------------------
    -- установка флага
-   gl.setp('RESERVE',SYS_CONTEXT ('USERENV', 'SID'),NULL);
+   gl.setp(l_res_kf,SYS_CONTEXT ('USERENV', 'SID'),NULL);
 
 /*
    p_2401(p_dat01);            -- ->00.Розподіл фін.актівів на суттєві та несуттєві
@@ -222,7 +222,7 @@ begin
 -------------------------------------------------------------------
    CR(p_dat01);                --      Розрахунок резерву
    -- снятие флага
-   gl.setp('RESERVE','',NULL);
+   gl.setp(l_res_kf,'',NULL);
    COMMIT;
 
    PRVN_FLOW.SeND_MSG (p_txt => 'END:'||l_msg );

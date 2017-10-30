@@ -4,7 +4,7 @@
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bars_audit.sql =========*** Run *** 
  PROMPT ===================================================================================== 
  
-  CREATE OR REPLACE PACKAGE BARS.BARS_AUDIT 
+create or replace package bars.bars_audit
 is
 
     -------------------------------------------------------
@@ -514,7 +514,7 @@ is
         p_make_context_snapshot in boolean default false);
 end;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.BARS_AUDIT 
+create or replace package body bars.bars_audit
 is
 
 
@@ -945,9 +945,9 @@ is
              client_identifier )
          values(
              s_secaudit.nextval,
-             g_absUserID,
+             nvl(to_number(sys_context('bars_global', 'user_id')), -1),
              sys_context('userenv', 'session_userid'),
-             nvl(sys_context('bars_global', 'user_name'),'UNKNOWN'),
+             nvl(sys_context('bars_global', 'user_name'), 'UNKNOWN'),
              sys_context('userenv', 'proxy_user'),
              l_rectype,
              l_recmodule,
@@ -2427,4 +2427,3 @@ grant EXECUTE                                                                on 
  PROMPT ===================================================================================== 
  PROMPT *** End *** ========== Scripts /Sql/BARS/package/bars_audit.sql =========*** End *** 
  PROMPT ===================================================================================== 
- 

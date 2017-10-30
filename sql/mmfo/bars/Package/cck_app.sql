@@ -227,7 +227,7 @@ END CCK_APP;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.CCK_APP AS
 
- G_BODY_VERSION  CONSTANT VARCHAR2(64)  := 'version 6 04/08/2014';
+ G_BODY_VERSION  CONSTANT VARCHAR2(64)  := 'version 7 25/10/2017';
 
 --------------------------------------------------------------
 
@@ -238,12 +238,12 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK_APP AS
   function to_number2(p varchar2) return number IS
   begin
       return TO_number(trim(p),
-                     '99999999999D99999',
+                     '999999999999999D99999',
                      'NLS_NUMERIC_CHARACTERS = ''. ''');
    exception when others then
      --EXECUTE IMMEDIATE 'alter session set NLS_NUMERIC_CHARACTERS=''.,''';
       return TO_number(trim(p),
-                     '99999999999D99999',
+                     '999999999999999D99999',
                      'NLS_NUMERIC_CHARACTERS = '', ''');
   end;
 

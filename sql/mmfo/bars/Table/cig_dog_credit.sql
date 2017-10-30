@@ -12,7 +12,7 @@ BEGIN
         execute immediate  
           'begin  
                bpa.alter_policy_info(''CIG_DOG_CREDIT'', ''CENTER'' , null, null, null, null);
-               bpa.alter_policy_info(''CIG_DOG_CREDIT'', ''FILIAL'' , null, null, null, null);
+               bpa.alter_policy_info(''CIG_DOG_CREDIT'', ''FILIAL'' , ''B'', ''B'', ''B'', ''B'');
                bpa.alter_policy_info(''CIG_DOG_CREDIT'', ''WHOLE'' , null, null, null, null);
                null;
            end; 

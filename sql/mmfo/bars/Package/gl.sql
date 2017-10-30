@@ -7,44 +7,51 @@ IS
 --
 --***************************************************************--
 
-G_HEADER_VERSION  CONSTANT VARCHAR2(64)  := 'version 7.2  13/09/2017';
+  G_HEADER_VERSION  CONSTANT VARCHAR2(64)  := 'version 7.3  26/10/2017';
 
-G_AWK_HEADER_DEFS CONSTANT VARCHAR2(512) := '';
-    aMFO    VARCHAR(12) DEFAULT NULL;  -- Local bank MFO
-    aOKPO   VARCHAR(12) DEFAULT NULL;  -- Local bank TAX Code
-    bDATE   DATE        DEFAULT NULL;  -- Current Banking day (local)
---  gbDATE  DATE        DEFAULT NULL;  -- Current Banking day (global)
-    vDATE   DATE        DEFAULT NULL;  -- Current Value date
-    aUID    NUMBER      DEFAULT NULL;  -- current user id
-    aUKF    VARCHAR2(6) DEFAULT NULL;  -- current user branch code
-    baseval NUMBER      DEFAULT 980 ;  -- Base Currency
-    aRNK    NUMBER      DEFAULT 1   ;  -- Local bank RNK
-    fRCVR   NUMBER      DEFAULT 0;     -- Recovery flag
-    fSOS0   NUMBER      DEFAULT 0;     -- Normal=0/Clearing=1 transaction
+  G_AWK_HEADER_DEFS CONSTANT VARCHAR2(512) := '';
 
-    aREF    NUMBER      DEFAULT NULL;  -- current refrence
-    aSTMT   NUMBER      DEFAULT 0;     -- current statement number
-    aOROW   UROWID      DEFAULT NULL;  -- current opldok rowid
-    aTT     CHAR(3)     DEFAULT NULL;  -- current tt
-    aSOS    NUMBER      DEFAULT NULL;  -- current doc payment status
-    aFMcheck SMALLINT   DEFAULT NULL;  -- FM-check status
+  p_notpaid         CONSTANT NUMBER := 0;
+  p_booked          CONSTANT NUMBER := 1;
+  p_forward         CONSTANT NUMBER := 3;
+  p_cleared         CONSTANT NUMBER := 5;
 
-    acc_rec accounts%ROWTYPE;       -- Transit record of accounts update(TRIG)
-    acc_otm SMALLINT;               -- Flag of kind changing for Accounts_Update
+  p_vp              CONSTANT CHAR(3) := 'VP ';
+  p_vvp             CONSTANT CHAR(3) := 'VVP';
 
-    TYPE    saldrec IS RECORD      -- Transit record of saldoa table (TRIG)
+  aMFO     VARCHAR(12) DEFAULT NULL;  -- Local bank MFO
+  aOKPO    VARCHAR(12) DEFAULT NULL;  -- Local bank TAX Code
+  bDATE    DATE        DEFAULT NULL;  -- Current Banking day (local)
+--gbDATE   DATE        DEFAULT NULL;  -- Current Banking day (global)
+  vDATE    DATE        DEFAULT NULL;  -- Current Value date
+  aUID     NUMBER      DEFAULT NULL;  -- current user id
+  aUKF     VARCHAR2(6) DEFAULT NULL;  -- current user branch code
+  baseval  NUMBER      DEFAULT 980 ;  -- Base Currency
+  aRNK     NUMBER      DEFAULT 1   ;  -- Local bank RNK
+  fRCVR    NUMBER      DEFAULT 0;     -- Recovery flag
+  fSOS0    NUMBER      DEFAULT 0;     -- Normal=0/Clearing=1 transaction
+  
+  aREF     NUMBER      DEFAULT NULL;  -- current refrence
+  aSTMT    NUMBER      DEFAULT 0;     -- current statement number
+  aOROW    UROWID      DEFAULT NULL;  -- current opldok rowid
+  aTT      CHAR(3)     DEFAULT NULL;  -- current tt
+  aSOS     NUMBER      DEFAULT NULL;  -- current doc payment status
+  aFMcheck SMALLINT    DEFAULT NULL;  -- FM-check status
+  
+  acc_rec  accounts%ROWTYPE;       -- Transit record of accounts update(TRIG)
+  acc_otm  SMALLINT;               -- Flag of kind changing for Accounts_Update
 
-               ( a_acc    NUMBER,
-                 a_ost    NUMBER,
-                 b_ost    NUMBER,
-                 a_ostq   NUMBER,
-		 b_ostq   NUMBER
-	       );
+  TYPE saldrec IS RECORD      -- Transit record of saldoa table (TRIG)
+           ( a_acc    NUMBER,
+             a_ost    NUMBER,
+             b_ost    NUMBER,
+             a_ostq   NUMBER,
+             b_ostq   NUMBER
+           );
 
-        val               saldrec;
+  val      saldrec;
 
-    TYPE    t_acc_rec IS RECORD      -- Transit record of accounts update(TRIG)
-
+  TYPE t_acc_rec IS RECORD      -- Transit record of accounts update(TRIG)
                (n_acc    INTEGER,
                 n_nls    VARCHAR2(15),
                 n_nlsalt VARCHAR2(15),
@@ -65,52 +72,42 @@ G_AWK_HEADER_DEFS CONSTANT VARCHAR2(512) := '';
                 n_blkk   SMALLINT,
                 n_otm    SMALLINT);
 
-        avl               t_acc_rec;
+  avl      t_acc_rec;
 
-    TYPE    cus_rec IS RECORD      -- Transit record of customers update(TRIG)
+--TYPE    cus_rec IS RECORD      -- Transit record of customers update(TRIG)
+--             (n_rnk        customer.rnk%type,
+--              n_custtype   customer.custtype%type,
+--              n_country    customer.country%type,
+--              n_nmk        customer.nmk%type,
+--              n_nmkv       customer.nmkv%type,
+--              n_nmkk       customer.nmkk%type,
+--              n_codcagent  customer.codcagent%type,
+--              n_prinsider  customer.prinsider%type,
+--              n_okpo       customer.okpo%type,
+--              n_adr        customer.adr%type,
+--              n_sab        customer.sab%type,
+--              n_taxf       customer.taxf%type,
+--              n_c_reg      customer.c_reg%type,
+--              n_c_dst      customer.c_dst%type,
+--              n_rgtax      customer.rgtax%type,
+--              n_datet      customer.datet%type,
+--              n_adm        customer.adm%type,
+--              n_datea      customer.datea%type,
+--              n_stmt       customer.stmt%type,
+--              n_date_on    customer.date_on%type,
+--              n_date_off   customer.date_off%type,
+--              n_notes      customer.notes%type,
+--              n_notesec    customer.notesec%type,
+--              n_crisk      customer.crisk%type,
+--              n_pincode    customer.pincode%type,
+--              n_otm        SMALLINT);
+--
+--cvl               cus_rec;
 
-               (n_rnk        customer.rnk%type,
-                n_custtype   customer.custtype%type,
-                n_country    customer.country%type,
-                n_nmk        customer.nmk%type,
-                n_nmkv       customer.nmkv%type,
-                n_nmkk       customer.nmkk%type,
-                n_codcagent  customer.codcagent%type,
-                n_prinsider  customer.prinsider%type,
-                n_okpo       customer.okpo%type,
-                n_adr        customer.adr%type,
-                n_sab        customer.sab%type,
-                n_taxf       customer.taxf%type,
-                n_c_reg      customer.c_reg%type,
-                n_c_dst      customer.c_dst%type,
-                n_rgtax      customer.rgtax%type,
-                n_datet      customer.datet%type,
-                n_adm        customer.adm%type,
-                n_datea      customer.datea%type,
-                n_stmt       customer.stmt%type,
-                n_date_on    customer.date_on%type,
-                n_date_off   customer.date_off%type,
-                n_notes      customer.notes%type,
-                n_notesec    customer.notesec%type,
-                n_crisk      customer.crisk%type,
-                n_pincode    customer.pincode%type,
-                n_otm        SMALLINT);
-
-        cvl               cus_rec;
-
-        p_notpaid   CONSTANT NUMBER := 0;
-        p_booked    CONSTANT NUMBER := 1;
-        p_forward   CONSTANT NUMBER := 3;
-        p_cleared   CONSTANT NUMBER := 5;
-
-        p_vp        CONSTANT CHAR(3)  := 'VP ';
-        p_vvp       CONSTANT CHAR(3)  := 'VVP';
-
-doc      oper%rowtype;   -- GLОбраз документа
-opl      opldok%rowtype; -- Образ записи проводки
-cus      customer%rowtype; -- Образ записи клиентов
-acc      accounts%rowtype; -- образ записи счетов
-
+  doc      oper%rowtype;     -- GLОбраз документа
+  opl      opldok%rowtype;   -- Образ записи проводки
+  cus      customer%rowtype; -- Образ записи клиентов
+  acc      accounts%rowtype; -- образ записи счетов
 
 /**
  * version - возвращает версию пакета
@@ -514,6 +511,15 @@ FUNCTION gbd RETURN DATE;
 
 FUNCTION kf RETURN VARCHAR2;
 
+/*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION  : USR_ID
+% DESCRIPTION : Returns current user id
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
+
+function USR_ID return number;
+
 END gl;
 /
 
@@ -531,7 +537,7 @@ is
   --
   --***************************************************************--
 
-  G_BODY_VERSION  CONSTANT VARCHAR2(100)  := '$7.9 2017-09-18';
+  G_BODY_VERSION  CONSTANT VARCHAR2(100)  := '$7.11 2017-10-26';
 
   G_AWK_BODY_DEFS CONSTANT VARCHAR2(512) := '';
   
@@ -1719,6 +1725,11 @@ IF p_flag IN (1,2,3) THEN -- Pay cleared
 
          END IF;
 
+         IF ( x*ms_<0 AND tip_='OVN' )
+         THEN
+           execute immediate 'begin OVRN.DEB_LIM ( :acc, :s ); end;' USING acc_, x*ms_;
+         END IF;
+
          IF gl.fRCVR <> 2 THEN  -- check to see if trig fired
             erm := '9341 - No triggers TU_SAL enabled';
             RAISE err;
@@ -2870,9 +2881,9 @@ FOR d IN ( SELECT gl.bDATE fdat FROM dual
 
 
 	  if length(ref_) > 10 then
-   	     l_nd := substr(ref_,-10) ;
+      l_nd := substr(ref_,-10);
 	  else
-	     l_nd := ref_;
+      l_nd := ref_;
 	  end if;
 
 	  INSERT INTO oper (ref,tt,vob,nd,dk,pdat,vdat,datd,userid,
@@ -3219,7 +3230,8 @@ is
   l_kf       oper.kf%type := gl.aMFO;
   l_branch   oper.branch%type := sys_context('bars_context','user_branch');
   
-  CURSOR c0 IS
+  CURSOR c0 ( v_min_dt date, v_max_dt date )
+  IS
   select o.ref, o.acc, o.fdat, decode(p.VOB,96,96,99,99,6) as VOB
        , o.DK, o.S, o.SQ, o.ROWID
     from OPER    p
@@ -3229,7 +3241,7 @@ is
      and o.ref = q.ref
      and p.ref = q.ref
      and o.ref = p.ref
---   and o.FDAT between DAT_NEXT_U( GL.GBD, -1 ) and GL.GBD
+     and o.FDAT between v_min_dt and v_max_dt
    order by 4, o.ACC, o.FDAT
      FOR UPDATE OF q.ref NOWAIT;
   
@@ -3241,7 +3253,7 @@ BEGIN
   
   gl.fSOS0 := 1;
 
-  OPEN c0;
+  OPEN c0( DAT_NEXT_U( GL.GBD, -1 ), GL.GBD );
   
   savepoint this#accountT00;
   
@@ -3296,7 +3308,7 @@ BEGIN
           values ( ref_, 'R00', acc_, fdat_, 0 ,sde_, sdeq_, 4, 1, l_kf );
         END IF;
         
-        IF skr_>0 
+        IF ( skr_ > 0 )
         THEN
           INSERT
             INTO OPLDOK ( REF, TT, ACC, FDAT, DK, S, SQ, SOS, STMT, KF )
@@ -3688,7 +3700,7 @@ END bd;
 FUNCTION gbd RETURN DATE
 IS
 BEGIN
-  RETURN gl.gbDATE;
+  return GL.gbDATE;
 END gbd;
 
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -3701,8 +3713,21 @@ END gbd;
 FUNCTION kf RETURN VARCHAR2
 IS
 BEGIN
-  RETURN gl.aMFO;
+  return GL.aMFO;
 END kf;
+
+/*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION  : USR_ID
+% DESCRIPTION : Returns current user id
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
+
+function USR_ID return number
+is
+begin
+  return GL.aUID;
+end USR_ID;
 
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %

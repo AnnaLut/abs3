@@ -997,10 +997,10 @@ create or replace package body sto_payment_utl as
 				select id
 				into   l_sbon_user_id
 				from   staff$base t
-				where  t.logname = branch_attribute_utl.get_value(sys_context('BARS_CONTEXT', 'USER_BRANCH'), 'STO_USER');
+				where  t.logname = branch_attribute_utl.get_value('/'||rec.kf||'/', 'STO_USER');
 			exception
 				when no_data_found then
-					 raise_application_error(-20000, 'Технологічний користувач СБОН з логіном {' || getglobaloption('STO_USER') || '} не знайдений');
+					 raise_application_error(-20000, 'Технологічний користувач СБОН з логіном {' || branch_attribute_utl.get_value('/'||rec.kf||'/', 'STO_USER') || '} не знайдений');
 			end;
 			bars_login.login_user(sys_guid(), l_sbon_user_id, '', '');	
 			

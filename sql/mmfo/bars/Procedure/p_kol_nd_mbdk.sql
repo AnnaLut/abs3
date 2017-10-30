@@ -1,17 +1,15 @@
-
-
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_KOL_ND_MBDK.sql =========*** Run
 PROMPT ===================================================================================== 
-
 
 PROMPT *** Create  procedure P_KOL_ND_MBDK ***
 
   CREATE OR REPLACE PROCEDURE BARS.P_KOL_ND_MBDK (p_dat01 date, p_mode integer) IS 
 
-/* Версия 3.0 24-01-2017  03-10-2016
+/* Версия 3.1 24-01-2017  03-10-2016
    Кількість днів прострочки по договорам МБДК + коррахунки
    -------------------------------------
+ 3) 17-10-2017(3.1) - Счета через REZ_DEB
  2) 24-01-2017 - Добавлен параметр S080 в p_get_nd_val
  1) 03-10-2016 - В p_get_nd_val добавлен РНК
 */
@@ -62,8 +60,10 @@ begin
          select nvl(max(kol),0) into kol_ 
          from  (select a.acc, a.nls, a.kv, nvl(f_days_past_due(p_DAT01, a.acc,decode(k.custtype,3,25000,50000)),0) kol 
                 from  nd_acc n, accounts a 
-                where n.nd=k.nd and n.acc=a.acc and a.nbs in ('1517','1527','1529','1509')  and a.nbs not in ('1500','1502') 
-                      and ost_korr(a.acc,l_dat31,null,a.nbs) <0);
+                where n.nd=k.nd and n.acc=a.acc 
+                  and (a.nbs     in (select nbs from rez_deb  where grupa = 3 and ( d_close is null or d_close > p_DAT01 )) or a.tip in ('SP ','SPN')) --('1517','1527','1529','1509') 
+                  and  a.nbs not in (select nbs from rez_deb  where grupa = 2 and ( d_close is null or d_close > p_DAT01 ))                             --('1500','1502') 
+                  and ost_korr(a.acc,l_dat31,null,a.nbs) <0);
       EXCEPTION WHEN NO_DATA_FOUND THEN  kol_ := 0;
       END;
       --if    s.RZ =2 THEN l_idf := 81;

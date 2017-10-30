@@ -8,19 +8,19 @@ begin
   --населяем заново
 
   insert into upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID, PREFUN)
-  values (l_file_id, 1, 'LAST_NAME', 'Прізвище', 'VARCHAR2', 50, null, null, null, 'Y', null, null, null, null, null);
+  values (l_file_id, 1, 'LAST_NAME', 'Прізвище', 'VARCHAR2', 50, null, null, null, 'Y', null, '35,09,13,10|32,32,32,32', null, null, null);
 
   insert into upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID, PREFUN)
-  values (l_file_id, 2, 'FIRST_NAME', 'Ім''я', 'VARCHAR2', 50, null, null, null, 'Y', null, null, null, null, null);
+  values (l_file_id, 2, 'FIRST_NAME', 'Ім''я', 'VARCHAR2', 50, null, null, null, 'Y', null, '35,09,13,10|32,32,32,32', null, null, null);
 
   insert into upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID, PREFUN)
-  values (l_file_id, 3, 'MIDDLE_NAME', 'По-батькові', 'VARCHAR2', 60, null, null, null, 'Y', null, null, null, null, null);
+  values (l_file_id, 3, 'MIDDLE_NAME', 'По-батькові', 'VARCHAR2', 60, null, null, null, 'Y', null, '35,09,13,10|32,32,32,32', null, null, null);
 
   insert into upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID, PREFUN)
   values (l_file_id, 4, 'BDAY', 'Дата народження', 'DATE', 7, null, 'dd/mm/yyyy', null, 'Y', null, null, null, null, null);
 
   insert into upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID, PREFUN)
-  values (l_file_id, 5, 'GR', 'Громадянство', 'VARCHAR2', 30, null, null, null, 'Y', null, null, null, null, null);
+  values (l_file_id, 5, 'GR', 'Громадянство', 'VARCHAR2', 30, null, null, null, 'Y', null, '35,09,13,10|32,32,32,32', null, null, null);
 
   insert into upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID, PREFUN)
   values (l_file_id, 6, 'PASSP', 'Тип документу', 'NUMBER', 22, 0, null, null, 'Y', null, null, null, null, null);
@@ -29,13 +29,13 @@ begin
   values (l_file_id, 7, 'SER', 'Серія', 'VARCHAR2', 10, null, null, null, 'Y', null, null, null, null, null);
 
   insert into upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID, PREFUN)
-  values (l_file_id, 8, 'NUMDOC', 'Номер документу', 'VARCHAR2', 20, null, null, null, 'Y', null, null, null, null, null);
+  values (l_file_id, 8, 'NUMDOC', 'Номер документу', 'VARCHAR2', 20, null, null, null, 'Y', null, '35,09,13,10|32,32,32,32', null, null, null);
 
   insert into upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID, PREFUN)
   values (l_file_id, 9, 'PDATE', 'Дата видачі', 'DATE', 7, null, 'dd/mm/yyyy', null, 'Y', null, null, null, null, null);
 
   insert into upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID, PREFUN)
-  values (l_file_id, 10, 'ORGAN', 'Орган видачі', 'VARCHAR2', 70, null, null, null, 'Y', null, null, null, null, null);
+  values (l_file_id, 10, 'ORGAN', 'Орган видачі', 'VARCHAR2', 70, null, null, null, 'Y', null, '35,09,13,10|32,32,32,32', null, null, null);
 
   insert into upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID, PREFUN)
   values (l_file_id, 11, 'PASSP_EXPIRE_TO', 'Документ дійсний до', 'DATE', 7, null, 'dd/mm/yyyy', null, 'Y', null, null, null, null, null);
@@ -77,16 +77,16 @@ begin
   values (l_file_id, 23, 'ADR_POST_COUNTRY', 'Країна', 'VARCHAR2', 55, null, null, null, 'Y', null, null, null, null, null);
 
   insert into upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID, PREFUN)
-  values (l_file_id, 24, 'ADR_POST_DOMAIN', 'Область', 'VARCHAR2', 30, null, null, null, 'Y', null, null, null, null, null);
+  values (l_file_id, 24, 'ADR_POST_DOMAIN', 'Область', 'VARCHAR2', 30, null, null, null, 'Y', null, '35,09,13,10|32,32,32,32', null, null, null);
 
   insert into upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID, PREFUN)
-  values (l_file_id, 25, 'ADR_POST_REGION', 'Район', 'VARCHAR2', 30, null, null, null, 'Y', null, null, null, null, null);
+  values (l_file_id, 25, 'ADR_POST_REGION', 'Район', 'VARCHAR2', 30, null, null, null, 'Y', null, '35,09,13,10|32,32,32,32', null, null, null);
 
   insert into upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID, PREFUN)
-  values (l_file_id, 26, 'ADR_POST_LOC', 'Населений пункт', 'VARCHAR2', 30, null, null, null, 'Y', null, null, null, null, null);
+  values (l_file_id, 26, 'ADR_POST_LOC', 'Населений пункт', 'VARCHAR2', 30, null, null, null, 'Y', null, '35,09,13,10|32,32,32,32', null, null, null);
 
   insert into upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID, PREFUN)
-  values (l_file_id, 27, 'ADR_POST_ADR', 'Вулиця, будинок, квартира', 'VARCHAR2', 100, null, null, null, 'Y', null, null, null, null, null);
+  values (l_file_id, 27, 'ADR_POST_ADR', 'Вулиця, будинок, квартира', 'VARCHAR2', 100, null, null, null, 'Y', null, '35,09,13,10|32,32,32,32', null, null, null);
 
   insert into upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID, PREFUN)
   values (l_file_id, 28, 'ADR_POST_ZIP', 'Поштовий індекс', 'VARCHAR2', 20, null, null, null, 'Y', null, null, null, null, null);
@@ -95,16 +95,16 @@ begin
   values (l_file_id, 29, 'ADR_FACT_COUNTRY', 'Країна', 'VARCHAR2', 55, null, null, null, 'Y', null, null, null, null, null);
 
   insert into upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID, PREFUN)
-  values (l_file_id, 30, 'ADR_FACT_DOMAIN', 'Область', 'VARCHAR2', 30, null, null, null, 'Y', null, null, null, null, null);
+  values (l_file_id, 30, 'ADR_FACT_DOMAIN', 'Область', 'VARCHAR2', 30, null, null, null, 'Y', null, '35,09,13,10|32,32,32,32', null, null, null);
 
   insert into upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID, PREFUN)
-  values (l_file_id, 31, 'ADR_FACT_REGION', 'Район', 'VARCHAR2', 30, null, null, null, 'Y', null, null, null, null, null);
+  values (l_file_id, 31, 'ADR_FACT_REGION', 'Район', 'VARCHAR2', 30, null, null, null, 'Y', null, '35,09,13,10|32,32,32,32', null, null, null);
 
   insert into upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID, PREFUN)
-  values (l_file_id, 32, 'ADR_FACT_LOC', 'Населений пункт', 'VARCHAR2', 30, null, null, null, 'Y', null, null, null, null, null);
+  values (l_file_id, 32, 'ADR_FACT_LOC', 'Населений пункт', 'VARCHAR2', 30, null, null, null, 'Y', null, '35,09,13,10|32,32,32,32', null, null, null);
 
   insert into upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID, PREFUN)
-  values (l_file_id, 33, 'ADR_FACT_ADR', 'Вулиця, будинок, квартира', 'VARCHAR2', 100, null, null, null, 'Y', null, null, null, null, null);
+  values (l_file_id, 33, 'ADR_FACT_ADR', 'Вулиця, будинок, квартира', 'VARCHAR2', 100, null, null, null, 'Y', null, '35,09,13,10|32,32,32,32', null, null, null);
 
   insert into upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID, PREFUN)
   values (l_file_id, 34, 'ADR_FACT_ZIP', 'Поштовий індекс', 'VARCHAR2', 20, null, null, null, 'Y', null, null, null, null, null);
@@ -113,16 +113,16 @@ begin
   values (l_file_id, 35, 'ADR_WORK_COUNTRY', 'Країна', 'VARCHAR2', 55, null, null, null, 'Y', null, null, null, null, null);
 
   insert into upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID, PREFUN)
-  values (l_file_id, 36, 'ADR_WORK_DOMAIN', 'Область', 'VARCHAR2', 30, null, null, null, 'Y', null, null, null, null, null);
+  values (l_file_id, 36, 'ADR_WORK_DOMAIN', 'Область', 'VARCHAR2', 30, null, null, null, 'Y', null, '35,09,13,10|32,32,32,32', null, null, null);
 
   insert into upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID, PREFUN)
-  values (l_file_id, 37, 'ADR_WORK_REGION', 'Район', 'VARCHAR2', 30, null, null, null, 'Y', null, null, null, null, null);
+  values (l_file_id, 37, 'ADR_WORK_REGION', 'Район', 'VARCHAR2', 30, null, null, null, 'Y', null, '35,09,13,10|32,32,32,32', null, null, null);
 
   insert into upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID, PREFUN)
-  values (l_file_id, 38, 'ADR_WORK_LOC', 'Населений пункт', 'VARCHAR2', 30, null, null, null, 'Y', null, null, null, null, null);
+  values (l_file_id, 38, 'ADR_WORK_LOC', 'Населений пункт', 'VARCHAR2', 30, null, null, null, 'Y', null, '35,09,13,10|32,32,32,32', null, null, null);
 
   insert into upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID, PREFUN)
-  values (l_file_id, 39, 'ADR_WORK_ADR', 'Вулиця, будинок, квартира', 'VARCHAR2', 55, null, null, null, 'Y', null, null, null, null, null);
+  values (l_file_id, 39, 'ADR_WORK_ADR', 'Вулиця, будинок, квартира', 'VARCHAR2', 55, null, null, null, 'Y', null, '35,09,13,10|32,32,32,32', null, null, null);
 
   insert into upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID, PREFUN)
   values (l_file_id, 40, 'ADR_WORK_ZIP', 'Поштовий індекс', 'VARCHAR2', 20, null, null, null, 'Y', null, null, null, null, null);
@@ -183,7 +183,6 @@ begin
 
   insert into upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID, PREFUN)
   values (l_file_id, 59, 'EDDR_ID', 'Номер запису в ЄДДР', 'VARCHAR2', 20, null, null, null, 'Y', null, null, null, null, null);
-
 
   insert into upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID, PREFUN)
   values (l_file_id, 60, 'IDCARD_VALID_DATE', 'Дійсний до (паспорт ID-картка)', 'DATE', 7, null, 'dd/mm/yyyy', null, 'Y', null, null, null, null, null);
