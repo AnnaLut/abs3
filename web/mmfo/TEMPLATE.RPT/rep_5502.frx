@@ -1,21 +1,20 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReportInfo.Created="10/05/2017 15:02:25" ReportInfo.Modified="10/06/2017 17:02:05" ReportInfo.CreatorVersion="2014.3.2.0">
+<Report ScriptLanguage="CSharp" ReportInfo.Created="10/05/2017 15:02:25" ReportInfo.Modified="10/25/2017 18:06:14" ReportInfo.CreatorVersion="2014.3.2.0">
   <Dictionary>
-    <OracleDataConnection Name="obmmfo6_dev" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoWN0HWRv5NgSW2TEYI2W7WcxAzcYw0iT3XYFACn5Dxoag==">
-      <TableDataSource Name="Table" Alias="Tab" DataType="System.Int32" Enabled="true" SelectCommand="select CHAR00 S_20, CHAR01 S_32, CHAR02 S_50, CHAR03 S_52, CHAR04 S_53, CHAR05 S_54, CHAR06 S_59, CHAR07 S_70, CHAR08 S_71, CHAR09 BRANCH, NUM00 REF, CHAR10 TT, CHAR11 ND, DAT00 VDAT, NUM01 KV, NUM02 S, CHAR12 NLSA, CHAR13 NAM_A, CHAR14 MFOA, CHAR15 NLSB, CHAR16 NAM_B, CHAR17 MFOB, CHAR18 NAZN from rs_tmp_report_data where session_id=:session_id order by id">
+    <OracleDataConnection Name="obmmfo6_dev" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoWN0HWRv5NgSW2TEYI2W7WcdLDt2eS9wxfWq0I3YTWffQ==">
+      <TableDataSource Name="Table" Alias="Tab" DataType="System.Int32" Enabled="true" SelectCommand="select CHAR00 S_20, CHAR01 S_32A, CHAR02 S_33B, CHAR03 S_50F, CHAR04 S_52A, CHAR05 S_57A, CHAR06 S_59, CHAR07 S_70, CHAR08 S_71A, CHAR09 BRANCH, NUM00 REF, CHAR10 TT, CHAR11 ND, DAT00 PDAT, NUM01 KV, NUM02 S, NUM03 SQ, CHAR12 NLSA, CHAR13 NAM_A, CHAR14 MFOA, CHAR15 NLSB, CHAR16 NAM_B, CHAR17 MFOB, CHAR18 NAZN from rs_tmp_report_data where session_id=:session_id order by id">
         <Column Name="S_20" DataType="System.String"/>
-        <Column Name="S_32" DataType="System.String"/>
-        <Column Name="S_50" DataType="System.String"/>
-        <Column Name="S_52" DataType="System.String"/>
-        <Column Name="S_53" DataType="System.String"/>
-        <Column Name="S_54" DataType="System.String"/>
+        <Column Name="S_32A" DataType="System.String" PropName="S_32"/>
+        <Column Name="S_50F" DataType="System.String" PropName="S_50"/>
+        <Column Name="S_52A" DataType="System.String" PropName="S_52"/>
+        <Column Name="S_33B" DataType="System.String" PropName="S_53"/>
+        <Column Name="S_57A" DataType="System.String" PropName="S_54"/>
         <Column Name="S_59" DataType="System.String"/>
         <Column Name="S_70" DataType="System.String"/>
-        <Column Name="S_71" DataType="System.String"/>
+        <Column Name="S_71A" DataType="System.String" PropName="S_71"/>
         <Column Name="REF" DataType="System.Decimal"/>
         <Column Name="TT" DataType="System.String"/>
         <Column Name="ND" DataType="System.String"/>
-        <Column Name="VDAT" DataType="System.DateTime"/>
         <Column Name="KV" DataType="System.Decimal"/>
         <Column Name="S" DataType="System.Decimal"/>
         <Column Name="NLSA" DataType="System.String"/>
@@ -26,6 +25,8 @@
         <Column Name="MFOB" DataType="System.String"/>
         <Column Name="NAZN" DataType="System.String"/>
         <Column Name="BRANCH" DataType="System.String"/>
+        <Column Name="PDAT" DataType="System.DateTime"/>
+        <Column Name="SQ" DataType="System.Decimal"/>
         <CommandParameter Name="session_id" DataType="112" Expression="[session_id]" DefaultValue="0"/>
       </TableDataSource>
     </OracleDataConnection>
@@ -42,7 +43,7 @@
         </Formats>
       </TextObject>
     </ReportTitleBand>
-    <PageHeaderBand Name="PageHeader1" Top="60.7" Width="1341.9" Height="47.25">
+    <PageHeaderBand Name="PageHeader1" Top="60.7" Width="1341.9" Height="47.25" PrintOn="FirstPage">
       <TableObject Name="Table2" Width="1341.9" Height="47.25">
         <TableColumn Name="Column16" Width="94.5"/>
         <TableColumn Name="Column17" Width="47.25"/>
@@ -62,7 +63,7 @@
           <TableCell Name="Cell73" Border.Lines="All" Text="Внутрішній номер документа" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
           <TableCell Name="Cell74" Border.Lines="All" Text="Тип транз" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
           <TableCell Name="Cell75" Border.Lines="All" Text="Номер документа" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
-          <TableCell Name="Cell76" Border.Lines="All" Text="Дата валютування" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell76" Border.Lines="All" Text="Дата надходження" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
           <TableCell Name="Cell77" Border.Lines="All" Text="Код вал" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
           <TableCell Name="Cell83" Border.Lines="All" Text="Сума" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
           <TableCell Name="Cell87" Border.Lines="All" Text="Рахунок відправника" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
@@ -96,9 +97,9 @@
           <TableCell Name="Cell1" Border.Lines="All" Text="[Tab.REF]" HorzAlign="Center" VertAlign="Center"/>
           <TableCell Name="Cell2" Border.Lines="All" Text="[Tab.TT]" HorzAlign="Center" VertAlign="Center"/>
           <TableCell Name="Cell3" Border.Lines="All" Text="[Tab.ND]" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell4" Border.Lines="All" Text="[Tab.VDAT]" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell4" Border.Lines="All" Text="[Tab.PDAT]" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center"/>
           <TableCell Name="Cell5" Border.Lines="All" Text="[Tab.KV]" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell26" Border.Lines="All" Text="[Tab.S]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell26" Border.Lines="All" Text="[Tab.S]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center"/>
           <TableCell Name="Cell36" Border.Lines="All" Text="[Tab.NLSA]" HorzAlign="Center" VertAlign="Center"/>
           <TableCell Name="Cell41" Border.Lines="All" Text="[Tab.NAM_A]" HorzAlign="Center" VertAlign="Center"/>
           <TableCell Name="Cell46" Border.Lines="All" Text="[Tab.MFOA]" HorzAlign="Center" VertAlign="Center"/>
@@ -117,7 +118,7 @@
           <TableColumn Name="Column34" Width="268.38"/>
           <TableColumn Name="Column35" Width="268.38"/>
           <TableRow Name="Row4" Height="141.75">
-            <TableCell Name="Cell102" Text="[Tab.S_20]&#10;[Tab.S_32]&#10;[Tab.S_50]&#10;[Tab.S_52]&#10;[Tab.S_53]&#10;[Tab.S_54]&#10;[Tab.S_59]&#10;[Tab.S_70]&#10;[Tab.S_71]" ColSpan="5"/>
+            <TableCell Name="Cell102" Text="[Tab.S_20]&#13;&#10;[Tab.S_32A]&#13;&#10;[Tab.S_33B]&#13;&#10;[Tab.S_50F]&#13;&#10;[Tab.S_52A]&#13;&#10;[Tab.S_57A]&#13;&#10;[Tab.S_59]&#13;&#10;[Tab.S_70]&#13;&#10;[Tab.S_71A]" ColSpan="5"/>
             <TableCell Name="Cell103"/>
             <TableCell Name="Cell104"/>
             <TableCell Name="Cell105"/>

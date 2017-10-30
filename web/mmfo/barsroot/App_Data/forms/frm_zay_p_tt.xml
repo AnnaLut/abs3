@@ -6,83 +6,79 @@
         <button caption="Виконати проводки" hint="Виконати проводки" confirmmessage="Сформувати проводки?" id="btnSave">
           <command type="PlSqlBlock" successmessage="Проводки сформовано успішно." successurl="/barsroot/barsweb/dynform.aspx?form=frm_zay_p">
             <sql>
-              declare
-              l_sTT1 varchar2(3);
-              l_sTT2 varchar2(3);
-              l_nVob number;
-              l_ref oper.ref%type;
-              l_bd date;
-              begin
-              SELECT t.tt INTO l_sTT1 FROM birja b, tts t WHERE substr(b.val,1,3) = t.tt AND b.par = 'TT_PS1';
-              SELECT t.tt INTO l_sTT2 FROM birja b, tts t WHERE substr(b.val,1,3) = t.tt AND b.par = 'TT_PS2';
-              gl.ref(l_ref);
-              l_bd := gl.bd;
-              if (f_ourmfo = :p_mfov) then
-              SELECT nvl(min(vob),6) INTO l_nVob FROM tts_vob WHERE tt = l_sTT1;
-              gl.in_doc3 (ref_   => l_ref,
-              tt_    => l_sTT1,
-              dk_    => 1,
-              vob_   => l_nVob,
-              nd_    => substr(l_ref,1,10),
-              pdat_  => sysdate,
-              data_  => l_bd,
-              vdat_  => l_bd,
-              datp_  => l_bd,
-              mfoa_  => :p_mfov,
-              nlsa_  => :p_nls,
-              nam_a_ => :p_nmk,
-              id_a_  => :p_okpo,
-              kv_    => :p_kv,
-              s_     => :p_ostc*100,
-              mfob_  => :p_mfov,
-              nlsb_  => :p_nlsv,
-              nam_b_ => :p_nmk,
-              id_b_  => :p_okpo,
-              kv2_   => :p_kv,
-              s2_    => :p_ostc*100,
-              nazn_  => :p_nazn,
-              uid_   => user_id,
-              d_rec_ => null,
-              sk_    => null,
-              id_o_  => null,
-              sign_  => null,
-              sos_   => 0,
-              prty_  => null);
-              paytt (0, l_ref, l_bd, l_sTT1, 1, :p_kv, :p_nls, :p_ostc, :p_kv, :p_nlsv, :p_ostc);
-              else
-              SELECT nvl(min(vob),1) INTO l_nVob FROM tts_vob WHERE tt = l_sTT2;
-              gl.in_doc3 (ref_   => l_ref,
-              tt_    => l_sTT2,
-              dk_    => 1,
-              vob_   => l_nVob,
-              nd_    => substr(l_ref,1,10),
-              pdat_  => sysdate,
-              data_  => l_bd,
-              vdat_  => l_bd,
-              datp_  => l_bd,
-              mfoa_  => :p_mfov,
-              nlsa_  => :p_nls,
-              nam_a_ => :p_nmk,
-              id_a_  => :p_okpo,
-              kv_    => :p_kv,
-              s_     => :p_ostc*100,
-              mfob_  => :p_mfov,
-              nlsb_  => :p_nlsv,
-              nam_b_ => :p_nmk,
-              id_b_  => :p_okpo,
-              kv2_   => :p_kv,
-              s2_    => :p_ostc*100,
-              nazn_  => :p_nazn,
-              uid_   => user_id,
-              d_rec_ => null,
-              sk_    => null,
-              id_o_  => null,
-              sign_  => null,
-              sos_   => 0,
-              prty_  => null);
-              paytt (0, l_ref, l_bd, l_sTT1, 1, :p_kv, :p_nls, :p_ostc, :p_kv, :p_nlsv, :p_ostc);
-              end if;
-              end;
+			declare
+			   l_tt    tts.tt%type;
+			   l_ref   oper.ref%type;
+			   l_vob   vob.vob%type;
+			   l_date  date;
+			begin
+			   begin
+				  select t.tt
+					into l_tt
+					from birja b, tts t
+				   where     substr (b.val, 1, 3) = t.tt
+						 and b.par = case when f_ourmfo = :p_mfov then 'TT_PS1' else 'TT_PS2' end;
+			   exception
+				  when no_data_found
+				  then
+					 raise_application_error (
+						-20000,
+						'Не вказані коди операцій в довіднику - "Налаштування параметрів для біржевих заявок"');
+			   end;
+
+			   begin
+				  select nvl (min (vob), 6)
+					into l_vob
+					from tts_vob
+				   where tt = l_tt;
+			   exception
+				  when no_data_found
+				  then
+					 l_vob := 6;
+			   end;
+			   l_date:=gl.bd;
+			   gl.ref (l_ref);
+			   gl.in_doc3 (ref_     => l_ref,
+						   tt_      => l_tt,
+						   dk_      => 1,
+						   vob_     => l_vob,
+						   nd_      => substr (l_ref, 1, 10),
+						   pdat_    => sysdate,
+						   data_    => l_date,
+						   vdat_    => gl.bdate,
+						   datp_    => gl.bdate,
+						   mfoa_    => :p_mfov,
+						   nlsa_    => :p_nls,
+						   nam_a_   => substr ( :p_nmk, 1, 38),
+						   id_a_    => :p_okpo,
+						   kv_      => :p_kv,
+						   s_       => :p_ostc * 100,
+						   mfob_    => :p_mfov,
+						   nlsb_    => :p_nlsv,
+						   nam_b_   => substr ( :p_nmk, 1, 38),
+						   id_b_    => :p_okpo,
+						   kv2_     => :p_kv,
+						   s2_      => :p_ostc * 100,
+						   nazn_    => substr ( :p_nazn, 1, 160),
+						   uid_     => user_id,
+						   d_rec_   => null,
+						   sk_      => null,
+						   id_o_    => null,
+						   sign_    => null,
+						   sos_     => 0,
+						   prty_    => null);
+			   paytt (0,
+					  l_ref,
+					  gl.bdate,
+					  l_tt,
+					  1,
+					  :p_kv,
+					  :p_nls,
+					  :p_ostc * 100,
+					  :p_kv,
+					  :p_nlsv,
+					  :p_ostc * 100);
+			end;
             </sql>
             <parameters>
               <parameter type="FormField" name="P_MFOV"/>

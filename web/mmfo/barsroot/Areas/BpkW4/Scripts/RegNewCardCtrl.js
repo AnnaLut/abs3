@@ -98,8 +98,7 @@ angular.module("BarsWeb.Areas")
             $http.get(bars.config.urlContent('/bpkw4/RegisteringNewCard/GetExternal?rnk=' + rnk))
                 .then(function (request) {
                     $scope.ext = request.data;
-
-                    if (!$scope.ext.IS_EXT && $scope.model.TYPE_INS === 0) {
+                    if (!$scope.ext.IS_EXT && Number($scope.model.TYPE_INS) === 1) {
                         bars.ui.error({
                             text: 'Обрано Страхування подорожі за кордон.<br />У клієнта не зареєстровано закордонний паспорт.'
                         });
@@ -145,7 +144,7 @@ angular.module("BarsWeb.Areas")
                                     }
                                     if(newCardData !== null){
                                         $http.post(bars.config.urlContent('/bpkw4/RegisteringNewCard/SetInsId'), newCardData)
-                                            .then(function (request) { $scope.saveFinalize(request.data.ND); });
+                                            .then(function (request) { $scope.saveFinalize(newCardData.nd); });
                                     }
                                     else{
                                         $scope.saveFinalize(data.ND);

@@ -453,12 +453,7 @@ namespace BarsWeb.Areas.BpkW4.Infrastructure.Repository.DI.Implementation
                     {
                         resp.ERR_CODE = -99;
                         resp.ERR_MSG = result;
-                        if (!txCommited) tx.Rollback();
-                    }
-                    else
-                    {
-                        tx.Commit();
-                        txCommited = true;
+                        throw new Exception(resp.ERR_MSG);
                     }
                 }
             }
@@ -492,7 +487,6 @@ namespace BarsWeb.Areas.BpkW4.Infrastructure.Repository.DI.Implementation
                 {
                     tx.Commit();
                 }
-
                 cmd.Dispose();
                 connection.Dispose();
                 connection.Close();

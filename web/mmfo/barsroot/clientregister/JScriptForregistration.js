@@ -845,7 +845,7 @@ function Check_ClientRekvBank() {
 
     var dis = (rezid == '2');
 
-    if ((tmp == etalon || tmp == '') && !dis) {
+    if (false && (tmp == etalon || tmp == '') && !dis) {
         alert(LocalizedString('Mes05')/*"Неправильно заполнено поле 'Код банка - МФО'"*/);
         gE(curTab, 'ed_MFO').focus();
         return false;

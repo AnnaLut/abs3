@@ -53,10 +53,11 @@ function GetMfoCom(val)
 	var input = new Array();
 	var output = new Array();
 
-	input.val = val;
-
-	output = GetWebServiceData('GetMfoCom', input, 1);
+    input.val = val;
+    
+ //   output = GetWebServiceData('GetMfoCom', val, 1);
+    
 	
-	lb_title_bank.innerText = output;						
+	//lb_title_bank.innerText = output;						
 }
 
