@@ -7,5 +7,11 @@ FROM xoz_ref x,   oper o,
    from accounts aa, ( select NVL( to_date ( PUL.get('DATZ'), 'dd.mm.yyyy') , GL.BD) DATZ  from dual ) dd
    where aa.tip in ('XOZ','W4X') 
    ) a 
-WHERE x.s > 0  AND (x.DATZ is null or x.DATZ >= a.DATZ )   AND x.acc = a.acc AND x.ref1 = o.REF;
+WHERE x.fdat < a.DATZ and x.s > 0  AND (x.DATZ is null or x.DATZ >= a.DATZ )   AND x.acc = a.acc AND x.ref1 = o.REF;
 /
+
+ALTER VIEW BARS.V_XOZREF_INV
+    COMPILE;
+/ 
+
+

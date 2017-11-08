@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Created by serhii.karchavets on 30.03.2017.
  */
 
@@ -10,7 +10,7 @@ angular.module("BarsWeb.Areas").factory('dataService', function(){
                 prod: save.prodValue,
                 fin: save.finValue.FIN,
                 inic: save.branchValue,
-                flags: (save.holidayValue ? "0" : "1") + (save.previousValue.ID == 1 ? "1" : "0"),
+                flags: (save.holidayValue.ID) + (save.previousValue.ID),
                 rang: save.rangValue.RANG,
                 sdi: save.discontSumValue,
                 metr: save.metrValue ? save.metrValue.METR : null,
@@ -27,7 +27,7 @@ angular.module("BarsWeb.Areas").factory('dataService', function(){
                 icr9: save.listUnsedValue.id,
                 daysn: save.diffDaysValue ? save.dayPayDiffValue : null,
                 datsn: save.diffDaysValue ? kendo.toString(kendo.parseDate(save.firstPayDiffValue), 'dd.MM.yyyy') : null,
-               // daynp: save.previousValue.ID
+                daynp: save.daynp.Key
             };
         },
         multiExtInt: function (nd, save){
@@ -102,7 +102,7 @@ angular.module("BarsWeb.Areas").factory('dataService', function(){
                 nKom: null
             };
         },
-        clearCredit: function (custtype) {
+        clearCredit: function () {
             return {
                 curValue: { KV: "980", LCV: "" },
                 numValue: null,
@@ -141,14 +141,14 @@ angular.module("BarsWeb.Areas").factory('dataService', function(){
                 nlsValue: null,
                 purposeValue: null,
                 guaranteeValue: null,
-                rangValue: custtype == 3 ? { RANG: "77", NAME: "" } : { RANG: "0", NAME: "" },
+                rangValue: null,
                 freqValue: { FREQ: "5", NAME: "" },
                 dayOfPayValue: null,
                 firstPayDateValue: null,
-                holidayValue: false,
+                holidayValue : { ID: 1 },
                 freqIntValue: { FREQ: "5", NAME: "" },
                 diffDaysValue: false,
-                previousValue: { ID: "0", NAME: "" },
+                previousValue: { ID: "0" },
                 discontSumValue: null,
                 curComAccValue: { KV: "980", LCV: "" },
                 metrValue: null,
@@ -161,12 +161,15 @@ angular.module("BarsWeb.Areas").factory('dataService', function(){
                 acc8: null,
                 basem: null,
                 dayPayDiffValue: null,
-                firstPayDiffValue: null
+                firstPayDiffValue: null,
+                daynp: { Key: -2 },
+                lim : null
             };
         },
         getDeal: function (save, resp) {
             if(resp.FLAGS != null && resp.FLAGS != 'null' && resp.FLAGS != undefined){      // 11 10 01 00
-                save.holidayValue = resp.FLAGS[0] == "0";
+                save.holidayValue = { ID: resp.FLAGS[0] };
+                save.previousValue = { ID: resp.FLAGS[1] };
             }
             save.rnkValue = resp.nRNK;
             save.numValue = resp.CC_ID;
@@ -209,8 +212,9 @@ angular.module("BarsWeb.Areas").factory('dataService', function(){
             save.listUnsedValue = { id: resp.I_CR9, name: resp.I_CR9NAME };
             save.dayPayDiffValue = resp.DAYSN;
             save.firstPayDiffValue = resp.DATSN;
-            save.previousValue = { ID: resp.DAYNP, NAME: resp.DAYNPNAME };
+            save.daynp = { Key: resp.DAYNP };
             save.diffDaysValue = save.dayPayDiffValue ? true : false;
+            save.lim = resp.LIM;
         }
     };
 });

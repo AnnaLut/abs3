@@ -140,7 +140,7 @@
         </tr>
         <tr>
             <td>
-                <label>Сума</label>
+                <label>Початкова сума</label>
             </td>
             <td>
                 <input kendo-numeric-text-box k-min="0"
@@ -148,8 +148,23 @@
                        k-ng-model="credit.sumValue"
                        k-ng-disabled="isSave"
                        name="inptSum"
+                       ng-blur="FillLim()" 
                        />
                 <span style="color: red" ng-show="!isSumValueValid()">Обов'язкове</span>
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>
+                <label>Поточний ліміт</label>
+            </td>
+            <td>
+                <input kendo-numeric-text-box k-min="0"
+                       k-max="999999999999999999999999999999"
+                       k-ng-model="credit.lim"
+                       name="inptSum"
+                       disabled/>
             </td>
             <td></td>
             <td></td>

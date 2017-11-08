@@ -1,4 +1,4 @@
-using System.Linq;
+﻿using System.Linq;
 using System.Collections.Generic;
 using BarsWeb.Areas.CreditUi.Models;
 using BarsWeb.Areas.CreditUi.Infrastructure.DI.Abstract;
@@ -319,39 +319,36 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
             return basey.AsQueryable();
         }
 
-        public IQueryable<RangList> getRang(decimal? custtype)
+        public IQueryable<RangList> getRang(byte vidd)
         {
             List<RangList> rang = new List<RangList>();
-            if (custtype != null)
+            OracleConnection connection = OraConnector.Handler.UserConnection;
+            OracleCommand cmd = connection.CreateCommand();
+            try
             {
-                OracleConnection connection = OraConnector.Handler.UserConnection;
-                OracleCommand cmd = connection.CreateCommand();
-                try
-                {
-                    cmd.CommandType = System.Data.CommandType.Text;
-                    cmd.CommandText = @"select rang, name
-                                      from cc_rang_name
-                                     where (d_close < gl.bd or d_close is null)
-                                       and (custtype is null or
-                                           custtype = :custtype)
-                                     order by rang";
-                    cmd.Parameters.Add("p_rnk", OracleDbType.Decimal, custtype, System.Data.ParameterDirection.Input);
-                    OracleDataReader reader = cmd.ExecuteReader();
+                int cusstype = GetCusttype(vidd);
+                cmd.CommandType = System.Data.CommandType.Text;
+                cmd.CommandText = String.Format(@"select rang, name
+                                    from cc_rang_name
+                                    where (d_close < gl.bd or d_close is null)
+                                    and (custtype is null or
+                                        custtype = {0})
+                                    order by rang {1}", cusstype, (cusstype == 3 ? "desc" : "") );
+                OracleDataReader reader = cmd.ExecuteReader();
 
-                    while (reader.Read())
-                    {
-                        RangList r = new RangList();
-                        r.RANG = reader.GetInt32(0);
-                        r.NAME = reader.GetString(1);
-                        rang.Add(r);
-                    }
-                }
-                finally
+                while (reader.Read())
                 {
-                    cmd.Dispose();
-                    connection.Dispose();
-                    connection.Close();
+                    RangList r = new RangList();
+                    r.RANG = reader.GetInt32(0);
+                    r.NAME = reader.GetString(1);
+                    rang.Add(r);
                 }
+            }
+            finally
+            {
+                cmd.Dispose();
+                connection.Dispose();
+                connection.Close();
             }
             return rang.AsQueryable();
         }
@@ -443,6 +440,31 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
                 connection.Close();
             }
             return par.AsQueryable();
+        }
+
+        public Dictionary<int,string> getDaynpList()
+        {
+            Dictionary<int, string> list = new Dictionary<int, string>();
+            OracleConnection connection = OraConnector.Handler.UserConnection;
+            OracleCommand cmd = connection.CreateCommand();
+            try
+            {
+                cmd.CommandType = System.Data.CommandType.Text;
+                cmd.CommandText = @"select KOD,TXT from V_CC_DAYNP";
+                OracleDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    list.Add(reader.GetInt16(0), reader.GetString(1));
+                }
+            }
+            finally
+            {
+                cmd.Dispose();
+                connection.Dispose();
+                connection.Close();
+            }
+            return list;
         }
 
         public IQueryable<NdTxtList> getNdTxt(string code)
@@ -965,7 +987,6 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
                 //                      "End;";
                 //    cmd.ExecuteNonQuery();
                 //}
-
             }
 
             finally
@@ -1096,7 +1117,8 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
                                            cck_app.Get_ND_TXT(cc.nd, 'DAYNP') as daynp,--52
                                            decode(cck_app.Get_ND_TXT(cc.nd, 'DAYNP'),'0','День','1','Місяць','Інше') as daynp_name, --53
                                            (select nb from banks where mfo = cc.mfokred) as bank_name, --54
-                                            cck_app.Get_ND_TXT(cc.nd, 'FLAGS') as FLAGS --55
+                                            cck_app.Get_ND_TXT(cc.nd, 'FLAGS') as FLAGS,--55
+                                            cc.limit--56
                                       from cc_v cc, customer c, sb_ob22 cp, cc_aim ca, int_accn ia
                                      where cc.rnk = c.rnk
                                        and cc.prod = cp.r020||cp.ob22
@@ -1163,7 +1185,8 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
                     credit.DAYNP = String.IsNullOrEmpty(reader.GetValue(52).ToString()) ? String.Empty : reader.GetString(52);
                     credit.DAYNPNAME = String.IsNullOrEmpty(reader.GetValue(53).ToString()) ? String.Empty : reader.GetString(53);
                     credit.nBANKNAME = String.IsNullOrEmpty(reader.GetValue(54).ToString()) ? String.Empty : reader.GetString(54);
-                    credit.FLAGS = String.IsNullOrEmpty(reader.GetValue(55).ToString()) ? String.Empty : reader.GetString(55);                    
+                    credit.FLAGS = String.IsNullOrEmpty(reader.GetValue(55).ToString()) ? String.Empty : reader.GetString(55);
+                    credit.LIM = String.IsNullOrEmpty(reader.GetValue(56).ToString()) ? (decimal?)null : reader.GetDecimal(56);
                 }
             }
             finally
@@ -1293,8 +1316,85 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
             }
             return "Ok";
         }
-		
-		private string GetNBSByCusttype (byte custtype, bool yeardiff = true)
+
+        public AuthStaticData GetAuthStaticData(decimal nd)
+        {
+            AuthStaticData data = new AuthStaticData();
+            OracleConnection connection = OraConnector.Handler.UserConnection;
+            OracleCommand cmd = connection.CreateCommand();
+            decimal rnk = 0;
+
+            var sql = @"select t.PRINSIDER, c.sdate, c.CC_ID,c.rnk  from customer t, cc_deal c where t.rnk=c.rnk and c.nd = " + nd;
+            try
+            {
+                cmd.CommandText = sql;
+                cmd.Parameters.Clear();
+
+                OracleDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    data.PRINSIDER = reader.GetInt16(0);
+                    data.DATE_START = Convert.ToDateTime(reader.GetValue(1).ToString()).ToString("dd/MM/yyyy");
+                    data.CC_ID = reader.GetString(2);
+                    rnk = reader.GetDecimal(3);
+                }
+
+                if (data.PRINSIDER != 99)
+                {
+                    cmd.CommandText = "select t1.value from customerw t1 where t1.tag='INSFO' and t1.rnk = " + rnk;
+                    var value = cmd.ExecuteScalar();
+                    data.INSFO = (value == null) ? "0" : value.ToString();
+                }
+                else
+                    data.INSFO = "0";
+            }
+            catch(Exception e)
+            {
+                data.ERROR += e.Message; 
+            }
+            finally
+            {
+                cmd.Dispose();
+                connection.Dispose();
+                connection.Close();
+            }
+            return data;
+        }
+
+        public string Authorize(decimal nd, int type, string pidstava, string initiative)
+        {
+            string error_msg = "";
+            OracleConnection connection = OraConnector.Handler.UserConnection;
+            OracleCommand cmd = connection.CreateCommand();
+            try
+            {
+                
+                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                cmd.Parameters.Clear();
+                cmd.CommandText = @"cck_ui.AUTOR";
+                cmd.Parameters.Add("nd", OracleDbType.Decimal, nd, System.Data.ParameterDirection.Input);
+                cmd.Parameters.Add("p_mode", OracleDbType.Int16, type, System.Data.ParameterDirection.Input);
+                cmd.Parameters.Add("p_x1", OracleDbType.Varchar2, pidstava, System.Data.ParameterDirection.Input);
+                cmd.Parameters.Add("p_x2", OracleDbType.Varchar2, initiative, System.Data.ParameterDirection.Input);  
+                cmd.ExecuteNonQuery();
+                
+            }
+            catch (Exception e)
+            {
+                error_msg+= e.Message;
+            }
+            finally
+            {
+                cmd.Dispose();
+                connection.Dispose();
+                connection.Close();
+            }
+
+            return error_msg == "" ? "Ok" : error_msg;
+        }
+
+        private string GetNBSByCusttype (byte custtype, bool yeardiff = true)
         {
             switch (custtype)
             {

@@ -309,7 +309,7 @@
                                                                                 <asp:Label ID="OKPOTitle" runat="server" Text="Ідент. код / Код за ЕДРПОУ: "></asp:Label>
                                                                             </td>
                                                                             <td>
-                                                                                <bars:TextBoxString ID="OKPO" runat="server" MaxLength="10" IsRequired="true" ValidationGroup="Params"
+                                                                                <bars:TextBoxString ID="OKPO" runat="server" MaxLength="14" IsRequired="true" ValidationGroup="Params"
                                                                                     Value='<%# Bind("OKPO") %>' />
                                                                             </td>
                                                                         </tr>
@@ -862,8 +862,8 @@
                                                                             </td>
 																			<td>
                                                                                 <asp:RegularExpressionValidator ID="RegularExpressionValidator1" runat="server" 
-                                                                                   ControlToValidate="VAGA2" ErrorMessage="Формат повинен відповідати 00.0000" 
-                                                                                   ValidationExpression="^(100([\.\,]0{1,4})?|[1-9]?\d([\.\,]\d{1,4})?)$">
+                                                                                   ControlToValidate="VAGA2" ErrorMessage="Формат повинен відповідати 00.0000000000" 
+                                                                                   ValidationExpression="^(100([\.\,]0{1,4})?|[1-9]?\d([\.\,]\d{1,10})?)$">
                                                                                 </asp:RegularExpressionValidator>
                                                                             </td>
                                                                         </tr>
@@ -1132,8 +1132,8 @@
                                                                                         </td>
                                                                                         <td>
                                                                                             <asp:RegularExpressionValidator ID="remail" runat="server" 
-                                                                                               ControlToValidate="VAGA1" ErrorMessage="Формат повинен відповідати 00.0000" 
-                                                                                               ValidationExpression="^(100([\.\,]0{1,4})?|[1-9]?\d([\.\,]\d{1,4})?)$">
+                                                                                               ControlToValidate="VAGA1" ErrorMessage="Формат повинен відповідати 00.0000000000" 
+                                                                                               ValidationExpression="^(100([\.\,]0{1,4})?|[1-9]?\d([\.\,]\d{1,10})?)$">
                                                                                             </asp:RegularExpressionValidator>
                                                                                         </td>
                                                                                     </tr>
@@ -1150,8 +1150,8 @@
 																					</td>
 																					<td>
 																						<asp:RegularExpressionValidator ID="RegularExpressionValidator1" runat="server" 
-																						   ControlToValidate="VAGA2" ErrorMessage="Формат повинен відповідати 00.0000" 
-																						   ValidationExpression="^(100([\.\,]0{1,4})?|[1-9]?\d([\.\,]\d{1,4})?)$">
+																						   ControlToValidate="VAGA2" ErrorMessage="Формат повинен відповідати 00.0000000000" 
+																						   ValidationExpression="^(100([\.\,]0{1,4})?|[1-9]?\d([\.\,]\d{1,10})?)$">
 																						</asp:RegularExpressionValidator>
 																					</td>
                                                                                     </tr>
@@ -1405,8 +1405,8 @@
                                                                             </td>
                                                                             <td>
                                                                                 <asp:RegularExpressionValidator ID="remail" runat="server" 
-                                                                                   ControlToValidate="VAGA1" ErrorMessage="Формат повинен відповідати 00.0000" 
-                                                                                   ValidationExpression="^(100([\.\,]0{1,4})?|[1-9]?\d([\.\,]\d{1,4})?)$">
+                                                                                   ControlToValidate="VAGA1" ErrorMessage="Формат повинен відповідати 00.0000000000" 
+                                                                                   ValidationExpression="^(100([\.\,]0{1,4})?|[1-9]?\d([\.\,]\d{1,10})?)$">
                                                                                 </asp:RegularExpressionValidator>
                                                                             </td>
                                                                         </tr>

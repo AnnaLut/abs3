@@ -84,25 +84,25 @@
 </TD>
 <TD width="5%">
 	<xsl:attribute name="onclick">
-		<xsl:text>Sort('DATZ')</xsl:text>
+		<xsl:text>Sort('DATZ_SORT')</xsl:text>
 	</xsl:attribute>
 <xsl:text>Дата заключення договору</xsl:text>
 </TD>
 <TD width="5%">
 	<xsl:attribute name="onclick">
-		<xsl:text>Sort('DAT_N')</xsl:text>
+		<xsl:text>Sort('DAT_N_SORT')</xsl:text>
 	</xsl:attribute>
 <xsl:text>Дата розміщення депозиту</xsl:text>
 </TD>
 <TD width="5%">
 	<xsl:attribute name="onclick">
-		<xsl:text>Sort('DAT_O')</xsl:text>
+		<xsl:text>Sort('DAT_O_SORT')</xsl:text>
 	</xsl:attribute>
 <xsl:text>Дата закінчення договору</xsl:text>
 </TD>
 <TD width="5%">
 	<xsl:attribute name="onclick">
-		<xsl:text>Sort('DAT_V')</xsl:text>
+		<xsl:text>Sort('DAT_V_SORT')</xsl:text>
 	</xsl:attribute>
 <xsl:text>Дата повернення депозиту</xsl:text>
 </TD>
@@ -223,8 +223,6 @@
   <TD title="Загальна кількість договорів"  align="right">
     <xsl:value-of select="count(//Table/DPU_ID)" />
   </TD>
-  <TD>
-  </TD>
   <TD></TD>
   <TD></TD>
   <TD></TD>
@@ -232,13 +230,14 @@
   <TD></TD>
   <TD></TD>
   <TD></TD>
-  <TD noWrap="true" align="right" title="Загальна сума всіх договорів">
+  <TD noWrap="true" align="right" title="Загальна сума договорів (еквівалент)">
     <xsl:value-of select="format-number(sum(//Table/SUMQ),'##### #### ##0.00','ua')" />
   </TD>
   <TD></TD>
-  <TD noWrap="true" align="right" title="Загальна сума всіх залишків">
+  <TD noWrap="true" align="right" title="Загальна сума залишків (еквівалент)">
     <xsl:value-of select="format-number(sum(//Table/OSTQ),'##### #### ##0.00','ua')" />
   </TD>
+  <TD></TD>
   <TD></TD>
   <TD></TD>
   <TD></TD>

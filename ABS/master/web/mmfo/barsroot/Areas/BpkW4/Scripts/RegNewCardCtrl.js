@@ -24,32 +24,35 @@ angular.module("BarsWeb.Areas")
                 close: function () { $window.location.href = portfolioUrl+"?nd="+ND; }
             });
         };
-    
+
         $http.get(bars.config.urlContent('/bpkw4/RegisteringNewCard/GetIsIns?cardCode=' + cardCode))
             .then(function (request) {
+
                 $scope.params.isIns = request.data.haveins;
                 $scope.params.insUkrId = request.data.insUkrId;
                 $scope.params.insWrdId = request.data.insWrdId;
                 $scope.params.tmpUkrId = request.data.tmpUkrId;
                 $scope.params.tmpWrdId = request.data.tmpWrdId;
-            });
-        bars.ui.loader('body', true);
-        $http.get(bars.config.urlContent('/bpkw4/RegisteringNewCard/GetCardValue?rnk=' + rnk + '&proectId=' + proectId + '&cardCode=' + cardCode + '&isIns=' + $scope.params.isIns))
-            .then(function (request) {
-                bars.ui.loader('body', false);
-                if(request.data.ERROR_MSG !== "" && request.data.ERROR_MSG !== null){
-                    bars.ui.error({ text: request.data.ERROR_MSG });
-                    return;
-                }
 
-                $scope.model = request.data;
-                if ($scope.model.ISMFO) {
-                    $scope.model.BRANCH = $scope.model.CURRENTBRANCH;
-                    $scope.model.BRANCH_NAME = $scope.model.CURBRANCHNAME;
-                    $scope.model.DELIVERY_BRANCH = $scope.model.CURRENTBRANCH;
-                    $scope.model.DELIVERY_BRANCH_NAME = $scope.model.CURBRANCHNAME;
-                }
-        });
+                bars.ui.loader('body', true);
+                $http.get(bars.config.urlContent('/bpkw4/RegisteringNewCard/GetCardValue?rnk=' + rnk + '&proectId=' + proectId + '&cardCode=' + cardCode + '&isIns=' + $scope.params.isIns))
+                    .then(function (request) {
+                        bars.ui.loader('body', false);
+                        if (request.data.ERROR_MSG !== "" && request.data.ERROR_MSG !== null) {
+                            bars.ui.error({ text: request.data.ERROR_MSG });
+                            return;
+                        }
+
+                        $scope.model = request.data;
+                        if ($scope.model.ISMFO) {
+                            $scope.model.BRANCH = $scope.model.CURRENTBRANCH;
+                            $scope.model.BRANCH_NAME = $scope.model.CURBRANCHNAME;
+                            $scope.model.DELIVERY_BRANCH = $scope.model.CURRENTBRANCH;
+                            $scope.model.DELIVERY_BRANCH_NAME = $scope.model.CURBRANCHNAME;
+                        }
+                    });
+            });
+
         //});
     
         $scope.toolsOptions = {
@@ -98,7 +101,7 @@ angular.module("BarsWeb.Areas")
             $http.get(bars.config.urlContent('/bpkw4/RegisteringNewCard/GetExternal?rnk=' + rnk))
                 .then(function (request) {
                     $scope.ext = request.data;
-                    if (!$scope.ext.IS_EXT && Number($scope.model.TYPE_INS) === 1) {
+                    if (!$scope.ext.IS_EXT && $scope.model.TYPE_INS !== null && Number($scope.model.TYPE_INS) === 0) {
                         bars.ui.error({
                             text: 'Обрано Страхування подорожі за кордон.<br />У клієнта не зареєстровано закордонний паспорт.'
                         });

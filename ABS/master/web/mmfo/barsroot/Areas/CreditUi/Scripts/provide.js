@@ -230,7 +230,6 @@ $(document).ready(function () {
                 $("#MDATE").kendoDatePicker({ value: e.model.MDATE, culture: "en-GB" });
                     
                 $("#kv_list").data("kendoDropDownList").readonly();
-                $("#SDATZ").data("kendoDatePicker").readonly();
                     
                 $("#pawn_list").data("kendoDropDownList").value(e.model.PAWN);
                 $("#kv_list").data("kendoDropDownList").value(e.model.KV);

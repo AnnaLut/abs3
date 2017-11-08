@@ -693,7 +693,7 @@ is
   --
   -- глобальные переменные и константы
   -- 
-  g_body_version  constant varchar2(64)          := 'version 44.02 28.08.2017';
+  g_body_version  constant varchar2(64)          := 'version 44.06 31.10.2017';
   
   modcode         constant varchar2(3)           := 'DPU';
   accispparam     constant varchar2(16)          := 'DPU_ISP';
@@ -1902,58 +1902,62 @@ $end
   
   -- открытие депозитного счета
   begin
-    BARS.OP_REG_EXFL
-    ( mod_  => 99
-    , p1_   => 0
-    , p2_   => 0
-    , p3_   => l_grp
-    , p4_   => l_tmp
-    , rnk_  => p_custid
-    , nls_  => p_depacc.numb
-    , kv_   => p_curcode
-    , nms_  => p_depacc.name
-    , tip_  => p_depacc.type
-    , isp_  => l_isp
-    , accR_ => p_depacc.id
-    , pap_  => 2
-    , vid_  => dpavid
-    , blkd_ => l_blkd
-    , tobo_ => p_branch );
+    ACCREG.SetAccountAttr
+    ( mod_    => 99
+    , p1_     => 0
+    , p2_     => 0
+    , p3_     => l_grp
+    , p4_     => l_tmp
+    , rnk_    => p_custid
+    , nls_    => p_depacc.numb
+    , kv_     => p_curcode
+    , nms_    => p_depacc.name
+    , tip_    => p_depacc.type
+    , isp_    => l_isp
+    , accR_   => p_depacc.id
+    , ob22_   => null
+    , pap_    => 2
+    , vid_    => dpavid
+    , blkd_   => l_blkd
+--  , nlsalt_ => (select nls from accounts where acc = p_gendepacc)
+    , branch_ => p_branch );
   exception
     when others then
-      bars_error.raise_nerror(modcode, 'OPENACC_FAILED', 
-                              p_depacc.numb, to_char(p_curcode), sqlerrm);
+      bars_error.raise_nerror( modcode, 'OPENACC_FAILED'
+                             , p_depacc.numb, to_char(p_curcode), sqlerrm );
   end;
-  
-  bars_audit.trace('%s depacc %s/%s opened, acc = %s', title, 
-                   p_depacc.numb, to_char(p_curcode), to_char(p_depacc.id));  
-  
+
+  bars_audit.trace( '%s depacc %s/%s opened, acc = %s', title
+                  , p_depacc.numb, to_char(p_curcode), to_char(p_depacc.id) );
+
   -- открытие процентного счета
   begin
-    BARS.OP_REG_EXFL
-    ( mod_  => 99
-    , p1_   => 0
-    , p2_   => 0
-    , p3_   => l_grp
-    , p4_   => l_tmp
-    , rnk_  => p_custid
-    , nls_  => p_intacc.numb
-    , kv_   => p_curcode
-    , nms_  => p_intacc.name
-    , tip_  => p_intacc.type
-    , isp_  => l_isp
-    , accR_ => p_intacc.id
-    , pap_  => 2
-    , tobo_ => p_branch );
+    ACCREG.SetAccountAttr
+    ( mod_    => 99
+    , p1_     => 0
+    , p2_     => 0
+    , p3_     => l_grp
+    , p4_     => l_tmp
+    , rnk_    => p_custid
+    , nls_    => p_intacc.numb
+    , kv_     => p_curcode
+    , nms_    => p_intacc.name
+    , tip_    => p_intacc.type
+    , isp_    => l_isp
+    , accR_   => p_intacc.id
+    , ob22_   => null
+    , pap_    => 2
+--  , nlsalt_ => (select nls from accounts where acc = p_genintacc)
+    , branch_ => p_branch );
   exception
     when others then
-      bars_error.raise_nerror(modcode, 'OPENACC_FAILED', 
-                              p_intacc.numb, to_char(p_curcode), sqlerrm);
+      bars_error.raise_nerror( modcode, 'OPENACC_FAILED', 
+                               p_intacc.numb, to_char(p_curcode), sqlerrm );
   end;
-  
-  bars_audit.trace('%s intacc %s/%s opened, acc = %s', title, 
-                   p_intacc.numb, to_char(p_curcode), to_char(p_intacc.id));  
-  
+
+  bars_audit.trace( '%s intacc %s/%s opened, acc = %s', title, 
+                    p_intacc.numb, to_char(p_curcode), to_char(p_intacc.id) );
+
   -- дата погашения, внебаланс
   update ACCOUNTS 
      set MDATE  = p_datend
@@ -4686,6 +4690,7 @@ is
   t_swift_dtls           t_swift_dtls_type := t_swift_dtls_type();
   l_accrec               dpt_web.acc_rec;
   l_val                  operw.value%type;
+  l_dpu_id               dpu_deal.dpu_id%type; -- ід. генерального договору
   l_num                  dpu_deal.nd%type;
   l_dat                  dpu_deal.datz%type;
   l_rnk                  dpu_deal.rnk%type;
@@ -4698,10 +4703,20 @@ begin
   bars_audit.trace( '%s: Entry with ( p_dpuid=%s, p_tt=%s ).', title, to_char(p_dpuid), p_tt );
   
   begin
-    select d.ND, d.DATZ, d.RNK
-      into l_num, l_dat, l_rnk
-      from DPU_DEAL d
-     where d.DPU_ID = p_dpuid;
+    select d.DPU_ID, d.ND, d.DATZ, d.RNK
+      into l_dpu_id, l_num, l_dat, l_rnk
+      from ( select DPU_ID, ND, DATZ, RNK
+               from DPU_DEAL
+              where DPU_ID = p_dpuid
+                and DPU_GEN Is Null
+              union
+             select gd.DPU_ID, gd.ND, gd.DATZ, gd.RNK
+               from DPU_DEAL sd
+               join DPU_DEAL gd
+                 on ( gd.DPU_ID = sd.DPU_GEN )
+              where sd.DPU_ID = p_dpuid
+                and sd.DPU_GEN Is Not Null
+            ) d;
   exception
     when NO_DATA_FOUND then
       bars_error.raise_nerror( modcode, 'DPUID_NOT_FOUND', to_char(p_dpuid) );
@@ -4716,7 +4731,7 @@ begin
         from ACCOUNTS ac
         join DPU_ACCOUNTS da
           on ( da.ACCID = ac.ACC )
-       where da.DPUID = p_dpuid
+       where da.DPUID = l_dpu_id
          and ac.TIP = case p_tt when 'DU7' then 'DEN' else 'DEP' end;
     exception
       when NO_DATA_FOUND then
@@ -4746,19 +4761,21 @@ begin
     when NO_DATA_FOUND then
       bars_error.raise_nerror( modcode, 'GENERAL_ERROR_CODE', 'Не вказані SWIFT реквізити для виплати!' );
   end;
-  
+
   begin
-    select F_TRANSLATE_KMU(LOCALITY), F_TRANSLATE_KMU(ADDRESS)
-      into l_city, l_adr
+    select BARS_SWIFT.STRVERIFY2( F_TRANSLATE_KMU( upper(LOCALITY) ), 'TRANS' )
+         , BARS_SWIFT.STRVERIFY2( F_TRANSLATE_KMU( upper(ADDRESS ) ), 'TRANS' )
+      into l_city
+         , l_adr
       from CUSTOMER_ADDRESS
-     where RNK = l_rnk
+     where RNK     = l_rnk
        and TYPE_ID = 1;
   exception
     when NO_DATA_FOUND then
       l_city := '___';
       l_adr  := r_swtags.TAG59_ADR;
   end;
-  
+
   for w in ( select r.TAG, r.USED4INPUT, r.OPT, r.VAL
                   , f.VSPO_CHAR
                from OP_RULES r
@@ -4783,13 +4800,14 @@ begin
                  when '56A  ' -- SWIFT-код Банка Посередника
                  then r_swtags.TAG56_CODE
                  when '57A  ' -- SWIFT-код Банка Посередника
-                 then r_swtags.TAG57_CODE
+                 then '/' || r_swtags.TAG57_ACC || chr(10)
+                          || r_swtags.TAG57_CODE
                  when '59   ' -- Реквізити отримувача
                  then '/' || r_swtags.TAG59_ACC               || chr(10) -- Номер рахунку Отримувача 
                           || SubStr(r_swtags.TAG59_NAME,1,35) || chr(10) -- Назва Отримувача
                           || SubStr(r_swtags.TAG59_ADR ,1,35)            -- Адреса Отримувача
                  when '70   ' -- Призначення платежу
-                 then SubStr(w.VAl,1,35)      || chr(10) ||
+                 then SubStr(w.VAL,1,35)      || chr(10) ||
                       'IN ACCORD TO CONTRACT' || chr(10) ||
                       SubStr('N '||l_num,1,35)|| chr(10) ||
                       'OF ' || to_char(l_dat,'dd.mm.yyyy')
@@ -4853,28 +4871,35 @@ is
   t_swift_dtls           t_swift_dtls_type;
   l_swift_dtls           varchar2(2048);
 begin
-  
+
   bars_audit.trace( '%s: Entry with ( p_dpuid=%s, p_tt=%s ).', title, to_char(p_dpuid), p_tt );
-  
-  t_swift_dtls := GET_SWIFT_DETAILS( p_dpuid, p_tt, null );
-  
-  if ( t_swift_dtls.count > 0 )
-  then
-    
-    for r in t_swift_dtls.first .. t_swift_dtls.last
-    loop
-      l_swift_dtls := l_swift_dtls || chr(38) || 'reqv_' || trim(t_swift_dtls(r).TAG)
-                                              || '='     || trim(t_swift_dtls(r).VAL);
-    end loop;
-    
-    t_swift_dtls.delete();
-    
-  end if;
-  
+
+  begin
+
+    t_swift_dtls := GET_SWIFT_DETAILS( p_dpuid, p_tt, null );
+
+    if ( t_swift_dtls.count > 0 )
+    then
+
+      for r in t_swift_dtls.first .. t_swift_dtls.last
+      loop
+        l_swift_dtls := l_swift_dtls || chr(38) || 'reqv_' || trim(t_swift_dtls(r).TAG)
+                                                || '='     || trim(t_swift_dtls(r).VAL);
+      end loop;
+
+      t_swift_dtls.delete();
+
+    end if;
+
+  exception
+    when OTHERS then
+      l_swift_dtls := null;
+  end;
+
   bars_audit.trace( '%s: %s.', title, l_swift_dtls );
-  
+
   return l_swift_dtls;
-  
+
 end GET_SWT_DTL;
 
 --
@@ -4914,7 +4939,7 @@ end iset_details;
 --
 procedure get_penalty_ex
 ( p_dpuid         in   number,
-  p_bdate         in   date,  
+  p_bdate         in   date,
   p_totalint_nom  out  number,
   p_totalint_eqv  out  number,
   p_penyaint_nom  out  number,
@@ -4931,29 +4956,29 @@ procedure get_penalty_ex
   p_details       out  varchar2
 ) is
   -- constants
-  c_title     constant varchar2(60)     := 'dpu.getpenalty:'; 
-  c_baseval   constant tabval.kv%type   := gl.baseval;    
+  c_title     constant varchar2(64)     := 'dpu.getpenalty:';
+  c_baseval   constant tabval.kv%type   := gl.baseval;
   c_getintid  constant int_accn.id%type := 1;
   c_addintid  constant int_accn.id%type := 3;
   -- types
-  type t_dealrec is record (dealnum     dpu_deal.nd%type, 
-                            dealdat     dpu_deal.datz%type, 
-                            gen_num     dpu_deal.nd%type, 
-                            datbeg      dpu_deal.dat_begin%type, 
-                            datend      dpu_deal.dat_end%type, 
-                            freq        dpu_deal.freqv%type, 
-                            stopid      dpu_deal.id_stop%type, 
-                            minsum      dpu_deal.min_sum%type, 
-                            depacc      accounts.acc%type, 
-                            depsal      accounts.ostc%type, 
+  type t_dealrec is record (dealnum     dpu_deal.nd%type,
+                            dealdat     dpu_deal.datz%type,
+                            gen_num     dpu_deal.nd%type,
+                            datbeg      dpu_deal.dat_begin%type,
+                            datend      dpu_deal.dat_end%type,
+                            freq        dpu_deal.freqv%type,
+                            stopid      dpu_deal.id_stop%type,
+                            minsum      dpu_deal.min_sum%type,
+                            depacc      accounts.acc%type,
+                            depsal      accounts.ostc%type,
                             depflg      number(1),
                             blkd        accounts.blkd%type,
-                            intacc      accounts.acc%type, 
-                            intsal      accounts.ostc%type, 
+                            intacc      accounts.acc%type,
+                            intsal      accounts.ostc%type,
                             intflg      number(1),
-                            curid       tabval.kv%type, 
-                            curcode     tabval.lcv%type, 
-                            acrdat      int_accn.acr_dat%type, 
+                            curid       tabval.kv%type,
+                            curcode     tabval.lcv%type,
+                            acrdat      int_accn.acr_dat%type,
                             rate        int_ratn.ir%type,
                             tax         number(1) );
   type t_stoprec is record (penya_type  dpt_stop_a.sh_proc%type,
@@ -5103,8 +5128,10 @@ $end
   end;
   
   -- общая сумма начисленных процентов
-  select sum(p.s), sum(p.sq) 
-    into p_totalint_nom, p_totalint_eqv
+  select nvl(sum(p.s ),0)
+       , nvl(sum(p.sq),0)
+    into p_totalint_nom
+       , p_totalint_eqv
     from opldok p, 
          oper o 
    where p.acc   = l_dpu.intacc
@@ -5116,20 +5143,20 @@ $end
      and o.pdat  > l_date_prol;
 
   -- 2. Общая сумма начисленных процентов за период с ... по ... составила ...
-  iset_details (p_details, bars_msg.get_msg(modcode, 'COMMENT2_TITLE'));
-  
-  iset_details (p_details, bars_msg.get_msg(modcode, 'COMMENT2_SUMN',
-                                                     to_char(l_dpu.datbeg, 'dd/mm/yyyy'),
-                                                     to_char(l_dpu.acrdat, 'dd/mm/yyyy'),
-                                                     trim(to_char(p_totalint_nom/100,'9999999999D99')),
-                                                     l_dpu.curcode)
+  iset_details( p_details, bars_msg.get_msg( modcode, 'COMMENT2_TITLE' ) );
+
+  iset_details( p_details, bars_msg.get_msg( modcode, 'COMMENT2_SUMN',
+                                                      to_char(l_dpu.datbeg, 'dd/mm/yyyy'),
+                                                      to_char(l_dpu.acrdat, 'dd/mm/yyyy'),
+                                                      trim(to_char(p_totalint_nom/100,'9999999999D99')),
+                                                      l_dpu.curcode )
                  || ( case when l_dpu.curid != c_baseval 
-                      then bars_msg.get_msg(modcode, 'COMMENT2_SUMEQV', 
-                                                        trim(to_char(p_totalint_eqv/100,'9999999999D99')))
-                       end ) );
+                      then bars_msg.get_msg( modcode, 'COMMENT2_SUMEQV'
+                                                    , trim(to_char(p_totalint_eqv/100,'9999999999D99')))
+                      end ) );
 
   -- остаток на счете
-  l_saldo := nvl(fost(l_dpu.depacc, p_bdate), 0);
+  l_saldo := nvl(FOST(l_dpu.depacc,p_bdate),0);
   
 $if MAKE_INTEREST.G_USE_TAX_INC OR MAKE_INTEREST.G_USE_TAX_MIL
 $then
@@ -5155,7 +5182,7 @@ $then
          AND t.sos   = 5
          AND t.tt IN ( '%15', 'MIL' )
          AND o.PDAT   > l_date_prol
-         AND p.DPU_ID = p_dpuid;    
+         AND p.DPU_ID = p_dpuid;
     exception
       when NO_DATA_FOUND then
         l_tax_income   := 0;
@@ -5163,7 +5190,14 @@ $then
     end;
     
     bars_audit.trace( '%s tax_income=%s, tax_military=%s.', c_title, to_char(l_tax_income), to_char(l_tax_military) );
+
+  else
     
+    p_tax_inc_ret := 0;
+    p_tax_mil_ret := 0;
+    p_tax_inc_pay := 0;
+    p_tax_mil_pay := 0;
+
   end if;
 $end
   -- -------------------------------------------------------------------------
@@ -5190,7 +5224,8 @@ $end
                                                      to_char(l_term_fact)));
 
   -- если депозит пролежал меньше 1 месяца, то %% не начисляются
-  if (l_stop.sh_proc = 1 and trunc(l_month_cnt) < 1) then   
+  if (l_stop.sh_proc = 1 and trunc(l_month_cnt) < 1) 
+  then
      -- срок депозита меньше 1 месяца 
      iset_details (p_details, bars_msg.get_msg(modcode, 'COMMENT3_TERM1MONTHS'));
      p_penya_rate    := 0;
@@ -5210,7 +5245,7 @@ $end
      bars_audit.trace('%s exit with intpay %s/%s, dptpay %s/%s, details %s', 
                       c_title, 
                       to_char(p_intpay_nom), to_char(p_intpay_eqv),
-                      to_char(p_dptpay_nom), to_char(p_dptpay_eqv),                                                               
+                      to_char(p_dptpay_nom), to_char(p_dptpay_eqv),
                       p_details);
      return;
   end if;
@@ -5223,7 +5258,7 @@ $end
      l_term    := round(l_month_cnt, 2);                       
      l_msgcode := 'COMMENT3_TERM_IN_MONTHS';
   else                      -- срок задан в днях  
-     l_term    := p_bdate - l_dpu.datbeg + 1;              
+     l_term    := p_bdate - l_dpu.datbeg + 1;
      l_msgcode := 'COMMENT3_TERM_IN_DAY';
   end if;
   -- => ОП = ... %%/мес/дней
@@ -5257,12 +5292,10 @@ $end
       iset_details (p_details, bars_msg.get_msg(modcode, 'COMMENT4_SHTRAF_OUT')); 
       p_penya_rate   := l_dpu.rate; 
       p_penyaint_nom := p_totalint_nom;
-      p_penyaint_eqv := round(gl.p_icurval (l_dpu.curid, p_penyaint_nom, p_bdate));
+      p_penyaint_eqv := round( gl.p_icurval( l_dpu.curid, p_penyaint_nom, p_bdate ) );
       p_dptpay_nom   := greatest ((p_totalint_nom - p_penyaint_nom) - l_dpu.intsal, 0);
       p_intpay_nom   := (p_totalint_nom - p_penyaint_nom) - p_dptpay_nom;
-      p_dptpay_eqv   := round(  (p_totalint_eqv - p_penyaint_eqv) 
-                              / (p_totalint_nom - p_penyaint_nom) 
-                              *  p_dptpay_nom);
+      p_dptpay_eqv   := round( gl.p_icurval( l_dpu.curid, p_dptpay_nom, p_bdate ) );
       p_intpay_eqv   := (p_totalint_eqv - p_penyaint_eqv) - p_dptpay_eqv;
       
       bars_audit.trace('%s exit with rate %s, totalint %s/%s, penyaint %s/%s', 
@@ -5272,7 +5305,7 @@ $end
       bars_audit.trace('%s exit with intpay %s/%s, dptpay %s/%s, details %s', 
                        c_title, 
                        to_char(p_intpay_nom), to_char(p_intpay_eqv),
-                       to_char(p_dptpay_nom), to_char(p_dptpay_eqv),                                                               
+                       to_char(p_dptpay_nom), to_char(p_dptpay_eqv),
                        p_details);
       return;
   end;
@@ -5515,28 +5548,21 @@ $end
   
   if ( l_dpu.tax = 1 )
   then -- податки з ФО
-    
+
     p_tax_inc_ret := l_tax_income;
     p_tax_mil_ret := l_tax_military;
- 
+
     p_tax_inc_pay := round(p_penyaint_nom * MAKE_INTEREST.GET_TAX_RATE(p_bdate, 1));
     p_tax_mil_pay := round(p_penyaint_nom * MAKE_INTEREST.GET_TAX_RATE(p_bdate, 2));
-    
+
     -- Сума утриманого з нарахованих %% податку на прибуток з ФО (для повернення)
     iset_details( p_details, 
                   bars_msg.get_msg( modcode, 'COMMENT6_TAX_INCOME_RET', to_char(p_tax_inc_ret/100,'FM9999990D09'), l_dpu.curcode ) );
-    
+
     -- Сума утриманого з нарахованих %% військового збору з ФО   (для повернення)
     iset_details( p_details, 
                   bars_msg.get_msg( modcode, 'COMMENT6_TAX_MILITARY_RET', to_char(p_tax_mil_ret/100,'FM9999990D09'), l_dpu.curcode ) );
-    
-  else
-    
-    p_tax_inc_ret := 0;
-    p_tax_mil_ret := 0;
-    p_tax_inc_pay := 0;
-    p_tax_mil_pay := 0;
-    
+
   end if;
   
   -- СУММА НАЧИСЛЕННЫХ %% ПО ШТРАФНОЙ СТАВКЕ = ...
@@ -5551,25 +5577,26 @@ $end
   then
     
     -- Сума податку на прибуток з ФО (для сплати з суми нарахованих %% по штрафній ставці)
-    iset_details( p_details, 
+    iset_details( p_details,
                   bars_msg.get_msg( modcode, 'COMMENT6_TAX_INCOME_PAY', to_char(p_tax_inc_pay/100,'FM9999990D09'), l_dpu.curcode ) );
     
     -- Сума військового збору з ФО   (для сплати з суми нарахованих %% по штрафній ставці)
-    iset_details( p_details, 
+    iset_details( p_details,
                   bars_msg.get_msg( modcode, 'COMMENT6_TAX_MILITARY_PAY', to_char(p_tax_mil_pay/100,'FM9999990D09'), l_dpu.curcode ) );
     
   end if;
-  
-  bars_audit.trace('%s exit with rate %s, totalint %s/%s, penyaint %s/%s', 
-                   c_title,              to_char(p_penya_rate),
-                   to_char(p_totalint_nom), to_char(p_totalint_eqv),
-                   to_char(p_penyaint_nom), to_char(p_penyaint_eqv));
-  bars_audit.trace('%s exit with intpay %s/%s, dptpay %s/%s, details %s', 
-                   c_title, 
+
+  bars_audit.trace('%s Exit with rate %s, totalint %s/%s, penyaint %s/%s'
+                  , c_title                , to_char(p_penya_rate)
+                  , to_char(p_totalint_nom), to_char(p_totalint_eqv)
+                  , to_char(p_penyaint_nom), to_char(p_penyaint_eqv) );
+
+  bars_audit.trace('%s Exit with intpay %s/%s, dptpay %s/%s, details %s',
+                   c_title,
                    to_char(p_intpay_nom), to_char(p_intpay_eqv),
-                   to_char(p_dptpay_nom), to_char(p_dptpay_eqv),                                                               
-                   p_details);
-  
+                   to_char(p_dptpay_nom), to_char(p_dptpay_eqv),
+                   p_details );
+
   rollback to penalty;
 
 end get_penalty_ex;
@@ -7611,22 +7638,34 @@ $end
 --
 --
 function CHECK_RUNNING_TASK
-( p_action  in   v$session.action%type
+( p_action   in   v$session.action%type
 ) return varchar2
 is
-  l_errmsg       varchar2(500);
-  l_usr_mfo      varchar2(6);
+  title  constant varchar2(64) :=  $$PLSQL_UNIT||'.CHECK_RUNNING_TASK';
+  l_errmsg        varchar2(500);
+  l_usr_mfo       varchar2(6);
 begin
   
   -- task is already running
   
   l_usr_mfo := sys_context('BARS_CONTEXT','USER_MFO');
   
+  bars_audit.info( title||': Start with ( p_action=>'||p_action||', l_usr_mfo='||l_usr_mfo||' ).' );
+
   if ( l_usr_mfo Is Null )
   then -- for all KF
     
     begin
-      select s.USERNAME || ' (' || s.MACHINE || '/' || s.OSUSER || ')'
+      select case s.USERNAME
+             when 'BARS_ACCESS_USER'
+             then ( select VALUE
+                      from V$GLOBALCONTEXT
+                     where NAMESPACE = 'BARS_GLOBAL'
+                       and ATTRIBUTE = 'USER_NAME'
+                       and CLIENT_IDENTIFIER = s.CLIENT_IDENTIFIER
+                  )
+             else s.USERNAME
+             end || ' (' || s.MACHINE || '/' || s.OSUSER || ')'
         into l_errmsg
         from V$SESSION s
        where s.TYPE   = 'USER'
@@ -7641,14 +7680,23 @@ begin
   else -- for one KF
     
     begin
-      select s.USERNAME || ' (' || s.MACHINE || '/' || s.OSUSER || ')'
+      select case s.USERNAME
+             when 'BARS_ACCESS_USER'
+             then ( select VALUE
+                      from V$GLOBALCONTEXT
+                     where NAMESPACE = 'BARS_GLOBAL'
+                       and ATTRIBUTE = 'USER_NAME'
+                       and CLIENT_IDENTIFIER = s.CLIENT_IDENTIFIER
+                  )
+             else s.USERNAME
+             end || ' (' || s.MACHINE || '/' || s.OSUSER || ')'
         into l_errmsg
         from V$SESSION s
        where s.TYPE   = 'USER'
          and s.STATUS = 'ACTIVE'
          and s.MODULE = 'DPU'
          and s.ACTION = p_action
-         and exists ( select 1 
+         and exists ( select 1
                         from V$GLOBALCONTEXT c
                        where c.NAMESPACE = 'BARS_CONTEXT'
                          and c.ATTRIBUTE = 'USER_MFO'
@@ -7660,9 +7708,11 @@ begin
     end;
     
   end if;
-  
+
+  bars_audit.trace( '%s: Exit with ( l_errmsg=>%s ).', title, l_errmsg );
+
   return l_errmsg;
-  
+
 end check_running_task;
 
 --
@@ -7671,7 +7721,7 @@ end check_running_task;
 procedure AUTO_PAYOUT_INTEREST
 ( p_bdate  in  fdat.fdat%type
 ) is
-  title        constant varchar2(60) := 'dpu.autopayoutinterest: ';
+  title        constant varchar2(64) := 'dpu.autopayoutinterest: ';
   l_runid      dpu_jobs_jrnl.run_id%type;       -- Ідентификатор запуску
   l_jobid      dpt_jobs_list.job_id%type;       -- Ідентификатор завдання
   l_int_ref    oper.ref%type;                   -- референс операції виплати відсотків
@@ -7718,7 +7768,7 @@ begin
   
   if (l_errmsg is Not Null)
   then
-    BARS_ERROR.RAISE_ERROR( modcode, 666, l_errmsg );
+    BARS_ERROR.RAISE_NERROR( modcode, 'TASK_ALREADY_RUNNING', l_errmsg );
   else
     dbms_application_info.set_module(MODCODE, 'AUTO_PAYOUT_INTEREST');
     dbms_application_info.set_client_info( 'Start at '||to_char(sysdate,'dd/mm/yyyy hh24:mi:ss') || 'with p_bdate=' || to_char(p_bdate, 'dd.mm.yyyy') );
@@ -8011,7 +8061,7 @@ begin
   
   if (l_errmsg is Not Null)
   then
-    bars_error.raise_error( modcode, 666, l_errmsg );
+    bars_error.raise_nerror( modcode, 'TASK_ALREADY_RUNNING', l_errmsg );
   else
     dbms_application_info.set_module(MODCODE, 'AUTO_PAYOUT_DEPOSIT');
     dbms_application_info.set_client_info( 'Start at '||to_char(sysdate,'dd/mm/yyyy hh24:mi:ss') || 'with p_bdate=' || to_char(p_bdate, 'dd.mm.yyyy') );
@@ -8458,7 +8508,7 @@ begin
   
   if (l_errmsg is Not Null)
   then
-    bars_error.raise_nerror( 'DPU', 'TASK_ALREADY_RUNNING', l_errmsg );
+    bars_error.raise_nerror( modcode, 'TASK_ALREADY_RUNNING', l_errmsg );
   else
     dbms_application_info.set_module(MODCODE, 'AUTO_MOVE2ARCHIVE');
     dbms_application_info.set_client_info( 'Start at '||to_char(sysdate,'dd/mm/yyyy hh24:mi:ss') || 'with p_bdate=' || to_char(p_bdate, 'dd.mm.yyyy') );
@@ -8605,7 +8655,7 @@ begin
   
   if (l_errmsg is Not Null)
   then
-    bars_error.raise_nerror( 'DPU', 'TASK_ALREADY_RUNNING', l_errmsg );
+    bars_error.raise_nerror( modcode, 'TASK_ALREADY_RUNNING', l_errmsg );
   else
     dbms_application_info.set_module(MODCODE, 'AUTO_MAKE_INT_FINALLY');
     dbms_application_info.set_client_info( 'Start at '||to_char(sysdate,'dd/mm/yyyy hh24:mi:ss') || 'with p_bdate=' || to_char(p_bdate, 'dd.mm.yyyy') );
@@ -8736,7 +8786,7 @@ begin
     
     if (l_errmsg is Not Null)
     then
-      bars_error.raise_error( modcode, 666, l_errmsg );
+      bars_error.raise_nerror( modcode, 'TASK_ALREADY_RUNNING', l_errmsg );
     else
       dbms_application_info.set_module(MODCODE, 'AUTO_MAKE_INTEREST');
       dbms_application_info.set_client_info( 'Start at '||to_char(sysdate,'dd/mm/yyyy hh24:mi:ss') || 'with p_bdate=' || to_char(p_bdate, 'dd.mm.yyyy') );
@@ -8888,7 +8938,7 @@ begin
   
   if (l_errmsg is Not Null)
   then
-    bars_error.raise_error( modcode, 666, l_errmsg );
+    bars_error.raise_nerror( modcode, 'TASK_ALREADY_RUNNING', l_errmsg );
   else
     dbms_application_info.set_module(MODCODE, 'AUTO_EXTENSION');
     dbms_application_info.set_client_info( 'Start at '||to_char(sysdate,'dd/mm/yyyy hh24:mi:ss') || 'with p_bdate=' || to_char(p_bdate, 'dd.mm.yyyy') );

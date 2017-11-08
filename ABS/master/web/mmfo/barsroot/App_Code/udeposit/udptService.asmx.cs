@@ -12,12 +12,16 @@ using Bars.Doc;
 using BarsWeb.Core.Logger;
 using Oracle.DataAccess.Client;
 using Oracle.DataAccess.Types;
+using System.Collections.Generic;
+using BarsWeb.Infrastructure.Helpers;
+using System.Text;
 
 namespace barsroot.udeposit
-{   // 2017-08-29 //
+{   // 2017-10-03 //
     public class DptUService : BarsWebService
     {
         string base_role = "wr_deposit_u";
+        int rowsLimit = 2000;
         private IDbLogger DBLogger; 
 
         private struct oper_stuct
@@ -102,6 +106,8 @@ namespace barsroot.udeposit
                     "d.freqn nFREQN, d.freqv nFREQV, d.freq_name FREQV, " +
                     "TO_CHAR(d.dat_z,'DD.MM.YYYY') DATZ, TO_CHAR(d.dat_n,'DD.MM.YYYY') DATN, " +
                     "TO_CHAR(d.dat_o,'DD.MM.YYYY') DATO, TO_CHAR(d.dat_v,'DD.MM.YYYY') DATV, " +
+                    "d.dat_z DATZ_SORT, d.dat_n DAT_N_SORT, " +
+                    "d.dat_o DAT_O_SORT, d.dat_v DAT_V_SORT, " +
                     "d.DAT_Z, d.DAT_N, d.DAT_O, d.DAT_V, d.branch BRANCH, " +
                     "d.mfod MFOD, d.nlsd ACCD, d.nmsd NMSD," +
                     "d.mfop MFOP, d.nlsp ACCP, d.nmsd NMSP," +
@@ -614,9 +620,12 @@ namespace barsroot.udeposit
                         try
                         {
                             ClearParameters();
+                            SetParameters("p_mfo", DB_TYPE.Varchar2, Convert.ToString(result[22]), DIRECTION.Input);
                             SetParameters("p_dpuid", DB_TYPE.Decimal, dpu_id, DIRECTION.Input);
                             SetParameters("p_tt", DB_TYPE.Varchar2, Convert.ToString(result[34]), DIRECTION.Input);
-                            result[44] = Convert.ToString(SQL_SELECT_scalar("select DPU.GET_SWT_DTL( :p_dpuid, :p_tt ) from DUAL"));
+                            result[44] = Convert.ToString(SQL_SELECT_scalar("select case DPU.IS_OSCHADBANK( :p_mfo ) when 0 "
+                                                                                 + "then DPU.GET_SWT_DTL( :p_dpuid, :p_tt ) "
+                                                                                 + "else NULL end from DUAL"));
                         }
                         catch(Exception ex)
                         {
@@ -629,9 +638,12 @@ namespace barsroot.udeposit
                         try
                         {
                             ClearParameters();
+                            SetParameters("p_mfo", DB_TYPE.Varchar2, Convert.ToString(result[22]), DIRECTION.Input);
                             SetParameters("p_dpuid", DB_TYPE.Decimal, dpu_id, DIRECTION.Input);
                             SetParameters("p_tt", DB_TYPE.Varchar2, Convert.ToString(result[35]), DIRECTION.Input);
-                            result[45] = Convert.ToString(SQL_SELECT_scalar("select DPU.GET_SWT_DTL( :p_dpuid, :p_tt ) from DUAL"));
+                            result[45] = Convert.ToString(SQL_SELECT_scalar("select case DPU.IS_OSCHADBANK( :p_mfo ) when 0 "
+                                                                                 + "then DPU.GET_SWT_DTL( :p_dpuid, :p_tt ) "
+                                                                                 + "else NULL end from DUAL"));
                         }
                         catch(Exception ex)
                         {
@@ -734,7 +746,7 @@ namespace barsroot.udeposit
         /// Розрахунок відсоткової ставки та сум штрафу при достроковому поверененні коштів по деп. дог.
         /// </summary>
         /// <param name="dpt_id"></param>
-        /// <param name="?"></param>
+        /// <param name="bnk_dt"></param>
         /// <returns></returns>
         [WebMethod(EnableSession = true)]
         public string[] getPenaltyEx( string dpt_id, string bnk_dt )
@@ -773,20 +785,20 @@ namespace barsroot.udeposit
 
                 SQL_PROCEDURE("DPU.GET_PENALTY_EX");
 
-                result[0] = Convert.ToString(GetParameter("p_details"));
+                result[0] = GetParameter("p_details").ToString().Trim();
 
-                amntRet = Convert.ToDecimal(GetParameter("p_totalint_nom"));
-                amntPay = Convert.ToDecimal(GetParameter("p_penyaint_nom"));
+                amntRet = Convert.ToDecimal(GetParameter("p_totalint_nom").ToString());
+                amntPay = Convert.ToDecimal(GetParameter("p_penyaint_nom").ToString());
 
                 result[2] = Convert.ToString((amntRet - amntPay));
 
-                amntRet = Convert.ToDecimal(GetParameter("p_tax_inc_ret"));
-                amntPay = Convert.ToDecimal(GetParameter("p_tax_inc_pay"));
+                amntRet = Convert.ToDecimal(GetParameter("p_tax_inc_ret").ToString());
+                amntPay = Convert.ToDecimal(GetParameter("p_tax_inc_pay").ToString());
 
                 result[3] =  Convert.ToString((amntRet-amntPay));
 
-                amntRet = Convert.ToDecimal(GetParameter("p_tax_mil_ret"));
-                amntPay = Convert.ToDecimal(GetParameter("p_tax_mil_pay"));
+                amntRet = Convert.ToDecimal(GetParameter("p_tax_mil_ret").ToString());
+                amntPay = Convert.ToDecimal(GetParameter("p_tax_mil_pay").ToString());
 
                 result[4] = Convert.ToString((amntRet - amntPay));
 
@@ -1163,7 +1175,7 @@ namespace barsroot.udeposit
                 InitOraConnection();
                 SetRole(base_role);
                 SetParameters("ID", DB_TYPE.Decimal, id, DIRECTION.Input);
-                ArrayList reader = SQL_reader("select d.srok, d.kv, t.lcv, t.name, d.freq_v, f.name, d.br_id, b.name, NVL(d.comproc,0), NVL(d.fl_extend,0)" + 
+                ArrayList reader = SQL_reader("select d.TERM_MAX, d.KV, t.lcv, t.name, d.freq_v, f.name, d.br_id, b.name, NVL(d.comproc,0), NVL(d.fl_extend,0)" + 
                                               "     , d.id_stop, s.name, d.bsd, d.bsn, d.DPU_TYPE, br.branch, br.name, d.SHABLON" +
                                               "     , nvl(d.MIN_SUMM,0)/100, nvl(d.MAX_SUMM,0)/100, nvl(d.TERM_TYPE,2)" +
                                               "  from TABVAL t, DPU_VIDD d, FREQ f, BRATES b, DPT_STOP s, BRANCH br " + 
@@ -1175,9 +1187,9 @@ namespace barsroot.udeposit
                 }
                 if (result[0].ToString() != string.Empty && dateN != string.Empty)
                 {
-                    decimal srok = Convert.ToDecimal(result[0], cinfo);
-                    int month = (int)srok;
-                    int days = (int)((srok - month) * 100);
+                    decimal term = Convert.ToDecimal(result[0], cinfo);
+                    int month = (int)term;
+                    int days = (int)((term - month) * 10000);
 
                     ClearParameters();
                     SetParameters("dateN", DB_TYPE.Date, Convert.ToDateTime(dateN, cinfo), DIRECTION.Input);
@@ -1607,13 +1619,11 @@ namespace barsroot.udeposit
         /// Дата закінчення депозитного договору
         /// </summary>
         /// <param name="sDateBegin">Дата початку договору</param>
-        /// <param name="sTerm">Термін депозиту</param>
+        /// <param name="sVIDD">Вид депозиту</param>
         /// <returns></returns>
         [WebMethod(EnableSession = true)]
         public string GetDateEnd(string sDateBegin, string sVIDD)
         {
-            // DBLogger.Info("GetDateEnd(" + sDateBegin + ", " + sTerm + ").", "BarsWeb.DepositU");
-
             string result = string.Empty;
 
             if ((sDateBegin != string.Empty) && (sVIDD != string.Empty))
@@ -1622,14 +1632,6 @@ namespace barsroot.udeposit
 
                 DateTime DateBegin = Convert.ToDateTime(sDateBegin, cinfo);
                 Decimal Vidd = Convert.ToDecimal(sVIDD, cinfo);
-
-                // Decimal Term = Convert.ToDecimal(sTerm, cinfo);
-
-                // Int32 Month = (int)Term;
-                // Int32 Days = (int)((Term - Month) * 100);
-
-                // // День розміщення враховується в термін договору
-                // Days = Days - 1;
 
                 try
                 {
@@ -1640,13 +1642,9 @@ namespace barsroot.udeposit
 
                     SetParameters("dateN", DB_TYPE.Date, DateBegin, DIRECTION.Input);
 
-                    // SetParameters("mnth", DB_TYPE.Decimal, Month, DIRECTION.Input);
-                    // SetParameters("days", DB_TYPE.Decimal, Days, DIRECTION.Input);
-                    // result = Convert.ToString(SQL_SELECT_scalar("SELECT to_char(add_months(:dateN,:mnth)+:days,'dd.MM.yyyy') from dual"));
-
                     SetParameters("vidd", DB_TYPE.Decimal, Vidd, DIRECTION.Input);
 
-                    result = SQL_SELECT_scalar("select TO_CHAR(add_months(:dateN, trunc(srok)) + ((srok - trunc(srok)) * 100 - 1),'DD.MM.YYYY') from BARS.DPU_VIDD where vidd = :vidd").ToString();
+                    result = SQL_SELECT_scalar("select to_char(add_months(:dateN, trunc(TERM_MAX)) + ((TERM_MAX - trunc(TERM_MAX)) * 10000 - 1),'DD.MM.YYYY') from DPU_VIDD where VIDD = :vidd").ToString();
                 }
                 finally
                 {
@@ -2138,10 +2136,11 @@ namespace barsroot.udeposit
                 else //  if ( String.IsNullOrEmpty(Convert.ToString(reader[7])) && String.IsNullOrEmpty(Convert.ToString(reader[8])))
                 {
                     reader = SQL_reader("select null, null, null, null, null, null, null" +
-                                        "     , nvl(c.NMKV,F_TRANSLATE_KMU(c.NMK))" +
-                                        "     , F_TRANSLATE_KMU(c.ADR), d.NLS_D" +
-                                        "  from BARS.DPU_DEAL d" +
-                                        "  join BARS.CUSTOMER c" +
+                                        "     , BARS_SWIFT.STRVERIFY2( upper( coalesce(c.NMKV,F_TRANSLATE_KMU(c.NMK)) ), 'TRANS' )" +
+                                        "     , BARS_SWIFT.STRVERIFY2( upper( F_TRANSLATE_KMU(c.ADR) ), 'TRANS' )"+
+                                        "     , d.NLS_D" +
+                                        "  from DPU_DEAL d" +
+                                        "  join CUSTOMER c" +
                                         "    on ( c.RNK = d.RNK )" +
                                         " where d.DPU_ID = :p_dpuid" );
                     reader.CopyTo(result);
@@ -2509,6 +2508,147 @@ namespace barsroot.udeposit
             }
 
             return errMsg;
+        }
+
+        [WebMethod(EnableSession = true)]
+        public string ExportToExcel(string[] data, bool? forceExecute = null)
+        {
+            try
+            {
+                InitOraConnection();
+
+                string sql = GetSqlTemplate(data);
+                string selStatement = BuildSelectStatementForTable(sql, "BARS.DPT_U d", "", data, false);
+
+                int rowsCount = 0;
+
+                if (false == forceExecute && (rowsCount = GetRowsCount(selStatement, sql)) > rowsLimit)
+                {
+                    return rowsCount.ToString();
+                }
+
+                if (!string.IsNullOrEmpty(data[3]))
+                {
+                    selStatement = AppendSorting(data, selStatement, "d");
+                }
+
+                DataSet ds = SQL_SELECT_dataset(selStatement);
+
+                return CreateExcelFile(ds);
+            }
+			catch
+			{
+				throw;
+			}
+            finally
+            {
+                DisposeOraConnection();
+            }
+
+        }
+
+        private string GetSqlTemplate(string[] data)
+        {
+            string sqlStr = " d.DPU_ID \"Реф. деп. дог.\", d.DPU_GEN \"Реф. ген. дог.\", d.DPU_ADD \"№ дод. угоди.\", " +
+                "d.ND \"Номер депоз. дог. \", d.RNK \"РНК \", d.NMK \"КЛІЄНТ \", d.ISO \"Вал \", d.NLS  \"Депозитний рахунок \", " +
+                "d.SUM/100 /*SUM*/ \"Загальна сума \", d.PROC \"% ставка \",  d.OSTC/100 /*OSTC*/ \"Cума на рах. депозиту \", d.OSTN/100 /*OSTN*/ \"Cума нарах. %% \", " +
+                "d.FREQ_NAME \"Періодичність погашення %% \", TO_CHAR(d.dat_z,'DD.MM.YYYY') /*DATZ*/ \"Дата заключення договору \", TO_CHAR(d.dat_n,'DD.MM.YYYY') /*DATN*/ \"Дата розміщення депозиту \", " +
+                "TO_CHAR(d.dat_o,'DD.MM.YYYY') /*DATO*/ \"Дата закінчення договору \", TO_CHAR(d.dat_v,'DD.MM.YYYY') /*DATV*/ \"Дата повернення депозиту \", d.BRANCH \"Код відділення \", d.MFOP \"МФО перерахув. %% \", " +
+                "d.nlsp /*ACCP*/ \"Рахунок для перерахув. %% \", d.MFOD \"МФО повернення депозиту \", d.nlsd /*ACCD*/ \"Рахунок повернення депозиту \", d.user_id /*ISP*/ \"Вик. \" ";
+
+            return sqlStr;
+        }
+        private int GetRowsCount(string sqlQueryString, string fields)
+        {
+            string countQuery = sqlQueryString.Replace(fields, "count(1)");
+
+            int rowsAmount;
+            int.TryParse(SQL_SELECT_scalar(countQuery).ToString(), out rowsAmount);
+
+            return rowsAmount;
+        }
+
+        private string AppendSorting(string[] data, string query, string tabAlias)
+        {
+            StringBuilder queryBuilder = new StringBuilder();
+            Dictionary<string, string> aliasesColumns = new Dictionary<string, string>()
+            {
+                {"DATZ_SORT", " dat_z"},
+                {"DAT_N_SORT", " dat_n"},
+                {"DAT_O_SORT", " dat_o"},
+                {"DAT_V_SORT", " dat_v"},
+                {"ACCP", " nlsd"},
+                {"ISP", " user_id"},
+                {"FREQV"," FREQ_NAME" }
+            };
+
+            queryBuilder.AppendFormat("{0} ORDER BY ", query);
+
+            var sortParams = data[3].Split(' ');
+            for (int i = 0; i < sortParams.Length; i += 2)
+            {
+                string colName = sortParams[i];
+                //sortParams[0,2,4..] is field and sortParams[1,3,5..] is asc|desc
+                if (aliasesColumns.ContainsKey(sortParams[i]))
+                {
+                    colName = aliasesColumns[sortParams[i]];
+                }
+                queryBuilder.Append(colName);
+
+                queryBuilder.AppendFormat(" {0}", sortParams[i+1]);
+            }
+
+            return queryBuilder.ToString();
+        }
+
+        private static string CreateExcelFile(DataSet ds)
+        {
+            var rep = new RegisterCountsDPARepository();
+            var userInf = rep.GetPrintHeader();
+            string fileXls = Path.GetTempFileName() + ".xls";
+            List<Dictionary<string, object>> res = new List<Dictionary<string, object>>();
+
+            for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+            {
+                Dictionary<string, object> row = new Dictionary<string, object>();
+                for (int j = 0; j < ds.Tables[0].Columns.Count; j++)
+                {
+                    string key = ds.Tables[0].Columns[j].Caption;
+                    var value = ds.Tables[0].Rows[i][j];
+                    row[key] = value;
+                }
+                res.Add(row);
+            }
+
+            List<string[]> fileContentHat = new List<string[]>();
+            for (int i = 0; i < ds.Tables[0].Columns.Count; i++)
+            {
+                string[] caption = new string[] { ds.Tables[0].Columns[i].ColumnName, ds.Tables[0].Columns[i].Caption };
+                fileContentHat.Add(caption);
+            }
+
+            List<TableInfo> tableInfo = new List<TableInfo>();
+            for (int i = 0; i < ds.Tables[0].Columns.Count; i++)
+            {
+                string colDataType = string.Empty;
+
+                tableInfo.Add(new TableInfo(ds.Tables[0].Columns[i].ColumnName, ds.Tables[0].Columns[i].MaxLength, colDataType, ds.Tables[0].Columns[i].AllowDBNull));
+            }
+
+            List<string> hat = new List<string>
+                {
+                    "АТ 'ОЩАДБАНК'",
+                    "Користувач:" + userInf.USER_NAME,
+                    "Дата: " + userInf.DATE.ToString("dd'.'MM'.'yyyy") + " Час: " + userInf.DATE.Hour + ":" + userInf.DATE.Minute + ":" + userInf.DATE.Second
+                };
+            var excel = new ExcelHelpers<List<Dictionary<string, object>>>(res, fileContentHat, tableInfo, null, hat);
+
+            using (MemoryStream ms = excel.ExportToMemoryStream())
+            {
+                ms.Position = 0;
+                File.WriteAllBytes(fileXls, ms.ToArray());
+            }
+            return fileXls;
         }
 
         #region Component Designer generated code

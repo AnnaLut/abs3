@@ -1,4 +1,4 @@
-using System.Linq;
+﻿using System.Linq;
 using BarsWeb.Areas.CreditUi.Models;
 using System;
 using System.Collections.Generic;
@@ -17,10 +17,11 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Abstract
         NlsParam getAimBal(byte vidd, decimal? aim, bool yearDiff);
         void setMasIni(string nbs);
         IQueryable<BaseyList> getBasey();
-        IQueryable<RangList> getRang(decimal? rnk);
+        IQueryable<RangList> getRang(byte vidd);
         IQueryable<FreqList> getFreq();
         IQueryable<MetrList> getMetr();
         IQueryable<ParamsList> getTabList();
+        Dictionary<int, string> getDaynpList();
         IQueryable<NdTxtList> getNdTxt(string code);
         IQueryable<NdTxtList> getNdTxtDeal(decimal nd, string code);
         decimal createDeal(CreateDeal credit);
@@ -32,5 +33,7 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Abstract
         PrologParam GetProlog(decimal nd);
         IQueryable<MultiExtInt> getMultiExtInt(decimal nd);
         string SetProlog(decimal nd, DateTime bnkDate, decimal kprolog, decimal sos, DateTime dateStart, DateTime dateEnd);
+        AuthStaticData GetAuthStaticData(decimal nd);
+        string Authorize(decimal nd, int type, string pidstava, string initiative);
     }
 }

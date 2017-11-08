@@ -1,4 +1,4 @@
-angular.module("BarsWeb.Areas").controller("CreditUi.creditParamsCtrl", ["$scope", "$http", "$rootScope", function ($scope, $http, $rootScope) {
+﻿angular.module("BarsWeb.Areas").controller("CreditUi.creditParamsCtrl", ["$scope", "$http", "$rootScope", function ($scope, $http, $rootScope) {
     var url = bars.config.urlContent("/creditui/newcredit/");
 
     var creditKeys = ['currBValue', 'currCValue', 'currDValue', 'currEValue'];
@@ -146,7 +146,8 @@ angular.module("BarsWeb.Areas").controller("CreditUi.creditParamsCtrl", ["$scope
                 $rootScope.credit.listUnsedValue = getUnsedValueByVidd([{VIDD: v}]);
             }
             $scope.$apply();
-			$scope.ddlAim.dataSource.read();
+            $scope.ddlAim.dataSource.read();
+            $rootScope.LoadRangs();
         },
         dataBound: function (e) {
             var dd = this;
@@ -487,5 +488,8 @@ angular.module("BarsWeb.Areas").controller("CreditUi.creditParamsCtrl", ["$scope
         });
     }
 
+    $scope.FillLim = function () {
+        $rootScope.credit.lim = $rootScope.credit.sumValue;
+    };
 
 }]);

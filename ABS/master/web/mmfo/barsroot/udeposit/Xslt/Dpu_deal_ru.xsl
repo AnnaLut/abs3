@@ -84,25 +84,25 @@
 </TD>
 <TD width="5%">
 	<xsl:attribute name="onclick">
-		<xsl:text>Sort('d.DAT_Z')</xsl:text>
+		<xsl:text>Sort('DATZ_SORT')</xsl:text>
 	</xsl:attribute>
 <xsl:text>Дата заключения договора</xsl:text>
 </TD>
 <TD width="5%">
 	<xsl:attribute name="onclick">
-		<xsl:text>Sort('d.DAT_N')</xsl:text>
+		<xsl:text>Sort('DAT_N_SORT')</xsl:text>
 	</xsl:attribute>
 <xsl:text>Дата размещения депозита</xsl:text>
 </TD>
 <TD width="5%">
 	<xsl:attribute name="onclick">
-		<xsl:text>Sort('d.DAT_O')</xsl:text>
+		<xsl:text>Sort('DAT_O_SORT')</xsl:text>
 	</xsl:attribute>
 <xsl:text>Дата окончания договора</xsl:text>
 </TD>
 <TD width="5%">
 	<xsl:attribute name="onclick">
-		<xsl:text>Sort('d.DAT_V')</xsl:text>
+		<xsl:text>Sort('DAT_V_SORT')</xsl:text>
 	</xsl:attribute>
 <xsl:text>Дата возврата депозита</xsl:text>
 </TD>
@@ -147,21 +147,21 @@
 <xsl:for-each select="//Table">
 <xsl:variable name="id" select="DPU_ID" />
 <TR>
-<xsl:if test="DPU_AD=0"><xsl:attribute name="style">background-color:#FFFF99</xsl:attribute></xsl:if>
+<xsl:if test="DPU_ADD=0"><xsl:attribute name="style">background-color:#FFFF99</xsl:attribute></xsl:if>
 <xsl:if test="CLOSED=1"><xsl:attribute name="style">color:#8080FF</xsl:attribute></xsl:if>
 <xsl:attribute name="onclick"><xsl:text>HidePopupMenu();SelectRow('</xsl:text><xsl:value-of select="$id"/><xsl:text>',</xsl:text><xsl:value-of select="position()"/><xsl:text>)</xsl:text></xsl:attribute>
 <xsl:attribute name="oncontextmenu"><xsl:text>ShowPopupMenu();SelectRow('</xsl:text><xsl:value-of select="$id"/><xsl:text>',</xsl:text><xsl:value-of select="position()"/><xsl:text>);return false</xsl:text></xsl:attribute>
 <xsl:attribute name="id"><xsl:value-of select="concat('r_',position())" /></xsl:attribute>
 <xsl:attribute name="dpugen"><xsl:value-of select="DPU_GEN" /></xsl:attribute>
-<xsl:attribute name="dpuadd"><xsl:value-of select="DPU_AD" /></xsl:attribute>
+<xsl:attribute name="dpuadd"><xsl:value-of select="DPU_ADD" /></xsl:attribute>
 <xsl:attribute name="dpuclosed"><xsl:value-of select="CLOSED" /></xsl:attribute>
 <xsl:attribute name="dpuexpired"><xsl:value-of select="FL_1" /></xsl:attribute>
 
 <TD><xsl:value-of select="DPU_ID" /></TD>
 <TD><xsl:value-of select="DPU_GEN" /></TD>
 <TD>
-	<xsl:if test="DPU_AD&gt;0"><xsl:attribute name="style">background-color:#FFFF99</xsl:attribute></xsl:if>
-	<xsl:value-of select="DPU_AD" />
+	<xsl:if test="DPU_ADD&gt;0"><xsl:attribute name="style">background-color:#FFFF99</xsl:attribute></xsl:if>
+	<xsl:value-of select="DPU_ADD" />
 </TD>
 <TD noWrap="true"><xsl:value-of select="ND" /></TD>
 <TD><xsl:value-of select="RNK" /></TD>
@@ -172,7 +172,6 @@
 <TD noWrap="true" align="right"><xsl:value-of select="format-number(PROC,'##### #### ##0.00','ua')" /></TD>
 <TD noWrap="true" align="right"><xsl:value-of select="format-number(OST,'##### #### ##0.00','ua')" /></TD>
 <TD noWrap="true" align="right"><xsl:value-of select="format-number(OSTN,'##### #### ##0.00','ua')" /></TD>
-<TD noWrap="true"><xsl:value-of select="NAME" /></TD>
 <TD noWrap="true"><xsl:value-of select="FREQV" /></TD>
 <TD noWrap="true" align="center">
 	<xsl:choose>
@@ -212,10 +211,45 @@
 <TD noWrap="true" align="center"><xsl:value-of select="MFOP" /></TD>
 <TD><xsl:value-of select="ACCP" /></TD>
 <TD align="center"><xsl:value-of select="MFOD" /></TD>
-<TD><xsl:value-of select="ACCD" /></TD>
-
+<TD>
+  <xsl:value-of select="ACCD" />
+</TD>
+<TD>
+  <xsl:value-of select="ISP" />
+</TD>
 </TR>
 </xsl:for-each>
+<TR style="background-color:Gray;color:White;">
+  <TD title="Загальна кількість договорів"  align="right">
+    <xsl:value-of select="count(//Table/DPU_ID)" />
+  </TD>
+  <TD></TD>
+  <TD></TD>
+  <TD></TD>
+  <TD></TD>
+  <TD></TD>
+  <TD></TD>
+  <TD></TD>
+  <TD noWrap="true" align="right" title="Общая сумма договоров (Эквивалент)">
+    <xsl:value-of select="format-number(sum(//Table/SUMQ),'##### #### ##0.00','ua')" />
+  </TD>
+  <TD></TD>
+  <TD noWrap="true" align="right" title="Общая сумма остатков (Эквивалент)">
+    <xsl:value-of select="format-number(sum(//Table/OSTQ),'##### #### ##0.00','ua')" />
+  </TD>
+  <TD></TD>
+  <TD></TD>
+  <TD></TD>
+  <TD></TD>
+  <TD></TD>
+  <TD></TD>
+  <TD></TD>
+  <TD></TD>
+  <TD></TD>
+  <TD></TD>
+  <TD></TD>
+  <TD></TD>
+</TR>
 </TABLE>
 </xsl:template>
 </xsl:stylesheet>

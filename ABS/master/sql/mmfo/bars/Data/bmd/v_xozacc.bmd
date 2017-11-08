@@ -57,7 +57,7 @@ declare
 
 begin
 
-  l_tabsemantic := '31.08.17.V_XOZACC. ДЗ за госп діяльністю. Рахунки.';
+  l_tabsemantic := '03.10.V_XOZACC. ДЗ за госп діяльністю. Рахунки.';
   l_tablinesdef := '20';
   l_tabname     := 'V_XOZACC';
 
@@ -169,16 +169,14 @@ begin
   bars_metabase.add_nsifunction(l_tabid, 13, 'Дебетові запити до ЦА, що знаходяться на контролі', '', '', 'ONCE', '', 'ОК', '', '', 'sPar=V_XOZ_IDZ[NSIFUNCTION][ACCESSCODE=>1][showDialogWindow=>false]', 71);
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 14, 'Інвентаризаційна відомость снаном на дату ', '', '', 'ONCE', '', 'ОК', '', '', 'sPar=V_XOZREF_INV[ACCESSCODE=>1][PROC=>PUL.PUT(''DATZ'',to_char(:D,''dd.mm.yyyy''))][PAR=>:D(SEM=Звітна_дата,TYPE=D)][EXEC=>BEFORE]', 51);
-
-  -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 15, 'Сформувати СТАРТ-значення для ОДНОГО рахунку', 'XOZ.START1( :ACC ) ', '', 'EACH', 'Картотеку  :NLS на суму :OSTC  буде представлено останніми деб.проводками ', 'ОК', '', '', '', 21);
-
-  -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 16, 'Сформувати СТАРТОВЕ значення для В С І Х  рах.XOZ', 'XOZ.START1( 0  ) ', '', 'ONCE', 'Всю Картотеку XOZ буде представлено останніми деб.проводками ', 'ОК', '', '', '', 19);
+  bars_metabase.add_nsifunction(l_tabid, 14, 'Інвентаризаційна відомість станом на дату :D  ', '', '', 'ONCE', '', 'ОК', '', '', 'sPar=V_XOZREF_INV[ACCESSCODE=>1][PROC=>PUL.PUT(''DATZ'',to_char(:D,''dd.mm.yyyy''))][PAR=>:D(SEM=Звітна_дата,TYPE=D)][EXEC=>BEFORE]', 51);
 
   -- добавляем описание функции на справочник
   bars_metabase.add_nsifunction(l_tabid, 25, 'X Закрити заборг коштами з ЦА, що надійшли по ВПС', 'XOZ.OPL_CA (0)', '', 'ONCE', '', 'ОК', '', '', '', 78);
+
+  -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 30, 'Авто-Закриття по закритим рахункам', 'XOZ.CLS (0)', '', 'ONCE', 'Закрити автоматично всю картотеку по рахункам, які закрито ?
+', 'ОК', '', '', '', 61);
 
   -- добавляем описание раскраски
   l_newcolid := bars_metabase.get_colid(l_tabid, 'DEL');

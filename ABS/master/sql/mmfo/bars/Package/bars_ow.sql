@@ -1,7 +1,7 @@
 CREATE OR REPLACE PACKAGE BARS_OW
 is
 
-g_header_version  constant varchar2(64)  := 'version 4.286 30/08/2017';
+g_header_version  constant varchar2(64)  := 'version 4.285 14/07/2017';
 g_header_defs     constant varchar2(512) := '';
 
 -- header_version - возвращает версию заголовка пакета
@@ -419,7 +419,7 @@ is
 --
 -- constants
 --
-g_body_version    constant varchar2(64)  := 'version 6.012 15/09/2017';
+g_body_version    constant varchar2(64)  := 'version 6.014 30/10/2017';
 g_body_defs       constant varchar2(512) := '';
 
 g_modcode         constant varchar2(3)   := 'BPK';
@@ -434,6 +434,7 @@ g_filetype_cng    constant varchar2(30)  := 'CNGEXPORT';
 g_filetype_roic   constant varchar2(30)  := 'R_DOCUMENTS_REV';
 
 g_keytype         constant varchar2(30)  := 'WAY_DOC';
+g_check_limit     number;
 -- латиница: A-Z(загловн_ л_тери),
 -- цифри: 1234567890,
 -- символи:  ' (апостроф),  / (слеш), - (тире), . (точка)
@@ -646,6 +647,7 @@ begin
   else
      g_cm_branch := null;
   end if;*/
+  g_check_limit :=getglobaloption ('W4CHEKLIM');
 
   bars_audit.trace(h || 'Params:' ||
      ' g_chkid=>' || to_char(g_chkid) ||
@@ -1242,7 +1244,7 @@ is
     nazns_ CHAR(2);        -- Narrative contens type
     id_a_  VARCHAR2(14);   -- Sender's customer identifier
     id_b_  VARCHAR2(14);   -- Target's customer identifier
-    id_o_  VARCHAR2(6);    -- Teller identifier
+    id_o_  VARCHAR2(8);    -- Teller identifier
     sign_  OPER.SIGN%TYPE; -- Signature
     datA_  DATE;           -- Input file date/time
     d_rec_ VARCHAR2(80);   -- Additional parameters
@@ -1498,7 +1500,7 @@ begin
            l_fdat := null;
 
            -- запоминаем дату валютирования проводки на пополнение
-           select min(fdat) into l_fdat from opldok where ref = p_ref and stmt <> l_stmt and sos < 5;
+           select min(fdat) into l_fdat from opldok where ref = p_ref and stmt <> l_stmt and sos < 4;
 
            -- меняем дату валютирования проводки на пополнение на будущую (чтоб она сейчас не платилась)
            if l_fdat is not null then
@@ -1510,7 +1512,7 @@ begin
 
            -- меняем дату валютирования проводки назад
            if l_fdat is not null then
-              update opldok set fdat = l_fdat where ref = p_ref and stmt <> l_stmt and sos < 5;
+              update opldok set fdat = l_fdat where ref = p_ref and stmt <> l_stmt and sos < 4;
            end if;
 
         end if;
@@ -7994,7 +7996,7 @@ begin
                  l_kv, l_s, l_kv, l_s, l_nazn, l_ref);
            end if;
 
-           if l_doc(i).work_flag = 0 then
+           if l_doc(i).work_flag = 0 and g_check_limit = 1 then
               begin
                  l_res := lcs_pack_service.f_stop(l_ref);
               exception
@@ -9784,6 +9786,7 @@ begin
     if l_count = 0 then
 
        delete from ow_iicfiles where file_name = l_file_name;
+       commit;
        l_file_name := null;
   --     l_clob_data := empty_clob();
        l_clob_data := ' ';
@@ -16621,6 +16624,7 @@ begin
 
   bars_audit.info(h || 'Start.');
 
+  execute immediate 'alter session set  NLS_NUMERIC_CHARACTERS=''.,''';
   get_iicfilebody (p_mode, p_filename, p_filebody);
 
   bars_audit.info(h || 'Finish.' || 'p_msg=>' || l_msg);

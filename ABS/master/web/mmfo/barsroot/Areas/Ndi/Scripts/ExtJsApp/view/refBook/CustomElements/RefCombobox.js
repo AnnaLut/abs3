@@ -55,25 +55,27 @@
                 if (!gridSelectModel)
                     return;
                 selectedRow = gridSelectModel.getSelection()[0];
-                //if (field.COL_DYN_TABNAME && field.COL_DYN_TABNAME != '')
-                //    var tableName = selectedRow.data[field.COL_DYN_TABNAME];
-                //    if (!tableName || tableName == '')
-                //{
-                //        Ext.MessageBox.show({ title: 'порожній запис ', msg: 'порожній запис ' + field.COL_DYN_TABNAME, buttons: Ext.MessageBox.OK });
-                       
-                //    return false
-                //}
-                   
-                //combo.SrcTableName = tableName;
-                //var dynamicUrl = '/barsroot/ndi/ReferenceBook/GetRelatedReferenceData?tableName=' + tableName;
                 var dynamicUrl;
-                if (field.COL_DYN_TABNAME)
-                {
+                if (field.COL_DYN_TABNAME && field.COL_DYN_TABNAME != '') {
+                    var tableName = selectedRow.data[field.COL_DYN_TABNAME];
+                    if (!tableName || tableName == '') {
+                        this.collapse();
+                        return false;
+                    }
                     dynamicUrl = ExtApp.utils.RefBookUtils.getUrlByDinamicTabName(field, selectedRow);
-                   
+
+                    //{
+                    //        Ext.MessageBox.show({ title: 'порожній запис ', msg: 'порожній запис ' + field.COL_DYN_TABNAME, buttons: Ext.MessageBox.OK });
+
+                    //    return false
+                    //}
+
+                    //combo.SrcTableName = tableName;
+                    //var dynamicUrl = '/barsroot/ndi/ReferenceBook/GetRelatedReferenceData?tableName=' + tableName;
+
                 }
-                if (field.HasSrcCond && field.srcQueryModel)
-                {
+                else
+                    if (field.HasSrcCond && field.srcQueryModel) {
                     dynamicUrl = ExtApp.utils.RefBookUtils.getUrlBySrcCond(field, selectedRow);
                 }
                 if (!dynamicUrl)

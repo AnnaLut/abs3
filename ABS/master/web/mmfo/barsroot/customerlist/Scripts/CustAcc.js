@@ -1,6 +1,7 @@
 ﻿//CustAcc
 var forceExecute = false;
 var v_XsltTemplateFileName;
+var filterState="";
 
 function InitCustAccParams() {
     rnk = getParamFromUrl("rnk", location.href);
@@ -137,13 +138,33 @@ function InitCustAcc() {
 
     obj.v_menuItems = menu;
     obj.v_enableViewState = true;
+
+    obj.v_funcOnSelect = "activateOnSelect";
+    obj.v_funcFilterBefore = "toggleNotFillBefore";
+    obj.v_funcFilter = "toggleNotFill";
+    obj.v_notFill = true;
+    if (type == 0 || (type == 3 && getParamFromUrl("nd", location.href))) {
+        obj.v_notFill = false;
+    }
+
     fn_InitVariables(obj);
-    InitGrid();
+    InitGrid(v_NotFill);
+    if (v_NotFill) {
+        LoadCustAcc();
+        alertify.alert("Для пошуку рахунків вкажіть параметри фільтрування.")
+    }
 }
 
 function LoadCustAcc() {
     var mod = getParamFromUrl("mod", location.href);
-    document.getElementById("lbNmk").innerText = returnServiceValue[2].text;
+    if (returnServiceValue) {
+        document.getElementById("lbNmk").innerText = returnServiceValue[2].text;
+        enableButton("btExpExcel");
+        enableButton("btShow");
+    } else {
+        disableButton("btExpExcel");
+        disableButton("btShow");
+    }
     if (type == 1 || type == 2 || type == 3 || type == 8 || mod == "ro") SetReadOnly();
     if (type == 1) {
         //document.getElementById("lbNmk").innerText = (parent.frames.length != 0) ? (parent.frames[0].document.getElementById("textLogin").innerText) : ("");
@@ -165,20 +186,23 @@ function LoadCustAcc() {
         document.getElementById("forbLinkAcc").src = image13.src;
     }
     insertXslRowSelectionTooltip();
+
+    if (v_NotFill) {
+        disableButton("btRefresh");
+        
+    } else {
+        enableButton("btRefresh");
+    }
 }
 function SetReadOnly() {
     var mod = getParamFromUrl("mod", location.href);
     v_data[9] = rnk;
-    document.getElementById("btOpen").style.filter = 'progid:DXImageTransform.Microsoft.Alpha( style=0,opacity=25)progid:DXImageTransform.Microsoft.BasicImage(grayScale=1)';
-    document.getElementById("btReg").style.filter = 'progid:DXImageTransform.Microsoft.Alpha( style=0,opacity=25)progid:DXImageTransform.Microsoft.BasicImage(grayScale=1)';
-    document.getElementById("btOpen").disabled = true;
-    document.getElementById("btReg").disabled = true;
+    disableButton("btOpen");
+    disableButton("btReg");
 
     if (mod != "del") {
-        document.getElementById("btClose").style.filter = 'progid:DXImageTransform.Microsoft.Alpha( style=0,opacity=25)progid:DXImageTransform.Microsoft.BasicImage(grayScale=1)';
-        document.getElementById("btReanim").style.filter = 'progid:DXImageTransform.Microsoft.Alpha( style=0,opacity=25)progid:DXImageTransform.Microsoft.BasicImage(grayScale=1)';
-        document.getElementById("btClose").disabled = true;
-        document.getElementById("btReanim").disabled = true;
+        disableButton("btClose");
+        disableButton("btReanim");
     }
 }
 
@@ -333,7 +357,17 @@ function onCloseAcc(result) {
         var promptNum = msg.substr(msg.indexOf("$$PROMPT$$") + 10);
         msg = msg.replace("$$PROMPT$$" + promptNum, "");
         if (Dialog(msg, 0) == 1) {
-            webService.Tmp.callService(onCloseAcc, "CloseAccount", selectedRowId, promptNum);
+            var vid = document.getElementById("VID_" + row_id).innerHTML;
+            var flagEnhCheck = (ModuleSettings && ModuleSettings.Accounts && ModuleSettings.Accounts.EnhanceCloseCheck == true);
+            var closureReason = null;
+            if (flagEnhCheck && vid != 0) {
+                if (document.getElementById('closureReason3').checked) {
+                    closureReason = document.getElementById('closureReason3').value;
+                } else if (document.getElementById('closureReason5').checked) {
+                    closureReason = document.getElementById('closureReason5').value;
+                }
+            }
+            webService.Tmp.callService(onCloseAcc, "CloseAccount", selectedRowId, promptNum, closureReason);
             return;
         }
     }
@@ -392,6 +426,13 @@ function gE(id) {
 }
 // Поиск 
 function QuickFind() {
+    if (!gE("tbFindNls").value && !gE("tbFindRNK").value && v_NotFill) {
+        alertify.alert("Не вказаний Pахунок і РНК клієнта");
+        return;
+    } else if ((gE("tbFindNls").value || gE("tbFindRNK").value) && v_NotFill) {
+        v_NotFill = false;
+    } else if (!gE("tbFindNls").value && !gE("tbFindRNK").value) { v_NotFill = true; }
+
     var where = "";
 
     var ob22 = gE("tbFindOb22").value;
@@ -454,22 +495,20 @@ function QuickFind() {
     }
 
     //save to cookie
-    document.cookie = "kv=" + kv;
-    document.cookie = "nls=" + nls;
-    document.cookie = "nms=" + nms;
+    document.cookie = "kv=" + escape(kv);
+    document.cookie = "nls=" + escape(nls);
+    document.cookie = "nms=" + escape(nms);
     document.cookie = "pap=" + gE("ddPap").selectedIndex;
     if (gE("ddBranches"))
         document.cookie = "branch like" + gE("ddBranches").selectedIndex + "%'";
     if (gE("ddWhereClause"))
         document.cookie = "ddWhereClause=" + gE("ddWhereClause").selectedIndex;
 
-    document.cookie = "ob22=" + ob22;
+    document.cookie = "ob22=" + escape(ob22);
 
     v_data[1] = where;
     ReInitGrid();
 }
-
-
 //Показать\спрятать закрытые счета
 function fnShowHide() {
     if (document.getElementById("btShow").style.borderTopStyle == "inset") {
@@ -568,10 +607,18 @@ function fnClickTurn() {
         document.location.href = '/barsroot/customerlist/turn4day.aspx?acc=' + selectedRowId;
     }
 }
+
+function getParamFromUrlIfExists(param) {
+	var p = getParamFromUrl(param, location.href);
+	if (p !== "") {
+		return "&" + param + "=" + p;
+	}
+	return "";
+}
 function fnClickTurnPeriod() {
 
     // window.showModalDialog('/barsroot/customerlist/dlg_date.aspx', top, 'status:no;resizable:no;help:no;scroll:no;dialogWidth:500Px;dialogHeight:400Px');
-    document.location.href = '/barsroot/customerlist/dlg_date.aspx?rnk=' + v_data[9];
+	document.location.href = '/barsroot/customerlist/dlg_date.aspx?rnk=' + v_data[9] + getParamFromUrlIfExists("nd");
 
 }
 
@@ -613,3 +660,44 @@ function createCookie(name, value, days) {
 function eraseCookie(name) {
     createCookie(name, "", -1);
 }
+
+function activateOnSelect() {
+    if ("2" == type) {
+        enableButton("btClose");
+    }
+}
+
+function enableButton(btnName) {
+    if (btnName) {
+        var btn = document.getElementById(btnName);
+        btn.style.filter = "";
+        btn.disabled = false;
+    }
+}
+
+function disableButton(btnName) {
+    if (btnName) {
+        var btn = document.getElementById(btnName);
+        btn.style.filter = 'progid:DXImageTransform.Microsoft.Alpha( style=0,opacity=25)progid:DXImageTransform.Microsoft.BasicImage(grayScale=1)';
+        btn.disabled = true;
+    }
+}
+
+function toggleNotFillBefore() {
+    if (!v_data[0].isEmpty() || !v_data[20].isEmpty()) {
+        v_NotFill = false;
+    }
+    if (filterState != v_data[0] + v_data[20]) {
+        v_NotFill = false;
+    }
+}
+function toggleNotFill() {
+    if (v_data[0].isEmpty() && v_data[20].isEmpty()) {
+        v_NotFill = true;
+    }
+    filterState = v_data[0] + v_data[20];
+}
+
+String.prototype.isEmpty = function () {
+    return (this.length === 0 || !this.replace(/^\s+|\s+$/g, ''));    
+};

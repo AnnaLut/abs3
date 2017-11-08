@@ -10,7 +10,7 @@
     <meta content="http://schemas.microsoft.com/intellisense/ie5" name="vs_targetSchema">
     <link href="Styles.css" type="text/css" rel="stylesheet">
     <link href="\Common\WebGrid\Grid.css" type="text/css" rel="stylesheet">
-    <script language="JavaScript" src="Scripts\CustAcc.js?v1.13"></script>
+    <script language="JavaScript" src="Scripts\CustAcc.js?v1.14"></script>
     <script type="text/javascript" language="javascript" src="/Common/jquery/jquery.js"></script>
     <script type="text/javascript" language="javascript" src="/Common/jquery/jquery-ui.1.8.js"></script>
     <script type="text/javascript" language="javascript" src="/Common/jquery/jquery.alerts.js"></script>
@@ -205,7 +205,7 @@
                         </div>
                     </td>
                     <td>
-                        <img src="\Common\Images\default\16\export_excel.png" class="outset" alt="Вигрузка в excel" onclick="fnExportToExcel()" />
+                        <img src="\Common\Images\default\16\export_excel.png" class="outset" alt="Вигрузка в excel" onclick="fnExportToExcel()" id ="btExpExcel"/>
                     </td>
                 </tr>
             </table>

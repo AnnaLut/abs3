@@ -744,8 +744,9 @@ Ext.onReady(function () {
 
             //обработчик итоговых строк
             gridColumn.summaryRenderer = function (value, summaryData, dataIndex) {
-                if (!referenceGrid.metadata.additionalProperties.addSummaryRow)
+                if (!referenceGrid.metadata.additionalProperties.addSummaryRow || colMetaInfo.COLTYPE == 'B')
                     return;
+
                 //индекс текущей колонки
                 var columnIndex = summaryData.column.dataIndex;
                 //Проверяем, есть ли шаблон, и устанавливаем его

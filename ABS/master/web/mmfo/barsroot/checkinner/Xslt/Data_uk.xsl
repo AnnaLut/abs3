@@ -6,9 +6,11 @@
       <TR align="center" style="color:White;background-color:Gray;font-family:Verdana;font-size:8pt;font-weight:bold; CURSOR: hand">
 
         <TD width="20px" title="Відзначити всі документи">
-          <xsl:attribute name="onclick">
+          <input id="mainChBox" type="checkbox" style="margin:0px;" onclick="selAllCheckbox(this);">
+          </input>
+          <!--<xsl:attribute name="onclick">
             <xsl:text>SelectAll()</xsl:text>
-          </xsl:attribute>
+          </xsl:attribute>-->
           <IMG alt="Відзначити всі документи" src="Images/SelectAll.gif"></IMG>
         </TD>
 
@@ -179,7 +181,11 @@
             <xsl:value-of select="$id"/>
             <xsl:text>',</xsl:text>
             <xsl:value-of select="position()"/>
-            <xsl:text>); </xsl:text>
+            <xsl:text>);editArrayForPrint('</xsl:text>
+            <xsl:value-of select="$id" />
+            <xsl:text>',chkb_</xsl:text>
+            <xsl:value-of select="$id" />
+            <xsl:text>);</xsl:text>
           </xsl:attribute>
 
           <xsl:attribute name="oncontextmenu">
@@ -194,7 +200,7 @@
           </xsl:attribute>
 
           <TD align="center">
-            <INPUT type="checkbox" style='WIDTH: 15px; HEIGHT: 15px'>
+            <INPUT id="mainChBox" type="checkbox" style='WIDTH: 15px; HEIGHT: 15px'>
               <xsl:attribute name="id">
                 <xsl:text>chkb_</xsl:text>
                 <xsl:value-of select="REF"/>

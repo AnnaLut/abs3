@@ -150,7 +150,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
                 Logger.Info(string.Format("begin get data for excel export table: {0} ", excelDataModel.TableName), LoggerPrefix);
                 GetDataResultInfo dataResult = GetData(excelDataModel);
                 Logger.Info(string.Format("begin excel export table: {0} dataCount: {1} ", excelDataModel.TableName, dataResult.DataRecords.Count()), LoggerPrefix);
-                return ExcelHelper.ExcelExport(tableSemantic, dataResult.DataRecords, allColumnsInfo, excelDataModel, selectBuilder.GetFilterParams());
+                return ExcelHelper.ExcelExport(tableSemantic, dataResult, allColumnsInfo, excelDataModel, selectBuilder.GetFilterParams());
 
 
 
