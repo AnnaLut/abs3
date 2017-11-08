@@ -57,7 +57,7 @@ declare
 
 begin
 
-  l_tabsemantic := '31/08/17.V_XOZREF_INV. Інвентариз.відомость по ГДЗ станом на дату';
+  l_tabsemantic := '31/08/17.V_XOZREF_INV. Інвентариз.відомість по ГДЗ станом на дату :D';
   l_tablinesdef := '10';
   l_tabname     := 'V_XOZREF_INV';
 

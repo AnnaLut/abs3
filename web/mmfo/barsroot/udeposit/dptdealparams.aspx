@@ -244,7 +244,7 @@
                                     </tr>
                                     <tr>
                                         <td style="white-space: nowrap; text-align: right">
-                                            <span class="BarsLabel" id="Span3">Періодичність виплати %%:</span>
+                                            <span class="BarsLabel" id="lbFreqV">Періодичність виплати %%:</span>
                                         </td>
                                         <td style="white-space: nowrap" align="left">
                                             <input id="tbFreqV" type="text" title="Код періодичності виплати %%" name="tbFreqV" 
@@ -257,7 +257,7 @@
                                     </tr>
                                     <tr>
                                         <td style="white-space: nowrap; text-align: right">
-                                            <span class="BarsLabel" id="Span2">Штраф при достр. розторг.:</span>
+                                            <span class="BarsLabel" id="lbStop">Штраф при достр. розторг.:</span>
                                         </td>
                                         <td>
                                             <input id="tbStop" type="text" title="Код штрафу за дострокове розсторгнення договору"

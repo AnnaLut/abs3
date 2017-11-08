@@ -97,17 +97,11 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
             try
             {
                 cmd.CommandType = System.Data.CommandType.Text;
-                cmd.CommandText = @"SELECT  t.dplan,
-                          t.FDAT,
-                          t.NPP ,
-                          t.acc,
-                          t.tip,
-                          t.kv,
-                          t.nls,
-                          t.nms,
-                          t.ostb ,
-                          t.ostc
-                     FROM vw_asp_credit_list t where t.nd=:nd";
+                cmd.CommandText = @"SELECT  t.dplan,t.FDAT,t.NPP,t.acc,t.tip,t.kv,t.nls,t.nms,t.ostb,t.ostc
+                    from VW_ASP_CREDIT_LIST_SUB_ND t where t.ndg=:nd
+                    union
+                    select t.dplan,t.FDAT,t.NPP,t.acc,t.tip,t.kv,t.nls,t.nms,t.ostb,t.ostc 
+                    from VW_ASP_CREDIT_LIST t where nd=:nd";
                 cmd.Parameters.Add("nd", OracleDbType.Decimal, nd, System.Data.ParameterDirection.Input);
                 OracleDataReader reader = cmd.ExecuteReader();
 

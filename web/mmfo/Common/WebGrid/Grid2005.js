@@ -32,6 +32,7 @@ var v_ServiceMethod;					//имя веб-метода из сервиса, ко�
 var v_ServiceFuncAfter;					//имя javascript функции, которая выполится сразу после отрисовки таблицы
 var v_FuncDelRow;						//имя javascript функции, при удалении стоки из таблицы
 var v_FuncFilter;						//имя javascript функции, при применении или изменении фильтра 
+var v_FuncFilterBefore;                 //имя javascript функции, которая выполится сразу после изменения фильтра
 var v_FuncOnSelect;						//имя javascript функции, при выделении стоки	
 var v_ShowFilterOnStart = false;		//флаг - показать окно фильтра при начальной загрузке
 var v_FilterTable;						//имя таблицы, для которой строется фильтр
@@ -60,6 +61,7 @@ var v_XmlFilenameFilter;				//имя xml-файла для вычитки фил
 var v_MenuItems = new Array();
 var row_new = 0;
 var v_row_style;
+var v_NotFill = false;                  //флаг - не выполнять заполнение грида
 
 //Инициализация параметров грида
 function fn_InitVariables(obj) {
@@ -70,12 +72,14 @@ function fn_InitVariables(obj) {
     v_FuncDelRow = obj.v_funcDelRow;
     v_FuncCheckValue = obj.v_funcCheckValue;
     v_FuncFilter = obj.v_funcFilter;
+    v_FuncFilterBefore = obj.v_funcFilterBefore;
     v_FuncOnSelect = obj.v_funcOnSelect;
     v_CustomViewState = obj.v_customViewState;
     v_ServiceAfterRefresh = obj.v_serviceAfterRefresh;
     v_XmlFilenameFilter = obj.v_xmlFilenameFilter;
     v_MenuItems = obj.v_menuItems;
     v_FilterTable = obj.v_filterTable;
+    if (obj.v_notFill != null) v_NotFill = obj.v_notFill;
 
     if (obj.v_filterInMenu != null) v_FilterInMenu = obj.v_filterInMenu;
 
@@ -277,7 +281,8 @@ function RefreshGrid() {
     if (v_ServiceAfterRefresh != null) eval(v_ServiceAfterRefresh + '()');
 }
 //Перечитка данных для грида
-function ReInitGrid() {
+function ReInitGrid(notFill) {
+    if (notFill) return; //не загружать данные
     if (v_EnableViewState) fnSaveViewState();
     var srv = document.getElementById(v_ServiceObjName);
     var srv_obj = eval('srv.' + v_ServiceMethod);
@@ -302,7 +307,7 @@ function KeyPressedOnEdit(evt) {
         v_data[5] = pageSize;
         v_data[4] = 0;
 
-        ReInitGrid()
+        ReInitGrid();
 
         return false;
     }
@@ -311,16 +316,17 @@ function KeyPressedOnEdit(evt) {
 }
 // при изменении эдита
 function OnEditChanged() {
-    var val = document.getElementById('edPageSize').value;
-    while (val.charAt(0) == '0') val = val.substr(1)
-    if (val == '') val = '10';
-    document.getElementById('edPageSize').value = val;
+    return;
+    //var val = document.getElementById('edPageSize').value;
+    //while (val.charAt(0) == '0') val = val.substr(1)
+    //if (val == '') val = '10';
+    //document.getElementById('edPageSize').value = val;
 
-    pageSize = new Number(val);
-    v_data[5] = pageSize;
-    v_data[4] = 0;
+    //pageSize = new Number(val);
+    //v_data[5] = pageSize;
+    //v_data[4] = 0;
 
-    ReInitGrid()
+    //ReInitGrid();
 }
 // код нажатого символа
 function getCharCode(evt) {
@@ -474,6 +480,7 @@ function gridControlCheckDocNumber(element) {
         return true;
     }
 
+
     var paramType = element.getAttribute('paramtype');
 
     var val = String.fromCharCode(event.keyCode);
@@ -483,12 +490,16 @@ function gridControlCheckDocNumber(element) {
     if (document.selection.type == "Text") valFull = val;
     if (0 === val.length) return true;
 
-    var rexp = new RegExp(/[0-9]/);
-    var length = element.getAttribute('maxlength');
+	var rexp = new RegExp(/[0-9]/);
+	var rexpNumFull = new RegExp(/^[0-9]*(\.[0-9]{0,2})?$/);
+	var length = element.getAttribute('maxlength');
 
-    if (paramType === 'N' && !rexp.test(val) || (length && valFull.length > length)) {
-        return false;
-    }
+	if (paramType === 'N' && valFull.indexOf(".") > -1) {
+		return rexpNumFull.test(valFull);
+	}
+	if (paramType === 'N' && !rexp.test(val) || (length && valFull.length > length)) {
+		return false;
+	}
 
     return true;
 }
@@ -656,7 +667,10 @@ function KeyPressFilter() {
 }
 //
 function ShowModalFilter() {
-    if (ShowFilterWindow()) ReInitGrid();
+    if (ShowFilterWindow()) {
+        if (v_FuncFilterBefore != null) eval(v_FuncFilterBefore + '()');
+        ReInitGrid(v_NotFill);
+    }
     if (v_FuncFilter != null) eval(v_FuncFilter + '()');
 }
 //Показать фильтр
@@ -713,7 +727,6 @@ function GetOperand(index) {
         case '5': return ' '; break;
     }
 }
-//
 function ShowFilterWindow() {
     var add = "&" + Math.random();
     var result = window.showModalDialog("/barsroot/webservices/filter.aspx?table=" + v_FilterTable + add, window, "dialogWidth:630px;dialogHeight:480px;center:yes;edge:sunken;help:no;status:no;scroll:no");
@@ -771,7 +784,7 @@ function ShowFilterWindow() {
                 else {
                     var tabname = obj.attr.split(';')[3];
                     //var rel1 = obj.attr.split(';')[4];
-                   // var rel2 = obj.attr.split(';')[5];
+                    // var rel2 = obj.attr.split(';')[5];
                     if (case_sens == "0" && type == "C") {
                         line_filter += 'UPPER(' + tabname + "." + field + ') ';
                         value = value.toUpperCase();
@@ -789,8 +802,8 @@ function ShowFilterWindow() {
                     }
                     //line_filter += ' AND ' + tabname + '.' + rel2 + '(+)=$ALIAS$.' + rel1 + " ";
                     var arr = obj.attr.split(";");
-                    for (var j = 4; j < arr.length; j+=2){
-                        line_filter += ' AND ' + tabname + '.' + arr[j+1] + '(+)=$ALIAS$.' + arr[j] + " ";
+                    for (var j = 4; j < arr.length; j += 2) {
+                        line_filter += ' AND ' + tabname + '.' + arr[j + 1] + '(+)=$ALIAS$.' + arr[j] + " ";
                     }
                 }
 

@@ -185,12 +185,8 @@ namespace Bars.WebServices
                     if (SQL_NONQUERY("UPDATE int_accn SET stp_dat=:bdat1, acr_dat=:bdat2 WHERE acc=:acc and acra=:acrA") == 0)
                         return result2 += "закрити неможливо.";
                 }
-                ClearParameters();
-                SetParameters("bdat", DB_TYPE.Date, bankdate, DIRECTION.Input);
-                SetParameters("acc", DB_TYPE.Decimal, acc, DIRECTION.Input);
-                SQL_NONQUERY("UPDATE accounts SET dazs=:bdat WHERE acc=:acc");
-
-                if (reason != null)
+				
+				if (reason != null)
                 {
                     ClearParameters();
                     SetParameters("nAcc", DB_TYPE.Decimal, acc, DIRECTION.Input);
@@ -198,6 +194,12 @@ namespace Bars.WebServices
                     SetParameters("nOperType", DB_TYPE.Decimal, reason, DIRECTION.Input);
                     SQL_PROCEDURE("accreg.setAccountwParam");
                 }
+				
+                ClearParameters();
+                SetParameters("bdat", DB_TYPE.Date, bankdate, DIRECTION.Input);
+                SetParameters("acc", DB_TYPE.Decimal, acc, DIRECTION.Input);
+                SQL_NONQUERY("UPDATE accounts SET dazs=:bdat WHERE acc=:acc");
+
                 return result += "закрито!";
             }
             finally

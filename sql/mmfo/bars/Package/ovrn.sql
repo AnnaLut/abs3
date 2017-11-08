@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BARS.OVRN IS  G_HEADER_VERSION  CONSTANT VARCHAR2(64) 
 08.04.2016 Сухова НОВАЯ ВЕРСИЯ ОВЕРДРАФТА
 */
 
-function Get_NLS   (p_R4 accounts.NBS%type ) return accounts.NLS%type   ;
+function  Get_NLS   (p_R4 accounts.NBS%type ) return accounts.NLS%type   ;
 procedure NEXT_LIM (p_acc8 number ) ; --  проверка на перелимиты с помещением с серую зону
 procedure REV_LIM  (p_acc  number , p_Dat_Tek date, p_dat21 date , p_dat_Nxt date ) ; -- переустановка лимитов
 procedure DEB_LIM  (p_acc  number , p_S number ) ; --- Контроль лимиба ОВР по дог
@@ -104,15 +104,17 @@ procedure repl_acc (p_nd number, p_old_acc number, p_new_kv int, p_new_nls varch
 END ;
 /
 
-
-
-
 CREATE OR REPLACE PACKAGE BODY BARS.OVRN IS
- G_BODY_VERSION  CONSTANT VARCHAR2(64)  :='ver.1.2 15.08.2017-1';
+ G_BODY_VERSION  CONSTANT VARCHAR2(64)  :='ver.1.2 06.09.2017-1';
  g_errN number := -20203 ;
  g_errS varchar2(5) := 'OVRN:' ;
 
 /*
+
+05/10/2017  SC-0360782-> COBUMMFO-5042  дострокове погашення нарах.відсотків з рах.3739 +       черговість списання . Було: 2600, 3739. А треба навпаки :3739, 2600.
+
+06.09.2017 чтобы 9129 обнулялся при нажатии на кнопку «Закрытия сделки»,
+05.09.2017 STA дЕБЕТОВІЕ ДОК при накплении ЧКО http://jira.unity-bars.com:11000/browse/COBUMMFO-4718
 17.08.2017 Sta  Операції які мають виконуватись при закритті угоди (додатково до тих, що вже виконуються): 
            1)	Відв’язка «родительского» рахунку 8998 від рахунку 2600 (для можливості відкрити новий овердрафт на цьому рахунку;
            2)	Закриття усіх рахунків, які приймали участь у договорі (2607, 8998, 2067, 2069, 3578, 3579, 3600, 3739)
@@ -1180,27 +1182,31 @@ else
        ;
 end if ;*/
 
+DECLARE OKPO_2600 CUSTOMER.OKPO%TYPE := l_OKPO ; ACC_2600 ACCOUNTS.ACC%TYPE := l_acc ;
+BEGIN
 --jeka 20.04.2017 --исключаем всех участников кроме себя и свои счета 2610, 2615, 2651, 2652, 2062, 2063, 2082, 2083
    INSERT INTO OVR_CHKO_DET ( REF,  acc, datm)
-   with tt as (select a.acc,a.nls from OVR_ACC_ADD oa, accounts a where a.acc = oa.acc_add and oa.acc = l_acc
-                union all
-               select a.acc,a.nls from  accounts a where  a.acc = l_acc)
+   with tt as (select a.acc,a.nls from OVR_ACC_ADD v, accounts a where a.acc = v.acc_add and v.acc = ACC_2600   union all  select a.acc,a.nls from  accounts a where  a.acc = ACC_2600)
      SELECT O.REF,  l_acc, dat1_
-     FROM OPER O , (select oo.ref from opldok oo, saldoa ss
-                    where ss.acc in (select acc from tt)
-                      and ss.acc= oo.acc
-                      and ss.fdat >= dat1_ and ss.fdat < dat2_ and ss.kos> 0 and ss.fdat = oo.fdat
-                      and oo.dk= 1 and oo.sos= 5
-                   ) p
-     where o.id_b = l_OKPO and o.nlsb in (select nls from tt)
-     and o.mfob = gl.aMfo   and o.ref  = p.ref
-       and o.id_a not in ( select distinct cc.okpo
-                           from customer cc, accounts aa, nd_acc nn
-                           where cc.rnk = aa.rnk and aa.acc = nn.acc and nn.nd = l_nd
-                             and cc.okpo <> l_OKPO
-                         )
-       and o.NLSA not in (select a.nls from accounts a where a.rnk=o.id_b and a.nbs not in ('2610', '2615', '2651', '2652', '2062', '2063', '2082', '2083' )) ;
+     FROM OPER O , (select x.ref from opldok x, saldoa y where y.acc in (select acc from tt) and y.acc=x.acc and y.fdat >= dat1_ and y.fdat < dat2_ and y.kos>0 and y.fdat=x.fdat and x.dk= 1 and x.sos=5 ) p
+     where o.id_B = OKPO_2600 and o.nlsB in (select nls from tt) and o.dk = 1 
+       and o.mfoB = gl.aMfo   and o.ref  = p.ref
 
+       and o.id_A not in (select distinct z.okpo from customer z, accounts q, nd_acc w  where z.rnk = q.rnk and q.acc = w.acc and W.nd = l_nd  and z.okpo <> OKPO_2600 )
+       and o.NLSA not in (select a.nls from accounts a where a.rnk=o.id_B and a.nbs not in ('2610', '2615', '2651', '2652', '2062', '2063', '2082', '2083' )) ;
+
+--STA 	05.09.2017 --дЕБЕТОВІЕ ДОК
+   INSERT INTO OVR_CHKO_DET ( REF,  acc, datm)
+   with tt as (select a.acc,a.nls from OVR_ACC_ADD v, accounts a where a.acc = v.acc_add and v.acc = ACC_2600   union all  select a.acc,a.nls from  accounts a where  a.acc = ACC_2600)
+     SELECT O.REF,  l_acc, dat1_
+     FROM OPER O , (select x.ref from opldok x, saldoa y where y.acc in (select acc from tt) and y.acc=x.acc and y.fdat >= dat1_ and y.fdat < dat2_ and y.kos>0 and y.fdat=x.fdat and x.dk= 1 and x.sos=5 ) p
+     where o.id_A = OKPO_2600 and o.nlsA in (select nls from tt) and o.dk = 0
+       and o.mfoA = gl.aMfo   and o.ref  = p.ref
+       and o.id_B not in (select distinct z.okpo from customer z, accounts q, nd_acc w  where z.rnk = q.rnk and q.acc = w.acc and W.nd = l_nd  and z.okpo <> OKPO_2600 )
+       and o.NLSB not in (select a.nls from accounts a where a.rnk=o.id_A and a.nbs not in ('2610', '2615', '2651', '2652', '2062', '2063', '2082', '2083' )) ;
+
+end ;
+--------------------------
 
   elsIf p_mode = 9 then  -- 9 - сжать в одну сумм
 
@@ -1212,17 +1218,8 @@ end if ;*/
      EXCEPTION WHEN NO_DATA_FOUND  THEN null;
      end;
 */
-
-logger.info('XXX-1*'|| dat1_ || '*'|| l_acc ||'*');
-
      delete from OVR_CHKO where datm = dat1_ and acc = l_acc;
-
-logger.info('XXX-2*'|| dat1_ || '*'|| l_acc ||'*');
-
-     insert into OVR_CHKO (ACC,DATM,S,PR)
-     select l_acc, dat1_, sum(o.s), 0 from OVR_CHKO_DET d, oper o where d.acc = l_acc and d.datm = dat1_ and d.ref = o.ref;
-
-logger.info('XXX-3*'|| dat1_ || '*'|| l_acc ||'*');
+     insert into OVR_CHKO (ACC,DATM,S,PR)     select l_acc, dat1_, sum(o.s), 0 from OVR_CHKO_DET d, oper o where d.acc = l_acc and d.datm = dat1_ and d.ref = o.ref;
 
   end if;
 
@@ -1683,17 +1680,46 @@ begin
 
 end Set_ost8 ;
 -----------------------------------------
-procedure OPL1  ( oo IN OUT oper%rowtype) is  -- опрлата
+procedure OPL1   ( oo IN OUT oper%rowtype) is  -- опрлата
 begin
-   If oo.ref is null then
-      gl.ref (oo.REF);
-      oo.nd := trim (Substr( '          '||to_char(oo.ref) , -10 ) ) ;
-      gl.in_doc3 (ref_=>oo.REF  ,  tt_ =>oo.tt  , vob_=>oo.vob , nd_  =>oo.nd   ,pdat_=>SYSDATE, vdat_=>oo.vdat , dk_ =>oo.dk,
-                   kv_=>oo.kv   ,  s_  =>oo.S   , kv2_=>oo.kv2 , s2_  =>oo.S2   ,sk_  => null  , data_=>gl.BDATE,datp_=>gl.bdate,
-                nam_a_=>oo.nam_a, nlsa_=>oo.nlsa,mfoa_=>oo.mfoa,nam_b_=>oo.nam_b,nlsb_=>oo.nlsb, mfob_=>oo.mfob,
-                 nazn_=>oo.nazn ,d_rec_=>null   ,id_a_=>oo.id_a,id_b_=>oo.id_b  ,id_o_=>null   , sign_=>null, sos_=>1, prty_=>null, uid_=>null );
-   end if;
-   gl.payv(0, oo.ref, oo.vdat, oo.tt, oo.dk, oo.kv, oo.nlsa, oo.s, oo.kv2,  oo.nlsb, oo.s2);
+  oo.vdat := NVL ( oo.vdat,gl.bdate); 
+  oo.vob  := NVL ( oo.vob, 6   );
+  oo.kv2  := NVL ( oo.kv2,oo.kv); 
+  oo.s2   := NVL ( oo.s2, gl.p_icurval(oo.kv2,oo.s,oo.vdat) ) ; 
+
+
+  If oo.ref is null then
+
+     If oo.nam_a is null then  begin select substr(nms,1,38) into oo.nam_A from accounts where kv = oo.kv   and nls = oo.nlsA; EXCEPTION WHEN NO_DATA_FOUND THEN null; end;  end if;
+
+     If oo.id_A  is null then 
+        If Substr(oo.nlsA,1,1) in ('4','5','6','7') then oo.id_A := gl.aOkpo;
+        else begin select c.okpo into oo.id_A from accounts a, customer c where a.kv=oo.kv  and a.nls=oo.nlsA and a.rnk=c.rnk; EXCEPTION WHEN NO_DATA_FOUND THEN null; end;
+        end if;   
+     end if;
+ 
+     If oo.nam_B is null then  begin select substr(nms,1,38) into oo.nam_B from accounts where kv = oo.kv2  and nls = oo.nlsB; EXCEPTION WHEN NO_DATA_FOUND THEN null; end;  end if;
+
+     If oo.id_B  is null then 
+        If Substr(oo.nlsB,1,1) in ('4','5','6','7') then oo.id_B := gl.aOkpo;
+        else begin select c.okpo into oo.id_B from accounts a, customer c where a.kv=oo.kv2 and a.nls=oo.nlsB and a.rnk=c.rnk; EXCEPTION WHEN NO_DATA_FOUND THEN null; end;
+        end if;   
+     end if;
+
+     oo.mfoa := NVL ( oo.mfoa, gl.aMfo);
+     oo.mfoB := NVL ( oo.mfoB,gl.aMfo) ;
+     oo.ND   := NVL ( oo.ND, trim (Substr( '          '||to_char(oo.ref), -10 ) ) ) ;  
+ 
+     gl.ref (oo.REF);
+     oo.nd := trim (Substr( '          '||to_char(oo.ref) , -10 ) ) ;
+     gl.in_doc3 (ref_=>oo.REF  ,  tt_ =>oo.tt  , vob_=>oo.vob , nd_  =>oo.nd   ,pdat_=>SYSDATE, vdat_=>oo.vdat , dk_ =>oo.dk,
+                  kv_=>oo.kv   ,  s_  =>oo.S   , kv2_=>oo.kv2 , s2_  =>oo.S2   ,sk_  => null  , data_=>gl.BDATE,datp_=>gl.bdate,
+               nam_a_=>oo.nam_a, nlsa_=>oo.nlsa,mfoa_=>oo.mfoa,nam_b_=>oo.nam_b,nlsb_=>oo.nlsb, mfob_=>oo.mfob,
+                nazn_=>oo.nazn ,d_rec_=>null   ,id_a_=>oo.id_a,id_b_=>oo.id_b  ,id_o_=>null   , sign_=>null, sos_=>1, prty_=>null, uid_=>null );
+  end if;
+
+  gl.payv(0, oo.ref, oo.vdat, oo.tt, oo.dk, oo.kv, oo.nlsa, oo.s, oo.kv2,  oo.nlsb, oo.s2);
+
 end OPL1;
 -------------
 
@@ -1763,17 +1789,16 @@ begin
            update accounts set mdate = null where acc = a26.acc and mdate is not null ; ----- 0) выставить/обновить дату погашения MDATE
         end if;
 
-
-        If a26.ostc+a26.lim > 0 then  ----- 1) Погашение всех плановых долгов
-           -- Получить  доп.рекв на асс по НЕзаблокированном дог.присании со счета 2600
-           If  Nvl ( OVRN.GetW(a26.acc,'NOT_DS') , '0') <> '1'  then  OVRN.BG1 ( p_ini, 1, l_date, dd, a26,a26 ) ;  end if;
-        end if;
-
         Begin  -- погашение со счета 3739/05/SG
             select a.* into a37 from accounts a, nd_acc n where a.tip='SG ' and a.ostc >0 and a.rnk=a26.rnk and a.acc=n.acc and n.nd=dd.ND ;
             OVRN.BG1 ( p_ini, 1, l_date, dd, a37,a26 ) ;
         EXCEPTION WHEN NO_DATA_FOUND THEN  null ;
         end;
+
+        If a26.ostc+a26.lim > 0 then  ----- 1) Погашение всех плановых долгов
+           -- Получить  доп.рекв на асс по НЕзаблокированном дог.присании со счета 2600
+           If  Nvl ( OVRN.GetW(a26.acc,'NOT_DS') , '0') <> '1'  then  OVRN.BG1 ( p_ini, 1, l_date, dd, a26,a26 ) ;  end if;
+        end if;
 
         select ostc into a26.ostc from accounts where acc = a26.acc;
 
@@ -2249,8 +2274,10 @@ procedure BG1 ( p_ini int, p_mode int, p_dat date, dd cc_deal%rowtype, a26 accou
 -- p_mode = 1 and              then    --- Погашение
 -- p_mode = 2 and l_donor <> 1 then    --- Вынос на просрочку тела
 -- p_mode = 3                  then    --- 06 число Проверить погашены ли % и ести нет - вынос на просточку
-  oo oper%rowtype      ;
+-- a26 - счет для списания( м.б.= 2600 или 3739)
+-- х26 - счет тела ОВР , всегда = 2600, - для поиска в проц.карточке
 
+  oo oper%rowtype      ;
   ii  int_accn%rowtype ;
   a91 accounts%rowtype ;
   a36 accounts%rowtype ;
@@ -2412,24 +2439,24 @@ If p_mode = 1  then    --- Погашение
    oo.dk := 1    ;  oo.nam_a := substr(a26.nms,1,38); oo.nlsa := a26.nls; oo.id_b := oo.id_a;
    oo.tt := 'ASG';
    L_OST := a26.ostc;
-   for sp in (select * from accounts where acc in (select acc from nd_acc where nd = dd.nd) and tip in ('SPN', 'SP ', 'SN ')
-              and ostc < 0 and rnk = a26.rnk )
+   for sp in (select * from accounts where acc in (select acc from nd_acc where nd = dd.nd) and tip in ('SPN', 'SP ', 'SN ') and ostc < 0 and rnk = a26.rnk 
+              order by decode (tip,'SPN', 1, 'SP ', 2, 3 )  )
    loop  oo.s := 0;
 
-      If sp.tip  = 'SN ' then   ------ g_TAGD = TERM_DAY -- Термiн(день мiс) для сплати %%
-      
+      --04.10.2017 Sta Списание суммы нач.проц со счета 3739.SG в день поступления денежных средств, а не в Платежный день ( типа 05 числа) 
+      If l_OST > 0  and ( sp.tip in ('SPN', 'SP ') OR a26.tip = 'SG ' )  then  
+         oo.s := LEAST ( L_OST, - sp.ostc) ;
+
+      ElsIf sp.tip  = 'SN ' then   ------ g_TAGD = TERM_DAY -- Термiн(день мiс) для сплати %%
          -- дата уплаты процентов в след месяце после их начисления
          begin select add_months(trunc(acr_dat,'MM'),1) + l_term_DAY - 1        into ii.acr_dat      from int_accn where id=0 and acc = x26.acc ;
       
                If p_dat < ii.acr_dat AND DD.WDATE > P_DAT and a26.tip <> 'SG '  then oo.s := 0 ; -- от 01 - 05 (для 2600)ничего не делаем. Дата уплаты еще НЕ наступила
-               else
-                  oo.s := OVRN.RES26( a26.acc  ) ;
-                  oo.s := LEAST(oo.s, - sp.ostc) ;
+               else  oo.s := OVRN.RES26( a26.acc  ) ;     oo.s := LEAST(oo.s, - sp.ostc) ;
                end if;
 
          EXCEPTION WHEN NO_DATA_FOUND THEN oo.s := 0;
          end ;
-
       elsIf l_OST > 0  then  oo.s := LEAST ( L_OST, - sp.ostc) ;
       else                   oo.s := 0;
       end if;
@@ -2597,20 +2624,27 @@ end if;*/
 
 
 --jeka 20.04.2017 --исключаем всех участников кроме себя и свои счета 2610, 2615, 2651, 2652, 2062, 2063, 2082, 2083
-
+DECLARE OKPO_2600 CUSTOMER.OKPO%TYPE := oo.id_a ; ACC_2600 ACCOUNTS.ACC%TYPE := a26.acc ;
+BEGIN
       INSERT INTO OVR_CHKO_DET ( REF, acc, datm)
-      with tt as (select a.acc,a.nls from OVR_ACC_ADD oa, accounts a where a.acc = oa.acc_add and oa.acc = a26.acc
-                union all
-               select a.acc,a.nls from  accounts a where  a.acc = a26.acc )
-      SELECT O.REF, p.acc, l_dat01  FROM OPER O , opldok p
-      where  o.nlsb in (select nls from tt)  and o.id_b = oo.id_a
-         and o.id_a not in
-              (select cc.okpo
-               from customer cc, accounts aa, nd_acc nn
-               where cc.rnk = aa.rnk and aa.acc = nn.acc and nn.nd = dd.nd and cc.okpo <> o.id_b)
-         and o.NLSA not in (select a.nls from accounts a where a.rnk=o.id_b and a.nbs not in ('2610', '2615', '2651', '2652', '2062', '2063', '2082', '2083' ))
-        and o.ref  = p.ref and p.fdat = p_dat and p.sos = 5 and  p.acc in (select acc from tt) and p.dk = 1
-        and NOT exists (select 1 from  OVR_CHKO_DET where acc = a26.acc and ref = o.REF);
+      with tt as (select a.acc,a.nls from OVR_ACC_ADD V, accounts a where a.acc = V.acc_add and V.acc = ACC_2600  union all select a.acc,a.nls from  accounts a where  a.acc = ACC_2600 )
+      SELECT O.REF, p.acc, l_dat01  
+       FROM OPER O, opldok p
+       where o.nlsB in (select nls from tt)  and o.id_B = OKPO_2600 AND O.DK = 1
+         and o.id_A not in (select cc.okpo from customer cc, accounts aa, nd_acc nn   where cc.rnk = aa.rnk and aa.acc = nn.acc and nn.nd = dd.nd and cc.okpo <> o.id_B)
+         and o.NLSA not in (select a.nls from accounts a where a.rnk=o.id_B and a.nbs not in ('2610', '2615', '2651', '2652', '2062', '2063', '2082', '2083' ))
+         and o.ref  = p.ref and p.fdat = p_dat and p.sos = 5 and  p.acc in (select acc from tt) and p.dk = 1  and NOT exists (select 1 from  OVR_CHKO_DET where acc = ACC_2600 and ref = o.REF);
+
+--STA 	05.09.2017 --дЕБЕТОВІЕ ДОК
+      INSERT INTO OVR_CHKO_DET ( REF, acc, datm)
+      with tt as (select a.acc,a.nls from OVR_ACC_ADD V, accounts a where a.acc = V.acc_add and V.acc = ACC_2600  union all select a.acc,a.nls from  accounts a where  a.acc = ACC_2600 )
+      SELECT O.REF, p.acc, l_dat01  
+        FROM OPER O, opldok p
+       where o.nlsA in (select nls from tt)  and o.id_A = OKPO_2600 AND O.DK = 0
+         and o.id_B not in (select cc.okpo from customer cc, accounts aa, nd_acc nn   where cc.rnk = aa.rnk and aa.acc = nn.acc and nn.nd = dd.nd and cc.okpo <> o.id_A)
+         and o.NLSB not in (select a.nls from accounts a where a.rnk=o.id_A and a.nbs not in ('2610', '2615', '2651', '2652', '2062', '2063', '2082', '2083' ))
+         and o.ref  = p.ref and p.fdat = p_dat and p.sos = 5 and  p.acc in (select acc from tt) and p.dk = 1 and NOT exists (select 1 from  OVR_CHKO_DET where acc = ACC_2600 and ref = o.REF);
+END;
 
     RETURN;
    end;
@@ -2727,6 +2761,7 @@ procedure CLS (P_ND NUMBER) IS
   A8 accounts%rowtype;
   l_bDat_Next date;
   l_Txt varchar2 (250);
+  oo oper%rowtype ;
 BEGIN
   l_bDat_Next := Dat_Next_U ( gl.bdate, 1 ) ;
   begin select * into dd from cc_deal where nd = p_nd and wdate < gl.bdate and sos < 15;
@@ -2774,9 +2809,17 @@ BEGIN
   -- ставим обметку о закрытии дог. Переходит в портфель закрытых .    Добавлю опцию «просмотра закрытых»
   for k in (select * from accounts   where acc in (select acc from nd_acc where nd = dd.nd)  and dazs is null      )
   loop 
-     If    k.nbs in ('2600','2650')  then  update accounts set lim = 0, accc = null where acc = k.ACC;
-     elsIf k.nbs in ('2608','2658')  then  null; 
-     elsIf k.tip ='OVN'              then  update accounts set dazs = l_bDat_Next where acc = k.ACC; 
+     If    k.nbs in ('2600','2650')     then  update accounts set lim = 0, accc = null where acc = k.ACC;
+     elsIf k.nbs in ('2608','2658')     then  null; 
+     elsIf k.tip ='OVN'                 then  update accounts set dazs = l_bDat_Next where acc = k.ACC; 
+
+     elsIf k.nbs ='9129' and k.ostc < 0 then  -- обнулить
+           oo.nlsb := BRANCH_USR.GET_BRANCH_PARAM2('NLS_9900',0) ;  oo.kv := k.KV       ;    oo.tt := 'CR9';
+           oo.s    := -k.ostc ;   oo.nlsa := k.nls;    oo.nam_a  := substr( k.nms,1,38) ;    oo.dk := 0    ;  oo.ref   := null;    
+           oo.nazn := Substr ( 'Остаточне закриття зобов’язань банку за Овердрафтом зг. дог. №'||dd.cc_id||' вiд '||TO_CHAR (dd.sdate,'dd.mm.yyyy')||'р.', 1, 160 );
+           OVRN.opl1(oo) ;   gl.pay (2, oo.ref, oo.vdat);
+           update accounts set dazs = l_bDat_Next where acc = k.ACC;
+
      Elsif k.ostc <> 0               then  raise_application_error(g_errn,'Рах.'||k.nls ||' має залишок='|| k.ostc/100 );  
      else                                  update accounts set dazs = l_bDat_Next where acc = k.ACC;
      end if ;

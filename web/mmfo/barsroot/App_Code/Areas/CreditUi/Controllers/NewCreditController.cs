@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Web.Mvc;
 using System.Linq;
 using BarsWeb.Controllers;
@@ -41,6 +41,10 @@ namespace BarsWeb.Areas.CreditUi.Controllers
         }
 
         public ActionResult MoreCreditParams()
+        {
+            return View();
+        }
+        public ActionResult Authorization()
         {
             return View();
         }
@@ -104,9 +108,9 @@ namespace BarsWeb.Areas.CreditUi.Controllers
             return Json(session, JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult getRang(decimal? rnk)
+        public ActionResult getRang(byte vidd)
         {
-            IQueryable<RangList> session = _creditRepository.getRang(rnk);
+            IQueryable<RangList> session = _creditRepository.getRang(vidd);
             return Json(session, JsonRequestBehavior.AllowGet);
         }
 
@@ -126,6 +130,13 @@ namespace BarsWeb.Areas.CreditUi.Controllers
         {
             IQueryable<ParamsList> session = _creditRepository.getTabList();
             return Json(session, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult getDaynpList()
+        {
+            Dictionary<int, string> getDaynpList = _creditRepository.getDaynpList();
+            return Json(getDaynpList.ToList(), JsonRequestBehavior.AllowGet);
+
         }
 
         public ActionResult getNdTxt([DataSourceRequest]DataSourceRequest request, string code)
@@ -225,6 +236,18 @@ namespace BarsWeb.Areas.CreditUi.Controllers
         {
             string session = _creditRepository.SetProlog(nd, bnkDate, kprolog, sos, dateStart, dateEnd);
             return Json(session);
+        }
+
+        public ActionResult GetAuthData(decimal nd)
+        {
+            AuthStaticData session = _creditRepository.GetAuthStaticData(nd);
+            return Json(session, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult Authorize(decimal nd, int type, string pidstava, string initiative)
+        {
+            string session = _creditRepository.Authorize(nd,type,pidstava,initiative);
+            return Json(session, JsonRequestBehavior.AllowGet);
         }
     }
 }

@@ -36,18 +36,22 @@
         }
         return !isEmpty($rootScope.credit.baseRateValue) || isRateAValue;
     };
+    $rootScope.isViddValid = function () { return !isEmpty($rootScope.credit.viddValue); };
+
+
+    $rootScope.isFlagsValid = function () { return !($rootScope.credit.holidayValue.ID == "9" && $rootScope.credit.previousValue.ID == "2"); };  //92 - неможливе значення FLAGS
 
     $scope.DatesValidMsg = "";
     $rootScope.isDatesValid = function () {
         $scope.DatesValidMsg = "";
         var conslDate = kendo.parseDate($rootScope.credit.conslValue);
-        if(conslDate == null){ $scope.DatesValidMsg = "Дата заключення не корректна"; return false;}
+        if(conslDate == null){ $scope.DatesValidMsg = "Дата заключення некоректна"; return false;}
         var issueDate = kendo.parseDate($rootScope.credit.issueValue);
-        if(issueDate == null){ $scope.DatesValidMsg = "Дата видачі не корректна"; return false;}
+        if(issueDate == null){ $scope.DatesValidMsg = "Дата видачі некоректна"; return false;}
         var endDate = kendo.parseDate($rootScope.credit.endValue);
-        if(endDate == null){ $scope.DatesValidMsg = "Дата завершення не корректна"; return false;}
+        if(endDate == null){ $scope.DatesValidMsg = "Дата завершення некоректна"; return false;}
         var startDate = kendo.parseDate($rootScope.credit.startValue);
-        if(startDate == null){ $scope.DatesValidMsg = "Дата початку не корректна"; return false;}
+        if(startDate == null){ $scope.DatesValidMsg = "Дата початку некоректна"; return false;}
         var dateFirst = kendo.parseDate($scope.credit.firstPayDateValue);
         if(dateFirst == null){ return false;}
         if(startDate < conslDate) { $scope.DatesValidMsg = "Дата заключення більша за дату початку"; return false; }
@@ -69,12 +73,12 @@
         }
 
         //check BD
-        if($rootScope.bankDate != null){
-            var bd = kendo.parseDate($rootScope.bankDate);
-            if(startDate < bd || issueDate < bd || dateFirst < bd || conslDate < bd || endDate < bd){
-                $scope.DatesValidMsg = "Дата меньше за банківську"; return false;
-            }
-        }
+        //if($rootScope.bankDate != null){
+        //    var bd = kendo.parseDate($rootScope.bankDate);
+        //    if(startDate < bd || issueDate < bd || dateFirst < bd || conslDate < bd || endDate < bd){
+        //        $scope.DatesValidMsg = "Дата меньше за банківську"; return false;
+        //    }
+        //}
 
         return true;
     };
@@ -108,9 +112,9 @@
 
     $rootScope.whereForCust = $rootScope.custtype == 3 ? 'where custtype = 3 and date_off is null' : 'where (custtype = 2 or (custtype = 3 and k050 = 910)) and date_off is null';
 
-    $rootScope.credit = dataService.clearCredit($rootScope.custtype);
+    $rootScope.credit = dataService.clearCredit();
 
-    $rootScope.update = function () {
+    $rootScope.update = function (mode) {
         var url = "";
         if ($rootScope.nd != null) {
 
@@ -136,6 +140,8 @@
                     bars.ui.loader('body', false);
                 });
             });
+            if (mode === "by_button")
+                $rootScope.LoadMoreCreditData("exist");
         }
         else {
             url = '/api/kernel/BankDates/';
@@ -211,7 +217,8 @@
             && $rootScope.credit.rnkValue != null
             && $rootScope.isNlsValid()
             && ($rootScope.credit.dayOfPayValue == null || ($rootScope.credit.dayOfPayValue >= 1 && $rootScope.credit.dayOfPayValue <= 31))
-            && (!$rootScope.credit.diffDaysValue || ($rootScope.credit.dayPayDiffValue == null || ($rootScope.credit.dayPayDiffValue >= 1 && $rootScope.credit.dayPayDiffValue <= 31)));
+            && (!$rootScope.credit.diffDaysValue || ($rootScope.credit.dayPayDiffValue == null || ($rootScope.credit.dayPayDiffValue >= 1 && $rootScope.credit.dayPayDiffValue <= 31)))
+            && $rootScope.isFlagsValid();
     };
 
     $scope.save = function () {
@@ -475,8 +482,8 @@
 
     };
 
-    $scope.prolongationUpdate = function () {
-        $rootScope.update();
+    $scope.creditUpdate = function () {
+        $rootScope.update("by_button");
     };
 
     $scope.prolongationClose = function () {
@@ -484,5 +491,5 @@
         $scope.prolong.dateEnd = null;
     };
 
-    $rootScope.update();    // load main data
+    $rootScope.update("initial");    // load main data
 }]);

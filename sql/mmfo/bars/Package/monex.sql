@@ -1,17 +1,14 @@
+create or replace package monex is
 
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/monex.sql =========*** Run *** =====
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.MONEX IS
-
-  --11.01.20176 Добавлена работа с БРАГАМИ
+  -- 19.09.2017  Sta + Artem Юрченко Очистка пользовательского контекста
+  -- 11.01.2017  Добавлена работа с БРАГАМИ
 
   TYPE rec1 IS RECORD (s number);
   TYPE tab1 IS TABLE  OF rec1 INDEX BY VARCHAR2(17);
 
 ---------------------------------------------------------
+procedure clear_session_context; -- Очистка пользовательского контекста
+
 function OB3  ( p_ob22 varchar2 )  return varchar2 ;
 function NLSM_ext ( p_UO int, p_BBBBOO varchar2,  p_branch monexr.branch%type ) return varchar2 ;
 function NLSM ( p_nbs  accounts.nbs%type,  p_ob22  monexr.ob22%type,  p_branch monexr.branch%type )  return varchar2 ;
@@ -38,9 +35,13 @@ PROCEDURE monex_KL (  p_UL number) ; --- p_dat1 date, p_dat2 date) ---- Выполнит
 --------------------------------------------------
 end monex;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.MONEX IS
+
+create or replace package body monex is
 
 /*
+  24/10/2017 LitvinSO При формировании Свифтов обрабатываем отрицательную суму если клиент нам должен
+             SC-0366458 При формуванні проводки не вірно відображається ЕДРПО відправника платежу
+  19.09.2017  Sta + Artem Юрченко Очистка пользовательского контекста
   13.03.2017 Sta  что-то по комис типа Гришкова
   28.02.2017 Сухова. Если СПП иммет расчетный счет у нас  - делаем внутренните проводки и по деб и по кред.
     типа глобал -мани
@@ -73,6 +74,9 @@ CREATE OR REPLACE PACKAGE BODY BARS.MONEX IS
 
     l_flag char(1);
     k_branch varchar2(30);
+
+    procedure clear_session_context    is     --    Очистка пользовательского контекста
+    begin   sys.dbms_session.clear_context('BARS_CLEARING', client_id=>sys_context('userenv', 'client_identifier'));  end clear_session_context;
 
 --Для работы с БРАГАМИ-----------------------------------------------
 
@@ -154,7 +158,8 @@ begin
   oo.mfoa := gl.aMfo ;
   for kk in (select * from monex_UO where id > 0 and id=decode(p_ul,0, id, p_UL) and mfo is not null and nls is not null and okpo is not null)
   loop
-      oo.id_a :=trim(kk.okpo);  oo.id_b := trim(kk.okpo);
+      --oo.id_a :=trim(kk.okpo);  
+      oo.id_b := trim(kk.okpo);
       oo.mfob := kk.Mfo ;  oo.nlsb := trim(kk.nls) ;  oo.nam_b:= substr(kk.name,1,38);
 
       for ss in ( select * from accounts where ostc <> 0 and ostb = ostc and nls in                     (
@@ -166,6 +171,14 @@ begin
 
       loop oo.kv   := ss.kv  ;     oo.kv2  := oo.KV ;    oo.s := abs ( ss.ostc);    oo.s2   := oo.s  ;
            oo.nlsa := ss.nls ;     oo.nam_a:= substr(ss.nms,1,38);
+           begin    -- COBUMMFO-5076 SC-0366458 При формуванні проводки не вірно відображається ЕДРПО відправника платежу
+                SELECT c.okpo
+                  INTO oo.id_a
+                  FROM customer c
+                 WHERE c.rnk = ss.rnk;
+           EXCEPTION WHEN NO_DATA_FOUND THEN oo.id_a := trim(kk.okpo); 
+           end;
+           
            If ss.ostc > 0          then oo.dk  := 1 ; oo.nazn := 'Перерахування кредитового' ;  oo.vob := 1;
            elsIf oo.MFOb = oo.Mfoa then oo.dk  := 0 ; oo.nazn := 'Списання дебетового';    oo.vob := 2 ;
            else                         oo.dk  := 2 ; oo.nazn := 'Вимога на відшкодування дебетового';  oo.vob := 2 ;
@@ -375,7 +388,7 @@ end monex_KL;
                   mfoa_    => gl.aMfo, -- VARCHAR2,  -- Sender's MFOs
                   nlsa_    => oo.nlsa, -- VARCHAR2,  -- Sender's account number
                   mfob_    => oo.mfob, -- VARCHAR2,  -- Destination MFO
-                  nlsb_    => oo.nlsb, -- VARCHAR2,  -- Target account number
+                  nlsb_    => oo.nlsb, -- VARCHAR2,  -- Target account number
                   dk_      => oo.dk, -- SMALLINT, -- Debet/Credit code
                   s_       => oo.s, -- DECIMAL,  -- Amount
                   vob_     => oo.vob, -- SMALLINT, -- Document type
@@ -499,7 +512,9 @@ begin
         gl.payv( 0, oo.REF, gl.bDATE , oo.tt, oo.dk, z.kv, aa.nls, oo.s, z.kv, oo.nlsb, oo.s )   ;
 
      else
-
+         if z.S < 0 then  -- Если сума отрицательная (система должна нам!) Ничего не делаем что бы процедура отрабатывала, а не рейзила ошибку
+           goto NOT_PAY;
+         end if;
         --вал-свифт-проводка : Есть ли шаблон
          oo.tt    := '8C2' ; --Kempf
 
@@ -700,7 +715,7 @@ begin
 
         oo.nlsa := x0.nlsT;
         oo.kv   := k.kv;
-        oo.kv2  := k.kv;
+        oo.kv2  := k.kv;
         oo.vob  := 2 ;
         oo.S    := k.S_2909;
         oo.S2   := oo.S;
@@ -921,15 +936,8 @@ end DEL_FIle ;
 
 end monex;
 /
- show err;
+show err;
  
 PROMPT *** Create  grants  MONEX ***
 grant EXECUTE                                                                on MONEX           to BARS_ACCESS_DEFROLE;
 grant EXECUTE                                                                on MONEX           to START1;
-
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/monex.sql =========*** End *** =====
- PROMPT ===================================================================================== 
- 

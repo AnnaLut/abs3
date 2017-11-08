@@ -11,6 +11,11 @@
     <script type="text/javascript" language="JavaScript" src="/Common/WebGrid/Grid2005.js?v1.0"></script>
     <script type="text/javascript" language="JavaScript" src="Scripts/Default.js?v1.1"></script>
     <script type="text/javascript" language="JavaScript" src="Scripts/Common.js?v1.0"></script>
+
+    <link href="../lib/alertify/css/alertify.core.css" rel="stylesheet" />
+    <link href="../lib/alertify/css/alertify.default.css" rel="stylesheet" />
+    <script src="../lib/alertify/js/alertify.min.js"></script>
+
 </head>
 <body>
     <div style="background-color: lightgrey">
@@ -36,6 +41,8 @@
                         onclick="ShowModalFilter()" src="/Common/Images/FILTER_.gif" />
                     <img class="outset" id="btPrint" title="Друк" alt=""
                         onclick="printTable()" src="/Common/Images/PRINT.gif" style="visibility: visible" />
+                    <img class="outset" id="btExcelExport" title="Вивантажити в Excel" alt="Вивантажити в Excel"
+                        onclick="exportToExcel()" src="\Common\Images\default\16\export_excel.png" style="visibility: visible" />
                     &nbsp;
                 </td>
                 <td>

@@ -118,13 +118,13 @@ begin
   values (l_file_id, 37, 'PK_ODAT', 'БПК. Місце роботи: з якого часу працює', 'VARCHAR2', 254, null, null, null, 'Y', null, null, null, null, null);
 
   insert into upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID, PREFUN)
-  values (l_file_id, 38, 'PK_STRTW', 'БПК. Місце роботи: вулиця', 'VARCHAR2', 254, null, null, null, 'Y', null, null, null, null, null);
+  values (l_file_id, 38, 'PK_STRTW', 'БПК. Місце роботи: вулиця', 'VARCHAR2', 254, null, null, null, 'Y', null, '35,09,13,10|32,32,32,32', null, null, null);
 
   insert into upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID, PREFUN)
-  values (l_file_id, 39, 'PK_CITYW', 'БПК. Місце роботи: місто', 'VARCHAR2', 254, null, null, null, 'Y', null, null, null, null, null);
+  values (l_file_id, 39, 'PK_CITYW', 'БПК. Місце роботи: місто', 'VARCHAR2', 254, null, null, null, 'Y', null, '35,09,13,10|32,32,32,32', null, null, null);
 
   insert into upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID, PREFUN)
-  values (l_file_id, 40, 'PK_OFFIC', 'БПК. Посада', 'VARCHAR2', 30, null, null, null, 'Y', null, null, null, null, null);
+  values (l_file_id, 40, 'PK_OFFIC', 'БПК. Посада', 'VARCHAR2', 30, null, null, null, 'Y', null, '35,09,13,10|32,32,32,32', null, null, null);
 
   insert into upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID, PREFUN)
   values (l_file_id, 41, 'DKBO_DATE_OFF', 'Дата розірвання ДКБО', 'DATE', 10, null, 'dd/mm/yyyy', null, 'Y', null, null, null, null, null);
@@ -133,7 +133,7 @@ begin
   values (l_file_id, 42, 'DKBO_START_DATE', 'Дата приєднання до ДКБО', 'DATE', 10, null, 'dd/mm/yyyy', null, 'Y', null, null, null, null, null);
 
   insert into upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID, PREFUN)
-  values (l_file_id, 43, 'DKBO_DEAL_NUMBER', '№ договору ДКБО', 'VARCHAR2', 30, null, null, null, 'Y', null, null, null, null, null);
+  values (l_file_id, 43, 'DKBO_DEAL_NUMBER', '№ договору ДКБО', 'VARCHAR2', 30, null, null, null, 'Y', null, '35,09,13,10|32,32,32,32', null, null, null);
 
   insert into upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID, PREFUN)
   values (l_file_id, 44, 'KOS', 'Обороти Кредит', 'NUMBER', 24, 0, null, null, 'Y', null, null, null, null, null);
@@ -148,7 +148,7 @@ begin
   values (l_file_id, 47, 'W4_KPROC', 'Way4. Відсоток по кредиту', 'VARCHAR2', 254, null, null, null, 'Y', null, null, null, null, null);
 
   insert into upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID, PREFUN)
-  values (l_file_id, 48, 'W4_SEC', 'Way4. Тайне слово', 'VARCHAR2', 254, null, null, null, 'Y', null, null, null, null, null);
+  values (l_file_id, 48, 'W4_SEC', 'Way4. Тайне слово', 'VARCHAR2', 254, null, null, null, 'Y', null, '35,09,13,10|32,32,32,32', null, null, null);
 
   insert into upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID, PREFUN)
   values (l_file_id, 49, 'ACC', 'Унікальний ідентифікатор рахунку', 'NUMBER', 24, 0, null, null, 'Y', null, null, null, null, 'TRUNC_E2');

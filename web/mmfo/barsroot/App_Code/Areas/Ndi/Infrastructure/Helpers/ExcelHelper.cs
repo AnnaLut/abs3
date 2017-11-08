@@ -23,7 +23,7 @@ public class ExcelHelper
         //
     }
 
-    public static ExcelResulModel ExcelExport(string tableSemantic, IEnumerable<Dictionary<string, object>> dataRecords,List<ColumnMetaInfo> allColumnsInfo,
+    public static ExcelResulModel ExcelExport(string tableSemantic, GetDataResultInfo dataResult,List<ColumnMetaInfo> allColumnsInfo,
         ExcelDataModel excelDataModel, GridFilter[] filterParams)
     {
         List<string> values = excelDataModel.ColumnsVisible == null ? new List<string>() : excelDataModel.ColumnsVisible.Split(',').ToList();
@@ -37,8 +37,8 @@ public class ExcelHelper
             }
         }
 
-        if (dataRecords.Count() > 80000)
-            return ExcelExportToCSV('|',tableSemantic, dataRecords, allShowColumns, excelDataModel.TableName);
+        if (dataResult.DataRecords.Count() > 80000)
+            return ExcelExportToCSV('|',tableSemantic, dataResult.DataRecords, allShowColumns, excelDataModel.TableName);
         var package = new ExcelPackage();
         MemoryStream result = new MemoryStream();
         try
@@ -51,11 +51,11 @@ public class ExcelHelper
             const int dataStartsFromRow = 3;
             int curRow = dataStartsFromRow;
             int curCol;
-            int startColumn = 2;
+            int startColumn = 1;
             bool hasFontPainter = true;
             bool hasBackgrouondPainter = true;
 
-            foreach (var item in dataRecords)
+            foreach (var item in dataResult.DataRecords)
             {
 
                 // заполнить значения всех столбцов строки
@@ -78,6 +78,19 @@ public class ExcelHelper
                 curRow++;
 
             }
+
+            if(dataResult.TotalRecord != null && dataResult.TotalRecord.Count() > 0)
+            {
+                curRow++;
+                worksheet.Cells[curRow, startColumn].Value = "Підсумок: ";
+                foreach (var item in dataResult.TotalRecord)
+                {
+                   int currCol = allShowColumns.FindIndex(x => x.COLNAME == item.Key) + startColumn;
+                    worksheet.Cells[curRow, currCol].Value = item.Value;
+                }
+            }
+            
+
             //}
 
             bool hasData = curRow != dataStartsFromRow;
@@ -99,8 +112,19 @@ public class ExcelHelper
                 range.Style.Border.BorderAround(ExcelBorderStyle.Thick);
                 range.Style.WrapText = true;
             }
-            //Process Columns
-            curCol = 1;
+
+            if(dataResult.TotalRecord != null && dataResult.TotalRecord.Count() > 0)
+            using (var range = worksheet.Cells[curRow, 1, curRow, allShowColumns.Count])
+            {
+                range.Style.Font.Bold = true;
+                range.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                range.Style.Fill.BackgroundColor.SetColor(Color.Yellow);
+                range.Style.Border.BorderAround(ExcelBorderStyle.Thick);
+                range.Style.WrapText = true;
+            }
+
+                //Process Columns
+                curCol = 1;
             foreach (var colTitle in allShowColumns)
             {
                 string lineBreak = "" + (char)13 + (char)10;

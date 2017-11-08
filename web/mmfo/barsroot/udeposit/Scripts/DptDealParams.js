@@ -1,5 +1,5 @@
 //------------------------------
-// 13.04.2016 
+// 07.11.2017
 //------------------------------
 window.onload = InitDptDealParams;
 
@@ -480,8 +480,8 @@ function onGetDepositDealParams(result) {
     var d = document.all;
 
     d.tbND.focus();
-    var nAdd;
-    var nGen;
+    var nAdd; // replace on global variable
+    var nGen; // replace on global variable
     var data = result.value;
     d.tbND.value = data[0].text;
 
@@ -677,8 +677,9 @@ function onGetDepositDealParams(result) {
         HideImg(d.btSwiftDetails);
     }
 
-    if (nGen != "")
+    if (nGen != "") {
         SetRO(d.tbND);
+    }
 
     if (mode >= 2) {
         // бухгалтер / лише перегляд
@@ -712,7 +713,7 @@ function onGetDepositDealParams(result) {
     }
 
     if (fl_extend == 2 && !nGen)
-        ShowHideControls("GEN_IR");
+        ShowHideControls("GENERAL");
 
     if (nGen == "") {
         d.lbTitleDeal.innerText = 'Депозитний договір № ' + d.tbND.value + ' #(' + dpu_id + ')';
@@ -727,7 +728,7 @@ function onGetDepositDealParams(result) {
 
 //**********************************************************************//
 function SetRO(obj) {
-    obj.readonly = true;
+    obj.readOnly = true;
     obj.className = "BarsTextBoxRO";
 }
 //**********************************************************************//
@@ -1061,31 +1062,26 @@ function fnDisableElements(disable) {
 
 //** Підготовка форми для пролонгації договору *************************//
 function fnPrepareProlongation() {
-    sDatEnd = document.getElementById('tbDatV_TextBox').value;
+    var sDatEnd = document.getElementById('tbDatV_TextBox').value;
 
     window["tbBrDat"].SetValue(sDatEnd);
     window["tbDatN"].SetValue(sDatEnd);
 
     if (fl_extend == 2 && dpu_gen == dpu_id) {
-        // нова дата звершення договору
-        var yearQty = 1;
-        if (periodType == 2) {
-            yearQty = 3;
-        }
-        var dateO = new Date();
-        dateO.setFullYear(parseInt(sDatEnd.split('.')[2],10) + yearQty, parseInt(sDatEnd.split('.')[1],10) - 1, parseInt(sDatEnd.split('.')[0],10) - 1);
-
-        sDatEnd = lpad(dateO.getDate().toString(), 2, "0") + "." + lpad((dateO.getMonth() + 1).toString(), 2, "0") + "." + dateO.getFullYear().toString(); // dateO.getFullYear().toString().substr(2, 2) 
-
-        window["tbDatO"].SetValue(sDatEnd);
-        window["tbDatV"].SetValue(sDatEnd);
+        // нова дата звершення ген. дог.
+        SetLineNewEndDate( sDatEnd );
 
         // % ставка
         document.getElementById('tbIr').disabled = true;
         document.getElementById('tbIr').value = 0;
 
         // доступність дати закінчення
-        document.getElementById('tbDatO_TextBox').disabled = true;
+        if (periodType == 0) {
+            document.getElementById('tbDatO_TextBox').disabled = (termType == 1);
+        }
+        else {
+            document.getElementById('tbDatO_TextBox').disabled = true;
+        }
     }
     else {
         // нова дата звершення договору
@@ -1300,7 +1296,7 @@ function ShowExtendOpt() {
 
 //
 function ShowHideControls(type) {
-    if (type == "GEN_IR") {
+    if (type == "GENERAL") {
         try {
             var d = document.all;
 
@@ -1310,12 +1306,20 @@ function ShowHideControls(type) {
             d.tbDatV_TextBox.style.visibility = "hidden";
             d.lbKtDay.style.visibility = "hidden";
             d.tbKtDay.style.visibility = "hidden";
-            //d.lbCntDubl.style.visibility = "hidden";
-            //d.tbCntDubl.style.visibility = "hidden";
+            // d.lbCntDubl.style.visibility = "hidden";
+            // d.tbCntDubl.style.visibility = "hidden";
+            
             d.lbSum.style.visibility = "hidden";
             d.tbSum.style.visibility = "hidden";
             d.lbMinSum.style.visibility = "hidden";
             d.tbMinSum.style.visibility = "hidden";
+            d.lbFreqV.style.visibility = "hidden";
+            d.tbFreqV.style.visibility = "hidden";
+            d.ddFreqV.style.visibility = "hidden";
+            d.lbStop.style.visibility = "hidden";
+            d.tbStop.style.visibility = "hidden";
+            d.ddStop.style.visibility = "hidden";
+            
             d.cbCompProc.disabled = true;
             d.tbIr.value = 0;
             d.tbIr.disabled = true;
@@ -1328,13 +1332,33 @@ function ShowHideControls(type) {
             d.ddBaseRates.disabled = true;
             d.tbBrDat.disabled = true;
 
-            d.ddFreqV.disabled = true;
-            d.ddStop.disabled = true;
+            // d.ddFreqV.disabled = true;
+            // d.ddStop.disabled = true;
         }
         catch (e) {
         }
     }
-    else if (type == "REFRESH_RATES") {
+    else if (type == "REGULAR") {
+        try {
+            var d = document.all;
+            
+            d.lbDatV.style.visibility = "visible";
+            d.tbDatV_TextBox.style.visibility = "visible";
+            d.lbKtDay.style.visibility = "visible";
+            d.tbKtDay.style.visibility = "visible";
+            d.lbSum.style.visibility = "visible";
+            d.tbSum.style.visibility = "visible";
+            d.lbMinSum.style.visibility = "visible";
+            d.tbMinSum.style.visibility = "visible";
+            d.lbFreqV.style.visibility = "visible";
+            d.tbFreqV.style.visibility = "visible";
+            d.ddFreqV.style.visibility = "visible";
+            d.lbStop.style.visibility = "visible";
+            d.tbStop.style.visibility = "visible";
+            d.ddStop.style.visibility = "visible";
+        }
+        catch (e) {
+        }
     }
 }
 
@@ -1364,21 +1388,11 @@ function onGetVal(result) {
     // fl_extend
     fl_extend = result.value[9].text;
 
-    if (fl_extend == 2 && !dpu_gen) {
-        ShowHideControls("GEN_IR");
-    }
-    else {
-        ShowHideControls("REFRESH_RATES");
-        SetProcs();
-    }
-
     d.tbStop.value = result.value[10].text;
     d.ddStop.options[0].value = result.value[10].text;
     d.ddStop.options[0].text = result.value[11].text;
-    
-    // bsd = result.value[12].text;
-    // bsn = result.value[13].text;
 
+    // 
     periodType = result.value[14].text;
 
     branch = result.value[15].text;
@@ -1397,29 +1411,40 @@ function onGetVal(result) {
         d.tbMinSum.disabled = true;
     }
 
+    // 1 - Фіксований термін / 2 - Діапазон
     termType = result.value[20].text;
 
     window["tbDatO"].SetValue(result.value[21].text);
     window["tbDatV"].SetValue(result.value[22].text);
 
     window["tbBrDat"].SetValue(d.tbDatZ_TextBox.value);
-    
+
     d.ddFreqV.disabled = true;
     d.ddStop.disabled = true;
 
     d.tbDatZ_TextBox.disabled = true;
-    
-    if ( !dpu_id || (dpu_id == 0) ) {
-        if ( termType == 1 ) {
-            // Фіксований термін
-            d.tbDatO_TextBox.disabled = true;
+
+    // доступність елементів форми 
+    if (fl_extend == 2 && !dpu_gen) {
+        ShowHideControls("GENERAL");
+        // дати закінчення
+        if ( periodType == 0 ) {
+            d.tbDatO_TextBox.disabled = (termType == 1);
         }
         else {
-            // Діапазон
-            d.tbDatO_TextBox.disabled = false;
+            SetLineNewEndDate( d.tbDatZ_TextBox.value );
+            d.tbDatO_TextBox.disabled = true;
         }
     }
-    
+    else {
+        ShowHideControls("REGULAR");
+        // дати закінчення
+        if ( !dpu_id || (dpu_id == 0) ) {
+            d.tbDatO_TextBox.disabled = (termType == 1);
+        }
+        SetProcs();
+    }
+
     if (srok != 0) {
         calcKtDay();
     }
@@ -1697,3 +1722,18 @@ function onGetSecAccounts(result) {
     }
 }
 //**********************************************************************//
+
+function SetLineNewEndDate( sDate ) {
+    var yearQty = 1;
+    if (periodType == 2) {
+        yearQty = 3;
+    }
+
+    var dateO = new Date();
+    dateO.setFullYear(parseInt(sDate.split('.')[2],10) + yearQty, parseInt(sDate.split('.')[1],10) - 1, parseInt(sDate.split('.')[0],10) - 1);
+
+    var sDatEnd = lpad(dateO.getDate().toString(), 2, "0") + "." + lpad((dateO.getMonth() + 1).toString(), 2, "0") + "." + dateO.getFullYear().toString();
+
+    window["tbDatO"].SetValue(sDatEnd);
+    window["tbDatV"].SetValue(sDatEnd);
+}

@@ -6,6 +6,7 @@ exception
   when dup_val_on_index then null;
 end;
 /
+
 prompt CLIENTFO2 into 10 group
 begin
   insert into upl_filegroups_rln(group_id, file_id, sql_id)
@@ -14,6 +15,7 @@ exception
   when dup_val_on_index then null;
 end;
 /
+
 prompt CLIENTADDRESS into 10 group
 begin
   insert into upl_filegroups_rln(group_id, file_id, sql_id)
@@ -22,6 +24,7 @@ exception
   when dup_val_on_index then null;
 end;
 /
+
 prompt DEPOSITS2 into 10 group
 declare 
 l_sql_id number;
@@ -57,6 +60,17 @@ exception
 end;
 /
 
+prompt CUSTEXT into 10, 11 group
+begin
+  delete from upl_filegroups_rln where group_id in (10, 11) and file_id = 120;
+  insert into upl_filegroups_rln(group_id, file_id, sql_id)
+  values (11, 120, 120);
+  insert into upl_filegroups_rln(group_id, file_id, sql_id)
+  values (11, 120, 1120);
+exception
+  when dup_val_on_index then null;
+end;
+/
 
 commit;
 /
@@ -68,6 +82,7 @@ exception
   when dup_val_on_index then null;
 end;
 /
+
 prompt CLIENTFO2 into 11 group
 begin
   insert into upl_filegroups_rln(group_id, file_id, sql_id)
@@ -84,6 +99,7 @@ exception
   when dup_val_on_index then null;
 end;
 /
+
 prompt DEPOSITS2 into 11 group
 declare 
 l_sql_id number;

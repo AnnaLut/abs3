@@ -157,6 +157,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
                 col.NOT_TO_SHOW = item.NOT_TO_SHOW;
                 col.EXTRNVAL = item.EXTRNVAL;
                 col.SHOWPOS = item.SHOWPOS;
+                col.SHOWRESULT = item.SHOWRESULT;
                 col.TABID = Convert.ToInt32(item.TABID);
                 col.IsPk = item.SHOWRETVAL;
                 col.InputInNewRecord = item.INPUT_IN_NEW_RECORD;
