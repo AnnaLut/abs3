@@ -1192,9 +1192,9 @@ $end
         l_sid varchar2(30 char);
         l_serial varchar2(30 char);
     begin
-        bars_audit.log_security('bars_login.clear_session',
+        /*bars_audit.log_security('bars_login.clear_session',
                                 'Завершення сесії користувача {' || p_client_id || '}',
-                                p_make_context_snapshot => true);
+                                p_make_context_snapshot => true);*/
 
         if (p_kill_session = 1) then
             for i in (select s.sid, s.serial#
@@ -1236,10 +1236,10 @@ $end
          end;
 
         drop_user_session(p_client_id);
-
+/*
         bars_audit.log_security('bars_login.clear_session',
                                 'Сесію користувача ' || p_client_id || ') примусово завершено' || chr(10) ||
-                                dbms_utility.format_call_stack());
+                                dbms_utility.format_call_stack());*/
     end;
 
     -----------------------------------------------------------------
@@ -1250,6 +1250,8 @@ $end
     is
         l_run_id integer;
         l_tms_run_row tms_run%rowtype;
+        l_exclusive_mode_persist_users string_list := string_list('BARS', 'BARS_DM', 'BARSUPL', 'BARSAQ', 'PFU', 'SBON');
+        l_additional_survivors string_list;
     begin
         branch_attribute_utl.set_attribute_value('/', 'EXCLUSIVE_MODE', '1');
 
@@ -1258,16 +1260,36 @@ $end
         l_run_id := pul.get('RUN_ID');
         l_tms_run_row := tms_utl.read_run(l_run_id, p_raise_ndf => false);
 
+        -- не відключаємо сесії співробітника, який виконує зміну банківської дати
+        l_exclusive_mode_persist_users.extend(1);
+        l_exclusive_mode_persist_users(l_exclusive_mode_persist_users.last) := user_utl.get_login_name(l_tms_run_row.user_id);
+
+        -- не відключаємо свої сесії (може не співпадати з користувачем, який запустив зміну банківської дати, в тих випадках,
+        -- коли процедура запускається на повторне виконання)
+        l_exclusive_mode_persist_users.extend(1);
+        l_exclusive_mode_persist_users(l_exclusive_mode_persist_users.last) := user_utl.get_login_name(sys_context('bars_global', 'user_id'));
+
+        -- додаємо користувачів, які можуть налаштовуватися адміністраторами АБС
+        l_additional_survivors := tools.string_to_words(p_string => branch_attribute_utl.get_attribute_value('/',
+                                                                           'EXCLUSIVE_MODE_PERSISTENT_USER',
+                                                                           p_raise_expt => 0,
+                                                                           p_parent_lookup => 1,
+                                                                           p_check_exist => 0),
+                                                        p_splitting_symbol => ',',
+                                                        p_trim_words => 'Y',
+                                                        p_ignore_nulls => 'Y');
+
+        if (l_additional_survivors is not null and l_additional_survivors is not empty) then
+            l_exclusive_mode_persist_users := l_exclusive_mode_persist_users multiset union l_additional_survivors;
+        end if;
+
         ddl_utl.refresh_mview_autonomous('MV_GLOBAL_CONTEXT');
 
-        for i in (select distinct c.client_identifier
+        for i in (select c.client_identifier
                   from   mv_global_context c
-                  join   staff_user_session s on s.client_identifier = c.client_identifier and
-                                                 -- не зупиняємо сесії, запущені від імені технолога, який запустив ВЗД, і від самого себе
-                                                 tools.compare(s.user_id, nvl(l_tms_run_row.user_id, sys_context('bars_global', 'user_id'))) <> 0 and
-                                                 s.logout_time is null
-                  join   staff$base u on u.id = s.user_id and
-                                         u.logname not in ('BARS', 'BARS_DM', 'BARSUPL', 'BARSAQ')) loop
+                  where  c.login_name not in (select column_value
+                                              from   table(l_exclusive_mode_persist_users)
+                                              where  column_value is not null)) loop
             begin
                 clear_session(i.client_identifier, 0);
             exception
