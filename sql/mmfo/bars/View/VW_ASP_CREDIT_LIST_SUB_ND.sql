@@ -1,4 +1,4 @@
-CREATE OR REPLACE FORCE VIEW BARS.VW_ASP_CREDIT_LIST
+CREATE OR REPLACE FORCE VIEW BARS.VW_ASP_CREDIT_LIST_SUB_ND
 (
    DPLAN,
    FDAT,
@@ -39,9 +39,7 @@ AS
                   d.nd,
                   d.ndg
              FROM accounts a, nd_acc n, cc_deal d
-            WHERE /*n.nd = :nd
-                                 and */
-                 a.acc = n.acc
+            WHERE     a.acc = n.acc
                   AND d.nd = n.nd
                   AND d.rnk = a.rnk
                   AND (   a.nbs < '4' AND a.ostb < 0
@@ -68,7 +66,7 @@ AS
                   cc_trans t,
                   cc_deal d
             WHERE /*n.nd = :nd
-                                 and */
+                                          and */
                  a.acc = n.acc
                   AND d.nd = n.nd
                   AND d.rnk = a.rnk
@@ -96,7 +94,7 @@ AS
                       WHERE d_fakt IS NULL
                    GROUP BY acc) ct
             WHERE /*n.nd = :nd
-                                 and*/
+                                          and*/
                  a.acc = n.acc
                   AND d.nd = n.nd
                   AND d.rnk = a.rnk
@@ -108,6 +106,4 @@ AS
                   AND (a.ostc / 100 + ct.ss / 100) > 0);
 
 
-GRANT SELECT ON BARS.VW_ASP_CREDIT_LIST TO BARSREADER_ROLE;
-
-GRANT SELECT ON BARS.VW_ASP_CREDIT_LIST TO BARS_ACCESS_DEFROLE;
+GRANT SELECT ON BARS.VW_ASP_CREDIT_LIST_SUB_ND TO BARS_ACCESS_DEFROLE;
