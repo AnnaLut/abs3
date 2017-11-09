@@ -261,7 +261,7 @@ Ext.onReady(function () {
                 },
                 listeners: {
                     load: function (store, records) {
-                        referenceGrid.height = 0 + "px";
+                        //referenceGrid.height = 0 + "px";
                         //устанавливать доступность кнопки сброса фильтра
                         var clearFiltersBtn = referenceGrid.down('button#clearFilterButton');
                         var metadata = referenceGrid.metadata;
