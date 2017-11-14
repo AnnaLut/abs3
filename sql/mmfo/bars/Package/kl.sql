@@ -5,7 +5,7 @@ IS
 -- (C) BARS. Contragents
 --***************************************************************************--
 
-G_HEADER_VERSION  CONSTANT VARCHAR2(64)  := 'Version 1.4 06/10/2017';
+G_HEADER_VERSION  CONSTANT VARCHAR2(64)  := 'Version 1.5 12/10/2017';
 G_AWK_HEADER_DEFS CONSTANT VARCHAR2(512) := ''
 $if KL_PARAMS.TREASURY $then
   || 'KAZ  - Для казначейства (без связ.клиентов, счетов юр.лиц в др.банках)' || chr(10)
@@ -25,7 +25,7 @@ function header_version return varchar2;
 --****** body_version - возвращает версию тела пакета ***********************--
 function body_version return varchar2;
 
-    
+
 
 --***************************************************************************--
 -- function 	: isCustomerTr
@@ -83,7 +83,7 @@ procedure open_client (
   Notes_         customer.notes%type,       -- Примечание
   Notesec_       customer.notesec%type,     -- Примечание для службы безопасности
   CRisk_         customer.crisk%type,       -- Категория риска
-  Pincode_       customer.pincode%type,     -- 
+  Pincode_       customer.pincode%type,     --
   RnkP_          customer.rnkp%type,        -- Рег. номер холдинга
   Lim_           customer.lim%type,         -- Лимит кассы
   NomPDV_        customer.nompdv%type,      -- № в реестре плат. ПДВ
@@ -129,7 +129,7 @@ procedure setCustomerAttr (
   Notes_         customer.notes%type,       -- Примечание
   Notesec_       customer.notesec%type,     -- Примечание для службы безопасности
   CRisk_         customer.crisk%type,       -- Категория риска
-  Pincode_       customer.pincode%type,     -- 
+  Pincode_       customer.pincode%type,     --
   RnkP_          customer.rnkp%type,        -- Рег. номер холдинга
   Lim_           customer.lim%type,         -- Лимит кассы
   NomPDV_        customer.nompdv%type,      -- № в реестре плат. ПДВ
@@ -227,7 +227,7 @@ PROCEDURE setPersonAttrEx
   TelW_     person.telw%type,       -- Робочий   телефон клієнта
   TelM_     person.cellphone%type default null,  -- Мобільний телефон клієнта
   actual_date_  person.actual_date%type default null,
-  eddr_id_      person.eddr_id%type default null); 
+  eddr_id_      person.eddr_id%type default null);
 
 --***************************************************************************--
 -- procedure 	: setCustomerRekv
@@ -351,7 +351,7 @@ procedure setCustomerAddressByTerritory (
   Address_     customer_address.address%type,
   TerritoryId_ customer_address.territory_id%type,
   p_flag_visa  number default 0 );
-  
+
 procedure setFullCustomerAddress (
 	p_rnk         	customer_address.rnk%type,
 	p_typeId    	customer_address.type_id%type,
@@ -370,9 +370,41 @@ procedure setFullCustomerAddress (
 	p_homepart_type	customer_address.homepart_type%type,
 	p_homepart     	customer_address.homepart%type,
 	p_room_type     customer_address.room_type%type,
-	p_room         	customer_address.room%type,	
+	p_room         	customer_address.room%type,
 	p_comment		customer_address.comm%type default null,
-	p_flag_visa  number default 0 );  
+	p_flag_visa  number default 0 );
+
+--***************************************************************************--
+-- PROCEDURE  : setFullCustomerAddress
+-- DESCRIPTION  : процедура обновления адресов клиента с новой структурой
+-- передается и ИД и наименование, все равно оно уже есть не вебе
+--***************************************************************************--
+procedure setFullCustomerAddress (
+  p_rnk           customer_address.rnk%type,
+  p_typeId      customer_address.type_id%type,
+  p_country     customer_address.country%type,
+  p_zip           customer_address.zip%type,
+  p_domain      customer_address.domain%type,
+  p_region      customer_address.region%type,
+  p_locality    customer_address.locality%type,
+  p_address     customer_address.address%type,
+  p_territoryId   customer_address.territory_id%type,
+  p_locality_type customer_address.locality_type%type,
+  p_street_type   customer_address.street_type%type,
+  p_street        customer_address.street%type,
+  p_home_type     customer_address.home_type%type,
+  p_home          customer_address.home%type,
+  p_homepart_type customer_address.homepart_type%type,
+  p_homepart      customer_address.homepart%type,
+  p_room_type     customer_address.room_type%type,
+  p_room          customer_address.room%type,
+  p_comment       customer_address.comm%type default null,
+  p_region_id     customer_address.region_id%type,
+  p_area_id       customer_address.area_id%type,
+  p_settlement_id customer_address.settlement_id%type,
+  p_street_id     customer_address.street_id%type,
+  p_house_id      customer_address.house_id%type,
+  p_flag_visa     number default 0 );
 
 $if KL_PARAMS.TREASURY $then
 $else
@@ -508,25 +540,24 @@ procedure check_attr_foropenacc (p_rnk in number, p_msg out varchar2);
   --     @p_number - номер паспорта
   --
   function recode_passport_number(p_number in person.numdoc%type) return person.numdoc%type;
-  
+
   -----------------------------------------------------------
   -- Ф-ция генерации номера ДКБО
   --
   -- @p_rnk - РНК клиента
   --
   function generate_dkbo_number(p_rnk customer.rnk%type) return varchar2;
-  
-  
-  
+
+
+
   -----------------------------------------------------------
-  -- Процедура вставляет(обновляет) фото клиента и отправляет информацию на CardMake 
+  -- Процедура вставляет(обновляет) фото клиента и отправляет информацию на CardMake
   --
   --
   procedure set_cutomer_image(p_rnk number, p_imgage_type  varchar2, p_image blob);
 
 END KL;
 /
-
 create or replace package body KL
 IS
 
@@ -534,7 +565,7 @@ IS
 -- (C) BARS. Contragents
 --***************************************************************************--
 
-  G_BODY_VERSION  CONSTANT VARCHAR2(64)  := 'version 1.9  23/10/2017';
+  G_BODY_VERSION  CONSTANT VARCHAR2(64)  := 'version 1.9 12/10/2017';
   G_AWK_BODY_DEFS CONSTANT VARCHAR2(512) := ''
 $if KL_PARAMS.TREASURY $then
   || 'KAZ   - Для казначейства (без связ.клиентов, счетов юр.лиц в др.банках)' || chr(10)
@@ -573,15 +604,15 @@ $end
   g_let_table       t_let_table;   /* таблица соответствия букв */
 
   g_modcode constant varchar2(3) := 'CAC';
-  
+
   --****** header_version - возвращает версию заголовка пакета ****************--
-  function header_version return varchar2 
+  function header_version return varchar2
   is
   begin
     return 'Package header KL ' || G_HEADER_VERSION || '.' || chr(10)
         || 'AWK definition: ' || chr(10) || G_AWK_HEADER_DEFS;
   end header_version;
-  
+
   --****** body_version - возвращает версию тела пакета ***********************--
   function body_version return varchar2
   is
@@ -601,9 +632,9 @@ $if KL_PARAMS.SBER $then
   deterministic
   is
   begin
-    
+
     bars_audit.trace( 'kl.get_ebk_cust_tp: custtype=%s, sed=%s.', g_modcode, to_char(p_custtype), p_sed );
-    
+
     return case
              when ( p_custtype = 2 )
              then 'L'
@@ -613,9 +644,9 @@ $if KL_PARAMS.SBER $then
              then 'I'
              else null
            end;
-    
+
   end GET_EBK_CUST_TP;
-  
+
   --
   -- GET_CUST_TP()
   --
@@ -629,7 +660,7 @@ $if KL_PARAMS.SBER $then
     l_custtype             customer.custtype%type;
     l_sed                  customer.sed%type;
   begin
-    
+
     begin
       select c.CUSTTYPE, c.SED
         into l_custtype, l_sed
@@ -642,13 +673,13 @@ $if KL_PARAMS.SBER $then
         -- реєстрація нового клієнта
         l_custtype := null;
     end;
-    
+
     bars_audit.trace( 'kl.get_cust_tp: rnk=%s, custtype=%s, sed=%s.', g_modcode, to_char(p_rnk), to_char(l_custtype), l_sed );
-    
+
     return GET_EBK_CUST_TP( l_custtype, l_sed );
-    
+
   end GET_CUST_TP;
-  
+
   --
   -- ADD_EBK_QUEUE()
   --
@@ -659,18 +690,18 @@ $if KL_PARAMS.SBER $then
   ) is
     l_cust_tp              varchar2(1);
   begin
-    
+
     if ( p_cust_tp IS Null )
     then
       l_cust_tp := GET_CUST_TP( p_rnk );
     else
       l_cust_tp := p_cust_tp;
     end if;
-    
+
     case
       when ( l_cust_tp = 'I' )
       then -- is_fiz_pers(p_rnk)
-        if ( p_custw_tag is Null or 
+        if ( p_custw_tag is Null or
              p_custw_tag in ('SN_LN','SN_FN','SN_MN','SN_GC','K013 ','FGADR','FGDST','FGTWN'
                             ,'MPNO ','SAMZ ','VIP_K','WORK ','PUBLP','CIGPO','FGOBL','EMAIL'
                             ,'PC_Z2','PC_Z1','PC_Z5','PC_Z3','PC_Z4','CHORN','SPMRK','WORKB')
@@ -685,7 +716,7 @@ $if KL_PARAMS.SBER $then
         end if;
       when ( l_cust_tp = 'P' )
       then -- is_private_ent(p_rnk)
-        if ( p_custw_tag is Null or 
+        if ( p_custw_tag is Null or
              p_custw_tag in ('MS_GR','EMAIL','CIGPO','SAMZ ','K013')
            )
         then
@@ -698,7 +729,7 @@ $if KL_PARAMS.SBER $then
         end if;
       when ( l_cust_tp = 'L' )
       then -- is_legal_pers(p_rnk)
-        if ( p_custw_tag is Null or 
+        if ( p_custw_tag is Null or
              p_custw_tag in ('FSKPR','IDPIB','UUDV ','KVPKK','AINAB','FSVED','FIRMA','O_REP'
                             ,'FSRSK','RIZIK','K013 ','MS_GR','VIP_K','NOTAX','N_RPD','CCVED'
                             ,'DATVR','DATZ ','DJER ','SUTD ')
@@ -714,11 +745,11 @@ $if KL_PARAMS.SBER $then
       else
         null;
     end case;
-    
+
   end add_ebk_queue;
-  
+
 $end
-  
+
 --***************************************************************************--
 -- PROCEDURE 	: isCustomerTr
 -- DESCRIPTION	: функция проверки наименование клиента на принадлежность к списку террористов
@@ -731,7 +762,7 @@ function isCustomerTr (
   lRet number := 0;
   l_title varchar2(20) := 'kl.isCustomerTr: ';
 begin
-  
+
 $if KL_PARAMS.FINMON $then
   bars_audit.trace('%s params: pNmk=>%s, pNmkk=>%s, pNmkv=>%s',
        l_title, pNmk, pNmkk, pNmkv);
@@ -913,13 +944,13 @@ $end
       bars_error.raise_nerror(g_modcode, 'RNK_ALREADY_EXISTS', to_char(p_custtype));
   end;
 
-  if p_custtype = 2 
+  if p_custtype = 2
   then
     set_corp_nmk(p_rnk, p_nmk);
   end if;
-  
+
   cust_insider(p_rnk);
-  
+
 end iopen_client;
 
 --***************************************************************************--
@@ -1015,7 +1046,7 @@ begin
      p_pincode   => Pincode_,
      p_mb        => MB_,
      p_bc        => BC_,
-     p_nrezid_code => null ); 
+     p_nrezid_code => null );
 end open_client;
 
 --***************************************************************************--
@@ -1177,13 +1208,13 @@ BEGIN
                isp       = Isp_,
                nrezid_code = p_nrezid_code
          WHERE rnk = Rnk_;
-        
+
 $if KL_PARAMS.SBER $then
         ADD_EBK_QUEUE( Rnk_ );
-        
+
 $end
         bars_audit.trace('%s 7. завершено обновление реквизитов клиента rnk=%s', l_title, Rnk_);
-        
+
      ELSE
 
         bars_audit.trace('%s 8. регистрация клиента', l_title);
@@ -1347,9 +1378,9 @@ $end
             sed  = p_k051
       where rnk = p_rnk;
 $if KL_PARAMS.SBER $then
-    
+
     ADD_EBK_QUEUE( p_rnk );
-    
+
 $end
 $if KL_PARAMS.CLV $then
   else
@@ -1497,7 +1528,7 @@ $if KL_PARAMS.CLV $then
      end;
 $end
   end if;
-  
+
 $if KL_PARAMS.RI $then
   begin
     select okpo
@@ -1522,16 +1553,16 @@ $if KL_PARAMS.RI $then
     end;
     if k060_ is not null
     then
-      
+
       update customer
          set prinsider=k060_
        where rnk = Rnk_;
-      
+
 $if KL_PARAMS.SBER $then
       add_ebk_queue(Rnk_);
-    
+
 $end
-      
+
     end if;
   end if;
 $end
@@ -1636,7 +1667,7 @@ PROCEDURE setPersonAttrEx
   TelW_     person.telw%type,       -- Робочий   телефон клієнта
   TelM_     person.cellphone%type default null,  -- Мобільний телефон клієнта
   actual_date_  person.actual_date%type default null,
-  eddr_id_      person.eddr_id%type default null 
+  eddr_id_      person.eddr_id%type default null
 ) IS
   l_title   varchar2(20) := 'kl.setPersonAttrEx: ';
 $if KL_PARAMS.RI $then
@@ -1691,7 +1722,7 @@ BEGIN
          bplace     = BPlace_,
          date_photo = nvl(Fdate_, date_photo),
 		 actual_date = actual_date_                                                 ,
-         eddr_id     = eddr_id_ 
+         eddr_id     = eddr_id_
    WHERE rnk = rnk_;
   IF SQL%rowcount = 0 THEN
      bars_audit.trace('%s 3. регистрация параметров физ.лица РНК=%s', l_title, Rnk_);
@@ -1701,16 +1732,16 @@ BEGIN
   ELSE
      bars_audit.trace('%s 5. завершено обновление параметров физ.лица РНК=%s', l_title, Rnk_);
   END IF;
-  
+
 $if KL_PARAMS.SBER $then
   ADD_EBK_QUEUE(rnk_);
-  
-$end  
+
+$end
   -- Моб.тел.
   If (TelM_ <> 'XXXXXXXXXX') Then
     setCustomerElement(Rnk_, 'MPNO', TelM_, 0);
   End If;
-  
+
 $if KL_PARAMS.RI $then
   begin
     select okpo
@@ -1770,12 +1801,12 @@ $if KL_PARAMS.RI $then
         end;
       end if;
     end if;
-    if k060_ is not null 
+    if k060_ is not null
     then
       update customer
       set    prinsider=k060_
       where  rnk=Rnk_;
-    
+
 $if KL_PARAMS.SBER $then
       ADD_EBK_QUEUE(Rnk_);
 $end
@@ -1840,10 +1871,10 @@ IS
   l_title     varchar2(30) := 'kl.setCustomerElement: ';
   l_isp       customerw.isp%type;
 BEGIN
-  
+
   bars_audit.trace( '%s 1.params: Rnk_=>%s, Tag_=>%s, Val_=>%s, Otd_=>%s'
                   , l_title, to_char(Rnk_), Tag_, Val_, to_char(Otd_) );
-  
+
 $if KL_PARAMS.SBER $then
   l_isp := 0;
 $else
@@ -1877,17 +1908,17 @@ $end
         ;
         if ( sql%rowcount = 0 )
         then
-          bars_audit.trace('%s 4. регистрация доп.реквизита %s клиента РНК=%s', l_title, Tag_, to_char(Rnk_));
-          insert into CUSTOMERW ( RNK, TAG, VALUE, ISP )
-          values ( Rnk_, Tag_, trim(Val_), l_isp );
-          bars_audit.trace('%s 5. завершена регистрация доп.реквизита %s клиента РНК=%s', l_title, Tag_, to_char(Rnk_));
+           bars_audit.trace('%s 4. регистрация доп.реквизита %s клиента РНК=%s', l_title, Tag_, to_char(Rnk_));
+           insert into CUSTOMERW ( RNK, TAG, VALUE, ISP )
+           values ( Rnk_, Tag_, trim(Val_), l_isp );
+           bars_audit.trace('%s 5. завершена регистрация доп.реквизита %s клиента РНК=%s', l_title, Tag_, to_char(Rnk_));
         else
-          bars_audit.trace('%s 6. завершено обновление доп.реквизита %s клиента РНК=%s', l_title, Tag_, to_char(Rnk_));
+           bars_audit.trace('%s 6. завершено обновление доп.реквизита %s клиента РНК=%s', l_title, Tag_, to_char(Rnk_));
         end if;
-        
+
 $if KL_PARAMS.SBER $then
         ADD_EBK_QUEUE(Rnk_, trim(Tag_));
-        
+
 $end
      END IF;
 $if KL_PARAMS.CLV $then
@@ -2229,7 +2260,7 @@ procedure setFullCustomerAddress (
 	p_flag_visa     number default 0 )
 IS
   NewId_ number;
-  l_title varchar2(40) := 'kl.setFullCustomerAddress: '; 
+  l_title varchar2(40) := 'kl.setFullCustomerAddress: ';
 BEGIN
   bars_audit.trace('%s 1.params:'
        || ' p_Rnk=>%s,'
@@ -2262,16 +2293,16 @@ BEGIN
         -- Обновление
 		-- для сумісності зі старою версією
 		if (p_locality_type is null
-		    and p_street_type is null 
-		    and p_street is null       
-		    and p_home_type is null    
-		    and p_home is null         
+		    and p_street_type is null
+		    and p_street is null
+		    and p_home_type is null
+		    and p_home is null
 		    and p_homepart_type is null
-		    and p_homepart is null     
-		    and p_room_type is null    
-		    and p_room is null 
+		    and p_homepart is null
+		    and p_room_type is null
+		    and p_room is null
 			and p_comment is null ) then
-			
+
 				update customer_address
 				set country       = p_Country,
 					zip     	     = p_Zip,
@@ -2279,11 +2310,11 @@ BEGIN
 					region        = p_Region,
 					locality      = p_Locality,
 					address       = p_Address,
-					territory_id  = p_TerritoryId					
+					territory_id  = p_TerritoryId
 				where rnk = p_Rnk and type_id = p_TypeId;
-		
+
 		else
-		
+
 			update customer_address
 				set country       = p_Country,
 					zip     	     = p_Zip,
@@ -2293,35 +2324,35 @@ BEGIN
 					address       = p_Address,
 					territory_id  = p_TerritoryId,
 					locality_type = p_locality_type,
-					street_type   = p_street_type,  
-					street        = p_street,       
-					home_type     = p_home_type,    
-					home          = p_home,        
+					street_type   = p_street_type,
+					street        = p_street,
+					home_type     = p_home_type,
+					home          = p_home,
 					homepart_type = p_homepart_type,
-					homepart      = p_homepart,     
-					room_type     = p_room_type,    
+					homepart      = p_homepart,
+					room_type     = p_room_type,
 					room          = p_room,
 					comm          = p_comment
 				where rnk = p_Rnk and type_id = p_TypeId;
-				
+
 		end if;
-				
+
         if sql%rowcount = 0 then
            bars_audit.trace('%s 4. регистрация данных об адресе клиента %s (тип=%s)', l_title, to_char(p_Rnk), to_char(p_TypeId));
            -- Добавление
            insert into customer_address (rnk, type_id, country, zip, domain, region, locality, address, territory_id,
               locality_type, street_type, street, home_type, home, homepart_type, homepart, room_type, room, comm)
            values ( p_Rnk, p_TypeId, p_Country, p_Zip, p_Domain, p_Region, p_Locality, p_Address, p_TerritoryId,
-              p_locality_type, p_street_type, p_street, p_home_type, p_home, p_homepart_type, p_homepart,     
+              p_locality_type, p_street_type, p_street, p_home_type, p_home, p_homepart_type, p_homepart,
               p_room_type, p_room, p_comment);
            bars_audit.trace('%s 5. завершена регистрация данных об адресе клиента %s (тип=%s)', l_title, to_char(p_Rnk), to_char(p_TypeId));
         else
            bars_audit.trace('%s 6. завершено обновление данных об адресе клиента %s (тип=%s)', l_title, to_char(p_Rnk), to_char(p_TypeId));
         end if;
-        
+
 $if KL_PARAMS.SBER $then
         ADD_EBK_QUEUE(p_rnk);
-        
+
 $end
      end if;
 $if KL_PARAMS.CLV $then
@@ -2339,14 +2370,181 @@ $if KL_PARAMS.CLV $then
         l_clv.address  	    := p_Address;
         l_clv.territory_id  := p_TerritoryId;
         l_clv.locality_type := p_locality_type;
-        l_clv.street_type   := p_street_type;  
-        l_clv.street        := p_street;       
-        l_clv.home_type     := p_home_type;    
-        l_clv.home          := p_home;         
+        l_clv.street_type   := p_street_type;
+        l_clv.street        := p_street;
+        l_clv.home_type     := p_home_type;
+        l_clv.home          := p_home;
         l_clv.homepart_type := p_homepart_type;
-        l_clv.homepart      := p_homepart;     
-        l_clv.room_type     := p_room_type;    
-        l_clv.room          := p_room; 
+        l_clv.homepart      := p_homepart;
+        l_clv.room_type     := p_room_type;
+        l_clv.room          := p_room;
+        l_clv.comm          := p_comment;
+        bars_clv.set_req_customeraddress(l_clv);
+     end;
+$end
+  end if;
+
+END;
+
+
+--***************************************************************************--
+-- PROCEDURE  : setFullCustomerAddress
+-- DESCRIPTION  : процедура обновления адресов клиента с новой структурой
+-- передается и ИД и наименование, все равно оно уже есть не вебе
+--***************************************************************************--
+procedure setFullCustomerAddress (
+  p_rnk           customer_address.rnk%type,
+  p_typeId      customer_address.type_id%type,
+  p_country     customer_address.country%type,
+  p_zip           customer_address.zip%type,
+  p_domain      customer_address.domain%type,
+  p_region      customer_address.region%type,
+  p_locality    customer_address.locality%type,
+  p_address     customer_address.address%type,
+  p_territoryId   customer_address.territory_id%type,
+  p_locality_type customer_address.locality_type%type,
+  p_street_type   customer_address.street_type%type,
+  p_street        customer_address.street%type,
+  p_home_type     customer_address.home_type%type,
+  p_home          customer_address.home%type,
+  p_homepart_type customer_address.homepart_type%type,
+  p_homepart      customer_address.homepart%type,
+  p_room_type     customer_address.room_type%type,
+  p_room          customer_address.room%type,
+  p_comment       customer_address.comm%type default null,
+  p_region_id     customer_address.region_id%type,
+  p_area_id       customer_address.area_id%type,
+  p_settlement_id customer_address.settlement_id%type,
+  p_street_id     customer_address.street_id%type,
+  p_house_id      customer_address.house_id%type,
+  p_flag_visa     number default 0 )
+IS
+  NewId_ number;
+  l_title varchar2(40) := 'kl.setFullCustomerAddress: ';
+BEGIN
+  bars_audit.trace('%s 1.params:'
+       || ' p_Rnk=>%s,'
+       || ' p_TypeId=>%s,'
+       || ' p_Country=>%s,'
+       || ' p_Zip=>%s,'
+       || ' p_Domain=>%s,'
+       || ' p_Region=>%s,'
+       || ' p_Locality=>%s,'
+       || ' p_Address=>%s,'
+       || ' p_TerritoryId=>' || to_char(p_TerritoryId),
+       l_title, to_char(p_Rnk), to_char(p_TypeId), to_char(p_Country),
+       p_Zip, p_Domain, p_Region, p_Locality, p_Address);
+
+  if p_flag_visa = 0
+  or p_flag_visa = 1 and not is_customer_visa(p_Rnk) then
+     -- Удаление
+     if     p_Country     is null
+        and p_Zip         is null
+        and p_Domain      is null
+        and p_Region      is null
+        and p_Locality    is null
+        and p_Address     is null
+        and p_TerritoryId is null
+     then
+        bars_audit.trace('%s 2. удаление данных об адресе клиента %s (тип=%s)', l_title, to_char(p_Rnk), to_char(p_TypeId));
+        delete from customer_address where rnk=p_Rnk and type_id=p_TypeId;
+        bars_audit.trace('%s 3. завершено удаление данных об адресе клиента %s (тип=%s)', l_title, to_char(p_Rnk), to_char(p_TypeId));
+     else
+        -- Обновление
+        -- для сумісності зі старою версією
+        if (p_locality_type is null
+            and p_street_type is null
+            and p_street is null
+            and p_home_type is null
+            and p_home is null
+            and p_homepart_type is null
+            and p_homepart is null
+            and p_room_type is null
+            and p_room is null
+          and p_comment is null ) then
+
+            update customer_address
+            set country       = p_Country,
+              zip            = p_Zip,
+              domain         = p_Domain,
+              region        = p_Region,
+              locality      = p_Locality,
+              address       = p_Address,
+              territory_id  = p_TerritoryId
+            where rnk = p_Rnk and type_id = p_TypeId;
+
+        else
+          update customer_address
+            set country       = p_Country,
+              zip            = p_Zip,
+              domain         = p_Domain,
+              region        = p_Region,
+              locality      = p_Locality,
+              address       = p_Address,
+              territory_id  = p_TerritoryId,
+              --locality_type = p_locality_type,
+              --street_type   = p_street_type,
+              street        = p_street,
+              home_type     = p_home_type,
+              home          = p_home,
+              homepart_type = p_homepart_type,
+              homepart      = p_homepart,
+              room_type     = p_room_type,
+              room          = p_room,
+              comm          = p_comment,
+              region_id     = p_region_id,
+              area_id       = p_area_id,
+              settlement_id = p_settlement_id,
+              street_id     = p_street_id,
+              house_id      = p_house_id,
+              locality_type_n = p_locality_type,
+              street_type_n   = p_street_type
+            where rnk = p_Rnk and type_id = p_TypeId;
+
+        end if;
+
+        if sql%rowcount = 0 then
+           bars_audit.trace('%s 4. регистрация данных об адресе клиента %s (тип=%s)', l_title, to_char(p_Rnk), to_char(p_TypeId));
+           -- Добавление
+           insert into customer_address (rnk, type_id, country, zip, domain, region, locality, address, territory_id,
+              locality_type, street_type, street, home_type, home, homepart_type, homepart, room_type, room, comm,
+              region_id, area_id, settlement_id, street_id, house_id, locality_type_n, street_type_n  )
+           values ( p_Rnk, p_TypeId, p_Country, p_Zip, p_Domain, p_Region, p_Locality, p_Address, p_TerritoryId,
+              /*p_locality_type*/null, /*p_street_type*/null, p_street, p_home_type, p_home, p_homepart_type, p_homepart,p_room_type, p_room, p_comment,
+              p_region_id, p_area_id, p_settlement_id, p_street_id,p_house_id, p_locality_type, p_street_type);
+           bars_audit.trace('%s 5. завершена регистрация данных об адресе клиента %s (тип=%s)', l_title, to_char(p_Rnk), to_char(p_TypeId));
+        else
+           bars_audit.trace('%s 6. завершено обновление данных об адресе клиента %s (тип=%s)', l_title, to_char(p_Rnk), to_char(p_TypeId));
+        end if;
+
+$if KL_PARAMS.SBER $then
+        ADD_EBK_QUEUE(p_rnk);
+
+$end
+     end if;
+$if KL_PARAMS.CLV $then
+  else
+     declare
+        l_clv clv_customer_address%rowtype;
+     begin
+        l_clv.rnk           := p_Rnk;
+        l_clv.type_id       := p_TypeId;
+        l_clv.country       := p_Country;
+        l_clv.zip           := p_Zip;
+        l_clv.domain        := p_Domain;
+        l_clv.region        := p_Region;
+        l_clv.locality      := p_Locality;
+        l_clv.address       := p_Address;
+        l_clv.territory_id  := p_TerritoryId;
+        l_clv.locality_type := p_locality_type;
+        l_clv.street_type   := p_street_type;
+        l_clv.street        := p_street;
+        l_clv.home_type     := p_home_type;
+        l_clv.home          := p_home;
+        l_clv.homepart_type := p_homepart_type;
+        l_clv.homepart      := p_homepart;
+        l_clv.room_type     := p_room_type;
+        l_clv.room          := p_room;
         l_clv.comm          := p_comment;
         bars_clv.set_req_customeraddress(l_clv);
      end;
@@ -2604,21 +2802,21 @@ $end
         and risk_id in  (2, 3, 62, 63, 64, 65)
         and dat_begin = :l_dat'
   into ipep using p_rnk, l_dat;
-  
+
   if ( ipep > 0 )
   then
-    
+
     setCustomerElement( Rnk_ => p_rnk
                       , Tag_ => 'PUBLP'
                       , Val_ => 'Так'
                       , Otd_ => 0
                       );
     /* pavlenko 04/04/2016 COBUSUPABS-4365
-    4) В картці клієнта (вкладка «Дод.реквізити»/Фін.мон.») 
-    додати реквізит «Дозвіл ПЕП», що приймає значення «На розгляді», «Так», «Ні», «пусте значення», 
-    при цьому виконувати контроль: 
-    якщо значення реквізиту «Належність до публічних діячів» дорівнює «Так», 
-    то значення даного реквізиту має приймати значення «На розгляді», «Так», «Ні», 
+    4) В картці клієнта (вкладка «Дод.реквізити»/Фін.мон.»)
+    додати реквізит «Дозвіл ПЕП», що приймає значення «На розгляді», «Так», «Ні», «пусте значення»,
+    при цьому виконувати контроль:
+    якщо значення реквізиту «Належність до публічних діячів» дорівнює «Так»,
+    то значення даного реквізиту має приймати значення «На розгляді», «Так», «Ні»,
     інакше – атрибут не заповнюється («пусте значення»).
     */
     begin
@@ -2628,34 +2826,34 @@ $end
        where rnk = p_rnk
          and tag = 'PEP';
      bars_audit.info( 'kl.set_customer_risk: pep='||l_pep );
-    exception 
-      when NO_DATA_FOUND 
+    exception
+      when NO_DATA_FOUND
       then bars_error.raise_nerror('CAC', 'ERR_EMPTY_PEP');
     end;
-    
+
     begin
       execute immediate 'select 1 from FM_PEP where upper(name) = :l_pep'
       into l_pep_valid using l_pep;
       bars_audit.info( 'kl.set_customer_risk: pep='||l_pep_valid );
     exception
-      when NO_DATA_FOUND 
-      then bars_error.raise_nerror('CAC', 'ERR_EMPTY_PEP'); 
+      when NO_DATA_FOUND
+      then bars_error.raise_nerror('CAC', 'ERR_EMPTY_PEP');
     end;
-    
+
   else
-    
+
     setCustomerElement( Rnk_ => p_rnk
                       , Tag_ => 'PUBLP'
                       , Val_ => 'Ні'
                       , Otd_ => 0
                       );
-    
+
     setCustomerElement( Rnk_ => p_rnk
                       , Tag_ => 'PEP'
                       , Val_ => null
                       , Otd_ => 0
                       );
-    
+
   end if;
 
 end set_customer_risk;
@@ -2784,9 +2982,9 @@ $if KL_PARAMS.CLV $then
 $end
 begin
 $if KL_PARAMS.CLV $then
-  if bars_clv.found_request(p_rnk, l_request) = true 
+  if bars_clv.found_request(p_rnk, l_request) = true
   then
-    
+
     begin
        select * into l_customer from clv_customer where rnk = p_rnk;
     exception when no_data_found then
@@ -2794,7 +2992,7 @@ $if KL_PARAMS.CLV $then
     end;
 
     -- customer
-    if l_request.req_type = 0 
+    if l_request.req_type = 0
     then
         iopen_client (
            p_rnk         => l_customer.rnk,         -- Customer number
@@ -3126,7 +3324,7 @@ begin
            -- Для 7 ID - картки серия пустая поэтому,  проверяем только для паспорта.
             case when l_person.passp = 1 then
                 check_attr(l_person.ser, 'Серія');
-            else null; 
+            else null;
             end case;
            check_attr(l_person.numdoc, 'Номер док.');
            check_attr(l_person.organ, 'Ким виданий');
@@ -3169,7 +3367,7 @@ begin
   p_msg := null;
 $if KL_PARAMS.SBER $then
   p_msg := get_empty_attr_foropenacc(p_rnk);
-  if p_msg is not null 
+  if p_msg is not null
   then
     p_msg := substr('Для відкриття рахунку в картці клієнта необхідно заповнити поля:' || chr(10) || p_msg, 1, 2000);
   end if;
@@ -3347,25 +3545,25 @@ end check_attr_foropenacc;
         bars_audit.trace('%s: succ end');
         return p_number;
     end recode_passport_number;
-    
+
 
     -----------------------------------------------------------
-    -- Процедура вставляет(обновляет) фото клиента и отправляет информацию на CardMake 
+    -- Процедура вставляет(обновляет) фото клиента и отправляет информацию на CardMake
     --
     --
     procedure set_cutomer_image(p_rnk number, p_imgage_type  varchar2, p_image blob)
     is
        p         constant varchar2(100)        := 'kl.set_cutomer_image';
     begin
-       begin  
+       begin
           insert into customer_images (rnk, type_img, date_img, image) values (p_rnk, p_imgage_type, sysdate, p_image);
-       exception when dup_val_on_index then 
+       exception when dup_val_on_index then
           update customer_images set date_img = sysdate, image = p_image where rnk = p_rnk and type_img = p_imgage_type;
        end;
-       --отправляет информацию на CardMake на заявку об изменении данных по клиенту 
+       --отправляет информацию на CardMake на заявку об изменении данных по клиенту
         bars.ow_utl.get_nd (p_rnk);
     end ;
-    
+
     -----------------------------------------------------------
     -- Ф-ция генерации номера ДКБО
     --
@@ -3374,23 +3572,19 @@ end check_attr_foropenacc;
     function generate_dkbo_number(p_rnk customer.rnk%type) return varchar2
       is
       begin
-        return p_rnk||to_char(sysdate, 'YYMMDDHH24MISS'); 
+        return p_rnk||to_char(sysdate, 'YYMMDDHH24MISS');
         end generate_dkbo_number;
 
 BEGIN
-  
+
   -- инициализируем массив соответствия букв латиницы и кириллицы для перекодировки серии паспорта
   fill_let_table();
-  
+
 END KL;
 /
-
-show err;
-
 grant EXECUTE on KL to ABS_ADMIN;
 grant EXECUTE on KL to BARS_ACCESS_DEFROLE;
 grant EXECUTE on KL to CUST001;
 grant EXECUTE on KL to WR_ALL_RIGHTS;
 grant EXECUTE on KL to WR_CUSTREG;
 grant EXECUTE on KL to WR_TOBO_ACCOUNTS_LIST;
-grant EXECUTE on KL to WR_USER_ACCOUNTS_LIST;
