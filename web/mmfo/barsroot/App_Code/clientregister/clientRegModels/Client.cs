@@ -1267,7 +1267,27 @@ namespace clientregister
                                     rdr["homepart"] != DBNull.Value ? (String)rdr["homepart"] : String.Empty,
                                     rdr["room_type"] != DBNull.Value ? (Decimal)rdr["room_type"] : (Decimal?)null,
                                     rdr["room"] != DBNull.Value ? (String)rdr["room"] : String.Empty,
-                                    rdr["comm"] != DBNull.Value ? (String)rdr["comm"] : String.Empty);
+                                    rdr["comm"] != DBNull.Value ? (String)rdr["comm"] : String.Empty,
+                                    rdr["region_id"] != DBNull.Value ? Convert.ToDecimal(rdr["region_id"]) : (decimal?)null,
+                                    rdr["area_id"] != DBNull.Value ? Convert.ToDecimal(rdr["area_id"]) : (decimal?)null,
+                                    rdr["settlement_id"] != DBNull.Value ? Convert.ToDecimal(rdr["settlement_id"]) : (decimal?)null,
+                                    rdr["street_id"] != DBNull.Value ? Convert.ToDecimal(rdr["street_id"]) : (decimal?)null,
+                                    rdr["house_id"] != DBNull.Value ? Convert.ToDecimal(rdr["house_id"]) : (decimal?)null,
+                                    rdr["region_name"] != DBNull.Value ? Convert.ToString(rdr["region_name"]) : string.Empty,
+                                    rdr["area_name"] != DBNull.Value ? Convert.ToString(rdr["area_name"]) : string.Empty,
+                                    rdr["settlement_name"] != DBNull.Value ? Convert.ToString(rdr["settlement_name"]) : string.Empty,
+                                    rdr["street_name"] != DBNull.Value ? Convert.ToString(rdr["street_name"]) : string.Empty,
+                                    rdr["house_num"] != DBNull.Value ? Convert.ToString(rdr["house_num"]) : string.Empty,
+                                    rdr["settlement_tp_id"] != DBNull.Value ? Convert.ToDecimal(rdr["settlement_tp_id"]) : (decimal?)null,
+                                    rdr["settlement_tp_nm"] != DBNull.Value ? Convert.ToString(rdr["settlement_tp_nm"]) : string.Empty,
+                                    rdr["str_tp_id"] != DBNull.Value ? Convert.ToDecimal(rdr["str_tp_id"]) : (decimal?)null,
+                                    rdr["str_tp_nm"] != DBNull.Value ? Convert.ToString(rdr["str_tp_nm"]) : string.Empty,
+                                    rdr["aht_tp_id"] != DBNull.Value ? Convert.ToDecimal(rdr["aht_tp_id"]) : (decimal?)null,
+                                    rdr["aht_tp_value"] != DBNull.Value ? Convert.ToString(rdr["aht_tp_value"]) : string.Empty,
+                                    rdr["ahpt_tp_id"] != DBNull.Value ? Convert.ToDecimal(rdr["ahpt_tp_id"]) : (decimal?)null,
+                                    rdr["ahpt_tp_value"] != DBNull.Value ? Convert.ToString(rdr["ahpt_tp_value"]) : string.Empty,
+                                    rdr["art_tp_id"] != DBNull.Value ? Convert.ToDecimal(rdr["art_tp_id"]) : (decimal?)null,
+                                    rdr["art_tp_value"] != DBNull.Value ? Convert.ToString(rdr["art_tp_value"]) : string.Empty);
 
                         switch (Convert.ToInt16(rdr["type_id"]))
                         {

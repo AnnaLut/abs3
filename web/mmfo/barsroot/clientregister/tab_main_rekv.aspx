@@ -12,9 +12,12 @@
     <link href="../Content/Themes/ModernUI/css/jquery-ui.css" rel="stylesheet" />  
     <link href="../Content/Themes/ModernUI/css/buttons.css" rel="stylesheet" />
     <link href="../content/themes/modernui/css/tiptip.css" rel="stylesheet" />
+
+    <link href="/barsroot/Content/Themes/Kendo/kendo.common.min.css" rel="stylesheet" />
+    <link href="/barsroot/Content/Themes/Kendo/kendo.bootstrap.min.css" rel="stylesheet" />
     
     <script type="text/javascript" src="../Scripts/html5shiv.js"></script>
-    
+
     <script type="text/javascript" src="../Scripts/jquery/jquery.min.js"></script>
     <script type="text/javascript" src="../scripts/jquery/jquery.maskMoney.js"></script>
     <script type="text/javascript" src="../Scripts/jquery/jquery.numbermask.js"></script>
@@ -22,6 +25,10 @@
     <script type="text/javascript" src="../Scripts/jquery/jquery-ui.min.js"></script>
     <script type="text/javascript" src="../Scripts/jquery/jquery.bars.ui.js"></script>
     <script type="text/javascript" src="../Content/Themes/ModernUI/scripts/jquery.tiptip.js"></script>
+    <script type="text/javascript" src="../Scripts/kendo/kendo.all.min.js"></script>
+    <script type="text/javascript" src="../Scripts/kendo/kendo.aspnetmvc.min.js"></script>
+    <script type="text/javascript" src="../Scripts/Bars/bars.ui.js"></script>
+    <script type="text/javascript" src="../Scripts/Bars/bars.config.js"></script>
 
     <script type="text/javascript"src="typingCheckerCtrl.js"></script>
 
@@ -38,74 +45,68 @@
         });
     </script>
     <style type="text/css">
-        div.required
-        {
+        div.required {
             display: inline;
             font-size: 12pt;
             width: 8px;
             color: red;
             height: 18px;
         }
-        #tblMain td.checkbox
-        {
+
+        #tblMain td.checkbox {
             padding-left: 20px;
             height: 44px;
         }
-        #tblEdits col.title
-        {
+
+        #tblEdits col.title {
             width: 200px;
             font-size: 10pt;
             font-family: Arial;
         }
-        .edit
-        {
+
+        .edit {
             width: 150px;
             border: 1px solid #000000;
         }
-        
-        .edit.long
-        {
-            width: 300px;
-        }
-        .edit.date
-        {
-            text-align: center;
-        }
-        .edit.centered
-        {
-            text-align: center;
-        }
-        
-        .edit.composite1-code
-        {
-            width: 45px;
-            text-align: center;
-        }
-        .edit.composite1-value
-        {
-            width: 251px;
-        }
-        
-        .edit.composite2-code
-        {
-            width: 125px;
-            text-align: center;
-        }
-        .edit.composite2-value
-        {
-            width: 171px;
-        }
-        
-        .ref
-        {
+
+            .edit.long {
+                width: 300px;
+            }
+
+            .edit.date {
+                text-align: center;
+            }
+
+            .edit.centered {
+                text-align: center;
+            }
+
+            .edit.composite1-code {
+                width: 45px;
+                text-align: center;
+            }
+
+            .edit.composite1-value {
+                width: 251px;
+            }
+
+            .edit.composite2-code {
+                width: 125px;
+                text-align: center;
+            }
+
+            .edit.composite2-value {
+                width: 171px;
+            }
+
+        .ref {
             width: 20px;
         }
         /*клас помилки*/
-        .err
-        {
-            background-color:#ffffd5;
-            border:1px solid red;
-            color:#000;
+        .err {
+            background-color: #ffffd5;
+            border: 1px solid red;
+            color: #000;
             /*background-color:#ffc0c0;
             border:1px solid red;*/
         }
@@ -244,13 +245,13 @@
             </td>
             <td>
                 <input class="edit long" id="ed_ADR" tabindex="20" type="text" maxlength="70" />
-                <input id="bt_fullADR" 
-                        style="height: 24px;padding:0px;"
+                <input id="btnOpenWindowAddress" 
+                        style="height: 24px;"
                         title="Режим ввода полного адреса" 
                         class="ref" 
-                        onclick="ShowfullADR();ToDoOnChange();"
+                        onclick="openWindowAddress()"
                         type="button" 
-                        value="..." tabindex="8" />
+                        value="..." tabindex="22" />
                 <div class="required">*</div>
             </td>
         </tr>

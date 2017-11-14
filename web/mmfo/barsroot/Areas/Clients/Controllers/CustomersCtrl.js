@@ -91,6 +91,7 @@
                     if (id) {
                         url = bars.config.urlContent('/clientregister/registration.aspx?readonly=0&rnk=' + id);
                         bars.ui.dialog({
+                            actions:['Maximize', 'Close'],
                             close: function () {
                                 vm.reloadCustomersGrid();
                             },
@@ -114,6 +115,7 @@
 
                         var url = bars.config.urlContent('/clientregister/registration.aspx?client=' + type.toLowerCase() + '&spd=' + (type === 'PERSONSPD' ? '1': '0') + '&rezid=' + (isResident ? '1' : '2'));
                         bars.ui.dialog({
+                            actions: ['Maximize', 'Close'],
                             iframe: true,
                             content: {
                                 url: url
@@ -211,6 +213,7 @@
                         bars.ui.error({ text: 'Спочатку виберіть клієнта, історію змін якого ви бажаєте переглянути.' });
                     } else {
                         bars.ui.dialog({
+                            actions: ['Maximize', 'Close'],
                             iframe: true,
                             content: {
                                 url: bars.config.urlContent('/customerlist/CustHistory.aspx?mode=2&rnk=' + row.Id + '&type=0')
