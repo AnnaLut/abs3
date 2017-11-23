@@ -11,7 +11,7 @@ PROMPT *** Create  procedure P_F44 ***
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирование файла #44 для КБ
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     : 23/03/2017 (20/04/2016, 21/03/2016)
+% VERSION     : 08/11/2017 (23/03/2017)
 %-----------------------------------------------------------------------------
 %23.03.2017 - показатели 92-98 будут формироваться по корреспонденции счетов 
 %             доп.реквизит "D#44" не обязателен 
@@ -94,7 +94,7 @@ cena_nomi_  Number;
 
 -- покупка/продажа безналичных металлов
 CURSOR OPL_DOK1 IS
-   SELECT  /*PARALLEL */
+   SELECT /*+ leading(a) */
           a.acc, a.nls, a.kv, a1.acc, a1.nls, o.ref, o.mfoa, o.mfob, o.nlsb, 
           c.ref, c.fdat, k.tag, k.value, translate(p.value,',','.'), sum(c.s)
    FROM accounts a, accounts a1, opldok c, opldok c1, oper o, operw k, operw p
@@ -103,14 +103,14 @@ CURSOR OPL_DOK1 IS
          a.nls not like '110%'      AND
          a.nls not like '8%'        AND
          a.nls not like '9%'        AND
-         c.fdat between Dat1_ and Dat_ AND
+         c.fdat = any (select fdat from fdat where fdat between Dat1_ and Dat_) AND
          c.dk = 0                   AND
          c.sos = 5                  AND
          a1.acc = c1.acc            AND
          a1.nls not like '110%'     AND
          c1.dk = 1-c.dk             AND
          c.stmt = c1.stmt           AND
-         c.tt not in ('024')        AND   -- 'FX3','FX4','NOS',
+         c.tt not in ('024')        AND   
          c.ref = k.ref(+)           AND
          c.ref = o.ref              AND
          ((k.tag(+) LIKE 'D#39%' AND substr(k.value(+),1,3) in ('112','122') ) OR

@@ -15,13 +15,13 @@ PROMPT *** Create  procedure NBUR_P_F44_NC ***
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :	Процедура формирования #27 для схема "C"
 % COPYRIGHT   :	Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     : 15.07.2016
+% VERSION     : 08.11.2017
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: p_report_date - отчетная дата
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 begin
-   NBUR_P_F44 (p_kod_filii, p_report_date, p_form_id, 'C');
---    p_f44 (p_report_date);
+--   NBUR_P_F44 (p_kod_filii, p_report_date, p_form_id, 'C');
+    p_f44 (p_report_date);
 
     p_nbu_save_rezult(p_report_date, p_kod_filii, '#44');
 

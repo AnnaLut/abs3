@@ -18,26 +18,32 @@
     SESS_STATE_FAILED              constant integer := 5;
     SESS_STATE_CANCELED            constant integer := 12;
     SESS_STATE_DATA_PART_RECEIVED  constant integer := 13;
+  SESS_TYPE_REQ_ENVELOPE_LIST constant integer := 1;
+  SESS_TYPE_REQ_ENVELOPE      constant integer := 2;
+  SESS_TYPE_REQUEST_STATE     constant integer := 3;
+  SESS_TYPE_GET_ENVELOPE_LIST constant integer := 4;
+  SESS_TYPE_GET_ENVELOPE      constant integer := 5;
+  -- SESS_TYPE_GET_ENVELOPE_PART    constant integer := 6;
+  SESS_TYPE_REQ_EPP_BATCH_LIST constant integer := 7;
+  SESS_TYPE_REQ_EPP_BATCH      constant integer := 8;
+  SESS_TYPE_GET_EPP_BATCH_LIST constant integer := 9;
+  SESS_TYPE_GET_EPP_BATCH      constant integer := 10;
+  SESS_TYPE_REQ_MATCHING1      constant integer := 11;
+  SESS_TYPE_REQ_EPP_MATCHING   constant integer := 12;
+  SESS_TYPE_REQ_EPP_ACTIVATION constant integer := 13;
+  SESS_TYPE_GET_EPP_MATCHING   constant integer := 14;
+  SESS_TYPE_REQ_MATCHING2      constant integer := 15;
+  SESS_TYPE_REQ_DEATH_LIST     constant integer := 16;
+  SESS_TYPE_GET_DEATH_LIST     constant integer := 17;
+  SESS_TYPE_REQ_DEATH          constant integer := 18;
+  SESS_TYPE_GET_DEATH          constant integer := 19;
+  SESS_TYPE_REQ_DEATH_MATCHING constant integer := 20;
+  SESS_TYPE_REQ_NO_TURNOVER    constant integer := 27;
+  SESS_TYPE_REQ_VERIFY_LIST    constant integer := 21;
+  SESS_TYPE_GET_VERIFY_LIST    constant integer := 23;
+  SESS_TYPE_REQ_CHANGE_ATTR    constant integer := 25;
+  SESS_TYPE_GET_CHANGE_ATTR    constant integer := 26;
 
-    SESS_TYPE_REQ_ENVELOPE_LIST    constant integer := 1;
-    SESS_TYPE_REQ_ENVELOPE         constant integer := 2;
-    SESS_TYPE_REQUEST_STATE        constant integer := 3;
-    SESS_TYPE_GET_ENVELOPE_LIST    constant integer := 4;
-    SESS_TYPE_GET_ENVELOPE         constant integer := 5;
-    -- SESS_TYPE_GET_ENVELOPE_PART    constant integer := 6;
-    SESS_TYPE_REQ_EPP_BATCH_LIST   constant integer := 7;
-    SESS_TYPE_REQ_EPP_BATCH        constant integer := 8;
-    SESS_TYPE_GET_EPP_BATCH_LIST   constant integer := 9;
-    SESS_TYPE_GET_EPP_BATCH        constant integer := 10;
-    SESS_TYPE_REQ_MATCHING1        constant integer := 11;
-    SESS_TYPE_REQ_EPP_MATCHING     constant integer := 12;
-    SESS_TYPE_REQ_EPP_ACTIVATION   constant integer := 13;
-    SESS_TYPE_GET_EPP_MATCHING     constant integer := 14;
-    SESS_TYPE_REQ_MATCHING2        constant integer := 15;
-    SESS_TYPE_REQ_DEATH_LIST       constant integer := 16;
-    SESS_TYPE_GET_DEATH_LIST       constant integer := 17;
-    SESS_TYPE_REQ_DEATH            constant integer := 18;
-    SESS_TYPE_GET_DEATH            constant integer := 19;
 
     REQ_STATE_ACCEPTED             constant char(1 byte) := 'R';
     REQ_STATE_PREPARED             constant char(1 byte) := 'S';
@@ -89,137 +95,138 @@
      RUN_STATUS         all_scheduler_job_run_details.STATUS%type,
      ADD_INFO           all_scheduler_job_run_details.ADDITIONAL_INFO%type
     );
-	type T_CM_ERROR is table of CM_ERROR_REC;
-	type T_JOB_INFO is table of job_rec;
-	type T_EPP_LINE_TAB is table of pfu_epp_line%rowtype index by binary_integer;
+  type T_CM_ERROR is table of CM_ERROR_REC;
+  type T_JOB_INFO is table of job_rec;
+  type T_EPP_LINE_TAB is table of pfu_epp_line%rowtype index by binary_integer;
 
-	type epp_num_t is table of integer index by binary_integer;
+  type epp_num_t is table of integer index by binary_integer;
 
-	function read_session(p_session_id in integer,
-												p_lock       in boolean default false,
-												p_raise_ndf  in boolean default true)
-		return pfu_session%rowtype;
+  function read_session(p_session_id in integer,
+                        p_lock       in boolean default false,
+                        p_raise_ndf  in boolean default true)
+    return pfu_session%rowtype;
 
-	function read_session_type(p_session_type_id in integer,
-														 p_raise_ndf       in boolean default true)
-		return pfu_session_type%rowtype;
+  function read_session_type(p_session_type_id in integer,
+                             p_raise_ndf       in boolean default true)
+    return pfu_session_type%rowtype;
 
   function add_text_node_utl(p_document  in out nocopy dbms_xmldom.DOMDocument,
-														 p_host_node in out nocopy dbms_xmldom.DOMNode,
-														 p_node_name in varchar2,
-														 p_node_text in varchar2)
+                             p_host_node in out nocopy dbms_xmldom.DOMNode,
+                             p_node_name in varchar2,
+                             p_node_text in varchar2)
      return dbms_xmldom.DOMNode;
 
   procedure add_text_node_utl(p_document  in out nocopy dbms_xmldom.DOMDocument,
-															p_host_node in out nocopy dbms_xmldom.DOMNode,
-															p_node_name in varchar2,
-															p_node_text in varchar2);
+                              p_host_node in out nocopy dbms_xmldom.DOMNode,
+                              p_node_name in varchar2,
+                              p_node_text in varchar2);
 
-	function get_session_type_name(p_session_type_id in integer)
-		return varchar2;
+  function get_session_type_name(p_session_type_id in integer)
+    return varchar2;
 
-	function get_session_ws_action(p_session_type_id in integer)
-		return varchar2;
+  function get_session_ws_action(p_session_type_id in integer)
+    return varchar2;
 
-	procedure gather_death_parts(p_request_id in integer);
+  procedure gather_death_parts(p_request_id in integer);
 
-	procedure gen_matching1(p_env_id in integer, p_ecp varchar2);
+  procedure gen_matching1(p_env_id in integer, p_ecp varchar2);
 
-	procedure regen_matching1(p_env_id in integer);
+  procedure regen_matching1(p_env_id in integer);
 
-	procedure gen_matching2(p_file_id in integer, p_ecp in varchar2);
+  procedure gen_matching2(p_file_id in integer, p_ecp in varchar2);
 
-	/*procedure gen_no_turnover(p_nt_id in integer,
-														p_mfo   in varchar2,
-														p_ecp   in varchar2);*/
+  procedure gen_no_turnover(p_nt_id in integer,
+                            p_mfo   in varchar2,
+                            p_ecp   in varchar2);
 
-	--procedure gen_death_matching(p_death_id in integer, p_ecp in varchar2);
+  procedure gen_death_matching(p_death_id in integer, p_ecp in varchar2);
 
-	procedure gen_epp_matching1(p_batch_id in integer);
+  procedure gen_epp_matching1(p_batch_id in integer);
 
-	procedure process_w4_statuses;
+  procedure process_w4_statuses;
 
-	procedure prepare_new_claims;
+  procedure prepare_new_claims;
 
-	procedure prepare_pensioner_claim(p_kf in pfu_syncru_params.kf%type);
+  procedure prepare_pensioner_claim(p_kf in pfu_syncru_params.kf%type);
 
-	procedure prepare_pensioner_claim;
+  procedure prepare_pensioner_claim;
 
-	procedure prepare_acc_rest(p_acc    in pfu_acc_trans_2909.acc_num%type,
-														 p_fileid in pfu_file.id%type,
-														 p_kf     in pfu_acc_trans_2909.kf%type);
+  procedure prepare_acc_rest(p_acc    in pfu_acc_trans_2909.acc_num%type,
+                             p_fileid in pfu_file.id%type,
+                             p_kf     in pfu_acc_trans_2909.kf%type);
 
-	procedure prepare_cardkill_claim;
+  procedure prepare_cardkill_claim;
 
   procedure prepare_set_destruct(p_epp_number pfu_epp_line.epp_number%type,
                                        p_mfo        pfu_epp_line.bank_mfo%type);
 
-	procedure prepare_cm_error_claim(p_kf in pfu_syncru_params.kf%type);
+  procedure prepare_cm_error_claim(p_kf in pfu_syncru_params.kf%type);
 
---	procedure prepare_paym_back(p_death_id in pfu_death_record.id%type);
+  procedure prepare_paym_back(p_death_id in pfu_death_record.id%type);
 
-	procedure prepare_restart_epp;
+  procedure prepare_restart_epp;
 
-	--procedure prepare_report_claim;
+  procedure prepare_report_claim(p_kf   in pfu_syncru_params.kf%type,
+                                 p_date in date);
 
-	procedure prepare_branch_claim(p_kf in pfu_syncru_params.kf%type);
+  procedure prepare_branch_claim(p_kf in pfu_syncru_params.kf%type);
 
-	function get_xml_cm_epp(p_id in transport_unit.id%type) return T_CM_ERROR
-		pipelined;
+  function get_xml_cm_epp(p_id in transport_unit.id%type) return T_CM_ERROR
+    pipelined;
 
-	procedure send_request(p_id_sess pfu_session.id%type);
+  procedure send_request(p_id_sess pfu_session.id%type);
 
-	procedure send_requests;
+  procedure send_requests;
 
-	procedure parse_fio(p_fio       in varchar2,
-											p_lastname  out varchar2,
-											p_firstname out varchar2,
-											p_surname   out varchar2);
+  procedure parse_fio(p_fio       in varchar2,
+                      p_lastname  out varchar2,
+                      p_firstname out varchar2,
+                      p_surname   out varchar2);
 
-	procedure set_session_request(p_session_id   in integer,
-																p_request_data in clob);
+  procedure set_session_request(p_session_id   in integer,
+                                p_request_data in clob);
 
-	procedure set_session_response(p_session_id    in integer,
-																 p_response_data in clob);
+  procedure set_session_response(p_session_id    in integer,
+                                 p_response_data in clob);
 
-	procedure set_session_response_xml_data(p_session_id        in integer,
-																					p_response_xml_data in clob);
+  procedure set_session_response_xml_data(p_session_id        in integer,
+                                          p_response_xml_data in clob);
 
-	procedure set_session_failure(p_session_id    in integer,
-																p_error_message in varchar2,
-																p_error_stack   in clob);
+  procedure set_session_failure(p_session_id    in integer,
+                                p_error_message in varchar2,
+                                p_error_stack   in clob);
 
-	procedure set_session_sign_failure(p_session_id    in integer,
-																		 p_error_message in varchar2,
-																		 p_stack_trace   in clob);
+  procedure set_session_sign_failure(p_session_id    in integer,
+                                     p_error_message in varchar2,
+                                     p_stack_trace   in clob);
 
-	procedure set_pfu_request_id(p_session_id     in integer,
-															 p_pfu_request_id in integer);
+  procedure set_pfu_request_id(p_session_id     in integer,
+                               p_pfu_request_id in integer);
 
-	procedure set_request_status_answer(p_session_id     in integer,
-																			p_request_status in varchar2,
-																			p_request_parts  in integer);
+  procedure set_request_status_answer(p_session_id     in integer,
+                                      p_request_status in varchar2,
+                                      p_request_parts  in integer);
 
-	procedure create_envelope(p_session_id           in integer,
-														p_pfu_envelope_id      in integer,
-														p_pfu_branch_code      in varchar2,
-														p_pfu_branch_name      in varchar2,
-														p_register_date        in varchar2,
-														p_receiver_mfo         in varchar2,
-														p_receiver_branch      in varchar2,
-														p_receiver_name        in varchar2,
-														p_envelope_full_sum    in number,
-														p_envelope_lines_count in integer);
+  procedure create_envelope(p_session_id           in integer,
+                            p_pfu_envelope_id      in integer,
+                            p_pfu_branch_code      in varchar2,
+                            p_pfu_branch_name      in varchar2,
+                            p_register_date        in varchar2,
+                            p_receiver_mfo         in varchar2,
+                            p_receiver_branch      in varchar2,
+                            p_receiver_name        in varchar2,
+                            p_envelope_full_sum    in number,
+                            p_envelope_lines_count in integer);
 
-	procedure create_file(p_request_id        in integer,
-												p_branch_number     in varchar2,
-												p_file_branch_sum   in number,
-												p_file_lines_count  in integer,
-												p_file_payment_date in varchar2,
-												p_file_number       in integer,
-												p_file_name         in varchar2,
-												p_file_data         in blob);
-	/*
+  procedure create_file(p_request_id        in integer,
+                        p_branch_number     in varchar2,
+                        p_file_branch_sum   in number,
+                        p_file_lines_count  in integer,
+                        p_file_payment_date in varchar2,
+                        p_file_number       in integer,
+                        p_file_name         in varchar2,
+                        p_file_data         in blob);
+  /*
    procedure create_file(p_request_id        in integer,
                          p_branch_number     in varchar2,
                          p_file_branch_sum   in number,
@@ -230,54 +237,54 @@
                          p_file_data         in blob,
                          p_file_id           out integer);
   */
-	function create_file(p_request_id        in integer,
-											 p_branch_number     in varchar2,
-											 p_file_branch_sum   in number,
-											 p_file_lines_count  in integer,
-											 p_file_payment_date in varchar2,
-											 p_file_number       in integer,
-											 p_file_name         in varchar2,
-											 p_file_data         in blob) return integer;
+  function create_file(p_request_id        in integer,
+                       p_branch_number     in varchar2,
+                       p_file_branch_sum   in number,
+                       p_file_lines_count  in integer,
+                       p_file_payment_date in varchar2,
+                       p_file_number       in integer,
+                       p_file_name         in varchar2,
+                       p_file_data         in blob) return integer;
 
-	procedure set_paybach_attr(p_id_rec      in pfu_file_records.id%type,
-														 p_dateback    in date,
-														 p_numpay_back in pfu_file_records.num_paym%type);
+  procedure set_paybach_attr(p_id_rec      in pfu_file_records.id%type,
+                             p_dateback    in date,
+                             p_numpay_back in pfu_file_records.num_paym%type);
 
-	procedure send_data_to_bank_units;
+  procedure send_data_to_bank_units;
 
-	function prepare_matching1(p_env_id   in integer,
-														 p_enc_type in number default 0) return clob;
+  function prepare_matching1(p_env_id   in integer,
+                             p_enc_type in number default 0) return clob;
 
-	function prepare_matching2(p_file_id  in integer,
-														 p_enc_type in number default 0) return clob;
+  function prepare_matching2(p_file_id  in integer,
+                             p_enc_type in number default 0) return clob;
 
-	/*function prepare_no_turnover(p_nt_id    in integer,
-															 p_mfo      in varchar2,
-															 p_enc_type in number default 0) return clob;*/
+  function prepare_no_turnover(p_nt_id    in integer,
+                               p_mfo      in varchar2,
+                               p_enc_type in number default 0) return clob;
 
-	/*function prepare_death_matching(p_death_id in integer,
-																	p_enc_type in number default 0) return clob;*/
+  function prepare_death_matching(p_death_id in integer,
+                                  p_enc_type in number default 0) return clob;
 
-	procedure validate_epp_lines(p_request_id in integer);
+  procedure validate_epp_lines(p_request_id in integer);
 
-	procedure gen_epp_matching2;
+  procedure gen_epp_matching2;
 
-	procedure prepare_check_state;
-	-- підготовка запиту на перевірку станів оплати референсів по ЕБП
+  procedure prepare_check_state;
+  -- підготовка запиту на перевірку станів оплати референсів по ЕБП
 
-	-- обробка декриптованих сесій
-	procedure process_response;
+  -- обробка декриптованих сесій
+  procedure process_response;
 
-	procedure gather_epp_batch_list_parts(p_request_id in integer);
+  procedure gather_epp_batch_list_parts(p_request_id in integer);
 
-	procedure gather_epp_batch_parts(p_request_id in integer);
+  procedure gather_epp_batch_parts(p_request_id in integer);
 
-	procedure process_receipt;
+  procedure process_receipt;
 
-	function get_job_info return t_job_info
-		pipelined;
-	procedure start_job(p_job_name in varchar2);
-	procedure stop_job(p_job_name in varchar2);
+  function get_job_info return t_job_info
+    pipelined;
+  procedure start_job(p_job_name in varchar2);
+  procedure stop_job(p_job_name in varchar2);
 	procedure disable_job(p_job_name in varchar2);
 	procedure enable_job(p_job_name in varchar2);
 
@@ -289,6 +296,7 @@
 	procedure process_all_stages;
 end;
 /
+
 create or replace package body pfu_service_utl as
 
 	function extract_clob(p_xml     in xmltype,
@@ -837,6 +845,39 @@ create or replace package body pfu_service_utl as
 													dbms_xmldom.getXmlType(l_doc).getClobVal());
 	end;
 
+	function gen_session_req_verify_list(p_request_id in integer)
+		return integer is
+		l_request_row            pfu_request%rowtype;
+		l_death_list_request_row pfu_verification_list_request%rowtype;
+
+		l_doc         dbms_xmldom.DOMDocument;
+		l_root_node   dbms_xmldom.DOMNode;
+		l_filter_node dbms_xmldom.DOMNode;
+	begin
+		l_request_row            := pfu_utl.read_request(p_request_id,
+																										 p_lock => true);
+		l_death_list_request_row := pfu_utl.read_verify_list_request(l_request_row.id);
+
+		l_doc         := dbms_xmldom.newDomDocument;
+		l_root_node   := dbms_xmldom.makeNode(l_doc);
+		l_filter_node := dbms_xmldom.appendChild(l_root_node,
+																						 dbms_xmldom.makeNode(dbms_xmldom.createElement(l_doc,
+																																														'filter')));
+
+		add_text_node_utl(l_doc,
+											l_filter_node,
+											'start_date',
+											to_char(l_death_list_request_row.date_from,
+															'ddmmyyyy'));
+		add_text_node_utl(l_doc,
+											l_filter_node,
+											'end_date',
+											to_char(l_death_list_request_row.date_to, 'ddmmyyyy'));
+
+		return create_session(pfu_service_utl.SESS_TYPE_REQ_VERIFY_LIST,
+													p_request_id,
+													dbms_xmldom.getXmlType(l_doc).getClobVal());
+	end;
 
 	function gen_session_req_epp_batch_list(p_request_id in integer)
 		return integer is
@@ -949,6 +990,45 @@ create or replace package body pfu_service_utl as
 			from pfu_matching_request pmr
 		 where pmr.id = p_request_id;
 		return create_session(pfu_service_utl.SESS_TYPE_REQ_MATCHING2,
+													p_request_id,
+													l_xml_clob);
+	end;
+
+	function gen_session_req_death_matching(p_request_id in integer)
+		return integer is
+		l_xml_clob clob;
+	begin
+		select pmr.pfu_matching_xml
+			into l_xml_clob
+			from pfu_matching_request pmr
+		 where pmr.id = p_request_id;
+		return create_session(pfu_service_utl.SESS_TYPE_REQ_DEATH_MATCHING,
+													p_request_id,
+													l_xml_clob);
+	end;
+
+	function gen_session_req_no_turnover(p_request_id in integer)
+		return integer is
+		l_xml_clob clob;
+	begin
+		select pmr.pfu_xml
+			into l_xml_clob
+			from pfu_no_turnover_request pmr
+		 where pmr.id = p_request_id;
+		return create_session(pfu_service_utl.SESS_TYPE_REQ_NO_TURNOVER,
+													p_request_id,
+													l_xml_clob);
+	end;
+
+	function gen_session_req_replacement(p_request_id in integer)
+		return integer is
+		l_xml_clob clob;
+	begin
+		select prr.pfu_replacement_xml
+			into l_xml_clob
+			from pfu_replacement_request prr
+		 where prr.id = p_request_id;
+		return create_session(pfu_service_utl.SESS_TYPE_REQ_CHANGE_ATTR,
 													p_request_id,
 													l_xml_clob);
 	end;
@@ -1099,6 +1179,72 @@ create or replace package body pfu_service_utl as
 		l_request_xml := dbms_xmldom.getXmlType(l_doc).getClobVal();
 
 		return create_session(pfu_service_utl.SESS_TYPE_GET_DEATH_LIST,
+													p_request_id,
+													l_request_xml);
+	end;
+
+	function gen_session_get_verify_list(p_request_id  in integer,
+																			 p_part_number in integer)
+		return integer is
+		l_request_row pfu_request%rowtype;
+		l_request_xml clob;
+
+		l_doc         dbms_xmldom.DOMDocument;
+		l_root_node   dbms_xmldom.DOMNode;
+		l_filter_node dbms_xmldom.DOMNode;
+	begin
+		l_request_row := pfu_utl.read_request(p_request_id, p_lock => true);
+
+		l_doc         := dbms_xmldom.newDomDocument;
+		l_root_node   := dbms_xmldom.makeNode(l_doc);
+		l_filter_node := dbms_xmldom.appendChild(l_root_node,
+																						 dbms_xmldom.makeNode(dbms_xmldom.createElement(l_doc,
+																																														'filter')));
+
+		add_text_node_utl(l_doc,
+											l_filter_node,
+											'id',
+											l_request_row.pfu_request_id);
+		-- список конвертів очікується тільки з однієї частини
+		-- (todo : переробити на універсальний механізм отримання+збору даних по частинах)
+		add_text_node_utl(l_doc, l_filter_node, 'part', p_part_number);
+
+		l_request_xml := dbms_xmldom.getXmlType(l_doc).getClobVal();
+
+		return create_session(pfu_service_utl.SESS_TYPE_GET_VERIFY_LIST,
+													p_request_id,
+													l_request_xml);
+	end;
+
+	function gen_session_get_replacement(p_request_id  in integer,
+																			 p_part_number in integer)
+		return integer is
+		l_request_row pfu_request%rowtype;
+		l_request_xml clob;
+
+		l_doc         dbms_xmldom.DOMDocument;
+		l_root_node   dbms_xmldom.DOMNode;
+		l_filter_node dbms_xmldom.DOMNode;
+	begin
+		l_request_row := pfu_utl.read_request(p_request_id, p_lock => true);
+
+		l_doc         := dbms_xmldom.newDomDocument;
+		l_root_node   := dbms_xmldom.makeNode(l_doc);
+		l_filter_node := dbms_xmldom.appendChild(l_root_node,
+																						 dbms_xmldom.makeNode(dbms_xmldom.createElement(l_doc,
+																																														'filter')));
+
+		add_text_node_utl(l_doc,
+											l_filter_node,
+											'id',
+											l_request_row.pfu_request_id);
+		-- список конвертів очікується тільки з однієї частини
+		-- (todo : переробити на універсальний механізм отримання+збору даних по частинах)
+		add_text_node_utl(l_doc, l_filter_node, 'part', p_part_number);
+
+		l_request_xml := dbms_xmldom.getXmlType(l_doc).getClobVal();
+
+		return create_session(pfu_service_utl.SESS_TYPE_GET_CHANGE_ATTR,
 													p_request_id,
 													l_request_xml);
 	end;
@@ -1284,6 +1430,20 @@ create or replace package body pfu_service_utl as
 		l_session_id integer;
 	begin
 		l_session_id := gen_session_get_death_list(p_request_id, p_part_number);
+	end;
+
+	procedure gen_session_get_verify_list(p_request_id  in integer,
+																				p_part_number in integer) is
+		l_session_id integer;
+	begin
+		l_session_id := gen_session_get_verify_list(p_request_id, p_part_number);
+	end;
+
+	procedure gen_session_get_replacement(p_request_id  in integer,
+																				p_part_number in integer) is
+		l_session_id integer;
+	begin
+		l_session_id := gen_session_get_replacement(p_request_id, p_part_number);
 	end;
 
 	procedure gen_session_get_envelope_list(p_request_id  in integer,
@@ -1545,7 +1705,10 @@ create or replace package body pfu_service_utl as
 			when (p_request_status = pfu_service_utl.REQ_STATE_PREPARED) then
 
 				if l_request_row.request_type in
-					 (pfu_utl.REQ_TYPE_MATCHING1, pfu_utl.REQ_TYPE_MATCHING2) then
+					 (pfu_utl.REQ_TYPE_MATCHING1,
+						pfu_utl.REQ_TYPE_MATCHING2,
+						pfu_utl.REQ_TYPE_DEATH_MATCHING,
+						pfu_utl.REQ_TYPE_NO_TURNOVER) then
 					pfu_utl.set_request_state(l_request_row.id,
 																		pfu_utl.REQ_STATE_DATA_PROCESSED,
 																		'Квитанція в ПФУ оброблена');
@@ -1579,6 +1742,12 @@ create or replace package body pfu_service_utl as
 								gen_session_get_death_list(l_request_row.id, part_num);
 							elsif (l_request_row.request_type = pfu_utl.REQ_TYPE_DEATH) then
 								gen_session_get_death(l_request_row.id, part_num);
+							elsif (l_request_row.request_type =
+										pfu_utl.REQ_TYPE_VERIFY_LIST) then
+								gen_session_get_verify_list(l_request_row.id, part_num);
+							elsif (l_request_row.request_type =
+										pfu_utl.REQ_TYPE_CHANGE_ATTR) then
+								gen_session_get_replacement(l_request_row.id, part_num);
 							end if;
 						end loop;
 					end if;
@@ -1685,6 +1854,47 @@ create or replace package body pfu_service_utl as
 
 		if (l_cnt > 0) then
 			pfu_utl.set_request_state(l_death_request_id,
+																pfu_utl.REQ_STATE_IGNORE,
+																'Запрос с таким ИД уже есть в работе');
+		end if;
+		null;
+
+	end;
+
+	procedure create_verification(p_session_id      in integer,
+																p_pfu_verify_id   in integer,
+																p_pfu_branch_code in varchar2,
+																p_pfu_branch_name in varchar2,
+																p_register_date   in varchar2,
+																p_lines_count     in integer) is
+		l_session_row       pfu_session%rowtype;
+		l_request_row       pfu_request%rowtype;
+		l_verify_request_id integer;
+		l_cnt               integer;
+	begin
+		l_session_row := read_session(p_session_id, p_lock => true);
+		l_request_row := pfu_utl.read_request(l_session_row.request_id,
+																					p_lock => true);
+
+		select count(*)
+			into l_cnt
+			from pfu_request pr, pfu_verification_request per
+		 where per.id = pr.id
+			 and per.pfu_verification_id = p_pfu_verify_id
+			 and pr.state not in (pfu_utl.REQ_STATE_FAILED,
+														pfu_utl.REQ_STATE_CANCELED_BY_PFU,
+														pfu_utl.REQ_STATE_IGNORE);
+
+		l_verify_request_id := pfu_utl.create_verification(p_pfu_verify_id,
+																											 p_pfu_branch_code,
+																											 p_pfu_branch_name,
+																											 to_date(p_register_date,
+																															 'ddmmyyyy'),
+																											 p_lines_count,
+																											 l_request_row.id);
+
+		if (l_cnt > 0) then
+			pfu_utl.set_request_state(l_verify_request_id,
 																pfu_utl.REQ_STATE_IGNORE,
 																'Запрос с таким ИД уже есть в работе');
 		end if;
@@ -3070,7 +3280,7 @@ create or replace package body pfu_service_utl as
 																					 dbms_xmldom.makeNode(dbms_xmldom.createElement(l_doc,
 																																													'declar')));
 
-		select pf.* into l_file_rec from pfu_file pf where pf.id = p_file_id;
+		select * into l_file_rec from pfu_file pf where pf.id = p_file_id;
 
 		l_header_node := dbms_xmldom.appendChild(l_root_node,
 																						 dbms_xmldom.makeNode(dbms_xmldom.createElement(l_doc,
@@ -3126,6 +3336,159 @@ create or replace package body pfu_service_utl as
 												'date_return',
 												rec_frec.DATE_PAYBACK);
 			add_text_node_utl(l_doc, l_row_node, 'num_return', rec_frec.NUM_PAYM);
+		end loop;
+		l_blob_xml := pfu_utl.clob_to_blob(dbms_xmldom.getXmlType(l_doc)
+																			 .getClobVal());
+		l_blob_zip := utl_compress.lz_compress(l_blob_xml);
+		if p_enc_type = 1 then
+			return pfu_utl.blob_to_hex(l_blob_zip);
+		end if;
+		l_clob_base64 := pfu_utl.pfu_encode_base64(l_blob_zip);
+	return l_clob_base64;
+	end;
+
+	function prepare_death_matching(p_death_id in integer,
+																	p_enc_type in number default 0) return clob is
+		l_doc         dbms_xmldom.DOMDocument;
+		l_root_node   dbms_xmldom.DOMNode;
+		l_header_node dbms_xmldom.DOMNode;
+		l_body_node   dbms_xmldom.DOMNode;
+		l_row_node    dbms_xmldom.DOMNode;
+		l_file_rec    pfu_death%rowtype;
+		l_blob_xml    blob;
+		l_blob_zip    blob;
+		l_clob_base64 clob;
+	begin
+		l_doc := dbms_xmldom.newDomDocument;
+
+		l_root_node := dbms_xmldom.makeNode(l_doc);
+		l_root_node := dbms_xmldom.appendChild(l_root_node,
+																					 dbms_xmldom.makeNode(dbms_xmldom.createElement(l_doc,
+																																													'declar')));
+
+		select * into l_file_rec from pfu_death pf where pf.id = p_death_id;
+
+		l_header_node := dbms_xmldom.appendChild(l_root_node,
+																						 dbms_xmldom.makeNode(dbms_xmldom.createElement(l_doc,
+																																														'declarhead')));
+		add_text_node_utl(l_doc,
+											l_header_node,
+											'date_time',
+											to_char(sysdate, 'dd.mm.yyyy hh24.mi.ss'));
+		add_text_node_utl(l_doc,
+											l_header_node,
+											'full_lines',
+											l_file_rec.count_res);
+		add_text_node_utl(l_doc, l_header_node, 'res_file', 0); -- &&&&&&&&);
+		l_body_node := dbms_xmldom.appendChild(l_root_node,
+																					 dbms_xmldom.makeNode(dbms_xmldom.createElement(l_doc,
+																																													'declarbody')));
+
+		for rec_frec in (select rownum, pd.*
+											 from pfu_death_record pd
+											where pd.list_id = p_death_id) loop
+			l_row_node := dbms_xmldom.appendChild(l_body_node,
+																						dbms_xmldom.makeNode(dbms_xmldom.createElement(l_doc,
+																																													 'row')));
+			add_text_node_utl(l_doc, l_row_node, 'rownum', rec_frec.rownum);
+			add_text_node_utl(l_doc, l_row_node, 'ln', rec_frec.last_name);
+			add_text_node_utl(l_doc, l_row_node, 'nm', rec_frec.first_name);
+			add_text_node_utl(l_doc, l_row_node, 'ftn', rec_frec.father_name);
+			add_text_node_utl(l_doc, l_row_node, 'numident', rec_frec.okpo);
+			add_text_node_utl(l_doc, l_row_node, 'ser_num', rec_frec.doc_num);
+			add_text_node_utl(l_doc,
+												l_row_node,
+												'result',
+												case when rec_frec.state in ('PROCESSED', 'PAYED') then 0 when
+												rec_frec.state = 'ERR_ACC_OKPO' then 1 when
+												rec_frec.state = 'ERR_NAME' then 2 when
+												rec_frec.state = 'ERR_ACC_CLOSE' then 3 when
+												rec_frec.state = 'ERR_OKPO' then 5 when
+												rec_frec.state = 'ERR_BLOCKED' then 6 end);
+			add_text_node_utl(l_doc,
+												l_row_node,
+												'date_return',
+												rec_frec.DATE_PAYBACK);
+			add_text_node_utl(l_doc, l_row_node, 'num_return', rec_frec.NUM_PAYM);
+--												rec_frec.date_pay);
+			add_text_node_utl(l_doc, l_row_node, 'num_return', rec_frec.ref);
+			add_text_node_utl(l_doc,
+												l_row_node,
+												'sum_return',
+												rec_frec.sum_payed);
+		end loop;
+		l_blob_xml := pfu_utl.clob_to_blob(dbms_xmldom.getXmlType(l_doc)
+																			 .getClobVal());
+		l_blob_zip := utl_compress.lz_compress(l_blob_xml);
+		if p_enc_type = 1 then
+			return pfu_utl.blob_to_hex(l_blob_zip);
+		end if;
+		l_clob_base64 := pfu_utl.pfu_encode_base64(l_blob_zip);
+
+		return l_clob_base64;
+	end;
+
+	function prepare_no_turnover(p_nt_id    in integer,
+															 p_mfo      in varchar2,
+															 p_enc_type in number default 0) return clob is
+		l_doc         dbms_xmldom.DOMDocument;
+		l_root_node   dbms_xmldom.DOMNode;
+		l_header_node dbms_xmldom.DOMNode;
+		l_body_node   dbms_xmldom.DOMNode;
+		l_row_node    dbms_xmldom.DOMNode;
+		l_file_rec    pfu_no_turnover_list%rowtype;
+		l_blob_xml    blob;
+		l_blob_zip    blob;
+		l_clob_base64 clob;
+		l_cnt         number;
+	begin
+		l_doc := dbms_xmldom.newDomDocument;
+
+		l_root_node := dbms_xmldom.makeNode(l_doc);
+		l_root_node := dbms_xmldom.appendChild(l_root_node,
+																					 dbms_xmldom.makeNode(dbms_xmldom.createElement(l_doc,
+																																													'declar')));
+
+		select *
+			into l_file_rec
+			from pfu_no_turnover_list pt
+		 where pt.id = p_nt_id
+			 and pt.kf = p_mfo;
+
+		select count(*)
+			into l_cnt
+			from pfu_no_turnover t
+		 where t.id_file = p_nt_id
+			 and t.kf = p_mfo;
+
+		l_header_node := dbms_xmldom.appendChild(l_root_node,
+																						 dbms_xmldom.makeNode(dbms_xmldom.createElement(l_doc,
+																																														'declarhead')));
+		add_text_node_utl(l_doc,
+											l_header_node,
+											'date_time',
+											to_char(sysdate, 'dd.mm.yyyy hh24.mi.ss'));
+		add_text_node_utl(l_doc, l_header_node, 'full_lines', l_cnt);
+		add_text_node_utl(l_doc, l_header_node, 'res_file', 0); -- &&&&&&&&);
+
+		for rec_frec in (select rownum, pd.*
+											 from pfu_no_turnover pd
+											where pd.id_file = p_nt_id) loop
+			l_row_node := dbms_xmldom.appendChild(l_body_node,
+																						dbms_xmldom.makeNode(dbms_xmldom.createElement(l_doc,
+																																													 'row')));
+			add_text_node_utl(l_doc, l_row_node, 'rownum', rec_frec.rownum);
+			add_text_node_utl(l_doc, l_row_node, 'ln', rec_frec.last_name);
+			add_text_node_utl(l_doc, l_row_node, 'nm', rec_frec.name);
+			add_text_node_utl(l_doc, l_row_node, 'ftn', rec_frec.father_name);
+			add_text_node_utl(l_doc, l_row_node, 'numident', rec_frec.okpo);
+			add_text_node_utl(l_doc, l_row_node, 'ser_num', rec_frec.ser_num);
+			add_text_node_utl(l_doc, l_row_node, 'num_acc', rec_frec.num_acc);
+			add_text_node_utl(l_doc, l_row_node, 'date_last', rec_frec.date_last);
+			add_text_node_utl(l_doc,
+												l_row_node,
+												'ndays',
+												trunc(sysdate) - rec_frec.date_last);
 		end loop;
 		l_blob_xml := pfu_utl.clob_to_blob(dbms_xmldom.getXmlType(l_doc)
 																			 .getClobVal());
@@ -3383,7 +3746,6 @@ create or replace package body pfu_service_utl as
 																						.getClobVal());
 			l_blob_zip    := utl_compress.lz_compress(l_blob_xml);
 			l_clob_base64 := pfu_utl.pfu_encode_base64(l_blob_zip);
-
 			add_clob_node_utl(l_doc1, l_root_node, 'data', l_clob_base64);
 
 			pfu_utl.create_epp_activation(dbms_xmldom.getXmlType(l_doc1)
@@ -3575,6 +3937,151 @@ create or replace package body pfu_service_utl as
 					 pf.userid     = bars.user_id,
 					 pf.match_date = l_date_cr
 		 where pf.id = p_file_id;
+	end;
+
+	procedure gen_death_matching(p_death_id in integer, p_ecp in varchar2) is
+		l_doc          dbms_xmldom.DOMDocument;
+		l_root_node    dbms_xmldom.DOMNode;
+		l_header_node  dbms_xmldom.DOMNode;
+		l_body_node    dbms_xmldom.DOMNode;
+		l_row_node     dbms_xmldom.DOMNode;
+		l_file_rec     pfu_death%rowtype;
+		l_death_rec    pfu_death_request%rowtype;
+		l_date_cr      date;
+		l_clob_xml     clob;
+		l_blob_xml     blob;
+		l_blob_zip     blob;
+		l_clob_res     clob;
+		l_clob_base64  clob;
+		l_dest_offset  integer := 1;
+		l_src_offset   integer := 1;
+		l_blob_csid    number := dbms_lob.default_csid;
+		l_lang_context number := dbms_lob.default_lang_ctx;
+		l_warning      integer;
+	begin
+		l_doc     := dbms_xmldom.newDomDocument;
+		l_date_cr := sysdate;
+		select * into l_file_rec from pfu_death pd where pd.id = p_death_id;
+		select *
+			into l_death_rec
+			from pfu_death_request per
+		 where per.id = l_file_rec.request_id;
+
+		l_root_node := dbms_xmldom.makeNode(l_doc);
+		l_root_node := dbms_xmldom.appendChild(l_root_node,
+																					 dbms_xmldom.makeNode(dbms_xmldom.createElement(l_doc,
+																																													'deadlists')));
+		add_text_node_utl(l_doc, l_root_node, 'id', l_death_rec.pfu_death_id);
+		add_text_node_utl(l_doc,
+											l_root_node,
+											'opfu_code',
+											l_death_rec.pfu_branch_code);
+		add_text_node_utl(l_doc,
+											l_root_node,
+											'date_cr',
+											to_char(l_date_cr, 'ddmmyyyy'));
+		add_text_node_utl(l_doc,
+											l_root_node,
+											'MFO_filia',
+											l_death_rec.receiver_mfo);
+		add_text_node_utl(l_doc,
+											l_root_node,
+											'filia_num',
+											l_death_rec.receiver_branch);
+		add_text_node_utl(l_doc,
+											l_root_node,
+											'filia_name',
+											nvl(l_death_rec.receiver_name, 'Нет данных'));
+		l_clob_xml := prepare_death_matching(p_death_id);
+		add_clob_node_utl(l_doc, l_root_node, 'notice_kv', l_clob_xml);
+		l_root_node := dbms_xmldom.appendChild(l_root_node,
+																					 dbms_xmldom.makeNode(dbms_xmldom.createElement(l_doc,
+																																													'ecp_list')));
+		add_text_node_utl(l_doc, l_root_node, 'ecp', p_ecp);
+
+		pfu_utl.create_matching(dbms_xmldom.getXmlType(l_doc).getClobVal(),
+														null,
+														3);
+		update pfu_death pf
+			 set pf.state = 'MATCH_SEND', pf.userid = bars.user_id
+		 where pf.id = p_death_id;
+	end;
+
+	procedure gen_no_turnover(p_nt_id in integer,
+														p_mfo   in varchar2,
+														p_ecp   in varchar2) is
+		l_doc          dbms_xmldom.DOMDocument;
+		l_root_node    dbms_xmldom.DOMNode;
+		l_header_node  dbms_xmldom.DOMNode;
+		l_body_node    dbms_xmldom.DOMNode;
+		l_row_node     dbms_xmldom.DOMNode;
+		l_file_rec     pfu_no_turnover_list%rowtype;
+		l_date_cr      date;
+		l_clob_xml     clob;
+		l_blob_xml     blob;
+		l_blob_zip     blob;
+		l_clob_res     clob;
+		l_clob_base64  clob;
+		l_dest_offset  integer := 1;
+		l_src_offset   integer := 1;
+		l_blob_csid    number := dbms_lob.default_csid;
+		l_lang_context number := dbms_lob.default_lang_ctx;
+		l_warning      integer;
+		l_fil_name     varchar2(200);
+		l_reqid        integer;
+		l_cnt          integer;
+	begin
+		l_doc     := dbms_xmldom.newDomDocument;
+		l_date_cr := sysdate;
+
+		select *
+			into l_file_rec
+			from pfu_no_turnover_list pd
+		 where pd.id = p_nt_id
+			 and pd.kf = p_mfo;
+
+		select count(*)
+			into l_cnt
+			from pfu_no_turnover pt
+		 where pt.id_file = p_nt_id
+			 and pt.kf = p_mfo;
+
+		select t.name
+			into l_fil_name
+			from pfu_syncru_params t
+		 where t.kf = p_mfo;
+
+		l_root_node := dbms_xmldom.makeNode(l_doc);
+		l_root_node := dbms_xmldom.appendChild(l_root_node,
+																					 dbms_xmldom.makeNode(dbms_xmldom.createElement(l_doc,
+																																													'deadlists')));
+		add_text_node_utl(l_doc, l_root_node, 'idb', l_file_rec.id);
+		add_text_node_utl(l_doc,
+											l_root_node,
+											'date_cr',
+											l_file_rec.date_create);
+		add_text_node_utl(l_doc, l_root_node, 'filia_num', l_file_rec.kf);
+		add_text_node_utl(l_doc, l_root_node, 'filia_name', l_fil_name);
+		add_text_node_utl(l_doc, l_root_node, 'tipe_pen', 1);
+		l_clob_xml := prepare_no_turnover(p_nt_id, p_mfo);
+		add_clob_node_utl(l_doc, l_root_node, 'drawing_kv', l_clob_xml);
+		l_root_node := dbms_xmldom.appendChild(l_root_node,
+																					 dbms_xmldom.makeNode(dbms_xmldom.createElement(l_doc,
+																																													'ecp_list')));
+		add_text_node_utl(l_doc, l_root_node, 'ecp', p_ecp);
+
+		pfu_utl.create_no_turnover(dbms_xmldom.getXmlType(l_doc).getClobVal(),
+															 null,
+															 l_reqid);
+
+		update pfu_no_turnover_list pt
+			 set pt.state      = 'MATCH_SENT',
+					 pt.user_id    = bars.user_id,
+					 pt.id_request = l_reqid,
+					 pt.full_lines = l_cnt,
+					 pt.date_sent  = sysdate
+		 where pt.id = p_nt_id
+			 and pt.kf = p_mfo;
 	end;
 
 	procedure set_paybach_attr(p_id_rec      in pfu_file_records.id%type,
@@ -3987,6 +4494,66 @@ create or replace package body pfu_service_utl as
 		end loop;
 	end;
 
+	procedure prepare_paym_back(p_death_id in pfu_death_record.id%type) is
+		l_doc               dbms_xmldom.DOMDocument;
+		l_root_node         dbms_xmldom.DOMNode;
+		l_header_node       dbms_xmldom.DOMNode;
+		l_body_node         dbms_xmldom.DOMNode;
+		l_row_node          dbms_xmldom.DOMNode;
+		l_death_rec         pfu_death_record%rowtype;
+		l_pfu_acc           pfu_acc_2560_payback.acc_num%type;
+		l_transport_unit_id integer;
+	begin
+		l_doc       := dbms_xmldom.newDomDocument;
+		l_root_node := dbms_xmldom.makeNode(l_doc);
+		l_root_node := dbms_xmldom.appendChild(l_root_node,
+																					 dbms_xmldom.makeNode(dbms_xmldom.createElement(l_doc,
+																																													'root')));
+
+		l_header_node := dbms_xmldom.appendChild(l_root_node,
+																						 dbms_xmldom.makeNode(dbms_xmldom.createElement(l_doc,
+																																														'header')));
+		l_body_node   := dbms_xmldom.appendChild(l_root_node,
+																						 dbms_xmldom.makeNode(dbms_xmldom.createElement(l_doc,
+																																														'body')));
+
+		select *
+			into l_death_rec
+			from pfu_death_record d
+		 where d.id = p_death_id;
+
+		select p.acc_num
+			into l_pfu_acc
+			from pfu_acc_2560_payback p
+		 where p.kf = l_death_rec.bank_mfo;
+
+		add_text_node_utl(l_doc,
+											l_body_node,
+											'fio',
+											l_death_rec.last_name || ' ' ||
+											l_death_rec.first_name || ' ' ||
+											l_death_rec.father_name);
+		add_text_node_utl(l_doc, l_body_node, 'okpo', l_death_rec.okpo);
+		add_text_node_utl(l_doc, l_body_node, 'sum', l_death_rec.sum_over);
+		add_text_node_utl(l_doc, l_body_node, 'num_acc', l_death_rec.num_acc);
+		add_text_node_utl(l_doc,
+											l_body_node,
+											'date_dead',
+											l_death_rec.date_dead);
+		add_text_node_utl(l_doc, l_body_node, 'acc_2560', l_pfu_acc);
+		add_text_node_utl(l_doc, l_body_node, 'did', l_death_rec.id);
+
+		begin
+			l_transport_unit_id := transport_utl.create_transport_unit(transport_utl.TRANS_TYPE_CREATE_PAYM,
+                                                                       l_death_rec.bank_mfo,
+																																 transport_utl.get_receiver_url(ltrim(l_death_rec.bank_mfo,
+																																																			'0')),
+																																 dbms_xmldom.getXmlType(l_doc)
+																																 .getClobVal());
+		end;
+
+	end;
+
 	procedure prepare_acc_rest(p_acc    in pfu_acc_trans_2909.acc_num%type,
 														 p_fileid in pfu_file.id %type,
 														 p_kf     in pfu_acc_trans_2909.kf%type)
@@ -4081,11 +4648,6 @@ create or replace package body pfu_service_utl as
 				 where t.state = 20
 					 and t.mfo = rec_mfo.mfo;
 
-				/*select count(*)
-					into l_cnt
-					from bars.mv_kf t
-				 where t.kf = rec_mfo.mfo;*/
-
 				if (l_file_lines is not empty) then
 					for i in (select column_value ref from table(l_file_lines)) loop
 
@@ -4127,6 +4689,69 @@ create or replace package body pfu_service_utl as
 			end if;
 		end loop;
     commit;
+	end;
+
+	procedure prepare_check_state_back
+	-- підготовка запиту на перевірку станів оплати референсів по ЕБП
+	 is
+		l_file_lines        number_list;
+		l_doc               dbms_xmldom.DOMDocument;
+		l_root_node         dbms_xmldom.DOMNode;
+		l_header_node       dbms_xmldom.DOMNode;
+		l_body_node         dbms_xmldom.DOMNode;
+		l_row_node          dbms_xmldom.DOMNode;
+		l_transport_unit_id integer;
+		l_count             integer;
+		l                   integer;
+	begin
+		-- Блокуємо рядки перед обробкою
+		for rec_mfo in (select p.kf mfo from pfu_syncru_params p) loop
+			select count(*)
+				into l_count
+				from pfu_death_record t
+			 where t.state = 'READY_FOR_PAY'
+				 and t.bank_mfo = rec_mfo.mfo;
+
+			if (l_count > 0) then
+				l_doc       := dbms_xmldom.newDomDocument;
+				l_root_node := dbms_xmldom.makeNode(l_doc);
+				l_root_node := dbms_xmldom.appendChild(l_root_node,
+																							 dbms_xmldom.makeNode(dbms_xmldom.createElement(l_doc,
+																																															'root')));
+
+				l_header_node := dbms_xmldom.appendChild(l_root_node,
+																								 dbms_xmldom.makeNode(dbms_xmldom.createElement(l_doc,
+																																																'header')));
+				l_body_node   := dbms_xmldom.appendChild(l_root_node,
+																								 dbms_xmldom.makeNode(dbms_xmldom.createElement(l_doc,
+																																																'body')));
+
+				select t.ref
+					bulk collect
+					into l_file_lines
+					from (select fr.ref
+									from pfu_death_record fr
+								 where fr.state = 'READY_FOR_PAY'
+									 and fr.bank_mfo = rec_mfo.mfo) t;
+
+				if (l_file_lines is not empty) then
+					for i in (select column_value ref from table(l_file_lines)) loop
+
+						l_row_node := dbms_xmldom.appendChild(l_body_node,
+																									dbms_xmldom.makeNode(dbms_xmldom.createElement(l_doc,
+																																																 'row')));
+						add_text_node_utl(l_doc, l_row_node, 'ref', i.ref);
+
+					end loop;
+					--TRANS_TYPE_CHECKSTATE проставляємо тип  4    CHECKPAYMSTATE  Опитування статусу платежу
+					l_transport_unit_id := transport_utl.create_transport_unit(transport_utl.TRANS_TYPE_CHECKBACKSTATE,
+																						rec_mfo.mfo,
+																																		 transport_utl.get_receiver_url(rec_mfo.mfo),
+																																		 dbms_xmldom.getXmlType(l_doc)
+																																		 .getClobVal());
+				end if;
+			end if;
+		end loop;
 	end;
 
 	procedure prepare_pensioner_claim(p_kf in pfu_syncru_params.kf%type) is
@@ -4442,10 +5067,14 @@ create or replace package body pfu_service_utl as
 					 pfu_service_utl.SESS_TYPE_REQ_ENVELOPE,
 					 pfu_service_utl.SESS_TYPE_REQ_DEATH_LIST,
 					 pfu_service_utl.SESS_TYPE_REQ_DEATH,
+					 pfu_service_utl.SESS_TYPE_REQ_VERIFY_LIST,
 					 pfu_service_utl.SESS_TYPE_REQ_EPP_BATCH_LIST,
 					 pfu_service_utl.SESS_TYPE_REQ_EPP_BATCH,
 					 pfu_service_utl.SESS_TYPE_REQ_MATCHING1,
 					 pfu_service_utl.SESS_TYPE_REQ_MATCHING2,
+					 pfu_service_utl.SESS_TYPE_REQ_DEATH_MATCHING,
+					 pfu_service_utl.SESS_TYPE_REQ_CHANGE_ATTR,
+					 pfu_service_utl.SESS_TYPE_REQ_NO_TURNOVER,
 					 pfu_service_utl.SESS_TYPE_REQ_EPP_MATCHING,
 					 pfu_service_utl.SESS_TYPE_REQ_EPP_ACTIVATION)) then
 
@@ -4602,6 +5231,39 @@ create or replace package body pfu_service_utl as
 																				l_session_row.session_type_id)) then
 					gather_death_parts(l_session_row.request_id);
 				end if;
+
+			elsif (l_session_row.session_type_id =
+						pfu_service_utl.SESS_TYPE_GET_VERIFY_LIST) then
+				l_xml := xmltype(l_session_row.response_xml_data);
+
+				l_request_data := l_xml.extract('requestdata/rd_data/text()')
+													.getclobval();
+				-- decode from base64
+				l_request_data := pfu_utl.decodeclobfrombase64(l_request_data);
+				-- convert from utf8  !Twice
+				l_request_data := pfu_utl.utf8todeflang(l_request_data);
+				l_request_data := pfu_utl.utf8todeflang(l_request_data);
+
+				-- <paymentlists><row><id>581</id><opfu_code>20001</opfu_code><opfu_name>Головне управління ПФУ в Харківській обл.</opfu_name>...
+				for r in (select extractvalue(value(p), '/row/id/text()') as verification_id,
+												 extractvalue(value(p), '/row/opfu_code/text()') as opfu_code,
+												 extractvalue(value(p), '/row/opfu_name/text()') as opfu_name,
+												 extractvalue(value(p), '/row/date_cr/text()') as date_cr,
+												 extractvalue(value(p), '/row/full_lines/text()') as full_lines
+										from table(xmlsequence(extract(xmltype(l_request_data),
+																									 '/verifylists/row'))) p) loop
+
+					create_verification(p_session_id      => l_session_row.id,
+															p_pfu_verify_id   => to_number(r.verification_id),
+															p_pfu_branch_code => r.opfu_code,
+															p_pfu_branch_name => r.opfu_name,
+															p_register_date   => r.date_cr,
+															p_lines_count     => to_number(r.full_lines));
+				end loop;
+
+				set_session_state(l_session_row.id,
+													pfu_service_utl.SESS_STATE_PROCESSED,
+													'Обробку сесії завершено - отримано список конвертів');
 				/*
                      elsif (l_session_row.session_type_id in (pfu_service_utl.SESS_TYPE_GET_EPP_MATCHING)) then
 
@@ -4686,6 +5348,10 @@ create or replace package body pfu_service_utl as
 				l_session_id := gen_session_req_matching1(c0.id);
 			elsif (c0.request_type = pfu_utl.REQ_TYPE_MATCHING2) then
 				l_session_id := gen_session_req_matching2(c0.id);
+			elsif (c0.request_type = pfu_utl.REQ_TYPE_DEATH_MATCHING) then
+				l_session_id := gen_session_req_death_matching(c0.id);
+			elsif (c0.request_type = pfu_utl.REQ_TYPE_NO_TURNOVER) then
+				l_session_id := gen_session_req_no_turnover(c0.id);
 			elsif (c0.request_type = pfu_utl.REQ_TYPE_EPP_MATCHING) then
 				l_session_id := gen_session_req_epp_matching(c0.id);
 			elsif (c0.request_type = pfu_utl.REQ_TYPE_EPP_ACTIVATION) then
@@ -4694,6 +5360,10 @@ create or replace package body pfu_service_utl as
 				l_session_id := gen_session_req_death_list(c0.id);
 			elsif (c0.request_type = pfu_utl.REQ_TYPE_DEATH) then
 				l_session_id := gen_session_req_death(c0.id);
+			elsif (c0.request_type = pfu_utl.REQ_TYPE_VERIFY_LIST) then
+				l_session_id := gen_session_req_verify_list(c0.id);
+			elsif (c0.request_type = pfu_utl.REQ_TYPE_CHANGE_ATTR) then
+				l_session_id := gen_session_req_replacement(c0.id);
 			end if;
 
 			l_session_row := read_session(l_session_id);
@@ -4775,6 +5445,7 @@ create or replace package body pfu_service_utl as
 			transport_utl.send_data(i);
 		end loop;
 		commit;
+
 		for i in (select t.*
 								from transport_unit t
 								join transport_unit_type tt
@@ -4807,11 +5478,12 @@ create or replace package body pfu_service_utl as
 											 transport_utl.TRANS_TYPE_CHECKISSUECARD,
 											 transport_utl.TRANS_TYPE_ACTIVATEACC,
 											 transport_utl.TRANS_TYPE_CHECKSTATE,
-											 /*transport_utl.TRANS_TYPE_GET_EBP,
-                       transport_utl.TRANS_TYPE_GET_EBPACC,*/
+											 transport_utl.TRANS_TYPE_CHECKBACKSTATE,
+											 transport_utl.TRANS_TYPE_CREATE_PAYM,
 											 transport_utl.TRANS_TYPE_GET_CARDKILL,
 											 transport_utl.TRANS_TYPE_GET_ACC_REST,
 											 transport_utl.TRANS_TYPE_CHECK_EPP_STATE,
+											 transport_utl.TRANS_TYPE_GET_REPORT,
 											 transport_utl.TRANS_TYPE_RESTART_EPP,
 											 transport_utl.TRANS_TYPE_GET_BRANCH,
 											 transport_utl.TRANS_TYPE_SET_CARD_BLOCK,
@@ -4855,14 +5527,19 @@ create or replace package body pfu_service_utl as
 					pfu_files_utl.r_checkstate_procesing(l_clob, c0.id);
 				elsif c0.transport_type_code = transport_utl.TRANS_TYPE_GET_EBP then
 					pfu_files_utl.r_getebp_procesing(l_clob, c0.id);
-					/*elsif c0.transport_type_code = transport_utl.TRANS_TYPE_GET_EBPACC then
-          pfu_files_utl.r_getebpacc_procesing(l_clob, c0.id);*/
+				elsif c0.transport_type_code =
+							transport_utl.TRANS_TYPE_CHECKBACKSTATE then
+					pfu_files_utl.r_checkbackstate_procesing(l_clob, c0.id);
+				elsif c0.transport_type_code = transport_utl.TRANS_TYPE_CREATE_PAYM then
+					pfu_files_utl.r_create_paym_procesing(l_clob, c0.id);
 				elsif c0.transport_type_code =
 							transport_utl.TRANS_TYPE_GET_CARDKILL then
 					pfu_files_utl.r_getcardkill_procesing(l_clob, c0.id);
 				elsif c0.transport_type_code =
 							transport_utl.TRANS_TYPE_GET_ACC_REST then
 					pfu_files_utl.r_getacc_rest_procesing(l_clob, c0.id);
+				elsif c0.transport_type_code = transport_utl.TRANS_TYPE_GET_REPORT then
+					pfu_files_utl.r_get_report_procesing(l_clob, c0.id, c0.kf);
 				elsif c0.transport_type_code =
 							transport_utl.TRANS_TYPE_CHECK_EPP_STATE then
 					pfu_epp_utl.r_check_epp_state_procesing(l_clob, c0.id);

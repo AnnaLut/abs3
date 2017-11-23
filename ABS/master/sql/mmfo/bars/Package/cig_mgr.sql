@@ -182,7 +182,7 @@ create or replace package body cig_mgr is
     branch_dog        customer.branch%type);
 
   --------------------------------------------------------------------------------
-  -- header_version - возвращает версию заголовка пакета
+   -- header_version - возвращает версию заголовка пакета
   --
   function header_version return varchar2 is
   begin
@@ -819,7 +819,7 @@ create or replace package body cig_mgr is
     case
 
       when (p_errcode = -01400 and
-           instr(p_sqlerrm, '"CIG_DOG_GENERAL"."CUST_ID"') > 0) then
+           instr(p_sqlerrm, '"V_CIG_DOG_GENERAL"."CUST_ID"') > 0) then
         l_errcode := 'CIG_CUST_NOTFOUND';
 
       when (p_errcode = -02291 and
@@ -895,7 +895,7 @@ create or replace package body cig_mgr is
                          p_branch    in branch.branch%type,
                          p_data_type in cig_sync_types.type_id%type) is
     l_th constant varchar2(100) := g_dbgcode || 'upd_syncdata';
-    l_sync_row cig_sync_data%rowtype;
+    l_sync_row V_CIG_SYNC_DATA%rowtype;
   begin
     bars_audit.trace('%s: entry point', l_th);
     bars_audit.trace('%s: data_id=%s, data_type=%s',
@@ -907,31 +907,31 @@ create or replace package body cig_mgr is
 
       select *
         into l_sync_row
-        from cig_sync_data
+        from V_CIG_SYNC_DATA
        where data_id = p_data_id
          and data_type = p_data_type
          and branch = p_branch;
 
     exception
       when no_data_found then
-        insert into cig_sync_data
+        insert into V_CIG_SYNC_DATA
           (data_id, data_type, branch)
         values
           (p_data_id, p_data_type, p_branch);
     end;
 
     if p_data_type = G_CUSTDATA then
-      update cig_customers
+      update V_CIG_CUSTOMERS
          set upd_date = sysdate
        where cust_id = p_data_id;
     elsif p_data_type = G_DOGDATA then
-      update cig_dog_general set upd_date = sysdate where id = p_data_id;
+      update V_CIG_DOG_GENERAL set upd_date = sysdate where id = p_data_id;
     elsif p_data_type = G_DOG_INSTDATA then
       update cig_dog_instalment
          set update_date = sysdate
        where id = p_data_id;
     elsif p_data_type = G_DOG_CREDITDATA then
-      update cig_dog_credit set update_date = sysdate where id = p_data_id;
+      update V_CIG_DOG_CREDIT set update_date = sysdate where id = p_data_id;
     end if;
 
     bars_audit.trace('%s: done', l_th);
@@ -947,7 +947,7 @@ create or replace package body cig_mgr is
                                 p_data_type  in cig_sync_types.type_id%type,
                                 p_branch_old in branch.branch%type) is
     l_th constant varchar2(100) := g_dbgcode || 'upd_syncdata_brnch';
-    l_sync_row cig_sync_data%rowtype;
+    l_sync_row V_CIG_SYNC_DATA%rowtype;
     l_cnt      number;
   begin
     bars_audit.trace('%s: entry point', l_th);
@@ -959,24 +959,24 @@ create or replace package body cig_mgr is
 
       select count(*)
         into l_cnt
-        from cig_sync_data csd
+        from V_CIG_SYNC_DATA csd
        where csd.data_id = p_data_id
          and csd.branch = p_branch
          and csd.data_type = p_data_type;
 
       if (l_cnt = 0) then
-        update cig_sync_data csd
+        update V_CIG_SYNC_DATA csd
            set csd.branch = p_branch
          where csd.data_id = p_data_id
            and csd.branch = p_branch_old
            and csd.data_type = p_data_type;
 
         if p_data_type = G_CUSTDATA then
-          update cig_customers
+          update V_CIG_CUSTOMERS
              set upd_date = sysdate
            where cust_id = p_data_id;
         elsif p_data_type = G_DOGDATA then
-          update cig_dog_general
+          update V_CIG_DOG_GENERAL
              set upd_date = sysdate
            where id = p_data_id;
         elsif p_data_type = G_DOG_INSTDATA then
@@ -984,7 +984,7 @@ create or replace package body cig_mgr is
              set update_date = sysdate
            where id = p_data_id;
         elsif p_data_type = G_DOG_CREDITDATA then
-          update cig_dog_credit
+          update V_CIG_DOG_CREDIT
              set update_date = sysdate
            where id = p_data_id;
         end if;
@@ -1019,7 +1019,7 @@ create or replace package body cig_mgr is
     select max(cust_id), max(branch)
       into l_custid, l_branch
       from (select cust_id, branch
-              from cig_customers
+              from V_CIG_CUSTOMERS
              where rnk = l_row.rnk
              order by cust_id desc)
      where rownum < 2;
@@ -1030,7 +1030,7 @@ create or replace package body cig_mgr is
 
       -- проверяем изменения окпо
       select cust_code into l_okpo
-      from cig_customers
+      from V_CIG_CUSTOMERS
       where cust_id = l_custid
         and branch = l_branch;
         -- при изменении окпо с 00000000 на другое необходимо в ПВБКИ один раз отправить 2а ключа идентификации type=3 и type=4
@@ -1039,7 +1039,7 @@ create or replace package body cig_mgr is
           (l_row.cust_key, f_ourmfo, 1);
       end if;
 
-      update cig_customers
+      update V_CIG_CUSTOMERS
          set cust_name = trim(l_row.surname) || ' ' || trim(l_row.firstname) || ' ' ||
                          trim(l_row.fathers_name),
              cust_code = l_row.okpo,
@@ -1047,7 +1047,7 @@ create or replace package body cig_mgr is
        where cust_id = l_custid
          and branch = l_branch;
 
-      update cig_cust_individual
+      update V_CIG_CUST_INDIVIDUAL
          set role_id        = l_row.role_id,
              first_name     = l_row.firstname,
              surname        = l_row.surname,
@@ -1094,11 +1094,11 @@ create or replace package body cig_mgr is
         upd_syncdata_branch(l_custid, l_row.branch, G_CUSTDATA, l_branch);
 
         for cur in (select g.id, g.branch
-                      from cig_dog_general g
+                      from V_CIG_DOG_GENERAL g
                      where g.cust_id = l_custid
                        and g.branch = l_branch) loop
 
-          update cig_dog_general g
+          update V_CIG_DOG_GENERAL g
              set g.branch = l_row.branch
            where g.branch = cur.branch
              and g.id = cur.id;
@@ -1124,10 +1124,10 @@ create or replace package body cig_mgr is
           end loop;
 
           for crs_c in (select i.id, i.branch, i.rowid as ri
-                          from CIG_DOG_CREDIT i
+                          from V_CIG_DOG_CREDIT i
                          where i.branch = cur.branch
                            and i.dog_id = cur.id) loop
-            update CIG_DOG_CREDIT i
+            update V_CIG_DOG_CREDIT i
                set i.branch = l_row.branch
              where i.rowid = crs_c.ri;
 
@@ -1164,7 +1164,7 @@ create or replace package body cig_mgr is
 
       -- вставка в таблицу клентов
       select s_cig_customers.nextval into l_custid from dual;
-      insert into cig_customers
+      insert into V_CIG_CUSTOMERS
         (cust_id, cust_type, rnk, upd_date, cust_name, cust_code, branch)
       values
         (l_custid,
@@ -1177,7 +1177,7 @@ create or replace package body cig_mgr is
          l_row.branch);
 
       -- вставка в таблицу физлиц
-      insert into cig_cust_individual
+      insert into V_CIG_CUST_INDIVIDUAL
         (cust_id,
          role_id,
          first_name,
@@ -1318,7 +1318,7 @@ create or replace package body cig_mgr is
     select max(cust_id), max(branch)
       into l_custid, l_branch
       from (select cust_id, branch
-              from cig_customers
+              from V_CIG_CUSTOMERS
              where rnk = l_row.rnk
              order by cust_id desc)
      where rownum < 2;
@@ -1327,7 +1327,7 @@ create or replace package body cig_mgr is
     if (l_custid is not null) then
       l_upd := false;
 
-      update cig_customers
+      update V_CIG_CUSTOMERS
          set cust_name = l_row.name,
              cust_code = l_row.cust_code,
              branch    = l_row.branch
@@ -1371,11 +1371,11 @@ create or replace package body cig_mgr is
         upd_syncdata_branch(l_custid, l_row.branch, G_CUSTDATA, l_branch);
 
         for cur in (select g.id, g.branch
-                      from cig_dog_general g
+                      from V_CIG_DOG_GENERAL g
                      where g.cust_id = l_custid
                        and g.branch = l_branch) loop
 
-          update cig_dog_general g
+          update V_CIG_DOG_GENERAL g
              set g.branch = l_row.branch
            where g.branch = cur.branch
              and g.id = cur.id;
@@ -1401,10 +1401,10 @@ create or replace package body cig_mgr is
           end loop;
 
           for crs_c in (select i.id, i.branch, i.rowid as ri
-                          from CIG_DOG_CREDIT i
+                          from V_CIG_DOG_CREDIT i
                          where i.branch = cur.branch
                            and i.dog_id = cur.id) loop
-            update CIG_DOG_CREDIT i
+            update V_CIG_DOG_CREDIT i
                set i.branch = l_row.branch
              where i.rowid = crs_c.ri;
 
@@ -1442,7 +1442,7 @@ create or replace package body cig_mgr is
 
       -- вставка в таблицу клентов
       select s_cig_customers.nextval into l_custid from dual;
-      insert into cig_customers
+      insert into V_CIG_CUSTOMERS
         (cust_id, cust_type, rnk, upd_date, cust_name, cust_code, branch)
       values
         (l_custid,
@@ -1856,7 +1856,7 @@ create or replace package body cig_mgr is
                    and cd.rnk = c1.rnk(+)
                    and cd.nd = n.nd
                    and n.acc = a8.acc
-                   and a8.tip = 'LIM'           
+                   and a8.tip = 'LIM'
                    --and to_number(substr(cd.prod, 1, 1)) < 9 #COBUSUPABS-4018
                    and substr(cd.prod, 1, 1) ='2'
                 --and not exists (select nd from cig_dog_general where nd = cd.nd)
@@ -1883,33 +1883,33 @@ create or replace package body cig_mgr is
                    c.custtype,
                    3          AS contract_type,
                    1          AS role_id,
-                   
- ----------------http://jira.unity-bars.com.ua:11000/browse/COBUMMFO-4056                 
- case when c.custtype = 3 then fio(REGEXP_REPLACE (c.nmk,'^ФОП'), 2) else null end firstname,     --  NULL AS firstname, 
+
+ ----------------http://jira.unity-bars.com.ua:11000/browse/COBUMMFO-4056
+ case when c.custtype = 3 then fio(REGEXP_REPLACE (c.nmk,'^ФОП'), 2) else null end firstname,     --  NULL AS firstname,
  case when c.custtype = 3 then fio(REGEXP_REPLACE (c.nmk,'^ФОП'), 1) else null end surname, --  NULL AS surname,
-                   NULL AS fathers_name,                 
- case when c.custtype = 3 then decode(to_number(p.sex),1,1,2,2,null) else null end gender, --  NULL AS gender,                 
- case when c.custtype = 3 then /*x*/ case when to_number(nvl(c.sed, 0)) = 91 then  2   else 1    end 
-                                                                                          else null end classification,    --  NULL AS classification,               
-                   NULL AS birth_surname,                
- case when c.custtype = 3 then p.bday  else null end  date_birth,    -- NULL AS date_birth,               
-                   NULL AS place_birth,                 
- case when c.custtype = 3 then /*x*/   case when c.codcagent = 5 then 1 else 2 end 
-                                                                          else null end  residency,     -- NULL AS residency,            
+                   NULL AS fathers_name,
+ case when c.custtype = 3 then decode(to_number(p.sex),1,1,2,2,null) else null end gender, --  NULL AS gender,
+ case when c.custtype = 3 then /*x*/ case when to_number(nvl(c.sed, 0)) = 91 then  2   else 1    end
+                                                                                          else null end classification,    --  NULL AS classification,
+                   NULL AS birth_surname,
+ case when c.custtype = 3 then p.bday  else null end  date_birth,    -- NULL AS date_birth,
+                   NULL AS place_birth,
+ case when c.custtype = 3 then /*x*/   case when c.codcagent = 5 then 1 else 2 end
+                                                                          else null end  residency,     -- NULL AS residency,
  case when c.custtype = 3 then /*x*/   case when cty.k040 = '011' then 'UA' else cty.a2 end
-                                                                           else null end citizenship,    -- NULL AS citizenship,             
+                                                                           else null end citizenship,    -- NULL AS citizenship,
                    NULL AS neg_status,
                    NULL AS education,
-                   NULL AS marital_status,                
+                   NULL AS marital_status,
  case when c.custtype = 3 then decode(w.value,'0','0','1','1','2','2','3','3',
                                               '4','4','5','5','6','6','7','7','8','8','9') else null end position,   --  NULL AS position,
- case when c.custtype = 3 then c.okpo   else null  end okpo,     --  NULL AS okpo,                            
- case when c.custtype = 3 then fio(c.nmk, 2) || fio(c.nmk, 1) || to_char(p.bday, 'ddmmyyyy') else null end cust_key,   --  NULL AS cust_key,                               
- case when c.custtype = 3 then p.ser    else null end ser,    --  NULL AS ser,                            
- case when c.custtype = 3 then p.numdoc else null end numdoc,    --  NULL AS numdoc,                      
- case when c.custtype = 3 then p.pdate  else null end passp_iss_date,      --   NULL AS passp_iss_date,              
-                   NULL AS passp_exp_date,                
- case when c.custtype = 3 then p.organ  else null end passp_organ, -- NULL AS passp_organ,  
+ case when c.custtype = 3 then c.okpo   else null  end okpo,     --  NULL AS okpo,
+ case when c.custtype = 3 then fio(c.nmk, 2) || fio(c.nmk, 1) || to_char(p.bday, 'ddmmyyyy') else null end cust_key,   --  NULL AS cust_key,
+ case when c.custtype = 3 then p.ser    else null end ser,    --  NULL AS ser,
+ case when c.custtype = 3 then p.numdoc else null end numdoc,    --  NULL AS numdoc,
+ case when c.custtype = 3 then p.pdate  else null end passp_iss_date,      --   NULL AS passp_iss_date,
+                   NULL AS passp_exp_date,
+ case when c.custtype = 3 then p.organ  else null end passp_organ, -- NULL AS passp_organ,
 
                    c1.telr AS phone_office,
                    NULL    AS phone_mobile,
@@ -2049,7 +2049,7 @@ create or replace package body cig_mgr is
                and p.rnk  = c.rnk
                and c.country = cty.k040(+)
                and a.rnk = w.rnk(+)
-               and w.tag(+) = 'CIGPO'               
+               and w.tag(+) = 'CIGPO'
                AND cd.nd = ow.nd
                and ow.cig_13 > 0
                AND a.kv = val.kv
@@ -2361,6 +2361,7 @@ create or replace package body cig_mgr is
                  where aa.rnk = c.rnk
                    and c.custtype = 2
                    and aa.rnk = c1.rnk(+)
+
 union all
 select
                  aa.nd,
@@ -3766,7 +3767,7 @@ select           aa.nd,
                           ''1523'',
                           ''1524'',
                           ''1527'')
-        --and not exists (select nd from cig_dog_general where nd = cd.nd)
+        --and not exists (select nd from V_CIG_DOG_GENERAL where nd = cd.nd)
         ) q,
        (select max(rnk) as rnk,
                nvl(max(decode(fact_terr_id,0,null,fact_terr_id)),-1) as fact_terr_id,
@@ -3811,15 +3812,15 @@ select           aa.nd,
     -- удаляем все предидущие записи по этому договору
     if p_oldbranch is not null then
       for cr in (select cdc.*
-                   from cig_dog_credit cdc, cig_dog_general dg
+                   from V_CIG_DOG_CREDIT cdc, V_CIG_DOG_GENERAL dg
                   where dg.nd = p_rec.nd
                     and cdc.dog_id = dg.id
                     and cdc.branch = p_oldbranch
                     and dg.contract_type = p_rec.contract_type) loop
-        delete from cig_dog_credit cdc
+        delete from V_CIG_DOG_CREDIT cdc
          where cdc.id = cr.id
            and cr.branch = cdc.branch;
-        delete from cig_sync_data csd
+        delete from V_CIG_SYNC_DATA csd
          where csd.branch = cr.branch
            and csd.data_id = cr.id
            and csd.data_type = 4;
@@ -3828,7 +3829,7 @@ select           aa.nd,
 
     select s_cig_dog_credit.nextval into l_id from dual;
 
-    insert into cig_dog_credit
+    insert into V_CIG_DOG_CREDIT
       (id,
        dog_id,
        limit_curr_id,
@@ -3866,8 +3867,8 @@ select           aa.nd,
   -- p_last_date - дата последнего обновления по договору
   -- p_date - дата, на которую нужно получить информацию
   --
-  procedure prc_dog_inst(p_dog_id    in cig_dog_general.id%type,
-                         p_branch    in cig_dog_general.branch%type,
+  procedure prc_dog_inst(p_dog_id    in V_CIG_DOG_GENERAL.id%type,
+                         p_branch    in V_CIG_DOG_GENERAL.branch%type,
                          p_nd        in cc_deal.nd%type,
                          p_last_date in date,
                          p_date      in date,
@@ -4052,7 +4053,7 @@ select           aa.nd,
     if p_oldbranch is not null then
       -- удаляем все предидущие записи по этому договору
       for cr in (select cdi.*
-                   from cig_dog_instalment cdi, cig_dog_general dg
+                   from cig_dog_instalment cdi, V_CIG_DOG_GENERAL dg
                   where dg.nd = p_nd
                     and cdi.dog_id = dg.id
                     and cdi.branch = p_oldbranch
@@ -4060,21 +4061,21 @@ select           aa.nd,
         delete from cig_dog_instalment cdi
          where cdi.id = cr.id
            and cr.branch = cdi.branch;
-        delete from cig_sync_data csd
+        delete from V_CIG_SYNC_DATA csd
          where csd.branch = cr.branch
            and csd.data_id = cr.id
            and csd.data_type = 3;
       end loop;
       for cr_ in (select cdc.*
-                    from cig_dog_credit cdc, cig_dog_general dg
+                    from V_CIG_DOG_CREDIT cdc, V_CIG_DOG_GENERAL dg
                    where dg.nd = p_nd
                      and cdc.dog_id = dg.id
                      and cdc.branch = p_oldbranch
                      and dg.contract_type = 2) loop
-        delete from cig_dog_credit cdc
+        delete from V_CIG_DOG_CREDIT cdc
          where cdc.id = cr_.id
            and cr_.branch = cdc.branch;
-        delete from cig_sync_data csd
+        delete from V_CIG_SYNC_DATA csd
          where csd.branch = cr_.branch
            and csd.data_id = cr_.id
            and csd.data_type = 4;
@@ -4125,13 +4126,13 @@ select           aa.nd,
 
   --------------------------------------------------------------------------------
   -- prc_dog_credit - опиши меня здесь
-  -- p_dog_id - индентификатор договора (cig_dog_general)
+  -- p_dog_id - индентификатор договора (V_CIG_DOG_GENERAL)
   -- p_nd - референс кредитного догвора (cc_deal)
   -- p_last_date - дата последнего обновления по договору
   -- p_date - дата, на которую нужно получить информацию
   --
-  procedure prc_dog_credit(p_dog_id        in cig_dog_general.id%type,
-                           p_branch        in cig_dog_general.branch%type,
+  procedure prc_dog_credit(p_dog_id        in V_CIG_DOG_GENERAL.id%type,
+                           p_branch        in V_CIG_DOG_GENERAL.branch%type,
                            p_nd            in cc_deal.nd%type,
                            p_last_date     in date,
                            p_date          in date,
@@ -4140,7 +4141,7 @@ select           aa.nd,
                            p_oldbranch     in branch.branch%type,
                            p_contract_type in NUMBER default null) is
     l_th constant varchar2(100) := g_dbgcode || 'prc_dog_credit';
-    l_rec         cig_dog_credit%rowtype;
+    l_rec         V_CIG_DOG_CREDIT%rowtype;
     l_cl_usage    number;
     l_lim_total   number;
     l_res_sum     number;
@@ -4266,7 +4267,7 @@ select           aa.nd,
     if p_oldbranch is not null then
       if (p_contract_type is null) then
         for cr in (select cdi.*
-                     from cig_dog_instalment cdi, cig_dog_general dg
+                     from cig_dog_instalment cdi, V_CIG_DOG_GENERAL dg
                     where dg.nd = p_nd
                       and cdi.dog_id = dg.id
                       and cdi.branch = p_oldbranch
@@ -4274,36 +4275,36 @@ select           aa.nd,
           delete from cig_dog_instalment cdi
            where cdi.id = cr.id
              and cr.branch = cdi.branch;
-          delete from cig_sync_data csd
+          delete from V_CIG_SYNC_DATA csd
            where csd.branch = cr.branch
              and csd.data_id = cr.id
              and csd.data_type = 3;
         end loop;
         for cr_ in (select cdc.*
-                      from cig_dog_credit cdc, cig_dog_general dg
+                      from V_CIG_DOG_CREDIT cdc, V_CIG_DOG_GENERAL dg
                      where dg.nd = p_nd
                        and cdc.dog_id = dg.id
                        and cdc.branch = p_oldbranch
                        and dg.contract_type = 2) loop
-          delete from cig_dog_credit cdc
+          delete from V_CIG_DOG_CREDIT cdc
            where cdc.id = cr_.id
              and cr_.branch = cdc.branch;
-          delete from cig_sync_data csd
+          delete from V_CIG_SYNC_DATA csd
            where csd.branch = cr_.branch
              and csd.data_id = cr_.id
              and csd.data_type = 4;
         end loop;
       elsif (p_contract_type = 7) then
         for cr_ in (select cdc.*
-                      from cig_dog_credit cdc, cig_dog_general dg
+                      from V_CIG_DOG_CREDIT cdc, V_CIG_DOG_GENERAL dg
                      where dg.nd = p_nd
                        and cdc.dog_id = dg.id
                        and cdc.branch = p_oldbranch
                        and dg.contract_type = p_contract_type) loop
-          delete from cig_dog_credit cdc
+          delete from V_CIG_DOG_CREDIT cdc
            where cdc.id = cr_.id
              and cr_.branch = cdc.branch;
-          delete from cig_sync_data csd
+          delete from V_CIG_SYNC_DATA csd
            where csd.branch = cr_.branch
              and csd.data_id = cr_.id
              and csd.data_type = 4;
@@ -4313,7 +4314,7 @@ select           aa.nd,
 
     select s_cig_dog_credit.nextval into l_id from dual;
 
-    insert into cig_dog_credit
+    insert into V_CIG_DOG_CREDIT
       (id,
        dog_id,
        limit_curr_id,
@@ -4347,13 +4348,13 @@ select           aa.nd,
 
   --------------------------------------------------------------------------------
   -- prc_dog_noninst - опиши меня здесь
-  -- p_dog_id - индентификатор договора (cig_dog_general)
+  -- p_dog_id - индентификатор договора (V_CIG_DOG_GENERAL)
   -- p_nd - референс кредитного догвора (cc_deal)
   -- p_last_date - дата последнего обновления по договору
   -- p_date - дата, на которую нужно получить информацию
   --
-  procedure prc_dog_noninst(p_dog_id        in cig_dog_general.id%type,
-                            p_branch        in cig_dog_general.branch%type,
+  procedure prc_dog_noninst(p_dog_id        in V_CIG_DOG_GENERAL.id%type,
+                            p_branch        in V_CIG_DOG_GENERAL.branch%type,
                             p_nd            in cc_deal.nd%type,
                             p_limit         in cc_deal.limit%type,
                             p_res_sum       in number,
@@ -4425,7 +4426,7 @@ select           aa.nd,
     if (p_oldbranch is not null) then
       -- удаляем все предидущие записи по этому договору
       for cr_ in (select cdc.*
-                    from cig_dog_noninstalment cdc, cig_dog_general dg
+                    from cig_dog_noninstalment cdc, V_CIG_DOG_GENERAL dg
                    where dg.nd = p_nd
                      and cdc.dog_id = dg.id
                      and cdc.branch = p_oldbranch
@@ -4433,7 +4434,7 @@ select           aa.nd,
         delete from cig_dog_noninstalment cdc
          where cdc.id = cr_.id
            and cr_.branch = cdc.branch;
-        delete from cig_sync_data csd
+        delete from V_CIG_SYNC_DATA csd
          where csd.branch = cr_.branch
            and csd.data_id = cr_.id
            and csd.data_type = 5;
@@ -4577,7 +4578,7 @@ select           aa.nd,
               begin
                 select g.branch
                   into old_branch
-                  from cig_dog_general g
+                  from V_CIG_DOG_GENERAL g
                  where g.nd = l_row.nd
                    and contract_type = l_row.contract_type;
               exception
@@ -4591,10 +4592,10 @@ select           aa.nd,
                 l_step := 1;
                 select max(cust_id)
                   into l_custid
-                  from cig_customers
+                  from V_CIG_CUSTOMERS
                  where rnk = l_row.rnk;
                 -- сначала апдейтим
-                update cig_dog_general
+                update V_CIG_DOG_GENERAL
                    set phase_id            = l_row.cig_15,
                        operation           = 1,
                        pay_method_id       = l_row.cig_19,
@@ -4647,7 +4648,7 @@ select           aa.nd,
                   select s_cig_dog_general.nextval into l_id from dual;
 
                   -- если нечего апдейтить  - вставляем
-                  insert into cig_dog_general
+                  insert into V_CIG_DOG_GENERAL
                     (id,
                      nd,
                      cust_id,
@@ -4705,7 +4706,7 @@ select           aa.nd,
                             l_row.rnk,
                             l_row.custtype,
                             p_dtype);
-                  bars_audit.trace('%s: cig_dog_general inserted, nd=%s, p_dtype=%s',
+                  bars_audit.trace('%s: V_CIG_DOG_GENERAL inserted, nd=%s, p_dtype=%s',
                                    l_th,
                                    to_char(l_row.nd),
                                    to_char(p_dtype));
@@ -5017,14 +5018,14 @@ select           aa.nd,
             broken = 'N'
       where branch  = '/'||p_kf||'/';
       commit;
-    
+
       prc_dog_data(p_date, p_kf);
     exception
       when others then
         add_event(G_SYSERROR,
                   bars_msg.get_msg(g_module_name, 'JOB_RUN_FAILED'),
                   sqlerrm);
-         update CIG_SHED_JOBS_STATE     
+         update CIG_SHED_JOBS_STATE
            set this_start_date = null,
                broken = 'Y',
                failures = failures +1
@@ -5033,7 +5034,7 @@ select           aa.nd,
     add_event(G_WITHOUT_ERRORS,
               bars_msg.get_msg(g_module_name, 'SYNС_END'),
               null);
-              
+
     update CIG_SHED_JOBS_STATE
         set last_start_date = this_start_date,
             this_start_date = null,
@@ -5042,7 +5043,7 @@ select           aa.nd,
             broken = 'N',
             failures = 0
       where branch  = '/'||p_kf||'/'
-      and broken = 'N';          
+      and broken = 'N';
     bars_audit.trace('%s: done', l_th);
     commit work;
   end collect_data;
@@ -5092,22 +5093,22 @@ select           aa.nd,
       into l_res;
     dbms_job.interval(p_job_id, p_interval);
     dbms_job.next_date(p_job_id, l_res);*/
-  
+
     DBMS_SCHEDULER.SET_ATTRIBUTE(name      => p_job_id,
                                  attribute => 'repeat_interval',
                                  value     => p_interval);
-  
+
     bars_audit.trace('%s: done', l_th);
   end job_interval;
-  
+
     -- Создает Джобы по формированию данных для ПЫБКИ для регионов которые уже переведены на ММФО.
   -- http://jira.unity-bars.com.ua:11000/browse/COBUMMFO-4381
- procedure create_job_cig_mmfo is 
-      
-  begin  
+ procedure create_job_cig_mmfo is
+
+  begin
     for rec in (select m.kf from mv_kf m where not exists ( select j.job_name from DBA_SCHEDULER_JOBS j where j.job_name like 'CIG_PVBKI_MMFO_'||m.kf))
-    
-    loop  
+
+    loop
         begin
           sys.dbms_scheduler.create_job(job_name        => 'BARS.CIG_PVBKI_MMFO_'||rec.kf,
                                         job_type        => 'PLSQL_BLOCK',
@@ -5121,11 +5122,11 @@ select           aa.nd,
                                         comments        => 'Выполняет сбор данных для передачи в ПВБКИ/МБКИ');
          exception when others then
                   if (sqlcode = -27477) then null;
-                  else raise; 
-                   end if;         
+                  else raise;
+                   end if;
     end;
-        end loop; 
-        
+        end loop;
+
  end;
 
 begin

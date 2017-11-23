@@ -149,7 +149,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
                 var tableSemantic = _entities.META_TABLES.First(t => t.TABID == excelDataModel.TableId).SEMANTIC;
                 Logger.Info(string.Format("begin get data for excel export table: {0} ", excelDataModel.TableName), LoggerPrefix);
                 GetDataResultInfo dataResult = GetData(excelDataModel);
-                Logger.Info(string.Format("begin excel export table: {0} dataCount: {1} ", excelDataModel.TableName, dataResult.DataRecords.Count()), LoggerPrefix);
+                //Logger.Info(string.Format("begin excel export table: {0} dataCount: {1} ", excelDataModel.TableName, dataResult.DataRecords.Count()), LoggerPrefix);
                 return ExcelHelper.ExcelExport(tableSemantic, dataResult, allColumnsInfo, excelDataModel, selectBuilder.GetFilterParams());
 
 
@@ -159,6 +159,10 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
             {
                 Debug.WriteLine("Error! - " + ex.ToString());
                 throw ex;
+            }
+            finally
+            {
+                this.GetOracleConnector.Dispose();
             }
             // return result;
         }
@@ -418,7 +422,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
         /// <returns>Признак успешной операции</returns>
         public bool DeleteData(int tableId, string tableName, List<FieldProperties> deletableRow, bool isMultipleProcedure = false)
         {
-            OracleConnection connection = this.GetOracleConnector.GetConn;
+            OracleConnection connection = this.GetOracleConnector.GetConnOrCreate;
             try
             {
                 // выполнить sql-процедуру, которая подменяет выполенение прямого запроса к таблице
@@ -1096,7 +1100,8 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
         /// <returns></returns>
         public GetDataResultInfo GetData(DataModel dataModel)
         {
-
+           
+            OracleConnection connection;
             UserMap user = ConfigurationSettings.GetCurrentUserInfo;
             // var bytesJsonSqlProcParams =  Convert.FromBase64String(dataModel.Base64jsonSqlProcParams);
             string stringJsonSqlProcParams = FormatConverter.ConvertFromUrlBase64UTF8(dataModel.Base64jsonSqlProcParams);// Encoding.UTF8.GetString(bytesJsonSqlProcParams);
@@ -1180,8 +1185,8 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
                 startInfo.FallDownFilter.FilterParams = sqlSelectRowParams.Where(x => startInfo.FallDownFilter.Condition.Contains(x.Name)).ToList();
 
             }
-
-            OracleConnection connection = OraConnector.Handler.UserConnection;
+            bool lazyLoad = dataModel is ExcelDataModel && dataModel.Limit > 80000 && nsiEditParams !=null &&   nsiEditParams.ExcelParam == "ALL_CSV";
+           connection = this.GetOracleConnector.GetConnOrCreate;
             try
             {
                 var selectBuilder = new SelectBuilder
@@ -1235,6 +1240,11 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
                 //if (selectBuilder.TotalColumns.Any())
                 // {
                 // для подсчета итоговых значений берем запрошенное количество строк
+                if(lazyLoad && !string.IsNullOrEmpty(nsiEditParams.ExcelParam) && nsiEditParams.ExcelParam == "ALL_CSV")
+                {
+                    result = AllRecordReader.GetDataForExcelCsv(getDataReader, nsiEditParams.ExcelParam);
+                    return result;
+                }
                 result = AllRecordReader.GetComplexResult(getDataReader, selectBuilder, hasDivision, startInfo);
                 if (selectBuilder.TotalColumns.Any())
                 {
@@ -1286,7 +1296,8 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
             }
             finally
             {
-                connection.Close();
+                if (!lazyLoad)
+                    this.GetOracleConnector.Dispose();
             }
         }
 

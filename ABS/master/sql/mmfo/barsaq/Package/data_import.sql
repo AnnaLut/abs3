@@ -1,10 +1,8 @@
-
- 
  PROMPT ===================================================================================== 
  PROMPT *** Run *** ========== Scripts /Sql/BARSAQ/package/data_import.sql =========*** Run *
  PROMPT ===================================================================================== 
  
-  CREATE OR REPLACE PACKAGE BARSAQ.DATA_IMPORT is
+CREATE OR REPLACE PACKAGE BARSAQ.data_import is
 
   -- global consts
   G_HEADER_VERSION constant varchar2(64)  := 'version 1.32 15/07/2015';
@@ -453,6 +451,11 @@
   -- sync_acctariffs - Синхронизация тарифов между схемами BANK -> CORE
   --
   procedure sync_acctariffs;
+  
+
+procedure sync_acc_transactions2_TEST(
+    p_startdate in date    default null,
+    p_scn       in number  default null);
 
   ----
   -- sync_acctariffs - синхронизация клиентов
@@ -461,7 +464,8 @@
 
 end data_import;
 /
-CREATE OR REPLACE PACKAGE BODY BARSAQ.DATA_IMPORT is
+
+CREATE OR REPLACE PACKAGE BODY BARSAQ.data_import is
 
   -- global consts
   G_BODY_VERSION constant varchar2(64)  := 'version 1.97 14/03/2017';
@@ -833,6 +837,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.DATA_IMPORT is
   is
     l_status    varchar2(30);
   begin
+    return; -- 31.05.2017  на время
     begin
         select status
           into l_status
@@ -1835,6 +1840,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.DATA_IMPORT is
                    and bank_id = f.kf;
                 l_cnt := sql%rowcount;
             else
+                if l_bankid = f.kf then
                 -- удаляем данные по одному счету
                 delete
                   from acc_turnovers
@@ -1843,6 +1849,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.DATA_IMPORT is
                    and cur_id  = l_curid
                    and turns_date >= l_startdate;
                 l_cnt := sql%rowcount;
+              end if;
             end if;
             --
             logger.trace('видалено старі обороти з локальної таблиці, к-сть рядків = %s', to_char(l_cnt));
@@ -1872,6 +1879,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.DATA_IMPORT is
                         );
                 l_cnt := sql%rowcount;
             else
+                if l_bankid = f.kf then 
                 -- по одному счету
                 insert
                   into acc_turnovers (
@@ -1883,13 +1891,14 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.DATA_IMPORT is
                                bars.gl.p_icurval(t.kv, s.ostf, s.fdat)/g_base_denom,
                                bars.gl.p_icurval(t.kv, s.dos, s.fdat)/g_base_denom,
                                bars.gl.p_icurval(t.kv, s.kos, s.fdat)/g_base_denom
-                          from bars.saldoa as of scn l_scn s,
-                               bars.tabval as of scn l_scn t
+                              from bars.saldoa s,
+                                   bars.tabval t
                          where t.kv      = l_curid
                            and s.acc     = p_acc
                            and s.fdat   >= l_startdate
                         );
                 l_cnt := sql%rowcount;
+            end if;
             end if;
             --
             logger.trace('наповнено нові обороти в локальній таблиці, к-сть рядків = %s', to_char(l_cnt));
@@ -2003,6 +2012,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.DATA_IMPORT is
                 l_cnt := sql%rowcount;
             else
                 -- удаляем данные по одному счету
+                if l_bankid = f.kf then
                 delete
                   from acc_turnovers
                  where bank_id = l_bankid
@@ -2010,6 +2020,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.DATA_IMPORT is
                    and cur_id  = l_curid
                    and turns_date between l_startdate and l_finishdate;
                 l_cnt := sql%rowcount;
+            end if;
             end if;
             --
             logger.trace('видалено старі обороти з локальної таблиці, к-сть рядків = %s', to_char(l_cnt));
@@ -2040,6 +2051,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.DATA_IMPORT is
                 l_cnt := sql%rowcount;
             else
                 -- по одному счету
+                if l_bankid = f.kf then 
                 insert
                   into acc_turnovers (
                           bank_id, acc_num, cur_id, turns_date, prev_turns_date,
@@ -2050,13 +2062,14 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.DATA_IMPORT is
                                bars.gl.p_icurval(t.kv, s.ostf, s.fdat)/g_base_denom,
                                bars.gl.p_icurval(t.kv, s.dos, s.fdat)/g_base_denom,
                                bars.gl.p_icurval(t.kv, s.kos, s.fdat)/g_base_denom
-                          from bars.saldoa as of scn l_scn s,
-                               bars.tabval as of scn l_scn t
+                              from bars.saldoa s,
+                                   bars.tabval t
                          where t.kv      = l_curid
                            and s.acc     = p_acc
                            and s.fdat   between l_startdate and l_finishdate
                         );
                 l_cnt := sql%rowcount;
+            end if;
             end if;
             --
             logger.trace('наповнено нові обороти в локальній таблиці, к-сть рядків = %s', to_char(l_cnt));
@@ -2164,6 +2177,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.DATA_IMPORT is
                and bank_id = f.kf;
             l_cnt := sql%rowcount;
         else
+            if l_bankid = f.kf then 
             delete
               from acc_transactions
              where bank_id = l_bankid
@@ -2171,6 +2185,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.DATA_IMPORT is
                and cur_id = l_curid
                and trans_date >= l_startdate;
             l_cnt := sql%rowcount;
+        end if;
         end if;
         --
         logger.trace('видалено старі проводки з локальної таблиці, к-сть рядків = %s', to_char(l_cnt));
@@ -2195,9 +2210,9 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.DATA_IMPORT is
                as corr_bank_id,
                case
                when p.dk=0 and d.dk=1 or p.dk=1 and d.dk=0 then
-                    (select nb from bars.banks as of scn l_scn where mfo=d.mfob)
+                    (select nb from bars.banks where mfo=d.mfob)
                else
-                    (select nb from bars.banks as of scn l_scn where mfo=d.mfoa)
+                    (select nb from bars.banks where mfo=d.mfoa)
                end
                as corr_bank_name,
                case
@@ -2303,7 +2318,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.DATA_IMPORT is
                bars.tabval          as of scn l_scn t,
                bars.opldok          as of scn l_scn p2,
                v_kf_accounts         a2,
-               bars.banks           as of scn l_scn b2,
+               bars.banks            b2,
                bars.customer        as of scn l_scn c2,
                bars.oper_visa         as of scn l_scn v
          where c.bank_id  = f.kf
@@ -2373,8 +2388,273 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.DATA_IMPORT is
   end sync_acc_transactions2;
 
 
+procedure sync_acc_transactions2_TEST(
+    p_startdate in date    default null,
+    p_scn       in number  default null)
+  is
+    p_acc        integer default null;
+    l_startdate date;
+    l_bankdate  date;
+    l_scn       number;
+    --
+    l_bankid    acc_transactions_test.bank_id%type;
+    l_accnum    acc_transactions_test.acc_num%type;
+    l_curid     acc_transactions_test.cur_id%type;
+    l_cnt       integer;
+    l_ref92     bars.operw.value%type;
+    l_ref92_bank_id acc_transactions_test.ref92_bank_id%type;
+    l_ref92_cust_code acc_transactions_test.ref92_cust_code%type;
+    l_ref92_acc_num acc_transactions_test.ref92_acc_num%type;
+    l_ref92_acc_name acc_transactions_test.ref92_acc_name%type;
+    l_ref92_bank_name acc_transactions_test.ref92_bank_name%type;
+  begin
+    -- точка отката
+    savepoint sp;
+    --
+    l_scn := nvl(p_scn, dbms_flashback.get_system_change_number());
+    --
+    if p_acc is not null
+    then
+      select kf, nls, kv
+        into l_bankid, l_accnum, l_curid
+        from v_kf_accounts
+       where acc = p_acc;
+    else
+      l_bankid := null;
+      l_accnum := null;
+      l_curid  := null;
+    end if;
+    -- по филиалам для мульти-мфо базы
+    for f in (select kf from v_kf)
+    loop
+        bars_sync.subst_mfo(f.kf);
+        l_bankdate := bars.gl.bd();
+        l_startdate := nvl(p_startdate, l_bankdate);
+        -- населяем временную таблицу счетов
+        delete from tmp_acc;
+        --
+        insert
+          into tmp_acc(acc, bank_id, acc_num, cur_id)
+        select a.acc, f.kf, a.nls, a.kv
+          from v_kf_accounts a, ibank_acc c
+         where a.acc = c.acc
+           and c.kf  = f.kf
+           and c.acc = case when p_acc is null then c.acc else p_acc end;
+        --
+        l_cnt := sql%rowcount;
+        --
+        -- удаляем старые значения локально
+        if p_acc is null
+        then
+            delete
+              from acc_transactions_test
+             where trans_date >= l_startdate
+               and bank_id = f.kf;
+            l_cnt := sql%rowcount;
+        else
+            delete
+              from acc_transactions_test
+             where bank_id = l_bankid
+               and acc_num = l_accnum
+               and cur_id = l_curid
+               and trans_date >= l_startdate;
+            l_cnt := sql%rowcount;
+        end if;
+        --
+        -- вставляем новые в локальную таблицу
+        -- сначала родительские транзакции
+        for cur_r in (
+          select  rownum rn, count(all 1) over () cnt,
+               c.bank_id, c.acc_num,
+               case
+               when p.dk=0 and d.dk=1 or p.dk=1 and d.dk=0 then d.nam_a
+               else d.nam_b
+               end
+               as name,
+               c.cur_id, p.fdat, p.stmt, to_char(p.ref) ref, nvl(d.nd, substr(to_char(p.ref),1,10)) nd,
+               (select nvl(max(dat), d.pdat) from bars.oper_visa where ref=d.ref and status = 2 and groupid not in (80, 81, 30, 130))  dat,
+               case when p.dk=0 then 'D' else 'C' end as type_id, p.s/t.denom as trans_sum, p.sq/g_base_denom as trans_sum_eq,
+               case
+               when p.dk=0 and d.dk=1 or p.dk=1 and d.dk=0 then d.mfob
+               else d.mfoa
+               end
+               as corr_bank_id,
+               case
+               when p.dk=0 and d.dk=1 or p.dk=1 and d.dk=0 then
+                    (select nb from bars.banks where mfo=d.mfob)
+               else
+                    (select nb from bars.banks where mfo=d.mfoa)
+               end
+               as corr_bank_name,
+               case
+               when p.dk=0 and d.dk=1 or p.dk=1 and d.dk=0 then d.id_b
+               else d.id_a
+               end
+               as corr_ident_code,
+               case
+               when p.dk=0 and d.dk=1 or p.dk=1 and d.dk=0 then d.nlsb
+               else d.nlsa
+               end
+               as corr_acc_num,
+               case
+               when p.dk=0 and d.dk=1 or p.dk=1 and d.dk=0 then d.nam_b
+               else d.nam_a
+               end
+               as corr_name,
+               d.nazn,
+               case when d.mfoa<>d.mfob or p.tt='R01' then
+                    ibank_accounts.extract_bis_external_clob(d.ref, l_scn)
+               else
+                    ibank_accounts.extract_bis_internal_clob(d.ref, l_scn)
+               end as narrative_extra,
+               (select to_number(value) from bars.operw as of scn l_scn where tag='EXREF' and ref=d.ref)
+               as ibank_docid,
+               p.tt
+          from tmp_acc c,
+               bars.opldok  as of scn l_scn p,
+               bars.oper    as of scn l_scn d,
+               bars.tabval  as of scn l_scn t,
+               bars.oper_visa as of scn l_scn v
+         where c.bank_id  = f.kf
+           and p.acc = c.acc
+           and p.fdat >= l_startdate
+--           and p.sos = 5
+           and p.ref = d.ref
+           and c.cur_id = t.kv
+           and (  not (d.kv is not null and d.kv2 is not null and d.kv<>d.kv2) -- не разновалютные
+                  and p.tt=d.tt and p.s=d.s -- код операции и сумма совпадают
+                  or p.tt='R01' -- или проводка типа R01
+               )
+           and d.ref = v.ref (+)
+           and v.groupid (+) not in (77, 80, 81, 30, 130)
+           and v.status (+) = 2)
+           loop
+dbms_application_info.set_action(cur_r.rn||'/'||cur_r.cnt||' Parent'); 
+        l_ref92_bank_id := null;
+        l_ref92_cust_code := null;
+        l_ref92_acc_num := null;
+        l_ref92_acc_name := null;
+        l_ref92_bank_name := null;
+
+        if cur_r.tt in ('902','901') then
+          begin
+         select value into l_ref92 from bars.operw where ref=cur_r.ref and tag='REF92';
+            select mfoa, id_a,  nlsa, nam_a
+             into l_ref92_bank_id, l_ref92_cust_code, l_ref92_acc_num, l_ref92_acc_name
+            from bars.oper where ref= l_ref92;
+         select b.nb into l_ref92_bank_name from bars.BANKS$BASE b where b.Mfo = l_ref92_bank_id;
+           exception
+             when NO_DATA_FOUND then null;
+           end;
+         end if;
+
+        insert
+          into acc_transactions_test (
+                   bank_id, acc_num, name, cur_id, trans_date, trans_id, doc_id, doc_number, doc_date,
+                   type_id, trans_sum, trans_sum_eq,
+                   corr_bank_id, corr_bank_name, corr_ident_code, corr_acc_num, corr_name,
+                   narrative, narrative_extra, ibank_docid, ref92_bank_id, ref92_cust_code, ref92_acc_num, ref92_acc_name, ref92_bank_name)
+        values (cur_r.bank_id, cur_r.acc_num, cur_r.name, cur_r.cur_id, cur_r.fdat, cur_r.stmt, cur_r.ref, cur_r.nd, cur_r.dat,
+                   cur_r.type_id,  cur_r.trans_sum, cur_r.trans_sum_eq,
+                   cur_r.corr_bank_id, cur_r.corr_bank_name, cur_r.corr_ident_code, cur_r.corr_acc_num, cur_r.corr_name,
+                   cur_r.nazn, cur_r.narrative_extra, cur_r.ibank_docid, l_ref92_bank_id, l_ref92_cust_code, l_ref92_acc_num, l_ref92_acc_name, l_ref92_bank_name);
+            end loop;
+        --
+        l_cnt := sql%rowcount;
+        --
+        -- теперь дочерние
+        for cur_d in (
+          select rownum rn, count(all 1) over () cnt,
+           c.bank_id, c.acc_num, c.cur_id,
+               p.fdat as trans_date,
+               p.stmt as trans_id,
+               to_char(p.ref) as doc_id,
+               nvl(d.nd, substr(to_char(p.ref),1,10)) as doc_number,
+               nvl(v.dat,d.pdat) as doc_date,
+               case when p.dk=0 then 'D' else 'C' end as type_id, p.s/t.denom as trans_sum, p.sq/g_base_denom as trans_sum_eq,
+               a2.kf as corr_bank_id,
+               b2.nb as corr_bank_name,
+               c2.okpo as corr_ident_code,
+               a2.nls as corr_acc_num,
+               substr(a2.nms,1,38) as corr_name,
+               trim(p.txt)||' '||trim(d.nazn) as narrative,
+               null as narrative_extra,
+               null as ibank_docid,
+               p.tt
+          from tmp_acc c,
+               bars.opldok          as of scn l_scn p,
+               bars.oper            as of scn l_scn d,
+               bars.tabval          as of scn l_scn t,
+               bars.opldok          as of scn l_scn p2,
+               v_kf_accounts         a2,
+               bars.banks            b2,
+               bars.customer        as of scn l_scn c2,
+               bars.oper_visa         as of scn l_scn v
+         where c.bank_id  = f.kf
+           and p.acc = c.acc
+           and p.fdat >= l_startdate
+--           and p.sos = 5
+           and p.ref = d.ref
+           and c.cur_id = t.kv
+           and (  d.kv is not null and d.kv2 is not null and d.kv<>d.kv2 -- разновалютные
+               or p.tt<>d.tt or p.s<>d.s -- код операции или сумма не совпадают
+             )
+           and p.tt<>'R01' -- и проводка не R01
+           and p.ref=p2.ref and p.stmt=p2.stmt and p.dk=1-p2.dk -- правая сторона проводки
+           and p2.acc=a2.acc and a2.kf=b2.mfo and a2.rnk=c2.rnk
+           and d.ref = v.ref (+)
+           and v.groupid (+) not in (77, 80, 81, 30)
+           and v.status (+) = 2
+          )
+          loop
+
+dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld'); 
+        l_ref92_bank_id := null;
+        l_ref92_cust_code := null;
+        l_ref92_acc_num := null;
+        l_ref92_acc_name := null;
+        l_ref92_bank_name := null;
+
+        if cur_d.tt in ('902','901') then
+          begin
+         select value into l_ref92 from bars.operw where ref=cur_d.doc_id and tag='REF92';
+            select mfoa, id_a,  nlsa, nam_a
+             into l_ref92_bank_id, l_ref92_cust_code, l_ref92_acc_num, l_ref92_acc_name
+            from bars.oper where ref= l_ref92;
+         select b.nb into l_ref92_bank_name from bars.BANKS$BASE b where b.Mfo = l_ref92_bank_id;
+           exception
+             when NO_DATA_FOUND then null;
+           end;
+         end if;
+
+        insert
+          into acc_transactions_test (
+               bank_id, acc_num, cur_id, trans_date, trans_id, doc_id, doc_number, doc_date,
+               type_id, trans_sum, trans_sum_eq,
+               corr_bank_id, corr_bank_name, corr_ident_code, corr_acc_num, corr_name,
+               narrative, narrative_extra, ibank_docid, ref92_bank_id, ref92_cust_code, ref92_acc_num, ref92_acc_name, ref92_bank_name)
+           values
+               (cur_d.bank_id, cur_d.acc_num, cur_d.cur_id, cur_d.trans_date, cur_d.trans_id, cur_d.doc_id, cur_d.doc_number, cur_d.doc_date,
+               cur_d.type_id, cur_d.trans_sum, cur_d.trans_sum_eq,
+               cur_d.corr_bank_id, cur_d.corr_bank_name, cur_d.corr_ident_code, cur_d.corr_acc_num, cur_d.corr_name,
+               cur_d.narrative, cur_d.narrative_extra, cur_d.ibank_docid, l_ref92_bank_id, l_ref92_cust_code, l_ref92_acc_num, l_ref92_acc_name, l_ref92_bank_name);
+           end loop;
+        --
+        l_cnt := sql%rowcount;
+        --
+    end loop;
+    --
+  exception when others then
+    --
+    rollback to sp;
+    --
+    raise_application_error(-20000, get_error_msg());
+    --
+  end sync_acc_transactions2_TEST;
+
+  
   ----
-  -- sync_acc_period_transactions2 - синхронизиреут проводки в АБС для передачи в систему
+  -- sync_acc_period_transactions2 - синхронизирует проводки в АБС для передачи в систему
   --
   -- @p_acc [in] - id счета в АБС
   -- @p_startdate - банковская дата, начиная с которой будем синхронизировать записи
@@ -2449,6 +2729,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.DATA_IMPORT is
                and bank_id = f.kf;
             l_cnt := sql%rowcount;
         else
+            if l_bankid = f.kf then
             delete
               from acc_transactions
              where bank_id = l_bankid
@@ -2456,6 +2737,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.DATA_IMPORT is
                and cur_id = l_curid
                and trans_date between l_startdate and l_finishdate;
             l_cnt := sql%rowcount;
+        end if;
         end if;
         --
         logger.trace('видалено старі проводки з локальної таблиці, к-сть рядків = %s', to_char(l_cnt));
@@ -2975,11 +3257,14 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.DATA_IMPORT is
     l_scn   number;
   begin
     begin
-        /*select oldest_message_number*/
-        select applied_message_number
+        l_scn := dbms_flashback.get_system_change_number();
+        -- На время проблем со стримсами в ММФО будем брать текущий scn,
+        -- поскольку oldest_message_number и select applied_message_number не обновляются
+        -- select oldest_message_number
+        /*select applied_message_number
           into l_scn
           from dba_apply_progress
-         where apply_name = CB_APPLY;
+         where apply_name = CB_APPLY;*/
         -- если здесь пусто, тогда не знаю как быть
         if l_scn is null or l_scn = 0
         then
@@ -3131,7 +3416,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.DATA_IMPORT is
         --
         -- устанавливаем SCN, с которого необходимо синхронизировать таблицы в будущем
         -- только если синхронизация выполнялась по всем счетам сразу
-        if p_acc is null
+        if p_acc is null and false -- temporary 02.06.2017
         then
             dbms_apply_adm.set_table_instantiation_scn(SRCTAB_SALDOA, g_global_name, l_scn);
             dbms_apply_adm.set_table_instantiation_scn(SRCTAB_OPLDOK, g_global_name, l_scn);
@@ -3428,8 +3713,8 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.DATA_IMPORT is
     loop
         -- загружаем один документ
         import_document(l_docs(i));
-        -- фиксируем транзакцию каждые 500 документов
-        if mod(i, 500) = 0 then
+        -- фиксируем транзакцию каждые 100 документов
+        if mod(i, 100) = 0 then
             commit;
         end if;
     end loop;
@@ -3815,7 +4100,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.DATA_IMPORT is
             l_idb      bars.customer.okpo%type;
             l_idb_bank bars.customer.okpo%type;
         begin
-        select trim(c.okpo), (select trim(val) from bars.params$base where par='OKPO' and rownum<2) into l_idb, l_idb_bank from bars.customer c, v_kf_accounts a
+        select trim(c.okpo), (select trim(val) from bars.params$base where par='OKPO' and kf=l_doc.mfo_b) into l_idb, l_idb_bank from bars.customer c, v_kf_accounts a
             where c.rnk=a.rnk and a.kf=l_doc.mfo_b and a.nls=l_doc.nls_b and a.kv=l_doc.kv;
             if l_idb<>l_doc.id_b and l_idb_bank<>l_doc.id_b then
                 raise_application_error(-20000,
@@ -4040,6 +4325,13 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.DATA_IMPORT is
             --
             insert into doc_import_props values l_prop;
         end if;
+        -- реквізит кількість доданих супровідних документів, в xml - реквізит  ATTACHMENT_MAILID - id листа в corp2 з вкладенням
+        if is_attr_exists(l_body, 'ATTACHMENT_MAILID') then
+            l_prop.tag      := 'ATT_D';
+            l_prop.value    := '1';
+            --
+            insert into doc_import_props values l_prop;
+        end if;
 
     end if;
     -- разбираемся со строками БИС
@@ -4158,6 +4450,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.DATA_IMPORT is
     l_taxflg        number;
     l_visaid        integer;
     l_visa_fullname xmltype;
+    l_attachments_count  integer := 0;
   begin
     logger.trace('%s: start', l_title);
     --
@@ -4188,6 +4481,11 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.DATA_IMPORT is
     --
     -- чтение общих атрибутов
     l_doc.dk       := get_attr_number(l_body, 'BUY_SELL_FLAG');
+    -- кількість доданих документів до заявки
+    if is_attr_exists(l_body, 'ATTACHMENT_MAILID') then 
+        l_attachments_count := 1;
+    end if;    
+
     -- получим валюту которая покупается
     l_doc.kv2      := get_attr_number(l_body, 'DOC_CURRENCY');
     -- получим валюту за которую покупается
@@ -4334,6 +4632,10 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.DATA_IMPORT is
         l_doc.skom   := null;
     end if;
 
+  begin
+     select branch into l_branch from v_kf_accounts where acc = l_doc.acc1;
+  exception when no_data_found then null;
+  end;
 
     l_taxflg := 0;
 
@@ -4374,10 +4676,12 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.DATA_IMPORT is
         --p_bnfbankname   => zayavka.bank_name%type     default null,  -- название банка                    (для dk = 1)
         --p_productgrp    => zayavka.product_group%type default null,  -- код товарной группы               (для dk = 1)
         p_details       => l_doc.basis,
+        p_branch        => l_branch,
         p_reqid         => l_doc.id);                         -- идентификатор заявки
     --
     -- сохраняем соответствие id заявки и id первичного документа
     insert into zayavka_id_map(idz, doc_id) values(l_doc.id, l_docid);
+    update bars.zayavka z set z.attachments_count = l_attachments_count where z.id = l_doc.id;
     --
     -- сохраняем историю визирования документа в corp2
     l_visaid := 1;
@@ -5138,6 +5442,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.DATA_IMPORT is
                                     pdat
                              from bars.oper p) o
                          where i.insertion_date >= p_startdate
+                           and o.status != e.status_id
                            and i.ref is not null -- только документы АБС
                            and e.doc_id=to_number(i.ext_ref) and i.ref=o.ref
                          ) as of scn l_scn
@@ -5913,13 +6218,23 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.DATA_IMPORT is
         rpc_sync.erase_cust_addresses();
         --
         write_sync_status(TAB_CUST_ADDRESSES, JOB_STATUS_INPROGRESS, 'вставка даних в БД АБС');
-
+/*
         --
         insert
           into cust_addresses(rnk, type_id, country_id, zip, region, district, city, address, bank_id)
         select ca.rnk, ca.type_id, ca.country, ca.zip, ca.domain, ca.region, ca.locality, ca.address, (select val from bars.params where par = 'GLB-MFO')
           from bars.customer_address as of scn l_scn ca where rnk in (select rnk from ibank_rnk);
          --
+*/
+        -- цикл на случай мульти-мфо
+        for c in (select kf from v_kf)
+        loop
+          insert
+            into cust_addresses(rnk, type_id, country_id, zip, region, district, city, address, bank_id)
+          select ca.rnk, ca.type_id, ca.country, ca.zip, ca.domain, ca.region, ca.locality, ca.address, c.kf
+            from bars.customer_address as of scn l_scn ca where rnk in (select rnk from ibank_rnk where kf = c.kf);
+        end loop;
+  
         write_sync_status(TAB_CUST_ADDRESSES, JOB_STATUS_INPROGRESS, 'вставка даних в БД corp2');
         --
         rpc_sync.fill_cust_addresses;
@@ -6391,8 +6706,8 @@ end data_import;
  show err;
  
 PROMPT *** Create  grants  DATA_IMPORT ***
-grant EXECUTE                                                                on DATA_IMPORT     to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on DATA_IMPORT     to IBANK_ADMIN;
+grant EXECUTE                                                                on BARSAQ.DATA_IMPORT     to BARS_ACCESS_DEFROLE;
+grant EXECUTE                                                                on BARSAQ.DATA_IMPORT     to IBANK_ADMIN;
 
  
  

@@ -51,6 +51,6 @@ namespace BarsWeb.Areas.Zay.Models
         public decimal? REQ_TYPE { get; set; }
         public string CODE_2C { get; set; }
         public string P12_2C { get; set; }
-        public int ATTACMENTS_COUNT { get; set; }
+        public decimal? ATTACHMENTS_COUNT { get; set; }
     }
 }

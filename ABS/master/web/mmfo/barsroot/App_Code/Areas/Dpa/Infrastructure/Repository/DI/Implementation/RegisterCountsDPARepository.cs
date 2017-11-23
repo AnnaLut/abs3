@@ -37,7 +37,7 @@ public class RegisterCountsDPARepository : IRegisterCountsDPARepository
       ,t.nls
       ,t.kv
       ,t.c_ag
-      ,t.nmk
+      ,SUBSTR(t.nmk, 0, 38) as nmk
       ,c.adr
       ,t.c_reg
       ,t.c_dst
@@ -78,7 +78,7 @@ SELECT t.rowid AS idrow
       ,t.nls
       ,t.kv
       ,t.c_ag
-      ,t.nmk
+      ,SUBSTR(t.nmk, 0, 38) as nmk 
       ,c.adr
       ,t.c_reg
       ,t.c_dst
@@ -590,13 +590,13 @@ SELECT t.rowid AS idrow
     public void InsertTicket(string path, string fileType, string fileName, string fileBody)
     {
         var branch = GetBranch();
-        var p = new DynamicParameters();
+        DynamicParameters p = null;
         var sql = "";
         if (fileType == "F")
         {
             p = new DynamicParameters();
-            p.Add("p_filename", dbType: DbType.String, size: 100, value: fileName, direction: ParameterDirection.Input);
-            p.Add("p_filedata", dbType: DbType.String, size: 10000, value: fileBody, direction: ParameterDirection.Input);
+			p.Add("p_filename", dbType: DbType.String, size: 100, value: fileName, direction: ParameterDirection.Input);
+            p.Add("p_filedata", dbType: DbType.String, size: fileBody.Length, value: fileBody, direction: ParameterDirection.Input);
 
             sql = @"begin
                         bars_dpa.ins_ticket(:p_filename, :p_filedata);
@@ -609,9 +609,9 @@ SELECT t.rowid AS idrow
         }
         else if (fileType == "R0")
         {
-            p = new DynamicParameters();
+			p = new DynamicParameters();
             p.Add("p_filename", dbType: DbType.String, size: 100, value: fileName, direction: ParameterDirection.Input);
-            p.Add("p_filedata", dbType: DbType.String, size: 10000, value: fileBody, direction: ParameterDirection.Input);
+            p.Add("p_filedata", dbType: DbType.String, size: fileBody.Length, value: fileBody, direction: ParameterDirection.Input);
             p.Add("p_tickname", dbType: DbType.String, size: 100, direction: ParameterDirection.Output);
 
             sql = @"begin
@@ -734,7 +734,8 @@ SELECT t.rowid AS idrow
         dat_in_dpa, dat_acc_dpa, id_pr, id_dpa, id_dps, id_rec, fn_f, n_f, err, (SELECT substr(err_msg,1,100) FROM dpa_err_codes WHERE err_code = err) as com
         from lines_r   
         where fn = :fileName
-        and trunc(dat) = (select max(trunc(dat)) from zag_f where fn = :fileName)";
+        and trunc(dat) = (select max(trunc(dat)) from zag_f where fn = :fileName)
+		and dat > sysdate-364";
 
         using (var connection = OraConnector.Handler.UserConnection)
         {

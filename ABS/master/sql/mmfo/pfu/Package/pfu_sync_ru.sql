@@ -169,29 +169,32 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_SYNC_RU is
      where pp.kf = p_kf
        and pp.rnk = p_rnk
        for update nowait;
-
-    update pfu_pensioner pp
-       set branch          = p_branch,
-           nmk             = p_nmk,
-           okpo            = p_okpo,
-           adr             = p_adr,
-           date_on         = p_date_on,
-           date_off        = p_date_off,
-           passp           = p_passp,
-           ser             = p_ser,
-           numdoc          = p_numdoc,
-           pdate           = p_pdate,
-           organ           = p_organ,
-           bday            = p_bday,
-           bplace          = p_bplace,
-           cellphone       = p_cellphone,
-           sys_time        = sysdate,
-           last_ru_idupd   = p_last_idupd,
-           last_ru_chgdate = p_last_chgdate
-     where pp.kf = p_kf
-       and pp.rnk = p_rnk;
-
-    p_res := 2;
+       
+      update pfu_pensioner pp
+         set branch          = p_branch,
+             nmk             = p_nmk,
+             okpo            = p_okpo,
+             adr             = p_adr,
+             date_on         = p_date_on,
+             date_off        = p_date_off,
+             passp           = p_passp,
+             ser             = p_ser,
+             numdoc          = p_numdoc,
+             pdate           = p_pdate,
+             organ           = p_organ,
+             bday            = p_bday,
+             bplace          = p_bplace,
+             cellphone       = p_cellphone,
+             sys_time        = sysdate,
+             is_okpo_well    = case to_char(bars.get_bday_byokpo(p_okpo), 'dd.mm.yyyy') when to_char(p_bday,'dd.mm.yyyy') 
+                                    then 1
+                                    else 0 end,
+             last_ru_idupd   = p_last_idupd,
+             last_ru_chgdate = p_last_chgdate
+       where pp.kf = p_kf
+         and pp.rnk = p_rnk;
+         
+      p_res := 2;
 
   exception
     -- acc for update not found, inserting...
@@ -215,6 +218,7 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_SYNC_RU is
          bplace,
          cellphone,
          sys_time,
+         is_okpo_well,
          last_ru_idupd,
          last_ru_chgdate)
       values
@@ -236,6 +240,10 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_SYNC_RU is
          p_bplace,
          p_cellphone,
          sysdate,
+         case to_char(bars.get_bday_byokpo(p_okpo), 'dd.mm.yyyy') 
+            when to_char(p_bday,'dd.mm.yyyy') 
+            then 1
+            else 0 end,
          p_last_idupd,
          p_last_chgdate);
 
@@ -321,7 +329,8 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_SYNC_RU is
          dazs,
          sys_time,
          last_ru_idupd,
-         last_ru_chgdate)
+         last_ru_chgdate,
+         ispayed)
       values
         (s_pfupensacc.nextval,
          p_kf,
@@ -336,7 +345,8 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_SYNC_RU is
          p_dazs,
          sysdate,
          p_last_idupd,
-         p_last_chgdate);
+         p_last_chgdate,
+         null);
 
       p_res := 2;
 

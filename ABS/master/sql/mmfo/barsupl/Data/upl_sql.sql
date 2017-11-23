@@ -57,11 +57,12 @@ declare
              edate
         from bars_dm.custur_rel c
    where c.per_id=bars_dm.dm_import.GET_PERIOD_ID(''DAY'',nvl(to_date(:param1, ''dd/mm/yyyy''), trunc(sysdate)))
-   and kf = sys_context(''bars_context'', ''user_mfo'')');
+   and kf = sys_context(''bars_context'', ''user_mfo'')
+   and change_type is null');
 begin
   update barsupl.upl_sql
   set sql_text = l_clob,
-      vers = '1.3'
+      vers = '1.4'
   where sql_id = 6;
   if sql%rowcount = 0 then
 	insert into barsupl.upl_sql (sql_id, sql_text, before_proc, after_proc, descript, vers)
@@ -81,11 +82,12 @@ declare
              edate
         from bars_dm.custur_rel c
    where c.per_id=bars_dm.dm_import.GET_PERIOD_ID(''MONTH'',nvl(to_date(:param1, ''dd/mm/yyyy''), trunc(sysdate)))
-   and kf = sys_context(''bars_context'', ''user_mfo'')');
+   and kf = sys_context(''bars_context'', ''user_mfo'')
+   and change_type is null');
 begin
   update barsupl.upl_sql
   set sql_text = l_clob,
-      vers = '1.3'
+      vers = '1.4'
   where sql_id = 7;
   if sql%rowcount = 0 then
 	insert into barsupl.upl_sql (sql_id, sql_text, before_proc, after_proc, descript, vers)
@@ -1087,7 +1089,7 @@ select LAST_NAME,
         DATE_ON,
         DATE_OFF,
         EDDR_ID,
-        case when PASSP = 7 then actual_date else null end as IDCARD_VALID_DATE,        
+        actual_date as IDCARD_VALID_DATE,        
         IDDPL,        
         BPLACE,
         SUBSD,
@@ -1614,7 +1616,7 @@ select LAST_NAME,
         DATE_ON,
         DATE_OFF,
         EDDR_ID,
-        case when PASSP = 7 then actual_date else null end as IDCARD_VALID_DATE,        
+        actual_date as IDCARD_VALID_DATE,        
         IDDPL,        
         BPLACE,
         SUBSD,

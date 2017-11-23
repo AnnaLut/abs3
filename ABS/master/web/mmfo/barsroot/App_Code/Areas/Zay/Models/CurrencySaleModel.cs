@@ -38,7 +38,7 @@ namespace BarsWeb.Areas.Zay.Models
         public string TXT { get; set; }
         public decimal? KV_CONV { get; set; }
         public decimal? REQ_TYPE { get; set; }
-        public int ATTACMENTS_COUNT { get; set; }
+        public decimal? ATTACHMENTS_COUNT { get; set; }
     }
 }
 

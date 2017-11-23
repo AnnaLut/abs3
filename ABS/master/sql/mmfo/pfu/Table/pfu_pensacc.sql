@@ -129,6 +129,7 @@ PROMPT *** Create  grants  PFU_PENSACC ***
 grant SELECT                                                                 on PFU_PENSACC     to BARS;
 grant DELETE,INSERT,SELECT,UPDATE                                            on PFU_PENSACC     to BARS_ACCESS_DEFROLE;
 
+
 PROMPT *** ADD field date_blk PK_PFUPENSACC ***
 begin
     execute immediate 'alter table PFU.PFU_PENSACC add date_blk date';
@@ -138,6 +139,16 @@ begin
 end;
 / 
 
+
+PROMPT *** ADD field ispayed PK_PFUPENSACC ***
+begin
+    execute immediate 'alter table PFU.PFU_PENSACC add ispayed number(1)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+                  
 PROMPT *** ADD field comm PK_PFUPENSACC ***
 begin
     execute immediate 'alter table PFU.PFU_PENSACC add comm varchar2(4000)';

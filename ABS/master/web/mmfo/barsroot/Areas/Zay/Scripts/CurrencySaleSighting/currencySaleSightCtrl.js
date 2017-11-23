@@ -316,7 +316,7 @@
                         KV_CONV: { type: "number", editable: false },
                         REQ_TYPE: { type: "number", editable: false },
                         SUP_DOC: { type: "boolean" },
-                        ATTACMENTS_COUNT: { type: "number" }
+                        ATTACHMENTS_COUNT: { type: "number" }
                     }
                 }
             },
@@ -579,9 +579,9 @@
                     }
                 }
             },{
-                field: "ATTACMENTS_COUNT",
+                field: "ATTACHMENTS_COUNT",
                 title: "Додано<br>сканкопію<br>документів",
-                template: "<input type='checkbox' disabled " + "#=data.ATTACMENTS_COUNT == 0 ? '' : 'checked'#" + "/>",
+                template: "<input type='checkbox' disabled " + "#=(data.ATTACHMENTS_COUNT == 0 || data.ATTACHMENTS_COUNT == null) ? '' : 'checked'#" + "/>",
                 width: 90,
                 attributes: { style: "text-align:center;" }
             }

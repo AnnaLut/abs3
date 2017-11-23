@@ -1927,14 +1927,16 @@ namespace clientregister
                                             custReptList);
 
 
-                    //check extra fin reqv only for persons
-                    if (myClient.CUSTTYPE == "person")
-                    {
-                        ForceCheckFinRekv(Convert.ToDecimal(myClient.ID),
-                                            (int)CustTypes.person,
-                                            Convert.ToInt32(CODCAGENT),
-                                            Convert.ToInt32(K050));
-                    }
+                    //check extra fin reqv if user turn of frontend validation 		
+					//Actors are corp clients or persons
+					//which are Bank Clients
+					if ((myClient.CUSTTYPE == "person" || myClient.CUSTTYPE == "corp") && myClient.BC != "1")
+					{
+						ForceCheckFinRekv(  Convert.ToDecimal(myClient.ID), 
+											(int)CustTypes.person, 
+											Convert.ToInt32(CODCAGENT), 
+											Convert.ToInt32(K050));
+					}
 
                     if (myClient.CUSTTYPE == "person")
                     {
@@ -2958,32 +2960,26 @@ namespace clientregister
             cmd.Parameters.Clear();
             cmd.CommandType = CommandType.StoredProcedure;
             cmd.CommandText = "kl.setFullCustomerAddress";
-            cmd.BindByName = true;
-            cmd.Parameters.Add("p_rnk", OracleDbType.Decimal, RNK, ParameterDirection.Input);
-            cmd.Parameters.Add("p_typeId", OracleDbType.Decimal, type_id, ParameterDirection.Input);
-            cmd.Parameters.Add("p_country", OracleDbType.Decimal, Country, ParameterDirection.Input);
-            cmd.Parameters.Add("p_zip", OracleDbType.Varchar2, adr.zip, ParameterDirection.Input);
-            cmd.Parameters.Add("p_domain", OracleDbType.Varchar2, adr.domain, ParameterDirection.Input);
-            cmd.Parameters.Add("p_region", OracleDbType.Varchar2, adr.region, ParameterDirection.Input);
-            cmd.Parameters.Add("p_locality", OracleDbType.Varchar2, adr.locality, ParameterDirection.Input);
-            cmd.Parameters.Add("p_address", OracleDbType.Varchar2, adr.address, ParameterDirection.Input);
-            cmd.Parameters.Add("p_territoryId", OracleDbType.Decimal, adr.territory_id, ParameterDirection.Input);
+            cmd.Parameters.Add("p_Rnk_", OracleDbType.Decimal, RNK, ParameterDirection.Input);
+            cmd.Parameters.Add("p_TypeId", OracleDbType.Decimal, type_id, ParameterDirection.Input);
+            cmd.Parameters.Add("p_Country", OracleDbType.Decimal, Country, ParameterDirection.Input);
+            cmd.Parameters.Add("p_Zip", OracleDbType.Varchar2, adr.zip, ParameterDirection.Input);
+            cmd.Parameters.Add("p_Domain", OracleDbType.Varchar2, adr.domain, ParameterDirection.Input);
+            cmd.Parameters.Add("p_Region", OracleDbType.Varchar2, adr.region, ParameterDirection.Input);
+            cmd.Parameters.Add("p_Locality", OracleDbType.Varchar2, adr.locality, ParameterDirection.Input);
+            cmd.Parameters.Add("p_Address", OracleDbType.Varchar2, adr.address, ParameterDirection.Input);
+            cmd.Parameters.Add("p_TerritoryId", OracleDbType.Decimal, adr.territory_id, ParameterDirection.Input);
 
-            cmd.Parameters.Add("p_locality_type", OracleDbType.Decimal, adr.settlement_tp_id == 0 ? null : adr.settlement_tp_id, ParameterDirection.Input);
-            cmd.Parameters.Add("p_street_type", OracleDbType.Decimal, adr.str_tp_id == 0 ? null : adr.str_tp_id, ParameterDirection.Input);
+            cmd.Parameters.Add("p_locality_type", OracleDbType.Decimal, adr.locality_type, ParameterDirection.Input);
+            cmd.Parameters.Add("p_street_type", OracleDbType.Decimal, adr.street_type, ParameterDirection.Input);
             cmd.Parameters.Add("p_street", OracleDbType.Varchar2, adr.street, ParameterDirection.Input);
-            cmd.Parameters.Add("p_home_type", OracleDbType.Decimal, adr.aht_tp_id == 0 ? null : adr.aht_tp_id, ParameterDirection.Input);
+            cmd.Parameters.Add("p_home_type", OracleDbType.Decimal, adr.home_type, ParameterDirection.Input);
             cmd.Parameters.Add("p_home", OracleDbType.Varchar2, adr.home, ParameterDirection.Input);
-            cmd.Parameters.Add("p_homepart_type", OracleDbType.Decimal, adr.ahpt_tp_id == 0 ? null : adr.ahpt_tp_id, ParameterDirection.Input);
-            cmd.Parameters.Add("p_homepart", OracleDbType.Varchar2, adr.homepart, ParameterDirection.Input);
-            cmd.Parameters.Add("p_room_type", OracleDbType.Decimal, adr.art_tp_id == 0 ? null : adr.art_tp_id, ParameterDirection.Input);
+            cmd.Parameters.Add("p_home_part_type", OracleDbType.Decimal, adr.homepart_type, ParameterDirection.Input);
+            cmd.Parameters.Add("p_home_part", OracleDbType.Varchar2, adr.homepart, ParameterDirection.Input);
+            cmd.Parameters.Add("p_room_type", OracleDbType.Decimal, adr.room_type, ParameterDirection.Input);
             cmd.Parameters.Add("p_room", OracleDbType.Varchar2, adr.room, ParameterDirection.Input);
             cmd.Parameters.Add("p_comment", OracleDbType.Varchar2, adr.Comment, ParameterDirection.Input);
-            cmd.Parameters.Add("p_region_id", OracleDbType.Decimal, adr.region_id, ParameterDirection.Input);
-            cmd.Parameters.Add("p_area_id", OracleDbType.Decimal, adr.area_id, ParameterDirection.Input);
-            cmd.Parameters.Add("p_settlement_id", OracleDbType.Decimal, adr.settlement_id, ParameterDirection.Input);
-            cmd.Parameters.Add("p_street_id", OracleDbType.Decimal, adr.street_id, ParameterDirection.Input);
-            cmd.Parameters.Add("p_house_id", OracleDbType.Decimal, adr.house_id, ParameterDirection.Input);
 
             if (IsNeedConfirmChanges())
             {
@@ -3294,6 +3290,33 @@ namespace clientregister
             if (PublicFlag != String.Empty) { PublicFlagMessage = String.Format("Увага! Виявлено збіг з переліком публічних діячів № в переліку ={0}, ({1}) Зверніться до підрозділу фінансового моніторингу!", PublicFlag, nmk); }
             DbLoggerConstruct.NewDbLogger().Info(String.Format("GetPublicFlag PublicFlag ={0}, PublicFlagMessage={1}.", PublicFlag, PublicFlagMessage), "ClientRegister");
 
+
+            return PublicFlagMessage;
+        }
+
+        [WebMethod(EnableSession = true)]
+        public string GetPublicFlagByRnk(decimal rnk)
+        {
+            string PublicFlagMessage = "";
+            string PublicFlag = String.Empty;
+
+            OracleConnection con = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnection();
+            OracleCommand cmd = con.CreateCommand();
+
+            cmd.CommandText = "select case when finmon_is_public(null, :p_rnk, 1)=0 then null else finmon_is_public(null, :p_rnk, 1) end fl from dual";
+            cmd.Parameters.Add("p_rnk", OracleDbType.Decimal, rnk, ParameterDirection.Input);
+
+            try
+            {
+                if (con.State != ConnectionState.Open) con.Open();
+                PublicFlag = Convert.ToString(cmd.ExecuteScalar());
+            }
+            finally
+            {
+                con.Close();
+                con.Dispose();
+            }
+            if (PublicFlag != String.Empty) { PublicFlagMessage = String.Format("Увага! Виявлено збіг з переліком публічних діячів № в переліку ={0}, ({1}) Зверніться до підрозділу фінансового моніторингу!", PublicFlag, rnk); }
 
             return PublicFlagMessage;
         }

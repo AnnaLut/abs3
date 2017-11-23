@@ -18,6 +18,12 @@
   procedure sign_record_buffer(p_id_rec in pfu_file_records.id%type,
                                p_sign   in pfu_file_records.sign%type);
 
+  function get_death_record_buffer(p_id_rec in pfu_death_record.id%type)
+    return varchar2;
+
+  procedure sign_death_record_buffer(p_id_rec in pfu_death_record.id%type,
+                                     p_sign in pfu_death_record.sign%type);
+
   procedure set_envelope_sign_failure(p_request_id    in integer,
                                       p_error_message in varchar2,
                                       p_error_stack   in varchar2);
@@ -33,7 +39,12 @@
   procedure set_file_state_for_pay(p_file_id in integer);
 
   procedure set_rec_unerror(p_rec_id in integer);
-
+  
+  procedure set_death_state_send_match(p_death_id in integer);
+  
+/*  procedure set_death_debet_ref(p_recid in pfu_death_record.id%type,
+                                  p_ref_debet in pfu_death_record.ref_debet%type);*/
+  
   procedure checking_record(p_rec         in out pfu.pfu_file_records%rowtype,
                               p_err_code    in out number,
                               p_err_message in out varchar2);
@@ -47,8 +58,18 @@
   procedure r_checkstate_procesing(p_file_data in clob,
                                    p_file_id   in number);
 
+  procedure r_checkbackstate_procesing(p_file_data in clob,
+                                         p_file_id   in number);
+
+  procedure r_get_report_procesing(p_file_data in clob,
+                                   p_file_id   in number,
+                                   p_mfo       in varchar2);
+
   procedure r_getebp_procesing(p_file_data in clob,
                                p_file_id   in number);
+
+  procedure r_create_paym_procesing(p_file_data in clob,
+                                    p_file_id   in number);
 
   procedure r_getcardkill_procesing(p_file_data in clob,
                                     p_file_id   in number);
@@ -203,7 +224,7 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_FILES_UTL as
       end;
 
       -- Пенсіонер блокований
-      if l_pensioner_row.state = 'BLOCKED' then
+      if l_pensioner_row.block_type is not null then
         l_err_code    := 4;
         l_err_message := 'Пенсіонер блокований';
         raise err_record;
@@ -228,6 +249,13 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_FILES_UTL as
       p_err_code    := 0;
       p_err_message := '';
       p_rec.ebp_nmk := l_pensioner_row.nmk;
+      
+      update pfu_pensacc pa 
+         set pa.ispayed = 1 
+       where pa.kf = p_rec.mfo
+         and pa.nls = p_rec.num_acc
+         and pa.ispayed is null;
+      
     exception
       when err_record then
         p_err_code    := l_err_code;
@@ -440,6 +468,27 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_FILES_UTL as
      where r.id   = p_id_rec;
   end;
 
+  function get_death_record_buffer(p_id_rec in pfu_death_record.id%type) return varchar2 is
+    l_buffer varchar2(32000);
+  begin
+    select d.bank_mfo || to_char(d.date_dead, 'DD.MM.YYYY') || d.num_acc ||
+           d.bank_num || d.death_akt || to_char(d.sum_over) || d.last_name||' '||d.last_name||' '||d.father_name||
+           d.okpo || d.date_akt || d.pfu_num
+      into l_buffer
+      from pfu_death_record d
+     where id = p_id_rec;
+
+    return l_buffer;
+  end;
+
+  procedure sign_death_record_buffer(p_id_rec in pfu_death_record.id%type, p_sign in pfu_death_record.sign%type) is
+
+  begin
+    update pfu_file_records r
+       set r.sign = p_sign
+     where r.id   = p_id_rec;
+  end;
+
   function read_pensioner(
         p_pensioner_okpo in pfu_pensioner.okpo%type,
         p_lock in boolean default false,
@@ -525,6 +574,15 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_FILES_UTL as
     begin
        update pfu_file_records set state = 0 where id=p_rec_id;
        commit;
+    end;
+    
+    procedure set_death_state_send_match(p_death_id in integer)
+      is
+    begin
+      update pfu_death d
+         set d.state = 'MATCH_SEND'
+       where d.id = p_death_id;
+      commit;
     end;
 
     procedure set_envelope_parsed(
@@ -668,7 +726,6 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_FILES_UTL as
                            from pfu_file_records pfr
                           where pfr.file_id = pf.id
                             and pfr.state = 20);
-
       transport_utl.set_transport_state(p_id               => p_file_id,
                                         p_state_id         => transport_utl.trans_state_done,
                                         p_tracking_comment => 'Файл оброблено',
@@ -682,6 +739,101 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_FILES_UTL as
                                         p_tracking_comment => 'Ошибка обработки',
                                         p_stack_trace      => dbms_utility.format_error_backtrace());
 
+    end;
+
+    procedure r_checkbackstate_procesing(p_file_data in clob,
+                                         p_file_id   in number) is
+      l_parser   dbms_xmlparser.parser;
+      l_doc      dbms_xmldom.domdocument;
+      l_rows     dbms_xmldom.domnodelist;
+      l_row      dbms_xmldom.domnode;
+      l_ref      number;
+      l_state    number;
+      l_cnt      number;
+      l_fileid   pfu_file_records.file_id%type; 
+    begin
+
+      l_parser := dbms_xmlparser.newparser;
+      dbms_xmlparser.parseclob(l_parser, p_file_data);
+      l_doc := dbms_xmlparser.getdocument(l_parser);
+
+      l_rows := dbms_xmldom.getelementsbytagname(l_doc, 'row');
+      for i in 0 .. dbms_xmldom.getlength(l_rows) - 1
+      loop
+
+        l_row     := dbms_xmldom.item(l_rows, i);
+        l_ref     := to_number(dbms_xslprocessor.valueof(l_row, 'ref/text()'));
+        l_state   := to_number(dbms_xslprocessor.valueof(l_row, 'state_id/text()'));
+
+        update pfu_death_record dr
+           set dr.state = case when l_state != 0
+                               then 'ERR_PAY'
+                               when l_state = 0  -- платеж закрыт
+                               then 'PAYED'
+                               end,
+               dr.date_pay = sysdate
+         where dr.ref = l_ref
+         returning dr.list_id into l_fileid;
+
+      end loop;
+      transport_utl.set_transport_state(p_id               => p_file_id,
+                                        p_state_id         => transport_utl.trans_state_done,
+                                        p_tracking_comment => 'Файл оброблено',
+                                        p_stack_trace      => null);
+      dbms_xmlparser.freeparser(l_parser);
+      dbms_xmldom.freedocument(l_doc);
+      exception
+        when others then
+            transport_utl.set_transport_state(p_id               => p_file_id,
+                                        p_state_id         => transport_utl.TRANS_STATE_FAILED,
+                                        p_tracking_comment => 'Ошибка обработки',
+                                        p_stack_trace      => dbms_utility.format_error_backtrace());
+
+    end;
+
+    procedure r_create_paym_procesing(p_file_data in clob,
+                                      p_file_id   in number) is
+      l_parser   dbms_xmlparser.parser;
+      l_doc      dbms_xmldom.domdocument;
+      l_rows     dbms_xmldom.domnodelist;
+      l_row      dbms_xmldom.domnode;
+
+      l_ref      pfu_death_record.ref%type;
+      l_sum      pfu_death_record.sum_payed%type;
+      l_typ      varchar2(30);
+      l_did      pfu_death_record.id%type;
+    begin
+      l_parser := dbms_xmlparser.newparser;
+      dbms_xmlparser.parseclob(l_parser, p_file_data);
+      l_doc := dbms_xmlparser.getdocument(l_parser);
+      
+      l_rows := dbms_xmldom.getelementsbytagname(l_doc, 'body');
+
+      l_row := dbms_xmldom.item(l_rows, 0);
+
+      l_ref   := to_number(dbms_xslprocessor.valueof(l_row, 'ref/text()'));
+      l_sum   := to_number(dbms_xslprocessor.valueof(l_row, 'sum/text()'));
+      l_typ   := dbms_xslprocessor.valueof(l_row, 'typ/text()');
+      l_did   := to_number(dbms_xslprocessor.valueof(l_row, 'did/text()'));
+
+      update pfu_death_record dr
+         set dr.sum_pay = l_sum,
+             dr.ref = l_ref,
+             dr.typ = l_typ,
+             dr.state = 'IN_PAY'
+       where dr.id = l_did;
+      transport_utl.set_transport_state(p_id               => p_file_id,
+                                        p_state_id         => transport_utl.trans_state_done,
+                                        p_tracking_comment => 'Файл оброблено',
+                                        p_stack_trace      => null);
+      dbms_xmlparser.freeparser(l_parser);
+      dbms_xmldom.freedocument(l_doc);
+      exception
+        when others then
+            transport_utl.set_transport_state(p_id               => p_file_id,
+                                        p_state_id         => transport_utl.TRANS_STATE_FAILED,
+                                        p_tracking_comment => 'Ошибка обработки',
+                                        p_stack_trace      => dbms_utility.format_error_backtrace());
     end;
 
     procedure r_getebp_procesing(p_file_data in clob,
@@ -820,6 +972,7 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_FILES_UTL as
       l_kill_date    date;
       l_cnt          number;
       l_mfo          pfu_epp_line.bank_mfo%type;
+
     begin
 
       l_parser := dbms_xmlparser.newparser;
@@ -874,7 +1027,7 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_FILES_UTL as
                                         p_stack_trace      => dbms_utility.format_error_backtrace());
 
     end;
-
+    
     procedure r_get_report_procesing(p_file_data in clob,
                                      p_file_id   in number,
                                      p_mfo       in varchar2) is
@@ -896,13 +1049,94 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_FILES_UTL as
       l_ispayed     number;
 
     begin
+
+      l_parser := dbms_xmlparser.newparser;
+      dbms_xmlparser.parseclob(l_parser, p_file_data);
+      l_doc := dbms_xmlparser.getdocument(l_parser);
+      
+      begin 
+           select tl.id 
+             into l_fileid
+             from pfu_no_turnover_list tl
+            where substr(to_char(tl.date_create, 'dd.mm.yyyy'), 4, 2) = substr(to_char(sysdate, 'dd.mm.yyyy'), 4, 2)
+              and tl.kf = p_mfo;
+         exception 
+           when NO_DATA_FOUND 
+              then 
+                l_fileid := pfu_no_turnover_list_seq.nextval;
+                insert into pfu_no_turnover_list(id, 
+                                                 id_request, 
+                                                 date_create, 
+                                                 date_sent, 
+                                                 full_lines, 
+                                                 user_id, 
+                                                 state,
+                                                 kf)
+                values (l_fileid, 
+                        null, 
+                        sysdate, 
+                        null, 
+                        null, 
+                        null, 
+                        'NEW',
+                        p_mfo);
+      end;
+
+      l_rows := dbms_xmldom.getelementsbytagname(l_doc, 'row');
+      for i in 0 .. dbms_xmldom.getlength(l_rows) - 1
+      loop
+
+         l_row          := dbms_xmldom.item(l_rows, i);
+         l_num_acc      := dbms_xslprocessor.valueof(l_row, 'acc_num/text()');
+         l_rnk          := to_number(dbms_xslprocessor.valueof(l_row, 'rkn/text()'));
+         l_mfo          := dbms_xslprocessor.valueof(l_row, 'mfo/text()');
+         l_datet        := to_date(dbms_xslprocessor.valueof(l_row, 'date_turn/text()'),'dd.mm.yyyy');
+         
+         select p.nmk, p.okpo, p.ser||' '||p.numdoc
+           into l_fullname, l_okpo, l_sernum 
+           from pfu_pensioner p
+          where p.rnk = l_rnk
+            and p.kf = l_mfo;
+            
+         select p.ispayed 
+           into l_ispayed
+           from pfu_pensacc p
+          where p.nls = l_num_acc
+            and p.kf = l_mfo;
+          
+         pfu_service_utl.parse_fio(l_fullname, l_last_name, l_name, l_father_name);
+         
+         if (l_ispayed = 1) then
+             insert into pfu_no_turnover(id,
+                                         id_file,
+                                         last_name,
+                                         name,
+                                         father_name,
+                                         okpo,
+                                         ser_num,
+                                         num_acc,
+                                         kf,
+                                         date_last)
+             values(pfu_no_turnover_seq.nextval,
+                    l_fileid,
+                    l_last_name, 
+                    l_name, 
+                    l_father_name,
+                    l_okpo,
+                    l_sernum,
+                    l_num_acc,
+                    l_mfo,
+                    l_datet);
+         end if;
+         
+      end loop;
       transport_utl.set_transport_state(p_id               => p_file_id,
                                         p_state_id         => transport_utl.trans_state_done,
                                         p_tracking_comment => 'Файл оброблено',
                                         p_stack_trace      => null);
       dbms_xmlparser.freeparser(l_parser);
-      dbms_xmldom.freedocument(l_doc);
-      exception
+      dbms_xmldom.freedocument(l_doc);       
+      exception 
         when others then
             transport_utl.set_transport_state(p_id               => p_file_id,
                                         p_state_id         => transport_utl.TRANS_STATE_FAILED,
@@ -910,7 +1144,7 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_FILES_UTL as
                                         p_stack_trace      => dbms_utility.format_error_backtrace());
 
     end;
-
+    
     procedure r_branch_procesing(p_file_data in clob,
                                       p_file_id   in number) is
       l_parser   dbms_xmlparser.parser;

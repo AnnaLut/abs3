@@ -1,4 +1,3 @@
-using AttributeRouting.Web.Http;
 using BarsWeb.Areas.Kernel.Models;
 using BarsWeb.Areas.RequestsProcessing.Infrastructure.DI.Abstract;
 using BarsWeb.Areas.RequestsProcessing.Infrastructure.DI.Implementation;
@@ -15,7 +14,6 @@ using Areas.RequestsProcessing.Models;
 
 namespace BarsWeb.Areas.RequestsProcessing.Controllers.Api
 {
-    [AuthorizeUser]
     public class RequestsProcessingController : ApiController
     {
         readonly IRequestsProcessingRepository _repo;

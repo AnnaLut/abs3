@@ -130,8 +130,66 @@ exception when others then
  end;
 /
 
+PROMPT *** ADD field sum_payed ***
+begin
+    execute immediate 'alter table PFU.PFU_DEATH_RECORD add sum_payed NUMBER(38)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+
+PROMPT *** ADD field ref ***
+begin
+    execute immediate 'alter table PFU.PFU_DEATH_RECORD add ref NUMBER(38)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+
+PROMPT *** ADD field sign ***
+begin
+    execute immediate 'alter table PFU.PFU_DEATH_RECORD add sign VARCHAR2(1000)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+
+PROMPT *** ADD field typ ***
+begin
+    execute immediate 'alter table PFU.PFU_DEATH_RECORD add typ VARCHAR2(30)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+
+PROMPT *** ADD field date_payback ***
+begin
+    execute immediate 'alter table PFU_DEATH_RECORD add date_payback date';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+
+PROMPT *** ADD field num_paym ***
+begin
+    execute immediate 'alter table PFU_DEATH_RECORD add num_paym varchar2(1000)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
 
 
+-- Add comments to the columns 
+comment on column PFU.PFU_DEATH_RECORD.sum_payed is 'Сума фактичного списання ';
+comment on column PFU.PFU_DEATH_RECORD.ref is 'Референс списання';
+comment on column PFU.PFU_DEATH_RECORD.sign is 'Подпись';
+comment on column PFU.PFU_DEATH_RECORD.typ is 'Тит оплаты';
 
 
 PROMPT ===================================================================================== 

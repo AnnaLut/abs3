@@ -1,5 +1,6 @@
 prompt BPK2 into 10 group
 begin
+  delete from upl_filegroups_rln where group_id = 10 and file_id = 4;
   insert into upl_filegroups_rln(group_id, file_id, sql_id)
   values (10, 4, 4);
 exception
@@ -66,7 +67,7 @@ begin
   insert into upl_filegroups_rln(group_id, file_id, sql_id)
   values (11, 120, 120);
   insert into upl_filegroups_rln(group_id, file_id, sql_id)
-  values (11, 120, 1120);
+  values (10, 120, 1120);
 exception
   when dup_val_on_index then null;
 end;
@@ -76,6 +77,7 @@ commit;
 /
 prompt BPK2 into 11 group
 begin
+  delete from upl_filegroups_rln where group_id = 11 and file_id = 4;
   insert into upl_filegroups_rln(group_id, file_id, sql_id)
   values (11, 4, 5);
 exception

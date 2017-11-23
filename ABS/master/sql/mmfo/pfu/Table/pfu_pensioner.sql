@@ -250,7 +250,16 @@ exception when others then
  end;
 /
 
+PROMPT *** ADD field is_okpo_well ***
+begin
+    execute immediate 'alter table PFU.PFU_PENSIONER add is_okpo_well NUMBER(1)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
 
+comment on column PFU.PFU_PENSIONER.is_okpo_well is 'Результат проверки ОКПО по дате рожения (0 - ОКПО не совпадает с датой рождения, 1- ОКПО совпадает с датой рождения )';
 
 PROMPT *** Create  grants  PFU_PENSIONER ***
 grant SELECT                                                                 on PFU_PENSIONER   to BARS;

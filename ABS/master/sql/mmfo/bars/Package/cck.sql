@@ -1,5 +1,5 @@
 CREATE OR REPLACE PACKAGE cck IS
-  g_header_version CONSTANT VARCHAR2(64) := 'ver.3.23  24/02/2017 ';
+  g_header_version CONSTANT VARCHAR2(64) := 'ver.3.24  10/11/2017 ';
 
   /*
    23.01.2017 LSO Додано призначення платежу для ручного розбіру
@@ -41,6 +41,12 @@ CREATE OR REPLACE PACKAGE cck IS
   err EXCEPTION;
   g_reports NUMBER := 0; -- (1) - включить режим выполнения для отчета
   ---================================================================
+  PROCEDURE p_int_save(nd_        cc_deal.nd%type,
+                       int_2_val  int_ratn.ir%type default null,
+                       int_2_date int_ratn.bdat%type default null,
+                       int_3_val  int_ratn.ir%type default null,
+                       int_3_date int_ratn.bdat%type default null,
+                       p_mode     number default 0 );
   PROCEDURE pl_ins_input
   (
     p_mode  INT
@@ -1161,7 +1167,7 @@ END cck;
 /
 CREATE OR REPLACE PACKAGE BODY cck IS
   -------------------------------------------------------------------
-  g_body_version CONSTANT VARCHAR2(64) := 'ver.4.0.0  27/07/2017 ';
+  g_body_version CONSTANT VARCHAR2(64) := 'ver.4.1.1  15/11/2017 ';
   ------------------------------------------------------------------
 
   /*
@@ -1176,6 +1182,7 @@ CREATE OR REPLACE PACKAGE BODY cck IS
   */
 
   /*
+  15/11/2017 змінено процедур cc_kor.Додано перевірку на статус КД.Залежно від статусу змінювати дозволено різні параметри 
   29.12.2016 Sta COBUSUPABS-5046
      При открытие счетов (раздел 20** и 22** ) в КП по "птичке" программа будет
      •  блокировать открытие - если таковой счет уже существует. При этом неважно – закрыт этот счет, или открыт в настоящее время.
@@ -1297,6 +1304,16 @@ CREATE OR REPLACE PACKAGE BODY cck IS
   */
 
   -----------------------------------------------------
+  PROCEDURE p_int_save(nd_        cc_deal.nd%type,
+                       int_2_val  int_ratn.ir%type default null,
+                       int_2_date int_ratn.bdat%type default null,
+                       int_3_val  int_ratn.ir%type default null,
+                       int_3_date int_ratn.bdat%type default null,
+                       p_mode     number default 0 )
+  is
+  begin
+  null;
+  end ;                     
   PROCEDURE p_cc_lim_copy
   (
     p_nd       cc_deal.nd%TYPE
@@ -6611,9 +6628,16 @@ CREATE OR REPLACE PACKAGE BODY cck IS
     -- процедура обновления КД
     dat3_   DATE;
     cc_kom_ INT;
+    nsos cc_Deal.sos%type;
   BEGIN
-
+ begin
+ select t.sos into  nsos from cc_deal t where t.nd= nd_;
+ exception when no_data_found then
+   nsos:=0;
+  end;
+ 
     UPDATE customer SET crisk = nfin_ WHERE rnk = nrnk_;
+ if  nsos=0 then
     UPDATE cc_deal
        SET cc_id = cc_id_
           ,sdate = datzak_
@@ -6635,7 +6659,26 @@ CREATE OR REPLACE PACKAGE BODY cck IS
           ,freq    = nfreq_
      WHERE nd = nd_
        AND adds = 0;
-
+else
+   UPDATE cc_deal
+       SET cc_id = cc_id_
+          ,sdate = datzak_
+          ,wdate = datend_
+          ,vidd  = nvid_
+          ,obs   = nobs_
+     WHERE nd = nd_;
+    UPDATE cc_add
+       SET aim     = ncel_
+          ,kv      = nkv_
+          ,bdate   = datbeg_
+          ,wdate   = datwid_
+          ,sour    = nisto_
+          ,acckred = nls_
+          ,mfokred = nbank_
+          ,freq    = nfreq_
+     WHERE nd = nd_
+       AND adds = 0;
+end if;
     BEGIN
       INSERT INTO nd_txt
         (nd, tag, txt)
@@ -8728,7 +8771,7 @@ CREATE OR REPLACE PACKAGE BODY cck IS
                FROM nd_acc n, accounts a, specparam s
               WHERE n.nd = k.nd
                 AND n.acc = a.acc
-                AND a.tip IN ('SS ', 'SP ', 'SPN', 'SN ','S36')
+                AND a.tip IN ('SS ', 'SP ', 'SPN', 'SN ')
                 AND a.acc = s.acc)
         INTO l_wdate_old, l_s080_old
         FROM cc_deal d
@@ -8780,7 +8823,8 @@ CREATE OR REPLACE PACKAGE BODY cck IS
                                   ,'CR9'
                                   ,'SN8'
                                   ,'SNA'
-                                  ,'SNO'))
+                                  ,'SNO'
+                                  ,'S36'))
         LOOP
 
           UPDATE accounts
@@ -9249,7 +9293,7 @@ CREATE OR REPLACE PACKAGE BODY cck IS
         COBUSUPABS-4376
         Забезпечення неможливості авторизації заявок на кредитні угоди (окрім кредитів по БПК),
         якщо позичальник є інсайдером.
-    */
+
 
     BEGIN
       SELECT c.prinsider INTO stmp_ FROM customer c WHERE dd.rnk = c.rnk;
@@ -9270,7 +9314,7 @@ CREATE OR REPLACE PACKAGE BODY cck IS
                              , '\8999-CCK.cc_autor:
 ЗАБОРОНЕНО Авторизацію договора - клієнт являється ІНСАЙДЕРОМ/Ознака = ' ||
                                stmp_);
-    END IF;
+    END IF;    */
 
   END cc_autor;
   ---------------------------------------------------------------
@@ -11710,7 +11754,7 @@ CREATE OR REPLACE PACKAGE BODY cck IS
           cf_     := -pmt1(par1_, par2_, pv_, fv_);
           cf_     := trunc(cf_ / power(10, dig_)) * power(10, dig_);
           sumo_cf := cf_ + sumk_;
-         
+
         FOR k IN (SELECT fdat
                       FROM cc_lim
                      WHERE nd = nd_
@@ -11721,18 +11765,18 @@ CREATE OR REPLACE PACKAGE BODY cck IS
             sg_  := 0;
             so_  := 0;
             sk0_ := 0;
-         
+
            IF k.fdat > l_bdat_1 THEN
               -- не первая банковская дата, начислить %
-         
+
               acrn.p_int(l_acc, 0, fdat1_, k.fdat - 1, int_, -pv_, 0);
               --bars_audit.info('CC_GPK. ACRN.P_INT l_acc=' || l_acc || ', fdat1_=' || fdat1_ ||', int_='||int_||', pv_'||pv_);
-   
+
               int_ := round(-int_, 0);
               IF irk_ > 0 THEN
-                 
+
                 acrn.p_int(l_acc, 2, fdat1_, k.fdat - 1, sk0_, -pv_, 0);
-                
+
                -- bars_audit.info('CC_GPK. ACRN.P_INT l_acc=' || l_acc || ', fdat1_=' || fdat1_ ||', int_='||int_||', pv_'||pv_);
                 sk0_ := round(-sk0_, 0);
               END IF;
@@ -13893,6 +13937,7 @@ null;
                          AND sos >= 1
                          AND sos < 14
                          AND vidd IN (1, 2, 3, 11, 12, 13)
+             and  substr(prod ,1,1)<>'9'
                          AND (nregim_ < 0 AND nd = -nregim_ OR nregim_ >= 0)) d
                WHERE a8.tip = 'LIM'
                  AND n8.acc = a8.acc
@@ -14633,6 +14678,7 @@ null;
       <<met_kon>>
       NULL;
     END LOOP; -- k
+  --raise_application_error(-20008,'CCK_ASG');
   END cc_asg;
   -----------------------
 

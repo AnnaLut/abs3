@@ -19,7 +19,7 @@
         { tag: "SN8_R", tab: $scope.ArrayTabs[2], fields: "Пеня" }, { tag: "DATSN", tab: $scope.ArrayTabs[1], fields: "Погашення процентного боргу -> Перша платіжна дата" },
         { tag: "DAYNP", tab: $scope.ArrayTabs[1], fields: "Тип урегулювання дня погашення" }, { tag: "DAYSN", tab: $scope.ArrayTabs[1], fields: "Погашення процентного боргу  -> День" },
         { tag: "INIC", tab: $scope.ArrayTabs[0], fields: "Ініціатива" }, { tag: "CCRNG", tab: $scope.ArrayTabs[1], fields: "Шаблон погашення рахунку \"SG\" " },
-        { tag: "S260", tab: $scope.ArrayTabs[0], fields: "Продукт" }, { tag: "I_CR9", tab: $scope.ArrayTabs[0], fields: "Вид" }, { tag: "R_CR9", tab: $scope.ArrayTabs[2], fields: "Комісія за невикористаний ліміт" },
+        { tag: "I_CR9", tab: $scope.ArrayTabs[0], fields: "Вид" }, { tag: "R_CR9", tab: $scope.ArrayTabs[2], fields: "Комісія за невикористаний ліміт" },
         { tag: "FREQ", tab: $scope.ArrayTabs[1], fields: "Погашення основного боргу -> Періодичність" }, { tag: "FREQP", tab: $scope.ArrayTabs[1], fields: "Погашення процентного боргу -> Періодичність" }];
 
     $scope.GetMessage = function (tag) {

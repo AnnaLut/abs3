@@ -792,13 +792,16 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
                                   "   CCK_APP.SET_ND_TXT(" + param.nd + ", 'CCRNG', '" + param.rang + "');" +
                                   "End;";
                 cmd.ExecuteNonQuery();
-                cmd.CommandText = "Begin" +
-                                  "   update nd_txt set txt = (select s260 from cc_potra where id = '" + param.prod + "' )  where tag = 'S260' and nd = " + param.nd + ";" +
-                                  "   if SQL%rowcount = 0 then" +
-                                  "      INSERT INTO nd_txt (ND, TAG, TXT) values(" + param.nd + ", 'S260', (select s260 from cc_potra where id = '" + param.prod + "' ) ) ;" +
-                                  "   end if;" +
-                                  "End;";
-                cmd.ExecuteNonQuery();
+                if (GetCusttype(param.vidd) == 3)
+                {
+                    cmd.CommandText = "Begin" +
+                                      "   update nd_txt set txt = (select s260 from cc_potra where id = '" + param.prod + "' )  where tag = 'S260' and nd = " + param.nd + ";" +
+                                      "   if SQL%rowcount = 0 then" +
+                                      "      INSERT INTO nd_txt (ND, TAG, TXT) values(" + param.nd + ", 'S260', (select s260 from cc_potra where id = '" + param.prod + "' ) ) ;" +
+                                      "   end if;" +
+                                      "End;";
+                    cmd.ExecuteNonQuery();
+                }
                 if (param.sdi != null)
                 {
                     cmd.CommandText = "Begin" +
@@ -987,6 +990,12 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
                 //                      "End;";
                 //    cmd.ExecuteNonQuery();
                 //}
+
+                cmd.Parameters.Clear();
+                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                cmd.CommandText = "bars.cck.p_int_save";
+                cmd.Parameters.Add("nd_", OracleDbType.Decimal, param.nd, System.Data.ParameterDirection.Input);
+                cmd.ExecuteNonQuery();
             }
 
             finally
