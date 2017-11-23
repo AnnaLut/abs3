@@ -1,7 +1,7 @@
 CREATE OR REPLACE PACKAGE BARS_OW
 is
 
-g_header_version  constant varchar2(64)  := 'version 4.285 14/07/2017';
+g_header_version  constant varchar2(64)  := 'version 4.285 23/11/2017';
 g_header_defs     constant varchar2(512) := '';
 
 -- header_version - возвращает версию заголовка пакета
@@ -12,6 +12,12 @@ function body_version return varchar2;
 
 -- Конвертит blob в clob
 function blob_to_clob (blob_in in blob) return clob;
+
+-------------------------------------------------------------------------------
+-- ow_init
+-- процедура инициализации параметров пакета
+--
+procedure ow_init;
 
 -- процедура импорта файлов от Way4 - для вертушки
 procedure w4_import_files (
