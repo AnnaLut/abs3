@@ -80,16 +80,18 @@ public partial class cim_payments_unbound_payments : System.Web.UI.Page
         {
             odsVCimUnboundPayments.TypeName = "cim.VCimOutUnboundPayments";
 
-            if (gridBoundColumns.Any(bf => bf.HeaderText.Equals(SuprovidniDocs)) == false)
+            TemplateField attachmentsCountField = new TemplateField()
             {
-                TemplateField attachmentsCountField = new TemplateField()
-                {
-                    ItemTemplate = new ChebkBooxColumn(),
-                    HeaderText = SuprovidniDocs,
-                    SortExpression = "ATTACHMENTS_COUNT"
-                };
-                gvVCimUnboundPayments.Columns.Add(attachmentsCountField);
+                ItemTemplate = new ChebkBooxColumn(),
+                HeaderText = SuprovidniDocs,
+                SortExpression = "ATTACHMENTS_COUNT"
+            };
+            if (gridBoundColumns.Any(bf => bf.HeaderText.Equals(SuprovidniDocs)))
+            {
+                var col = gridBoundColumns.FirstOrDefault(c=> c.HeaderText== SuprovidniDocs);
+                if (col != null) gvVCimUnboundPayments.Columns.Remove(col);
             }
+            gvVCimUnboundPayments.Columns.Add(attachmentsCountField);
             SetVisibility(gridBoundColumns, SuprovidniDocs, true);
 
             gvVCimUnboundPayments.Columns[2].Visible = false;
@@ -365,6 +367,7 @@ class ChebkBooxColumn : ITemplate
     public void InstantiateIn(System.Web.UI.Control container)
     {
         CheckBox cbAttachmentsCount = new CheckBox();
+        cbAttachmentsCount.Enabled = false;
         cbAttachmentsCount.ID = "cbAttachmentsCount";
         cbAttachmentsCount.DataBinding += new EventHandler(this.AttachmentsCount_DataBinding);
         container.Controls.Add(cbAttachmentsCount);

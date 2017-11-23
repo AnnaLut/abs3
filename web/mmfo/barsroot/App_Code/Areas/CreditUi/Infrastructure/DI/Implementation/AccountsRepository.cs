@@ -123,18 +123,18 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
 
                 while (reader.Read())
                 {
-                    data.CC_ID = reader.GetString(0);
-                    data.RNK = reader.GetDecimal(1);
-                    data.S = reader.GetDecimal(2);
-                    data.SDOG = reader.GetDecimal(3);
-                    data.DIFF = reader.GetDecimal(4);
-                    data.SDATE = Convert.ToDateTime(reader.GetValue(5).ToString()).ToString("dd/MM/yyyy");
-                    data.WDATE = Convert.ToDateTime(reader.GetValue(6).ToString()).ToString("dd/MM/yyyy");
-                    data.NAMK = reader.GetString(7);
-                    data.VNAME = reader.GetString(8);
-                    data.OSTB_9129 = reader.GetDecimal(9);
-                    data.Date_issuance = Convert.ToDateTime(reader.GetValue(10).ToString()).ToString("dd/MM/yyyy");
-                    data.CUSTYPE = reader.GetInt32(11);
+                    data.CC_ID = String.IsNullOrEmpty(reader.GetValue(0).ToString()) ? String.Empty : reader.GetString(0);
+                    data.RNK = String.IsNullOrEmpty(reader.GetValue(1).ToString()) ? 0 : reader.GetDecimal(1);
+                    data.S = String.IsNullOrEmpty(reader.GetValue(2).ToString()) ? 0 : reader.GetDecimal(2);
+                    data.SDOG = String.IsNullOrEmpty(reader.GetValue(3).ToString()) ? 0 : reader.GetDecimal(3);
+                    data.DIFF = String.IsNullOrEmpty(reader.GetValue(4).ToString()) ? 0 : reader.GetDecimal(4);
+                    data.SDATE = String.IsNullOrEmpty(reader.GetValue(5).ToString()) ? String.Empty : Convert.ToDateTime(reader.GetValue(5).ToString()).ToString("dd/MM/yyyy");
+                    data.WDATE = String.IsNullOrEmpty(reader.GetValue(6).ToString()) ? String.Empty : Convert.ToDateTime(reader.GetValue(6).ToString()).ToString("dd/MM/yyyy");
+                    data.NAMK = String.IsNullOrEmpty(reader.GetValue(7).ToString()) ? String.Empty : reader.GetString(7);
+                    data.VNAME = String.IsNullOrEmpty(reader.GetValue(8).ToString()) ? String.Empty : reader.GetString(8);
+                    data.OSTB_9129 = String.IsNullOrEmpty(reader.GetValue(9).ToString()) ? 0 : reader.GetDecimal(9);
+                    data.Date_issuance = String.IsNullOrEmpty(reader.GetValue(10).ToString()) ? String.Empty : Convert.ToDateTime(reader.GetValue(10).ToString()).ToString("dd/MM/yyyy");
+                    data.CUSTYPE = String.IsNullOrEmpty(reader.GetValue(11).ToString()) ? 0 : reader.GetInt32(11);
                 }
             }
             finally

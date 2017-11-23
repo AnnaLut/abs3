@@ -196,7 +196,6 @@ COMMENT ON COLUMN BARS.ZAYAVKA.SUPPORT_DOCUMENT IS 'Наличие подтверждающих докум
 
 
 
-
 PROMPT *** Create  constraint FK_ZAYAVKA_BRANCH ***
 begin   
  execute immediate '
@@ -621,6 +620,19 @@ exception when others then
 
 
 
+begin
+  execute immediate
+    ' alter table bars.zayavka add ATTACHMENTS_COUNT integer ';
+exception when others then
+  if sqlcode=-1430 then null; else raise; end if;
+end;
+/
+
+COMMENT ON COLUMN BARS.ZAYAVKA.ATTACHMENTS_COUNT is 'Кількість доданих документів';
+
+
+
+
 PROMPT *** Create  grants  ZAYAVKA ***
 grant FLASHBACK,REFERENCES,SELECT                                            on ZAYAVKA         to BARSAQ with grant option;
 grant REFERENCES,SELECT                                                      on ZAYAVKA         to BARSAQ_ADM with grant option;
@@ -631,6 +643,7 @@ grant INSERT                                                                 on 
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ZAYAVKA         to WR_ALL_RIGHTS;
 grant ALTER,DEBUG,DELETE,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on ZAYAVKA         to ZAY;
 
+GRANT UPDATE 																ON BARS.ZAYAVKA 	TO BARSAQ;
 
 
 PROMPT *** Create SYNONYM  to ZAYAVKA ***

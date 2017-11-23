@@ -36,9 +36,15 @@ public class ExcelHelper
                 allShowColumns.Add(item);
             }
         }
-
-        if (dataResult.DataRecords.Count() > 80000)
-            return ExcelExportToCSV('|',tableSemantic, dataResult.DataRecords, allShowColumns, excelDataModel.TableName);
+        if (dataResult is ResultForExcel)
+        {
+            ResultForExcel excelResult = dataResult as ResultForExcel;
+            if (excelResult.ExcelParam == "ALL_CSV")
+                return ExcelExportToCSV('|', tableSemantic, dataResult, allShowColumns, excelDataModel.TableName);
+        }
+           
+       
+            
         var package = new ExcelPackage();
         MemoryStream result = new MemoryStream();
         try
@@ -85,7 +91,11 @@ public class ExcelHelper
                 worksheet.Cells[curRow, startColumn].Value = "Підсумок: ";
                 foreach (var item in dataResult.TotalRecord)
                 {
-                   int currCol = allShowColumns.FindIndex(x => x.COLNAME == item.Key) + startColumn;
+
+                    int currCol = allShowColumns.FindIndex(x => x.COLNAME == item.Key);
+                    if (currCol == -1)
+                        continue;
+                        currCol = currCol + startColumn;
                     worksheet.Cells[curRow, currCol].Value = item.Value;
                 }
             }
@@ -190,12 +200,16 @@ public class ExcelHelper
         }
     }
 
-    public static ExcelResulModel ExcelExportToCSV(char columnSeparator, string tableSemantic, IEnumerable<Dictionary<string, object>> dataRecords, List<ColumnMetaInfo> ColumnsInfo,
+    public static ExcelResulModel ExcelExportToCSV(char columnSeparator, string tableSemantic, GetDataResultInfo resultInfo, List<ColumnMetaInfo> ColumnsInfo,
         string fileName)
     {
-
-        Dictionary<string, int> headerLen = new Dictionary<string, int>();
+        IEnumerable<Dictionary<string, object>> dataRecords = resultInfo.DataRecords;
+       Dictionary<string, int> headerLen = new Dictionary<string, int>();
         System.Text.StringBuilder sb = new System.Text.StringBuilder();
+        Encoding windows = Encoding.GetEncoding("windows-1251");
+        Encoding unicode = Encoding.Unicode;
+        try
+        {
         //sb.Append("sep=|");
         //foreach (Dictionary<string, object> rowData in dataRecords)
         //{
@@ -209,6 +223,7 @@ public class ExcelHelper
         {
             System.Text.StringBuilder sbRow = new System.Text.StringBuilder();
           
+         
             foreach (KeyValuePair<string, object> r in rowData)
             {
                 string v = r.Value.ToString();
@@ -218,9 +233,9 @@ public class ExcelHelper
                 //hack for A7 report
                 if (colInfo.COLTYPE == "D")
                 {
+                        if(!string.IsNullOrEmpty(v))
                     v = ((DateTime)r.Value).ToString(string.IsNullOrEmpty(colInfo.SHOWFORMAT) ? "ddMMyyyy" : colInfo.SHOWFORMAT);
                 }
-
                 sbRow.Append(v);
                 sbRow.Append(columnSeparator);
             }
@@ -244,9 +259,24 @@ public class ExcelHelper
             sb.Insert(0, "sep=" + columnSeparator + "\n");
         ExcelResulModel excelResult = new ExcelResulModel();
         excelResult.FileName = fileName + ".csv";
-        excelResult.ContentType = "text/csv";
-        excelResult.ContentResult = Encoding.UTF8.GetBytes(sb.ToString());
-       
+        excelResult.ContentType = "application/ms-excel";// "text/csv";
+
+        byte[] unicodeBytes = unicode.GetBytes(sb.ToString());
+        byte[] asciiBytes = Encoding.Convert(unicode, windows, unicodeBytes);
+        //char[] asciiChars = new char[ascii.GetCharCount(asciiBytes, 0, asciiBytes.Length)];
+        //ascii.GetChars(asciiBytes, 0, asciiBytes.Length, asciiChars, 0);
+        //string resStr = new string(asciiChars);
+        excelResult.ContentResult = asciiBytes;
+
+
         return excelResult;
+
+
+        }
+        catch (Exception e)
+        {
+
+            throw e;
+        }
     }
 }

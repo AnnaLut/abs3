@@ -26,10 +26,16 @@
     REQ_TYPE_EPP_BATCH             constant varchar2(30) := 'GET_EPP_BATCH';
     REQ_TYPE_MATCHING1             constant varchar2(30) := 'GET_POST_CONVERT_ANSWER';
     REQ_TYPE_MATCHING2             constant varchar2(30) := 'GET_POST_PAYMENT_REPLY';
+    REQ_TYPE_DEATH_MATCHING        constant varchar2(30) := 'POST_WORKING_NOTICE_DEATH_BANK';
+    REQ_TYPE_NO_TURNOVER           constant varchar2(30) := 'POST_NOTICE_DRAWING_BANK_ANSW';
     REQ_TYPE_EPP_MATCHING          constant varchar2(30) := 'PUT_EPP_PACKET_BNK_STATE';
     REQ_TYPE_EPP_ACTIVATION        constant varchar2(30) := 'PUT_EPP_BNK_INFO_ASK';
     REQ_TYPE_DEATH_LIST            constant varchar2(30) := 'GET_DEATH_LIST';
     REQ_TYPE_DEATH                 constant varchar2(30) := 'GET_DEATH';
+    REQ_TYPE_VERIFY_LIST           constant varchar2(30) := 'GET_VERIFICATION_LIST';
+    REQ_TYPE_VERIFY                constant varchar2(30) := 'GET_VERIFICATION';
+    REQ_TYPE_CHANGE_ATTR           constant varchar2(30) := 'POST_REPLACEMENT_ACCOUNT';
+    
 
     ENV_STATE_LIST_RECEIVED        constant varchar2(30) := 'ENVLIST_RECEIVED';
     ENV_STATE_ENVELOPE_RECEIVED    constant varchar2(30) := 'ENVELOPE_RECEIVED';
@@ -72,6 +78,11 @@
         p_request_id in integer,
         p_raise_ndf in boolean default true)
     return pfu_death_list_request%rowtype;
+    
+    function read_verify_list_request(
+        p_request_id in integer,
+        p_raise_ndf in boolean default true)
+    return pfu_verification_list_request%rowtype;
 
     function get_request_type_name(
         p_request_type_id in integer)
@@ -99,6 +110,11 @@
         p_date_to   in date,
         p_opfu_code in varchar2 default null)
     return integer;
+    
+    function create_verify_list_request(
+        p_date_from in date,
+        p_date_to   in date)
+    return integer;
 
     function create_envelope(
         p_pfu_envelope_id in integer,
@@ -125,7 +141,16 @@
         p_check_lines_count in integer,
         p_parent_request_id in integer)
     return integer;
-
+    
+    function create_verification(
+        p_pfu_death_id in integer,
+        p_pfu_branch_code in varchar2,
+        p_pfu_branch_name in varchar2,
+        p_register_date in date,
+        p_check_lines_count in integer,
+        p_parent_request_id in integer)
+    return integer;
+    
     function create_death_file(
         p_death_request_id in integer,
         p_fileid in varchar2,
@@ -136,12 +161,18 @@
     procedure create_matching(p_xml in clob,
                               p_parent_request_id in integer,
                               p_match_type in number);
+                              
+    procedure create_no_turnover(p_xml in clob,
+                                p_parent_request_id in integer,
+                                p_request_id out integer);
 
     procedure create_epp_matching(p_xml in clob,
                                   p_parent_request_id in integer);
 
     procedure create_epp_activation(
         p_xml in clob);
+
+    procedure create_replacement(p_xml in clob);
 
     function get_rec_to_kvit1 return tblFileForKvit pipelined;
 
@@ -325,6 +356,27 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_UTL as
              else return null;
              end if;
     end;
+    
+    function read_verify_list_request(
+        p_request_id in integer,
+        p_raise_ndf in boolean default true)
+    return pfu_verification_list_request%rowtype
+    is
+        l_verify_list_request_row pfu_verification_list_request%rowtype;
+    begin
+        select *
+        into   l_verify_list_request_row
+        from   pfu_verification_list_request t
+        where  t.id = p_request_id;
+
+        return l_verify_list_request_row;
+    exception
+        when no_data_found then
+             if (p_raise_ndf) then
+                raise_application_error(-20000, 'Запит на отримання списку пенсіонерів {' || p_request_id || '} не знайдений');
+             else return null;
+             end if;
+    end;
 
     function read_envelope_request(
         p_request_id in integer,
@@ -454,6 +506,29 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_UTL as
 
         return l_request_id;
     end;
+    
+    function create_verify_list_request(
+        p_date_from in date,
+        p_date_to   in date)
+    return integer
+    is
+        l_request_id integer;
+    begin
+
+        l_request_id := create_request(pfu_utl.REQ_TYPE_VERIFY_LIST);
+        
+        insert into pfu_verification_list_request
+        values (l_request_id, p_date_from, p_date_to, sysdate);
+
+        track_request(l_request_id,
+                      pfu_utl.REQ_STATE_NEW,
+                      'Запит на отримання списку пенсіонерів, що померли за період {' ||
+                          to_char(p_date_from, 'dd.mm.yyyy') || ' - ' ||
+                          to_char(p_date_to, 'dd.mm.yyyy') ||
+                          '} зареєстрований');
+
+        return l_request_id;
+    end;
 
     function create_envelope(
         p_pfu_envelope_id in integer,
@@ -546,6 +621,44 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_UTL as
 
         return l_request_id;
     end;
+    
+    function create_verification(
+        p_pfu_death_id in integer,
+        p_pfu_branch_code in varchar2,
+        p_pfu_branch_name in varchar2,
+        p_register_date in date,
+        p_check_lines_count in integer,
+        p_parent_request_id in integer)
+    return integer
+    is
+        l_request_id integer;
+    begin
+        l_request_id := create_request(pfu_utl.REQ_TYPE_VERIFY, p_parent_request_id);
+
+        insert into pfu_verification_request
+        values (l_request_id,
+                p_pfu_death_id,
+                p_pfu_branch_code,
+                p_pfu_branch_name,
+                p_register_date,
+                p_check_lines_count,
+                sysdate,
+                null,
+                null,
+                null,
+                DEA_STATE_LIST_RECEIVED,
+                null,
+                null);
+
+         track_request(l_request_id,
+                      pfu_utl.REQ_STATE_NEW,
+                      'Запит на отримання конверту для філії {' ||
+                          p_pfu_branch_name || ' на дату ' ||
+                          to_char(p_register_date, 'dd.mm.yyyy') ||
+                          '} зареєстрований');
+
+        return l_request_id;
+    end;
 
     procedure create_matching(p_xml in clob,
                               p_parent_request_id in integer,
@@ -556,11 +669,48 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_UTL as
     begin
         l_request_id := create_request(case p_match_type when 1
                                                          then pfu_utl.REQ_TYPE_MATCHING1
-                                                       when 2
-                                                         then pfu_utl.REQ_TYPE_MATCHING2 end,
+                                                         when 2 
+                                                         then pfu_utl.REQ_TYPE_MATCHING2 
+                                                         when 3 
+                                                         then pfu_utl.REQ_TYPE_DEATH_MATCHING end, 
                                        p_parent_request_id);
 
         insert into pfu_matching_request
+        values (l_request_id,
+                p_xml);
+
+        track_request(l_request_id,
+                      pfu_utl.REQ_STATE_NEW,
+                      'Запит на формування квитанції зареєстрований');
+
+    end;
+    
+    procedure create_no_turnover(p_xml in clob,
+                                p_parent_request_id in integer,
+                                p_request_id out integer)
+
+    is
+    begin
+        p_request_id := create_request(pfu_utl.REQ_TYPE_NO_TURNOVER, 
+                                       p_parent_request_id);
+
+        insert into pfu_no_turnover_request
+        values (p_request_id,
+                p_xml);
+
+        track_request(p_request_id,
+                      pfu_utl.REQ_STATE_NEW,
+                      'Запит на формування повідомлення зареєстрований');
+
+    end;
+    
+    procedure create_replacement(p_xml in clob)
+    is
+        l_request_id integer;
+    begin
+        l_request_id := create_request(pfu_utl.REQ_TYPE_CHANGE_ATTR);
+
+        insert into pfu_replacement_request
         values (l_request_id,
                 p_xml);
 
@@ -991,8 +1141,12 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_UTL as
        end if;
 
        update pfu_death_record dr
-          set dr.state = 'PROCESSED'
+          set dr.state = case when nvl(dr.sum_over,0) > 0 then 'READY_FOR_PAY' ELSE 'PROCESSED' END
         where dr.id = p_recid;
+
+        if (nvl(l_rec.sum_over,0) > 0) then
+          pfu_service_utl.prepare_paym_back(l_rec.id);
+        end if;
 
     end;
 

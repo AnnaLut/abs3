@@ -237,7 +237,7 @@ begin
                                                   );
      
 
-    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Довідники NEW ********** ');
+      DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Довідники NEW ********** ');
           --  Створюємо функцію Довідники NEW
       l := l +1;
       l_function_ids.extend(l);      
@@ -249,30 +249,58 @@ begin
                                                   );
      
 
-    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Обробка запитів ********** ');
-          --  Створюємо функцію Обробка запитів
-      l := l +1;
-      l_function_ids.extend(l);      
-      l_function_ids(l)   :=   abs_utils.add_func(
-                                                  p_name     => 'Обробка запитів',
-                                                  p_funcname => '/barsroot/requestsProcessing/requestsProcessing',
-                                                  p_rolename => '' ,    
-                                                  p_frontend => l_application_type_id
-                                                  );
-     
+    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' *** Створюємо функцію "Обробка запитів" ***' );
+    -- Створюємо функцію "Обробка запитів"
+    l := l + 1;
+    l_function_ids.extend(l);
+    l_function_ids(l) := ABS_UTILS.ADD_FUNC( p_name     => 'Обробка запитів',
+                                             p_funcname => '/barsroot/requestsProcessing/requestsProcessing',
+                                             p_rolename => '',
+                                             p_frontend => l_application_type_id
+                                             );
 
-   DBMS_OUTPUT.PUT_LINE(chr(13)||chr(10)||'  Прикріпляємо ресурси функцій до даного АРМу ($RM_BUHG) - АРМ Головний Бухгалтер  ');
+    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' *** Створюємо функцію "Управління доступом до минулої банківської дати" ***' );
+    -- Створюємо функцію "Управління доступом до минулої банківської дати"
+    l := l + 1;
+    l_function_ids.extend(l);
+    l_function_ids(l) := ABS_UTILS.ADD_FUNC( p_name     => 'Управління доступом до минулої банківської дати'
+                                           , p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?tableName=V_FDAT_KF&accessCode=2'
+                                           , p_rolename => null
+                                           , p_frontend => l_application_type_id
+                                           );
+
+    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' *** Створюємо функцію "Перегляд неоплачених документів минулих днів" ***' );
+    -- Створюємо функцію "Перегляд неоплачених документів минулих днів"
+    l := l + 1;
+    l_function_ids.extend(l);
+    l_function_ids(l) := ABS_UTILS.ADD_FUNC( p_name     => 'Перегляд неоплачених документів минулих днів'
+                                           , p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&sPar=V_NOT_PAID_DOCS[NSIFUNCTION]'
+                                           , p_rolename => null
+                                           , p_frontend => l_application_type_id
+                                           );
+
+    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' *** Створюємо функцію "Реанімація рахунків" ***' );
+    -- Створюємо функцію "Реанімація рахунків"
+    l := l + 1;
+    l_function_ids.extend(l);
+    l_function_ids(l) := ABS_UTILS.ADD_FUNC( p_name     => 'Реанімація рахунків'
+                                           , p_funcname => '/barsroot/AccountRestore/AccountRestore/index'
+                                           , p_rolename => null
+                                           , p_frontend => l_application_type_id
+                                           );
+
+    DBMS_OUTPUT.PUT_LINE(chr(13)||chr(10)||' Прикріпляємо ресурси функцій до даного АРМу ($RM_BUHG) - АРМ Головний Бухгалтер' );
     l := l_function_ids.first;
-    while (l is not null and l_function_ids(l)  is not null) loop
+    while (l is not null and l_function_ids(l)  is not null)
+    loop
         resource_utl.set_resource_access_mode(l_arm_resource_type_id, l_application_id, l_func_resource_type_id, l_function_ids(l), 1);
         l := l_function_ids.next(l);
     end loop;
-     
-     
+
     DBMS_OUTPUT.PUT_LINE(' Bидані функції можливо потребують підтвердження - автоматично підтверджуємо їх ');
     for i in (select a.id
-              from   adm_resource_activity a
-              where  a.grantee_type_id = l_arm_resource_type_id and
+                from adm_resource_activity a
+               where a.grantee_type_id = l_arm_resource_type_id and
                      a.resource_type_id = l_func_resource_type_id and
                      a.grantee_id = l_application_id and
                      a.resource_id in (select column_value from table(l_function_ids))  and
@@ -280,8 +308,8 @@ begin
                      a.resolution_time is null) loop
         resource_utl.approve_resource_access(i.id, 'Автоматичне підтвердження прав на функції для АРМу');
     end loop;
-     DBMS_OUTPUT.PUT_LINE(' Commit;  ');
-   commit;
+    DBMS_OUTPUT.PUT_LINE(' Commit;  ');
+    commit;
 end;
 /
 

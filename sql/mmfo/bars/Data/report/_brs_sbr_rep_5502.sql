@@ -1,5 +1,9 @@
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/Bars/Data/_BRS_SBR_REP_5502.sql =========*** Run 
+PROMPT ===================================================================================== 
 prompt ===================================== 
-prompt == Звіт для контролю файлів стат звітності по валютних операціях на РУ
+prompt == Звіт для контролю файлів стат звітності по валютних операціях
 prompt ===================================== 
 
 set serveroutput on
@@ -48,44 +52,80 @@ begin
     l_zpr.default_vars := '';
     l_zpr.bind_sql     := '';
     l_zpr.xml_encoding := 'CL8MSWIN1251';
-    l_zpr.txt          := 'select 
-(select ''#F20:''||s.value||''#'' from sw_operw s where s.tag = 20 and s.swref = so.swref and rownum = 1) S_20,
-(select ''#F32A:''||s.value||''#'' from sw_operw s where s.tag = 32 and s.opt = ''A'' and s.swref = so.swref and rownum = 1) S_32A,
-(select ''#F33B:''||s.value||''#'' from sw_operw s where s.tag = 33 and s.opt = ''B'' and s.swref = so.swref and rownum = 1) S_33B,
-(select ''#F50F:''||replace(s.value,chr(13)||chr(10), ''#''||chr(13)||chr(10)||''#'')||''#'' from sw_operw s where s.tag = 50 and s.opt = ''F'' and s.swref = so.swref and rownum = 1) S_50F,
-(select ''#F52A:''||s.value||''#'' from sw_operw s where s.tag = 52 and s.opt = ''A'' and s.swref = so.swref and rownum = 1) S_52A,
-(select ''#F57A:''||s.value||''#'' from sw_operw s where s.tag = 57 and s.opt = ''A'' and s.swref = so.swref and rownum = 1) S_57A,
-(select ''#F59:''||replace(s.value,chr(13)||chr(10), ''#''||chr(13)||chr(10)||''#'')||''#'' from sw_operw s where s.tag = 59 and s.swref = so.swref and rownum = 1) S_59,
-(select ''#F70:''||s.value||''#'' from sw_operw s where s.tag = 70 and s.swref = so.swref and rownum = 1) S_70,
-(select ''#F71A:''||s.value||''#'' from sw_operw s where s.tag = 71 and s.opt = ''A'' and s.swref = so.swref and rownum = 1) S_71A,
-o.branch, o.ref, o.tt, o.nd, to_date(o.pdat, ''dd.mm.yy'') pdat, o.kv, o.s, o.sq, o.nlsa, o.nam_a, o.mfoa, o.nlsb, o.nam_b, o.mfob, o.nazn from oper o, sw_oper so where o.ref = so.ref and o.kv != 980 
-and (o.nlsa like ''1500%'' or o.nlsa like ''1600%'') 
-and (o.nlsb = decode(o.mfob, ''302076'', ''29090100010082'',
-decode(o.mfob, ''303398'', ''29093100020082'',
-decode(o.mfob, ''305482'', ''29098100030082'',
-decode(o.mfob, ''335106'', ''29093100040082'',
-decode(o.mfob, ''311647'', ''29095100050082'',
-decode(o.mfob, ''312356'', ''29095100060082'', 
-decode(o.mfob, ''313957'', ''29097100070082'',
-decode(o.mfob, ''336503'', ''29094100080082'',
-decode(o.mfob, ''323475'', ''29095100100082'',
-decode(o.mfob, ''304665'', ''29097100120082'',
-decode(o.mfob, ''325796'', ''29099100130082'',
-decode(o.mfob, ''326461'', ''29095100140082'',
-decode(o.mfob, ''328845'', ''29090100150082'', 
-decode(o.mfob, ''331467'', ''29093100160082'',
-decode(o.mfob, ''333368'', ''29095100170082'',
-decode(o.mfob, ''337568'', ''29096100180082'',
-decode(o.mfob, ''338545'', ''29094100190082'',
-decode(o.mfob, ''351823'', ''29090100200082'',
-decode(o.mfob, ''352457'', ''29095100210082'',
-decode(o.mfob, ''315784'', ''29093100220082'',
-decode(o.mfob, ''354507'', ''29097100230082'',
-decode(o.mfob, ''353553'', ''29097100230082'', 
-decode(o.mfob, ''356334'', ''29096100250082'',
-decode(o.mfob, ''322669'', ''29092100260082'' )))))))))))))))))))))))) or 
-o.nlsb in (select a.nls from accounts a where a.nbs = ''2909'' and a.ob22 = ''56'' and a.kv = o.kv and o.mfob = a.kf) )
-and (to_date(o.pdat, ''dd.mm.yy'') between to_date(:sFdat1,''dd.mm.yyyy'') and to_date(:sFdat2,''dd.mm.yyyy'') )';
+    l_zpr.txt          := 'select
+ oper.branch,
+ oper.ref,
+ oper.tt,
+ oper.nd,
+ to_date(oper.pdat, ''dd.mm.yy'') pdat,
+ oper.kv,
+ (oper.s / 100) s,
+ (oper.sq / 100) sq,
+ oper.nlsa,
+ oper.nam_a,
+ oper.mfoa,
+ oper.nlsb,
+ oper.nam_b,
+ oper.mfob,
+ oper.nazn,
+ oper.kf
+  from oper
+ where oper.pdat between
+       to_date(:sFdat1||'' 00:00:00'', ''dd.mm.yyyy HH24:MI:SS'') and
+       to_date(:sFdat2||'' 23:59:59'', ''dd.mm.yyyy HH24:MI:SS'')
+   and oper.kv != 980
+   and oper.tt = ''C14''
+   and exists (select null from sw_oper sw where sw.ref = oper.ref)
+   and substr(oper.nlsa, 1, 4) in (''1500'', ''1600'')
+   and oper.nlsb in (''29090100010082'',
+                     ''29093100020082'',
+                     ''29098100030082'',
+                     ''29093100040082'',
+                     ''29095100050082'',
+                     ''29095100060082'',
+                     ''29097100070082'',
+                     ''29094100080082'',
+                     ''29095100100082'',
+                     ''29097100120082'',
+                     ''29099100130082'',
+                     ''29095100140082'',
+                     ''29090100150082'',
+                     ''29093100160082'',
+                     ''29095100170082'',
+                     ''29096100180082'',
+                     ''29094100190082'',
+                     ''29090100200082'',
+                     ''29095100210082'',
+                     ''29093100220082'',
+                     ''29097100230082'',
+                     ''29097100230082'',
+                     ''29096100250082'',
+                     ''29092100260082'',
+                     ''29094100010000'',
+                     ''29097100020000'',
+                     ''29092100030000'',
+                     ''29097100040000'',
+                     ''29099100050000'',
+                     ''29099100060000'',
+                     ''29091100070000'',
+                     ''29098100080000'',
+                     ''29091000100000'',
+                     ''29094000120000'',
+                     ''29093100130000'',
+                     ''29091000140000'',
+                     ''29094100150000'',
+                     ''29090000160000'',
+                     ''29091000170000'',
+                     ''29091000180000'',
+                     ''29098100190000'',
+                     ''29094100200000'',
+                     ''29099100210000'',
+                     ''29097100220000'',
+                     ''29091100230000'',
+                     ''29098100240000'',
+                     ''29090100250000'',
+                     ''29096100260000'')
+order by oper.kf';
     l_zpr.xsl_data     := '';
     l_zpr.xsd_data     := '';
 
@@ -94,6 +134,7 @@ and (to_date(o.pdat, ''dd.mm.yy'') between to_date(:sFdat1,''dd.mm.yyyy'') and t
        l_message:=l_message||'Добавлен новый кат.запрос №'||l_zpr.kodz||'.'; 
     else                           
        update zapros set name         = l_zpr.name,        
+                         namef        = l_zpr.namef,       
                          bindvars     = l_zpr.bindvars,    
                          create_stmt  = l_zpr.create_stmt, 
                          rpt_template = l_zpr.rpt_template,
@@ -115,73 +156,62 @@ and (to_date(o.pdat, ''dd.mm.yy'') between to_date(:sFdat1,''dd.mm.yyyy'') and t
                                 
 
     l_rep.name        :='Empty';
-    l_rep.description :='Звіт для контролю файлів стат звітності по валютних операціях на РУ';
+    l_rep.description :='Звіт для контролю файлів стат звітності по валютних операціях';
     l_rep.form        :='frm_FastReport';
-    l_rep.param       :=l_zpr.kodz||',3,sFdat,sFdat,"",FALSE,FALSE';
-    l_rep.ndat        :=0;
+    l_rep.param       :=l_zpr.kodz||',3,sFdat,sFdat2,"",TRUE,FALSE';
+    l_rep.ndat        :=2;
     l_rep.mask        :='';
     l_rep.usearc      :=0;
     begin                                                                        
-        select idf into l_repfolder from reportsf where idf = 160;
-    exception when no_data_found then
-        l_repfolder := null;
-    end;
-    l_rep.idf := l_repfolder;
+        select idf into l_repfolder from reportsf where idf = 160; 
+    exception when no_data_found then                                            
+        l_repfolder := null;                                                     
+    end;                         
+    l_rep.idf := l_repfolder;    
 
-    -- Фиксированный № печатного отчета
+    -- Фиксированный № печатного отчета   
     l_rep.id          := 5502;
 
 
-    if l_isnew = 1 then
-       begin
-          insert into reports values l_rep;
+    if l_isnew = 1 then                     
+       begin                                
+          insert into reports values l_rep;        
           l_message:=l_message||nlchr||'Добавлен новый печ. отчет под №'||l_rep.id;
-       exception when dup_val_on_index then 
+       exception when dup_val_on_index then  
            bars_error.raise_error('REP',14, to_char(l_rep.id));
-       end;
-    else
-       begin
-          insert into reports values l_rep;
+       end;                                    
+    else                                            
+       begin                                        
+          insert into reports values l_rep;         
           l_message:=l_message||nlchr||'Добавлен новый печ. отчет под №'||l_rep.id;
-       exception when dup_val_on_index then
+       exception when dup_val_on_index then         
           l_message:=l_message||nlchr||'Печатный отчет под №'||l_rep.id||' изменен.';
-          update reports set
-             name        = l_rep.name,
+          update reports set                
+             name        = l_rep.name,       
              description = l_rep.description,
-             form        = l_rep.form,
-             param       = l_rep.param,
-             ndat        = l_rep.ndat,
-             mask        = l_rep.mask,
-             usearc      = l_rep.usearc,
-             idf         = l_rep.idf
-          where id=l_rep.id;
-       end;
-    end if;
+             form        = l_rep.form,       
+             param       = l_rep.param,      
+             ndat        = l_rep.ndat,       
+             mask        = l_rep.mask,       
+             usearc      = l_rep.usearc,     
+             idf         = l_rep.idf         
+          where id=l_rep.id;                 
+       end;                                  
+    end if;                                  
+    bars_report.print_message(l_message); 
 
-    begin
-       Insert into BARS.APP_REP
-               (CODEAPP, CODEREP, APPROVE, GRANTOR)
-       Values
-               ('$RM_DRU1', l_rep.id, 1, 1);
-          l_message:=l_message||nlchr||'Печатный отчет под №'||l_rep.id||' добавлен в АРМ Друк звітів';
-    exception when dup_val_on_index
-          then 
-          l_message:=l_message||nlchr||'Печатный отчет под №'||l_rep.id||' существует в АРМ Друк звітів';
-    end;
+	begin
+    insert into app_rep (codeapp, coderep, approve)
+    values ('$RM_NBUR', 5502, 1);
+    exception when dup_val_on_index then null;
+    end;		
+end;                                        
+/                                           
+                                            
+commit;                                     
 
-    begin
-       Insert into BARS.APP_REP
-               (CODEAPP, CODEREP, APPROVE, GRANTOR)
-       Values
-               ('$RM_NBUR', l_rep.id, 1, 1);
-          l_message:=l_message||nlchr||'Печатный отчет под №'||l_rep.id||' добавлен в АРМ Звітність (новий)';
-    exception when dup_val_on_index
-          then 
-          l_message:=l_message||nlchr||'Печатный отчет под №'||l_rep.id||' существует в АРМ Звітність (новий)';
-    end;
 
-    bars_report.print_message(l_message);
-end;
-/
 
-commit;
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/Bars/Data/_BRS_SBR_REP_5502.sql =========*** End 
+PROMPT ===================================================================================== 

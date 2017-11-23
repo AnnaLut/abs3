@@ -735,7 +735,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PFU_RU_EPP_UTL is
            join accounts a
              on w.acc_pk = a.acc;
   end;
-  
+
   procedure create_epp(p_fileid in number) is
     l_epp   t_epp;
     l_rnk   customer.rnk%type;
@@ -1708,25 +1708,31 @@ CREATE OR REPLACE PACKAGE BODY BARS.PFU_RU_EPP_UTL is
   end;
 
   procedure pfu_files_processing is
-
+    l_kf pfu_ca_files.kf%type;
   begin
     for i in (select *
                 from pfu_ca_files t
                where t.state = 0
+               order by t.kf
                  for update skip locked) loop
       begin
-        dbms_session.reset_package;
+      if (l_kf is not null and l_kf != i.kf) or (l_kf is null) then
+        l_kf := i.kf;
         bars.bc.go(i.kf);
+        bars_ow.ow_init;
+      end if;
       if i.file_type = 1 then
         epp_processing(i.file_data, i.id);
       elsif i.file_type = 2 then
         issuecard_processing(i.file_data, i.id);
       elsif i.file_type = 3 then
         activateacc_procesing(i.file_data, i.id);
-      elsif i.file_type = 4 then
+      elsif i.file_type in ( 4, 13) then
         pfu_ru_file_utl.ref_state_processing(i.file_data, i.id);
       elsif i.file_type = 5 then
         pfu_ru_file_utl.get_ebp_processing(i.file_data, i.id);
+      elsif i.file_type = 6 then
+        pfu_ru_file_utl.get_create_paym_processing(i.file_data, i.id);
       elsif i.file_type = 7 then
         pfu_ru_file_utl.get_cardkill_processing(i.file_data, i.id);
       elsif i.file_type = 8 then
@@ -1738,9 +1744,11 @@ CREATE OR REPLACE PACKAGE BODY BARS.PFU_RU_EPP_UTL is
       elsif i.file_type = 11 then
         pfu_ru_file_utl.get_restart_epp_processing(i.file_data, i.id);
       elsif i.file_type = 12 then
-        pfu_ru_file_utl.get_branch_processing(i.file_data, i.id);
+        pfu_ru_file_utl.get_branch_processing(i.file_data, i.id); 
+      elsif i.file_type = 14 then
+        pfu_ru_file_utl.get_report_processing(i.file_data, i.id);
       elsif i.file_type = 15 then
-        pfu_ru_file_utl.set_card_block_processing(i.file_data, i.id);
+ 	pfu_ru_file_utl.set_card_block_processing(i.file_data, i.id);
       elsif i.file_type = 16 then
         pfu_ru_file_utl.set_destruct_processing(i.file_data, i.id);
       elsif i.file_type = 17 then

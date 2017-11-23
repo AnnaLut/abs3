@@ -1,0 +1,135 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+}
+<link href="~/Areas/AccountRestore/Css/Main.css" rel="stylesheet" />
+<script src="~/Areas/AccountRestore/Scripts/AccountRestore/Controllers/accountRestoreCtrl.js"></script>
+<script src="~/Areas/AccountRestore/Scripts/AccountRestore/Services/accountRestoreService.js"></script>
+
+<div ng-controller="AccountRestore.acccountRestoreCtrl as account" class="container">
+    
+    <div class="panel panel-default" style="margin-top:100px">
+        <div class="panel-heading" style="background-color: #E8E8E8">Заповніть дані</div>
+        <div class="panel-body grey-color">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-4 col-ms-4 col-xs-4 col-lg-4">
+                        <label for="in_nls">Введіть номер особового рахунку (зовнішній)</label>
+                    </div>
+                    <div class="col-md-8 col-ms-8 col-xs-8 col-lg-8">
+                        <input id="in_nls" type="text" class="k-textbox" ng-model="account.in_acc"/>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 col-ms-4 col-xs-4 col-lg-4">
+                        <label for="in_nls">Виберіть валюту рахунку</label>
+                    </div>
+                    <div class="col-md-8 col-ms-8 col-xs-8 col-lg-8">
+                        <select id="currencyDropDown" kendo-drop-down-list k-options="account.currencyDropDownOptions" k-ng-model="account.in_currency"></select>
+                    </div>
+                </div>
+                <br/>
+                <div class="row">
+                    <div class="col-md-2 col-ms-2 col-xs-2 col-lg-2">
+                        <button class="k-button" ng-click="account.loadAccountGrid()">Пошук рахунок</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <br />
+
+    <div class="panel panel-default">
+        <div class="panel-heading" style="background-color: #E8E8E8">Отримані дані</div>
+        <div class="panel-body grey-color">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-4 col-ms-4 col-xs-4 col-lg-4">
+                        <label for="acc">Внутрішній номер рахунку</label>
+                    </div>
+                    <div class="col-md-8 col-ms-8 col-xs-8 col-lg-8">
+                        <input id="acc" type="text" class="k-textbox" ng-model="account.acc" readonly />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 col-ms-4 col-xs-4 col-lg-4">
+                        <label for="nls">Номер особового рахунку (зовнішній)</label>
+                    </div>
+                    <div class="col-md-8 col-ms-8 col-xs-8 col-lg-8">
+                        <input id="nls" type="text" class="k-textbox" ng-model="account.nls" readonly />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 col-ms-4 col-xs-4 col-lg-4">
+                        <label for="kv">Код валюти</label>
+                    </div>
+                    <div class="col-md-8 col-ms-8 col-xs-8 col-lg-8">
+                        <input id="kv" type="text" class="k-textbox" ng-model="account.kv" readonly />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 col-ms-4 col-xs-4 col-lg-4">
+                        <label for="nms">Найменування рахунку</label>
+                    </div>
+                    <div class="col-md-8 col-ms-8 col-xs-8 col-lg-8">
+                        <input id="nms" type="text" class="k-textbox" ng-model="account.nms" readonly />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 col-ms-4 col-xs-4 col-lg-4">
+                        <label for="daos">Дата відкриття рахунку</label>
+                    </div>
+                    <div class="col-md-8 col-ms-8 col-xs-8 col-lg-8">
+                        <input id="daos" type="text" class="k-textbox" ng-model="account.daos" readonly />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 col-ms-4 col-xs-4 col-lg-4">
+                        <label for="dazs">Дата закриття рахунку</label>
+                    </div>
+                    <div class="col-md-8 col-ms-8 col-xs-8 col-lg-8">
+                        <input id="dazs" type="text" class="k-textbox" ng-model="account.dazs" readonly />
+                    </div>
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-md-2 col-ms-2 col-xs-2 col-lg-2">
+                        <button class="k-button" ng-click="account.restoreAccount()">Реанімувати рахунок</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+    .panel-group.panel-horizontal {
+        display: table;
+        width: 100%;
+    }
+
+        .panel-group.panel-horizontal > .panel.panel-default {
+            display: table-cell;
+        }
+
+    .k-textbox {
+        width: 100%;
+    }
+
+    .panel-group.panel-horizontal > .panel.panel-default.none {
+        border: none;
+        width: 8px;
+    }
+
+    .row {
+        margin: 8px;
+    }
+
+    form {
+        height: auto;
+    }
+
+    .grey-color {
+        background-color: #E8E8E8;
+    }
+</style>
+

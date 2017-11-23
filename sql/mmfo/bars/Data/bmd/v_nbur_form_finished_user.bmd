@@ -139,7 +139,7 @@ begin
   bars_metabase.add_sortorder(l_tabid, 7, 2, 'ASC ');
 
   -- добавляем описание сортировки
-  bars_metabase.add_sortorder(l_tabid, 9, 1, 'ASC ');
+  bars_metabase.add_sortorder(l_tabid, 9, 1, 'DESC');
 
   -- добавляем описание сортировки
   bars_metabase.add_sortorder(l_tabid, 10, 3, 'ASC ');

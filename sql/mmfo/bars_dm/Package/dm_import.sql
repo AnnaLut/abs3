@@ -212,7 +212,7 @@ end;
 create or replace package body DM_IMPORT
  is
 
-    g_body_version constant varchar2(64) := 'Version 3.2.0 31/10/2017';
+    g_body_version constant varchar2(64) := 'Version 3.3.0 01/11/2017';
     g_body_defs    constant varchar2(512) := null;
     G_TRACE        constant varchar2(20) := 'dm_import.';
   -- 26.09.2017 изменена выгрузка сегментов
@@ -763,7 +763,7 @@ create or replace package body DM_IMPORT
                             and ba.acc_ovr = a.acc
                             and a.nbs in ('2202','2203')
                             and a.rnk      = c.rnk
-                            and c.custtype in (2, 3) 
+                            and c.custtype in (2, 3)
     --                        and not (C.ise in ('14100', '14200', '14101','14201') and C.sed ='91') --фильтруем ФОПов -- 20.03.2017  COBUSUPABS-5659
                             and ba.acc_pk = aa.acc and aa.nbs = '2625'
                             and ba.acc_9129 = a9129.acc(+)
@@ -2949,12 +2949,15 @@ create or replace package body DM_IMPORT
                  join bars.customer c on cru.rnk = c.rnk
                 where (r.vaga1 is not null or r.vaga2 is null)   -- COBUSUPABS-5519';
 
+                /* #COBUXRMCORP-5 костыль - уже не "полная" выгрузка, а вдобавок ко всему выгружаем удаленные записи за 30 календ. дней */
         q_str_full  varchar2(4000) :=
-                'select c.kf,
+                'with customer_rel_updated as
+                  (select distinct rnk, rel_rnk, rel_id, rel_intext from bars.customer_rel_update cru where cru.chgdate between trunc(:p_dat)-30 and trunc(:p_dat)+0.99999)
+                select c.kf,
                        c.rnk,
-                       r.rel_id,
-                       r.rel_rnk,
-                       r.rel_intext,
+                       coalesce(r.rel_id, cru.rel_id),
+                       coalesce(r.rel_rnk, cru.rel_rnk),
+                       coalesce(r.rel_intext, cru.rel_intext),
                        r.name,
                        r.okpo,
                        r.vaga1,
@@ -2966,14 +2969,15 @@ create or replace package body DM_IMPORT
                        r.bdate,
                        r.edate,
                        r.sign_privs,
-                       null as change_type,
+                       case when r.rnk is null then ''D'' else '''' end as change_type,
                        case when c.custtype = 3 and C.ise in (''14100'', ''14200'', ''14101'',''14201'') and C.sed =''91'' then 4 else c.custtype end CL_TYPE
-                 from bars.customer c, bars.V_CUSTOMER_REL r
-                where (r.vaga1 is not null or r.vaga2 is null)   -- COBUSUPABS-5519
-                  and c.rnk = r.rnk';
+                 from customer_rel_updated cru
+                 full join bars.V_CUSTOMER_REL r on (cru.rnk = r.rnk and cru.rel_rnk = r.rel_rnk and cru.rel_intext = r.rel_intext and cru.rel_id = r.rel_id)
+                 join bars.customer c on cru.rnk = c.rnk or r.rnk = c.rnk
+                where (r.vaga1 is not null or r.vaga2 is null)   -- COBUSUPABS-5519';
     begin
         bars.bars_audit.info(l_trace||' start');
-        -- get period id
+
         l_per_id := get_period_id (p_periodtype, p_dat);
 
         if l_per_id is null then
@@ -2983,15 +2987,12 @@ create or replace package body DM_IMPORT
         delete from custur_rel where per_id=l_per_id;
 
         l_row.per_id := l_per_id;
-    --    l_row.kf := bars.f_ourmfo_g;
 
         if (p_periodtype = C_INCRIMP) then
             open c for q_str_inc using p_dat, p_dat;
         else
-            open c for q_str_full;
+            open c for q_str_full using p_dat, p_dat;
         end if;
-        -- test q_str
-        -- insert into t_clob values(sysdate,q_str);
 
         loop
           begin
@@ -3229,16 +3230,16 @@ create or replace package body DM_IMPORT
 
                 p_rows_count := p_rows_count + l_rows_count;
                 p_errors_count := p_errors_count + l_errors_count;
-                
+
                 dbms_application_info.set_client_info(l_trace||to_char(p_rows_count)|| ' processed');
-                
+
                 exit when l_cursor%notfound;
             end loop;
         end loop;
         bars.bc.home;
-        
+
         select count(*) into p_rows_count from customers_segment t where t.per_id = l_period_id;
-        
+
         bars_audit.info('Сегментація клієнтів для XRM - вставку даних до таблиці customer_segments завершено' || chr(10) ||
                         'загальна кількість клієнтів: ' || p_rows_count || chr(10) ||
                         'помилок вставки: ' || p_errors_count);
@@ -3299,7 +3300,7 @@ create or replace package body DM_IMPORT
                                                                 'CUSTOMER_SEGMENT_PRODUCTS_AMNT', 'CUSTOMER_PRDCT_AMNT_DPT',
                                                                 'CUSTOMER_PRDCT_AMNT_CREDITS', 'CUSTOMER_PRDCT_AMNT_CRD_GARANT',
                                                                 'CUSTOMER_PRDCT_AMNT_CRDENERGY', 'CUSTOMER_PRDCT_AMNT_CRDCARDS',
-                                                                'CUSTOMER_PRDCT_AMNT_CARDS', 'CUSTOMER_PRDCT_AMNT_ACC') and k.value_by_date_flag = 'N';                          
+                                                                'CUSTOMER_PRDCT_AMNT_CARDS', 'CUSTOMER_PRDCT_AMNT_ACC') and k.value_by_date_flag = 'N';
 
             loop
                 fetch l_cursor bulk collect into l_attribute_values limit 1000;
@@ -3308,14 +3309,14 @@ create or replace package body DM_IMPORT
 
                 p_rows_count := p_rows_count + l_rows_count;
                 p_errors_count := p_errors_count + l_errors_count;
-                
+
                 dbms_application_info.set_client_info(l_trace||to_char(p_rows_count)|| ' processed');
 
                 exit when l_cursor%notfound;
             end loop;
         end loop;
         bars.bc.home;
-        
+
         select count(*) into p_rows_count from customers_segment t where t.per_id = l_period_id;
 
         bars_audit.info('Сегментація клієнтів для XRM - вставку даних до таблиці customer_segments завершено' || chr(10) ||
@@ -4536,6 +4537,10 @@ create or replace package body DM_IMPORT
                        decode(vipk,'1',1,0) vipk,--значення параметру
                        decode(vipk,'1', (select max(fio_manager) from bars.vip_flags where rnk=c.rnk),'') vip_fio_manager,--піб працівника по віп
                        decode(vipk,'1', (select max(phone_manager) from bars.vip_flags where rnk=c.rnk),'') vip_phone_manager,--телефон працівника по віп
+                       decode(vipk,'1', (select s.active_directory_name
+                                        from bars.vip_flags v
+                                        join bars.staff_ad_user s on v.account_manager = s.user_id
+                                        where rnk=c.rnk),'') vip_account_manager,--аккаунт працівника по віп в форматі АД
                        date_on,--дата відкриття клієнта
                        date_off,--дата закриття
                        p.eddr_id,
@@ -5037,6 +5042,10 @@ create or replace package body DM_IMPORT
                        decode(vipk,'1',1,0) vipk,--значення параметру
                        decode(vipk,'1', (select max(fio_manager) from bars.vip_flags where rnk=c.rnk),'') vip_fio_manager,--піб працівника по віп
                        decode(vipk,'1', (select max(phone_manager) from bars.vip_flags where rnk=c.rnk),'') vip_phone_manager,--телефон працівника по віп
+                       decode(vipk,'1', (select s.active_directory_name
+                                        from bars.vip_flags v
+                                        join bars.staff_ad_user s on v.account_manager = s.user_id
+                                        where rnk=c.rnk),'') vip_account_manager,--аккаунт працівника по віп в форматі АД
                        date_on,--дата відкриття клієнта
                        date_off,--дата закриття
                        p.eddr_id,
@@ -5497,7 +5506,7 @@ create or replace package body DM_IMPORT
               l_row.NUMDOC := c.NUMDOC;
               l_row.PDATE := c.PDATE;
               l_row.ORGAN := c.ORGAN;
-              l_row.PASSP_EXPIRE_TO := null;
+              l_row.PASSP_EXPIRE_TO := c.ACTUAL_DATE;
               l_row.PASSP_TO_BANK := null;
               l_row.OKPO := c.OKPO;
               l_row.CUST_STATUS := c.CUST_STATUS;
@@ -5507,29 +5516,32 @@ create or replace package body DM_IMPORT
               l_row.TELD := c.TELD;
               l_row.TELADD := c.TELADD;
               l_row.EMAIL := c.EMAIL;
+			  
               l_row.ADR_POST_COUNTRY := c.ap_contry;
               l_row.ADR_POST_DOMAIN := c.ap_domain;
               l_row.ADR_POST_REGION := c.ap_region;
               l_row.ADR_POST_LOC := c.ap_locality;
               l_row.ADR_POST_ADR := c.ap_adress;
               l_row.ADR_POST_ZIP := c.ap_zip;
-              l_row.ADR_FACT_COUNTRY := c.af_contry;
-              l_row.ADR_FACT_DOMAIN := c.af_domain;
-              l_row.ADR_FACT_REGION := c.af_region;
-              l_row.ADR_FACT_LOC := c.af_locality;
-              l_row.ADR_FACT_ADR := c.af_adress;
-              l_row.ADR_FACT_ZIP := c.af_zip;
+              /* В adr_fact - адрес регистрации - выгружаем юридический адрес; Место работы - аналогично, т.е. дублируем */
+              l_row.ADR_FACT_COUNTRY := c.au_contry;
+              l_row.ADR_FACT_DOMAIN := c.au_domain;
+              l_row.ADR_FACT_REGION := c.au_region;
+              l_row.ADR_FACT_LOC := c.au_locality;
+              l_row.ADR_FACT_ADR := c.au_adress;
+              l_row.ADR_FACT_ZIP := c.au_zip;
               l_row.ADR_WORK_COUNTRY := c.au_contry;
               l_row.ADR_WORK_DOMAIN := c.au_domain;
               l_row.ADR_WORK_REGION := c.au_region;
               l_row.ADR_WORK_LOC := c.au_locality;
               l_row.ADR_WORK_ADR := c.au_adress;
               l_row.ADR_WORK_ZIP := c.au_zip;
+			  
               l_row.NEGATIV_STATUS := null;
               l_row.REESTR_MOB_BANK := null;
               l_row.REESTR_INET_BANK := null;
               l_row.REESTR_SMS_BANK := null;
-              l_row.MONTH_INCOME := null;
+              l_row.MONTH_INCOME := c.DJAVI;
               l_row.SUBJECT_ROLE := null;
               l_row.REZIDENT := c.REZIDENT;
               l_row.MERRIED := c.PC_SS; -- "сімейний стан" берем из рекв. БПК
@@ -5749,6 +5761,7 @@ create or replace package body DM_IMPORT
               l_row.P_STREET_ID := c.p_street_id;
               l_row.P_HOUSE_ID := c.p_house_id;
 
+              l_row.vip_account_manager := c.vip_account_manager;
 
             insert into customers_plt values l_row;
 

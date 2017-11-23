@@ -40,7 +40,7 @@ namespace BarsWeb.Areas.Zay.Infrastructure.Repository.DI.Implementation
                        trim(to_char(v.product_group,'09')||' '||v.product_group_name) product_group_name, 
                        v.num_vmd, v.viza, v.priority, v.priorname, v.comm,
                        bars_zay.get_request_cover(v.id) cover_id,
-                       v.verify_opt, v.identkb, v.kv_conv, v.req_type, v.code_2c, v.p12_2c, v.attachments_count                  
+                       v.verify_opt, v.identkb, v.kv_conv, v.req_type, v.code_2c, v.p12_2c, v.ATTACHMENTS_COUNT                  
                 FROM bars.v_zay_queue v,
                      bars.country c,
                      bars.country bc, bars.v_kod_70_2 k7
@@ -66,7 +66,7 @@ namespace BarsWeb.Areas.Zay.Infrastructure.Repository.DI.Implementation
                     to_char(v.meta,'09')||' '||v.aim_name meta_aim_name,
                     v.viza, v.priority, v.priorname, v.comm,
                     bars_zay.get_request_cover(v.id) cover_id, 
-                    v.verify_opt, v.obz, v.aims_code, null txt, v.kv_conv, v.req_type, v.attachments_count 
+                    v.verify_opt, v.obz, v.aims_code, null txt, v.kv_conv, v.req_type, v.ATTACHMENTS_COUNT 
                 FROM v_zay_queue v
                 WHERE v.sos = 0 
                       AND v.dk = :p_dk

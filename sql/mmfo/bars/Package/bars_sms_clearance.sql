@@ -4,65 +4,7 @@
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bars_sms_clearance.sql =========*** 
  PROMPT ===================================================================================== 
  
-  CREATE OR REPLACE PACKAGE BARS.BARS_SMS_CLEARANCE 
-IS
-   ----
-   -- Package bars_sms_clearance - пакет процедур для подготовки дебиторской задолженности за  SMS-сообщения
-   --
-
-   g_header_version    CONSTANT VARCHAR2 (64) := 'version 1.2 03/08/2015';
-
-   g_awk_header_defs   CONSTANT VARCHAR2 (512) := '';
-
-   ----
-   -- header_version
-   --
-   FUNCTION header_version
-      RETURN VARCHAR2;
-
-   ----
-   -- body_version
-   --
-   FUNCTION body_version
-      RETURN VARCHAR2;
-
-   ----
-   -- знаходить рахунок для виставлення заборгованості для клієнта(для одного 3570 на всі рахунки клієнта)
-   --, при відсутності рахунку створює його
-   ----
-   PROCEDURE set_clearance_acc (p_acc_parent IN accounts.acc%TYPE);
-
-   ----
-   -- виставляє дебіторську заборгованість за СМС по конкретному рахунку клієнта. якщо  acc = null - по всіх
-   --
-   ----
-   PROCEDURE pay_for_sms_by_acc (p_acc IN accounts.acc%TYPE DEFAULT 0);
-
-
-   ----
-   -- виставляє дебіторську заборгованість за СМС по конкретному клієнту. якщо  rnk = null - по всіх клієнтах
-   --
-
-   PROCEDURE pay_for_sms_by_rnk (p_rnk IN customer.rnk%TYPE DEFAULT 0);
-
-   ----
-   --оплачує дебіторську заборгованість за СМС по конкретному рахунку клієнта
-   --
-
-   PROCEDURE pay_clearance (p_acc_parent IN accounts.acc%TYPE);
-
- ----
-   --переносить заборгованість на рахунок прострочки
-   --
-
-   PROCEDURE transfer_clearance ( p_acc   IN     accounts.acc%TYPE);
-   ----
-   -- init
-   --
-   PROCEDURE init;
-END bars_sms_clearance;
-/
-CREATE OR REPLACE PACKAGE BODY BARS.BARS_SMS_CLEARANCE 
+ CREATE OR REPLACE PACKAGE BODY bars_sms_clearance
 IS
    ----
    --  Package bars_sms_clearance - пакет процедур для подготовки дебиторской задолженности за  SMS-сообщения
@@ -668,8 +610,7 @@ IS
          WHEN NO_DATA_FOUND
          THEN
             g_err_num := -20001;
-            g_erm :=
-               g_erm || ' - Не настроена операция SMS !';
+           g_erm :=nvl(g_erm, DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE()) || ' - Не настроена операция SMS !';
             raise_application_error (g_err_num, g_erm);
       END;
 
@@ -689,8 +630,7 @@ IS
          IF (l_sum_to_pay IS NULL)
          THEN
             g_err_num := -20002;
-            g_erm :=
-               g_erm || ' - Не настроена тариф для SMS !';
+           g_erm :=nvl(g_erm, DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE()) || ' - Не настроена тариф для SMS !';
             raise_application_error (g_err_num, g_erm);
          END IF;
       END;
@@ -719,8 +659,7 @@ IS
          WHEN NO_DATA_FOUND
          THEN
             g_err_num := -20003;
-            g_erm :=
-               g_erm || ' - Не найден счет оплаты 6110!';
+            g_erm :=nvl(g_erm, DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE()) || ' - Не найден счет оплаты 6110!';
             raise_application_error (g_err_num, g_erm);
       END;
 
@@ -729,54 +668,13 @@ IS
          gl.REF (l_ref);
          logger.info ('l_ref=' || l_ref);
 
-         INSERT INTO oper (REF,
-                           tt,
-                           vob,
-                           nd,
-                           dk,
-                           Pdat,
-                           Vdat,
-                           Datd,
-                           datP,
-                           nlsa,
-                           nam_a,
-                           mfoa,
-                           nlsb,
-                           nam_b,
-                           mfob,
-                           kv,
-                           s,
-                           kv2,
-                           s2,
-                           id_a,
-                           id_b,
-                           userid,
-                           nazn)
-                 VALUES (
-                           l_ref,
-                           l_tt,
-                           6,
-                           l_ref,
-                           1,
-                           SYSDATE,
-                           gl.bDATE,
-                           gl.bDATE,
-                           gl.bDATE,
-                           l_nlsa,
-                           l_nmsa,
-                           gl.aMFO,
-                           l_nlsb,
-                           l_tobob,
-                           gl.aMFO,
-                           g_kv,
-                           l_sum_to_pay,
-                           g_kv,
-                           l_sum_to_pay,
-                           l_okpoa,
-                           gl.aOKPO,
-                           gl.aUID,
-                              'За SMS інформування рах. '
-                           || l_nls_parent);
+
+
+
+    gl.in_doc3 (l_ref,l_tt,6, l_ref,SYSDATE,gl.bDATE,1,g_kv,l_sum_to_pay,g_kv,l_sum_to_pay,null,gl.bDATE,gl.bDATE,l_nmsa,l_nlsa,gl.aMFO,l_tobob,l_nlsb,
+                gl.aMFO, 'За SMS інформування рах. '|| l_nls_parent,null,l_okpoa,gl.aOKPO,null,null,null,null,gl.aUID);
+
+
 
          paytt                                                    /* GL.PAYV*/
                (l_flg,
@@ -805,7 +703,7 @@ IS
          WHEN OTHERS
          THEN
             g_err_num := -20004;
-            g_erm := g_erm || ' - Ошибка при оплате СМC!';
+            g_erm :=nvl(g_erm, DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE()) || ' - Ошибка при оплате СМC!';
             --RAISE;
             raise_application_error (g_err_num, g_erm);
       END;
@@ -976,9 +874,7 @@ IS
          WHEN NO_DATA_FOUND
          THEN
             g_err_num := -20012;
-            g_erm :=
-                  g_erm
-               || ' - Не настроена операция для погашения задолжености по SMS !';
+          g_erm :=nvl(g_erm, DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE()) || ' - Не настроена операция для погашения задолжености по SMS !';
             raise_application_error (g_err_num, g_erm);
       END;
 
@@ -1034,9 +930,7 @@ IS
          WHEN NO_DATA_FOUND
          THEN
             g_err_num := -20003;
-            g_erm :=
-                  g_erm
-               || ' - Не найден счет заборгованості';
+            g_erm :=nvl(g_erm, DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE()) || ' - Не найден счет заборгованості';  
             raise_application_error (g_err_num, g_erm);
       END;
 
@@ -1045,9 +939,7 @@ IS
          IF (l_ostc <> l_ostb)
          THEN
             g_err_num := -20005;
-            g_erm :=
-                  g_erm
-               || ' - Рахунок заборгованості має незавізовані документи!';
+            g_erm :=nvl(g_erm, DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE()) || ' - Рахунок заборгованості має незавізовані документи!';
             raise_application_error (g_err_num, g_erm);
          END IF;
       END;
@@ -1057,55 +949,9 @@ IS
       BEGIN
          gl.REF (l_ref);
          logger.info ('l_ref=' || l_ref);
-
-         INSERT INTO oper (REF,
-                           tt,
-                           vob,
-                           nd,
-                           dk,
-                           Pdat,
-                           Vdat,
-                           Datd,
-                           datP,
-                           nlsa,
-                           nam_a,
-                           mfoa,
-                           nlsb,
-                           nam_b,
-                           mfob,
-                           kv,
-                           s,
-                           kv2,
-                           s2,
-                           id_a,
-                           id_b,
-                           userid,
-                           nazn)
-                 VALUES (
-                           l_ref,
-                           l_tt,
-                           6,
-                           l_ref,
-                           1,
-                           SYSDATE,
-                           gl.bDATE,
-                           gl.bDATE,
-                           gl.bDATE,
-                           l_nlsa,
-                           l_nmsa,
-                           gl.aMFO,
-                           l_nlsb,
-                           l_tobob,
-                           gl.aMFO,
-                           g_kv,
-                           l_sum_to_pay,
-                           g_kv,
-                           l_sum_to_pay,
-                           l_okpoa,
-                           gl.aOKPO,
-                           gl.aUID,
-                              'За SMS інформування рах. '
-                           || l_nls_parent);
+               
+   gl.in_doc3 (l_ref,l_tt,6, l_ref,SYSDATE,gl.bDATE,1,g_kv,l_sum_to_pay,g_kv,l_sum_to_pay,null,gl.bDATE,gl.bDATE,l_nmsa,l_nlsa,gl.aMFO,l_tobob,l_nlsb,
+                gl.aMFO, 'За SMS інформування рах. '|| l_nls_parent,null,l_okpoa,gl.aOKPO,null,null,null,null,gl.aUID);
 
          paytt (l_flg,
                 l_ref,
@@ -1132,9 +978,7 @@ IS
          WHEN OTHERS
          THEN
             g_err_num := -20004;
-            g_erm :=
-                  g_erm
-               || ' - Ошибка при погашении задолжености за СМC!';
+            g_erm :=nvl(g_erm, DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE()) || ' - Ошибка при погашении задолжености за СМC!';            
             --RAISE;
             raise_application_error (g_err_num, g_erm);
       END;
@@ -1160,9 +1004,7 @@ IS
          WHEN NO_DATA_FOUND
          THEN
             g_err_num := -20010;
-            g_erm :=
-                  g_erm
-               || ' - Не найден счет задолжености';
+           g_erm :=nvl(g_erm, DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE()) || ' - Не найден счет задолжености';
             raise_application_error (g_err_num, g_erm);
       END;
    END find_clearance;
@@ -1216,9 +1058,7 @@ IS
          WHEN NO_DATA_FOUND
          THEN
             g_err_num := -20011;
-            g_erm :=
-                  g_erm
-               || ' - Не найден счет для оплаты задолжености';
+           g_erm :=nvl(g_erm, DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE())|| ' - Не найден счет для оплаты задолжености';
             raise_application_error (g_err_num, g_erm);
       END;
    END find_fost_parent_acc;

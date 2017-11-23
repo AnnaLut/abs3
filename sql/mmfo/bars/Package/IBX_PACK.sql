@@ -1,4 +1,4 @@
-CREATE OR REPLACE PACKAGE BARS.ibx_pack is
+CREATE OR REPLACE PACKAGE ibx_pack is
 
   -- ===============================================================================================
   g_header_version constant varchar2(64) := 'version 2.0.1 14.02.2017';
@@ -6,7 +6,6 @@ CREATE OR REPLACE PACKAGE BARS.ibx_pack is
   g_pack constant varchar2(100) := 'ibx_pack';
   -- Имя модуля для работы с ошибками
   g_mod constant varchar2(3) := 'IBX';
-
   --
   -- возвращает версию заголовка пакета
   function header_version return varchar2;
@@ -18,6 +17,8 @@ CREATE OR REPLACE PACKAGE BARS.ibx_pack is
 -- Получение сумы %% к оплате
 --
  function  Int_for_pay (p_nd number) return number;
+
+   type varchar2_list_pck is table of varchar2(4000) index by binary_integer;
 
   /*
    IBox - проплата задолжености (ON-line оплата с терминала)
@@ -168,13 +169,26 @@ CREATE OR REPLACE PACKAGE BARS.ibx_pack is
                    p_res_code out number,
                    p_res_text out varchar2,
                    p_res_ref  out oper.ref%type);
-                   
+
+  procedure pay_legal_pers(p_trade_point in varchar2,
+                          p_payer_name in varchar2,
+                          p_receiver_acc in varchar2,
+                          p_receiver_mfo in varchar2,
+                          p_receiver_curr in varchar2,
+                          p_receiver_okpo in integer,
+                          p_receiver_name in varchar2,
+                          p_cash_symb in varchar2,
+                          p_payment_purpose in varchar2,
+                          p_transaction_info in varchar2_list_pck,
+                          p_answer_info out varchar2_list_pck,
+                          p_res_code out number,
+                          p_res_text out varchar2);
+
   procedure ins_log_xml(p_in_xml clob, p_out_xml clob, p_ref varchar2);
 
 end ibx_pack;
 /
-
-CREATE OR REPLACE PACKAGE BODY BARS.ibx_pack is
+CREATE OR REPLACE PACKAGE BODY ibx_pack is
   -- ================================== Константы ===============================================
   g_body_version constant varchar2(64) := 'version 2.0 15.02.2017';
 
@@ -2341,7 +2355,7 @@ procedure get_info_doc(p_params in xmltype, -- XML c входящими параметрами
     p_res_ref:=l_ref;
 
  end;
- 
+
  --Процедура оплати по всем правилам через PAYTT
  procedure pay_gl(p_src_nls  in varchar2,
                   p_trans_nls in varchar2,
@@ -2385,10 +2399,10 @@ procedure get_info_doc(p_params in xmltype, -- XML c входящими параметрами
        p_res_code  := 2;
        p_res_text:='Не допустимий балансовий номер рахунку';
      end if;*/
-     
+
 
      --l_src_nls := '10049000001001';--'10040000012001';
-      
+
 
     -- получение параметров счета источника
     begin
@@ -2404,7 +2418,7 @@ procedure get_info_doc(p_params in xmltype, -- XML c входящими параметрами
         p_res_text := 'Рахунок джерела для списання не найдено nls=' || p_src_nls;
         return;
     end;
-    
+
     -- ищем договор
     begin
       /*select wa.*
@@ -2422,7 +2436,7 @@ procedure get_info_doc(p_params in xmltype, -- XML c входящими параметрами
         p_res_text := 'Рахунок №' || p_deal_id || ' не знайдено';
         return;
     end;
-    
+
     -- ищем договор
     begin
       /*select wa.*
@@ -2454,7 +2468,7 @@ procedure get_info_doc(p_params in xmltype, -- XML c входящими параметрами
         p_res_text:='Рахунок №'||l_nls_credit||' не знайдено!';
         return;
     end;
-     
+
     /*
     if l_acc.tip = 'DEP' then
       declare
@@ -2525,7 +2539,7 @@ procedure get_info_doc(p_params in xmltype, -- XML c входящими параметрами
           kvb_ => l_kv,
          nls2_ => p_trans_nls,
            sb_ => p_sum );
-           
+
   paytt ( flg_ => null,
           ref_ => l_ref,
          datv_ => l_bdate,
@@ -2537,22 +2551,295 @@ procedure get_info_doc(p_params in xmltype, -- XML c входящими параметрами
           kvb_ => l_kv,
          nls2_ => l_nls_credit,
            sb_ => p_sum );
-           
-    gl.pay( 2, l_ref,l_bdate);
 
-    p_res_ref:=l_ref;
+    gl.pay( 2, l_ref,l_bdate);
+    
+    p_res_ref := l_ref;
+
 
  end;
- 
+
+ --Процедура оплати по всем правилам через PAYTT
+ procedure pay_legal_pers(p_trade_point in varchar2,
+                          p_payer_name in varchar2,
+                          p_receiver_acc in varchar2,
+                          p_receiver_mfo in varchar2,
+                          p_receiver_curr in varchar2,
+                          p_receiver_okpo in integer,
+                          p_receiver_name in varchar2,
+                          p_cash_symb in varchar2,
+                          p_payment_purpose in varchar2,
+                          p_transaction_info in varchar2_list_pck,
+                          p_answer_info out varchar2_list_pck,
+                          p_res_code out number,
+                          p_res_text out varchar2) is
+       l_nd         oper.nd%type;
+       l_debit_nls  oper.nlsa%type;
+       l_trans_2902 oper.nlsb%type;
+       l_6110 oper.nlsb%type;
+       l_nls_t00 oper.nlsb%type;
+       l_debit_name oper.nam_a%type;
+       l_dk         number:=1;
+       l_ref        oper.ref%type;
+       l_trade_point  ibx_trade_point.trade_point%type;
+       l_mfo          banks.mfo%type;
+       l_bdate        date;
+       l_tt           tts.tt%type:='TO1';
+       l_nazn         varchar2(160);
+       l_pay_amount   number(32);
+       l_fee_amount   number(32);
+       l_pay_id       varchar2(300);
+       l_transaction_info varchar2(1000);
+
+       err_   NUMBER;    -- Return code
+       rec_   NUMBER;    -- Record number
+       mfoa_  VARCHAR2(12);   -- Sender's MFOs
+       nlsa_  VARCHAR2(15);   -- Sender's account number
+       mfob_  VARCHAR2(12);   -- Destination MFO
+       nlsb_  VARCHAR2(15);   -- Target account number
+       dk_    NUMBER;         -- Debet/Credit code
+       s_     DECIMAL(24);    -- Amount
+       vob_   NUMBER;         -- Document type
+       nd_    VARCHAR2(10);   -- Document number
+       kv_    NUMBER;         -- Currency code
+       datD_  DATE;           -- Document date
+       datP_  DATE;           -- Posting date
+       nam_a_  VARCHAR2(38);  -- Sender's customer name
+       nam_b_  VARCHAR2(38);  -- Target customer name
+       nazn_   VARCHAR(160);  -- Narrative
+       nazns_ CHAR(2);        -- Narrative contens type
+       id_a_  VARCHAR2(14);   -- Sender's customer identifier
+       id_b_  VARCHAR2(14);   -- Target's customer identifier
+       datA_  DATE;           -- Input file date/time
+       d_rec_ VARCHAR2(80);   -- Additional parameters
+       sos_   NUMBER;
+       refA_  VARCHAR2(9);
+       prty_  NUMBER;
+ begin
+
+        -- обнуляем результат
+    p_res_code := 22;
+    p_res_text := null;
+
+    l_mfo   := substr(p_trade_point,-6,6);
+
+    bc.go(l_mfo);
+
+    l_bdate := gl.bdate;
+    l_trade_point := substr(p_trade_point, 0, length(p_trade_point)-6);
+
+/*    if (l_pay_amount < 100) or (l_fee_amount < 100) then
+          p_res_code := 101;
+          p_res_text := 'Суммы платежа и комиссии должны быть кратными 1 грн(мелочь не допускается)';
+          return;
+    end if;*/
+
+    begin
+       select itp.nls
+         into l_debit_nls
+         from ibx_trade_point itp
+        where itp.trade_point = l_trade_point
+          and itp.mfo = l_mfo;
+      exception
+        when no_data_found then
+          p_res_code := 101;
+          p_res_text := 'Код устройства Томас в указанном МФО не найден';
+          return;
+     end;
+
+     begin
+       select acc.nms
+         into l_debit_name
+         from accounts acc
+        where acc.nls = l_debit_nls
+          and acc.kf = l_mfo;
+      exception
+        when no_data_found then
+          p_res_code := 101;
+          p_res_text := 'Счет 1004 для устройства Томас не найден';
+          return;
+     end;
+
+    l_nazn  := nvl(p_payment_purpose, 'Поповнення рахунку від '||p_payer_name);
+
+    p_res_text := l_nazn;
+
+    for c0 in p_transaction_info.first..p_transaction_info.last loop
+       l_pay_id := substr(p_transaction_info(c0),1,instr(p_transaction_info(c0),'@')-1);
+       l_transaction_info := substr(p_transaction_info(c0),instr(p_transaction_info(c0),'@') + 1);
+       l_pay_amount := to_number(substr(l_transaction_info,1,instr(l_transaction_info,'@')-1));
+       l_transaction_info := substr(l_transaction_info,instr(l_transaction_info,'@') + 1);
+       l_fee_amount := to_number(substr(l_transaction_info,1));
+
+       begin
+           select i.ref
+             into l_ref
+             from ibx_legal_pers_paym i
+            where i.pay_id = l_pay_id;
+        exception when no_data_found then
+          l_ref := null;
+       end;
+
+       if (l_ref is null) then
+          --Оплата документа
+          gl.ref (l_ref);
+
+          gl.in_doc3 (ref_    => l_ref,
+                      tt_     => l_tt,
+                      vob_    => 6,
+                      nd_     => l_nd,
+                      pdat_   => sysdate,
+                      vdat_   => l_bdate,
+                      dk_     => l_dk,
+                      kv_     => p_receiver_curr,
+                      s_      => l_pay_amount + l_fee_amount,
+                      kv2_    => p_receiver_curr,
+                      s2_     => l_pay_amount + l_fee_amount,
+                      sk_     => p_cash_symb,
+                      data_   => l_bdate,
+                      datp_   => l_bdate,
+                      nam_a_  => l_debit_name,
+                      nlsa_   => l_debit_nls,
+                      mfoa_   => l_mfo,
+                      nam_b_  => p_receiver_name,
+                      nlsb_   => p_receiver_acc,
+                      mfob_   => p_receiver_mfo,
+                      nazn_   => l_nazn,
+                      d_rec_  => null,
+                      id_a_   => f_ourokpo,
+                      id_b_   => p_receiver_okpo,
+                      id_o_   => null,
+                      sign_   => null,
+                      sos_    => null,
+                      prty_   => 0,
+                      uid_    => null);
+                      
+          select ac.nls
+            into l_trans_2902
+            from accounts ac
+           where ac.nls = '29023061015099'
+             and ac.ob22 = '06'
+             and ac.kv = p_receiver_curr
+             and ac.dazs is null
+             and ac.kf = l_mfo
+             and ac.branch = '/'||l_mfo||'/';
+
+          paytt ( flg_ => 0,
+                  ref_ => l_ref,
+                 datv_ => l_bdate,
+                   tt_ => l_tt,
+                  dk0_ => l_dk,
+                  kva_ => p_receiver_curr,
+                 nls1_ => l_debit_nls,
+                   sa_ => l_pay_amount + l_fee_amount,
+                  kvb_ => p_receiver_curr,
+                 nls2_ => l_trans_2902,
+                   sb_ => l_pay_amount + l_fee_amount );
+
+           if (l_fee_amount > 0) then
+              select ac.nls
+                into l_6110
+                from accounts ac
+               where ac.nls = '61108740015099'
+                 and ac.ob22 = '74'
+                 and ac.kf = l_mfo
+                 and ac.kv = p_receiver_curr
+                 and ac.dazs is null
+                 and ac.branch = '/'||l_mfo||'/';
+
+              paytt ( flg_ => 0,
+                      ref_ => l_ref,
+                     datv_ => l_bdate,
+                       tt_ => l_tt,
+                      dk0_ => l_dk,
+                      kva_ => p_receiver_curr,
+                     nls1_ => l_trans_2902,
+                       sa_ => l_fee_amount,
+                      kvb_ => p_receiver_curr,
+                     nls2_ => l_6110,
+                       sb_ => l_fee_amount);
+           end if;
+             
+            
+
+              if (l_mfo != p_receiver_mfo) then
+                select get_proc_nls('T00',980)
+                  into l_nls_t00
+                  from dual;
+                paytt ( flg_ => 0,
+                        ref_ => l_ref,
+                       datv_ => l_bdate,
+                         tt_ => l_tt,
+                        dk0_ => l_dk,
+                        kva_ => p_receiver_curr,
+                       nls1_ => l_trans_2902,
+                         sa_ => l_pay_amount,
+                        kvb_ => p_receiver_curr,
+                       nls2_ => l_nls_t00,
+                         sb_ => l_pay_amount );
+
+                gl.pay( 2,l_ref,l_bdate);
+
+                 SELECT mfoa, nlsa, mfob, nlsb, dk, s, vob, nd, kv,
+                        datd, datp, nam_a, nam_b, nazn, id_a, id_b,
+                        d_rec, sos, ref_a, prty
+                   INTO mfoa_,nlsa_,mfob_,nlsb_,dk_,s_,vob_,nd_,kv_,
+                        datd_,datp_,nam_a_,nam_b_,nazn_,id_a_,id_b_,
+                        d_rec_, sos_, refA_, prty_
+                   FROM oper WHERE ref=l_ref;
+
+                 if (sos_ = 5 ) then
+                    IF LENGTH(TRIM(NVL(d_rec_,'')))>0 THEN
+                       nazns_ := '11';
+                    ELSE
+                       nazns_ := '10';
+                    END IF;
+                 end if;
+
+                    sep.in_sep(err_,rec_,mfoa_,nlsa_,mfob_,nlsb_,dk_,s_,
+                               vob_,nd_,kv_,datD_,datP_,nam_a_,nam_b_,nazn_,
+                               NULL,nazns_,id_a_,id_b_,'******',refA_,0,'0123',
+                               NULL,NULL,datA_,d_rec_,0,l_ref,0);
+              else
+                paytt ( flg_ => null,
+                        ref_ => l_ref,
+                       datv_ => l_bdate,
+                         tt_ => l_tt,
+                        dk0_ => l_dk,
+                        kva_ => p_receiver_curr,
+                       nls1_ => l_trans_2902,
+                         sa_ => l_pay_amount,
+                        kvb_ => p_receiver_curr,
+                       nls2_ => p_receiver_acc,
+                         sb_ => l_pay_amount);
+                gl.pay( 2, l_ref,l_bdate);
+              end if;
+
+           insert into ibx_legal_pers_paym (pay_id, ref)
+           values (l_pay_id, l_ref);
+       end if;
+       p_answer_info(c0) :=  l_pay_id||'@'||l_ref;
+    end loop;
+    commit;
+    exception when others then
+       p_res_code := 101;
+       p_res_text := sqlerrm;
+       p_answer_info.delete;
+       rollback;
+
+
+ end;
+
+
  procedure ins_log_xml(p_in_xml clob, p_out_xml clob, p_ref varchar2) is
-     
+
    begin
 
      merge into test_ibx_xml t
       using (select * from dual) on (t.ext_ref = p_ref)
       when matched then update set rq_clob = p_in_xml, rs_clob = p_out_xml
       when not matched then insert values (p_ref, p_in_xml, p_out_xml);
-     
+
    end;
 
 end ibx_pack;
