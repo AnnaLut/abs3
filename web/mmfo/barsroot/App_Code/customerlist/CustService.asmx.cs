@@ -106,7 +106,7 @@ namespace CustomerList
 
                     if ((title = Convert.ToString(SQL_SELECT_scalar("select '(РНК '||rnk||',НД '||nd||').'||nmk from v_tobo_cust where rnk=:rnk"))) == "")
                         throw new Exception("Нет доступа к просмотру счетов даного контрагента!");
-                    where = "a.acc in (select acc from cust_acc where rnk=:rnk)";
+                    where = "a.rnk=:rnk";
 
                     if (localBD == "1")
                         table = "V_TOBO_ACCOUNTS";
@@ -713,7 +713,7 @@ namespace CustomerList
 
                     if ((title = Convert.ToString(SQL_SELECT_scalar("select '(РНК '||rnk||',НД '||nd||').'||nmk from v_tobo_cust where rnk=:rnk"))) == "")
                         throw new Exception("Нет доступа к просмотру счетов даного контрагента!");
-                    where = "a.acc in (select acc from cust_acc where rnk=:rnk)";
+                    where = "a.rnk=:rnk";
 
                     if (localBD == "1")
                         table = "V_TOBO_ACCOUNTS";
