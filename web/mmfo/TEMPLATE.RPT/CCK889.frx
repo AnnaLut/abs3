@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="08/23/2016 11:57:47" ReportInfo.Modified="11/30/2016 18:22:44" ReportInfo.CreatorVersion="2014.1.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="cobusup_abs_sup" ConnectionString="rijcmlq8+HCsj5mnfc2oQWOJAI1rOWOGv68sBpiXMxVx5dIqE4nOwox1a6zb8OjZvhDAnVmkFCTGlJvprHLU2Dom3/cMA==" CommandTimeout="1000">
+      <TableDataSource Name="Table" Alias="vw_escr_errors" DataType="System.Int32" Enabled="true" SelectCommand="select rez.*,d.rnk,d.cc_id,d.sos,d.sdate,d.wdate from (SELECT t.deal_id&#13;&#10;                    ,listagg(t.rn || '.' || t.description || chr(13) ||&#13;&#10;                             chr(10)) within GROUP(ORDER BY t.rn, t.deal_id, t.description) reg_errors&#13;&#10;                FROM (SELECT t1.deal_id&#13;&#10;                            ,t2.description&#13;&#10;                            ,row_number() over(PARTITION BY t1.deal_id ORDER BY t1.deal_id) rn&#13;&#10;                        FROM bars.VW_ESCR_INVALID_CREDITS   t1&#13;&#10;                            ,bars.escr_errors_types t2&#13;&#10;                       WHERE t1.error_id = t2.id) t&#13;&#10;               GROUP BY t.deal_id)rez,cc_deal d&#13;&#10;               where rez.deal_id=d.nd order by d.wdate desc">
+        <Column Name="DEAL_ID" DataType="System.Decimal"/>
+        <Column Name="REG_ERRORS" DataType="System.String"/>
+        <Column Name="RNK" DataType="System.Decimal"/>
+        <Column Name="CC_ID" DataType="System.String"/>
+        <Column Name="SOS" DataType="System.Decimal"/>
+        <Column Name="SDATE" DataType="System.DateTime"/>
+        <Column Name="WDATE" DataType="System.DateTime"/>
+        <CommandParameter Name="Parameter" DataType="126"/>
+      </TableDataSource>
+    </OracleDataConnection>
+  </Dictionary>
+  <ReportPage Name="Page1" PaperWidth="300" FirstPageSource="15" OtherPagesSource="15">
+    <ReportTitleBand Name="ReportTitle1" Width="1058.4" Height="47.25">
+      <TextObject Name="Text8" Width="1058.4" Height="47.25" Text="Перелік КД, які  включені до портфелю енергозберігіючих кредитів РУ, але не можуть бути відправлені на ЦБД" HorzAlign="Center" Font="Arial, 14pt, style=Bold"/>
+    </ReportTitleBand>
+    <PageHeaderBand Name="PageHeader1" Top="50.89" Width="1058.4" Height="47.25">
+      <RichObject Name="Rich1" Width="75.6" Height="47.25" Border.Lines="All" Text="{\rtf1\ansi\ansicpg1251\deff0\nouicompat\deflang1058{\fonttbl{\f0\fnil\fcharset204{\*\fname Arial;}Arial CYR;}{\f1\fnil\fcharset204 Tahoma;}}&#13;&#10;{\*\generator Riched20 6.3.9600}\viewkind4\uc1 &#13;&#10;\pard\qc\f0\fs20\'d0\'e5\'f4\'e5\'f0\'e5\'ed\'f1 \'ca\'c4\f1\fs17\par&#13;&#10;}&#13;&#10;"/>
+      <RichObject Name="Rich2" Left="75.6" Width="75.6" Height="47.25" Border.Lines="All" Text="{\rtf1\ansi\ansicpg1251\deff0\nouicompat\deflang1058{\fonttbl{\f0\fnil\fcharset204{\*\fname Arial;}Arial CYR;}{\f1\fnil\fcharset204 Tahoma;}}&#13;&#10;{\*\generator Riched20 6.3.9600}\viewkind4\uc1 &#13;&#10;\pard\qc\f0\fs20\'cd\'ee\'ec\'e5\'f0 \'ca\'c4\f1\fs17\par&#13;&#10;}&#13;&#10;"/>
+      <RichObject Name="Rich3" Left="151.2" Width="94.5" Height="47.25" Border.Lines="All" Text="{\rtf1\ansi\ansicpg1251\deff0\nouicompat\deflang1058{\fonttbl{\f0\fnil\fcharset204{\*\fname Arial;}Arial CYR;}{\f1\fnil\fcharset204 Tahoma;}}&#13;&#10;{\*\generator Riched20 6.3.9600}\viewkind4\uc1 &#13;&#10;\pard\qc\f0\fs20\'c4\'e0\'f2\'e0 \'ef\'ee\'f7\'e0\'f2\'ea\'f3 \'e4\'b3\'bf \'ca\'c4\f1\fs17\par&#13;&#10;}&#13;&#10;"/>
+      <RichObject Name="Rich4" Left="245.7" Width="85.05" Height="47.25" Border.Lines="All" Text="{\rtf1\ansi\ansicpg1251\deff0\nouicompat\deflang1058{\fonttbl{\f0\fnil\fcharset204{\*\fname Arial;}Arial CYR;}{\f1\fnil\fcharset204 Tahoma;}}&#13;&#10;{\*\generator Riched20 6.3.9600}\viewkind4\uc1 &#13;&#10;\pard\qc\f0\fs20\'c4\'e0\'f2\'e0 \'e7\'e0\'ea\'b3\'ed\'f7\'e5\'ed\'ed\'ff \'e4\'b3\'bf \'ca\'c4\f1\fs17\par&#13;&#10;}&#13;&#10;"/>
+      <RichObject Name="Rich5" Left="330.75" Width="56.7" Height="47.25" Border.Lines="All" Text="{\rtf1\ansi\ansicpg1251\deff0\nouicompat\deflang1058{\fonttbl{\f0\fnil\fcharset204{\*\fname Arial;}Arial CYR;}{\f1\fnil\fcharset204 Tahoma;}}&#13;&#10;{\*\generator Riched20 6.3.9600}\viewkind4\uc1 &#13;&#10;\pard\qc\f0\fs20\'d1\'f2\'e0\'f2\'f3\'f1 \'ca\'c4\f1\fs17\par&#13;&#10;}&#13;&#10;"/>
+      <RichObject Name="Rich6" Left="387.45" Width="66.15" Height="47.25" Border.Lines="All" Text="{\rtf1\ansi\ansicpg1251\deff0\nouicompat\deflang1058{\fonttbl{\f0\fnil\fcharset204{\*\fname Arial;}Arial CYR;}{\f1\fnil\fcharset204 Tahoma;}}&#13;&#10;{\*\generator Riched20 6.3.9600}\viewkind4\uc1 &#13;&#10;\pard\qc\f0\fs20\'d0\'cd\'ca \f1\fs17\par&#13;&#10;}&#13;&#10;"/>
+      <RichObject Name="Rich7" Left="453.6" Width="604.8" Height="47.25" Border.Lines="All" Text="{\rtf1\ansi\ansicpg1251\deff0\nouicompat\deflang1058{\fonttbl{\f0\fnil\fcharset204{\*\fname Arial;}Arial CYR;}{\f1\fnil\fcharset204 Tahoma;}}&#13;&#10;{\*\generator Riched20 6.3.9600}\viewkind4\uc1 &#13;&#10;\pard\qc\f0\fs20\'ce\'ef\'e8\'f1 \'ef\'ee\'ec\'e8\'eb\'ea\'e8\f1\fs17\par&#13;&#10;}&#13;&#10;"/>
+    </PageHeaderBand>
+    <DataBand Name="Data1" Top="101.77" Width="1058.4" Height="18.9" CanGrow="true" CanBreak="true" DataSource="Table">
+      <TextObject Name="Text2" Width="75.6" Height="18.9" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[vw_escr_errors.DEAL_ID]"/>
+      <TextObject Name="Text1" Left="75.6" Width="75.6" Height="18.9" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[vw_escr_errors.CC_ID]"/>
+      <TextObject Name="Text3" Left="151.2" Width="94.5" Height="18.9" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[vw_escr_errors.SDATE]" Format="Date" Format.Format="dd.MM.yyyy"/>
+      <TextObject Name="Text4" Left="245.7" Width="85.05" Height="18.9" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[vw_escr_errors.WDATE]" Format="Date" Format.Format="dd.MM.yyyy"/>
+      <TextObject Name="Text5" Left="330.75" Width="56.7" Height="18.9" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[vw_escr_errors.SOS]" HorzAlign="Right" WordWrap="false" Trimming="EllipsisCharacter"/>
+      <TextObject Name="Text6" Left="387.45" Width="66.15" Height="18.9" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[vw_escr_errors.RNK]"/>
+      <TextObject Name="Text7" Left="453.6" Width="604.8" Height="18.9" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[vw_escr_errors.REG_ERRORS]" HorzAlign="Center"/>
+    </DataBand>
+    <PageFooterBand Name="PageFooter1" Top="124.31" Width="1058.4"/>
+  </ReportPage>
+</Report>
