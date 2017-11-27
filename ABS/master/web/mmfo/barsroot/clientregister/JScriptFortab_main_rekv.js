@@ -1,45 +1,5 @@
 ﻿var FREE_ECONOMIC_ZONE_KRYM_CODE = "900";
 
-function openWindowAddress() {
-
-    var win;
-
-    if (window.parent && window.parent.parent) {
-        win = window.parent.parent;
-    } else {
-        win = window.parent;
-    }
-
-    if (!win.bars.ui) {
-        win = window;
-    }
-
-    win.customerAddress = parent.obj_Parameters['fullADR'];
-
-    win.bars.ui.dialog({
-        //bars.ui.dialog({
-        iframe: true,
-        actions: ["Close"],
-        width: '850px',
-        height: '590px',
-        id: 'winClientAddress',
-        title: 'Повна адреса клієнта',
-        content: {
-            url: bars.config.urlContent('/clients/ClientAddress/ClientAddress'),
-            modal: true
-        },
-        close: function () {
-            if (win.customerAddress.type1.filled == true) {
-                window.parent.$('#bt_reg').prop("disabled", false);
-                $('#ed_ADR')
-                    .val(parent.obj_Parameters['fullADR'].type1.locality +
-                    ', ' +
-                    parent.obj_Parameters['fullADR'].type1.address);
-            }
-        }
-    });
-}
-
 $(document).ready(function () {
     $('#ed_NMK').change(function () { $(this).removeClass('err').attr('title', ''); });
     $('#ed_NMKK').change(function () { $(this).removeClass('err').attr('title', ''); });
@@ -79,7 +39,7 @@ $(document).ready(function () {
         $('#btRegisterDbo').hide();
         $('#btSignDbo').hide();
         $('#lSign').hide();
-    }
+    }  
 });
 //заборона вводу нічого крім цифр 
 //назначається на подію onkeyup (onkeyup="return maskInt(this);")
@@ -139,7 +99,7 @@ function GetCodecagentList() {
 }
 // Тип гос реестра
 function GetTGRList() {
-    var items = ExecSync('GetTgrList', { CType: parent.obj_Parameters['CUSTTYPE'], rezid: $get('ddl_CODCAGENT').item($get('ddl_CODCAGENT').selectedIndex).value.substr(0, 1) }).d;
+	var items = ExecSync('GetTgrList', { CType: parent.obj_Parameters['CUSTTYPE'], rezid: $get('ddl_CODCAGENT').item($get('ddl_CODCAGENT').selectedIndex).value.substr(0, 1) }).d;
     $get('ddl_TGR').options.length = 0;
     for (var i in items) {
         var item = document.createElement("OPTION");
@@ -806,7 +766,7 @@ var getCountryCode = function () {
 var JSON = JSON || {};
 // implement JSON.stringify serialization
 JSON.stringify = JSON.stringify || function (obj) {
-    var t = typeof (obj);
+	var t = typeof (obj);
     if (t != "object" || obj === null) {
         // simple data type
         if (t == "string") obj = '"' + obj + '"';
@@ -829,19 +789,19 @@ JSON.stringify = JSON.stringify || function (obj) {
 
 //COBUSUPABS-6570
 function setTgrList() {
-    var rezid = getParamFromUrl('rezid', document.location.href);
-    if (parent.obj_Parameters['CUSTTYPE'] === 'person' && rezid === "1") {
-        var okpo = $get('ed_OKPO').value;
-        if (okpo == '0000000000') {
-            $('.ddlTGRClass option[value="5"]').attr("selected", "selected");
-        } else {
-            $('.ddlTGRClass option[value="2"]').attr("selected", "selected");
-        }
-    }
+	var rezid = getParamFromUrl('rezid', document.location.href);
+	if (parent.obj_Parameters['CUSTTYPE'] === 'person' && rezid === "1") {
+		var okpo = $get('ed_OKPO').value;
+		if (okpo == '0000000000') {
+			$('.ddlTGRClass option[value="5"]').attr("selected", "selected");
+		} else {
+			$('.ddlTGRClass option[value="2"]').attr("selected", "selected");
+		}
+	}
 }
 
 function ToUpperCase(fieldName) {
-    getEl(fieldName).value = getEl(fieldName).value.toUpperCase();
+	getEl(fieldName).value = getEl(fieldName).value.toUpperCase();
 }
 // implement JSON.parse de-serialization
 JSON.parse = JSON.parse || function (str) {
@@ -855,8 +815,8 @@ $(document).ready(function () {
 
     function callConfWindow() {
         var msgString = "<b>Підтвердіть, що у клієнта відсутні дані По-батькові</b><br>" +
-            "- натиснувши <b>\"ТАК\"</b> картка клієнта <b>зберігається без заповнення даних;</b><br>" +
-            "- натиснувши <b>\"НІ\" поверніться</b> для <b>заповнення поля По-Батькові клієнта</b><br>";
+                            "- натиснувши <b>\"ТАК\"</b> картка клієнта <b>зберігається без заповнення даних;</b><br>" +
+                            "- натиснувши <b>\"НІ\" поверніться</b> для <b>заповнення поля По-Батькові клієнта</b><br>";
         parent.bars.ui.approve({
             text: msgString,
             func: function () { isOper2ndNameEmpty = true; },
@@ -864,7 +824,7 @@ $(document).ready(function () {
         });
     }
     function focuscheck() {
-        semafor = 1;
+		semafor = 1;
         if (!isOper2ndNameEmpty) {
             if (parent.gE(parent.getFrame('Tab0'), 'ed_FIO_MN').value == "") {
                 callConfWindow();
@@ -901,12 +861,12 @@ $(document).ready(function () {
     ///
 
     function callConfWinNameMname(option, item, value) {
-        var msgString = "Ви намагаєтесь ввести <b>російське</b> " + option + ", пропонуємо<br>" +
-            "замінити його на <b>український</b> аналог (з довідника)";
+        var msgString = "Ви намагаєтесь ввести <b>російське</b> "+option+", пропонуємо<br>" +
+                        "замінити його на <b>український</b> аналог (з довідника)";
         parent.bars.ui.approve({
             text: msgString,
             func: function () { item.val(value.toUpperCase()); },
-            nfunc: function () { }
+            nfunc: function () {  }
         });
     }
     //Formatting for base productivity
@@ -935,12 +895,12 @@ $(document).ready(function () {
         var m_name = getNameInfo();
         m_name.MName = $('#ed_FIO_MN').val().capitalize();
         return m_name;
-    }
-    function getFioInfo() {
-        var fio = getMidNameInfo();
-        fio.SName = $('#ed_FIO_LN').val().capitalize();
-        return fio;
-    }
+	}
+	function getFioInfo() {
+		var fio = getMidNameInfo();
+		fio.SName = $('#ed_FIO_LN').val().capitalize();
+		return fio;
+	}
     //name autocomplete
     $("#ed_FIO_FN").autocomplete({
         source: function (request, response) {
@@ -989,18 +949,19 @@ $(document).ready(function () {
             success: function (data) {
                 if (data.d !== null && data.d !== "") {
                     if (mode == 1) {
-                        callConfWinNameMname("ім'я", $("#ed_FIO_FN"), data.d);
+                         callConfWinNameMname("ім'я", $("#ed_FIO_FN"), data.d);
                     } else if (mode == 2) {
-                        callConfWinNameMname("по-батькові", $("#ed_FIO_MN"), data.d);
+                         callConfWinNameMname("по-батькові", $("#ed_FIO_MN"), data.d);
                     }
                 }
             }
         });
 
     }
-
-    $("#ed_FIO_FN").focusout(function () {
-        if ($("#ed_FIO_FN").val().length > 0) {
+    
+	$("#ed_FIO_FN").focusout(function () {
+        if ($("#ed_FIO_FN").val().length > 0)
+        {
             var n_info = getMidNameInfo();
             checkCompleteName_Midname(1, n_info);
         }
@@ -1033,13 +994,13 @@ $(document).ready(function () {
         focus: function (event, ui) {
             event.preventDefault();
         }
-    });
+	});
 
-    //check if user start typing ua or en language
-    (function initTypingCheker() {
-        var identifiers = NMKCodes.codes.data();
-        for (var i in identifiers) {
-            $("#" + identifiers[i]).keydown(function (e) { initTranslate(e); return true; });
-        }
-    })();
+	//check if user start typing ua or en language
+	(function initTypingCheker() {
+		var identifiers = NMKCodes.codes.data();
+		for (var i in identifiers) {
+			$("#" + identifiers[i]).keydown(function (e) { initTranslate(e); return true; });
+		}
+	})();
 });
