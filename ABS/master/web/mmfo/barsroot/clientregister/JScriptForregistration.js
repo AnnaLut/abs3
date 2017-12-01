@@ -336,8 +336,10 @@ function Check_MainRekv() {
 
     //if mob. tel is contains *** - it is masked and its value was not changed
 	//else = write new value
-	if (mobTelElement && mobTelElement.value.indexOf("*****") == -1) {
-	   obj_Parameters['DopRekv_MPNO'] = mobTelElement.value;	
+	if(obj_Parameters['CUSTTYPE'] != 'person'){
+		if (mobTelElement && mobTelElement.value.indexOf("*****") == -1) {
+		   obj_Parameters['DopRekv_MPNO'] = mobTelElement.value;	
+		}
 	}
 	//if (mobTelElement) {
 	//	obj_Parameters['DopRekv_MPNO'] = mobTelElement.value;
@@ -1072,15 +1074,14 @@ function saveCustomerToBase() {
 			if (mobPhone.indexOf("*****") !== -1) {
 				mobPhone = obj_Parameters['DopRekv_MPNO'];
 			}
+			if (mobPhone) {
+				custAttrList['MPNO'] = {
+					Isp: "0",
+					Tag: "MPNO",
+					Value: mobPhone
+				}
+			}
 		}
-
-        if (mobPhone) {
-            custAttrList['MPNO'] = {
-                Isp: "0",
-                Tag: "MPNO",
-                Value: mobPhone
-            }
-        }
     }
 
     var custAttrCheck = gE(getFrame('Tab5'), "chCheckReq").checked;
