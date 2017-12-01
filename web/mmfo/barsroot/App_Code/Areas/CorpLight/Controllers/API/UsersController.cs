@@ -112,7 +112,7 @@ namespace BarsWeb.Areas.CorpLight.Controllers.Api
        /// Validate mobile phone
        /// </summary>
        /// <param name="phoneNumber"></param>
-        [POST("api/CorpLight/Users/validateMobilePhone")]
+        [POST("api/CorpLight/Users/validateMobilePhone/{phoneNumber}")]
         public void ValidateMobilePhone(string phoneNumber)
         {
             var confirmPhoneList = GetConfirmPhoneList();
@@ -124,7 +124,7 @@ namespace BarsWeb.Areas.CorpLight.Controllers.Api
                     Phone = phoneNumber,
                     Secret = GetSecret()
                 };
-                var smsStatus = SendSms(phoneNumber, "You secure code is " + curentPhone.Secret);
+                _relatedCustRepository.SendSms(phoneNumber, "Your secure code is " + curentPhone.Secret);
 
                 confirmPhoneList.Add(curentPhone);
             }
@@ -135,11 +135,6 @@ namespace BarsWeb.Areas.CorpLight.Controllers.Api
         /// <param name="phone"></param>
         /// <param name="message"></param>
         /// <returns></returns>
-        private SMSInfo SendSms(string phone, string message)
-        {
-            var smsProvider = new send_sms();
-            return smsProvider.Send(phone, message);
-        }
         private string GetSecret()
         {
             var randObj = new Random((int)DateTime.Now.Ticks & 0x0000FFFF);

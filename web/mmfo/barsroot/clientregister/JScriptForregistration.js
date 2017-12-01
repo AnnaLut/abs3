@@ -336,7 +336,7 @@ function Check_MainRekv() {
 
     //if mob. tel is contains *** - it is masked and its value was not changed
 	//else = write new value
-	if(obj_Parameters['CUSTTYPE'] != 'person'){
+	if (obj_Parameters['CUSTTYPE'] != 'person') {
 		if (mobTelElement && mobTelElement.value.indexOf("*****") == -1) {
 		   obj_Parameters['DopRekv_MPNO'] = mobTelElement.value;	
 		}
@@ -847,7 +847,7 @@ function Check_ClientRekvBank() {
 
     var dis = (rezid == '2');
 
-    if (false && (tmp == etalon || tmp == '') && !dis) {
+    if ((tmp == etalon || tmp == '') && !dis) {
         alert(LocalizedString('Mes05')/*"Неправильно заполнено поле 'Код банка - МФО'"*/);
         gE(curTab, 'ed_MFO').focus();
         return false;
@@ -1065,23 +1065,24 @@ function Register() {
 function saveCustomerToBase() {
 
     if (!custAttrList['MPNO']) {
-
         var clientRekvTab = getFrame('Tab3');
         var mobPhone = gE(clientRekvTab, 'ed_TELM') != undefined ? gE(clientRekvTab, 'ed_TELM').value : undefined;
 
-		//custtype 1 and 2 doenst have mob phone...
+        //if mobile phone is masked - it was not changed and obj_Parameters['DopRekv_MPNO'] contains initial value
+        //custtype 1 and 2 doenst have mob phone...
 		if (obj_Parameters['CUSTTYPE'] === 'person') {
 			if (mobPhone.indexOf("*****") !== -1) {
 				mobPhone = obj_Parameters['DopRekv_MPNO'];
 			}
-			if (mobPhone) {
-				custAttrList['MPNO'] = {
-					Isp: "0",
-					Tag: "MPNO",
-					Value: mobPhone
-				}
-			}
 		}
+
+        if (mobPhone) {
+            custAttrList['MPNO'] = {
+                Isp: "0",
+                Tag: "MPNO",
+                Value: mobPhone
+            }
+        }
     }
 
     var custAttrCheck = gE(getFrame('Tab5'), "chCheckReq").checked;

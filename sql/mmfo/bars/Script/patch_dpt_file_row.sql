@@ -86,20 +86,32 @@ begin
   dbms_output.put_line( 'Index dropped.' );
 exception
   when E_IDX_NOT_EXIST then
+    null;
+end;
+/
+
+declare
+  E_IDX_NOT_EXIST        exception;
+  pragma exception_init( E_IDX_NOT_EXIST, -01418 );
+begin
+  execute immediate 'drop index IDX_DPTFILEROW_KF_HDRID';
+  dbms_output.put_line( 'Index dropped.' );
+exception
+  when E_IDX_NOT_EXIST then
     dbms_output.put_line( 'Specified index does not exist.' );
 end;
 /
 
 begin
-  execute immediate q'[create index IDX_DPTFILEROW_KF_HDRID on DPT_FILE_ROW ( KF, HEADER_ID ) tablespace BRSBIGI]';
-  dbms_output.put_line( 'Index "IDX_DPTFILEROW_KF_HDRID" created.' );
+  execute immediate q'[create index IDX_DPTFILEROW_HDRID_KF on DPT_FILE_ROW ( HEADER_ID, KF ) tablespace BRSBIGI]';
+  dbms_output.put_line( 'Index "IDX_DPTFILEROW_HDRID_KF" created.' );
 exception
   when OTHERS then
     case
       when (sqlcode = -00955)
-      then dbms_output.put_line( 'Index "IDX_DPTFILEROW_KF_HDRID" already exists in the table.' );
+      then dbms_output.put_line( 'Index "IDX_DPTFILEROW_HDRID_KF" already exists in the table.' );
       when (sqlcode = -01408)
-      then dbms_output.put_line( 'Column(s) "KF", "HEADER_ID" already indexed.' );
+      then dbms_output.put_line( 'Column(s) "HEADER_ID", "KF" already indexed.' );
       else raise;
     end case;
 end;

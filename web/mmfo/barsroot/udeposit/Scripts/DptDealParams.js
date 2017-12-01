@@ -20,7 +20,7 @@ var branchName;
 var acc = null;
 var accN = "";
 var termType = null;   // DPU_VIDD.TERM_TYPE - fixed (1) OR variable interval (2) term
-var periodType = null; // DPU_VIDD.DPU_TYPE  - long-term, short-term OR on-demand contract duration
+var periodType = null; // DPU_VIDD.IRREVOCABLE - Irrevocable/term (1) or Revocable/on-demand (0)
 var comments = null;
 var dpu_bal = 0;
 // old values
@@ -195,15 +195,16 @@ function getFilteredCurrency(curList) {
 function getFilteredVidd(ddlist) {
     var prodId = "";
     var val = "";
+    var frq = "";
 
     if ((prodId = document.getElementById("ddProduct").value) == "") {
-        alert("Вкажіть продукт !");
+        alert("Оберіть продукт !");
         return;
     }
 
     if ((val = document.getElementById("ddKv").value) == "")
     {
-        alert("Вкажіть валюту !");
+        alert("Оберіть валюту !");
         return;
     }
 
@@ -503,6 +504,10 @@ function onGetDepositDealParams(result) {
         gE("tbDatV_TextBox").value = "";
     }
 
+    // cnt_dubl must have a value for correctly calculate the number of days
+    cnt_dubl = data[56].text;
+    d.tbCntDubl.value = cnt_dubl;
+
     calcKtDay();
 
     d.tbMfoD.value = data[9].text;
@@ -514,8 +519,6 @@ function onGetDepositDealParams(result) {
     d.tbNmsP.value = data[15].text;
     d.tbNbP.value = data[16].text;
     d.tbOkpoP.value = data[55].text;
-    cnt_dubl = data[56].text;
-    d.tbCntDubl.value = cnt_dubl;
 
     comments = data[17].text;
 
@@ -594,7 +597,7 @@ function onGetDepositDealParams(result) {
     d.ddProduct.disabled = true;
     d.ddFreqV.disabled = true;
     d.ddStop.disabled = true;
-    d.cbCompProc.disabled = true;    
+    d.cbCompProc.disabled = true;
     d.cbRatePerson.disabled = true;
     d.cbRateBase.disabled = true;
     d.ddBaseRates.disabled = true;
@@ -602,16 +605,25 @@ function onGetDepositDealParams(result) {
     d.tbDatZ_TextBox.disabled = true;
     d.tbDatN_TextBox.disabled = true;
 
-    if (termType == 2 && usr_lvl == 1 && dpu_expired == 1 )
+    if (usr_lvl == 1 && dpu_expired == 1 )
     {
         d.tbND.disabled = false;
         d.tbSum.disabled = false;
         d.tbMinSum.disabled = false;
-        d.tbDatO_TextBox.disabled = false;
+        d.tbDatO_TextBox.disabled = (termType == 1);
         d.tbIr.disabled = false;
         d.tbBrDat_TextBox.disabled = false;
+        d.tbMfoP.disabled = false;
+        d.tbNlsP.disabled = false;
+        d.tbNmsP.disabled = false;
+        d.tbOkpoP.disabled = false;
+        d.tbMfoD.disabled = false;
+        d.tbNlsD.disabled = false;
+        d.tbNmsD.disabled = false;
+        // UnHideImg(d.btSave);
         UnHideImg(d.btBranch);
         UnHideImg(d.btClAcc);
+        UnHideImg(d.btCalcRate);
     }
     else
     {
@@ -621,8 +633,17 @@ function onGetDepositDealParams(result) {
         d.tbDatO_TextBox.disabled = true;
         d.tbIr.disabled = true;
         d.tbBrDat_TextBox.disabled = true;
+        d.tbMfoP.disabled = true;
+        d.tbNlsP.disabled = true;
+        d.tbNmsP.disabled = true;
+        d.tbOkpoP.disabled = true;
+        d.tbMfoD.disabled = true;
+        d.tbNlsD.disabled = true;
+        d.tbNmsD.disabled = true;
+        // HideImg(d.btSave);
         HideImg(d.btBranch);
         HideImg(d.btClAcc);
+        HideImg(d.btCalcRate);
     }
 
     d.tbDatV_TextBox.disabled = true;
@@ -1382,6 +1403,7 @@ function onGetVal(result) {
     d.ddFreqV.options[0].value = result.value[4].text;
     d.ddFreqV.options[0].text = result.value[5].text;
 
+    // d.cbCompProc.checked = (result.value[8].text == "1") ? (true) : (false);
     d.cbCompProc.checked = (result.value[8].text == "1") ? (true) : (false);
     fnCompProc();
 

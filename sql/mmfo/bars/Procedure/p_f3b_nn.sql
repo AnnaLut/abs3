@@ -7,410 +7,495 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure P_F3B_NN ***
 
-  CREATE OR REPLACE PROCEDURE BARS.P_F3B_NN (Dat_ DATE, sheme_ varchar2 default 'G', pr_op_ Number default 1) IS
+  CREATE OR REPLACE PROCEDURE BARS.p_f3b_NN (Dat_ DATE, sheme_ varchar2 default 'G', pr_op_ Number default 1) IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% DESCRIPTION :    Процедура формирования #3B для
-% COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     :    22/12/2016 (14.07.2016)
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  параметры: Dat_ - отчетная дата
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% DESCRIPTION :	Процедура формирования #3B для
+% COPYRIGHT   :	Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
+%
+% VERSION     : 23.11.2017 (21.08.2017,16.08.2017)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    параметры: Dat_    - отчетная дата
+               sheme_  - код схемы
+
+   Структура показателя     LL P M K DDDDD ZZZZZZZZZZ
+
+  1    LL           значения по списку         (01,02,..,10)
+  3    P            тип предприятия            (1/2/3)
+  4    M            код отчетного периода      (1/2)
+  5    K            тип статьи фин.отчетности  (0/1/2)
+  6    DDDDD        код статьи фин.отчетности
+ 11    ZZZZZZZZZZ   ОКПО предприятия
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+23.11.2017 Сегмент LL=10 -oбработка данных формы 3 для клиентов
+21.08.2017 Изменено формирование показателя 05 (признак АТО)
+           (0 - находится в АТО, 1 - нет) 
+16.08.2017 Изменение знака по показателю 02300 (ОБ)
+25.07.2017 на 01.01.2017 новая структура показателя и новые показатели
 07.10.2014 Доработки по BRSMAIN-2937
 23.10.2014 Изменение знака по показателю 02300 (ОБ)
 07.08.2015 Доработки по COBUSUPABS-3548
 14.07.2016 Доработки по COBUSUPABS-4577
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-kodf_    varchar2(2):='3B';
-userid_  number;
-mfo_     number;
-mfou_    number;
-dtb_     date;
-dte_     date;
-znap_    number;
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
+    kodf_    varchar2(2) := '3B';
+    userid_  number;
+    mfo_     number;
+    mfou_    number;
+    dtb_     date;
+    dte_     date;
+    znap_    number;
+    p04_     varchar2(1);
+    fmt_     varchar2 (10)  := '9990D00';
 BEGIN
-userid_ := user_id;
-mfo_:=F_OURMFO();
+    userid_ := user_id;
+    mfo_:=F_OURMFO();
 
-begin
-   select nvl(trim(mfou), mfo_) into mfou_ from banks where mfo = mfo_;
-exception
-   when no_data_found
-   then
-      mfou_ := mfo_;
-end;
+    begin
+       select nvl(trim(mfou), mfo_) 
+          into mfou_ 
+       from banks where mfo = mfo_;
+    exception
+       when no_data_found
+       then
+          mfou_ := mfo_;
+    end;
 
--------------------------------------------------------------------
-EXECUTE IMMEDIATE 'TRUNCATE TABLE RNBU_TRACE';
-DELETE FROM OTCN_LOG
-         WHERE userid = userid_ AND kodf = kodf_;
--------------------------------------------------------------------
+    -------------------------------------------------------------------
+    EXECUTE IMMEDIATE 'TRUNCATE TABLE RNBU_TRACE';
+    DELETE FROM OTCN_LOG
+             WHERE userid = userid_ AND kodf = kodf_;
+    -------------------------------------------------------------------
 
-select trunc(dat_,'yyyy'), add_months(trunc(dat_,'yyyy'),12) into dtb_,dte_ from dual;
+    select trunc(dat_,'yyyy'), add_months(trunc(dat_,'yyyy'),12) 
+       into dtb_, dte_ 
+    from dual;
 
-INSERT INTO OTCN_LOG (kodf, userid, txt)
-        VALUES (kodf_, userid_,
-                     TO_CHAR (SYSDATE, 'dd.mm.yyyy hh24:mi:ss')
-                  || ' Протокол формирования файла #3B за '
-                  || TO_CHAR (dat_, 'dd.mm.yyyy'));
+    INSERT INTO OTCN_LOG (kodf, userid, txt) VALUES(kodf_,userid_,to_char(sysdate,'dd.mm.yyyy hh24:mi:ss')||' Протокол формирования файла #3B за '||to_char(dat_,'dd.mm.yyyy'));
+    INSERT INTO OTCN_LOG (kodf, userid, txt) VALUES(kodf_,userid_,'Дата начала отчетного периода - '||to_char(dtb_,'dd.mm.yyyy'));
+    INSERT INTO OTCN_LOG (kodf, userid, txt) VALUES(kodf_,userid_,'Дата окончания отчетного периода - '||to_char(dte_,'dd.mm.yyyy'));
+    INSERT INTO OTCN_LOG (kodf, userid, txt) VALUES(kodf_,userid_,'--------------------------------------------------');
+    --------------------------------------------------------
+    for t in (select edrpou okpo 
+              from okpof659 
+              where edrpou in (select lpad(okpo,10,'0') 
+                               from customer c 
+                               where okpo in (select edrpou 
+                                              from okpof659 
+                                              where exists (select 1 
+                                                            from fin_rnk 
+                                                            where okpo = edrpou 
+                                                              and idf in (1, 2, 3) 
+                                                              and fdat in (dtb_, dte_)
+                                                              and branch like '/'||mfo_||'/' 
+                                                            )
+                                             )
+                                 and (date_off is null or date_off > dte_) 
+                               group by lpad(c.okpo,10,'0') 
+                               having count(*) > 1
+                              )
+                and zvitdate = to_date('01012017','ddmmyyyy')
+             )
+    loop
+       INSERT INTO OTCN_LOG (kodf, userid, txt) VALUES(kodf_,userid_,'ОКПО '||to_char(t.okpo)||' имеет более одного RNK');
+    end loop;
 
-INSERT INTO OTCN_LOG (kodf, userid, txt)
-        VALUES (kodf_, userid_,
-                     'Дата начала отчетного периода - '
-                  || TO_CHAR (dtb_, 'dd.mm.yyyy'));
+    for t in (select edrpou 
+              from okpof659 
+              where not exists (select 1 
+                                from nbu23_rez 
+                                where fdat = dte_ and okpo = edrpou) 
+                                  and exists (select 1 
+                                              from customer 
+                                              where is_number(okpo) = 1 
+                                                and okpo = edrpou 
+                                                and (date_off is null or date_off > dte_)
+                                             ) 
+                                  and exists (select 1 
+                                              from fin_rnk 
+                                              where okpo = edrpou 
+                                                and idf in (1, 2, 3) 
+                                                and fdat in (dtb_, dte_)
+                                                and branch like '/'||mfo_||'/' 
+                                             )
+                and zvitdate = to_date('01012017','ddmmyyyy')
+             )
 
-INSERT INTO OTCN_LOG (kodf, userid, txt)
-        VALUES (kodf_, userid_,
-                     'Дата окончания отчетного периода - '
-                  || TO_CHAR (dte_, 'dd.mm.yyyy'));
+       loop
+          INSERT INTO OTCN_LOG (kodf, userid, txt) VALUES(kodf_,userid_,'ОКПО '||to_char(t.edrpou)||' отсутствует в NBU23_REZ за '||to_char(dte_,'dd.mm.yyyy'));
+       end loop;
 
-INSERT INTO OTCN_LOG (kodf, userid, txt)
-        VALUES (
-                  kodf_,
-                  userid_,
-                  '--------------------------------------------------');
---------------------------------------------------------
-FOR T IN
-(SELECT edrpou okpo
-   FROM okpof659
-  WHERE edrpou IN (  SELECT LPAD (okpo, 10, '0')
-                       FROM customer c
-                      WHERE okpo IN (SELECT TO_CHAR (edrpou)
-                                       FROM okpof659
-                                      WHERE EXISTS
-                                               (SELECT 1
-                                                  FROM fin_rnk
-                                                 WHERE     okpo = edrpou
-                                                       AND idf IN (1, 2)
-                                                       AND fdat IN (dtb_,
-                                                                    dte_)))
-                            AND (date_off IS NULL OR date_off > dte_)
-                   GROUP BY LPAD (c.okpo, 10, '0')
-                     HAVING COUNT (*) > 1))
-loop
-    INSERT INTO OTCN_LOG (kodf, userid, txt) 
-    VALUES(kodf_,userid_,'ОКПО '||to_char(t.okpo)||' имеет более одного RNK');
-END LOOP;
+      for t in (select * from
+              (select okpo, sum(fmb) fmb,sum(fme) fme 
+               from (select okpo,
+                            decode(fdat,dte_,null,decode(nvl(fm,'0'),'M',2,'R',2,1)) fmb,
+                            decode(fdat,dte_,decode(nvl(fm,'0'),'M',2,'R',2,1),null) fme 
+                     from fin_fm 
+                     where fdat in (dtb_, dte_) 
+                       and okpo in (select edrpou 
+                                    from okpof659 
+                                    where exists (select 1 
+                                                  from customer 
+                                                  where is_number(okpo) = 1 
+                                                    and okpo = edrpou 
+                                                    and (date_off is null or date_off>dte_)
+                                                 ) 
+                                      and exists (select 1 
+                                                  from fin_rnk 
+                                                  where okpo = edrpou 
+                                                    and idf in (1, 2, 3) 
+                                                    and fdat in (dtb_, dte_)
+                                                    and branch like '/'||mfo_||'/' 
+                                                 )
+                                      and zvitdate = to_date('01012017','ddmmyyyy')
+                                   )
+                    )
+               group by okpo
+              )
+              where fmb<>fme
+             )
+       loop
 
-FOR T IN
-(SELECT edrpou
-   FROM okpof659
-  WHERE     NOT EXISTS
-               (SELECT 1
-                  FROM nbu23_rez
-                 WHERE fdat = dte_ AND okpo = to_char(edrpou))
-        AND EXISTS
-               (SELECT 1
-                  FROM customer
-                 WHERE     is_number (okpo) = 1
-                       AND okpo = to_char(edrpou)
-                       AND (date_off IS NULL OR date_off > dte_))
-        AND EXISTS
-               (SELECT 1
-                  FROM fin_rnk
-                 WHERE     okpo = edrpou
-                       AND idf IN (1, 2)
-                       AND fdat IN (dtb_, dte_)))
-loop
-    INSERT INTO OTCN_LOG (kodf, userid, txt) 
-    VALUES(kodf_,userid_,'ОКПО '||to_char(t.edrpou)||' отсутствует в NBU23_REZ за '||to_char(dte_,'dd.mm.yyyy'));
-END LOOP;
+          INSERT INTO OTCN_LOG (kodf, userid, txt) VALUES(kodf_,userid_,'ОКПО '||to_char(t.okpo)||' исключается из отчета т.к. изменилась форма, на начало периода "'||decode(t.fmb,1,'большие и средние','малые')||' предприятия", на конец периода "'||decode(t.fme,1,'большие и средние','малые')||' предприятия".');
 
-FOR T IN
+       end loop;
 
-(SELECT edrpou
-   FROM okpof659 o JOIN customer c ON c.okpo = TO_CHAR (o.edrpou)
-  WHERE     EXISTS
-               (SELECT 1
-                  FROM customer
-                 WHERE     is_number (okpo) = 1
-                       AND okpo = to_char(edrpou)
-                       AND (date_off IS NULL OR date_off > dte_))
-        AND EXISTS
-               (SELECT 1
-                  FROM fin_rnk
-                 WHERE okpo = edrpou
-                       AND idf IN (1, 2)
-                       AND fdat IN (dtb_, dte_))
-        AND EXISTS
-               (SELECT 1
-                  FROM nbu23_rez
-                 WHERE fdat = dte_ AND rnk = c.rnk)
-        AND (SELECT MIN (kat)
-               FROM nbu23_rez
-              WHERE fdat = dte_ AND rnk = c.rnk)
-               IS NULL)
-loop
-    INSERT INTO OTCN_LOG (kodf, userid, txt) 
-    VALUES(kodf_,userid_,'ОКПО '||to_char(t.edrpou)||' не заполнено S080 в NBU23_REZ за '||to_char(dte_,'dd.mm.yyyy'));
-END LOOP;
+    --------------------------------------------------------
+    -- блок для формування показників LL = '01','02','03','04','05','06','07','08','09'
+    for k in (select distinct nnnnn, okpo, nmk, p, pp, ll, koef_k, s190, pato, 
+                              psk, plink, pinvest 
+              from (
+               select * 
+               from ((select a.nnnnn, a.okpo, a.nmk, 
+                             to_char(decode(nvl(d.fm,'R'),'N',1,'R',2,2)) p, 
+                             to_char(decode(nvl(f.fm,'R'),'N',1,'R',2,2)) pp,
+                             '00000' ddddd, d.m, 
+                             trim(to_char(nvl(b.k160,0),'00')) II, 
+                             trim(to_char(nvl(b.koef_k,0))) KOEF_K, 
+                             nvl(c.k111,'00') LL, 
+                             trim(to_char(nvl(b.s190,0))) s190, 
+                             a.pmax, a.pato, a.psk, a.plink, pinvest,  
+                             round((fin_nbu.zn_rep(e.kod,e.idf, decode(d.m,2,dtb_,1,dte_),a.okpo)),1) znap 
+                      from (select nnnnn, edrpou okpo, txt nmk, 
+                                   decode(coalesce(par_max,0),1,0,1) pmax, 
+                                   --decode(coalesce(par_ato,0),1,0,1) pato, 
+                                   NVL(par_ato, 1) pato, 
+                                   nvl(par_sk, '0') psk,
+                                   nvl(par_link, '0') plink,
+                                   nvl(par_invest, '0') pinvest
+                            from okpof659
+                            where exists (select 1 
+                                          from customer 
+                                          where is_number(okpo) = 1 
+                                            and okpo = edrpou 
+                                            and (date_off is null or date_off > dte_)
+                                         )
+                              and exists (select 1 
+                                          from fin_rnk 
+                                          where okpo = edrpou 
+                                            and fdat in (dtb_, dte_)
+                                            and branch like '/'||mfo_||'/' 
+                                          )
+                              and zvitdate = to_date('01012017','ddmmyyyy')
+                              and (mfo_ = 300465 or k is null)
+                            order by nnnnn
+                           ) a
+                           left join (select okpo, '00' k160, max(nvl(k,0)) k, 
+                                             max(nvl(k,0)) koef_k, 
+                                             max(nvl(obs,0)) s190 
+                                      from (select okpo, k, kat, obs 
+                                            from bars.nbu23_rez 
+                                            where fdat = dte_
+                                              and ddd like '12%'
+                                            --  union all
+                                            --select edrpou okpo, k, kat, obs 
+                                            --from bars.okpof659
+                                            --where zvitdate = to_date('01012017','ddmmyyyy')   
+                                           )
+                                      group by okpo
+                                     ) b
+                              on a.okpo = b.okpo
+                           left join (select okpo, k111 
+                                      from customer c, kl_k110 kl 
+                                      where (kl.d_open <= dte_ 
+                                        and (kl.d_close is null or kl.d_close >= dte_)) 
+                                        and c.rnk in (select max(rnk) 
+                                                      from customer 
+                                                      where (date_off is null or date_off > dte_)
+                                                      group by lpad(okpo,10,'0')
+                                                     ) 
+                                        and c.ved = kl.k110
+                                     ) c
+                              on a.okpo = c.okpo
+                           left join (select f1.okpo, 
+                                             nvl(f1.fm,'R') fm, 
+                                             decode(f1.fdat,dte_,1,2) m 
+                                      from bars.fin_fm f1
+                                      where f1.fdat = dte_
+                                     ) d
+                              on a.okpo = d.okpo
+                           left join (select f2.okpo, 
+                                             nvl(f2.fm,'R') fm 
+                                      from bars.fin_fm f2
+                                      where f2.fdat = dtb_
+                                     ) f
+                              on a.okpo = f.okpo 
+                           left join (select p, ddddd, kod, idf 
+                                      from kl_f659
+                                     ) e
+                              on e.p = decode(nvl(d.fm,'R'),'N',1,'R',2,2)
+                     )
+                   )
+              order by P, nnnnn, substr(DDDDD,2), M)
+             order by 3, 1
+             )
+       loop
+          INSERT INTO rnbu_trace (recid, userid, odate, kodp, znap, comm)
+             -- KODP = LL+P+1+M+DDDDD+ZZZZZZZZZZ
+             VALUES (s_rnbu_record.NEXTVAL, userid_, dat_, 
+                     '01'||k.P||'1'||'0'||'00000'||LPAD(k.okpo, 10,'0'), k.nmk, 'OKPO='||k.OKPO);
 
-FOR T IN
+          INSERT INTO rnbu_trace (recid, userid, odate, kodp, znap, comm)
+             -- KODP = LL+P+1+M+DDDDD+ZZZZZZZZZZ
+             VALUES (s_rnbu_record.NEXTVAL, userid_, dat_, 
+                     '02'||k.P||'1'||'0'||'00000'||LPAD(k.okpo, 10,'0'), k.ll, 'OKPO='||k.OKPO);
 
-(SELECT *
-   FROM (  SELECT okpo, SUM (fmb) fmb, SUM (fme) fme
-             FROM (SELECT okpo,
-                          DECODE (fdat,
-                                  dte_, NULL,
-                                  DECODE (NVL (fm, '0'),  'M', 2,  'R', 2,  1))
-                             fmb,
-                          DECODE (
-                             fdat,
-                             dte_, DECODE (NVL (fm, '0'),  'M', 2,  'R', 2,  1),
-                             NULL)
-                             fme
-                     FROM fin_fm
-                    WHERE     fdat IN (dtb_, dte_)
-                          AND okpo IN (SELECT edrpou
-                                         FROM okpof659
-                                        WHERE     EXISTS
-                                                     (SELECT 1
-                                                        FROM customer
-                                                       WHERE is_number(okpo) = 1
-                                                             AND okpo = to_char(edrpou)
-                                                             AND (   date_off
-                                                                        IS NULL
-                                                                  OR date_off >
-                                                                        dte_))
-                                              AND EXISTS
-                                                     (SELECT 1
-                                                        FROM fin_rnk
-                                                       WHERE     okpo = edrpou
-                                                             AND idf IN (1, 2)
-                                                             AND fdat IN (dtb_,
-                                                                          dte_))))
-         GROUP BY okpo)
-  WHERE fmb <> fme)
-loop
-    INSERT INTO OTCN_LOG (kodf, userid, txt) 
-    VALUES(kodf_,userid_,'ОКПО '||to_char(t.okpo)||' исключается из отчета т.к. изменилась форма, на начало периода "'||decode(t.fmb,1,'большие и средние','малые')||' предприятия", на конец периода "'||decode(t.fme,1,'большие и средние','малые')||' предприятия".');
-END LOOP;
+          INSERT INTO rnbu_trace (recid, userid, odate, kodp, znap, comm)
+             -- KODP = LL+P+1+M+DDDDD+ZZZZZZZZZZ
+             VALUES (s_rnbu_record.NEXTVAL, userid_, dat_, 
+                     '03'||k.P||'1'||'0'||'00000'||LPAD(k.okpo, 10,'0'), k.s190, 'OKPO='||k.OKPO);
 
---------------------------------------------------------
-FOR T IN
-(SELECT *
-   FROM ( (SELECT a.nnnnn,
-                  a.okpo,
-                  e.p,
-                  e.ddddd,
-                  d.m,
-                  TRIM (TO_CHAR (NVL (b.k160, 0), '00')) II,
-                  TRIM (TO_CHAR (NVL (b.s080, 0))) T,
-                  NVL (c.k111, '00') LL,
-                  TRIM (TO_CHAR (NVL (b.s190, 0))) s190,
-                  a.pmax,
-                  a.pato,
-                  ROUND ( (fin_nbu.zn_rep (e.kod,
-                                           e.idf,
-                                           DECODE (d.m,  2, dtb_,  1, dte_),
-                                           a.okpo)),
-                         1)
-                     znap
-             FROM (  SELECT nnnnn,
-                            TO_CHAR (edrpou) okpo,
-                            DECODE (COALESCE (par_max, 0), 1, 0, 1) pmax,
-                            DECODE (COALESCE (par_ato, 0), 1, 0, 1) pato
-                       FROM okpof659
-                      WHERE     EXISTS
-                                   (SELECT 1
-                                      FROM customer
-                                     WHERE     is_number (okpo) = 1
-                                           AND okpo = to_char(edrpou)
-                                           AND (   date_off IS NULL
-                                                OR date_off > dte_))
-                            AND EXISTS
-                                   (SELECT 1
-                                      FROM fin_rnk
-                                     WHERE okpo = edrpou
-                                           AND fdat IN (dtb_, dte_))
-                            AND (mfo_ = 300465 OR k IS NULL)
-                   ORDER BY nnnnn) a
-                  LEFT JOIN (  SELECT okpo,   
-                                      '00' k160,
-                                      MAX (NVL (k, 0)) k,
-                                      MAX (NVL (kat, 0)) s080,
-                                      MAX (NVL (obs, 0)) s190
-                                 FROM (SELECT okpo,
-                                              k,
-                                              kat,
-                                              obs
-                                         FROM bars.nbu23_rez
-                                        WHERE fdat = dte_
-                                       UNION ALL
-                                       SELECT edrpou okpo,
-                                              k,
-                                              kat,
-                                              obs
-                                         FROM bars.okpof659)
-                             GROUP BY okpo) b
-                     ON a.okpo = b.okpo
-                  LEFT JOIN
-                  (SELECT okpo, k111
-                     FROM customer, kl_k110
-                    WHERE     (    kl_k110.d_open <= dte_
-                               AND (   kl_k110.d_close IS NULL
-                                    OR kl_k110.d_close >= dte_))
-                          AND rnk IN (  SELECT MAX (rnk)
-                                          FROM customer
-                                         WHERE    date_off IS NULL
-                                               OR date_off > dte_
-                                      GROUP BY LPAD (okpo, 10, '0'))
-                          AND customer.ved = kl_k110.k110) c
-                     ON a.okpo = c.okpo
-                  LEFT JOIN
-                  (  SELECT f1.okpo,
-                            MIN (
-                               DECODE (NVL (f2.fm, '0'),  'M', 2,  'R', 2,  1))
-                               fm,
-                            DECODE (f1.fdat, dte_, 1, 2) m
-                       FROM bars.fin_fm f1
-                            INNER JOIN bars.fin_fm f2
-                               ON f1.okpo = f2.okpo AND f2.fdat = dte_
-                      WHERE f1.fdat IN (dtb_, dte_)
-                   GROUP BY f1.okpo, f1.fdat) d
-                     ON a.okpo = d.okpo
-                  LEFT JOIN (SELECT p,
-                                    ddddd,
-                                    kod,
-                                    idf
-                               FROM kl_f659) e
-                     ON e.p = NVL (d.fm, '1'))
-         UNION ALL
-         (SELECT a.nnnnn,
-                 a.okpo,
-                 NVL (TO_CHAR (d.fm), '1') p,
-                 '77777' ddddd,
-                 NVL (d.m, 1) m,
-                 TRIM (TO_CHAR (NVL (b.k160, 0), '00')) II,
-                 TRIM (TO_CHAR (NVL (b.s080, 0))) T,
-                 NVL (c.k111, '00') LL,
-                 TRIM (TO_CHAR (NVL (b.s190, 0))) s190,
-                 a.pmax,
-                 a.pato,
-                 ROUND (NVL (b.k, 0), 2) znap
-            FROM (  SELECT nnnnn,
-                           TO_CHAR (edrpou) okpo,
-                           DECODE (COALESCE (par_max, 0), 1, 0, 1) pmax,
-                           DECODE (COALESCE (par_ato, 0), 1, 0, 1) pato
-                      FROM okpof659
-                     WHERE     EXISTS
-                                  (SELECT 1
-                                     FROM customer
-                                    WHERE     is_number (okpo) = 1
-                                          AND okpo = to_char(edrpou)
-                                          AND (   date_off IS NULL
-                                               OR date_off > dte_))
-                           AND EXISTS
-                                  (SELECT 1
-                                     FROM fin_rnk
-                                    WHERE okpo = edrpou
-                                          AND fdat IN (dtb_, dte_))
-                           AND (mfo_ = 300465 OR k IS NULL)
-                  ORDER BY nnnnn) a
-                 LEFT JOIN (  SELECT okpo,                 
-                                     '00' k160,
-                                     MAX (NVL (k, 0)) k,
-                                     MAX (NVL (kat, 0)) s080,
-                                     MAX (NVL (obs, 0)) s190
-                                FROM (SELECT okpo,
-                                             k,
-                                             kat,
-                                             obs
-                                        FROM bars.nbu23_rez
-                                       WHERE fdat = dte_
-                                      UNION ALL
-                                      SELECT edrpou okpo,
-                                             k,
-                                             kat,
-                                             obs
-                                        FROM bars.okpof659)
-                            GROUP BY okpo) b
-                    ON a.okpo = b.okpo
-                 LEFT JOIN
-                 (SELECT okpo, k111
-                    FROM customer, kl_k110
-                   WHERE     (    kl_k110.d_open <= dte_
-                              AND (   kl_k110.d_close IS NULL
-                                   OR kl_k110.d_close >= dte_))
-                         AND rnk IN (  SELECT MAX (rnk)
-                                         FROM customer
-                                        WHERE    date_off IS NULL
-                                              OR date_off > dte_
-                                     GROUP BY LPAD (okpo, 10, '0'))
-                         AND customer.ved = kl_k110.k110) c
-                    ON a.okpo = c.okpo
-                 LEFT JOIN
-                 (  SELECT okpo,
-                           MIN (DECODE (NVL (fm, '0'),  'M', 2,  'R', 2,  1))
-                              fm,
-                           DECODE (fdat, dte_, 1, 2) m
-                      FROM fin_fm
-                     WHERE fdat IN (dte_)
-                  GROUP BY okpo, fdat) d
-                    ON a.okpo = d.okpo))order by P,nnnnn,substr(DDDDD,2),M)
-loop
+          p04_ := '0';
+          if k.p <> k.pp
+          then
+             p04_ := '1';
+          end if;
 
-if (t.ddddd in ('02050', '02070', '02130', '02150', '02180', '02250', '02255', 
-                '02270', '21425', '21430','23360', '04020', '04080', '04090', 
-                '04100', '04140','02300','02095','02195','02295','02355') or 
-                (t.ddddd in('02285') and t.P='2')) and sign(t.znap)=1 
-then
-   znap_:=-t.znap;
-ELSE
-   znap_:=t.znap;
-END IF;
+          INSERT INTO rnbu_trace (recid, userid, odate, kodp, znap, comm)
+             -- KODP = LL+P+1+M+DDDDD+ZZZZZZZZZZ
+             VALUES (s_rnbu_record.NEXTVAL, userid_, dat_, 
+                     '04'||k.P||'1'||'0'||'00000'||LPAD(k.okpo, 10,'0'), p04_, 'OKPO='||k.OKPO);
 
-INSERT INTO rnbu_trace (recid,
-                        userid,
-                        odate,
-                        kodp,
-                        znap,
-                        comm)
-        VALUES (
-                  s_rnbu_record.NEXTVAL,
-                  userid_,
-                  dat_,
-                     t.P
-                  || t.DDDDD
-                  || t.M
-                  || t.II
-                  || t.T
-                  || t.LL
-                  || TRIM (TO_CHAR (t.nnnnn, '00000'))
-                  || t.s190
-                  || t.pmax
-                  || t.pato,
-                  TO_CHAR (znap_),
-                  'OKPO=' || t.OKPO);
+          INSERT INTO rnbu_trace (recid, userid, odate, kodp, znap, comm)
+             -- KODP = LL+P+1+M+DDDDD+ZZZZZZZZZZ
+             VALUES (s_rnbu_record.NEXTVAL, userid_, dat_, 
+                     '05'||k.P||'1'||'0'||'00000'||LPAD(k.okpo, 10,'0'), k.pato, 'OKPO='||k.OKPO);
 
-END LOOP;
+          INSERT INTO rnbu_trace (recid, userid, odate, kodp, znap, comm)
+             -- KODP = LL+P+1+M+DDDDD+ZZZZZZZZZZ
+             VALUES (s_rnbu_record.NEXTVAL, userid_, dat_, 
+                     '06'||k.P||'1'||'0'||'00000'||LPAD(k.okpo, 10,'0'), k.psk, 'OKPO='||k.OKPO);
 
-DELETE FROM rnbu_trace
-      WHERE znap = 0 AND SUBSTR (kodp, 2, 5) NOT IN ('77777');
+          INSERT INTO rnbu_trace (recid, userid, odate, kodp, znap, comm)
+             -- KODP = LL+P+1+M+DDDDD+ZZZZZZZZZZ
+             VALUES (s_rnbu_record.NEXTVAL, userid_, dat_, 
+                     '07'||k.P||'1'||'0'||'00000'||LPAD(k.okpo, 10,'0'), k.plink, 'OKPO='||k.OKPO);
 
-FOR T IN
+          INSERT INTO rnbu_trace (recid, userid, odate, kodp, znap, comm)
+             -- KODP = LL+P+1+M+DDDDD+ZZZZZZZZZZ
+             VALUES (s_rnbu_record.NEXTVAL, userid_, dat_, 
+                     '08'||k.P||'1'||'0'||'00000'||LPAD(k.okpo, 10,'0'), k.pinvest, 'OKPO='||k.OKPO);
 
-(SELECT SUBSTR (a.kodp, 1, 1) || '02350' || SUBSTR (a.kodp, 7) kodp,
-        0 znap,
-        comm
-   FROM rnbu_trace a
-  WHERE     SUBSTR (kodp, 2, 6) = '219001'
-        AND NOT EXISTS
-               (SELECT 1
-                  FROM rnbu_trace b
-                 WHERE b.kodp LIKE '_0235_' || SUBSTR (a.kodp, 7)))
-loop
-    INSERT INTO rnbu_trace (recid, userid, odate, kodp, znap, comm)
-    VALUES (s_rnbu_record.NEXTVAL, userid_, dat_, t.kodp, t.znap, t.comm);
-END LOOP;
----------------------------------------------------
-delete from tmp_nbu where kodf=kodf_ and datf= dat_;
----------------------------------------------------
---- формирование файла в табл. TMP_NBU
-insert into tmp_nbu(kodf, datf, kodp, znap)
-select kodf_, dat_, kodp, sum(znap) znap
-from rnbu_trace
-group by kodp;
+          INSERT INTO rnbu_trace (recid, userid, odate, kodp, znap, comm)
+             -- KODP = LL+P+1+M+DDDDD+ZZZZZZZZZZ
+             VALUES (s_rnbu_record.NEXTVAL, userid_, dat_, 
+                     '09'||k.P||'1'||'0'||'00000'||LPAD(k.okpo, 10,'0'), 
+                         LTRIM (to_char (ROUND (k.koef_k, 2), fmt_)), 'OKPO='||k.OKPO);
+
+       end loop;
+    --------------------------------------------------------
+    -- блок для формування показників LL = '10'
+    for t in (select * 
+              from ( (select a.nnnnn, a.okpo, a.nmk, e.p, e.ddddd, 
+                             d.m, trim(to_char(nvl(b.k160,0),'00')) II, 
+                             trim(to_char(nvl(b.s080,0))) T, 
+                             nvl(c.k111,'00') LL, 
+                             trim(to_char(nvl(b.s190,0))) s190, 
+                             a.pmax, a.pato, 
+                             round((fin_nbu.zn_rep(e.kod,e.idf, decode(d.m,2,dtb_,1,dte_),a.okpo)),1) znap 
+                      from (select nnnnn, edrpou okpo, txt nmk, 
+                                   decode(coalesce(par_max,0),1,0,1) pmax, 
+                                   --decode(coalesce(par_ato,0),1,0,1) pato 
+                                   NVL(par_ato, 1) pato 
+                            from okpof659
+                            where exists (select 1 
+                                          from customer 
+                                          where is_number(okpo) = 1 
+                                            and okpo=edrpou 
+                                            and (date_off is null or date_off > dte_)
+                                         )
+                              and exists (select 1 
+                                          from fin_rnk 
+                                          where okpo = edrpou 
+                                            and fdat in (dtb_, dte_)
+                                            and branch like '/'||mfo_||'/' 
+                                          )
+                              and zvitdate = to_date('01012017','ddmmyyyy')  
+                              and (mfo_ = 300465 or k is null)
+                            order by nnnnn
+                           ) a
+                           left join (select okpo, '00' k160, max(nvl(k,0)) k, 
+                                             max(nvl(kat,0)) s080, 
+                                             max(nvl(obs,0)) s190 
+                                      from (select okpo, k, kat, obs 
+                                            from bars.nbu23_rez 
+                                            where fdat = dte_
+                                              and ddd like '12%'
+                                            --  union all
+                                            --select edrpou okpo, k, kat, obs 
+                                            --from bars.okpof659
+                                            --where zvitdate = to_date('01012017','ddmmyyyy')
+                                           )
+                                      group by okpo
+                                     ) b
+                              on a.okpo = b.okpo
+                           left join (select okpo, k111 
+                                      from customer c, kl_k110 kl 
+                                      where (kl.d_open <= dte_ 
+                                        and (kl.d_close is null or kl.d_close >= dte_)) 
+                                        and c.rnk in (select max(rnk) 
+                                                      from customer 
+                                                      where (date_off is null or date_off > dte_)
+                                                      group by lpad(okpo,10,'0')
+                                                     ) 
+                                        and c.ved = kl.k110
+                                     ) c           
+                              on a.okpo = c.okpo
+                           left join (select f1.okpo, 
+                                             min(decode(nvl(f2.fm,'0'),'M',2,'R',2,1)) fm, 
+                                             decode(f1.fdat,dte_,1,2) m
+                                      from bars.fin_fm f1
+                                      inner join bars.fin_fm f2 
+                                         on f1.okpo = f2.okpo and f2.fdat = dte_
+                                      where f1.fdat in (dtb_, dte_)
+                                      group by f1.okpo,f1.fdat
+                                     ) d
+                              on a.okpo = d.okpo
+                           left join (select p, ddddd, kod, idf 
+                                      from kl_f659
+                                     ) e
+                              on e.p = nvl(d.fm,'1')
+                     )
+                   )
+              order by P, nnnnn, substr(DDDDD,2), M)
+
+       loop
+        
+          if (t.ddddd in ('02050', '02070', '02130', '02150', '02180', '02250', 
+                          '02255', '02270', '21425', '21430', '23360', '04020', 
+                          '04080', '04090', '04100', '04140', '02095', --'02300',
+                          '02195','02295','02355') or 
+                         (t.ddddd in('02285') and t.P='2')) and sign(t.znap)=1 then
+             znap_ := -t.znap;
+          else
+             znap_ := t.znap;
+          end if;
+
+          if t.ddddd  = '02300' 
+          then
+             znap_ := - t.znap;
+          end if;
+
+          INSERT INTO rnbu_trace (recid, userid, odate, kodp, znap, comm)
+             VALUES (s_rnbu_record.NEXTVAL, userid_, dat_, 
+                     '10'||t.P||t.M||'0'||t.DDDDD||LPAD(t.okpo,10,'0'), TO_CHAR(znap_), 'OKPO='||t.OKPO);
+
+       end loop;
+
+    --------------------------------------------------------
+    -- блок для формування показників LL = '10' по формi 3
+    for t in (select * 
+                from ( select a.nnnnn, a.okpo, a.nmk, d.fm P,
+                              a.pmax, a.pato,
+                              decode(r.fdat, dte_, '1','2') M,
+                              r.fdat, r.idf, r.ddddd, r.colum3, r.colum4
+                        from (select nnnnn, edrpou okpo, txt nmk, 
+                                     decode(coalesce(par_max,0),1,0,1) pmax, 
+                                     NVL(par_ato, 1) pato 
+                                from okpof659
+                               where exists (select 1 
+                                          from customer 
+                                          where is_number(okpo) = 1 
+                                            and okpo=edrpou 
+                                            and branch like '/'||mfo_||'/%'  
+                                            and (date_off is null or date_off > dte_)
+                                         )
+                                 and exists (select 1 
+                                               from fin_forma3_dm 
+                                              where okpo = edrpou 
+                                                and fdat in (dtb_, dte_)
+                                             )
+                                 and zvitdate = to_date('01012017','ddmmyyyy')  
+                                 and (mfo_ = 300465 or k is null)
+                               order by nnnnn
+                             ) a
+                           left join (select okpo,
+                                             decode(nvl(fm,'0'),'M',2,'R',2,1) fm
+                                        from bars.fin_fm
+                                       where fdat = dte_
+                                     ) d
+                              on a.okpo = d.okpo
+                           left join ( select d.fdat, d.okpo, d.colum3, d.colum4, u.idf,
+                                              to_char(u.idf)||trim(to_char(u.kod,'0000')) ddddd
+                                         from fin_forma3_dm d, fin_forma3_ref u
+                                        where d.id = u.id
+                                          and d.fdat in ( dtb_, dte_ )
+                                          and trim(u.kod) is not null
+                                     ) r
+                              on a.okpo = r.okpo
+                     )
+                 order by P, nnnnn, substr(DDDDD,2), M 
+       ) loop
+        
+          if t.idf =3  then
+
+             INSERT INTO rnbu_trace (recid, userid, odate, kodp, znap, comm)
+                VALUES (s_rnbu_record.NEXTVAL, userid_, dat_, 
+                        '10'||t.P||t.M||'0'||t.DDDDD||LPAD(t.okpo,10,'0'), TO_CHAR(t.COLUM3), 'OKPO='||t.OKPO);
+
+          end if;
+
+          if t.idf =4 and t.COLUM4 >0 then
+
+             INSERT INTO rnbu_trace (recid, userid, odate, kodp, znap, comm)
+                VALUES (s_rnbu_record.NEXTVAL, userid_, dat_, 
+                        '10'||t.P||t.M||'1'||t.DDDDD||LPAD(t.okpo,10,'0'), TO_CHAR(t.COLUM4), 'OKPO='||t.OKPO);
+
+          end if;
+
+          if t.idf =4 and t.COLUM3 >0 then
+
+             INSERT INTO rnbu_trace (recid, userid, odate, kodp, znap, comm)
+                VALUES (s_rnbu_record.NEXTVAL, userid_, dat_, 
+                        '10'||t.P||t.M||'2'||t.DDDDD||LPAD(t.okpo,10,'0'), TO_CHAR(t.COLUM3), 'OKPO='||t.OKPO);
+          end if;
+
+       end loop;
+
+--    if mfo_ = 300465 then
+       delete from rnbu_trace where znap='0' and kodp like '10%';
+
+       delete from rnbu_trace r
+       where not exists (select 1 
+                         from rnbu_trace r1
+                         where substr(r1.kodp, 11, 10) = substr(r.kodp, 11, 10)
+                           and r1.kodp like '10_1______' || substr(r.kodp, 11, 10) || '%'
+                       );  
+--    end if;
+    
+    ---------------------------------------------------
+    delete from tmp_nbu where kodf=kodf_ and datf= dat_;
+    ---------------------------------------------------
+    --- формирование файла в табл. TMP_NBU
+    insert into tmp_nbu(kodf, datf, kodp, znap)
+    select kodf_, dat_, kodp, znap
+    from rnbu_trace
+    where substr(kodp,1,2) in ('01','02','03','04','05','06','07','08','09');
+
+    insert into tmp_nbu(kodf, datf, kodp, znap)
+    select kodf_, dat_, kodp, sum(znap) znap
+    from rnbu_trace
+    where substr(kodp,1,2) = '10'
+    group by kodp;
 ------------------------------------------------------------------
 END p_f3b_NN;
 /

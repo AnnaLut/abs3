@@ -4,9 +4,9 @@
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/dpt_pf.sql =========*** Run *** ====
  PROMPT ===================================================================================== 
  
-  CREATE OR REPLACE PACKAGE BARS.DPT_PF 
+CREATE OR REPLACE PACKAGE DPT_PF
 IS
-   G_HEADER_VERSION   CONSTANT VARCHAR2 (64) := ' version 1.04 09.10.2015';
+   G_HEADER_VERSION   CONSTANT VARCHAR2 (64) := ' version 1.05 22.11.2017';
 
    --
    --  службові функції
@@ -28,7 +28,10 @@ IS
    --
    PROCEDURE not_get_pension ( p_dat   IN  DATE,
                                p_dd    IN  NUMBER DEFAULT 1);
-
+    --==================================================================================================
+    -- Подготовка данных для отчета для ПФ по карточным счетам
+    --
+    procedure not_get_pension_w4 (p_dat in date);
    ----------------------------------------------------------------------------------------------------------
    -- Створення документів за списком (зарахування пенсії)
    ----------------------------------------------------------------------------------------------------------
@@ -45,13 +48,15 @@ IS
 -- добавлено условие для выборки согласно заявки BRSMAIN-2466
 -- and fdos(acc, add_months(:l_dat_beg,-12), :l_dat_beg) > 0
 -- (2. Уникнути дублювання інформації в поточному та попередніх періодах: згідно вимог Пенсійного фонду кожен наступний звіт повинен містити інформацію  по вкладникам , по яким обставини щодо одержання пенсії за довіреністю більше року або не одержання пенсії більше року  виникли в поточному місяці.)
+-- lypskykh:
 -- 12.04.2017 - добавлена обработка зачислений на депозит от ПФУ для всех операций #COBUSUPABS-5267
 -- 23.10.2017 - Переделана "домиграция" данных на обход по МФО - для обхода ora-600
+-- 22.11.2017 - добавлено логирование в start_fill_contracts. Добавлена процедура для накопления данных для отчета в ПФ по карточным счетам
 --=============================================================================
 
     --  / constants /
     --
-    g_body_version  CONSTANT VARCHAR2(64)  := 'version 1.15 23.10.2017';
+    g_body_version  CONSTANT VARCHAR2(64)  := 'version 1.16 22.11.2017';
     g_modcode       CONSTANT varchar2(6)   := 'DPT_PF';
     g_errmsg        VARCHAR2(4000);
 
@@ -74,7 +79,8 @@ IS
     is
     l_ctx_mfo varchar2(30) := sys_context('bars_context', 'user_mfo');
     begin
-      for d in (select d.deposit_id, a.dapp
+        bars_audit.info('DPT_PF.start_fill_contracts: начало DPT');
+        for d in (select d.deposit_id, a.dapp
                   from BARS.DPT_DEPOSIT d,
                        BARS.ACCOUNTS    a,
                        ( select v.vidd, v.bsd as nbs_dep, p.val as ob22_dep
@@ -90,31 +96,31 @@ IS
                    and a.nbs  = p.nbs_dep
                    and a.ob22 = p.ob22_dep
                    and a.acc  = d.acc)
-      loop
-        begin
-          Insert into BARS.DPT_DEPOSIT_DETAILS (dpt_id, dat_transfer_pf)
-               values (d.deposit_id, d.dapp);
-        exception when OTHERS then null;
-        end;
-      end loop;
-
-      for c in (SELECT distinct w4.nd, a.dapp
+        loop
+            begin
+              Insert into BARS.DPT_DEPOSIT_DETAILS (dpt_id, dat_transfer_pf)
+                   values (d.deposit_id, d.dapp);
+            exception when OTHERS then null;
+            end;
+        end loop;
+        bars_audit.info('DPT_PF.start_fill_contracts: начало W4');
+        for c in (SELECT distinct w4.nd, a.dapp
                    FROM BARS.ACCOUNTS a, w4_acc w4
                   WHERE w4.acc_pk = a.acc
                     AND W4.CARD_CODE like 'PENS%'
                     and not exists (select 1 from W4_PF_DETAILS w where w.ND = W4.ND))
-      loop
+        loop
         begin
           insert into BARS.W4_PF_DETAILS(ND, dat_transfer_pf)
                values (C.ND, C.dapp);
         exception when OTHERS then null;
         end;
-      end loop;
-      
-      bc.set_context;
-      --обрабатываем операции-зачисления от пенсионного
-      for rec in (select kf from mv_kf)
-      loop
+        end loop;
+        bars_audit.info('DPT_PF.start_fill_contracts: DPT_PF зачисления');
+        bc.set_context;
+        --обрабатываем операции-зачисления от пенсионного
+        for rec in (select kf from mv_kf)
+        loop
           bc.go(rec.kf);
           merge into bars.dpt_deposit_details ddd
           using (with acclist as (select acc --счета-пенсионники
@@ -141,10 +147,10 @@ IS
           on (ddd.dpt_id = PF.deposit_id)
           when matched then update set ddd.dat_transfer_pf = PF.vdat
           when not matched then insert (ddd.dpt_id, ddd.dat_transfer_pf) values (PF.deposit_id, PF.vdat);
-      end loop;
-      bc.go(l_ctx_mfo);
-      bc.set_policy_group('WHOLE');
-
+        end loop;
+        bc.go(l_ctx_mfo);
+        bc.set_policy_group('WHOLE');
+        bars_audit.info('DPT_PF.start_fill_contracts: finish');
     end start_fill_contracts;
 
     -- Процедура аналізу депозитів на "Пенсійність"
@@ -515,6 +521,228 @@ IS
              || CHR (10)
              || DBMS_UTILITY.format_error_backtrace ());
     END NOT_GET_PENSION;
+    
+    --==================================================================================================
+    -- Подготовка данных для отчета по карточным счетам
+    --
+    /*
+    TODO: owner="oleksandr.lypskykh" category="Optimize" priority="3 - Low" created="22.11.2017"
+    text="Возможно, есть смысл совместить с 296 отчетом (not_get_pension) и делать одну витрину, из которой уже выбирать данные разной структуры"
+    */
+    procedure not_get_pension_w4 (p_dat in date)
+        is
+        l_ctx_mfo varchar2(6) := sys_context('bars_context', 'user_mfo');
+    begin
+        bars_audit.info('DPT_PF.not_get_pension_w4: start');
+        begin
+            execute immediate 'alter table T_W4_OTCH_PF truncate partition for ('||l_ctx_mfo||')';
+        exception
+            when others then
+                if sqlcode = -54 then 
+                    bars_audit.error('DPT_PF.not_get_pension_w4: error: resource busy');
+                    return; 
+                else raise; 
+                end if;
+        end;
+        bars_audit.info('DPT_PF.not_get_pension_w4: Начинаем накопление данных');
+        insert /*+ append parallel(8) */ into T_W4_OTCH_PF (branch, 
+                                                            nls, 
+                                                            rnk, 
+                                                            okpo, 
+                                                            nmk, 
+                                                            bday, 
+                                                            pass_ser, 
+                                                            pass_num, 
+                                                            indx1, 
+                                                            np1, 
+                                                            adr1, 
+                                                            indx2, 
+                                                            np2, 
+                                                            adr2, 
+                                                            card_code, 
+                                                            code, 
+                                                            pr, 
+                                                            zar_365, 
+                                                            zar_n_365, 
+                                                            dmin_zar, 
+                                                            dmax_zar, 
+                                                            spi_365, 
+                                                            spi_365_dw, 
+                                                            dmax_spi, 
+                                                            ost_2625, 
+                                                            kf)
+        select x.branch, 
+               x.nls, 
+               x.rnk, 
+               x.okpo, 
+               x.nmk, 
+               x.bday, 
+               x.PASS_SER, 
+               x.PASS_NUM, 
+               ca.zip as indx1,
+               ca.locality as np1, 
+               ca.address as adr1, 
+               cb.zip as indx2, 
+               cb.locality as np2, 
+               cb.address as adr2, 
+               x.CARD_CODE, 
+               x.CODE, 
+               x.PR, 
+               x.ZAR_365, 
+               x.ZAR_N_365, 
+               x.DMIN_ZAR, 
+               x.DMAX_ZAR, 
+               x.SPI_365, 
+               x.SPI_365_DW, 
+               x.DMAX_SPI, 
+               fost(x.acc, p_dat)/100 as ost_2625, 
+               l_ctx_mfo
+        from (
+        select /*+ parallel(8) use_hash(wg wc w4 a2) */
+        a2.branch,
+               a2.acc,
+               a2.nls,
+               a2.rnk,
+               c2.okpo,
+               c2.nmk,
+               p.bday,
+               w4.CARD_CODE,
+               wg.CODE,
+               substr(w4.CARD_CODE, 6, 3) as PR,
+               max(p.SER) as PASS_SER,
+               max(p.NUMDOC) as PASS_NUM,
+               round(sum(case
+                           when o2.dk = 1 and o2.TT in ('PKX') AND
+                                (o2.fdat between p_dat - 365 + 1 and
+                                p_dat) then
+                            nvl(o2.s, 0)
+                           else
+                            0
+                         end) / 100,
+                     2) as ZAR_365,
+               sum(case
+                     when o2.dk = 1 and o2.TT in ('PKX') AND
+                          (o2.fdat between p_dat - 365 + 1 and
+                          p_dat) then
+                      1
+                     else
+                      0
+                   end) as ZAR_N_365,
+               round(sum(case
+                           when (o2.dk = 0 and o2.TT in ('OW1') and
+                                substr(p2.nlsa, 1, 4) = '2625' and
+                                substr(p2.nlsb, 1, 4) in ('2920', '2924') AND
+                                (o2.fdat between
+                                p_dat - 365 + 1 and
+                                p_dat)) or
+                                (o2.dk = 0 and o2.TT in ('PKF', 'PKD') and
+                                substr(p2.nlsa, 1, 4) = '2625' and
+                                substr(p2.nlsb, 1, 4) in ('2909', '2924', '1002') AND
+                                (o2.fdat between
+                                p_dat - 365 + 1 and
+                                p_dat)) then
+                            nvl(o2.s, 0)
+                           else
+                            0
+                         end) / 100,
+                     2) as SPI_365,
+               round(sum(case
+                           when (o2.dk = 0 and o2.TT in ('PKF') and
+                                substr(p2.nlsa, 1, 4) = '2625' and
+                                substr(p2.nlsb, 1, 4) in ('2909', '2924', '1002') AND
+                                (o2.fdat between
+                                p_dat - 365 + 1 and
+                                p_dat) and
+                                translate(upper(trim(p.ser) || trim(p.numdoc)),
+                                           'АВСЕІКМНОРТХ',
+                                           'ABCEIKMHOPTX') <>
+                                translate(upper(replace(trim((select ow.value
+                                                                from operw ow
+                                                               where o2.ref = ow.ref
+                                                                 and ow.tag = 'PASPN')),
+                                                         ' ',
+                                                         '')),
+                                           'АВСЕІКМНОРТХ',
+                                           'ABCEIKMHOPTX')
+                                
+                                ) then
+                            nvl(o2.s, 0)
+                           else
+                            0
+                         end) / 100,
+                     2) as SPI_365_DW,
+               min(case
+                     when o2.dk = 1 and o2.TT in ('PKX') AND
+                          o2.fdat <= p_dat then
+                      o2.fdat
+                     else
+                      NULL
+                   end) as DMIN_ZAR,
+               max(case
+                     when o2.dk = 1 and o2.TT in ('PKX') AND
+                          o2.fdat <= p_dat then
+                      o2.fdat
+                     else
+                      NULL
+                   end) as DMAX_ZAR,
+               max(case
+                     when (o2.dk = 0 and o2.TT in ('OW1') AND
+                          o2.fdat <= p_dat and
+                          substr(p2.nlsa, 1, 4) = '2625' and
+                          substr(p2.nlsb, 1, 4) in ('2920', '2924')) or
+                          (o2.dk = 0 and o2.TT in ('PKF', 'PKD') AND
+                          o2.fdat <= p_dat and
+                          substr(p2.nlsa, 1, 4) = '2625' and
+                          substr(p2.nlsb, 1, 4) in ('2909', '2924', '1002')) then
+                      o2.fdat
+                     else
+                      NULL
+                   end) as DMAX_SPI
+
+          from accounts          a2,
+               opldok            o2,
+               w4_acc            w4,
+               oper              p2,
+               w4_card           wc,
+               w4_product        wp,
+               w4_product_groups wg,
+               customer          c2,
+               person            p
+         where a2.nbs = '2625'
+           and (a2.dazs is NULL or a2.dazs > p_dat)
+           and a2.daos <= p_dat - 365 + 1
+           and o2.acc = a2.acc
+           and o2.sos = 5
+           --AND o2.fdat >= a2.daos
+           AND o2.fdat <= p_dat
+           and w4.acc_pk = a2.acc
+           and o2.ref = p2.ref
+           and wc.CODE = w4.CARD_CODE
+           and wc.product_code = wp.code
+           and wg.code = wp.GRP_CODE
+           and wg.code = 'PENSION'
+           and c2.rnk = a2.rnk
+           and c2.rnk = p.rnk
+
+         group by a2.branch,
+                  a2.acc,
+                  a2.nls,
+                  a2.rnk,
+                  c2.okpo,
+                  c2.nmk,
+                  p.bday,
+                  w4.CARD_CODE,
+                  wg.CODE
+        ) x left join customer_address ca on (x.rnk=ca.rnk  and ca.type_id=1)
+                 left join customer_address cb on (x.rnk=cb.rnk  and cb.type_id=2)
+        where x.ZAR_365>0 /*and x.ZAR_N_365>9*/ and (x.SPI_365=0 or x.SPI_365=x.SPI_365_DW or x.SPI_365_DW>0)
+        --  and x.DMAX_SPI >= add_months(p_dat-365+1,-1) -- DELTA
+        --  and x.dmin_zar<=p_dat-365+1
+          and x.dmax_zar>=add_months(TO_DATE('01.'||to_char(EXTRACT(MONTH FROM p_dat))||'.'||to_char(EXTRACT(YEAR FROM p_dat)),'dd.mm.yyyy'),-1);
+
+        bars_audit.info('DPT_PF.not_get_pension_w4: finish');
+    end not_get_pension_w4;
+    
 
     --==================================================================================================
     -- Створення документів за списком (зарахування пенсії)
@@ -647,11 +875,15 @@ IS
 
 END DPT_PF;
 /
- show err;
- 
-PROMPT *** Create  grants  DPT_PF ***
-grant DEBUG,EXECUTE                                                          on DPT_PF          to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on DPT_PF          to DPT_ADMIN;
+show err;
+ 
+
+PROMPT *** Create  grants  DPT_PF ***
+
+grant DEBUG,EXECUTE                                                          on DPT_PF          to BARS_ACCESS_DEFROLE;
+
+grant EXECUTE                                                                on DPT_PF          to DPT_ADMIN;
+
 
  
  

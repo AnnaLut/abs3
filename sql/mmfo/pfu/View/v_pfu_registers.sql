@@ -7,11 +7,12 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view V_PFU_REGISTERS ***
 
-  CREATE OR REPLACE FORCE VIEW PFU.V_PFU_REGISTERS ("ID", "RECEIVER_MFO", "ENVELOPE_REQUEST_ID", "DATE_ENV_CRT", "FILE_NAME", "REGISTER_DATE", "ENV_ID", "PAYMENT_DATE", "FILE_SUM", "FILE_LINES_COUNT", "FILE_SUM_REC", "FILE_COUNT_REC", "PAYED_SUM", "PAYED_CNT", "PAYBACK_SUM", "PAYBACK_CNT", "PAY_DATE", "STATE", "STATE_NAME", "CRT_DATE", "REST", "RESTDATE", "REST_2909", "ACC") AS 
+  CREATE OR REPLACE FORCE VIEW PFU.V_PFU_REGISTERS ("ID", "RECEIVER_MFO", "ENVELOPE_REQUEST_ID", "DATE_ENV_CRT", "PFU_BRANCH_NAME", "FILE_NAME", "REGISTER_DATE", "ENV_ID", "PAYMENT_DATE", "FILE_SUM", "FILE_LINES_COUNT", "FILE_SUM_REC", "FILE_COUNT_REC", "PAYED_SUM", "PAYED_CNT", "PAYBACK_SUM", "PAYBACK_CNT", "PAY_DATE", "STATE", "STATE_NAME", "CRT_DATE", "REST", "RESTDATE", "REST_2909", "ACC") AS 
   SELECT f.id,
           er.receiver_mfo,
           f.envelope_request_id,
           er.crt_date date_env_crt,
+          er.pfu_branch_name,
           f.file_name,
           er.register_date,
           f.envelope_request_id env_id,
@@ -75,7 +76,8 @@ PROMPT *** Create  view V_PFU_REGISTERS ***
           LEFT JOIN pfu_acc_rest ar
              ON ar.fileid = f.id
           LEFT JOIN pfu_acc_trans_2560 pat
-             ON pat.kf = LTRIM (er.receiver_mfo, '0');
+             ON pat.kf = LTRIM (er.receiver_mfo, '0')
+;
 
 
 

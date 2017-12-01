@@ -22,11 +22,19 @@ public partial class tools_Print_fin : Bars.BarsPage //System.Web.UI.Page
     protected void Page_Load(object sender, EventArgs e)
     {
 
+             if ( Convert.ToString(Request["back"]) == "NOT" )
+             {
+                 Ib_back.Visible = false;
+             }
+             else
+             {
                if (!IsPostBack)
                 {
                    //  сохраняем страничку с которой перешли
                     ViewState.Add("PREV_URL", Request.UrlReferrer.PathAndQuery);
                 }
+               
+             }
 
         if (!IsPostBack & !String.IsNullOrEmpty(Convert.ToString(Request["nd"])))
         {
@@ -58,11 +66,11 @@ public partial class tools_Print_fin : Bars.BarsPage //System.Web.UI.Page
                 
             }
 
-            FRT_WINDOW();
+            
 
         }
- 
-       
+
+         if (!IsPostBack)  FRT_WINDOW();
 
        }
 
