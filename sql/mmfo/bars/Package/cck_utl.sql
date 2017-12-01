@@ -1,8 +1,10 @@
+
+ 
  PROMPT ===================================================================================== 
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/cck_utl.sql =========*** Run *** ===
  PROMPT ===================================================================================== 
-
-create or replace package cck_utl is
+ 
+  CREATE OR REPLACE PACKAGE BARS.CCK_UTL is
     -- Author  : Artem Yurchenko
     -- Created : 3.08.2016
     -- Purpose : набір утилітарних функцій для роботи з об'єктами модуля CCK (кредити юридичних і фізичних осіб + МБДК +
@@ -110,8 +112,10 @@ create or replace package cck_utl is
         p_loan_aim_id in integer default null,                         -- (aim         integer      ) ідентифікатор цільового призначення кредиту
         p_funds_source_id in integer default cck_utl.FUNDS_SOURCE_OWN, -- (sour        integer      ) ідентифікатор джерела походження коштів
         p_mfo in varchar2 default bars_context.current_mfo(),          -- (kf          varchar2(6)  ) МФО в якому зареєстрована угода
-        p_application_id in integer default 0,                          -- (adds        integer      ) ідентифікатор додаткової угоди
-        p_certificate_nbu IN VARCHAR2 default null);              -- (n_nbu       varchar2(50)    ) номер свідоцтва НБУ
+        p_application_id in integer default 0,                         -- (adds        integer      ) ідентифікатор додаткової угоди
+        p_certificate_nbu IN VARCHAR2 default null,                    -- (n_nbu       varchar2(50) ) номер свідоцтва НБУ
+        p_date_reestr_nbu IN DATE default null);                       -- (d_nbu       date         ) дата реєстрації НБУ
+
 
     function get_deal_kind_name(
          p_deal_kind_id in integer)
@@ -140,7 +144,7 @@ create or replace package cck_utl is
         p_document_id in integer);
 end;
 /
-create or replace package body cck_utl as
+CREATE OR REPLACE package body BARS.cck_utl as
 
     function read_cc_vidd(
         p_kind_id in integer,
@@ -386,7 +390,8 @@ create or replace package body cck_utl as
         p_funds_source_id in integer default cck_utl.FUNDS_SOURCE_OWN, -- (sour        integer      ) ідентифікатор джерела походження коштів
         p_mfo in varchar2 default bars_context.current_mfo(),          -- (kf          varchar2(6)  ) МФО в якому зареєстрована угода
         p_application_id in integer default 0,                         -- (adds        integer      ) ідентифікатор додаткової угоди
-        p_certificate_nbu IN VARCHAR2 default null)                -- (n_nbu       varchar2(50)    ) номер свідоцтва НБУ
+        p_certificate_nbu IN VARCHAR2 default null,                    -- (n_nbu       varchar2(50) ) номер свідоцтва НБУ
+        p_date_reestr_nbu IN DATE default null)                        -- (d_nbu       date         ) номер реєстрації в НБУ
     is
     begin
         insert into cc_add
@@ -427,10 +432,11 @@ create or replace package body cck_utl as
                 null,                           -- namkred     varchar2(38),
                 null,                           -- naznkred    varchar2(160),
                 p_transit_account,              -- nls_1819    varchar2(14),
-                p_partner_alt_requisites,      -- field_58d   varchar2(250)
-                p_certificate_nbu);              -- n_nbu       varchar2(50)   номер свідоцтва НБУ
+                p_partner_alt_requisites,       -- field_58d   varchar2(250)
+                p_certificate_nbu,              -- n_nbu       varchar2(50)   номер свідоцтва НБУ
+                p_date_reestr_nbu);             -- d_nbu       date           дата реєстрації в НБУ
     end;
-
+--------
     function get_deal_kind_name(
          p_deal_kind_id in integer)
     return integer
@@ -524,6 +530,7 @@ create or replace package body cck_utl as
     end;
 end;
 /
+
  show err;
  
 PROMPT *** Create  grants  CCK_UTL ***

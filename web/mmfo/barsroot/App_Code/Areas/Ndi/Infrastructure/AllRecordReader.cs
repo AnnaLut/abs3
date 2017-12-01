@@ -121,7 +121,6 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
                 allData = ReadAll(reader);
             if (selectBuilder.TableName == "DYN_FILTER")
                 allData = ReplaceResult(allData, "WHERE_CLAUSE", "$~~ALIAS~~$", selectBuilder.NativeTableNameForFilter);
-            
             int rowsCount = 0;
             List<Dictionary<string, object>> resultData = allData.ToList();
             if (resultData.Count <= 0)
@@ -163,19 +162,6 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
                 TotalRecord = summaryData
             };
 
-        }
-
-
-        public static ResultForExcel GetDataForExcelCsv(OracleDataReader reader, string excelParam = "")
-        {
-            return new ResultForExcel()
-            {
-                DataRecords = ReadAll(reader),
-                RecordsCount = 0,
-                TotalRecord = null,
-                ExcelParam = excelParam
-            };
-            
         }
 
         public static IEnumerable<Dictionary<string, object>> GetRsultRecords(IEnumerable<Dictionary<string, object>> data, List<ColumnMetaInfo> columns)

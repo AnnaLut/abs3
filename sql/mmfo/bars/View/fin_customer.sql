@@ -12,7 +12,7 @@ PROMPT *** Create  view FIN_CUSTOMER ***
           upper(nmk) nmk,
           okpo,
           custtype,
-          branch,
+          '/'||kf||'/' branch,
           isp AS rnkp,
           ved,
           NULL AS date_off,

@@ -50,7 +50,6 @@ namespace BarsWeb.Areas.Ndi.Models
         public string LinkWebFormName { get; set; }
         public bool OpenInWindow { get; set; }
 
-        public ThrowParams ThrowNsiParams { get; set; }
         public List<string> InputParamsNames { get; set; }
 
 

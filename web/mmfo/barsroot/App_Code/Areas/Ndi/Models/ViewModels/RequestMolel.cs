@@ -35,7 +35,7 @@ namespace BarsWeb.Areas.Ndi.Models.ViewModels
         public int? BaseCodeOper { get; set; }
         public bool GetFiltersOnly { get; set; }
         public bool SaveFilterLocal { get; set; }
-        public string  InsertDefParams { get; set; }
+
         public string Code { get; set; }
     }
 }

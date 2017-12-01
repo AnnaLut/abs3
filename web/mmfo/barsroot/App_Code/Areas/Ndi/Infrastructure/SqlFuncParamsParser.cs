@@ -7,7 +7,6 @@ using Oracle.DataAccess.Client;
 using BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation;
 using System;
 using System.Data;
-using BarsWeb.Areas.Ndi.Models.DbModels;
 
 namespace BarsWeb.Areas.Ndi.Infrastructure
 {
@@ -62,24 +61,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
             }
         }
 
-        public static List<string> GetParamNames(string paramsString)
-        {
-            List<string> listParams = null;
-            const string pattern = @":\w+";
-            Regex reg = new Regex(pattern);
-            MatchCollection collParams = reg.Matches(paramsString);
-            if (collParams.Count > 0)
-            {
-                listParams = new List<string>();
-                foreach (Match item in collParams)
-                {
-                    listParams.Add(item.Value.Replace(":", ""));
-                }
-            }
-            return listParams;
 
-
-        }
         public static OracleDbType GetOracleDbType(string code)
         {
             switch (code)
@@ -187,7 +169,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
         }
 
 
-        public static void BuilFunctionParams(List<CallFunctionMetaInfo> callFunctions, MetaTable tableInfo = null)
+        public static void BuilFunctionParams(List<CallFunctionMetaInfo> callFunctions)
         {
             foreach (var func in callFunctions)
             {
@@ -209,14 +191,14 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
                     func.OutParamsInfo = GetSqlFuncCallParamsDescription<OutParamsInfo>(func.PROC_NAME, func.OutParams);
                     if (func.OutParamsInfo != null && func.OutParamsInfo.Count() > 0)
                     {
-                        if (paramsInfo != null && paramsInfo.Count() > 0)
-                            paramsInfo.RemoveAll(x => func.OutParamsInfo.Find(y => y.ColName == x.ColName) != null);
-
-
+                            if (paramsInfo != null && paramsInfo.Count() > 0)
+                                paramsInfo.RemoveAll(x => func.OutParamsInfo.Find(y => y.ColName == x.ColName) != null);
+                            
+                        
                         if (func.OutParamsInfo.FirstOrDefault(x => x.Kind == "GET_FILE") != null)
                             func.HasFileResult = true;
-
-
+                         
+                        
                     }
 
                 }
@@ -236,15 +218,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
 
 
                 }
-                if (func.PROC_EXEC == "BEFORE" && tableInfo != null && tableInfo.SemanticParamNames.Count > 0)
-                    paramsInfo.ForEach(item => {
-                        if (tableInfo.SemanticParamNames.Contains(item.ColName))
-                        {
-                            item.AdditionalUse.Add("ReplaseTableSemantic");
-                        }
-                           
-                    });
-                
+
 
                 // преобразуем список информации о параметрах к формату, который ожидает клиент
                 func.ParamsInfo = paramsInfo.Select(x => new
@@ -252,7 +226,6 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
                     IsInput = x.IsInput,
                     DefaultValue = x.DefaultValue,
                     Kind = x.Kind,
-                    AdditionalUse = x.AdditionalUse,
                     ColumnInfo = new
                     {
                         COLNAME = x.ColName,
@@ -267,9 +240,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
 
                 //func.PROC_EXEC = "BEFORE";
             }
-
         }
-        
         public static void AddUploadParameters(CallFunctionMetaInfo callFunction, OracleCommand command, List<FieldProperties> funcParams, List<FieldProperties> additionalParams)
         {
             List<UploadParamsInfo> uploadParams = GetSqlFuncCallParamsDescription<UploadParamsInfo>(callFunction.PROC_NAME, callFunction.UploadParams);
@@ -343,8 +314,6 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
                 AddOptionsFromDictionary(paramMetaInfo as OutParamsInfo, options);
             else if (paramMetaInfo is MultiRowsParams)
                 AddOptionsFromDictionary(paramMetaInfo as MultiRowsParams, options);
-            else if (paramMetaInfo is ComplexParams)
-                AddOptionsFromDictionary(paramMetaInfo as ComplexParams, options);
             else
                 AddOptionsFromDictionary(paramMetaInfo, options);
 
@@ -416,21 +385,6 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
             }
         }
 
-
-        private static void AddOptionsFromDictionary(ComplexParams paramMetaInfo, Dictionary<string, string> options)
-        {
-
-            foreach (var option in options)
-            {
-                switch (option.Key)
-                {
-                    case "GET_FROM":
-                        paramMetaInfo.GetFrom = option.Value;
-                        break;
-                }
-            }
-
-        }
         private static void AddOptionsFromDictionary(UploadParamsInfo paramMetaInfo, Dictionary<string, string> options)
         {
             if (paramMetaInfo is UploadFileName)
@@ -572,6 +526,55 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
             return fileName;
         }
 
+        public static ParamMetaInfo GetDefaultRelatedData(string srcTabName)
+        {
+            string sourcTabName = srcTabName;
+            ParamMetaInfo refParam = new ParamMetaInfo();
+
+            OracleConnection connection = OraConnector.Handler.UserConnection;
+            try
+            {
+                // получить tabId
+                //
+                OracleCommand selectTabId = connection.CreateCommand();
+                selectTabId.BindByName = true;
+                selectTabId.CommandText = "select tabid from meta_tables where tabname=:tabName";
+                selectTabId.Parameters.Add(new OracleParameter("tabName", sourcTabName));
+                var tabId = (decimal)selectTabId.ExecuteScalar();
+
+                // получить имя первой колонки-первичного ключа
+                //
+                OracleCommand selectPkColumn = connection.CreateCommand();
+                selectPkColumn.BindByName = true;
+                selectPkColumn.CommandText = "select colname from meta_columns where tabid=:tabid and showretval=:showretval";
+                selectPkColumn.Parameters.Add(new OracleParameter("tabid", tabId));
+                selectPkColumn.Parameters.Add(new OracleParameter("showretval", 1));
+                var pkColumn = (string)selectPkColumn.ExecuteScalar();
+
+                // pkColumn = FilterHelper.BuildValueForLike(pkColumn);
+
+                // получить имя колонки-наименования
+                //
+                OracleCommand selectNameColumn = connection.CreateCommand();
+                selectNameColumn.BindByName = true;
+                selectNameColumn.CommandText = "select colname from meta_columns where tabid=:tabid and instnssemantic=:instnssemantic";
+                selectNameColumn.Parameters.Add(new OracleParameter("tabid", tabId));
+                selectNameColumn.Parameters.Add(new OracleParameter("instnssemantic", 1));
+                var nameColumn = (string)selectNameColumn.ExecuteScalar();
+
+                //nameColumn = FilterHelper.BuildValueForLike(nameColumn);
+
+                refParam.SrcTableName = sourcTabName;
+                refParam.SrcColName = pkColumn;
+                refParam.SrcTextColName = nameColumn;
+                return refParam;
+
+            }
+            finally
+            {
+                connection.Close();
+            }
+        }
 
         /// <summary>
         /// Заменить в строке NULL-константы центуры на значение Oracle null (NUMBER_Null -> null, STRING_Null -> null ...)

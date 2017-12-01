@@ -38,8 +38,6 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
 
             List<FieldProperties> RowParams = string.IsNullOrEmpty(requestModel.JsonSqlParams) || requestModel.JsonSqlParams == "undefined" ? new List<FieldProperties>() : JsonConvert.DeserializeObject<List<FieldProperties>>(requestModel.JsonSqlParams) as List<FieldProperties>;
             bool isFuncOnly = false;
-            List<FieldProperties> defParams = string.IsNullOrEmpty(requestModel.InsertDefParams) || requestModel.InsertDefParams == "undefined" ? new List<FieldProperties>() : JsonConvert.DeserializeObject<List<FieldProperties>>(requestModel.InsertDefParams) as List<FieldProperties>;
-           
 
             //if (!string.IsNullOrEmpty(requestModel.Code))
             //    return BuildByCode(requestModel.Code);
@@ -57,24 +55,13 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
                     requestModel.BaseCodeOper = requestModel.Spar;
 
             }
-
             requestModel.TableName = nsiEditParams == null || string.IsNullOrEmpty(nsiEditParams.TableName) ? requestModel.TableName : nsiEditParams.TableName;
             if (string.IsNullOrEmpty(requestModel.TableName) && nsiEditParams != null && nsiEditParams.IsFuncOnly)
             {
                 return BuildFunctionOnlyRequest(requestModel);
             }
-
             var metaTable = _repository.GetMetaTableByName(requestModel.TableName.Trim().ToUpper());
             MainOptionsViewModel tableViwModel = new MainOptionsViewModel();
-
-            if (defParams.Count > 0)
-            {
-                tableViwModel.DefParamModel = new DefParamModel();
-                tableViwModel.DefParamModel.InsertDefParams = defParams;
-                tableViwModel.DefParamModel.Base64InsertDefParamsString = requestModel.InsertDefParams;
-            }
-              
-
             tableViwModel.TableId = metaTable != null ? Convert.ToInt32(metaTable.TABID) : (requestModel.NativeTabelId != null && requestModel.NativeTabelId.HasValue ? requestModel.NativeTabelId : null);
             tableViwModel.CodeOper = requestModel.Spar;
             tableViwModel.SParColumn = requestModel.SparColumn;
@@ -92,7 +79,6 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
             tableViwModel.NativeTabelId = requestModel.NativeTabelId != null && requestModel.NativeTabelId.HasValue ? requestModel.NativeTabelId : null;
             tableViwModel.TableMode = accessLevel;
             tableViwModel.Base64jsonSqlProcParams = FormatConverter.ConvertToUrlBase4UTF8(requestModel.JsonSqlParams);
-            tableViwModel.DefParamModel.Base64InsertDefParamsString = FormatConverter.ConvertToUrlBase4UTF8(requestModel.InsertDefParams);
             tableViwModel.IsFuncOnly = isFuncOnly;
             tableViwModel.NsiTableId = requestModel.NsiTableId;
             tableViwModel.NsiFuncId = requestModel.NsiFuncId;

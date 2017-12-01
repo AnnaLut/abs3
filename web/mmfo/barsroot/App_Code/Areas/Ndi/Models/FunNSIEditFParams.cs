@@ -48,15 +48,12 @@ public class FunNSIEditFParams
     public string TableName { get; set; }
     public string[] FunNSIEditFParamsArray { get; set; }
     List<ParamMetaInfo> FunNSIEditFParamsInfo { get; set; }
-    ThrowParams ThrowNsiParams { get;set; }
-    public string ThrowNsiParamsString { get; set; }
     List<string> ConditionParamsNames { get; set; }
 
     [MainOptionAttribute("SUMM_VISIBLE_ROWS", true)]
     public string SummVisibleRows { get; set; }
     //public string RowParamsNames { get; set; }
     public List<string> ParamsNames { get; set; }
-    List<FieldProperties> RowParams { get; set; }
     public bool IsInMeta_NSIFUNCTION { get; set; }
 
     [MainOptionAttribute("ACCESSCODE", true)]
@@ -211,13 +208,6 @@ public class FunNSIEditFParams
             if (showDialogWindow.Length > showDialogWindow.IndexOf("showDialogWindow=>") + "showDialogWindow=>".Length)
                 this.ShowDialogWindow = showDialogWindow.Substring(showDialogWindow.IndexOf("showDialogWindow=>") + "showDialogWindow=>".Length).Trim();
         OpenInWindow = !string.IsNullOrEmpty(paramsArray.FirstOrDefault(u => u.Contains("OpenInWindow")));
-
-        string throwParams = paramsArray.FirstOrDefault(x => x.Contains("THROW_PARAMS=>"));
-        if (!string.IsNullOrEmpty(throwParams))
-            if (throwParams.Length > throwParams.IndexOf("THROW_PARAMS=>") + "THROW_PARAMS=>".Length)
-                this.ThrowNsiParamsString = throwParams.Substring(throwParams.IndexOf("THROW_PARAMS=>") + "THROW_PARAMS=>".Length).Trim();
-       
-
         if (!string.IsNullOrEmpty("FUNCTION_BUTTONS"))
             RenderFunctionsIn = RenderFunctions.RenderInToolbar.ToString();
         if (string.IsNullOrEmpty(TableName) && !string.IsNullOrEmpty(this.PROC))
@@ -233,30 +223,13 @@ public class FunNSIEditFParams
         this.ParamsNames = new List<string>();
         this.RowParamNames = new List<string>();
         this.InputParamaNames = new List<string>();
+
         CollectConditionsParams();
 
         BuildAddEditInform();
 
         BuildBaseOptions();
-
-        
-        BuildThrowParams();
     }
-
-    private void BuildThrowParams()
-    {
-        if (string.IsNullOrEmpty(this.ThrowNsiParamsString))
-            return;
-        List<ComplexParams> complexParams = SqlStatementParamsParser.GetSqlFuncCallParamsDescription<ComplexParams>(ThrowNsiParamsString, ThrowNsiParamsString);
-        List<DefParam> defParams = complexParams.Where(x => x.Kind == "DEF_VAL_BY_INSERT" && x is DefParam).Select(y => y as DefParam).ToList();
-        if(defParams != null && defParams.Count > 0)
-        {
-            this.ThrowNsiParams = new ThrowParams();
-            this.ThrowNsiParams.DefParams.AddRange(defParams);
-        }
-       
-    }
-
     public void BuildBaseOptions()
     {
         if (!string.IsNullOrEmpty(this.BaseOptions))
@@ -294,7 +267,6 @@ public class FunNSIEditFParams
         func.RowParamsNames = this.ParamsNames;
         func.SysPar = this.SystemParams;
         func.UploadParams = UploadParams;
-        func.ThrowNsiParams  = this.ThrowNsiParams;
         List<ParamMetaInfo> paramsInfo = SqlStatementParamsParser.GetSqlFuncCallParamsDescription<ParamMetaInfo>(func.PROC_NAME, func.PROC_PAR);
         List<UploadParamsInfo> uploadParamsInfo = SqlStatementParamsParser.GetSqlFuncCallParamsDescription<UploadParamsInfo>(func.PROC_NAME, func.PROC_PAR);
         
@@ -331,19 +303,12 @@ public class FunNSIEditFParams
         func.CodeOper = this.CodeOper;
         func.ConditionParamNames = this.ConditionParamsNames;
         func.RowParamsNames = this.RowParamNames;
-        //if ( this.EXEC == "BEFORE" &&  this.RowParamNames != null && this.RowParamNames.Count > 0)
-        //{
-        //    func.ConditionParamNames.AddRange(this.RowParamNames);
-        //}
-            
-        
         func.OutParams = this.OutParams;
         func.SysPar = this.SystemParams;
         func.MultiParams = this.MultiParams;
         func.OpenInWindow = this.OpenInWindow;
         func.UploadParams = this.UploadParams;
         func.PROC_EXEC = GetProcExec(func, this);
-        func.ThrowNsiParams = this.ThrowNsiParams;
         return func;
     }
 

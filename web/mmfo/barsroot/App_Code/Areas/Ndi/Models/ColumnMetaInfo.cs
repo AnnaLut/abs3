@@ -9,7 +9,7 @@ namespace BarsWeb.Areas.Ndi.Models
     /// <summary>
     /// Метаданные колонок справочника (на основе META_COLUMNS)
     /// </summary>
-    public class ColumnMetaInfo : ICloneable
+    public class ColumnMetaInfo 
     {
         public ColumnMetaInfo()
         {
@@ -122,17 +122,12 @@ namespace BarsWeb.Areas.Ndi.Models
             return nativeColumnMeta != null ? nativeColumnMeta.COLNAME : "";
         }
 
-        public object Clone()
-        {
-            return this.MemberwiseClone();
-        }
-
         /// <summary>
         /// Информация о проваливании для колонки
         /// </summary>
-        // public FallDownColumnInfo FallDownInfo { get; set; }
+       // public FallDownColumnInfo FallDownInfo { get; set; }
 
-
+      
     }
 }
 

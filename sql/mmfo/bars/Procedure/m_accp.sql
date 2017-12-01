@@ -100,9 +100,10 @@ BEGIN
                   RAISE_APPLICATION_ERROR(-20001,'Обране забезпечення вже включено в  КД '||nd_);
             end if;
       FOR k IN (SELECT n.acc, a.tip
-                  FROM nd_acc n, accounts a
+                  FROM nd_acc n, accounts a, cc_deal d
                  WHERE a.acc = n.acc
-                   AND n.nd = nd_
+                   and n.nd = d.nd
+                   AND (d.nd = nd_ or d.ndg =  nd_)
                    AND a.tip IN ('SS '
                                 ,'SL '
                                 ,'SP '
@@ -111,7 +112,8 @@ BEGIN
                                 ,'SNO'
                                 ,'SPN'
                                 ,'DEP'
-                                ,'DEN')
+                                ,'DEN'
+								,'ODB')
                    AND a.nbs NOT LIKE '25%'
                    AND a.nbs NOT LIKE '26%'
                    AND (accz_, n.acc) NOT IN (SELECT acc, accs FROM cc_accp))

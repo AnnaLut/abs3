@@ -1190,7 +1190,7 @@ public partial class credit_defolt_bud : Bars.BarsPage
                                                                  'select -99 as val, null as name from dual union all select val, name as name from FIN_QUESTION_REPLY where kod='''||KOD||''' and idf = '||IDF  l_sql
                                                                  --,(select count(1) from fin_question_reply where kod = q.kod and idf = q.idf) tip
                                                           from  FIN_QUESTION q
-                                                           where  q.idf = 74 
+                                                           where  q.idf = 74 and kod != 'VD0' 
                                                            ORDER BY ord");
 
 

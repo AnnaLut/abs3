@@ -8,7 +8,7 @@
    G_HEADER_VERSION  CONSTANT VARCHAR2(64)  := 'version 1.4.0  20.06.2017';
    
    G_DATE_VAL DATE := to_date('04-03-2012','dd-mm-yyyy'); --дата  видачі вал.КД до якої не враховується валютна виручка
-
+   
 /*
 
 20-06-2017 - correction_parameters добавлен VKR
@@ -28,7 +28,7 @@
   aDAT_       date;     -- активна дата 
   
   FZ_  char(1);
-  
+  spPKdR_   number                ;
 
   ern CONSTANT POSITIVE   := 208; 
   err EXCEPTION; 
@@ -82,7 +82,17 @@
   type tp_pawn is record ( acc    tp_acc) ;
   tp_pawns tp_pawn;
   
- 
+  -- масив перевірки проходлжнння логіки форм
+    type t_col_logk is record(  DAT  fin_fm.fdat%type    
+                               ,OKPO fin_fm.okpo%type
+                               ,IDF  fin_rnk.idf%type
+                               ,err  int  );
+    TYPE t_logk iS TABLE OF t_col_logk index by pls_integer;
+	
+    type tp_logk is record ( logk    t_logk) ;
+	
+    tp_logks tp_logk;
+  
  function f_kpz_nd(p_nd number, p_dat date) return number;
  
  -- Автоматизоване визначення показників	 type 3					   
@@ -268,7 +278,7 @@ FUNCTION ZN_F2    (KOD_   char,
 ---------------------------------------------------------------
   FUNCTION F_FM ( 
                   OKPO_ int, 
-                  DAT_ date  ) RETURN char;
+                  DAT_ date  ) RETURN char RESULT_CACHE ;
 				  
 				  
 ---------------------------------------------------------------
@@ -276,7 +286,8 @@ FUNCTION ZN_F2    (KOD_   char,
 --Лог?чний контроль Форми №1 та форми №2
 --
 ----------------------------------------------------------------
-
+  function logk_  ( DAT_ date, OKPO_ int , IDF_ int ) RETURN number ;
+  
   FUNCTION LOGK ( 
                    DAT_ date, 
                    OKPO_ int, 
@@ -462,7 +473,35 @@ procedure adjustment_class_kons (RNK_  number,
                                  ND_   number,
 					             DAT_  date);
 
+
+
+
+	--*Цінні папери   (бюджетники)
+
+-- Автоматизоване визначення показників						   
+procedure get_subpok_bud_cp (RNK_  number,
+                             ND_   number,
+					         DAT_  date);
+							 
+-- Корегування класу позичальника (Постанова 351)				  BUD  
+procedure adjustment_class_bud_cp(RNK_  number,
+                                  ND_   number,
+					              DAT_  date);
+
 								 
+function get_vnkr_cp (RNK_  number,
+                      ND_   number, 
+					  DAT_  date   ,
+					  p_idf   number ) return varchar2;								 
+								 
+procedure set_vnkr_cp (RNK_   number,
+                       ND_    number, 
+				 	   DAT_   date   ,
+					   p_idf  number ,
+					   p_vnkr varchar2);
+
+
+					   
 function header_version return varchar2;
 
 function body_version   return varchar2;		
@@ -1122,8 +1161,18 @@ FUNCTION GET_KVED (RNK_   number, fdat_max_ date, p_type number default 0) RETUR
 				into p_kved
 				from fin_fm
 			   where okpo = okpo_ and fdat = trunc(fdat_max_,'YYYY');
-			 exception when NO_DATA_FOUND THEN p_kved := null;
-		 end;
+			 exception when NO_DATA_FOUND THEN  p_kved := null;
+		  end;
+
+		    if p_kved is null then
+			    begin
+						  select ved
+							into p_kved
+							from fin_fm
+						   where okpo = okpo_ and fdat = fdat_max_;
+						 exception when NO_DATA_FOUND THEN p_kved := null;
+					  end;
+			 end if;			  
 
  
 if p_kved is not null then  return p_kved;
@@ -1416,7 +1465,7 @@ end if;
   END; 
 
   
-  if LOGK(DAT_, OKPO_, 1) > 0 
+  if LOGK_(DAT_, OKPO_, 1) > 0 
    then  raise_application_error(-(20000),'\ '||'      Баланс Форми №1 заповнений з помилками за період - '||DAT0_,TRUE);  
  null;
   end if;
@@ -1434,21 +1483,13 @@ FUNCTION ZN_F2    (KOD_   char,
                     ) RETURN  number IS
 dat0_     date					;
 dat1_     date					;
-spPKdR_   number                ;
+
 Q_        number ;                   -- № звітного кварталу
 l_        number ;        -- 0  -  однакових форм звітності за останні 5 звітних періодів
                           -- >0 - not однакових форм звітності за останні 5 звітних періодів
 BEGIN
 
- 	Begin
-       	 select val
-		   into spPKdR_
-		   from params
-		  where PAR = 'FIN_NBU_RV';  -- Вид приведення до річного виміру
-      exception when NO_DATA_FOUND THEN 
-	        spPKdR_:= 3;
-	END;  
-
+FZ_ :=  FIN_NBU.F_FM(OKPO_, DAT_);
 	/*
 	ВОТ ТУТ САМОЕ ИНТЕРЕСНОЕ..........
 	коли змінюється форма звітності з повної в малу.....
@@ -1468,16 +1509,17 @@ BEGIN
    
    -- вставка початок
    
+   
  select count(*)
   into l_ 
 from fin_fm 
 where okpo =  OKPO_
    and fdat between  add_months(trunc( DAT_),-12) and DAT_
    --and Fm <> FIN_NBU.F_FM(OKPO_, DAT_);  
-   and Fm not in ( FIN_NBU.F_FM(OKPO_, DAT_), decode(FIN_NBU.F_FM(OKPO_, aDAT_),'N',' ',' ','N','-') ); 
+   and Fm not in ( FZ_, decode(FZ_,'N',' ',' ','N','-') ); 
  
 	
-	if l_ > 0 or FIN_NBU.F_FM(OKPO_, DAT_) not in ( ' ', 'N') then spPKdR_ := 1;
+	if l_ > 0 or FZ_ not in ( ' ', 'N') then spPKdR_ := 1;
 	else 
 	   
 	    select count(*)
@@ -1486,7 +1528,7 @@ where okpo =  OKPO_
 		where okpo =  OKPO_
 		   and fdat between  add_months(trunc( DAT_),-12) and DAT_
 		   --and Fm = FIN_NBU.F_FM(OKPO_, DAT_); 
-		   and fm in ( FIN_NBU.F_FM(OKPO_, DAT_), decode(FIN_NBU.F_FM(OKPO_, aDAT_),'N',' ',' ','N','-')  );
+		   and fm in ( FZ_, decode(FZ_,'N',' ',' ','N','-')  );
 	   if l_ < 5 then spPKdR_ := 1;
 	   end if;
 	
@@ -1501,7 +1543,7 @@ where okpo =  OKPO_
 
 	    then   
 
-		if LOGK(DAT_, OKPO_, 2) > 0 
+		if LOGK_(DAT_, OKPO_, 2) > 0 
         then  raise_application_error(-(20000),'\ '||'       Форми №2 заповнена з помилками за період - '||DAT_,TRUE);  end if;
 
 		if gr_ = 4 
@@ -1526,13 +1568,13 @@ where okpo =  OKPO_
 				    dat0_ := DAT_;
       				 dat1_ := trunc( (DAT_ - 1) , 'Y' ); 
 					 Q_    := to_char( (dat0_ - 1) , 'Q'); 
- 	 if LOGK(DAT_, OKPO_, 2) > 0 then  raise_application_error(-(20000),'\ '||'       Форми №2 заповнена з помилками за період - '||DAT_,TRUE);  end if;
-	 if LOGK(DAT1_, OKPO_, 2) > 0 then  raise_application_error(-(20000),'\ '||'       Форми №2 заповнена з помилками за період - '||DAT1_,TRUE);  end if;	 
+ 	 if LOGK_(DAT_, OKPO_, 2) > 0 then  raise_application_error(-(20000),'\ '||'       Форми №2 заповнена з помилками за період - '||DAT_,TRUE);  end if;
+	 if LOGK_(DAT1_, OKPO_, 2) > 0 then  raise_application_error(-(20000),'\ '||'       Форми №2 заповнена з помилками за період - '||DAT1_,TRUE);  end if;	 
 					 return  round((ZN_P(KOD_, 2, DAT1_, OKPO_)+ZN_P(KOD_, 2, DAT0_, OKPO_))/(4 + Q_))*4;
 					
 				elsif gr_ = 3 
 			 	    then            dat0_ := DAT_ ; 
-						            if LOGK(DAT_, OKPO_, 2) > 0 then  raise_application_error(-(20000),'\ '||'       Форми №2 заповнена з помилками за період - '||DAT_,TRUE);  end if;
+						            if LOGK_(DAT_, OKPO_, 2) > 0 then  raise_application_error(-(20000),'\ '||'       Форми №2 заповнена з помилками за період - '||DAT_,TRUE);  end if;
 		    		return          ZN_P(KOD_, 2, DAT0_, OKPO_) ; 
 				 else  return           0;
 				 end if;
@@ -1545,13 +1587,13 @@ where okpo =  OKPO_
 				if gr_ = 4 
 				   then dat0_ := DAT_;
 				   return (ZN_FDK(KOD_,DAT_, OKPO_) +  ZN_FDK(KOD_,add_months(trunc(DAT_),-3), OKPO_) + ZN_FDK(KOD_,add_months(trunc(DAT_),-6), OKPO_) + ZN_FDK(KOD_,add_months(trunc(DAT_),-9), OKPO_));
-  	 if LOGK(DAT_, OKPO_, 2) > 0                       then  raise_application_error(-(20000),'\ '||'       Форми №2 заповнена з помилками за період - '||DAT_,TRUE);  end if;
-	 if LOGK(add_months(trunc(DAT_),-3), OKPO_, 2) > 0 then  raise_application_error(-(20000),'\ '||'       Форми №2 заповнена з помилками за період - '||add_months(trunc(DAT_),-3),TRUE);  end if;
-	 if LOGK(add_months(trunc(DAT_),-6), OKPO_, 2) > 0 then  raise_application_error(-(20000),'\ '||'       Форми №2 заповнена з помилками за період - '||add_months(trunc(DAT_),-6),TRUE);  end if;
-	 if LOGK(add_months(trunc(DAT_),-9), OKPO_, 2) > 0 then  raise_application_error(-(20000),'\ '||'       Форми №2 заповнена з помилками за період - '||add_months(trunc(DAT_),-9),TRUE);  end if;	 
+  	 if LOGK_(DAT_, OKPO_, 2) > 0                       then  raise_application_error(-(20000),'\ '||'       Форми №2 заповнена з помилками за період - '||DAT_,TRUE);  end if;
+	 if LOGK_(add_months(trunc(DAT_),-3), OKPO_, 2) > 0 then  raise_application_error(-(20000),'\ '||'       Форми №2 заповнена з помилками за період - '||add_months(trunc(DAT_),-3),TRUE);  end if;
+	 if LOGK_(add_months(trunc(DAT_),-6), OKPO_, 2) > 0 then  raise_application_error(-(20000),'\ '||'       Форми №2 заповнена з помилками за період - '||add_months(trunc(DAT_),-6),TRUE);  end if;
+	 if LOGK_(add_months(trunc(DAT_),-9), OKPO_, 2) > 0 then  raise_application_error(-(20000),'\ '||'       Форми №2 заповнена з помилками за період - '||add_months(trunc(DAT_),-9),TRUE);  end if;	 
 				elsif gr_ = 3 
 				   then dat0_ := DAT_ ; 
-				   	    if LOGK(DAT_, OKPO_, 2) > 0 then  raise_application_error(-(20000),'\ '||'       Форми №2 заповнена з помилками за період - '||DAT_,TRUE);  end if;
+				   	    if LOGK_(DAT_, OKPO_, 2) > 0 then  raise_application_error(-(20000),'\ '||'       Форми №2 заповнена з помилками за період - '||DAT_,TRUE);  end if;
 						return ZN_P(KOD_, 2, DAT0_, OKPO_) ; 
 				else  return 0;
 				end if;
@@ -2365,18 +2407,59 @@ null;
 end;
   
   
-FUNCTION F_FM ( OKPO_ int, DAT_ date  )   RETURN char IS
+FUNCTION F_FM ( OKPO_ int, DAT_ date  )   RETURN char 
+  RESULT_CACHE  relies_on (fin_fm)
+IS
   sTmp_ char(1):=' ';
+  l_mod varchar2(254) := 'fin_nbu.fm >>';	
 begin
   begin 
-    select f.FM into sTmp_ from FIN_FM f  where f.okpo = OKPO_  and 
-    (f.okpo,f.fdat) = ( select okpo,max(fdat) from FIN_FM 
-                        where okpo=f.OKPO and fdat <= DAT_ group by okpo );
-   exception when NO_DATA_FOUND THEN null;
+    select f.FM into sTmp_ from FIN_FM f  where f.okpo = OKPO_  and  fdat = DAT_;
+   exception when NO_DATA_FOUND THEN 
+       select max(f.FM) into sTmp_ from FIN_FM f  where f.okpo = OKPO_  and 
+                         (f.okpo,f.fdat) = ( select okpo,max(fdat) from FIN_FM 
+                             where okpo=f.OKPO and fdat <= DAT_ group by okpo );
   end;
+    --TRACE(l_mod,'FIN_FM-'||OKPO_||':'||TO_CHAR(DAT_,'DD-MM-YYYY'));
   RETURN sTmp_;
 end F_FM;
 -----------
+
+function logk_  ( DAT_ date, OKPO_ int , IDF_ int ) RETURN number 
+   is 
+   t_ind pls_integer;
+   l_mod varchar2(254) := 'fin_nbu.logk_ >>';	
+begin
+   --return logk ( DAT_ , OKPO_  , IDF_ );
+   
+  if tp_logks.logk.COUNT() > 0 then  
+
+  	  FOR f IN 1 .. tp_logks.logk.COUNT()
+		 LOOP
+		 
+		  if tp_logks.logk(f).okpo = OKPO_ and tp_logks.logk(f).dat = DAT_ and tp_logks.logk(f).idf = IDF_
+		      then --trace(l_mod,'read tp_logks-'||tp_logks.logk(f).okpo||'-'||TO_CHAR(tp_logks.logk(f).DAT,'DD-MM-YYYY')); 
+			       return tp_logks.logk(f).err;
+		  end if;
+		  
+         END LOOP;
+  end if;
+  
+  
+   t_ind := tp_logks.logk.COUNT()+1;
+   tp_logks.logk(t_ind).dat    := DAT_;
+   tp_logks.logk(t_ind).okpo   := OKPO_;
+   tp_logks.logk(t_ind).idf    := IDF_;
+   tp_logks.logk(t_ind).err    := LOGK_read (DAT_  => tp_logks.logk(t_ind).dat,
+ 										     OKPO_ => tp_logks.logk(t_ind).okpo ,
+										     IDF_  => tp_logks.logk(t_ind).idf,
+										     mode_ => 1);
+ 
+    --trace(l_mod,'read table-'||tp_logks.logk(t_ind).okpo||'-'||TO_CHAR(tp_logks.logk(t_ind).DAT,'DD-MM-YYYY')); 
+    return tp_logks.logk(t_ind).err;
+	
+end;
+
 
 
 FUNCTION LOGK ( DAT_ date, OKPO_ int , IDF_ int ) RETURN number is
@@ -2425,7 +2508,7 @@ begin
 	select 1 kol,NVL(SUM(decode(KOD,'2285',S,0)),0),
 			 greatest(NVL(SUM(decode(KOD,'2285',0,S)),0),NVL(SUM(decode(KOD,'2285',S,0)),0))
 	from fin_rnk where OKPO=OKPO_ and FDAT=DAT_ and idf=IDF_ and
-		 kod in ('2285','3001')
+		 kod in ('2285','2250')
 	  having NVL(SUM(decode(KOD,'2285',S,0)),0)<>
 			 greatest(NVL(SUM(decode(KOD,'2285',0,S)),0),NVL(SUM(decode(KOD,'2285',S,0)),0))					
 					);
@@ -3508,7 +3591,7 @@ kont_ number;
     and idf = idf_
     and fdat = dat_;
 
-    kont_ := LOGK ( DAT_ , OKPO_ , IDF_ );
+    kont_ := LOGK( DAT_ , OKPO_ , IDF_ );
 	
 	if mode_ = 1 then
 	      if kont_ = 0  and coun_ !=0 and sum_ != 0 then return 0;           -- повністю заповненна форма та пройдена логіку
@@ -4118,7 +4201,7 @@ begin
 			  if l_fin_cust.okpo is not null and cur.rel_id = 51  then 
 				  begin
 				   l_fin_cust.custtype := 5;
-				   l_fin_cust.branch   := sys_context('bars_context','user_branch');
+				   l_fin_cust.kf   := sys_context('bars_context','user_mfo');
 				   insert into  fin_cust values l_fin_cust;
 					   exception when dup_val_on_index then  null;
 				  end;
@@ -4359,7 +4442,7 @@ begin
  
 
     -- перевірка на заповнення розшифровки рядка 2000 
-	  if GET_KVED(RNK_,TRUNC(zDAT_,'YYYY'), 1) is null
+	  if GET_KVED(RNK_, case when (sysdate-datea_) < 366 then zDAT_ else TRUNC(zDAT_,'YYYY') end , 1) is null
 		 then sTmp0 := 1;
 		 else sTmp0 := 0;
 	  end if;
@@ -4702,17 +4785,29 @@ begin
      end case;		 
   */	  
   -- 3.8 Значення параметру встановлюється «ТАК» та Контрагенту встановлюється клас 10 якщо виконався хоча б один із таких параметрів або параметру «Наявність ознак для визнання події дефолту» встановлено значення «ТАК»:	  
-    case 
-	    when  ZN_P_ND('RK1', 56, DAT_) = 1  then l_klass := greatest(l_klass, 10);
-        else null;
-    end case;		
-
+     -- якщо ознаки припинення дефолту всі так то не коригуємо на 10  
+	 -- 180 перевірить для незаблокованих 
+	 -- якщо більше 180 днів  не коригуємо на 10 інакше корегуємо на 10
+	if   ZN_P_ND('ZD1', 55, DAT_) = 1 and ZN_P_ND('ZD2', 55, DAT_) = 1  and ZN_P_ND('ZD3', 55, DAT_)  = 1  
+	    then  null;
+		else
+	  
+			case 
+				when  ZN_P_ND('RK1', 56, DAT_) = 1  then l_klass := greatest(l_klass, 10);
+				else null;
+			end case;		
+	end if;
+  
   
   -- 3.11. Якщо значення параметру «Припинення визнання дефолту» - «ТАК», то коригування класу на параметри, зазначені у пункті 3.9., не відбувається. Якщо значення параметру «Припинення визнання дефолту» - «НІ» - клас 10.
-    case 
-	    when  ZN_P_ND('RK2', 56, DAT_) = 1  and ZN_P_ND('RK3', 56, DAT_) = 0 then l_klass := greatest(l_klass, 10);
-        else null;
-    end case;		
+    if   ZN_P_ND('ZD1', 55, DAT_) = 1 and ZN_P_ND('ZD2', 55, DAT_) = 1  and ZN_P_ND('ZD3', 55, DAT_)  = 1  
+	    then  null;
+		else
+				case 
+					when  ZN_P_ND('RK2', 56, DAT_) = 1  and ZN_P_ND('RK3', 56, DAT_) = 0 then l_klass := greatest(l_klass, 10);
+					else null;
+				end case;		
+	end if;
 	 
  
  -- 3.12. У разі наявності у Банку інформації щодо кредитної історії Контрагента в частині його класифікації за класом 10 – понижується клас такого Контрагента на три класи.
@@ -5133,19 +5228,22 @@ begin
    end if;	  
   
   fin_obu.days_of_delay(ND_, gl.bd);
-  
-  
+ 
+ 
+  fin_nbu.record_fp_nd('BO1', 0, 71, DAT_); 
   fin_nbu.record_fp_nd('KR2', 0, 72, DAT_); 
   fin_nbu.record_fp_nd('KR4', 0, 72, DAT_); 
-  
-  
+ 
+  /*
   Case  
 	when FIN_OBU.G_KOL_DELY  between  31 and 60   then   fin_nbu.record_fp_nd('KR2', 1, 72, DAT_);  --прострочення боргу від 31 до 60 днів (включно) з дати виконання зобов’язання за договором (застосовується за урахованим векселем та факторингом)', 2,'KR2', 72, '', 1 );
 	when FIN_OBU.G_KOL_DELY  between  61 and 90   then   fin_nbu.record_fp_nd('KR4', 1, 72, DAT_);  --прострочення боргу від 61 до 90 днів (включно) з дати виконання зобов’язання за договором (застосовується за урахованим векселем та факторингом)', 4,'KR4', 72, '', 1 );
 	when FIN_OBU.G_KOL_DELY  between  91 and 9999 then   fin_nbu.record_fp_nd('BO1', 1, 73, DAT_);  -- прострочення боргу більш ніж на 90 днів, в.ч. за урахованим векселем та факторингом (з дати виконання зобов’язання за договором)
     else null;
   End case;
-	
+   */
+	 
+	 
   
   l_kpz := f_kpz_nd(ND_,DAT_);
   fin_nbu.record_fp_nd('KPZ', l_kpz, 70, DAT_);
@@ -5381,7 +5479,7 @@ begin
     end case;	
     */
  --   зберігаємо скорегований клас. CLS/56  
-      
+     fin_nbu.record_fp_nd('CLS', l_cls, 56, DAT_);
      fin_nbu.record_fp_nd('CLS', l_cls, 70, DAT_); 
 	 fin_nbu.record_fp_nd('CLS', l_cls, 76, DAT_);
     
@@ -5551,6 +5649,271 @@ fin_nbu.record_fp_nd('CLS', greatest(l_cls,l_klass), 59, DAT_);
 end;
 
 	
+	--*Цінні папери   (бюджетники)
+
+-- Автоматизоване визначення показників						   
+procedure get_subpok_bud_cp (RNK_  number,
+                             ND_   number,
+					         DAT_  date)
+							 
+Is
+	okpo_  number;
+	datea_ date;
+	sdate_ date;
+	sdatey_ date;
+	sTmp    number := 0;
+	sTmp0   number := 0;
+	sTmp1   number := 0;
+	sTmp2   number := 0;
+	sTmp3   number := 0;
+	
+	l_bv  number;
+	l_rez number;
+	l_period int;
+	l_okpo_rel number;
+	l_NGRK   number := 0;
+	l_fin_cust fin_cust%rowtype;
+	l_kpz number;
+begin
+
+	begin
+		select okpo, datea
+   		into okpo_, datea_
+		from fin_customer
+		where rnk = rnk_;
+	exception when NO_DATA_FOUND THEN
+					     raise_application_error(-(20000),'\ ' ||'     Не знайдено клієнта з RNK - '||rnk_,TRUE);
+	END;
+
+	
+  aOKPO_   := okpo_;    -- активный код ОКПО
+  aND_     := ND_ ;     -- активный код ND
+  aRNK_    := RNK_;     -- активный код RNK
+  aDAT_    := DAT_;     -- активна дата звітності
+  
+  --'KR1', 82
+  case
+      when datea_ between  add_months(sysdate,-12) and sysdate                   then fin_nbu.record_fp_nd('KR1', 0, 82, DAT_); 
+      when datea_ between  add_months(sysdate,-24) and add_months(sysdate,-12)   then fin_nbu.record_fp_nd('KR1', 1, 82, DAT_);
+	  when datea_ between  add_months(sysdate,-36) and add_months(sysdate,-24)   then fin_nbu.record_fp_nd('KR1', 2, 82, DAT_);
+	                                                                             else fin_nbu.record_fp_nd('KR1', 3, 82, DAT_);
+  end case; 
+  
+  
+End get_subpok_bud_cp;
+
+
+-- Корегування класу позичальника (Постанова 351)				  BUD  
+procedure adjustment_class_bud_cp(RNK_  number,
+                                  ND_   number,
+					              DAT_  date)
+Is
+    l_klass int := 0;
+	okpo_  number;
+	datea_ date;
+	sdate_ date;
+	l_cls int;
+	l_cs int; l_cy int; l_cn int;
+	l_pd number;
+begin
+
+	begin
+		select okpo, datea
+   		into okpo_, datea_
+		from fin_customer
+		where rnk = rnk_;
+	exception when NO_DATA_FOUND THEN
+					     raise_application_error(-(20000),'\ ' ||'     Не знайдено клієнта з RNK - '||rnk_,TRUE);
+	END;
+
+	
+  aOKPO_   := okpo_;      -- активный код ОКПО
+  aND_     := ND_ ;      -- активный код ND
+  aRNK_    := RNK_;      -- активный код RNK
+  aDAT_    := DAT_;     -- активна дата звітності
+
+  -- 3.3.Дата реєстрації Контрагента менше одного року з дати державної реєстрації 
+  
+   Case
+      when  ZN_P_ND('KR1', 82, DAT_) = 0  
+      	  then l_klass := greatest(l_klass, 3); -- клас не менше 5
+      else null;
+   end case;	  
+	  
+     
+	  
+  -- 2.2 Значення параметру встановлюється «ТАК» та Контрагенту встановлюється клас 10 якщо виконався хоча б один із таких параметрів або параметру «Наявність ознак для визнання події дефолту» встановлено значення «ТАК»:	  
+    case 
+	    when  ZN_P_ND('RK1', 86, DAT_) = 1  then l_klass := greatest(l_klass, 5);
+        else null;
+    end case;		
+
+  
+  -- 2.3. Якщо значення параметру «Припинення визнання дефолту» - «ТАК», то коригування класу на параметри, зазначені у пункті 3.9., не відбувається. Якщо значення параметру «Припинення визнання дефолту» - «НІ» - клас 10.
+    case 
+	    when  ZN_P_ND('RK2', 86, DAT_) = 1  and ZN_P_ND('RK3', 86, DAT_) = 0  then l_klass := greatest(l_klass, 5);
+        else null;
+    end case;		
+	  
+ 
+ -- 3.12. У разі наявності у Банку інформації щодо кредитної історії Контрагента в частині його класифікації за класом 10 – понижується клас такого Контрагента на три класи.
+    l_cls := greatest(nvl(ZN_P_ND('CLAS', 81, DAT_),0),  l_klass);
+
+-- Корегуємо на  ознаки високого кредитного ризику
+    for k in 
+         (   Select r.repl_s
+			  from fin_question q,
+				   fin_question_reply r,
+				   fin_nd n
+			 Where q.idf  = n.idf    and q.idf  = r.idf  and n.idf  = 82
+			   and q.kod  = n.kod    and q.kod  = r.kod  and n.s    = r.val
+			   and n.rnk  = RNK_
+			   and n.nd   = ND_
+			   and n.fdat = DAT_
+							   )   
+	loop
+	    l_cls := greatest( k.repl_s,  l_cls);
+	end loop;
+  
+  
+
+    
+ --   зберігаємо скорегований клас. CLS/56  
+     fin_nbu.record_fp_nd('CLS', l_cls, 81, DAT_); 
+    
+	
+  -- врахування кількості днів прострочки
+/*
+select  accexpr into l_accexpr from cp_deal where ref = d.ref AND ACCEXPR IS NOT NULL;
+         l_kol := f_days_past_due (p_dat01, l_accexpr,0);
+*/  
+        select max(f_days_past_due (DAT_, accexpr,0))
+	      into FIN_OBU.G_KOL_DELY
+		  from cp_deal d
+		  join cp_kod  k on d.id = k.id
+		  join accounts a on d.acc = a.acc
+		  join customer c on a.rnk = c.rnk
+		where d.dazs is null
+		  and c.rnk = RNK_
+		  and d.id  = case ND_ when -1 then d.id else ND_ end;
+
+
+/*	fin_obu.days_of_delay(ND_, gl.bd);
+    fin_nbu.record_fp_nd('KKDP', FIN_OBU.G_KOL_DELY, 76, DAT_);*/
+  Case  
+    when FIN_OBU.G_KOL_DELY  between 8  and 30 then  fin_nbu.record_fp_nd('CLSP', greatest(l_cls,  2 ), 86, DAT_);
+	when FIN_OBU.G_KOL_DELY  between 31 and 60 then  fin_nbu.record_fp_nd('CLSP', greatest(l_cls,  3 ), 86, DAT_);
+	when FIN_OBU.G_KOL_DELY  between 61 and 90 then  fin_nbu.record_fp_nd('CLSP', greatest(l_cls,  4 ), 86, DAT_);
+	when FIN_OBU.G_KOL_DELY  >  90             then  fin_nbu.record_fp_nd('CLSP', greatest(l_cls,  5 ), 86, DAT_);
+	                                           else  fin_nbu.record_fp_nd('CLSP',               l_cls , 86, DAT_);
+  end case;	     
+ 
+   fin_nbu.record_fp_nd('CLSP',               l_cls , 86, DAT_); 
+ 
+ /*
+    if      d.custtype = 1 and d.RZ =2   THEN l_idf := 80; l_tip := 1;
+      elsif d.custtype = 1 and d.RZ =1   THEN l_idf := 80; l_tip := 1;
+      elsif d.custtype = 2               THEN l_idf := 50; l_tip := 2;
+      elsif d.custtype = 3 and d.kv<>980 THEN l_idf := 60; l_tip := 1;
+      else                                    l_idf := 60; l_tip := 1;
+      end if;
+ */
+ 
+ /*
+    l_pd :=get_pd (  p_rnk   => aRNK_,
+                     p_nd    => aND_,
+		   			 p_dat   => aDAT_,   
+					 p_clas  => l_cls,
+					 p_vncr  => fin_zp.zn_vncrr(aRNK_, aND_),
+					 p_idf   => 86
+					);
+  */
+  fin_nbu.record_fp_nd('PD', l_pd, 86, DAT_);
+	
+
+end adjustment_class_bud_cp; 	
+	
+function get_vnkr_cp (RNK_  number,
+                      ND_   number, 
+					  DAT_  date   ,
+					  p_idf   number ) return varchar2
+as
+l_vncrr    cck_rating.code%type; 
+l_id_vnkr  cck_rating.ord%type;
+begin
+    l_id_vnkr :=  ZN_P_ND('VNKR', p_idf, DAT_, ND_, RNK_, null);
+    case 
+	when l_id_vnkr is not null then 
+	     null; 
+    when nd_ = -1 then
+
+		  select max(V.ORD) 
+			into l_id_vnkr 
+			from cp_deal d
+			join cp_kod  k on d.id = k.id
+			join accounts a on d.acc = a.acc
+			join customer c on a.rnk = c.rnk
+			join cck_rating v on k.vncrr = V.CODE
+		   where d.dazs is null
+			 and c.rnk = RNK_; 
+
+    else     
+		  select max(V.ORD) 
+			into l_id_vnkr 
+			from cp_deal d
+			join cp_kod  k on d.id = k.id
+			join accounts a on d.acc = a.acc
+			join customer c on a.rnk = c.rnk
+			join cck_rating v on k.vncrr = V.CODE
+		   where d.dazs is null
+			 and c.rnk = RNK_
+			 and d.id  = ND_;
+    end case;
+	
+	 Begin 
+		select code
+		  into l_vncrr	
+		  from cck_rating
+		  where ord = l_id_vnkr;
+		exception when no_data_found then 
+		  null;
+	 end;   
+        
+	return 	l_vncrr;
+
+end;
+	
+procedure set_vnkr_cp (RNK_   number,
+                       ND_    number, 
+				 	   DAT_   date   ,
+					   p_idf  number, 
+					   p_vnkr varchar2)
+as
+l_id_vnkr  cck_rating.ord%type;
+begin
+
+	 Begin 
+		select ord
+		  into l_id_vnkr	
+		  from cck_rating
+		  where code = p_vnkr;
+		exception when no_data_found then 
+		  null;
+	 end;
+
+	record_fp_ND(KOD_   => 'VNKR', 
+                 S_     => l_id_vnkr,  
+                 IDF_   => p_idf,
+				 DAT_   => DAT_,
+				 ND_    => ND_,
+                 RNK_   => RNK_
+				 );
+	 
+	 --//************************************
+	 --  прописуємо в портфель
+
+end;					   
+	
 
 /**
  * header_version - возвращает версию заголовка пакета FIN_NBU
@@ -5568,6 +5931,15 @@ begin
   return 'Package body FIN_NBU '||G_BODY_VERSION;
 end body_version;
 --------------
+
+Begin
+       	 select val
+		   into spPKdR_
+		   from params
+		  where PAR = 'FIN_NBU_RV';  -- Вид приведення до річного виміру
+      exception when NO_DATA_FOUND THEN 
+	        spPKdR_:= 3;
+
 END fin_nbu;
 /
  show err;

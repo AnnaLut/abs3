@@ -61,8 +61,7 @@ begin
 	NAMKRED VARCHAR2(38), 
 	NAZNKRED VARCHAR2(160), 
 	NLS_1819 VARCHAR2(14), 
-	FIELD_58D VARCHAR2(250),
- n_nbu varchar2(300 char)
+	FIELD_58D VARCHAR2(250)
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -72,15 +71,7 @@ exception when others then
 end; 
 /
 
-declare
-    column_already_exists exception;
-    pragma exception_init(column_already_exists, -1430);
-begin
-    execute immediate 'alter table CC_ADD add n_nbu varchar2(300)';
-exception
-    when column_already_exists then null;
-end;
-/
+
 
 
 PROMPT *** ALTER_POLICIES to CC_ADD ***
@@ -126,7 +117,7 @@ COMMENT ON COLUMN BARS.CC_ADD.NAMKRED IS 'Наименование получателя';
 COMMENT ON COLUMN BARS.CC_ADD.NAZNKRED IS 'Назначение платежа';
 COMMENT ON COLUMN BARS.CC_ADD.NLS_1819 IS 'Транзит 1819 для кредитных ресурсов';
 COMMENT ON COLUMN BARS.CC_ADD.FIELD_58D IS 'Поле 58D для рублей';
-COMMENT ON COLUMN cc_add.n_NBU IS 'Номер свідоцтва НБУ';
+
 
 
 
@@ -334,9 +325,6 @@ exception when others then
  end;
 /
 
-
-
-
 PROMPT *** Create  index IDX_CCADD_KFACC ***
 begin   
  execute immediate '
@@ -348,6 +336,24 @@ exception when others then
  end;
 /
 
+
+begin
+ execute immediate   'alter table CC_add add (N_NBU varchar2(50)) ';
+exception when others then
+  -- ORA-01430: column being added already exists in table
+  if SQLCODE = - 01430 then null;   else raise; end if; 
+end;
+/
+COMMENT ON COLUMN cc_add.n_NBU IS 'Номер свідоцтва НБУ';
+
+begin
+ execute immediate   'alter table CC_add add (D_NBU date) ';
+exception when others then
+  -- ORA-01430: column being added already exists in table
+  if SQLCODE = - 01430 then null;   else raise; end if; 
+end;
+/
+COMMENT ON COLUMN cc_add.D_NBU IS 'Дата реєстрації в НБУ';
 
 
 PROMPT *** Create  grants  CC_ADD ***

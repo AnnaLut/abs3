@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Oracle.DataAccess&#13;&#10;FastReport.Oracle" DoublePass="true" FinishReportEvent="_FinishReport" ReportInfo.Created="05/17/2013 18:06:00" ReportInfo.Modified="10/20/2017 12:25:43" ReportInfo.CreatorVersion="2013.3.2.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Oracle.DataAccess&#13;&#10;FastReport.Oracle" DoublePass="true" FinishReportEvent="_FinishReport" ReportInfo.Created="05/17/2013 18:06:00" ReportInfo.Modified="06/21/2016 21:17:57" ReportInfo.CreatorVersion="2013.2.2.0">
   <ScriptText>using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -46,7 +46,7 @@ namespace FastReport
 }
 </ScriptText>
   <Dictionary>
-    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqXDNPX1eqkVhJtvHKAD0Djt/MITHTlpPj6G4OkulVf+40Fe1uiBSI9iD+ozDTQOd6I//bMRbfYBu2k0VApbDfeQ==">
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqZLE460ApuhBq9nxfsVEDUjsnvJzXtSTPbWY4MKJi2yK6Cw7h6oGX20YJkb5YAkRnz39NwNOHtdozFvmxYGeq+g==">
       <TableDataSource Name="Table" Alias="DPT_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select nvl(d.nd, to_char(d.deposit_id)) as id,&#13;&#10;       f_dat_lit(d.datz) as dealdate,&#13;&#10;       f_dat_lit(d.dat_end) as end_date,&#13;&#10;       a.nls as nlsd,&#13;&#10;       substr ((select b.name from branch b where b.branch = a.branch),6) as branch_name,&#13;&#10;       d.limit / 100 as summ,&#13;&#10;       f_sumpr(d.limit, d.kv, 'F') as sum_w,&#13;&#10;       decode(d.kv, 980, 'грн.', t.lcv) as kv,&#13;&#10;       f_doc_dpt(d.deposit_id, 3, 1) as term_calc,&#13;&#10;       f_doc_dpt(d.deposit_id, 3, 2) as term_calc_w,&#13;&#10;       dpt.fproc(d.acc, trunc(sysdate)) as rate,&#13;&#10;       f_sumpr(dpt.fproc(d.acc,trunc(sysdate)), '', 'M', 3) as rate_w,&#13;&#10;       nvl(trim(d.mfo_p), '_________________') as paym_mfo,&#13;&#10;       nvl(trim(b.nb), '____') as paym_nb,&#13;&#10;       nvl(trim(d.nls_p), '_________________') as paym_nls&#13;&#10;  from dpt_deposit d, tabval t, accounts a, banks b&#13;&#10; where d.acc = a.acc&#13;&#10;   and d.kv = t.kv&#13;&#10;   and d.mfo_p = b.mfo(+)&#13;&#10;   and d.deposit_id = (select da.dpt_id&#13;&#10;                         from dpt_agreements da&#13;&#10;                        where da.agrmnt_id = :p_agrmnt_id)">
         <Column Name="ID" DataType="System.String"/>
         <Column Name="DEALDATE" DataType="System.String"/>
@@ -138,8 +138,8 @@ namespace FastReport
     <Parameter Name="p_agrmnt_id" DataType="System.Int32" Expression="396752"/>
   </Dictionary>
   <ReportPage Name="Page1">
-    <DataBand Name="Data1" Width="718.2" Height="557.7" CanGrow="true" CanShrink="true" CanBreak="true" DataSource="Table4">
-      <TableObject Name="Table1" Left="9.45" Top="9.45" Width="698.42" Height="510.45">
+    <DataBand Name="Data1" Width="718.2" Height="556.7" CanGrow="true" CanShrink="true" CanBreak="true" DataSource="Table4">
+      <TableObject Name="Table1" Left="9.45" Top="9.45" Width="698.42" Height="547.25">
         <TableColumn Name="Column1" Width="160.62"/>
         <TableColumn Name="Column2" Width="169.25"/>
         <TableColumn Name="Column3" Width="368.55"/>
@@ -166,12 +166,12 @@ namespace FastReport
           <TableCell Name="Cell241" Font="Times New Roman, 10pt" HtmlTags="true"/>
         </TableRow>
         <TableRow Name="Row117" Height="28.35">
-          <TableCell Name="Cell252" Text="_________________________________________________________________________________________________________________________________________&#13;&#10;&#13;&#10;" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="3"/>
+          <TableCell Name="Cell252" Border.Lines="Bottom" Text="_________________________________________________________________________________________________________________________________________&#13;&#10;&#13;&#10;" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="3"/>
           <TableCell Name="Cell253" Font="Times New Roman, 10pt" HtmlTags="true"/>
           <TableCell Name="Cell254" Font="Times New Roman, 10pt" HtmlTags="true"/>
         </TableRow>
-        <TableRow Name="Row115" Height="1" AutoSize="true">
-          <TableCell Name="Cell246" Font="Times New Roman, 9pt" HtmlTags="true" ColSpan="3"/>
+        <TableRow Name="Row115" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell246" Text="(Наприклад: заповідаю три четвертих суми цього вкладу Марії Дмитрівні Петренко та одну четверту суми цього вкладу  Володимиру Григоровичу Петренку)." Font="Times New Roman, 9pt" HtmlTags="true" ColSpan="3"/>
           <TableCell Name="Cell247" Font="Times New Roman, 10pt" HtmlTags="true"/>
           <TableCell Name="Cell248" Font="Times New Roman, 10pt" HtmlTags="true"/>
         </TableRow>
@@ -187,7 +187,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <PageFooterBand Name="PageFooter1" Top="561.15" Width="718.2" Height="18.9">
+    <PageFooterBand Name="PageFooter1" Top="558.74" Width="718.2" Height="18.9">
       <BarcodeObject Name="Barcode1" Left="96.52" Width="126.25" Height="18.9" Anchor="Top, Right" Expression="[TICKET_DATA.DOC_ID]+&quot;:&quot;+[TotalPages]+&quot;:&quot;+[Page]" ShowText="false" Barcode="Codabar"/>
       <TextObject Name="Text2" Left="264.6" Width="444.15" Height="18.9" Text="№ друку [TICKET_DATA.DOC_ID] сторінка [Page] з [TotalPages]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
     </PageFooterBand>

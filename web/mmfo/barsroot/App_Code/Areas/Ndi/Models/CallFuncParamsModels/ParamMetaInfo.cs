@@ -1,6 +1,4 @@
 ﻿
-using System.Collections.Generic;
-
 namespace BarsWeb.Areas.Ndi.Models
 {
     /// <summary>
@@ -9,29 +7,22 @@ namespace BarsWeb.Areas.Ndi.Models
     public class ParamMetaInfo
     {
         public ParamMetaInfo()
-            :this(false)
         {
 
         }
         public ParamMetaInfo(bool isInput)
         {
-            this.AdditionalUse = new List<string>();
             this.IsInput = isInput;
         }
         /// <summary>
         /// Имя колонки
         /// </summary>
         public string ColName { get; set; }
-
         /// <summary>
         /// Имя параметра
         /// </summary>
-        public string Name { get; set; }
 
-        /// <summary>
-        /// ресурс, откуда берется параметр(из колонки грида, из файла...)
-        /// </summary>
-        public string GetFrom { get; set; }
+        public string Name { get; set; }
 
         /// <summary>
         /// Тип колонки
@@ -72,10 +63,6 @@ namespace BarsWeb.Areas.Ndi.Models
         /// Наименование колонки для выпадающего списка
         /// </summary>
         public string SrcTextColName { get; set; }
-
-        public string SrcTextColName2 { get; set; }
-
-        public List<string> AdditionalUse { get; set; }
 
         public bool FileForBackend { get; set; }
     }
