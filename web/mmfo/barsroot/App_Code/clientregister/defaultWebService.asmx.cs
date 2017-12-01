@@ -1932,8 +1932,11 @@ namespace clientregister
 					//which are Bank Clients
 					if ((myClient.CUSTTYPE == "person" || myClient.CUSTTYPE == "corp") && myClient.BC != "1")
 					{
+						int current_custtype = 3; //person as default
+                        if (myClient.CUSTTYPE == "corp")
+                            current_custtype = 2;
 						ForceCheckFinRekv(  Convert.ToDecimal(myClient.ID), 
-											(int)CustTypes.person, 
+											current_custtype, 
 											Convert.ToInt32(CODCAGENT), 
 											Convert.ToInt32(K050));
 					}
