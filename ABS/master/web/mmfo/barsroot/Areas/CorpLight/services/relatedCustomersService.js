@@ -50,10 +50,10 @@ angular.module(globalSettings.modulesAreas)
 
             var mapResponse = function (data) {
                 if (data && data.DocDate) {
-                    data.DocDate = kendo.toString(kendo.parseDate(data.DocDate), 'dd.MM.yyyy');
+                    data.DocDate = kendo.parseDate(data.DocDate);
                 }
                 if (data && data.BirthDate) {
-                    data.BirthDate = kendo.toString(kendo.parseDate(data.BirthDate), 'dd.MM.yyyy');
+                    data.BirthDate = kendo.parseDate(data.BirthDate);
                 }
                 return data;
             }
@@ -114,7 +114,7 @@ angular.module(globalSettings.modulesAreas)
                 });
                 return deferred.promise;
             };
-            var _update = function(relCustomer) {
+            var _update = function (relCustomer) {
                 state.isLoading = true;
                 var deferred = $q.defer();
 
@@ -160,7 +160,7 @@ angular.module(globalSettings.modulesAreas)
                 state.isLoading = true;
                 var deferred = $q.defer();
 
-                $http.post(bars.config.urlContent('/corpLight/users/validateMobilePhone'), { phoneNumber: phoneNum})
+                $http.post(bars.config.urlContent('/api/CorpLight/Users/validateMobilePhone/?phoneNumber=' + phoneNum))
                 .success(function (response) {
                     state.isLoading = false;
                     deferred.resolve(response);

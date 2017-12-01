@@ -399,30 +399,33 @@ begin
               raise_application_error(-(20737), 'RNK2RNK: помилка - '||sqlerrm,TRUE);
             end;
 --
-            begin
+/*            begin
               execute immediate 'alter trigger TBU_ACCOUNTS_DAZS disable';
             exception when OTHERS then
               raise_application_error(-(20743), 'RNK2RNK: помилка - '||sqlerrm,TRUE);
-            end;
+            end;*/
 --
+            dbms_application_info.set_action('rnk2rnk');
             begin
               execute immediate 'update accounts
                                  set    dazs=null
                                  where  acc='||to_char(acc_);
             exception when OTHERS then
-              begin
+/*              begin
                 dbms_utility.exec_ddl_statement('alter trigger TBU_ACCOUNTS_DAZS enable');
               exception when OTHERS then
                 raise_application_error(-(20744), 'RNK2RNK: помилка - '||sqlerrm,TRUE);
-              end;
+              end;*/
+              dbms_application_info.set_action(null);
               raise_application_error(-(20738), 'RNK2RNK: помилка - '||sqlerrm,TRUE);
             end;
+            dbms_application_info.set_action(null);
 --
-            begin
+/*            begin
               dbms_utility.exec_ddl_statement('alter trigger TBU_ACCOUNTS_DAZS enable');
             exception when OTHERS then
               raise_application_error(-(20744), 'RNK2RNK: помилка - '||sqlerrm,TRUE);
-            end;
+            end;*/
 --
             begin
               execute immediate 'update accounts

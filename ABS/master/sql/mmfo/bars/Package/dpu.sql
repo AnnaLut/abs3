@@ -693,7 +693,7 @@ is
   --
   -- глобальные переменные и константы
   -- 
-  g_body_version  constant varchar2(64)          := 'version 44.06 31.10.2017';
+  g_body_version  constant varchar2(64)          := 'version 44.09 30.11.2017';
   
   modcode         constant varchar2(3)           := 'DPU';
   accispparam     constant varchar2(16)          := 'DPU_ISP';
@@ -1837,9 +1837,10 @@ end p_open_standart;
 --
 -- открытие счетов 8-го класса для обслуживания доп.соглашения
 --
-procedure iopen_agraccs
- (p_agrnum    in  dpu_deal.dpu_add%type,  -- № доп.соглашения
-  p_genid     in  dpu_deal.dpu_id%type,   -- референсе ген.договора
+procedure IOPEN_AGRACCS
+( p_agrid     in  dpu_deal.dpu_id%type,   -- референс доп.соглашения
+  p_agrnum    in  dpu_deal.dpu_add%type,  -- № доп.соглашения
+  p_genid     in  dpu_deal.dpu_id%type,   -- референс ген.договора
   p_gennum    in  dpu_deal.nd%type,       -- № ген.договора
   p_gendepacc in  dpu_deal.acc%type,      -- внутр.№ деп. счета ген.договора
   p_genintacc in  dpu_deal.acc%type,      -- внутр.№ проц.счета ген.договора
@@ -1854,28 +1855,48 @@ procedure iopen_agraccs
   p_accisp    in  accounts.isp%type,      -- ответ.исп.
   p_accgrp    in  accounts.grp%type,      -- группа доступа
   p_mfo       in  banks.mfo%type,         -- МФО банка
-  p_depacc    out r_accrec,               -- параметры деп.счета 8-го класса
+  p_depacc    out r_accrec,               -- параметры деп. счета 8-го класса
   p_intacc    out r_accrec)               -- параметры проц.счета 8-го класса
 is
   title  constant varchar2(60) := 'dpu.iopenagraccs:';
   l_num  dpu_deal.nd%type;
   l_isp  accounts.isp%type;
-  l_grp  accounts.grp%type; 
+  l_grp  accounts.grp%type;
   l_tmp  number(38);
-  l_blkd accounts.blkd%type := 0; 
+  l_blkd accounts.blkd%type := 0;
+  ---
+  procedure CHK_ACC_NUM
+  is
+  begin
+    begin
+      select Substr(p_depacc.numb,1,5)||Substr(to_char(trunc(p_agrid/100)),-9)
+        into p_depacc.numb
+        from ACCOUNTS
+       where NLS = p_depacc.numb
+         and KV  = p_curcode;
+      p_intacc.numb := Substr(p_intacc.numb,1,5)||Substr(p_depacc.numb,6,9);
+    exception
+      when NO_DATA_FOUND then
+        null;
+    end;
+  end CHK_ACC_NUM;
+  ---
 begin
-  
-  bars_audit.trace('%s entry, agr № %s for № %s/%s, grp = %s', title, 
-                   to_char(p_agrnum), p_gennum, to_char(p_genid), to_char(p_accgrp));
-  
-  l_num := substr( '000000'||p_genid, -10, 6 );
-  
+
+  bars_audit.trace( '%s entry, agr № %s for № %s/%s, grp = %s', title
+                  , to_char(p_agrnum), p_gennum, to_char(p_genid), to_char(p_accgrp) );
+
+  l_num := substr( '000000'||p_genid, -8, 6 );
+
   -- номера рахунків
-  p_depacc.numb := '8'||substr(p_deptype, 2, 3)||'0'||l_num||substr('000'||p_agrnum, -3, 3);  
+  p_depacc.numb := '8'||substr(p_deptype, 2, 3)||'0'||l_num||substr('000'||p_agrnum, -3, 3);
   p_intacc.numb := '8'||substr(p_inttype, 2, 3)||'0'||l_num||substr('000'||p_agrnum, -3, 3);
 
-  p_depacc.numb := substr(vkrzn(substr(p_mfo, 1, 5), p_depacc.numb), 1, 14);
-  p_intacc.numb := substr(vkrzn(substr(p_mfo, 1, 5), p_intacc.numb), 1, 14);
+  -- перевірка на наявність відкритих рах. з такими номерами
+  CHK_ACC_NUM;
+
+  p_depacc.numb := substr(vkrzn(substr(p_mfo,1,5), p_depacc.numb),1, 14);
+  p_intacc.numb := substr(vkrzn(substr(p_mfo,1,5), p_intacc.numb),1, 14);
 
   -- наименования счетов = Дод.угода № ... + наименование клиента 
   p_depacc.name := substr(bars_msg.get_msg(modcode, 'FNLS_NMS_AGREEMENT', to_char(p_agrnum))||' '||p_custname, 1, 70);
@@ -1888,18 +1909,18 @@ begin
   -- доступ к счетам 
   l_grp := p_accgrp;
   l_isp := p_accisp;
-  
-  get_secaccparams( p_accmain  =>  p_mainacc, 
-                    p_curmain  =>  p_curcode,
-                    p_accisp   =>  l_isp,
-                    p_accgrp   =>  l_grp);
+
+  get_secaccparams( p_accmain  => p_mainacc,
+                    p_curmain  => p_curcode,
+                    p_accisp   => l_isp,
+                    p_accgrp   => l_grp);
   
 $if DPU_PARAMS.SBER
 $then
   -- код блокування рах. на дебет при відкритті депозиту інсайдеру
   l_blkd := case when is_insider(p_custid) then с_blkd_ins else 0 end;
 $end
-  
+
   -- открытие депозитного счета
   begin
     ACCREG.SetAccountAttr
@@ -1964,20 +1985,20 @@ $end
        , NBS    = '8'||substr(nbs, 2, 3)
        , NLSALT = (select nls from accounts where acc = p_gendepacc)
    where ACC    = p_depacc.id;
-  
+
   update ACCOUNTS 
      set MDATE  = p_datend,
          NBS    = '8'||substr(nbs, 2, 3), 
          NLSALT = (select nls from accounts where acc = p_genintacc)
    where ACC    = p_intacc.id;
-  
+
   -- заповнення спецпараметрів рах.
   fill_specparams( p_depaccid   => p_depacc.id, 
                    p_depacctype => p_deptype, 
                    p_intaccid   => p_intacc.id,
                    p_intacctype => p_inttype,
                    p_d020       => '01' );
-                   
+
   bars_audit.trace('%s exit with (%s,%s,%s) and (%s,%s,%s)', title, 
                    to_char(p_depacc.id), p_depacc.numb, p_depacc.name,
                    to_char(p_intacc.id), p_intacc.numb, p_intacc.name);
@@ -2121,21 +2142,22 @@ $then
 $end
   
   -- открытие счетов 8-го класса для обслуживания доп.соглашения
-  iopen_agraccs( p_agrnum    => l_addnum,
-                 p_genid     => p_gendpuid, 
+  IOPEN_AGRACCS( p_agrid     => l_dpuid,
+                 p_agrnum    => l_addnum,
+                 p_genid     => p_gendpuid,
                  p_gennum    => l_gendpunum,
                  p_gendepacc => l_gendepacc,
                  p_genintacc => l_genintacc,
                  p_datend    => p_dato,
                  p_custid    => p_custid,
                  p_branch    => l_branch,
-                 p_custname  => l_custname, 
+                 p_custname  => l_custname,
                  p_deptype   => l_typerow.bsd,
                  p_inttype   => l_typerow.bsn,
-                 p_curcode   => l_typerow.kv, 
+                 p_curcode   => l_typerow.kv,
                  p_mainacc   => p_deprcvacnt,
                  p_accisp    => p_accisp,
-                 p_accgrp    => p_accgrp, 
+                 p_accgrp    => p_accgrp,
                  p_mfo       => l_mfo,
                  p_depacc    => l_depacc,
                  p_intacc    => l_intacc);
@@ -2156,13 +2178,13 @@ $end
 
   if p_comproc = 1 
   then
-     l_intrcvacnt := substr(l_depacc.numb, 1, 14);
-     l_intrcvbank := substr(l_mfo,         1,  6);
-     l_intrcvcust := substr(l_depacc.name, 1, 38);
+    l_intrcvacnt := substr(l_depacc.numb, 1, 14);
+    l_intrcvbank := substr(l_mfo,         1,  6);
+    l_intrcvcust := substr(l_depacc.name, 1, 38);
   else
-     l_intrcvacnt := substr(p_intrcvacnt,  1, 14);
-     l_intrcvbank := substr(p_intrcvbank,  1,  6);
-     l_intrcvcust := substr(p_intrcvcust,  1, 38);
+    l_intrcvacnt := substr(p_intrcvacnt,  1, 14);
+    l_intrcvbank := substr(p_intrcvbank,  1,  6);
+    l_intrcvcust := substr(p_intrcvcust,  1, 38);
   end if;
   
   bars_audit.trace('%s int_receiver (%s,%s,%s)', title, 
@@ -2278,7 +2300,7 @@ procedure p_open_deposit_line
    err_         out varchar2)
 is
 begin
-  create_agreement (p_dealnum    => nd_,
+  create_agreement( p_dealnum    => nd_,
                     p_custid     => rnk_,
                     p_dputype    => vidd_,
                     p_gendpuid   => dpu_gen_,
@@ -4796,7 +4818,7 @@ begin
                           || SubStr('3/UA/' || l_city        ,1,35) || chr(10) -- Код країни + Місто
                           ||        '6/UA/' || l_accrec.CUST_IDCODE            -- Код країни + Код ЄДРПОУ Платника
                  when '52A  ' -- SWIFT-код Банка Платника
-                 then BRANCH_ATTRIBUTE_UTL.GET_VALUE('BICCODE')
+                 then BRANCH_ATTRIBUTE_UTL.GET_VALUE('BICCODE') -- для РУ: GetGlobalOption('BICCODE')
                  when '56A  ' -- SWIFT-код Банка Посередника
                  then r_swtags.TAG56_CODE
                  when '57A  ' -- SWIFT-код Банка Посередника
@@ -5869,6 +5891,10 @@ is
   l_nls8            accounts.nls%type;    -- 
   l_rec_A           dpt_web.acc_rec;      -- параметри платежду строни А
   l_rec_A8          dpt_web.acc_rec;      -- параметри платежду строни А (дод.угоди деп.лінії)
+  l_mfo_B           oper.mfoB%type;
+  l_nls_B           oper.nlsB%type;
+  l_nms_B           oper.nam_b%type;
+  l_okpo_B          oper.id_b%type;
   --
   -- Заповнення SWIFT реквізитів документу
   --
@@ -5937,7 +5963,23 @@ begin
                  p_ref   => p_ref );
     
   else -- міжбанк
-  
+
+$if DPU_PARAMS.SBER
+$then
+    if ( l_rec_A.acc_cur != GL.baseval and IS_OSCHADBANK( p_mfo_B ) = 0 )
+    then
+      l_mfo_B  := '300465';
+      l_nls_B  := '191992';
+      l_nms_B  := 'ГОУ ВАТ Ощадбанк';
+      l_okpo_B := '00032129';
+    else
+      l_mfo_B  := p_mfo_B;
+      l_nls_B  := p_nls_B;
+      l_nms_B  := p_nms_B;
+      l_okpo_B := p_okpo_B;
+    end if;
+$end
+
 $if DPU_PARAMS.LINE8
 $then
     if (SubStr(l_rec_A.acc_num, 1, 1) = '8' )
@@ -5957,18 +5999,18 @@ $then
 $end
     
     begin
-      gl.ref( p_ref );
-      gl.in_doc3( ref_    => p_ref,                           mfoa_   => gl.amfo,
+      GL.ref( p_ref );
+      GL.in_doc3( ref_    => p_ref,                           mfoa_   => gl.amfo,
                   tt_     => l_tt,                            nlsa_   => l_rec_A.acc_num,
                   vob_    => 6,                               kv_     => l_rec_A.acc_cur,
                   dk_     => 1,                               nam_a_  => l_rec_A.acc_name,
                   nd_     => SubStr(to_char(p_ref),-10),      id_a_   => l_rec_A.cust_idcode,
                   pdat_   => sysdate,                         s_      => p_sum,
-                  vdat_   => p_bdat,                          mfob_   => p_mfo_B,
-                  data_   => p_bdat,                          nlsb_   => p_nls_B,
+                  vdat_   => p_bdat,                          mfob_   => l_mfo_B,
+                  data_   => p_bdat,                          nlsb_   => l_nls_B,
                   datp_   => p_bdat,                          kv2_    => l_rec_A.acc_cur,
-                  sk_     => null,                            nam_b_  => p_nms_B,
-                  d_rec_  => null,                            id_b_   => coalesce( p_okpo_B, l_rec_A.cust_idcode ),
+                  sk_     => null,                            nam_b_  => l_nms_B,
+                  d_rec_  => null,                            id_b_   => nvl( l_okpo_B, l_rec_A.cust_idcode ),
                   id_o_   => null,                            s2_     => p_sum,
                   sign_   => null,                            nazn_   => p_nazn,
                   sos_    => null,                            uid_    => null,
@@ -5976,7 +6018,7 @@ $end
       
       paytt( null, p_ref, p_bdat, l_tt, 1,
                    l_rec_A.acc_cur, l_rec_A.acc_num, p_sum,
-                   l_rec_A.acc_cur, p_nls_B        , p_sum );
+                   l_rec_A.acc_cur, l_nls_B        , p_sum );
       
       -- Запис номера деп. договору в додаткові реквізити операції
       fill_operw( p_ref, 'ND', to_char(p_dpuid) );
@@ -5984,7 +6026,7 @@ $end
       -- Запис реф. документа в історію платежів по договору
       fill_dpu_payments( p_dpuid, p_ref );
       
-      if ( l_rec_A.acc_cur != gl.baseval and IS_OSCHADBANK( p_mfo_B ) = 0 )
+      if ( l_rec_A.acc_cur != GL.baseval and IS_OSCHADBANK( p_mfo_B ) = 0 )
       then -- для міжбанківських в інвалюті заповнення SWIFT реквізитів
         SET_SWIFT_DETAILS;
       end if;
@@ -6008,7 +6050,8 @@ $end
         bars_error.raise_nerror('DPT', 'PAYDOC_ERROR', sqlerrm);  
     end;
   
-  end if;  
+  end if;
+
 end PAY_DOC_EXT;
 
 -- 
@@ -7427,60 +7470,68 @@ function GET_DISCREPANCY_BALANCES
 ( p_rpt_dt         in     date default null
 ) return varchar2
 is
-  l_ost_ADD   accounts.ostc%type;
   l_ost_GEN   accounts.ostc%type;
   l_nls_GEN   varchar2(18);
   l_out_msg   varchar2(4000) := null;
   l_bnk_dt    date;
 begin
-  
+
+  if ( sys_context('BARS_CONTEXT','USER_BRANCH') = '/' )
+  then
+    bars_error.raise_nerror( modcode, 'GENERAL_ERROR_CODE', 'Забрононено виконання рівні /' );
+  end if;
+
   l_bnk_dt := coalesce( p_rpt_dt, GL.BD(), GL.GBD() );
   
-  for k in ( select da.*
-               from BARS.DPU_ACCOUNTS da
-               join BARS.DPU_DEAL     dd
-                 on ( dd.DPU_ID = da.DPUID )
-               join BARS.DPU_VIDD     dv
-                 on ( dv.VIDD = dd.VIDD )
-              where nvl(dd.DPU_GEN,0) = 0
-                and dd.CLOSED = 0
-                and dd.BRANCH like sys_context('BARS_CONTEXT','USER_BRANCH_MASK')
-                and dv.FL_EXTEND = 2
+  for k in ( select GEN_ID, ACC_TIP
+                  , sum( nvl( FOST( DEP_ACC, l_bnk_dt ), 0 ) ) as OST_ADD
+               from ( select dd.DPU_GEN as GEN_ID
+                           , da.ACCID   as DEP_ACC
+                           , case
+                             when ( da.ACCID = dd.ACC )
+                             then 'NL8'
+                             else 'DEN'
+                             end as ACC_TIP
+                        from DPU_ACCOUNTS da
+                        join DPU_DEAL     dd
+                          on ( dd.DPU_ID = da.DPUID )
+                       where dd.DPU_GEN Is Not Null
+                         and dd.CLOSED = 0
+                    )
+             group by GEN_ID, ACC_TIP
            )
   loop
-    
-    select nvl(sum(BARS.FOST(DEP_ACC, l_bnk_dt)),0)
-      into l_ost_ADD
-      from BARS.V_DPU_RELATION_ACC
-     where GEN_ACC = k.accid;
-      
-    l_ost_GEN := BARS.FOST( k.accid, l_bnk_dt );
+
+    select nvl( FOST( da.ACCID, l_bnk_dt ), 0 ) as OST_GEN
+         , ac.NLS||'/'||to_char(ac.KV) as NLS_GEN
+      into l_ost_GEN
+         , l_nls_gen
+      from DPU_ACCOUNTS da
+      join DPU_DEAL     dd
+        on ( dd.KF = da.KF and dd.DPU_ID = da.DPUID )
+      join ACCOUNTS     ac
+        on ( ac.ACC = da.ACCID )
+     where dd.DPU_ID = k.GEN_ID
+       and ac.TIP    = k.ACC_TIP;
     
     -- якщо залишок на рах.ген.угоди != сумі зал.на рах.дод.угод
-    if (l_ost_GEN != l_ost_ADD)
+    if ( l_ost_GEN != k.OST_ADD )
     then
-      
-      select nls||'/'||to_char(kv)
-        into l_nls_gen
-        from accounts 
-       where acc = k.accid;
-       
-      l_out_msg :=  l_out_msg||'#'||to_char(k.dpuid)||': залишок '||to_char(l_ost_GEN/100,'FM999G999G999G990D00')||' на рах.'||
-                    l_nls_GEN||' <> сумі залишків '||to_char(l_ost_ADD/100,'FM999G999G999G990D00')||' на рах.дод.угод!'||chr(10);
-                   
-      bars_audit.trace('DPU.GET_DISCREPANCY_BALANCES: '||l_out_msg);
-      
+
+      l_out_msg :=  l_out_msg||'#'||to_char(k.GEN_ID)||': залишок '||to_char(l_ost_GEN/100,'FM999G999G999G990D00')||' на рах.'||
+                    l_nls_GEN||' <> сумі залишків '||to_char(k.OST_ADD/100,'FM999G999G999G990D00')||' на рах.дод.угод!'||chr(10);
+
     end if;
-    
+
   end loop;
-  
-  if (web_utl.is_web_user = 1) 
+
+  if ( web_utl.is_web_user = 1 )
   then -- виклик процедури з WEB
     l_out_msg := replace(l_out_msg,chr(10),'<BR>');
   end if;
-  
+
   RETURN l_out_msg;
-  
+
 end GET_DISCREPANCY_BALANCES;
 
 --
@@ -7731,11 +7782,6 @@ procedure AUTO_PAYOUT_INTEREST
   l_errflg     boolean;
   l_errmsg     sec_audit.rec_message%type;
   error_       exception;
-  --
-  l_int_mfob   oper.mfob%type;
-  l_int_nlsb   oper.nlsb%type;
-  l_int_nmsB   oper.nam_b%type;
-  l_int_idb    oper.id_b%type;
 begin
 
   bars_audit.trace( '%s start with: p_bdate=>%s.', title, to_char(p_bdate,'dd.mm.yyyy') );
@@ -7847,7 +7893,7 @@ begin
       
       l_errflg   := false;
       l_errmsg   := null;
-      l_int_ref  := null;  
+      l_int_ref  := null;
       l_int_amnt := null;
       
       if ( d.acr_dat < d.stp_dat and p_bdate is Not Null )
@@ -7862,14 +7908,14 @@ begin
           ( 'DPU', d.dpt_mfo, d.dpt_branch, d.dpt_id, d.dpt_num, d.dpt_dat, 
             d.dpt_acc_id, d.dpt_acc_nm, d.dpt_acc_name, d.dpt_cur_id, d.lcv, 
             d.dpt_nbs, d.daos, d.cust_id, d.int_id, d.int_tt );
-                  
-        make_int( p_dat2      => d.stp_dat, 
-                  p_runmode   => 1, 
-                  p_runid     => 0,
-                  p_intamount => l_int_amnt, 
-                  p_errflg    => l_errflg);
 
-        if l_errflg 
+        MAKE_INT( p_dat2      => d.stp_dat,
+                  p_runmode   => 1,
+                  p_runid     => 0,
+                  p_intamount => l_int_amnt,
+                  p_errflg    => l_errflg );
+
+        if l_errflg
         then
           
           l_errmsg := substr('Помилка нарахування %% по договору №'||d.dpt_num||' ('||to_char(d.dpt_id)||') '||sqlerrm, 1, 2000 );
@@ -7900,43 +7946,24 @@ begin
             l_errmsg := substr( 'ошибка блокировки счета '||d.int_acc_nm||': '||sqlerrm, 1, 2000 );
             raise error_;
         end;
-        
+
         -- выплата процентов
         if ( l_int_amnt > 0 )
         then
-          
-$if DPU_PARAMS.SBER
-$then
-          if ( d.int_cur_id != gl.baseval and
-               d.int_mfoB   != gl.aMFO    and
-               IS_OSCHADBANK( d.int_mfoB  ) = 0
-             )
-          then
-            l_int_mfoB := '300465';
-            l_int_nlsB := '191992';
-            l_int_nmsB := 'ГОУ ВАТ Ощадбанк';
-            l_int_idB  := '00032129';
-          else
-            l_int_mfoB := d.int_mfoB;
-            l_int_nlsB := d.int_nlsB;
-            l_int_nmsB := d.int_namB;
-            l_int_idB  := d.int_idB;
-          end if;
-$end
-          
+
           PAY_DOC_EXT( p_dpuid  => d.dpt_id,
                        p_bdat   => l_bdate,
                        p_acc_A  => d.int_acc_id,
-                       p_mfo_B  => l_int_mfoB,
-                       p_nls_B  => l_int_nlsB,
-                       p_nms_B  => l_int_nmsB,
-                       p_okpo_B => l_int_idB,
+                       p_mfo_B  => d.int_mfoB,
+                       p_nls_B  => d.int_nlsB,
+                       p_nms_B  => d.int_namB,
+                       p_okpo_B => d.int_idB,
                        p_sum    => l_int_amnt,
-                       p_nazn   => SubStr('Відсотки по депозиту згідно '||F_NAZN('U', d.dpt_id), 1, 160),
+                       p_nazn   => SubStr('Відсотки по депозиту згідно '||F_NAZN('U',d.dpt_id),1,160),
                        p_ref    => l_int_ref );
             
           update INT_ACCN i
-             set i.APL_DAT = l_bdate 
+             set i.APL_DAT = l_bdate
            where i.ACC = d.int_acc_id
              and i.ID  = 1;
           
@@ -8112,7 +8139,7 @@ begin
       
       l_errflg   := false;
       l_errmsg   := null;
-      l_dpt_ref  := null;  
+      l_dpt_ref  := null;
       l_dpt_amnt := null;
       
       If (d.dpt_mfoB is NOT null AND d.dpt_nlsB is NOT null) 
@@ -8155,9 +8182,9 @@ $end
                        p_sum    => l_dpt_amnt,
                        p_nazn   => SubStr('Повернення депозиту згідно '||F_NAZN('U', d.dpt_id), 1, 160),
                        p_ref    => l_dpt_ref );
-          
+
           bars_audit.financial('Зформовано документ на виплату депозиту (ref =  '||to_char(l_dpt_ref)||').' );
-          
+
           dpt_jobs_audit.p_save2log( p_modcode => modcode,
                                    p_runid   => l_runid,
                                    p_dptid   => d.dpt_id,
@@ -9284,7 +9311,7 @@ begin
   -- для депозитних ліній
   If (l_genid is Not Null) 
   then
-    
+
     -- пошук рах. ген. дог. (лінії)
     select   acc
       into l_acc

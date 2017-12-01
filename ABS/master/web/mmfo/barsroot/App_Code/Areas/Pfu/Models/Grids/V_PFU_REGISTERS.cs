@@ -28,5 +28,6 @@ namespace BarsWeb.Areas.Pfu.Models.Grids
         public decimal? env_id { get; set; } //acc
         public DateTime?  date_env_crt { get; set; }
         public DateTime? pay_date { get; set; }
+        public string pfu_branch_name { get; set; }
     }
 }

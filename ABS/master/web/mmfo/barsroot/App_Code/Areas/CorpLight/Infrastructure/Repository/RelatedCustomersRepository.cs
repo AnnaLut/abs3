@@ -12,6 +12,8 @@ using CorpLight.Users.Models.Enums;
 using Models;
 using BarsWeb.Areas.CorpLight.Infrastructure.Services;
 using System.Text.RegularExpressions;
+using Bars.Classes;
+using Oracle.DataAccess.Client;
 
 // ReSharper disable once CheckNamespace
 namespace BarsWeb.Areas.CorpLight.Infrastructure.Repository
@@ -229,7 +231,7 @@ namespace BarsWeb.Areas.CorpLight.Infrastructure.Repository
         public void Add(RelatedCustomer relatedCustomer)
         {
             var id = _entities.ExecuteStoreQuery<decimal>(
-                "select MBM_REL_CUST_SEQ.nextval from dual").FirstOrDefault();
+                "select bars_sqnc.get_nextval('mbm_rel_cust_seq') from dual").FirstOrDefault();
 
             var sql = @"Insert into MBM_REL_CUSTOMERS
                             (ID, 
@@ -611,6 +613,20 @@ namespace BarsWeb.Areas.CorpLight.Infrastructure.Repository
             return result;
         }
 
+        public void SendSms(string phone, string message)
+        {
+            phone = phone.Replace(" ", "+");
+            var sql = new Kernel.Models.BarsSql {
+                SqlText = @"begin 
+                                BARS.p_clt_sendsms(:p_phone, :p_msg_text); 
+                            end;",
+                 SqlParams = new object[] {
+                     new OracleParameter("p_phone", OracleDbType.Varchar2) { Value = phone },
+                     new OracleParameter("p_msg_text", OracleDbType.Varchar2) { Value = message }
+                 }
+            };
+            int res = _entities.ExecuteStoreCommand(sql.SqlText, sql.SqlParams);
+        }
     }
 
     /// <summary>
@@ -727,6 +743,8 @@ namespace BarsWeb.Areas.CorpLight.Infrastructure.Repository
         /// <param name="relCustId"></param>
         /// <param name="val"></param>
         void SetAcskActual(decimal relCustId, decimal val);
+
+        void SendSms(String phone, String message);
 
     }
 }

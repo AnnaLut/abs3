@@ -48,7 +48,9 @@ var FILES_GRID_HISTORY_FIELDS = {
     payed_sum: { type: "number" },
     payback_sum: { type: "number" },
     pay_date: { type: "date" },
-    receiver_mfo: { type: "number" }
+    receiver_mfo: { type: "number" },
+    pfu_branch_name: { type: 'string' },
+    acc: {type:'string'}
 };
 
 var FILES_GRID_COLUMNS = [
@@ -185,6 +187,16 @@ var FILES_GRID_HISTORY_COLUMNS = [
          title: "МФО",
          width: "150px"
      },
+      {
+          field: "pfu_branch_name",
+          title: "Найменування <br/> платника",
+          width: "150px"
+      },
+            {
+                field: "acc",
+                title: "Рахунок <br/> одержувача",
+                width: "150px"
+            },
     {
         field: "file_name",
         title: "Назва файлу<br/>реєстру",
@@ -274,13 +286,8 @@ var FILES_GRID_HISTORY_COLUMNS = [
         field: "state_name",
         title: "Статус",
         width: "150px"
-    },
-    {
-        field: "acc",
-        title: "ACC",
-        width: "100px",
-        hidden: true
     }
+   
 ];
 
 var drop_el = ""

@@ -82,6 +82,11 @@
               union all
               select k.fdat fdat, '2' idf, kod, 0 s, k.OKPO okpo, SYS_CONTEXT ('bars_context', 'user_branch') branch from fin_forma2m where kod is not null  and fm = case when k.fm ='C'then 'R' else  k.fm end);
 
+              if k.fdat = trunc(k.fdat,'YYYY')  then
+              fin_formaf3.load_in_data(k.okpo, k.fdat,3);
+              fin_formaf3.load_in_data(k.okpo, k.fdat,4);
+              end if;
+
               end loop;
               END;
               /*    Fin_rnk_check(dat_, 1, okpo_);
@@ -115,17 +120,19 @@
           <command type="PlSqlBlock"  successurl="/barsroot/barsweb/dynform.aspx?form=frm_fin2_kart_kl">
             <sql>
               DECLARE
-               okpo_  varchar2(10)       := :OKPO;
-               dat_   date               := to_date( :DAT1, 'dd/mm/yyyy');
-               rnk_   number             := :RNK;
+              okpo_  varchar2(10)       := :OKPO;
+              dat_   date               := to_date( :DAT1, 'dd/mm/yyyy');
+              rnk_   number             := :RNK;
               begin
               for k in (
-                   select * from fin_fm where okpo = okpo_ and fdat = dat_
-                        )
-               loop
-                 delete fin_rnk where okpo = k.okpo and fdat = k.fdat;
-                 delete fin_fm  where okpo = k.okpo and fdat = k.fdat;
-               end loop;
+              select * from fin_fm where okpo = okpo_ and fdat = dat_
+              )
+              loop
+              delete fin_rnk where okpo = k.okpo and fdat = k.fdat;
+              delete fin_fm  where okpo = k.okpo and fdat = k.fdat;
+              fin_formaf3.data_deletion(k.okpo, k.fdat,3);
+              fin_formaf3.data_deletion(k.okpo, k.fdat,4);
+              end loop;
               end;
             </sql>
           
@@ -264,7 +271,32 @@
             </parameters>
           </command>
         </button>
-        
+        <!--КНОПКА Введення даних форми №3 -->
+        <button id="Bt303" type="Button" imagename="note"  hint="Форма №3" caption="F3" >
+          <command type="Redirect" url="\barsroot\credit\fin_nbu\fin_form_f3.aspx" checkselectedrow="true">
+            <parameters>
+              <parameter name="OKPO" altname="okpo" datatype="Int64" type="DataField"></parameter>
+              <parameter name="frm"  altname="frm"  datatype="Int64" type="Constant">
+                <defaultvalue type="Constant" value="3"/>
+              </parameter>
+              <parameter name="DAT" altname="dat" datatype="String" type="DataField"></parameter>
+              <parameter name="RNK"  altname="rnk"  datatype="Int64" type="DataField" ></parameter>
+            </parameters>
+          </command>
+        </button>
+        <!--КНОПКА Введення даних форми №3n -->
+        <button id="Bt304" type="Button" imagename="note"  hint="Форма №3n" caption="F3n" >
+          <command type="Redirect" url="\barsroot\credit\fin_nbu\fin_form_f3.aspx" checkselectedrow="true">
+            <parameters>
+              <parameter name="OKPO" altname="okpo" datatype="Int64" type="DataField"></parameter>
+              <parameter name="frm"  altname="frm"  datatype="Int64" type="Constant">
+                <defaultvalue type="Constant" value="4"/>
+              </parameter>
+              <parameter name="DAT" altname="dat" datatype="String" type="DataField"></parameter>
+              <parameter name="RNK"  altname="rnk"  datatype="Int64" type="DataField" ></parameter>
+            </parameters>
+          </command>
+        </button>
         
         <button id="btIPS" type="Image" imagename="document_gear" caption="Рорахувати інтгрований показник та клас боржника"  hint="Рорахувати інтгрований показник та клас боржника" confirmmessage="Провести розрахунок" >
           <command type="PlSqlBlock" checkselectedrow="true">
@@ -295,7 +327,7 @@
           <command type="Redirect" target="Self" url="/barsroot/credit/fin_nbu/Print_fin.aspx">
             <customfields oktext="Ok" canceltext="Cancel" title="Звіт ?">
               <customfield name="frt" altname="frt" datatype="String" required="true" label="Звітна форма"  >
-                <uicontrol type="DropDownList" table="(Select 'Fin_nbu_CGD23_agr_bal' frx , 'Агрегований баланс' name from dual union all Select 'Fin_nbu_CGD23_forms' frx , 'Форма 1 та 2' name from dual )" keyfield="frx" valuefield="name"  addemptyitem="true"></uicontrol>
+                <uicontrol type="DropDownList" table="(Select 'Fin_agr_bal' frx , 'Агрегований звіт(квартальний)' name from dual union all Select 'Fin_agr_bal_kym' frx , 'Агрегований звіт(кумулятивний)' name from dual union all Select 'Fin_nbu_CGD23_forms' frx , 'Форма 1 та 2' name from dual )" keyfield="frx" valuefield="name"  addemptyitem="true"></uicontrol>
               </customfield>
             </customfields>
             <parameters>

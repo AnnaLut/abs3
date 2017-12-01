@@ -197,65 +197,65 @@ namespace barsroot.udeposit
                 
                 SetParameters("DPU_ID", DB_TYPE.Decimal, dpu_id, DIRECTION.Input);
 
-                ArrayList reader = SQL_reader("select ND," + //0
-                                              "VIDD," + //1
-                                              "VIDD_NAME," + //2
-                                              "RNK," + //3
-                                              "SUM," + //4
-                                              "to_char(DAT_BEGIN,'dd.mm.yyyy')," + //5
-                                              "to_char(DAT_END,'dd.mm.yyyy')," + //6
-                                              "to_char(DATZ,'dd.mm.yyyy')," + //7
-                                              "to_char(DATV,'dd.mm.yyyy')," + //8
-                                              "MFO_D," + //9
-                                              "NLS_D," + //10
-                                              "NMS_D," + //11
-                                              "NB_D," +  //12
-                                              "MFO_P," + //13
-                                              "NLS_P," + //14
-                                              "NMS_P," + //15
-                                              "NB_P," +  //16
-                                              "COMMENTS," + //17
-                                              "KV," + //18
-                                              "LCV," + //19
-                                              "NAMEV," + //20
-                                              "NMK," + //21
-                                              "OKPO," + //22
-                                              "ADR," + //23
-                                              "to_char(BDAT,'dd.mm.yyyy')," + //24
-                                              "BR," + //25
-                                              "BR_NAME," +//26
-                                              "OP," +//27
-                                              "IR," +//28
-                                              "FREQV," +//29
-                                              "FREQV_NAME," +//30
-                                              "ACC," +//31
-                                              "NLS," +//32
-                                              "ACRA," +//33
-                                              "COMPROC," +//34
-                                              "DPU_ADD," +//35
-                                              "DPU_GEN," +//36
-                                              "ID_STOP," +//37
-                                              "STOP_NAME," +//38
-                                              "MIN_SUM, " +//39
-                                              "f_ourmfo, " +//40
-                                              "ACR_NLS, " +//41
-                                              "FL_EXT, " +//42
-                                              "BRANCH, " +//43
-                                              "BRANCH_NAME, " + // 44
-                                              "DPU_CODE, "    + // 45
-                                              "TAS_ID, "      + // 46
-                                              "DPU_TYPE, "    + // 47
-                                              "TERM_TYPE, "   + // 48
-                                              "OSTC, "        + // 49
-                                              "ACC2, "        + // 50
-                                              "TEMPLATE_ID, " + // 51
-                                              "K013, "        + // 52
-                                              "TYPE_ID, "     + // 53
-                                              "TYPE_NAME, "   + // 54
-                                              "OKPO_P, "      + // 55
-                                              "CNT_DUBL,"     + // 56
-                                              "(select nvl(min(FR),-1) from DOC_SCHEME where ID = TEMPLATE_ID ) as TPL_TP,"  + // 57
-                                              "(select (length(branch)-1)/7 from STAFF$BASE where ID = USER_ID ) as USR_LVL" + // 58
+                ArrayList reader = SQL_reader("select ND" + //0
+                                              ", VIDD" + //1
+                                              ", VIDD_NAME" + //2
+                                              ", RNK" + //3
+                                              ", SUM" + //4
+                                              ", to_char(DAT_BEGIN,'dd.mm.yyyy')" + //5
+                                              ", to_char(DAT_END,'dd.mm.yyyy')" + //6
+                                              ", to_char(DATZ,'dd.mm.yyyy')" + //7
+                                              ", to_char(DATV,'dd.mm.yyyy')" + //8
+                                              ", MFO_D" + //9
+                                              ", NLS_D" + //10
+                                              ", NMS_D" + //11
+                                              ", NB_D" +  //12
+                                              ", MFO_P" + //13
+                                              ", NLS_P" + //14
+                                              ", NMS_P" + //15
+                                              ", NB_P" +  //16
+                                              ", COMMENTS" + //17
+                                              ", KV" + //18
+                                              ", LCV" + //19
+                                              ", NAMEV" + //20
+                                              ", NMK" + //21
+                                              ", OKPO" + //22
+                                              ", ADR" + //23
+                                              ", to_char(BDAT,'dd.mm.yyyy')" + //24
+                                              ", BR"          + // 25
+                                              ", BR_NAME"     + // 26
+                                              ", OP"          + // 27
+                                              ", IR"          + // 28
+                                              ", FREQV"       + // 29
+                                              ", FREQV_NAME"  + // 30
+                                              ", ACC"         + // 31
+                                              ", NLS"         + // 32
+                                              ", ACRA"        + // 33
+                                              ", COMPROC"     + // 34
+                                              ", DPU_ADD"     + // 35
+                                              ", DPU_GEN"     + // 36
+                                              ", ID_STOP"     + // 37
+                                              ", STOP_NAME"   + // 38
+                                              ", MIN_SUM"     + // 39
+                                              ", F_OURMFO()"  + // 40
+                                              ", ACR_NLS"     + // 41
+                                              ", FL_EXT"      + // 42
+                                              ", BRANCH"      + // 43
+                                              ", BRANCH_NAME" + // 44
+                                              ", DPU_CODE"    + // 45
+                                              ", TAS_ID"      + // 46
+                                              ", DPU_TYPE"    + // 47
+                                              ", TERM_TYPE"   + // 48
+                                              ", OSTC"        + // 49
+                                              ", ACC2"        + // 50
+                                              ", TEMPLATE_ID" + // 51
+                                              ", K013"        + // 52
+                                              ", TYPE_ID"     + // 53
+                                              ", TYPE_NAME"   + // 54
+                                              ", OKPO_P"      + // 55
+                                              ", CNT_DUBL"    + // 56
+                                              ", ( select nvl(min(FR),-1) from DOC_SCHEME where ID = TEMPLATE_ID ) as TPL_TP"  + // 57
+                                              ", (length(sys_context('bars_context','user_branch'))-1)/7 as USR_LVL" + // 58
                                               " from V_DPU_DEAL_WEB WHERE DPU_ID=:DPU_ID");
 
                 DBLogger.Info("Пользователь просматривает параметры депозитного договора № " + dpu_id, "BarsWeb.DepositU");
