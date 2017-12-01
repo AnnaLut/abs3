@@ -67,7 +67,7 @@ namespace BarsWeb.Areas.Ndi.Models
         /// </summary>
         public int RecordsCount { get; set; }
 
-        public List<ColumnMetaInfo> NativeMetaColumnsForeSelect { get; set; }
+        public List<ColumnMetaInfo> NativeMetaColumns { get; set; }
         public List<ColumnMetaInfo> ExternalMetaColumns { get; set; }
         /// <summary>
         /// Получить все строки
@@ -84,7 +84,5 @@ namespace BarsWeb.Areas.Ndi.Models
 
         public bool SummaryForRecordsOnScrean { get; set; }
         public string SelectStatement { get; set; }
-        public List<MetaColumnsDbModel> DbMetaColumns { get; internal set; }
-        public List<ColumnMetaInfo> NativeMetaColumns { get; internal set; }
     }
 }

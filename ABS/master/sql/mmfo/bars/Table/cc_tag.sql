@@ -24,7 +24,7 @@ PROMPT *** Create  table CC_TAG ***
 begin 
   execute immediate '
   CREATE TABLE BARS.CC_TAG 
-   (	TAG VARCHAR2(8), 
+   (	TAG VARCHAR2(5), 
 	NAME VARCHAR2(50), 
 	TAGTYPE VARCHAR2(5), 
 	TABLE_NAME VARCHAR2(30), 
@@ -115,6 +115,11 @@ exception when others then
 /
 
 
+PROMPT *** MODIFY COLUMN  TAG***
+begin   
+ execute immediate 'ALTER TABLE BARS.CC_TAG MODIFY TAG VARCHAR2(7)';
+ end;
+/
 
 PROMPT *** Create  grants  CC_TAG ***
 grant SELECT                                                                 on CC_TAG          to BARSUPL;

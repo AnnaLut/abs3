@@ -1,11 +1,5 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/function/f_cck_otcn.sql =========*** Run ***
- PROMPT ===================================================================================== 
- 
   CREATE OR REPLACE FUNCTION BARS.F_CCK_OTCN (FDAT_ DATE, ACC_ INT, MDATE_ DATE,
-             VST_ number, FAKT_ varchar2 default '000', PDAT_ date default null,
+             VST_ number, FAKT_ varchar2 default '00000000', PDAT_ date default null,
              typen_ number default 1, 
              fdatb_ in date default null, 
              fdate_ in date default null,
@@ -15,7 +9,7 @@ IS
 % DESCRIPTION :    Вспомогательная функция для формирования #A7
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     : v.16.003    03/04/2017
+% VERSION     : v.17.004    11.09.2017
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  параметры: FDAT_ - отчетная дата
             ACC_ - ид. счета основного долга
@@ -33,6 +27,7 @@ IS
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+11.09.2017 - txt_sql8: для счетов 2701,3660 в портфеле мбдк
 26.08.2016 - txt_sql7: (счета SNO) добавлен ограничительный интервал на дату погашения 
 19.08.2016 - обработка графиков для счетов SNO (скрипт txt_sql7)
 30/07/2012 - будем обрабатывать бал.счет 1418 из табл. OTCN_LIM_SB (ПКБ)
@@ -85,6 +80,12 @@ IS
                                          and fdat >= :fdat_
                                        ORDER BY 1 desc';
 
+  txt_sql8         varchar2(1000) := 'select FDAT, SUMG
+                                        from CC_LIM
+                                       where acc=:acc_
+                                         and fdat >= :fdat_
+                                       ORDER BY 1 desc';
+
   txt_sql3         varchar2(1000) := 'select d_plan, sv - nvl(sz, ''0'')
                                        from OTC_ARC_CC_TRANS
                                        where dat_otc = :dat_ 
@@ -131,6 +132,7 @@ IS
   TYPE ref_type_curs IS REF CURSOR;
 
   fakt_curs     ref_type_curs;
+  cc_curs       ref_type_curs;
   sb_curs       ref_type_curs;
   trans_curs    ref_type_curs;
   restr_curs    ref_type_curs;
@@ -448,7 +450,8 @@ BEGIN
                     pipe ROW(i);
                END IF;
        END;
-   elsif (nbs_ in ('2701', '3660', '3648') or
+   elsif (nbs_ = '3648'  or
+          nbs_ in ('2701', '3660') and substr(fakt_,8,1) ='0' or
           substr(nls_a7_,1,4) in ('1410','1413','1414','3112','3113','3114')) and substr(fakt_,2,1) = '1' then
        open sb_curs
        for txt_sql2 using acc_, odat_;
@@ -478,6 +481,38 @@ BEGIN
        END LOOP;
 
        close sb_curs;
+
+       IF ost_ >0 THEN 
+          if abs(ost_)<=100 then -- вирівнювання 
+             DEL(zn_ * OST_, i_mdate, i);  
+             pipe ROW(i); 
+          else  
+             DEL(zn_ * OST_, MDATE_, i);  
+             pipe ROW(i); 
+          END IF;
+       end if;
+   elsif nbs_ in ('2701', '3660') and substr(fakt_,8,1) = '1' then
+
+       open cc_curs
+       for txt_sql8 using acc_, odat_;
+
+       comm_ := 'розбивка по CC_LIM';
+
+       LOOP
+          FETCH cc_curs into i_mdate, pog_;
+          EXIT WHEN cc_curs%NOTFOUND;
+
+          L_ := least(Gl.P_Icurval(kv1_, pog_, fdat_), OST_);
+
+          IF L_ > 0 AND (OST_ -L_)>=0 THEN
+             DEL(L_, i_mdate, i);
+             pipe ROW(i);
+
+             OST_:= OST_ - L_;
+          END IF;
+       END LOOP;
+
+       close cc_curs;
 
        IF ost_ >0 THEN 
           if abs(ost_)<=100 then -- вирівнювання 
@@ -851,10 +886,4 @@ BEGIN
 END;
 /
  show err;
- 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/function/f_cck_otcn.sql =========*** End ***
- PROMPT ===================================================================================== 
- 
+

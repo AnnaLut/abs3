@@ -1,5 +1,6 @@
 ﻿angular.module('BarsWeb.Controllers', [])
 .controller('RegisterCountsDpa', ['$scope', '$http', function ($scope, $http) {
+
     $scope.AjaxGetFunction = function (url) {
         $.ajax({
             url: url,
@@ -1105,15 +1106,7 @@
                             NMK: {
                                 type: 'string',
                                 validation: {
-                                    required: { message: "Поле Назва обов'язкове!" },
-                                    maxlength:
-                                    function(input) {
-                                        if (input.val().length > 38) {
-                                            input.attr("data-maxlength-msg", "Кількість символів не повинна перевищувати 38!");
-                                            return false;
-                                        }
-                                        return true;
-                                    }
+                                    required: { message: "Поле Назва обов'язкове!" }
                                 }
                             },
                             ADR: {
@@ -1262,14 +1255,6 @@
                                 type: 'string',
                                 validation: {
                                     required: { message: "Поле Назва обов'язкове!" }
-                                },
-                                maxlength:
-                                function (input) {
-                                    if (input.val().length > 38) {
-                                        input.attr("data-maxlength-msg", "Кількість символів не повинна перевищувати 38!");
-                                        return false;
-                                    }
-                                    return true;
                                 }
                             },
                             OT: {
@@ -1944,11 +1929,7 @@
                 {
                     ID: 3,
                     NAME: "Закриття"
-                },
-				{
-					ID: 5,
-					NAME: "Закриття. Не за ініціативою клієнта"
-				}
+                }
             ]
         }
         else if (options.field === "C_AG") {
@@ -1992,10 +1973,6 @@
                     {
                         ID: 3,
                         NAME: "Закриття"
-                    },
-                    {
-                        ID: 5,
-                        NAME: "Закриття. Не за ініціативою клієнта"
                     }
             ]
         }

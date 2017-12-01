@@ -1,11 +1,11 @@
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/package/mbk.sql =========*** Run *** =======
-PROMPT ===================================================================================== 
-
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/package/mbk.sql =========*** Run *** =======
+ PROMPT ===================================================================================== 
+ 
 create or replace package mbk
 is
 
-    MBK_HEAD_VERS  constant varchar2(64)  := 'version 55.0 02.01.2017';
+    MBK_HEAD_VERS  constant varchar2(64)  := 'version 55.0 11.01.2017';
 
     ATTR_AWAITING_MAIN_AMOUNT     constant varchar2(30 char) := 'MBDK_AWAITING_MAIN_AMOUNT';
     ATTR_AWAITING_INTEREST_AMOUNT constant varchar2(30 char) := 'MBDK_AWAITING_INTEREST_AMOUNT';
@@ -92,114 +92,114 @@ is
     ----------------------------------------------------------------------
     --    Процедура обновления даты заключения сделки
     --
-    procedure upd_cc_deal (p_nd number, p_sdate date);
+    procedure upd_cc_deal (p_nd number, p_sdate date, p_prod varchar2, p_n_nbu varchar2, p_d_nbu date);
     ----------------------------------------------------------------------
-    procedure inp_deal (
-              cc_id_      varchar2,
+    procedure inp_deal ( 
+              cc_id_      varchar2, 
               nvidd_      integer ,
-              ntipd_      integer ,
-              nkv_        integer ,
+              ntipd_      integer , 
+              nkv_        integer , 
               rnkb_       integer ,
-              dat2_       date    ,
-              p_datv      date    ,
+              dat2_       date    , 
+              p_datv      date    , 
               dat4_       date    ,
-              ir_         number  ,
-              op_         number  ,
+              ir_         number  , 
+              op_         number  , 
               br_         number  ,
-              sum_        number  ,
-              nbasey_     integer ,
+              sum_        number  , 
+              nbasey_     integer , 
               nio_        integer ,
-              s1_         varchar2,
-              s2_         varchar2,
-              s3_         varchar2,
-              s4_         varchar2,
+              s1_         varchar2, 
+              s2_         varchar2, 
+              s3_         varchar2, 
+              s4_         varchar2, 
               s5_         number  ,
-              nlsa_       varchar2,
-              nms_        varchar2,
-              nlsna_      varchar2,
+              nlsa_       varchar2, 
+              nms_        varchar2, 
+              nlsna_      varchar2, 
               nmsn_       varchar2,
-              nlsnb_      varchar2,
-              nmkb_       varchar2,
+              nlsnb_      varchar2, 
+              nmkb_       varchar2, 
               nazn_       varchar2,
-              nlsz_       varchar2,
-              nkvz_       integer ,
-              p_pawn      number  ,
+              nlsz_       varchar2, 
+              nkvz_       integer , 
+              p_pawn      number  ,   
               id_dcp_     integer ,
-              s67_        varchar2,
-              ngrp_       integer ,
+              s67_        varchar2, 
+              ngrp_       integer , 
               nisp_       integer ,
-              bica_       varchar2,
-              ssla_       varchar2,
-              bicb_       varchar2,
+              bica_       varchar2, 
+              ssla_       varchar2, 
+              bicb_       varchar2, 
               sslb_       varchar2,
               sump_       number  ,
-              altb_       varchar2,
+              altb_       varchar2, 
               intermb_    varchar2,
-              intpartya_  varchar2,
-              intpartyb_  varchar2,
-              intinterma_ varchar2,
+              intpartya_  varchar2, 
+              intpartyb_  varchar2, 
+              intinterma_ varchar2, 
               intintermb_ varchar2,
-              nd_    out  integer ,
-              acc1_ out   integer ,
+              nd_    out  integer , 
+              acc1_ out   integer , 
               serr_ out   varchar2) ;
-
+        
     ----------------------------------------------------------------------
-    procedure inp_deal_Ex (
-              cc_id_        varchar2,
+    procedure inp_deal_Ex (   
+              cc_id_        varchar2, 
               nvidd_        integer ,
-              ntipd_        integer ,
-              nkv_          integer ,
+              ntipd_        integer , 
+              nkv_          integer , 
               rnkb_         integer ,
-              dat2_         date    ,
-              p_datv        date    ,
+              dat2_         date    , 
+              p_datv        date    , 
               dat4_         date    ,
-              ir_           number  ,
-              op_           number  ,
+              ir_           number  , 
+              op_           number  , 
               br_           number  ,
-              sum_          number  ,
-              nbasey_       integer ,
+              sum_          number  , 
+              nbasey_       integer , 
               nio_          integer ,
-              s1_           varchar2,
-              s2_           varchar2,
-              s3_           varchar2,
-              s4_           varchar2,
+              s1_           varchar2, 
+              s2_           varchar2, 
+              s3_           varchar2, 
+              s4_           varchar2, 
               s5_           number  ,
-              nlsa_         varchar2,
-              nms_          varchar2,
-              nlsna_        varchar2,
+              nlsa_         varchar2, 
+              nms_          varchar2, 
+              nlsna_        varchar2, 
               nmsn_         varchar2,
-              nlsnb_        varchar2,
-              nmkb_         varchar2,
+              nlsnb_        varchar2, 
+              nmkb_         varchar2, 
               nazn_         varchar2,
-              nlsz_         varchar2,
-              nkvz_         integer ,
-              p_pawn        number  ,
+              nlsz_         varchar2, 
+              nkvz_         integer , 
+              p_pawn        number  ,   
               id_dcp_       integer ,
-              s67_          varchar2,
-              ngrp_         integer ,
+              s67_          varchar2, 
+              ngrp_         integer , 
               nisp_         integer ,
-              bica_         varchar2,
-              ssla_         varchar2,
-              bicb_         varchar2,
+              bica_         varchar2, 
+              ssla_         varchar2, 
+              bicb_         varchar2, 
               sslb_         varchar2,
               sump_         number  ,
-              altb_         varchar2,
+              altb_         varchar2, 
               intermb_      varchar2,
-              intpartya_    varchar2,
-              intpartyb_    varchar2,
-              intinterma_   varchar2,
+              intpartya_    varchar2, 
+              intpartyb_    varchar2, 
+              intinterma_   varchar2, 
               intintermb_   varchar2,
-              nd_           out integer ,
-              acc1_         out integer ,
+              nd_           out integer , 
+              acc1_         out integer , 
               serr_         out varchar2,
               DDAte_        date     default null,  -- Дата заключення
               IRR_          number   default null,  -- Еф. % ставка
               code_product_ number   default null,  -- Код продукта
-              n_nbu_        varchar2 default null   -- Номер свідоцтва НБУ
+              n_nbu_        varchar2 default null,  -- Номер свідоцтва НБУ 
+              d_nbu_        date                    -- Дата реєстрації в НБУ
 ) ;
 
-
-    ----------------------------------------------------------------------
+     ----------------------------------------------------------------------
     procedure set_field58d (p_nd number, p_field58d varchar2);
 
     ----------------------------------------------------------------------
@@ -374,9 +374,9 @@ is
     function body_version return varchar2;
 end;
 /
-create or replace package body mbk is
+CREATE OR REPLACE PACKAGE BODY mbk is
 
-    MBK_BODY_VERS   CONSTANT VARCHAR2(64)  := 'version 75.1 02.08.2017';
+    MBK_BODY_VERS   CONSTANT VARCHAR2(64)  := 'version 75.1 12.09.2017';
 /*
     13.10.2016 Sta - код оп при приеме сумм на заход
 
@@ -997,9 +997,9 @@ create or replace package body mbk is
         where  t.accs = p_new_main_account_id and
                (exists (select 1 from accounts a
                         where  a.acc = t.acc and
-                               (a.dazs is not null or --
+                               (a.dazs is not null or -- 
                                 (l_new_cc_vidd_row.tipd = cck_utl.DEAL_TYPE_ALLOCATION_OF_FUNDS and a.nbs = '9510') or
-                                (l_new_cc_vidd_row.tipd = cck_utl.DEAL_TYPE_FUNDRAISING and a.nbs <> '9510'))) or
+                                (l_new_cc_vidd_row.tipd = cck_utl.DEAL_TYPE_FUNDRAISING and a.nbs <> '9510'))) or 
                 not exists (select 1 from pawn_acc p where p.acc = t.acc));
 
         delete cc_accp t
@@ -1361,7 +1361,7 @@ create or replace package body mbk is
     ------------------------------------------------------------------
     -- тип залишку, на який нараховуються відсотки - визначається за таблицею proc_dr$base, знаходиться в полі IO
     -- довідник доступних типів залишку - таблиця int_ion
-    -- таблиця proc_dr$base зберігає одночасно багато значень з одним і тим самим номером балансового рахунку і
+    -- таблиця proc_dr$base зберігає одночасно багато значень з одним і тим самим номером балансового рахунку і 
     -- прив'язаним до нього типом залишку. Предметна логіка, і всі попередні реалізації даної задачі в коді Центури,
     -- розраховують на те, що для одного балансового рахунку не зустрінеться різних IO і беруть перший-ліпший рядок.
     -- Наприклад: If SqlPrepareAndExecute(hSql(), "select nvl(IO, 0) into :nIO from proc_dr where nbs=:nVidd and sour=4") and SqlFetchNext(hSql(), nFetchRes)
@@ -1896,10 +1896,11 @@ create or replace package body mbk is
     ----------------------------------------------------------------------
     --    Процедура обновления даты заключения сделки
     --
-    procedure upd_cc_deal (p_nd number, p_sdate date)
+    procedure upd_cc_deal (p_nd number, p_sdate date, p_prod varchar2, p_n_nbu varchar2, p_d_nbu date)
     is
     begin
-      update cc_deal set sdate = p_sdate where nd = p_nd;
+      update cc_deal set sdate = p_sdate, prod  = p_prod  where nd = p_nd;
+      update cc_add  set n_nbu = p_n_nbu, d_nbu = p_d_nbu where nd = p_nd and adds=0;
     end upd_cc_deal;
 
     ----------------------------------------------------------------------
@@ -1954,7 +1955,8 @@ create or replace package body mbk is
       DDAte_        date     default null,  -- Дата заключення
       IRR_          number   default null,  -- Еф. % ставка
       code_product_ number   default null,  -- Код продукта
-      n_nbu_        varchar2 default null   -- Номер свідоцтва НБУ
+      n_nbu_        varchar2 default null,  -- Номер свідоцтва НБУ 
+      d_nbu_        date                    -- Дата реєстрації НБУ
     ) IS
 
       title         constant  varchar2(60) := 'mbk.inp_deal';
@@ -1979,13 +1981,11 @@ create or replace package body mbk is
       l_grp                   accounts.grp%type;
       l_clt_amnt              oper.s%type; -- сума застава з pul
       inr_err                 exception;   -- Internal error
-	  l_nmkb                  int_accn.namb%type;
-
+      l_nmkb                  int_accn.namb%type;
 
     BEGIN
-
-	   
-      bars_audit.info( SubStr( title || ': Entry with( CC_ID_ => ' || CC_ID_
+      
+      bars_audit.info( SubStr( title || ': Entry with( CC_ID_ => ' || CC_ID_ 
            || chr(10) || ', nVidd_ => '      || nVidd_
            || chr(10) || ', nTipd_ => '      || nTipd_
            || chr(10) || ', nKV_ => '        || nKV_
@@ -1998,69 +1998,69 @@ create or replace package body mbk is
            || chr(10) || ', nIO_  => '       || nIO_       || ', S1_  => '        || S1_
            || chr(10) || ', S2_   => '       || S2_        || ', S3_  => '        || S3_
            || chr(10) || ', S4_   => '       || S4_        || ', S5_  => '        || S5_
-           || chr(10) || ', NLSA_ => '       || NLSA_      || ', NMS_ => '        || NMS_
-           || chr(10) || ', NLSNA_ => '      || NLSNA_     || ', NMSN_ => '       || NMSN_
-           || chr(10) || ', NLSNB_ => '      || NLSNB_     || ', NMKB_ => '       || NMKB_
-           || chr(10) || ', Nazn_  => '      || Nazn_      || ', NLSZ_ => '       || NLSZ_
-           || chr(10) || ', nKVZ_  => '      || nKVZ_      || ', p_pawn => '      || p_pawn
-           || chr(10) || ', Id_DCP_ => '     || Id_DCP_    || ', S67_ => '        || S67_
-           || chr(10) || ', nGrp_   => '     || nGrp_      || ', nIsp_ => '       || nIsp_
-           || chr(10) || ', BICA_   => '     || BICA_      || ', SSLA_ => '       || SSLA_
-           || chr(10) || ', BICB_   => '     || BICB_      || ', SSLB_ => '       || SSLB_
-           || chr(10) || ', SUMP_   => '     || SUMP_      || ', AltB_ => '       || AltB_
-           || chr(10) || ', IntermB_    => ' || IntermB_   || ', IntPartyA_ => '  || IntPartyA_
+           || chr(10) || ', NLSA_ => '       || NLSA_      || ', NMS_ => '        || NMS_       
+           || chr(10) || ', NLSNA_ => '      || NLSNA_     || ', NMSN_ => '       || NMSN_      
+           || chr(10) || ', NLSNB_ => '      || NLSNB_     || ', NMKB_ => '       || NMKB_      
+           || chr(10) || ', Nazn_  => '      || Nazn_      || ', NLSZ_ => '       || NLSZ_      
+           || chr(10) || ', nKVZ_  => '      || nKVZ_      || ', p_pawn => '      || p_pawn     
+           || chr(10) || ', Id_DCP_ => '     || Id_DCP_    || ', S67_ => '        || S67_       
+           || chr(10) || ', nGrp_   => '     || nGrp_      || ', nIsp_ => '       || nIsp_      
+           || chr(10) || ', BICA_   => '     || BICA_      || ', SSLA_ => '       || SSLA_      
+           || chr(10) || ', BICB_   => '     || BICB_      || ', SSLB_ => '       || SSLB_      
+           || chr(10) || ', SUMP_   => '     || SUMP_      || ', AltB_ => '       || AltB_      
+           || chr(10) || ', IntermB_    => ' || IntermB_   || ', IntPartyA_ => '  || IntPartyA_ 
            || chr(10) || ', IntPartyB_  => ' || IntPartyB_ || ', IntIntermA_ => ' || IntIntermA_
            || chr(10) || ', IntIntermB_ => ' || IntIntermB_|| ').', 1, 4000 ) );
-
+      
       BEGIN
 
-   	    l_nmkb := substr(NMKB_,1,38);
-		
+        l_nmkb := substr(NMKB_,1,38);
+        
         nUser_ := USER_ID;
         ND_    := null;
-
+        
         -- счет доходов-расходов
         if ( S67_ Is Null )
         then
-
+          
           ACC3_ := BARS.F_PROC_DR( RNKB_, 4, 0, 'MKD', nVidd_, nKv_ );
-
+          
           if ( ACC3_ Is Null )
           then
             sERR_ := 'Не знайдено рахунок доходів/витрат';
             raise inr_err;
           end if;
-
+          
         else
-
+          
           BEGIN
-            SELECT acc
-              INTO ACC3_
+            SELECT acc 
+              INTO ACC3_ 
               FROM accounts
-             WHERE kv=gl.baseval
-               and nls=S67_
+             WHERE kv=gl.baseval 
+               and nls=S67_ 
                and dazs is null;
           EXCEPTION
-            WHEN NO_DATA_FOUND THEN
+            WHEN NO_DATA_FOUND THEN 
               sERR_ := 'Не открыт счет '||S67_;
               raise inr_err;
           END;
-
+          
         end if;
-
+        
         --SELECT s_cc_deal.nextval into ND_  FROM dual;
         nd_ := bars_sqnc.get_nextval('s_cc_deal');
-
+        
         INSERT INTO cc_deal (nd , vidd  , rnk  , user_id, cc_id , sos, wdate, sdate                , limit, kprolog,ir  ,prod         )
                      VALUES (ND_, nVidd_, RNKB_, nUser_ , CC_ID_, 10 , DAT4_, nvl(DDAte_, gl.BDATE), SUM_ , 0      ,IRR_,code_product_);
-
-        INSERT INTO cc_add (nd         , adds       , s      , kv     , bdate  , wdate  , sour      , acckred   , mfokred , freq      , accperc   ,
-                            mfoperc    , refp       , swi_bic, swi_acc, swo_bic, swo_acc, int_amount, alt_partyb, interm_b, int_partya, int_partyb,
-                            int_interma, int_intermb, n_nbu  )
-                    VALUES (ND_        , 0          , Sum_   , nKv_   , DAT2_  , p_datv , 4         , S1_       , S2_     , 2         , S3_       ,
-                            S4_        , S5_        , bica_  , ssla_  , bicb_  , sslb_  , sump_     , altb_     , intermb_, IntPartyA_, IntPartyB_,
-                            IntIntermA_, IntIntermB_, n_nbu_ );
-
+        
+        INSERT INTO cc_add (nd         , adds       , s      , kv     , bdate  , wdate  , sour      , acckred   , mfokred , freq      , accperc   , 
+                            mfoperc    , refp       , swi_bic, swi_acc, swo_bic, swo_acc, int_amount, alt_partyb, interm_b, int_partya, int_partyb, 
+                            int_interma, int_intermb, n_nbu  , d_nbu  )
+                    VALUES (ND_        , 0          , Sum_   , nKv_   , DAT2_  , p_datv , 4         , S1_       , S2_     , 2         , S3_       , 
+                            S4_        , S5_        , bica_  , ssla_  , bicb_  , sslb_  , sump_     , altb_     , intermb_, IntPartyA_, IntPartyB_, 
+                            IntIntermA_, IntIntermB_, n_nbu_ , d_nbu_ );
+        
         if ( nTipd_ Is Null )
         then
           select TIPD
@@ -2070,53 +2070,53 @@ create or replace package body mbk is
         else
           l_tipd := nTipd_;
         end if;
-
-        if l_tipd = 1
+        
+        if l_tipd = 1 
         then
-          nID_ :=0;
+          nID_ :=0; 
           Tip1_:='SS ';
           Tip2_:='SN ';
-        else
+        else 
           nID_ :=1;
           Tip1_:='DEP';
           Tip2_:='DEN';
         end if ;
-
+        
         if ( nIsp_ Is Null )
         then
           l_isp := gl.aUID;
         else
           l_isp := nIsp_;
         end if;
-
+        
         if ( nGrp_ Is Null )
         then
           l_grp := 33;
         else
           l_grp := nGrp_;
         end if;
-
+        
         bars_audit.info( title || ': tipd = ' || to_char(l_tipd)
                                || ', grp = '  || to_char(l_grp)
                                || ', isp = '  || to_char(l_isp) );
-
+        
         -- открытие основного счета
         Op_Reg_ex(1,ND_,nTmp_, l_grp, nTmp_,RNKB_,NLSA_, nKv_,NMS_, Tip1_, l_isp, ACC1_, '1', null, null,
            null);  -- KB  pos=1
-
+        
         bars_audit.info( title || ': ACC1_ = ' || ACC1_ );
-
+        
         -- открытие счета нач.%%
         Op_Reg_ex(1,ND_,nTmp_, l_grp, nTmp_,RNKB_,NLSNA_,nKv_,NMSN_,Tip2_, l_isp, ACC2_, '1', null, null,
            null);  -- KB  pos=1
-
-        UPDATE cc_add
-           SET accs=ACC1_
+        
+        UPDATE cc_add 
+           SET accs=ACC1_ 
          WHERE nd=ND_;
-
+        
         -- 30.08.2010 Sta
         l_INITIATOR := substr( pul.Get_Mas_Ini_Val('INITIATOR'), 1, 2 );
-
+        
         If gl.aMfo = '300465' and l_INITIATOR is not null then
            -- Доп.реквизиты счета SS
            EXECUTE IMMEDIATE 'update SPECPARAM_CP_OB set INITIATOR =''' || l_INITIATOR || ''' where acc= '|| ACC1_ ;
@@ -2124,7 +2124,7 @@ create or replace package body mbk is
               EXECUTE IMMEDIATE 'insert into SPECPARAM_CP_OB (ACC,INITIATOR) ' ||
                                 'values ( ' || ACC1_ || ', '''|| l_INITIATOR || ''' )';
            end if;
-
+        
            EXECUTE IMMEDIATE 'update SPECPARAM_CP_OB set INITIATOR =''' || l_INITIATOR || ''' where acc= '|| ACC2_ ;
            if SQL%rowcount = 0 then
               EXECUTE IMMEDIATE 'insert into SPECPARAM_CP_OB (ACC,INITIATOR) ' ||
@@ -2132,49 +2132,58 @@ create or replace package body mbk is
            end if;
         end if;
         -------------
-
-        IF NLSZ_ is not null
+        
+        IF NLSZ_ is not null 
         then
           -- открытие счета залога
           op_reg_ex( 2, ND_, p_pawn -- case when ( l_tipd = 2 ) then 999999 else p_pawn end
                    , 2, nTmp_, RNKB_, NLSZ_, nKVZ_, NMS_, 'ZAL', l_isp, ACC4_, '1', null, null, null
                    ); -- KB  pos=1
-
+          
           bars_audit.info( title || ': ZAL ACC4_ = ' || ACC4_ );
-
+          
           -- проставляем группу доступа для счета залога как для основного счета
           p_setAccessByAccmask(ACC4_, ACC1_);
-
+          
           insert into nd_acc (nd, acc) values (ND_, ACC4_);
-
+           
            if ( l_tipd = 1 )
            then
-
-              update cc_accp
-                 set nd=ND_
+              
+              update cc_accp 
+                 set nd=ND_ 
                  where acc=ACC4_ and accs=ACC1_;
-
-              IF SQL%rowcount = 0
+              
+              IF SQL%rowcount = 0 
               then
                  INSERT into cc_accp (ACC,ACCS,nd) values (ACC4_,ACC1_,ND_);
               END IF;
            END IF;
-
+           
            cck_utl.set_deal_attribute(ND_, 'PAWN', to_char(p_pawn));
-
+           
         END IF;
-
+        
         IF Id_DCP_ is not null then
            -- обеспечение - ДЦП
            UPDATE dcp_p Set ref=-ND_, acc=ACC1_ WHERE id=Id_DCP_;
         END IF;
-
+        
         UPDATE accounts SET mdate=DAT4_,PAP=l_tipd WHERE acc=ACC1_;
         UPDATE accounts SET mdate=DAT4_            WHERE acc=ACC2_;
         UPDATE accounts SET mdate=DAT4_            WHERE acc=ACC4_;
-    /*
-        if substr(nVidd_,1,2) = '39' then
 
+        -- Внесение РНК в CUSTBANK для сделок (2700,2701,3660)
+        if mbdk_tip(nVidd_) = 1 THEN 
+           update custbank set bki = 1 where rnk = RNKB_ ;
+           if SQL%rowcount = 0 then
+              insert into custbank (rnk, bki) values (RNKB_, 1);
+           end if;
+        end if;
+   
+    /*  
+        if substr(nVidd_,1,2) = '39' then
+        
            -- установка ОБ22
            l_ob22 := case when nKV_ = gl.baseval then '02' else '12' end;
            update specparam_int set ob22 = l_ob22 where acc = ACC1_ ;
@@ -2187,7 +2196,7 @@ create or replace package body mbk is
               insert into specparam_int (acc, ob22)
               values (ACC2_, '02');
            end if;
-
+        
            -- проставим спецпараметр МФО (нужно для файлов 32, 33)
            update specparam_int set mfo=S2_ where acc = ACC1_ ;
            if SQL%rowcount = 0 then
@@ -2199,9 +2208,9 @@ create or replace package body mbk is
               insert into specparam_int (acc, mfo)
               values (ACC2_, S2_);
            end if;
-
+        
         end if;
-    */
+    */  
         -- Artem Yurchenko, 24.11.2014
         -- для кредитных ресурсов необходимо использовать другие операции
         if (check_if_deal_belong_to_crsour(nVidd_) = 'Y') then
@@ -2209,13 +2218,13 @@ create or replace package body mbk is
             l_ob22 := '02';
             accreg.setAccountSParam(ACC1_, 'OB22', l_ob22);
             accreg.setAccountSParam(ACC2_, 'OB22', l_ob22);
-
+        
             -- проставим спецпараметр МФО (нужно для файлов 32, 33)
             accreg.setAccountSParam(ACC1_, 'MFO', s2_);
             accreg.setAccountSParam(ACC2_, 'MFO', s2_);
-
+        
             sTTB_ := 'PS2';
-
+        
             --операция по начислению проц
             l_proc_dr_row := get_proc_dr_row(to_char(nVidd_, 'FM9999'), rnkb_);
             sTTA_ := case when nKv_ = gl.baseval then l_proc_dr_row.tt
@@ -2223,7 +2232,7 @@ create or replace package body mbk is
                      end;
         else
             sTTB_ := case when nKv_ = gl.baseval then 'WD2' else 'WD3' end;
-
+        
             --операция по начислению проц
             BEGIN
                SELECT val INTO sTTA_ FROM params WHERE par='MBD_%%1';
@@ -2231,7 +2240,7 @@ create or replace package body mbk is
             END;
             BEGIN
               -- резидент-нерезидент
-              SELECT decode (codcagent,1, sTTA_, decode(l_tipd,1,'%00','%02') )
+              SELECT decode (codcagent, 1, sTTA_, 3, sTTA_, decode(l_tipd,1,'%00','%02') )
                 INTO sTTA_
                 FROM customer WHERE rnk=RNKB_;
             EXCEPTION
@@ -2240,7 +2249,7 @@ create or replace package body mbk is
                 raise inr_err;
             END;
         end if;
-
+        
         if ( nIO_ Is Null )
         then
           select IO
@@ -2252,7 +2261,7 @@ create or replace package body mbk is
         else
           l_io := nIO_;
         end if;
-
+        
         update BARS.INT_ACCN
            set BASEY = nBASEY_
              , TT = sTTA_
@@ -2264,19 +2273,19 @@ create or replace package body mbk is
              , acr_dat = decode(l_io,1,gl.BDATE,acr_dat)
          where acc = ACC1_
            and id  = nID_;
-
-        IF SQL%rowcount = 0
+        
+        IF SQL%rowcount = 0 
         then
           INSERT INTO int_accN ( acc, ID, metr, basem, BASEY, freq, ACRA, ACRB, KVB, TT, TTB, STP_DAT, s, IO, acr_dat )
           VALUES (ACC1_, nID_, 0, 0, nBASEY_, 1, ACC2_, ACC3_, nKv_, sTTA_, sTTB_, DAT4_-1, 0, l_io, decode(l_io,1,gl.BDATE,null));
         END IF;
-
+        
         IF ( nID_ = 1 and nKV_=gl.baseval )
         then
            UPDATE int_accN
               Set NLSB=NLSNB_
                 , MFOB=S2_
-                , NAMB= l_nmkb
+                , NAMB=l_nmkb
                 , NAZN=Nazn_
             WHERE acc=ACC1_ AND id=1;
         ELSIF nID_ = 1 and nKV_<>gl.baseval then
@@ -2294,23 +2303,23 @@ create or replace package body mbk is
                  WHERE acc=ACC1_ AND id=1;
             end if;
         END IF;
-
+        
         update INT_ratn
            SET ir=IR_, op=OP_, br=BR_
          where acc=ACC1_ and id=nID_ and bdat=DAT2_;
-
-        if SQL%rowcount = 0
+        
+        if SQL%rowcount = 0 
         then
            INSERT INTO INT_ratn (acc  , ID ,bdat ,ir ,op ,br)
            VALUES (ACC1_, nID_, DAT2_, IR_, OP_, BR_);
         end if;
-
+        
         -- При открытии договора D020 := '01'
         UPDATE specparam set D020 = '01' where acc=ACC1_;
         if SQL%rowcount = 0 then
            INSERT INTO specparam (ACC, D020 ) values ( ACC1_, '01' );
         end if;
-
+        
         -- новый код срока только для 1-го класса
         if nVidd_ like '1%' then
            l_s180 := FS180(ACC1_, '1', bankdate);
@@ -2319,7 +2328,7 @@ create or replace package body mbk is
               INSERT INTO specparam (ACC, S180) values (ACC1_, l_s180);
            end if;
         end if;
-
+        
         -- установка параметрів Первинний та Поточний ВКР
         begin
           select VALUE
@@ -2332,14 +2341,14 @@ create or replace package body mbk is
             bars_audit.info( title || ': not found "VNCRR" for RNK = ' || to_char(RNKB_) );
             -- raise_application_error(-20666, 'Відсутнє занчення ВКР у клієнта з РНК = '||to_char(RNKB_), true);
         end;
-
+        
         -- Поточний ВКР
         cck_utl.set_deal_attribute( ND_, 'VNCRR', l_txt );
-
+        
         -- Первинний ВКР
         begin
           -- первинний ВКР не оновлюється тому юзаєм INSERT
-          insert
+          insert 
             into BARS.ND_TXT
             ( ND, TAG, TXT )
           values
@@ -2349,14 +2358,14 @@ create or replace package body mbk is
             -- вже був вставлений тригером
             null;
         end;
-
+        
         begin
-
+          
           l_clt_amnt := to_number( bars.pul.get_mas_ini_val('COLLATERAL_AMOUNT') );
-
+          
           if ( ( l_clt_amnt > 0 ) and ( NLSZ_ is Not Null ) )
           then
-
+            
             collateral_payments( p_mbk_id   => ND_
                                , p_mbk_num  => CC_ID_
                                , p_beg_dt   => DAT2_
@@ -2367,27 +2376,27 @@ create or replace package body mbk is
                                , p_rnk      => RNKB_
                                , p_dk       => case when l_tipd = 1 then 1 else 0 end
                                );
-
+            
           end if;
-
+          
         exception
-          when OTHERS then
+          when OTHERS then 
             bars_audit.info( 'mbk.inp_deal: collateral_payments_error => '
-                          || dbms_utility.format_error_stack()
+                          || dbms_utility.format_error_stack() 
                           || dbms_utility.format_error_backtrace() );
         end;
-
+        
       EXCEPTION
-        when INR_ERR then
+        when INR_ERR then 
           null;
         when OTHERS then
-          bars_audit.info( 'mbk.inp_deal: error => '|| dbms_utility.format_error_stack()
+          bars_audit.info( 'mbk.inp_deal: error => '|| dbms_utility.format_error_stack() 
                                                     || dbms_utility.format_error_backtrace() );
           sErr_ := dbms_utility.format_error_stack();
       END;
-
+      
       bars_audit.info( 'mbk.inp_deal: Exit with( ND='|| to_char(ND_) ||', ACC1='|| to_char(ACC1_) || ').' );
-
+      
     END inp_deal_Ex;
     ------------------------------------------------------------------
     -- inp_deal
@@ -2495,6 +2504,7 @@ create or replace package body mbk is
                         ND_          ,
                         ACC1_        ,
                         sErr_        ,
+                        null         , 
                         null         ,
                         null         ,
                         null         ,
@@ -2528,6 +2538,7 @@ create or replace package body mbk is
 
       -- перевірки
       select count(m.ND)
+
         into l_qty
         from MBD_K_R m
        where m.ND = ND_
@@ -3076,12 +3087,12 @@ create or replace package body mbk is
         end if;
 
         return currency_utl.from_fractional_units(
-                   round(calp_nr(currency_utl.to_fractional_units(p_amount, p_currency_id),
+             round(calp_nr(currency_utl.to_fractional_units(p_amount, p_currency_id),
                            p_interest_rate,
                            l_date_from,
                            l_date_through,
                            p_interest_base), 0),
-                   p_currency_id);
+                   p_currency_id); 
     end;
 
     procedure prepare_portfolio_interest(
@@ -3483,7 +3494,7 @@ SELECT a.nls, a.ostc/power(10,:nDig) INTO :sDB_1819, :ost_DB_1819
                                             ' ' || currency_utl.get_currency_lcv(l_main_account_row.kv) ||
                                             ' складає ' ||
                                             to_char(l_operation_item.amount, l_money_format) ||
-                                             ' ' || currency_utl.get_currency_lcv(l_main_account_row.kv) ||
+                                             ' ' || currency_utl.get_currency_lcv(l_main_account_row.kv) || 
                                             '<br>Очікується розміщення на суму різниці';
 
                 if (l_main_account_row.kv = gl.baseval) then
@@ -3517,7 +3528,7 @@ SELECT a.nls, a.ostc/power(10,:nDig) INTO :sDB_1819, :ost_DB_1819
                     l_transaction_code := get_sending_transaction_code(l_cc_deal_row.vidd, l_main_account_row.nls, l_interest_account_row.nls);
 
                     -- Field 72: Sender to Receiver Information
-                    --
+                    -- 
                     -- FORMAT
                     -- 6*35x (Narrative Structured Format)
                     -- The following line formats must be used:
@@ -4017,8 +4028,7 @@ SELECT a.nls, a.ostc/power(10,:nDig) INTO :sDB_1819, :ost_DB_1819
 
         l_operation_item := null;
         l_operation_item.operation_type_name := 'Нарахування відсотків';
-
-        if (l_int_accn_row.acr_dat is null or l_int_accn_row.acr_dat < l_int_accn_row.stp_dat) then
+         if (tools.compare_range_borders(l_int_accn_row.acr_dat, l_int_accn_row.stp_dat) < 0) then 
             l_operation_item.purpose := 'Дата останнього нарахування відсотків: <b>' || to_char(l_int_accn_row.acr_dat, 'dd.mm.yyyy') ||
                                         '</b><br>Дата завершення нарахування відсотків: <b>' || to_char(l_int_accn_row.stp_dat, 'dd.mm.yyyy');
             l_operation_item.url            := '<a href="'||
@@ -4246,7 +4256,7 @@ SELECT a.nls, a.ostc/power(10,:nDig) INTO :sDB_1819, :ost_DB_1819
     end;
 end;
 /
-show err;
+ show err;
  
 PROMPT *** Create  grants  MBK ***
 grant EXECUTE                                                                on MBK             to BARS_ACCESS_DEFROLE;

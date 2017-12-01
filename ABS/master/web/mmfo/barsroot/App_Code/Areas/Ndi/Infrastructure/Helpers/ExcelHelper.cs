@@ -23,7 +23,7 @@ public class ExcelHelper
         //
     }
 
-    public static ExcelResulModel ExcelExport(string tableSemantic, GetDataResultInfo dataResult,List<ColumnMetaInfo> allColumnsInfo,
+    public static ExcelResulModel ExcelExport(string tableSemantic, IEnumerable<Dictionary<string, object>> dataRecords,List<ColumnMetaInfo> allColumnsInfo,
         ExcelDataModel excelDataModel, GridFilter[] filterParams)
     {
         List<string> values = excelDataModel.ColumnsVisible == null ? new List<string>() : excelDataModel.ColumnsVisible.Split(',').ToList();
@@ -36,15 +36,9 @@ public class ExcelHelper
                 allShowColumns.Add(item);
             }
         }
-        if (dataResult is ResultForExcel)
-        {
-            ResultForExcel excelResult = dataResult as ResultForExcel;
-            if (excelResult.ExcelParam == "ALL_CSV")
-                return ExcelExportToCSV('|', tableSemantic, dataResult, allShowColumns, excelDataModel.TableName);
-        }
-           
-       
-            
+
+        if (dataRecords.Count() > 80000)
+            return ExcelExportToCSV('|',tableSemantic, dataRecords, allShowColumns, excelDataModel.TableName);
         var package = new ExcelPackage();
         MemoryStream result = new MemoryStream();
         try
@@ -57,11 +51,11 @@ public class ExcelHelper
             const int dataStartsFromRow = 3;
             int curRow = dataStartsFromRow;
             int curCol;
-            int startColumn = 1;
+            int startColumn = 2;
             bool hasFontPainter = true;
             bool hasBackgrouondPainter = true;
 
-            foreach (var item in dataResult.DataRecords)
+            foreach (var item in dataRecords)
             {
 
                 // заполнить значения всех столбцов строки
@@ -84,23 +78,6 @@ public class ExcelHelper
                 curRow++;
 
             }
-
-            if(dataResult.TotalRecord != null && dataResult.TotalRecord.Count() > 0)
-            {
-                curRow++;
-                worksheet.Cells[curRow, startColumn].Value = "Підсумок: ";
-                foreach (var item in dataResult.TotalRecord)
-                {
-
-                    int currCol = allShowColumns.FindIndex(x => x.COLNAME == item.Key);
-                    if (currCol == -1)
-                        continue;
-                        currCol = currCol + startColumn;
-                    worksheet.Cells[curRow, currCol].Value = item.Value;
-                }
-            }
-            
-
             //}
 
             bool hasData = curRow != dataStartsFromRow;
@@ -122,19 +99,8 @@ public class ExcelHelper
                 range.Style.Border.BorderAround(ExcelBorderStyle.Thick);
                 range.Style.WrapText = true;
             }
-
-            if(dataResult.TotalRecord != null && dataResult.TotalRecord.Count() > 0)
-            using (var range = worksheet.Cells[curRow, 1, curRow, allShowColumns.Count])
-            {
-                range.Style.Font.Bold = true;
-                range.Style.Fill.PatternType = ExcelFillStyle.Solid;
-                range.Style.Fill.BackgroundColor.SetColor(Color.Yellow);
-                range.Style.Border.BorderAround(ExcelBorderStyle.Thick);
-                range.Style.WrapText = true;
-            }
-
-                //Process Columns
-                curCol = 1;
+            //Process Columns
+            curCol = 1;
             foreach (var colTitle in allShowColumns)
             {
                 string lineBreak = "" + (char)13 + (char)10;
@@ -200,16 +166,12 @@ public class ExcelHelper
         }
     }
 
-    public static ExcelResulModel ExcelExportToCSV(char columnSeparator, string tableSemantic, GetDataResultInfo resultInfo, List<ColumnMetaInfo> ColumnsInfo,
+    public static ExcelResulModel ExcelExportToCSV(char columnSeparator, string tableSemantic, IEnumerable<Dictionary<string, object>> dataRecords, List<ColumnMetaInfo> ColumnsInfo,
         string fileName)
     {
-        IEnumerable<Dictionary<string, object>> dataRecords = resultInfo.DataRecords;
-       Dictionary<string, int> headerLen = new Dictionary<string, int>();
+
+        Dictionary<string, int> headerLen = new Dictionary<string, int>();
         System.Text.StringBuilder sb = new System.Text.StringBuilder();
-        Encoding windows = Encoding.GetEncoding("windows-1251");
-        Encoding unicode = Encoding.Unicode;
-        try
-        {
         //sb.Append("sep=|");
         //foreach (Dictionary<string, object> rowData in dataRecords)
         //{
@@ -223,7 +185,6 @@ public class ExcelHelper
         {
             System.Text.StringBuilder sbRow = new System.Text.StringBuilder();
           
-         
             foreach (KeyValuePair<string, object> r in rowData)
             {
                 string v = r.Value.ToString();
@@ -233,9 +194,9 @@ public class ExcelHelper
                 //hack for A7 report
                 if (colInfo.COLTYPE == "D")
                 {
-                        if(!string.IsNullOrEmpty(v))
                     v = ((DateTime)r.Value).ToString(string.IsNullOrEmpty(colInfo.SHOWFORMAT) ? "ddMMyyyy" : colInfo.SHOWFORMAT);
                 }
+
                 sbRow.Append(v);
                 sbRow.Append(columnSeparator);
             }
@@ -259,24 +220,9 @@ public class ExcelHelper
             sb.Insert(0, "sep=" + columnSeparator + "\n");
         ExcelResulModel excelResult = new ExcelResulModel();
         excelResult.FileName = fileName + ".csv";
-        excelResult.ContentType = "application/ms-excel";// "text/csv";
-
-        byte[] unicodeBytes = unicode.GetBytes(sb.ToString());
-        byte[] asciiBytes = Encoding.Convert(unicode, windows, unicodeBytes);
-        //char[] asciiChars = new char[ascii.GetCharCount(asciiBytes, 0, asciiBytes.Length)];
-        //ascii.GetChars(asciiBytes, 0, asciiBytes.Length, asciiChars, 0);
-        //string resStr = new string(asciiChars);
-        excelResult.ContentResult = asciiBytes;
-
-
+        excelResult.ContentType = "text/csv";
+        excelResult.ContentResult = Encoding.UTF8.GetBytes(sb.ToString());
+       
         return excelResult;
-
-
-        }
-        catch (Exception e)
-        {
-
-            throw e;
-        }
     }
 }

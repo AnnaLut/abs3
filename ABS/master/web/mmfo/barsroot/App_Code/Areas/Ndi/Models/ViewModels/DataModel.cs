@@ -10,7 +10,7 @@ namespace BarsWeb.Areas.Ndi.Models.ViewModels
     {
         public string GridFilter { get; set; }
         public string ExternalFilter { get; set; }
-         public virtual string DynamicFilter { get; set; }
+         public string DynamicFilter { get; set; }
         public int TableId { get; set; }
         public string TableName { get; set; }
         public string StartFilter { get; set; }

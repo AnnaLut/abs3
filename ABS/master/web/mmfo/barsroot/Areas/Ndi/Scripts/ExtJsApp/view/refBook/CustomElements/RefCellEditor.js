@@ -101,17 +101,25 @@
         currRowNum = this.context.rowIdx;
         crurrCollIndex = this.context.colIdx;
 
+        field.el.dom.focus();
+
         if (e.getKey() === e.UP) {
             
             ed.completeEdit();
             e.stopEvent();
             e.preventDefault();
+            //field.focus(false);
             var newRowNum = this.context.rowIdx - 1;
             var  newCollIndex = this.context.colIdx;
             if (field.xtype == 'refTextBox')
                 setTimeout('upEdit()', 30);
             else
                 this.startEditByPosition({ row: currRowNum - 1, column: crurrCollIndex });
+            //var curRow = me.grid.getSelectionModel().getSelection();
+            //this.startEditByPosition({ row: currRownum - 4, column: newCollIndex });
+            //var curRow = me.grid.getSelectionModel().getSelection();
+            //me.grid.getSelectionModel().setCurrentPosition({row: curRow, column: newCollIndex });
+
         }
         if (e.getKey() == e.LEFT) {
             ed.completeEdit();
@@ -126,6 +134,8 @@
             e.preventDefault();
             this.startEditByPosition({ row: currRowNum, column: crurrCollIndex + 1 });
         }
+        // this.st
+        // this.startEditByPosition({ row: currRownum - 1, column: newCollIndex });//: newCollIndex  this.startEditByPosition({ row: --currRownum, column: newCollIndex });
         if (e.getKey() == e.DOWN)
         {
             ed.completeEdit();
@@ -135,7 +145,13 @@
                 setTimeout('downEdit()', 30);
             else
                 this.startEditByPosition({ row: currRowNum + 1, column: crurrCollIndex });
+         //   this.startEditByPosition({ row: currRownum + 1, column: newCollIndex });
+         //newCell = me.view.walkCells(sm, pos +1, -1, this.acceptsNav, this);
+         //newRow = me.view.walkRows(sm, 1);
+
         }
+
+        //me.grid.columns[9].field.focus(true);
         me.callParent(arguments);
     }
 

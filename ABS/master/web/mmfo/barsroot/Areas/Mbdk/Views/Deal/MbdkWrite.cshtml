@@ -4,7 +4,7 @@
 <link rel="stylesheet" href="~/Areas/Mbdk/Content/index.css" />
 @*------------------------------------------------------------------------------------------------------------------------------------------------*@
 
-<script src="~/Areas/Mbdk/Scripts/userControls.js"></script>
+<script src="~/Areas/Mbdk/Scripts/userControls.js?1213"></script>
 <h1>Введення угоди МБДК</h1>
 <form id="deal" autocomplete="off">
     <div id="clientPasportWindow">
@@ -41,87 +41,141 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-md-5 col-sm-5">
-            <div class="form-group">
-                <input type="text" style="margin-left: 15px" class="k-textbox disable-solid" id="initTrans" required validationMessage="Оберіть значення" />
+        <div class="form-group">
+            <div class="col-md-5 col-sm-5">
+                <input type="text" name="initTrans" style="margin-left: 15px" class="k-textbox disable-solid" id="initTrans" required validationMessage="Оберіть значення" />
             </div>
         </div>
     </div>
     <div class="row">
         <div class="col-md-6 col-sm-6">
             <div class="panel panel-default">
-                <div class="panel-body" style="height:210px">
+                @*<div id="topLeft" class="panel-body" style="height:325px;">*@
+                <div id="topLeft" class="panel-body" style="height:auto;">
+
                     <div class="form-group">
-                        <label for="" class="col-md-12 col-sm-12 control-label">Вид договору</label>
+                        <label for="productType" class="col-md-12 col-sm-12 control-label">Продукт</label>
                         <div class="col-md-12 col-sm-12">
-                            <input type="text" class="k-textbox disable-solid" id="dealType" required validationMessage="Оберіть вид договору" tabindex="1"/>
+                            <input type="text" name="productType" class="k-textbox disable-solid" id="productType" @*required validationMessage="Оберіть продукт"*@ title="Продукт" tabindex="1" />
                         </div>
                     </div>
 
                     <div class="form-group">
+                        <label for="dealType" class="col-md-12 col-sm-12 control-label">Вид договору</label>
+                        <div class="col-md-12 col-sm-12">
+                            <input type="text" name="dealType" class="k-textbox disable-solid" id="dealType" required validationMessage="Оберіть вид договору" title="Вид договору" tabindex="2" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+
                         <label class="col-md-2 col-sm-2 control-label">Валюта</label>
                         <div class="col-md-4 col-sm-4">
-                            <input id="currency" title="Валюта" placeholder="Валюта" style="width: 65px" required pattern="\d*" validationMessage="Введіть код валюти"  tabindex="2"/>
-                            <button type="button" id="callCurrencyHandBook" title="Довідник валют" style="margin-left: 10px" class="k-button" tabindex="7">
+                            <input id="currency" name="currency" title="Валюта" placeholder="Валюта" style="width: 65px" required pattern="\d*" validationMessage="Введіть код валюти" tabindex="3" />
+                            <button type="button" id="callCurrencyHandBook" title="Довідник валют" style="margin-left: 10px" class="k-button" tabindex="9">
                                 <span class="k-sprite pf-icon pf-16 pf-search" style="margin-bottom: 3px"></span>
                             </button>
-                        </div>                        
+                        </div>
+
                         <label for="" class="col-md-1 col-sm-1 control-label">Сума</label>
                         <div class="col-md-5 col-sm-5">
-                            <input type="text" placeholder="Сума" name="inSum" id="inSum" k-options="decimalFormat" required validationMessage="Введіть cуму" tabindex="3"/>
+                            @*<input type="text" class="k-textbox" placeholder="Сума" name="inSumField" id="inSumField" k-options="decimalFormat" required validationMessage="Введіть cуму" tabindex="4" />*@
+                            <input placeholder="Сума" name="inSumField" id="inSumField" k-options="decimalFormat" required validationMessage="Введіть cуму" tabindex="4" />
+                            <!-- на ІЕ вроді навіть працює... -->
+                            <span class="k-invalid-msg" data-for="inSumField"></span>
                         </div>
-                    </div>                    
+
+                    </div>
                     <div class="form-group">
-                        <label for="" class="col-md-4 col-sm-4 control-label left-pos">N тікета/договору</label>
-                        <label for="" class="col-md-4 col-sm-4 control-label left-pos">Початок</label>
-                        <label for="" class="col-md-4 col-sm-4 control-label left-pos">Завершення</label>
+                        <label for="ccid" class="col-md-6 col-sm-6 control-label left-pos">N тікета/договору</label>
+                        <label for="" class="col-md-6 col-sm-6 control-label left-pos">Дата договору</label>
 
-                        <div class="col-md-4 col-sm-4">
-                            <input type="text" class="k-textbox" placeholder="№ Договору" title="№ тікета/договору" id="ccid" required validationMessage="Введіть номер договору"  tabindex="4"/>
+                        @*<label for="ccid" class="col-md-6 col-sm-6 control-label left-pos">Номер свідоцтва НБУ</label>*@
+
+                        <div class="col-md-6 col-sm-6">
+                            <input type="text" class="k-textbox" placeholder="№ Договору" title="№ тікета/договору" id="ccid" name="ccid" required validationMessage="Введіть № договору" tabindex="5" />
                         </div>
 
-                        <div class="col-md-4 col-sm-4">
-                            <input type="date" class="k-textbox dateStart disable-solid" title="Початок" id="dateStart"  tabindex="5"/>
+                        <div class="col-md-6 col-sm-6">
+                            <input type="date" class="k-textbox conclusionDate disable-solid" title="Фактична дата заключення угоди" id="conclusionDate" tabindex="7" />
                         </div>
 
-                        <div class="col-md-4 col-sm-4">
-                            <input type="date" class="k-textbox dateEnd disable-solid" title="Закінчення" id="dateEnd"  tabindex="6"/>
+                        @*<div class="col-md-6 col-sm-6">
+                                <input type="text" class="k-textbox" placeholder="Номер свідоцтва НБУ" title="Номер свідоцтва НБУ" id="nbuId" name="nbuId"  tabindex="6" />
+                            </div>*@
+
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="col-md-6 col-sm-6 control-label left-pos">Початок</label>
+                        <label for="" class="col-md-6 col-sm-6 control-label left-pos">Завершення</label>
+
+                        <div class="col-md-6 col-sm-6">
+                            <input type="date" class="k-textbox dateStart disable-solid" title="Початок" id="dateStart" tabindex="8" />
                         </div>
+
+                        <div class="col-md-6 col-sm-6">
+                            <input type="date" class="k-textbox dateEnd disable-solid" title="Закінчення" id="dateEnd" tabindex="9" />
+                        </div>
+
                     </div>
                 </div>
             </div>
         </div>
         <div class="col-md-6 col-sm-6">
             <div class="panel panel-default">
-                <div class="panel-body" style="padding-left: 25px; height:210px">
+                <div id="topRight" class="panel-body" style="padding-left: 25px; height:325px;">
+
+                    <div class="form-group hidden-id-read">
+                        <label for="" class="col-md-4 col-sm-4 control-label">Ефективна % ставка</label>
+                        <div class="col-md-8 col-sm-8">
+                            <input type="text" class="k-textbox" id="EffectiveProcStav" title="Ефективна % ставка" name="EffectiveProcStav" @*required*@ placeholder="Відсоткова ставка"
+                                   pattern="\d+(\.\d{1,6})?" @*validationMessage="Введіть відсоток"*@ tabindex="10" />
+                        </div>
+                    </div>
+
                     <div class="form-group hidden-id-read">
                         <label for="" class="col-md-4 col-sm-4 control-label">% ставка</label>
                         <div class="col-md-8 col-sm-8">
-                            <input type="text" class="k-textbox" id="procStav" title="% ставка" name="procStav" required placeholder="Відсоткова ставка" pattern="\d+(\.\d{1,6})?" validationMessage="Введіть відсоток" tabindex="7"/>
+                            <input type="text" class="k-textbox" id="procStav" title="% ставка" name="procStav" required placeholder="Відсоткова ставка"
+                                   pattern="\d+(\.\d{1,6})?" validationMessage="Введіть відсоток" tabindex="11" />
                         </div>
                     </div>
+
                     <div class="form-group">
                         <label for="" class="col-md-4 col-sm-4 control-label">% база</label>
                         <div class="col-md-8 col-sm-8">
-                            <input type="text" class="k-textbox disable-solid" required id="listOfBase" title="% база" tabindex="8">
+                            <input type="text" class="k-textbox disable-solid" required validationMessage="Оберіть базовий відсоток" id="listOfBase" name="listOfBase" title="% база" tabindex="12">
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="" class="col-md-4 col-sm-4 control-label">Сума %%</label>
                         <div class="col-md-8 col-sm-8">
-                            <input type="text" class="non-active" id="outSum" title="Сума %%" placeholder="Сума угоди" required" />
+                            <input type="text" class="non-active" id="outSum" name="outSum" title="Сума %%" placeholder="Сума угоди" required" />
                         </div>
                     </div>
                     <hr />
+
                     <div style="padding-left: 25px;" id="scoreNLS">
                         <div class="form-group">
                             <label class="k-label col-md-10">Рахунок доходів не обрано</label>
                         </div>
                     </div>
+
+                    <div class="form-group">
+                        <label for="nbuId" class="col-md-6 col-sm-6 control-label left-pos">Номер свідоцтва НБУ</label>
+                        <label for="nbuRegDate" class="col-md-6 col-sm-6 control-label left-pos">Дата реєстрації в НБУ</label>
+
+                        <div class="col-md-6 col-sm-6">
+                            <input type="text" class="k-textbox" placeholder="Номер свідоцтва НБУ" title="Номер свідоцтва НБУ" id="nbuId" name="nbuId" @*required validationMessage="Введіть Номер свідоцтва НБУ"*@ tabindex="6" />
+                        </div>
+
+                        <div class="col-md-6 col-sm-6">
+                            <input type="date" class="k-textbox nbuRegDate disable-solid" title="Дата реєстрації в НБУ" id="nbuRegDate" tabindex="8" />
+                        </div>
+                    </div>
+
                 </div>
-            </div>          
-
-
+            </div>
         </div>
     </div>
     <div class="row">
@@ -188,9 +242,9 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        
-                        <label for="" class="col-md-10 col-sm-10 control-label" id="providName">Забезпечення</label>                       
-                        
+
+                        <label for="" class="col-md-10 col-sm-10 control-label" id="providName">Забезпечення</label>
+
                         <div class="col-md-4 col-sm-4">
                             <input type="text" id="provSum" title="Сума забезпечення" placeholder="Сума" readonly />
                         </div>
@@ -199,7 +253,7 @@
                         </div>
                         <div class="col-md-5 col-sm-5">
                             <input type="text" class="k-textbox non-active" id="provScore" title="Рахунок забезпечення" placeholder="Рахунок" readonly />
-                        </div>                        
+                        </div>
                         <div class="col-md-1 col-sm-1">
                             <div type="button" class="k-button" title="Вибір виду забезпечення" id="providing" style="margin-left: -20px">
                                 <span class="k-sprite pf-icon pf-16 pf-search" style="margin-bottom: 3px"></span>
@@ -231,13 +285,13 @@
                     </div>
                     <div class="form-group">
                         <div class="col-md-4 col-sm-4">
-                            <input type="text" class="k-textbox" id="mfo" title="МФО партнера" placeholder="МФО партнера"  tabindex="13"/>
+                            <input type="text" class="k-textbox" id="mfo" title="МФО партнера" placeholder="МФО партнера" tabindex="13" />
                         </div>
                         <div class="col-md-4 col-sm-4">
-                            <input type="text" class="k-textbox" id="bic" title="ВІС партнера" placeholder="ВІС партнера"  tabindex="14"/>
+                            <input type="text" class="k-textbox" id="bic" title="ВІС партнера" placeholder="ВІС партнера" tabindex="14" />
                         </div>
                         <div class="col-md-3 col-sm-2">
-                            <input type="text" class="k-textbox" id="numNd" placeholder="№ дог." title="№ ген. договору"  tabindex="15" />
+                            <input type="text" class="k-textbox" id="numNd" placeholder="№ дог." title="№ ген. договору" tabindex="15" />
 
                         </div>
                         <div class="col-md-1 col-sm-1">
@@ -249,38 +303,38 @@
 
                     <div class="form-group">
                         <div class="col-md-4 col-sm-4">
-                            <input type="text" class="k-textbox" id="okpoUser" title="ОКПО партнера" placeholder="ОКПО партнера"  tabindex="12"/>
+                            <input type="text" class="k-textbox" id="okpoUser" title="ОКПО партнера" placeholder="ОКПО партнера" tabindex="12" />
                         </div>
                         <div class="col-md-4 col-sm-4">
-                            <input type="text" class="k-textbox" id="kod_b" title="Код 1-ПБ партнера" placeholder="Код 1-ПБ партнера"  tabindex="16"/>
+                            <input type="text" class="k-textbox" id="kod_b" title="Код 1-ПБ партнера" placeholder="Код 1-ПБ партнера" tabindex="16" />
                         </div>
                         <div class="col-md-4 col-sm-4">
-                            <input type="text" class="k-textbox" id="rnk" title="Рег № партнера" placeholder="Рег № партнера"  tabindex="11" />
+                            <input type="text" class="k-textbox" id="rnk" title="Рег № партнера" placeholder="Рег № партнера" tabindex="11" />
                         </div>
                     </div>
                     <div id="disableGroup">
                         <div class="form-group" style="margin-bottom:0">
                             <div class="col-md-6 col-sm-6">
                                 <label for="" class="control-label">Основний</label>
-                                <input type="checkbox" id="eq2" class="k-checkbox" style="margin-top: 9px;"  tabindex="17">
+                                <input type="checkbox" id="eq2" class="k-checkbox" style="margin-top: 9px;" tabindex="17">
                                 <label class="control-label" style="margin-left: 20px" for="eq2">Внутрішній</label>
                             </div>
                             <div class="col-md-6 col-sm-6">
                                 <label for="" class="control-label">Нарахованих %</label>
-                                <input type="checkbox" id="eq3" class="k-checkbox" style="margin-top: 9px;"  tabindex="18">
+                                <input type="checkbox" id="eq3" class="k-checkbox" style="margin-top: 9px;" tabindex="18">
                                 <label class="control-label" style="margin-left: 20px" for="eq3">Внутрішній</label>
                             </div>
 
                         </div>
                         <div class="form-group">
                             <div class="col-md-6 col-sm-6">
-                                <input type="text" class="k-textbox" id="s1"  tabindex="19"/>
+                                <input type="text" class="k-textbox" id="s1" tabindex="19" />
                             </div>
                             <div class="col-md-6 col-sm-6">
-                                <input type="text" class="k-textbox" id="s3"  tabindex="20"/>
+                                <input type="text" class="k-textbox" id="s3" tabindex="20" />
                             </div>
                         </div>
-                    </div>                    
+                    </div>
                     <div class="form-group">
                         <label for="" class="col-md-12 col-sm-12 control-label">Траса вихідного платежу (57/ВІС, 58-Рахунок)</label>
                         <div class="col-xs-5">

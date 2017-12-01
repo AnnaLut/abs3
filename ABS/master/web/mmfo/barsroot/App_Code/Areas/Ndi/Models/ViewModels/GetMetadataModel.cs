@@ -17,6 +17,6 @@
 
         public string Code { get; set; }
 
-        public string Base64InsertDefParamsString { get; set; }
+
     }
 }

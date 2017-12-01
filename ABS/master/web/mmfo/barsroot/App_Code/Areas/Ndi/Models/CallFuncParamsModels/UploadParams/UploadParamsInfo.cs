@@ -19,7 +19,7 @@ namespace BarsWeb.Areas.Ndi.Models
         {
            
         }
-        //public string GetFrom { get; set; }
+        public string GetFrom { get; set; }
 
 
        

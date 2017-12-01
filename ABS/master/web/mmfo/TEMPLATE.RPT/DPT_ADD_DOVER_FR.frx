@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Oracle.DataAccess&#13;&#10;FastReport.Oracle" DoublePass="true" FinishReportEvent="_FinishReport" ReportInfo.Created="05/17/2013 18:06:00" ReportInfo.Modified="10/27/2017 16:27:39" ReportInfo.CreatorVersion="2013.3.2.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Oracle.DataAccess&#13;&#10;FastReport.Oracle" DoublePass="true" FinishReportEvent="_FinishReport" ReportInfo.Created="05/17/2013 18:06:00" ReportInfo.Modified="05/18/2015 13:08:33" ReportInfo.CreatorVersion="2013.3.2.0">
   <ScriptText>using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -46,7 +46,7 @@ namespace FastReport
 }
 </ScriptText>
   <Dictionary>
-    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqXDNPX1eqkVhJtvHKAD0Djt/MITHTlpPj6G4OkulVf+40Fe1uiBSI9iD+ozDTQOd62raNJ8jvgQZBz7m3saPRiA==">
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqZLE460ApuhBq9nxfsVEDUjsnvJzXtSTPbWY4MKJi2yK6Cw7h6oGX20YJkb5YAkRniMDM4qda++fu056ydzn4CA==">
       <TableDataSource Name="Table" Alias="DPT_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select nvl(d.nd, to_char(d.deposit_id)) as id,   &#13;&#10;&#13;&#10; bp.val  as branch_name &#13;&#10;&#13;&#10;  from dpt_deposit d , branch_parameters bp, dpt_agreements da &#13;&#10;&#13;&#10; where d.deposit_id =  da.dpt_id &#13;&#10;       and da.agrmnt_id = :p_agrmnt_id &#13;&#10;       and bp.tag='NAME_BRANCH' &#13;&#10;       and bp.branch=d.branch">
         <Column Name="ID" DataType="System.String"/>
         <Column Name="BRANCH_NAME" DataType="System.String"/>
@@ -78,7 +78,7 @@ namespace FastReport
         <Column Name="EA_STRUCT_ID" DataType="System.Decimal"/>
         <CommandParameter Name="p_doc_id" DataType="113" Expression="[p_doc_id]" DefaultValue="-1"/>
       </TableDataSource>
-      <TableDataSource Name="Table4" Alias="CLIENT_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select c.nmk as fio,&#13;&#10;       fio(c.nmk, 1) || ' ' || substr(fio(c.nmk, 2), 1, 1) || '. ' ||&#13;&#10;       substr(fio(c.nmk, 3), 1, 1) || '.' as fio_short,&#13;&#10;       c.okpo as okpo,&#13;&#10;       decode(c.codcagent,&#13;&#10;              5,&#13;&#10;              'резидент',&#13;&#10;              6,&#13;&#10;              'нерезидент',&#13;&#10;              '--') as codcagent,&#13;&#10;       p.passp as doc_id,&#13;&#10;       ps.name as doc_name,&#13;&#10;       p.ser || ' ' || p.numdoc as pasp_no,&#13;&#10;       f_dat_lit(p.pdate) as pasp_date,&#13;&#10;       p.organ as pasp_atrt,&#13;&#10;       c.adr as address,&#13;&#10;       F_GET_ADR (c.rnk ,1) as address_complete,&#13;&#10;       nvl(p.teld, nvl(p.telw, '________')) as phone &#13;&#10;  from customer c, person p, passp ps, dpt_agreements da&#13;&#10; where c.rnk = p.rnk(+)&#13;&#10;   and da.cust_id = c.rnk&#13;&#10;   and p.passp = ps.passp&#13;&#10;   and da.agrmnt_id = :p_agrmnt_id">
+      <TableDataSource Name="Table4" Alias="CLIENT_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select c.nmk as fio,&#13;&#10;       fio(c.nmk, 1) || ' ' || substr(fio(c.nmk, 2), 1, 1) || '. ' ||&#13;&#10;       substr(fio(c.nmk, 3), 1, 1) || '.' as fio_short,&#13;&#10;       c.okpo as okpo,&#13;&#10;       decode(c.codcagent,&#13;&#10;              5,&#13;&#10;              'резидент',&#13;&#10;              6,&#13;&#10;              'нерезидент',&#13;&#10;              '--') as codcagent,&#13;&#10;       p.passp as doc_id,&#13;&#10;       ps.name as doc_name,&#13;&#10;       p.ser || ' ' || p.numdoc as pasp_no,&#13;&#10;       f_dat_lit(p.pdate) as pasp_date,&#13;&#10;       p.organ as pasp_atrt,&#13;&#10;       c.adr as address,&#13;&#10;       F_GET_ADR (c.rnk ,1) as address_complete,&#13;&#10;       nvl(p.teld, nvl(p.telw, '________')) as phone,&#13;&#10;       bars.dpt_trusty_options(da.denom_count) as trusty_options&#13;&#10;  from customer c, person p, passp ps, dpt_agreements da&#13;&#10; where c.rnk = p.rnk(+)&#13;&#10;   and da.cust_id = c.rnk&#13;&#10;   and p.passp = ps.passp&#13;&#10;   and da.agrmnt_id = :p_agrmnt_id">
         <Column Name="FIO" DataType="System.String"/>
         <Column Name="OKPO" DataType="System.String"/>
         <Column Name="CODCAGENT" DataType="System.String"/>
@@ -90,6 +90,7 @@ namespace FastReport
         <Column Name="ADDRESS" DataType="System.String"/>
         <Column Name="PHONE" DataType="System.String"/>
         <Column Name="FIO_SHORT" DataType="System.String"/>
+        <Column Name="TRUSTY_OPTIONS" DataType="System.String"/>
         <Column Name="ADDRESS_COMPLETE" DataType="System.String"/>
         <CommandParameter Name="p_agrmnt_id" DataType="113" Expression="[p_agrmnt_id]" DefaultValue="-1"/>
       </TableDataSource>
@@ -123,7 +124,7 @@ namespace FastReport
       </TableDataSource>
     </OracleDataConnection>
     <Parameter Name="p_doc_id" DataType="System.Int32" Expression="1025"/>
-    <Parameter Name="p_rnk" DataType="System.Int64" Expression="97407801"/>
+    <Parameter Name="p_rnk" DataType="System.Int64" Expression="1064574"/>
     <Parameter Name="p_agr_id" DataType="System.Int64" Expression="7335001"/>
     <Parameter Name="p_agrmnt_id" DataType="System.Int32" Expression="396752"/>
   </Dictionary>
@@ -148,7 +149,7 @@ namespace FastReport
         <TableRow Name="Row114" Height="37.8" AutoSize="true">
           <TableCell Name="Cell243" Text="[COMMON_DATA.STAFF_TOWN]" HorzAlign="Center" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
           <TableCell Name="Cell244" HorzAlign="Center" Font="Times New Roman, 10pt" HtmlTags="true"/>
-          <TableCell Name="Cell245" Text="&lt;u&gt;[COMMON_DATA.TODAY_WB]&lt;/u&gt;" HorzAlign="Center" Font="Times New Roman, 10pt" HtmlTags="true"/>
+          <TableCell Name="Cell245" Text="&lt;u&gt;[COMMON_DATA.TODAY_WB]&lt;/u&gt;&#13;&#10;(дата літерами: число, місяць та рік)" HorzAlign="Center" Font="Times New Roman, 10pt" HtmlTags="true"/>
         </TableRow>
         <TableRow Name="Row3" Height="66.15" AutoSize="true">
           <TableCell Name="Cell11" Text="	Я, що нижче підписався, &lt;b&gt;[CLIENT_DATA.FIO]&lt;/b&gt;, мешкаю за адресою &lt;b&gt;[CLIENT_DATA.ADDRESS_COMPLETE]&lt;/b&gt;, цією довіреністю уповноважую &lt;b&gt;[TRUSTEE_CLIENT_DATA.FIO_R]&lt;/b&gt;, який(яка) мешкає за адресою &lt;b&gt;[TRUSTEE_CLIENT_DATA.ADDRESS_COMPLETE]&lt;/b&gt;," HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="3"/>
@@ -156,7 +157,7 @@ namespace FastReport
           <TableCell Name="Cell241" Font="Times New Roman, 10pt" HtmlTags="true"/>
         </TableRow>
         <TableRow Name="Row117" Height="30.24" AutoSize="true">
-          <TableCell Name="Cell252" Text="«розпоряджатися рахунком(ами), отримувати (перераховувати) кошти з рахунку(ів), закрити рахунок(и) та інше, що не суперечить чинному законодавству України)»," HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="3"/>
+          <TableCell Name="Cell252" Text="[CLIENT_DATA.TRUSTY_OPTIONS]" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="3"/>
           <TableCell Name="Cell253" Font="Times New Roman, 10pt" HtmlTags="true"/>
           <TableCell Name="Cell254" Font="Times New Roman, 10pt" HtmlTags="true"/>
         </TableRow>
@@ -202,7 +203,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <PageFooterBand Name="PageFooter1" Top="851.21" Width="718.2" Height="18.9">
+    <PageFooterBand Name="PageFooter1" Top="850.6" Width="718.2" Height="18.9">
       <BarcodeObject Name="Barcode1" Left="96.52" Width="126.25" Height="18.9" Anchor="Top, Right" Expression="[TICKET_DATA.DOC_ID]+&quot;:&quot;+[TotalPages]+&quot;:&quot;+[Page]" ShowText="false" Barcode="Codabar"/>
       <TextObject Name="Text2" Left="264.6" Width="444.15" Height="18.9" Text="№ друку [TICKET_DATA.DOC_ID] сторінка [Page] з [TotalPages]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
     </PageFooterBand>
