@@ -22,7 +22,23 @@ PROMPT *** Create  view V_CC_DEAL ***
           c.k23,
           c.sos,
           c.prod
-     FROM cc_deal c;
+     FROM cc_deal c
+   UNION ALL
+   SELECT 'OVR' AS tip,
+          2600 AS vidd,
+          a.rnk,
+          o.nd,
+          ndoc AS cc_id,
+          datd AS sdate,
+          datd2 AS wdate,
+          a.branch,
+          o.fin23,
+          o.obs23,
+          o.kat23,
+          o.k23,
+          15 AS sos,
+          a.nbs AS prod
+          FROM acc_over o, accounts a WHERE o.acc = a.acc AND o.acc = o.acco;
 
 PROMPT *** Create  grants  V_CC_DEAL ***
 grant DELETE,SELECT,UPDATE                                                   on V_CC_DEAL       to BARS_ACCESS_DEFROLE;

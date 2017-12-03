@@ -1,5 +1,4 @@
 ﻿var globalID; //num
-var readonly;
 var staticData = [];
 var dialogGlkArchive; //window
 var dialogGlkArchive_Body; //window
@@ -9,7 +8,6 @@ var archive_date = "";
 $(document).ready(function () {
 
     globalID = bars.extension.getParamFromUrl('id', location.href);
-    readonly = bars.extension.getParamFromUrl('readonly', location.href);
 
     var toolbar = [];
     toolbar.push({ name: "btAdd", type: "button", text: "<span class='pf-icon pf-16 pf-add'></span> Додати запис" });
@@ -166,14 +164,6 @@ $(document).ready(function () {
             });
             disabledButtons(false, ".k-grid-btDel");
             disabledButtons(false, ".k-grid-btEdit");
-            if (readonly) {
-                disabledButtons(false, ".k-grid-btAdd");
-                disabledButtons(false, ".k-grid-btGLK");
-                disabledButtons(false, ".k-grid-btGPK");
-                disabledButtons(false, ".k-grid-btf9");
-                disabledButtons(false, ".k-grid-btArchive");
-                disabledButtons(false, ".k-grid-btToExcel");
-            }
         },
         change: function (e) {
             $('tr').find('[class=checkboxExist]').prop('checked', false);
@@ -604,8 +594,8 @@ function CheckButtons()
     var selected_items = grid.select();
     var selected_first = selected_items.first();
     var enable = grid.dataItem(selected_first).FDAT >= kendo.parseDate(staticData.BANKDATE);
-    disabledButtons(readonly && ((selected_items.length > 0) && enable), ".k-grid-btDel");
-    disabledButtons(readonly && ((selected_items.length == 1) && enable), ".k-grid-btEdit");
+    disabledButtons(((selected_items.length > 0) && enable), ".k-grid-btDel");
+    disabledButtons(((selected_items.length == 1) && enable), ".k-grid-btEdit");
 }
 
 function selectArchiveBody()

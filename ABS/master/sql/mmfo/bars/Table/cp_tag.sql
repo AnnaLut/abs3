@@ -1,3 +1,5 @@
+
+
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/Table/CP_TAG.sql =========*** Run *** ======
 PROMPT ===================================================================================== 
@@ -23,7 +25,7 @@ begin
   execute immediate '
   CREATE TABLE BARS.CP_TAG 
    (	ID NUMBER(*,0), 
-	TAG VARCHAR2(7), 
+	TAG VARCHAR2(5), 
 	NAME VARCHAR2(50)
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
@@ -47,12 +49,6 @@ COMMENT ON COLUMN BARS.CP_TAG.TAG IS 'ТЭГ -мнем.код доп.реквизита';
 COMMENT ON COLUMN BARS.CP_TAG.NAME IS 'Семантика доп.реквизита';
 
 
-
-PROMPT *** MODIFY COLUMN  TAG***
-begin   
- execute immediate 'ALTER TABLE BARS.CP_TAG MODIFY TAG VARCHAR2(7)';
- end;
-/
 
 
 PROMPT *** Create  constraint XPK_CPTAG ***
@@ -79,16 +75,6 @@ exception when others then
   if  sqlcode=-955  then null; else raise; end if;
  end;
 /
-
-
-begin   
- execute immediate 'alter table CP_TAG add dict_name VARCHAR2(30)';
-exception when others then
-  if  sqlcode=-1430  then null; else raise; end if;
- end;
-/
-comment on column CP_TAG.dict_name  is 'Найменування довідника (таблиця чи представлення)';
-
 
 
 

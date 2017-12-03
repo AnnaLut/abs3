@@ -2,7 +2,6 @@ set lines 1000
 set trimspool on
 set serveroutput on size 1000000
 
-
 prompt Создание / Обновление операции WD3
 prompt Наименование операции: WD3-ВОЗВРАТ МБ (SWIFT)
 declare
@@ -125,7 +124,7 @@ begin
   end;
   begin
     insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
-    values ('D1#E2', 'WD3', 'M', 1, null, '24', null);
+    values ('D1#E2', 'WD3', 'M', 0, null, '24', null);
   exception
     when dup_val_on_index then null;
     when others then

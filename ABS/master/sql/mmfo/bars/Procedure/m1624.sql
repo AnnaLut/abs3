@@ -6,11 +6,6 @@ create or replace procedure m1624 ( p_vidd number, p_rnk number, p_kv number, p_
  l_acc  number;
  g_ND  number ;
 -------------
-/*
-1) Остались лишние строки в портфеле, т.е. те с которых перенеслись остатки.
-2)  Назначение платежа при «схлопывании сделок» 1624 должно быть таким :
-*/
-
 begin bc.go('300465')  ;
 
   for G in (select a.kv, acrn.fprocn ( a.acc, 1, gl.bd) ir, d.rnk, 
@@ -95,7 +90,7 @@ begin bc.go('300465')  ;
      oo.nam_a:= Substr( 'Рах.1624*RNK='||g.RNK|| ', вал='||g.KV||', % ст='|| g.IR ,1,38) ;
      select okpo into oo.id_a from customer where rnk = g.rnk;
 
-     for d in (select  a.acc, a.nls, a.nms, a.ostc, d.nd, d.sdate, d.wdate, d.cc_id, a1.nls nls1, a1.ostc  ostc1, rownum RI, i.acr_dat, i.basey 
+     for d in (select  a.acc, a.nls, a.nms, a.ostc, d.nd, d.wdate, d.cc_id, a1.nls nls1, a1.ostc  ostc1, rownum RI, i.acr_dat, i.basey 
                from cc_deal d, cc_add x, accounts  a, int_accn i,  accounts a1 
                where d.vidd = p_vidd and d.nd = x.nd and x.adds =0 and x.accs = a.acc and d.wdate > gl.bdate
                  and d.rnk  = G.rnk and a.kv = G.kv and  acrn.fprocn ( a.acc, 1, gl.bd) = g.IR
@@ -116,13 +111,8 @@ begin bc.go('300465')  ;
            l_basey := d.basey ;
            l_acc   := d.acc   ;
            update cc_deal set sdate = g.sdate, wdate = g.wdate, ndi = g_nd where nd = d.ND;
---         oo.nazn := 'Об`єднання в одну угоду МБК № '|| d.CC_ID || ' кількох траншів по РНК='||g.RNK|| ', вал='||g.KV||',  % ст='|| g.IR  ;         
-           oo.nazn := Substr( 'Перенесення залишку коштів за довг.кредитом від 30/12/13р. на рах. '   ||oo.nlsb ||
-                              ' по клієнту EIB, РНК='|| g.RNK ||
-                              ' (реалізація Портфелю угод)', 1,160);
+           oo.nazn := 'Об`єднання в одну угоду МБК № '|| d.CC_ID || ' кількох траншів по РНК='||g.RNK|| ', вал='||g.KV||',  % ст='|| g.IR  ;         
         else
-
-           update cc_deal set sos = 15 where nd = d.ND;
 
            If ( d.ostc > 0 OR d.ostc1 > 0 ) then 
 
@@ -189,5 +179,4 @@ begin bc.go('300465')  ;
 end ;
 /
 
---exec  m1624 ( p_vidd =>1624 , p_rnk => 0, p_kv =>0 , p_ir => 0  ) ;
---commit;
+commit;

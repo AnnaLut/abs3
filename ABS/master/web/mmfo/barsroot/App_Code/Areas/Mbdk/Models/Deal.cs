@@ -36,13 +36,6 @@ namespace BarsWeb.Areas.Mbdk.Models
         public string SWO_ACC { get; set; }
         public string ALT_PARTYB { get; set; }
         public decimal DIG { get; set; }
-        public DateTime DATE_B { get; set; }
-        public string IRR { get; set; }
-        public decimal CODE_PRODUCT { get; set; }
-        public string NAME_PRODUCT { get; set; }
-        public string N_NBU { get; set; }
-        public string ND { get; set; }
-        public DateTime D_NBU { get; set; }
 
         /*public decimal KV { get; set; }
         public string NLS { get; set; }

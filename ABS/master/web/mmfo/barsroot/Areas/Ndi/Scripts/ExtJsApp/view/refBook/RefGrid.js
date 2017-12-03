@@ -75,7 +75,19 @@ Ext.onReady(function () {
             //наш грид-представление, конфигурацию которого будем дополнять
             var referenceGrid = this;
             var thisController = referenceGrid.thisController;
-            //устанавливаем заголовок грида по имени таблицы 
+            //устанавливаем заголовок грида по имени таблицы
+            
+            if(referenceGrid.metadata.tableInfo.SEMANTIC.indexOf(' :') > -1)
+                Ext.each(referenceGrid.metadata.saveInPageParams.ReplaceModels.ReplaceSemanticFields, function (field) {
+                    var par = ':' + field.Name;
+                    if(referenceGrid.metadata.tableInfo.SEMANTIC.indexOf(' ' + par) > -1)
+                    {
+                        var colDateFormat = 'd.m.Y';
+                        value = Ext.Date.format(field.Value, colDateFormat);
+                        referenceGrid.metadata.tableInfo.SEMANTIC = referenceGrid.metadata.tableInfo.SEMANTIC.replace(par, value);
+                    }
+
+                });
             referenceGrid.title = referenceGrid.metadata.tableInfo.SEMANTIC;
             var semantic = referenceGrid.metadata.tableInfo.SEMANTIC;
             if (window.parent && window.parent.document)
@@ -249,7 +261,7 @@ Ext.onReady(function () {
                 },
                 listeners: {
                     load: function (store, records) {
-  
+                        referenceGrid.height = 0 + "px";
                         //устанавливать доступность кнопки сброса фильтра
                         var clearFiltersBtn = referenceGrid.down('button#clearFilterButton');
                         var metadata = referenceGrid.metadata;
@@ -384,6 +396,7 @@ Ext.onReady(function () {
                 var menuItemFunctionsInToolbar = new Array();
                 Ext.each(referenceGrid.metadata.callFunctions, function (funcMetaInfo) {
                     //добавляем все функции кроме типа BEFORE - функции с таким типом вызываются только до загрузки данных в грид
+
                     if (funcMetaInfo.PROC_EXEC !== "BEFORE") {
                         var menuItem = Ext.create('Ext.Button');
                         //текст для отображения берем из DESCR
@@ -731,8 +744,9 @@ Ext.onReady(function () {
 
             //обработчик итоговых строк
             gridColumn.summaryRenderer = function (value, summaryData, dataIndex) {
-                if (!referenceGrid.metadata.additionalProperties.addSummaryRow)
+                if (!referenceGrid.metadata.additionalProperties.addSummaryRow || colMetaInfo.COLTYPE == 'B')
                     return;
+
                 //индекс текущей колонки
                 var columnIndex = summaryData.column.dataIndex;
                 //Проверяем, есть ли шаблон, и устанавливаем его
@@ -740,6 +754,7 @@ Ext.onReady(function () {
                     summaryData.record.data[columnIndex] = Ext.util.Format.number(summaryData.record.data[columnIndex], colMetaInfo.SHOWFORMAT)
                 }
                 if (colMetaInfo.COLTYPE == 'D') {
+                    
                     var format = colMetaInfo.SHOWFORMAT ? colMetaInfo.SHOWFORMAT : Ext.util.Format.dateFormat;
                     return Ext.util.Format.date(summaryData.record.data[columnIndex], format);
                 }
@@ -887,6 +902,7 @@ Ext.onReady(function () {
             }
             //форматирование числовых полей
             if (colMetaInfo.COLTYPE == "N" || colMetaInfo.COLTYPE == "E") {
+                
                 if (colMetaInfo.SHOWFORMAT) {
 
                     if (value < 0) {

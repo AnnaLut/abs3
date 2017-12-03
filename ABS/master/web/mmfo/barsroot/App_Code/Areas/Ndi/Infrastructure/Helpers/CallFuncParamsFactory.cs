@@ -35,6 +35,10 @@ public static class CallFuncParamsFactory<T> where  T : ParamMetaInfo ,new()
                 parMetaInfo = new T();
         }
 
+        if(typeof(T).Equals(typeof(ComplexParams)))
+        {
+            parMetaInfo = GetByKindParam(kind);
+        }
         SqlStatementParamsParser.ExecOptionsFromDictionary<T>(parMetaInfo, parOptions);
         return parMetaInfo;
     }
@@ -53,6 +57,10 @@ public static class CallFuncParamsFactory<T> where  T : ParamMetaInfo ,new()
             case "GET_FILE":
                 parMetaInfo = new GetFileParInfo() as T;
                 break;
+            case "DEF_VAL_BY_INSERT":
+                DefParam e = new DefParam();
+                e.Kind = "DEF_VAL_BY_INSERT";
+                return e as T;
             default:
                 parMetaInfo = new T();
                 break;
@@ -102,4 +110,12 @@ public static class CallFuncParamsFactory<T> where  T : ParamMetaInfo ,new()
         }
         return param;
     }
+
+    public static void BuildComplexParams(ComplexParams param)
+    {
+
+    }
+
+
 }
+

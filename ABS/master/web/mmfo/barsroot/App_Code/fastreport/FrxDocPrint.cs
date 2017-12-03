@@ -311,7 +311,7 @@ public class FrxDoc
             string m = e.InnerException != null ? e.InnerException.Message : e.Message;
             _dbLogger.Error(string.Format("FrxDoc:Print Message={0}", m), "FrxDoc");
             _dbLogger.Error(string.Format("FrxDoc:Print StackTrace={0}", e.StackTrace), "FrxDoc");
-            _dbLogger.Error(string.Format("FrxDoc:Print Count={0} TemplatePath={1}", _frxParameters != null ? _frxParameters.Count.ToString() : "0", TemplatePath), "FrxDoc");
+            _dbLogger.Error(string.Format("FrxDoc:Print Count={0} TemplatePath={1}", _frxParameters.Count.ToString(), TemplatePath), "FrxDoc");
             throw e;
             //HttpContext.Current.Response.Write(e.Message); :-)
         }

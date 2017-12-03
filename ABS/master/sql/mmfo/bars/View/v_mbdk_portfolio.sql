@@ -1,3 +1,5 @@
+
+
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_MBDK_PORTFOLIO.sql =========*** Run *
 PROMPT ===================================================================================== 
@@ -5,16 +7,15 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view V_MBDK_PORTFOLIO ***
 
-CREATE OR REPLACE VIEW V_MBDK_PORTFOLIO AS
-SELECT user_utl.get_user_name(m.userid) user_name,                      -- isp
+  CREATE OR REPLACE FORCE VIEW BARS.V_MBDK_PORTFOLIO ("USER_NAME", "OSTC", "OSTB", "OSTF", "KV", "NLS", "ZDATE", "SDATE", "WDATE", "RNK", "OKPO", "NMK", "CC_ID", "ND", "ACC", "LIMIT", "SROK", "OST_SROK", "VIDD", "TIPD", "KPROLOG", "BIC", "SWI_REF", "SWO_REF", "NLS_N", "RATN", "MDATE_N", "OSTCN", "OSTBN", "OSTFN", "ACR_DAT", "MFOKRED", "ACCKRED", "MFOPERC", "ACCPERC", "S_1819", "BUH", "RAH", "PROSTR", "GPK", "REPO", "ZAL", "ZAL1") AS 
+  SELECT user_utl.get_user_name(m.userid) user_name,                      -- isp
        m.ostc / POWER (10, 2) ostc,                             -- ost body
        m.ostb / POWER (10, 2) ostb,                         -- план по тілу
        m.ostf / POWER (10, 2) ostf,                    -- майбутній по тілу
        m.kv,                                                      -- валюта
        m.nls,                                               -- рахунок тіла
-       m.ddate,                                          -- дата заключення
-       m.zdate,                                             -- дата початку
-       m.sdate,                                              --Дата виплати
+       m.zdate,                                         -- датьа заключення
+       m.sdate,                                              --Дата початку
        m.wdate,                                          -- Дата закінчення
        m.rnk,                                                        -- РНК
        m.okpo,                                                    -- ЄДРПОУ
@@ -33,7 +34,6 @@ SELECT user_utl.get_user_name(m.userid) user_name,                      -- isp
        m.swo_ref,                                          -- Реф вихідного
        m.nls_n,                                               -- Рахунок %%
        acrN.fprocN (m.acc, m.dk, bankdate) ratn,                --%% ставка
-       m.IRR ,                                               --еф.%% ставка
        m.mdate_n,                                      -- Дата погашення %%
        m.ostc_n / POWER (10, 2) ostcn,                        -- Залишок %%
        m.ostb_n / POWER (10, 2) ostbn,
@@ -50,13 +50,7 @@ SELECT user_utl.get_user_name(m.userid) user_name,                      -- isp
        'Перегляд' GPK,
        'Перегляд' REPO,
        'zal' zal,
-       case when (select count(*) from cc_accp p where p.accs = m.acc) = 0 then 0 else 1 end ZAL1,
-       CODE_PRODUCT,
-       NAME_PRODUCT,
-       NBS,
-       OB22,
-       N_NBU,
-       D_NBU
+       case when (select count(*) from cc_accp p where p.accs = m.acc) = 0 then 0 else 1 end ZAL1
 FROM   mbd_k m
 ORDER BY m.nd DESC;
 

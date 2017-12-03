@@ -78,7 +78,7 @@ end if;
        SELECT * INTO dd FROM cc_deal WHERE nd = l_nd;
         IF dd.vidd in (1211,1510,1511,1512,1515,1517,1521,1522,1523,1524,1526,1527) THEN  --(АКТИВ)
             l_tipD := 1 ; ----1=Розміщення (актив)
-            SELECT a.acc  INTO acc8_  FROM accounts a, nd_acc n    WHERE n.nd = dd.nd      AND a.acc = n.acc
+            SELECT a.acc  INTO acc8_  FROM accounts a, nd_acc n    WHERE n.nd = dd.nd      AND a.acc = n.acc  
             and(a.nls LIKE '1211%' or a.nls LIKE '1510%' or a.nls LIKE '1511%' or a.nls LIKE '1512%' or a.nls LIKE '1515%'or a.nls LIKE '1517%'
             or a.nls LIKE '1521%' or a.nls LIKE '1522%' or a.nls LIKE '1523%' or a.nls LIKE '1524%' or a.nls LIKE '1526%' or a.nls LIKE '1527%');
         else
@@ -162,11 +162,11 @@ end if;
   if p_ob22 is not null then       accreg.setAccountSParam(az.acc, 'OB22', p_ob22); end if;
 
   BEGIN    SELECT * INTO az FROM accounts WHERE acc = az.acc;
-  EXCEPTION    WHEN no_data_found THEN
+  EXCEPTION    WHEN no_data_found THEN 
          raise_application_error(g_errn  ,g_errs || 'Не знайдено рах.забезп.асс=' ||     az.acc);
   END;
 
-  If l_tipD in (1,2)  then   --insert в cc_accp
+  If l_tipD in (1,2)  then   --insert в cc_accp  
 
      INSERT INTO cc_accp (ACC,   ACCS,       pr_12,     nd )
                 select az.acc, x.accs, nvl(p_pr_12,1), x.nd
@@ -177,7 +177,7 @@ end if;
      ----Связать счет займа и счет обеспечения не только для АКТ , но и для ПАСС --==========
      FOR k IN (SELECT *  FROM accounts  WHERE accc = acc8_  OR acc = l_accs)
      LOOP    p_pawn_nd(l_nd,az.acc,az.ob22,k.acc,NULL,p_nree,p_cc_idz,p_sdatz,p_mdate,NULL,p_sv,p_depid,p_pr_12,p_pawn);
-      END LOOP;*/
+      END LOOP;*/           
   end if;
 
   -------------===========================================================================
