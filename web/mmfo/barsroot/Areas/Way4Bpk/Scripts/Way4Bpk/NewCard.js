@@ -5,8 +5,8 @@
 var VALUE_LABEL_CLASS = "label label-primary";  //alert alert-success
 var G_CUSTTYPE_CLAUSE = {
     1: " custtype = 3 and sed <> '91  '",        //FO
-    2: "",                         //UO
-    3: ""                          //SPD
+    2: " custtype = 2",                         //UO
+    3: " custtype = 3"                          //SPD
 };
 var checkNullArr = ["W4_PRODUCT_GROUPS_REF", "GBPKW4PROECT_REF", "GBPKW4PRODUCT_REF", "GBPKW4CARD_REF"];
 
@@ -17,19 +17,7 @@ var IS_DEBUG = false;
 function print(o) {	if(IS_DEBUG){console.log(o);}}
 function isEmpty(s) { return s === undefined || s === null || s === ""; }
 
-function getCusttype() {
-    var custtype = bars.extension.getParamFromUrl('custtype');
-    if(isEmpty(custtype)){
-        custtype = 1;       // 1 - FO, 2 - UO, 3 - SPD
-    }
-    return parseInt(custtype);
-}
-
 function getUrlNewCard(isKievCard, rnk, proectId, cardCode) {
-    if(getCusttype() === 2){
-        return "/barsroot/barsweb/dynform.aspx?form=bpkw4.frm.newdeal_uo&rnk=" + rnk + "&proect_id=" + proectId +
-            "&card_code=" + cardCode;
-    }
     if(isKievCard){
         return "/barsroot/cardkiev/cardkievparams.aspx?form=bpkw4.ref.card&rnk=" + rnk + "&proect_id=" + proectId +
             "&card_code=" + cardCode + "&card_kiev=1";
@@ -104,7 +92,7 @@ var REFER_SETTINGS = {
         }
     },
     GBPKW4CUSTOMER_REF: {
-        tabName: getCusttype() === 1 ? "v_bpk_customer" : "v_bpk_customer_uo",
+        tabName: "v_bpk_customer",
         whereClause: function () {
             var where = "WHERE";
             var newCardRnk = $("#newCardRnk").val();
@@ -120,14 +108,14 @@ var REFER_SETTINGS = {
                 if(!isEmpty(newCardRnk) || !isEmpty(newCardIpn)){where+=" and";}
                 where += (" upper(nmk) like '%'|| upper('" + newCardPib + "')||'%' ");
             }
+            if(!isEmpty(newCardRnk) || !isEmpty(newCardIpn) || !isEmpty(newCardPib)){where+=" and";}
 
-            var w = G_CUSTTYPE_CLAUSE[getCusttype()];
-            if(!isEmpty(w)){
-                if(where !== "WHERE"){ where += " and "; }
-                where += w;
+            var custtype = bars.extension.getParamFromUrl('custtype');
+            if(isEmpty(custtype)){
+                custtype = 1;       // 1 - FO, 2 - UO, 3 - SPD
             }
+            where += G_CUSTTYPE_CLAUSE[custtype];
 
-            if(where === "WHERE"){ where = ""; }
             return where;
         },
         fields: "RNK,OKPO,CTYPE,NMK,PK_NAME,ADR,DOC,ISSUER",
@@ -142,19 +130,8 @@ var REFER_SETTINGS = {
         }
     }
 };
-var REFER_SETTINGS_UO_FIXED = ['W4_PRODUCT_GROUPS_REF', 'GBPKW4PROECT_REF'];
 
 function prepareNewCard() {
-    if(getCusttype() === 2){
-        g_deal[REFER_SETTINGS['W4_PRODUCT_GROUPS_REF'].deal] = "CORPORATE";
-        g_deal[REFER_SETTINGS['GBPKW4PROECT_REF'].deal] = -1;
-
-        for(var j = 0; j < REFER_SETTINGS_UO_FIXED.length; j++){
-            $("#fo_" + REFER_SETTINGS_UO_FIXED[j]).hide();
-            $("#fo_val_" + REFER_SETTINGS_UO_FIXED[j]).hide();
-        }
-    }
-
     uiEnabled(["W4_PRODUCT_GROUPS_REF", "GBPKW4CUSTOMER_REF"], true);
 
     for(var i = checkNullArr.length-1; i > 0; i--){

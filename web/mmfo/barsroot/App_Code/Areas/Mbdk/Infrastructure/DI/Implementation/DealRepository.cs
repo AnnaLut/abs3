@@ -20,12 +20,9 @@ namespace BarsWeb.Areas.Mbdk.Infrastructure.DI.Implementation
             if (!string.IsNullOrEmpty(megamodel.colSummaZ))
                 SavePledgeSumm(megamodel.colSummaZ);
 
-            #region check dates
             DateTime colDatDU;
             DateTime colDatDV;
             DateTime dDatEnd;
-            DateTime dDateConclusion;
-            DateTime? dNbuRegDate;
             if (!DateTime.TryParseExact(megamodel.colDatDV, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out colDatDU))
                 throw new Exception("Невірний формат дати!");
 
@@ -35,24 +32,9 @@ namespace BarsWeb.Areas.Mbdk.Infrastructure.DI.Implementation
             if (!DateTime.TryParseExact(megamodel.colDatEndDog, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out dDatEnd))
                 throw new Exception("Невірний формат дати!");
 
-            if (!DateTime.TryParseExact(megamodel.colDatConclusion, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out dDateConclusion))
-                throw new FormatException("Невірний формат дати фактичного заключення договору!");
-
-            if (string.IsNullOrWhiteSpace(megamodel.colNbuRegDate))
-                dNbuRegDate = null;
-            else
-            {
-                DateTime tmpNbuDate;
-                if (!DateTime.TryParseExact(megamodel.colNbuRegDate, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out tmpNbuDate))
-                    throw new FormatException("Невірний формат дати реєстрації в НБУ!");
-                dNbuRegDate = (DateTime?)tmpNbuDate;
-            }
-            #endregion
-
             using (var connection = OraConnector.Handler.UserConnection)
             {
                 var p = new DynamicParameters();
-                // need to add new input parameters here, after DB side will be ready
                 #region DONT OPEN
                 p.Add("CC_ID_", megamodel.CC_ID, DbType.String, ParameterDirection.Input);
                 p.Add("nVidd_", megamodel.nVidd, DbType.Decimal, ParameterDirection.Input);
@@ -101,69 +83,18 @@ namespace BarsWeb.Areas.Mbdk.Infrastructure.DI.Implementation
                 p.Add("IntPartyB_", null);
                 p.Add("IntIntermA_", null);
                 p.Add("IntIntermB_", null);
-
-                #region new parameters
-                p.Add("DDAte_", dDateConclusion, DbType.DateTime, ParameterDirection.Input);
-                p.Add("IRR_", megamodel.irr, DbType.Decimal, ParameterDirection.Input);
-                p.Add("code_product_", megamodel.productCode, DbType.Int32, ParameterDirection.Input);
-                p.Add("n_nbu_", megamodel.n_nbu, DbType.String, ParameterDirection.Input);
-                p.Add("d_nbu_", dNbuRegDate, DbType.DateTime, ParameterDirection.Input);
-                #endregion
-
                 p.Add("ND_", dbType: DbType.Int64, direction: ParameterDirection.Output);
                 p.Add("ACC1_", dbType: DbType.Int64, direction: ParameterDirection.Output);
                 p.Add("sErr_", dbType: DbType.String, direction: ParameterDirection.Output, size: 32767);
                 #endregion
-                connection.Execute("BARS.MBK.inp_deal_Ex", p, commandType: CommandType.StoredProcedure);
+                connection.Execute("BARS.MBK.inp_deal", p, commandType: CommandType.StoredProcedure);
 
-                var nd = p.Get<long?>("ND_");
-                var acc = p.Get<long?>("ACC1_");
+                var nd = p.Get<Int64?>("ND_");
+                var acc = p.Get<Int64?>("ACC1_");
                 var error = p.Get<string>("sErr_");
                 var resultObj = new { nd, acc, error };
                 return resultObj;
             }
-        }
-
-        public UpdateDealResponse UpdateDeal(SaveDealParam model)
-        {
-            UpdateDealResponse res = new UpdateDealResponse() { error = "", result = "OK" };
-            try
-            {
-                DateTime dDateConclusion;
-                if (!DateTime.TryParseExact(model.colDatConclusion, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out dDateConclusion))
-                    throw new FormatException("Невірний формат дати фактичного заключення договору!");
-
-                DateTime? dNbuRegDate;
-                if (string.IsNullOrWhiteSpace(model.colNbuRegDate))
-                    dNbuRegDate = null;
-                else
-                {
-                    DateTime tmpNbuDate;
-                    if (!DateTime.TryParseExact(model.colNbuRegDate, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out tmpNbuDate))
-                        throw new FormatException("Невірний формат дати реєстрації в НБУ!");
-                    dNbuRegDate = (DateTime?)tmpNbuDate;
-                }
-
-                using (var connection = OraConnector.Handler.UserConnection)
-                {
-                    var p = new DynamicParameters();
-                    p.Add("p_nd", model.nd, DbType.String, ParameterDirection.Input);
-                    p.Add("p_sdate", dDateConclusion, DbType.DateTime, ParameterDirection.Input);
-                    p.Add("p_prod", model.productCode, DbType.String, ParameterDirection.Input);
-                    p.Add("p_n_nbu", model.n_nbu, DbType.String, ParameterDirection.Input);
-                    p.Add("p_d_nbu", dNbuRegDate, DbType.DateTime, ParameterDirection.Input);
-
-                    connection.Execute("BARS.MBK.upd_cc_deal", p, commandType: CommandType.StoredProcedure);
-                    //procedure upd_cc_deal (p_nd number, p_sdate date, p_prod varchar2, p_n_nbu varchar2);
-                }
-            }
-            catch (Exception ex)
-            {
-                res.error = ex.Message;
-                res.result = "ERROR";
-            }
-
-            return res;
         }
 
         public decimal DealSum(SummInfo model)
@@ -188,8 +119,7 @@ namespace BarsWeb.Areas.Mbdk.Infrastructure.DI.Implementation
 
                 command.ExecuteNonQuery();
 
-                OracleDecimal res = (OracleDecimal)estimatedAmountParameter.Value;
-                if (!res.IsNull)
+                if (estimatedAmountParameter.Value != null)
                     return ((OracleDecimal)estimatedAmountParameter.Value).Value;
 
                 return 0;
@@ -208,11 +138,11 @@ namespace BarsWeb.Areas.Mbdk.Infrastructure.DI.Implementation
                                        d.a_nls, d.a_kv, t.lcv, d.b_nls, d.refp,
                                        d.acckred, d.accperc, d.mfokred, d.mfoperc, 
                                        d.rnk, d.nmk, d.okpo, d.mfo, d.bic, d.kod_b, d.num_nd,
-                                       d.swi_bic, d.swi_acc, d.swo_bic, d.swo_acc, d.alt_partyb, t.dig,
-                                       d.irr, d.date_b, d.code_product, d.name_product, d.n_nbu, d.nd, d.d_nbu
+                                       d.swi_bic, d.swi_acc, d.swo_bic, d.swo_acc, d.alt_partyb, t.dig
                                 FROM mbk_deal d, tabval t
                                 WHERE d.nd   = :ND
                                 AND d.a_kv = t.kv ";
+
 
                 var model = connection.Query<Deal>(sql, new { ND }).SingleOrDefault();
                 if (model == null)
@@ -241,11 +171,11 @@ namespace BarsWeb.Areas.Mbdk.Infrastructure.DI.Implementation
         }
 
         public IQueryable<Currency> GetCurrency()
-        {
+        {                
             using (OracleConnection connection = OraConnector.Handler.UserConnection)
             {
                 var sql = @"select kv, name lcv from v_mbdk_currency order by kv desc";
-                return connection.Query<Currency>(sql).AsQueryable();
+                return connection.Query<Currency>(sql).AsQueryable();                
             }
         }
 
