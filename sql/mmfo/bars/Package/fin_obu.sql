@@ -116,10 +116,9 @@
 								 
 								 
 	FUNCTION   CALC_POK_DOP (kod_ IN  char,
-                             dat_   IN  date default aDAT_,   
-                             okpo_  IN  int default aOKPO_,
-					         p_type in  int default 1
-					         )
+                       dat_ IN  date default aDAT_,   
+                       okpo_ IN  int default aOKPO_
+					   )
 	return number;
 						 
     FUNCTION   CALC_POK (kod_ IN  char,
@@ -1044,29 +1043,15 @@ end if;
 END record_fp_ND_date;
 
 
-   FUNCTION   CALC_POK_DOP (kod_    IN  char,
-                            dat_    IN  date default aDAT_,
-                            okpo_   IN  int default aOKPO_,
-							p_type in  int default 1
-					        )
+   FUNCTION   CALC_POK_DOP (kod_ IN  char,
+                       dat_ IN  date default aDAT_,
+                       okpo_ IN  int default aOKPO_
+					   )
 	return number is
 	
 	FZ_ varchar2(1); --Форма звітності
-	p_type_  number := p_type; -- 1 агрегований(квартальний) 2- накопичувальний агрегований
 	
-function l_zvt (p_okpo number, p_dat date ) return number result_cache
-as
-begin
-
-  init1(OKPO_ => p_okpo, 
-        DAT_  => p_dat);
-
-   return  g_period;		
-		
-end;	
-
-	
-Begin
+	Begin
 	
 	
 	fin_nbu.aDAT_ :=DAT_;
@@ -1074,12 +1059,7 @@ Begin
 	
 	FZ_    := fin_nbu.F_FM (OKPO_, DAT_ ) ;
 
-	if l_zvt(OKPO_, DAT_)  = 12
-	  then  p_type_ := 2;
-	end if;
-	
- 
-
+Begin
 	if kod_ = 'FR1' then
 	--Виручка від реалізації продукції    FR1
 			IF FZ_ = 'N' or FZ_ in ('R','C') THEN
@@ -1218,7 +1198,7 @@ Begin
 			       return fin_nbu.ZN_FDK('140',dat_, okpo_) + fin_nbu.ZN_FDK('260',dat_, okpo_) + fin_nbu.ZN_FDK('170',dat_, okpo_) - fin_nbu.ZN_FDK('175',dat_, okpo_);
 			ElsIF FZ_ in ('R','C') THEN
 			       --return fin_nbu.ZN_FDK('2350',dat_, okpo_) + fin_nbu.ZN_FDK('2300',dat_, okpo_)+ (fin_nbu.ZN_F1('1012',4, dat_, OKPO_)-fin_nbu.ZN_F1('1012', 4,add_months(trunc( DAT_),-12), OKPO_))/4+fin_nbu.ZN_FDK('3001',dat_, okpo_);
-				   return fin_nbu.ZN_F2('2350',3,dat_, okpo_) + fin_nbu.ZN_F2('2300',3,dat_, okpo_)+ (fin_nbu.ZN_F1('1012',4, dat_, OKPO_)-fin_nbu.ZN_F1('1012', 4,add_months(trunc( DAT_),-12), OKPO_))+fin_nbu.ZN_F2('2250',3,dat_, okpo_);
+				   return fin_nbu.ZN_F2('2350',3,dat_, okpo_) + fin_nbu.ZN_F2('2300',3,dat_, okpo_)+ (fin_nbu.ZN_F1('1012',4, dat_, OKPO_)-fin_nbu.ZN_F1('1012', 4,add_months(trunc( DAT_),-12), OKPO_))+fin_nbu.ZN_F2('3001',3,dat_, okpo_);
 				   
 		    ELSE
 			       return  fin_nbu.ZN_F2('130',3,dat_, okpo_) + (fin_nbu.ZN_F1('032',4, dat_, OKPO_)-fin_nbu.ZN_F1('032', 4,add_months(trunc( DAT_),-12), OKPO_)) +  (fin_nbu.ZN_F1('037',4, dat_, OKPO_)-fin_nbu.ZN_F1('037',4,add_months(trunc( DAT_),-12), OKPO_));
@@ -1466,553 +1446,16 @@ Begin
 			      return fin_nbu.ZN_F1('640',4,dat_, okpo_);
 			END IF;
 
-	 -- 09/2017  Новий агрегований баланс
-	    	-- p_type_ - 1 агрегований(квартальний) 2- накопичувальний агрегований
-
-	  
-	    /* AZ1	1	Виручка від реалізації продукції (квартальна)*/
-    elsif 	kod_ = 'AZ1' and p_type_ = 1 then
-            Case
-  				when FZ_ = 'N'         then return fin_nbu.ZN_FDK('2000',dat_, okpo_) + fin_nbu.ZN_FDK('2010',dat_, okpo_);
- 			    when FZ_ in ('R','C')  then return fin_nbu.ZN_FDK('2000', dat_, okpo_);
-					                   else return null;
-			end case; 
-		/* AZ1	1	Виручка від реалізації продукції(кумулятивна) */
-    elsif 	kod_ = 'AZ1' and p_type_ = 2 then
-	        Case
-			   when FZ_ = 'N'         then return fin_nbu.ZN_F2('2000',3,dat_, okpo_) + fin_nbu.ZN_F2('2010',3,dat_, okpo_);
- 			   when FZ_ in ('R','C')  then return fin_nbu.ZN_F2('2000',3,dat_, okpo_);
-			 		                  else return null;
-			End case; 
-
-	    /* AZ2	2	Собівартість реалізованої продукції (квартальна)*/
-    elsif 	kod_ = 'AZ2' and p_type_ = 1 then
-            Case
-  				when FZ_ = 'N'         then return fin_nbu.ZN_FDK('2050',dat_, okpo_) + fin_nbu.ZN_FDK('2070',dat_, okpo_);
- 			    when FZ_ in ('R','C')  then return fin_nbu.ZN_FDK('2050', dat_, okpo_);
-					                   else return null;
-			end case; 
-		/* AZ2	2	Собівартість реалізованої продукції(кумулятивна) */
-    elsif 	kod_ = 'AZ2' and p_type_ = 2 then
-	        Case
-			   when FZ_ = 'N'         then return fin_nbu.ZN_F2('2050',3,dat_, okpo_) + fin_nbu.ZN_F2('2070',3,dat_, okpo_);
- 			   when FZ_ in ('R','C')  then return fin_nbu.ZN_F2('2050',3,dat_, okpo_);
-			 		                  else return null;
-			End case; 			
-	
-        /* AZ3	3	Валовий прибуток / збиток  (квартальна)*/	
-    elsif 	kod_ = 'AZ3' and p_type_ = 1 then
-            Case
-  				when FZ_ = 'N'         then return fin_nbu.ZN_FDK('2090',dat_, okpo_) - fin_nbu.ZN_FDK('2095',dat_, okpo_);
- 			    when FZ_ in ('R','C')  then return fin_nbu.ZN_FDK('2000',dat_, okpo_) - fin_nbu.ZN_FDK('2050',dat_, okpo_);
-					                   else return null;
-			end case; 
-		/* AZ3	3	Валовий прибуток / збиток  (кумулятивна) */
-    elsif 	kod_ = 'AZ3' and p_type_ = 2 then
-	        Case
-			   when FZ_ = 'N'         then return fin_nbu.ZN_F2('2090',3,dat_, okpo_) - fin_nbu.ZN_F2('2095',3,dat_, okpo_);
- 			   when FZ_ in ('R','C')  then return fin_nbu.ZN_F2('2000',3,dat_, okpo_) - fin_nbu.ZN_F2('2050',3,dat_, okpo_);
-			 		                  else return null;
-			End case; 				
-	
-        /* AZ4	4	Інші операційні доходи (квартальна)   2105 та 2110 беруть участь у розрахунку цього рядка за умови, що їх значення >0*/	 
-    elsif 	kod_ = 'AZ4' and p_type_ = 1 then
-            Case
-  				when FZ_ = 'N'         then return fin_nbu.ZN_FDK('2120',dat_, okpo_) + greatest(fin_nbu.ZN_FDK('2105',dat_, okpo_),0) + greatest(fin_nbu.ZN_FDK('2110',dat_, okpo_),0);
- 			    when FZ_ in ('R','C')  then return fin_nbu.ZN_FDK('2120',dat_, okpo_);
-					                   else return null;
-			end case; 
-		/* AZ4	4	Інші операційні доходи  (кумулятивна) */
-    elsif 	kod_ = 'AZ4' and p_type_ = 2 then
-	        Case
-			   when FZ_ = 'N'         then return fin_nbu.ZN_F2('2120',3,dat_, okpo_) + greatest(fin_nbu.ZN_F2('2105',3,dat_, okpo_),0) + greatest(fin_nbu.ZN_F2('2110',3,dat_, okpo_),0);
- 			   when FZ_ in ('R','C')  then return fin_nbu.ZN_F2('2120',3,dat_, okpo_);
-			 		                  else return null;
-			End case; 				
-
-        /* AZ5	5	Адміністративні витрати (квартальна)*/	
-    elsif 	kod_ = 'AZ5' and p_type_ = 1 then
-            Case
-  				when FZ_ = 'N'         then return fin_nbu.ZN_FDK('2130',dat_, okpo_);
- 			    when FZ_ in ('R','C')  then return null;
-					                   else return null;
-			end case; 
-		/* AZ5	5	Адміністративні витрати (кумулятивна) */
-    elsif 	kod_ = 'AZ5' and p_type_ = 2 then
-	        Case
-			   when FZ_ = 'N'         then return fin_nbu.ZN_F2('2130',3,dat_, okpo_);
- 			   when FZ_ in ('R','C')  then return null;
-			 		                  else return null;
-			End case; 	
-
-        /* AZ6	6	Витрати на збут (квартальна)*/	
-    elsif 	kod_ = 'AZ6' and p_type_ = 1 then
-            Case
-  				when FZ_ = 'N'         then return fin_nbu.ZN_FDK('2150',dat_, okpo_);
- 			    when FZ_ in ('R','C')  then return null;
-					                   else return null;
-			end case; 
-		/* AZ6	6	Витрати на збут (кумулятивна) */
-    elsif 	kod_ = 'AZ6' and p_type_ = 2 then
-	        Case
-			   when FZ_ = 'N'         then return fin_nbu.ZN_F2('2150',3,dat_, okpo_);
- 			   when FZ_ in ('R','C')  then return null;
-			 		                  else return null;
-			End case; 	
-
-        /* AZ7	7	Інші операційні витрати (квартальна)*/	
-    elsif 	kod_ = 'AZ7' and p_type_ = 1 then
-            Case
-  				when FZ_ = 'N'         then return fin_nbu.ZN_FDK('2180',dat_, okpo_) + abs(least(fin_nbu.ZN_FDK('2105',dat_, okpo_),0)) + abs(least(fin_nbu.ZN_FDK('2110',dat_, okpo_),0));
- 			    when FZ_ in ('R','C')  then return fin_nbu.ZN_FDK('2180',dat_, okpo_);
-					                   else return null;
-			end case; 
-		/* AZ7	7	Інші операційні витрати  (кумулятивна) */
-    elsif 	kod_ = 'AZ7' and p_type_ = 2 then
-	        Case
-			   when FZ_ = 'N'         then return fin_nbu.ZN_F2('2180',3,dat_, okpo_) + abs(least(fin_nbu.ZN_F2('2105',3,dat_, okpo_),0)) + abs(least(fin_nbu.ZN_F2('2110',3,dat_, okpo_),0));
- 			   when FZ_ in ('R','C')  then return fin_nbu.ZN_F2('2180',3,dat_, okpo_);
-			 		                  else return null;
-			End case; 
-
-        /* AZ8	8	Операційний прибуток / збиток  (квартальна)*/	
-    elsif 	kod_ = 'AZ8' and p_type_ = 1 then
-            Case
-  				when FZ_ = 'N'         then return fin_nbu.ZN_FDK('2190',dat_, okpo_) - fin_nbu.ZN_FDK('2195',dat_, okpo_);
- 			    when FZ_ in ('R','C')  then return fin_nbu.ZN_FDK('2000',dat_, okpo_) - fin_nbu.ZN_FDK('2050',dat_, okpo_) + fin_nbu.ZN_FDK('2120',dat_, okpo_) - fin_nbu.ZN_FDK('2180',dat_, okpo_);
-					                   else return null;
-			end case; 
-		/* AZ8	8	Операційний прибуток / збиток (кумулятивна) */
-    elsif 	kod_ = 'AZ8' and p_type_ = 2 then
-	        Case
-			   when FZ_ = 'N'         then return fin_nbu.ZN_F2('2190',3,dat_, okpo_) - fin_nbu.ZN_F2('2195',3,dat_, okpo_);
- 			   when FZ_ in ('R','C')  then return fin_nbu.ZN_F2('2000',3,dat_, okpo_) - fin_nbu.ZN_F2('2050',3,dat_, okpo_) + fin_nbu.ZN_F2('2120',3,dat_, okpo_) - fin_nbu.ZN_F2('2180',3,dat_, okpo_);
-			 		                  else return null;
-			End case; 
-
-        /* AZ9	9	Фінансові доходи (квартальна)*/	
-    elsif 	kod_ = 'AZ9' and p_type_ = 1 then
-            Case
-  				when FZ_ = 'N'         then return fin_nbu.ZN_FDK('2220',dat_, okpo_);
- 			    when FZ_ in ('R','C')  then return null;
-					                   else return null;
-			end case; 
-		/* AZ9	9	Фінансові доходи (кумулятивна) */
-    elsif 	kod_ = 'AZ9' and p_type_ = 2 then
-	        Case
-			   when FZ_ = 'N'         then return fin_nbu.ZN_F2('2220',3,dat_, okpo_);
- 			   when FZ_ in ('R','C')  then return null;
-			 		                  else return null;
-			End case; 
-
-        /* AZ10	10	Фінансові витрати (квартальна)*/	
-    elsif 	kod_ = 'AZ10' and p_type_ = 1 then
-            Case
-  				when FZ_ = 'N'         then return fin_nbu.ZN_FDK('2250',dat_, okpo_);
- 			    when FZ_ in ('R','C')  then return fin_nbu.ZN_FDK('2250',dat_, okpo_);
-					                   else return null;
-			end case; 
-		/* AZ10	10	Фінансові витрати (кумулятивна) */
-    elsif 	kod_ = 'AZ10' and p_type_ = 2 then
-	        Case
-			   when FZ_ = 'N'         then return fin_nbu.ZN_F2('2250',3,dat_, okpo_);
- 			   when FZ_ in ('R','C')  then return fin_nbu.ZN_F2('2250',3,dat_, okpo_);
-			 		                  else return null;
-			End case; 
-
-        /* AZ11	11	Результат від участі в капіталі (квартальна)*/	
-    elsif 	kod_ = 'AZ11' and p_type_ = 1 then
-            Case
-  				when FZ_ = 'N'         then return fin_nbu.ZN_FDK('2200',dat_, okpo_) - fin_nbu.ZN_FDK('2255',dat_, okpo_);
- 			    when FZ_ in ('R','C')  then return null;
-					                   else return null;
-			end case; 
-		/* AZ11	11	Результат від участі в капіталі (кумулятивна) */
-    elsif 	kod_ = 'AZ11' and p_type_ = 2 then
-	        Case
-			   when FZ_ = 'N'         then return fin_nbu.ZN_F2('2200',3,dat_, okpo_) - fin_nbu.ZN_F2('2250',3,dat_, okpo_);
- 			   when FZ_ in ('R','C')  then return null;
-			 		                  else return null;
-			End case; 				
-
-        /* AZ12	12	Інші доходи (квартальна)*/	
-    elsif 	kod_ = 'AZ12' and p_type_ = 1 then
-            Case
-  				when FZ_ = 'N'         then return fin_nbu.ZN_FDK('2240',dat_, okpo_) + greatest(fin_nbu.ZN_FDK('2275',dat_, okpo_),0);
- 			    when FZ_ in ('R','C')  then return fin_nbu.ZN_FDK('2240',dat_, okpo_);
-					                   else return null;
-			end case; 
-		/* AZ12	12	Інші доходи  (кумулятивна) */
-    elsif 	kod_ = 'AZ12' and p_type_ = 2 then
-	        Case
-			   when FZ_ = 'N'         then return fin_nbu.ZN_F2('2240',3,dat_, okpo_) + greatest(fin_nbu.ZN_F2('2275',3,dat_, okpo_),0);
- 			   when FZ_ in ('R','C')  then return fin_nbu.ZN_F2('2240',3,dat_, okpo_);
-			 		                  else return null;
-			End case; 
-
-        /* AZ13	13	Інші витрати (квартальна)*/	
-    elsif 	kod_ = 'AZ13' and p_type_ = 1 then
-            Case
-  				when FZ_ = 'N'         then return fin_nbu.ZN_FDK('2270',dat_, okpo_) - least(fin_nbu.ZN_FDK('2275',dat_, okpo_),0);
- 			    when FZ_ in ('R','C')  then return fin_nbu.ZN_FDK('2270',dat_, okpo_);
-					                   else return null;
-			end case; 
-		/* AZ13	13	Інші витрати  (кумулятивна) */
-    elsif 	kod_ = 'AZ13' and p_type_ = 2 then
-	        Case
-			   when FZ_ = 'N'         then return fin_nbu.ZN_F2('2270',3,dat_, okpo_) - least(fin_nbu.ZN_F2('2275',3,dat_, okpo_),0);
- 			   when FZ_ in ('R','C')  then return fin_nbu.ZN_F2('2270',3,dat_, okpo_);
-			 		                  else return null;
-			End case; 
-
-        /* AZ14	14	Чистий прибуток / збиток від курсових різниць (квартальна)*/	
-    elsif 	kod_ = 'AZ14' and p_type_ = 1 then
-            Case
-  				when FZ_ = 'N'         then return fin_nbu.ZN_FDK('2410',dat_, okpo_);
- 			    when FZ_ in ('R','C')  then return null;
-					                   else return null;
-			end case; 
-		/* AZ14	14	Чистий прибуток / збиток від курсових різниць  (кумулятивна) */
-    elsif 	kod_ = 'AZ14' and p_type_ = 2 then
-	        Case
-			   when FZ_ = 'N'         then return fin_nbu.ZN_F2('2410',3,dat_, okpo_);
- 			   when FZ_ in ('R','C')  then return null;
-			 		                  else return null;
-			End case; 
-
-        /* AZ15	15	Прибуток / збиток до оподаткування  (квартальна)*/	
-    elsif 	kod_ = 'AZ15' and p_type_ = 1 then
-            Case
-  				when FZ_ = 'N'         then return fin_nbu.ZN_FDK('2290',dat_, okpo_) - fin_nbu.ZN_FDK('2295',dat_, okpo_) + fin_nbu.ZN_FDK('2305',dat_, okpo_);
- 			    when FZ_ in ('R','C')  then return fin_nbu.ZN_FDK('2290',dat_, okpo_);
-					                   else return null;
-			end case; 
-		/* AZ15	15	Прибуток / збиток до оподаткування  (кумулятивна)*/
-    elsif 	kod_ = 'AZ15' and p_type_ = 2 then
-	        Case
-			   when FZ_ = 'N'         then return fin_nbu.ZN_F2('2290',3,dat_, okpo_) - fin_nbu.ZN_F2('2295',3,dat_, okpo_) + fin_nbu.ZN_F2('2305',3,dat_, okpo_);
- 			   when FZ_ in ('R','C')  then return fin_nbu.ZN_F2('2290',3,dat_, okpo_) ;
-			 		                  else return null;
-			End case; 
-
-        /* AZ16	16	Податки (квартальна)*/	
-    elsif 	kod_ = 'AZ16' and p_type_ = 1 then
-            Case
-  				when FZ_ = 'N'         then return fin_nbu.ZN_FDK('2300',dat_, okpo_);
- 			    when FZ_ in ('R','C')  then return fin_nbu.ZN_FDK('2300',dat_, okpo_);
-					                   else return null;
-			end case; 
-		/* AZ16	16	Податки  (кумулятивна)*/
-    elsif 	kod_ = 'AZ16' and p_type_ = 2 then
-	        Case
-			   when FZ_ = 'N'         then return fin_nbu.ZN_F2('2300',3,dat_, okpo_);
- 			   when FZ_ in ('R','C')  then return fin_nbu.ZN_F2('2300',3,dat_, okpo_) ;
-			 		                  else return null;
-			End case; 
-
-        /* AZ17	17	Чистий прибуток / збиток (квартальна)*/	
-    elsif 	kod_ = 'AZ17' and p_type_ = 1 then
-            Case
-  				when FZ_ = 'N'         then return fin_nbu.ZN_FDK('2350',dat_, okpo_)-fin_nbu.ZN_FDK('2355',dat_, okpo_);
- 			    when FZ_ in ('R','C')  then return fin_nbu.ZN_FDK('2350',dat_, okpo_);
-					                   else return null;
-			end case; 
-		/* AZ17	17	Чистий прибуток / збиток  (кумулятивна)*/
-    elsif 	kod_ = 'AZ17' and p_type_ = 2 then
-	        Case
-			   when FZ_ = 'N'         then return fin_nbu.ZN_F2('2350',3,dat_, okpo_)-fin_nbu.ZN_F2('2355',3,dat_, okpo_);
- 			   when FZ_ in ('R','C')  then return fin_nbu.ZN_F2('2350',3,dat_, okpo_) ;
-			 		                  else return null;
-			End case; 
-		
-		
-        /* AZ18	18	Амортизація (квартальна)*/	
-    elsif 	kod_ = 'AZ18' and p_type_ = 1 then
-            Case
-  				when FZ_ = 'N'         then return fin_nbu.ZN_FDK('2515',dat_, okpo_);
- 			    when FZ_ in ('R','C')  then return null;
-					                   else return null;
-			end case; 
-		/* AZ18	18	Амортизація (кумулятивна)*/
-    elsif 	kod_ = 'AZ18' and p_type_ = 2 then
-	        Case
-			   when FZ_ = 'N'         then return fin_nbu.ZN_F2('2515',3,dat_, okpo_);
- 			   when FZ_ in ('R','C')  then return null;
-			 		                  else return null;
-			End case; 			
-
---***********************************Агрегований баланс АКТИВ ********************************************************
-		/* AB1	1	Активи  */
-         elsif 	kod_ = 'AB1' then
-			Case
-  			     when FZ_ = 'N'        then  return fin_nbu.ZN_F1('1300',4,dat_, okpo_);
-			     when FZ_ in ('R','C') then  return fin_nbu.ZN_F1('1300',4,dat_, okpo_);
-			                           else null;
-			End case;	
-			
-		/* AB2	2	Основні засоби, нерухомість та обладнання  */
-         elsif 	kod_ = 'AB2' then
-			Case
-  			     when FZ_ = 'N'        then  return fin_nbu.ZN_F1('1010',4,dat_, okpo_)+fin_nbu.ZN_F1('1005',4,dat_, okpo_)+fin_nbu.ZN_F1('1020',4,dat_, okpo_)+fin_nbu.ZN_F1('1115',4,dat_, okpo_);
-			     when FZ_ in ('R','C') then  return fin_nbu.ZN_F1('1010',4,dat_, okpo_)+fin_nbu.ZN_F1('1005',4,dat_, okpo_)+fin_nbu.ZN_F1('1020',4,dat_, okpo_);
-			                           else null;
-			End case;		
-			
-		/* AB3	3	Нематеріальні активи */
-         elsif 	kod_ = 'AB3' then
-			Case
-  			     when FZ_ = 'N'        then  return fin_nbu.ZN_F1('1000',4,dat_, okpo_)+fin_nbu.ZN_F1('1050',4,dat_, okpo_);
-			     when FZ_ in ('R','C') then  return null;
-			                           else null;
-			End case;	
-			
-		/* AB4	4	Торгова та інша дебіторська заборгованість */
-         elsif 	kod_ = 'AB4' then
-			Case
-  			     when FZ_ = 'N'        then  return fin_nbu.ZN_F1('1040',4,dat_, okpo_);
-			     when FZ_ in ('R','C') then  return null;
-			                           else null;
-			End case;	
-			
-		/* AB5	5	Відкладені податкові активи */
-         elsif 	kod_ = 'AB5' then
-			Case
-  			     when FZ_ = 'N'        then  return fin_nbu.ZN_F1('1045',4,dat_, okpo_);
-			     when FZ_ in ('R','C') then  return null;
-			                           else null;
-			End case;	
-			
-		/* AB6	6	Інші необоротні активи */
-         elsif 	kod_ = 'AB6' then
-			Case
-  			     when FZ_ = 'N'        then  return fin_nbu.ZN_F1('1030',4,dat_, okpo_)+fin_nbu.ZN_F1('1035',4,dat_, okpo_)+fin_nbu.ZN_F1('1090',4,dat_, okpo_)
-				                                   +fin_nbu.ZN_F1('1200',4,dat_, okpo_)+fin_nbu.ZN_F1('1060',4,dat_, okpo_)+fin_nbu.ZN_F1('1065',4,dat_, okpo_);
-			     when FZ_ in ('R','C') then  return fin_nbu.ZN_F1('1030',4,dat_, okpo_)+fin_nbu.ZN_F1('1090',4,dat_, okpo_)+fin_nbu.ZN_F1('1200',4,dat_, okpo_);
-			                           else null;
-			End case;		
-			
-		/* AB7	7	Необоротні активи */
-         elsif 	kod_ = 'AB7' then
-			Case
-  			     when FZ_ = 'N'        then  return fin_nbu.ZN_F1('1200',4,dat_, okpo_)+fin_nbu.ZN_F1('1095',4,dat_, okpo_);
-			     when FZ_ in ('R','C') then  return fin_nbu.ZN_F1('1200',4,dat_, okpo_)+fin_nbu.ZN_F1('1095',4,dat_, okpo_);
-			                           else null;
-			End case;		
-			
-		/* AB8	8	Запаси */
-         elsif 	kod_ = 'AB8' then
-			Case
-  			     when FZ_ = 'N'        then  return fin_nbu.ZN_F1('1100',4,dat_, okpo_)+fin_nbu.ZN_F1('1110',4,dat_, okpo_);
-			     when FZ_ in ('R','C') then  return fin_nbu.ZN_F1('1100',4,dat_, okpo_)+fin_nbu.ZN_F1('1110',4,dat_, okpo_);
-			                           else null;
-			End case;
-			
-		/* AB9	9	Поточна дебіторська заборгованість */
-         elsif 	kod_ = 'AB9' then
-			Case
-  			     when FZ_ = 'N'        then  return fin_nbu.ZN_F1('1125',4,dat_, okpo_)+fin_nbu.ZN_F1('1120',4,dat_, okpo_)+fin_nbu.ZN_F1('1130',4,dat_, okpo_)
-				                                   +fin_nbu.ZN_F1('1155',4,dat_, okpo_)+fin_nbu.ZN_F1('1115',4,dat_, okpo_)+fin_nbu.ZN_F1('1140',4,dat_, okpo_)
-                                                   +fin_nbu.ZN_F1('1145',4,dat_, okpo_);   												   
-			     when FZ_ in ('R','C') then  return fin_nbu.ZN_F1('1125',4,dat_, okpo_)+fin_nbu.ZN_F1('1155',4,dat_, okpo_);
-			                           else null;
-			End case;		
-			
-		/* AB10	10	Поточні податкові активи */
-         elsif 	kod_ = 'AB10' then
-			Case
-  			     when FZ_ = 'N'        then  return fin_nbu.ZN_F1('1135',4,dat_, okpo_);
-			     when FZ_ in ('R','C') then  return fin_nbu.ZN_F1('1135',4,dat_, okpo_);
-			                           else null;
-			End case;		
-		
-		/* AB11	11	Грошові кошти */
-         elsif 	kod_ = 'AB11' then
-			Case
-  			     when FZ_ = 'N'        then  return fin_nbu.ZN_F1('1165',4,dat_, okpo_);
-			     when FZ_ in ('R','C') then  return fin_nbu.ZN_F1('1165',4,dat_, okpo_);
-			                           else null;
-			End case;
-			
-		/* AB12	12	Інші оборотні активи */
-         elsif 	kod_ = 'AB12' then
-			Case
-  			     when FZ_ = 'N'        then  return fin_nbu.ZN_F1('1160',4,dat_, okpo_)+fin_nbu.ZN_F1('1170',4,dat_, okpo_)+fin_nbu.ZN_F1('1190',4,dat_, okpo_)+fin_nbu.ZN_F1('1180',4,dat_, okpo_);
-			     when FZ_ in ('R','C') then  return fin_nbu.ZN_F1('1160',4,dat_, okpo_)+fin_nbu.ZN_F1('1170',4,dat_, okpo_)+fin_nbu.ZN_F1('1190',4,dat_, okpo_);
-			                           else null;
-			End case;
-			
-		/* AB13	13	Оборотні активи */
-         elsif 	kod_ = 'AB13' then
-			Case
-  			     when FZ_ = 'N'        then  return fin_nbu.ZN_F1('1195',4,dat_, okpo_);
-			     when FZ_ in ('R','C') then  return fin_nbu.ZN_F1('1195',4,dat_, okpo_);
-			                           else null;
-			End case;
-
-
-
-
---***********************************Агрегований баланс ПАСИВ ********************************************************
-		/* AP1	1	Пасиви */
-         elsif 	kod_ = 'AP1' then
-			Case
-  			     when FZ_ = 'N'        then  return fin_nbu.ZN_F1('1900',4,dat_, okpo_);
-			     when FZ_ in ('R','C') then  return fin_nbu.ZN_F1('1900',4,dat_, okpo_);
-			                           else null;
-			End case;		
-		
-		/* AP2	2	Статутний капітал */
-         elsif 	kod_ = 'AP2' then
-			Case
-  			     when FZ_ = 'N'        then  return fin_nbu.ZN_F1('1400',4,dat_, okpo_)+fin_nbu.ZN_F1('1401',4,dat_, okpo_)+fin_nbu.ZN_F1('1410',4,dat_, okpo_)
-				                                   +fin_nbu.ZN_F1('1411',4,dat_, okpo_)+fin_nbu.ZN_F1('1415',4,dat_, okpo_)+fin_nbu.ZN_F1('1425',4,dat_, okpo_)
-												   +fin_nbu.ZN_F1('1435',4,dat_, okpo_)+fin_nbu.ZN_F1('1430',4,dat_, okpo_);
-			     when FZ_ in ('R','C') then  return fin_nbu.ZN_F1('1400',4,dat_, okpo_)+fin_nbu.ZN_F1('1410',4,dat_, okpo_)+fin_nbu.ZN_F1('1415',4,dat_, okpo_)
-				                                   +fin_nbu.ZN_F1('1425',4,dat_, okpo_);
-			                           else null;
-			End case;
-			
-		/* AP3	3	Фонд переоцінки */
-         elsif 	kod_ = 'AP3' then
-			Case
-  			     when FZ_ = 'N'        then  return fin_nbu.ZN_F1('1405',4,dat_, okpo_);
-			     when FZ_ in ('R','C') then  return null;
-			                           else null;
-			End case;
-		
-		/* AP4	4	Резерв накопичених курсових різниць */
-         elsif 	kod_ = 'AP4' then
-			Case
-  			     when FZ_ = 'N'        then  return fin_nbu.ZN_F1('1412',4,dat_, okpo_);
-			     when FZ_ in ('R','C') then  return null;
-			                           else null;
-			End case;
-			
-		/* AP5	5	Нерозподілений прибуток / збиток */
-         elsif 	kod_ = 'AP5' then
-			Case
-  			     when FZ_ = 'N'        then  return fin_nbu.ZN_F1('1420',4,dat_, okpo_);
-			     when FZ_ in ('R','C') then  return fin_nbu.ZN_F1('1420',4,dat_, okpo_);
-			                           else null;
-			End case;
-			
-		/* AP6	6	Власний капітал */
-         elsif 	kod_ = 'AP6' then
-			Case
-  			     when FZ_ = 'N'        then  return fin_nbu.ZN_F1('1495',4,dat_, okpo_);
-			     when FZ_ in ('R','C') then  return fin_nbu.ZN_F1('1495',4,dat_, okpo_);
-			                           else null;
-			End case;
-			
-		/* AP7	7	Неконтрольна частка */
-         elsif 	kod_ = 'AP7' then
-			Case
-  			     when FZ_ = 'N'        then  return fin_nbu.ZN_F1('1490',4,dat_, okpo_);
-			     when FZ_ in ('R','C') then  return fin_nbu.ZN_F1('1490',4,dat_, okpo_);
-			                           else null;
-			End case;
-			
-		/* AP8	8	Капітал */
-         elsif 	kod_ = 'AP8' then
-			Case
-  			     when FZ_ = 'N'        then  return fin_nbu.ZN_F1('1400',4,dat_, okpo_) + fin_nbu.ZN_F1('1401',4,dat_, okpo_) + fin_nbu.ZN_F1('1410',4,dat_, okpo_)
-				                                   +fin_nbu.ZN_F1('1411',4,dat_, okpo_) + fin_nbu.ZN_F1('1415',4,dat_, okpo_) + fin_nbu.ZN_F1('1425',4,dat_, okpo_)
-												   +fin_nbu.ZN_F1('1435',4,dat_, okpo_) + fin_nbu.ZN_F1('1430',4,dat_, okpo_) + fin_nbu.ZN_F1('1405',4,dat_, okpo_)
-												   +fin_nbu.ZN_F1('1412',4,dat_, okpo_) + fin_nbu.ZN_F1('1420',4,dat_, okpo_) + fin_nbu.ZN_F1('1490',4,dat_, okpo_);
-			     when FZ_ in ('R','C') then  return fin_nbu.ZN_F1('1400',4,dat_, okpo_) + fin_nbu.ZN_F1('1410',4,dat_, okpo_) + fin_nbu.ZN_F1('1415',4,dat_, okpo_)
-				                                   +fin_nbu.ZN_F1('1425',4,dat_, okpo_) + fin_nbu.ZN_F1('1420',4,dat_, okpo_) + fin_nbu.ZN_F1('1490',4,dat_, okpo_);
-			                           else null;
-			End case;
-			
-		/* AP9	9	Кредити та запозичення */
-         elsif 	kod_ = 'AP9' then
-			Case
-  			     when FZ_ = 'N'        then  return fin_nbu.ZN_F1('1510',4,dat_, okpo_) + fin_nbu.ZN_F1('1520',4,dat_, okpo_) + fin_nbu.ZN_F1('1525',4,dat_, okpo_);
-			     when FZ_ in ('R','C') then  return fin_nbu.ZN_F1('1510',4,dat_, okpo_);
-			                           else null;
-			End case;
-			
-		/* AP10	10	Відкладені податкові зобов'язання */
-         elsif 	kod_ = 'AP10' then
-			Case
-  			     when FZ_ = 'N'        then  return fin_nbu.ZN_F1('1500',4,dat_, okpo_) + fin_nbu.ZN_F1('1505',4,dat_, okpo_);
-			     when FZ_ in ('R','C') then  return null;
-			                           else null;
-			End case;	
-			
-		/* AP11	11	Інші довгострокові зобов'язання */
-         elsif 	kod_ = 'AP11' then
-			Case
-  			     when FZ_ = 'N'        then  return fin_nbu.ZN_F1('1515',4,dat_, okpo_) + fin_nbu.ZN_F1('1521',4,dat_, okpo_) + fin_nbu.ZN_F1('1526',4,dat_, okpo_)
-				                                   +fin_nbu.ZN_F1('1530',4,dat_, okpo_) + fin_nbu.ZN_F1('1535',4,dat_, okpo_) + fin_nbu.ZN_F1('1540',4,dat_, okpo_)
-												   +fin_nbu.ZN_F1('1545',4,dat_, okpo_) ;
-			     when FZ_ in ('R','C') then  return null;
-			                           else null;
-			End case;	
-			
-		/* AP12	12	Довгострокові зобов'язання */
-         elsif 	kod_ = 'AP12' then
-			Case
-  			     when FZ_ = 'N'        then  return fin_nbu.ZN_F1('1595',4,dat_, okpo_);
-			     when FZ_ in ('R','C') then  return fin_nbu.ZN_F1('1595',4,dat_, okpo_);
-			                           else null;
-			End case;
-			
-		/* AP13	13	Поточні кредити та запозичення */
-         elsif 	kod_ = 'AP13' then
-			Case
-  			     when FZ_ = 'N'        then  return fin_nbu.ZN_F1('1600',4,dat_, okpo_);
-			     when FZ_ in ('R','C') then  return fin_nbu.ZN_F1('1600',4,dat_, okpo_);
-			                           else null;
-			End case;		
-			
-		/* AP14	14	Торгова та інша кредиторська заборгованість */
-         elsif 	kod_ = 'AP14' then
-			Case
-  			     when FZ_ = 'N'        then  return fin_nbu.ZN_F1('1610',4,dat_, okpo_) + fin_nbu.ZN_F1('1615',4,dat_, okpo_) + fin_nbu.ZN_F1('1625',4,dat_, okpo_)
-				                                   +fin_nbu.ZN_F1('1630',4,dat_, okpo_) + fin_nbu.ZN_F1('1605',4,dat_, okpo_) + fin_nbu.ZN_F1('1635',4,dat_, okpo_)
-												   +fin_nbu.ZN_F1('1640',4,dat_, okpo_) + fin_nbu.ZN_F1('1645',4,dat_, okpo_) + fin_nbu.ZN_F1('1650',4,dat_, okpo_);
-			     when FZ_ in ('R','C') then  return fin_nbu.ZN_F1('1610',4,dat_, okpo_) + fin_nbu.ZN_F1('1615',4,dat_, okpo_) + fin_nbu.ZN_F1('1625',4,dat_, okpo_)
-				                                   +fin_nbu.ZN_F1('1630',4,dat_, okpo_);
-			                           else null;
-			End case;
-			
-		/* AP15	15	Податкові зобов'язання */
-         elsif 	kod_ = 'AP15' then
-			Case
-  			     when FZ_ = 'N'        then  return fin_nbu.ZN_F1('1620',4,dat_, okpo_);
-			     when FZ_ in ('R','C') then  return fin_nbu.ZN_F1('1620',4,dat_, okpo_);
-			                           else null;
-			End case;
-			
-		/* AP16	16	Інші поточні зобов'язання */
-         elsif 	kod_ = 'AP16' then
-			Case
-  			     when FZ_ = 'N'        then  return fin_nbu.ZN_F1('1660',4,dat_, okpo_) + fin_nbu.ZN_F1('1665',4,dat_, okpo_) + fin_nbu.ZN_F1('1690',4,dat_, okpo_)
-				                                   +fin_nbu.ZN_F1('1700',4,dat_, okpo_) + fin_nbu.ZN_F1('1670',4,dat_, okpo_) + fin_nbu.ZN_F1('1800',4,dat_, okpo_);
-			     when FZ_ in ('R','C') then  return fin_nbu.ZN_F1('1665',4,dat_, okpo_) + fin_nbu.ZN_F1('1690',4,dat_, okpo_) + fin_nbu.ZN_F1('1700',4,dat_, okpo_);
-			                           else null;
-			End case;
-			
-		/* AP17	17	Поточні зобов'язання */
-         elsif 	kod_ = 'AP17' then
-			Case
-  			     when FZ_ = 'N'        then  return fin_nbu.ZN_F1('1695',4,dat_, okpo_) + fin_nbu.ZN_F1('1700',4,dat_, okpo_) + fin_nbu.ZN_F1('1800',4,dat_, okpo_);
-			     when FZ_ in ('R','C') then  return fin_nbu.ZN_F1('1695',4,dat_, okpo_) + fin_nbu.ZN_F1('1700',4,dat_, okpo_);
-			                           else null;
-			End case;
-			
     else
 
 	return null;
 	end if;
-	return null; 
  exception
     when others then
 return null;
 end;	
 
-
+	end;
 
 
   FUNCTION   CALC_POK (kod_ IN  char,
@@ -4682,28 +4125,7 @@ elsif kod_ = 'DRP' then
 				 DAT_ => DAT1_,
 				 ND_  => ND_,
                  RNK_ => RNK_);				 */
-  				
- if fin_nbu.logk_(dat_,okpo_,1) = 0 and fin_nbu.logk_(dat_,okpo_,2) = 0 
-    Then
-		for k in ( 
-					  select k.kod, k.idf,  fin_obu.CALC_POK_DOP(k.kod,m.fdat,m.okpo,2) ss
-						from fin_fm m, fin_kod k 
-					   where okpo = okpo_ and fdat= DAT_
-						 and k.idf between 11 and 13
-					   order by k.idf, k.ord )
-			loop
-			  fin_nbu. record_fp(KOD_   => k.kod, 
-								 S_     => k.ss,  
-								 IDF_   => k.idf,
-								 DAT_   => DAT_,
-								 OKPO_  => okpo_);
-			end loop;			   
-  end if; 
-
-
-
-
-				
+				 
 	null;
 	END GET_POK;
 
@@ -4886,7 +4308,7 @@ end GET_calc_print;
 FUNCTION p_zvt ( RNK_ NUMBER, 
                  DAT_  date 
 				)
-  RETURN number  IS 
+                    RETURN number IS
 p_okpo varchar2(12);
 BEGIN
 

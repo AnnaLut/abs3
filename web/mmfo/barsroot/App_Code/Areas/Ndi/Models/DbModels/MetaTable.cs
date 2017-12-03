@@ -12,9 +12,7 @@ namespace BarsWeb.Areas.Ndi.Models.DbModels
     {
         public MetaTable()
         {
-            //
-            // TODO: Add constructor logic here
-            //
+            SemanticParamNames = new List<string>();
         }
         public string TABNAME { get; set; }
         public int TABID { get; set; }
@@ -26,9 +24,11 @@ namespace BarsWeb.Areas.Ndi.Models.DbModels
         public int TABRELATION { get; set; }
         public int? TableDel { get; set; }
 
-        public int? LINESDEF { get; set; }
+        public decimal? LINESDEF { get; set; }
 
         public string SELECT_STATEMENT { get; set; }
         
+        public List<string> SemanticParamNames { get; set; }
+
     }
 }

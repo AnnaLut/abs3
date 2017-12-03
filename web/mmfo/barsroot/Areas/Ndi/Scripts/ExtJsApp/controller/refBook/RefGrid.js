@@ -355,7 +355,6 @@
 
     //метод вызывается при нажатии на кнопку "Зберегти" в плагине RowEditing
     onEdit: function (editor, e) {
-        //debugger;
         var isPhantom = e.record.phantom;
         if (editor.pluginId == 'cellEditPlugin') {
             if (ExtApp.utils.RefBookUtils.isValueEquelToOriginal(e.value, e.originalValue))
@@ -385,6 +384,7 @@
     },
 
     onAddBtnClick: function (button, e) {
+        
         //нашли грид и плагин rowEditing
         var grid = button.up('referenceGrid');
         //var rowEditing = grid.getPlugin('rowEditPlugin');
@@ -399,14 +399,17 @@
         }
         var rowsToInsert = addEditInform.InsertRowAfter ? store.getCount() : 0;
         //добавили в store пустую запись
+        
         var emptyModel = this.getModel('refBook.RefGrid');
         store.insert(rowsToInsert, emptyModel);
-
+        ExtApp.utils.RefBookUtils.setInsertRecordByDefault(grid);
+       
         //перешли на редактирование новой записи
         //rowEditing.startEdit(0, 0);
     },
 
     onSampleBtnClick: function (button, e) {
+        
         //нашли грид и плагин rowEditing
         var grid = button.up('referenceGrid');
         //var rowEditing = grid.getPlugin('rowEditPlugin');
@@ -423,8 +426,8 @@
         }
         var rowsToInsert = addEditInform.InsertRowAfter ? store.getCount() : 0;
         //добавили в store запись с такими же данными как у текущей выделенной строки
-        store.insert(rowsToInsert, selectedRow.data);
-
+        store.insert(rowsToInsert, selectedRow.data); 
+    
         //перешли на редактирование новой записи
         // rowEditing.startEdit(0, 0);
     },
@@ -1034,7 +1037,7 @@
     syncAllCanges: function (btn) {
         var grid = btn.up('grid');
         var thisController = this;
-        debugger;
+        
         var addingModels = ExtApp.utils.RefBookUtils.getAddingRowsFromGrid(grid);
         if (thisController.controllerMetadata.AddEditRowsInform.EditingRowsDataArray.length === 0 && (!addingModels || addingModels.length < 1)) {
             Ext.MessageBox.show({ title: 'дані не змінено', msg: 'немає змінених даних', buttons: Ext.MessageBox.OK });
@@ -2303,7 +2306,7 @@
 
     updateColumnsHidden: function () {
         var grid = this.getGrid();
-        debugger;
+        
         var hiddenColumns = ExtApp.utils.RefBookUtils.getColumnsHiddenFromGrid(grid);
         var clearColBtn = Ext.getCmp('cleareColumnsButton');
         if (clearColBtn)
@@ -2319,7 +2322,7 @@
     },
     onExportToExcelBtnClick: function (menu, item) {
         var grid = menu.up('referenceGrid');
-
+        debugger;
         
         var columnsHiddenNames = ExtApp.utils.RefBookUtils.getHiddenColumnsFromLocalSrorage(grid.metadata.localStorageModel);
         
@@ -2353,7 +2356,7 @@
             "&tableName=" + grid.metadata.tableInfo.TABNAME +
             "&gridFilter=" + oper.params.gridFilter +
             "&startFilter=" + grid.store.proxy.extraParams.startFilter +
-            "&dynamicFilter=" + grid.store.proxy.extraParams.dynamicFilter +
+            "&Base64DynamicFilter=" + ExtApp.utils.RefBookUtils.getBase64().encode(grid.store.proxy.extraParams.dynamicFilter)  +
             "&columnsVisible=" + columnsHiddenNames +
             "&externalFilter=" + grid.store.proxy.extraParams.externalFilter +
             "&sort=" + Ext.encode(sort) +
@@ -2381,7 +2384,7 @@
         var gridSelectModel = referenceGrid.getSelectionModel();
         var selectedRows;
         //заполнить информацию о вызываемой функции по метаданным
-        thisController.fillCallFuncInfo(funcMetaInfo);
+        thisController.fillCallFuncInfo(funcMetaInfo,referenceGrid.metadata);
         var func = thisController.currentCalledSqlFunction;
         switch (funcMetaInfo.PROC_EXEC) {
             //выполнение процедуры один раз, параметры не берутся из данных грида, а либо константы либо вводятся вручную
@@ -2425,8 +2428,7 @@
                     }
                     if (qst) {
                         var selectRow = selectedRows[0];
-                        if (descr)
-                            if (descr.indexOf(":") > -1) {
+                        if (descr && descr.indexOf(":") > -1) {
                                 var thisController = this;
                                 var referenceGrid = thisController.getGrid();
                                 Ext.each(referenceGrid.metadata.columnsInfo, function (item) {
@@ -2712,7 +2714,9 @@
                 }
             case "INTERNER_LINK_WITH_PARAMS":
                 {
+                    
                     var params = new Array();
+                    var insertDefParams = Array();
                     var gridSelectModel = referenceGrid.getSelectionModel();
                     var selectedRows = gridSelectModel.getSelection();
                     //если в гриде вообще нет строк с данными
@@ -2738,6 +2742,8 @@
                         })
 
                     });
+
+                    
                     Ext.each(funcMetaInfo.RowParamsNames, function (parName) {
                         Ext.each(referenceGrid.metadata.columnsInfo, function (item) {
                             if (item.COLNAME == parName) {
@@ -2751,6 +2757,21 @@
                         })
 
                     });
+                    if (funcMetaInfo.ThrowNsiParams && funcMetaInfo.ThrowNsiParams.DefParams && funcMetaInfo.ThrowNsiParams.DefParams.length)
+                        Ext.each(funcMetaInfo.ThrowNsiParams.DefParams, function (defPar) {
+                            Ext.each(referenceGrid.metadata.columnsInfo, function (item) {
+                                if (item.COLNAME == defPar.ColName && defPar.Kind == 'DEF_VAL_BY_INSERT') {
+                                    var field = {};
+                                    field.Name = item.COLNAME;
+                                    field.Type = item.COLTYPE;
+                                    field.SEMANTIC = item.SEMANTIC;
+                                    field.Value = selectRow.data[defPar.ColName];
+                                    insertDefParams.push(field);
+                                }
+                            })
+
+                        });
+
                     var emptyParam = Ext.Array.findBy(params, function (param) { return param.Value == "" });
                     if (emptyParam) {
                         if (emptyParam.Name)
@@ -2763,10 +2784,12 @@
                     }
 
                     var paramsString = Ext.JSON.encode(params);
-                    var Base64 = { _keyStr: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=", encode: function (e) { var t = ""; var n, r, i, s, o, u, a; var f = 0; e = Base64._utf8_encode(e); while (f < e.length) { n = e.charCodeAt(f++); r = e.charCodeAt(f++); i = e.charCodeAt(f++); s = n >> 2; o = (n & 3) << 4 | r >> 4; u = (r & 15) << 2 | i >> 6; a = i & 63; if (isNaN(r)) { u = a = 64 } else if (isNaN(i)) { a = 64 } t = t + this._keyStr.charAt(s) + this._keyStr.charAt(o) + this._keyStr.charAt(u) + this._keyStr.charAt(a) } return t }, decode: function (e) { var t = ""; var n, r, i; var s, o, u, a; var f = 0; e = e.replace(/[^A-Za-z0-9+/=]/g, ""); while (f < e.length) { s = this._keyStr.indexOf(e.charAt(f++)); o = this._keyStr.indexOf(e.charAt(f++)); u = this._keyStr.indexOf(e.charAt(f++)); a = this._keyStr.indexOf(e.charAt(f++)); n = s << 2 | o >> 4; r = (o & 15) << 4 | u >> 2; i = (u & 3) << 6 | a; t = t + String.fromCharCode(n); if (u != 64) { t = t + String.fromCharCode(r) } if (a != 64) { t = t + String.fromCharCode(i) } } t = Base64._utf8_decode(t); return t }, _utf8_encode: function (e) { e = e.replace(/rn/g, "n"); var t = ""; for (var n = 0; n < e.length; n++) { var r = e.charCodeAt(n); if (r < 128) { t += String.fromCharCode(r) } else if (r > 127 && r < 2048) { t += String.fromCharCode(r >> 6 | 192); t += String.fromCharCode(r & 63 | 128) } else { t += String.fromCharCode(r >> 12 | 224); t += String.fromCharCode(r >> 6 & 63 | 128); t += String.fromCharCode(r & 63 | 128) } } return t }, _utf8_decode: function (e) { var t = ""; var n = 0; var r = c1 = c2 = 0; while (n < e.length) { r = e.charCodeAt(n); if (r < 128) { t += String.fromCharCode(r); n++ } else if (r > 191 && r < 224) { c2 = e.charCodeAt(n + 1); t += String.fromCharCode((r & 31) << 6 | c2 & 63); n += 2 } else { c2 = e.charCodeAt(n + 1); c3 = e.charCodeAt(n + 2); t += String.fromCharCode((r & 15) << 12 | (c2 & 63) << 6 | c3 & 63); n += 3 } } return t } }
+                    //var Base64 = { _keyStr: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=", encode: function (e) { var t = ""; var n, r, i, s, o, u, a; var f = 0; e = Base64._utf8_encode(e); while (f < e.length) { n = e.charCodeAt(f++); r = e.charCodeAt(f++); i = e.charCodeAt(f++); s = n >> 2; o = (n & 3) << 4 | r >> 4; u = (r & 15) << 2 | i >> 6; a = i & 63; if (isNaN(r)) { u = a = 64 } else if (isNaN(i)) { a = 64 } t = t + this._keyStr.charAt(s) + this._keyStr.charAt(o) + this._keyStr.charAt(u) + this._keyStr.charAt(a) } return t }, decode: function (e) { var t = ""; var n, r, i; var s, o, u, a; var f = 0; e = e.replace(/[^A-Za-z0-9+/=]/g, ""); while (f < e.length) { s = this._keyStr.indexOf(e.charAt(f++)); o = this._keyStr.indexOf(e.charAt(f++)); u = this._keyStr.indexOf(e.charAt(f++)); a = this._keyStr.indexOf(e.charAt(f++)); n = s << 2 | o >> 4; r = (o & 15) << 4 | u >> 2; i = (u & 3) << 6 | a; t = t + String.fromCharCode(n); if (u != 64) { t = t + String.fromCharCode(r) } if (a != 64) { t = t + String.fromCharCode(i) } } t = Base64._utf8_decode(t); return t }, _utf8_encode: function (e) { e = e.replace(/rn/g, "n"); var t = ""; for (var n = 0; n < e.length; n++) { var r = e.charCodeAt(n); if (r < 128) { t += String.fromCharCode(r) } else if (r > 127 && r < 2048) { t += String.fromCharCode(r >> 6 | 192); t += String.fromCharCode(r & 63 | 128) } else { t += String.fromCharCode(r >> 12 | 224); t += String.fromCharCode(r >> 6 & 63 | 128); t += String.fromCharCode(r & 63 | 128) } } return t }, _utf8_decode: function (e) { var t = ""; var n = 0; var r = c1 = c2 = 0; while (n < e.length) { r = e.charCodeAt(n); if (r < 128) { t += String.fromCharCode(r); n++ } else if (r > 191 && r < 224) { c2 = e.charCodeAt(n + 1); t += String.fromCharCode((r & 31) << 6 | c2 & 63); n += 2 } else { c2 = e.charCodeAt(n + 1); c3 = e.charCodeAt(n + 2); t += String.fromCharCode((r & 15) << 12 | (c2 & 63) << 6 | c3 & 63); n += 3 } } return t } }
 
-                    var bas64Params = Base64.encode(paramsString);
+                   // var bas64Params = Base64.encode(paramsString);
                     var WEB_NAME = funcMetaInfo.WEB_FORM_NAME + "&jsonSqlParams=" + paramsString;
+                    if (insertDefParams.length > 0)
+                        WEB_NAME += "&InsertDefParams=" + Ext.JSON.encode(insertDefParams);
                     if (funcMetaInfo.OpenInWindow && funcMetaInfo.OpenInWindow == true)
                         this.openWindowByFunction(WEB_NAME);
                     else
@@ -2889,7 +2912,7 @@
 
     //заполнить информацию о вызываемой sql-функции 
     //funcMetaInfo - метаинформация о вызываемой функции
-    fillCallFuncInfo: function (funcMetaInfo) {
+    fillCallFuncInfo: function (funcMetaInfo,metadata) {
         
         var thisController = this;
         
@@ -2929,7 +2952,8 @@
             simpleMsg: funcMetaInfo.MSG,
             canSendByBatch: Ext.Array.contains(['ALL', 'EACH', 'BATCH'], funcMetaInfo.PROC_EXEC),
             MultiRowsParams: funcMetaInfo.MultiRowsParams,
-            procExec: funcMetaInfo.PROC_EXEC
+            procExec: funcMetaInfo.PROC_EXEC,
+            saveInPageParams: !metadata ? null : metadata.saveInPageParams
         };
        
         var func = thisController.currentCalledSqlFunction;
@@ -2940,7 +2964,8 @@
                 Name: par.ColumnInfo.COLNAME,
                 Type: par.ColumnInfo.COLTYPE,
                 IsInput: par.IsInput,
-                kind: par.Kind
+                kind: par.Kind,
+                additionalUse : par.AdditionalUse
             });
             //для параметров, которые нужно вводить вручную, заполняем поля формы
             if (par.IsInput == true) {
@@ -3072,6 +3097,9 @@
                                 Value: form.findField(par.Name).getValue()
                             }
                             inputParams.push(param);
+                            
+                            if(par.additionalUse  && par.additionalUse.length)
+                                ExtApp.utils.RefBookUtils.buildSaveInPageParamsByAddUse(par.additionalUse,func.saveInPageParams,param);
                         }
                     });
                     if(func.sendByBatch)
@@ -3088,13 +3116,13 @@
                     }
 
                     formWindow.closeAction = 'destroy';
- var ProcParams = func.params[0].rowParams;
+                    var ProcParams = func.params[0].rowParams;
                     if (ProcParams && ProcParams.length > 0 &&
                         Ext.Array.findBy(ProcParams, function (param) { return param.Type == "CLOB"; })) {
                         thisController.executeCurrentSqlFunctionWithUploadFile(func, formWindow);
                         return true;
                     }
-
+                    
                     //закрываем окно
                     formWindow.close();
 

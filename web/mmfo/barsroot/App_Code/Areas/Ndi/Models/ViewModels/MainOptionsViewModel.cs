@@ -17,11 +17,12 @@ namespace BarsWeb.Areas.Ndi.Models.ViewModels
             //
             // TODO: Add constructor logic here
             //
+            this.DefParamModel = new DefParamModel();
         }
 
         public MainOptionsViewModel Res { get; set; }
-       // public string Res { get; set; }
-     
+        // public string Res { get; set; }
+        public DefParamModel DefParamModel { get;set; }
         public int? TableId { get; set; }
         public string TableMode { get; set; }
         public string Conditions { get; set; }

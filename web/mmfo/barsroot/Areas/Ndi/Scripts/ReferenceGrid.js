@@ -18,6 +18,7 @@
     //точка входа в приложение
     launch: function () {
         var thisApp = this;
+      
         //заполняется из ViewBag в представлении
         var tableId = window.tableId;
         var codeOper = window.CodeOper;
@@ -29,6 +30,7 @@
         var nsiFuncId = window.nsiFuncId;
         var filterCode = window.filterCode;
         var baseCodeOper = window.baseCodeOper;
+        var Base64InsertDefParamsString = window.Base64InsertDefParamsString;
         var code = window.Code;
         var thisController = thisApp.controllers.findBy(function (controller) { return controller.id = "refBook.RefGrid"; });
         if (tableId) {
@@ -43,7 +45,7 @@
             getObj.BaseCodeOper = baseCodeOper === 'undefined' ? '' : baseCodeOper;
             getObj.Filtercode = filterCode === 'undefined' ? '' : filterCode;
             getObj.Code = code === 'undefined' ? '' : code;
-
+            getObj.Base64InsertDefParamsString = Base64InsertDefParamsString;
             //запрос на получение метаданных
             Ext.Ajax.request({
                 url: '/barsroot/ndi/ReferenceBook/GetMetadata',
@@ -140,7 +142,8 @@
         var beforeFunc = Ext.Array.findBy(metadata.callFunctions, function (i) { return i.PROC_EXEC == "BEFORE" });
         //если нужно вызвать какую-то функцию перед тем как населить таблицу
         if (beforeFunc) {
-            thisController.fillCallFuncInfo(beforeFunc);
+            
+            thisController.fillCallFuncInfo(beforeFunc,metadata);
             var func = thisController.currentCalledSqlFunction;
             func.infoDialogTitle = beforeFunc.DESCR;
             //для ONCE заполняем единожды параметры в диалоге и вызываем функцию (из строк грида никакие данные не берутся)
@@ -167,7 +170,7 @@
             } else {
                 if (func.paramsInfo.length > 0 && Ext.Array.findBy(func.paramsInfo, function (i) { return i.IsInput == true })) {
                     thisController.showInputParamsDialog(false, function () {
-                        //thisController.executeCurrentSqlFunction(function () {
+                        
                         thisApp.createRefGrid(metadata);
                         // });
                     });

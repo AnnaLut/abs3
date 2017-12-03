@@ -12,7 +12,7 @@ BEGIN
         execute immediate  
           'begin  
                bpa.alter_policy_info(''FIN_CUST'', ''CENTER'' , null, null, null, null);
-               bpa.alter_policy_info(''FIN_CUST'', ''FILIAL'' , ''M'', ''M'', ''M'', ''M'');
+               bpa.alter_policy_info(''FIN_CUST'', ''FILIAL'' , ''F'', ''F'', ''F'', ''F'');
                bpa.alter_policy_info(''FIN_CUST'', ''WHOLE'' , null, null, null, null);
                null;
            end; 
@@ -41,14 +41,7 @@ exception when others then
 end; 
 /
 
-begin 
-  execute immediate  ' ALTER TABLE BARS.FIN_CUST ADD (kf VARCHAR2(6 BYTE) DEFAULT sys_context(''bars_context'',''user_mfo''))';
-  execute immediate  'update FIN_CUST set kf = substr(branch,2,6)';
-  execute immediate  'delete from FIN_CUST where branch = ''/''';
-exception when others then 
-  if sqlcode=-1430 then null; else raise; end if;
-end;
-/
+
 
 
 PROMPT *** ALTER_POLICIES to FIN_CUST ***
@@ -60,39 +53,18 @@ COMMENT ON COLUMN BARS.FIN_CUST.NMK IS 'Наименование клиента';
 COMMENT ON COLUMN BARS.FIN_CUST.OKPO IS 'ОКПО(числовое) или РНК';
 COMMENT ON COLUMN BARS.FIN_CUST.CUSTTYPE IS '';
 COMMENT ON COLUMN BARS.FIN_CUST.FZ IS 'Форма звiту=" " или M(лат)';
---COMMENT ON COLUMN BARS.FIN_CUST.BRANCH IS '';
+COMMENT ON COLUMN BARS.FIN_CUST.BRANCH IS '';
 COMMENT ON COLUMN BARS.FIN_CUST.ISP IS 'Ответ.Исполнитель в банке';
 COMMENT ON COLUMN BARS.FIN_CUST.VED IS 'Дата реєстрації підприемства';
 COMMENT ON COLUMN BARS.FIN_CUST.DATEA IS '';
 
 
-begin 
-  execute immediate 
-    ' ALTER TABLE BARS.FIN_CUST DROP COLUMN BRANCH';
-exception when others then 
-  if sqlcode=-904 then null; else raise; end if;
-end;
-/
 
-begin 
-  execute immediate 
-    ' ALTER TABLE BARS.FIN_CUST  DROP CONSTRAINT XPK_FIN_CUST';
-exception when others then 
-  if sqlcode=-2443 then null; else raise; end if;
-end;
-/
 
-begin 
-  execute immediate 
-    ' DROP INDEX BARS.XPK_FIN_CUST';
-exception when others then 
-  if sqlcode=-1418 then null; else raise; end if;
-end;
-/
 PROMPT *** Create  constraint XPK_FIN_CUST ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.FIN_CUST ADD CONSTRAINT XPK_FIN_CUST PRIMARY KEY (OKPO,KF)
+  ALTER TABLE BARS.FIN_CUST ADD CONSTRAINT XPK_FIN_CUST PRIMARY KEY (OKPO)
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSMDLI  ENABLE';
 exception when others then
@@ -114,12 +86,12 @@ exception when others then
 /
 
 
-/*
+
 
 PROMPT *** Create  constraint FK_FIN_CUST_BRANCH ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.FIN_CUST ADD CONSTRAINT FK_FIN_CUST_BRANCH FOREIGN KEY (BRANCH,KF)
+  ALTER TABLE BARS.FIN_CUST ADD CONSTRAINT FK_FIN_CUST_BRANCH FOREIGN KEY (BRANCH)
 	  REFERENCES BARS.BRANCH (BRANCH) DEFERRABLE ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
@@ -138,7 +110,7 @@ exception when others then
  end;
 /
 
-*/
+
 
 
 PROMPT *** Create  index XPK_FIN_CUST ***

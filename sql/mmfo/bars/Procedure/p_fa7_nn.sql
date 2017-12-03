@@ -9,7 +9,7 @@ IS
 % DESCRIPTION :  Процедура формирования #A7 для КБ (универсальная)
 % COPYRIGHT   :  Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.17.010    11.09.2017
+% VERSION     :  v.17.009    28.07.2017
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%/%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_ - отчетная дата
                pmode_ = режим (0 - для отчетности, 1 - для ANI-отчетов, 2 - для @77)
@@ -32,7 +32,6 @@ IS
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
- 11.09.2017 для счетов 2701,3660 проверяется их наличие в МБДК
  28.07.2017 отдельное определение r012 для счетов 1592
  15.05.2017 определение s240 для счетов 2924 по ob22 (для 322669)
  25.04.2017 для формирования остатка по счетам убрал годовые корректирующие
@@ -166,7 +165,6 @@ IS
    exist_cp        NUMBER                 := 0;
    exist_cp_acc    NUMBER                 := 0;
    exist_sno_gr    NUMBER                 := 0;
-   exist_cclim_acc      NUMBER                 := 0;
 
    tobo_           accounts.tobo%TYPE;
    branch_         accounts.tobo%TYPE;
@@ -194,7 +192,7 @@ IS
           END
          );
 
-   fl_mode_ char(8);
+   fl_mode_ char(7);
    pr_01    Number;
 
    sql_doda_ varchar2(2000);
@@ -229,7 +227,7 @@ IS
 
    -- балансовые счета дисконта
    nbsdiscont_     VARCHAR2 (2000)
-      := '2016,2026,2036,2066,2076,2086,2106,2116,2126,2136,2206,2216,2226,2236,2706,3666,1626';
+      := '2016,2026,2036,2066,2076,2086,2106,2116,2126,2136,2206,2216,2226,2236,';
    -- балансовые счета премии
    nbspremiy_      VARCHAR2 (2000)
       := '2065,2075,2085,2105,2115,2125,2135,2205,2215,2235,';
@@ -617,21 +615,6 @@ end;
       cnt_   NUMBER;
    BEGIN
       sql_ := 'select count(*) ' || 'from OTCN_LIM_SB ' || 'where acc=:acc_';
-
-      EXECUTE IMMEDIATE sql_
-                   INTO cnt_
-                  USING pacc_;
-
-      RETURN cnt_;
-   END;
-
-   FUNCTION f_exist_cclim_acc (pacc_ IN NUMBER)
-      RETURN NUMBER
-   IS
-      sql_   VARCHAR2 (100);
-      cnt_   NUMBER;
-   BEGIN
-      sql_ := 'select count(*) ' || 'from CC_LIM ' || 'where acc=:acc_';
 
       EXECUTE IMMEDIATE sql_
                    INTO cnt_
@@ -1243,9 +1226,8 @@ BEGIN
              then
                 if tips_ = 'SNA' then
                    r012_ := '4';
-                elsif nbs_ not in ('2706','3666','1626')  then
+                else
                    r012_ := 'D';
-                else NULL;
                 end if;
 
                 if nd_ is null and nls_ like '3%'  then
@@ -1575,8 +1557,8 @@ BEGIN
                       x_ := '1';
                    END IF;
                 END IF;
-
-                if x_ = '1' and s242_ > 'B' and s242_ <> 'Z' and
+                
+                if x_ = '1' and s242_ > 'B' and s242_ <> 'Z' and 
                    mdate_ is not null and nkd_ like '%БПК%'
                 then
                    s242_ := 'B';
@@ -1828,19 +1810,13 @@ BEGIN
                 END IF;
              END IF;
 
-             exist_cclim_acc := 0;
-             if substr(nls_,1,4) in ('1624','2701','3660')  then
-
-                exist_cclim_acc := f_exist_cclim_acc( acc_ );
-             end if;
-
              -- не кредиты и не счета начисленных процентов кредитного модуля
              IF tips_ NOT IN ('SS', 'SP', 'SL')
                    and not (tips_ = 'DEP' and nls_ like '132%')
                    AND fa7p_ = 0
-                   AND exist_sbb_acc =0 and exist_cclim_acc =0
-                   and exist_cp_acc =0
-                OR                                -- обычный режим
+                   AND exist_sbb_acc = 0
+                   and exist_cp_acc = 0
+                OR                                                -- обычный режим
                        pmode_ = 1
                    AND tips_ IN ('SS', 'SP', 'SL')
                    AND NOT tp_graf
@@ -2357,12 +2333,12 @@ BEGIN
                    AND tips_ IN ('SS', 'SP', 'SL')
                    AND tp_graf      -- с разбивкой по графику
                    AND type_ = 1
-                OR                            -- с разбивкой по таблице OTC_LIM_SB
+                OR                                       -- с разбивкой по таблице OTC_LIM_SB
                        tips_ NOT IN ('SS', 'SP', 'SL')
                    AND SUBSTR (nls_, 1, 4) IN
-                          ('1410', '1413', '1414', '1418', '1624', '2701',
+                          ('1410', '1413', '1414', '1418', '2701',
                            '3112', '3113', '3114', '3660', '3648')
-                   AND ( exist_sbb_acc > 0 or exist_cclim_acc >0 )
+                   AND exist_sbb_acc > 0
                 OR     pmode_ in (0, 2)
                    AND tips_ IN ('SS', 'SP', 'SL')
                    AND (exist_trans_acc > 0 or tp_graf)
@@ -2425,13 +2401,6 @@ BEGIN
                 if not (fa7p_ > 0 and tips_ = 'SNO' and
                         exist_sno_gr = 1)
                 then
-                   fl_mode_ := trim(fl_mode_)||'0';
-                else
-                   fl_mode_ := trim(fl_mode_)||'1';
-                end if;
-
-                -- flag 8
-                if exist_cclim_acc = 0 then
                    fl_mode_ := trim(fl_mode_)||'0';
                 else
                    fl_mode_ := trim(fl_mode_)||'1';
@@ -2642,14 +2611,9 @@ BEGIN
 
 --  договор открыт уже после расчета резервов
 --          для расшифровки дисконтов/процентов должен быть в _REZ1
-                      if (tips_ = 'SS' and extract( day from sdate_) >1 and
-                          trunc(sdate_,'mm') = trunc(pdat_,'mm') )
-                         or
---  для расшифровки дисконтов по этим договорам
-                          exist_cclim_acc >0  and
-                           substr(nls_,1,4) in ('1624','2701','3660') 
+                      if tips_ = 'SS' and extract( day from sdate_) >1 and
+                         trunc(sdate_,'mm') = trunc(pdat_,'mm')
                       then
-
 insert into OTCN_FA7_REZ1
          ( ND, ACC, nls, kv, KODP, ZNAP, SUMA, SUMD, SUMP)
   values (nd_, acc_, rnls_, kv_, kodp_, abs(se_), abs(se_), 0, 0);
@@ -3246,7 +3210,7 @@ insert into OTCN_FA7_REZ1
       ELSE
          nbuc_ := nbuc1_;
       END IF;
-
+   
 --      IF typ_ > 0 THEN
 --         nbuc_ := NVL (F_Codobl_branch (k.tobo, typ_), nbuc1_);
 --      ELSE
@@ -4366,6 +4330,3 @@ insert into OTCN_FA7_REZ1
 --        logger.info ('P_FA7_NN: Error: '||sqlerrm);
 END p_fa7_nn;
 /
-
-
-

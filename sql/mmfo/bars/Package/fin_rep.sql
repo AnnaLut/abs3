@@ -2399,10 +2399,9 @@ begin
 				   where q.idf in (52, 5) and q.kod in ('SKK','KVZK','PVKZ','KP612')
 					 and q.idf = h.idf       and q.kod = h.kod
 					 and q.idf = r.idf  	 and q.kod = r.kod
-					 and h.s = R.VAL 		 --and ( (h.s = 1 and q.kod != 'KP61') or (h.s = 0 and q.kod = 'KP61') )
+					 and h.s = R.VAL 		 and ( (h.s = 1 and q.kod != 'KP61') or (h.s = 0 and q.kod = 'KP61') )
 					 and h.nd = x.nd    	 and h.rnk = x.rnk
 					 and h.fdat = x.fdat
-					 and (h.kod, h.idf) in (select kod, idf from fin_nd_hist where nd = x.nd and rnk = x.rnk and idf in (52,5) and  ( (s = 1 and kod != 'KP61') or (s = 0 and kod = 'KP61') ) and fdat between p_sFdat1 and p_sFdat2  )
 			   )
 	loop
 	l_rep.sort := Ovkr.ord;
@@ -2423,10 +2422,9 @@ begin
 				   where q.idf in (53) 
 					 and q.idf = h.idf       and q.kod = h.kod
 					 and q.idf = r.idf  	 and q.kod = r.kod
-					 and h.s = R.VAL 		 --and h.s = 1
+					 and h.s = R.VAL 		 and h.s = 1
 					 and h.nd = x.nd    	 and h.rnk = x.rnk
 					 and h.fdat = x.fdat
-					  and (h.kod, h.idf) in (select kod, idf from fin_nd_hist where nd = x.nd and rnk = x.rnk and idf = 53 and s = 1 and fdat between p_sFdat1 and p_sFdat2  )
 			   )
 	loop
 	l_rep.sort := Ovkr.ord;
@@ -2447,10 +2445,9 @@ begin
 				   where q.idf in (54) 
 					 and q.idf = h.idf       and q.kod = h.kod
 					 and q.idf = r.idf  	 and q.kod = r.kod
-					 and h.s = R.VAL 		 --and h.s = 1
+					 and h.s = R.VAL 		 and h.s = 1
 					 and h.nd = x.nd    	 and h.rnk = x.rnk
 					 and h.fdat = x.fdat
-					 and (h.kod, h.idf) in (select kod, idf from fin_nd_hist where nd = x.nd and rnk = x.rnk and idf = 54 and s = 1 and fdat between p_sFdat1 and p_sFdat2  )
 			   )
 	loop
 	l_rep.sort := Ovkr.ord;
@@ -2471,10 +2468,9 @@ begin
 				   where q.idf in (55) 
 					 and q.idf = h.idf       and q.kod = h.kod
 					 and q.idf = r.idf  	 and q.kod = r.kod
-					 and h.s = R.VAL 		-- and h.s = 0
+					 and h.s = R.VAL 		 and h.s = 0
 					 and h.nd = x.nd    	 and h.rnk = x.rnk
 					 and h.fdat = x.fdat
-					 and (h.kod, h.idf) in (select kod, idf from fin_nd_hist where nd = x.nd and rnk = x.rnk and idf = 55 and s = 0 and fdat between p_sFdat1 and p_sFdat2  )
 			   )
 	loop
 	l_rep.sort := Ovkr.ord;

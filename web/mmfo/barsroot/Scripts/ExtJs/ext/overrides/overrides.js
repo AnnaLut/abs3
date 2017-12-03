@@ -147,19 +147,56 @@ Ext.override(Ext.dom.Element, {
         var me = this,
           scrollTop = undefined,
           body;
+
         dom = dom || me.dom;
         body = (dom.ownerDocument || DOC).body || DOC.body;
+        //debugger;
         try {
             if (Number(defer)) {
                 Ext.defer(me.focus, defer, me, [null, dom]);
             } else {
                 if (dom.offsetHeight > Ext.dom.Element.getViewHeight()) {
+                    //Change from Element.getViewHeight()
                     scrollTop = body.scrollTop;
                 }
+                //if (Ext.isIE) {
+                //    if (dom.id.indexOf('inputEl') > -1) {
+                //        //this focus is called also for view, and then scroll begins but we need to focus only in particular cell (some input field).
+                //        if (!Ext.FinishedEdit) {
+                //            //debugger;
+                //            //if (dom.nodeName !== 'TR')
+                //            //    dom.focus();
+                //            Ext.defer(function () {
+                //                //debugger;
+                //                if (dom.nodeName !== 'TR')
+                //                    dom.focus();
+                //            }, 50);
+                //        }
+                //        else {
+                //            //debugger;
+                //            Ext.FinishedEdit = null;
+                //            Ext.defer(function () {
+                //                //debugger;
+                //                if (dom.nodeName !== 'TR')
+                //                    dom.focus();
+                //            }, 50);
+                //        }
+                //    }
+                //}
+                //else {
+                //    if (dom.nodeName !== 'TR')
+                //        dom.focus();
+                //    Ext.defer(function () {
+                //        //debugger;
+                //        if (dom.nodeName !== 'TR')
+                //            dom.focus();
+                //    }, 50);
+                //}
 
                 if (dom.nodeName !== 'TR')
                     dom.focus();
                 Ext.defer(function () {
+                    //debugger;
                     if (dom.nodeName !== 'TR')
                         dom.focus();
                 }, 50);
@@ -173,49 +210,4 @@ Ext.override(Ext.dom.Element, {
     }
 });
 
-Ext.define('MyApp.rtl.Table', {
-    override: 'Ext.panel.Table'
-    ,syncHorizontalScroll: function (d, b) {
-        var c = this,
-            a;
-        b = b === true;
-        if (c.rendered && (b || d !== c.scrollLeftPos)) {
-            if (b) {
-                a = c.getScrollTarget();
-                a.el.dom.scrollLeft = d
-            }
-            var grid = Ext.getCmp('mainReferenceGrid');
-            if (grid) {
-                var scrollPosition = grid.el.down('.x-grid-view').getScroll();
-                if (scrollPosition.left !== d) {
-                    d = scrollPosition.left;
-                }
-            }
-            c.headerCt.el.dom.scrollLeft = d;
-            c.scrollLeftPos = d
-        }
-    }
-});
-Ext.define('Ext.ux.grid.Panel', {
-    override: 'Ext.selection.CellModel',
-    onViewRefresh: function (b) {
-            var c = this,
-                g = c.getCurrentPosition(),
-                e = b.headerCt,
-                a, d;
-            if (g && g.view === b) {
-                a = g.record;
-                d = g.columnHeader;
-                if (!d.isDescendantOf(e)) {
-                    d = e.queryById(d.id) || e.down('[text="' + d.text + '"]') || e.down('[dataIndex="' + d.dataIndex + '"]')
-                }                
-                if (d && a && (b.store.indexOfId(a.getId()) !== -1)) {
-                    c.setCurrentPosition({
-                        row: a,
-                        column: d,
-                        view: b
-                    })
-                }
-            }
-        }
-});
+

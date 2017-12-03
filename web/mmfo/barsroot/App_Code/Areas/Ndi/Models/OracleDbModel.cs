@@ -29,12 +29,19 @@ namespace BarsWeb.Areas.Ndi.Models
         //        return thisInstance;
         //    }
         //}
-        public OracleConnection GetConn
+        public void CreateAndSetConn()
+        {
+            if (_conn == null || _conn.State != ConnectionState.Open)
+                _conn = OraConnector.Handler.UserConnection;
+        }
+
+        public OracleConnection GetConnOrCreate
         {
             get { return _conn ?? (_conn = OraConnector.Handler.UserConnection); }
         }
         private OracleCommand _command = null;
 
+        public bool IsOpenConnection { get { return _conn != null && _conn.State == ConnectionState.Open; } }
         public OracleCommand GetCommandOrCreate
         {
             get

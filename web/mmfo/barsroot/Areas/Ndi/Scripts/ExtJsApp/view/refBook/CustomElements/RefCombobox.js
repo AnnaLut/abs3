@@ -23,7 +23,7 @@
     //это нужно для крутого форматирования вывода списка после раскрывания комбобокса
     tpl: Ext.create('Ext.XTemplate',
         '<tpl for=".">',
-        '<div class="x-boundlist-item"><span style="font-weight:bold;font-size:14px;">{ID}</span> - {NAME}</div>',
+        '<div class="x-boundlist-item"><span style="font-weight:bold;font-size:14px;">{ID}</span> | {NAME} | {NAME2}</div>',
         '</tpl>'),
     width: 500,
     //в initComponent вынесены свойства которые нужно заполнить с учетом переданных данных при создании комбобокса
@@ -55,25 +55,27 @@
                 if (!gridSelectModel)
                     return;
                 selectedRow = gridSelectModel.getSelection()[0];
-                //if (field.COL_DYN_TABNAME && field.COL_DYN_TABNAME != '')
-                //    var tableName = selectedRow.data[field.COL_DYN_TABNAME];
-                //    if (!tableName || tableName == '')
-                //{
-                //        Ext.MessageBox.show({ title: 'порожній запис ', msg: 'порожній запис ' + field.COL_DYN_TABNAME, buttons: Ext.MessageBox.OK });
-                       
-                //    return false
-                //}
-                   
-                //combo.SrcTableName = tableName;
-                //var dynamicUrl = '/barsroot/ndi/ReferenceBook/GetRelatedReferenceData?tableName=' + tableName;
                 var dynamicUrl;
-                if (field.COL_DYN_TABNAME)
-                {
+                if (field.COL_DYN_TABNAME && field.COL_DYN_TABNAME != '') {
+                    var tableName = selectedRow.data[field.COL_DYN_TABNAME];
+                    if (!tableName || tableName == '') {
+                        this.collapse();
+                        return false;
+                    }
                     dynamicUrl = ExtApp.utils.RefBookUtils.getUrlByDinamicTabName(field, selectedRow);
-                   
+
+                    //{
+                    //        Ext.MessageBox.show({ title: 'порожній запис ', msg: 'порожній запис ' + field.COL_DYN_TABNAME, buttons: Ext.MessageBox.OK });
+
+                    //    return false
+                    //}
+
+                    //combo.SrcTableName = tableName;
+                    //var dynamicUrl = '/barsroot/ndi/ReferenceBook/GetRelatedReferenceData?tableName=' + tableName;
+
                 }
-                if (field.HasSrcCond && field.srcQueryModel)
-                {
+                else
+                    if (field.HasSrcCond && field.srcQueryModel) {
                     dynamicUrl = ExtApp.utils.RefBookUtils.getUrlBySrcCond(field, selectedRow);
                 }
                 if (!dynamicUrl)
@@ -86,7 +88,7 @@
             
         };
         thisCombo.store = Ext.create('Ext.data.ArrayStore', {
-            fields: ['ID', 'NAME'],
+            fields: ['ID', 'NAME', 'NAME2'],
             pageSize: 10,
             autoLoad: false,
             isLoaded: false,

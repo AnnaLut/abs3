@@ -65,6 +65,11 @@ exception when others then
 end;
 /
 
+
+delete from fin_rnk
+ where  rowid not in (select min(rowid)  from fin_rnk group by okpo,  idf, fdat, kod );
+commit;
+
 begin 
   execute immediate 
     ' DROP INDEX BARS.XPK_FIN_RNK';

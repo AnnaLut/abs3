@@ -116,27 +116,26 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
         /// </summary>
         /// <param name="columnList"></param>
         /// <returns></returns>
-        public static List<ColumnMetaInfo> MetaColumnsToColumnInfo(IEnumerable<MetaColumnsDbModel> columnList)
+        public static List<ColumnMetaInfo> MetaColumnsToColumnsForSelect(List<ColumnMetaInfo> columnList)
         {
-            //    List<ColumnMetaInfo> allColumnsInfo = columnList.Select(ci => new ColumnMetaInfo
-            //    {
-            //        COLID = ci.COLID,
-            //        COLNAME = string.IsNullOrEmpty(ci.COLNAME) ? ci.COLNAME : ci.COLNAME.Replace("/100", "").Trim(),
-            //        COLTYPE = string.IsNullOrEmpty(ci.COLTYPE) ? ci.COLTYPE : ci.COLTYPE.Trim(),
-            //        SEMANTIC = string.IsNullOrEmpty(ci.SEMANTIC) ? ci.SEMANTIC : ci.SEMANTIC.Trim(),
-            //        SHOWWIDTH = ci.SHOWWIDTH,
-            //        SHOWMAXCHAR = ci.SHOWMAXCHAR,
-            //        SHOWFORMAT = string.IsNullOrEmpty(ci.SHOWFORMAT) ? ci.SHOWFORMAT : ci.SHOWFORMAT.Trim(),
-            //        SHOWIN_FLTR = ci.SHOWIN_FLTR,
-            //        NOT_TO_EDIT = ci.NOT_TO_EDIT,
-            //        NOT_TO_SHOW = ci.NOT_TO_SHOW,
-            //        EXTRNVAL = ci.EXTRNVAL,
-            //        SHOWPOS = ci.SHOWPOS,
-            //        TABID = ci.TABID,
-            //        SHOWRESULT = ci.SHOWRESULT,
-            //        IsPk = ci.SHOWRETVAL
-            //    }).ToList();
-            //    return allColumnsInfo;
+            List<ColumnMetaInfo> listToClone = new List<ColumnMetaInfo>(columnList.Count);
+
+
+            columnList.ForEach((item) =>
+            {
+                ColumnMetaInfo clonItem = item.Clone() as ColumnMetaInfo;
+                if (!string.IsNullOrEmpty(clonItem.COLNAME) && clonItem.COLNAME.Contains("/100"))
+                    clonItem.COLNAME = clonItem.COLNAME.Replace("/100", "").Trim();
+                listToClone.Add(clonItem);
+
+            });
+            return listToClone;
+            
+        }
+
+
+        public static List<ColumnMetaInfo> DbColumnsToMetaColumns(List<MetaColumnsDbModel> columnList)
+        {
             bool isFuncOnly;
             CallFunctionMetaInfo functionMetaInfo;
             List<string> paramNames = new List<string>();
@@ -147,29 +146,43 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
                 var col = new ColumnMetaInfo();
 
                 col.COLID = Convert.ToInt32(item.COLID);
-                col.COLNAME = string.IsNullOrEmpty(item.COLNAME) ? item.COLNAME : item.COLNAME.Replace("/100", "").Trim();
+                col.COLNAME = string.IsNullOrEmpty(item.COLNAME) ? item.COLNAME : item.COLNAME.Trim();
                 col.COLTYPE = string.IsNullOrEmpty(item.COLTYPE) ? item.COLTYPE : item.COLTYPE.Trim();
                 col.SEMANTIC = string.IsNullOrEmpty(item.SEMANTIC) ? item.SEMANTIC : item.SEMANTIC.Trim();
                 col.SHOWWIDTH = Convert.ToInt32(item.SHOWWIDTH);
-                col.SHOWMAXCHAR = Convert.ToInt32( item.SHOWMAXCHAR);
+                col.SHOWMAXCHAR = Convert.ToInt32(item.SHOWMAXCHAR);
                 col.SHOWFORMAT = string.IsNullOrEmpty(item.SHOWFORMAT) ? item.SHOWFORMAT : item.SHOWFORMAT.Trim();
                 col.SHOWIN_FLTR = item.SHOWIN_FLTR;
                 col.NOT_TO_EDIT = item.NOT_TO_EDIT;
                 col.NOT_TO_SHOW = item.NOT_TO_SHOW;
                 col.EXTRNVAL = item.EXTRNVAL;
                 col.SHOWPOS = item.SHOWPOS;
+                col.SHOWRESULT = item.SHOWRESULT;
                 col.TABID = Convert.ToInt32(item.TABID);
                 col.IsPk = item.SHOWRETVAL;
                 col.InputInNewRecord = item.INPUT_IN_NEW_RECORD;
-                col.WEB_FORM_NAME = ReplaceParameter(item.WEB_FORM_NAME, "sPar=", Convert.ToInt32(item.COLID),Convert.ToInt32(item.TABID),
+                col.WEB_FORM_NAME = ReplaceParameter(item.WEB_FORM_NAME, "sPar=", Convert.ToInt32(item.COLID), Convert.ToInt32(item.TABID),
                     out isFuncOnly, out functionMetaInfo, out paramNames);
                 col.IsFuncOnly = isFuncOnly;
                 col.FunctionMetaInfo = functionMetaInfo;
                 col.ParamsNames = paramNames.ToList();
                 columnsInfo.Add(col);
+
             }
-
-
+            foreach (var column in columnsInfo)
+            {
+                if (!string.IsNullOrEmpty(column.SHOWFORMAT))
+                {
+                    if (column.COLTYPE == "N" || column.COLTYPE == "E")
+                    {
+                        column.SHOWFORMAT = FormatConverter.ConvertToExtJsDecimalFormat(column.SHOWFORMAT);
+                    }
+                    if (column.COLTYPE == "D")
+                    {
+                        column.SHOWFORMAT = FormatConverter.ConvertToExtJsDateFormat(column.SHOWFORMAT);
+                    }
+                }
+            }
             return columnsInfo;
         }
 

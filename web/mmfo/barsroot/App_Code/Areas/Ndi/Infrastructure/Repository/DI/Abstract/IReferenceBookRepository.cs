@@ -114,8 +114,9 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Abstract
         /// <exception cref="Exception"></exception>
         /// <returns></returns>
         List<Dictionary<string, object>> GetRelatedReferenceData(int? nativeTableId, string tableName, string fieldForId,
-            string fieldForName, string query, int start = 0, int limit = 10);
+            string fieldForName, string query,string tableName2 = null, int start = 0, int limit = 10);
 
+        ParamMetaInfo GetDefaultRelatedData(MetaTable srcTable);
         List<Dictionary<string, object>> GetSrcQueryResult(SrcQueryModel srcQueryModel, string query, int start, int limit);
         /// <summary>
         /// Получить условие фильтра из таблицы meta_filtercodes

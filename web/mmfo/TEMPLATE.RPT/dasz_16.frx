@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReportInfo.Created="09/02/2016 10:17:26" ReportInfo.Modified="09/06/2016 09:19:25" ReportInfo.CreatorVersion="2014.1.2.0">
+<Report ScriptLanguage="CSharp" ReportInfo.Created="09/02/2016 10:17:26" ReportInfo.Modified="11/26/2017 14:25:49" ReportInfo.CreatorVersion="2014.1.2.0">
   <Styles>
     <Style Name="Стиль1" Fill.Color="WhiteSmoke" ApplyBorder="false" ApplyTextFill="false" ApplyFont="false"/>
   </Styles>
   <Dictionary>
-    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoWU4uZh0xq0M+idP2jLc01TnaOsk2gz6ZvQnlpWOFMl/Q==">
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoWU4uZh0xq0M+idP2jLc01TtzLiR7FsSnIxNyCv/lHA7Q==" CommandTimeout="4000">
       <TableDataSource Name="Table" Alias="zvit" DataType="System.Int32" Enabled="true" SelectCommand="select bp.val as name, a.kf as mfo, a.branch, c.nmk, c.okpo, a.nls, a.kv, a.dazs  from accounts a, customer c,  branch_parameters bp&#13;&#10;where   a.rnk=c.rnk&#13;&#10;    and A.BRANCH=bp.branch&#13;&#10;    and bp.tag='NAME_BRANCH' &#13;&#10;    and (a.dazs between :sFdat1 and :sFdat2+0.9999)&#13;&#10;    and (A.NBS in ('2512', '2513', '2520', '2523', '2526', '2530', '2531', '2541', '2542', '2544', '2545',&#13;&#10;     '2550', '2551', '2552', '2553', '2554', '2555', '2556', '2560', '2561', '2562', '2565', '2570', '2571', &#13;&#10;     '2572', '2600', '2601', '2602', '2603', '2604', '2605', '2606', '2640','2641','2642','2643','2644','2655')&#13;&#10;    or (a.nbs='2650' and A.OB22 in ('01','09')))&#13;&#10;    order by 8 asc, 5">
         <Column Name="NAME" DataType="System.String"/>
         <Column Name="MFO" DataType="System.String"/>
@@ -29,7 +29,7 @@
       <TextObject Name="Text1" Top="18.9" Width="1058.4" Height="66.15" Text="&#13;&#10;Книга закритих поточних рахунків клієнтам мікро, малого та середнього бізнесу та &#13;&#10;клієнтам великого корпоративного бізнесу&#13;&#10;за період з [FormatDateTime([sFdat1],&quot;Short Date&quot;)] р. по [FormatDateTime([sFdat2],&quot;Short Date&quot;)] р.&#13;&#10;" HorzAlign="Center"/>
       <TextObject Name="Text2" Width="1048.95" Height="18.9" Text="  Дата та час формування звіту  [Date]" HorzAlign="Right" VertAlign="Center"/>
     </ReportTitleBand>
-    <PageHeaderBand Name="PageHeader1" Top="88.38" Width="1047.06" Height="66.15" CanShrink="true" PrintOn="FirstPage" Guides="0,66.15">
+    <PageHeaderBand Name="PageHeader1" Top="89.05" Width="1047.06" Height="66.15" CanShrink="true" PrintOn="FirstPage" Guides="0,66.15">
       <TableObject Name="Table1" Width="1062.81" Height="66.15">
         <TableColumn Name="Column6" Width="31.5"/>
         <TableColumn Name="Column8" Width="248.85"/>
@@ -53,7 +53,7 @@
         </TableRow>
       </TableObject>
     </PageHeaderBand>
-    <DataBand Name="Data1" Top="157.87" Width="1047.06" Height="28.35" CanGrow="true" CanShrink="true" EvenStyle="Стиль1" EvenStylePriority="UseAll" Guides="0,18.9" DataSource="Table">
+    <DataBand Name="Data1" Top="159.2" Width="1047.06" Height="28.35" CanGrow="true" CanShrink="true" EvenStyle="Стиль1" EvenStylePriority="UseAll" Guides="0,18.9" DataSource="Table">
       <TableObject Name="Table2" Width="1062.81" Height="18.9">
         <TableColumn Name="Column14" Width="31.5"/>
         <TableColumn Name="Column15" Width="248.85"/>
@@ -77,7 +77,7 @@
         </TableRow>
       </TableObject>
     </DataBand>
-    <ReportSummaryBand Name="ReportSummary1" Top="189.55" Width="1047.06" Height="122.85" Guides="0,113.4,18.9,37.8,56.7,75.6,94.5">
+    <ReportSummaryBand Name="ReportSummary1" Top="191.55" Width="1047.06" Height="122.85" Guides="0,113.4,18.9,37.8,56.7,75.6,94.5">
       <TableObject Name="Table4" Width="1062.81" Height="113.4">
         <TableColumn Name="Column50" Width="31.5"/>
         <TableColumn Name="Column51" Width="248.85"/>
@@ -156,6 +156,6 @@
         </TableRow>
       </TableObject>
     </ReportSummaryBand>
-    <PageFooterBand Name="PageFooter1" Top="315.73" Width="1047.06" Height="18.9"/>
+    <PageFooterBand Name="PageFooter1" Top="318.4" Width="1047.06" Height="18.9"/>
   </ReportPage>
 </Report>

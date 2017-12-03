@@ -1,11 +1,12 @@
-$(document).ready(function() {
+$(document).ready(function () {
 
     var editableModel = {
         conclusionDateStartValue: kendo.toString($("#conclusionDate").data("kendoDatePicker").value(), "dd.MM.yyyy"),
-        nbuRegDateValue: kendo.toString($("#nbuRegDate").data("kendoDatePicker").value(), "dd.MM.yyyy"),
         product: $("#productType").val(),
         nbuNumber: $("#nbuId").val()
     };
+
+
 
 
     $("#btnSave").kendoButton({
@@ -15,7 +16,7 @@ $(document).ready(function() {
 
     var datepicker = $("#conclusionDate").data("kendoDatePicker");
 
-    datepicker.bind("change", function() {
+    datepicker.bind("change", function () {
 
         var value = kendo.toString(this.value(), "dd.MM.yyyy");
 
@@ -26,22 +27,9 @@ $(document).ready(function() {
 
     });
 
-    datepicker = $("#nbuRegDate").data("kendoDatePicker");
-
-    datepicker.bind("change", function() {
-
-        var value = kendo.toString(this.value(), "dd.MM.yyyy");
-
-        if (value != editableModel.nbuRegDateValue)
-            $("#btnSave").data("kendoButton").enable(true);
-        else
-            $("#btnSave").data("kendoButton").enable(false);
-
-    });
-
     var productSelector = $("#productType").data("kendoDropDownList");
 
-    productSelector.bind("change", function() {
+    productSelector.bind("change", function () {
 
         var value = this.value();
 
@@ -54,7 +42,7 @@ $(document).ready(function() {
 
     var nbuTb = $("#nbuId");
 
-    nbuTb.bind("change", function() {
+    nbuTb.bind("change", function () {
 
         var value = $("#nbuId").val();
 
@@ -68,13 +56,10 @@ $(document).ready(function() {
     function updDeal() {
 
         var valueConcDate = $("#conclusionDate").data("kendoDatePicker").value();
-        var valueNbuRegDate = $("#nbuRegDate").data("kendoDatePicker").value();
         var concDate = kendo.toString(valueConcDate, "dd/MM/yyyy");
-        var nbuDate = kendo.toString(valueNbuRegDate, "dd/MM/yyyy");
 
         var megamodel = {
             colDatConclusion: concDate,
-            colNbuRegDate: nbuDate,
             nd: globalND,
             productCode: $("#productType").val(),
             n_nbu: $("#nbuId").val()
@@ -84,7 +69,7 @@ $(document).ready(function() {
             type: "POST",
             url: bars.config.urlContent("/api/mbdk/savedeal/SaveDeal"),
             data: megamodel,
-            success: function(data) {
+            success: function (data) {
                 bars.ui.loader('body', false);
 
                 if (data.error == null || data.error == "") {
@@ -92,7 +77,6 @@ $(document).ready(function() {
                     $("#btnSave").data("kendoButton").enable(false);
 
                     editableModel.conclusionDateStartValue = kendo.toString(valueConcDate, "dd.MM.yyyy");
-                    editableModel.nbuRegDateValue = kendo.toString(valueNbuRegDate, "dd.MM.yyyy");
                     editableModel.product = $("#productType").val();
                     editableModel.nbuNumber = $("#nbuId").val();
 

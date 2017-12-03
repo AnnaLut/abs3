@@ -1,9 +1,6 @@
-PROMPT ===================================================================================== 
+п»їPROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/Table/BUS_MOD.sql =========*** Run *** =====
 PROMPT ===================================================================================== 
-
-
-
 
 
 PROMPT *** ALTER_POLICY_INFO to BUS_MOD***
@@ -35,11 +32,11 @@ exception when others then
 end; 
 /
 
-COMMENT ON TABLE BARS.BUS_MOD IS 'Тип бізнес моделі для договору';
+COMMENT ON TABLE BARS.BUS_MOD IS 'РўРёРї Р±С–Р·РЅРµСЃ РјРѕРґРµР»С– РґР»СЏ РґРѕРіРѕРІРѕСЂСѓ';
 
-COMMENT ON COLUMN BARS.BUS_MOD.BUS_MOD_ID IS 'Код параметра';
+COMMENT ON COLUMN BARS.BUS_MOD.BUS_MOD_ID IS 'РљРѕРґ РїР°СЂР°РјРµС‚СЂР°';
 
-COMMENT ON COLUMN BARS.BUS_MOD.BUS_MOD_NAME IS 'Наименование параметра';
+COMMENT ON COLUMN BARS.BUS_MOD.BUS_MOD_NAME IS 'РќР°РёРјРµРЅРѕРІР°РЅРёРµ РїР°СЂР°РјРµС‚СЂР°';
 
 PROMPT *** Create  constraint PK_BUS_MOD ***
 begin   

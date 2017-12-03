@@ -24,7 +24,7 @@ PROMPT *** Create  view VV_9819 ***
           k.prim,
 		  k.branch branch_cx
      FROM cc_deal d, customer c, ND_9819 k
-    WHERE     d.vidd IN (1, 2, 3, 11, 12, 13,10)
+    WHERE     d.vidd IN (1, 2, 3, 11, 12, 13)
           --AND d.sos >= 10
           --AND d.sos <= 13
           AND d.rnk = c.rnk
