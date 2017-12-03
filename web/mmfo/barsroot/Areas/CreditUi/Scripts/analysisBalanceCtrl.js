@@ -43,8 +43,7 @@ angular.module("BarsWeb.Controllers", ['kendo.directives'])
         };
         $scope.payment = {
             NPP: null,
-            NAZN: null,
-            OSTC: null
+            NAZN: null
         };
 
         $scope.nppval = {
@@ -122,9 +121,9 @@ angular.module("BarsWeb.Controllers", ['kendo.directives'])
                 },
                 batch: true,
                 pageSize: 20,
-                //   serverPaging: true,
-                //   serverFiltering: true,
-                //   serverSorting: true,
+                serverPaging: true,
+                serverFiltering: true,
+                serverSorting: true,
                 schema: {
                     data: "Data",
                     total: "Total",
@@ -144,7 +143,6 @@ angular.module("BarsWeb.Controllers", ['kendo.directives'])
                 }
             },
             selectable: true,
-            filterable: true,
             dataBound: function (data) {
                 var d = data.sender._data[0];
                 if (d) {
@@ -171,7 +169,7 @@ angular.module("BarsWeb.Controllers", ['kendo.directives'])
                     $scope.isAccShow = true;
                     $scope.$apply();
                 }
-                if (selectKredit && selectDebit && $scope.credit.OSTB <= selectKredit.OSTB) {
+                if (selectKredit && selectDebit && $scope.credit.OSTB <= selectKredit.OSTB && $scope.payment.NPP > 0) {
                     $scope.isDisExec = false;
                     $scope.$apply();
                 }
@@ -233,14 +231,11 @@ angular.module("BarsWeb.Controllers", ['kendo.directives'])
                         url: "#"
                     }
                 },
-                aggregate: [{ field: "OSTB", aggregate: "sum" },
-                    { field: "OSTC", aggregate: "sum" },
-                ],
                 batch: true,
-                pageSize: 1000,
-                //  serverPaging: true,
-                //  serverFiltering: true,
-                //   serverSorting: true,
+                pageSize: 20,
+                serverPaging: true,
+                serverFiltering: true,
+                serverSorting: true,
                 schema: {
                     data: "Data",
                     total: "Total",
@@ -282,9 +277,6 @@ angular.module("BarsWeb.Controllers", ['kendo.directives'])
                         $(elem).addClass("k-success-colored");
                     }
                 });
-
-                var total = $scope.CalcSum();
-                $("#Summ").html(total.toString());
             },
             change: function (e) {
                 var gridKredit = $scope.gridKredit;
@@ -298,7 +290,7 @@ angular.module("BarsWeb.Controllers", ['kendo.directives'])
                         e.sender.tbody.find(">tr:not(.k-grouping-row)[data-uid=" + item.uid + "]").addClass("k-state-selected");
                     }
                 }
-                if (selectKredit && selectDebit && $scope.credit.OSTB <= selectKredit.OSTB) {
+                if (selectKredit && selectDebit && $scope.credit.OSTB <= selectKredit.OSTB && $scope.payment.NPP > 0) {
                     $scope.isDisExec = false;
                     $scope.$apply();
                 }
@@ -308,21 +300,10 @@ angular.module("BarsWeb.Controllers", ['kendo.directives'])
                 }
 
             },
-            sortable: true,
             editable: true,
-            filterable: true,
-            edit: function (e) {
-                if (e.container.context.cellIndex == 7) {
-                    var input = e.container.find("input");
-                    input.dblclick(function () {
-                        e.model.set("NPP", Math.abs(e.model.OSTC));
-                    });
-                }
-            },
             save: function (e) {
-                if (e.values.NPP || $scope.payment.NPP != null) {
+                if (e.values.NPP) {
                     $scope.payment.NPP = e.values.NPP;
-                    $scope.payment.OSTC = e.model.OSTC;
                 }
                 if (e.values.NAZN) {
                     $scope.payment.NAZN = e.values.NAZN;
@@ -339,89 +320,62 @@ angular.module("BarsWeb.Controllers", ['kendo.directives'])
             columns: [{
                 field: "TIP",
                 title: "Тип",
-                width: 50,
-                sortable: false
+                width: 50
             },
             {
                 field: "KV",
                 title: "Вал.",
-                width: 50,
-                sortable: false
+                width: 50
             },
             {
                 field: "NLS",
                 title: "Рах. погашення",
-                width: 120,
-                sortable: false
+                width: 120
             },
             {
                 field: "NMS",
                 title: "Назва рах.",
-                width: 200,
-                sortable: false
+                width: 200
             },
             {
                 field: "FDAT",
                 title: "Факт-дата видачі",
                 format: "{0:dd.MM.yyyy}",
-                width: 100,
-                sortable: true
+                width: 100
             },
             {
                 field: "OSTB",
                 title: "Плановий зал.",
                 template: "#=moneyFormat(OSTB)#",
-                width: 100,
-                footerTemplate: " #: kendo.toString(sum, 'n2') #",
-                format: "{0:##,#}",
-                sortable: true
+                width: 100
             },
             {
                 field: "OSTC",
                 title: "Фактичний зал.",
                 template: "#=moneyFormat(OSTC)#",
-                width: 100,
-                footerTemplate: " #: kendo.toString(sum, 'n2') #",
-                format: "{0:##,#}",
-                sortable: true
+                width: 100
             },
             {
                 field: "NPP",
                 title: "Погасити суму",
                 template: "#=moneyFormat(NPP)#",
-                width: 100,
-                footerTemplate: " <span id='Summ'> </span> ",
-                sortable: false
+                width: 100
             },
             {
                 field: "DPLAN",
                 title: "План-дата погаш.",
                 format: "{0:dd.MM.yyyy}",
-                width: 100,
-                sortable: true
+                width: 100
             },
             {
                 field: "NAZN",
                 title: "Призначення платежу",
-                width: 200,
-                sortable: false
+                width: 200
             }/*,
             {
                 command: ["edit"]
             }*/]
         };
-
-        $scope.CalcSum = function () {
-            var newValue = 0;
-
-            var grid = $scope.gridDebit;
-            var data = grid.dataSource.data();
-            $(data).each(function (index, elem) {
-                newValue += elem.NPP;
-            });
-
-            if (newValue != 0) { return moneyFormat(newValue); } else { return ""; }
-        }
 
         $scope.window;
         $scope.showAccList = function () {
@@ -456,7 +410,7 @@ angular.module("BarsWeb.Controllers", ['kendo.directives'])
             debugger;
             if (kredit < sumDebit) {
                 bars.ui.error({
-                    text: "Введена сума перевищує залишок на рахунку!"
+                    text: "Введена сума перебільшує залишок на рахунку!"
                 });
             }
             else {
@@ -473,7 +427,7 @@ angular.module("BarsWeb.Controllers", ['kendo.directives'])
                                 SD: selectDebit.NPP * 100,//($scope.payment.NPP ? $scope.payment.NPP : selectDebit.NPP) * 100,
                                 KVK: selectDebit.KV,
                                 NLSK: selectDebit.NLS,
-                                NAZN: selectDebit.NAZN  //$scope.payment.NAZN ? $scope.payment.NAZN : selectDebit.NAZN
+                                NAZN: $scope.payment.NAZN ? $scope.payment.NAZN : selectDebit.NAZN
                             };
                             isgModelArray.push(isgModel);
                         }
@@ -550,28 +504,16 @@ angular.module("BarsWeb.Controllers", ['kendo.directives'])
             }*/
         };
 
-        $scope.$watch('payment.NPP', function (e) {
-            var total = $scope.CalcSum();
+        $scope.$watch('payment.NPP', function () {
             var gridKredit = $scope.gridKredit;
             var gridDebit = $scope.gridDebit;
             var selectKredit = gridKredit.dataItem(gridKredit.select());
-            var lastSelectItem = gridDebit.dataItem(gridDebit.select().last());
-
             var selectDebit = gridDebit.dataItem(gridDebit.select());
             if (selectKredit && selectDebit && $scope.credit.OSTB <= selectKredit.OSTB && $scope.payment.NPP > 0) {
                 $scope.isDisExec = false;
-                $scope.$apply();
             }
             else {
                 $scope.isDisExec = true;
             }
-            if (selectDebit && Math.abs($scope.payment.OSTC) < $scope.payment.NPP) {
-                bars.ui.alert({
-                    text: "Введена сума перевищує залишок на рахунку!"
-                });
-
-            }
-            
-              $("#Summ").html(total.toString().replace(/(\d{1,3})(?=((\d{3})*([^\d]|$)))/g, "$1"));
         });
     }]);

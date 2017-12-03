@@ -40,17 +40,27 @@ namespace BarsWeb.Areas.CreditUi.Controllers
             return Json(_provideRepository.GetStaticDataBPK(id));
         }
 
-        public ActionResult GetProvideList(decimal id, decimal? tip, [DataSourceRequest]DataSourceRequest request)
+        public ActionResult GetProvideList(decimal id, decimal? tip, byte? balance, [DataSourceRequest]DataSourceRequest request)
         {
-            IQueryable<ProvideList> session = _provideRepository.GetProvideList(id, tip);
-            return Json(session.ToDataSourceResult(request), JsonRequestBehavior.AllowGet);
+            try
+            {
+                IQueryable<ProvideList> session = _provideRepository.GetProvideList(id, tip, balance);
+                return Json(session.ToDataSourceResult(request), JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception e) { Status = e.Message + " StackTrace=" + e.StackTrace; }
+            return Json(new { Status = Status }, JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult GetProvidePerRef(decimal id, decimal? tip, [DataSourceRequest]DataSourceRequest request)
+        public ActionResult GetProvidePerRef(decimal id, decimal? tip, byte? balance, [DataSourceRequest]DataSourceRequest request)
         {
-            IQueryable<ExistProvide> session = _provideRepository.GetProvidePerRef(id, tip);
-            return Json(session.ToDataSourceResult(request), JsonRequestBehavior.AllowGet);
-        }
+                try
+                {
+                    IQueryable<ExistProvide> session = _provideRepository.GetProvidePerRef(id, tip, balance);
+                    return Json(session.ToDataSourceResult(request), JsonRequestBehavior.AllowGet);
+                }
+                catch (Exception e) { Status = e.Message + " StackTrace=" + e.StackTrace; }
+                return Json(new { Status = Status }, JsonRequestBehavior.AllowGet);
+            }
         public ActionResult DeleteProvide(string provideString, decimal id, int tip)
         {
             try
@@ -75,34 +85,34 @@ namespace BarsWeb.Areas.CreditUi.Controllers
             return Json(new { Status = Status }, JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult AddProvide(string provideString, decimal? id, decimal? accs)
+        public ActionResult AddProvide(string provideString, decimal? id, decimal? accs, int? tip)
         {
             try
             {
                 var serializer = new JavaScriptSerializer();
                 UpdateProvide provide = serializer.Deserialize<UpdateProvide>(provideString);
                 List<UpdateProvide> provide_list = new List<UpdateProvide> { provide };
-                _provideRepository.CreateOrEditGroupProvide(provide_list, id,accs);
+                _provideRepository.CreateOrEditGroupProvide(provide_list, id,accs,tip);
             }
             catch (Exception e) { Status = e.Message + " StackTrace=" + e.StackTrace; }
             return Json(new { Status = Status });
         }
 
-        public ActionResult EditProvide(string provideString, decimal? nd)
+        public ActionResult EditProvide(string provideString, decimal? nd, int? tip)
         {
             try
             {
                 var serializer = new JavaScriptSerializer();
                 List<UpdateProvide> provide_list = serializer.Deserialize<List<UpdateProvide>>(provideString);
-                _provideRepository.CreateOrEditGroupProvide(provide_list, nd,null);
+                _provideRepository.CreateOrEditGroupProvide(provide_list, nd,null,tip);
             }
             catch (Exception e) { Status = e.Message + " StackTrace=" + e.StackTrace; }
             return Json(new { Status = Status });
         }
 
-        public ActionResult GetPawn([DataSourceRequest] DataSourceRequest request, string nls)
+        public ActionResult GetPawn([DataSourceRequest] DataSourceRequest request, string nls, byte? tip, byte? balance)
         {
-            return Json(_provideRepository.GetPawn(nls).ToDataSourceResult(request), JsonRequestBehavior.AllowGet);
+            return Json(_provideRepository.GetPawn(nls,tip,balance).ToDataSourceResult(request), JsonRequestBehavior.AllowGet);
         }
 
         public ActionResult GetKV([DataSourceRequest] DataSourceRequest request, string branch)

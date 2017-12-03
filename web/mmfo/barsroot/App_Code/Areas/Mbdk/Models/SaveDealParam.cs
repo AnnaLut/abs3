@@ -21,18 +21,26 @@
         public string NLSA { get; set; }
         public string NLSNA { get; set; }
         public string NLSNB { get; set; }
-        public string NMKB  { get; set; }
+        public string NMKB { get; set; }
         public string NMSN { get; set; }
         public string Nazn_ { get; set; }
         public string NLSZ_ { get; set; }
         public decimal nKVZ_ { get; set; }
         public decimal p_pawn { get; set; }
         public string BICKA { get; set; }
-        public string SSLA  { get; set; }
+        public string SSLA { get; set; }
         public string BICKB { get; set; }
         public string SSLB { get; set; }
         public decimal colSummaP { get; set; }
         public string NMS { get; set; }
         public string AltB { get; set; }
+        public string colDatConclusion { get; set; }
+
+        public string colNbuRegDate { get; set; }
+
+        public decimal productCode { get; set; }
+        public string n_nbu { get; set; }
+        public string irr { get; set; }
+        public string nd { get; set; }
     }
 }
