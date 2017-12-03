@@ -27,7 +27,7 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
             try
             {
                 cmd.CommandType = System.Data.CommandType.Text;
-                cmd.CommandText = @"select cd.cc_id || ' від ' || to_char(cd.sdate,'dd.MM.yyyy') as cc_id, 
+                cmd.CommandText = @"select cd.cc_id || ' від ' || trunc(cd.sdate) as cc_id, 
                                            c.okpo,
                                            cd.nd
                                       from cc_deal cd, 
@@ -97,11 +97,17 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
             try
             {
                 cmd.CommandType = System.Data.CommandType.Text;
-                cmd.CommandText = @"SELECT  t.dplan,t.FDAT,t.NPP,t.acc,t.tip,t.kv,t.nls,t.nms,t.ostb,t.ostc
-                    from VW_ASP_CREDIT_LIST_SUB_ND t where t.ndg=:nd
-                    union
-                    select t.dplan,t.FDAT,t.NPP,t.acc,t.tip,t.kv,t.nls,t.nms,t.ostb,t.ostc 
-                    from VW_ASP_CREDIT_LIST t where nd=:nd";
+                cmd.CommandText = @"SELECT  t.dplan,
+                          t.FDAT,
+                          t.NPP ,
+                          t.acc,
+                          t.tip,
+                          t.kv,
+                          t.nls,
+                          t.nms,
+                          t.ostb ,
+                          t.ostc
+                     FROM vw_asp_credit_list t where t.nd=:nd";
                 cmd.Parameters.Add("nd", OracleDbType.Decimal, nd, System.Data.ParameterDirection.Input);
                 OracleDataReader reader = cmd.ExecuteReader();
 

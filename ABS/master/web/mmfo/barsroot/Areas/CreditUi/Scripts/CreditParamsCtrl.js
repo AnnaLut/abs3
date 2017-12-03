@@ -6,11 +6,6 @@
     $scope.showReferKv = function (tabName, showFields, whereClause, creditKey) {
         bars.ui.handBook(tabName, function (data) {
                 var kv = data[0].KV;
-                if($rootScope.credit.curValue.KV == kv){
-                    bars.ui.error({ text: "Виберіть іншу валюту" });
-                    return;
-                }
-
                 for(var i = 0; i < creditKeys.length; i++){
                     var k = creditKeys[i];
                     if(k != creditKey && $rootScope.credit[k] == kv){
@@ -37,7 +32,7 @@
     $scope.isPruductBtnEnabled = function () { return $rootScope.credit.aimValue != null; };
     $scope.isDdlAimEnabled = function () { return $rootScope.credit.custValue != null; };
 
-/*    angular.element(document).ready(function () {
+    angular.element(document).ready(function () {
 
         if (!$rootScope.nd) {
             var url = '/api/kernel/Params/GetParam/?id=MFO';
@@ -50,7 +45,7 @@
             });
         }
     });
-*/
+
     var checkRisk = function () {
         
         if ($rootScope.credit.finValue != null && $rootScope.credit.obsValue != null) {
@@ -142,12 +137,8 @@
         change: function(e) {
             var dd = this;
             var v = dd.value();
-            if(($rootScope.sos == "0") || ($rootScope.sos == null)){
-                $rootScope.credit.listUnsedValue = getUnsedValueByVidd([{VIDD: v}]);
-            }
+            $rootScope.credit.listUnsedValue = getUnsedValueByVidd([{VIDD: v}]);
             $scope.$apply();
-            $scope.ddlAim.dataSource.read();
-            $rootScope.LoadRangs();
         },
         dataBound: function (e) {
             var dd = this;
@@ -161,12 +152,6 @@
 
     $scope.ddlListUnsedOptions = {
         dataSource: LIST_UNSED,
-        dataTextField: "name",
-        dataValueField: "id"
-    };
-
-    $scope.ddlListServiceOptions = {
-        dataSource: [{ id: "0", name: "Класичний" }, { id: "1", name: "Ануїтетний" }],
         dataTextField: "name",
         dataValueField: "id"
     };
@@ -191,8 +176,8 @@
                 read: {
                     url: url + "getAim",
                     data: {
-                        vidd: function () {
-                            return $rootScope.credit.viddValue.VIDD;
+                        rnk: function () {
+                            return $rootScope.credit.rnkValue;
                         },
                         dealDate: function () {
                             var date = kendo.toString(kendo.parseDate($rootScope.credit.startValue), 'dd.MM.yyyy');
@@ -248,7 +233,7 @@
         var yearDiff = ((diff[2] <= 365));
         if (!$scope.credit.aimValue) return false;
         var aim = $scope.credit.aimValue.AIM;
-        var urlui = url + 'getAimBal?vidd=' + $rootScope.credit.viddValue.VIDD + "&aim=" + /*e.sender._old*/aim + "&yearDiff=" + yearDiff;
+        var urlui = url + 'getAimBal?rnk=' + $rootScope.credit.rnkValue + "&aim=" + /*e.sender._old*/aim + "&yearDiff=" + yearDiff;
         $http.get(urlui).then(function (request) {
             if (request.data && request.data.NLS) {
                 urlui = url + 'setMasIni';
@@ -389,6 +374,7 @@
             $rootScope.credit.rnkValue = data[0].RNK;
             $rootScope.credit.nmkValue = data[0].NMK;
             $scope.ddlVidd.dataSource.read();
+            $scope.ddlAim.dataSource.read();
             $rootScope.$apply();
         },
         {
@@ -488,8 +474,5 @@
         });
     }
 
-    $scope.FillLim = function () {
-        $rootScope.credit.lim = $rootScope.credit.sumValue;
-    };
 
 }]);

@@ -43,7 +43,6 @@ namespace BarsWeb.Areas.CreditUi
             ninjectKernel.Bind<IAnalysisBalanceRepository>().To<AnalysisBalanceRepository>();
             ninjectKernel.Bind<IProvideRepository>().To<ProvideRepository>();
             ninjectKernel.Bind<IAccountsRepository>().To<AccountsRepository>();
-            ninjectKernel.Bind<IglkRepository>().To<glkRepository>();
         }
     }
 }

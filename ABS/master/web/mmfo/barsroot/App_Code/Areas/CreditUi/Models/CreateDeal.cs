@@ -64,6 +64,5 @@ namespace BarsWeb.Areas.CreditUi.Models
         public DateTime? DATSN { get; set; }
         public string DAYNP { get; set; }
         public string DAYNPNAME { get; set; }
-        public decimal? LIM { get; set; }
     }
 }

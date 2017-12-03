@@ -6,8 +6,9 @@
 <script src="~/lib/jsZip/jszip.js"></script>
 <script src="~/Scripts/respond.min.js"></script>
 <script src="~/Areas/Way4Bpk/Scripts/KendoCommon.js?v1.0"></script>
-<script src="~/Areas/Way4Bpk/Scripts/Way4Bpk/NewCard.js?v1.3"></script>
-<script src="~/Areas/Way4Bpk/Scripts/Way4Bpk/Main.js?v1.3.1"></script>
+<script src="~/Areas/Way4Bpk/Scripts/Way4Bpk/NewCard.js?v1.1.6"></script>
+<script src="~/Areas/Way4Bpk/Scripts/Way4Bpk/AddParams.js?v1.3.3"></script>
+<script src="~/Areas/Way4Bpk/Scripts/Way4Bpk/Main.js?v1.1.6"></script>
 <link rel="stylesheet" href="~/Areas/Way4Bpk/Css/Way4Bpk/Main.css" />
 
 <div class="page-header">
@@ -68,7 +69,7 @@
 <div id="gridMain"></div>
 <div class="search-main"></div>
 
-<div id="dialogProcessing">
+<div id="dialogProcessing" style="display:none">
     <div class="search-proc"></div>
 
     <div class="row">
@@ -88,7 +89,7 @@
     </div>
 </div>
 
-<div id="dialogCngCard">
+<div id="dialogCngCard" style="display:none">
     <div class="search-cng-card"></div>
     <div id="gridCngCard"></div>
     <div style="margin-top: 4px;text-align: center;">
@@ -96,19 +97,19 @@
     </div>
 </div>
 
-<div id="dialogNewCard">
+<div id="dialogNewCard" style="display:none">
     <div class="search-NewCard"></div>
     <br />
     <table border="0">
         <tr>
             <td>
-                <div class="form-group" style="margin-right:15px">
+                <div id="fo_W4_PRODUCT_GROUPS_REF" class="form-group" style="margin-right:15px">
                     <a class='k-button' id="gBpkW4ProductGrp" onclick="showRefer('W4_PRODUCT_GROUPS_REF')"><i class='pf-icon pf-16 pf-book'></i></a>
                     <label class="control-label" for="gBpkW4ProductGrp"><b>Група продуктів</b></label>
                 </div>
             </td>
             <td>
-                <div class="form-group" style="margin-right:15px">
+                <div id="fo_GBPKW4PROECT_REF" class="form-group" style="margin-right:15px">
                     <a class='k-button' id="gBpkW4Proect" onclick="showRefer('GBPKW4PROECT_REF')"><i class='pf-icon pf-16 pf-book'></i></a>
                     <label class="control-label" for="gBpkW4Proect"><b>Зарплатний проект</b></label>
                 </div>
@@ -128,10 +129,10 @@
         </tr>
         <tr>
             <td>
-                <div class="form-group" style="margin-right:15px"><div id="gBpkW4ProductGrpValue"></div></div>
+                <div id="fo_val_GBPKW4PROECT_REF" class="form-group" style="margin-right:15px"><div id="gBpkW4ProductGrpValue"></div></div>
             </td>
             <td>
-                <div class="form-group" style="margin-right:15px"><div id="gBpkW4ProectValue"></div></div>
+                <div id="fo_val_GBPKW4PROECT_REF" class="form-group" style="margin-right:15px"><div id="gBpkW4ProectValue"></div></div>
             </td>
             <td>
                 <div class="form-group" style="margin-right:15px"><div id="gBpkW4ProductValue"></div></div>
@@ -193,7 +194,7 @@
     </button>
 </div>
 
-<div id="dialogGo2BackOffice">
+<div id="dialogGo2BackOffice" style="display:none">
     <div class="search-Go2BackOffice"></div>
     
     <div class="row">
@@ -214,6 +215,83 @@
     <div class="row">
         <div class="col-md-12">
             <button id="Go2BackOfficeConfirmBtn" type="button" class="btn btn-primary" style="margin-left: 40%">
+                <i class="fa fa-pencil-square-o"></i> Змінити
+            </button>
+        </div>
+    </div>
+</div>
+
+<div id="dialogAddParams" style="display:none">
+    <div class="search-AddParams"></div>
+
+    <div class="row">
+        <div class="col-md-3">
+            <div class="form-group">
+                <a class='k-button' id="BUS_MOD" onclick="showReferAddParams('BUS_MOD')"><i class='pf-icon pf-16 pf-book'></i></a>
+                <label class="control-label" for="BUS_MOD"><b>Тип бізнес моделі для договору</b></label>
+                <hr />
+                <div id="BUS_MOD_Tag"></div>
+                <div id="BUS_MOD_Value"></div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <a class='k-button' id="IFRS" onclick="showReferAddParams('IFRS')"><i class='pf-icon pf-16 pf-book'></i></a>
+                <label class="control-label" for="IFRS_MOD"><b>Класифікаіція за МСФЗ</b></label>
+                <hr />
+                <div id="IFRS_Tag"></div>
+                <div id="IFRS_Value"></div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <a class='k-button' id="SPPI" onclick="showReferAddParams('SPPI')"><i class='pf-icon pf-16 pf-book'></i></a>
+                <label class="control-label" for="SPPI"><b>Відповідність критерію SPPI</b></label>
+                <hr />
+                <div id="SPPI_Tag"></div>
+                <div id="SPPI_Value"></div>
+            </div>
+        </div>
+    </div>
+    <hr />
+    <div class="row">
+        <div class="col-md-12">
+            <div id="AddParamsMsg" class="alert alert-danger">Дані модифіковано</div>
+            <button id="AddParamsConfirmBtn" type="button" class="btn btn-primary" style="margin-left: 40%">
+                <i class="fa fa-pencil-square-o"></i> Змінити
+            </button>
+        </div>
+    </div>
+</div>
+
+
+<div id="dialogCardUpdate" style="display:none">
+    <div class="search-CardUpdate"></div>
+
+    <div class="row">
+        <div class="col-md-3">
+            <div class="form-group">
+                <label for="ndCardUpdate"><b>Номер договору:</b></label>
+                <input type="text" class="form-control" id="ndCardUpdate" readonly style="background-color:cornsilk;display: inline;width: 180px" />
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label for="accNlsCardUpdate"><b>Картковий рахунок:</b></label>
+                <input type="text" class="form-control" id="accNlsCardUpdate" readonly style="background-color:cornsilk;display: inline;width:180px" />
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label for="idatCardUpdate"><b>Дата видачі картки:</b></label>
+                <input type="text" class="form-control" id="idatCardUpdate" style="display: inline;width: 180px" />
+                <div id="idatCardUpdateErrorMsg" class="alert alert-danger">Дата не може бути більше поточної.</div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <button id="CardUpdateConfirmBtn" type="button" class="btn btn-primary" style="margin-left: 40%">
                 <i class="fa fa-pencil-square-o"></i> Змінити
             </button>
         </div>

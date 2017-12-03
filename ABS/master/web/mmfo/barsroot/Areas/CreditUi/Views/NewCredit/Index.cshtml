@@ -2,19 +2,19 @@
     Layout = "~/Views/Shared/_LayoutKendo.cshtml";
     //ViewBag.Title = "";
 }
-<script src="~/Areas/CreditUi/Scripts/creditUiServices.js?v1.0.1"></script>
+<script src="~/Areas/CreditUi/Scripts/creditUiServices.js"></script>
 <script src="~/Areas/CreditUi/Scripts/maskedDatePicker.js"></script>
 <script src="~/Areas/CreditUi/Scripts/mainCreditCtrl.js"></script>
 <script src="~/Areas/CreditUi/Scripts/creditParamsCtrl.js"></script>
 <script src="~/Areas/CreditUi/Scripts/dataMaturityCtrl.js"></script>
 <script src="~/Areas/CreditUi/Scripts/commitionLimitCtrl.js"></script>
-<script src="~/Areas/CreditUi/Scripts/moreCreditParamsCtrl.js?v1.0.1"></script>
+<script src="~/Areas/CreditUi/Scripts/moreCreditParamsCtrl.js"></script>
 <div ng-controller="CreditUi.mainCreditCtrl">
     <h1>{{Title}}</h1>
     <div kendo-tool-bar="mainTool">
         <button class="k-button" ng-click="save()" ng-disabled="!isSaveBtnEnabled()"><span class='pf-icon pf-16 pf-save'></span> Зберегти</button>
         <button class="k-button" ng-click="prolongation()" ng-show="nd != null && !isTagOnly"><span class='pf-icon pf-16 pf-calendar-update'></span> Пролонгація</button>
-        <button class="k-button" ng-click="creditUpdate()" ng-show="nd != null"><span class='pf-icon pf-16 pf-reload_rotate'></span> Обновити</button>
+        <button class="k-button" ng-click="prolongationUpdate()" ng-show="nd != null"><span class='pf-icon pf-16 pf-reload_rotate'></span> Обновити</button>
     </div>
     <fieldset>
         <form kendo-validator="validator" k-options="mainValidationOptions">

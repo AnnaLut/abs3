@@ -88,7 +88,7 @@ public partial class credit_fin_nbu_fin_kved : Bars.BarsPage
 
     private void FillData()
     {
-
+        load_form();
         try
         {
             
@@ -108,7 +108,7 @@ public partial class credit_fin_nbu_fin_kved : Bars.BarsPage
         {
             DisposeOraConnection();
         }
-        load_form();
+       // load_form();
     }
 
     protected void load_form()
@@ -118,7 +118,7 @@ public partial class credit_fin_nbu_fin_kved : Bars.BarsPage
  
         OracleConnection con = OraConnector.Handler.IOraConnection.GetUserConnection();
         OracleCommand cmd = new OracleCommand(OraConnector.Handler.IOraConnection.GetSetRoleCommand("WR_CREDIT"), con);
-
+        
         try
         {
             CultureInfo cinfo = CultureInfo.CreateSpecificCulture("en-GB");
@@ -131,11 +131,10 @@ public partial class credit_fin_nbu_fin_kved : Bars.BarsPage
             // установка роли
             cmd.ExecuteNonQuery();
 
-
-
+            cmd.Parameters.Add("dat", OracleDbType.Date, Convert.ToDateTime(DATP_.Value, cinfo), ParameterDirection.Input);
             cmd.Parameters.Add("dat", OracleDbType.Date, dat, ParameterDirection.Input);
             cmd.Parameters.Add("OKPO", OracleDbType.Decimal, rnk, ParameterDirection.Input);
-            cmd.CommandText = @" select c.nmk, c.okpo, f.ved, (select count(1) from fin_kved where okpo = c.okpo and dat = f.fdat and flag = 1) kol, to_char(trunc(f.fdat,'YYYY') -1,'YYYY') Year_
+            cmd.CommandText = @" select c.nmk, c.okpo, f.ved, (select count(1) from fin_kved where okpo = c.okpo and dat = f.fdat and flag = 1) kol, case when (sysdate-datea) < 366 then to_char(:dat,'DD.MM.YYYY') else to_char(trunc(f.fdat,'YYYY') -1,'YYYY') end Year_, case when (sysdate-datea) < 366 then 1 else 0 end tips, to_char(datea) as datea
                                   from fin_customer c 
                                        left join fin_fm f on c.okpo = f.okpo and f.fdat = :dat 
                                  where c.rnk = :rnk";
@@ -144,6 +143,15 @@ public partial class credit_fin_nbu_fin_kved : Bars.BarsPage
             if (rdr.Read())
             {
                 LbOrp.Text = "Обсяг реалізованої продукції за " + Convert.ToString(rdr["Year_"]) + " рік";
+                
+                //новостворені підприемства дані перем за звітний період а не за попередній рік
+                if (Convert.ToDecimal(rdr["TIPS"]) == 1) 
+                { 
+                     DAT_.Value = DATP_.Value;
+                     LbOrp.Text = "Обсяг реалізованої продукції на " + Convert.ToString(rdr["Year_"]) + " рік";
+                } 
+
+                
                 LbNMK.Text = Convert.ToString(rdr["NMK"]);
                 Decimal Flag = Convert.ToDecimal(rdr["KOL"]);
 

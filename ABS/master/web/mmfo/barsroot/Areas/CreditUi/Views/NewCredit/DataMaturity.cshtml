@@ -6,7 +6,7 @@
     <table>
         <tr>
             <td>
-                <label>Шаблон погашення рахунку "SG"</label><span style="color: red; margin-left:10px" ng-show="!isViddValid()">Оберіть вид</span>
+                <label>Шаблон погашення рахунку "SG"</label>
             </td>
             <td>
                 <select kendo-drop-down-list="ddlRang" name="ddlRang" id="ddlRang" style="width: 400px" k-ng-model="credit.rangValue" k-options="ddlRangOptions" k-ng-disabled="isSaveFunc()"></select>
@@ -14,7 +14,7 @@
         </tr>
         <tr>
             <td>
-                <div class="panel panel-default" style="display: inline-flex;width:100%;height:310px">
+                <div class="panel panel-default" style="display: inline-flex;width:100%;height:300px">
                     <div class="panel-body">
                         <div class="form-group">
                             <label><b>Погашення основного боргу</b></label>
@@ -54,24 +54,9 @@
                                         <span style="color: red" ng-show="!isFirtsPayDateValueValid()">Обов'язкове</span>
                                     </td>
                                 </tr>
-                                <tr colspan="2">
-                                    <td>
-                                        <label>Канікули: </label>
-                                    </td>
-                                </tr>
-                                <tr colspan="2">
+                                <tr>
                                     <td colspan="2">
-                                        <select kendo-drop-down-list style="width: 140px" k-ng-model="credit.holidayValue" k-options="ddlListHolidays" ng-disabled="isSaveFunc()"></select>
-                                    </td>
-                                </tr>
-                                <tr colspan="2">
-                                    <td colspan="2">
-                                        <label>Тип урегулювання дня погашення: </label>
-                                    </td>
-                                </tr>
-                                <tr colspan="2">
-                                    <td colspan="2">
-                                        <select kendo-drop-down-list style="width: 270px" k-ng-model="credit.daynp" k-options="ddlDayNP" ng-disabled="isSaveFunc()" ></select>
+                                        <input type="checkbox" ng-model="credit.holidayValue" id="chkHoliday" name="chkHoliday" ng-disabled="isSaveFunc()"/>  <label>канікули?</label>
                                     </td>
                                 </tr>
                             </table>
@@ -80,7 +65,7 @@
                 </div>
             </td>
             <td>
-                <div class="panel panel-default" style="display: inline-flex;width:100%;height:310px">
+                <div class="panel panel-default" style="display: inline-flex;width:100%;height:300px">
                     <div class="panel-body">
                         <div class="form-group">
                             <label><b>Погашення процентного боргу</b></label>
@@ -126,9 +111,7 @@
                                 </tr>
                                 <tr>
                                     <td colspan="2">
-                                        <select kendo-drop-down-list name="ddlPrevious" id="ddlPrevious" style="width: 150px" k-ng-model="credit.previousValue" k-options="ddlPreviousOptions" k-ng-disabled="isSaveFunc()"></select>
-                                        <span style="color: red" ng-show="!isFlagsValid()">92 - неможливе значення FLAGS</span>
-                                        <label style="color: green"  ng-show="isFlagsValid()">значення FLAGS:</label>  <span style="color: green" ng-show="isFlagsValid()" ng-bind="credit.holidayValue.ID + credit.previousValue.ID"> </span>
+                                        <select kendo-drop-down-list name="ddlPrevious" id="ddlPrevious" style="width: 100px" k-ng-model="credit.previousValue" k-options="ddlPreviousOptions" k-ng-disabled="!credit.diffDaysValue || isSaveFunc()"></select>
                                     </td>
                                 </tr>
                             </table>
