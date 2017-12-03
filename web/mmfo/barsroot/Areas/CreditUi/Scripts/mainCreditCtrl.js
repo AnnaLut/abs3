@@ -23,20 +23,35 @@
     $rootScope.isDdlViddValueValid = function() { return !isEmpty($rootScope.credit.viddValue); };
     $rootScope.isProdValueValid = function() { return !isEmpty($rootScope.credit.prodValue); };
     $rootScope.isBaseRateValueValueValid = function() {
-        return !isEmpty($rootScope.credit.baseRateValue) || !isEmpty($rootScope.credit.rateAValue);
+        var isRateAValue = !isEmpty($rootScope.credit.rateAValue);
+        if(!isRateAValue){
+            var prodValue = $rootScope.credit.prodValue;
+            var isProdValueValid = false;
+            if(!isEmpty(prodValue)){
+                isProdValueValid = prodValue[0] == "9";
+            }
+            if(isProdValueValid){
+                isRateAValue = $rootScope.credit.rateAValue !== null;
+            }
+        }
+        return !isEmpty($rootScope.credit.baseRateValue) || isRateAValue;
     };
+    $rootScope.isViddValid = function () { return !isEmpty($rootScope.credit.viddValue); };
+
+
+    $rootScope.isFlagsValid = function () { return !($rootScope.credit.holidayValue.ID == "9" && $rootScope.credit.previousValue.ID == "2"); };  //92 - неможливе значення FLAGS
 
     $scope.DatesValidMsg = "";
     $rootScope.isDatesValid = function () {
         $scope.DatesValidMsg = "";
         var conslDate = kendo.parseDate($rootScope.credit.conslValue);
-        if(conslDate == null){ $scope.DatesValidMsg = "Дата заключення не корректна"; return false;}
+        if(conslDate == null){ $scope.DatesValidMsg = "Дата заключення некоректна"; return false;}
         var issueDate = kendo.parseDate($rootScope.credit.issueValue);
-        if(issueDate == null){ $scope.DatesValidMsg = "Дата видачі не корректна"; return false;}
+        if(issueDate == null){ $scope.DatesValidMsg = "Дата видачі некоректна"; return false;}
         var endDate = kendo.parseDate($rootScope.credit.endValue);
-        if(endDate == null){ $scope.DatesValidMsg = "Дата завершення не корректна"; return false;}
+        if(endDate == null){ $scope.DatesValidMsg = "Дата завершення некоректна"; return false;}
         var startDate = kendo.parseDate($rootScope.credit.startValue);
-        if(startDate == null){ $scope.DatesValidMsg = "Дата початку не корректна"; return false;}
+        if(startDate == null){ $scope.DatesValidMsg = "Дата початку некоректна"; return false;}
         var dateFirst = kendo.parseDate($scope.credit.firstPayDateValue);
         if(dateFirst == null){ return false;}
         if(startDate < conslDate) { $scope.DatesValidMsg = "Дата заключення більша за дату початку"; return false; }
@@ -58,12 +73,12 @@
         }
 
         //check BD
-        if($rootScope.bankDate != null){
-            var bd = kendo.parseDate($rootScope.bankDate);
-            if(startDate < bd || issueDate < bd || dateFirst < bd || conslDate < bd || endDate < bd){
-                $scope.DatesValidMsg = "Дата меньше за банківську"; return false;
-            }
-        }
+        //if($rootScope.bankDate != null){
+        //    var bd = kendo.parseDate($rootScope.bankDate);
+        //    if(startDate < bd || issueDate < bd || dateFirst < bd || conslDate < bd || endDate < bd){
+        //        $scope.DatesValidMsg = "Дата меньше за банківську"; return false;
+        //    }
+        //}
 
         return true;
     };
@@ -90,9 +105,8 @@
     var isNew = ($rootScope.sos == "0") || ($rootScope.sos == null) ? false : true;
 
     $scope.isSaveFunc = function () {
-        return isNew;
+        return false;
     };
-
     $scope.isSave = isNew;
     $scope.create = dataService.clearMain();
 
@@ -100,7 +114,7 @@
 
     $rootScope.credit = dataService.clearCredit();
 
-    $rootScope.update = function () {
+    $rootScope.update = function (mode) {
         var url = "";
         if ($rootScope.nd != null) {
 
@@ -126,6 +140,8 @@
                     bars.ui.loader('body', false);
                 });
             });
+            if (mode === "by_button")
+                $rootScope.LoadMoreCreditData("exist");
         }
         else {
             url = '/api/kernel/BankDates/';
@@ -185,8 +201,10 @@
     };
 
     $scope.isSaveBtnEnabled = function () {
-        return !$scope.isSaveFunc()
-            && $rootScope.isDatesValid()
+        if ($rootScope.isTagOnly) {
+            return true;
+        }
+        return $rootScope.isDatesValid()
             && $rootScope.isCurrValid()
             && $rootScope.isDayOfPayValueValid()
             && $rootScope.isBranchValueValid()
@@ -199,7 +217,8 @@
             && $rootScope.credit.rnkValue != null
             && $rootScope.isNlsValid()
             && ($rootScope.credit.dayOfPayValue == null || ($rootScope.credit.dayOfPayValue >= 1 && $rootScope.credit.dayOfPayValue <= 31))
-            && (!$rootScope.credit.diffDaysValue || ($rootScope.credit.dayPayDiffValue == null || ($rootScope.credit.dayPayDiffValue >= 1 && $rootScope.credit.dayPayDiffValue <= 31)));
+            && (!$rootScope.credit.diffDaysValue || ($rootScope.credit.dayPayDiffValue == null || ($rootScope.credit.dayPayDiffValue >= 1 && $rootScope.credit.dayPayDiffValue <= 31)))
+            && $rootScope.isFlagsValid();
     };
 
     $scope.save = function () {
@@ -243,10 +262,10 @@
                 bars.ui.alert({ text: "Не обрано валюту коміссійних доходів" });
                 bars.ui.loader('body', false);
             }
-            else if (save.penaltiesRateValue && save.unusedLimitValue == null) {
-                bars.ui.alert({ text: "Не обрано \"Комісія за не використаний кредит\"" });
-                bars.ui.loader('body', false);
-            }
+            //else if (save.penaltiesRateValue && save.unusedLimitValue == null) {
+            //    bars.ui.alert({ text: "Не обрано \"Комісія за не використаний кредит\"" });
+            //    bars.ui.loader('body', false);
+            //}
             else {
                 if ($rootScope.nd == null) {
                     dataService.create($scope.create, save);
@@ -263,6 +282,7 @@
                             url = '/creditui/newcredit/setndtxt';
 
                             $http.post(bars.config.urlContent(url), $rootScope.ndtxtsave).then(function (request) {
+                                var output_err = request.data.Error_data != "Ok" ? request.data.Error_data : "";
                                 if(!$scope.validateRequest(request)){ return; }
 
                                 url = '/creditui/newcredit/afterSaveDeal';
@@ -279,6 +299,12 @@
                                             bars.ui.alert({
                                                 text: "Створено КД №" + $rootScope.ndtxtsave.nd
                                             });
+                                            if (output_err != "") {
+                                                bars.ui.error({
+                                                    title: "Помилки при збереженні доппараметрів",
+                                                    text: output_err
+                                                });
+                                            }
                                             bars.ui.loader('body', false);
                                         });
                                     }
@@ -288,6 +314,12 @@
                                         bars.ui.alert({
                                             text: "Створено КД №" + $rootScope.ndtxtsave.nd
                                         });
+                                        if (output_err != "") {
+                                            bars.ui.error({
+                                                title: "Помилки при збереженні доппараметрів",
+                                                text: output_err
+                                            });
+                                        }
                                         bars.ui.loader('body', false);
                                     }
                                 });
@@ -314,6 +346,7 @@
                         if ($rootScope.ndtxtsave.nd != -1) {
                             url = '/creditui/newcredit/setndtxt';
                             $http.post(bars.config.urlContent(url), $rootScope.ndtxtsave).then(function (request) {
+                                var output_err = request.data.Error_data != "Ok" ? request.data.Error_data : "";
                                 url = '/creditui/newcredit/afterSaveDeal';
                                 $http.post(bars.config.urlContent(url), dataService.afterSaveDeal($rootScope.ndtxtsave.nd, save)).then(function (request) {
                                     url = "/creditui/newcredit/setMultiExtInt";
@@ -322,6 +355,12 @@
                                         bars.ui.alert({
                                             text: "Оновлено КД №" + $rootScope.ndtxtsave.nd
                                         });
+                                        if (output_err != "") {
+                                            bars.ui.error({
+                                                title: "Помилки при збереженні доппараметрів",
+                                                text: output_err
+                                            });
+                                        }
                                         bars.ui.loader('body', false);
                                     });
                                 });
@@ -340,10 +379,18 @@
                     if ($rootScope.ndtxtsave.nd != -1) {
                         url = '/creditui/newcredit/setndtxt';
                         $http.post(bars.config.urlContent(url), $rootScope.ndtxtsave).then(function (request) {
+                            var output_err = request.data.Error_data != "Ok" ? request.data.Error_data : "";
                             $scope.isSave = true;
-                            bars.ui.alert({
-                                text: "Оновлено КД №" + $rootScope.ndtxtsave.nd
-                            });
+                            if (output_err == "") {
+                                bars.ui.alert({
+                                    text: "Оновлено КД №" + $rootScope.ndtxtsave.nd
+                                });
+                            } else {
+                                bars.ui.error({
+                                    title: "Помилки при збереженні доппараметрів", 
+                                    text: output_err
+                                });
+                            }
                             bars.ui.loader('body', false);
                         });
                     }
@@ -435,8 +482,8 @@
 
     };
 
-    $scope.prolongationUpdate = function () {
-        $rootScope.update();
+    $scope.creditUpdate = function () {
+        $rootScope.update("by_button");
     };
 
     $scope.prolongationClose = function () {
@@ -444,5 +491,5 @@
         $scope.prolong.dateEnd = null;
     };
 
-    $rootScope.update();    // load main data
+    $rootScope.update("initial");    // load main data
 }]);

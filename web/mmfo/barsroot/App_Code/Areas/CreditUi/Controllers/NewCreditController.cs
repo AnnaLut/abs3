@@ -44,6 +44,10 @@ namespace BarsWeb.Areas.CreditUi.Controllers
         {
             return View();
         }
+        public ActionResult Authorization()
+        {
+            return View();
+        }
 
         public ActionResult getCurrency()
         {
@@ -81,15 +85,15 @@ namespace BarsWeb.Areas.CreditUi.Controllers
             return Json(session, JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult getAim(decimal? rnk, string dealDate)
+        public ActionResult getAim(byte vidd, string dealDate)
         {
-            IQueryable<AimList> session = _creditRepository.getAim(rnk, dealDate);
+            IQueryable<AimList> session = _creditRepository.getAim(vidd, dealDate);
             return Json(session, JsonRequestBehavior.AllowGet);
         }
         [HttpGet]
-        public ActionResult getAimBal(decimal? rnk, decimal? aim, bool yearDiff)
+        public ActionResult getAimBal(byte vidd, decimal? aim, bool yearDiff)
         {
-            NlsParam session = _creditRepository.getAimBal(rnk, aim, yearDiff);
+            NlsParam session = _creditRepository.getAimBal(vidd, aim, yearDiff);
             return Json(session, JsonRequestBehavior.AllowGet);
         }
         [HttpPost]
@@ -104,9 +108,9 @@ namespace BarsWeb.Areas.CreditUi.Controllers
             return Json(session, JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult getRang(decimal? rnk)
+        public ActionResult getRang(byte vidd)
         {
-            IQueryable<RangList> session = _creditRepository.getRang(rnk);
+            IQueryable<RangList> session = _creditRepository.getRang(vidd);
             return Json(session, JsonRequestBehavior.AllowGet);
         }
 
@@ -126,6 +130,13 @@ namespace BarsWeb.Areas.CreditUi.Controllers
         {
             IQueryable<ParamsList> session = _creditRepository.getTabList();
             return Json(session, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult getDaynpList()
+        {
+            Dictionary<int, string> getDaynpList = _creditRepository.getDaynpList();
+            return Json(getDaynpList.ToList(), JsonRequestBehavior.AllowGet);
+
         }
 
         public ActionResult getNdTxt([DataSourceRequest]DataSourceRequest request, string code)
@@ -169,13 +180,13 @@ namespace BarsWeb.Areas.CreditUi.Controllers
         [HttpPost]
         public ActionResult setNdTxt(decimal nd, List<NdTxt> txt)
         {
-            string Status = "OK";
+            string Status = "OK", Error_data = "";
             try
             {
-                _creditRepository.setNdTxt(nd, txt);
+                Error_data = _creditRepository.setNdTxt(nd, txt);
             }
             catch (Exception e) { Status = e.Message + " StackTrace=" + e.StackTrace; }
-            return Json(new { Status = Status });
+            return Json(new { Status = Status, Error_data = Error_data });
         }
 
         [HttpPost]
@@ -225,6 +236,18 @@ namespace BarsWeb.Areas.CreditUi.Controllers
         {
             string session = _creditRepository.SetProlog(nd, bnkDate, kprolog, sos, dateStart, dateEnd);
             return Json(session);
+        }
+
+        public ActionResult GetAuthData(decimal nd)
+        {
+            AuthStaticData session = _creditRepository.GetAuthStaticData(nd);
+            return Json(session, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult Authorize(decimal nd, int type, string pidstava, string initiative)
+        {
+            string session = _creditRepository.Authorize(nd,type,pidstava,initiative);
+            return Json(session, JsonRequestBehavior.AllowGet);
         }
     }
 }

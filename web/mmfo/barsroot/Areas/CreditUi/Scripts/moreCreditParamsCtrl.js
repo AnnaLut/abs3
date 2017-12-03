@@ -13,6 +13,25 @@
         }
     });*/
 
+    $scope.ArrayTabs = ["Параметри КД", "Дані про погашення", "Комісія та Ліміт"];
+
+    $scope.NoEditParams = [{ tag: "FLAGS", tab: $scope.ArrayTabs[1], fields: "\"Канікули\" та \"За попередній\"" }, { tag: "S_SDI", tab: $scope.ArrayTabs[2], fields: "Початкова, Одноразова" },
+        { tag: "SN8_R", tab: $scope.ArrayTabs[2], fields: "Пеня" }, { tag: "DATSN", tab: $scope.ArrayTabs[1], fields: "Погашення процентного боргу -> Перша платіжна дата" },
+        { tag: "DAYNP", tab: $scope.ArrayTabs[1], fields: "Тип урегулювання дня погашення" }, { tag: "DAYSN", tab: $scope.ArrayTabs[1], fields: "Погашення процентного боргу  -> День" },
+        { tag: "INIC", tab: $scope.ArrayTabs[0], fields: "Ініціатива" }, { tag: "CCRNG", tab: $scope.ArrayTabs[1], fields: "Шаблон погашення рахунку \"SG\" " },
+        { tag: "I_CR9", tab: $scope.ArrayTabs[0], fields: "Вид" }, { tag: "R_CR9", tab: $scope.ArrayTabs[2], fields: "Комісія за невикористаний ліміт" },
+        { tag: "FREQ", tab: $scope.ArrayTabs[1], fields: "Погашення основного боргу -> Періодичність" }, { tag: "FREQP", tab: $scope.ArrayTabs[1], fields: "Погашення процентного боргу -> Періодичність" }];
+
+    $scope.GetMessage = function (tag) {
+        if (!$rootScope.isTagOnly) {
+            for (var i = 0; i < $scope.NoEditParams.length; i++) {
+                if ($scope.NoEditParams[i].tag === tag)
+                    return [$scope.NoEditParams[i].tab, $scope.NoEditParams[i].fields];
+            }
+        }
+        return false;
+    };
+
     $rootScope.ndtxtsave = { nd: null, txt: [] };
 
     $scope.tabDataSource = new kendo.data.DataSource({
@@ -29,35 +48,39 @@
     };
 
     $scope.getEditor = function (container, options) {
-        switch (options.model.TYPE) {
-            case "S":
-                var editor = container.append('<input type="text" class="k-textbox" data-bind="value:' + options.field + '"/>');
-                //debugger;
-                break;
-            case "N":
-                var editor = container.append('<input kendo-numeric-text-box data-bind="value:' + options.field + '"/>');
-                break;
-            case "D":
-                var editor = container.append('<input kendo-masked-date-picker k-format="dd/MM/yyyy" data-bind="value:' + options.field + '"/>');
-                break;
-            case "R": {
-                var editor = container.append('<input type="text" class="k-textbox" style="widrh:60%" data-bind="value:' + options.field + '" id="edit' + options.model.TAG + '"/>');
-                var tabname = options.model.TABLE_NAME;
-                var columns = options.model.COL_NAME;
-                bars.ui.handBook(tabname, function (data) {
-                    angular.element(document).find('#edit' + options.model.TAG)[0].value = data[0].PrimaryKeyColumn;
-                    options.model.TXT = data[0].PrimaryKeyColumn;
-                    options.model.SEM = data[0].SemanticColumn;
-                },
-                {
-                    multiSelect: false,
-                    clause: null,
-                    columns: columns
-                });
-                break;
+        if (!($scope.GetMessage(options.model.TAG))) {
+            switch (options.model.TYPE) {
+                case "S":
+                    var editor = container.append('<input type="text" class="k-textbox" data-bind="value:' + options.field + '"/>');
+                    //debugger;
+                    break;
+                case "N":
+                    var editor = container.append('<input kendo-numeric-text-box data-decimals="2" data-bind="value:' + options.field + '"/>');
+                    break;
+                case "D":
+                    var editor = container.append('<input kendo-masked-date-picker k-format="dd/MM/yyyy" data-bind="value:' + options.field + '"/>');
+                    break;
+                case "R": {
+                    var editor = container.append('<input type="text" class="k-textbox" style="widrh:60%" data-bind="value:' + options.field + '" id="edit' + options.model.TAG + '"/>');
+                    var tabname = options.model.TABLE_NAME;
+                    var columns = options.model.COL_NAME;
+                    bars.ui.handBook(tabname, function (data) {
+                        angular.element(document).find('#edit' + options.model.TAG)[0].value = data[0].PrimaryKeyColumn;
+                        options.model.TXT = data[0].PrimaryKeyColumn;
+                        options.model.SEM = data[0].SemanticColumn;
+                    },
+                    {
+                        multiSelect: false,
+                        clause: null,
+                        columns: columns
+                    });
+                    break;
+                }
+                default: var editor = container.append('<input type="text" class="k-textbox" data-bind="value:' + options.field + '"/>'); break;
             }
-            default: var editor = container.append('<input type="text" class="k-textbox" data-bind="value:' + options.field + '"/>'); break;
         }
+        else
+            var editor = container.append('<input type="text" class="k-textbox" data-bind="value:' + options.field + '"/>');
     }
 
     $scope.gridColumns = [{
@@ -88,12 +111,22 @@
         editable: {
             mode: "inline"
         },
+        edit: function (e)
+        {
+            var message = $scope.GetMessage(e.model.TAG);
+            if (message) {
+                this.cancelRow();
+                bars.ui.alert({
+                    text: "Редагування на вкладці <b>" + message[0] + "</b>, <br> поле: <b>\"" + message[1] + "\"</b>"
+                });
+            }
+        },
         save: function (e) {
-            if (e.model.TYPE == "D") {
+            if ((e.model.TYPE == "D") && (e.model.TXT != null)) {
                 var date = new Date(e.model.TXT);
                 e.model.TXT = kendo.toString(kendo.parseDate(date), 'dd/MM/yyyy');
             }
-            if (e.model.TXT == "" || e.model.TXT == null) {
+            if (e.model.TXT === "" || e.model.TXT == null) {
                 e.model.TXT = null;
                 if (e.model.TYPE == "R") {
                     e.model.SEM = null;
@@ -116,14 +149,22 @@
 
     $scope.tabDataSource.fetch(function () {
         bars.ui.loader('body', true);
+        $rootScope.LoadMoreCreditData("new");
+        bars.ui.loader('body', false);
+    });
+
+    $rootScope.LoadMoreCreditData = function(mode)
+    {
         var tabs = $scope.tabDataSource.view();
         var tabStrip = $scope.tabParams;
         var nd = bars.extension.getParamFromUrl('nd', $location.absUrl());
         for (i = 0; i < tabs.length; i++) {
-            tabStrip.append({
-                text: tabs[i].NAME,
-                content: "<div kendo-grid='" + tabs[i].CODE + "' k-columns='gridColumns' k-filterable='true' k-options='gridOptions' k-pageable='true'></div>"
-            });
+            if (mode === "new") {
+                tabStrip.append({
+                    text: tabs[i].NAME,
+                    content: "<div kendo-grid='" + tabs[i].CODE + "' k-columns='gridColumns' k-filterable='true' k-options='gridOptions' k-pageable='true'></div>"
+                });
+            }
             var urlTxt = "";
             var dataTxt;
             if (nd != null) {
@@ -165,6 +206,6 @@
             $scope[tabs[i].CODE].setDataSource(gridDataSource);
         }
         tabStrip.select(0);
-        bars.ui.loader('body', false);
-    });
+    }
+
 }]);
