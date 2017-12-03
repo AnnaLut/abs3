@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Created by serhii.karchavets on 30.03.2017.
  */
 
@@ -10,7 +10,7 @@ angular.module("BarsWeb.Areas").factory('dataService', function(){
                 prod: save.prodValue,
                 fin: save.finValue.FIN,
                 inic: save.branchValue,
-                flags: (save.holidayValue ? "1" : "0") + (save.previousValue.ID == 1 ? "1" : "0"),
+                flags: (save.holidayValue.ID) + (save.previousValue.ID),
                 rang: save.rangValue.RANG,
                 sdi: save.discontSumValue,
                 metr: save.metrValue ? save.metrValue.METR : null,
@@ -27,14 +27,15 @@ angular.module("BarsWeb.Areas").factory('dataService', function(){
                 icr9: save.listUnsedValue.id,
                 daysn: save.diffDaysValue ? save.dayPayDiffValue : null,
                 datsn: save.diffDaysValue ? kendo.toString(kendo.parseDate(save.firstPayDiffValue), 'dd.MM.yyyy') : null,
-                daynp: save.diffDaysValue ? save.previousValue.ID : null
+                daynp: save.daynp.Key,
+                vidd: save.viddValue.VIDD
             };
         },
         multiExtInt: function (nd, save){
             return {
                 ND: nd,
                 BRID: save.baseRateValue,
-                CBA: save.serviceValue ? 1 : 0,
+                CBA: save.serviceValue.id == 1 ? 1 : 0,
                 KV1: save.currBValue,
                 PROC1: save.rateBValue,
                 KV2: save.currCValue,
@@ -122,7 +123,7 @@ angular.module("BarsWeb.Areas").factory('dataService', function(){
                 aimValue: null,
                 prodValue: null,
                 prodNameValue: null,
-                serviceValue: false,
+                serviceValue: { ID: "0", NAME: "" },
                 sIdValue: null,
                 sCatValue: null,
                 currAValue: "980",
@@ -141,32 +142,35 @@ angular.module("BarsWeb.Areas").factory('dataService', function(){
                 nlsValue: null,
                 purposeValue: null,
                 guaranteeValue: null,
-                rangValue: { RANG: "0", NAME: "" },
+                rangValue: null,
                 freqValue: { FREQ: "5", NAME: "" },
                 dayOfPayValue: null,
                 firstPayDateValue: null,
-                holidayValue: false,
+                holidayValue : { ID: 1 },
                 freqIntValue: { FREQ: "5", NAME: "" },
                 diffDaysValue: false,
-                previousValue: { ID: "0", NAME: "" },
+                previousValue: { ID: "0" },
                 discontSumValue: null,
                 curComAccValue: { KV: "980", LCV: "" },
                 metrValue: null,
                 metrRateValue: null,
                 unusedLimitValue: null,
-                listUnsedValue: { id: "0", name: "" },
+                listUnsedValue: { id: "1", name: "" },
                 isPenaltiesValue: true,
                 penaltiesRateValue: null,
                 earlyRateValue: null,
                 acc8: null,
                 basem: null,
                 dayPayDiffValue: null,
-                firstPayDiffValue: null
+                firstPayDiffValue: null,
+                daynp: { Key: -2 },
+                lim : null
             };
         },
         getDeal: function (save, resp) {
             if(resp.FLAGS != null && resp.FLAGS != 'null' && resp.FLAGS != undefined){      // 11 10 01 00
-                save.holidayValue = resp.FLAGS[0] == "1";
+                save.holidayValue = { ID: resp.FLAGS[0] };
+                save.previousValue = { ID: resp.FLAGS[1] };
             }
             save.rnkValue = resp.nRNK;
             save.numValue = resp.CC_ID;
@@ -198,7 +202,7 @@ angular.module("BarsWeb.Areas").factory('dataService', function(){
             save.prodNameValue = resp.PRODNAME;
             save.purposeValue = resp.AIMNAME;
             save.acc8 = resp.ACC8;
-            save.serviceValue = resp.BASEM == 1;
+            save.serviceValue = { id: resp.BASEM };
             save.discontSumValue = resp.S_SDI;
             save.rangValue = { RANG: resp.RANG, NAME: resp.RANGNAME };
             save.metrValue = { METR: resp.METR, NAME: resp.METRNAME };
@@ -209,8 +213,9 @@ angular.module("BarsWeb.Areas").factory('dataService', function(){
             save.listUnsedValue = { id: resp.I_CR9, name: resp.I_CR9NAME };
             save.dayPayDiffValue = resp.DAYSN;
             save.firstPayDiffValue = resp.DATSN;
-            save.previousValue = { ID: resp.DAYNP, NAME: resp.DAYNPNAME };
+            save.daynp = { Key: resp.DAYNP };
             save.diffDaysValue = save.dayPayDiffValue ? true : false;
+            save.lim = resp.LIM;
         }
     };
 });

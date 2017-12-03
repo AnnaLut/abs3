@@ -28,5 +28,6 @@ namespace BarsWeb.Areas.CreditUi.Models
         public string daysn { get; set; }
         public string datsn { get; set; }
         public string daynp { get; set; }
+        public byte vidd { get; set; }
     }
 }

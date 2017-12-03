@@ -17,8 +17,7 @@
                 <label>Ініціатива</label>  
                 @*<a class='k-button' ng-click="showReferBranch('OUR_BRANCH','BRANCH,NAME','where date_closed is null')" ng-disabled="isSave"><i class='pf-icon pf-16 pf-book'></i></a>*@
 
-                <kendo-button ng-disabled="isSaveFunc()"
-                              ng-click="showReferBranch('OUR_BRANCH','BRANCH,NAME','where date_closed is null')"
+                <kendo-button ng-click="showReferBranch('OUR_BRANCH','BRANCH,NAME','where date_closed is null')"
                               class="pf-icon pf-16 pf-book">
                 </kendo-button>
 
@@ -141,7 +140,7 @@
         </tr>
         <tr>
             <td>
-                <label>Сума</label>
+                <label>Початкова сума</label>
             </td>
             <td>
                 <input kendo-numeric-text-box k-min="0"
@@ -149,8 +148,23 @@
                        k-ng-model="credit.sumValue"
                        k-ng-disabled="isSave"
                        name="inptSum"
+                       ng-blur="FillLim()" 
                        />
                 <span style="color: red" ng-show="!isSumValueValid()">Обов'язкове</span>
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>
+                <label>Поточний ліміт</label>
+            </td>
+            <td>
+                <input kendo-numeric-text-box k-min="0"
+                       k-max="999999999999999999999999999999"
+                       k-ng-model="credit.lim"
+                       name="inptSum"
+                       disabled/>
             </td>
             <td></td>
             <td></td>
@@ -243,7 +257,7 @@
                 <label>Вид</label>
             </td>
             <td>
-                <label>Джерело залуч-ня коштів</label>
+                
             </td>
             <td colspan="2" rowspan="8">
                 <div class="panel panel-default" style="display: inline-flex;width:100%">
@@ -327,7 +341,7 @@
                                         <input kendo-numeric-text-box k-min="0" k-max="100" k-ng-model="credit.rateCValue" style="width: 70px" k-ng-disabled="isSaveFunc()" />
                                     </td>
                                     <td>
-                                        <select kendo-drop-down-list name="ddlBAsey" id="ddlBAsey" style="width: 300px" k-ng-model="credit.baseyValue" k-options="ddlBaseyOptions" k-ng-disabled="isSaveFunc()"></select>
+                                        <select kendo-drop-down-list name="ddlBAsey" id="ddlBAsey" style="width: 300px" k-ng-model="credit.baseyValue" k-options="ddlBaseyOptions"></select>
                                     </td>
                                 </tr>
                                 <tr>
@@ -367,9 +381,9 @@
         </tr>
         <tr>
             <td>
-                <select kendo-drop-down-list style="width: 150px" k-ng-model="credit.listUnsedValue" k-options="ddlListUnsedOptions" k-ng-disabled="isSaveFunc()"></select>
+                <select kendo-drop-down-list style="width: 150px" k-ng-model="credit.listUnsedValue" k-options="ddlListUnsedOptions" ></select>
             </td>
-            <td></td>
+            <td><label>Джерело залучення коштів</label></td>
         </tr>
         <tr>
             <td>
@@ -378,8 +392,7 @@
                         id="ddlVidd" 
                         style="width: 200px" 
                         k-ng-model="credit.viddValue" 
-                        k-options="ddlViddOptions" 
-                        k-ng-disabled="isSaveFunc()">
+                        k-options="ddlViddOptions" >
                 </select>
                 <span style="color: red" ng-show="!isDdlAimEnabled()">Оберіть позичальника</span>
                 <span style="color: red" ng-show="!isDdlViddValueValid() && isDdlAimEnabled()">Обов'язкове</span>
@@ -430,7 +443,8 @@
         </tr>
         <tr>
             <td colspan="2">
-                <input type="checkbox" ng-disabled="isSaveFunc()" ng-model="credit.serviceValue" id="chkService" name="chkService" />  <label>Обслуговування по схемі "Ануїтет"</label>
+               @*<input type="checkbox" ng-model="credit.serviceValue" id="chkService" name="chkService" /> *@  <label>Обслуговування по схемі: </label>
+                <select kendo-drop-down-list style="width: 100px" k-ng-model="credit.serviceValue" k-options="ddlListServiceOptions"></select>
             </td>
             <td></td>
             <td></td>
@@ -456,7 +470,6 @@
                 
                 <kendo-button ng-disabled="isSaveFunc()"
                               ng-click="showReferBanks('BANKS','MFO,SAB,NB','where blk!=4')"
-                              ng-show="custtype==3"
                               class="pf-icon pf-16 pf-book">                    
                 </kendo-button>
                 

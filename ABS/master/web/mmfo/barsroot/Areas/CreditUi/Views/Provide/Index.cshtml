@@ -2,7 +2,7 @@
     ViewBag.Title = "Договора забезпечення";
 }
 <script src="@Url.Content("~/lib/jsZip/jszip.js")"></script>
-<script src="@Url.Content("~/Areas/CreditUi/Scripts/provide.js")"></script>
+<script src="@Url.Content("~/Areas/CreditUi/Scripts/provide.js?v.1.0.1")"></script>
 <script src="@Url.Content("~/Areas/CreditUi/Scripts/creditUI.js")"></script>
 <h1 style="padding-bottom: 0px;">@ViewBag.title</h1>
 <br />
@@ -121,7 +121,7 @@
         <label for="CC_IDZ">№ дог. заб</label>
     </div>
     <div class="k-edit-field">
-        <input name="CC_IDZ" data-bind="value:CC_IDZ" class="created" />
+        <input name="CC_IDZ" data-bind="value:CC_IDZ" />
     </div>
     <div class="k-edit-label">
         <label for="SDATZ">Дата дог. забез.</label>

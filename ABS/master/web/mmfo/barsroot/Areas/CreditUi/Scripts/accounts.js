@@ -73,6 +73,7 @@ $(document).ready(function () {
         },
         columns: [
             { 
+                //headerTemplate: '<input class="checkbox" type="checkbox" id="AllExsist">',
                 template: '<input class="checkboxExist" type="checkbox"/>',
                 width: 29
             },
@@ -100,6 +101,7 @@ $(document).ready(function () {
              width: 100,
              nullable: true,
              field: "TT_NAME",
+             //template: '<a onclick="window.open(this.href); return false;" href=#=TT#</a>'
              template: "<a onclick='ChooseType(${TT_HREF}); return false;'>${TT_NAME}</a>"
          },
          {
@@ -208,12 +210,24 @@ $(document).ready(function () {
                nullable: true,
                field: "BASEY"
            },
+         /*  {
+               title: "Реф КД",
+               width: 100,
+               nullable: true,
+               field: "ND"
+           },*/
           {
               title: "Відп\nВик",
               width: 64,
               nullable: true,
               field: "ISP"
           },
+          /* {
+               title: "Сорт",
+               width: 67,
+               nullable: true,
+               field: "ORD"
+           },*/
            {
                title: "ACC рах",
                width: 86,
@@ -236,8 +250,6 @@ $(document).ready(function () {
             });
 
             disabledButtons(false, ".k-grid-btDel");
-            disabledButtons(staticData.Avalible_provide, ".k-grid-btProvide");
-            disabledButtons(staticData.Avalible_provide, ".k-grid-btGLK");
         },
         change: function (e) {
             var grid = $("#gridAccounts").data("kendoGrid");
@@ -523,12 +535,6 @@ function SetStatic(data) {
     var diff_limit = data.DIFF - Math.abs(data.OSTB_9129);
     $("#diff_9129").val(moneyFormat(diff_limit));
     $("#date_first_pay").val(data.Date_issuance);
-
-    if (data.NDR != null) {
-        $(".ref_gen").show();
-        $("#ref_gen").val(data.NDR);
-    }
-
     //setstaticData();
     SetPul();
 }
