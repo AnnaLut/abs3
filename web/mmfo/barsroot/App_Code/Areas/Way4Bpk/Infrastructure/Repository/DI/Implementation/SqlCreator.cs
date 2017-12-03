@@ -11,10 +11,12 @@ namespace BarsWeb.Areas.Way4Bpk.Infrastructure.DI.Implementation {
     public class SqlCreator
     {
   
-        public static BarsSql SearchMain(string custName, string okpo, long? ndNumber, long? accNls, int? passState, string passDateStrs)
+        public static BarsSql SearchMain(short custtype, string custName, string okpo, long? ndNumber, long? accNls, int? passState, string passDateStrs)
         {
-            List<OracleParameter> paramsList = new List<OracleParameter>();
-            StringBuilder sql = new StringBuilder("select * from W4_DEAL_WEB where ");
+            string table = custtype == 1 ? "W4_DEAL_WEB" : "W4_DEAL_WEB_UO";
+
+            List <OracleParameter> paramsList = new List<OracleParameter>();
+            StringBuilder sql = new StringBuilder(string.Format("select * from {0} where ", table));
             if (ndNumber.HasValue)
             {
                 sql.Append("nd = :P_ND ");
@@ -115,6 +117,19 @@ namespace BarsWeb.Areas.Way4Bpk.Infrastructure.DI.Implementation {
             };
         }
 
+        public static BarsSql SetIdat(long nD, DateTime dt)
+        {
+            return new BarsSql()
+            {
+                SqlText = @"begin bars_ow.set_idat(:ND, :CARD_IDAT_BANKDATE); end;",
+                SqlParams = new object[]
+                {
+                    new OracleParameter("ND", OracleDbType.Long) { Value = nD },
+                    new OracleParameter("CARD_IDAT_BANKDATE", OracleDbType.Date) { Value = dt }
+                }
+            };
+        }
+
         public static BarsSql SetPassDate(long nD, int passState, DateTime dt)
         {
             return new BarsSql()
@@ -152,6 +167,52 @@ namespace BarsWeb.Areas.Way4Bpk.Infrastructure.DI.Implementation {
             {
                 SqlText = @"select sys_context('bars_context','user_branch') from dual",
                 SqlParams = new object[] { }
+            };
+        }
+
+        public static BarsSql SetAddParameter(long ND, string p_tag, string p_value)
+        {
+            return new BarsSql()
+            {
+                SqlText = @"begin 
+                                bars_ow.set_bpk_parameter(:p_nd, :p_tag, :p_value); 
+                            end;",
+                SqlParams = new object[]
+                {
+                    new OracleParameter("p_nd", OracleDbType.Long) { Value = ND },
+                    new OracleParameter("p_tag", OracleDbType.Varchar2) { Value = p_tag },
+                    new OracleParameter("p_value", OracleDbType.Varchar2) { Value = p_value }
+                }
+            };
+        }
+
+        public static BarsSql GetAddParams(long ND)
+        {
+            return new BarsSql()
+            {
+                SqlText = @"select TAG,VALUE from V_BPK_PARAM where ND = :P_ND",
+                SqlParams = new object[]
+                {
+                    new OracleParameter("P_ND", OracleDbType.Long) { Value = ND }
+                }
+            };
+        }
+
+        public static BarsSql GetAddParamValue(string table, string p_tag)
+        {
+            List<object> SqlParamsList = new List<object>();
+            if (table == "BUS_MOD")
+            {
+                SqlParamsList.Add(new OracleParameter("p_tag", OracleDbType.Int32) { Value = Convert.ToInt32(p_tag) });
+            }
+            else
+            {
+                SqlParamsList.Add(new OracleParameter("p_tag", OracleDbType.Varchar2) { Value = p_tag });
+            }
+            return new BarsSql()
+            {
+                SqlText = string.Format(@"select TO_CHAR({0}_ID) ID,{1}_NAME NAME from {2} where {3}_id = :p_tag", table, table, table, table),
+                SqlParams = SqlParamsList.ToArray()
             };
         }
     }

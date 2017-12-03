@@ -27,7 +27,7 @@ BEGIN
    IF DELETING
    THEN
       l_chgaction := 'D';
-      l_idupd     := bars_sqnc.get_nextval(s_cp_refw_update.NEXTVAL);
+      l_idupd     := bars.s_cp_refw_update.nextval;
       INSERT INTO cp_refw_update (idupd,
                                     chgaction,
                                     effectdate,
@@ -47,7 +47,7 @@ BEGIN
    ELSIF INSERTING
    THEN
       l_chgaction := 'I';
-      l_idupd     := bars_sqnc.get_nextval(s_cp_refw_update.NEXTVAL);
+      l_idupd     := bars.s_cp_refw_update.nextval;
       INSERT INTO cp_refw_update (idupd,
                                     chgaction,
                                     effectdate,
@@ -67,7 +67,7 @@ BEGIN
    ELSIF UPDATING AND (:old.tag <> :new.tag OR :old.ref <> :new.ref)
    THEN
       l_chgaction := 'D';
-      l_idupd     := bars_sqnc.get_nextval(s_cp_refw_update.NEXTVAL);
+      l_idupd     := bars.s_cp_refw_update.nextval;
       INSERT INTO cp_refw_update (idupd,
                                     chgaction,
                                     effectdate,
@@ -86,7 +86,7 @@ BEGIN
                    :old.VALUE);
 
       l_chgaction := 'I';
-      l_idupd     := bars_sqnc.get_nextval(s_cp_refw_update.NEXTVAL);
+      l_idupd     := bars.s_cp_refw_update.nextval;
       INSERT INTO cp_refw_update (idupd,
                                     chgaction,
                                     effectdate,
@@ -106,7 +106,7 @@ BEGIN
    ELSIF UPDATING AND :old.VALUE <> :new.VALUE
    THEN
       l_chgaction := 'U';
-      l_idupd     := bars_sqnc.get_nextval(s_cp_refw_update.NEXTVAL);
+      l_idupd     := bars.s_cp_refw_update.nextval;
       INSERT INTO cp_refw_update (idupd,
                                     chgaction,
                                     effectdate,

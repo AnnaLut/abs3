@@ -255,7 +255,7 @@
           union all
           select '5' n, 'Фінансові витрати' txt, '2285' rr, '2285 > Фін.витрати  ' rr2, NVL(SUM(decode(KOD,'2285',S,0)),0) s,        greatest(NVL(SUM(decode(KOD,'2285',0,S)),0),NVL(SUM(decode(KOD,'2285',S,0)),0)) s2
           from fin_rnk where OKPO=:OKPO and FDAT=:DAT and idf=:nForm and
-          kod in ('2285','3001')
+          kod in ('2285','2250')
           )
           where 2 = :nForm and   ( 'C' =  fin_nbu.F_FM(:OKPO, :DAT) or 'R' =  fin_nbu.F_FM(:OKPO, :DAT))
 

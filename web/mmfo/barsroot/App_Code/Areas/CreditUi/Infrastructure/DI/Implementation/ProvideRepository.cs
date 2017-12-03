@@ -24,25 +24,23 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
             _homeRepository = homeRepository;
         }
 
-        public IQueryable<ProvideList> GetProvideList(decimal refID, decimal? tip)
+        public IQueryable<ProvideList> GetProvideList(decimal refID, decimal? tip, byte? balance)
         {
             OracleConnection connection = OraConnector.Handler.UserConnection;
             OracleCommand cmd = connection.CreateCommand();
-            OracleCommand cmd1 = connection.CreateCommand();
 
             List<ProvideList> provideList = new List<ProvideList>();
-            var pooling_query = (tip == null)? @"begin p_set_pawn_acc_list(deal_id => " + refID + "); end;" : @"begin pul.set_mas_ini('ACC_LIST', " + refID + ", NULL); end;";
+            var pooling_query = (tip == null || tip == 2)? @"begin p_set_pawn_acc_list(deal_id => " + refID + "); end;" : @"begin pul.set_mas_ini('ACC_LIST', " + refID + ", NULL); end;";
             var select_sql = @"select RNK, NMK, NMS, NLS, KV, OST,ACC,PAWN, NAME, OB22 from v_zal_nd_not_new ";
+            if (tip == 2)
+                select_sql += " where nls "+ ((balance == 1)? "not" : "") + " like '9510%'";
             try
             {
-                cmd1.CommandType = System.Data.CommandType.Text;
-                cmd1.CommandText = pooling_query;
-                cmd1.ExecuteNonQuery();
+                cmd.CommandType = CommandType.Text;
+                cmd.CommandText = pooling_query;
+                cmd.ExecuteNonQuery();
 
-                cmd.CommandType = System.Data.CommandType.Text;
                 cmd.CommandText = select_sql;
-                cmd.Parameters.Clear();
-
                 OracleDataReader reader = cmd.ExecuteReader();
 
                 while (reader.Read())
@@ -65,31 +63,30 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
             finally
             {
                 cmd.Dispose();
-                cmd1.Dispose();
                 connection.Dispose();
                 connection.Close();
             }
             return provideList.AsQueryable();
         }
 
-        public IQueryable<ExistProvide> GetProvidePerRef(decimal refID, decimal? tip)
+        public IQueryable<ExistProvide> GetProvidePerRef(decimal refID, decimal? tip, byte? balance)
         {
             OracleConnection connection = OraConnector.Handler.UserConnection;
             OracleCommand cmd = connection.CreateCommand();
-            OracleCommand cmd1 = connection.CreateCommand();
 
             List<ExistProvide> provideList = new List<ExistProvide>();
-            var pooling_query = (tip == null) ? @"begin p_set_pawn_acc_list(deal_id => " + refID + "); end;" : @"begin pul.set_mas_ini('ACC_LIST', " + refID + ", NULL); end;";
+            var pooling_query = (tip == null || tip == 2) ? @"begin p_set_pawn_acc_list(deal_id => " + refID + "); end;" : @"begin pul.set_mas_ini('ACC_LIST', " + refID + ", NULL); end;";
             var sql1 = @"select RNK,PAWN,ACC,NLS,KV,OB22,OSTB,OSTC, CC_IDZ,SDATZ,MPAWN,DEL, DEPID,PR_12,NREE,SV,MDATE,DAZS,NAZN,NMK,NAME  from v_Zal_Nd_New";
+            if (tip == 2)
+                sql1 += " where nls " + ((balance == 1) ? "not" : "") + " like '9510%'";
             try
             {
-                cmd.CommandType = System.Data.CommandType.Text;
+                cmd.CommandType = CommandType.Text;
                 cmd.CommandText = pooling_query;
                 cmd.ExecuteNonQuery();
 
-                cmd1.CommandType = System.Data.CommandType.Text;
-                cmd1.CommandText = sql1;
-                OracleDataReader reader = cmd1.ExecuteReader();
+                cmd.CommandText = sql1;
+                OracleDataReader reader = cmd.ExecuteReader();
 
                 while (reader.Read())
                 {
@@ -123,7 +120,6 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
             finally
             {
                 cmd.Dispose();
-                cmd1.Dispose();
                 connection.Dispose();
                 connection.Close();
             }
@@ -156,11 +152,11 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
 
         }
 
-        public void CreateOrEditGroupProvide(List<UpdateProvide> list_provide, decimal? id, decimal? accs)
+        public void CreateOrEditGroupProvide(List<UpdateProvide> list_provide, decimal? id, decimal? accs, int? tip)
         {
             OracleConnection connection = OraConnector.Handler.UserConnection;
             OracleCommand cmd = connection.CreateCommand();
-            string sdatz, mdate, nree, depid, pr12, nazn,sv, del, cc_idz, ob22, r103,acc,id_str,accs_str,mpawn;
+            string sdatz, mdate, nree, depid, pr12, nazn,sv, del, cc_idz, ob22, r103,acc,id_str,accs_str,mpawn, proc_name;
             try
             {
                 cmd.CommandType = System.Data.CommandType.Text;
@@ -181,8 +177,9 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
                     mpawn = (provide.MPAWN == null) ? "null" : provide.MPAWN.ToString();
                     id_str = (id == null) ? "null" : id.ToString();
                     accs_str = (accs == null) ? "null" : accs.ToString();
+                    proc_name = (tip == 2) ? "bars.p_add_zal_mbdk" : "bars.P_ADD_ZAl"  ; //tip==2 - МБДК
 
-                    var sql = @"begin bars.P_ADD_ZAl(" + id_str + "," + accs_str + "," + provide.RNK + "," +
+                    var sql = @"begin " +proc_name+ "(" + id_str + "," + accs_str + "," + provide.RNK + "," +
                         provide.PAWN + "," + acc + "," + provide.KV + "," + sv + "," + del + "," + cc_idz + "," + sdatz + "," + mdate +
                         "," + nree + "," + depid + "," + mpawn + "," + pr12 + "," + nazn + "," + ob22+ "," + r103+ "); end;";
 
@@ -201,7 +198,7 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
             }
         }
 
-        public List<PAWNList> GetPawn(string nls)
+        public List<PAWNList> GetPawn(string nls, byte? tip, byte? balance)
         {
             List<PAWNList> lst = new List<PAWNList>();
 
@@ -209,8 +206,10 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
             OracleCommand cmd = connection.CreateCommand();
 
             var sql = "select PAWN, NAME from cc_pawn c where c.d_Close IS NULL ";
-            if (nls != null)
-                sql += "AND NBSZ = trim(substr('"+nls+"',1,4))";
+            if (tip == 2)
+                sql += " AND NBSZ "+ ( (balance == 1)? "<>" : "=" ) +" 9510 "; 
+            else if (nls != null) 
+                sql += " AND NBSZ = trim(substr('"+nls+"',1,4))";
             sql+= " order by pawn";
             try
             {

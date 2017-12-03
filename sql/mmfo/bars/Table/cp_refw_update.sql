@@ -73,14 +73,13 @@ begin
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSMDLI  ENABLE NOVALIDATE';
 exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 or sqlcode=-1735 then null; else raise; end if;
  end;
 /
-
-PROMPT *** Create  index XAI_CP_REFW_UPDATEPK ***
+PROMPT *** Create  index CP_REFW_UPDATE_EFFECTDATE***
 begin   
  execute immediate '
-  CREATE UNIQUE INDEX BARS.XAI_CP_REFW_UPDATEPK ON BARS.CP_REFW_UPDATE (EFFECTDATE) 
+CREATE INDEX BARS.CP_REFW_UPDATE_EFFECTDATE ON BARS.CP_REFW_UPDATE (EFFECTDATE) 
   PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSMDLI ';
 exception when others then
@@ -88,10 +87,10 @@ exception when others then
  end;
 /
 
-PROMPT *** Create  index INDREF_CP_REFW_UPDATE ***
+PROMPT *** Create  index CP_REFW_UPDATE_REF***
 begin   
  execute immediate '
-  CREATE UNIQUE INDEX BARS.INDREF_CP_REFW_UPDATE ON BARS.CP_REFW_UPDATE (REF) 
+  CREATE INDEX BARS.CP_REFW_UPDATE_REF ON BARS.CP_REFW_UPDATE (REF) 
   PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSMDLI ';
 exception when others then

@@ -59,13 +59,18 @@ hr {
 
 .k-textbox .dateStart {
     width: 100%;
-    /*padding-top: 6px;*/
     padding-left: 10px;
 }
 
 .k-textbox .dateEnd {
     width: 100%;
-    /*padding-top: 6px;*/
+    padding-left: 10px;
+}
+
+/*, .k-textbox .nbuRegDate*/ 
+
+.k-textbox .conclusionDate {
+    width: 100%;
     padding-left: 10px;
 }
 
@@ -75,12 +80,12 @@ hr {
 
 .left-bank {
     color: darkblue;
-    height:400px;
+    height: 400px;
 }
 
 .right-bank {
     color: #720303;
-    height:400px;
+    height: 400px;
 }
 
 .left-bank .k-textbox {
@@ -89,4 +94,8 @@ hr {
 
 .right-bank .k-textbox {
     color: #720303;
+}
+
+input.k-textbox-dark {
+    background-color: #ccc;
 }

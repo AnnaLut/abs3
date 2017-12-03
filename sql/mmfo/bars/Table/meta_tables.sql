@@ -24,14 +24,22 @@ PROMPT *** Create  table META_TABLES ***
 begin 
   execute immediate '
   CREATE TABLE BARS.META_TABLES 
-   (	TABID NUMBER(38,0), 
+   (	
+	TABID NUMBER(38,0), 
+	
 	TABNAME VARCHAR2(30), 
+	
 	SEMANTIC VARCHAR2(80), 
+	
 	TABRELATION NUMBER(1,0) DEFAULT 0, 
+
 	TABLDEL NUMBER(1,0), 
+
 	BRANCH VARCHAR2(30) DEFAULT sys_context(''bars_context'',''user_branch''), 
-	LINESDEF NUMBER(*,0)
-   ) SEGMENT CREATION IMMEDIATE 
+	
+	LINESDEF INTEGER	
+) 
+SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
   TABLESPACE BRSSMLD ';
@@ -41,12 +49,12 @@ end;
 /
 
 begin
-  execute immediate q'[ALTER TABLE BARS.META_TABLES ADD select_statement CLOB]';
+  execute immediate q'[ALTER TABLE BARS.META_TABLES ADD SELECT_STATEMENT CLOB]';
   dbms_output.put_line('Table altered.');
 exception
   when OTHERS then
     if ( sqlcode = -01430 )
-    then dbms_output.put_line('Column "select_statement" already exists in table.');
+    then dbms_output.put_line('Column "SELECT_STATEMENT" already exists in table.');
     else raise;
     end if;
 end;
@@ -66,7 +74,7 @@ COMMENT ON COLUMN BARS.META_TABLES.SEMANTIC IS 'Наименование таблицы';
 COMMENT ON COLUMN BARS.META_TABLES.TABRELATION IS 'Признак таблицы, описывающей отношение между таблицами (0/1)';
 COMMENT ON COLUMN BARS.META_TABLES.TABLDEL IS 'Признак логического удаления';
 COMMENT ON COLUMN BARS.META_TABLES.BRANCH IS 'Hierarchical Branch Code';
-comment on column META_TABLES.select_statement is 'Текст SQL-виразу, що буде використовуватися у фразі FROM замість назви представлення (TABNAME)';
+COMMENT ON COLUMN BARS.META_TABLES.SELECT_STATEMENT is 'Текст SQL-виразу, що буде використовуватися у фразі FROM замість назви представлення (TABNAME)';
 
 
 
