@@ -17,24 +17,18 @@ var g_gridMainToolbar = [
     { template: '<a class="k-button" onclick="onClickBtn(this)" title="Перегляд картки рахунку" id="btnAccCard" ><i class="pf-icon pf-16 pf-table"></i></a>'    },
     { template: '<a class="k-button" onclick="onClickBtn(this)" title="Рахунки угоди" id="btnAccOrder" ><i class="pf-icon pf-16 pf-business_report"></i></a>'    },
     { template: '<a class="k-button" onclick="onClickBtn(this)" title="Друк договорів" id="btnPrintOrders" ><i class="pf-icon pf-16 pf-print"></i></a>'    },
-    { template: '<a class="k-button" onclick="onClickBtn(this)" title="Договір забезпечення" id="btnCreditUi" ><i class="pf-icon pf-16 pf-money"></i></a>'    },
-    { template: '<a class="k-button" onclick="onClickBtn(this)" title="Змінити тип картки" id="btnСngСard" ><i class="pf-icon pf-16 pf-calendar-update"></i></a>'    },
-    { template: '<a class="k-button" onclick="onClickBtn(this)" title="Друк договорів страхування" id="btnPrintOrders2" ><i class="pf-icon pf-16 pf-report_open-import"></i></a>'    },
-    { template: '<a class="k-button" onclick="onClickBtn(this)" title="Додаткові параметри" id="btnAddParams" ><i class="pf-icon pf-16 pf-view_options"></i></a>'    },
-    { template: '<a class="k-button" onclick="onClickBtn(this)" title="Встановити дату видачі карти" id="btnCardUpdate" ><i class="pf-icon pf-16 pf-report_open"></i></a>'    }
-];
-
-var g_gridMainToolbar_FO = [
-    { template: '<a class="k-button" onclick="onClickBtn(this)" title="Інформація про передачу до бек-офісу" id="btnGo2BackOffice" ><i class="pf-icon pf-16 pf-tool_pencil"></i></a>'    },
-    { template: '<a class="k-button" onclick="onClickBtn(this)" title="Довгострокове доручення" id="btnLongTermAssignments" ><i class="pf-icon pf-16 pf-list-ok"></i></a>'    },
-    { template: '<a class="k-button" onclick="onClickBtn(this)" title="Приєднати до ДКБО" id="btnConnDkbo" ><i class="pf-icon pf-16 pf-database-arrow_right"></i></a>'    },
     { template: '<a class="k-button" onclick="onClickBtn(this)" title="Сформувати запит" id="btnRunSelect" ><i class="pf-icon pf-16 pf-mail-arrow_right"></i></a>'    },
     { template: '<a class="k-button" onclick="onClickBtn(this)" title="Додаткова картка по КК" id="btnAddCard" ><i class="pf-icon pf-16 pf-man_1-update"></i></a>'    },
-    { template: '<a class="k-button" onclick="onClickBtn(this)" title="Додаткова картка школяра" id="btnSchoolboy" ><i class="pf-icon pf-16 pf-user"></i></a>'    }
+    { template: '<a class="k-button" onclick="onClickBtn(this)" title="Додаткова картка школяра" id="btnSchoolboy" ><i class="pf-icon pf-16 pf-user"></i></a>'    },
+    { template: '<a class="k-button" onclick="onClickBtn(this)" title="Довгострокове доручення" id="btnLongTermAssignments" ><i class="pf-icon pf-16 pf-list-ok"></i></a>'    },
+    { template: '<a class="k-button" onclick="onClickBtn(this)" title="Приєднати до ДКБО" id="btnConnDkbo" ><i class="pf-icon pf-16 pf-database-arrow_right"></i></a>'    }
 ];
 
-var g_gridMainToolbar_UO = [
-
+var g_gridMainToolbarRoot = [
+    { template: '<a class="k-button" onclick="onClickBtn(this)" title="Договір забезпечення" id="btnCreditUi" ><i class="pf-icon pf-16 pf-money"></i></a>'    },
+    { template: '<a class="k-button" onclick="onClickBtn(this)" title="Змінити тип картки" id="btnСngСard" ><i class="pf-icon pf-16 pf-calendar-update"></i></a>'    },
+    { template: '<a class="k-button" onclick="onClickBtn(this)" title="Інформація про передачу до бек-офісу" id="btnGo2BackOffice" ><i class="pf-icon pf-16 pf-tool_pencil"></i></a>'    },
+    { template: '<a class="k-button" onclick="onClickBtn(this)" title="Друк договорів страхування" id="btnPrintOrders2" ><i class="pf-icon pf-16 pf-report_open-import"></i></a>'    }
 ];
 
 var g_mainGridNeedSelectFirstRow = true;
@@ -49,7 +43,7 @@ var g_statesDataSource = [];
 for (var k in PASS_STATES){ g_statesDataSource.push({ name: PASS_STATES[k], id: k }); }
 
 ///***
-var g_data = { ndNumber: "", accNls: "", custName: "", okpo: "", passState: "", passDateStr: "", custtype: getCusttype() };
+var g_data = { ndNumber: "", accNls: "", custName: "", okpo: "", passState: "", passDateStr: "" };
 var g_opertype = null;
 
 function updateMainGrid() {
@@ -277,7 +271,7 @@ function Search() {
         return;
     }
     g_data = { ndNumber: ndNumber, accNls: accNls, custName: custName, okpo: okpo,
-        passState: passState, passDateStr: passDateStr, custtype: getCusttype()
+        passState: passState, passDateStr: passDateStr
     };
     updateMainGrid();
 }
@@ -316,14 +310,6 @@ function onClickBtn(btn) {
     }
 
     switch (btn.id){
-        case "btnCardUpdate":
-            $("#dialogCardUpdate").data('kendoWindow').center().open();
-            break;
-
-        case "btnAddParams":
-            $("#dialogAddParams").data('kendoWindow').center().open();
-            break;
-
         case "btnExcel":
             grid.saveAsExcel();
             break;
@@ -527,33 +513,13 @@ function Go2BackOfficeConfirmBtn() {
     } });
 }
 
-function CardUpdateConfirmBtn() {
-    var grid = $('#gridMain').data("kendoGrid");
-    var row = grid.dataItem(grid.select());
-
-    var idatDateStr = replaceAll($("#idatCardUpdate").val(), '/', '.');
-
-    WaitingForID(true, ".search-CardUpdate");
-    AJAX({ srcSettings: {
-        url: bars.config.urlContent("/api/Way4Bpk/Way4Bpk/SetIdat"),
-        success: function (data) {
-            $("#dialogCardUpdate").data('kendoWindow').close();
-            updateMainGrid();
-            bars.ui.notify("До відома", "Дані успішно змінено", 'info', {autoHideAfter: 5*1000});
-        },
-        complete: function(jqXHR, textStatus){ WaitingForID(false, ".search-CardUpdate"); }
-        ,data: JSON.stringify({ nD: row.ND, passDateStr: idatDateStr })
-    } });
-}
-
 $(document).ready(function () {
 
     // input params:
     // custtype - 1,2,3
     // nd - number
 
-    var titleTag = getCusttype() === 1 ? "(ФО)" : "(ЮО)";
-	$("#title").html("Way4. Портфель БПК "+ titleTag);
+	$("#title").html("Way4. Портфель БПК");
 
     $('#SearchBtn').click(Search);
     $('#confirmCngCard').click(confirmCngCard);
@@ -571,48 +537,33 @@ $(document).ready(function () {
     InitGridWindow({windowID: "#dialogGo2BackOffice", srcSettings: {title: "Зміна інформації про передачу до бек-офісу", open: function () {
         $("#passDateErrorMsg").hide();
     }}});
-    InitGridWindow({windowID: "#dialogAddParams", srcSettings: {title: "Додаткові параметри", width: "1024px", open: openDialogAddParams}});
-    InitGridWindow({windowID: "#dialogCardUpdate", srcSettings: {title: "Дата видачі карти", width: "900px", open: function () {
-        $("#idatCardUpdateErrorMsg").hide();
-        var grid = $('#gridMain').data("kendoGrid");
-        var row = grid.dataItem(grid.select());
-        $("#ndCardUpdate").kendoNumericTextBox({ format: "#", decimals: 0, spinners : false, value: row.ND });
-        $("#accNlsCardUpdate").kendoNumericTextBox({ format: "#", decimals: 0, spinners : false, value: row.ACC_NLS });
-    }}});
 
     $('#FireConfirmBtn').click(FireConfirm);
     $('#selectNewCardBtn').click(selectNewCardBtn);
     $('#Go2BackOfficeConfirmBtn').click(Go2BackOfficeConfirmBtn);
-    $('#AddParamsConfirmBtn').click(AddParamsConfirmBtn);
-    $('#CardUpdateConfirmBtn').click(CardUpdateConfirmBtn);
 
     var now = new Date(Date.now());
     var d = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-
-    function validatorMaskedDatePicker(idMaskedDatePicker, idError, gridDateColumnId) {
-        $(idMaskedDatePicker).kendoMaskedDatePicker({
-            format: "dd/MM/yyyy",
-            value: d,
-            change: function() {
-                $(idError).hide();
-                var value = this.value();
-                if(value > now){
-                    $(idError).show();
-                    setTimeout(function () { $(idError).hide(); }, 3000);
-                    var grid = $('#gridMain').data("kendoGrid");
-                    var row = grid.dataItem(grid.select());
-                    if(!isEmpty(row[gridDateColumnId])){
-                        this.value(new Date(row[gridDateColumnId].getFullYear(), row[gridDateColumnId].getMonth(), row[gridDateColumnId].getDate()));
-                    }
-                    else{
-                        this.value(d);
-                    }
+    $("#passDate").kendoMaskedDatePicker({
+        format: "dd/MM/yyyy",
+        value: d,
+        change: function() {
+            $("#passDateErrorMsg").hide();
+            var value = this.value();
+            if(value > now){
+                $("#passDateErrorMsg").show();
+                setTimeout(function () { $("#passDateErrorMsg").hide(); }, 3000);
+                var grid = $('#gridMain').data("kendoGrid");
+                var row = grid.dataItem(grid.select());
+                if(!isEmpty(row.PASS_DATE)){
+                    this.value(new Date(row.PASS_DATE.getFullYear(), row.PASS_DATE.getMonth(), row.PASS_DATE.getDate()));
+                }
+                else{
+                    this.value(d);
                 }
             }
-        });
-    }
-    validatorMaskedDatePicker("#passDate",          "#passDateErrorMsg",        "PASS_DATE");
-    validatorMaskedDatePicker("#idatCardUpdate",    "#idatCardUpdateErrorMsg",  "CARD_IDAT");
+        }
+    });
 
     $("#passStateDdl").kendoDropDownList({
         dataTextField: "name",
@@ -646,7 +597,6 @@ $(document).ready(function () {
 
     visibilityErrorNewCard();
 
-    g_gridMainToolbar = g_gridMainToolbar.concat(getCusttype() === 1 ? g_gridMainToolbar_FO : g_gridMainToolbar_UO);
-
+    g_gridMainToolbar = g_gridMainToolbar.concat(g_gridMainToolbarRoot);
     initMainGrid();
 });

@@ -11,6 +11,5 @@ namespace BarsWeb.Areas.Mbdk.Infrastructure.DI.Abstract
         Deal ReadReal(string ND);
         List<object> ScoresNms(ScoreNms model);
         IQueryable<Currency> GetCurrency();
-        UpdateDealResponse UpdateDeal(SaveDealParam model);
     }
 }

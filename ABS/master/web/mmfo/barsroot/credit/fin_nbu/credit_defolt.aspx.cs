@@ -1876,11 +1876,6 @@ public partial class credit_defolt : Bars.BarsPage
             // фіксуємо відповіді. та клас.
             //...
             Tb_clas.Text = read_zn_p(Tb_okpo.Text, "CLAS", "6", TB_Dat.Text);
-            // якщо наявна звітність записуємо в базу
-            if (!Pn_K0.Visible && !Pn_K1.Visible)
-            {
-                record_fp_nd("CLS1", Convert.ToDecimal(Tb_clas.Text), "56");
-            }
             //Відсутність консолідованої звітності 
             if (Pn_K0.Visible)
             {
@@ -1956,6 +1951,7 @@ public partial class credit_defolt : Bars.BarsPage
             if (Dl_NgrK.SelectedValue == "1")
             {
                 record_fp_nd("NKZV", (Dd_NKZV.SelectedValue), "51");
+                Tb_cls1.Text = read_nd_hist(ND_.Value, RNK_.Value, "CLS1", "56", Dl_Zdat.SelectedValue);
                 l_clas = Tb_cls1.Text;
             }
             else
@@ -1999,7 +1995,7 @@ public partial class credit_defolt : Bars.BarsPage
                 record_fp_nd("GP2", Dl_GP2.SelectedValue, "51");
                 record_fp_nd("GP3", Dl_GP3.SelectedValue, "51");
                 record_fp_nd("GP4", Dl_GP4.SelectedValue, "51");
-                Tb_cls2.Text = l_clas; 
+                Tb_cls2.Text = l_clas; // Tb_clas.Text;
 
                 if (Dl_GP1.SelectedValue == "0" && Dl_GP2.SelectedValue == "0" && Dl_GP3.SelectedValue == "0" && Dl_GP4.SelectedValue == "0")
                 {
@@ -2028,6 +2024,7 @@ public partial class credit_defolt : Bars.BarsPage
                 Tb_cls2.Text = null;
             }
 
+            //Response.Write("Tb_cls2.Text=" + Tb_cls2.Text);
             record_fp_nd("CLS2", Tb_cls2.Text, "56");
             
          
@@ -2159,7 +2156,6 @@ public partial class credit_defolt : Bars.BarsPage
             Pn_povk.Visible = true;
             Lb_cls2.Visible = true;
             Tb_cls2.Visible = true;
-            Dl_GP_SelectedIndexChanged(null,null);
         } 
     }
 
@@ -2548,10 +2544,6 @@ public partial class credit_defolt : Bars.BarsPage
         Tb_clas.Text = read_zn_p(Tb_okpo.Text, "CLAS", "6", TB_Dat.Text);
         Tb_cls.Text  = read_nd(ND_.Value, RNK_.Value, "CLS", "56", Dl_Zdat.SelectedValue);
         Tb_clsb.Text = read_nd(ND_.Value, RNK_.Value, "CLSP", "56", Dl_Zdat.SelectedValue);
-        //--??
-        Tb_cls1.Text = read_nd(ND_.Value, RNK_.Value, "CLS1", "56", Dl_Zdat.SelectedValue);
-        Tb_cls2.Text = read_nd(ND_.Value, RNK_.Value, "CLS2", "56", Dl_Zdat.SelectedValue);
-
 
         OracleConnection con = OraConnector.Handler.IOraConnection.GetUserConnection();
         OracleCommand cmd = new OracleCommand(OraConnector.Handler.IOraConnection.GetSetRoleCommand("WR_CREDIT"), con);

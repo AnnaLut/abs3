@@ -88,14 +88,14 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
                 while (reader.Read())
                 {
                    
-                    data.CC_ID = String.IsNullOrEmpty(reader.GetValue(0).ToString()) ? String.Empty : reader.GetString(0);
-                    data.LIMIT = String.IsNullOrEmpty(reader.GetValue(1).ToString()) ? 0 : reader.GetDecimal(1);
-                    data.SDOG = String.IsNullOrEmpty(reader.GetValue(2).ToString()) ? 0 : reader.GetDecimal(2);
-                    data.SDATE = String.IsNullOrEmpty(reader.GetValue(3).ToString()) ? String.Empty : reader.GetDateTime(3).ToString("dd/MM/yyyy");
-                    data.NMK = String.IsNullOrEmpty(reader.GetValue(4).ToString()) ? String.Empty : reader.GetString(4);
-                    data.RNK = String.IsNullOrEmpty(reader.GetValue(5).ToString()) ? 0 : reader.GetDecimal(5);
-                    data.SOS = String.IsNullOrEmpty(reader.GetValue(6).ToString()) ? 0 : reader.GetInt32(6);
-                    data.CUSTYPE = String.IsNullOrEmpty(reader.GetValue(7).ToString()) ? 0 : reader.GetInt32(7);
+                    data.CC_ID = reader.GetString(0);
+                    data.LIMIT = reader.GetDecimal(1);
+                    data.SDOG = reader.GetDecimal(2);
+                    data.SDATE = Convert.ToDateTime(reader.GetValue(3).ToString()).ToString("dd/MM/yyyy");
+                    data.NMK = reader.GetString(4);
+                    data.RNK = reader.GetDecimal(5);
+                    data.SOS = reader.GetInt32(6);
+                    data.CUSTYPE = reader.GetInt32(7);
                 }
 
                 cmd.CommandText = get_bank_date;
