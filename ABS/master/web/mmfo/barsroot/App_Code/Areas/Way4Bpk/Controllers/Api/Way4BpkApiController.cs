@@ -19,13 +19,14 @@ using System.Globalization;
 
 namespace BarsWeb.Areas.Way4Bpk.Controllers.Api
 {
+    [AuthorizeApi]
     public class Way4BpkController: ApiController
     {
         readonly IWay4BpkRepository _repo;
         public Way4BpkController(IWay4BpkRepository repo) { _repo = repo; }
 
         [HttpGet]
-        public HttpResponseMessage SearchMain([ModelBinder(typeof(WebApiDataSourceRequestModelBinder))] DataSourceRequest request, string custName, string okpo, long? ndNumber, long? accNls, int? passState, string passDateStr)
+        public HttpResponseMessage SearchMain([ModelBinder(typeof(WebApiDataSourceRequestModelBinder))] DataSourceRequest request, short custtype, string custName, string okpo, long? ndNumber, long? accNls, int? passState, string passDateStr)
         {
             try
             {
@@ -35,7 +36,7 @@ namespace BarsWeb.Areas.Way4Bpk.Controllers.Api
                     return Request.CreateResponse(HttpStatusCode.OK, new { Data = new List<W4DealWeb>(), Total = 0 });
                 }
 
-                BarsSql sql = SqlCreator.SearchMain(custName, okpo, ndNumber, accNls, passState, passDateStr);
+                BarsSql sql = SqlCreator.SearchMain(custtype, custName, okpo, ndNumber, accNls, passState, passDateStr);
                 List<W4DealWeb> data = _repo.SearchGlobal<W4DealWeb>(request, sql).ToList();
                 //decimal dataCount = _repo.CountGlobal(request, sql);
                 decimal dataCount = (request.Page * request.PageSize) + 1;
@@ -82,6 +83,23 @@ namespace BarsWeb.Areas.Way4Bpk.Controllers.Api
             }
         }
 
+        [HttpPost]
+        public HttpResponseMessage SetIdat(BackOfficeData o)
+        {
+            try
+            {
+                DateTime dt = DateTime.ParseExact(o.passDateStr, "dd.MM.yyyy", CultureInfo.InvariantCulture);
+
+                BarsSql sql = SqlCreator.SetIdat(o.nD, dt);
+                _repo.ExecuteStoreCommand(sql.SqlText, sql.SqlParams);
+                return Request.CreateResponse(HttpStatusCode.OK, new { });
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
         [HttpGet]
         public HttpResponseMessage SearchSubproduct([ModelBinder(typeof(WebApiDataSourceRequestModelBinder))] DataSourceRequest request, string code)
         {
@@ -116,6 +134,34 @@ namespace BarsWeb.Areas.Way4Bpk.Controllers.Api
         }
 
         [HttpPost]
+        public HttpResponseMessage SetAddParameter(AddParameters o)
+        {
+            try
+            {
+                AddParameters resp = new AddParameters { ND = o.ND, Params = new List<AddParameter>() };
+                foreach (var param in o.Params)
+                {
+                    try
+                    {
+                        BarsSql sql = SqlCreator.SetAddParameter(o.ND, param.Tag, param.Value);
+                        _repo.ExecuteStoreCommand(sql.SqlText, sql.SqlParams);
+                    }
+                    catch (Exception e)
+                    {
+                        param.Value = e.InnerException != null ? e.InnerException.Message : e.Message;
+                        resp.Params.Add(param);     //  error callback to client side
+                    }
+                }
+
+                return Request.CreateResponse(HttpStatusCode.OK, resp);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpPost]
         public HttpResponseMessage UserBranch()
         {
             try
@@ -123,6 +169,42 @@ namespace BarsWeb.Areas.Way4Bpk.Controllers.Api
                 string userBranch = _repo.ExecuteStoreQuery<string>(SqlCreator.UserBranch()).SingleOrDefault();
                 
                 return Request.CreateResponse(HttpStatusCode.OK, new { userBranch = userBranch });
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpPost]
+        public HttpResponseMessage GetAddParams(AddParameters o)
+        {
+            try
+            {
+                BarsSql sql = SqlCreator.GetAddParams(o.ND);
+                var data = _repo.ExecuteStoreQuery<AddParameter>(sql);
+                return Request.CreateResponse(HttpStatusCode.OK, data);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpPost]
+        public HttpResponseMessage GetAddParamValue(List<AddParameter> o)
+        {
+            try
+            {
+                List<AddParamVal> res = new List<AddParamVal>();
+                foreach (var v in o)
+                {
+                    BarsSql sql = SqlCreator.GetAddParamValue(v.Tag, v.Value);
+                    AddParamVal data = _repo.ExecuteStoreQuery<AddParamVal>(sql).SingleOrDefault();
+                    data.Tag = v.Tag;
+                    res.Add(data);
+                }
+                return Request.CreateResponse(HttpStatusCode.OK, res);
             }
             catch (Exception ex)
             {

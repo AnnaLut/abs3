@@ -44,11 +44,29 @@ namespace BarsWeb.Areas.Mbdk.Controllers.Api
         }
 
         [HttpGet]
+        public HttpResponseMessage GetProductList()
+        {
+            try
+            {
+                var sql = @"SELECT * FROM MBDK_PRODUCT";
+                using (var connection = OraConnector.Handler.UserConnection)
+                {
+                    object list = connection.Query(sql).ToList();
+                    return Request.CreateResponse(HttpStatusCode.OK, list);
+                }
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest, ex.Message);
+            }
+        }
+
+        [HttpGet]
         public HttpResponseMessage GetAgreements()
         {
             try
             {
-                var sql = @"select name, vidd from v_mbdk_product order by vidd";
+                var sql = @"select name, vidd , tipp from v_mbdk_product order by vidd";
 
                 using (var connection = OraConnector.Handler.UserConnection)
                 {
@@ -302,7 +320,7 @@ namespace BarsWeb.Areas.Mbdk.Controllers.Api
                 {
                     OracleCommand command = new OracleCommand("mbk.get_pawn_account_number", connection);
                     command.CommandType = CommandType.StoredProcedure;
-                    
+
                     OracleParameter pawnAccountNumberParameter = new OracleParameter("p_pawn_account_number", OracleDbType.Varchar2, 4000, null, ParameterDirection.ReturnValue);
                     command.Parameters.Add(pawnAccountNumberParameter);
                     command.Parameters.Add("p_main_account_number", model.mainDealAccount);
@@ -314,7 +332,7 @@ namespace BarsWeb.Areas.Mbdk.Controllers.Api
 
                     OracleString pawnAccountNumberValue = (OracleString)pawnAccountNumberParameter.Value;
                     string score = pawnAccountNumberValue == null ? "" : pawnAccountNumberValue.Value;
-                    
+
                     return Request.CreateResponse(HttpStatusCode.OK, new { score });
                 }
             }
@@ -430,7 +448,7 @@ namespace BarsWeb.Areas.Mbdk.Controllers.Api
                     var s58D = requestData["s58D"].ToObject<string>();
                     var partherAccNumber = requestData["partherAccNumber"].ToObject<string>();
 
-                    
+
                     OracleCommand command = new OracleCommand("mbk.save_partner_trace", connection);
                     command.CommandType = CommandType.StoredProcedure;
 
@@ -445,7 +463,7 @@ namespace BarsWeb.Areas.Mbdk.Controllers.Api
 
 
                     command.ExecuteNonQuery();
-                    return Request.CreateResponse(HttpStatusCode.OK,1);
+                    return Request.CreateResponse(HttpStatusCode.OK, 1);
 
                 }
             }
@@ -463,7 +481,7 @@ namespace BarsWeb.Areas.Mbdk.Controllers.Api
             {
                 using (var connection = OraConnector.Handler.UserConnection)
                 {
-                    object type = connection.Query(sql, new { nVidd}).FirstOrDefault();
+                    object type = connection.Query(sql, new { nVidd }).FirstOrDefault();
                     return Request.CreateResponse(HttpStatusCode.OK, type);
                 }
             }

@@ -16,13 +16,26 @@ namespace BarsWeb.Areas.Mbdk.Controllers.Api
         {
             _deal = deal;
         }
-        
+
         [HttpPost]
         public HttpResponseMessage CreateDeal(SaveDealParam megamodel)
         {
             try
             {
                 return Request.CreateResponse(HttpStatusCode.OK, _deal.SaveDeal(megamodel));
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest, ex.Message);
+            }
+        }
+
+        [HttpPost]
+        public HttpResponseMessage SaveDeal(SaveDealParam model)
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, _deal.UpdateDeal(model));
             }
             catch (Exception ex)
             {

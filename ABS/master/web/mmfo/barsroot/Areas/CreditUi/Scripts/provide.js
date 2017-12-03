@@ -6,6 +6,7 @@ $(document).ready(function () {
         
     globalID = bars.extension.getParamFromUrl('id', location.href);
     globaltip = bars.extension.getParamFromUrl('tip', location.href);
+    balance = bars.extension.getParamFromUrl('balance', location.href);
         
     var toolbar = [];
     toolbar.push({ name: "btNew", type: "button", text: "<span class='pf-icon pf-16 pf-add'></span> Додати нове забезпечення" });
@@ -192,13 +193,13 @@ $(document).ready(function () {
                 format: "#"
             });
 
-            TemplateDropDown("#mpawn_list", '/CreditUI/Provide/GetMpawn', "NAME", "MPAWN", null,null);
+            TemplateDropDown("#mpawn_list", '/CreditUI/Provide/GetMpawn', "NAME", "MPAWN", null, null);
             TemplateDropDown("#kv_list", '/CreditUI/Provide/GetKV', "NAME", "KV", "startswith",null); 
           
             $("#kv_list").data("kendoDropDownList").list.width(200);
             $("#kv_list").data("kendoDropDownList").value(980);
             if (e.model.isNew()) {
-                TemplateDropDown("#pawn_list", '/CreditUI/Provide/GetPawn', "NAME", "PAWN", null, null);
+                TemplateDropDown("#pawn_list", '/CreditUI/Provide/GetPawn', "NAME", "PAWN", null, { tip: globaltip == null ? null : globaltip, balance: balance });
                 $("#pawn_list").data("kendoDropDownList").list.width(400);
                 $("#lbl_del").text("Сума застави");
                 $('[name="SV"]').attr("hidden", "hidden");
@@ -217,7 +218,7 @@ $(document).ready(function () {
                 $("#MDATE").kendoDatePicker({ format: "dd.MM.yyyy", culture: "en-GB" });
                 $("#MDATE").attr("readonly", true);
             } else {
-                TemplateDropDown("#pawn_list", '/CreditUI/Provide/GetPawn', "NAME", "PAWN", null, { nls: e.model.NLS });
+                TemplateDropDown("#pawn_list", '/CreditUI/Provide/GetPawn', "NAME", "PAWN", null, { nls: e.model.NLS, tip: globaltip == null ? null : globaltip, balance: balance });
                 $("#pawn_list").data("kendoDropDownList").list.width(400);
 
                 $("#sv").kendoNumericTextBox({
@@ -270,8 +271,9 @@ $(document).ready(function () {
                     dataType: 'json',
                     data: {
                         provideString: JSON.stringify(provide),
-                        id: globaltip == null ? globalID : null,
-                        accs: globaltip == null ? null : staticData.ACCS
+                        id: (globaltip == null  || globaltip == 2)  ? globalID : null,
+                        accs: globaltip == null ? null : staticData.ACCS,
+                        tip: globaltip == null ? null : globaltip
                     },
                     success: function (data) {
                         if (CatchErrors(data)) {
@@ -659,7 +661,7 @@ function onChangeList() {
 
 /////////////////////////
 function GetStatic() {
-    var local_url = (globaltip == null) ? "/CreditUI/Provide/GetStaticDataKredit/" : "/CreditUI/Provide/GetStaticDataBPK/";
+    var local_url = (globaltip == null || globaltip == 2) ? "/CreditUI/Provide/GetStaticDataKredit/" : "/CreditUI/Provide/GetStaticDataBPK/";
     $.ajax({
         type: "POST",
         async: true,
@@ -846,8 +848,9 @@ function TemplateCreateDataSource(id, url, model_id, columns) {
                 cache: false,
                 url: bars.config.urlContent(url),
                 data: {
-                    id: globaltip != null ? staticData.ACCS : globalID,
-                    tip: globaltip != null ? globaltip : null
+                    id: (globaltip == 3)? staticData.ACCS : globalID,
+                    tip: globaltip != null ? globaltip : null,
+                    balance: balance
                 }
             },
             update: function (o) {
@@ -858,7 +861,16 @@ function TemplateCreateDataSource(id, url, model_id, columns) {
         schema: {
             data: "Data",
             total: "Total",
-            errors: "Errors",
+            errors: function (e) {
+                if (e.Status != undefined) {
+                    bars.ui.error({
+                        title: "Помилка ",
+                        text: e.Status,
+                        width: '800px',
+                        height: '600px'
+                    })
+                }
+            },
             model: {
                 id: model_id,
                 fields: columns
@@ -877,7 +889,8 @@ function Edit_Provide(provide, text) {
         dataType: 'json',
         data: {
             provideString: JSON.stringify(provide),
-            nd: globaltip == null ? globalID : null
+            nd: globaltip == null ? globalID : null,
+            tip: globaltip == null ? null : globaltip
         },
         success: function (data) {
             if (CatchErrors(data)) {
@@ -895,7 +908,7 @@ function Edit_Provide(provide, text) {
     });
 }
 function ChangeProvide(text_question,id,url,text) {
-    var tip = globaltip == null ? 1 : globaltip; //якщо немає типу, то кредит, якщо є, то значення типу
+    var tip = (globaltip == null || globaltip == 2)? 1 : globaltip; //якщо немає типу, то кредит, якщо є, то значення типу
     bars.ui.confirm({
         text: text_question,
         func: function () {

@@ -51,7 +51,6 @@ namespace BarsWeb.Areas.Mbdk.Controllers
         }
         public FileResult ExportDoc(decimal ND)
         {
-
             const string mbdkTemplateName = "mbdk_tic.frx";
 
             string templatePath = FrxDoc.GetTemplatePathByFileName(mbdkTemplateName);
@@ -62,7 +61,7 @@ namespace BarsWeb.Areas.Mbdk.Controllers
             FrxDoc doc = new FrxDoc(templatePath, pars, null);
             using (var str = new MemoryStream())
             {
-                
+
                 var name = "mbdk_{0}.pdf";
                 doc.ExportToMemoryStream(FrxExportTypes.Pdf, str);
                 Response.ClearHeaders();

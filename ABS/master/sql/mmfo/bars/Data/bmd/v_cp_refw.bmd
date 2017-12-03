@@ -58,8 +58,8 @@ declare
 
 begin
 
-  l_tabsemantic := '6) Дод.реквiзити угод купiвлi ЦП - значення';
-  l_tablinesdef := '';
+  l_tabsemantic := '6) Дод.реквiзити угод ЦП - значення';
+  l_tablinesdef := '20';
   l_tabselect_statement := '';
   l_tabname     := 'V_CP_REFW';
 
@@ -124,18 +124,23 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'REF', 'N', 'Реф.~угоди', '2', null, 1, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'TAG', 'C', 'Код~дод.рекв', '2', null, 1, 0, 1, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'VALUE', 'C', 'Значення~дод.рекв', '5', 255, 3, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'REF', 'N', 'Реф.~угоди', '2', null, 1, 0, 1, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'TAG', 'C', 'Код~дод.рекв', '1', null, 2, 0, 1, 0, 1, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'NAME', 'C', 'Найменування~дод.рекв', '3', null, 3, 0, 1, 0, 1, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'VALUE', 'C', 'Значення~дод.рекв', '5', 255, 4, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'DICT_NAME', 'C', 'Довідник', '5', 255, 5, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'ID_CP', 'N', 'ID ЦП', '1', 6, 6, 0, 0, 0, 1, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'NAME_OP', 'C', 'Тип операції~над ЦП', '3', 55, 7, 0, 0, 0, 1, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
 
-  -- добавляем описание сложного поля
-  l_newtabid := bars_metabase.get_tabid('V3_CP_TAG');
-  l_newcolid := bars_metabase.get_colid(l_newtabid, 'TAG');
+  -- добавляем описание сложного поля(особливе поле для вибору з довідника)
+  l_newtabid := bars_metabase.get_tabid('CP_VOPER');
+  l_newcolid := bars_metabase.get_colid(l_newtabid, 'ID');
   if (l_newtabid is not null and l_newcolid is not null) then
-    bars_metabase.add_extrnval(l_tabid, 3, l_newtabid, l_newcolid, '', '', '', 'TAG');
+    bars_metabase.add_extrnval(l_tabid, 4, l_newtabid, l_newcolid, '', '', '', 'DICT_NAME');
   else
-    dbms_output.put_line('В БМД не описана таблица V3_CP_TAG для описания сложного поля таблицы V_CP_REFW.');
+    dbms_output.put_line('В БМД не описана таблица CP_VOPER для описания сложного поля таблицы V_CP_KODW.');
   end if;
+
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);

@@ -130,12 +130,12 @@ begin
   bars_metabase.add_column(l_tabid, 4, 'NAME', 'C', 'Назва~ Дод рекв', '', null, 3, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
-  l_newtabid := bars_metabase.get_tabid('CC_TAG');
-  l_newcolid := bars_metabase.get_colid(l_newtabid, 'NAME');
+  l_newtabid := bars_metabase.get_tabid('CCK_RATING');
+  l_newcolid := bars_metabase.get_colid(l_newtabid, 'CODE');
   if (l_newtabid is not null and l_newcolid is not null) then
-    bars_metabase.add_extrnval(l_tabid, 3, l_newtabid, l_newcolid, '', '', '', 'TAG');
+    bars_metabase.add_extrnval(l_tabid, 3, l_newtabid, l_newcolid, '', '', '', '');
   else
-    dbms_output.put_line('В БМД не описана таблица CC_TAG для описания сложного поля таблицы ND_DREC.');
+    dbms_output.put_line('В БМД не описана таблица CCK_RATING для описания сложного поля таблицы ND_DREC.');
   end if;
 
   -- добавляем описание процедур

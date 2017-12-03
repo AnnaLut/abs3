@@ -11120,6 +11120,16 @@ end add_deal;
 --
 procedure set_bpk_parameter(p_nd number, p_tag varchar2, p_value varchar2)
 is
+d_close w4_acc.dat_close%type;
+begin
+  begin
+	select  distinct dat_close into d_close from (
+	select a.dat_close  from  w4_acc a  where a.nd=p_nd
+    union
+    select a.dat_close from  bpk_acc a  where a.nd=p_nd);
+   end;
+
+   if (d_close is null) then
 begin
   if p_value is null then
      delete from bpk_parameters where nd = p_nd and tag = p_tag;
@@ -11133,6 +11143,10 @@ begin
          where nd = p_nd and tag = p_tag;
      end;
   end if;
+  end;
+  else
+  raise_application_error(-20000, 'По клієнту ' || to_char(p_nd) || ' неможливо додати доп.параметр, бо він закритий');
+   end if;
 end set_bpk_parameter;
 
 -------------------------------------------------------------------------------

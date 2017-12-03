@@ -1,6 +1,10 @@
 ﻿@model BarsWeb.Areas.Mbdk.Models.Deal
+<link rel="stylesheet" href="~/Areas/Mbdk/Content/index.css" />
 <script>
+    var globalND = '@Model.ND';
+
     $(document).ready(function() {
+
         $(function() {
             $.ajax({
                 type: "GET",
@@ -14,13 +18,13 @@
                     $("#outRnk").val(data[5]);
                 }
             });
-        });       
+        });
 
         kendo.cultures.current.numberFormat[","] = ' ';
         $("#inSum").kendoNumericTextBox({
             min: 0,
             decimal: 3,
-            spinners: false            
+            spinners: false
         });
 
         var basey = @Model.BASEY;
@@ -93,10 +97,61 @@
                 date = date.replace("0:00:00", "");
                 $(".dateEnd").val(date);
             }
-
         });
 
+        var bDate = '@Model.DATE_B';
 
+        if (bDate.indexOf("0:00:00")!==-1) {
+            bDate = bDate.replace("0:00:00", "");
+        }
+
+        $("#conclusionDate").kendoDatePicker({
+            value: bDate,
+            format: "dd.MM.yyyy",
+            animation: {
+                open: {
+                    effects: "zoom:in",
+                    duration: 300
+                }
+            }
+        });
+
+        var nbuDate = '@Model.D_NBU';
+        if (nbuDate.indexOf("0:00:00")!==-1) {
+            nbuDate = nbuDate.replace("0:00:00", "");
+        }
+
+        $("#nbuRegDate").kendoDatePicker({
+            //value: nbuDate,
+            format: "dd.MM.yyyy",
+            animation: {
+                open: {
+                    effects: "zoom:in",
+                    duration: 300
+                }
+            }
+        });
+        if (nbuDate != '' && nbuDate != undefined && nbuDate != null) {
+            var datepicker = $("#nbuRegDate").data("kendoDatePicker");
+            datepicker.value(nbuDate);
+        }
+
+        var prodCode = '@Model.CODE_PRODUCT';
+
+        $("#productType").kendoDropDownList({
+            optionLabel: " ",
+            dataTextField: "NAME_PRODUCT",
+            dataValueField: "CODE_PRODUCT",
+            value: prodCode,
+            dataSource: {
+                transport: {
+                    read: {
+                        dataType: "json",
+                        url: bars.config.urlContent("/api/mbdk/getdata/getproductlist")
+                    }
+                }
+            }
+        });
 
         if ($("#nls").val().indexOf("0") !== -1) {
             this.value = $("#nls").val("");
@@ -104,250 +159,296 @@
     });
 
 </script>
-<style>
-    input.k-textbox {
-        background-color: #ccc;
-    }
-</style>
+<script src="~/Areas/Mbdk/Scripts/MbdkReadControls.js" charset="windows-1251"></script>
 <div id="window">
     <div id="gridClient"></div>
     <div id="gridRoad"></div>
 </div>
 
-<!--Ліва колонка значень-->
-<div class="col-xs-6">
+<div class="row">
+    <!--Ліва колонка значень-->
+    <div class="col-xs-6">
 
-    <div class="panel panel-default" style="display: inline-flex;">
-        <div class="panel-body">
-            <div class="form-group">
-                <label for="" class="col-xs-12 control-label">Вид договору</label>
-                <div class="col-xs-12">
-                    <input type="text" class="k-textbox non-active" id="dealType" value="@Model.VIDD_NAME" readonly>
+        <div class="panel panel-default" style="display: inline-flex;">
+            <div class="panel-body">
+
+                <div class="form-group">
+                    <label for="productType" class="col-xs-12 control-label">Продукт</label>
+                    <div class="col-md-12 col-sm-12">
+                        <input type="text" name="productType" class="k-textbox disable-solid" id="productType" title="Продукт" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="" class="col-xs-12 control-label">Вид договору</label>
+                    <div class="col-xs-12">
+                        <input type="text" class="k-textbox k-textbox-dark non-active" id="dealType" value="@Model.VIDD_NAME" readonly>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-xs-1 control-label">Валюта</label>
+                    <div class="col-md-3 col-xs-3">
+                        @*@Html.EditorFor(m => m.LCV, new { @class = "k-textbox", @id = "currency" })*@
+                        <input type="text" class="k-textbox k-textbox-dark non-active" id="currency" placeholder="Валюта" value="@Model.LCV" readonly>
+                    </div>
+                    <label for="" class="col-xs-2 control-label">Сума</label>
+                    <div class="col-xs-6">
+                        @*@Html.EditorFor(m => m.SUMM, new { @class = "k-textbox" })*@
+                        <input type="text" class="non-active" k-options="decimalFormat" placeholder="Сума" id="inSum" value="@Model.SUMM" readonly>
+                    </div>
+                </div>
+                <br />
+                <div class="form-group">
+                    <label for="" class="col-xs-6 control-label left-pos">N тікета/договору</label>
+                    <label for="" class="col-xs-6 control-label left-pos">Дата договору</label>
+
+
+
+                    <div class="col-xs-6">
+                        <input type="text" class="k-textbox k-textbox-dark non-active" placeholder="№ Договору" value="@Model.CC_ID" readonly>
+                    </div>
+
+                    <div class="col-xs-6">
+                        <input type="date" class="k-textbox conclusionDate disable-solid" title="Фактична дата заключення угоди" id="conclusionDate" />
+                    </div>
+
+
+                </div>
+                <div class="form-group">
+                    <label for="" class="col-xs-6 control-label left-pos">Початок</label>
+                    <label for="" class="col-xs-6 control-label left-pos">Кінець</label>
+
+                    <div class="col-xs-6">
+                        <input type="text" class="k-textbox k-textbox-dark non-active dateStart disable-solid" title="Початок" value="@Model.DATE_U" readonly>
+                    </div>
+
+                    <div class="col-xs-6">
+                        <input type="text" class="k-textbox k-textbox-dark non-active dateEnd disable-solid" title="Закінчення" value="@Model.DATE_END" readonly>
+                    </div>
                 </div>
             </div>
+        </div>
+        <!--Реквізити банку-->
 
-            <div class="form-group">
-                <label class="col-xs-1 control-label">Валюта</label>
-                <div class="col-md-3 col-xs-3">
-                    @*@Html.EditorFor(m => m.LCV, new { @class = "k-textbox", @id = "currency" })*@
-                    <input type="text" class="k-textbox non-active" id="currency" placeholder="Валюта" value="@Model.LCV" readonly>
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div class="form-group">
+                    <label for="" class="col-xs-4 control-label" id="bankName"></label>
                 </div>
-                <label for="" class="col-xs-2 control-label">Сума</label>
-                <div class="col-xs-6">
-                    @*@Html.EditorFor(m => m.SUMM, new { @class = "k-textbox" })*@                    
-                    <input type="text" class="non-active" k-options="decimalFormat" placeholder="Сума" id="inSum"  value="@Model.SUMM" readonly>                    
+
+                <div class="form-group">
+                    <div class="col-xs-4">
+                        <input type="text" class="k-textbox k-textbox-dark non-active mfo" value="" readonly title="МФО нашого Банку">
+                    </div>
+                    <div class="col-xs-4">
+                        <input type="text" class="k-textbox k-textbox-dark non-active" id="bicode" readonly value="" title="BIC нашого Банку">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-xs-4">
+                        <input type="text" class="k-textbox k-textbox-dark non-active" id="okpo" value="" readonly title="ОКПО нашого банку">
+                    </div>
+                    <div class="col-xs-4">
+                        <input type="text" class="k-textbox k-textbox-dark non-active" id="pb" value="OKPO_BA" readonly title="Код 1-ПБ нашого банку">
+                    </div>
+                    <div class="col-xs-4">
+                        <input type="text" class="k-textbox k-textbox-dark non-active" id="outRnk" value="" readonly title="Рег.№ нашого банку">
+                    </div>
+
+                </div>
+
+
+                <div class="form-group">
+                    <label for="" class="col-xs-6 control-label left-pos">Основний</label>
+                    <label for="" class="col-xs-6 control-label left-pos">Нарахованих %</label>
+
+                    <div class="col-xs-6">
+                        <input type="text" class="k-textbox k-textbox-dark non-active" id="" name="" readonly placeholder="Основний" value="@Model.A_NLS">
+                    </div>
+
+                    <div class="col-xs-6">
+                        <input type="text" class="k-textbox k-textbox-dark non-active" id="" name="" readonly placeholder="Нарахованих %" value="@Model.B_NLS">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="" class="col-xs-12 control-label left-pos">Траса вхідного платежу (57-ВІС, 58-Рахунок)</label>
+                    <div class="col-xs-6">
+                        <input type="text" class="k-textbox k-textbox-dark non-active" readonly id="bicUser" title="ВІС нашого банку-кореспондента" placeholder="BIC банку кореспондента" value="@Model.SWI_BIC">
+                    </div>
+                    <div class="col-xs-6">
+                        <input type="text" class="k-textbox k-textbox-dark non-active" readonly id="acc" title="Рахунок VOSTRO у нашого банку-кореспондента" value="@Model.SWI_ACC" placeholder="Рахунок VOSTRO">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-xs-6">
+                        <input type="text" class="k-textbox k-textbox-dark non-active" readonly id="scoreList" title="Назва рахунку для входу валюти" placeholder="Назва рахунку для входу валюти">
+                    </div>
+                    <div class="col-xs-6">
+                        <input type="text" class="k-textbox k-textbox-dark non-active" readonly id="nls" title="Рахунок для входу валюти" value="@Model.REFP" placeholder="Рахунок для входу валюти">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="" class="col-xs-12 control-label">Забезпечення відсутнє</label>
+                    <div class="col-xs-3">
+                        <input type="text" class="k-textbox k-textbox-dark non-active" readonly id="" name="" placeholder="" value="">
+                    </div>
+                    <div class="col-xs-3">
+                        <input type="text" class="k-textbox k-textbox-dark non-active" readonly id="" name="" placeholder="" value="">
+                    </div>
+
+                    <div class="col-xs-3">
+                        <input type="text" class="k-textbox k-textbox-dark non-active" readonly>
+                    </div>
+                    <div class="col-xs-3">
+                        <input type="text" class="k-textbox k-textbox-dark non-active" readonly id="" name="" placeholder="" value="">
+                    </div>
                 </div>
             </div>
-            <br />
-            <div class="form-group">
-                <label for="" class="col-xs-4 control-label left-pos">N тікета/договору</label>
-                <label for="" class="col-xs-4 control-label left-pos">Початок</label>
-                <label for="" class="col-xs-4 control-label left-pos">Кінець</label>
+        </div>
+        <div class="form-group">
+            <div class="col-xs-4">
+            </div>
+            <div class="col-xs-2">
+                <input type="text" class="k-textbox k-textbox-dark non-active" readonly value="@Model.A_KV">
+            </div>
 
-                <div class="col-xs-4">
-                    <input type="text" class="k-textbox non-active" placeholder="№ Договору" value="@Model.CC_ID" readonly>
-                </div>
-
-                <div class="col-xs-4">
-                    <input type="text" class="k-textbox non-active dateStart disable-solid" title="Початок" value="@Model.DATE_U" readonly>
-                </div>
-
-                <div class="col-xs-4">
-                    <input type="text" class="k-textbox non-active dateEnd disable-solid" title="Закінчення" value="@Model.DATE_END" readonly>
-                </div>
+            <div class="col-xs-3">
+                <input type="text" class="k-textbox k-textbox-dark non-active" readonly id="multiScore">
+            </div>
+            <div class="col-xs-3">
+                <input type="text" class="k-textbox k-textbox-dark non-active" readonly id="ostat">
             </div>
         </div>
     </div>
-    <!--Реквізити банку-->
 
-    <div class="panel panel-default">
-        <div class="panel-body">
-            <div class="form-group">
-                <label for="" class="col-xs-4 control-label" id="bankName"></label>
-            </div>
+    <!--Права колонка значень-->
+    <div class="col-xs-6">
 
-            <div class="form-group">
-                <div class="col-xs-4">
-                    <input type="text" class="k-textbox non-active mfo" value="" readonly title="МФО нашого Банку">
-                </div>
-                <div class="col-xs-4">
-                    <input type="text" class="k-textbox non-active" id="bicode" readonly value="" title="BIC нашого Банку">
-                </div>
-            </div>
-            <div class="form-group">
-                <div class="col-xs-4">
-                    <input type="text" class="k-textbox non-active" id="okpo" value="" readonly title="ОКПО нашого банку">
-                </div>
-                <div class="col-xs-4">
-                    <input type="text" class="k-textbox non-active" id="pb" value="OKPO_BA" readonly title="Код 1-ПБ нашого банку">
-                </div>
-                <div class="col-xs-4">
-                    <input type="text" class="k-textbox non-active" id="outRnk" value="" readonly title="Рег.№ нашого банку">
+        <div class="panel panel-default">
+
+            <div class="panel-body" style="padding-left: 25px">
+
+                <div class="form-group">
+                    <label for="" class="col-xs-4 control-label">Ефективна % ставка</label>
+                    <div class="col-xs-8">
+                        <input type="text" class="k-textbox k-textbox-dark non-active" readonly value="@Model.IRR">
+                    </div>
                 </div>
 
-            </div>
-
-
-            <div class="form-group">
-                <label for="" class="col-xs-6 control-label left-pos">Основний</label>
-                <label for="" class="col-xs-6 control-label left-pos">Нарахованих %</label>
-
-                <div class="col-xs-6">
-                    <input type="text" class="k-textbox non-active" id="" name="" readonly placeholder="Основний" value="@Model.A_NLS">
+                <div class="form-group">
+                    <label for="" class="col-xs-4 control-label">% ставка</label>
+                    <div class="col-xs-8">
+                        <input type="text" class="k-textbox k-textbox-dark non-active" readonly value="@Model.S_PR">
+                    </div>
                 </div>
 
-                <div class="col-xs-6">
-                    <input type="text" class="k-textbox non-active" id="" name="" readonly placeholder="Нарахованих %" value="@Model.B_NLS">
+                <div class="form-group">
+                    <label for="" class="col-xs-4 control-label">% база</label>
+                    <div class="col-xs-8">
+                        <input type="text" class="k-textbox k-textbox-dark non-active" readonly id="listOfBase" name="">
+                    </div>
                 </div>
-            </div>
-
-            <div class="form-group">
-                <label for="" class="col-xs-12 control-label left-pos">Траса вхідного платежу (57-ВІС, 58-Рахунок)</label>
-                <div class="col-xs-6">
-                    <input type="text" class="k-textbox non-active" readonly id="bicUser" title="ВІС нашого банку-кореспондента" placeholder="BIC банку кореспондента" value="@Model.SWI_BIC">
-                </div>
-                <div class="col-xs-6">
-                    <input type="text" class="k-textbox non-active" readonly id="acc" title="Рахунок VOSTRO у нашого банку-кореспондента" value="@Model.SWI_ACC" placeholder="Рахунок VOSTRO">
-                </div>
-            </div>
-            <div class="form-group">
-                <div class="col-xs-6">
-                    <input type="text" class="k-textbox non-active" readonly id="scoreList" title="Назва рахунку для входу валюти" placeholder="Назва рахунку для входу валюти">
-                </div>
-                <div class="col-xs-6">
-                    <input type="text" class="k-textbox non-active" readonly id="nls" title="Рахунок для входу валюти" value="@Model.REFP" placeholder="Рахунок для входу валюти">
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="" class="col-xs-12 control-label">Забезпечення відсутнє</label>
-                <div class="col-xs-3">
-                    <input type="text" class="k-textbox non-active" readonly id="" name="" placeholder="" value="">
-                </div>
-                <div class="col-xs-3">
-                    <input type="text" class="k-textbox non-active" readonly id="" name="" placeholder="" value="">
+                <div class="form-group">
+                    <label for="" class="col-xs-4 control-label">Сума %%</label>
+                    <div class="col-xs-8">
+                        <input type="text" class="k-textbox k-textbox-dark non-active" readonly id="" name="" placeholder="" value="@Model.INT_AMOUNT">
+                    </div>
                 </div>
 
-                <div class="col-xs-3">
-                    <input type="text" class="k-textbox non-active" readonly>
+                <div class="form-group">
+                    <label for="" class="col-xs-6 control-label left-pos">Номер свідоцтва НБУ</label>
+                    <label for="nbuRegDate" class="col-md-6 col-sm-6 control-label left-pos">Дата реєстрації в НБУ</label>
+
+                    <div class="col-xs-6">
+                        <input type="text" class="k-textbox" placeholder="Номер свідоцтва НБУ" id="nbuId" name="nbuId" value="@Model.N_NBU">
+                    </div>
+
+                    <div class="col-md-6 col-sm-6">
+                        <input type="date" class="k-textbox nbuRegDate disable-solid" title="Дата реєстрації в НБУ" id="nbuRegDate" />
+                    </div>
                 </div>
-                <div class="col-xs-3">
-                    <input type="text" class="k-textbox non-active" readonly id="" name="" placeholder="" value="">
-                </div>
+
             </div>
         </div>
-    </div>
-    <div class="form-group">
-        <div class="col-xs-4">
-        </div>
-        <div class="col-xs-2">
-            <input type="text" class="k-textbox non-active" readonly value="@Model.A_KV">
-        </div>
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div class="form-group">
+                    <label id="nmk" class="col-xs-12 control-label" value="">@Model.NMK</label>
+                </div>
+                <div class="form-group">
+                    <div class="col-xs-4">
+                        <input type="text" class="k-textbox k-textbox-dark non-active" readonly id="mfo" placeholder="МФО партнера" value="@Model.MFO">
+                    </div>
+                    <div class="col-xs-4">
+                        <input type="text" class="k-textbox k-textbox-dark non-active" readonly id="bic" placeholder="ВІС партнера" value="@Model.BIC">
+                    </div>
+                    <div class="col-xs-4" style="padding-right: 0px;">
+                        <input type="text" class="k-textbox k-textbox-dark non-active" readonly placeholder="№ дог." title="№ ген. договору" style="width: 81px;" value="@Model.NUM_ND">
+                    </div>
+                </div>
 
-        <div class="col-xs-3">
-            <input type="text" class="k-textbox non-active" readonly id="multiScore">
-        </div>
-        <div class="col-xs-3">
-            <input type="text" class="k-textbox non-active" readonly id="ostat">
+                <div class="form-group">
+                    <div class="col-xs-4">
+                        <input type="text" class="k-textbox k-textbox-dark non-active" readonly id="okpoUser" title="ОКПО партнера" placeholder="ОКПО партнера" value="@Model.OKPO">
+                    </div>
+                    <div class="col-xs-4">
+                        <input type="text" class="k-textbox k-textbox-dark non-active" readonly id="kod_b" title="Код 1-ПБ партнера" placeholder="Код 1-ПБ партнера" value="@Model.KOD_B">
+                    </div>
+                    <div class="col-xs-4">
+                        <input type="text" class="k-textbox k-textbox-dark non-active" readonly id="rnk" title="Рег № партнера" placeholder="Рег № партнера" value="@Model.RNK">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-6 col-sm-6">
+                        <label for="" class="control-label">Основний</label>
+                    </div>
+                    <div class="col-md-6 col-sm-6">
+                        <label for="" class="control-label">Нарахованих %</label>
+                    </div>
+
+                </div>
+                <div class="form-group" style="margin-bottom: 18px">
+                    <div class="col-xs-6">
+                        <input type="text" class="k-textbox k-textbox-dark non-active" readonly id="" name="" value="@Model.ACCKRED">
+                    </div>
+                    <div class="col-xs-6">
+                        <input type="text" class="k-textbox k-textbox-dark non-active" readonly id="" name="" value="@Model.ACCPERC">
+                    </div>
+
+                </div>
+
+                <div class="form-group">
+                    <label for="" class="col-xs-12 control-label">Траса вихідного платежу (57/ВІС, 58-Рахунок)</label>
+                </div>
+                <div class="form-group">
+                    <div class="col-xs-5">
+                        <input type="text" class="k-textbox k-textbox-dark non-active" title="ВІС банку-кореспондента партнера" readonly id="bicRoad">
+                    </div>
+                    <div class="col-xs-5">
+                        <input type="text" class="k-textbox k-textbox-dark non-active" title="Рахунок VOSTRO партнера у його банку-кореспондента" readonly value="@Model.SWO_ACC">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-xs-12">
+                        <input type="text" class="k-textbox k-textbox-dark non-active" title="Назва траси платежу" readonly id="nameRoad">
+                    </div>
+                </div>
+
+                <div class="form-group">
+
+                    <div class="col-xs-4">
+                        <textarea id="area" style="width: 395px; background-color: #ccc" rows="4" title="57D - Альтернативне заповнення вихідної траси" readonly>@Model.ALT_PARTYB</textarea>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
-<!--Права колонка значень-->
-<div class="col-xs-6">
-
-    <div class="panel panel-default">
-
-        <div class="panel-body" style="padding-left: 25px">
-            <div class="form-group">
-                <label for="" class="col-xs-4 control-label">% ставка</label>
-                <div class="col-xs-8">
-                    <input type="text" class="k-textbox non-active" readonly value="@Model.S_PR">
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="" class="col-xs-4 control-label">% база</label>
-                <div class="col-xs-8">
-                    <input type="text" class="k-textbox non-active" readonly id="listOfBase" name="">
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="" class="col-xs-4 control-label">Сума %%</label>
-                <div class="col-xs-8">
-                    <input type="text" class="k-textbox non-active" readonly id="" name="" placeholder="" value="@Model.INT_AMOUNT">
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="panel panel-default">
-        <div class="panel-body">
-            <div class="form-group">
-                <label id="nmk" class="col-xs-12 control-label" value="">@Model.NMK</label>
-            </div>
-            <div class="form-group">
-                <div class="col-xs-4">
-                    <input type="text" class="k-textbox non-active" readonly id="mfo" placeholder="МФО партнера" value="@Model.MFO">
-                </div>
-                <div class="col-xs-4">
-                    <input type="text" class="k-textbox non-active" readonly id="bic" placeholder="ВІС партнера" value="@Model.BIC">
-                </div>
-                <div class="col-xs-4" style="padding-right: 0px;">
-                    <input type="text" class="k-textbox non-active" readonly placeholder="№ дог." title="№ ген. договору" style="width: 81px;" value="@Model.NUM_ND">
-                </div>
-            </div>
-
-            <div class="form-group">
-                <div class="col-xs-4">
-                    <input type="text" class="k-textbox non-active" readonly id="okpoUser" title="ОКПО партнера" placeholder="ОКПО партнера" value="@Model.OKPO">
-                </div>
-                <div class="col-xs-4">
-                    <input type="text" class="k-textbox non-active" readonly id="kod_b" title="Код 1-ПБ партнера" placeholder="Код 1-ПБ партнера" value="@Model.KOD_B">
-                </div>
-                <div class="col-xs-4">
-                    <input type="text" class="k-textbox non-active" readonly id="rnk" title="Рег № партнера" placeholder="Рег № партнера" value="@Model.RNK">
-                </div>
-            </div>
-            <div class="form-group">
-                <div class="col-md-6 col-sm-6">
-                    <label for="" class="control-label">Основний</label> 
-                </div>
-                <div class="col-md-6 col-sm-6">
-                    <label for="" class="control-label">Нарахованих %</label>                   
-                </div>
-
-            </div>
-            <div class="form-group" style="margin-bottom: 18px">
-                <div class="col-xs-6">
-                    <input type="text" class="k-textbox non-active" readonly id="" name="" value="@Model.ACCKRED">
-                </div>
-                <div class="col-xs-6">
-                    <input type="text" class="k-textbox non-active" readonly id="" name="" value="@Model.ACCPERC">
-                </div>
-
-            </div>
-
-            <div class="form-group">
-                <label for="" class="col-xs-12 control-label">Траса вихідного платежу (57/ВІС, 58-Рахунок)</label>
-            </div>
-            <div class="form-group">
-                <div class="col-xs-5">
-                    <input type="text" class="k-textbox non-active" title="ВІС банку-кореспондента партнера" readonly id="bicRoad">
-                </div>
-                <div class="col-xs-5">
-                    <input type="text" class="k-textbox non-active" title="Рахунок VOSTRO партнера у його банку-кореспондента" readonly value="@Model.SWO_ACC">
-                </div>
-            </div>
-            <div class="form-group">
-                <div class="col-xs-12">
-                    <input type="text" class="k-textbox non-active" title="Назва траси платежу" readonly id="nameRoad">
-                </div>
-            </div>
-
-            <div class="form-group">
-
-                <div class="col-xs-4">
-                    <textarea id="area" style="width: 395px; background-color: #ccc" rows="4" title="57D - Альтернативне заповнення вихідної траси" readonly>@Model.ALT_PARTYB</textarea>
-                </div>
-            </div>
-        </div>
+<div class="row">
+    <div class="col-xs-1 col-xs-offset-11">
+        <button id="btnSave" class="k-primary" style="margin-bottom:20px;">Зберегти</button>
     </div>
 </div>

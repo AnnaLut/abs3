@@ -1,5 +1,4 @@
 
- 
  PROMPT ===================================================================================== 
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/mbk2.sql =========*** Run *** ======
  PROMPT ===================================================================================== 
@@ -7,6 +6,7 @@
   CREATE OR REPLACE PACKAGE BARS.MBK2 IS
 
 /*
+
   23.01.2015 Сухова Добавки к основному пакеджу МБК, который потом Ната Ч. объединит в один
              Забрала сюда процедуру mbk_SP
 */
@@ -36,6 +36,7 @@ END MBK2;
 CREATE OR REPLACE PACKAGE BODY BARS.MBK2 IS
 
 /*
+  24-04-2017 Марценюк В GPK добавлено vidd in (2700,2701,3660,3661) 
   30.01.2015 Сухова Мелочи.
   23.01.2015 Сухова Добавки к основному пакеджу МБК, который потом Ната Ч. объединит в один
              Забрала сюда процедуру mbk_SP
@@ -80,7 +81,7 @@ begin
   l_Err :=  ': МБК-угоду ' || l_ND || ' не знайдено !' ;
 
 
-  begin select * into  d1523 from cc_deal  where nd = L_ND and vidd >1200 and vidd < 1700 and sos <15 ;
+  begin select * into  d1523 from cc_deal  where nd = L_ND and (vidd >1200 and vidd < 1700 or vidd in (2700,2701,3660,3661)) and sos <15 ;
       --  d1523.limit := d1523.limit * 100;
   exception when no_data_found then raise_application_error(-20000, 'CC_DEAL' || l_Err );
   end;

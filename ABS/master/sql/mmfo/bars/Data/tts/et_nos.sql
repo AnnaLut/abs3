@@ -2,6 +2,7 @@ set lines 1000
 set trimspool on
 set serveroutput on size 1000000
 
+
 prompt Создание / Обновление операции NOS
 prompt Наименование операции: NOS - Загр.перев после подбора НОСТРО-сч (доп рекв)
 declare
@@ -184,12 +185,12 @@ begin
   end;
   begin
     insert into chklist_tts(idchk, tt, priority, f_big_amount, sqlval, f_in_charge)
-    values (42, 'NOS', 5, null, '((KV=980 AND S<=30000000000) OR (KV<>980 AND GL.P_ICURVAL(KV,S,BANKDATE)<=30000000000)) and exists (select 1 from operw where ref = o.ref and tag = ''NOS_T'' and value in (''FX4'',''WD3'',''V07'',''8C4'',''SW4'',''KV3''))', null);
+    values (42, 'NOS', 5, null, '((KV=980 AND S<=30000000000) OR (KV<>980 AND GL.P_ICURVAL(KV,S,BANKDATE)<=30000000000)) and exists (select 1 from operw where ref = o.ref and tag = ''NOS_T'' and value in (''FX4'',''WD3'',''V07'',''8C4'',''SW4'',''KV3'')) AND mbk.check_if_42_visa_should_apply(o.ref)=1', null);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 42, ''NOS'', 5, null, ''((KV=980 AND S<=30000000000) OR (KV<>980 AND GL.P_ICURVAL(KV,S,BANKDATE)<=30000000000)) and exists (select 1 from operw where ref = o.ref and tag = ''''NOS_T'''' and value in (''''FX4'''',''''WD3'''',''''V07'''',''''8C4'''',''''SW4'''',''''KV3''''))'', null) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 42, ''NOS'', 5, null, ''((KV=980 AND S<=30000000000) OR (KV<>980 AND GL.P_ICURVAL(KV,S,BANKDATE)<=30000000000)) and exists (select 1 from operw where ref = o.ref and tag = ''''NOS_T'''' and value in (''''FX4'''',''''WD3'''',''''V07'''',''''8C4'''',''''SW4'''',''''KV3'''')) AND mbk.check_if_42_visa_should_apply(o.ref)=1'', null) - первичный ключ не найден!');
       else raise;
       end if;
   end;

@@ -1,23 +1,25 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_FE8_NN.sql =========*** Run *** 
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure P_FE8_NN ***
-
-  CREATE OR REPLACE PROCEDURE BARS.P_FE8_NN (dat_     DATE,
+CREATE OR REPLACE PROCEDURE BARS.p_fe8_nn (dat_     DATE,
                                       sheme_   VARCHAR2 DEFAULT 'G',
                                       prnk_    NUMBER DEFAULT NULL ) IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирования #E8 для КБ (универсальная)
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 2008.  All Rights Reserved.
-% VERSION     : 24.02.2017 `(27.12.2016)
+% VERSION     : 11/10/2017 (12/09/2017, 02/08/2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_ - отчетная дата
                sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+11.10.2017 - для групп бал.счетоа 270, 366 дату начала договора вибираем из
+             поля SDATE табл. CC_DEAL  вместо bdate табл. CC_ADD
+12.09.2017 - для групп бал.счетоа 270, 366 номер договора, идентификатор
+             договора, дату начала и дату окончания договора вибираем из
+             CC_DEAL
+02.08.2017 - добален блок для изменения %% ставки для счетов овердрафтов
+             и добавлен блок вилучення дуже старих вкладів 
+             (до 01/01/2000 - узгоджено з Квашук)
+25.01.2017 - изменяем %% ставку для счетов овердрафтов если на конец месяца 
+             остаток активный но с учетом корректирующих оборотов 
+             стал пассивный
 27.12.2016 -при отсутствии кода региона в параметрах он выбирается по МФО
             из rcukru
 06.12.2016 - для нерезидентов в коде ZZZZZZZZZZ вместо условной нумерации 
@@ -50,6 +52,7 @@ PROMPT *** Create  procedure P_FE8_NN ***
    s04_         NUMBER;
    f91_         NUMBER;
    sum_d_       NUMBER;
+   ostq_no96_   NUMBER;
    kos_         NUMBER;
    fmt_         VARCHAR2 (20)         := '9999999990D0000';
    dfmt_        VARCHAR2 (8)          := 'ddmmyyyy';
@@ -114,7 +117,7 @@ PROMPT *** Create  procedure P_FE8_NN ***
    p080f_       VARCHAR2 (2);
    p081_        VARCHAR2 (70);
    p090k_       specparam.nkd%TYPE;  --VARCHAR2 (20);
-   p090_        specparam.nkd%TYPE;  --VARCHAR2 (20);
+   p090_        cc_deal.cc_id%TYPE;  --VARCHAR2 (20);
    p100_        VARCHAR2 (1);
    p111_        DATE;
    p111p_       DATE;
@@ -146,7 +149,7 @@ PROMPT *** Create  procedure P_FE8_NN ***
    p_sum_zd_    NUMBER                := NULL;
    p_p111_      DATE                  := NULL;
    p_p112_      DATE                  := NULL;
-   p_p090_      specparam.nkd%TYPE         := '------'; --VARCHAR2 (20)
+   p_p090_      cc_deal.cc_id%TYPE         := '------'; --VARCHAR2 (20)
    p_p130_      NUMBER;
    doda_        VARCHAR2 (10);
    acck_        NUMBER;
@@ -161,6 +164,7 @@ PROMPT *** Create  procedure P_FE8_NN ***
    sql_    varchar2(1000);
    dat_izm1     date := to_date('31/08/2013','dd/mm/yyyy'); 
    dat_izm2     date := to_date('31/03/2016','dd/mm/yyyy'); 
+   dat_izm3     date := to_date('31/01/2017','dd/mm/yyyy'); 
    ret_         NUMBER;
    sql_acc_     clob:='';
    
@@ -177,7 +181,7 @@ PROMPT *** Create  procedure P_FE8_NN ***
                a.daos, a.mdate, 
                decode(a.kv, 980, a.ost, a.ostq) ostq,
                a.kv, a.fdat, a.tip, a.custtype, NVL (TRIM (k.ddd), '121'), a.ostf,
-               a.glb, a.kb, a.vost
+               a.glb, a.kb, a.vost, a.ostq_no96
           FROM (SELECT /*+ordered */
                        s.acc, s.nls, s.nbs, s.kv, s.daos, s.mdate, aa.fdat,
                        aa.ost - aa.dos96 + aa.kos96 ost, 
@@ -188,7 +192,8 @@ PROMPT *** Create  procedure P_FE8_NN ***
                        c.prinsider prins, 
                        DECODE (c.custtype, 1, 2, 2, 2, DECODE (sed, 91, 3, 1)) custtype, 
                        c.ise, d.ostf,
-                       NVL(rc.glb,0) glb, NVL(cb.alt_bic,'0') kb, aa.vost 
+                       NVL(rc.glb,0) glb, NVL(cb.alt_bic,'0') kb, aa.vost, 
+                       decode(aa.kv, 980, aa.ost, aa.ostq) ostq_no96 
                   FROM otcn_f71_rnk d, customer c, otcn_saldo aa, otcn_acc s, 
                        custbank cb, rcukru rc
                  WHERE DECODE(mfou_, 300465, DECODE(mfo_, 300465, c.rnk, DECODE(c.rnkp, NULL, c.rnk, c.rnkp)), c.rnk) = d.rnk
@@ -735,7 +740,7 @@ BEGIN
 
 
    if prnk_ is null then
-       sql_acc_ := 'select /*+PARALLEL(a) */ * from accounts a where nvl(nbs, substr(nls,1,4)) in ';
+       sql_acc_ := 'select /*+PARALLEL(8) */ * from accounts a where nvl(nbs, substr(nls,1,4)) in ';
        sql_acc_ := sql_acc_ || '(select r020 from kl_f3_29 where kf=''E8'') ';
        sql_acc_ := sql_acc_ || ' and (nls, kv) NOT IN (SELECT nls, kv FROM kf91) ';
        
@@ -746,7 +751,7 @@ BEGIN
           
           sql_acc_ := sql_acc_ || ' UNION ALL ';                                             
                                                     
-          sql_acc_ := sql_acc_ || ' select /*+PARALLEL(a) */ * 
+          sql_acc_ := sql_acc_ || ' select /*+PARALLEL(8) */ * 
                                          from accounts a 
                                          where acc in (select dep_acc
                                                         from v_dpu_rel_acc_all
@@ -768,7 +773,7 @@ BEGIN
           sql_acc_ := sql_acc_ || ' select distinct a.acc, a.nls, a.kv, substr(a.nlsalt,1,4) nbs,
                                            a.rnk, a.daos, a.dapp, a.isp, a.nms, a.lim, a.pap, a.tip, 
                                            a.vid, a.mdate, a.dazs, a.accc, a.tobo
-                                    from (select  /*+PARALLEL(a) */ * 
+                                    from (select  /*+PARALLEL(8) */ * 
                                          from accounts
                                          where rnk = '||to_char(prnk_)||' and 
                                                acc in (select dep_acc
@@ -780,65 +785,10 @@ BEGIN
            
        ret_ := F_Pop_Otcn(Dat_, 2, sql_acc_, null, 0, 1);
    end if;
-
-   -- расшифровка в разрезе контрагентов бал.счета 3351
-   -- 04.05.2016 
-   -- новый блок для выбора счетов 3351
-   --delete from otcn_acc
-   --where substr(nls,1,4) in ('3351');
-
-   --delete from otcn_saldo
-   --where substr(nls,1,4) in ('3351');
-
-   --swap_otcn ( Dat_ );
-
-   --for k in ( select t.ACC, t.NLS, t.KV, t.SK RNK, 
-   --                  sum(t.ost) OST, t.mfo, t.nlsk, t.namk
-   --           from TMP_VPKLB t
-   --           where t.nls like '3351%'  
-   --             and t.sk is not null
-   --           group by t.ACC, t.NLS, t.KV, t.SK, 
-   --                    t.mfo, t.nlsk, t.namk
-   --         )
- 
-   --   loop
-
-   --      if k.ost <> 0 then
-
-   --         insert into otcn_acc (acc, nls, kv, nbs, rnk, nms)
-   --         values (k.acc, k.nls, k.kv, substr(k.nls,1,4), k.rnk, k.namk); 
-
-   --         INSERT INTO OTCN_SALDO (ODATE, FDAT, ACC, NLS, KV, NBS, RNK,
-   --                                 VOST, VOSTQ, OST, OSTQ,
-   --                                 DOS, DOSQ, KOS, KOSQ,
-   --                                 DOS96, DOSQ96, KOS96, KOSQ96,
-   --                                 DOS96P, DOSQ96P, KOS96P, KOSQ96P,
-   --                                 DOS99, DOSQ99, KOS99, KOSQ99, DOSZG, KOSZG, 
-   --                                 DOS96ZG, KOS96ZG, DOS99ZG, KOS99ZG)
-   --         VALUES (dat_, dat_, k.acc, k.NLS,  k.KV, substr(k.nls,1,4), k.RNK,
-   --                 0,
-   --                 0,
-   --                 k.ost,
-   --                 0,
-   --                 0,
-   --                 0,
-   --                 0,
-   --                 0,
-   --                 0,
-   --                 0,
-   --                 0,
-   --                 0,
-   --                 0,
-   --                 0,
-   --                 0,
-   --                 0,
-   --                 0,0,0,0,0,0,0,0,0,0);
-            
-   --      end if;
-
-   --    end loop;
--------------------------------------------------------------------------
-   
+    
+   -- вилучення дуже старих вкладів (до 01/01/2000 - узгоджено з Квашук)
+   delete from otcn_saldo where acc in (select acc from accounts where daos < to_date('01012000','ddmmyyyy'));
+      
    INSERT INTO otcn_f71_rnk
                 (rnk, ostf)
        SELECT  
@@ -871,7 +821,11 @@ BEGIN
                       and c.codcagent in (5,6)
                       and NVL(trim(c.sed),'00')<>'91');
    end if;
-
+   
+   --20,07,2017  по Криму виключаємо консолідовані рахунки фізосіб
+   if mfo_ = 324805 then 
+      delete from otcn_f71_rnk o where rnk in (29992702, 35051702, 45427002);
+   end if;
 --------------------------------------------------------------------------
    OPEN saldo;
 
@@ -879,7 +833,7 @@ BEGIN
       FETCH saldo
        INTO acc_, nls_, nbs_, p010_, rnk_, p021_, p030_, rez_, p050_, reg_, ved_,
             p060_, p070_, p111_, p112_, p120_, p140_, data_, tip_,
-            custtype_, ddd_, sum_d_, glb_, kb_, p130_BCZ;
+            custtype_, ddd_, sum_d_, glb_, kb_, p130_BCZ, ostq_no96_;
 
       EXIT WHEN saldo%NOTFOUND;
       
@@ -888,12 +842,34 @@ BEGIN
       p090_ := nkd_;
       
       begin
-        p130_ := acrn.fproc (acc_, dat_); 
+        p130_ := acrn_otc.fproc (acc_, dat_); 
       exception
         when others then
             p130_ := 0;
             logger.info('NBUR P_FE8_NN acc = '||acc_);
       end;
+
+      -- новый блок для овердрафтов остаток на конец месяца активный
+      -- но с учетом корректирующих оборотов стал пассивный 
+      if nbs_ in ('2600','2605','2620','2625','2650','2655') and 
+         p120_ > 0 and ostq_no96_ < 0
+      then
+         begin
+         select i.ir 
+            into p130_
+         from int_ratn i
+         where i.acc = acc_ 
+           and i.id = 1 
+           and i.bdat = ( select max(bdat)
+                          from int_ratn
+                          where acc=acc_ 
+                            and id =1
+                            and bdat <= dat_ 
+                         );
+         exception
+            when others  then p130_ := 0;
+         end;
+      end if;
 
       if mfo_ = 324485 then
          glb_ := 81;
@@ -946,6 +922,18 @@ BEGIN
          END;
       END IF;
 
+      if Dat_ > dat_izm3 and (nls_ like '270%' or nls_ like '366%')
+      then
+         BEGIN
+            select nd 
+               into p_nd_ 
+            from nd_acc 
+            where acc = acc_;
+         EXCEPTION WHEN NO_DATA_FOUND THEN
+            null;
+         END; 
+      end if;
+ 
       s04_ := 0;
       f91_ := 0;
 
@@ -1156,13 +1144,25 @@ BEGIN
                    exception
                        WHEN NO_DATA_FOUND THEN
                           p112p_ := p112_;
-                   end;         
+                   end;    
                 else
                     SELECT c.daos, c.mdate
                        INTO p111p_, p112p_
                     FROM accounts c
                     WHERE c.acc = acc_;
                 end if;
+
+                if Dat_ > dat_izm3 and nls_ like '366%' 
+                then 
+                   BEGIN
+                      SELECT c.nd, NVL (c.cc_id, nkd_), c.sdate, c.wdate
+                         INTO nd_, p090_, p111p_, p112p_
+                      FROM cc_deal c 
+                      WHERE c.nd = p_nd_;
+                   EXCEPTION WHEN NO_DATA_FOUND THEN
+                      null;
+                   END;   
+                end if;                 
             ELSE
                BEGIN
                  SELECT NVL (c.nd, nkd_), c.datz, c.dat_end  --c.dat_begin, c.dat_end
@@ -1222,6 +1222,18 @@ BEGIN
                  END;
                END;
                
+               if Dat_ > dat_izm3 and nls_ like '270%' 
+               then 
+                  BEGIN
+                     SELECT c.nd, NVL (c.cc_id, nkd_), c.sdate, c.wdate
+                        INTO nd_, p090_, p111p_, p112p_
+                     FROM cc_deal c 
+                     WHERE c.nd = p_nd_;
+                  EXCEPTION WHEN NO_DATA_FOUND THEN
+                     null;
+                  END;   
+               end if;                 
+
                if nls_ LIKE '260%' OR (nls_ like '2650%' and r013_ !='8') 
                  OR (nls_ like '2655%' and r013_ != '1')  
                then
@@ -1337,6 +1349,19 @@ BEGIN
                         p112p_ := null;
                      END;
                   end if;
+
+                  if Dat_ > dat_izm3 and (nls_ like '270%' or nls_ like '366%')
+                  then
+                     BEGIN
+                        SELECT c.nd, NVL (c.cc_id, nkd_), c.sdate, c.wdate
+                           INTO nd_, p090_, p111p_, p112p_
+                        FROM cc_deal c 
+                        WHERE c.nd = p_nd_;
+                     EXCEPTION WHEN NO_DATA_FOUND THEN
+                        null;
+                     END;
+                  end if;
+ 
                END IF;
             END IF;
 
@@ -1661,7 +1686,7 @@ BEGIN
             select nvl(sum(ostq*(ndat - bdat)*ir)/sum(decode(ostq,0,(ndat - bdat),ostq*(ndat - bdat))), k.znap)
                into znap_
             from ( 
-                  select fost(i.acc,i.bdat-1) ostq, dat1_ bdat, i.bdat ndat, acrn.fprocn(i.acc, i.id, i.bdat-1) ir
+                  select fost(i.acc,i.bdat-1) ostq, dat1_ bdat, i.bdat ndat, acrn_otc.fprocn(i.acc, i.id, i.bdat-1) ir
                   from int_ratn i 
                   where i.acc = k.acc and
                         i.id = 1 and
@@ -1673,7 +1698,7 @@ BEGIN
                   select ostq, decode(bdat, daos, bdat+1, bdat) bdat, 
                          nvl(lead(bdat) over (partition by acc order by bdat), dat_+1) ndat, ir
                   from (select fost(i.acc,i.bdat) ostq, i.acc, i.bdat, 
-                               acrn.fprocn(i.acc, i.id, i.bdat) ir,
+                               acrn_otc.fprocn(i.acc, i.id, i.bdat) ir,
                                a.daos daos
                         from int_ratn i, accounts a  
                         where i.acc = k.acc and
@@ -1735,13 +1760,3 @@ BEGIN
 ----------------------------------------
 END p_fe8_nn;
 /
-show err;
-
-PROMPT *** Create  grants  P_FE8_NN ***
-grant EXECUTE                                                                on P_FE8_NN        to BARS_ACCESS_DEFROLE;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_FE8_NN.sql =========*** End *** 
-PROMPT ===================================================================================== 
