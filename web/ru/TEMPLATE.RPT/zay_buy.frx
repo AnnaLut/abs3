@@ -1,0 +1,96 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" MaxPages="1" ReportInfo.Name="ZAY_SAL" ReportInfo.Author="BARS-Lanbina" ReportInfo.Description="Заявка на продажу валюты" ReportInfo.Created="07/05/2012 12:36:03" ReportInfo.Modified="07/05/2012 16:32:33" ReportInfo.CreatorVersion="1.9.1.0">
+  <Dictionary>
+    <OracleDataConnection Name="barsprog" ConnectionString="rijcmlq9LvSyWwS+3h3xYld2hxmBK9Mzl6bn0LPe3yxx6NmPdiH8N2oPRWl7qvW3gJU2hAsBfsDTSWEWPn8Zim0gpdu6g==">
+      <TableDataSource Name="Table" Alias="Table1" DataType="System.Int32" Enabled="true" SelectCommand="select z.id ZAY_ID,  &#13;&#10;       nvl(z.nd, TO_CHAR(z.id)) ZAY_NUM,  &#13;&#10;       z.fdat ZAY_DAT,  &#13;&#10;       replace(substr(f_dat_lit(z.fdat), 1, 100),'&quot;','') ZAY_DATLIT,  &#13;&#10;       c.nmk CLIENTNAME,  &#13;&#10;       substr(f_custw(c.rnk,'FGIDX'),1,6)||' '||c.adr CLIENTADR,  &#13;&#10;       decode(c.custtype, 3, p.telw, nvl(co.telr,co.tel_fax)) CLIENTFAX,  &#13;&#10;       nvl(z.contact_fio,cz.fio) STAFFNAME,   &#13;&#10;       nvl(z.contact_tel,cz.tel) STAFFPHONE,   &#13;&#10;       substr(z.basis,1,254) BASIS,  &#13;&#10;       z.contract DEAL_NUM,  &#13;&#10;       z.dat2_vmd DEAL_DAT,  &#13;&#10;       z.meta AIM_ID,  &#13;&#10;       a.description AIM_NAME,  &#13;&#10;       a.description_eng AIM_NAMENG,  &#13;&#10;       z.dat_vmd  LTD_DAT,  &#13;&#10;       z.num_vmd LTD_NUM,  &#13;&#10;       z.dat5_vmd OTD_DAT,  &#13;&#10;       decode(z.dat_vmd, null, 1, 0) FL_AVANS,  &#13;&#10;       bnfc.name BENEFC,  &#13;&#10;       bnkc.name BANKC,  &#13;&#10;       z.bank_name BANKNAME,&#13;&#10;       z.kv2 CUR_KV,  &#13;&#10;       t.lcv CUR_ISO,  &#13;&#10;       t.name CUR_NAME,          &#13;&#10;       replace(to_char(z.s2/100,'fm99999999.00'),'.',',') CUR_AMOUNT,  &#13;&#10;       --nvl(replace(to_char(decode(nvl(z.fl_kursz, 0), 1, to_number(null), z.kurs_z),'fm99999999.0000'),'.',','),'Курс уповноваженого банку') RATE,  &#13;&#10;       nvl(replace(decode(nvl(z.fl_kursz, 0), 1, null, z.kurs_kl),'.',','),'Курс уповноваженого банку') RATE,  &#13;&#10;       replace(to_char(round(decode(nvl(z.fl_kursz, 0), 1, to_number(null), z.kurs_z)* z.s2)/100,'fm99999999.00'),'.',',') EQV_AMOUNT, &#13;&#10;       ag.nls ACC_NC,   &#13;&#10;       av.nls ACC_FC,  &#13;&#10;       cz.mfov MFO_REST,   &#13;&#10;       substr(case when b.mfo = f_ourmfo() then nvl((select substr(val,1,254) from birja where par = 'C_BNAME'),substr(getbankname(f_ourmfo()),1,254)) else substr(b.nb,1,254) end,1,254) BANK_REST,  &#13;&#10;       cz.nlsv ACC_REST,  &#13;&#10;       substr(substr(substr(fio(co.ruk,2),1,1) || '. ' || substr(fio(co.ruk,3),1,1) || '. ' || fio(co.ruk,1),1,254),1,254) RUK,  &#13;&#10;       substr(substr(substr(fio(co.buh,2),1,1) || '. ' || substr(fio(co.buh,3),1,1) || '. ' || fio(co.buh,1),1,254),1,254) BUH,  &#13;&#10;       decode(replace(to_char(z.kom,'fm999999990.00'),'.',',')||'(%)','(%)',z.skom||' грн.',replace(to_char(z.kom,'fm999999990.00'),'.',',')||'(%)') COMMISS, &#13;&#10;       substr(nvl((select substr(val,1,254) from birja where par = 'C_BADR'),substr(f_ouraddress(),1,100)),1,254) BADR,  &#13;&#10;       substr(nvl((select substr(val,1,254) from birja where par = 'C_BNAME'),substr(getbankname(f_ourmfo()),1,254)),1,254) BNAME,  &#13;&#10;       cz.nls29 ACC_TR,&#13;&#10;       f_ourmfo() BMFO  &#13;&#10;  from zayavka z, cust_zay cz, customer c, corps co, person p,&#13;&#10;       tabval t, zay_aims a, country bnfc, country bnkc,   &#13;&#10;       accounts ag, accounts av, banks b   &#13;&#10; where z.rnk = c.rnk  &#13;&#10;   and c.rnk = co.rnk(+)&#13;&#10;   and c.rnk = p.rnk(+)   &#13;&#10;   and z.kv2 = t.kv   &#13;&#10;   and z.acc0 = ag.acc  &#13;&#10;   and z.acc1 = av.acc  &#13;&#10;   and z.meta = a.aim(+)     &#13;&#10;   and c.rnk = cz.rnk(+)  &#13;&#10;   and cz.mfov = b.mfo(+)  &#13;&#10;   and z.benefcountry = bnfc.country (+)  &#13;&#10;   and z.country = bnkc.country (+)   &#13;&#10;   and z.id = :ZAY_ID">
+        <Column Name="ZAY_ID" DataType="System.Decimal"/>
+        <Column Name="ZAY_NUM" DataType="System.String"/>
+        <Column Name="ZAY_DAT" DataType="System.DateTime"/>
+        <Column Name="ZAY_DATLIT" DataType="System.String"/>
+        <Column Name="CLIENTNAME" DataType="System.String"/>
+        <Column Name="CLIENTADR" DataType="System.String"/>
+        <Column Name="CLIENTFAX" DataType="System.String"/>
+        <Column Name="STAFFNAME" DataType="System.String"/>
+        <Column Name="STAFFPHONE" DataType="System.String"/>
+        <Column Name="DEAL_NUM" DataType="System.String"/>
+        <Column Name="DEAL_DAT" DataType="System.DateTime"/>
+        <Column Name="AIM_NAME" DataType="System.String"/>
+        <Column Name="AIM_NAMENG" DataType="System.String"/>
+        <Column Name="CUR_KV" DataType="System.Decimal"/>
+        <Column Name="CUR_ISO" DataType="System.String"/>
+        <Column Name="CUR_NAME" DataType="System.String"/>
+        <Column Name="CUR_AMOUNT" DataType="System.String"/>
+        <Column Name="RATE" DataType="System.String"/>
+        <Column Name="EQV_AMOUNT" DataType="System.String"/>
+        <Column Name="ACC_NC" DataType="System.String"/>
+        <Column Name="ACC_TR" DataType="System.String"/>
+        <Column Name="RUK" DataType="System.String"/>
+        <Column Name="BUH" DataType="System.String"/>
+        <Column Name="ACC_FC" DataType="System.String"/>
+        <Column Name="COMMISS" DataType="System.String"/>
+        <Column Name="BADR" DataType="System.String"/>
+        <Column Name="BNAME" DataType="System.String"/>
+        <Column Name="BMFO" DataType="System.String"/>
+        <Column Name="BASIS" DataType="System.String"/>
+        <Column Name="AIM_ID" DataType="System.Decimal"/>
+        <Column Name="LTD_DAT" DataType="System.DateTime"/>
+        <Column Name="LTD_NUM" DataType="System.String"/>
+        <Column Name="OTD_DAT" DataType="System.String"/>
+        <Column Name="FL_AVANS" DataType="System.Decimal"/>
+        <Column Name="BENEFC" DataType="System.String"/>
+        <Column Name="BANKC" DataType="System.String"/>
+        <Column Name="BANKNAME" DataType="System.String"/>
+        <Column Name="MFO_REST" DataType="System.String"/>
+        <Column Name="BANK_REST" DataType="System.String"/>
+        <Column Name="ACC_REST" DataType="System.String"/>
+        <CommandParameter Name="ZAY_ID" DataType="112" Expression="[ZAY_ID]" DefaultValue="0"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="ZAY_ID" DataType="System.Int32" Description="Идентификатор заявки"/>
+  </Dictionary>
+  <ReportPage Name="Page1" Guides="0">
+    <PageHeaderBand Name="PageHeader1" Width="718.2" Height="510.3" Guides="56.7">
+      <TextObject Name="Text1" Left="463.05" Width="245.7" Height="56.7" Text="Додаток 1&#13;&#10;до Положення про порядок та&#13;&#10;умови торгівлі іноземною валютою" Font="Calibri, 8pt"/>
+      <TextObject Name="Text2" Left="567" Top="56.7" Width="94.5" Height="28.35" Border.Lines="All" Text="0408006" HorzAlign="Center" VertAlign="Center" Font="Calibri, 10pt"/>
+      <TextObject Name="Text3" Left="491.4" Top="94.5" Width="217.35" Height="66.15" Text="Прийнято&#13;&#10;Дата: _____  Час: _______&#13;&#10;Підпис: ________________&#13;&#10;Штамп" Font="Calibri, 10pt"/>
+      <TextObject Name="Text4" Top="37.8" Width="387.45" Height="18.9" Text="(найменування та місцезнаходження уповноваженого банку)" HorzAlign="Center" VertAlign="Center" Font="Calibri, 8pt"/>
+      <TextObject Name="Text5" Left="56.7" Top="170.1" Width="623.7" Height="18.9" Text="ЗАЯВА* ПРО КУПІВЛЮ ІНОЗЕМНОЇ ВАЛЮТИ ТА БАНКІВСЬКИХ МЕТАЛІВ" HorzAlign="Center" VertAlign="Center" Font="Calibri, 12pt"/>
+      <TextObject Name="Text6" Left="160.65" Top="198.45" Width="198.45" Height="18.9" Text="№  [Table1.ZAY_NUM] " HorzAlign="Right" VertAlign="Center" Font="Calibri, 10pt"/>
+      <TextObject Name="Text7" Left="359.1" Top="198.45" Width="255.15" Height="18.9" Text=" від  [Table1.ZAY_DATLIT]" VertAlign="Center" Font="Calibri, 10pt"/>
+      <TextObject Name="Text8" Top="226.8" Width="708.75" Height="18.9" Text="Найменування клієнта/прізвище, ім'я, по батькові [Table1.CLIENTNAME]" VertAlign="Center" Font="Calibri, 10pt"/>
+      <TextObject Name="Text9" Top="245.7" Width="699.3" Height="18.9" Text="Місцезнаходження / місце проживання  [Table1.CLIENTADR]" VertAlign="Center" Font="Calibri, 10pt"/>
+      <TextObject Name="Text10" Top="264.6" Width="708.75" Height="18.9" Text="№ тел./факсу  [Table1.CLIENTFAX]" VertAlign="Center" Font="Calibri, 10pt"/>
+      <TextObject Name="Text11" Top="283.5" Width="699.3" Height="56.7" Text="Прізвище, ім'я, по батькові  працівника, який уповноважений вирішувати питання щодо купівлі іноземної валюти або банківських металів [Table1.STAFFNAME], № тел.  [Table1.STAFFPHONE]&#13;&#10;(зразок підпису)" Font="Calibri, 10pt"/>
+      <TextObject Name="Text14" Top="349.65" Width="699.3" Height="37.8" Text="Підстава для купівлі іноземної валюти на міжбанківському валютному ринку України  [Table1.BASIS]" Font="Calibri, 10pt"/>
+      <TextObject Name="Text15" Top="387.45" Width="708.75" Height="18.9" Text="Доручаємо купити іноземну валюту або банківскі метали на умовах, що зазначені нижче." Font="Calibri, 10pt"/>
+      <TextObject Name="Text17" Top="425.25" Width="151.2" Height="85.05" Border.Lines="All" Fill="Hatch" Fill.ForeColor="Gainsboro" Fill.BackColor="White" Fill.Style="BackwardDiagonal" Text="Назва іноземної валюти або виду банківського металу,що купується, її/його код" HorzAlign="Center" VertAlign="Center" Font="Calibri, 9pt"/>
+      <TextObject Name="Text20" Left="151.2" Top="425.25" Width="179.55" Height="85.05" Border.Lines="All" Fill="Hatch" Fill.ForeColor="Gainsboro" Fill.BackColor="White" Fill.Style="BackwardDiagonal" Text="Сума купівлі іноземної валюти або маса банківських металів " HorzAlign="Center" VertAlign="Center" Font="Calibri, 9pt"/>
+      <TextObject Name="Text21" Left="330.75" Top="425.25" Width="141.75" Height="85.05" Border.Lines="All" Fill="Hatch" Fill.ForeColor="Gainsboro" Fill.BackColor="White" Fill.Style="BackwardDiagonal" Text="Курс купівлі в грн./курс уповноваженого банку" HorzAlign="Center" VertAlign="Center" Font="Calibri, 9pt"/>
+      <TextObject Name="Text22" Left="472.5" Top="425.25" Width="236.25" Height="85.05" Border.Lines="All" Fill="Hatch" Fill.ForeColor="Gainsboro" Fill.BackColor="White" Fill.Style="BackwardDiagonal" Text="Сума купівлі в грн. відповідно до курсу, що зазначений у заяві" HorzAlign="Center" VertAlign="Center" Font="Calibri, 9pt"/>
+      <TextObject Name="Text19" Left="18.9" Width="378" Height="18.9" Text="[Table1.BNAME]" HorzAlign="Center" VertAlign="Center" Font="Calibri, 10pt"/>
+      <TextObject Name="Text24" Left="18.9" Top="18.9" Width="378" Height="18.9" Border.Lines="Bottom" Text="[Table1.BADR]" HorzAlign="Center" VertAlign="Center" Font="Calibri, 10pt"/>
+    </PageHeaderBand>
+    <DataBand Name="Data1" Top="514.3" Width="718.2" Height="56.7">
+      <TextObject Name="Text18" Left="472.5" Width="236.25" Height="56.7" Border.Lines="All" Text="[Table1.EQV_AMOUNT]" HorzAlign="Center" VertAlign="Center" Font="Calibri, 10pt"/>
+      <TextObject Name="Text23" Left="330.75" Width="141.75" Height="56.7" Border.Lines="All" Text="[Table1.RATE]" HorzAlign="Center" VertAlign="Center" Font="Calibri, 10pt"/>
+      <TextObject Name="Text25" Left="151.2" Width="179.55" Height="56.7" Border.Lines="All" Text="[Table1.CUR_AMOUNT]" HorzAlign="Center" VertAlign="Center" Font="Calibri, 10pt"/>
+      <TextObject Name="Text16" Width="151.2" Height="56.7" Border.Lines="All" Text="[Table1.CUR_ISO], [Table1.CUR_KV]" HorzAlign="Center" VertAlign="Center" Font="Calibri, 10pt"/>
+    </DataBand>
+    <PageFooterBand Name="PageFooter1" Top="575" Width="718.2" Height="472.5">
+      <TextObject Name="Text12" Top="9.45" Width="708.75" Height="56.7" Text="Зобов'язуємося перерахувати на рахунок № [Table1.ACC_TR] у [Table1.BNAME], код банку [Table1.BMFO] кошти в гривнях у розмірі, що потрібний для купівлі іноземної валюти або банківських металів за курсом, зазначеним у цій заяві." Font="Calibri, 10pt"/>
+      <TextObject Name="Text26" Top="66.15" Width="708.75" Height="56.7" Text="Якщо після виконання заяви залишаються невикористаними кошти в гривнях, просимо уповноважений банк перерахувати їх на поточний рахунок [Table1.ACC_REST] у [Table1.BANK_REST], код банку [Table1.MFO_REST]." Font="Calibri, 10pt"/>
+      <TextObject Name="Text27" Top="122.85" Width="708.75" Height="18.9" Text="'Надаємо право утримати комісійної винагороди у гривнях у розмірі [Table1.COMMISS]" Font="Calibri, 10pt"/>
+      <TextObject Name="Text28" Top="151.2" Width="699.3" Height="56.7" Text="Доручаємо уповноваженому банку перерахувати придбану іноземну валюту або банківські метали на поточний рахунок в іноземній валюті №  [Table1.ACC_FC] у [Table1.BNAME], код банку [Table1.BMFO]." Font="Calibri, 10pt"/>
+      <TextObject Name="Text29" Left="18.9" Top="283.5" Width="94.5" Height="18.9" Text="М.П." Font="Calibri, 10pt"/>
+      <TextObject Name="Text30" Left="500.85" Top="283.5" Width="207.9" Height="18.9" Text="[Table1.RUK]" Font="Calibri, 10pt"/>
+      <TextObject Name="Text31" Left="500.85" Top="311.85" Width="207.9" Height="18.9" Text="[Table1.BUH]" Font="Calibri, 10pt"/>
+      <TextObject Name="Text32" Left="283.5" Top="283.5" Width="66.15" Height="18.9" Text="Підписи:" Font="Calibri, 10pt"/>
+      <TextObject Name="Text33" Left="170.1" Top="359.1" Width="198.45" Height="75.6" Text="Валютний контроль виконано:&#13;&#10;Дата ____________________&#13;&#10;Підпис __________________" Font="Calibri, 10pt"/>
+      <TextObject Name="Text34" Left="387.45" Top="359.1" Width="198.45" Height="75.6" Text="Відмітки про виконання:&#13;&#10;Дата ____________________&#13;&#10;Підпис __________________&#13;&#10;Штамп" Font="Calibri, 10pt"/>
+      <TextObject Name="Text35" Top="453.6" Width="699.3" Height="18.9" Text="* Заповнюється юридичними особами та підприємцями." Font="Calibri, 10pt"/>
+      <TextObject Name="Text36" Left="359.1" Top="283.5" Width="132.3" Height="18.9" Border.Lines="Bottom" Font="Calibri, 12pt"/>
+      <TextObject Name="Text37" Left="359.1" Top="311.85" Width="132.3" Height="18.9" Border.Lines="Bottom" Font="Calibri, 12pt"/>
+      <TextObject Name="Text13" Top="207.9" Width="699.3" Height="56.7" Text="Якщо придбана на МВРУ іноземна валюта згідно з цією заявою не буде перерахована нами за призначенням у визначений законодавством України строк після зарахування на наш поточний рахунок, то доручаємо уповноваженому банку продати  цю іноземну валюту на МВРУ." Font="Calibri, 10pt"/>
+    </PageFooterBand>
+  </ReportPage>
+</Report>

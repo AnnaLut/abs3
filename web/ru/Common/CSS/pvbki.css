@@ -1,0 +1,143 @@
+body {
+	
+}
+.header {
+	color: white; font-family: Microsoft Sans Serif,verdana, Arial, Helvetica, sans-serif; font-size: 10px; text-decoration: none;
+}
+.header2 {
+	color: white; font-family: Microsoft Sans Serif,verdana, Arial, Helvetica, sans-serif; font-size: 12px; text-decoration: none;
+}
+.header3 {
+	color: black; font-family: Microsoft Sans Serif,verdana, Arial, Helvetica, sans-serif; font-size: 12px; text-decoration: none;
+}
+.headerb {
+	color: black; font-family: Microsoft Sans Serif,verdana, Arial, Helvetica, sans-serif; font-size: 10px; text-decoration: none;
+}
+.header4 {
+	color: white; font-family: Microsoft Sans Serif,verdana, Arial, Helvetica, sans-serif; font-size: 12px; font-weight: bolder; text-decoration: none;
+}
+.headerwhite {
+	color: white; font-family: Microsoft Sans Serif,verdana, Arial, Helvetica, sans-serif; font-size: 17px; font-weight: bolder; text-decoration: none;
+}
+.headerred {
+	color: rgb(137, 22, 24); font-family: Microsoft Sans Serif,verdana, Arial, Helvetica, sans-serif; font-size: 17px; font-weight: bolder; text-decoration: none;
+}
+.headerblack {
+	color: black; font-family: Microsoft Sans Serif,verdana, Arial, Helvetica, sans-serif; font-size: 17px; font-weight: bolder; text-decoration: none;
+}
+.conbig {
+	color: rgb(137, 22, 24); font-family: Microsoft Sans Serif,verdana, Arial, Helvetica, sans-serif; font-size: 15px; font-weight: bolder; text-decoration: none;
+}
+.conbig2 {
+	color: black; font-family: Microsoft Sans Serif,verdana, Arial, Helvetica, sans-serif; font-size: 14px; font-weight: bolder; text-decoration: none;
+}
+.con {
+	color: black; font-family: Microsoft Sans Serif,verdana, Arial, Helvetica, sans-serif; font-size: 10px; text-decoration: none;
+}
+p.break {
+	page-break-after: always;
+}
+break {
+	page-break-after: always;
+}
+.reportTable {
+	border-collapse: collapse;
+}
+.reportContainer {
+	text-align: left;
+}
+.reportCell {
+	border: 1px solid rgb(205, 205, 205); color: black; font-family: Microsoft Sans Serif,verdana, Arial, Helvetica, sans-serif; font-size: 12px; text-decoration: none;
+}
+#ddlExportTypes, #btnExport, #lbtnPrint, #imgBtnPrint {visibility:hidden;}
+
+body {
+	width: 640px; font-family: Verdana; font-size: 10px;
+}
+table {
+	border: 1px solid currentColor; width: 100%;
+}
+th {
+	padding: 2px 5px; width: 25%; text-align: left; vertical-align: top;
+}
+td {
+	padding: 2px 5px; width: 25%; vertical-align: top;
+}
+.caption {
+	text-align: left; color: white; padding-left: 2px; background-color: yellowgreen;
+}
+.caption2 {
+	text-align: left; color: white; padding-left: 2px; background-color: yellowgreen;
+}
+.subCaption {
+	color: black; background-color: silver;
+}
+.subCaption2 {
+	color: black; background-color: silver;
+}
+.subCaption3 {
+	color: black; background-color: rgb(240, 240, 240);
+}
+.subCaption th {
+	text-align: right;
+}
+.subCaption td {
+	text-align: left;
+}
+.ul_italic {
+	font-style: italic; border-bottom-color: rgb(0, 0, 0); border-bottom-width: 1px; border-bottom-style: solid;
+}
+.UnknownValue {
+	
+}
+.UnknownSourceData {
+	
+}
+.ReportHeader {
+	width: 100%; text-align: center; color: white; font-size: 1.5em; background-color: yellowgreen;
+}
+.HeaderTable {
+	width: 100%;
+}
+.FooterTable {
+	width: 100%;
+}
+.EntityTable {
+	width: 100%;
+}
+.ClassificationTable {
+	width: 100%;
+}
+.SummaryTable {
+	width: 100%;
+}
+.ContactsTable {
+	width: 100%;
+}
+.IdentificationsTable {
+	width: 100%;
+}
+.IndividualTable {
+	border: 1px solid currentColor; width: 100%;
+}
+.NegativeDataTable {
+	width: 100%;
+}
+.AddressesTable {
+	width: 100%;
+}
+.InquiersTable {
+	width: 100%;
+}
+.CalendarTable {
+	margin: 10px 0px; padding: 0px; width: 100%;
+}
+.CalendarTable th {
+	padding: 2px 5px; width: 16%; text-align: left;
+}
+.CalendarTable td {
+	padding: 2px 5px; width: 7%; text-align: right;
+}
+.DetailedTable {
+	width: 640px;
+}
