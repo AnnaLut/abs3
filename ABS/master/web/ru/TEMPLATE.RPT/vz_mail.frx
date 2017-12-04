@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="11/12/2013 12:59:19" ReportInfo.Modified="02/19/2014 09:43:18" ReportInfo.CreatorVersion="1.7.1.0">
+  <Dictionary>
+    <OracleDataConnection Name="BARSDEV_NEW" ConnectionString="rijcmlq9SEZoacNJntaKIKp6mVF12Jc6VA4pf/8RrGHV3rJ5fRI/+1i800gk2EU5LvmIVqP4R0Cw2jEV17btBGSD0tx9A==">
+      <TableDataSource Name="Table" Alias="t" DataType="System.Int32" Enabled="true" SelectCommand="select b.name as bank_name, a.nmk, a.adr, d.num1, d.open_date1, d.num2, d.open_date2, d.opertype&#13;&#10;from&#13;&#10;(select name from cim_journal_num where branch=SYS_CONTEXT ('bars_context', 'user_branch')&#13;&#10;) b, (select max(nmk) as nmk, max(adr) as adr from customer where okpo=:p_okpo0) a,&#13;&#10;(&#13;&#10;select c1.num as num1, to_char(c1.open_date,'dd/mm/yyyy') as open_date1, &#13;&#10;       c2.num as num2, to_char(c2.open_date,'dd/mm/yyyy') as open_date2, 'експортної' as opertype &#13;&#10;from cim_fantom_payments p1, cim_fantom_payments p2, cim_contracts c1, cim_contracts c2&#13;&#10;where c1.contr_type=1 and c2.contr_type=0 and c1.okpo=:p_okpo1 and c2.okpo=:p_okpo2&#13;&#10;      and c1.contr_id=(select max(contr_id) from cim_fantoms_bound where delete_date is null and s=p1.s and fantom_id=p1.fantom_id)&#13;&#10;      and c2.contr_id=(select max(contr_id) from cim_fantoms_bound where delete_date is null and s=p2.s and fantom_id=p2.fantom_id)&#13;&#10;      and p1.kv=p2.kv and p1.s=p2.s and p1.payment_type=5 and p2.payment_type=5 &#13;&#10;      and p1.val_date=to_date(:p_vdat1,'dd/mm/yyyy') and p2.val_date=to_date(:p_vdat2,'dd/mm/yyyy')&#13;&#10;&#13;&#10;union all      &#13;&#10;select c1.num as num1, to_char(c1.open_date,'dd/mm/yyyy') as open_date1, &#13;&#10;       c2.num as num2, to_char(c2.open_date,'dd/mm/yyyy') as open_date2, decode(c1.contr_type, 0, 'експортної', 'імпортної') as opertype &#13;&#10;from cim_fantom_payments p1, cim_acts p2, cim_contracts c1, cim_contracts c2&#13;&#10;where c1.contr_type=c2.contr_type and c1.contr_type&lt;2 and c1.okpo=:p_okpo3 and c2.okpo=:p_okpo4 &#13;&#10;      and c1.contr_id=(select max(contr_id) from cim_fantoms_bound where delete_date is null and s=p1.s and fantom_id=p1.fantom_id)&#13;&#10;      and c2.contr_id=(select max(contr_id) from cim_act_bound where delete_date is null and s_vt=p2.s and act_id=p2.act_id)&#13;&#10;      and p1.kv=p2.kv and p1.s=p2.s and p1.payment_type=5 and p2.act_type=5 &#13;&#10;      and p1.val_date=to_date(:p_vdat3,'dd/mm/yyyy') and p2.act_date=to_date(:p_vdat4,'dd/mm/yyyy')&#13;&#10;) d">
+        <Column Name="ADR" DataType="System.String"/>
+        <Column Name="Column" Enabled="false" DataType="System.Int32" Calculated="true" Expression=""/>
+        <Column Name="NMK" DataType="System.String"/>
+        <Column Name="NUM1" DataType="System.String"/>
+        <Column Name="OPEN_DATE1" DataType="System.String"/>
+        <Column Name="NUM2" DataType="System.String"/>
+        <Column Name="OPEN_DATE2" DataType="System.String"/>
+        <Column Name="BANK_NAME" DataType="System.String"/>
+        <Column Name="OPERTYPE" DataType="System.String"/>
+        <CommandParameter Name="p_okpo0" DataType="126" Expression="[okpo]"/>
+        <CommandParameter Name="p_okpo1" DataType="126" Expression="[okpo]"/>
+        <CommandParameter Name="p_okpo2" DataType="126" Expression="[okpo]"/>
+        <CommandParameter Name="p_vdat1" DataType="126" Expression="[oper_date]"/>
+        <CommandParameter Name="p_vdat2" DataType="126" Expression="[oper_date]"/>
+        <CommandParameter Name="p_okpo3" DataType="126" Expression="[okpo]"/>
+        <CommandParameter Name="p_okpo4" DataType="126" Expression="[okpo]"/>
+        <CommandParameter Name="p_vdat3" DataType="126" Expression="[oper_date]"/>
+        <CommandParameter Name="p_vdat4" DataType="126" Expression="[oper_date]"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Relation Name="Table_Table1" ParentDataSource="Table" ChildDataSource="null" ParentColumns="BOUND_ID" ChildColumns="ACT_ID" Enabled="true"/>
+    <Parameter Name="oper_date" DataType="System.String"/>
+    <Parameter Name="director_pos" DataType="System.String"/>
+    <Parameter Name="director_name" DataType="System.String"/>
+    <Parameter Name="vik_name" DataType="System.String"/>
+    <Parameter Name="vik_tel" DataType="System.String"/>
+    <Parameter Name="okpo" DataType="System.String"/>
+  </Dictionary>
+  <ReportPage Name="Page1" Guides="37.8,66.15">
+    <DataBand Name="Data1" Width="718.2" Height="822.15" CanGrow="true" CanShrink="true" CanBreak="true" StartNewPage="true" DataSource="Table">
+      <TextObject Name="Text22" Left="368.55" Top="170.1" Width="349.65" Height="18.9" Text="(поштова адреса податкового органу)" HorzAlign="Center" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text23" Left="368.55" Top="151.2" Width="349.65" Height="18.9" Text="_______________________________________" HorzAlign="Center" Font="Times New Roman, 12pt, style=Underline"/>
+      <TextObject Name="Text24" Left="368.55" Top="122.85" Width="349.65" Height="28.35" Text="___________________________________&#13;&#10;&#13;&#10;" HorzAlign="Center" Font="Times New Roman, 14pt"/>
+      <TextObject Name="Text25" Left="368.55" Top="103.95" Width="349.65" Height="18.9" Text="Начальнику_____________________________" HorzAlign="Center" Font="Times New Roman, 12pt, style=Underline"/>
+      <TextObject Name="Text26" Top="321.3" Width="718.2" Height="217.35" CanGrow="true" CanShrink="true" Text="              На виконання вимог пункту 5.8. розділу 5 Інструкції про порядок здійснення контролю за експортними, імпортними операціями, затвердженої Постановою Правління Національного банку України від 24.03.1999 р. № 136 (зі змінами), [t.BANK_NAME] АТ „Ощадбанк” повідомляє про факт зняття з контролю [t.OPERTYPE] операції (дата операції [oper_date] р.)  [t.NMK] (код ЄДРПОУ/ДРФО [okpo], юридична адреса: [t.ADR]) на підставі документів про припинення зобов’язань за цією операцією шляхом зарахування зустрічних однорідних вимог за зовнішньоекономічними договорами: № [t.NUM1] від [t.OPEN_DATE1] р. та № [t.NUM2] від [t.OPEN_DATE2] р." HorzAlign="Justify" Font="Times New Roman, 12pt"/>
+      <TextObject Name="Text21" Top="680.4" Width="207.9" Height="56.7" Text="[director_pos]" Font="Times New Roman, 12pt"/>
+      <TextObject Name="Text17" Left="207.9" Top="680.4" Width="226.8" Height="56.7" Text="_______________________&#13;&#10;(підпис)" HorzAlign="Center" Font="Times New Roman, 12pt"/>
+      <TextObject Name="Text19" Left="434.7" Top="680.4" Width="170.1" Height="18.9" Border.Lines="Bottom" Text="[director_name]" HorzAlign="Center" Font="Times New Roman, 12pt"/>
+      <TextObject Name="Text20" Left="500.85" Top="699.3" Width="66.15" Height="18.9" Text="П.І.Б." HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text18" Top="737.1" Width="274.05" Height="75.6" Text="Виконавець&#13;&#10;[vik_name]&#13;&#10;тел. [vik_tel]&#13;&#10;" Font="Arial, 10pt, style=Italic"/>
+    </DataBand>
+  </ReportPage>
+</Report>

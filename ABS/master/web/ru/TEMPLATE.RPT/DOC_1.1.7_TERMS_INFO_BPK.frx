@@ -1,0 +1,218 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="04/15/2011 18:11:20" ReportInfo.Modified="03/26/2013 13:20:45" ReportInfo.CreatorVersion="1.7.1.0">
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqD6nWZEExUJ9MEhdFZpB1A6ZfSeiTM+6WLeB8pW5aURqkGwhV134I2SUIQGUGXcXil8BhpTWuiKejeJa347yHvA==">
+      <TableDataSource Name="Table1" Alias="WCS_SBP_DETAILS" DataType="System.Int32" Enabled="true" SelectCommand="select sd.*&#13;&#10;  from v_wcs_sbp_details sd&#13;&#10; where sd.subproduct_id = :p_subproduct_id">
+        <Column Name="PRODUCT_ID" DataType="System.String"/>
+        <Column Name="SUBPRODUCT_ID" DataType="System.String"/>
+        <Column Name="SUBPRODUCT_NAME" DataType="System.String"/>
+        <Column Name="SUM_MIN" DataType="System.Decimal"/>
+        <Column Name="SUM_MAX" DataType="System.Decimal"/>
+        <Column Name="SUM_INITIAL_MIN" DataType="System.Decimal"/>
+        <Column Name="SUM_INITIAL_MAX" DataType="System.Decimal"/>
+        <Column Name="TERM_MIN" DataType="System.Decimal"/>
+        <Column Name="TERM_MAX" DataType="System.Decimal"/>
+        <Column Name="CURRENCY" DataType="System.String"/>
+        <Column Name="INTEREST_RATE_MIN" DataType="System.Decimal"/>
+        <Column Name="INTEREST_RATE_MAX" DataType="System.Decimal"/>
+        <Column Name="GARANTEES" DataType="System.String"/>
+        <Column Name="DESCRIPTION" DataType="System.String"/>
+        <Column Name="DOCS" DataType="System.String"/>
+        <Column Name="ICO" DataType="System.Byte[]" BindableControl="Picture"/>
+        <Column Name="PRT_TPL" DataType="System.String"/>
+        <CommandParameter Name="p_subproduct_id" DataType="126" Expression="[p_subproduct_id]"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="p_subproduct_id" DataType="System.String" Expression="&quot;SBP_AUTO_G2_84_EP&quot;"/>
+  </Dictionary>
+  <ReportPage Name="Page1" Landscape="true" PaperWidth="297" PaperHeight="210" RawPaperSize="9" FirstPageSource="15" OtherPagesSource="15">
+    <DataBand Name="Data1" Width="1047.06" Height="2069.55">
+      <TextObject Name="Text2" Left="18.9" Top="9.45" Width="1011.15" Height="56.7" Text="Умови користування відновлювальною кредитною лінією держателями платіжних карток, емітованих&#13;&#10;АТ «Ощадбанк»" HorzAlign="Center" Font="Times New Roman, 14pt, style=Bold"/>
+      <TableObject Name="Table2" Left="18.9" Top="66.15" Width="1010.34" Height="1445.85" Border.Lines="All">
+        <TableColumn Name="Column1" Width="26.01"/>
+        <TableColumn Name="Column2" Width="328.4"/>
+        <TableColumn Name="Column6" Width="150.71"/>
+        <TableColumn Name="Column7" Width="84.63"/>
+        <TableColumn Name="Column4" Width="205.55"/>
+        <TableColumn Name="Column5" Width="215.04"/>
+        <TableRow Name="Row1" Height="75.6">
+          <TableCell Name="Cell1" Border.Lines="All" Text="№&#13;&#10;п/п" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt, style=Bold" RowSpan="2"/>
+          <TableCell Name="Cell2" Border.Lines="All" Text="Клієнтська група" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt, style=Bold" RowSpan="2"/>
+          <TableCell Name="Cell26" Border.Lines="All" Text="Умови користування відновлювальною кредитною лінією в національній валюті по картковому рахунку" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt, style=Bold"/>
+          <TableCell Name="Cell31" Border.Lines="All" Text="Плата за перевищення витратного ліміту по картрахунку (овердрафт)" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt, style=Bold" RowSpan="2"/>
+          <TableCell Name="Cell4" Border.Lines="All" Text="Ліміт кредиту" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt, style=Bold" RowSpan="2"/>
+          <TableCell Name="Cell5" Border.Lines="All" Text="Вид забезпечення&#13;&#10;кредитних операцій" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt, style=Bold" RowSpan="2"/>
+        </TableRow>
+        <TableRow Name="Row3" Height="47.25">
+          <TableCell Name="Cell11" Border.Lines="All" VertAlign="Center" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell12" Border.Lines="All" VertAlign="Center" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell28" Border.Lines="All" Text="Плата за &#13;&#10;користування &#13;&#10;кредитом (9)" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt, style=Bold"/>
+          <TableCell Name="Cell33" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt, style=Bold"/>
+          <TableCell Name="Cell14" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt, style=Bold"/>
+          <TableCell Name="Cell15" Border.Lines="All" VertAlign="Center" Font="Times New Roman, 9pt"/>
+        </TableRow>
+        <TableRow Name="Row33">
+          <TableCell Name="Cell110" Border.Lines="Bottom" Text="Обслуговування карткового рахунку за дебетово – кредитною схемою" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold" ColSpan="6"/>
+          <TableCell Name="Cell111" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell112" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell113" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell114" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell115" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row32">
+          <TableCell Name="Cell104" Text="Клієнти - держателі платіжних карток на загальних умовах" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold" ColSpan="6"/>
+          <TableCell Name="Cell105" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell106" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell107" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell108" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell109" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row4" Height="217.35">
+          <TableCell Name="Cell16" Border.Lines="All" Text="1." HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell17" Border.Lines="All" Text="&lt;b&gt;Фізичні особи на загальних умовах&#13;&#10;надання карток та в рамках пакету “Ексклюзивний”&lt;/b&gt;&#13;&#10;&lt;i&gt;Рішення приймаються на рівні регіональних управлінь без погодження з Центральним апаратом&lt;/i&gt;" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt" HtmlTags="true"/>
+          <TableCell Name="Cell29" Border.Lines="All" Text="+ 3% до процентної ставки встановленої по депозитному (вкладному) рахунку у гривні відповідного строку вкладу, що виступає забезченням" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt" RowSpan="2"/>
+          <TableCell Name="Cell34" Border.Lines="All" Text="35% незалежно від валюти рахунку" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell19" Border.Lines="All" Text="1- й рік - до 90 % від суми коштів на рахунку забезпечення у гривні.&#13;&#10;Наступні роки - за домовленістю, при відсутності порушень умов договору з боку клієнта  – до 95 % від суми коштів на рахунку забезпечення у гривні;&#13;&#10;&#13;&#10;до 80% гривневого еквіваленту за курсом НБУ (що склався на дату укладання кредитного договору) розміру коштів в іноземній валюті, розміщених на вкладному (депозитному) рахунку" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell20" Border.Lines="All" Text="Застава майнових прав на грошові кошти, що належать позичальнику та розміщені на депозитному (вкладному) рахунку, що відкритий в установі банку, де відкривається картковий рахунок." HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt" RowSpan="2"/>
+        </TableRow>
+        <TableRow Name="Row37" Height="66.15">
+          <TableCell Name="Cell134" Border.Lines="Right, Bottom" Text="2." HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell135" Border.Lines="Bottom" Text="&lt;b&gt;Юридичні особи на загальних умовах надання карток&lt;/b&gt;&#13;&#10;&lt;i&gt;Рішення приймаються на рівні регіональних управлінь без погодження з Центральним апаратом&lt;/i&gt;" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt" HtmlTags="true"/>
+          <TableCell Name="Cell136" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell137" Border.Lines="Bottom" Text="35% незалежно від валюти рахунку" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell138" Border.Lines="Left, Bottom" Text="до 90 % від суми коштів на рахунку забезпечення" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell139" Font="Times New Roman, 9pt"/>
+        </TableRow>
+        <TableRow Name="Row35">
+          <TableCell Name="Cell122" Border.Lines="Bottom" Text="Клієнти - держателі платіжних карток в рамках зарплатних проектів (6)" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold" ColSpan="6"/>
+          <TableCell Name="Cell123" Border.Lines="Bottom" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell124" Border.Lines="Bottom" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell125" Border.Lines="Bottom" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell126" Border.Lines="Bottom" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell127" Border.Lines="Bottom" Font="Times New Roman, 9pt"/>
+        </TableRow>
+        <TableRow Name="Row38" Height="75.6">
+          <TableCell Name="Cell140" Border.Lines="All" Text="3." HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell141" Border.Lines="All" Text="&lt;b&gt;Всі працівники підприємств з якими банк уклав договір на виплату заробітної плати за допомогою платіжних карток.&lt;/b&gt;&#13;&#10;&lt;i&gt;Рішення приймаються на рівні регіональних управлінь без погодження з Центральним апаратом (10)&lt;/i&gt;" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt" HtmlTags="true"/>
+          <TableCell Name="Cell142" Border.Lines="All" Text="24%" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell143" Border.Lines="All" Text="35%" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell144" Border.Lines="All" Text="до 200% середньомісячної заробітної плати, &lt;i&gt;але не більше 15 000 грн.&lt;/i&gt;" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt" HtmlTags="true"/>
+          <TableCell Name="Cell145" Border.Lines="All" Text="Пеня, яка є неустойкою, або пеня, яка є неустойкою, та страхування кредитів (4)" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+        </TableRow>
+        <TableRow Name="Row39" Height="75.6">
+          <TableCell Name="Cell146" Border.Lines="All" Text="3.1." HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell147" Border.Lines="All" Text="&lt;b&gt;Всі працівники підприємств (1) з якими банк уклав договір на виплату заробітної плати за допомогою платіжних карток&lt;/b&gt;&#13;&#10;&lt;i&gt;Рішення приймаються виключно за погодженням з Центральним апаратом (10)&lt;/i&gt;" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt" HtmlTags="true"/>
+          <TableCell Name="Cell148" Border.Lines="All" Text="24%" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell149" Border.Lines="All" Text="35%" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell150" Border.Lines="All" Text="від 201% до 400 % від середньомісячної заробітної плати, але не більше 15 000 грн." HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt" HtmlTags="true"/>
+          <TableCell Name="Cell151" Border.Lines="All" Text="Пеня, яка є неустойкою та страхування кредитів (4)" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+        </TableRow>
+        <TableRow Name="Row41" Height="75.6">
+          <TableCell Name="Cell158" Border.Lines="All" Text="3.2." HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell159" Border.Lines="All" Text="&lt;b&gt;Керівники (2) підприємств (1) з якими банк уклав договір на виплату заробітної плати за допомогою платіжних карток&lt;/b&gt;&#13;&#10;&lt;i&gt;Рішення приймаються виключно за погодженням з Центральним апаратом (10)&lt;/i&gt;" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt" HtmlTags="true"/>
+          <TableCell Name="Cell160" Border.Lines="All" Text="24%" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell161" Border.Lines="All" Text="35%" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell162" Border.Lines="All" Text="від 401% - 600 % від середньомісячної заробітної плати, але не більше 20 000 грн." HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt" HtmlTags="true"/>
+          <TableCell Name="Cell163" Border.Lines="All" Text="Пеня, яка є неустойкою та страхування кредитів (4)" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+        </TableRow>
+        <TableRow Name="Row42" Height="75.6">
+          <TableCell Name="Cell164" Border.Lines="All" Text="4." HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell165" Border.Lines="All" Text="&lt;b&gt;Окремі умови для працівників бюджетних установ та Пенсійного фонду України, УДППЗ „Укрпошта” та його структурних підрозділів&lt;b&gt;&#13;&#10;&lt;i&gt;Рішення приймаються на рівні регіональних управлінь без погодження з Центральним апаратом&lt;/i&gt;" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt" HtmlTags="true"/>
+          <TableCell Name="Cell166" Border.Lines="All" Text="Облікова ставка НБУ" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell167" Border.Lines="All" Text="35%" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell168" Border.Lines="All" Text="50% середньомісячної заробітної плати" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt" HtmlTags="true"/>
+          <TableCell Name="Cell169" Border.Lines="All" Text="Пеня, яка є неустойкою" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+        </TableRow>
+        <TableRow Name="Row44" Height="85.05">
+          <TableCell Name="Cell176" Border.Lines="All" Text="5." HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell177" Border.Lines="All" Text="&lt;b&gt;Співробітники АТ „Ощадбанк” в межах зарплатного проекту. Кредитні лінії не відкриваються по картках співробітникам протягом перших трьох місяців роботи.&lt;/b&gt;&#13;&#10;&lt;i&gt;Рішення приймаються на рівні регіональних управлінь без погодження з Центральним апаратом, за виключенням встановлення кредитних ліній інсайдерам.&lt;/i&gt;" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt" HtmlTags="true"/>
+          <TableCell Name="Cell178" Border.Lines="All" Text="10,5%" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell179" Border.Lines="All" Text="24%" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell180" Border.Lines="All" Text="до 500% середньомісячної заробітної плати, але не більше 30 000 грн." HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt" HtmlTags="true"/>
+          <TableCell Name="Cell181" Border.Lines="All" Text="Пеня, яка є неустойкою" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+        </TableRow>
+        <TableRow Name="Row43" Height="198.45">
+          <TableCell Name="Cell170" Border.Lines="All" Text="5.1." HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell171" Border.Lines="All" Text="&lt;b&gt;Співробітники АТ „Ощадбанк” в межах зарплатного проекту.&lt;/b&gt;&#13;&#10;&lt;b&gt;На рівні центрального апарату&lt;/b&gt;: &lt;i&gt;посада співробітника не нижче заступника директора департаменту, начальника управління.&lt;/i&gt;&#13;&#10;&lt;b&gt;На рівні регіонального управління&lt;/b&gt;: &lt;i&gt;посада співробітника не нижче заступника начальника обласного управління, головного бухгалтера.&lt;/i&gt;&#13;&#10;&#13;&#10;&lt;b&gt;Кредитні лінії не відкриваються по картках співробітникам протягом перших трьох місяців роботи.&lt;/b&gt;&#13;&#10;&lt;i&gt;Рішення приймаються на рівні регіональних управлінь без погодження з Центральним апаратом, за виключенням встановлення кредитних ліній інсайдерам.&lt;/i&gt;" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt" HtmlTags="true"/>
+          <TableCell Name="Cell172" Border.Lines="All" Text="10,5%" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell173" Border.Lines="All" Text="24%" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell174" Border.Lines="All" Text="до 500% середньомісячної заробітної плати, але не більше 50 000 грн. (8)" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt" HtmlTags="true"/>
+          <TableCell Name="Cell175" Border.Lines="All" Text="Пеня, яка є неустойкою" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+        </TableRow>
+        <TableRow Name="Row40">
+          <TableCell Name="Cell152" Border.Lines="All" Text="Клієнти - держателі пенсійних платіжних карток" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold" ColSpan="6"/>
+          <TableCell Name="Cell153" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell154" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell155" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell156" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell157" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+        </TableRow>
+        <TableRow Name="Row45">
+          <TableCell Name="Cell182" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell183" Border.Lines="All" Text="Соціальні пенсіонери (5)" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt, style=Bold" HtmlTags="true"/>
+          <TableCell Name="Cell184" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt" ColSpan="4"/>
+          <TableCell Name="Cell185" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell186" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell187" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+        </TableRow>
+        <TableRow Name="Row46" Height="47.25">
+          <TableCell Name="Cell188" Border.Lines="All" Text="6.1." HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell189" Border.Lines="All" Text="&lt;b&gt;Соціальні пенсіонери, віком до 75 років&lt;/b&gt;&#13;&#10;&lt;i&gt;Рішення приймаються на рівні регіональних управлінь без погодження з Центральним апаратом&lt;/i&gt;" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt" HtmlTags="true"/>
+          <TableCell Name="Cell190" Border.Lines="All" Text="24%" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell191" Border.Lines="All" Text="35%" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell192" Border.Lines="All" Text="до 100% від розміру пенсії за місяць (7), max 5 000 грн." HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt" HtmlTags="true"/>
+          <TableCell Name="Cell193" Border.Lines="All" Text="Пеня, яка є неустойкою або пеня, яка є неустойкою, та страхування кредитів (4)" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+        </TableRow>
+        <TableRow Name="Row47" Height="47.25">
+          <TableCell Name="Cell194" Border.Lines="All" Text="6.2." HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell195" Border.Lines="All" Text="&lt;b&gt;Соціальні пенсіонери, віком до 75 років&lt;/b&gt;&#13;&#10;&lt;i&gt;Рішення приймаються виключно за погодженням з Центральним апаратом&lt;/i&gt;" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt" HtmlTags="true"/>
+          <TableCell Name="Cell196" Border.Lines="All" Text="26%" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell197" Border.Lines="All" Text="35%" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell198" Border.Lines="All" Text="від 101% до 200% від розміру пенсії за місяць (5)" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt" HtmlTags="true"/>
+          <TableCell Name="Cell199" Border.Lines="All" Text="Пеня, яка є неустойкою та страхування кредитів." HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+        </TableRow>
+        <TableRow Name="Row48" Height="75.6">
+          <TableCell Name="Cell200" Border.Lines="All" Text="6.3." HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell201" Border.Lines="All" Text="&lt;b&gt;Військові пенсіонери (3) в рамках програми «Арсенал» (5)&#13;&#10;Військові пенсіонери (3) віком до 75 років&lt;/b&gt;&#13;&#10;&lt;i&gt;Рішення приймаються на рівні регіональних управлінь без погодження з Центральним апаратом&lt;/i&gt;" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt" HtmlTags="true"/>
+          <TableCell Name="Cell202" Border.Lines="All" Text="25%" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell203" Border.Lines="All" Text="35%" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell204" Border.Lines="All" Text="не більше 200% від розміру  пенсії за місяць (7), max 15 000 грн." HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt" HtmlTags="true"/>
+          <TableCell Name="Cell205" Border.Lines="All" Text="Пеня, яка є неустойкою або пеня, яка є неустойкою, та страхування кредитів (4)" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+        </TableRow>
+        <TableRow Name="Row49" Height="47.25">
+          <TableCell Name="Cell206" Border.Lines="All" Text="6.4." HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell207" Border.Lines="All" Text="&lt;b&gt;Військові пенсіонери (3) (офіцерський склад)&lt;/b&gt;&#13;&#10;&lt;i&gt;Рішення приймаються виключно за погодженням з Центральним апаратом&lt;/i&gt;" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt" HtmlTags="true"/>
+          <TableCell Name="Cell208" Border.Lines="All" Text="25%" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell209" Border.Lines="All" Text="35%" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell210" Border.Lines="All" Text="від 201% - 500% від розміру  пенсії за місяць" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt" HtmlTags="true"/>
+          <TableCell Name="Cell211" Border.Lines="All" Text="Пеня, яка є неустойкою, та страхування кредитів" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+        </TableRow>
+        <TableRow Name="Row50" Height="47.25">
+          <TableCell Name="Cell212" Border.Lines="All" Text="6.5." HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell213" Border.Lines="All" Text="&lt;b&gt;Військові пенсіонери (3) (всі крім офіцерського складу)&lt;/b&gt;&#13;&#10;&lt;i&gt;Рішення приймаються виключно за погодженням з Центральним апаратом&lt;/i&gt;" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt" HtmlTags="true"/>
+          <TableCell Name="Cell214" Border.Lines="All" Text="25%" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell215" Border.Lines="All" Text="35%" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell216" Border.Lines="All" Text="від 201% - 300% від розміру  пенсії за місяць" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt" HtmlTags="true"/>
+          <TableCell Name="Cell217" Border.Lines="All" Text="Пеня, яка є неустойкою, та страхування кредитів" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+        </TableRow>
+        <TableRow Name="Row52">
+          <TableCell Name="Cell224" Border.Lines="All" Text="Обслуговування карткового рахунку за дебетовою схемою" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt, style=Bold" ColSpan="6"/>
+          <TableCell Name="Cell225" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell226" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell227" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell228" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell229" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+        </TableRow>
+        <TableRow Name="Row34" Height="75.6">
+          <TableCell Name="Cell116" Border.Lines="All" Text="7." HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell117" Border.Lines="All" Text="Для всіх категорій клієнтських груп" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt, style=Bold"/>
+          <TableCell Name="Cell118" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell119" Border.Lines="All" Text="35% незалежно від валюти рахунку" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell120" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+          <TableCell Name="Cell121" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+        </TableRow>
+      </TableObject>
+      <TextObject Name="Text3" Left="18.9" Top="1512" Width="1011.15" Height="538.65" Text="(1) Вимоги до організації/підприємства та фізичної особи-працівника підприємства  при кредитуванні з лімітом кредиту в розмірі 201%- 600% від суми посадового окладу:&#13;&#10;  - відсутності на підприємстві затримок з виплати заробітної плати за останні  6 місяців;&#13;&#10;  - термін співпраці підприємства з Ощадбанком (крім бюджетних організацій) – не менше 6 місяців;&#13;&#10;  - строк роботи фізичної особи в даній організації/підприємстві – не менше 6 місяців. &#13;&#10;&#13;&#10;(2) Керівниками  організацій/підприємств вважаються - (керівники,їх  заступники  та головні бухгалтери), в тому числі керівники Пенсійного фонду України, УДППЗ «Укрпошта» та його структурних підрозділів&#13;&#10;&#13;&#10;(3) За обслуговування кредитної лінії по платіжній картці Клієнт при відкритті або подовженні картки сплачує банку комісію в сумі 35 грн. на рік готівкою в касу банку.&#13;&#10;&#13;&#10;(4) Страхування банком кредитів здійснюється для забезпечення виконання Позичальником в терміни, визначені в конкретному Договорі про відкриття фізичній особі карткового рахунку та здійснення його розрахунково-касового обслуговування за дебетово-кредитною схемою (далі – Договір), своїх зобов’язань по поверненню суми кредиту та/або відсотків за користування кредитом в строки та на умовах, що передбачені в конкретному Договорі Позичальника внаслідок неплатоспроможності Позичальника. У разі, якщо вік позичальника перевищує 65 років, забезпеченням виконання своїх зобов’язань Позичальником є пеня, яка є неустойкою, та страхування кредитів.&#13;&#10;Сплата страхових платежів здійснюється щомісячно по сумі кредитної заборгованості за звітний місяць.&#13;&#10;                                      &#13;&#10;(5) Платіжна картка відкривається пенсіонерам на наступних умовах:&#13;&#10;	&#13;&#10;  • картка відкривається або подовжується терміном дії на 1 рік;&#13;&#10;  • кредитна лінія по пенсійній картці може бути встановлена пенсіонеру віком до 74 років (включно). &#13;&#10;  • у випадку, якщо термін дії подовженої платіжної картки припадає на період часу коли пенсіонеру виповнюється від 74 до 75 років – ліміт кредитної лінії по такій картці зменшується щомісячно рівними частинами (1/12 ліміту кредитної лінії) починаючи з першого місяця дії подовженої кредитної картки.&#13;&#10;  • при наявності у пенсіонера утримань з пенсії (аліментів тощо), при розрахунку розміру кредиту, розмір пенсії  необхідно зменшувати на суму утримань.&#13;&#10;&#13;&#10;(6) Річна плата за обслуговування кредитної лінії по зарплатній платіжній картці – на договірних умовах.&#13;&#10;&#13;&#10;(7) Кредитний ліміт може бути встановлено:&#13;&#10;  • за бажанням Клієнта  в розмірі мінімальної пенсії за віком відповідно до діючого законодавства в разі непред’явлення ним документа, що засвідчує щомісячний розмір отримуваної пенсії;&#13;&#10;  • відповідно до Порядку видачі та обслуговування зарплатних, пенсійних платіжних карток та карток для отримання грошової допомоги установами АТ «Ощадбанк», затвердженого постановою правління від 23.08.11 № 403.&#13;&#10;&#13;&#10;(8) Ліміт кредиту інсайдерам встановлюється кредитним комітетом в разі не перевищення загальної заборгованості за іншими кредитними договорами 120 тис. грн. з урахуванням цього ліміту кредиту.&#13;&#10;&#13;&#10;(9) з початком емісії карток у власному процесинговому центрі банку, при кредитуванні держателів платіжних карток встановлюється «Грейс період». Грейс-період тривалістю 30 календарних днів, протягом якого проценти за користування кредитом нараховуються за ставкою 0,001%, за умови отримання Клієнтом кредиту, шляхом використання картки у якості засобу безготівкового платежу за товари та послуги. Після закінчення вказаного періоду, у разі непогашення клієнтом заборгованості проценти за користуванням кредитом нараховуються за стандартною ставкою. У разі отримання кредиту за платіжною карткою готівкою грейс-період відсутній, проценти за користуванням кредитом нараховуються за стандартною ставкою по кредиту.&#13;&#10;&#13;&#10;(10) з початком емісії карток у власному процесинговому центрі для держателів платіжних карток в рамках зарплатних проектів кредит стає доступним з дати першого зарахування заробітної плати. При кредитуванні співробітників зарплатних проектів (окрім працівників бюджетних установ та співробітників АТ «Ощадбанк») встановлюється щомісячна плата за обслуговування невикористаної частини кредиту у розмірі до 0,5% щомісячно." VertAlign="Center" Font="Times New Roman, 8pt, style=Italic"/>
+    </DataBand>
+  </ReportPage>
+</Report>
