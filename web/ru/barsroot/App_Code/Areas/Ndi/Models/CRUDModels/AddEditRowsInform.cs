@@ -15,5 +15,6 @@ public class AddEditRowsInform
 		//
 	}
     public bool AddAfter = false;
-    public string EditorMode =   "ROW_EDIT"; //"MULTI_EDIT";
+    public string EditorMode = "ROW_EDIT"; // "MULTI_EDIT";
+    public bool CarriageRollback = false;
 }

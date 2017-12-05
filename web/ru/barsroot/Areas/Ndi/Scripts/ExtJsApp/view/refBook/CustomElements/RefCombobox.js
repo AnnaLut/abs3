@@ -23,7 +23,7 @@
     //это нужно для крутого форматирования вывода списка после раскрывания комбобокса
     tpl: Ext.create('Ext.XTemplate',
         '<tpl for=".">',
-        '<div class="x-boundlist-item"><span style="font-weight:bold;font-size:14px;">{ID}</span> - {NAME}</div>',
+        '<div class="x-boundlist-item"><span style="font-weight:bold;font-size:14px;">{ID}</span> | {NAME} | {NAME2}</div>',
         '</tpl>'),
     width: 500,
     //в initComponent вынесены свойства которые нужно заполнить с учетом переданных данных при создании комбобокса
@@ -45,9 +45,9 @@
             },
             expand: function (field, eOpts, event) {
                 
-                if (!field.DYN_TABNAME || field.DYN_TABNAME == '')
+                if ((!field.COL_DYN_TABNAME || field.COL_DYN_TABNAME == '') && (!field.HasSrcCond || !field.srcQueryModel))
                     return;
-                var combo = this;
+                //var combo = this;
                 var grid = Ext.getCmp('mainReferenceGrid');
                 if (!grid)
                     return;
@@ -55,28 +55,40 @@
                 if (!gridSelectModel)
                     return;
                 selectedRow = gridSelectModel.getSelection()[0];
-                //if (field.DYN_TABNAME && field.DYN_TABNAME != '')
-                    var tableName = selectedRow.data[field.DYN_TABNAME];
-                    if (!tableName || tableName == '')
-                {
-                        Ext.MessageBox.show({ title: 'порожній запис ', msg: 'порожній запис ' + field.DYN_TABNAME, buttons: Ext.MessageBox.OK });
-                       
-                    return false
+                var dynamicUrl;
+                if (field.COL_DYN_TABNAME && field.COL_DYN_TABNAME != '') {
+                    var tableName = selectedRow.data[field.COL_DYN_TABNAME];
+                    if (!tableName || tableName == '') {
+                        this.collapse();
+                        return false;
+                    }
+                    dynamicUrl = ExtApp.utils.RefBookUtils.getUrlByDinamicTabName(field, selectedRow);
+
+                    //{
+                    //        Ext.MessageBox.show({ title: 'порожній запис ', msg: 'порожній запис ' + field.COL_DYN_TABNAME, buttons: Ext.MessageBox.OK });
+
+                    //    return false
+                    //}
+
+                    //combo.SrcTableName = tableName;
+                    //var dynamicUrl = '/barsroot/ndi/ReferenceBook/GetRelatedReferenceData?tableName=' + tableName;
+
                 }
-                   
-                combo.SrcTableName = tableName;
-                var dynamicUrl = '/barsroot/ndi/ReferenceBook/GetRelatedReferenceData?tableName=' + tableName;
-                var oldUrl = combo.getStore().getProxy().url;
-                combo.getStore().getProxy().url = dynamicUrl;
+                else
+                    if (field.HasSrcCond && field.srcQueryModel) {
+                    dynamicUrl = ExtApp.utils.RefBookUtils.getUrlBySrcCond(field, selectedRow);
+                }
+                if (!dynamicUrl)
+                    return false;
+                var oldUrl = field.getStore().getProxy().url;
+                field.getStore().getProxy().url = dynamicUrl;
                 if(dynamicUrl != oldUrl)
-                combo.getStore().reload();
-            },
-            show: function () { alert('show') }, // don't work
-            beforeshow: function () { alert('beforeshow') }, // don't work
-            activate: function () { alert('activate') } // don't work
+                    field.getStore().reload();
+            }
+            
         };
         thisCombo.store = Ext.create('Ext.data.ArrayStore', {
-            fields: ['ID', 'NAME'],
+            fields: ['ID', 'NAME', 'NAME2'],
             pageSize: 10,
             autoLoad: false,
             isLoaded: false,
@@ -105,17 +117,17 @@
     },
     cellEditRecord: function (combo, records, thisCombo) {
         var referenceGrid = combo.up('grid');
-        //var selectedRerecordcord = referenceGrid.store.indexOf(referenceGrid.metadata.lastClickRowInform.currentSelectedRecord);
+        //var selectedRerecordcord = referenceGrid.store.indexOf(referenceGrid.metadata.CurrentActionInform.lastClickRowInform.currentSelectedRecord);
        // var rescordNum = referenceGrid.store.indexOf(selectedRerecordcord);
         //var models = referenceGrid.getStore().getRange();
         
         
-        var srcColumnValue = referenceGrid.metadata.lastClickRowInform.currentSelectedRecord.data[thisCombo.SrcTableName + "_" + thisCombo.SrcTextColName];
+        var srcColumnValue = referenceGrid.metadata.CurrentActionInform.lastClickRowInform.currentSelectedRecord.data[thisCombo.SrcTableName + "_" + thisCombo.SrcTextColName];
         if (srcColumnValue != undefined && thisCombo.SrcTab_Alias)
-            referenceGrid.metadata.lastClickRowInform.currentSelectedRecord.set(thisCombo.SrcTab_Alias + "_" + thisCombo.SrcTextColName, records[0].data.NAME);
+            referenceGrid.metadata.CurrentActionInform.lastClickRowInform.currentSelectedRecord.set(thisCombo.SrcTab_Alias + "_" + thisCombo.SrcTextColName, records[0].data.NAME);
         if (srcColumnValue != undefined)
-            referenceGrid.metadata.lastClickRowInform.currentSelectedRecord.set(thisCombo.SrcTableName + "_" + thisCombo.SrcTextColName,records[0].data.NAME);
-        //referenceGrid.metadata.lastClickRowInform.currentSelectedRecord.commit();
+            referenceGrid.metadata.CurrentActionInform.lastClickRowInform.currentSelectedRecord.set(thisCombo.SrcTableName + "_" + thisCombo.SrcTextColName,records[0].data.NAME);
+        //referenceGrid.metadata.CurrentActionInform.lastClickRowInform.currentSelectedRecord.commit();
     },
     rowEditRecord: function (combo, records, thisCombo) {
         var fieldWithName = combo.up('form').getForm().findField(thisCombo.SrcTableName + "_" + thisCombo.SrcTextColName);
