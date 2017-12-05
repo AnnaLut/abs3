@@ -9,7 +9,7 @@ IS
 % DESCRIPTION :  Процедура формирования #A7 для КБ (универсальная)
 % COPYRIGHT   :  Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.17.010    11.09.2017
+% VERSION     :  v.17.010  28/11/2017
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%/%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_ - отчетная дата
                pmode_ = режим (0 - для отчетности, 1 - для ANI-отчетов, 2 - для @77)
@@ -4053,7 +4053,7 @@ insert into OTCN_FA7_REZ1
                          where dd.dat_begin > dp_date_
                            and dd.dpu_id = da.dpuid
                            and dd.vidd = dv.vidd
-                           and nvl(dv.IRREVOCABLE,0) !=1
+                           and nvl(dv.IRVK,0) !=1
                         union all
                         select da.accid
                           from dpt_deposit dd, dpt_accounts da,
@@ -4236,7 +4236,7 @@ insert into OTCN_FA7_REZ1
                                into recid_
                               from rnbu_trace
                               where nbuc = k.nbuc and
-                                    kodp like k.t020||k.nbs||'___'||k.rez||'B'||lpad(k.kv, 3, '0')||'%' and
+                                    kodp like k.t020||k.nbs||'___'||k.rez||'_'||lpad(k.kv, 3, '0')||'%' and
                                     substr(kodp, 6, 1)||substr(kodp, 10, 1) = substr(k.R013_s580_A,2,2) and
                                     (sign(k.rizn) = -1 and to_number(znap) >= abs(k.rizn) or
                                     sign(k.rizn) = 1 and to_number(znap) > 0) and
@@ -4367,5 +4367,15 @@ insert into OTCN_FA7_REZ1
 END p_fa7_nn;
 /
 
+CREATE OR REPLACE PUBLIC SYNONYM P_FA7_NN FOR BARS.P_FA7_NN
+/
 
 
+GRANT EXECUTE ON BARS.P_FA7_NN TO BARS_ACCESS_DEFROLE
+/
+
+GRANT EXECUTE ON BARS.P_FA7_NN TO RPBN002
+/
+
+GRANT EXECUTE ON BARS.P_FA7_NN TO WR_ALL_RIGHTS
+/

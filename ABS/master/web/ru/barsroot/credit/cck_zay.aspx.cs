@@ -16,11 +16,16 @@ public partial class credit_cck_zay : Bars.BarsPage
     private String _ShowBanksReferPattern = "ShowBanksRefer('{0}', '{1}'); return false;";
     private String _ShowDepositReferPattern = "ShowDepositRefer('{0}', '{1}', '{2}', '{3}', '{4}'); return false;";
     string[] _creditOrders = { "220263", "220353" };
+    string[] _creditOrdersNew = { "220377", "220353" };
     # endregion
 
     # region События
     protected void Page_Load(object sender, EventArgs e)
     {
+        Bars.WebServices.NewNbs ws = new Bars.WebServices.NewNbs();
+        bool useNew = ws.UseNewNbs();
+        _creditOrders = useNew ? _creditOrdersNew : _creditOrders;
+
         if (!IsPostBack)
         {
             // сохраняем страничку с которой перешли
@@ -29,30 +34,51 @@ public partial class credit_cck_zay : Bars.BarsPage
             cbINS_CheckedChanged(cbINS, e);
             cbPAWN_CheckedChanged(cbPAWN, e);
             cbPAWNP_CheckedChanged(cbPAWNP, e);
-            
 
-            switch (Request.Params.Get("PROD"))
+
+            if (!useNew)
             {
-                case "220234":
-                case "220239":
-                case "220325":
-                case "220330": {
-                    lbDPT_ID.Visible = true;
-                    DPT_ID.Visible = true;
-                    btDepositReferDPT_ID.Visible = true;
-                    PAWN_DPTRNK.Visible = true;
-                    PAWN_DPTS.Visible = true;
-
-                    btCustomerReferPAWN_RNK.Visible = false;
-                    PAWN_RNK.Visible = false;
-                    PAWN_RNK.Enabled = false;
-                    PAWN_S.Visible = false;
+                switch (Request.Params.Get("PROD"))
+                {
+                    case "220234":
+                    //220365
+                    case "220239":
+                    //--
+                    case "220325":
+                    case "220330":
+                        ConfigForm();
+                        break;
                 }
-                break;
-            }            
+            }
+            else
+            {
+                switch (Request.Params.Get("PROD"))
+                {
+                    case "220365":
+                    case "220325":
+                    case "220330":
+                        ConfigForm();
+                        break;
+                }
+            }
             creditOrderTitle.Visible = creditOrder.Visible = _creditOrders.Contains(Request.Params.Get("PROD"));
         }
     }
+
+    private void ConfigForm()
+    {
+        lbDPT_ID.Visible = true;
+        DPT_ID.Visible = true;
+        btDepositReferDPT_ID.Visible = true;
+        PAWN_DPTRNK.Visible = true;
+        PAWN_DPTS.Visible = true;
+
+        btCustomerReferPAWN_RNK.Visible = false;
+        PAWN_RNK.Visible = false;
+        PAWN_RNK.Enabled = false;
+        PAWN_S.Visible = false;
+    }
+
     protected void RNK_ValueChanged(object sender, EventArgs e)
     {
         Decimal? RNK = (sender as Bars.UserControls.TextBoxNumb).Value;
@@ -75,20 +101,20 @@ public partial class credit_cck_zay : Bars.BarsPage
 
             if (rdr.Read())
             {
-            	if (rdr["DATE_OFF"] == DBNull.Value)
-            	{
-                	(FindControl(BaseID + "OKPO") as TextBox).Text = rdr["OKPO"] == DBNull.Value ? (String)null : (String)rdr["OKPO"];
-                	(FindControl(BaseID + "FIO") as TextBox).Text = rdr["FIO"] == DBNull.Value ? (String)null : (String)rdr["FIO"];
-            	}
-            	else
-            	{
-	                (sender as Bars.UserControls.TextBoxNumb).Value = (Decimal?)null;
-	                (FindControl(BaseID + "OKPO") as TextBox).Text = "";
-	                (FindControl(BaseID + "FIO") as TextBox).Text = "";
+                if (rdr["DATE_OFF"] == DBNull.Value)
+                {
+                    (FindControl(BaseID + "OKPO") as TextBox).Text = rdr["OKPO"] == DBNull.Value ? (String)null : (String)rdr["OKPO"];
+                    (FindControl(BaseID + "FIO") as TextBox).Text = rdr["FIO"] == DBNull.Value ? (String)null : (String)rdr["FIO"];
+                }
+                else
+                {
+                    (sender as Bars.UserControls.TextBoxNumb).Value = (Decimal?)null;
+                    (FindControl(BaseID + "OKPO") as TextBox).Text = "";
+                    (FindControl(BaseID + "FIO") as TextBox).Text = "";
 
-	                ShowError("Клієн (" + RNK.ToString() + ") закритий");
-            	}
-			}
+                    ShowError("Клієн (" + RNK.ToString() + ") закритий");
+                }
+            }
             else
             {
                 (sender as Bars.UserControls.TextBoxNumb).Value = (Decimal?)null;
@@ -107,7 +133,7 @@ public partial class credit_cck_zay : Bars.BarsPage
             con.Dispose();
         }
     }
-	/*protected void CC_ID_ValueChanged(object sender, EventArgs e)
+    /*protected void CC_ID_ValueChanged(object sender, EventArgs e)
     {
         String CC_ID = (sender as Bars.UserControls.TextBoxString).Value;
        // if (!String.IsNullOrEmpty(CC_ID)) return;
@@ -790,7 +816,7 @@ public partial class credit_cck_zay : Bars.BarsPage
             con.Close();
             con.Dispose();
         }
-     
+
         return true;
     }
     private Boolean SendZay()
@@ -824,11 +850,11 @@ public partial class credit_cck_zay : Bars.BarsPage
             cmd.Parameters.Add("SDATE", OracleDbType.Date, SDATE.Value, ParameterDirection.Input);
             cmd.Parameters.Add("WDATE", OracleDbType.Date, WDATE.Value, ParameterDirection.Input);
             cmd.Parameters.Add("GPK", OracleDbType.Decimal, GPK.Value, ParameterDirection.Input);
-            
+
             cmd.Parameters.Add("METR", OracleDbType.Decimal, METR.Value, ParameterDirection.Input);
             cmd.Parameters.Add("METR_R", OracleDbType.Decimal, METR_R.Value, ParameterDirection.Input);
             cmd.Parameters.Add("METR_9", OracleDbType.Decimal, METR_9.Value, ParameterDirection.Input);
-            
+
             cmd.Parameters.Add("nFIN", OracleDbType.Decimal, NFIN.Value, ParameterDirection.Input);
             cmd.Parameters.Add("nFREQ", OracleDbType.Decimal, NFREQ.Value, ParameterDirection.Input);
             cmd.Parameters.Add("dfDen", OracleDbType.Decimal, DFDEN.Value, ParameterDirection.Input);
@@ -890,10 +916,10 @@ public partial class credit_cck_zay : Bars.BarsPage
             try
             {
                 ClearParameters();
-			    SetParameters("ND", DB_TYPE.Decimal, ND, DIRECTION.Input);
+                SetParameters("ND", DB_TYPE.Decimal, ND, DIRECTION.Input);
 
-                SetParameters("nBANK", DB_TYPE.Decimal,  NBANK.Value , DIRECTION.Input);
-                SetParameters("NLS", DB_TYPE.Varchar2,  NLS_MFO.Value, DIRECTION.Input);
+                SetParameters("nBANK", DB_TYPE.Decimal, NBANK.Value, DIRECTION.Input);
+                SetParameters("NLS", DB_TYPE.Varchar2, NLS_MFO.Value, DIRECTION.Input);
                 SetParameters("NLS_NAME", DB_TYPE.Varchar2, NLS_NAME.Value, DIRECTION.Input);
                 SetParameters("NLS_OKPO", DB_TYPE.Varchar2, NLS_OKPO.Value, DIRECTION.Input);
 
@@ -902,12 +928,12 @@ public partial class credit_cck_zay : Bars.BarsPage
                 SetParameters("NLS_NAME2", DB_TYPE.Varchar2, cbINS2.Checked ? NLS_NAME2.Value : (String)null, DIRECTION.Input);
                 SetParameters("NLS_OKPO2", DB_TYPE.Varchar2, cbINS2.Checked ? NLS_OKPO2.Value : (String)null, DIRECTION.Input);
 
-                SetParameters("nBANK3",DB_TYPE.Decimal, cbINS3.Checked ? NBANK3.Value : (Decimal?)null, DIRECTION.Input);
-                SetParameters("NLS3",DB_TYPE.Varchar2, cbINS3.Checked ? NLS_MFO3.Value : (String)null, DIRECTION.Input);
+                SetParameters("nBANK3", DB_TYPE.Decimal, cbINS3.Checked ? NBANK3.Value : (Decimal?)null, DIRECTION.Input);
+                SetParameters("NLS3", DB_TYPE.Varchar2, cbINS3.Checked ? NLS_MFO3.Value : (String)null, DIRECTION.Input);
                 SetParameters("NLS_NAME3", DB_TYPE.Varchar2, cbINS3.Checked ? NLS_NAME3.Value : (String)null, DIRECTION.Input);
                 SetParameters("NLS_OKPO3", DB_TYPE.Varchar2, cbINS3.Checked ? NLS_OKPO3.Value : (String)null, DIRECTION.Input);
 
-                SetParameters("nBANK4",DB_TYPE.Decimal, cbINS4.Checked ? NBANK4.Value : (Decimal?)null, DIRECTION.Input);
+                SetParameters("nBANK4", DB_TYPE.Decimal, cbINS4.Checked ? NBANK4.Value : (Decimal?)null, DIRECTION.Input);
                 SetParameters("NLS4", DB_TYPE.Varchar2, cbINS4.Checked ? NLS_MFO4.Value : (String)null, DIRECTION.Input);
                 SetParameters("NLS_NAME4", DB_TYPE.Varchar2, cbINS4.Checked ? NLS_NAME4.Value : (String)null, DIRECTION.Input);
                 SetParameters("NLS_OKPO4", DB_TYPE.Varchar2, cbINS4.Checked ? NLS_OKPO4.Value : (String)null, DIRECTION.Input);

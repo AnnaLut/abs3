@@ -3,81 +3,46 @@ IS
    g_header_version   CONSTANT VARCHAR2 (64) := 'version 33  19/06/2009';
    --15/06/2009 Sta Плавающая ставка в РУ ОБ
 
-   PROCEDURE p_ovr8z (
-      nmode_     INT,
-      acc_2000   INT,
-      sum_       INT DEFAULT NULL,
-      sum_pr_    INT DEFAULT NULL
-   );
-
-   PROCEDURE p_oversob (
-      acc_     NUMBER,
-      nd_      NUMBER,
-      ref_     NUMBER,
-      sob_     NUMBER,
-      s_       NUMBER,
-      mdate_   DATE
-   );
-
+   PROCEDURE p_ovr8z ( nmode_     INT,acc_2000   INT,    sum_       INT DEFAULT NULL,      sum_pr_    INT DEFAULT NULL   );
+   PROCEDURE p_oversob ( acc_     NUMBER,   nd_      NUMBER,   ref_     NUMBER,    sob_     NUMBER,     s_       NUMBER,    mdate_   DATE  );
    PROCEDURE check_ovr (acc_ NUMBER, nnd_ OUT NUMBER, ndc_ OUT VARCHAR2);
-
    PROCEDURE check_ovr2 (acc_ NUMBER, nls_ OUT VARCHAR2, kv_ OUT NUMBER);
-
    PROCEDURE p_tmp_agx (dat1_ DATE, dat2_ DATE);
-
-   FUNCTION ovr_par_val (par_ VARCHAR)
-      RETURN VARCHAR2;
-
-   FUNCTION int_per (dat_ DATE, acc_ INT, br_id_ INT)
-      RETURN NUMBER;
-
-   FUNCTION f_nbs (acc_ INT, nbs_par INT)
-      RETURN VARCHAR;
-
-   FUNCTION getpo (tt_ VARCHAR2)
-      RETURN NUMBER;
-
-
-   PROCEDURE int_ovrp (
-      nacc_          INT,                                   -- для передачи в
-      nid            INT, -- acrn.p_int(nAcc,nId,dDat1,dDat2,nInt,nOst,nMode)
-      ddat1          DATE,                                                  --
-      ddat2_         DATE,                                                  --
-      nint     OUT   NUMBER,                              -- Interest accrued
-      nost           NUMBER,
-      nmode          INT
-   );
-
-
+   FUNCTION ovr_par_val (par_ VARCHAR)      RETURN VARCHAR2;
+   FUNCTION int_per (dat_ DATE, acc_ INT, br_id_ INT)      RETURN NUMBER;
+   FUNCTION f_nbs (acc_ INT, nbs_par INT)      RETURN VARCHAR;
+   FUNCTION getpo (tt_ VARCHAR2)      RETURN NUMBER;
+   PROCEDURE int_ovrp (  nacc_          INT,    nid    INT,   ddat1      DATE,    ddat2_         DATE,     nint     OUT   NUMBER,      nost  NUMBER,    nmode    INT  );
    PROCEDURE mdate_9129 (aa_ NUMBER);
-
-   Function pay_date
-     ( p_date  in  fdat.fdat%type,
-       p_pday  in  acc_over.pr_2600a%type  default null
-     ) return date;
-
-
-/**
- * header_version - возвращает версию заголовка пакета CCK
- */
-   FUNCTION header_version
-      RETURN VARCHAR2;
-
-
-/**
- * body_version - возвращает версию тела пакета CCK
- */
-   FUNCTION body_version
-      RETURN VARCHAR2;
+   Function pay_date  ( p_date  in  fdat.fdat%type,     p_pday  in  acc_over.pr_2600a%type  default null   ) return date;
+   FUNCTION header_version      RETURN VARCHAR2;
+   FUNCTION body_version      RETURN VARCHAR2;
 -------------------
 END ovr;
 /
+show err
 
-CREATE OR REPLACE PACKAGE BODY BARS.ovr
-IS
-   g_body_version   CONSTANT VARCHAR2 (64) := 'version 32  15/06/2009';
-   --15/06/2009 Sta  Плавающая ставка в РУ ОБ
+CREATE OR REPLACE PACKAGE BODY BARS.ovr IS    g_body_version   CONSTANT VARCHAR2 (64) := 'version 4.0  16/11/2017';
+/*
+ 16.11.2017 Тип счета для просроченной фин.деб. '3579' tip := 'OFR' 
+                                                '2067' tip := 'SP '  
+                                                '2069' tip := 'SPN' 
 
+ 15.11.2017 Transfer-2017  2067.01 => 2063.33 -- короткостроковў кредити в поточну дўяльнўсть
+                           2069.04 => 2068.46 -- простроченў нарахованў доходи за короткостроковими кредитами в поточну дўяльнўсть
+                           6111.05 => 6511.05 -- за супроводження кредитів, наданих юридичним особам та іншим суб`єктам підприємницької діяльності
+                           3579.91 => 3578.66 -- --прострочені нараховані доходи за кредитами овердрафт, що неотримані від суб"єктів господарювання	
+
+
+ 15/06/2009 Sta  Плавающая ставка в РУ ОБ
+*/
+   G_2017 int;
+   SB_2067 SB_OB22%rowtype;
+   SB_2069 SB_OB22%rowtype;
+   SB_6020 SB_OB22%rowtype;
+   SB_6111 SB_OB22%rowtype;
+   SB_3579 SB_OB22%rowtype;
+   ------------------------
    PROCEDURE p_ovr8z (
       nmode_     INT,
       acc_2000   INT,
@@ -1342,18 +1307,9 @@ RETURN;
                End if;
 
                Begin                                    --- 9). 3579
-
-                 Select ACC into acc_3579_
-                 From   Accounts 
-                 Where  NBS='3579'
-                    and NMS like 'Просроч%комiс%за%овердрафт%'
-                    and RNK in (Select RNK from Accounts where ACC=k.acc); 
-
-                 INSERT into ND_ACC (ACC,      ND  ) 
-                       values       (acc_3579_,k.ND); 
-
-               Exception when OTHERS then
-                  null;
+                  Select ACC into acc_3579_   From   Accounts           Where  NBS = SB_3579.R020  and NMS like 'Просроч%комiс%за%овердрафт%' and RNK in (Select RNK from Accounts where ACC=k.acc); 
+                  INSERT into ND_ACC (ACC,      ND  )   values       (acc_3579_,k.ND); 
+               Exception when OTHERS then     null;
                End;
 
             END LOOP;
@@ -1401,31 +1357,16 @@ RETURN;
        --               - как параметр TAG='NLS_9900'
        --               - счет 9900/00 на BRANCH-е
 
-               Begin 
-                  Select VAL  into  nls9_ 
-                  From   BRANCH_PARAMETERS 
-                  where  TAG='OVR_9900' and BRANCH=k.tobo;
+               Begin  Select VAL  into  nls9_    From   BRANCH_PARAMETERS     where  TAG='OVR_9900' and BRANCH=k.tobo;
                EXCEPTION WHEN NO_DATA_FOUND THEN
-                  Begin
-                     Select VAL  into  nls9_ 
-                     From   BRANCH_PARAMETERS 
-                     where  TAG='NLS_9900' and BRANCH=k.tobo;
-                  EXCEPTION WHEN NO_DATA_FOUND THEN
-                     nls9_:=NBS_OB22_NULL('9900','00', k.tobo);
+                  Begin  Select VAL  into  nls9_  From   BRANCH_PARAMETERS      where  TAG='NLS_9900' and BRANCH=k.tobo;
+                  EXCEPTION WHEN NO_DATA_FOUND THEN     nls9_:=NBS_OB22_NULL('9900','00', k.tobo);
                   END;
                END;
 
 
-               BEGIN
-                  SELECT ovr.f_nbs (k.acc, 9129), acc,  SUBSTR (nms, 1, 38)
-                    INTO b9129_, acc9_, nms9_
-                    FROM Accounts
-                   WHERE NLS=nls9_  and  KV=k.kv;
-               EXCEPTION
-                  WHEN NO_DATA_FOUND
-                  THEN
-                     erm := '8012 - No defined # ' || nls9_;
-                     RAISE err;
+               BEGIN  SELECT ovr.f_nbs (k.acc, 9129), acc,  SUBSTR (nms, 1, 38)   INTO b9129_, acc9_, nms9_      FROM Accounts       WHERE NLS=nls9_  and  KV=k.kv;
+               EXCEPTION   WHEN NO_DATA_FOUND             THEN      erm := '8012 - No defined # ' || nls9_;            RAISE err;
                END;
 ----------------------
 
@@ -1439,72 +1380,18 @@ RETURN;
                             s_
                        FROM accounts
                       WHERE nbs = b9129_ AND kv = k.kv AND acc = k.acc_9129;
-                  EXCEPTION
-                     WHEN NO_DATA_FOUND
-                     THEN
-                        BEGIN
-                           nls_ := f_newnls (k.nls, 'OV9', '');
-                           nls_ :=
-                              vkrzn (SUBSTR (gl.amfo, 1, 5),
-                                        b9129_
-                                     || '0'
-                                     || SUBSTR (NVL (nls_, k.nls), 6, 9)
-                                    );
-                           txt_ := 'Открытие ' || nls_;
-                           op_reg_ex (99,
-                                      0,
-                                      0,
-                                      k.grp,
-                                      ret1_,
-                                      k.rnk,
-                                      nls_,
-                                      k.kv,
-                                      k.nms,
-                                      'ODB',
-                                      k.isp,
-                                      acc_,
-                                      '1',
-                                      NULL,
-                                      NULL,
-                                      NULL,
-                                      NULL,
-                                      NULL,
-                                      NULL,
-                                      NULL,
-                                      NULL,
-                                      NULL,
-                                      NULL,
-                                      NULL,
-                                      k.tobo,
-                                      NULL
-                                     );
-
-                           UPDATE accounts
-                              SET sec = k.sec
-                            WHERE acc = acc_;
-
-                            if a_grp_ > 0 then
-                               SEC.addAgrp(acc_, a_grp_);
-                            end if;
-
-                           s_ := 0;
-                        END;
+                  EXCEPTION    WHEN NO_DATA_FOUND        THEN
+                      nls_ := f_newnls (k.nls, 'OV9', '');
+                      nls_ := vkrzn (SUBSTR (gl.amfo, 1, 5),  b9129_ || '0' || SUBSTR (NVL (nls_, k.nls), 6, 9)    );
+                      txt_ := 'Открытие ' || nls_;
+                      op_reg_ex (99, 0, 0, k.grp, ret1_, k.rnk, nls_, k.kv, k.nms, 'ODB', k.isp, acc_, '1', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, k.tobo, NULL);
+                      UPDATE accounts  SET sec = k.sec      WHERE acc = acc_ ;
+                      if a_grp_ > 0 then   SEC.addAgrp(acc_, a_grp_); end if ;
+                      s_ := 0;
                   END;
 
                   txt_ := '9129-Наследование обеспечения';
-
-                  Begin
-                     INSERT INTO cc_accp
-                              (accs, acc, nd)
-                     SELECT acc_, c.acc, c.nd
-                       FROM cc_accp c, pawn_acc p
-                      WHERE accs = k.acc
-                        AND c.acc = p.acc
-                        AND (acc_, c.acc) NOT IN (SELECT accs, acc
-                                                    FROM cc_accp);
-                  EXCEPTION WHEN others THEN
-                     null;
-                  End;
+                  INSERT INTO cc_accp (accs,acc,nd)  SELECT acc_, c.acc, c.nd  FROM cc_accp c, pawn_acc p  WHERE accs = k.acc  AND c.acc = p.acc AND (acc_, c.acc) NOT IN (SELECT accs, acc FROM cc_accp);
 
                   naz_ :=
                         'Врегулювання невикористаного овердрафту по рах. '||k.NLS||' '||k.NMS;
@@ -1522,27 +1409,13 @@ RETURN;
                 --                       );
                   s_ := k.s - s_;
 
-                  IF s_ <> 0
-                  THEN
-                     txt_ := 'Урегулирование 9129';
-
-                     IF s_ < 0
-                     THEN
-                        dk_ := 0;
-                        s_ := 0 - s_;
-                     ELSE
-                        dk_ := 1;
+                  IF s_ <> 0      THEN           txt_ := 'Урегулирование 9129';
+                     IF s_ < 0    THEN           dk_ := 0;        s_ := 0 - s_;
+                     ELSE                        dk_ := 1;
                      END IF;
 
-                     BEGIN
-                        SELECT vob
-                          INTO vob_
-                          FROM tts_vob
-                         WHERE tt = tt9_ AND ROWNUM = 1;
-                     EXCEPTION
-                        WHEN NO_DATA_FOUND
-                        THEN
-                           vob_ := 89;
+                     BEGIN     SELECT vob    INTO       vob_     FROM tts_vob       WHERE tt = tt9_ AND ROWNUM = 1;
+                     EXCEPTION WHEN NO_DATA_FOUND  THEN vob_ := 89;
                      END;
 
                      gl.REF (ref_);
@@ -1658,7 +1531,7 @@ RETURN;
             --2.OVR-S3: Перенос на просрочку        (D-2067,K-2600,D-2069,K2607)
 
             -- перенос на просрочку задолженности по овердрафту
-            nbs3_ := '3579';         -- для комиссии за однодневный овердрафт
+            nbs3_ := SB_3579.R020 ;         -- для комиссии за однодневный овердрафт
             naz_ := 'Перенесення заборгованностi овердрафта на просрочену';
 
             FOR k IN (SELECT a.nls, a.kv, SUBSTR (a.nms, 1, 38) nms, a.acc,
@@ -1678,252 +1551,61 @@ RETURN;
                          AND o.tipo <> 200)
             LOOP
                SAVEPOINT do_provodki_2;
-               nbs_ := ovr.f_nbs (k.acc, 2067);  -- пока неясен другой способ
+               nbs_  := ovr.f_nbs (k.acc, 2067);  -- пока неясен другой способ
                nbs9_ := ovr.f_nbs (k.acc, 2069);         -- для нач процентов
-               nbs3_ := '3579';                               -- для комиссии
+               nbs3_ := SB_3579.R020;                     -- для комиссии
 
                --Обнуление 9129
                BEGIN
-                  BEGIN
-                     dtxt_ :=
-                           'Угода № '
-                        || RTRIM (k.ndoc)
-                        || ' вiд '
-                        || TO_CHAR (k.datd, 'dd.mm.yyyy');
+                  BEGIN   dtxt_ :=  'Угода № '  || RTRIM (k.ndoc)  || ' вiд '  || TO_CHAR (k.datd, 'dd.mm.yyyy');
 
-                     BEGIN     --  Есть ли 2067 и 2069 ?
-
-                        SELECT DAZS , substr(NMS,1,38)        --- 2067
-                          INTO dazs_, nms_2067_
-                          FROM accounts
-                         WHERE acc = k.ACC_2067;
-
-
-                        SELECT i.ACRA   , substr(a.NMS,1,38) --- 2069
-                          INTO acc_2069_, nms_2069_
-                          FROM int_accn i, accounts a 
-                         WHERE i.acc = k.ACC_2067
-                           and i.ID=0 
-                           and i.ACRA=a.ACC;
-
-                     EXCEPTION WHEN NO_DATA_FOUND THEN
-                        dazs_ := NULL;
+                     BEGIN SELECT DAZS , substr(NMS,1,38)    INTO dazs_, nms_2067_  FROM accounts WHERE acc = k.ACC_2067;
+                           SELECT i.ACRA   , substr(a.NMS,1,38)  INTO acc_2069_, nms_2069_  FROM int_accn i, accounts a  WHERE i.acc = k.ACC_2067  and i.ID=0  and i.ACRA=a.ACC;
+                     EXCEPTION WHEN NO_DATA_FOUND THEN        dazs_ := NULL;
                      END;
 
-                     IF NVL (k.ACC_2067, 0) = 0  or  ---  Нет 2067 
-                        DAZS_ is not NULL then       ---  или он Закрыт
-                                                
-                        SELECT s080
-                          INTO s080_
-                          FROM specparam
-                         WHERE acc = k.acc;
-
-                        nls_2067_ :=
-                              nbs_
-                           || '0'
-                           || SUBSTR (NVL (f_newnls (k.acc, 'OV2067', ''),
-                                           k.nls
-                                          ),
-                                      6,
-                                      9
-                                     );
-                        nls_2067_ := vkrzn (SUBSTR (mfo5_, 1, 5), nls_2067_);
-                        nms_2067_ :=
-                           SUBSTR ('Просроч.заборг.' || k.ndoc || ' за овердp.',
-                                   1,
-                                   38
-                                  );
-                        ret1_ := 0;
-                        txt_ := '1.Открытие ' || nls_2067_;
-                        op_reg_ex (99,
-                                   0,
-                                   0,
-                                   k.grp,
-                                   ret1_,
-                                   k.rnk,
-                                   nls_2067_,
-                                   k.kv,
-                                   nms_2067_,
-                                   'ODB',
-                                   k.isp,
-                                   acc_2067_,
-                                   '1',
-                                   NULL,
-                                   NULL,
-                                   NULL,
-                                   NULL,
-                                   NULL,
-                                   NULL,
-                                   NULL,
-                                   NULL,
-                                   NULL,
-                                   NULL,
-                                   NULL,
-                                   k.tobo,
-                                   NULL
-                                  );
-                        txt_ := '2.Обновление ' || nls_2067_;
-
-                        UPDATE accounts
-                           SET sec = k.sec,
-                               blkd = 0,
-                               mdate = k.mdate,
-                               nms = nms_2067_,
-                               dazs = NULL
-                         WHERE acc = acc_2067_;
-
-
-                        if a_grp_ > 0 then
-                           SEC.addAgrp(acc_2067_, a_grp_);
-                        end if;
-
-
-                        UPDATE specparam
-                           SET s080 = s080_
-                         WHERE acc = acc_2067_;
-
-                        BEGIN
-                           SELECT acc
-                             INTO ret1_
-                             FROM specparam
-                            WHERE acc = acc_2067_;
-                        EXCEPTION WHEN NO_DATA_FOUND  THEN
-                              INSERT INTO specparam
-                                          (acc, s080
-                                          )
-                                   VALUES (acc_2067_, s080_
-                                          );
-                        END;
-
-                        nls_2069_ :=
-                              nbs9_
-                           || '0'
-                           || SUBSTR (NVL (f_newnls (k.acc, 'OV2069', ''),
-                                           k.nls
-                                          ),
-                                      6,
-                                      9
-                                     );
+                     IF NVL (k.ACC_2067, 0) = 0  or  DAZS_ is not NULL then ---  Нет 2067     ---  или он Закрыт
+                                               
+                        SELECT s080   INTO s080_     FROM specparam    WHERE acc = k.acc;
+                        -----------------------------------------------------------------
+                        nls_2067_ := nbs_  || '0'  || SUBSTR (NVL (f_newnls (k.acc, 'OV2067', ''),    k.nls ),   6,   9 ) ;
+                        nls_2067_ := vkrzn (SUBSTR (mfo5_, 1, 5), nls_2067_ ) ;
+                        nms_2067_ := SUBSTR ('Просроч.заборг.' || k.ndoc || ' за овердp.', 1,  38 );
+                        ret1_     := 0;
+                        txt_      := '1.Открытие ' || nls_2067_;
+                        op_reg_ex (99, 0, 0, k.grp, ret1_, k.rnk, nls_2067_, k.kv, nms_2067_, 'SP ', k.isp, acc_2067_, '1', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, k.tobo, NULL);
+                        txt_      := '2.Обновление ' || nls_2067_;
+                        UPDATE accounts  SET sec = k.sec,  blkd = 0,   mdate = k.mdate,   nms = nms_2067_,      dazs = NULL WHERE acc = acc_2067_ ;
+                        Accreg.setAccountSParam(acc_2067_, 'S080', s080_ ) ;
+                        if a_grp_ > 0 then      SEC.addAgrp(acc_2067_, a_grp_) ;  end if;
+                        -----------------------------------------------------------------
+                        nls_2069_ := nbs9_ || '0' || SUBSTR (NVL (f_newnls (k.acc, 'OV2069', ''), k.nls),  6,  9  ) ;
                         nls_2069_ := vkrzn (SUBSTR (mfo5_, 1, 5), nls_2069_);
-
-
-                        nms_2069_ :=
-                           SUBSTR('Просроч. % за дог.овердpафту № '
-                                   || k.ndoc,
-                                   1,70
-                                 );
-
+                        nms_2069_ :=  SUBSTR('Просроч. % за дог.овердpафту № ' || k.ndoc,   1 , 70 );
                         ret1_ := 0;
-                        txt_ := '3.Открытие ' || nls_2069_;
-                        op_reg_ex (99,
-                                   0,
-                                   0,
-                                   k.grp,
-                                   ret1_,
-                                   k.rnk,
-                                   nls_2069_,
-                                   k.kv,
-                                   nms_2069_,
-                                   'ODB',
-                                   k.isp,
-                                   acc_2069_,
-                                   '1',
-                                   NULL,
-                                   NULL,
-                                   NULL,
-                                   NULL,
-                                   NULL,
-                                   NULL,
-                                   NULL,
-                                   NULL,
-                                   NULL,
-                                   NULL,
-                                   NULL,
-                                   k.tobo,
-                                   NULL
-                                  );
-                        txt_ := '4.Обновление ' || nls_2069_;
-
-                        UPDATE accounts
-                           SET sec = k.sec,
-                               blkd = 0,
-                               mdate = k.mdate,
-                               nms = nms_2069_,
-                               dazs = NULL
-                         WHERE acc = acc_2069_;
-
-                        if a_grp_ > 0 then
-                           SEC.addAgrp(acc_2069_, a_grp_);
-                        end if;
-
+                        txt_      := '3.Открытие ' || nls_2069_;
+                        op_reg_ex (99, 0, 0, k.grp, ret1_, k.rnk, nls_2069_, k.kv, nms_2069_, 'SPN', k.isp, acc_2069_, '1', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, k.tobo, NULL);
+                        txt_      := '4.Обновление ' || nls_2069_;
+                        UPDATE accounts  SET sec = k.sec, blkd = 0, mdate = k.mdate, nms = nms_2069_, dazs = NULL WHERE acc = acc_2069_ ;
+                        if a_grp_ > 0 then   SEC.addAgrp( acc_2069_, a_grp_);  end if ;
+                        -----------------------------------------------------------------
 
 
                         IF ovr.ovr_par_val ('DO_3578') = 'TRUE' THEN
 
-                           nls_3579_ :=
-                                 nbs3_
-                              || '0'
-                              || SUBSTR (NVL (f_newnls (k.acc, 'OV3579', ''),
-                                              k.nls
-                                             ),
-                                         6,
-                                         9
-                                        );
-                           nls_3579_ :=
-                                       vkrzn (SUBSTR (mfo5_, 1, 5), nls_3579_);
-                           nms_3579_ :=
-                              SUBSTR
-                                  ('Просроч.комiс.за дог.овердрафту № '
-                                   || trim(k.ndoc),
-                                   1,70
-                                  );
+                           nls_3579_ := nbs3_ || '0' || SUBSTR (NVL (f_newnls (k.acc, 'OV3579', ''),  k.nls ),  6,  9 );
+                           nls_3579_ := vkrzn (SUBSTR (mfo5_, 1, 5), nls_3579_);
+                           nms_3579_ := SUBSTR ('Просроч.комiс.за дог.овердрафту № ' || trim(k.ndoc),1,70  );
                            ret1_ := 0;
                            txt_ := '5.Открытие ' || nls_3579_;
-                           op_reg (99,
-                                   0,
-                                   0,
-                                   k.grp,
-                                   ret1_,
-                                   k.rnk,
-                                   nls_3579_,
-                                   k.kv,
-                                   nms_3579_,
-                                   'ODB',
-                                   k.isp,
-                                   acc_3579_
-                                  );
+                           op_reg (99,0,0, k.grp, ret1_, k.rnk, nls_3579_, k.kv, nms_3579_, ( CASE WHEN newnbs.g_state = 1 then 'OFR' else 'ODB' end ), k.isp, acc_3579_ ) ;
                            txt_ := '6.Обновление ' || nls_3579_;
-
-                           UPDATE accounts
-                              SET sec = k.sec,
-                                  blkd = 0,
-                                  mdate = k.mdate,
-                                  nms = nms_3579_,
-                                  dazs = NULL,
-                                  TOBO=k.tobo
-                           WHERE acc = acc_3579_;
-
-                           if a_grp_ > 0 then
-                              SEC.addAgrp(acc_3579_, a_grp_);
-                           end if;
-
-
-                           BEGIN
-                              INSERT INTO nd_acc
-                                          (nd, acc
-                                          )
-                                   VALUES (k.nd, acc_3579_
-                                          );
-                           EXCEPTION WHEN OTHERS THEN
-                              NULL;
+                           UPDATE accounts    SET sec = k.sec, blkd = 0, mdate = k.mdate, nms = nms_3579_, dazs = NULL,TOBO=k.tobo  WHERE acc = acc_3579_;
+                           if a_grp_ > 0 then    SEC.addAgrp(acc_3579_, a_grp_);          end if;
+                           BEGIN  INSERT INTO nd_acc  (nd, acc   )  VALUES (k.nd, acc_3579_        );
+                           EXCEPTION WHEN OTHERS THEN     NULL;
                            END;
-
-                           Begin
-                             INSERT into Specparam_Int (ACC,OB22) values (acc_3579_,'91'); 
-                           EXCEPTION WHEN OTHERS then
-                             UPDATE Specparam_Int  SET OB22='91' where ACC=acc_3579_ ; -- and  OB22 is NULL ; 
-                           End;
-
+                           Accreg.setAccountSParam(acc_3579_, 'OB22', SB_3579.ob22 ) ;
                         END IF;
 
 
@@ -2481,37 +2163,19 @@ RETURN;
        --               - как параметр TAG='NLS_9900'
        --               - счет 9900/00 на 
 
-                     Begin 
-                        Select VAL  into  nls9_ 
-                        From   BRANCH_PARAMETERS 
-                        where  TAG='OVR_9900' and BRANCH=k.tobo;
+                     Begin  Select VAL  into  nls9_   From   BRANCH_PARAMETERS       where  TAG='OVR_9900' and BRANCH=k.tobo;
                      EXCEPTION WHEN NO_DATA_FOUND THEN
-                        Begin
-                           Select VAL  into  nls9_ 
-                           From   BRANCH_PARAMETERS 
-                           where  TAG='NLS_9900' and BRANCH=k.tobo;
-                        EXCEPTION WHEN NO_DATA_FOUND THEN
-                           nls9_:=NBS_OB22_NULL('9900','00', k.tobo);
+                        Begin Select VAL  into  nls9_ From   BRANCH_PARAMETERS        where  TAG='NLS_9900' and BRANCH=k.tobo;
+                        EXCEPTION WHEN NO_DATA_FOUND THEN         nls9_:=NBS_OB22_NULL('9900','00', k.tobo);
                         END;
                      END;
 
 
-                     BEGIN
-                        SELECT acc,  SUBSTR(nms,1,38)
-                          INTO acc9_, nms9_
-                          FROM Accounts
-                         WHERE NLS=nls9_  and  KV=kv_;
-                     EXCEPTION
-                        WHEN NO_DATA_FOUND
-                        THEN
-                           erm := '8012 - No defined # ' || nls9_;
-                           RAISE err;
+                     BEGIN   SELECT acc,  SUBSTR(nms,1,38)     INTO acc9_, nms9_     FROM Accounts     WHERE NLS=nls9_  and  KV=kv_;
+                     EXCEPTION    WHEN NO_DATA_FOUND    THEN  erm := '8012 - No defined # ' || nls9_;     RAISE err;
                      END;
 
-                  EXCEPTION WHEN NO_DATA_FOUND THEN
-
-                        erm := '8012 - No defined # ' || tt9_;
-                        RAISE err;
+                  EXCEPTION WHEN NO_DATA_FOUND THEN    erm := '8012 - No defined # ' || tt9_;             RAISE err;
                   END;
 
                   naz_ :=
@@ -2652,95 +2316,29 @@ RETURN;
 
                Begin --- Проставляем OB22 уже открытым 2607,9129:
 
-                 SELECT a.acc              
-                 INTO   acc_2008_
-                 FROM   accounts a, int_accn i
-                 WHERE                         
-                        i.acc = k.acc   
-                    AND i.ID = 0   
-                    AND i.acra = a.acc ;
-                                           ---  2607/01
-                 Begin
-                   INSERT into Specparam_Int (ACC,OB22) values (acc_2008_,'01'); 
-                 EXCEPTION WHEN OTHERS then
-                   UPDATE Specparam_Int  SET OB22='01' where ACC=acc_2008_  and  OB22 is NULL ; 
-                 End;
+                  SELECT a.acc     INTO   acc_2008_    FROM   accounts a, int_accn i    WHERE  i.acc = k.acc     AND i.ID = 0    AND i.acra = a.acc ;
+                  Accreg.setAccountSParam(acc_2008_ , 'OB22', '01') ;
 
+                  ---  В зависмости от наличия застави 95* проставляем ОВ22 счету 9129:
+                  Select count(*) into kol_9500  from CC_ACCP c, ACCOUNTS a  where c.ACC=a.ACC and c.ACCS=k.ACC and a.NBS like '95%'; 
 
+                  if kol_9500 > 0 then   Accreg.setAccountSParam(k.acc_9129 , 'OB22', '04') ;
+                  else                   Accreg.setAccountSParam(k.acc_9129 , 'OB22', '37') ;
+                  end if;
 
-                 ---  В зависмости от наличия застави 95* проставляем ОВ22 счету 9129:
-
-                 kol_9500:=0;
-
-                 Select count(*) into kol_9500 
-                   from CC_ACCP c, ACCOUNTS a 
-                  where c.ACC=a.ACC and c.ACCS=k.ACC and a.NBS like '95%'; 
-
-                 if kol_9500 > 0 then
-                                           --- 9129/04   - есть 9500
-                    Begin
-                      INSERT into Specparam_Int (ACC,OB22) values (k.acc_9129,'04'); 
-                    EXCEPTION WHEN OTHERS then
-                      UPDATE Specparam_Int  SET OB22='04' where ACC=k.acc_9129 ;  
-                    End;
-
-                 else 
-                                           --- 9129/37   - нет 9500
-                    Begin
-                      INSERT into Specparam_Int (ACC,OB22) values (k.acc_9129,'37'); 
-                    EXCEPTION WHEN OTHERS then
-                      UPDATE Specparam_Int  SET OB22='37' where ACC=k.acc_9129 ;  
-                    End;
-
-                 end if;
-
-
-               EXCEPTION  WHEN NO_DATA_FOUND  THEN
-                 NULL;
+               EXCEPTION  WHEN NO_DATA_FOUND  THEN       NULL;
                END;
      
 
                If nvl(k.acc_8000,0) > 0 then              
-               
-                  Begin                     ---  3578/36
-
-                     SELECT ACRA              
-                     INTO   acc_3578_
-                     FROM   Int_Accn
-                     WHERE  ACC = k.acc_8000   
-                        and ID  = 0 ;
-                  
-
-                     Begin
-                       INSERT into Specparam_Int (ACC,OB22) values (acc_3578_,'36'); 
-                     EXCEPTION WHEN OTHERS then
-                       UPDATE Specparam_Int  SET OB22='36' where ACC=acc_3578_ ; -- and  OB22 is NULL ; 
-                     End;
-
--------------------------------
-                     Begin                  ---  3579/91
-                     
-                       Select ACC into acc_3579_
-                       From   Accounts 
-                       Where  NBS='3579'
-                          and NMS like 'Просроч%комiс%за%овердрафт%'
-                          and RNK in (Select RNK from Accounts where ACC=k.acc); 
-                     
-                       Begin
-                         INSERT into Specparam_Int (ACC,OB22) values (acc_3579_,'91'); 
-                       EXCEPTION WHEN OTHERS then
-                         UPDATE Specparam_Int  SET OB22='91' where ACC=acc_3579_ ; -- and  OB22 is NULL ; 
-                       End;
-                     
-                     Exception when OTHERS then
-                        null;
-                     End;
--------------------------------
-
-                  Exception when OTHERS then
-                     null;
+                  Begin SELECT ACRA  INTO   acc_3578_  FROM   Int_Accn   WHERE  ACC = k.acc_8000         and ID  = 0 ;   ---             ---  3578/36
+                        Accreg.setAccountSParam(acc_3578_ , 'OB22', '36') ;
+                        Begin Select ACC into acc_3579_  From   Accounts       Where  NBS='3579'and NMS like 'Просроч%комiс%за%овердрафт%' and RNK in (Select RNK from Accounts where ACC=k.acc);    ---  3579/91
+                              Accreg.setAccountSParam(acc_3579_ , 'OB22', SB_3579.ob22) ;
+                        Exception when OTHERS then   null;
+                        End;
+                  Exception when OTHERS then      null;
                   End;
-               
                End if;
 
 
@@ -2754,37 +2352,11 @@ RETURN;
                         || ' вiд '
                         || TO_CHAR (k.datd, 'dd.mm.yyyy');
 
-                     BEGIN
-
-                        SELECT DAZS , substr(NMS,1,38)  --- 2067
-                          INTO dazs_, nms_2067_
-                          FROM accounts
-                         WHERE acc = k.ACC_2067;
-
-                        ------   2067 уже есть:
-                                                        --- 2067/01
-                        Begin
-                          INSERT into Specparam_Int (ACC,OB22) values (k.ACC_2067,'01'); 
-                        EXCEPTION WHEN OTHERS then
-                          UPDATE Specparam_Int  SET OB22='01' where ACC=k.ACC_2067  and  OB22 is NULL ; 
-                        End;
-
-
-                        SELECT i.ACRA   , substr(a.NMS,1,38)  --- 2069
-                          INTO acc_2069_, nms_2069_
-                          FROM int_accn i, accounts a 
-                         WHERE i.acc = k.ACC_2067
-                           and i.ID=0 
-                           and i.ACRA=a.ACC;
-                                                              --- 2069/04
-                        Begin
-                          INSERT into Specparam_Int (ACC,OB22) values (acc_2069_,'04'); 
-                        EXCEPTION WHEN OTHERS then
-                          UPDATE Specparam_Int  SET OB22='04' where ACC=acc_2069_  and  OB22 is NULL ; 
-                        End;
-
-                     EXCEPTION  WHEN NO_DATA_FOUND  THEN
-                          dazs_ := NULL;
+                     BEGIN SELECT DAZS , substr(NMS,1,38)   INTO dazs_, nms_2067_       FROM accounts    WHERE acc = k.ACC_2067;
+                           Accreg.setAccountSParam( k.ACC_2067, 'OB22', SB_2067.ob22 ) ;
+                           SELECT i.ACRA   , substr(a.NMS,1,38)  INTO acc_2069_, nms_2069_    FROM int_accn i, accounts a   WHERE i.acc = k.ACC_2067   and i.ID=0    and i.ACRA=a.ACC;
+                           Accreg.setAccountSParam( acc_2069_, 'OB22', SB_2069.ob22 ) ;
+                     EXCEPTION  WHEN NO_DATA_FOUND  THEN     dazs_ := NULL;
                      END;
 
 
@@ -2850,52 +2422,15 @@ RETURN;
                          WHERE acc = acc_2067_;
 
 
-                        if a_grp_ > 0 then
-                           SEC.addAgrp(acc_2067_, a_grp_);
-                        end if;
+                        if a_grp_ > 0 then          SEC.addAgrp(acc_2067_, a_grp_);             end if;
 
+                        Accreg.setAccountSParam( acc_2067_, 'OB22', SB_2067.ob22 ) ;
+                        Accreg.setAccountSParam( acc_2067_, 'S080', s080_ ) ;
 
-                        UPDATE specparam
-                           SET s080 = s080_
-                         WHERE acc = acc_2067_;
-
-                                                        --- 2067/01
-                        Begin
-                          INSERT into Specparam_Int (ACC,OB22) values (acc_2067_,'01'); 
-                        EXCEPTION WHEN OTHERS then
-                          UPDATE Specparam_Int  SET OB22='01' where ACC=acc_2067_ and  OB22 is NULL; 
-                        End;
-
-
-                        BEGIN
-                           SELECT acc
-                             INTO ret1_
-                             FROM specparam
-                            WHERE acc = acc_2067_;
-                        EXCEPTION WHEN NO_DATA_FOUND THEN
-                            INSERT INTO specparam
-                                        (acc, s080
-                                        )
-                                 VALUES (acc_2067_, s080_
-                                        );
-                        END;
-
-                        nls_2069_ :=
-                              nbs9_
-                           || '0'
-                           || SUBSTR (NVL (f_newnls (k.acc, 'OV2069', ''),
-                                           k.nls
-                                          ),
-                                      6,
-                                      9
-                                     );
+                        nls_2069_ := nbs9_     || '0'  || SUBSTR (NVL (f_newnls (k.acc, 'OV2069', ''),  k.nls    ),   6, 9  );
                         nls_2069_ := vkrzn (SUBSTR (mfo5_, 1, 5), nls_2069_);
+                        nms_2069_ := SUBSTR('Просроч. % за дог.овердpафту № '    || k.ndoc,   1,70   );
 
-                        nms_2069_ :=
-                           SUBSTR('Просроч. % за дог.овердpафту № '
-                                   || k.ndoc,
-                                   1,70
-                                 );
                         ret1_ := 0;
                         txt_ := '3.Открытие ' || nls_2069_;
                         op_reg_ex (99,
@@ -2927,47 +2462,14 @@ RETURN;
                                   );
                         txt_ := '4.Обновление ' || nls_2069_;
 
-                        UPDATE accounts
-                           SET sec = k.sec,
-                               blkd = 0,
-                               mdate = k.mdate,
-                               nms = nms_2069_,
-                               dazs = NULL
-                         WHERE acc = acc_2069_;
-
-
-                                                   --- 2069/04
-                        Begin
-                          INSERT into Specparam_Int (ACC,OB22) values (acc_2069_,'04'); 
-                        EXCEPTION WHEN OTHERS then
-                          UPDATE Specparam_Int  SET OB22='04' where ACC=acc_2069_ and  OB22 is NULL; 
-                        End;
-
-
-                        if a_grp_ > 0 then
-                           SEC.addAgrp(acc_2069_, a_grp_);
-                        end if;
+                        UPDATE accounts       SET sec = k.sec,        blkd = 0,    mdate = k.mdate,      nms = nms_2069_,      dazs = NULL    WHERE acc = acc_2069_;
+                        Accreg.setAccountSParam(acc_2069_, 'OB22', sb_2069.ob22 ) ;
+                        if a_grp_ > 0 then       SEC.addAgrp(acc_2069_, a_grp_);    end if;
 -----------------------------------------
-
-                        IF ovr.ovr_par_val ('DO_3578') = 'TRUE'
-                        THEN
-                           nls_3579_ :=
-                                 nbs3_
-                              || '0'
-                              || SUBSTR (NVL (f_newnls (k.acc, 'OV3579', ''),
-                                              k.nls
-                                             ),
-                                         6,
-                                         9
-                                        );
-                           nls_3579_ :=
-                                       vkrzn (SUBSTR (mfo5_, 1, 5), nls_3579_);
-                           nms_3579_ :=
-                              SUBSTR
-                                  ('Просроч.комiс.за дог.овердрафту № '
-                                   ||trim(k.ndoc),
-                                   1,38
-                                  );
+                        IF ovr.ovr_par_val ('DO_3578') = 'TRUE'           THEN
+                           nls_3579_ :=  nbs3_ || '0' || SUBSTR (NVL (f_newnls (k.acc, 'OV3579', ''),   k.nls   ),  6,  9      );
+                           nls_3579_ :=  vkrzn (SUBSTR (mfo5_, 1, 5), nls_3579_);
+                           nms_3579_ :=  SUBSTR  ('Просроч.комiс.за дог.овердрафту № ' ||trim(k.ndoc),    1,38    );
                            ret1_ := 0;
                            txt_ := '5.Открытие ' || nls_3579_;
                            op_reg (99,
@@ -4050,31 +3552,15 @@ RETURN;
        --               - как параметр TAG='NLS_9900'
        --               - счет 9900/00 на этом BRANCH-е
 
-            Begin 
-               Select VAL  into  nls9_ 
-               From   BRANCH_PARAMETERS 
-               where  TAG='OVR_9900' and BRANCH=tobo_a;
+            Begin  Select VAL  into  nls9_   From   BRANCH_PARAMETERS  where  TAG='OVR_9900' and BRANCH=tobo_a;
             EXCEPTION WHEN NO_DATA_FOUND THEN
-               Begin
-                  Select VAL  into  nls9_ 
-                  From   BRANCH_PARAMETERS 
-                  where  TAG='NLS_9900' and BRANCH=tobo_a;
-               EXCEPTION WHEN NO_DATA_FOUND THEN
-                  nls9_:=NBS_OB22_NULL('9900','00', tobo_a);
+               Begin Select VAL  into  nls9_   From   BRANCH_PARAMETERS   where  TAG='NLS_9900' and BRANCH=tobo_a;
+               EXCEPTION WHEN NO_DATA_FOUND THEN                 nls9_:=NBS_OB22_NULL('9900','00', tobo_a);
                END;
             END;
 
-
-            BEGIN
-               SELECT acc,  SUBSTR(nms,1,38)
-                 INTO acc9_, nms9_
-                 FROM Accounts
-                WHERE NLS=nls9_  and  KV=kv_;
-            EXCEPTION
-               WHEN NO_DATA_FOUND
-               THEN
-                  erm := '8012 - No defined # ' || nls9_;
-                  RAISE err;
+            BEGIN SELECT acc,  SUBSTR(nms,1,38)   INTO acc9_, nms9_   FROM Accounts    WHERE NLS=nls9_  and  KV=kv_;
+            EXCEPTION     WHEN NO_DATA_FOUND    THEN     erm := '8012 - No defined # ' || nls9_;   RAISE err;
             END;
        -------------------------------------
 
@@ -4988,9 +4474,7 @@ RETURN;
    END;
 --------------------------------------------------------------------------------
 
-   FUNCTION f_nbs (acc_ INT, nbs_par INT)
-      RETURN VARCHAR
-   IS
+   FUNCTION f_nbs (acc_ INT, nbs_par INT)      RETURN VARCHAR   IS
       nbs2600_   VARCHAR (4);
       nbs2000_   VARCHAR (4);
       nbs2607_   VARCHAR (4);
@@ -5000,81 +4484,30 @@ RETURN;
       nbs2480_   VARCHAR (4);
       nbs9129_   VARCHAR (4);
    BEGIN
-      SELECT SUBSTR (nls, 1, 4)
-        INTO nbs2600_
-        FROM accounts
-       WHERE acc = acc_;
+      SELECT SUBSTR (nls, 1, 4)        INTO nbs2600_        FROM accounts       WHERE acc = acc_;
 
       BEGIN
-         SELECT NVL (nbs2600, '2600'), NVL (nbs2000, '2000'),
-                NVL (nbs2607, '2607'), NVL (nbs2067, '2607'),
-                NVL (nbs2069, '2069'), NVL (nbs2096, '2096'),
-                NVL (nbs2480, '2480'), NVL (nbs9129, '9129')
-           INTO nbs2600_, nbs2000_,
-                nbs2607_, nbs2067_,
-                nbs2069_, nbs2096_,
-                nbs2480_, nbs9129_
-           FROM acc_over_nbs
-          WHERE nbs2600 = nbs2600_;
-      EXCEPTION
-         WHEN NO_DATA_FOUND
-         THEN
-            nbs2000_ := '2000';
-            nbs2607_ := '2607';
-            nbs2067_ := '2067';
-            nbs2069_ := '2069';
-            nbs2096_ := '2096';
-            nbs2480_ := '2480';
-            nbs9129_ := '9129';
+         SELECT NVL(nbs2600,   '2600')    ,  NVL(nbs2000,  '2000'),     NVL(nbs2607,'2607'), 
+                NVL(nbs2067, SB_2067.R020),  NVL(nbs2069,SB_2069.R020), NVL(nbs2096, '2096'),   NVL (nbs2480, '2480'), NVL (nbs9129, '9129')
+         INTO nbs2600_, nbs2000_,  nbs2607_, nbs2067_,  nbs2069_, nbs2096_,  nbs2480_, nbs9129_
+         FROM acc_over_nbs          WHERE nbs2600 = nbs2600_;
+      EXCEPTION WHEN NO_DATA_FOUND THEN   nbs2000_ :=   '2000';       nbs2607_ :=   '2607';  
+                                          nbs2067_ := SB_2067.R020;   nbs2069_ := SB_2069.R020; nbs2096_ := '2096'; nbs2480_ := '2480';  nbs9129_ := '9129';
       END;
 
-      IF nbs_par = 2600
-      THEN
-         RETURN nbs2600_;
-      ELSIF nbs_par = 2000
-      THEN
-         RETURN nbs2000_;
-      ELSIF nbs_par = 2607
-      THEN
-         RETURN nbs2607_;
-      ELSIF nbs_par = 2067
-      THEN
-         RETURN nbs2067_;
-      ELSIF nbs_par = 2069
-      THEN
-         RETURN nbs2069_;
-      ELSIF nbs_par = 2096
-      THEN
-         RETURN nbs2096_;
-      ELSIF nbs_par = 2480
-      THEN
-         RETURN nbs2480_;
-      ELSIF nbs_par = 9129
-      THEN
-         RETURN nbs9129_;
+      IF    nbs_par = 2600 THEN  RETURN nbs2600_;  ELSIF nbs_par = 2000  THEN  RETURN nbs2000_;  ELSIF nbs_par = 2607 THEN  RETURN nbs2607_;  ELSIF nbs_par = 2067  THEN  RETURN nbs2067_;
+      ELSIF nbs_par = 2069 THEN  RETURN nbs2069_;  ELSIF nbs_par = 2096  THEN  RETURN nbs2096_;  ELSIF nbs_par = 2480 THEN  RETURN nbs2480_;  ELSIF nbs_par = 9129  THEN  RETURN nbs9129_;
       END IF;
 
       RETURN NULL;
    END;
 --------------------------------------------------------------------------------
 
-   FUNCTION getpo (tt_ VARCHAR2)
-      RETURN NUMBER
-   IS
-      po   NUMBER;
-   BEGIN
-      BEGIN
-         SELECT TO_NUMBER (SUBSTR (flags, 38, 1))
-           INTO po
-           FROM tts
-          WHERE tt = tt_;
-      EXCEPTION
-         WHEN NO_DATA_FOUND
-         THEN
-            po := 1;
-      END;
-
-      RETURN po;
+   FUNCTION getpo (tt_ VARCHAR2)      RETURN NUMBER   IS      po   NUMBER;
+   BEGIN    BEGIN         SELECT TO_NUMBER (SUBSTR (flags, 38, 1))           INTO po           FROM tts          WHERE tt = tt_;      
+            EXCEPTION         WHEN NO_DATA_FOUND         THEN            po := 1;
+            END;
+     RETURN po;
    END;
 
 -------------------------------------------------------------------
@@ -5442,51 +4875,37 @@ RETURN;
   
 ---------------------------------------------------------------
 
-  Function pay_date
-  ( p_date  in  fdat.fdat%type,
-    p_pday  in  acc_over.pr_2600a%type  default NULL
-  ) return date
-  is
-    l_paydat  fdat.fdat%type;
+  Function pay_date  ( p_date  in  fdat.fdat%type,    p_pday  in  acc_over.pr_2600a%type  default NULL  ) return date  is    l_paydat  fdat.fdat%type;
   Begin
-
-    If (p_pday > 0) then
-      Select  min(FDAT) 
-        Into  l_paydat
-        From  FDAT 
-        Where FDAT >= (trunc(p_date,'MM') + p_pday - 1 );
-    Else             
-      Select  min(FDAT)
-        into  l_paydat
-        from  FDAT
-        where FDAT > (Select min(FDAT) from FDAT where FDAT >= p_date);
+    If (p_pday > 0) then   Select  min(FDAT)  Into  l_paydat  From  FDAT  Where FDAT >= (trunc(p_date,'MM') + p_pday - 1 );
+    Else                   Select  min(FDAT)  into  l_paydat  from  FDAT  where FDAT > (Select min(FDAT) from FDAT where FDAT >= p_date);
     End If;
-       
     Return l_paydat;
-  
   End pay_date;
 ---------------------------------------------------------------
+  FUNCTION header_version    RETURN VARCHAR2  IS  BEGIN    RETURN 'Package header CCK ' || g_header_version;   END header_version;
+  FUNCTION body_version    RETURN VARCHAR2  IS  BEGIN    RETURN 'Package body CCK ' || g_body_version;  END body_version;
 
-  /*
-   * header_version - возвращает версию заголовка пакета CCK
-   */
-  FUNCTION header_version
-    RETURN VARCHAR2
-  IS
-  BEGIN
-    RETURN 'Package header CCK ' || g_header_version;
-   END header_version;
+---Аномимный блок --------------
+begin
 
-  /*
-   * body_version - возвращает версию тела пакета CCK
-   */
-  FUNCTION body_version
-    RETURN VARCHAR2
-  IS
-  BEGIN
-    RETURN 'Package body CCK ' || g_body_version;
-  END body_version;
---------------
+ begin select 0 into OVR.G_2017 from SB_OB22  where         r020  = '2067'      and ob22  = '01'   and d_close is null ;
+       SB_2067.R020 := '2067';   SB_2067.OB22 := '01' ; -- короткостроковў кредити в поточну дўяльнўсть
+       SB_2069.R020 := '2069';   SB_2069.OB22 := '04' ; -- простроченў нарахованў доходи за короткостроковими кредитами в поточну дўяльнўсть
+       SB_6020.R020 := '6020';   SB_6020.ob22 := '06' ; -- за рахунками клўїнтўв банку за овердрафтом в нацўональнўй валютў (рахунок 2600)
+       SB_6111.R020 := '6111';   SB_6111.ob22 := '05' ; -- за супроводження кредитів, наданих юридичним особам та іншим суб`єктам підприємницької діяльності
+       SB_3579.R020 := '3579';   SB_3579.ob22 := '91' ; -- за нарахованими доходами за кредитами овердрафт, що неотримані від суб"єктів господарювання
+ EXCEPTION WHEN NO_DATA_FOUND THEN OVR.G_2017 := 1;  
+       SB_2067.R020 := '2063';   SB_2067.OB22 := '33' ; -- короткостроковў кредити в поточну дўяльнўсть                                     
+       SB_2069.R020 := '2068';   SB_2069.OB22 := '46' ; -- простроченў нарахованў доходи за короткостроковими кредитами в поточну дўяльнўсть
+       SB_6020.R020 := '6020';   SB_6020.ob22 := '06' ; -- за рахунками клўїнтўв банку за овердрафтом в нацўональнўй валютў (рахунок 2600)
+       SB_6111.R020 := '6511';   SB_6111.ob22 := '05' ; -- за супроводження кредитів, наданих юридичним особам та іншим суб`єктам підприємницької діяльності
+       SB_3579.R020 := '3578';   SB_3579.ob22 := '55' ; --прострочені нараховані доходи за кредитами овердрафт, що неотримані від суб"єктів господарювання	
+ end ;
+
+
+
+
 END ovr;
 /
 

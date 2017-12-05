@@ -2631,7 +2631,8 @@ is
     
       -- для строкових вкладів що відкриваються по ЕБП (Ощадбанк)
       if ((branch_usr.get_branch_param2('DPT_WORKSCHEME', 1) = 'EBP') and
-         (substr(l_nlsd, 1, 4) in ('2630', '2635')) and (l_migr is null)) then
+         ((substr(l_nlsd, 1, 4) in ('2630', '2635') and newnbs.g_state = 0) or (substr(l_nlsd, 1, 4) = '2630' and newnbs.g_state = 1)) 
+         and (l_migr is null)) then
       
         ebp.set_archive_docid(l_dpt, 0);
       
@@ -9526,7 +9527,7 @@ is
             l_ob22 := case p_nbs
                         when '2620' then '30'
                         when '2630' then '46'
-                        when '2635' then '38'
+                        --when '2635' then '38'
                         else null
                       end;
         end;

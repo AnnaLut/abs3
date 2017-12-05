@@ -27,7 +27,8 @@ BEGIN
      FROM ACCOUNTS
     WHERE NLS = P_NLS_DPT_OUT AND KV = P_KV;
 
-   IF L_NBS IN ('2630', '2635') AND L_NBS_OUT IN ('2630', '2635')
+   IF (L_NBS IN ('2630', '2635') AND L_NBS_OUT IN ('2630', '2635') AND newnbs.g_state = 0) OR
+     (L_NBS = '2630' AND L_NBS_OUT = '2630' AND newnbs.g_state = 1)
    THEN
       BEGIN
          SELECT NLS

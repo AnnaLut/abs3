@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bars_dwhcck.sql =========*** Run ***
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.BARS_DWHCCK 
+create or replace package BARS_DWHCCK 
 is
     -------------------------------------------------------------------
     --                                                               --
@@ -112,7 +106,7 @@ is
     -- NEST_DBLCREDITS
     --
     -- Население временной таблицы dwh_tmp_dblcredits
-    -- кредитами, у которых тело кредита учитывается ка кна 2202  так на 2203 или 2233
+    -- кредитами, у которых тело кредита учитывается на 2203 или 2233
     --
     -- p_date        - дата формирования
     -- p_daymon_flag - тип инв. ведомости (0-дневная, 1-месячная)
@@ -122,7 +116,10 @@ is
 
 end bars_dwhcck;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.BARS_DWHCCK 
+
+show err
+
+create or replace package body BARS_DWHCCK 
 is
     -------------------------------------------------------------------
     --                                                               --
@@ -135,7 +132,7 @@ is
     -- Константы                                                   --
     -----------------------------------------------------------------
 
-    VERSION_BODY      constant varchar2(64)  := 'version 1.0 29.12.2011';
+    VERSION_BODY      constant varchar2(64)  := 'version 1.1 20.11.2017';
     G_MODULE          constant varchar2(4)   := 'DWHC';
     G_TRACE     constant varchar2(100)       := 'bars_cckdwh.';
 
@@ -442,7 +439,7 @@ is
     -- NEST_DBLCREDITS
     --
     -- Население временной таблицы dwh_tmp_dblcredits
-    -- кредитами, у которых тело кредита учитывается ка кна 2202  так на 2203 или 2233
+    -- кредитами, у которых тело кредита учитывается на 2203 или 2233
     --
     -- p_date        - дата формирования
     -- p_daymon_flag - тип инв. ведомости (0-дневная, 1-месячная)
@@ -457,7 +454,8 @@ is
        select g00, gt, gr, g59
          from ( select g00, gt, gr, g59, count(*)  cnt
                   from inv_cck_fl
-                 where g19 in ('2202','2203') and gr <> 'I'
+                 where g19 = '2203'
+                   and gr <> 'I'
                  group by g00, gt, gr, g59
               )
         where cnt > 1;
@@ -466,14 +464,7 @@ is
 
 end bars_dwhcck;
 /
- show err;
- 
-PROMPT *** Create  grants  BARS_DWHCCK ***
-grant EXECUTE                                                                on BARS_DWHCCK     to BARSDWH_ACCESS_USER;
 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/bars_dwhcck.sql =========*** End ***
- PROMPT ===================================================================================== 
- 
+show err;
+
+grant EXECUTE on BARS_DWHCCK to BARSDWH_ACCESS_USER;

@@ -4,11 +4,16 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe8_nn (dat_     DATE,
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирования #E8 для КБ (универсальная)
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 2008.  All Rights Reserved.
-% VERSION     : 02/08/2017 (20/07/2017, 12/07/2017)
+% VERSION     : 11/10/2017 (12/09/2017, 02/08/2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_ - отчетная дата
                sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+11.10.2017 - для групп бал.счетоа 270, 366 дату начала договора вибираем из
+             поля SDATE табл. CC_DEAL  вместо bdate табл. CC_ADD
+12.09.2017 - для групп бал.счетоа 270, 366 номер договора, идентификатор
+             договора, дату начала и дату окончания договора вибираем из
+             CC_DEAL
 02.08.2017 - добален блок для изменения %% ставки для счетов овердрафтов
              и добавлен блок вилучення дуже старих вкладів 
              (до 01/01/2000 - узгоджено з Квашук)
@@ -112,7 +117,7 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe8_nn (dat_     DATE,
    p080f_       VARCHAR2 (2);
    p081_        VARCHAR2 (70);
    p090k_       specparam.nkd%TYPE;  --VARCHAR2 (20);
-   p090_        specparam.nkd%TYPE;  --VARCHAR2 (20);
+   p090_        cc_deal.cc_id%TYPE;  --VARCHAR2 (20);
    p100_        VARCHAR2 (1);
    p111_        DATE;
    p111p_       DATE;
@@ -144,7 +149,7 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe8_nn (dat_     DATE,
    p_sum_zd_    NUMBER                := NULL;
    p_p111_      DATE                  := NULL;
    p_p112_      DATE                  := NULL;
-   p_p090_      specparam.nkd%TYPE         := '------'; --VARCHAR2 (20)
+   p_p090_      cc_deal.cc_id%TYPE         := '------'; --VARCHAR2 (20)
    p_p130_      NUMBER;
    doda_        VARCHAR2 (10);
    acck_        NUMBER;
@@ -159,6 +164,7 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe8_nn (dat_     DATE,
    sql_    varchar2(1000);
    dat_izm1     date := to_date('31/08/2013','dd/mm/yyyy'); 
    dat_izm2     date := to_date('31/03/2016','dd/mm/yyyy'); 
+   dat_izm3     date := to_date('31/01/2017','dd/mm/yyyy'); 
    ret_         NUMBER;
    sql_acc_     clob:='';
    
@@ -836,7 +842,7 @@ BEGIN
       p090_ := nkd_;
       
       begin
-        p130_ := acrn.fproc (acc_, dat_); 
+        p130_ := acrn_otc.fproc (acc_, dat_); 
       exception
         when others then
             p130_ := 0;
@@ -916,6 +922,18 @@ BEGIN
          END;
       END IF;
 
+      if Dat_ > dat_izm3 and (nls_ like '270%' or nls_ like '366%')
+      then
+         BEGIN
+            select nd 
+               into p_nd_ 
+            from nd_acc 
+            where acc = acc_;
+         EXCEPTION WHEN NO_DATA_FOUND THEN
+            null;
+         END; 
+      end if;
+ 
       s04_ := 0;
       f91_ := 0;
 
@@ -1126,13 +1144,25 @@ BEGIN
                    exception
                        WHEN NO_DATA_FOUND THEN
                           p112p_ := p112_;
-                   end;         
+                   end;    
                 else
                     SELECT c.daos, c.mdate
                        INTO p111p_, p112p_
                     FROM accounts c
                     WHERE c.acc = acc_;
                 end if;
+
+                if Dat_ > dat_izm3 and nls_ like '366%' 
+                then 
+                   BEGIN
+                      SELECT c.nd, NVL (c.cc_id, nkd_), c.sdate, c.wdate
+                         INTO nd_, p090_, p111p_, p112p_
+                      FROM cc_deal c 
+                      WHERE c.nd = p_nd_;
+                   EXCEPTION WHEN NO_DATA_FOUND THEN
+                      null;
+                   END;   
+                end if;                 
             ELSE
                BEGIN
                  SELECT NVL (c.nd, nkd_), c.datz, c.dat_end  --c.dat_begin, c.dat_end
@@ -1192,6 +1222,18 @@ BEGIN
                  END;
                END;
                
+               if Dat_ > dat_izm3 and nls_ like '270%' 
+               then 
+                  BEGIN
+                     SELECT c.nd, NVL (c.cc_id, nkd_), c.sdate, c.wdate
+                        INTO nd_, p090_, p111p_, p112p_
+                     FROM cc_deal c 
+                     WHERE c.nd = p_nd_;
+                  EXCEPTION WHEN NO_DATA_FOUND THEN
+                     null;
+                  END;   
+               end if;                 
+
                if nls_ LIKE '260%' OR (nls_ like '2650%' and r013_ !='8') 
                  OR (nls_ like '2655%' and r013_ != '1')  
                then
@@ -1307,6 +1349,19 @@ BEGIN
                         p112p_ := null;
                      END;
                   end if;
+
+                  if Dat_ > dat_izm3 and (nls_ like '270%' or nls_ like '366%')
+                  then
+                     BEGIN
+                        SELECT c.nd, NVL (c.cc_id, nkd_), c.sdate, c.wdate
+                           INTO nd_, p090_, p111p_, p112p_
+                        FROM cc_deal c 
+                        WHERE c.nd = p_nd_;
+                     EXCEPTION WHEN NO_DATA_FOUND THEN
+                        null;
+                     END;
+                  end if;
+ 
                END IF;
             END IF;
 
@@ -1631,7 +1686,7 @@ BEGIN
             select nvl(sum(ostq*(ndat - bdat)*ir)/sum(decode(ostq,0,(ndat - bdat),ostq*(ndat - bdat))), k.znap)
                into znap_
             from ( 
-                  select fost(i.acc,i.bdat-1) ostq, dat1_ bdat, i.bdat ndat, acrn.fprocn(i.acc, i.id, i.bdat-1) ir
+                  select fost(i.acc,i.bdat-1) ostq, dat1_ bdat, i.bdat ndat, acrn_otc.fprocn(i.acc, i.id, i.bdat-1) ir
                   from int_ratn i 
                   where i.acc = k.acc and
                         i.id = 1 and
@@ -1643,7 +1698,7 @@ BEGIN
                   select ostq, decode(bdat, daos, bdat+1, bdat) bdat, 
                          nvl(lead(bdat) over (partition by acc order by bdat), dat_+1) ndat, ir
                   from (select fost(i.acc,i.bdat) ostq, i.acc, i.bdat, 
-                               acrn.fprocn(i.acc, i.id, i.bdat) ir,
+                               acrn_otc.fprocn(i.acc, i.id, i.bdat) ir,
                                a.daos daos
                         from int_ratn i, accounts a  
                         where i.acc = k.acc and

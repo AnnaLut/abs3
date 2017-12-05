@@ -39,7 +39,7 @@ END;
 
 
 /
-ALTER TRIGGER BARS.TU_OPER_888 ENABLE;
+ALTER TRIGGER BARS.TU_OPER_888 DISABLE;
 
 
 PROMPT ===================================================================================== 

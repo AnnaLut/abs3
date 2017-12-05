@@ -4,7 +4,7 @@ Application Description: 02-06-2010 Нарахування плати за РКО та постійні доручен
 .data VIEWINFO
 0000: 6F00000001000000 FFFF01000D004347 5458566965775374 6174650400010000
 0020: 00000000001D0100 002C000000020000 0003000000000000 0042020000F8FFFF
-0040: FFE2FFFFFFFFFFFF FF000000007C0200 004D010000010000 0001000000010000
+0040: FFE1FFFFFFFFFFFF FF000000007C0200 004D010000010000 0001000000010000
 0060: 000F4170706C6963 6174696F6E497465 6D00000000
 .enddata
 .data DT_MAKERUNDLG
@@ -396,58 +396,58 @@ Application Description: 02-06-2010 Нарахування плати за РКО та постійні доручен
 						Set bApdInited = TRUE
 					Return bApdInited
 			! Function: Ins_File
-				                                                                                                                           Description: Принять 1 файл  по выбору
-				                                                                                                                           Returns 
-					                                                                                                                           Boolean: 
-				                                                                                                                           Parameters 
-					                                                                                                                           String: strTip
-					                                                                                                                           Number: nNd
-					                                                                                                                           String: sSPECIFIC
+				                                                                                                                            Description: Принять 1 файл  по выбору
+				                                                                                                                            Returns 
+					                                                                                                                            Boolean: 
+				                                                                                                                            Parameters 
+					                                                                                                                            String: strTip
+					                                                                                                                            Number: nNd
+					                                                                                                                            String: sSPECIFIC
 					!
-				                                                                                                                           Static Variables 
-				                                                                                                                           Local variables 
-					                                                                                                                           String: sSqlI
-					                                                                                                                           String: strFilters[*]
-					                                                                                                                           String: strFileName
-					                                                                                                                           String: strFilePath
-					                                                                                                                           Number: nIndex
-					                                                                                                                           Number: nSize
+				                                                                                                                            Static Variables 
+				                                                                                                                            Local variables 
+					                                                                                                                            String: sSqlI
+					                                                                                                                            String: strFilters[*]
+					                                                                                                                            String: strFileName
+					                                                                                                                            String: strFilePath
+					                                                                                                                            Number: nIndex
+					                                                                                                                            Number: nSize
 					!
-					                                                                                                                           File Handle: inFile
-					                                                                                                                           Long String: sTiket
-					                                                                                                                           String: sFileM[*]
-					                                                                                                                           Number: nNumFiles
-					                                                                                                                           Number: nTmp
+					                                                                                                                            File Handle: inFile
+					                                                                                                                            Long String: sTiket
+					                                                                                                                            String: sFileM[*]
+					                                                                                                                            Number: nNumFiles
+					                                                                                                                            Number: nTmp
 					! Number: nRet
-					                                                                                                                           String: sTxt
-				                                                                                                                           Actions 
-					                                                                                                                           Set strFilters[0] = strTip
+					                                                                                                                            String: sTxt
+				                                                                                                                            Actions 
+					                                                                                                                            Set strFilters[0] = strTip
 					! Set strFilters[1] = '*.xml'
-					                                                                                                                           Set strFilters[1] = '*'||SalStrRightX( SalStrTrimX( sSPECIFIC ) , 5 )
-					                                                                                                                           Set nIndex = 1
+					                                                                                                                            Set strFilters[1] = '*'||SalStrRightX( SalStrTrimX( sSPECIFIC ) , 5 )
+					                                                                                                                            Set nIndex = 1
 					! Set nRet = -1
-					                                                                                                                           If not SalDlgOpenFile ( hWndForm, 'Вибір електронного документу', strFilters, 2, nIndex, strFileName, sSPECIFIC )
-						                                                                                                                           Return FALSE
+					                                                                                                                            If not SalDlgOpenFile ( hWndForm, 'Вибір електронного документу', strFilters, 2, nIndex, strFileName, sSPECIFIC )
+						                                                                                                                            Return FALSE
 					! Наташа 
-					                                                                                                                           Set sTxt = 'Выполнен импорт+обработка макета файла ' || strFileName
-					                                                                                                                           If PutFileToTmpLob( hSql(), strFileName, 'C') 
-						                                                                                                                           Call SqlCommit(  hSql() )
-						                                                                                                                           If SqlPrepareAndExecute( hSql(), " delete from CCK_AN_TMP  " )
-							                                                                                                                           If nAlg = 26 or nAlg = 27 
-								                                                                                                                           Set sSqlI = 
+					                                                                                                                            Set sTxt = 'Выполнен импорт+обработка макета файла ' || strFileName
+					                                                                                                                            If PutFileToTmpLob( hSql(), strFileName, 'C') 
+						                                                                                                                            Call SqlCommit(  hSql() )
+						                                                                                                                            If SqlPrepareAndExecute( hSql(), " delete from CCK_AN_TMP  " )
+							                                                                                                                            If nAlg = 26 or nAlg = 27 
+								                                                                                                                            Set sSqlI = 
 										"insert into CCK_AN_TMP (branch,n1) 
 										 select BR3_DECODED,  FEE_AMT_A * 100
 										 from table(f_get_maket_records) 
 										 where BR3_DECODED is not null 
 										   and CPS = decode ( :nAlg, 27,'V', 26,'M', '*' )  " 
-								                                                                                                                           If SqlPrepareAndExecute( hSql(),  sSqlI )
-									                                                                                                                           If SqlCommitEx(  hSql(), sTxt )
-										                                                                                                                           Call MessageNoWait( sTxt , 'Информация', 5, 0)
-										                                                                                                                           Call F_Rest()
-										                                                                                                                           Return TRUE
+								                                                                                                                            If SqlPrepareAndExecute( hSql(),  sSqlI )
+									                                                                                                                            If SqlCommitEx(  hSql(), sTxt )
+										                                                                                                                            Call MessageNoWait( sTxt , 'Информация', 5, 0)
+										                                                                                                                            Call F_Rest()
+										                                                                                                                            Return TRUE
 					! !!!
-					                                                                                                                           Call MessageNoWait('HE ' || sTxt, 'Информация', 5, 1)
-					                                                                                                                           Return FALSE
+					                                                                                                                            Call MessageNoWait('HE ' || sTxt, 'Информация', 5, 1)
+					                                                                                                                            Return FALSE
 			Function: Sel002	! __exported
 				Description: Bars002_Selector
 				Returns
@@ -697,10 +697,10 @@ Application Description: 02-06-2010 Нарахування плати за РКО та постійні доручен
 							Break
 						!
 						! Case 121 !! Заведення нового Ломб.Кредиту
-							                                                                                                                                                                                                            If IsWindow( h_21 )
-								                                                                                                                                                                                                            Call SalDestroyWindow( h_21 )
-							                                                                                                                                                                                                            Set h_21 = SalCreateWindow( LK1, hWndMDI, nMode, nPar, strPar01, strPar02 )
-							                                                                                                                                                                                                            Break 
+							                                                                                                                                                                                                             If IsWindow( h_21 )
+								                                                                                                                                                                                                             Call SalDestroyWindow( h_21 )
+							                                                                                                                                                                                                             Set h_21 = SalCreateWindow( LK1, hWndMDI, nMode, nPar, strPar01, strPar02 )
+							                                                                                                                                                                                                             Break 
 						!
 						Case 24 !! Заявка казначейства на ресурсы и его цену по бронированию средств на сч.ХО
 							If not IsWindow(hWin24)
@@ -1260,7 +1260,7 @@ Application Description: 02-06-2010 Нарахування плати за РКО та постійні доручен
 						On SAM_Click
 							Call SalSendMsg ( hWndForm, UM_Populate, 0, 0 )
 						! On SAM_TooltipSetText
-							                                                                                                                                                                                                                                                                                                                                                                                                                 Return XSalTooltipSetText(lParam, IifS(obFullShort, 'Вы', 'В') ||
+							                                                                                                                                                                                                                                                                                                                                                                                                                  Return XSalTooltipSetText(lParam, IifS(obFullShort, 'Вы', 'В') ||
 									       'ключить пересканирование')
 						On UM_NoFontChange
 							Return TRUE
@@ -4259,8 +4259,8 @@ Application Description: 02-06-2010 Нарахування плати за РКО та постійні доручен
 			On SAM_Create
 				! If GetBankMfo()='353575' 
 						   AND SalDateCurrent()>=SalDateConstruct( 2006, 5, 15, 0, 0, 0 ) 
-					                                                                                                                                                                                                                                                                                                                                                                     Call SalMessageBox("Окончен срок тестового использования модуля 'Регулярные платежи'! Обратитесь к разработчику!" , "В Н И М А Н И Е !", MB_Ok | MB_IconStop)
-					                                                                                                                                                                                                                                                                                                                                                                     Call SalDestroyWindow( hWndForm )
+					                                                                                                                                                                                                                                                                                                                                                                      Call SalMessageBox("Окончен срок тестового использования модуля 'Регулярные платежи'! Обратитесь к разработчику!" , "В Н И М А Н И Е !", MB_Ok | MB_IconStop)
+					                                                                                                                                                                                                                                                                                                                                                                      Call SalDestroyWindow( hWndForm )
 				!
 				Call SalSendMsgToChildren(hWndForm, UM_QueryLabelText, 0, 0)
 				Call SalSetWindowText(hWndForm, CurrentLangTable.GetAtomTitle('KSTO.cTWndTitle'))
@@ -4588,8 +4588,8 @@ Application Description: 02-06-2010 Нарахування плати за РКО та постійні доручен
 					Background Color: Class Default
 					Message Actions
 						! On SAM_Click
-							                                                                                                                                                                                                                         Set sFilNem = GetFilNem('PRKR'||SalFmtFormatDateTime(GetBankDate(),'ddMM'))
-							                                                                                                                                                                                                                         Call TablePrint(ISTO, CurrentLangTable.GetAtomTitle('ISTO.cTPrint'), sFilNem, '')
+							                                                                                                                                                                                                                          Set sFilNem = GetFilNem('PRKR'||SalFmtFormatDateTime(GetBankDate(),'ddMM'))
+							                                                                                                                                                                                                                          Call TablePrint(ISTO, CurrentLangTable.GetAtomTitle('ISTO.cTPrint'), sFilNem, '')
 				Line
 					Resource Id: 25425
 					Class Child Ref Key: 41
@@ -7988,11 +7988,11 @@ Application Description: 02-06-2010 Нарахування плати за РКО та постійні доручен
 				Set Nazn =  'Пiдкрiплення Вал.Поз.' 
 				Call SalSendClassMessage( SAM_Create, 0, 0 )
 			! On UM_Update
-				                                                                                                                                                                                                                                                                 Call SalSendMsg( hWndLost, UM_Update, 0, 0 )
-				                                                                                                                                                                                                                                                                 Call SalSendMsg( tbl,      UM_Update, 0, 0 )
-				                                                                                                                                                                                                                                                                 Call SalSendMsg( tbl2,     UM_Update, 0, 0 )
+				                                                                                                                                                                                                                                                                  Call SalSendMsg( hWndLost, UM_Update, 0, 0 )
+				                                                                                                                                                                                                                                                                  Call SalSendMsg( tbl,      UM_Update, 0, 0 )
+				                                                                                                                                                                                                                                                                  Call SalSendMsg( tbl2,     UM_Update, 0, 0 )
 			! On SAM_Close
-				                                                                                                                                                                                                                                                                 Call SalMapEnterToTab( FALSE )
+				                                                                                                                                                                                                                                                                  Call SalMapEnterToTab( FALSE )
 	Form Window: U1003		!! Управление подотчетниками
 .data CLASSPROPS
 0000: 56543A53706C6974 746572002B000100 00000000000090B0 A800C8D8D8005880
@@ -8522,7 +8522,7 @@ Application Description: 02-06-2010 Нарахування плати за РКО та постійні доручен
 						Background Color: Default
 						Input Mask: Unformatted
 .end
-					                                                                                                                                                                                                                                                                                                                                                                            Message Actions 
+					                                                                                                                                                                                                                                                                                                                                                                             Message Actions 
 				! Data Field: NLS_1007
 .winattr
 					Class Child Ref Key: 0
@@ -8554,7 +8554,7 @@ Application Description: 02-06-2010 Нарахування плати за РКО та постійні доручен
 						Background Color: Default
 						Input Mask: Unformatted
 .end
-					                                                                                                                                                                                                                                                                                                                                                                            Message Actions 
+					                                                                                                                                                                                                                                                                                                                                                                             Message Actions 
 				Frame
 					Resource Id: 40446
 					Class Child Ref Key: 0
@@ -9000,13 +9000,13 @@ Application Description: 02-06-2010 Нарахування плати за РКО та постійні доручен
 								and not SqlFetchNext( hSqlAux2(), nFetchRes )
 							Set tbl.FA =0
 					! On UM_Update
-						                                                                                                                                                                                                                                                                                                                                                                                Call SalSendClassMessage( UM_Update, 0, 0 )
+						                                                                                                                                                                                                                                                                                                                                                                                 Call SalSendClassMessage( UM_Update, 0, 0 )
 					! On UM_Insert
-						                                                                                                                                                                                                                                                                                                                                                                                Call SalSendClassMessage( UM_Insert, 0, 0 )
-						                                                                                                                                                                                                                                                                                                                                                                                If not tbl.IDS
-							                                                                                                                                                                                                                                                                                                                                                                                Call SqlPrepareAndExecute( hSql(),"SELECT s_sto_ids.NEXTVAL INTO :tbl.IDS FROM dual")
-							                                                                                                                                                                                                                                                                                                                                                                                Call SqlFetchNext( hSql(),nFetchRes)
-						                                                                                                                                                                                                                                                                                                                                                                                Set nSch=tbl.IDS
+						                                                                                                                                                                                                                                                                                                                                                                                 Call SalSendClassMessage( UM_Insert, 0, 0 )
+						                                                                                                                                                                                                                                                                                                                                                                                 If not tbl.IDS
+							                                                                                                                                                                                                                                                                                                                                                                                 Call SqlPrepareAndExecute( hSql(),"SELECT s_sto_ids.NEXTVAL INTO :tbl.IDS FROM dual")
+							                                                                                                                                                                                                                                                                                                                                                                                 Call SqlFetchNext( hSql(),nFetchRes)
+						                                                                                                                                                                                                                                                                                                                                                                                 Set nSch=tbl.IDS
 					!
 			Child Table: tbl2
 				Class Child Ref Key: 27
@@ -9868,8 +9868,8 @@ Application Description: 02-06-2010 Нарахування плати за РКО та постійні доручен
 		Message Actions
 			On SAM_Create
 				! If GetBankMfo()='353575' AND SalFmtFormatDateTime(GetBankDate(),'ddMMYYYY')>='15042006' 
-					                                                                                                                                                                                                                                                                                                                                                                                Call SalMessageBox("Окончен срок тестового использования модуля 'Регулярные платежи'! Обратитесь к разработчику!" , "В Н И М А Н И Е !", MB_Ok | MB_IconStop)
-					                                                                                                                                                                                                                                                                                                                                                                                Call SalDestroyWindow( hWndForm )
+					                                                                                                                                                                                                                                                                                                                                                                                 Call SalMessageBox("Окончен срок тестового использования модуля 'Регулярные платежи'! Обратитесь к разработчику!" , "В Н И М А Н И Е !", MB_Ok | MB_IconStop)
+					                                                                                                                                                                                                                                                                                                                                                                                 Call SalDestroyWindow( hWndForm )
 				Set nCol1 = SalColorFromRGB( 255,210,210 ) ! СЛАБО-КРАСНЫЙ
 				Call SalColorSet( pbIns, COLOR_IndexWindow, nCol1 )
 				!
@@ -9917,9 +9917,9 @@ Application Description: 02-06-2010 Нарахування плати за РКО та постійні доручен
 						"select a1.nms, a7.nms into :NMS_1001,:NMS_1007 from accounts a1, accounts a7 
 						 where a1.nls=:NLS_1001 and a7.nls=:NLS_1007 and a1.kv=:n980 and a7.kv=:n980 and a1.dazs is null and a7.dazs is null " )
 						and not SqlFetchNext( hSql(), nFetchRes )
-					                                                                                                                                                                                                                                                                                                                                                                            Call SalMessageBox('Не найдены сч.1001 и сч.1007',
+					                                                                                                                                                                                                                                                                                                                                                                             Call SalMessageBox('Не найдены сч.1001 и сч.1007',
 							'Внимание ! Ошибка в параметрах вызова ', MB_IconStop)
-					                                                                                                                                                                                                                                                                                                                                                                            Call SalDestroyWindow( hWndForm )
+					                                                                                                                                                                                                                                                                                                                                                                             Call SalDestroyWindow( hWndForm )
 				Call SalMapEnterToTab( TRUE )
 				Call PrepareWindowEx( hWndForm )
 				Call SetWindowFullSize( hWndForm )
@@ -11987,13 +11987,13 @@ Application Description: 02-06-2010 Нарахування плати за РКО та постійні доручен
 								Call SalDisableWindow( pb_Finis )
 						On SAM_Click
 							! If not SalIsNull(ND) 
-								                                                                                                                                                                                                                                                                                                    Set sTmpE = 'Виконано Процедури ЗАКРИТТЯ дня для ND='|| Str(ND)
-								                                                                                                                                                                                                                                                                                                    If SqlPLSQLCommand(hSql(), "mvo_ovr.OVRF( ND, dDat) " )
-									                                                                                                                                                                                                                                                                                                    Call SqlCommitEx( hSql(),sTmpE )
-									                                                                                                                                                                                                                                                                                                    Call MessageNoWait(sTmpE ,'Повідомлення',2,0)
-								                                                                                                                                                                                                                                                                                                    Else 
-									                                                                                                                                                                                                                                                                                                    Call SqlRollback(hSql())
-									                                                                                                                                                                                                                                                                                                    Call MessageNoWait('НЕ ' || sTmpE, 'Помилка !', 0, 1)
+								                                                                                                                                                                                                                                                                                                     Set sTmpE = 'Виконано Процедури ЗАКРИТТЯ дня для ND='|| Str(ND)
+								                                                                                                                                                                                                                                                                                                     If SqlPLSQLCommand(hSql(), "mvo_ovr.OVRF( ND, dDat) " )
+									                                                                                                                                                                                                                                                                                                     Call SqlCommitEx( hSql(),sTmpE )
+									                                                                                                                                                                                                                                                                                                     Call MessageNoWait(sTmpE ,'Повідомлення',2,0)
+								                                                                                                                                                                                                                                                                                                     Else 
+									                                                                                                                                                                                                                                                                                                     Call SqlRollback(hSql())
+									                                                                                                                                                                                                                                                                                                     Call MessageNoWait('НЕ ' || sTmpE, 'Помилка !', 0, 1)
 							Set sTmpE = 'Виконано Процедури ЗАКРИТТЯ дня для дог.ОВР'
 							If SqlPLSQLCommand(hSql(), "mvo_ovr.OVRF( 0, dDat) " )
 								Call SqlCommitEx( hSql(),sTmpE )
@@ -12035,8 +12035,8 @@ Application Description: 02-06-2010 Нарахування плати за РКО та постійні доручен
 						Uncheck Value: 0
 						Ignore Case? Yes
 .end
-				                                                                                                                                                                                                                                                                                                          List Values 
-				                                                                                                                                                                                                                                                                                                          Message Actions 
+				                                                                                                                                                                                                                                                                                                           List Values 
+				                                                                                                                                                                                                                                                                                                           Message Actions 
 			Column: RNK
 				Class Child Ref Key: 0
 				Class ChildKey: 0
@@ -18480,7 +18480,7 @@ Application Description: 02-06-2010 Нарахування плати за РКО та постійні доручен
 					Background Color: Light Green
 					Message Actions
 						! On SAM_Create
-							                                                                                                                                                                                                                                                                                                                                        Set strTip = 'Печать договора '
+							                                                                                                                                                                                                                                                                                                                                         Set strTip = 'Печать договора '
 						! On SAM_Click
 							! Call PrintFAKTORData()
 				Pushbutton: pb_Kli ! Паспорт клиента
@@ -18711,7 +18711,7 @@ Application Description: 02-06-2010 Нарахування плати за РКО та постійні доручен
 					Text Color: Default
 					Background Color: Light Green
 .end
-					                                                                                                                                                                                                                                                                                                                              Message Actions 
+					                                                                                                                                                                                                                                                                                                                               Message Actions 
 				! ctb_pbExecute: pb_Vypl
 .winattr class Pushbutton:
 					Class Child Ref Key: 0
@@ -18738,14 +18738,14 @@ Application Description: 02-06-2010 Нарахування плати за РКО та постійні доручен
 					Text Color: Default
 					Background Color: Sky
 .end
-					                                                                                                                                                                                                                                                                                                                              Message Actions 
-						                                                                                                                                                                                                                                                                                                                              On SAM_Create
-							                                                                                                                                                                                                                                                                                                                              Set strTip = 
+					                                                                                                                                                                                                                                                                                                                               Message Actions 
+						                                                                                                                                                                                                                                                                                                                               On SAM_Create
+							                                                                                                                                                                                                                                                                                                                               Set strTip = 
 									'Капитализация % за бронь по закрывающимся '|| 
 									SalFmtFormatDateTime( bDat, 'dd.MM.yyyy' )|| ' договорам'
-							                                                                                                                                                                                                                                                                                                                              If nPar != 4 
-								                                                                                                                                                                                                                                                                                                                              Call SalDisableWindow( pb_Vypl )
-						                                                                                                                                                                                                                                                                                                                              On SAM_Click
+							                                                                                                                                                                                                                                                                                                                               If nPar != 4 
+								                                                                                                                                                                                                                                                                                                                               Call SalDisableWindow( pb_Vypl )
+						                                                                                                                                                                                                                                                                                                                               On SAM_Click
 				Frame
 					Resource Id: 64564
 					Class Child Ref Key: 0
@@ -20953,13 +20953,13 @@ Application Description: 02-06-2010 Нарахування плати за РКО та постійні доручен
 					Text Color: Default
 					Background Color: Sky
 .end
-					                                                                                                                                                                                                                                            Message Actions 
-						                                                                                                                                                                                                                                            On SAM_Create
-							                                                                                                                                                                                                                                            Set strTip = 'Перегляд архіву ГУ '
-							                                                                                                                                                                                                                                            If nPar = 9
-								                                                                                                                                                                                                                                            Call SalHideWindow( pb_All )
-						                                                                                                                                                                                                                                            On SAM_Click
-							                                                                                                                                                                                                                                            Call SalCreateWindow( XD0, hWndMDI,nMode,9, "","" )
+					                                                                                                                                                                                                                                             Message Actions 
+						                                                                                                                                                                                                                                             On SAM_Create
+							                                                                                                                                                                                                                                             Set strTip = 'Перегляд архіву ГУ '
+							                                                                                                                                                                                                                                             If nPar = 9
+								                                                                                                                                                                                                                                             Call SalHideWindow( pb_All )
+						                                                                                                                                                                                                                                             On SAM_Click
+							                                                                                                                                                                                                                                             Call SalCreateWindow( XD0, hWndMDI,nMode,9, "","" )
 				Frame
 					Resource Id: 3586
 					Class Child Ref Key: 0
@@ -21817,15 +21817,15 @@ Application Description: 02-06-2010 Нарахування плати за РКО та постійні доручен
 						Call SalHideWindow( OTM )
 						Set sTitl = "XD3: Угоди Госп.Дiяльностi: Перегляд та Аналіз"
 					! Else If nPar = 2 
-						                                                                                                                                                                                                                                               Set sFilter_SOS = strPar01 || " and d.sos>=2  and d.sos < 6  "
-						                                                                                                                                                                                                                                               Set BR1.rb2 = TRUE
-						                                                                                                                                                                                                                                               Call SalShowWindow( BR1.OTM )
-						                                                                                                                                                                                                                                               Call SalTblSetColumnTitle( BR1.OTM, "Согл
+						                                                                                                                                                                                                                                                Set sFilter_SOS = strPar01 || " and d.sos>=2  and d.sos < 6  "
+						                                                                                                                                                                                                                                                Set BR1.rb2 = TRUE
+						                                                                                                                                                                                                                                                Call SalShowWindow( BR1.OTM )
+						                                                                                                                                                                                                                                                Call SalTblSetColumnTitle( BR1.OTM, "Согл
 								2" )
-						                                                                                                                                                                                                                                               Set sTitl = "BR2: Брон.средств на сч.ХО: Просмотр, Согласование"
+						                                                                                                                                                                                                                                                Set sTitl = "BR2: Брон.средств на сч.ХО: Просмотр, Согласование"
 						!
-						                                                                                                                                                                                                                                               Call SalEnableWindow( BR1.pbDel )
-						                                                                                                                                                                                                                                               Call SalEnableWindow( BR1.pbUpdate )
+						                                                                                                                                                                                                                                                Call SalEnableWindow( BR1.pbDel )
+						                                                                                                                                                                                                                                                Call SalEnableWindow( BR1.pbUpdate )
 					!
 					Call SalSetWindowText( hWndForm, sTitl || '/'|| strPar01 )
 					Call SalSendMsg(hWndForm, UM_Populate, 0, 0)
@@ -23349,10 +23349,10 @@ Application Description: 02-06-2010 Нарахування плати за РКО та постійні доручен
 							Else
 								Call SalTblDeleteRow(hWndForm, nRow, TBL_NoAdjust)
 					! On SAM_FetchRowDone
-						                                                                                                                                                                                                                                                                                                                                                            Call tbl2.colFreqn.SetSelectById( tbl2.colFreq )
+						                                                                                                                                                                                                                                                                                                                                                             Call tbl2.colFreqn.SetSelectById( tbl2.colFreq )
 					! On SAM_DoubleClick
-						                                                                                                                                                                                                                                                                                                                                                            If tbl2.IDD != NUMBER_Null
-							                                                                                                                                                                                                                                                                                                                                                            Call SalModalDialog(dlgCalendar, hWndForm, tbl.NMK, tbl2.colNlsA,
+						                                                                                                                                                                                                                                                                                                                                                             If tbl2.IDD != NUMBER_Null
+							                                                                                                                                                                                                                                                                                                                                                             Call SalModalDialog(dlgCalendar, hWndForm, tbl.NMK, tbl2.colNlsA,
 									tbl2.IDD, tbl2.colFreq, tbl2.colDat1, tbl2.colDat2, tbl2.WEND, tbl2.colFreqn )
 			!
 			Child Table: tbl3
@@ -27622,132 +27622,132 @@ Application Description: 02-06-2010 Нарахування плати за РКО та постійні доручен
 						Call SalEnableWindow( pb_Reestr )
 					Return TRUE
 			! Function: F_Fun1
-				               Description: 
-				               Returns 
-				               Parameters 
-				               Static Variables 
-				               Local variables 
-					               String: sNLS_G
-					               Number: nS1
-					               Number: nS2
-					               Number: nS3
-					               Number: nS4
-					               Number: nS5
-					               Number: nITOG
-					               String: sNazn1
-					               String: sNazn2
+				                Description: 
+				                Returns 
+				                Parameters 
+				                Static Variables 
+				                Local variables 
+					                String: sNLS_G
+					                Number: nS1
+					                Number: nS2
+					                Number: nS3
+					                Number: nS4
+					                Number: nS5
+					                Number: nITOG
+					                String: sNazn1
+					                String: sNazn2
 					!
 					!
-				               Actions 
+				                Actions 
 					!
-					               Set nRow = TBL_MinRow
-					               Set sNLS_G = STRING_Null 
-					               Set nITOG = 0
-					               Set sPeriod =  ' Перiод : ' || 
+					                Set nRow = TBL_MinRow
+					                Set sNLS_G = STRING_Null 
+					                Set nITOG = 0
+					                Set sPeriod =  ' Перiод : ' || 
 							SalFmtFormatDateTime( DATP + 1, "dd.MM.yyyy" ) || ' - ' || 
 							SalFmtFormatDateTime( dDat, "dd.MM.yyyy" )  
-					               Set sNazn1 =  Subs( NAZN1 || sPeriod,1,160 )
-					               Set sNazn2 =  Subs( NAZN2 || sPeriod,1,160 )
-					               If NOT SqlPrepareAndExecute( hSql(),
+					                Set sNazn1 =  Subs( NAZN1 || sPeriod,1,160 )
+					                Set sNazn2 =  Subs( NAZN2 || sPeriod,1,160 )
+					                If NOT SqlPrepareAndExecute( hSql(),
 							"update branch_opelot o 
 							 set NAZN1 = :NAZN1, 
 							     DATP  = :dDat, 
 							     NAZN2 = :NAZN2 
 							 where OB22 = :OB22 and " || sAnd )
-						               Return FALSE
-					               While SalTblFindNextRow( hWndForm, nRow, 0, 0 )
-						               Call SalTblSetContext( hWndForm, nRow )
+						                Return FALSE
+					                While SalTblFindNextRow( hWndForm, nRow, 0, 0 )
+						                Call SalTblSetContext( hWndForm, nRow )
 						! 2905 OTM = 0 ; 2805 OOTM = 1
-						               If OTM >= 0
+						                If OTM >= 0
 							! 2905 - на разніе
-							               If OTM = 0
-								               Set nS3 = OST03 * 100
-								               Set nS2 = OST02 * 100
-								               Set nS1 = OST01 * 100
-								               Set nS4 = OST29_2 *100
-								               Set nITOG = nITOG + nS4
+							                If OTM = 0
+								                Set nS3 = OST03 * 100
+								                Set nS2 = OST02 * 100
+								                Set nS1 = OST01 * 100
+								                Set nS4 = OST29_2 *100
+								                Set nITOG = nITOG + nS4
 							! 2905 - на 2805
-							               Else 
-								               Set nS5 = - OST29 * 100
+							                Else 
+								                Set nS5 = - OST29 * 100
 							! Первый док не д.б. на 2805
-							               If sNLS_G = STRING_Null 
-								               If OTM =1 
-									               Return FALSE
+							                If sNLS_G = STRING_Null 
+								                If OTM =1 
+									                Return FALSE
 								!
-								               Set sNLS_G = dNLS_G
-								               Call cDoc.SetDoc( 0, sTT, 1, IifN(cb_Zo = 0, nVob, 96), STRING_Null,
+								                Set sNLS_G = dNLS_G
+								                Call cDoc.SetDoc( 0, sTT, 1, IifN(cb_Zo = 0, nVob, 96), STRING_Null,
 										     dDat, dDat, dDat, dDat,
 										     NLS29, NAME, aMfo,'', n980, nS3, aOkpo,
 										     NLS03, aName, aMfo,'', n980, nS3, aOkpo,
 										     sNazn1, '', GetIdOper(), '', NUMBER_Null, 0 )
-								               If NOT cDoc.oDoc() 
-									               Return FALSE
-								               Set nRef = cDoc.m_nRef
-								               If NOT F_Fun2(nRef ,"Розщеплення: за наданi послуги ") 
-									               Return FALSE
-								               If sNLS_G != NLS29 
-									               If nS4 >0 
-										               If NOT cDoc.PayV (0,nRef,dDat,sTT,1,n980, NLS29,nS4, n980,sNLS_G,nS4)
-											               Return FALSE
-										               If NOT F_Fun2(nRef ,"Акумуляцiя загальної суми")
-											               Return FALSE
+								                If NOT cDoc.oDoc() 
+									                Return FALSE
+								                Set nRef = cDoc.m_nRef
+								                If NOT F_Fun2(nRef ,"Розщеплення: за наданi послуги ") 
+									                Return FALSE
+								                If sNLS_G != NLS29 
+									                If nS4 >0 
+										                If NOT cDoc.PayV (0,nRef,dDat,sTT,1,n980, NLS29,nS4, n980,sNLS_G,nS4)
+											                Return FALSE
+										                If NOT F_Fun2(nRef ,"Акумуляцiя загальної суми")
+											                Return FALSE
 							! Следующие
-							               Else 
+							                Else 
 								! 2905 - на разніе
-								               If OTM = 0
-									               If nS3 >0 
-										               If NOT cDoc.PayV (0,nRef,dDat,sTT,1,n980,NLS29,nS3, n980,NLS03,nS3)
-											               Return FALSE
-										               If NOT F_Fun2(nRef ,"Розщеплення: за наданi послуги ")
-											               Return FALSE
-									               If nS4 >0 
-										               If NOT cDoc.PayV (0,nRef,dDat,sTT,1,n980, NLS29,nS4,n980,sNLS_G,nS4)
-											               Return FALSE
-										               If NOT F_Fun2(nRef ,"Акумуляцiя загальної суми")
-											               Return FALSE
+								                If OTM = 0
+									                If nS3 >0 
+										                If NOT cDoc.PayV (0,nRef,dDat,sTT,1,n980,NLS29,nS3, n980,NLS03,nS3)
+											                Return FALSE
+										                If NOT F_Fun2(nRef ,"Розщеплення: за наданi послуги ")
+											                Return FALSE
+									                If nS4 >0 
+										                If NOT cDoc.PayV (0,nRef,dDat,sTT,1,n980, NLS29,nS4,n980,sNLS_G,nS4)
+											                Return FALSE
+										                If NOT F_Fun2(nRef ,"Акумуляцiя загальної суми")
+											                Return FALSE
 							! 2905 - на разніе
-							               If OTM = 0 
-								               If nS1 >0 
-									               If NOT cDoc.PayV (0,nRef,dDat,sTT,1,n980,NLS29,nS1,n980,NLS01,nS1)
-										               Return FALSE
-									               If NOT F_Fun2(nRef ,"Розщеплення: доходи зг.договорiв")
-										               Return FALSE
-								               If nS2 >0 
-									               If NOT cDoc.PayV (0,nRef,dDat,sTT,1,n980,NLS29,nS2,n980,NLS02,nS2)
-										               Return FALSE
-									               If NOT F_Fun2(nRef ,"Розщеплення: ПДВ ")
-										               Return FALSE
+							                If OTM = 0 
+								                If nS1 >0 
+									                If NOT cDoc.PayV (0,nRef,dDat,sTT,1,n980,NLS29,nS1,n980,NLS01,nS1)
+										                Return FALSE
+									                If NOT F_Fun2(nRef ,"Розщеплення: доходи зг.договорiв")
+										                Return FALSE
+								                If nS2 >0 
+									                If NOT cDoc.PayV (0,nRef,dDat,sTT,1,n980,NLS29,nS2,n980,NLS02,nS2)
+										                Return FALSE
+									                If NOT F_Fun2(nRef ,"Розщеплення: ПДВ ")
+										                Return FALSE
 							! 2905 - на 2805
-							               Else 
-								               If nITOG > 0 and nS5 > 0 
-									               Set nS5 = SalNumberMin( nITOG, nS5 )
-									               If NOT cDoc.PayV (0,nRef,dDat,sTT,1,n980,sNLS_G,nS5,n980,NLS29,nS5)
-										               Return FALSE
-									               If NOT F_Fun2(nRef ,"Перекриття сплачених (деб.заборг.)")
-										               Return FALSE
-									               Set nITOG = nITOG - nS5
+							                Else 
+								                If nITOG > 0 and nS5 > 0 
+									                Set nS5 = SalNumberMin( nITOG, nS5 )
+									                If NOT cDoc.PayV (0,nRef,dDat,sTT,1,n980,sNLS_G,nS5,n980,NLS29,nS5)
+										                Return FALSE
+									                If NOT F_Fun2(nRef ,"Перекриття сплачених (деб.заборг.)")
+										                Return FALSE
+									                Set nITOG = nITOG - nS5
 					! Call Debug ( 'nITOG='||Str(nITOG)||' REZ_S='||Str(REZ_S))
-					               If nITOG > 0  and REZ_S > 0
-						               Set REZ_S = SalNumberMin( REZ_S, nITOG )
-						               If NOT cDoc.PayV (0,nRef,dDat,sTT,1,n980,sNLS_G , REZ_S,  n980, REZ_NLS, REZ_S )
-							               Return FALSE
-						               If NOT F_Fun2(nRef ,"Формування постiйного залишку")
-							               Return FALSE
-						               Set nITOG = nITOG - REZ_S
-					               If nITOG > 0 
-						               Call cDoc.SetDoc( 
+					                If nITOG > 0  and REZ_S > 0
+						                Set REZ_S = SalNumberMin( REZ_S, nITOG )
+						                If NOT cDoc.PayV (0,nRef,dDat,sTT,1,n980,sNLS_G , REZ_S,  n980, REZ_NLS, REZ_S )
+							                Return FALSE
+						                If NOT F_Fun2(nRef ,"Формування постiйного залишку")
+							                Return FALSE
+						                Set nITOG = nITOG - REZ_S
+					                If nITOG > 0 
+						                Call cDoc.SetDoc( 
 								     0, IifS(aMfo = MFO, sTT, sTT2 ), 1, nVob, STRING_Null,
 								     dDat, dDat, dDat, dDat,
 								     sNLS_G, aName, aMfo,'', n980, nITOG, aOkpo,
 								     NLS  , NAME,  MFO, '', n980, nITOG, OKPO,
 								     sNazn2, '', GetIdOper(), '', NUMBER_Null, 0 )
-						               If NOT cDoc.oDoc()
-							               Return FALSE
+						                If NOT cDoc.oDoc()
+							                Return FALSE
 						! Set nRef = cDoc.m_nRef
-						               Set REF2 = cDoc.m_nRef
-						               Set SALDO = nITOG /100
-						               Call SalEnableWindow( pb_Reestr )
-					               Return TRUE
+						                Set REF2 = cDoc.m_nRef
+						                Set SALDO = nITOG /100
+						                Call SalEnableWindow( pb_Reestr )
+					                Return TRUE
 			Function: F_Fun2
 				Description:
 				Returns
@@ -28347,8 +28347,8 @@ Application Description: 02-06-2010 Нарахування плати за РКО та постійні доручен
 						Uncheck Value:
 						Ignore Case? Yes
 .end
-				                                                                                                                                                                                                                                                        List Values 
-				                                                                                                                                                                                                                                                        Message Actions 
+				                                                                                                                                                                                                                                                         List Values 
+				                                                                                                                                                                                                                                                         Message Actions 
 			! Column: STMT
 .winattr
 				Class Child Ref Key: 0
@@ -28381,8 +28381,8 @@ Application Description: 02-06-2010 Нарахування плати за РКО та постійні доручен
 						Uncheck Value:
 						Ignore Case? Yes
 .end
-				                                                                                                                                                                                                                                                        List Values 
-				                                                                                                                                                                                                                                                        Message Actions 
+				                                                                                                                                                                                                                                                         List Values 
+				                                                                                                                                                                                                                                                         Message Actions 
 			Column: BRANCH
 				Class Child Ref Key: 0
 				Class ChildKey: 0
@@ -28694,11 +28694,11 @@ Application Description: 02-06-2010 Нарахування плати за РКО та постійні доручен
 				Call SalPostMsg(hWndForm, SAM_TblDoDetails, 0, 0)
 				Call SalWaitCursor(FALSE)
 			On SAM_FetchRowDone
-				If Subs( NLSK,1,4) ='6119'
+				If Subs( NLSK,1,4) ='6519' !! 6119
 					Set I_6119 = I_6119 + S 
 				Else If Subs( NLSK,1,4) ='3622'
 					Set I_3622 = I_3622 + S 
-				Else If Subs( NLSK,1,4) ='6110'
+				Else If Subs( NLSK,1,4) ='6510' !! 6110
 					Set I_6110 = I_6110 + S 
 				Else If Subs( NLSK,1,4) ='2805'
 					Set I_2805 = I_2805 + S 
@@ -29948,15 +29948,15 @@ Application Description: 02-06-2010 Нарахування плати за РКО та постійні доручен
 					Input Mask: Unformatted
 				Message Actions
 					! On SAM_Validate
-						                                                                                                                                                                                                If SqlPrepareAndExecute( hSql(), 
+						                                                                                                                                                                                                 If SqlPrepareAndExecute( hSql(), 
 								"SELECT daos, nms, -ostc/100,acc  into :DAOS, :NMS_2202, :OST_2202, :ACC_2202
 								 FROM accounts where kv=980 and nls=:NLS_2202 and ostc<0" )
 								and NOT SqlFetchNext( hSql(), nFetchRes )
-							                                                                                                                                                                                                Call SalMessageBox('Не знайдено заборгованість по кредиту','Увага !', MB_IconStop)
-							                                                                                                                                                                                                Set NLS_2202 = STRING_Null
-							                                                                                                                                                                                                Set NMS_2202 = STRING_Null
-							                                                                                                                                                                                                Set OST_2202 = NUMBER_Null
-							                                                                                                                                                                                                Set ACC_2202 = NUMBER_Null
+							                                                                                                                                                                                                 Call SalMessageBox('Не знайдено заборгованість по кредиту','Увага !', MB_IconStop)
+							                                                                                                                                                                                                 Set NLS_2202 = STRING_Null
+							                                                                                                                                                                                                 Set NMS_2202 = STRING_Null
+							                                                                                                                                                                                                 Set OST_2202 = NUMBER_Null
+							                                                                                                                                                                                                 Set ACC_2202 = NUMBER_Null
 					On SAM_TooltipSetText
 						Return XSalTooltipSetText( lParam, 'Позичковий рахунок' )
 			Data Field: NMS_2202
@@ -30110,15 +30110,15 @@ Application Description: 02-06-2010 Нарахування плати за РКО та постійні доручен
 					Input Mask: Unformatted
 				Message Actions
 					! On SAM_Validate
-						                                                                                                                                                                                                If SqlPrepareAndExecute( hSql(), 
+						                                                                                                                                                                                                 If SqlPrepareAndExecute( hSql(), 
 								"SELECT nms, -ostc/100,acc into :NMS_2208, :OST_2208, :ACC_2208 
 								 FROM accounts where kv=980 and nls=:NLS_2208 and ostc<0" )
 								and NOT SqlFetchNext( hSql(), nFetchRes )
-							                                                                                                                                                                                                Call SalMessageBox('Не знайдено заборгованість по %%','Увага !', MB_IconStop)
-							                                                                                                                                                                                                Set NLS_2208 = STRING_Null
-							                                                                                                                                                                                                Set NMS_2208 = STRING_Null
-							                                                                                                                                                                                                Set OST_2208 = NUMBER_Null
-							                                                                                                                                                                                                Set ACC_2208 = NUMBER_Null
+							                                                                                                                                                                                                 Call SalMessageBox('Не знайдено заборгованість по %%','Увага !', MB_IconStop)
+							                                                                                                                                                                                                 Set NLS_2208 = STRING_Null
+							                                                                                                                                                                                                 Set NMS_2208 = STRING_Null
+							                                                                                                                                                                                                 Set OST_2208 = NUMBER_Null
+							                                                                                                                                                                                                 Set ACC_2208 = NUMBER_Null
 					On SAM_TooltipSetText
 						Return XSalTooltipSetText( lParam, 'Рахунок нарахованих %%' )
 			Data Field: NMS_2208
@@ -30463,24 +30463,24 @@ Application Description: 02-06-2010 Нарахування плати за РКО та постійні доручен
 					Input Mask: Unformatted
 				Message Actions
 					! On SAM_Validate
-						                                                                                                                                                                                                If SqlPrepareAndExecute( hSql(),
+						                                                                                                                                                                                                 If SqlPrepareAndExecute( hSql(),
 								"SELECT DAPP, nms, -ostc/100, acc into :DAPP, :NMS_9501, :OST_9501, :ACC_9501 
 								 FROM accounts where kv=980 and nls=:NLS_9501 " )
 								and NOT SqlFetchNext( hSql(), nFetchRes )
-							                                                                                                                                                                                                Call SalMessageBox('Не знайдено рахунок застави ','Увага !', MB_IconStop)
-							                                                                                                                                                                                                Set NLS_9501 = STRING_Null
-							                                                                                                                                                                                                Set NMS_9501 = STRING_Null
-							                                                                                                                                                                                                Set OST_9501 = NUMBER_Null
-							                                                                                                                                                                                                Set ACC_9501 = NUMBER_Null
-							                                                                                                                                                                                                Set OST_9501_1k= NUMBER_Null
-						                                                                                                                                                                                                Else 
-							                                                                                                                                                                                                If OST_9501 = 0 
-								                                                                                                                                                                                                If SqlPrepareAndExecute( hSql(),
+							                                                                                                                                                                                                 Call SalMessageBox('Не знайдено рахунок застави ','Увага !', MB_IconStop)
+							                                                                                                                                                                                                 Set NLS_9501 = STRING_Null
+							                                                                                                                                                                                                 Set NMS_9501 = STRING_Null
+							                                                                                                                                                                                                 Set OST_9501 = NUMBER_Null
+							                                                                                                                                                                                                 Set ACC_9501 = NUMBER_Null
+							                                                                                                                                                                                                 Set OST_9501_1k= NUMBER_Null
+						                                                                                                                                                                                                 Else 
+							                                                                                                                                                                                                 If OST_9501 = 0 
+								                                                                                                                                                                                                 If SqlPrepareAndExecute( hSql(),
 										"SELECT -fost( :ACC_9501, :DAPP -1 ) into :OST_9501_1k from dual  " )
 										and NOT SqlFetchNext( hSql(), nFetchRes )
-							                                                                                                                                                                                                Else 
-								                                                                                                                                                                                                Set OST_9501_1k = - OST_9501
-								                                                                                                                                                                                                Set DAPP = DATETIME_Null
+							                                                                                                                                                                                                 Else 
+								                                                                                                                                                                                                 Set OST_9501_1k = - OST_9501
+								                                                                                                                                                                                                 Set DAPP = DATETIME_Null
 					On SAM_TooltipSetText
 						Return XSalTooltipSetText( lParam, 'Рахунок застави' )
 			Data Field: NMS_9501
@@ -32924,83 +32924,83 @@ Application Description: 02-06-2010 Нарахування плати за РКО та постійні доручен
 			Maximum Rows in Memory: Default
 			Discardable? No
 .end
-		                                                                                                                                                                                                                                               Description: 
-		                                                                                                                                                                                                                                               Named Menus 
-		                                                                                                                                                                                                                                               Menu 
-		                                                                                                                                                                                                                                               Tool Bar 
-			                                                                                                                                                                                                                                               Contents 
-				                                                                                                                                                                                                                                               Pushbutton: pbIns
-					                                                                                                                                                                                                                                               Message Actions 
-				                                                                                                                                                                                                                                               Pushbutton: pbDel
-					                                                                                                                                                                                                                                               Message Actions 
-				                                                                                                                                                                                                                                               Pushbutton: pbRefresh
-					                                                                                                                                                                                                                                               Message Actions 
-				                                                                                                                                                                                                                                               Pushbutton: pbUpdate
-					                                                                                                                                                                                                                                               Message Actions 
-				                                                                                                                                                                                                                                               Line 
-				                                                                                                                                                                                                                                               Pushbutton: pbSearch
-					                                                                                                                                                                                                                                               Message Actions 
-				                                                                                                                                                                                                                                               Pushbutton: pbFilter
-					                                                                                                                                                                                                                                               Message Actions 
-				                                                                                                                                                                                                                                               Pushbutton: pbDetails
-					                                                                                                                                                                                                                                               Message Actions 
-				                                                                                                                                                                                                                                               Pushbutton: pbPrint
-					                                                                                                                                                                                                                                               Message Actions 
-				                                                                                                                                                                                                                                               Line 
-				                                                                                                                                                                                                                                               Pushbutton: pbExit
-					                                                                                                                                                                                                                                               Message Actions 
-				                                                                                                                                                                                                                                               Line 
-		                                                                                                                                                                                                                                               Contents 
-			                                                                                                                                                                                                                                               Column: DK 
-				                                                                                                                                                                                                                                               List Values 
-				                                                                                                                                                                                                                                               Message Actions 
-			                                                                                                                                                                                                                                               Column: ND 
-				                                                                                                                                                                                                                                               List Values 
-				                                                                                                                                                                                                                                               Message Actions 
-			                                                                                                                                                                                                                                               Column: CC_ID 
-				                                                                                                                                                                                                                                               List Values 
-				                                                                                                                                                                                                                                               Message Actions 
-			                                                                                                                                                                                                                                               Column: RNK 
-				                                                                                                                                                                                                                                               List Values 
-				                                                                                                                                                                                                                                               Message Actions 
-			                                                                                                                                                                                                                                               Column: BRANCH  
-				                                                                                                                                                                                                                                               List Values 
-				                                                                                                                                                                                                                                               Message Actions 
-			                                                                                                                                                                                                                                               Column: DAT1 
-				                                                                                                                                                                                                                                               List Values 
-				                                                                                                                                                                                                                                               Message Actions 
-			                                                                                                                                                                                                                                               Column: DAT4 
-				                                                                                                                                                                                                                                               List Values 
-				                                                                                                                                                                                                                                               Message Actions 
-			                                                                                                                                                                                                                                               Column: ISP 
-				                                                                                                                                                                                                                                               List Values 
-				                                                                                                                                                                                                                                               Message Actions 
-			                                                                                                                                                                                                                                               Column: NLS 
-				                                                                                                                                                                                                                                               List Values 
-				                                                                                                                                                                                                                                               Message Actions 
-			                                                                                                                                                                                                                                               Column: OB22
-				                                                                                                                                                                                                                                               List Values 
-				                                                                                                                                                                                                                                               Message Actions 
-			                                                                                                                                                                                                                                               Column: SDOG 
-				                                                                                                                                                                                                                                               List Values 
-				                                                                                                                                                                                                                                               Message Actions 
-			                                                                                                                                                                                                                                               Column: OSTC 
-				                                                                                                                                                                                                                                               List Values 
-				                                                                                                                                                                                                                                               Message Actions 
-			                                                                                                                                                                                                                                               Column: ACC 
-				                                                                                                                                                                                                                                               List Values 
-				                                                                                                                                                                                                                                               Message Actions 
+		                                                                                                                                                                                                                                                Description: 
+		                                                                                                                                                                                                                                                Named Menus 
+		                                                                                                                                                                                                                                                Menu 
+		                                                                                                                                                                                                                                                Tool Bar 
+			                                                                                                                                                                                                                                                Contents 
+				                                                                                                                                                                                                                                                Pushbutton: pbIns
+					                                                                                                                                                                                                                                                Message Actions 
+				                                                                                                                                                                                                                                                Pushbutton: pbDel
+					                                                                                                                                                                                                                                                Message Actions 
+				                                                                                                                                                                                                                                                Pushbutton: pbRefresh
+					                                                                                                                                                                                                                                                Message Actions 
+				                                                                                                                                                                                                                                                Pushbutton: pbUpdate
+					                                                                                                                                                                                                                                                Message Actions 
+				                                                                                                                                                                                                                                                Line 
+				                                                                                                                                                                                                                                                Pushbutton: pbSearch
+					                                                                                                                                                                                                                                                Message Actions 
+				                                                                                                                                                                                                                                                Pushbutton: pbFilter
+					                                                                                                                                                                                                                                                Message Actions 
+				                                                                                                                                                                                                                                                Pushbutton: pbDetails
+					                                                                                                                                                                                                                                                Message Actions 
+				                                                                                                                                                                                                                                                Pushbutton: pbPrint
+					                                                                                                                                                                                                                                                Message Actions 
+				                                                                                                                                                                                                                                                Line 
+				                                                                                                                                                                                                                                                Pushbutton: pbExit
+					                                                                                                                                                                                                                                                Message Actions 
+				                                                                                                                                                                                                                                                Line 
+		                                                                                                                                                                                                                                                Contents 
+			                                                                                                                                                                                                                                                Column: DK 
+				                                                                                                                                                                                                                                                List Values 
+				                                                                                                                                                                                                                                                Message Actions 
+			                                                                                                                                                                                                                                                Column: ND 
+				                                                                                                                                                                                                                                                List Values 
+				                                                                                                                                                                                                                                                Message Actions 
+			                                                                                                                                                                                                                                                Column: CC_ID 
+				                                                                                                                                                                                                                                                List Values 
+				                                                                                                                                                                                                                                                Message Actions 
+			                                                                                                                                                                                                                                                Column: RNK 
+				                                                                                                                                                                                                                                                List Values 
+				                                                                                                                                                                                                                                                Message Actions 
+			                                                                                                                                                                                                                                                Column: BRANCH  
+				                                                                                                                                                                                                                                                List Values 
+				                                                                                                                                                                                                                                                Message Actions 
+			                                                                                                                                                                                                                                                Column: DAT1 
+				                                                                                                                                                                                                                                                List Values 
+				                                                                                                                                                                                                                                                Message Actions 
+			                                                                                                                                                                                                                                                Column: DAT4 
+				                                                                                                                                                                                                                                                List Values 
+				                                                                                                                                                                                                                                                Message Actions 
+			                                                                                                                                                                                                                                                Column: ISP 
+				                                                                                                                                                                                                                                                List Values 
+				                                                                                                                                                                                                                                                Message Actions 
+			                                                                                                                                                                                                                                                Column: NLS 
+				                                                                                                                                                                                                                                                List Values 
+				                                                                                                                                                                                                                                                Message Actions 
+			                                                                                                                                                                                                                                                Column: OB22
+				                                                                                                                                                                                                                                                List Values 
+				                                                                                                                                                                                                                                                Message Actions 
+			                                                                                                                                                                                                                                                Column: SDOG 
+				                                                                                                                                                                                                                                                List Values 
+				                                                                                                                                                                                                                                                Message Actions 
+			                                                                                                                                                                                                                                                Column: OSTC 
+				                                                                                                                                                                                                                                                List Values 
+				                                                                                                                                                                                                                                                Message Actions 
+			                                                                                                                                                                                                                                                Column: ACC 
+				                                                                                                                                                                                                                                                List Values 
+				                                                                                                                                                                                                                                                Message Actions 
 			!
-		                                                                                                                                                                                                                                               Functions 
-		                                                                                                                                                                                                                                               Window Parameters 
-			                                                                                                                                                                                                                                               Number: nMode
-			                                                                                                                                                                                                                                               Number: nPar
-			                                                                                                                                                                                                                                               String: strPar01
-			                                                                                                                                                                                                                                               String: strPar02
-		                                                                                                                                                                                                                                               Window Variables 
-		                                                                                                                                                                                                                                               Message Actions 
-			                                                                                                                                                                                                                                               On SAM_Create
-				                                                                                                                                                                                                                                               Set XD1.strSqlPopulate =
+		                                                                                                                                                                                                                                                Functions 
+		                                                                                                                                                                                                                                                Window Parameters 
+			                                                                                                                                                                                                                                                Number: nMode
+			                                                                                                                                                                                                                                                Number: nPar
+			                                                                                                                                                                                                                                                String: strPar01
+			                                                                                                                                                                                                                                                String: strPar02
+		                                                                                                                                                                                                                                                Window Variables 
+		                                                                                                                                                                                                                                                Message Actions 
+			                                                                                                                                                                                                                                                On SAM_Create
+				                                                                                                                                                                                                                                                Set XD1.strSqlPopulate =
 						"SELECT ISP,ND,CC_ID,DK,RNK,DAT1,DAT4,OSTC/100,NLS,OB22,ACC,BRANCH,SDOG
 						 into :XD1.ISP,:XD1.ND,:XD1.CC_ID,:XD1.DK,:XD1.RNK,
 						      :XD1.DAT1,:XD1.DAT4,:XD1.OSTC,:XD1.NLS,:XD1.OB22,:XD1.ACC,
@@ -33015,8 +33015,8 @@ Application Description: 02-06-2010 Нарахування плати за РКО та постійні доручен
 				! Set aOkpo= GetBankOkpoS()
 				! Call ShowApdVersion('03')
 				! Call SalMapEnterToTab( TRUE )
-				                                                                                                                                                                                                                                               Call SalTblSetLockedColumns( hWndForm, 2 )
-				                                                                                                                                                                                                                                               Call SalSendClassMessage( SAM_Create, 0, 0 )
+				                                                                                                                                                                                                                                                Call SalTblSetLockedColumns( hWndForm, 2 )
+				                                                                                                                                                                                                                                                Call SalSendClassMessage( SAM_Create, 0, 0 )
 	Table Window: SEP
 		Class: cGenericTable
 		Property Template:
@@ -33935,8 +33935,8 @@ Application Description: 02-06-2010 Нарахування плати за РКО та постійні доручен
 				Local variables
 				Actions
 					! If SUM_3739 <= 0
-						                                                                                                                                                                                                                            Call SalMessageBox('Помилка в сумі для перерозподілу !','Увага !', MB_IconStop)
-						                                                                                                                                                                                                                            Return FALSE
+						                                                                                                                                                                                                                             Call SalMessageBox('Помилка в сумі для перерозподілу !','Увага !', MB_IconStop)
+						                                                                                                                                                                                                                             Return FALSE
 					Call SalWaitCursor(TRUE)
 					Set nS = SUM_3739
 					Set nK = 100
@@ -34057,7 +34057,7 @@ Application Description: 02-06-2010 Нарахування плати за РКО та постійні доручен
 				Set nVob = -7
 				Set cb_Zo = 0
 				! If sVob != STRING_Null
-					                                                                                                                                                                                                        Set nVob = Val(sVob)
+					                                                                                                                                                                                                         Set nVob = Val(sVob)
 				Set aOkpo= GetBankOkpoS()
 				Set mBRANCH = '/' || aMfo || '/000000/'
 				Set sTitl = 'Перерозподiл комiсiї ГОУ за СЕП-платежi' 
@@ -35089,12 +35089,12 @@ Application Description: 02-06-2010 Нарахування плати за РКО та постійні доручен
 					Text Color: Default
 					Background Color: White
 .end
-					                                                                                                                                                        Message Actions 
-						                                                                                                                                                        On SAM_Create
-							                                                                                                                                                        Set strTip = 
+					                                                                                                                                                         Message Actions 
+						                                                                                                                                                         On SAM_Create
+							                                                                                                                                                         Set strTip = 
 									'Прийняти суми з XML (МАSTER CARD, VISA, ...)' 
-						                                                                                                                                                        On SAM_Click
-							                                                                                                                                                        Call Ins_File(strTip,nPar, '.xml' )
+						                                                                                                                                                         On SAM_Click
+							                                                                                                                                                         Call Ins_File(strTip,nPar, '.xml' )
 				Pushbutton: pb_Run
 					Class Child Ref Key: 0
 					Class ChildKey: 0
@@ -35837,7 +35837,7 @@ Application Description: 02-06-2010 Нарахування плати за РКО та постійні доручен
 					Text Color: Default
 					Background Color: Default
 .end
-					                                                                                                                                                        Message Actions 
+					                                                                                                                                                         Message Actions 
 				Check Box: cb_DK
 					Class Child Ref Key: 0
 					Class ChildKey: 0
@@ -36065,7 +36065,7 @@ Application Description: 02-06-2010 Нарахування плати за РКО та постійні доручен
 					On SAM_Validate
 						Call F_KONTROL()
 					! On SAM_KillFocus
-						                                            Call F_KONTROL()
+						                                             Call F_KONTROL()
 			Column: NB
 				Class Child Ref Key: 0
 				Class ChildKey: 0
@@ -36133,7 +36133,7 @@ Application Description: 02-06-2010 Нарахування плати за РКО та постійні доручен
 					On SAM_Validate
 						Call F_KONTROL()
 					! On SAM_KillFocus
-						                                            Call F_KONTROL()
+						                                             Call F_KONTROL()
 			Column: NAM_B
 				Class Child Ref Key: 0
 				Class ChildKey: 0
@@ -36168,9 +36168,9 @@ Application Description: 02-06-2010 Нарахування плати за РКО та постійні доручен
 					On SAM_Validate
 						Call F_KONTROL()
 					! On SAM_AnyEdit
-						                                            Call F_KONTROL()
+						                                             Call F_KONTROL()
 					! On SAM_SetFocus
-						                                            Call F_KONTROL()
+						                                             Call F_KONTROL()
 			Column: OKPOB
 				Class Child Ref Key: 0
 				Class ChildKey: 0
@@ -36275,9 +36275,9 @@ Application Description: 02-06-2010 Нарахування плати за РКО та постійні доручен
 				List Values
 				Message Actions
 					! On SAM_Validate
-						                                                                                                                                            Call F_STR (1)
+						                                                                                                                                             Call F_STR (1)
 					! On SAM_KillFocus
-						                                                                                                                                            Call F_STR (1)
+						                                                                                                                                             Call F_STR (1)
 			Column: S
 				Class Child Ref Key: 0
 				Class ChildKey: 0
@@ -37187,12 +37187,12 @@ Application Description: 02-06-2010 Нарахування плати за РКО та постійні доручен
 					Text Color: Default
 					Background Color: Light Periwinkle
 .end
-					                                                         Message Actions 
-						                                                         On SAM_Create
-							                                                         Set strTip = 
+					                                                          Message Actions 
+						                                                          On SAM_Create
+							                                                          Set strTip = 
 									'Прийняти суми з "Внутрішньої бухгалтерії"' 
-						                                                         On SAM_Click
-							                                                         Call GeneralImport(hWndForm, 1,110, "","" )
+						                                                          On SAM_Click
+							                                                          Call GeneralImport(hWndForm, 1,110, "","" )
 							! If File(sNadraFDir || '\\MFOOUT.DBF')
 									
 									            >> If ImportDbf(sNadraFDir,

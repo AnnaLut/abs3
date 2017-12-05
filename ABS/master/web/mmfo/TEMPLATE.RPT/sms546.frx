@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReportInfo.Created="02/13/2015 10:37:09" ReportInfo.Modified="08/10/2016 18:09:44" ReportInfo.CreatorVersion="2013.2.2.0">
+<Report ScriptLanguage="CSharp" ReportInfo.Created="02/13/2015 10:37:09" ReportInfo.Modified="11/22/2017 09:51:15" ReportInfo.CreatorVersion="2014.1.2.0">
   <Dictionary>
-    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqJOsxPO45Mfc7mc0tWCiv9ZcE0UiwPcqYmH+VcG0UiFZpSwi3Ef95HKrZY6J0M5rBH8fyANV6F3Zui0hgMViTaw==">
-      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="SELECT ROWNUM, b.*&#13;&#10;  FROM (SELECT r.*, VERIFY_CELLPHONE (tel) vt&#13;&#10;          FROM (SELECT a.kf,&#13;&#10;                       a.acc,&#13;&#10;                       a.branch,&#13;&#10;                       A1.ACC acc_2620,&#13;&#10;                       a.nls nls_2203,&#13;&#10;                       a1.nls nls_2620,&#13;&#10;                       a.rnk,&#13;&#10;                       a.SEND_SMS,&#13;&#10;                       SUBSTR (&#13;&#10;                          CASE&#13;&#10;                             WHEN INSTR (c.VALUE, '+380') &gt; 0&#13;&#10;                             THEN c.VALUE&#13;&#10;                             WHEN SUBSTR (c.VALUE, 1, 1) = '0'&#13;&#10;                             THEN '+38' || c.VALUE&#13;&#10;                             WHEN SUBSTR (c.VALUE, 1, 2) = '38'&#13;&#10;                             THEN '+' || c.VALUE&#13;&#10;                             ELSE c.VALUE&#13;&#10;                          END, 1, 20) tel&#13;&#10;                  FROM accounts a,&#13;&#10;                       customerw c,&#13;&#10;                       nd_acc n,&#13;&#10;                       nd_acc n1,&#13;&#10;                       accounts a1&#13;&#10;                 WHERE     (   (a.nbs = '2202' AND a.ob22 IN ('57', '58'))&#13;&#10;                            OR (a.nbs = '2203' AND a.ob22 IN ('47', '48')))&#13;&#10;                       AND c.rnk(+) = a.rnk&#13;&#10;                       AND c.tag(+) = 'MPNO '&#13;&#10;                       AND n.acc = A.ACC&#13;&#10;                       AND n.nd = n1.nd&#13;&#10;                       AND n1.acc = a1.acc&#13;&#10;                       AND a1.nbs = '2620'&#13;&#10;                       AND A1.send_sms IS NULL&#13;&#10;                       AND A1.DAZS IS NULL) r) b&#13;&#10; WHERE vt = 0">
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqJOsxPO45Mfc7mc0tWCiv9ZcE0UiwPcqYmH+VcG0UiFZpSwi3Ef95HKrZY6J0M5rBzra/xiHw+ufmktntvcmZ3g==">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="SELECT ROWNUM, b.*&#13;&#10;  FROM (SELECT r.*, VERIFY_CELLPHONE (tel) vt&#13;&#10;          FROM (SELECT a.kf,&#13;&#10;                       a.acc,&#13;&#10;                       a.branch,&#13;&#10;                       A1.ACC acc_2620,&#13;&#10;                       a.nls nls_2203,&#13;&#10;                       a1.nls nls_2620,&#13;&#10;                       a.rnk,&#13;&#10;                       a.SEND_SMS,&#13;&#10;                       SUBSTR (&#13;&#10;                          CASE&#13;&#10;                             WHEN INSTR (c.VALUE, '+380') &gt; 0&#13;&#10;                             THEN c.VALUE&#13;&#10;                             WHEN SUBSTR (c.VALUE, 1, 1) = '0'&#13;&#10;                             THEN '+38' || c.VALUE&#13;&#10;                             WHEN SUBSTR (c.VALUE, 1, 2) = '38'&#13;&#10;                             THEN '+' || c.VALUE&#13;&#10;                             ELSE c.VALUE&#13;&#10;                          END, 1, 20) tel&#13;&#10;                  FROM accounts a,&#13;&#10;                       customerw c,&#13;&#10;                       nd_acc n,&#13;&#10;                       nd_acc n1,&#13;&#10;                       accounts a1&#13;&#10;                 WHERE     a.nbs = '2203' AND a.ob22 IN ('47', '48','73','74')&#13;&#10;                       AND c.rnk(+) = a.rnk&#13;&#10;                       AND c.tag(+) = 'MPNO '&#13;&#10;                       AND n.acc = A.ACC&#13;&#10;                       AND n.nd = n1.nd&#13;&#10;                       AND n1.acc = a1.acc&#13;&#10;                       AND a1.nbs = '2620'&#13;&#10;                       AND A1.send_sms IS NULL&#13;&#10;                       AND A1.DAZS IS NULL) r) b&#13;&#10; WHERE vt = 0">
         <Column Name="RNK" DataType="System.Char" Format="General"/>
         <Column Name="ACC" DataType="System.Decimal"/>
         <Column Name="ACC_2620" DataType="System.Decimal"/>
@@ -63,9 +63,9 @@
         </TableRow>
       </TableObject>
     </ReportTitleBand>
-    <GroupHeaderBand Name="GroupHeader1" Top="87.79" Width="718.2" Height="18.9" Border.ShadowWidth="1" Border.ShadowColor="Transparent" Condition="[Table.KF]">
+    <GroupHeaderBand Name="GroupHeader1" Top="87.85" Width="718.2" Height="18.9" Border.ShadowWidth="1" Border.ShadowColor="Transparent" Condition="[Table.KF]">
       <TextObject Name="Text1" Left="1.89" Top="1.89" Width="62.37" Height="17.01" Text="[Table.KF]" Font="Arial, 8pt"/>
-      <DataBand Name="Data1" Top="109.43" Width="718.2" Height="9.45" Border.Lines="All" DataSource="Table">
+      <DataBand Name="Data1" Top="109.54" Width="718.2" Height="9.45" Border.Lines="All" DataSource="Table">
         <TableObject Name="Table1" Width="585.9" Height="9.45" Border.Lines="All">
           <TableColumn Name="Column11" Width="130.41"/>
           <TableColumn Name="Column12" Width="64.26"/>
@@ -113,6 +113,6 @@
         </Sort>
       </DataBand>
     </GroupHeaderBand>
-    <PageFooterBand Name="PageFooter1" Top="121.62" Width="718.2" Height="37.8" Guides="0,0,0,0"/>
+    <PageFooterBand Name="PageFooter1" Top="121.79" Width="718.2" Height="37.8" Guides="0,0,0,0"/>
   </ReportPage>
 </Report>

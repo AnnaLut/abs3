@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure NBUR_P_F27 ***
 
-  CREATE OR REPLACE PROCEDURE BARS.NBUR_P_F27 (p_kod_filii        varchar2,
+CREATE OR REPLACE PROCEDURE BARS.NBUR_P_F27 (p_kod_filii        varchar2,
                                              p_report_date      date,
                                              p_form_id          number,
                                              p_scheme           varchar2 default 'C',
@@ -18,9 +18,9 @@ is
 % DESCRIPTION : Процедура формирования @12 для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.16.003  15.12.2016
+% VERSION     :  v.16.004  14/16/2017
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_          char(30)  := 'v.16.003  15.12.2016';
+  ver_          char(30)  := 'v.16.004  14/16/2017';
 /*
    Структура показника  D BBBB 00 VVV
    
@@ -123,7 +123,7 @@ BEGIN
         SELECT d.report_date,
                d.kf,
                p_file_code,
-               l_nbuc nbuc,
+               (case when l_type = 0 then l_nbuc else a.nbuc end) nbuc,
                '7' ||
                d.nbs ||
                d.d020 ||
@@ -174,8 +174,10 @@ BEGIN
                       t.acc_num_db like '1919%' and t.ob22_cr = '02' and
                       t.acc_num_cr like '3800%' and t.ob22_cr = '10'
                       )
-            
-            ) d;
+            ) d, NBUR_DM_ACCOUNTS a
+            where a.report_date = p_report_date and
+                  a.kf = p_kod_filii and
+                  a.acc_id = d.acc_id;
     EXCEPTION
        WHEN OTHERS
        THEN

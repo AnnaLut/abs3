@@ -11,7 +11,7 @@ PROMPT *** Create  procedure P_F87SBR ***
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :	Процедура формирование файла @87 для КБ
 % COPYRIGHT   :	Copyright UNITY-BARS Limited, 2009.All Rights Reserved.
-% VERSION     : 07/04/2017 (05.03.2014)
+% VERSION     : 10/08/2017 (05.03.2014)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
@@ -119,26 +119,47 @@ typ_    Number;
 nbuc1_  VARCHAR2(12);
 nbuc_   VARCHAR2(12);
 
-sql_acc_ VARCHAR2(1000) := '';
-ret_     number := 0;
-
 ---Остатки на отчетную дату грн.
 CURSOR SaldoASeekOstf IS
-   SELECT  a.acc, a.nls, a.kv, a.fdat, a.nbs, a.ost, a.dos, a.kos,
-           a.dos96, a.kos96, a.tobo, a.nms, nvl(sp.ob22, '00'),
-           NVL(sp.p080,'0000'), NVL(sp.r020_fa,'0000')
-   FROM  (SELECT s.acc, s.nls, s.kv, aa.fdat, s.nbs, 
-                 aa.dos, aa.kos, aa.ost, 
-                 aa.dos96, aa.kos96,
-                 s.tobo, s.nms
-          FROM otcn_saldo aa, otcn_acc s 
-          WHERE aa.acc=s.acc) a, specparam_int sp   
+   SELECT  a.acc, a.nls, a.kv, a.fdat, a.nbs, a.ostf-a.dos+a.kos,
+           a.tobo, a.nms
+   FROM  (SELECT s.acc, s.nls, s.kv, aa.fdat, s.nbs, aa.ostf,
+         aa.dos, aa.kos, s.tobo, s.nms
+         FROM saldoa aa, accounts s
+         WHERE aa.acc=s.acc     AND
+              (s.acc,aa.fdat) in
+               (select c.acc,max(c.fdat)
+                from saldoa c
+                where c.fdat <= dat_
+                group by c.acc)) a   
    WHERE a.kv=980
+     and a.nbs LIKE '8%'
+     and a.nbs not in ('8605','8625','8999')
+     and a.acc in (select accn from v_ob22nu_n
+                       union
+                     select accn from V_OB22NU80_OTC);
+
+---Обороты грн.
+CURSOR SaldoASeekOs IS
+   SELECT  a.acc, a.nls, a.kv, a.nbs, NVL(SUM(s.dos),0), NVL(SUM(s.kos),0), a.tobo, a.nms
+   FROM saldoa s, accounts a    
+   WHERE s.fdat(+) >= Dat1_
+     and s.fdat(+) <= dat_
+     and a.acc=s.acc(+)
+     and a.kv=980
+     and a.nbs LIKE '8%'
+     and a.nbs not in ('8605','8625','8999')
      and a.acc in (select accn from v_ob22nu_n
                    union
-                   select accn from v_ob22nu80)
-     and (a.ost <> 0 or a.dos + a.kos <> 0)
-     and a.acc = sp.acc(+);
+                   select accn from V_OB22NU80_OTC)
+   GROUP BY a.acc, a.nls, a.kv, a.nbs, a.tobo, a.nms ;
+
+CURSOR Saldo6_7 IS
+   SELECT a.acc, a.accc, a.nls, a.kv, a.nbs
+   FROM accounts a, v_ob22nu_n v
+   WHERE a.acc = v.acc
+     AND v.accn=acc_
+     AND a.kv=980 ;
 
 CURSOR BaseL IS
     SELECT kodp, nbuc, SUM (znap)
@@ -157,74 +178,185 @@ Dat2_ := TRUNC(Dat_ + 25);
 -- определение начальных параметров
 P_Proc_Set_Int(kodf_,sheme_,nbuc1_,typ_);
 -------------------------------------------------------------------
-sql_acc_ := 'select unique r020 FROM sb_p0853 ';
+---корректирующие проводки
+DELETE FROM ref_kor ;
+IF to_char(Dat_,'MM')='12' THEN
+   INSERT INTO ref_kor (REF, VOB, VDAT)
+   SELECT /*+ index(o,  IDX_OPER_VDAT_KF) */ 
+        ref, vob, vdat
+   FROM oper
+   WHERE vdat>=Dat1_-3 and vdat<=Dat2_ and
+         vob in (96,99) and not
+         ((substr(nlsa,1,1) in ('6','7') and substr(nlsb,1,4) in ('5040','5041')) OR
+          (substr(nlsa,1,4) in ('5040','5041') and substr(nlsb,1,1) in ('6','7'))) ;
+ELSE
+   INSERT INTO ref_kor (REF, VOB, VDAT)
+   SELECT /*+ index(o,  IDX_OPER_VDAT_KF) */ 
+        ref, vob, vdat
+   FROM oper o
+   WHERE vdat= Dat_ and
+         (vob in (96,99) or tt = 'PO1');
+END IF ;
 
-if to_char(Dat_,'MM') = '12' then
-   ret_ := f_pop_otcn(Dat_, 4, sql_acc_, null, 1);
-else
-   ret_ := f_pop_otcn(Dat_, 3, sql_acc_);
-end if;
+DELETE FROM kor_prov ;
+INSERT INTO KOR_PROV (REF,  DK,  ACC , S,  FDAT , VDAT, SOS,  VOB)
+SELECT o.ref, o.dk, o.acc, o.s, o.fdat, p.vdat, o.sos, p.vob
+FROM opldok o, ref_kor p     
+WHERE o.fdat>Dat1_     AND
+      o.fdat<=Dat2_    AND
+      o.ref=p.ref      AND
+      o.sos=5 ;
 
 -- Остатки грн. --
 OPEN SaldoASeekOstf;
 LOOP
-   FETCH SaldoASeekOstf INTO acc_, nls_, kv_, data_, Nbs_, Ostn8_, Dosn8_, Kosn8_,
-              Dosnk_, Kosnk_, tobo_, nms_, zz_, pp_, r020_fa_;
+   FETCH SaldoASeekOstf INTO acc_, nls_, kv_, data_, Nbs_, Ostn8_, tobo_, nms_ ;
    EXIT WHEN SaldoASeekOstf%NOTFOUND;
 
-   IF typ_>0 THEN
-      nbuc_ := NVL(F_Codobl_Tobo(acc_,typ_),nbuc1_);
-   ELSE
-      nbuc_ := nbuc1_;
-   END IF;
+   SELECT count(*) INTO f87_ FROM sb_p0853 WHERE r020=nbs_ ;
 
-   comm_ := '';
+   IF f87_ >0 and Ostn8_<>0 THEN
 
-   Ostn8_:=Ostn8_ - Dosnk_ + Kosnk_;
+      IF typ_>0 THEN
+         nbuc_ := NVL(F_Codobl_Tobo(acc_,typ_),nbuc1_);
+      ELSE
+         nbuc_ := nbuc1_;
+      END IF;
 
-   dk_:=IIF_N(Ostn8_,0,'1','2','2');
+      comm_ := '';
 
-   comm_ := substr(comm_ || tobo_ || '  ' || nms_, 1, 200);
+      BEGIN
+         SELECT NVL(p080,'0000'), NVL(r020_fa,'0000'),  NVL(ob22,'00')
+            INTO pp_, r020_fa_, zz_
+         FROM specparam_int
+         WHERE acc=acc_ ;
+      EXCEPTION WHEN NO_DATA_FOUND THEN
+         pp_:='0000' ;
+         r020_fa_ := '0000';
+         zz_ := '00';
+      END ;
 
-   IF pp_ not in ('0000','FFFF') and Ostn8_ <> 0 THEN
-      kodp_:=dk_ || pp_ || r020_fa_ || zz_; 
-      znap_:=TO_CHAR(ABS(Ostn8_));
-               
-      INSERT INTO rnbu_trace         -- Остатки в номинале валюты
-               (nls, kv, odate, kodp, znap, acc, comm, tobo, nbuc)
-      VALUES  (nls_, kv_, data_, kodp_, znap_, acc_, comm_, tobo_, nbuc_) ;
-   END IF ;
-
-   Dosn8_:=Dosn8_+Dosnk_;
-   Kosn8_:=Kosn8_+Kosnk_;
-
-   IF pp_ not in ('0000','FFFF') and Kosn8_ > 0 THEN
-      kodp_:='6' || pp_ || r020_fa_ || zz_; 
-      znap_:=TO_CHAR(Kosn8_) ;
+     BEGIN
+        SELECT d.acc, SUM(DECODE(d.dk, 0, d.s, 0)),
+                      SUM(DECODE(d.dk, 1, d.s, 0))
+        INTO acc1_, Dosnk_, Kosnk_
+        FROM  kor_prov d
+        WHERE d.acc=acc_  AND
+              d.fdat > Dat_                AND
+              d.fdat <= Dat2_              AND
+              d.vob in (6, 96)
+        GROUP BY d.acc ;
+     EXCEPTION WHEN NO_DATA_FOUND THEN
+        Dosnk_ :=0 ;
+        Kosnk_ :=0 ;
+     END ;
      
-      INSERT INTO rnbu_trace     -- Дт. обороты в номинале валюты (грн.+вал.)
-             (nls, kv, odate, kodp, znap, acc, comm, tobo, nbuc)
-      VALUES  (nls_, kv_, dat_, kodp_, znap_, acc_, comm_, tobo_, nbuc_) ;
-   END IF;
+     Ostn8_:=Ostn8_-Dosnk_+Kosnk_;
 
-    IF pp_ not in ('0000','FFFF') and Dosn8_ > 0 THEN
-       kodp_:='5' || pp_ || r020_fa_ || zz_;  
-       znap_:=TO_CHAR(Dosn8_);
-       
-       INSERT INTO rnbu_trace     -- Кр. обороты в номинале валюты (грн.+вал.)
-               (nls, kv, odate, kodp, znap, acc, comm, tobo, nbuc)
-       VALUES  (nls_, kv_, dat_, kodp_, znap_, acc_, comm_, tobo_, nbuc_) ;
-    END IF;
+     dk_:=IIF_N(Ostn8_,0,'1','2','2');
+
+     kol6_7 := 0;
+
+     comm_ := substr(comm_ || tobo_ || '  ' || nms_, 1, 200);
+
+     IF kol6_7=0 THEN
+        IF pp_ not in ('0000','FFFF') and Ostn8_ <> 0 THEN
+           kodp_:=dk_ || pp_ || r020_fa_ || zz_;  --'000000' ;  --- nbs1_='0000',zz_='00'
+           znap_:=TO_CHAR(ABS(Ostn8_));
+           INSERT INTO rnbu_trace         -- Остатки в номинале валюты
+                   (nls, kv, odate, kodp, znap, acc, comm, tobo, nbuc)
+           VALUES  (nls_, kv_, data_, kodp_, znap_, acc_, comm_, tobo_, nbuc_) ;
+        END IF ;
+     END IF ;
+   END IF;
 END LOOP;
 CLOSE SaldoASeekOstf;
+--------------------------------------------------------------------
+-- Обороты текущие грн. --
+OPEN SaldoASeekOs;
+LOOP
+   FETCH SaldoASeekOs INTO acc_, nls_, kv_, Nbs_, Dosn8_, Kosn8_, tobo_, nms_ ;
+   EXIT WHEN SaldoASeekOs%NOTFOUND;
+
+   SELECT count(*) INTO f87_ FROM sb_p0853 WHERE r020=nbs_ ;
+
+   IF f87_>0 THEN    
+
+      IF typ_>0 THEN
+         nbuc_ := NVL(F_Codobl_Tobo(acc_,typ_),nbuc1_);
+      ELSE
+         nbuc_ := nbuc1_;
+      END IF;
+
+      comm_ := '';
+
+      BEGIN
+         SELECT NVL(p080,'0000'), NVL(r020_fa,'0000'), NVL(ob22,'00')
+            INTO pp_, r020_fa_, zz_
+         FROM specparam_int
+         WHERE acc=acc_ ;
+      EXCEPTION WHEN NO_DATA_FOUND THEN
+         pp_ := '0000' ;
+         r020_fa_ := '0000';
+         zz_ := '00';
+      END ;
+
+     --- корректирующие проводки отчетного месяца
+     BEGIN
+        SELECT d.acc,
+               SUM(DECODE(d.dk, 0, d.s, 0)),
+               SUM(DECODE(d.dk, 1, d.s, 0))
+        INTO acc1_, Dosnk_, Kosnk_
+        FROM  kor_prov d
+        WHERE d.acc=acc_
+          AND d.fdat > Dat_
+          AND d.fdat <= Dat2_
+          AND d.vob in (6, 96)
+        GROUP BY d.acc ;
+     EXCEPTION WHEN NO_DATA_FOUND THEN
+        Dosnk_ :=0 ;
+        Kosnk_ :=0 ;
+     END ;
+     Dosn8_:=Dosn8_+Dosnk_;
+     Kosn8_:=Kosn8_+Kosnk_;
+
+     kol6_7 := 0;
+     comm_ := substr(comm_ || tobo_ || '  ' || nms_, 1, 200);
+
+     IF kol6_7=0 THEN
+        IF pp_ not in ('0000','FFFF') and Kosn8_ > 0 THEN
+           kodp_:='6' || pp_ || r020_fa_ || zz_;  
+           znap_:=TO_CHAR(Kosn8_) ;
+           INSERT INTO rnbu_trace     -- Дт. обороты в номинале валюты (грн.+вал.)
+                   (nls, kv, odate, kodp, znap, acc, comm, tobo, nbuc)
+           VALUES  (nls_, kv_, dat_, kodp_, znap_, acc_, comm_, tobo_, nbuc_) ;
+        END IF;
+
+        IF pp_ not in ('0000','FFFF') and Dosn8_ > 0 THEN
+           kodp_:='5' || pp_ || r020_fa_ || zz_;  
+           znap_:=TO_CHAR(Dosn8_);
+           INSERT INTO rnbu_trace     -- Кр. обороты в номинале валюты (грн.+вал.)
+                   (nls, kv, odate, kodp, znap, acc, comm, tobo, nbuc)
+           VALUES  (nls_, kv_, dat_, kodp_, znap_, acc_, comm_, tobo_, nbuc_) ;
+        END IF;
+     END IF;
+   END IF;
+END LOOP;
+CLOSE SaldoASeekOs;
 -------------------------------------------------------------------------
 ---------------------------------------------------
 DELETE FROM tmp_irep where kodf='87' and datf= dat_;
 ---------------------------------------------------
-INSERT INTO tmp_irep (kodf, datf, kodp, nbuc, znap)
-SELECT '87', Dat_, kodp, nbuc, SUM (znap)
-    FROM rnbu_trace
-    GROUP BY kodp,nbuc;
+OPEN BaseL;
+LOOP
+   FETCH BaseL INTO  kodp_, nbuc_, znap_;
+   EXIT WHEN BaseL%NOTFOUND;
+   INSERT INTO tmp_irep
+        (kodf, datf, kodp, nbuc, znap)
+   VALUES
+        ('87', Dat_, kodp_, nbuc_, znap_);
+END LOOP;
+CLOSE BaseL;
 ------------------------------------------------------------------
 END p_f87sbr;
 /

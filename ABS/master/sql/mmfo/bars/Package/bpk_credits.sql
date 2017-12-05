@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bpk_credits.sql =========*** Run ***
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.BPK_CREDITS 
+create or replace package BPK_CREDITS
 is
 
   --
@@ -46,12 +40,15 @@ is
 
 end BPK_CREDITS;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.BPK_CREDITS 
+
+show errors;
+
+create or replace package body BPK_CREDITS
 is
   --
   -- constants
   --
-  g_body_version             constant varchar2(64)  := 'version 1.08 10.08.2016';
+  g_body_version             constant varchar2(64)  := 'version 1.09 16.11.2017';
 
   --
   -- variables
@@ -247,7 +244,7 @@ is
       l_rep_dt := trunc(p_report_date,'MM');
     end if;
 
-    delete from BARS.BPK_CREDIT_DEAL_VAR
+    delete BPK_CREDIT_DEAL_VAR
      where REPORT_DT = p_report_date
        and ADJ_FLG   = p_adjustment;
 
@@ -255,11 +252,11 @@ is
 
     l_err_tag := to_char(p_report_date,'dd/mm/yyyy') || '-' || to_char(p_adjustment);
 
-    delete from BARS.BPK_CREDIT_DEAL_VAR_ERRLOG
+    delete BPK_CREDIT_DEAL_VAR_ERRLOG
      where ORA_ERR_TAG$ = l_err_tag;
 
     insert /*+ APPEND */
-      into BARS.BPK_CREDIT_DEAL_VAR
+      into BPK_CREDIT_DEAL_VAR
          ( REPORT_DT, KF, DEAL_ND, DEAL_SUM, DEAL_RNK, RATE, MATUR_DT, SS, SN, SP, SPN, CR9, CREATE_DT, ADJ_FLG )
     select /*+ PARALLEL */
            l_rep_dt,
@@ -276,45 +273,45 @@ is
            nvl(cd.CR9,0) as CR9,
            l_create_dt,
            p_adjustment
-      from ( select dc.KF,
-                    dc.DEAL_ND,
-                    dc.DEAL_RNK,
-                    w4.ACC_OVR,
-                    w4.DAT_END,
-                    MAX(case when a.nbs in ('2202','2203','2062','2063') then a.MDATE    else Null end) MDATE,
-                    MAX(case when a.nbs in ('2202','2203','2062','2063') then a.RNK      else Null end) RNK,
-                    MAX(case when a.nbs in ('2202','2203','2062','2063') then abs(a.LIM) else    0 end) LIM,
-                    SUM(case when a.nbs in ('2202','2203','2062','2063')
+      from ( select dc.KF
+                  , dc.DEAL_ND
+                  , dc.DEAL_RNK
+                  , w4.ACC_OVR
+                  , w4.DAT_END
+                  , max(case when  a.ACC = w4.ACC_OVR then a.MDATE    else Null end) MDATE
+                  , max(case when  a.ACC = w4.ACC_OVR then a.RNK      else Null end) RNK
+                  , max(case when  a.ACC = w4.ACC_OVR then abs(a.LIM) else    0 end) LIM
+                  , sum(case when ms.ACC = w4.ACC_OVR
                              then case when p_adjustment = 1 then (ms.OST - ms.CRDOS + ms.CRKOS) else ms.OST end
-                             else 0 end) SS,
-                    SUM(case when a.nbs in ('2208','2068')
+                             else 0 end) SS
+                  , sum(case when ms.ACC = w4.ACC_2208
                              then case when p_adjustment = 1 then (ms.OST - ms.CRDOS + ms.CRKOS) else ms.OST end
-                             else 0 end) SN,
-                    SUM(case when a.nbs in ('2207','2067')
+                             else 0 end) SN
+                  , sum(case when ms.ACC = w4.ACC_2207
                              then case when p_adjustment = 1 then (ms.OST - ms.CRDOS + ms.CRKOS) else ms.OST end
-                             else 0 end) SP,
-                    SUM(case when a.nbs in ('2209','2069')
+                             else 0 end) SP
+                  , sum(case when ms.ACC = w4.ACC_2209
                              then case when p_adjustment = 1 then (ms.OST - ms.CRDOS + ms.CRKOS) else ms.OST end
-                             else 0 end) SPN,
-                    SUM(case when a.nbs in ('9129')
+                             else 0 end) SPN
+                  , sum(case when ms.ACC = w4.ACC_9129
                              then case when p_adjustment = 1 then (ms.OST - ms.CRDOS + ms.CRKOS) else ms.OST end
                              else 0 end) CR9
-               from BARS.BPK_CREDIT_DEAL dc,
+               from BPK_CREDIT_DEAL dc,
                     ( select KF, ND, ACC_9129, ACC_OVR, ACC_2208, ACC_2207, ACC_2209, DAT_END
                            , 'W4' PC_TYPE
-                        from BARS.W4_ACC_UPDATE
+                        from W4_ACC_UPDATE
                        where IDUPD in ( select max(u.IDUPD)
-                                          from BARS.W4_ACC_UPDATE u
+                                          from W4_ACC_UPDATE u
                                          where u.EFFECTDATE < l_rep_dt
                                          group by u.ND )
                        union all
                       select KF, ND, ACC_9129, ACC_OVR, ACC_2208, ACC_2207, ACC_2209, DAT_END
                            , 'BPK' as PC_TYPE
-                        from BARS.BPK_ACC
+                        from BPK_ACC
                     ) w4,
                     table(sys.ODCINumberList(w4.ACC_9129, w4.ACC_OVR, w4.ACC_2208, w4.ACC_2207, w4.ACC_2209)) l,
-                    BARS.AGG_MONBALS ms,
-                    BARS.ACCOUNTS     a
+                    AGG_MONBALS ms,
+                    ACCOUNTS     a
               where w4.KF      = dc.KF
                 and w4.ND      = dc.CARD_ND
                 and w4.PC_TYPE = dc.PC_TYPE
@@ -330,7 +327,7 @@ is
            ) cd;
     /*
     LOG ERRORS
-    INTO BARS.BPK_CREDIT_DEAL_VAR_ERRLOG ( l_err_tag )
+    INTO BPK_CREDIT_DEAL_VAR_ERRLOG ( l_err_tag )
     REJECT LIMIT UNLIMITED;
     */
 
@@ -349,17 +346,10 @@ BEGIN
 
 END BPK_CREDITS;
 /
- show err;
- 
-PROMPT *** Create  grants  BPK_CREDITS ***
-grant EXECUTE                                                                on BPK_CREDITS     to BARSUPL;
-grant EXECUTE                                                                on BPK_CREDITS     to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on BPK_CREDITS     to OW;
-grant EXECUTE                                                                on BPK_CREDITS     to UPLD;
 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/bpk_credits.sql =========*** End ***
- PROMPT ===================================================================================== 
- 
+show errors;
+
+grant EXECUTE on BPK_CREDITS to BARSUPL;
+grant EXECUTE on BPK_CREDITS to BARS_ACCESS_DEFROLE;
+grant EXECUTE on BPK_CREDITS to OW;
+grant EXECUTE on BPK_CREDITS to UPLD;

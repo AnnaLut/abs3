@@ -12,7 +12,7 @@ PROMPT *** Create  procedure P_F2D_NN ***
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирования #2D для КБ
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     : 11/03/2016 (04/11/2015, 03/03/2015)
+% VERSION     : 16/11/2017 (02/06/2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
@@ -22,7 +22,7 @@ PROMPT *** Create  procedure P_F2D_NN ***
 03.11.2015 значение показателя 64 будем определять также как и в файле #E2.
 30.09.2014 для банка Надра будут включаться проводки Дт 2650 Кт 1919
            Дт 2909 Кт 1919
-           для 315784 (Хмельницького РУ) будут включаться проводки
+           для 315784 (Хмельницького РУ) будут включаться проводки 
            Дт 2600,2620,2650 Кт 2909
 25.09.2014 с 25.09.2014 новый файл отчетности аналог файла #E2
 24.06.2014 вместо доп.реквизита 57A будем обрабатывать доп.реквизит 58A
@@ -413,11 +413,11 @@ BEGIN
                 s_nom, s_eqv)
         SELECT *
         FROM (
-              SELECT   '3' ko, ca.rnk, o.REF, tt, o.accd, o.nlsd, o.kv, o.acck,
+              SELECT   '3' ko, o.rnkd rnk, o.REF, tt, o.accd, o.nlsd, o.kv, o.acck,
                        o.nlsk, o.nazn,
                        o.s * 100 s_nom,
                        gl.p_icurval (o.kv, o.s * 100, dat_) s_eqv
-                  FROM provodki o, cust_acc ca
+                  FROM provodki_otc o
                  WHERE o.fdat = dat_
                    AND o.kv not in (959,961,962,964,980)
         AND (
@@ -457,8 +457,6 @@ BEGIN
                                                  '3660',  -- добавил 06.02.09
                                                  '3661',  -- 3660,3661,3668
                                                  '3668' )
-        -- исключил 18.08.2008                             '3720',
-        --                                                 '3739'  )
                           AND SUBSTR(o.nlsk,1,4) in ('1500', '3900')
                           AND SUBSTR (LOWER (TRIM (o.nazn)), 1, 4) != 'конв')
                    OR (o.nlsd LIKE '1919%'     and
@@ -467,7 +465,7 @@ BEGIN
                    OR (o.nlsd LIKE '191992%'     and
                        (o.nlsk LIKE '1500%' or o.nlsk like '1600%') and
                        mfo_ in (300465) )
-                   OR (o.nlsd in ('37394501547') and  --,'37396506')
+                   OR (o.nlsd in ('37394501547') and  
                        o.nlsk LIKE '1500%' and
                        mfo_ in (300465) )
                    OR (o.nlsd LIKE '15_8%'     and
@@ -484,13 +482,13 @@ BEGIN
                         AND mfo_ in (300465)
                         AND ref in (select ref 
                                     from oper 
-                                    where ( ((nlsa like '70%' or nlsa like '71%') and 
-                                             (nlsb like '1500%' or nlsb like '1600%')) or
-                                            ((nlsa like '1500%' or nlsa like '1600%') and 
-                                            (nlsb like '70%' or nlsb like '71%')) )
+                                    where (((nlsa like '70%' or nlsa like '71%' or nlsa like '75%') and 
+                                           (nlsb like '1500%' or nlsb like '1600%')) or
+                                           ((nlsa like '1500%' or nlsa like '1600%') and 
+                                            (nlsb like '70%' or nlsb like '71%' or nlsb like '75%')))
                                    )
                         AND gl.p_icurval(o.kv, o.s*100, dat_) > sum_kom ))
-                   AND o.accd = ca.acc);
+                   );
 
         -- удаляем проводки пополнения коррсчета (в OPER Дт 1500 Кт 1500)
         delete from otcn_prov_temp
@@ -528,7 +526,7 @@ BEGIN
         where ref in (select a.ref
                       from oper a
                       where a.ref in (select b.ref from otcn_prov_temp b)
-                        and a.nlsa like '1500%' and a.nlsb like '7100%' and a.dk=0)
+                        and a.nlsa like '1500%' and (a.nlsb like '7100%' or a.nlsb like '7500%') and a.dk=0)
                         and round(s_eqv / kurs_, 0) < 100000 ;
    else
      -- отбор проводок, удовлетворяющих условию
@@ -539,24 +537,24 @@ BEGIN
         SELECT *
         FROM (
             SELECT /*+NO_MERGE(v) PUSH_PRED(v) */
-                  '3' ko, ca.rnk, o.REF, tt, o.accd, o.nlsd, o.kv, o.acck,
+                  '3' ko, o.rnkd rnk, o.REF, tt, o.accd, o.nlsd, o.kv, o.acck,
                      o.nlsk, o.nazn,
                      o.s * 100 s_nom,
                      gl.p_icurval (o.kv, o.s * 100, dat_) s_eqv
-            FROM provodki o, cust_acc ca,
-               ( select substr(d_rec, 6+instr(d_rec, '#CREF:'),
-                                           instr(substr(d_rec, 6+instr(d_rec, '#CREF:')), '#')-1) ref
-                             from arc_rrp
-                             where dat_a >= Dat_
-                               and dk = 3
-                               and nlsb like '2909%'
-                               and nazn like '#E2;%'
-                               and trim(d_rec) is not null
-                               and d_rec like '%D' || to_char(Dat_, 'yymmdd')|| '%') v 
+            FROM provodki_otc o, 
+               ( select o.ref
+                  from arc_rrp a, oper o
+                  where trunc(a.dat_a) >= Dat_
+                    and a.dk = 3
+                    and a.nlsb like '2909%'
+                    and a.nazn like '#E2;%'
+                    and trim(a.d_rec) is not null
+                    and a.d_rec like '%D' || to_char(Dat_, 'yymmdd') || '%'
+                    and substr(a.d_rec, 6+instr(a.d_rec, '#CREF:'),
+                        instr(substr(a.d_rec, 6+instr(a.d_rec, '#CREF:')), '#')-1) = o.ref_a) v 
             WHERE o.kv != 980
               and o.fdat between Dat_ - 10 and dat_
-              and o.ref = v.ref
-              and o.accd = ca.acc);
+              and o.ref = v.ref);
    end if;
 
    OPEN c_main;
@@ -802,11 +800,10 @@ BEGIN
                                  select c.rnk, trim(c.okpo), c.nmk, TO_CHAR (c.country), c.adr,
                                         NVL (c.ved, '00000'), c.codcagent, p.tt, p.NLSD, p.accd
                                     into rnk_, okpo_, nmk_, k040_, adr_, k110_, codc_, ttd_, nlsdd_, accdd_
-                                 from provodki p, cust_acc ca, customer c
+                                 from provodki_otc p, customer c
                                  where p.ref=refd_
                                    and p.acck=acc_
-                                   and p.accd=ca.acc  --изменил на условие строкой выше 14.03.2008
-                                   and ca.rnk=c.rnk;
+                                   and p.rnkd=c.rnk;
 
                                  -- для банков по коду ОКПО из RCUKRU(IKOD)
                                  -- определяем код банка поле GLB

@@ -2,10 +2,11 @@ Application Description: ДОКУМЕНТАРНІ ОПЕРАЦІЇ ( Гарантії / Акредитиви / Авалі )
 	Outline Version - 4.0.26
 	Design-time Settings
 .data VIEWINFO
-0000: 6F00000001000000 FFFF01000D004347 5458566965775374 6174650400010000
+0000: 6F00000001000000 FFFF01000D004347 5458566965775374 6174650400800000
 0020: 0000000000060100 002C000000020000 0003000000000000 00BB010000F8FFFF
-0040: FFE2FFFFFFFFFFFF FF000000007C0200 004D010000010000 0001000000010000
-0060: 000F4170706C6963 6174696F6E497465 6D00000000
+0040: FFE1FFFFFFFFFFFF FF000000007C0200 004D010000010000 0000000000010000
+0060: 000F4170706C6963 6174696F6E497465 6D02000000075769 6E646F77730C6672
+0080: 6D5F4741525F4C49 4E45
 .enddata
 .data DT_MAKERUNDLG
 0000: 0200000000001D51 3A5C424152533938 5C4C494252415259 5C42415253303135
@@ -531,8 +532,8 @@ Application Description: ДОКУМЕНТАРНІ ОПЕРАЦІЇ ( Гарантії / Акредитиви / Авалі )
 					Background Color: Class Default
 					Message Actions
 						! On SAM_Click
-							                                                                                                                                                                                                                              If SetQueryDFilter(AccF)
-								                                                                                                                                                                                                                              Call SalPostMsg(hWndForm,  UM_Populate, 0, 0)
+							                                                                                                                                                                                                                               If SetQueryDFilter(AccF)
+								                                                                                                                                                                                                                               Call SalPostMsg(hWndForm,  UM_Populate, 0, 0)
 				Pushbutton: pbPrint
 					Class Child Ref Key: 40
 					Class ChildKey: 0
@@ -1117,9 +1118,9 @@ Application Description: ДОКУМЕНТАРНІ ОПЕРАЦІЇ ( Гарантії / Акредитиви / Авалі )
 							If not SalIsNull(ND)
 								Call DOP_MOS (ND, CC_ID, NMK, 'All')
 								! If nTip_Fun =90
-									                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             Call DOP_MOS (ND, CC_ID, NMK, 'ReadOnly')
+									                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              Call DOP_MOS (ND, CC_ID, NMK, 'ReadOnly')
 								! Else
-									                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             Call DOP_MOS (ND, CC_ID, NMK, 'All')
+									                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              Call DOP_MOS (ND, CC_ID, NMK, 'All')
 				!
 				Pushbutton: pbExit
 					Class Child Ref Key: 42
@@ -2616,7 +2617,7 @@ Application Description: ДОКУМЕНТАРНІ ОПЕРАЦІЇ ( Гарантії / Акредитиви / Авалі )
 					On SAM_Click
 						Call F_Choice_Type()
 					! On SAM_TooltipSetText
-						                                                                                                             Return XSalTooltipSetText( lParam, 'БС='||IifS(nTypeClient=1,'9000','9020') )
+						                                                                                                              Return XSalTooltipSetText( lParam, 'БС='||IifS(nTypeClient=1,'9000','9020') )
 			Radio Button: rbAKR
 				Class Child Ref Key: 0
 				Class ChildKey: 0
@@ -2641,7 +2642,7 @@ Application Description: ДОКУМЕНТАРНІ ОПЕРАЦІЇ ( Гарантії / Акредитиви / Авалі )
 					On SAM_Click
 						Call F_Choice_Type()
 					! On SAM_TooltipSetText
-						                                                                                                                                                                      Return XSalTooltipSetText( lParam, 'БС=9001' )
+						                                                                                                                                                                       Return XSalTooltipSetText( lParam, 'БС=9001' )
 			Radio Button: rbAKC
 				Class Child Ref Key: 0
 				Class ChildKey: 0
@@ -2664,9 +2665,9 @@ Application Description: ДОКУМЕНТАРНІ ОПЕРАЦІЇ ( Гарантії / Акредитиви / Авалі )
 				Background Color: Default
 				Message Actions
 					! On SAM_Click
-						                                                                                                                                                                      Call F_RB()
+						                                                                                                                                                                       Call F_RB()
 					! On SAM_TooltipSetText
-						                                                                                                                                                                      Return XSalTooltipSetText( lParam, 'БС=9002' )
+						                                                                                                                                                                       Return XSalTooltipSetText( lParam, 'БС=9002' )
 			Radio Button: rbAVL
 				Class Child Ref Key: 0
 				Class ChildKey: 0
@@ -2691,7 +2692,7 @@ Application Description: ДОКУМЕНТАРНІ ОПЕРАЦІЇ ( Гарантії / Акредитиви / Авалі )
 					On SAM_Click
 						Call F_Choice_Type()
 					! On SAM_TooltipSetText
-						                                                                                                                                                                      Return XSalTooltipSetText( lParam, 'БС=9023' )
+						                                                                                                                                                                       Return XSalTooltipSetText( lParam, 'БС=9023' )
 			!
 			Group Box: Параметри лінії
 				Resource Id: 54245
@@ -4118,7 +4119,7 @@ Application Description: ДОКУМЕНТАРНІ ОПЕРАЦІЇ ( Гарантії / Акредитиви / Авалі )
 					! АВАЛЬ
 					Else If rbAVL
 						Set nVIDD=39
-						Set sNBS = '9023'
+						Set sNBS = '9003'
 						Call SalSetWindowLabelText ( bgFindCust, "Пошук клієнта ПРИНЦИПІАЛА" )
 					! Call SqlPLSQLCommand( hSql(), "PUL.Set_Mas_Ini( 'NBS_AIM', sNBS, 'Бал.рах.' )" )
 					! Set Frm_GAR.pb_DEB.strTip = CurrentLangTable.GetAtomTitle('frm_Open.cBTipAddOption')
@@ -7213,25 +7214,25 @@ Application Description: ДОКУМЕНТАРНІ ОПЕРАЦІЇ ( Гарантії / Акредитиви / Авалі )
 							Set frm_GAR.lbClient = CurrentLangTable.GetAtomTitle( 'frm_GAR.Client' ) || ' / ' || CurrentLangTable.GetAtomTitle( 'frm_GAR.Issuer' )
 							Break
 			! Function: F_Prov
-				                                                                  Description: 
-				                                                                  Returns 
-				                                                                  Parameters 
-					                                                                  Number: nDk
-					                                                                  String: sTxt
-				                                                                  Static Variables 
-				                                                                  Local variables 
-					                                                                  String: sTxt1
-				                                                                  Actions 
-					                                                                  Set sTxt1 =  sTxt || ' на сумму ' || SalNumberToStrX( S, 2 )
-					                                                                  If ( S > 0 ) And
+				                                                                   Description: 
+				                                                                   Returns 
+				                                                                   Parameters 
+					                                                                   Number: nDk
+					                                                                   String: sTxt
+				                                                                   Static Variables 
+				                                                                   Local variables 
+					                                                                   String: sTxt1
+				                                                                   Actions 
+					                                                                   Set sTxt1 =  sTxt || ' на сумму ' || SalNumberToStrX( S, 2 )
+					                                                                   If ( S > 0 ) And
 							SalMessageBox( "Вы действительно хотите " || sTxt1 || "?",
 							                                    CurrentLangTable.GetAtomTitle( 'cTAt' ),
 							                                    MB_IconQuestion | MB_YesNo) = IDYES
-						                                                                  If ( ND > 0 ) And SqlPLSQLCommand( hSql(),"GAR.PAY( ND, VIDD, nDk, (S*100), CC_ID, DAT1 )" )
+						                                                                   If ( ND > 0 ) And SqlPLSQLCommand( hSql(),"GAR.PAY( ND, VIDD, nDk, (S*100), CC_ID, DAT1 )" )
 								And SqlCommitEx( hSql(), sTxt1 )
-							                                                                  Call SalMessageBox( sTxt1, 'Виконано по плановому залишку!', MB_Ok )
-							                                                                  Return TRUE
-					                                                                  Return FALSE
+							                                                                   Call SalMessageBox( sTxt1, 'Виконано по плановому залишку!', MB_Ok )
+							                                                                   Return TRUE
+					                                                                   Return FALSE
 			Function: F_Lim
 				Description: Вибір договору лінії
 				Returns
@@ -7263,7 +7264,7 @@ Application Description: ДОКУМЕНТАРНІ ОПЕРАЦІЇ ( Гарантії / Акредитиви / Авалі )
 							If ( ( SalIsNull( DAT4 ) ) OR ( dDat4 < DAT4 ) )
 								Set DAT4 = dDat4
 							! If ( KV = nKv And LIMIT = NUMBER_Null )
-								                                                                                                                                Set LIMIT = nLim
+								                                                                                                                                 Set LIMIT = nLim
 							If ( KV = n980 )
 								Set dfKV_2602 = KV
 								Call SalDisableWindow( dfKV_2602 )
@@ -7543,7 +7544,7 @@ Application Description: ДОКУМЕНТАРНІ ОПЕРАЦІЇ ( Гарантії / Акредитиви / Авалі )
 								Call SalEnableWindow( pb_Payments )
 							! Повернення покриття / оплата за рахунок покриття
 							! If ( f_CHECK_USER_RIGHT() )
-								                                                                                       Call SalEnableWindow( pbACTIVATE )
+								                                                                                        Call SalEnableWindow( pbACTIVATE )
 							If ( dfSUM_2602 > 0 )
 								Call SalEnableWindow( pb_PAYOUT )
 								Call SalEnableWindow( pb_RETURN )
@@ -7682,7 +7683,7 @@ Application Description: ДОКУМЕНТАРНІ ОПЕРАЦІЇ ( Гарантії / Акредитиви / Авалі )
 						Set sNBS = '9002'
 					! АВАЛЬ
 					Else If ( VIDD=39 )
-						Set sNBS = '9023'
+						Set sNBS = '9003'
 					!
 					If SqlPLSQLCommand( hSql(), "PUL.Set_Mas_Ini( 'NBS_AIM', sNBS, 'Бал.рах.' )" )
 						Return TRUE
@@ -7781,30 +7782,30 @@ Application Description: ДОКУМЕНТАРНІ ОПЕРАЦІЇ ( Гарантії / Акредитиви / Авалі )
 							Return TRUE
 					!
 					! If ( sName = 'DAT_DEAL' )
-						                                                                    If ( (DAT1 > dfDAT2) OR ( dfDAT2 >= DAT4 ) )
+						                                                                     If ( (DAT1 > dfDAT2) OR ( dfDAT2 >= DAT4 ) )
 							! Set dfDAT2 = DAT1
-							                                                                    Call SalMessageBox( "Вказано недопустиму дату початку!",
+							                                                                     Call SalMessageBox( "Вказано недопустиму дату початку!",
 									                                             CurrentLangTable.GetAtomTitle('cTErr'),
 									                                             MB_Ok | MB_IconStop )
-							                                                                    Return FALSE
-						                                                                    Else 
-							                                                                    Return TRUE
+							                                                                     Return FALSE
+						                                                                     Else 
+							                                                                     Return TRUE
 					! If ( sName = 'DAT_BEGIN' )
-						                                                             If ( dfDAT2 < DAT1 )
-							                                                             Call SalMessageBox( "Дата початку повинна бути >= даті заключення !",
+						                                                              If ( dfDAT2 < DAT1 )
+							                                                              Call SalMessageBox( "Дата початку повинна бути >= даті заключення !",
 									                                             CurrentLangTable.GetAtomTitle('cTErr'),
 									                                             MB_Ok | MB_IconStop )
-							                                                             Return FALSE
-						                                                             Else 
-							                                                             Return TRUE
+							                                                              Return FALSE
+						                                                              Else 
+							                                                              Return TRUE
 					! If ( sName = 'DAT_END' )
-						                                                    If ( ( DAT4 > DAT1 ) AND ( DAT4 > dfDAT2) )
-							                                                    Return TRUE
-						                                                    Else 
-							                                                    Call SalMessageBox( "Вказано недопустиму дату завершення!",
+						                                                     If ( ( DAT4 > DAT1 ) AND ( DAT4 > dfDAT2) )
+							                                                     Return TRUE
+						                                                     Else 
+							                                                     Call SalMessageBox( "Вказано недопустиму дату завершення!",
 									                                             CurrentLangTable.GetAtomTitle('cTErr'),
 									                                             MB_Ok | MB_IconStop )
-							                                                    Return FALSE
+							                                                     Return FALSE
 			Function: F_GET_PROD_PARAMS
 				Description: Пошук параметрів продукту
 				Returns
@@ -9148,7 +9149,7 @@ Application Description: ДОКУМЕНТАРНІ ОПЕРАЦІЇ ( Гарантії / Акредитиви / Авалі )
 							 into :tbN.KV, :tbN.NLS, :tbN.TIP, :tbN.NMS, :tbN.OSTC, :tbN.ACC
 							 from accounts a
 							 where a.rnk = :nRNK and a.dazs is null
-							   and a.nbs in ( '2602', '2622', '3578', '3579', '3648' )
+							   and a.nbs in ( '2602', '2622', '3578', '3648' )
 							   and a.acc not in (select acc from nd_acc )", TBL_FillAll )
 					! Call Debug('13')
 			Function: F_FILL_BENEFICIARY
@@ -10014,9 +10015,9 @@ Application Description: ДОКУМЕНТАРНІ ОПЕРАЦІЇ ( Гарантії / Акредитиви / Авалі )
 										Call SqlCommitEx(hSql(), 'Текст договора № ' || SalNumberToStrX(nND,0) || ', дополнительное соглашение:' || SalNumberToStrX(lbAdd.GetCurrentKey(),0) || ' сохранен в БД!' )
 									! If SqlPrepare( hSql(), 'INSERT INTO CC_DOCS (id,nd,text,adds)
 											 VALUES (:tblTemplates.colId,:nND,:sDoc,0)' )
-										                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         If SqlSetLongBindDatatype( 3, 23 )
-											                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         If SqlExecute( hSql() )
-												                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         Call SqlCommitEx( hSql(), 'Текст договора № ' || SalNumberToStrX(nND,0) || ', дополнительное соглашение:'||SalNumberToStrX( lbAdd.GetCurrentKey(),0)|| ' сохранен в БД!' )
+										                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          If SqlSetLongBindDatatype( 3, 23 )
+											                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          If SqlExecute( hSql() )
+												                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          Call SqlCommitEx( hSql(), 'Текст договора № ' || SalNumberToStrX(nND,0) || ', дополнительное соглашение:'||SalNumberToStrX( lbAdd.GetCurrentKey(),0)|| ' сохранен в БД!' )
 												! Return 1
 							Call cCnc.Disconnect()
 							Call cCnc2.Disconnect()

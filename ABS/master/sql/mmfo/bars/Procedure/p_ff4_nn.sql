@@ -3,11 +3,15 @@ CREATE OR REPLACE PROCEDURE BARS.P_FF4_NN (Dat_ DATE ,
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :	Процедура формирования #F4
 % COPYRIGHT   :	Copyright UNITY-BARS Limited, 2009.  All Rights Reserved.
-% VERSION     : 20/06/2017 (04/04/2017, 06/03/2017)
+% VERSION     : 14/11/2017 (04/10/2017, 06/07/2017, 20/06/2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+14/11/2017 - изменил вызов процедуры P_POPULATE_KOR для разных отчетных 
+             месяцев (было на ММФО)
+06/07/2017 - для некоторых значений K072 устанавливаем K140='9'
+             для показателя кредитовых оборотов  k140='9'                
 12/06/2017 - с 30/06/2017 добавляется часть кода показателя 
              "Код розміру суб'єкта господарювання" (доп.параметр K140)
 04/04/2017  добавлены исправления выполненные 26/11/2015
@@ -73,13 +77,14 @@ sql_     VARCHAR2 (200);
 dat_spr_ date := last_day(dat_)+1;
 dat_Izm1 date := to_date('30062017','ddmmyyyy');
 k140_    varchar2(1);
+branch_   varchar2(100);
 
 CURSOR SaldoAOd IS
   select b.acc, b.nls, b.kv, b.codc, b.odate, b.s180, NVL(trim(k.k112),'0') k112, 
          b.d020, b.ints, 
          (case when b.mb = '0' and b.r013 <> '0' then b.r013 else b.mb end) r013,
          decode(b.k072, '0', NVL(trim(e.k072),'0'), b.k072) k072, 
-         b.mdate, b.dos, b.kos, b.ost, b.nbs, b.rnk, b.s180R  
+         b.mdate, b.dos, b.kos, b.ost, b.nbs, b.rnk, b.s180R, b.branch
   from (
     SELECT c.acc, a.nls, a.kv, mod(d.codcagent,2) codc, a.odate, NVL(a.s180,'0') s180,
            NVL(trim(a.k112),'0') k112, lpad(NVL(trim(a.d020),'1'),2,'0') d020, 
@@ -88,9 +93,10 @@ CURSOR SaldoAOd IS
            NVL(trim(p.k072),'0') k072, c.mdate,
            a.dos, a.kos, a.ost, c.nbs, 
            d.rnk, nvl(trim(d.ise), '00000') k070, nvl(trim(d.ved), '00000') k110,
-           nvl(trim(P.R013), '0') r013, fs180(c.acc, substr(c.nls,1,1), a.odate) s180R
+           nvl(trim(P.R013), '0') r013, fs180(c.acc, substr(c.nls,1,1), a.odate) s180R,
+           c.branch
     FROM rnbu_history a, accounts c, specparam p, customer d
-    WHERE a.odate between DAT1_ + 1 and Dat_
+    WHERE a.kf = to_char(mfo_) and a.odate between DAT1_ + 1 and Dat_
      AND (a.dos+a.kos != 0 OR a.ost != 0)
      AND nvl(a.ints,0) >= 0
      and a.acc = c.acc
@@ -105,9 +111,11 @@ CURSOR SaldoAOd IS
            NVL(trim(p.k072),'0') k072, c.mdate,
            a.dos, a.kos, a.ost, '2'||substr(c.nbs,2) nbs, 
            d.rnk, nvl(trim(d.ise), '0000') k070, nvl(trim(d.ved), '00000') k110,
-           nvl(trim(P.R013), '0') r013, fs180(c.acc, substr(c.nls,1,1), a.odate) s180R
+           nvl(trim(P.R013), '0') r013, fs180(c.acc, substr(c.nls,1,1), a.odate) s180R,
+           c.branch
     FROM rnbu_history a, accounts c, specparam p, customer d
-    WHERE a.nls like '86%'
+    WHERE a.kf = to_char(mfo_) 
+     and a.nls like '86%'
 	 AND a.acc = c.acc
 	 AND (a.dos+a.kos != 0  OR   a.ost != 0)
 	 AND nvl(a.ints,0)>=0
@@ -123,17 +131,19 @@ CURSOR SaldoAOd IS
 
 CURSOR SaldoKor IS
   select b.acc, b.nls, b.kv, b.fdat, b.nbs, b.s180, b.r013,
-         decode(b.k072, '0', NVL(trim(e.k072),'0'), b.k072) k072, 
-         b.codc, b.rnk, b.d020,b.mdate, b.sdos, b.skos, NVL(trim(k.k112),'0') k112
+         decode(b.k072, '0', NVL(trim(e.k072),'0'), b.k072) k072,
+         b.codc, b.rnk, b.d020,b.mdate, b.sdos, b.skos, NVL(trim(k.k112),'0') k112,
+         b.branch
   from (
     SELECT s.acc, s.nls, s.kv, a.fdat, s.nbs,
            DECODE(trim(p.s180), NULL, FS180(a.acc), p.s180) s180,
 	       NVL(trim(p.r013),'0') r013, NVL(trim(p.k072),'0') k072,
-           MOD(c.codcagent, 2) codc, c.rnk, 
+           MOD(c.codcagent, 2) codc, c.rnk,
            nvl(trim(c.ise), '00000') k070, nvl(trim(c.ved), '00000') k110,
            NVL(to_char(to_number(p.d020)),'01') d020, s.mdate,
            SUM(DECODE(a.dk, 0, GL.P_ICURVAL(s.kv, a.s, a.fdat), 0)) sdos,
-           SUM(DECODE(a.dk, 1, GL.P_ICURVAL(s.kv, a.s, a.fdat), 0)) skos
+           SUM(DECODE(a.dk, 1, GL.P_ICURVAL(s.kv, a.s, a.fdat), 0)) skos,
+           s.branch
     FROM kor_prov a, accounts s, customer c, specparam p, kod_r020 k
     WHERE s.nbs LIKE k.r020 || '%'
       AND k.a010 = kodf_
@@ -148,8 +158,8 @@ CURSOR SaldoKor IS
              NVL(trim(p.r013),'0'), NVL(trim(p.k072),'0'),
              MOD(c.codcagent, 2), c.rnk, nvl(trim(c.ise), '00000'),
              nvl(trim(c.ved), '00000'), NVL(to_char(to_number(p.d020)),'01'),
-             s.mdate) b
-   left outer join 
+             s.mdate, s.branch) b
+   left outer join
    (select * from KL_K110 where d_open <= dat_ and (d_close is null or d_close > dat_)) k
    on (b.k110 = k.k110)
    left outer join 
@@ -206,7 +216,7 @@ mfo_:=F_OURMFO();
 OPEN SaldoAOd;
 LOOP
     FETCH SaldoAOd INTO acc_, nls_, Kv_, Cntr_, data_, S180_, K112_, d020_,
-                        sPCnt_, r013_, k072_, mdate_, sDos_, sKos_, se_, nbs_, rnk_, S180R_ ;
+                        sPCnt_, r013_, k072_, mdate_, sDos_, sKos_, se_, nbs_, rnk_, S180R_, branch_ ;
     EXIT WHEN SaldoAOd%NOTFOUND;
 
     if r013_ <> '0' then
@@ -226,23 +236,23 @@ LOOP
        END;
     end if;
     
-    if (nls_ like '2202%' and s180_ > 'B' or nls_ like '2203%' and s180_ <= 'B') then
-        if nls_ like '2202%' and s180R_ <= 'B' or 
-           nls_ like '2203%' and s180R_  > 'B'
-        then   
-           s180_ := S180R_; 
-        else
-           s180_ := (case when nls_ like '2202%' then 'B' else 'C' end);
-        end if;
-    end if;
-    
+--    if (nls_ like '2202%' and s180_ > 'B' or nls_ like '2203%' and s180_ <= 'B') and mfo_<>351823 then
+--        if nls_ like '2202%' and s180R_ <= 'B' or
+--           nls_ like '2203%' and s180R_  > 'B'
+--        then
+--           s180_ := S180R_;
+--        else
+--           s180_ := (case when nls_ like '2202%' then 'B' else 'C' end);
+--        end if;
+--    end if;
+
     if cntr_ = 0 then 
        k072_ := '0';
     end if;
 
     k140_ := '9';
 
-    if nls_ like '20%'
+    if nls_ like '20%' or nls_ like '260%'
     then
        BEGIN
           select nvl(substr(trim(cw.value), 1, 1), '9')
@@ -254,9 +264,18 @@ LOOP
           k140_ := '9';
        END;
     end if;
+
+    if k072_ in ('0','5','6','7','H','I','J','K','N','R','Z','Y')
+    then
+       k140_ := '9';
+    end if;
     
     if typ_ > 0 then
        nbuc_ := nvl(f_codobl_tobo(acc_,typ_),nbuc1_);
+       
+       if data_ < to_date('26092017','ddmmyyyy') and branch_ = '/322669/000124/000121/' then
+          nbuc_ := '26';
+       end if;
     else
        nbuc_ := nbuc1_;
     end if;
@@ -447,7 +466,8 @@ LOOP
            else
              kodp_ := (case when se_ < 0 then '5' else '6' end) ||
                       nbs_ || r013_ || K112_ || K072_ || s180_ ||
-                      to_char(2-Cntr_) || d020_ || lpad(Kv_, 3, '0') || k140_;
+                      to_char(2-Cntr_) || d020_ || lpad(Kv_, 3, '0') || 
+                      (case when se_ < 0 then k140_ else '9' end);
            end if;
 
            -- Кт. обороты
@@ -464,7 +484,7 @@ CLOSE SaldoAOd;
 OPEN SaldoKor;
 LOOP
     FETCH SaldoKor INTO acc_, nls_, Kv_, data_, nbs_, S180_, r013_,
-                        k072_, Cntr_, rnk_, d020_, mdate_, sDos_, sKos_, k112_;
+                        k072_, Cntr_, rnk_, d020_, mdate_, sDos_, sKos_, k112_, branch_;
 
     EXIT WHEN SaldoKor%NOTFOUND;
 

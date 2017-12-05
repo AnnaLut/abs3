@@ -6,11 +6,12 @@ var dpu_gen = null;
 var type = null, acr_dat_term, needVisa;
 var tt1;
 var tt2;
-var tt3;
-var tt4;
-var ttProc;
+var ttDep;
+var ttInt;
 var acc;
 var kv, sum, mfo_d, nls_d, nam_d, nb_d, okpo, mfo_p, nls_p, nam_p, okpo_p, gen_nls_dep, gen_nls_int;
+var swtDtlDep = "";
+var swtDtlInt = "";
 
 window.onload = InitDptDealState;
 
@@ -22,6 +23,7 @@ function InitDptDealState() {
     type = getParamFromUrl("type", location.href);
 
     bankdate = window.dialogArguments.bankdate;
+
     if (!isInit) {
         IniDateTimeControl("tbDat");
         window["tbDat"].SetValue(window.dialogArguments.last_bankdate);
@@ -36,15 +38,18 @@ function InitDptDealState() {
     }
 }
 function onGetDepositDealState(result) {
-    var d = document.all;
     if (!getError(result)) return;
 
     var data = result.value;
+    var d = document.all;
+
     if (dpu_id == dpu_gen) {
         d.lbTitleDeal.innerText = "Депозитний договір № " + data[0].text;
     }
-    else
+    else {
         d.lbTitleDeal.innerText = "Дод. угода № " + data[0].text + " до договору " + data[36].text;
+    }
+
     d.tbNmk.value = data[2].text;
     d.tbVidD.value = data[3].text;
     d.tbKv.value = data[4].text;
@@ -64,28 +69,35 @@ function onGetDepositDealState(result) {
     nam_d = data[24].text;
     nb_d = data[25].text;
     sum = data[26].text;
-    //Not closed
+    // isn't closed
     if (data[14].text != "1")
     {
-        d.pb0.disabled = (data[27].text != "1"); // Розміщення
-        d.pb1.disabled = (data[28].text != "1");
-        d.pb4.disabled = (data[29].text != "1");
-        d.pb5.disabled = (data[30].text != "1");
-        d.pb2.disabled = (data[31].text != "1");
-        d.pb3.disabled = false;
+        d.pb0.disabled = (data[27].text == "1" ? false : true); // Розміщення
+        d.pb3.disabled = (data[27].text == "1" ? true : false); // Нарахування %% активне коли Розміщення не активне
+        d.pb1.disabled = (data[28].text == "1" ? false : true); // Поповнення
+        d.pb4.disabled = (data[29].text == "1" ? false : true); // Виплата. нарах. %%
+        d.pb5.disabled = (data[30].text == "1" ? false : true); // Штрафування
+        d.pb2.disabled = (data[31].text == "1" ? false : true); // Погашення
     }
     tt1 = data[32].text;
     tt2 = data[33].text;
-    tt3 = data[34].text;
-    tt4 = data[35].text;
+    ttDep = data[34].text;
+    ttInt = data[35].text;
+
     needVisa = data[37].text;
     mfo_p = data[38].text;
     nls_p = data[39].text;
     nam_p = data[40].text;
-    okpo_p = data[44].text;
-    ttProc = data[41].text;
+    okpo_p = data[41].text;
+
     gen_nls_dep = data[42].text;
     gen_nls_int = data[43].text;
+
+    if ( kv != "980" )
+    {
+        swtDtlDep = data[44].text;
+        swtDtlInt = data[45].text;
+    }
     
     webService.DPU.callService(onfillTables, "fillTables", acc, accN);
 }
@@ -114,7 +126,7 @@ function AddRow(arr, table) {
     }
 }
 function fnShowSal(acc, dat) {
-    window.dialogArguments.open("/barsroot/customerlist/accextract.aspx?type=4&acc=" + acc + "&date=" + dat, "", "height=" + (window.screen.height - 200) + ",width=" + (window.screen.width - 10) + ",status=no,toolbar=no,menubar=no,location=no,left=0,top=0");
+    window.dialogArguments.open("/barsroot/customerlist/accextract.aspx?type=4&acc=" + acc + "&date=" + dat, "", "height=" + (window.screen.height - 200) + ",width=" + (window.screen.width - 10) + ",resizable=yes,status=no,toolbar=no,menubar=no,location=no,left=0,top=0");
 }
 //**********************************************************************//
 function fnDetail() {
@@ -163,17 +175,24 @@ function onMakeInt(result) {
     }
 }
 //**********************************************************************//
+// *** Interest payout
 function fnViplat() {
     var s = GetValue("tbOstN_Pl");
-    var url = "/barsroot/docinput/docinput.aspx?tt=" + ttProc + "&Nls_A=" + gen_nls_int + "&Kv_A=" + kv + "&nd=" + dpu_id + "&Mfo_B=" + mfo_p + "&SumC=" + s + "&Nls_B=" + nls_p + "&Nam_B=" + nam_p + "&Id_B=" + okpo + "&reqv_ND=" + dpu_id;
-    window.showModalDialog(encodeURI(url), null, "dialogWidth:680px; dialogHeight:600px;scroll:no; center:yes; status:no");
+    var url = "/barsroot/docinput/docinput.aspx?tt=" + ttInt + "&nd=" + dpu_id + "&Nls_A=" + gen_nls_int + "&Kv_A=" + kv +
+        "&SumC=" + s +
+        "&Mfo_B=" + mfo_p + "&Nls_B=" + nls_p + "&Nam_B=" + nam_p + "&Id_B=" + okpo + "&reqv_ND=" + dpu_id + swtDtlInt;
+    // prompt("msg", url);
+    window.showModalDialog(encodeURI(url), null, "dialogWidth:680px; dialogHeight:600px;scroll:yes; center:yes; status:no");
     fnRefresh();
 }
 //**********************************************************************//
+// *** Deposit payout
 function fnPogash() {
     var s = GetValue("tbOst_Pl");
-    var url = "/barsroot/docinput/docinput.aspx?tt=" + tt3 + "&Nls_A=" + gen_nls_dep + "&Kv_A=" + kv + "&nd=" + dpu_id + "&Mfo_B=" + mfo_d + "&SumC=" + s + "&Nls_B=" + nls_d + "&Nam_B=" + nam_d + "&Id_B=" + okpo + "&reqv_ND=" + dpu_id;
-    window.showModalDialog(encodeURI(url), null, "dialogWidth:680px; dialogHeight:600px;scroll:no; center:yes; status:no");
+    var url = "/barsroot/docinput/docinput.aspx?tt=" + ttDep + "&nd=" + dpu_id + "&Nls_A=" + gen_nls_dep + "&Kv_A=" + kv +
+        "&SumC=" + s + "&flag_se=1" +
+        "&Mfo_B=" + mfo_d + "&Nls_B=" + nls_d + "&Nam_B=" + nam_d + "&Id_B=" + okpo + "&reqv_ND=" + dpu_id + swtDtlDep;
+    window.showModalDialog(encodeURI(url), null, "dialogWidth:680px; dialogHeight:600px;scroll:yes; center:yes; status:no");
     fnRefresh();
 }
 //**********************************************************************//
@@ -186,18 +205,19 @@ function fnStop() {
         Dialog("Є незавізовані документи по рахунках даного договору.", "alert");
         return;
     }
-    webService.DPU.callService(onGetPenalty, "getPenalty", dpu_id, bankdate);
+    webService.DPU.callService(onGetPenalty, "getPenaltyEx", dpu_id, bankdate);
 }
 function onGetPenalty(result) {
     if (!getError(result)) return;
     var data = result.value;
-    if (confirm(data[3] + "\n\n Надрукувати?")) {
-        barsie$print(data[4]);
+    if (confirm(data[0] + "\n\n Надрукувати?")) {
+        barsie$print(data[1]);
     }
-    var penalty = data[0] - data[1];
-    var message = "Виконати проводку по стягненню штрафу на суму " + penalty / 100 + " грн. ?";
+
+    var message = "Виконати проводку по стягненню штрафу на суму " + (parseInt(data[2],10)/100).toString() + " грн. ?";
+
     if (Dialog(message, "confirm") == 1) {
-        webService.DPU.callService(onPayPenalty, "payPenalty", dpu_id, bankdate, penalty, kv);
+        webService.DPU.callService(onPayPenalty, "payPenaltyEx", dpu_id, data[2], "0", data[3], data[4]);
     }
 }
 function onPayPenalty(result) {
@@ -205,11 +225,20 @@ function onPayPenalty(result) {
     var data = result.value;
     if (!data) {
         Dialog("Штрафування успішно виконано", "alert");
+        // refresh form
+        fnRefresh();
+        // payout deposit
         fnPogash();
+        // payout inerest
+        if ( GetValue("tbOstN_Pl") > 0 )
+        {
+            fnViplat();
+        }
     }
     else
+    {
         Dialog(data, "alert");
-    fnRefresh();
+    }
 }
 //**********************************************************************//
 function fnHotKey() {

@@ -2,12 +2,14 @@ PROMPT =========================================================================
 PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/CCK_351.sql =========*** 
 PROMPT ===================================================================================== 
 
-
 CREATE OR REPLACE PROCEDURE BARS.CCK_351 (p_dat01 date, p_nd integer, p_mode integer  default 0 ) IS
 
-/* Версия 14.3   17-10-2017  03-10-2017  06-09-2017  30-08-2017  12-06-2017 16-05-2017 05-04-2017  06-03-2017  03-03-2017  23-02-2017  01-02-2017  24-01-2017 
+/* Версия 14.5   28-11-2017 16-11-2017  17-10-2017  03-10-2017  06-09-2017  30-08-2017  12-06-2017 
    Розрахунок кредитного ризику по кредитах + БПК
+
    ----------------------------------------------
+26) 28-11-2017(14.5) - Новый план счетов по ОВЕРАМ холдинга берем все счета + 9003 вместо 9023
+25) 27-11-2017(14.4) - LGD 9129 для безризикових =1 , по ризиковим розраховується
 24) 17-10-2017(14.3) - При удалении из таблицы добавила tipa = 90 - 9129 по оверам и 94 - 9129 по БПК
 23) 03-10-2017(14.2) - Тип счета по БПК из REZ_W4_BPK 
 22) 06-09-2017 - Товары в обороте S240 - если срок действия договора < 1 года, иначе не учитывать 
@@ -89,7 +91,7 @@ begin
              WHERE  e.VIDD IN (1,2,3,110,11,12,13)  AND e.SDATE  <  p_DAT01 and  p_nd in (0, e.nd)
                and  n.fdat = p_dat01 and e.nd = n.nd -- действующие
              union all
-             select distinct nd, null cc_id, 11, fin23, tip_kart tipa, null dat_begin, null dat_end, '2202' prod, null RNK, null pd, vkr 
+             select distinct nd, null cc_id, 11, fin23, tip_kart tipa, null dat_begin, null dat_end, '2203' prod, null RNK, null pd, vkr 
              from rez_w4_bpk b 
             )
    LOOP 
@@ -136,7 +138,7 @@ begin
                       substr( decode(c.custtype,3, c.nmk, nvl(c.nmkk,c.nmk) ) , 1,35) NMK, decode(trim(c.sed),'91',3,c.custtype) custtype,
                       a.branch, DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6', 2, 1) RZ,trim(c.sed) sed         --, n.nd,a.* 
                from   nd_acc n,accounts a , customer c
-               where  n.nd = d.nd and n.acc=a.acc and a.nbs in ('2067','2069' ,'2600','2607','2608' ,'9129') 
+               where  n.nd = d.nd and n.acc=a.acc --and a.nbs in ('2067','2069' ,'2600','2607','2608' ,'9129') Берем все счета 16-11-2017
                  and  ost_korr(a.acc,l_dat31,null,a.nbs) <>0 and a.rnk = c.rnk;
          else 
             OPEN c0 FOR
@@ -144,7 +146,7 @@ begin
                       substr( decode(c.custtype,3, c.nmk, nvl(c.nmkk,c.nmk) ) , 1,35) NMK, c.custtype, 
                       a.branch, DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6', 2, 1) RZ, '00' sed        
                from   rez_w4_bpk b, accounts a, customer c 
-               where  b.acc = a.acc  and a.rnk=c.rnk and b.nd=d.nd and A.NBS not in ('3570','3578','3579','3550','3551');
+               where  b.acc = a.acc  and a.rnk=c.rnk and b.nd=d.nd and b.tip not in ('SK9','ODB');
          end if;       
          loop
             FETCH c0 INTO s;
@@ -194,7 +196,7 @@ begin
 
             end if; 
 
-            if s.nbs in ('9129','9122','9023') THEN
+            if s.nbs in ('9129','9122','9023','9003') THEN
                begin 
                   SELECT R013 INTO l_r013 FROM specparam p  WHERE  s.acc = p.acc (+);
                EXCEPTION WHEN NO_DATA_FOUND THEN l_r013:= NULL;  
@@ -331,10 +333,6 @@ begin
                    --logger.info('REZ_351 42 : nd = ' || d.nd || ' l_zal_lgd =' || l_zal_lgd || ' l_s =' || l_s || ' l_LGD =' || l_LGD ) ;    
                end if;
 
-               IF l_dv >= 51 and  l_lgd >=l_lgd_51 then 
-                  if f_rnk_not_uudv(s.rnk) = 0 THEN l_LGD  := l_lgd_51; end if;
-               end if;
-
                if z.kv = 980 THEN l_tip_kv := 2;
                else               l_tip_kv := 3;
                end if;
@@ -344,9 +342,13 @@ begin
                END IF; 
 
                --logger.info('REZ_351 34 : nd = ' || d.nd || ' l_fp =' || l_fp || ' l_pd =' || l_pd  ) ;    
-               if (s.nbs in ('9129','9122') and l_r013 = '9') or s.nbs in ('9023') and l_r013 = '1' THEN 
-                  l_pd := 0; l_fin := 1; l_pd_0 := 1;  
+               if (s.nbs in ('9129','9122') and l_r013 = '9') or s.nbs in ('9023','9003') and l_r013 = '1' THEN 
+                  l_pd := 0; l_fin := 1; l_pd_0 := 1; l_lgd := 1;  
                   l_s080    := f_get_s080 (p_dat01,l_tip_fin, l_fin);
+               end if;
+
+               IF l_dv >= 51 and  l_lgd >=l_lgd_51 then 
+                  if f_rnk_not_uudv(s.rnk) = 0 THEN l_LGD  := l_lgd_51; end if;
                end if;
                --logger.info('REZ_351 44: nd = ' || d.nd || ' l_EAD = '|| l_EAD || ' l_pd = ' || l_pd  || ' L_zal=' ||L_zal) ;   
                --          l_CR   := round(greatest(l_pd * (l_EAD - l_zal),0),2);

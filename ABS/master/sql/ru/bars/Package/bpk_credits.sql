@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bpk_credits.sql =========*** Run ***
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.BPK_CREDITS 
+create or replace package BPK_CREDITS
 is
 
   --
@@ -46,12 +40,15 @@ is
 
 end BPK_CREDITS;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.BPK_CREDITS 
+
+show errors;
+
+create or replace package body BPK_CREDITS
 is
   --
   -- constants
   --
-  g_body_version             constant varchar2(64)  := 'version 1.07 22.04.2016';
+  g_body_version             constant varchar2(64)  := 'version 1.09 16.11.2017';
 
   --
   -- variables
@@ -87,7 +84,6 @@ is
     return 'Package DPU_AGR body ' || g_body_version || '.';
   end body_version;
 
-
   ------------------------------------------------------------------------------
   -- fill_bpk_credit_deal  -- (до)наповнення портфеля договорів
   --
@@ -100,6 +96,7 @@ is
   ) is
     title  constant  varchar2(60) := 'bpk_credits.fill_bpk_credit_deal';
     l_min_dt         date;
+    l_kf             bpk_credit_deal.kf%type;
   begin
 
     bars_audit.info( title || ': Розпочато наповнення портфелю договорів кредитних лімітів по БПК ( p_date => ' ||
@@ -114,19 +111,24 @@ is
 
     l_min_dt := add_months(l_rep_dt,-1);
 
+    l_kf := sys_context('bars_context','user_mfo');
+
+    bars_audit.info( title || ': l_min_dt = ' || to_char(l_min_dt,'dd/mm/yyyy')
+                           || ', l_kf = '     || l_kf || ' ).' );
+
     -- синхронізація дат закриття договорів (реанімований або закритий)
     -- зміна значення дати закриття на даний момент не передбачається!
     select d.DEAL_ND, b.DAT_CLOSE
       bulk collect
       into t_close_dt
-      from ( select ND, DAT_CLOSE, 'W4'  as PC_TYPE
+      from ( select KF, ND, DAT_CLOSE, 'W4'  as PC_TYPE
                from BARS.W4_ACC
               union all
-             select ND, DAT_CLOSE, 'BPK' as PC_TYPE
+             select KF, ND, DAT_CLOSE, 'BPK' as PC_TYPE
                from BARS.BPK_ACC
            ) b
       join BARS.BPK_CREDIT_DEAL d
-        on ( b.ND = d.CARD_ND and b.PC_TYPE = d.PC_TYPE )
+        on ( b.KF = d.KF and b.ND = d.CARD_ND and b.PC_TYPE = d.PC_TYPE )
      where ( b.DAT_CLOSE Is Null     and d.CLOSE_DT Is Not Null )
         or ( b.DAT_CLOSE Is Not Null and d.CLOSE_DT Is Null     );
 
@@ -135,8 +137,8 @@ is
 
       FORALL i IN t_close_dt.first .. t_close_dt.last
       update BARS.BPK_CREDIT_DEAL
-         set CLOSE_DT = t_close_dt(i).close_dt
-       where DEAL_ND  = t_close_dt(i).deal_nd;
+         set CLOSE_DT = t_close_dt(i).CLOSE_DT
+       where DEAL_ND  = t_close_dt(i).DEAL_ND;
 
       bars_audit.info(title || ': Updated '||to_char(sql%rowcount)||' records.' );
 
@@ -144,42 +146,42 @@ is
 
     end if;
 
-    -- донаповнення договорами
+    -- донаповнення договорами ( + рекодування ідентифікаторів для DWH )
     insert /*+ APPEND */
       into BARS.BPK_CREDIT_DEAL
-         ( CARD_ND,  DEAL_ND,  DEAL_SUM, DEAL_KV,  DEAL_RNK,
+         ( KF, CARD_ND,  DEAL_ND,  DEAL_SUM, DEAL_KV,  DEAL_RNK,
            OPEN_DT,  MATUR_DT, CLOSE_DT, CREATE_DT,
            ACC_9129, ACC_OVR,  ACC_2208, ACC_2207, ACC_2209, PC_TYPE )
-    select /*+ parallel */
-           o.ND,
-           S_CC_DEAL.NextVal,
-           o.LIM, o.KV, o.RNK,
-           o.DATE_BEGIN, o.DATE_END, o.DATE_CLOSE, SYSDATE,
-           o.ACC_9129, o.ACC_OVR, o.ACC_2208, o.ACC_2207, o.ACC_2209, o.PC_TYPE
-      from ( select a.kv, a.rnk,
+    select /*+ parallel */ o.KF
+         , o.ND
+         , bars_sqnc.get_nextval('S_CC_DEAL')
+         , o.LIM, o.KV, o.RNK
+         , o.DATE_BEGIN, o.DATE_END, o.DATE_CLOSE, SYSDATE
+         , o.ACC_9129, o.ACC_OVR, o.ACC_2208, o.ACC_2207, o.ACC_2209, o.PC_TYPE
+      from ( select a.KV, a.RNK,
                     coalesce(a.LIM,0) as LIM,
                     a.daos as DATE_BEGIN,
                     add_months(a.daos, 12) as DATE_END,
                     a.dazs as DATE_CLOSE,
-                    b.nd, acc_9129, acc_ovr, acc_2208, acc_2207, acc_2209,
+                    b.KF, b.ND, b.ACC_9129, b.ACC_OVR, b.ACC_2208, b.ACC_2207, b.ACC_2209,
                     'BPK' as PC_TYPE
                from BARS.BPK_ACC  b
                join BARS.ACCOUNTS a
-                 on ( a.acc = b.acc_pk )
-              where coalesce( acc_9129, acc_ovr, acc_2208, acc_2207, acc_2209, 0 ) > 0
-                and a.daos < l_rep_dt      -- рахунок БПК відкритий до звітної дати
+                 on ( a.ACC = b.ACC_PK )
+              where coalesce( ACC_9129, ACC_OVR, ACC_2208, ACC_2207, ACC_2209, 0 ) > 0
+                and a.DAOS < l_rep_dt      -- рахунок БПК відкритий до звітної дати
                 and 1 <= ( select count(1) -- є хоча б один не закритий рахунок
                              from BARS.ACCOUNTS
-                            where ACC in ( acc_9129, acc_ovr, acc_2208, acc_2207, acc_2209 )
+                            where ACC in ( ACC_9129, ACC_OVR, ACC_2208, ACC_2207, ACC_2209 )
                               and ( DAZS is Null OR ( DAZS >= l_min_dt AND DAPP >= l_min_dt ) )
                          )
               union all
-             select a.kv, a.rnk,
+             select a.KV, a.RNK,
                     coalesce(a.LIM,0) as LIM,
                     b.DAT_BEGIN as DATE_BEGIN,
                     b.DAT_END   as DATE_END,
                     b.DAT_CLOSE as DATE_CLOSE,
-                    b.ND, ACC_9129, ACC_OVR, ACC_2208, ACC_2207, ACC_2209,
+                    b.KF, b.ND, ACC_9129, ACC_OVR, ACC_2208, ACC_2207, ACC_2209,
                     'W4' PC_TYPE
                from BARS.W4_ACC b
                join BARS.ACCOUNTS a
@@ -194,7 +196,7 @@ is
            ) o
       left
       join BARS.BPK_CREDIT_DEAL dc
-        on ( dc.CARD_ND = o.ND )
+        on ( dc.KF = o.KF and dc.CARD_ND = o.ND )
      where dc.CARD_ND Is Null; -- Ще відсутні в портфелі
 
     bars_audit.info( title || ': Завершено наповнення портфелю договорів (вставлено ' ||
@@ -242,7 +244,7 @@ is
       l_rep_dt := trunc(p_report_date,'MM');
     end if;
 
-    delete from BARS.BPK_CREDIT_DEAL_VAR
+    delete BPK_CREDIT_DEAL_VAR
      where REPORT_DT = p_report_date
        and ADJ_FLG   = p_adjustment;
 
@@ -250,14 +252,15 @@ is
 
     l_err_tag := to_char(p_report_date,'dd/mm/yyyy') || '-' || to_char(p_adjustment);
 
-    delete from BARS.BPK_CREDIT_DEAL_VAR_ERRLOG
+    delete BPK_CREDIT_DEAL_VAR_ERRLOG
      where ORA_ERR_TAG$ = l_err_tag;
 
     insert /*+ APPEND */
-      into BARS.BPK_CREDIT_DEAL_VAR
-         ( REPORT_DT, DEAL_ND, DEAL_SUM, DEAL_RNK, RATE, MATUR_DT, SS, SN, SP, SPN, CR9, CREATE_DT, ADJ_FLG )
+      into BPK_CREDIT_DEAL_VAR
+         ( REPORT_DT, KF, DEAL_ND, DEAL_SUM, DEAL_RNK, RATE, MATUR_DT, SS, SN, SP, SPN, CR9, CREATE_DT, ADJ_FLG )
     select /*+ PARALLEL */
            l_rep_dt,
+           cd.KF,
            cd.DEAL_ND,
            cd.LIM,
            coalesce(cd.RNK, cd.DEAL_RNK) as RNK,
@@ -270,50 +273,52 @@ is
            nvl(cd.CR9,0) as CR9,
            l_create_dt,
            p_adjustment
-      from ( select dc.DEAL_ND,
-                    dc.DEAL_RNK,
-                    w4.ACC_OVR,
-                    w4.DAT_END,
-                    MAX(case when a.nbs in ('2202','2203','2062','2063') then a.MDATE    else Null end) MDATE,
-                    MAX(case when a.nbs in ('2202','2203','2062','2063') then a.RNK      else Null end) RNK,
-                    MAX(case when a.nbs in ('2202','2203','2062','2063') then abs(a.LIM) else    0 end) LIM,
-                    SUM(case when a.nbs in ('2202','2203','2062','2063')
+      from ( select dc.KF
+                  , dc.DEAL_ND
+                  , dc.DEAL_RNK
+                  , w4.ACC_OVR
+                  , w4.DAT_END
+                  , max(case when  a.ACC = w4.ACC_OVR then a.MDATE    else Null end) MDATE
+                  , max(case when  a.ACC = w4.ACC_OVR then a.RNK      else Null end) RNK
+                  , max(case when  a.ACC = w4.ACC_OVR then abs(a.LIM) else    0 end) LIM
+                  , sum(case when ms.ACC = w4.ACC_OVR
                              then case when p_adjustment = 1 then (ms.OST - ms.CRDOS + ms.CRKOS) else ms.OST end
-                             else 0 end) SS,
-                    SUM(case when a.nbs in ('2208','2068')
+                             else 0 end) SS
+                  , sum(case when ms.ACC = w4.ACC_2208
                              then case when p_adjustment = 1 then (ms.OST - ms.CRDOS + ms.CRKOS) else ms.OST end
-                             else 0 end) SN,
-                    SUM(case when a.nbs in ('2207','2067')
+                             else 0 end) SN
+                  , sum(case when ms.ACC = w4.ACC_2207
                              then case when p_adjustment = 1 then (ms.OST - ms.CRDOS + ms.CRKOS) else ms.OST end
-                             else 0 end) SP,
-                    SUM(case when a.nbs in ('2209','2069')
+                             else 0 end) SP
+                  , sum(case when ms.ACC = w4.ACC_2209
                              then case when p_adjustment = 1 then (ms.OST - ms.CRDOS + ms.CRKOS) else ms.OST end
-                             else 0 end) SPN,
-                    SUM(case when a.nbs in ('9129')
+                             else 0 end) SPN
+                  , sum(case when ms.ACC = w4.ACC_9129
                              then case when p_adjustment = 1 then (ms.OST - ms.CRDOS + ms.CRKOS) else ms.OST end
                              else 0 end) CR9
-               from BARS.BPK_CREDIT_DEAL dc,
-                    ( select ND, ACC_9129, ACC_OVR, ACC_2208, ACC_2207, ACC_2209, DAT_END,
-                             'W4' PC_TYPE
-                        from BARS.W4_ACC_UPDATE
+               from BPK_CREDIT_DEAL dc,
+                    ( select KF, ND, ACC_9129, ACC_OVR, ACC_2208, ACC_2207, ACC_2209, DAT_END
+                           , 'W4' PC_TYPE
+                        from W4_ACC_UPDATE
                        where IDUPD in ( select max(u.IDUPD)
-                                          from BARS.W4_ACC_UPDATE u
+                                          from W4_ACC_UPDATE u
                                          where u.EFFECTDATE < l_rep_dt
                                          group by u.ND )
                        union all
-                      select ND, ACC_9129, ACC_OVR, ACC_2208, ACC_2207, ACC_2209, DAT_END,
-                             'BPK' as PC_TYPE
-                        from BARS.BPK_ACC
+                      select KF, ND, ACC_9129, ACC_OVR, ACC_2208, ACC_2207, ACC_2209, DAT_END
+                           , 'BPK' as PC_TYPE
+                        from BPK_ACC
                     ) w4,
-                    table(sys.ODCINumberList(w4.acc_9129, w4.acc_ovr, w4.acc_2208, w4.acc_2207, w4.acc_2209)) l,
-                    BARS.AGG_MONBALS ms,
-                    BARS.ACCOUNTS     a
-              where w4.nd      = dc.card_nd
+                    table(sys.ODCINumberList(w4.ACC_9129, w4.ACC_OVR, w4.ACC_2208, w4.ACC_2207, w4.ACC_2209)) l,
+                    AGG_MONBALS ms,
+                    ACCOUNTS     a
+              where w4.KF      = dc.KF
+                and w4.ND      = dc.CARD_ND
                 and w4.PC_TYPE = dc.PC_TYPE
-                and a.ACC      = l.column_value
-                and ms.acc(+)  = l.column_value
+                and a.ACC      = l.COLUMN_VALUE
+                and ms.acc(+)  = l.COLUMN_VALUE
                 and ms.FDAT(+) = l_balance_dt
-              group by dc.DEAL_ND, dc.DEAL_RNK, w4.ACC_OVR, w4.DAT_END, dc.CLOSE_DT
+              group by dc.KF, dc.DEAL_ND, dc.DEAL_RNK, w4.ACC_OVR, w4.DAT_END, dc.CLOSE_DT
              having ( dc.CLOSE_DT Is Null
                       OR
                       dc.CLOSE_DT >= l_balance_dt
@@ -322,7 +327,7 @@ is
            ) cd;
     /*
     LOG ERRORS
-    INTO BARS.BPK_CREDIT_DEAL_VAR_ERRLOG ( l_err_tag )
+    INTO BPK_CREDIT_DEAL_VAR_ERRLOG ( l_err_tag )
     REJECT LIMIT UNLIMITED;
     */
 
@@ -341,17 +346,10 @@ BEGIN
 
 END BPK_CREDITS;
 /
- show err;
- 
-PROMPT *** Create  grants  BPK_CREDITS ***
-grant EXECUTE                                                                on BPK_CREDITS     to BARSUPL;
-grant EXECUTE                                                                on BPK_CREDITS     to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on BPK_CREDITS     to OW;
-grant EXECUTE                                                                on BPK_CREDITS     to UPLD;
 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/bpk_credits.sql =========*** End ***
- PROMPT ===================================================================================== 
- 
+show errors;
+
+grant EXECUTE on BPK_CREDITS to BARSUPL;
+grant EXECUTE on BPK_CREDITS to BARS_ACCESS_DEFROLE;
+grant EXECUTE on BPK_CREDITS to OW;
+grant EXECUTE on BPK_CREDITS to UPLD;

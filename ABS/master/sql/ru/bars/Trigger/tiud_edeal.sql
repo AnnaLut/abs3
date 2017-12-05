@@ -1,13 +1,4 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Trigger/TIUD_EDEAL.sql =========*** Run *** 
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  trigger TIUD_EDEAL ***
-
-  CREATE OR REPLACE TRIGGER BARS.TIUD_EDEAL 
+CREATE OR REPLACE TRIGGER TIUD_EDEAL
 instead of insert or update or delete ON BARS.E_DEAL for each row
 declare
   -- version 1.6  15/04-16
@@ -41,7 +32,7 @@ begin
     if ( :new.nls36 is not null )
     then -- 3570 02 - нараховані доходи за обсл. Суб.Госп. через системи дистанційного обслуговування
 
-      select acc, nbs, nvl(ob22,'XX'), nls, f_check_elt_ob22(0,nbs,ob22)
+      select acc, nbs, nvl(ob22,'XX'), nls, f_check_elt_ob22(0,nbs,ob22,tip)
         into l_acc36, l_nbs, l_ob22, l_nls36, l_ob22t
         from accounts
        where nls = :new.nls36
@@ -64,19 +55,29 @@ begin
     then -- 3579 24 - прострочені нараховані доходи за обсл. Суб.Госп. через системи дистанційного обслуговування
 
       begin
-      select acc, nbs, nvl(ob22,'YY'), nls, f_check_elt_ob22(0,nbs,ob22)
+      select acc, nbs, nvl(ob22,'YY'), nls, f_check_elt_ob22(0,nbs,ob22,tip)
         into l_accd, l_nbs, l_ob22, l_nls36, l_ob22t
         from accounts
        where nls = :new.nls_d
          and kv  = nvl(:new.kvd, gl.baseVal);
 
+      if newnbs.g_state= 1 then  --переход на новый план счетов
+      case
+        when ( l_nbs <> '3570' )
+        then raise_application_error( -20444, 'Недопустиме значення балансового рахунка! '||l_nbs, true );
+        when ( l_ob22t in ('-5'))
+        then raise_application_error( -20444, l_nls36||' Недопустиме значення параметра ОБ22! '||l_ob22, true );
+        else null;
+      end case;
+      else
       case
         when ( l_nbs <> '3579' )
         then raise_application_error( -20444, 'Недопустиме значення балансового рахунка! '||l_nbs, true );
         when ( l_ob22t in ('-5'))
         then raise_application_error( -20444, l_nls36||' Недопустиме значення параметра ОБ22! '||l_ob22, true );
         else null;
-      end case;
+      end case;        
+      end if;
 
       exception
         when no_data_found then NULL;
@@ -157,9 +158,3 @@ begin
 
 end TIUD_EDEAL;
 /
-ALTER TRIGGER BARS.TIUD_EDEAL ENABLE;
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Trigger/TIUD_EDEAL.sql =========*** End *** 
-PROMPT ===================================================================================== 

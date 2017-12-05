@@ -101,12 +101,12 @@ CREATE OR REPLACE FORCE VIEW BARS.V_DPU_DEAL_WEB
           d.mfo_d,
           d.nls_d,
           d.nms_d,
-          b1.nb,
+          ( select nb from banks where mfo = d.mfo_d ),
           d.mfo_p,
           d.nls_p,
           d.nms_p,
           NVL (d.okpo_p, c.okpo),
-          b2.nb,
+          ( select nb from banks where mfo = d.mfo_p ),
           d.comments,
           v.kv,
           t.lcv,
@@ -150,7 +150,7 @@ CREATE OR REPLACE FORCE VIEW BARS.V_DPU_DEAL_WEB
           d.branch,
           brc.name,
           v.DPU_CODE,
-          v.DPU_TYPE,
+          v.IRVK,
           v.TERM_TYPE,
           d.TRUSTEE_ID,
           cast( null as varchar2(70)  ) as FIO,      -- tas.fio,
@@ -176,8 +176,6 @@ CREATE OR REPLACE FORCE VIEW BARS.V_DPU_DEAL_WEB
                                              and BDAT <= gl.bd
                                            group by ACC, ID )
           ) ir,
-          banks b1,
-          banks b2,
           accounts a,
           accounts a1,
           brates br,
@@ -194,8 +192,6 @@ CREATE OR REPLACE FORCE VIEW BARS.V_DPU_DEAL_WEB
       AND ia.id = 1
       AND ir.acc = d.acc
       AND ir.id = 1
-      AND d.mfo_d = b1.mfo(+)
-      AND d.mfo_p = b2.mfo(+)
       AND d.id_stop = s.id(+)
       AND ir.br = br.br_id(+)
       AND d.freqv = fr.freq

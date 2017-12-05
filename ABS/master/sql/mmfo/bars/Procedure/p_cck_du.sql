@@ -1,13 +1,4 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_CCK_DU.sql =========*** Run *** 
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure P_CCK_DU ***
-
-  CREATE OR REPLACE PROCEDURE BARS.P_CCK_DU 
+CREATE OR REPLACE procedure BARS.P_CCK_DU
 (p_dat1 date,  -- период пересчета % :Дата С  включительно
  p_dat2 date,  -- период пересчета % :Дата ПО включительно
  p_mode int    -- =0 только протокол, =1 - протокол с проводками
@@ -82,9 +73,11 @@ select  substr(TOBO,1,15), sum(S)/100  from s_ARJK_DATF group by   substr(TOBO,1
  dd cc_deal%rowtype;
  jj arjk%rowtype   ;
  BBBBoo_  char(6)  ;
---------------------
-begin
+ l_newnbs number; 
+BEGIN
 
+   l_newnbs := NEWNBS.GET_STATE;  
+    
  if p_dat1 is null or p_dat2 is null or p_dat2 < p_dat1 then
      raise_application_error(-20203,'\      Недопустимi дати', TRUE);
  end if;
@@ -96,13 +89,16 @@ begin
  oo.vdat  := gl.BDATE  ;
  oo.vob   := 6;
  oo.sk    := null;
+
  -------------------------
 
  if p_mode = 1 then -- только длч режима "с проводками"
 
     -- 0) хеш-таблица для выборки счетов 6 кл.
     tmp.DELETE;
-    for k in (select * from accounts where dazs is null and length(branch)=15 and kv=gl.baseval and nbs||ob22 in ('604665','6042F5','611137' ))
+    for k in (select * from accounts where dazs is null and length(branch)=15 and kv=gl.baseval and nbs||ob22 in (decode(l_newnbs,0,'604665','605534'),
+                                                                                                                  decode(l_newnbs,0,'6042F5','605256'),
+                                                                                                                  decode(l_newnbs,0,'611137','')))
     loop
       ind_ := k.nbs||k.ob22||k.branch;
       tmp(ind_).nls := k.nls ;
@@ -120,7 +116,7 @@ begin
    EXECUTE IMMEDIATE 'truncate table TMP_ARJK_OPER ';
    insert into  TMP_ARJK_OPER (vdat, KV, nlsa, nlsb, nazn, s, s2, nam_b, nd)
                     select vdat, KV, nlsa, nlsb, nazn, s, s2, nam_b, nd from oper where sos=5 and tt='%%1'
-                       and (nlsa like '22_8%' and nlsb like '60%' or  nlsa like '3578%' and nlsb like '61%')
+                       and (nlsa like '22_8%' and nlsb like '60%' or  nlsa like '3578%' and nlsb like decode(l_newnbs,0,'61%','65%'))
                        and  pdat>(p_dat1-5) and pdat<(p_dat2+5);
    commit;
  Logger.info('TMP_ARJK_OPER-2-End');
@@ -129,10 +125,10 @@ begin
  for k in (SELECT * from TMP_ARJK_OPER )
  loop
     If NOT (k.vdat >= p_dat1  and k.vdat <= p_dat2) then  goto RecNext;  end if;
-
-    If    k.nlsb like '6046%' then     BBBBoo_  :='604665';
-    ElsIf k.nlsb like '6042%' then     BBBBoo_  :='6042F5';
-    elsIf k.nlsb like '6111%' then     BBBBoo_  :='611137';
+                       
+    If    k.nlsb like case when l_newnbs = 0 then '6046%' else '6055%' end then     BBBBoo_  := case when l_newnbs = 0 then '604665' else '605534' end;
+    ElsIf k.nlsb like case when l_newnbs = 0 then '6042%' else '6052%'end then     BBBBoo_  :=  case when l_newnbs = 0 then '6042F5' else '605256' end;
+    elsIf k.nlsb like case when l_newnbs = 0 then '6111%' else '' end then  BBBBoo_  :=  case when l_newnbs = 0 then '611137' else '' end;
     else  goto RecNext;
     end if;
 
@@ -230,14 +226,3 @@ end if;
 
 end  P_CCK_DU ;
 /
-show err;
-
-PROMPT *** Create  grants  P_CCK_DU ***
-grant EXECUTE                                                                on P_CCK_DU        to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on P_CCK_DU        to RCC_DEAL;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_CCK_DU.sql =========*** End *** 
-PROMPT ===================================================================================== 

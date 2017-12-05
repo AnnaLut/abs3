@@ -47,8 +47,14 @@ exception when others then
 end; 
 /
 
-
-
+prompt add column W4_NBS_OB22.OB_6110
+begin
+	execute immediate 'alter table bars.w4_nbs_ob22 add OB_6110 char(2)';
+exception
+	when others then
+		if sqlcode = -1430 then null; else raise; end if;
+end;
+/
 
 PROMPT *** ALTER_POLICIES to W4_NBS_OB22 ***
  exec bpa.alter_policies('W4_NBS_OB22');

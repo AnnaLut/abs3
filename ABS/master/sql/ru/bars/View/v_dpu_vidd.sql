@@ -1,14 +1,59 @@
+-- ======================================================================================
+-- Module : ADR
+-- Author : BAA
+-- Date   : 27.08.2016
+-- ======================================================================================
+-- create view V_DPU_VIDD
+-- ======================================================================================
 
+SET SERVEROUTPUT ON SIZE UNLIMITED FORMAT WRAPPED
+SET ECHO         OFF
+SET LINES        500
+SET PAGES        500
 
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_DPU_VIDD.sql =========*** Run *** ===
-PROMPT ===================================================================================== 
+prompt -- ======================================================
+prompt -- create view V_DPU_VIDD
+prompt -- ======================================================
 
-
-PROMPT *** Create  view V_DPU_VIDD ***
-
-  CREATE OR REPLACE FORCE VIEW BARS.V_DPU_VIDD ("VIDD_ID", "VIDD_NM", "VIDD_CODE", "TYPE_ID", "TYPE_NM", "CCY_ID", "CCY_CODE", "SROK", "R020_DEP", "R020_INT", "BR_ID", "BR_NM", "FREQ_ID", "FREQ_NM", "COMPROC", "AMNT_MIN", "AMNT_MAX", "AMNT_ADD", "REPLENISHABLE", "STOP_ID", "STOP_NM", "PROLONGABLE", "TEMPLATE_ID", "COMMENTS", "IS_LINE", "IS_ACTIVE", "IRREVOCABLE", "DPU_TYPE", "TERM_TP", "TERM_MIN_MO", "TERM_MIN_DY", "TERM_MAX_MO", "TERM_MAX_DY", "TERM_ADD", "SEGMENT", "DEAL_QTY") AS 
-  select DPU_VIDD.VIDD
+CREATE OR REPLACE VIEW BARS.V_DPU_VIDD
+( VIDD_ID
+, VIDD_NM
+, VIDD_CODE
+, TYPE_ID
+, TYPE_NM
+, CCY_ID
+, CCY_CODE
+, SROK
+, R020_DEP
+, R020_INT
+, BR_ID
+, BR_NM
+, FREQ_ID
+, FREQ_NM
+, COMPROC
+, AMNT_MIN
+, AMNT_MAX
+, AMNT_ADD
+, REPLENISHABLE
+, STOP_ID
+, STOP_NM
+, PROLONGABLE
+, TEMPLATE_ID
+, COMMENTS
+, IS_LINE
+, IS_ACTIVE
+, IRREVOCABLE
+, TERM_TP
+, TERM_MIN_MO
+, TERM_MIN_DY
+, TERM_MAX_MO
+, TERM_MAX_DY
+, TERM_ADD
+, SEGMENT
+, DEAL_QTY
+) 
+as
+select DPU_VIDD.VIDD
      , DPU_VIDD.NAME
      , DPU_VIDD.DPU_CODE
      , DPU_VIDD.TYPE_ID
@@ -34,8 +79,7 @@ PROMPT *** Create  view V_DPU_VIDD ***
      , DPU_VIDD.COMMENTS
      , sign(DPU_VIDD.FL_EXTEND)
      , nvl(DPU_VIDD.FLAG,0)
-     , DPU_VIDD.IRREVOCABLE
-     , DPU_VIDD.DPU_TYPE
+     , DPU_VIDD.IRVK
      , DPU_VIDD.TERM_TYPE
      , trunc(DPU_VIDD.TERM_MIN) as TERM_MIN_MO
      , (DPU_VIDD.TERM_MIN - trunc(DPU_VIDD.TERM_MIN))*10000 as TERM_MIN_DY
@@ -43,37 +87,70 @@ PROMPT *** Create  view V_DPU_VIDD ***
      , (DPU_VIDD.TERM_MAX - trunc(DPU_VIDD.TERM_MAX))*10000 as TERM_MAX_DY
      , DPU_VIDD.TERM_ADD
      , 0 as SEGMENT
-     , q.QTY
-  from BARS.DPU_VIDD
-  join BARS.DPU_TYPES
+     , ( select count(DPU_ID)
+           from DPU_DEAL
+          where VIDD = DPU_VIDD.VIDD
+            and CLOSED = 0
+       ) as QTY
+  from DPU_VIDD
+  join DPU_TYPES
     on ( DPU_TYPES.TYPE_ID = DPU_VIDD.TYPE_ID )
-  join BARS.TABVAL$GLOBAL
+  join TABVAL$GLOBAL
     on ( TABVAL$GLOBAL.KV = DPU_VIDD.KV )
-  join BARS.DPT_STOP
+  join DPT_STOP
     on ( DPT_STOP.ID = DPU_VIDD.ID_STOP )
-  join BARS.FREQ
+  join FREQ
     on ( FREQ.FREQ = DPU_VIDD.FREQ_V )
   left
-  join BARS.BRATES
+  join BRATES
     on ( BRATES.BR_ID = DPU_VIDD.BR_ID )
-  left
-  join ( select VIDD, count(DPU_ID) as QTY
-           from DPU_DEAL
-          where CLOSED = 0
-          group by VIDD
-       ) q
-    on ( q.VIDD = DPU_VIDD.VIDD )
 ;
 
-PROMPT *** Create  grants  V_DPU_VIDD ***
-grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on V_DPU_VIDD      to BARS_ACCESS_DEFROLE;
-grant DELETE,INSERT,SELECT,UPDATE                                            on V_DPU_VIDD      to DPT_ADMIN;
-grant SELECT                                                                 on V_DPU_VIDD      to DPT_ROLE;
-grant SELECT                                                                 on V_DPU_VIDD      to START1;
-grant FLASHBACK,SELECT                                                       on V_DPU_VIDD      to WR_REFREAD;
+show err
 
+prompt -- ======================================================
+prompt -- Comments
+prompt -- ======================================================
 
+COMMENT ON TABLE  BARS.V_DPU_VIDD               IS 'Види депозитів ЮЛ';
 
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_DPU_VIDD.sql =========*** End *** ===
-PROMPT ===================================================================================== 
+COMMENT ON COLUMN BARS.V_DPU_VIDD.VIDD_ID       IS 'Вид депозиту (ідентифікатор)';
+COMMENT ON COLUMN BARS.V_DPU_VIDD.VIDD_NM       IS 'Назва виду депозиту';
+COMMENT ON COLUMN BARS.V_DPU_VIDD.CCY_ID        IS 'Ід. валюты';
+COMMENT ON COLUMN BARS.V_DPU_VIDD.CCY_CODE      IS 'Код валюты';
+COMMENT ON COLUMN BARS.V_DPU_VIDD.SROK          IS 'Длительность вида депозитного договора ЮЛ';
+COMMENT ON COLUMN BARS.V_DPU_VIDD.R020_DEP      IS 'Бал.счет депозита';
+COMMENT ON COLUMN BARS.V_DPU_VIDD.R020_INT      IS 'Бал.счет начисл.%%';
+COMMENT ON COLUMN BARS.V_DPU_VIDD.BR_ID         IS 'Код базовой %% ставки';
+COMMENT ON COLUMN BARS.V_DPU_VIDD.BR_NM         IS 'Код базовой %% ставки';
+COMMENT ON COLUMN BARS.V_DPU_VIDD.FREQ_ID       IS 'Ід. періодичності виплати %%';
+COMMENT ON COLUMN BARS.V_DPU_VIDD.FREQ_NM       IS 'Назва періодичності виплати %%';
+COMMENT ON COLUMN BARS.V_DPU_VIDD.COMPROC       IS 'Флаг капитализации %%';
+COMMENT ON COLUMN BARS.V_DPU_VIDD.STOP_ID       IS 'Код штрафа за досрочное расторжение договора';
+COMMENT ON COLUMN BARS.V_DPU_VIDD.STOP_NM       IS 'Назва штрафа за досрочное расторжение договора';
+COMMENT ON COLUMN BARS.V_DPU_VIDD.AMNT_MIN      IS 'Min. сума депозиту';
+COMMENT ON COLUMN BARS.V_DPU_VIDD.AMNT_MAX      IS 'Max. сума депозиту';
+COMMENT ON COLUMN BARS.V_DPU_VIDD.AMNT_ADD      IS 'Мін. сума поповнення депозиту';
+COMMENT ON COLUMN BARS.V_DPU_VIDD.TEMPLATE_ID   IS 'Шаблон договора';
+COMMENT ON COLUMN BARS.V_DPU_VIDD.COMMENTS      IS 'Комментарий';
+COMMENT ON COLUMN BARS.V_DPU_VIDD.IS_ACTIVE     IS 'Флаг активности вида депозита';
+COMMENT ON COLUMN BARS.V_DPU_VIDD.IS_LINE       IS 'Флаг депозитной линии';
+COMMENT ON COLUMN BARS.V_DPU_VIDD.REPLENISHABLE IS 'Флаг пополнения депозита' ;
+COMMENT ON COLUMN BARS.V_DPU_VIDD.PROLONGABLE   IS 'Признак автомат.переоформления договора';
+COMMENT ON COLUMN BARS.V_DPU_VIDD.IRREVOCABLE   IS 'Безвідкличний депозитний договір (заборонено дострокове вилучення)';
+COMMENT ON COLUMN BARS.V_DPU_VIDD.TYPE_ID       IS 'Ід. типу депозиту (депозитного продукту )';
+COMMENT ON COLUMN BARS.V_DPU_VIDD.TYPE_NM       IS 'Назва типу депозиту (депозитного продукту )';
+COMMENT ON COLUMN BARS.V_DPU_VIDD.TERM_TP       IS 'Тип терміну депозиту (1 - фікований, 2 - діапазон)';
+COMMENT ON COLUMN BARS.V_DPU_VIDD.TERM_MIN_MO   IS 'Мінімальний термін дії депозиту (в місяцях)';
+COMMENT ON COLUMN BARS.V_DPU_VIDD.TERM_MIN_DY   IS 'Мінімальний термін дії депозиту (в днях)';
+COMMENT ON COLUMN BARS.V_DPU_VIDD.TERM_MAX_MO   IS 'Максимальний термін дії депозиту (в місяцях)';
+COMMENT ON COLUMN BARS.V_DPU_VIDD.TERM_MAX_DY   IS 'Максимальний термін дії депозиту (в днях)';
+COMMENT ON COLUMN BARS.V_DPU_VIDD.TERM_ADD      IS 'Термін протягом якого дозволено поповнення депозиту';
+COMMENT ON COLUMN BARS.V_DPU_VIDD.SEGMENT       IS 'Клієнтський Сегмент';
+COMMENT ON COLUMN BARS.V_DPU_VIDD.DEAL_QTY      IS 'К-ть діючих депозитних договорів';
+
+prompt -- ======================================================
+prompt -- Grants
+prompt -- ======================================================
+
+GRANT SELECT ON BARS.V_DPU_VIDD TO BARS_ACCESS_DEFROLE;

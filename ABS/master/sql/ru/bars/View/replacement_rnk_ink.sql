@@ -20,8 +20,7 @@ PROMPT *** Create  view REPLACEMENT_RNK_INK ***
             c.okpo,
             c.bc
        FROM v_gl a, customer c
-      WHERE     (   (nbs = '3578' AND ob22 IN ('17', '09'))
-                 OR (nbs = '3579' AND ob22 IN ('19', '39'))
+      WHERE     (   (nbs = '3578' AND ob22 IN ('17', '09', '41', '45'))                 
                  OR (nbs = '2909' AND ob22 IN ('43'))
                  or nbs in ('3610', '3619', '3519','3510')
                  )

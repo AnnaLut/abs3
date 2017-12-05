@@ -1,4 +1,4 @@
-CREATE OR REPLACE PACKAGE CCK_UI IS
+CREATE OR REPLACE PACKAGE BARS.CCK_UI IS
 
   g_header_version CONSTANT VARCHAR2(64) := 'ver.3.1. 20.07.2017';
 /*
@@ -253,9 +253,10 @@ CREATE OR REPLACE PACKAGE CCK_UI IS
   -------------------
 END cck_ui;
 /
-CREATE OR REPLACE PACKAGE BODY cck_ui AS
 
-  g_body_version CONSTANT VARCHAR2(64) := 'ver.3.1 27.07.2017';
+CREATE OR REPLACE PACKAGE BODY BARS.cck_ui AS
+
+  g_body_version CONSTANT VARCHAR2(64) := 'ver.3.3 PLAN 29.11.2017';
   g_errn NUMBER := -20203;
   g_errs VARCHAR2(16) := 'CCK_UI:';
 
@@ -783,14 +784,30 @@ CREATE OR REPLACE PACKAGE BODY cck_ui AS
       IF x_tip = 'CR9' THEN
         l_nbs := '9129';
       ELSIF x_tip = 'SP ' THEN
-        l_nbs := l_b3 || '7';
+        if NEWNBS.GET_STATE = 1 then
+          if l_b3 = '207' then
+             l_nbs := l_b3 || '1';
+          else
+         l_nbs := l_b3 || '3';
+          end if;
+        else
+         l_nbs := l_b3 || '7';
+        end if;
       ELSIF x_tip = 'SPN' THEN
-        l_nbs := l_b3 || '9';
+        if NEWNBS.GET_STATE = 1 then
+         l_nbs := l_b3 || '8';
+        else
+         l_nbs := l_b3 || '9';
+        end if;
       ELSIF x_tip = 'SDI'
             AND x_prod NOT LIKE '9%' THEN
         l_nbs := l_b3 || '6';
       ELSIF x_tip = 'SPI' THEN
-        l_nbs := l_b3 || '5';
+        if NEWNBS.GET_STATE = 1 then
+         l_nbs := l_b3 || '6';
+        else
+         l_nbs := l_b3 || '5';
+        end if;
       ELSIF x_tip = 'SN ' THEN
         l_nbs := l_b3 || '8';
       ELSIF x_tip = 'SNO' THEN
@@ -802,7 +819,11 @@ CREATE OR REPLACE PACKAGE BODY cck_ui AS
       ELSIF x_tip = 'SK0' THEN
         l_nbs := '3578';
       ELSIF x_tip = 'SK9' THEN
-        l_nbs := '3579';
+        if NEWNBS.GET_STATE = 1 then
+         l_nbs := '3578';
+        else
+         l_nbs := '3579';
+        end if;
       ELSIF x_tip = 'SG ' THEN
         l_nbs := '3739';
       ELSIF x_tip = 'SN8' THEN
@@ -1547,7 +1568,7 @@ CREATE OR REPLACE PACKAGE BODY cck_ui AS
     p_sz1    NUMBER,
     p_comm   VARCHAR2  ) IS
 
-    tt    cc_trans%ROWTYPE;    l_err VARCHAR2(250);  
+    tt    cc_trans%ROWTYPE;    l_err VARCHAR2(250);
   BEGIN
 
     BEGIN  SELECT *  INTO tt   FROM cc_trans WHERE npp = p_id  AND d_fakt IS NULL;
@@ -1559,8 +1580,8 @@ CREATE OR REPLACE PACKAGE BODY cck_ui AS
 
     IF p_sz1 >0 and p_sz1 >= p_sz THEN l_err := 'Cума погаш. вiдокр.траншу >= суми погаш. основ. траншу';  raise_application_error(g_errn, g_errs || l_err);  END IF;
 
-    IF p_sz <> tt.sz/100          THEN      cct.upd_sz (p_id, tt.sz/100, p_sz  ); 
-    ELSE                                    cct.upd_pog(p_id, p_dplan  , p_sv1, p_dplan1, p_sz1, p_comm); 
+    IF p_sz <> tt.sz/100          THEN      cct.upd_sz (p_id, tt.sz/100, p_sz  );
+    ELSE                                    cct.upd_pog(p_id, p_dplan  , p_sv1, p_dplan1, p_sz1, p_comm);
     END IF;
 
     -- CCT.Start0 ( Nd )
@@ -1583,16 +1604,16 @@ CREATE OR REPLACE PACKAGE BODY cck_ui AS
     If tt1.npp  is null then  PUL.put('ID_TRANSH', p_ID) ; RETURN; end if; -- вход с первой записью
     tt2.npp     := p_id;
 
-    begin select * into tt1 from cc_trans where npp = tt1.npp;    
-          select * into tt2 from cc_trans where npp = tt2.npp;    
-    EXCEPTION  WHEN no_data_found THEN  
-          PUL.put('ID_TRANSH', null ); 
-          return;   
+    begin select * into tt1 from cc_trans where npp = tt1.npp;
+          select * into tt2 from cc_trans where npp = tt2.npp;
+    EXCEPTION  WHEN no_data_found THEN
+          PUL.put('ID_TRANSH', null );
+          return;
     end;
 
-    If  tt1.acc <> tt2.acc  OR  tt1.fdat <> tt2.fdat  OR  tt1.D_PLAN <> tt2.D_PLAN then               
+    If  tt1.acc <> tt2.acc  OR  tt1.fdat <> tt2.fdat  OR  tt1.D_PLAN <> tt2.D_PLAN then
         PUL.put('ID_TRANSH', null );
-        l_err := tt1.npp ||' та '||tt2.npp ||' : Реквізити "Рахунок","Дата видачі","Дата погашення" НЕ співпадають !';  raise_application_error(g_errn, g_errs || l_err);  
+        l_err := tt1.npp ||' та '||tt2.npp ||' : Реквізити "Рахунок","Дата видачі","Дата погашення" НЕ співпадають !';  raise_application_error(g_errn, g_errs || l_err);
     END IF;
 
     CCT.Del_TRANSH( tt2.npp);
@@ -2104,6 +2125,7 @@ END p_cck_interest;
                                 'Невідповідність останньої дати в ГПК=' ||
                                 to_char(dd.wdate, ' dd.mm.yyyy'));
     END;
+
 
     BEGIN
       SELECT * INTO aa FROM accounts WHERE acc = ll.acc;
@@ -2677,7 +2699,7 @@ END p_cck_interest;
     END;
     IF aa.nbs LIKE '20%'
        OR aa.nbs LIKE '22%'
-       OR aa.nbs = '3579'
+       OR aa.nbs = case when NEWNBS.GET_STATE =  1 then '3578' else '3579'end
        AND aa.tip = 'SK9'
        OR aa.nbs = '3578'
        AND aa.tip = 'SK0'
@@ -2780,7 +2802,7 @@ END p_cck_interest;
         IF dd.vidd IN (1, 2, 3) THEN
           aa.nbs := '6020';
         ELSE
-          aa.nbs := '6042';
+          aa.nbs := case when NEWNBS.GET_STATE =  1 then '6052' else '6042' end;
         END IF;
         aa.nls := nbs_ob22_null(aa.nbs, aa.ob22, substr(dd.branch, 1, 15));
         UPDATE int_accn

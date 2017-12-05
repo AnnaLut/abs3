@@ -69,7 +69,7 @@ begin
        and old.type_cod = new.type_cod
        and old.kv       = new.kv
        and old.freq_k   = new.freq_k
-       and old.bsd      in ('2630', '2635')
+       and ((old.bsd in ('2630', '2635') and newnbs.g_state = 0) or (old.bsd in ('2630') and newnbs.g_state = 1))
        and new.bsd      = '2620';
   exception
     when no_data_found then

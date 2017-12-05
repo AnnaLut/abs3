@@ -63,7 +63,8 @@ begin
 	ROWTYPE NUMBER, 
 	GRPLIST VARCHAR2(70), 
 	D_REC VARCHAR2(60), 
-	REFNLS VARCHAR2(14)
+	REFNLS VARCHAR2(14),
+    NLSALT  VARCHAR2(15)
    ) ON COMMIT PRESERVE ROWS ';
 exception when others then       
   if sqlcode=-955 then null; else raise; end if; 
@@ -121,7 +122,7 @@ COMMENT ON COLUMN BARS.TMP_LICM.ROWTYPE IS '';
 COMMENT ON COLUMN BARS.TMP_LICM.GRPLIST IS 'Список отчетных групп в кот. входит счет';
 COMMENT ON COLUMN BARS.TMP_LICM.D_REC IS '';
 COMMENT ON COLUMN BARS.TMP_LICM.REFNLS IS 'Лицевой счет по которому был выполнен платеж(если выписка делается по родительскому счету - не дочернему)';
-
+COMMENT ON COLUMN BARS.TMP_LICM.NLSALT IS 'Альтернативный номер счета';
 
 
 PROMPT *** Create  grants  TMP_LICM ***

@@ -1,26 +1,25 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReportInfo.Created="02/17/2014 08:37:12" ReportInfo.Modified="10/02/2014 16:40:00" ReportInfo.CreatorVersion="2013.3.2.0">
+<Report ScriptLanguage="CSharp" ReportInfo.Created="02/17/2014 08:37:12" ReportInfo.Modified="11/20/2017 15:46:27" ReportInfo.CreatorVersion="2014.1.2.0">
   <Dictionary>
-    <OracleDataConnection Name="KHRSN72" ConnectionString="rijcmlqcFv7/QVsbsa1pDpr21P0mHXdl2BpgMbYS4w+AnBeGDddnQ5MuNy1h3sM21aiXmM/eOvKXoCY3g0gR4shNFVWZg==">
-      <TableDataSource Name="Table" Alias="klient_info" DataType="System.Int32" Enabled="true" SelectCommand="select decode(wcs_utl.get_answ(b.bid_id, 'GRT_0', p.ws_id, p.ws_number),&#13;&#10;              0,&#13;&#10;              wcs_utl.get_answ(b.bid_id, 'CL_1', p.ws_id, p.ws_number) || ' ' ||&#13;&#10;              wcs_utl.get_answ(b.bid_id, 'CL_2', p.ws_id, p.ws_number) || ' ' ||&#13;&#10;              wcs_utl.get_answ(b.bid_id, 'CL_3', p.ws_id, p.ws_number),&#13;&#10;              b.fio) as fio,&#13;&#10;             wcs_utl.get_answ(b.bid_id, 'CL_123_O', p.ws_id, p.ws_number) as fio_o,&#13;&#10;       decode(wcs_utl.get_answ(b.bid_id, 'GRT_0', p.ws_id, p.ws_number),&#13;&#10;              0,&#13;&#10;              substr(wcs_utl.get_answ(b.bid_id, 'CL_2', p.ws_id, p.ws_number),&#13;&#10;                     1,&#13;&#10;                     1) || '. ' ||&#13;&#10;              substr(wcs_utl.get_answ(b.bid_id, 'CL_3', p.ws_id, p.ws_number),&#13;&#10;                     1,&#13;&#10;                     1) || '.  ' ||&#13;&#10;              wcs_utl.get_answ(b.bid_id, 'CL_1', p.ws_id, p.ws_number),&#13;&#10;              substr(b.i, 1, 1) || '. ' || substr(b.o, 1, 1) || '. ' || b.f) as fio_short,&#13;&#10;       decode(wcs_utl.get_answ(b.bid_id, 'CL_0_188'),&#13;&#10;              0,&#13;&#10;              case&#13;&#10;                when wcs_utl.get_answ(b.bid_id, 'CL_13') in (26, 27) then&#13;&#10;                 wcs_utl.get_answ_refer_text(b.bid_id, 'CL_13') || ', ' ||&#13;&#10;                 wcs_utl.get_answ(b.bid_id, 'CL_16')&#13;&#10;                else&#13;&#10;                 'обл. ' || wcs_utl.get_answ_refer_text(b.bid_id, 'CL_13') || ', ' ||&#13;&#10;                 decode(wcs_utl.has_answ(b.bid_id, 'CL_14'),&#13;&#10;                        1,&#13;&#10;                        'р. ' || wcs_utl.get_answ(b.bid_id, 'CL_14') || ', ',&#13;&#10;                        null) || decode(wcs_utl.has_answ(b.bid_id, 'CL_15'),&#13;&#10;                                        1,&#13;&#10;                                        wcs_utl.get_answ(b.bid_id, 'CL_15') || ', ',&#13;&#10;                                        null) || wcs_utl.get_answ(b.bid_id, 'CL_16')&#13;&#10;              end,&#13;&#10;              case&#13;&#10;                when wcs_utl.get_answ(b.bid_id, 'CL_18') in (26, 27) then&#13;&#10;                 wcs_utl.get_answ_refer_text(b.bid_id, 'CL_18') || ', ' ||&#13;&#10;                 wcs_utl.get_answ(b.bid_id, 'CL_21')&#13;&#10;                else&#13;&#10;                 'обл. ' || wcs_utl.get_answ_refer_text(b.bid_id, 'CL_18') || ', ' ||&#13;&#10;                 decode(wcs_utl.has_answ(b.bid_id, 'CL_19'),&#13;&#10;                        1,&#13;&#10;                        'р. ' || wcs_utl.get_answ(b.bid_id, 'CL_19') || ', ',&#13;&#10;                        null) || decode(wcs_utl.has_answ(b.bid_id, 'CL_20'),&#13;&#10;                                        1,&#13;&#10;                                        wcs_utl.get_answ(b.bid_id, 'CL_20') || ', ',&#13;&#10;                                        null) || wcs_utl.get_answ(b.bid_id, 'CL_21')&#13;&#10;              end) || decode(wcs_utl.has_answ(b.bid_id, 'CL_22'),&#13;&#10;                             1,&#13;&#10;                             ', тел. ' || wcs_utl.get_answ(b.bid_id, 'CL_22'),&#13;&#10;                             null) as adress,&#13;&#10;       (case&#13;&#10;         when wcs_utl.get_answ(b.bid_id, 'CODE_002', p.ws_id, p.ws_number) = '0000000000' or wcs_utl.get_answ(b.bid_id, 'CODE_002', p.ws_id, p.ws_number) = '9999999999' then&#13;&#10;           decode(wcs_utl.get_answ(b.bid_id, 'GRT_0', p.ws_id, p.ws_number),&#13;&#10;              0,&#13;&#10;              wcs_utl.get_answ(b.bid_id, 'CL_7', p.ws_id, p.ws_number) ||&#13;&#10;              wcs_utl.get_answ(b.bid_id, 'CL_8', p.ws_id, p.ws_number) ||&#13;&#10;              ' виданий ' ||&#13;&#10;              wcs_utl.get_answ(b.bid_id, 'CL_9', p.ws_id, p.ws_number) || ' № ' ||&#13;&#10;              wcs_utl.get_answ(b.bid_id, 'CL_11', p.ws_id, p.ws_number),&#13;&#10;              wcs_utl.get_answ(b.bid_id, 'CL_7') ||&#13;&#10;              wcs_utl.get_answ(b.bid_id, 'CL_8') || ' виданий ' ||&#13;&#10;              wcs_utl.get_answ(b.bid_id, 'CL_9') || ' ' ||&#13;&#10;              wcs_utl.get_answ_formated(b.bid_id, 'CL_11')||' р.')&#13;&#10;           else decode(wcs_utl.get_answ(b.bid_id, 'GRT_0', p.ws_id, p.ws_number),&#13;&#10;              0,&#13;&#10;              wcs_utl.get_answ(b.bid_id, 'CODE_002', p.ws_id, p.ws_number),&#13;&#10;              b.inn)&#13;&#10;              end) idcode_pasport,&#13;&#10;       wcs_utl.get_answ_text(b.bid_id,'CL_199') as tel&#13;&#10;  from v_wcs_bids b,&#13;&#10;       (select :p_ws_id as ws_id, :p_ws_number as ws_number from dual) p&#13;&#10; where b.bid_id = :p_bid_id">
+    <OracleDataConnection Name="KHRSN72" ConnectionString="rijcmlqPlOzoyo7TwkT/OyKIqWYSPlwE/rH93Z4ieZrR8eekQaangrP2G3TD6KndOWygLtrRPuov1Oz+qsr73O5OIXTgw==">
+      <TableDataSource Name="Table" Alias="klient_info" DataType="System.Int32" Enabled="true" SelectCommand="select decode(wcs_utl.get_answ(b.bid_id, 'GRT_0', p.ws_id, p.ws_number),&#13;&#10;              0,&#13;&#10;              wcs_utl.get_answ(b.bid_id, 'CL_1', p.ws_id, p.ws_number) || ' ' ||&#13;&#10;              wcs_utl.get_answ(b.bid_id, 'CL_2', p.ws_id, p.ws_number) || ' ' ||&#13;&#10;              wcs_utl.get_answ(b.bid_id, 'CL_3', p.ws_id, p.ws_number),&#13;&#10;              b.fio) as fio,&#13;&#10;             wcs_utl.get_answ(b.bid_id, 'CL_123_O', p.ws_id, p.ws_number) as fio_o,&#13;&#10;       decode(wcs_utl.get_answ(b.bid_id, 'GRT_0', p.ws_id, p.ws_number),&#13;&#10;              0,&#13;&#10;              substr(wcs_utl.get_answ(b.bid_id, 'CL_2', p.ws_id, p.ws_number),&#13;&#10;                     1,&#13;&#10;                     1) || '. ' ||&#13;&#10;              substr(wcs_utl.get_answ(b.bid_id, 'CL_3', p.ws_id, p.ws_number),&#13;&#10;                     1,&#13;&#10;                     1) || '.  ' ||&#13;&#10;              wcs_utl.get_answ(b.bid_id, 'CL_1', p.ws_id, p.ws_number),&#13;&#10;              substr(b.i, 1, 1) || '. ' || substr(b.o, 1, 1) || '. ' || b.f) as fio_short,&#13;&#10;       (case&#13;&#10;         when wcs_utl.get_answ(b.bid_id, 'CODE_002', p.ws_id, p.ws_number) = '0000000000' or wcs_utl.get_answ(b.bid_id, 'CODE_002', p.ws_id, p.ws_number) = '9999999999' then&#13;&#10;           decode(wcs_utl.get_answ(b.bid_id, 'GRT_0', p.ws_id, p.ws_number),&#13;&#10;              0,&#13;&#10;              wcs_utl.get_answ(b.bid_id, 'CL_7', p.ws_id, p.ws_number) ||&#13;&#10;              wcs_utl.get_answ(b.bid_id, 'CL_8', p.ws_id, p.ws_number) ||&#13;&#10;              ' виданий ' ||&#13;&#10;              wcs_utl.get_answ(b.bid_id, 'CL_9', p.ws_id, p.ws_number) || ' № ' ||&#13;&#10;              wcs_utl.get_answ(b.bid_id, 'CL_11', p.ws_id, p.ws_number),&#13;&#10;              wcs_utl.get_answ(b.bid_id, 'CL_7') ||&#13;&#10;              wcs_utl.get_answ(b.bid_id, 'CL_8') || ' виданий ' ||&#13;&#10;              wcs_utl.get_answ(b.bid_id, 'CL_9') || ' ' ||&#13;&#10;              wcs_utl.get_answ_formated(b.bid_id, 'CL_11')||' р.')&#13;&#10;           else decode(wcs_utl.get_answ(b.bid_id, 'GRT_0', p.ws_id, p.ws_number),&#13;&#10;              0,&#13;&#10;              wcs_utl.get_answ(b.bid_id, 'CODE_002', p.ws_id, p.ws_number),&#13;&#10;              b.inn)&#13;&#10;              end) idcode_pasport,&#13;&#10;       wcs_utl.get_answ_text(b.bid_id,'CL_199') as tel&#13;&#10;  from v_wcs_bids b,&#13;&#10;       (select :p_ws_id as ws_id, :p_ws_number as ws_number from dual) p&#13;&#10; where b.bid_id = :p_bid_id">
         <Column Name="FIO" DataType="System.String"/>
         <Column Name="FIO_O" DataType="System.String"/>
         <Column Name="FIO_SHORT" DataType="System.String"/>
-        <Column Name="ADRESS" DataType="System.String"/>
         <Column Name="TEL" DataType="System.String"/>
         <Column Name="IDCODE_PASPORT" DataType="System.String"/>
         <CommandParameter Name="p_bid_id" DataType="126" Expression="[p_bid_id]"/>
         <CommandParameter Name="p_ws_id" DataType="126" Expression="[p_ws_id]"/>
         <CommandParameter Name="p_ws_number" DataType="126" Expression="[p_ws_number]"/>
       </TableDataSource>
-      <TableDataSource Name="Table3" Alias="acc_kl" DataType="System.Int32" Enabled="true" SelectCommand="select br.name,&#13;&#10;       c.okpo,&#13;&#10;       a.kf,&#13;&#10;       a.nls &#13;&#10;  from wcs_bids b,&#13;&#10;       accounts a,&#13;&#10;       customer c,&#13;&#10;       branch br&#13;&#10; where b.id = :p_bid_id&#13;&#10;   and b.rnk = c.rnk&#13;&#10;   and b.rnk = a.rnk&#13;&#10;   and a.branch = br.branch&#13;&#10;   and a.nbs in (2620, 2625, 2630, 2635)">
+      <TableDataSource Name="Table3" Alias="acc_kl" DataType="System.Int32" Enabled="true" SelectCommand="select br.name,&#13;&#10;       c.okpo,&#13;&#10;       a.kf,&#13;&#10;       a.nls &#13;&#10;  from wcs_bids b,&#13;&#10;       accounts a,&#13;&#10;       customer c,&#13;&#10;       branch br&#13;&#10; where b.id = :p_bid_id&#13;&#10;   and b.rnk = c.rnk&#13;&#10;   and b.rnk = a.rnk&#13;&#10;   and a.branch = br.branch&#13;&#10;   and a.nbs in (2620, 2625, 2630)">
         <Column Name="NLS" DataType="System.String"/>
         <Column Name="NAME" DataType="System.String"/>
         <Column Name="OKPO" DataType="System.String"/>
         <Column Name="KF" DataType="System.String"/>
         <CommandParameter Name="p_bid_id" DataType="126" Expression="[p_bid_id]"/>
       </TableDataSource>
-      <TableDataSource Name="Table5" Alias="acc" DataType="System.Int32" Enabled="true" SelectCommand="select b.id, &#13;&#10;       listagg(case when A.NBS like '2%' then A.NLS else '' end  , ', ') WITHIN GROUP(ORDER BY b.ID)  as nls_2,&#13;&#10;       listagg(case when A.NBS like '9%' then A.NLS else '' end  , ', ') WITHIN GROUP(ORDER BY b.ID)  as nls_9&#13;&#10;  from accounts a,wcs_bids b &#13;&#10; where a.rnk = B.RNK&#13;&#10;   and b.id = :p_bid_id&#13;&#10;   and a.nbs in (2202,2203,2232,2233,2207,2237,2208,2238,2209,2239,2205,2235,2206,2236,9031,9129,9500,9520,9521,9523,9819) &#13;&#10;group by b.ID  ">
+      <TableDataSource Name="Table5" Alias="acc" DataType="System.Int32" Enabled="true" SelectCommand="select b.id, &#13;&#10;       listagg(case when A.NBS like '2%' then A.NLS else '' end  , ', ') WITHIN GROUP(ORDER BY b.ID)  as nls_2,&#13;&#10;       listagg(case when A.NBS like '9%' then A.NLS else '' end  , ', ') WITHIN GROUP(ORDER BY b.ID)  as nls_9&#13;&#10;  from accounts a,wcs_bids b &#13;&#10; where a.rnk = B.RNK&#13;&#10;   and b.id = :p_bid_id&#13;&#10;   and a.nbs in (2203,2232,2233,2208,2238,2206,2236,9031,9129,9500,9520,9521,9523,9819) &#13;&#10;group by b.ID  ">
         <Column Name="NLS_2" DataType="System.String"/>
         <Column Name="ID" DataType="System.Decimal"/>
         <Column Name="NLS_9" DataType="System.String"/>
@@ -86,8 +85,15 @@
         <Column Name="CRISK_OBU" DataType="System.String"/>
         <CommandParameter Name="p_bid_id" DataType="126" Expression="[p_bid_id]"/>
       </TableDataSource>
+      <TableDataSource Name="Table16" Alias="Adress" DataType="System.Int32" Enabled="true" SelectCommand="select b.adr_reg,&#13;&#10;       decode(wcs_utl.get_answ_bool(b.id, 'CL_0_6'),&#13;&#10;              1,', тел. ' || wcs_utl.get_answ(b.id, 'CL_23'),'') tel_reg,&#13;&#10;       decode(wcs_utl.get_answ_bool(b.id, 'CL_0_188'),&#13;&#10;              1,b.adr_reg,&#13;&#10;              decode(wcs_utl.has_answ(b.id, 'ADR_FACT_SETTLEMENT_ID'),&#13;&#10;                     0,decode(wcs_utl.has_answ(b.id, 'ADR_FACT_REGION'),&#13;&#10;                              1,wcs_utl.get_answ(b.id, 'ADR_FACT_REGION') || ' обл., ','')||&#13;&#10;                       decode(length(wcs_utl.get_answ(b.id, 'ADR_FACT_AREA')),0,'',1,'',&#13;&#10;                              wcs_utl.get_answ(b.id, 'ADR_FACT_AREA') || ' р-н., ')||&#13;&#10;                       decode(wcs_utl.has_answ(b.id, 'ADR_FACT_LOCALITY_TYPE'),&#13;&#10;                              1,wcs_utl.get_answ_refer(b.id, 'ADR_FACT_LOCALITY_TYPE'),'')||' '|| &#13;&#10;                       decode(wcs_utl.has_answ(b.id, 'ADR_FACT_LOCALITY'),&#13;&#10;                              1,wcs_utl.get_answ(b.id, 'ADR_FACT_LOCALITY'),''),                             &#13;&#10;                     (select decode(a.REGION_ID,9,'',19,'',A.REGION_NAME||', ')||&#13;&#10;                             decode(nvl(A.AREA_ID,0),0,'',A.AREA_NAME||', ')||&#13;&#10;                             A.SETTLEMENT_TYPE||&#13;&#10;                             A.SETTLEMENT_NAME&#13;&#10;                      from VW_ESCR_ADDRESS a&#13;&#10;                      where a.SETTLEMENT_ID=wcs_utl.get_answ_refer(b.id, 'ADR_FACT_SETTLEMENT_ID'))) ||', '||&#13;&#10;              decode(wcs_utl.has_answ(b.id, 'ADR_FACT_STREET_ID'),&#13;&#10;                     1,(SELECT t.str_tp_nm|| ' '||t.street_name&#13;&#10;                        FROM vw_adr_streets t&#13;&#10;                        WHERE t.street_id = wcs_utl.get_answ_refer(b.id, 'ADR_FACT_STREET_ID')),&#13;&#10;                     decode(length(wcs_utl.get_answ(b.id, 'ADR_FACT_STREET')),0,'',1,'',   &#13;&#10;                     decode(wcs_utl.has_answ(b.id, 'ADR_FACT_STREET_TYPE'),&#13;&#10;                            1,wcs_utl.get_answ_refer_text(b.id, 'ADR_FACT_STREET_TYPE'),'')||' '|| &#13;&#10;                     decode(wcs_utl.has_answ(b.id, 'ADR_FACT_STREET'),&#13;&#10;                            1,wcs_utl.get_answ(b.id, 'ADR_FACT_STREET'),'')))||', '||&#13;&#10;              decode(wcs_utl.has_answ(b.id, 'ADR_FACT_HOME_TYPE'),&#13;&#10;                     1,wcs_utl.get_answ_refer(b.id, 'ADR_FACT_HOME_TYPE'),'')||' '|| &#13;&#10;              decode(wcs_utl.has_answ(b.id, 'ADR_FACT_HOME'),&#13;&#10;                     1,wcs_utl.get_answ(b.id, 'ADR_FACT_HOME'),'')||', '||&#13;&#10;              decode(wcs_utl.has_answ(b.id, 'ADR_FACT_HOMEPART_TYPE'),&#13;&#10;                     1,wcs_utl.get_answ_refer(b.id, 'ADR_FACT_HOMEPART_TYPE'),'')||' '|| &#13;&#10;              decode(wcs_utl.has_answ(b.id, 'ADR_FACT_HOMEPART'),&#13;&#10;                     1,wcs_utl.get_answ(b.id, 'ADR_FACT_HOMEPART')||', ','')||&#13;&#10;              decode(wcs_utl.has_answ(b.id, 'ADR_FACT_ROOM_TYPE'),&#13;&#10;                     1,wcs_utl.get_answ_refer(b.id, 'ADR_FACT_ROOM_TYPE'),'')||' '|| &#13;&#10;              decode(wcs_utl.has_answ(b.id, 'ADR_FACT_ROOM'),&#13;&#10;                     1,wcs_utl.get_answ(b.id, 'ADR_FACT_ROOM'),'')) as adr_live,&#13;&#10;       decode(wcs_utl.get_answ_bool(b.id, 'CL_0_8'),&#13;&#10;              1,', тел. ' || wcs_utl.get_answ(b.id, 'CL_22'),'') as tel_live                                   &#13;&#10;from(select b.id,&#13;&#10;            decode(nvl(a.SETTLEMENT_ID,0),&#13;&#10;                   0,decode(wcs_utl.has_answ(b.id, 'ADR_REG_REGION'),&#13;&#10;                            1,wcs_utl.get_answ(b.id, 'ADR_REG_REGION') || ' обл., ','')||&#13;&#10;                     decode(length(wcs_utl.get_answ(b.id, 'ADR_REG_AREA')),0,'',1,'',&#13;&#10;                            wcs_utl.get_answ(b.id, 'ADR_REG_AREA') || ' р-н., ')||&#13;&#10;                     decode(wcs_utl.has_answ(b.id, 'ADR_REG_LOCALITY_TYPE'),&#13;&#10;                            1,wcs_utl.get_answ_refer(b.id, 'ADR_REG_LOCALITY_TYPE'),'')||' '|| &#13;&#10;                     decode(wcs_utl.has_answ(b.id, 'ADR_REG_LOCALITY'),&#13;&#10;                            1,wcs_utl.get_answ(b.id, 'ADR_REG_LOCALITY'),''),                             &#13;&#10;                   decode(a.REGION_ID,9,'',19,'',A.REGION_NAME||', ')||&#13;&#10;                   decode(nvl(AREA_ID,0),0,'',A.AREA_NAME||', ')||&#13;&#10;                   A.SETTLEMENT_TYPE||&#13;&#10;                   A.SETTLEMENT_NAME)||', '||&#13;&#10;            decode(wcs_utl.has_answ(b.id, 'ADR_REG_STREET_ID'),&#13;&#10;                   1,(SELECT t.str_tp_nm|| ' '||t.street_name&#13;&#10;                      FROM vw_adr_streets t&#13;&#10;                      WHERE t.street_id = wcs_utl.get_answ_refer(b.id, 'ADR_REG_STREET_ID')),&#13;&#10;                   decode(length(wcs_utl.get_answ(b.id, 'ADR_REG_STREET')),0,'',1,'',   &#13;&#10;                   decode(wcs_utl.has_answ(b.id, 'ADR_REG_STREET_TYPE'),&#13;&#10;                          1,wcs_utl.get_answ_refer_text(b.id, 'ADR_REG_STREET_TYPE'),'')||' '|| &#13;&#10;                   decode(wcs_utl.has_answ(b.id, 'ADR_REG_STREET'),&#13;&#10;                          1,wcs_utl.get_answ(b.id, 'ADR_REG_STREET'),'')))||', '||&#13;&#10;            decode(wcs_utl.has_answ(b.id, 'ADR_REG_HOME_TYPE'),&#13;&#10;                   1,wcs_utl.get_answ_refer(b.id, 'ADR_REG_HOME_TYPE'),'')||' '|| &#13;&#10;            decode(wcs_utl.has_answ(b.id, 'ADR_REG_HOME'),&#13;&#10;                   1,wcs_utl.get_answ(b.id, 'ADR_REG_HOME'),'')||', '||&#13;&#10;            decode(wcs_utl.has_answ(b.id, 'ADR_REG_HOMEPART_TYPE'),&#13;&#10;                   1,wcs_utl.get_answ_refer(b.id, 'ADR_REG_HOMEPART_TYPE'),'')||' '|| &#13;&#10;            decode(wcs_utl.has_answ(b.id, 'ADR_REG_HOMEPART'),&#13;&#10;                   1,wcs_utl.get_answ(b.id, 'ADR_REG_HOMEPART')||', ','')||&#13;&#10;            decode(wcs_utl.has_answ(b.id, 'ADR_REG_ROOM_TYPE'),&#13;&#10;                   1,wcs_utl.get_answ_refer(b.id, 'ADR_REG_ROOM_TYPE'),'')||' '|| &#13;&#10;            decode(wcs_utl.has_answ(b.id, 'ADR_REG_ROOM'),&#13;&#10;                   1,wcs_utl.get_answ(b.id, 'ADR_REG_ROOM'),'') as adr_reg&#13;&#10;     from wcs_bids b left join VW_ESCR_ADDRESS a on(a.SETTLEMENT_ID=wcs_utl.get_answ_refer(b.id, 'ADR_REG_SETTLEMENT_ID'))&#13;&#10;     where b.id = :p_bid_id&#13;&#10;    ) b   ">
+        <Column Name="ADR_REG" DataType="System.String"/>
+        <Column Name="TEL_REG" DataType="System.String"/>
+        <Column Name="ADR_LIVE" DataType="System.String"/>
+        <Column Name="TEL_LIVE" DataType="System.String"/>
+        <CommandParameter Name="p_bid_id" DataType="126" Expression="[p_bid_id]"/>
+      </TableDataSource>
     </OracleDataConnection>
-    <Parameter Name="p_bid_id" DataType="System.Int32" Expression="3559921 "/>
+    <Parameter Name="p_bid_id" DataType="System.Int32" Expression="13024321"/>
     <Parameter Name="p_ws_id" DataType="System.String" Expression="&quot;MAIN&quot;"/>
     <Parameter Name="p_ws_number" DataType="System.Int32" Expression="0"/>
   </Dictionary>
@@ -95,18 +101,18 @@
     <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="37.8" Guides="9.45,28.35">
       <TextObject Name="Text1" Top="9.45" Width="718.2" Height="18.9" Text="Узагальнена інформація по кредиту" HorzAlign="Center" VertAlign="Center" Font="Arial, 14pt, style=Bold"/>
     </ReportTitleBand>
-    <DataBand Name="Data1" Top="40.83" Width="718.2" Height="179.55" Guides="9.45,28.35,47.25,94.5,113.4,179.55">
+    <DataBand Name="Data1" Top="40.6" Width="718.2" Height="179.55" Guides="9.45,28.35,47.25,94.5,113.4,179.55">
       <TextObject Name="Text2" Top="9.45" Width="151.2" Height="18.9" Text="1. ПІБ позичальника" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
       <TextObject Name="Text3" Left="151.2" Top="9.45" Width="567" Height="18.9" Text="[klient_info.FIO]" VertAlign="Center"/>
       <TextObject Name="Text4" Top="28.35" Width="368.55" Height="18.9" Text="&lt;b&gt;2. Характер відносин з банком&lt;/b&gt; (клієнт, інсайдер тощо)" VertAlign="Center" HtmlTags="true"/>
       <TextObject Name="Text5" Left="368.55" Top="28.35" Width="349.65" Height="18.9" VertAlign="Center"/>
       <TextObject Name="Text6" Top="47.25" Width="151.2" Height="47.25" Text="3. Адреса &#13;&#10;позичальника&#13;&#10;(місце проживання)" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
-      <TextObject Name="Text7" Left="151.2" Top="47.25" Width="567" Height="47.25" Text="[klient_info.ADRESS]" VertAlign="Center"/>
+      <TextObject Name="Text7" Left="151.2" Top="47.25" Width="567" Height="47.25" Text="[Adress.ADR_LIVE]" VertAlign="Center"/>
       <TextObject Name="Text8" Top="94.5" Width="151.2" Height="18.9" Text="4. Телефон" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
       <TextObject Name="Text9" Left="151.2" Top="94.5" Width="567" Height="18.9" Text="[klient_info.TEL]" VertAlign="Center"/>
       <TextObject Name="Text10" Top="113.4" Width="500.85" Height="66.15" Text="5. Реєстраційний номер облікової картки платника податків або серія&#13;&#10; та номер паспорта (для фізичної особи, яка відмовилася від прийняття реєстраційного номера облікової картки платника податків та має відповідну відмітку у паспорті)" HorzAlign="Justify" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
       <TextObject Name="Text11" Left="500.85" Top="113.4" Width="217.35" Height="66.15" Text="[klient_info.IDCODE_PASPORT]" HorzAlign="Justify" VertAlign="Center"/>
-      <DataBand Name="Data2" Top="330.39" Width="718.2" Height="28.35" CanGrow="true" CanShrink="true" CanBreak="true" Guides="0,28.35">
+      <DataBand Name="Data2" Top="329.69" Width="718.2" Height="28.35" CanGrow="true" CanShrink="true" CanBreak="true" Guides="0,28.35">
         <TableObject Name="Table1" Width="718.5" Height="28.35" Border.Lines="All">
           <TableColumn Name="Column7" Width="222.11"/>
           <TableColumn Name="Column8" Width="70.91"/>
@@ -123,7 +129,7 @@
             <TableCell Name="Cell32" Border.Lines="All" VertAlign="Center"/>
           </TableRow>
         </TableObject>
-        <DataHeaderBand Name="DataHeader1" Top="223.41" Width="718.2" Height="103.95" CanGrow="true" CanShrink="true" CanBreak="true" Guides="0,18.9,103.95,85.05">
+        <DataHeaderBand Name="DataHeader1" Top="222.94" Width="718.2" Height="103.95" CanGrow="true" CanShrink="true" CanBreak="true" Guides="0,18.9,103.95,85.05">
           <TextObject Name="Text12" Width="718.2" Height="18.9" Text="6. Інформація щодо кредитного договору " HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
           <TableObject Name="Table1" Top="18.9" Width="718.42" Height="85.05" Border.Lines="All">
             <TableColumn Name="Column1" Width="222.1"/>
@@ -143,7 +149,7 @@
           </TableObject>
         </DataHeaderBand>
       </DataBand>
-      <DataBand Name="Data3" Top="468.75" Width="718.2" Height="28.35" CanGrow="true" CanShrink="true" CanBreak="true" Guides="0,28.35" DataSource="Table2">
+      <DataBand Name="Data3" Top="467.59" Width="718.2" Height="28.35" CanGrow="true" CanShrink="true" CanBreak="true" Guides="0,28.35" DataSource="Table2">
         <TableObject Name="Table1" Width="718.68" Height="28.35" Border.Lines="All">
           <TableColumn Name="Column19" Width="119.78"/>
           <TableColumn Name="Column20" Width="91.43"/>
@@ -160,7 +166,7 @@
             <TableCell Name="Cell44" Border.Lines="All" VertAlign="Center"/>
           </TableRow>
         </TableObject>
-        <DataHeaderBand Name="DataHeader2" Top="361.77" Width="718.2" Height="103.95" Guides="0,18.9,103.95,85.05">
+        <DataHeaderBand Name="DataHeader2" Top="360.84" Width="718.2" Height="103.95" Guides="0,18.9,103.95,85.05">
           <TextObject Name="Text13" Width="718.2" Height="18.9" Text="7. Інформація щодо забезпечення по кредиту" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
           <TableObject Name="Table1" Top="18.9" Width="718.68" Height="85.05" Border.Lines="All">
             <TableColumn Name="Column13" Width="119.78"/>
@@ -180,7 +186,7 @@
           </TableObject>
         </DataHeaderBand>
       </DataBand>
-      <DataBand Name="Data10" Top="500.13" Width="718.2" Height="56.7" Guides="0,56.7,37.8">
+      <DataBand Name="Data10" Top="498.73" Width="718.2" Height="56.7" Guides="0,56.7,37.8">
         <TableObject Name="Table15" Restrictions="HideAllProperties" Width="721.98" Height="56.7" Border.Lines="All">
           <TableColumn Name="Column56" Width="360.99"/>
           <TableColumn Name="Column57" Width="360.99"/>
@@ -194,7 +200,7 @@
           </TableRow>
         </TableObject>
       </DataBand>
-      <DataBand Name="Data4" Top="559.86" Width="718.2" Height="18.9" CanGrow="true" Guides="0,18.9" DataSource="Table5">
+      <DataBand Name="Data4" Top="558.23" Width="718.2" Height="18.9" CanGrow="true" Guides="0,18.9" DataSource="Table5">
         <TableObject Name="Table4" Restrictions="HideAllProperties" Width="721.98" Height="18.9" Border.Lines="All">
           <TableColumn Name="Column35" Width="360.99"/>
           <TableColumn Name="Column36" Width="360.99"/>
@@ -204,7 +210,7 @@
           </TableRow>
         </TableObject>
       </DataBand>
-      <DataBand Name="Data5" Top="641.52" Width="718.2" Height="28.35" CanGrow="true" CanShrink="true" CanBreak="true" Guides="0,28.35" DataSource="Table3">
+      <DataBand Name="Data5" Top="639.42" Width="718.2" Height="28.35" CanGrow="true" CanShrink="true" CanBreak="true" Guides="0,28.35" DataSource="Table3">
         <TableObject Name="Table4" Width="718.13" Height="28.35" Border.Lines="All">
           <TableColumn Name="Column31" Width="255.13"/>
           <TableColumn Name="Column32" Width="141.74"/>
@@ -217,7 +223,7 @@
             <TableCell Name="Cell74" Border.Lines="All" Text="[acc_kl.NLS]" HorzAlign="Center" VertAlign="Center"/>
           </TableRow>
         </TableObject>
-        <DataHeaderBand Name="DataHeader3" Top="581.79" Width="718.2" Height="56.7" Guides="0,18.9,56.7,37.8">
+        <DataHeaderBand Name="DataHeader3" Top="579.93" Width="718.2" Height="56.7" Guides="0,18.9,56.7,37.8">
           <TextObject Name="Text15" Width="718.2" Height="18.9" Text="9. Рахунки позичальника в АТ &quot;Ощадбанк&quot;" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
           <TableObject Name="Table4" Top="18.9" Width="718.16" Height="37.8" Border.Lines="All">
             <TableColumn Name="Column27" Width="255.14"/>
@@ -233,7 +239,7 @@
           </TableObject>
         </DataHeaderBand>
       </DataBand>
-      <DataBand Name="Data6" Top="672.9" Width="718.2" Height="189" CanGrow="true" Guides="0,189,37.8,113.4,132.3,151.2,170.1">
+      <DataBand Name="Data6" Top="670.57" Width="718.2" Height="189" CanGrow="true" Guides="0,189,37.8,113.4,132.3,151.2,170.1">
         <TableObject Name="Table7" Width="718.2" Height="189" Border.Lines="All">
           <TableColumn Name="Column37" Width="245.7"/>
           <TableColumn Name="Column38" Width="103.95"/>
@@ -284,7 +290,7 @@
           </TableRow>
         </TableObject>
       </DataBand>
-      <DataBand Name="Data7" Top="864.93" Width="718.2" Height="160.65" Guides="0,160.65,37.8,85.05,103.95,122.85,141.75">
+      <DataBand Name="Data7" Top="862.37" Width="718.2" Height="160.65" Guides="0,160.65,37.8,85.05,103.95,122.85,141.75">
         <TableObject Name="Table8" Width="718.2" Height="160.65" Border.Lines="All">
           <TableColumn Name="Column42" Width="160.65"/>
           <TableColumn Name="Column43" Width="170.1"/>
@@ -321,7 +327,7 @@
           </TableRow>
         </TableObject>
       </DataBand>
-      <DataBand Name="Data8" Top="1028.61" Width="718.2" Height="330.75" Guides="0,330.75,28.35,103.95,122.85,141.75,160.65,179.55,198.45,217.35,236.25,255.15,274.05,292.95,311.85">
+      <DataBand Name="Data8" Top="1025.82" Width="718.2" Height="330.75" Guides="0,330.75,28.35,103.95,122.85,141.75,160.65,179.55,198.45,217.35,236.25,255.15,274.05,292.95,311.85">
         <TableObject Name="Table9" Width="718.2" Height="330.75" Border.Lines="All">
           <TableColumn Name="Column45" Width="113.4"/>
           <TableColumn Name="Column46" Width="122.85"/>
@@ -458,7 +464,7 @@
           </TableRow>
         </TableObject>
       </DataBand>
-      <DataBand Name="Data9" Top="1362.39" Width="718.2" Height="1237.95" Guides="0,1237.95,18.9,37.8,85.05,103.95,122.85,141.75,189,226.8,274.05,292.95,311.85,349.65,368.55,406.35,444.15,481.95,510.3,529.2,567,604.8,623.7,642.6,680.4,699.3,718.2,737.1,756,774.9,812.7,831.6,850.5,888.3,907.2,926.1,945,963.9,982.8,1020.6,1039.5,1077.3,1096.2,1219.05">
+      <DataBand Name="Data9" Top="1359.36" Width="718.2" Height="1237.95" Guides="0,1237.95,18.9,37.8,85.05,103.95,122.85,141.75,189,226.8,274.05,292.95,311.85,349.65,368.55,406.35,444.15,481.95,510.3,529.2,567,604.8,623.7,642.6,680.4,699.3,718.2,737.1,756,774.9,812.7,831.6,850.5,888.3,907.2,926.1,945,963.9,982.8,1020.6,1039.5,1077.3,1096.2,1219.05">
         <TableObject Name="Table10" Width="718.1" Height="1237.95" Border.Lines="All">
           <TableColumn Name="Column52" Width="51.95"/>
           <TableColumn Name="Column53" Width="382.7"/>
@@ -725,6 +731,6 @@
         </TableObject>
       </DataBand>
     </DataBand>
-    <PageFooterBand Name="PageFooter1" Top="2603.37" Width="718.2" Height="18.9"/>
+    <PageFooterBand Name="PageFooter1" Top="2600.11" Width="718.2" Height="18.9"/>
   </ReportPage>
 </Report>

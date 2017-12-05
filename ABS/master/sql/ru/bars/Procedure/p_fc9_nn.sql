@@ -3,7 +3,7 @@ CREATE OR REPLACE PROCEDURE BARS.p_fc9_nn ( dat_     DATE,
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирования #C9 для КБ
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     : 18/08/2017 (15/08/2017, 10/08/2017)
+% VERSION     : 14/11/2017 (18/08/2017, 15/08/2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
@@ -13,6 +13,7 @@ CREATE OR REPLACE PROCEDURE BARS.p_fc9_nn ( dat_     DATE,
                (классификатор KOD_C9_1) и D2#70 - DC#70.
                Нужен доп.пармаметр DC#70 - номер ВМД.%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+14.11.2017 удалил ненужные строки и изменил некоторые блоки формирования 
 18.08.2017 для Запорожья МФО=313957 не будут включаться проводки 
            Дт 3739  Кт 29091100070000
 15.08.2017 для кода 31 и значения = '6' будем формировать как '006'
@@ -357,7 +358,7 @@ CREATE OR REPLACE PROCEDURE BARS.p_fc9_nn ( dat_     DATE,
                d1#C9_ := '30';  -- с 26.07.2012 согласно письма Рощиной от 11.07.2012
             end if;
             
-            if mfo_ <> 300120 and instr(lower(nazn_),'комерц_йний переказ') > 0 
+            if instr(lower(nazn_),'комерц_йний переказ') > 0 
             then
                d1#C9_ := '01';  -- восстановил 21.09.2015 (было до 26.07.2012)
                --d1#C9_ := '30';  -- с 26.07.2012 согласно письма Рощиной от 11.07.2012
@@ -863,14 +864,10 @@ BEGIN
                                  AND SUBSTR (o.nlsk, 1, 4) in ('2603')
                                  AND mfo_ = 300465)
                              OR ( SUBSTR (o.nlsd, 1, 4) in ('1500','1600')   -- 23/06/2009
-                                 AND SUBSTR (o.nlsk, 1, 4) = '2909' 
-                                 AND mfo_ <> 300120)
+                                 AND SUBSTR (o.nlsk, 1, 4) = '2909' )
                              OR ( SUBSTR (o.nlsd, 1, 4) = '1500'   -- 25/07/2009
                                  AND SUBSTR (o.nlsk, 1, 4) = '1819'
-                                 AND mfo_ in (380623, 300465) )
-                             --OR ( SUBSTR (o.nlsd, 1, 4) = '3739'     -- 07/09/2010
-                             --    AND o.nlsk = '29091100070000'       -- Запорiжжя ОБ
-                             --    AND mfo_=313957)
+                                 AND mfo_ = 300465 )
                              OR ( o.nlsd = '29093000110000'   -- 12/10/2010
                                  AND (o.nlsk LIKE '2909%' or o.nlsk LIKE '2603%')  -- Крим ОБ
                                  AND mfo_ = 324805)
@@ -1222,8 +1219,8 @@ BEGIN
       -- для Черниговского РУ
       -- удаляем проводки Дт 2909 Кт 2924 где в OPER не Дт 2909 Кт 2625
       -- для Полтавского РУ (добавлено 13.03.2017)
-      --IF mfo_ in (353553, 331467) 
-      --THEN 
+      IF mfo_ in (353553, 331467) 
+      THEN 
          delete from otcn_f70_temp o
          where o.nlsd like '2909%'
            and o.nlsk like '2924%'
@@ -1236,7 +1233,7 @@ BEGIN
                               and p.nlsa like '2909%' 
                               and p.nlsb like '2625%'
                           );
-      --END IF;
+      END IF;
 
       for k in ( select * from otcn_f70_temp
                  where nlsd like '2909%'
@@ -1254,13 +1251,27 @@ BEGIN
                  and p.kv = k.kv 
                  and p.s*100 = k.s_nom
                  and rownum = 1;
- 
-              update otcn_f70_temp t set t.rnk = rnk_
-              where t.ref = k.ref
-                and t.nlsd like '2909%' 
-                and t.nlsk like '2924%'; 
             exception when no_data_found then
-               null;
+               BEGIN
+                  select p.rnkk 
+                     into rnk_
+                  from provodki_otc p, operw w
+                  where p.fdat = dat_ 
+                    and p.nlsd like '2924%'
+                    and p.nlsk like '2625%'
+                    and p.kv = k.kv 
+                    and p.s*100 = k.s_nom 
+                    and w.ref = k.ref 
+                    and w.tag like '59%' 
+                    and p.nlsk = substr(w.value,2,14); 
+   
+                 update otcn_f70_temp t set t.rnk = rnk_
+                 where t.ref = k.ref
+                   and t.nlsd like '2909%' 
+                   and t.nlsk like '2924%'; 
+               exception when no_data_found then
+                  null;
+               END;
             end;
       end loop;
     
@@ -1312,199 +1323,228 @@ BEGIN
          END;
       end if;
 
--- до 13.08.07 в файл #C9 включалась сумма поступления от нерезидентов
--- 100 тыс.долларов общая по клиенту, а
--- с 13.08.2007 50 тыс.долларов только одной операции
+      -- до 13.08.07 в файл #C9 включалась сумма поступления от нерезидентов
+      -- 100 тыс.долларов общая по клиенту, а
+      -- с 13.08.2007 50 тыс.долларов только одной операции
 
-         okpo_1 := okpo_;
+      okpo_1 := okpo_;
 
-         ---надходження в?д нерезидент?в безгот?вково? валюти
-         OPEN opl_dok;
+      ---надходження в?д нерезидент?в безгот?вково? валюти
+      OPEN opl_dok;
 
-         LOOP
-            FETCH opl_dok
-             INTO ko_1, ref_, acc_, nls_, kv_, nlsk_, accd_, nazn_, sum0_, sumk0_ ;
+      LOOP
+         FETCH opl_dok
+          INTO ko_1, ref_, acc_, nls_, kv_, nlsk_, accd_, nazn_, sum0_, sumk0_ ;
 
-            EXIT WHEN opl_dok%NOTFOUND;
+         EXIT WHEN opl_dok%NOTFOUND;
 
-            okpo_ := okpo_1;
-            nls1_  := substr(nls_,1,2);
-            d1#C9_ := null;
-            d2#C9_ := null;
-            d3#C9_ := null;
-            d4#C9_ := null;
-            d6#C9_ := null;
-            dc#C9_ := null;
-            d99#C9_:= null;
-            de#C9_ := null;
-            val_   := null;
-            kol_99 := 0;
-            refd1_ := ref_;
-            kod_g_ := null;
-            s_nom_2603 := 0;
-            name_sp_ := '';
+         okpo_ := okpo_1;
+         nls1_  := substr(nls_,1,2);
+         d1#C9_ := null;
+         d2#C9_ := null;
+         d3#C9_ := null;
+         d4#C9_ := null;
+         d6#C9_ := null;
+         dc#C9_ := null;
+         d99#C9_:= null;
+         de#C9_ := null;
+         val_   := null;
+         kol_99 := 0;
+         refd1_ := ref_;
+         kod_g_ := null;
+         s_nom_2603 := 0;
+         name_sp_ := '';
 
-            if nlsk_ like '2909______0000%' and nls_ like '2909%'
-            then
-               begin
-                  select c.okpo
-                     into okpo_
-                    from opldok p, opldok p1, accounts a, customer c
-                    where p.fdat = Dat_
-                      and p.dk = 0 
-                      and p.acc = acc_                                        
-                      and p.s = sum0_
-                      and p.ref = p1.ref 
-                      and p.stmt = p1.stmt 
-                      and p1.dk = 1
-                      and p1.acc = a.acc
-                      and (a.nls like '2603%' or a.nls like '2620%') 
-                      and a.rnk = c.rnk
-                      and rownum = 1 ; 
-               EXCEPTION WHEN NO_DATA_FOUND THEN
-                  NULL;
-               END;
-            end if;
+         if nlsk_ like '2909______0000%' and nls_ like '2909%'
+         then
+            begin
+               select c.okpo
+                  into okpo_
+                 from opldok p, opldok p1, accounts a, customer c
+                 where p.fdat = Dat_
+                   and p.dk = 0 
+                   and p.acc = acc_                                        
+                   and p.s = sum0_
+                   and p.ref = p1.ref 
+                   and p.stmt = p1.stmt 
+                   and p1.dk = 1
+                   and p1.acc = a.acc
+                   and (a.nls like '2603%' or a.nls like '2620%') 
+                   and a.rnk = c.rnk
+                   and rownum = 1 ; 
+            EXCEPTION WHEN NO_DATA_FOUND THEN
+               NULL;
+            END;
+         end if;
 
-            if nlsk_ like '2603%' and nls_ like '2900%' 
-            then
-               begin
-                  select ref
-                     into refd1_
-                  from otcn_f70_temp
-                  where nlsd like '2603%'
-                    and (nlsk like '2600%' or nlsk like '2650%')
-                    and kv = kv_
-                    and round(s_nom/100, 0) = round(sum0_/100, 0)
-                    and rnk = rnk_
-                    and rownum = 1;
-               exception when no_data_found then
-                  null;
-               end;
-            end if;
+         if nlsk_ like '2603%' and nls_ like '2900%' 
+         then
+            begin
+               select ref
+                  into refd1_
+               from otcn_f70_temp
+               where nlsd like '2603%'
+                 and (nlsk like '2600%' or nlsk like '2650%')
+                 and kv = kv_
+                 and round(s_nom/100, 0) = round(sum0_/100, 0)
+                 and rnk = rnk_
+                 and rownum = 1;
+            exception when no_data_found then
+               null;
+            end;
+         end if;
 
-            IF (ko_ = '3' AND ROUND (sumk0_ / kurs_, 0) > gr_sumn_ AND
-                ( nls1_ not in ('15','16') OR
-                  ( nls1_ in ('15','16') and codc_ in (2,4,6)
-                  ) 
-                ) 
-               ) OR
-               ROUND (GL.p_icurval(kv_, s_nom_2603, dat_) / kurs_, 0) > gr_sumn_
+         IF (ko_ = '3' AND ROUND (sumk0_ / kurs_, 0) > gr_sumn_ AND
+             ( nls1_ not in ('15','16') OR
+               ( nls1_ in ('15','16') and codc_ in (2,4,6)
+               ) 
+             ) 
+            ) OR
+            ROUND (GL.p_icurval(kv_, s_nom_2603, dat_) / kurs_, 0) > gr_sumn_
 
+         THEN
+            dig_ := f_ret_dig (kv_) * 100;
+                                    -- сумма должна быть в единицах валюты
+
+            IF ko_ = ko_1
             THEN
-               dig_ := f_ret_dig (kv_) * 100;
-                                       -- сумма должна быть в единицах валюты
-
-               IF ko_ = ko_1
+               IF typ_ > 0
                THEN
-                  IF typ_ > 0
-                  THEN
-                     nbuc_ := NVL (f_codobl_tobo (acc_, typ_), nbuc1_);
-                  ELSE
-                     nbuc_ := nbuc1_;
-                  END IF;
+                  nbuc_ := NVL (f_codobl_tobo (acc_, typ_), nbuc1_);
+               ELSE
+                  nbuc_ := nbuc1_;
+               END IF;
 
                -- OAB добавил 16.06.06 по просьбе Сбербанка
                -- определяем код страны перечисления валюты
-                  if ko_ = 3 
-                  then 
-                     BEGIN
-                        SELECT SUBSTR (VALUE, 1, 70)
-                           INTO d6#c9_
-                        FROM operw
-                        WHERE REF = refd1_ AND tag = 'D6#70';
-                     EXCEPTION
-                        WHEN NO_DATA_FOUND
-                        THEN
-                        d6#C9_ := NULL;
-                     END;
+               if ko_ = 3 
+               then 
+                  BEGIN
+                     SELECT SUBSTR (VALUE, 1, 70)
+                        INTO d6#c9_
+                     FROM operw
+                     WHERE REF = refd1_ AND tag = 'D6#70';
+                  EXCEPTION
+                     WHEN NO_DATA_FOUND
+                     THEN
+                     d6#C9_ := NULL;
+                  END;
+               end if;
+               
+               for k in (select * from operw where ref=refd1_)
+
+               loop
+
+                  -- с 01.08.2012 добавляется код страны отправителя или получателя перевода
+                  if k.tag like 'n%' and substr(trim(k.value),1,1) in ('O','P','О','П') 
+                  then
+                     kod_g_ := substr(trim(k.value),2,3);
                   end if;
-                  
-                  for k in (select * from operw where ref=refd1_)
 
-                  loop
+                  if kod_g_ is null and k.tag like 'n%' and substr(trim(k.value),1,1) not in ('O','P','О','П') 
+                  then
+                     kod_g_ := substr(trim(k.value),1,3);
+                  end if;
 
-                     -- с 01.08.2012 добавляется код страны отправителя или получателя перевода
-                     if k.tag like 'n%' and substr(trim(k.value),1,1) in ('O','P','О','П') 
-                     then
-                        kod_g_ := substr(trim(k.value),2,3);
-                     end if;
+                  if kod_g_ is null and k.tag like 'D6#70%' and substr(trim(k.value),1,1) in ('O','P','О','П') 
+                  then
+                     kod_g_ := substr(trim(k.value),2,3);
+                  end if;
 
-                     if kod_g_ is null and k.tag like 'n%' and substr(trim(k.value),1,1) not in ('O','P','О','П') 
-                     then
-                        kod_g_ := substr(trim(k.value),1,3);
-                     end if;
+                  if kod_g_ is null and k.tag like 'D6#70%' and substr(trim(k.value),1,1) not in ('O','P','О','П') 
+                  then
+                     kod_g_ := substr(trim(k.value),1,3);
+                  end if;
 
-                     if kod_g_ is null and k.tag like 'D6#70%' and substr(trim(k.value),1,1) in ('O','P','О','П') 
-                     then
-                        kod_g_ := substr(trim(k.value),2,3);
-                     end if;
- 
-                     if kod_g_ is null and k.tag like 'D6#70%' and substr(trim(k.value),1,1) not in ('O','P','О','П') 
-                     then
-                        kod_g_ := substr(trim(k.value),1,3);
-                     end if;
+                  if kod_g_ is null and k.tag like 'D6#E2%' and substr(trim(k.value),1,1) in ('O','P','О','П') 
+                  then
+                     kod_g_ := substr(trim(k.value),2,3);
+                  end if;
 
-                     if kod_g_ is null and k.tag like 'D6#E2%' and substr(trim(k.value),1,1) in ('O','P','О','П') 
-                     then
-                        kod_g_ := substr(trim(k.value),2,3);
-                     end if;
+                  if kod_g_ is null and k.tag like 'D6#E2%' and substr(trim(k.value),1,1) not in ('O','P','О','П') 
+                  then
+                     kod_g_ := substr(trim(k.value),1,3);
+                  end if;
 
-                     if kod_g_ is null and k.tag like 'D6#E2%' and substr(trim(k.value),1,1) not in ('O','P','О','П') 
-                     then
-                        kod_g_ := substr(trim(k.value),1,3);
-                     end if;
+                  if kod_g_ is null and k.tag like 'D1#E9%' and substr(trim(k.value),1,1) in ('O','P','О','П') 
+                  then
+                     kod_g_ := substr(trim(k.value),2,3);
+                  end if;
 
-                     if kod_g_ is null and k.tag like 'D1#E9%' and substr(trim(k.value),1,1) in ('O','P','О','П') 
-                     then
-                        kod_g_ := substr(trim(k.value),2,3);
-                     end if;
+                  if kod_g_ is null and k.tag like 'D1#E9%' and substr(trim(k.value),1,1) not in ('O','P','О','П') 
+                  then
+                     kod_g_ := substr(trim(k.value),1,3);
+                  end if;
 
-                     if kod_g_ is null and k.tag like 'D1#E9%' and substr(trim(k.value),1,1) not in ('O','P','О','П') 
-                     then
-                        kod_g_ := substr(trim(k.value),1,3);
-                     end if;
+               end loop;
 
-                  end loop;
-
-                  -- новый блок 14.03.2017
-                  IF kod_g_ is null 
-                  THEN
+               -- новый блок 14.03.2017
+               IF kod_g_ is null 
+               THEN
+                  BEGIN
+                     SELECT substr(trim(value), instr(UPPER(trim(value)),'3/')+2, 2)
+                        INTO swift_k_
+                     FROM OPERW
+                     WHERE REF=REFD1_
+                       AND TAG LIKE '50F%'
+                       AND ROWNUM = 1;
+                       
+                     SELECT trim(b.k040)
+                     INTO kod_g_
+                     from kl_k040 b
+                     where b.A2 like swift_k_ || '%';            
+                  EXCEPTION WHEN NO_DATA_FOUND THEN
                      BEGIN
-                        SELECT substr(trim(value), instr(UPPER(trim(value)),'3/')+2, 2)
-                           INTO swift_k_
+                        SELECT substr(trim(value), instr(UPPER(trim(value)),'/')+1, 2)
+                        INTO swift_k_
                         FROM OPERW
                         WHERE REF=REFD1_
-                          AND TAG LIKE '50F%'
+                          AND TAG LIKE '50K%'
                           AND ROWNUM = 1;
-                          
+                       
                         SELECT trim(b.k040)
-                        INTO kod_g_
+                           INTO kod_g_
                         from kl_k040 b
-                        where b.A2 like swift_k_ || '%';            
+                        where b.A2 like swift_k_ || '%'; 
                      EXCEPTION WHEN NO_DATA_FOUND THEN
                         BEGIN
-                           SELECT substr(trim(value), instr(UPPER(trim(value)),'/')+1, 2)
-                           INTO swift_k_
+                           SELECT substr(trim(value), 1, 10)
+                              INTO swift_k_
                            FROM OPERW
-                           WHERE REF=REFD1_
-                             AND TAG LIKE '50K%'
+                           WHERE REF = REFD1_
+                             AND TAG = '52A'
+                             AND length(trim(value)) > 3
                              AND ROWNUM = 1;
-                          
-                           SELECT trim(b.k040)
-                              INTO kod_g_
-                           from kl_k040 b
-                           where b.A2 like swift_k_ || '%'; 
+      
+                           BEGIN
+                              SELECT k040
+                                 INTO kod_g_
+                              FROM RC_BNK
+                              WHERE SWIFT_CODE LIKE swift_k_||'%'
+                                AND ROWNUM = 1;
+                           EXCEPTION WHEN NO_DATA_FOUND THEN
+                              swift_k_ := substr(swift_k_,1,4)||' '||substr(swift_k_,5,2)||
+                                        ' '||substr(swift_k_,7,2);
+                              BEGIN
+                                 SELECT k040
+                                    INTO kod_g_
+                                 FROM RC_BNK
+                                 WHERE SWIFT_CODE LIKE swift_k_||'%'
+                                   AND ROWNUM = 1;
+                              EXCEPTION WHEN NO_DATA_FOUND THEN
+                                 null;
+                              END;
+                           END;
                         EXCEPTION WHEN NO_DATA_FOUND THEN
                            BEGIN
-                              SELECT substr(trim(value), 1, 10)
+                              SELECT substr(trim(value), 10, 10)
                                  INTO swift_k_
                               FROM OPERW
                               WHERE REF = REFD1_
                                 AND TAG = '52A'
-                                AND length(trim(value)) > 3
+                                AND length(trim(value)) > 10
                                 AND ROWNUM = 1;
-         
+      
                               BEGIN
                                  SELECT k040
                                     INTO kod_g_
@@ -1525,131 +1565,100 @@ BEGIN
                                  END;
                               END;
                            EXCEPTION WHEN NO_DATA_FOUND THEN
-                              BEGIN
-                                 SELECT substr(trim(value), 10, 10)
-                                    INTO swift_k_
-                                 FROM OPERW
-                                 WHERE REF = REFD1_
-                                   AND TAG = '52A'
-                                   AND length(trim(value)) > 10
-                                   AND ROWNUM = 1;
-         
-                                 BEGIN
-                                    SELECT k040
-                                       INTO kod_g_
-                                    FROM RC_BNK
-                                    WHERE SWIFT_CODE LIKE swift_k_||'%'
-                                      AND ROWNUM = 1;
-                                 EXCEPTION WHEN NO_DATA_FOUND THEN
-                                    swift_k_ := substr(swift_k_,1,4)||' '||substr(swift_k_,5,2)||
-                                              ' '||substr(swift_k_,7,2);
-                                    BEGIN
-                                       SELECT k040
-                                          INTO kod_g_
-                                       FROM RC_BNK
-                                       WHERE SWIFT_CODE LIKE swift_k_||'%'
-                                         AND ROWNUM = 1;
-                                    EXCEPTION WHEN NO_DATA_FOUND THEN
-                                       null;
-                                    END;
-                                 END;
-                              EXCEPTION WHEN NO_DATA_FOUND THEN
-                                 null;
-                              END;
+                              null;
                            END;
                         END;
                      END;
-                  END IF;
+                  END;
+               END IF;
 
-                  if kod_g_ is null 
-                  then
+               if kod_g_ is null 
+               then
+                  BEGIN
+                     SELECT substr(value,1,3)
+                        INTO kod_g_
+                     FROM OPERW
+                     WHERE REF = refd1_ AND tag = 'KOD_G';
+                  EXCEPTION WHEN NO_DATA_FOUND THEN
                      BEGIN
-                        SELECT substr(value,1,3)
+                        SELECT '804'
                            INTO kod_g_
                         FROM OPERW
-                        WHERE REF = refd1_ AND tag = 'KOD_G';
+                        WHERE REF = refd1_ 
+                          AND tag = '50F'
+                          AND instr(UPPER(trim(value)),'3/UA') > 0;
                      EXCEPTION WHEN NO_DATA_FOUND THEN
-                        BEGIN
-                           SELECT '804'
-                              INTO kod_g_
-                           FROM OPERW
-                           WHERE REF = refd1_ 
-                             AND tag = '50F'
-                             AND instr(UPPER(trim(value)),'3/UA') > 0;
-                        EXCEPTION WHEN NO_DATA_FOUND THEN
-                           kod_g_ := NULL;
-                        END;
+                        kod_g_ := NULL;
                      END;
-                  end if;
+                  END;
+               end if;
 
-                  if d6#C9_ is null and trim(kod_g_) is not null 
+               if d6#C9_ is null and trim(kod_g_) is not null 
+               then
+                  d6#C9_ := kod_g_;
+               end if;
+
+               if d6#C9_ is null or d6#C9_ not in ('804','UKR') 
+               then
+
+                  -- для проводок Дт 2909 Кт 2924 в OPER NLSA='2909...' NLSB='2625...' 
+                  -- будем выбирать первоначальную сумму док-та
+                  -- и будем определять код ОКПО для счета 2625
+                  if nlsk_ like '2909%' and nls_ like '2924%'
                   then
-                     d6#C9_ := kod_g_;
-                  end if;
+                     BEGIN
+                        select o.s, trim(o.id_b)
+                           into sum0_, okpo_
+                        from oper o 
+                        where o.ref = ref_
+                          and o.nlsa like '2909%'
+                          and o.nlsb like '2625%';                              
+                        --select p.ps, trim(c.okpo)
+                        --   into sum0_, okpo_
+                        --from provodki_otc p, customer c
+                        --where fdat = Dat_ 
+                        --  and p.ref = ref_
+                        --  and p.nlsd like nls_ || '%'
+                        --  and p.nlsk like '2625%'
+                        --  and p.rnkk = c.rnk;               
+                     EXCEPTION WHEN NO_DATA_FOUND THEN
+                        NULL;
+                     END;  
+                  end if; 
 
-                  if d6#C9_ is null or d6#C9_ not in ('804','UKR') 
+                  if ref_ = refd1_
                   then
+                     nnnn_ := nnnn_ + 1;
 
-                     --if mfo_ = 353553 then
-                        -- для проводок Дт 2909 Кт 2924 в OPER NLSA='2909...' NLSB='2625...' 
-                        -- будем выбирать первоначальную сумму док-та
-                        -- и будем определять код ОКПО для счета 2625
-                        if nlsk_ like '2909%' and nls_ like '2924%'
-                        then
-                           BEGIN
-                              select o.s, trim(o.id_b)
-                                 into sum0_, okpo_
-                              from oper o 
-                              where o.ref = ref_
-                                and o.nlsa like '2909%'
-                                and o.nlsb like '2625%';                              
-                              --select p.ps, trim(c.okpo)
-                              --   into sum0_, okpo_
-                              --from provodki_otc p, customer c
-                              --where fdat = Dat_ 
-                              --  and p.ref = ref_
-                              --  and p.nlsd like nls_ || '%'
-                              --  and p.nlsk like '2625%'
-                              --  and p.rnkk = c.rnk;               
-                           EXCEPTION WHEN NO_DATA_FOUND THEN
-                              NULL;
-                           END;  
-                        end if; 
-                     --end if;
+                     -- код валюти
+                     p_ins (nnnn_, '10', LPAD (kv_, 3, '0'));
 
-                     if ref_ = refd1_
+                     -- сума в единицах валюты (код 12)
+                     -- округлять будем общую сумму по клиенту в TMP_NBU
+                     --p_ins (nnnn_, '20', TO_CHAR (ROUND (sum0_ / dig_, 0)));
+                     p_ins (nnnn_, '20', TO_CHAR (sum0_));
+
+                     -- ОКПО клiєнта
+                     -- для нерезидентiв
+                     IF (rez_ = 0 and trim(okpo_) is null) OR 
+                        (rez_ = 0 and trim(okpo_) in ('00000','000000000','0000000000','99999') )
+                     THEN
+                        okpo_ := '0';
+                     END IF;
+
+                     if okpo_ = ourOKPO_ 
                      then
-                        nnnn_ := nnnn_ + 1;
+                        okpo_ := ourGLB_;
+                        codc_ := 1 ;
+                     end if;
 
-                        -- код валюти
-                        p_ins (nnnn_, '10', LPAD (kv_, 3, '0'));
+                     p_ins (nnnn_, '31', TRIM (okpo_));
 
-                        -- сума в единицах валюты (код 12)
-                        -- округлять будем общую сумму по клиенту в TMP_NBU
-                        --p_ins (nnnn_, '20', TO_CHAR (ROUND (sum0_ / dig_, 0)));
-                        p_ins (nnnn_, '20', TO_CHAR (sum0_));
-
-                        -- ОКПО клiєнта
-                        -- для нерезидентiв
-                        IF (rez_ = 0 and trim(okpo_) is null) OR 
-                           (rez_ = 0 and trim(okpo_) in ('00000','000000000','0000000000','99999') )
-                        THEN
-                           okpo_ := '0';
-                        END IF;
-
-                        if okpo_ = ourOKPO_ 
-                        then
-                           okpo_ := ourGLB_;
-                           codc_ := 1 ;
-                        end if;
-
-                        p_ins (nnnn_, '31', TRIM (okpo_));
-
-                        if dat_ >= to_date('13082007','ddmmyyyy') 
-                        then
-                           -- код резидентностi
-                           p_ins (nnnn_, '35', TO_CHAR(2 - mod(codc_,2)));
-                        end if;
+                     if dat_ >= to_date('13082007','ddmmyyyy') 
+                     then
+                        -- код резидентностi
+                        p_ins (nnnn_, '35', TO_CHAR(2 - mod(codc_,2)));
+                     end if;
                   else 
                      BEGIN
                         select substr(kodp,3,3)
@@ -1668,237 +1677,236 @@ BEGIN
                   end if;
                end if;
 
-                  refd_ := to_number(trim(f_dop(ref_, 'NOS_R')));
+               refd_ := to_number(trim(f_dop(ref_, 'NOS_R')));
 
+               begin
+                  select trim(nd)
+                     into nd_
+                  from oper
+                  where ref = ref_;
+               exception
+                         when no_data_found then
+                  nd_ := '0';
+               end;
+
+               if refd_ is null 
+               then
                   begin
-                     select trim(nd)
-                        into nd_
+                     select ref
+                        into refd_
                      from oper
-                     where ref = ref_;
+                     where vdat = any (select max(fdat) from fdat where fdat BETWEEN dat_ - 7 AND dat_)  
+                       --vdat between dat_ - 7 and dat_  
+                       and nlsb = nls_ 
+                       and kv = kv_ 
+                       and refl = ref_;
                   exception
                             when no_data_found then
-                     nd_ := '0';
-                  end;
-
-                  if refd_ is null 
-                  then
                      begin
                         select ref
                            into refd_
                         from oper
                         where vdat = any (select max(fdat) from fdat where fdat BETWEEN dat_ - 7 AND dat_)  
-                          --vdat between dat_ - 7 and dat_  
+                          --vdat between dat_ - 7 and dat_ 
                           and nlsb = nls_ 
                           and kv = kv_ 
-                          and refl = ref_;
+                          and ref like nd_ || '%';
                      exception
-                               when no_data_found then
+                            when others then
                         begin
                            select ref
                               into refd_
                            from oper
-                           where vdat = any (select max(fdat) from fdat where fdat BETWEEN dat_ - 7 AND dat_)  
-                             --vdat between dat_ - 7 and dat_ 
-                             and nlsb = nls_ 
-                             and kv = kv_ 
-                             and ref like nd_ || '%';
+                           where vdat = dat_ 
+                             and nlsa like '2909%'   
+                             and nlsb = nlsk_ 
+                             and kv   = kv_ 
+                             and s = sum0_   
+                             and rownum = 1;
                         exception
-                               when others then
-                           begin
-                              select ref
-                                 into refd_
-                              from oper
-                              where vdat = dat_ 
-                                and nlsa like '2909%'   
-                                and nlsb = nlsk_ 
-                                and kv   = kv_ 
-                                and s = sum0_   
-                                and rownum = 1;
-                           exception
-                                  when no_data_found then
-                              refd_ := null;
-                           end;
+                               when no_data_found then
+                           refd_ := null;
                         end;
                      end;
-                  end if;
+                  end;
+               end if;
 
-                  begin
-                     select p.pid, max(p.id)
-                        into pid_, id_
-                     from contract_p p
-                     where p.ref = ref_
-                     group by p.pid;
+               begin
+                  select p.pid, max(p.id)
+                     into pid_, id_
+                  from contract_p p
+                  where p.ref = ref_
+                  group by p.pid;
 
-                     select lpad(to_char(t.id_oper),2,'0'),
-                            t.name, to_char(t.dateopen, 'ddmmyyyy'),
-                            t.bankcountry
-                        into D1#C9_, D2#C9_, D3#C9_, D6#C9_
-                     from top_contracts t
-                     where t.pid = pid_; --and p.kv=t.kv - Инна сказала, что это условие лишнее (платеж м.б. в другой валюте)
+                  select lpad(to_char(t.id_oper),2,'0'),
+                         t.name, to_char(t.dateopen, 'ddmmyyyy'),
+                         t.bankcountry
+                     into D1#C9_, D2#C9_, D3#C9_, D6#C9_
+                  from top_contracts t
+                  where t.pid = pid_; --and p.kv=t.kv - Инна сказала, что это условие лишнее (платеж м.б. в другой валюте)
 
+                  BEGIN
+                     select max(trim(name))
+                        into DC#C9_max
+                     from tamozhdoc
+                     where pid = pid_
+                       and id = id_ ;
+
+                     select count(*)
+                        INTO kol_99
+                     from contract_p
+                     where ref = ref_;
+                  exception
+                            when no_data_found then
+                     DC#C9_ := null;
+                  END;
+
+                  if DC#C9_max is not null 
+                  then
                      BEGIN
-                        select max(trim(name))
-                           into DC#C9_max
-                        from tamozhdoc
-                        where pid = pid_
-                          and id = id_ ;
-
-                        select count(*)
-                           INTO kol_99
-                        from contract_p
-                        where ref = ref_;
+                        select to_char(t.datedoc,'ddmmyyyy'),
+                               lpad(trim(c.cnum_cst),9,'#')||'/'||
+                               substr(c.cnum_year,-1)||'/'||
+                               lpad(DC#C9_max,6,'0')
+                           into D4#C9_, DC#C9_
+                        from tamozhdoc t, customs_decl c
+                        where t.pid = pid_
+                          and t.id = id_
+                          and trim(t.name) = trim(DC#C9_max)
+                          and trim(c.cnum_num) = trim(t.name)
+                          and trim(c.f_okpo) = trim(okpo_)
+                          and rownum = 1;
                      exception
                                when no_data_found then
-                        DC#C9_ := null;
-                     END;
+                        dc#c9_ := dc#c9_max;  --null;
+                     end;
 
-                     if DC#C9_max is not null 
+                     if kol_99 <= 3 
                      then
-                        BEGIN
-                           select to_char(t.datedoc,'ddmmyyyy'),
+                        for k in ( select pid, id
+                                   from contract_p
+                                   where ref = ref_ and id <> id_
+                                   order by pid, id )
+
+                        loop
+
+                           select t.name, to_char(t.datedoc,'dd/mm/yyyy'),
                                   lpad(trim(c.cnum_cst),9,'#')||'/'||
-                                  substr(c.cnum_year,-1)||'/'||
-                                  lpad(DC#C9_max,6,'0')
-                              into D4#C9_, DC#C9_
-                           from tamozhdoc t, customs_decl c
-                           where t.pid = pid_
-                             and t.id = id_
-                             and trim(t.name) = trim(DC#C9_max)
+                                  substr(c.cnum_year,-1)||'/'
+                              into name_, datedoc_, DC1#C9_
+                           from  tamozhdoc t, customs_decl c
+                           where t.pid = k.pid
+                             and t.id = k.id
                              and trim(c.cnum_num) = trim(t.name)
                              and trim(c.f_okpo) = trim(okpo_)
                              and rownum = 1;
-                        exception
-                                  when no_data_found then
-                           dc#c9_ := dc#c9_max;  --null;
-                        end;
 
-                        if kol_99 <= 3 
-                        then
-                           for k in ( select pid, id
-                                      from contract_p
-                                      where ref = ref_ and id <> id_
-                                      order by pid, id )
+                           D99#C9_ := D99#C9_||DC1#C9_||trim(name_)||' '||
+                                      datedoc_||',';
 
-                           loop
-
-                              select t.name, to_char(t.datedoc,'dd/mm/yyyy'),
-                                     lpad(trim(c.cnum_cst),9,'#')||'/'||
-                                     substr(c.cnum_year,-1)||'/'
-                                 into name_, datedoc_, DC1#C9_
-                              from  tamozhdoc t, customs_decl c
-                              where t.pid = k.pid
-                                and t.id = k.id
-                                and trim(c.cnum_num) = trim(t.name)
-                                and trim(c.f_okpo) = trim(okpo_)
-                                and rownum = 1;
-
-                              D99#C9_ := D99#C9_||DC1#C9_||trim(name_)||' '||
-                                         datedoc_||',';
-
-                           end loop;
-                        else
-                           D99#C9_ := 'оплата за'||to_char(kol_99)||'-ма ВМД';
-                        end if;
+                        end loop;
+                     else
+                        D99#C9_ := 'оплата за'||to_char(kol_99)||'-ма ВМД';
                      end if;
-                  exception
-                            when no_data_found then
-                     null;
-                            when too_many_rows then
-                     null; -- если платеж по нескольким контрактам, то пусть разбивают сумму и вводят реквизиты сами
-                  end;
-
-                  if refd_ is null 
-                  then
-                     refd_ := ref_;
                   end if;
+               exception
+                         when no_data_found then
+                  null;
+                         when too_many_rows then
+                  null; -- если платеж по нескольким контрактам, то пусть разбивают сумму и вводят реквизиты сами
+               end;
 
-                  -- додатковi параметри
-                  IF dat_ < TO_DATE ('13-08-2007','dd-mm-yyyy')
-                  THEN
-                     n_ := 11;
-                  ELSE
-                     n_ := 13;
-                  END IF;
+               if refd_ is null 
+               then
+                  refd_ := ref_;
+               end if;
 
-                  IF dat_ >= to_date('01062009','ddmmyyyy') and dat_ <= dat_Izm1_
-                  THEN
-                     n_ := 14;
-                  END IF;
-
-                  if ref_ = refd1_ 
-                  then
-
-                     FOR i IN 1 .. n_
-                     LOOP
-                        tag_ := '';
-                       
-                        IF i < 10
-                        THEN
-                           tag_ := 'D' || TO_CHAR (i) || '#70';
-                        ELSIF i = 10
-                        THEN
-                           tag_ := 'DA#70';
-                        ELSIF i = 11
-                        THEN
-                           tag_ := 'DB#70';
-                        ELSIF i = 12
-                        THEN
-                           tag_ := 'DC#70';
-                        ELSIF i = 13
-                        THEN
-                           tag_ := 'DD#70';
-                        ELSE
-                           tag_ := 'DE#C9';
-                        END IF;
-
-                        IF i = 1 
-                        THEN
-                           tag_ := 'D1#C9';
-                        END IF;
-
-                        -- с 01.07.2005 для поступлений от нерезидентов нужны
-                        -- доп.реквизиты (D1#70,D6#70,D9#70,DA#70)
-                        -- с 28.02.2006 нужны доп.реквизиты (D1#70,D6#70,DB#70)
-                        -- с 13.08.2007 нужны доп.реквизиты (D1#70, D2#70, D3#70,
-                        --                                   D4#70, D6#70, DB#70,
-                        --                                   DC#70)
-
-                        IF (dat_ < TO_DATE ('13-08-2007','dd-mm-yyyy') and
-                            ko_ = 3 AND i IN (1, 6, 11)) OR
-                           (dat_ >= TO_DATE ('13-08-2007','dd-mm-yyyy') and
-                            dat_ <  TO_DATE ('01-06-2009','dd-mm-yyyy') and
-                            ko_ = 3 AND i IN (1, 2, 3, 4, 6, 11, 12, 13) OR
-                           (dat_ >= TO_DATE ('01-06-2009','dd-mm-yyyy') and
-                            ko_ = 3 AND i IN (1, 6, 11, 13, 14)))
-                           THEN
-                           -- 16.06.06 OAB добавил условие, если Украина, то не формируем
-                           IF d6#C9_ IS NULL OR TRIM (d6#C9_) not in ('804','UKR')
-                           THEN
-                              BEGIN
-                                 SELECT SUBSTR (VALUE, 1, 70)
-                                    INTO val_
-                                 FROM operw
-                                 WHERE REF = refd_ AND tag = tag_;
-                              EXCEPTION
-                                 WHEN NO_DATA_FOUND
-                                 THEN
-                                 val_ := NULL;
-                              END;
-
-                              -- код показника та default-значення
-                              p_tag (i, val_, kodp_, ref_, nazn_);
-                              -- запис показника
-                              p_ins (nnnn_, kodp_, val_);
-                           END IF;
-                        END IF;
-                     END LOOP;
-                  end if;
-
+               -- додатковi параметри
+               IF dat_ < TO_DATE ('13-08-2007','dd-mm-yyyy')
+               THEN
+                  n_ := 11;
+               ELSE
+                  n_ := 13;
                END IF;
-            END IF;
-         END LOOP;
 
-         CLOSE opl_dok;
+               IF dat_ >= to_date('01062009','ddmmyyyy') and dat_ <= dat_Izm1_
+               THEN
+                  n_ := 14;
+               END IF;
+
+               if ref_ = refd1_ 
+               then
+
+                  FOR i IN 1 .. n_
+                  LOOP
+                     tag_ := '';
+                 
+                     IF i < 10
+                     THEN
+                        tag_ := 'D' || TO_CHAR (i) || '#70';
+                     ELSIF i = 10
+                     THEN
+                        tag_ := 'DA#70';
+                     ELSIF i = 11
+                     THEN
+                        tag_ := 'DB#70';
+                     ELSIF i = 12
+                     THEN
+                        tag_ := 'DC#70';
+                     ELSIF i = 13
+                     THEN
+                        tag_ := 'DD#70';
+                     ELSE
+                        tag_ := 'DE#C9';
+                     END IF;
+
+                     IF i = 1 
+                     THEN
+                        tag_ := 'D1#C9';
+                     END IF;
+
+                     -- с 01.07.2005 для поступлений от нерезидентов нужны
+                     -- доп.реквизиты (D1#70,D6#70,D9#70,DA#70)
+                     -- с 28.02.2006 нужны доп.реквизиты (D1#70,D6#70,DB#70)
+                     -- с 13.08.2007 нужны доп.реквизиты (D1#70, D2#70, D3#70,
+                     --                                   D4#70, D6#70, DB#70,
+                     --                                   DC#70)
+
+                     IF (dat_ < TO_DATE ('13-08-2007','dd-mm-yyyy') and
+                         ko_ = 3 AND i IN (1, 6, 11)) OR
+                        (dat_ >= TO_DATE ('13-08-2007','dd-mm-yyyy') and
+                         dat_ <  TO_DATE ('01-06-2009','dd-mm-yyyy') and
+                         ko_ = 3 AND i IN (1, 2, 3, 4, 6, 11, 12, 13) OR
+                        (dat_ >= TO_DATE ('01-06-2009','dd-mm-yyyy') and
+                         ko_ = 3 AND i IN (1, 6, 11, 13, 14)))
+                     THEN
+                        -- 16.06.06 OAB добавил условие, если Украина, то не формируем
+                        IF d6#C9_ IS NULL OR TRIM (d6#C9_) not in ('804','UKR')
+                        THEN
+                           BEGIN
+                              SELECT SUBSTR (VALUE, 1, 70)
+                                  INTO val_
+                              FROM operw
+                              WHERE REF = refd_ AND tag = tag_;
+                           EXCEPTION
+                              WHEN NO_DATA_FOUND
+                              THEN
+                              val_ := NULL;
+                           END;
+
+                           -- код показника та default-значення
+                           p_tag (i, val_, kodp_, ref_, nazn_);
+                           -- запис показника
+                           p_ins (nnnn_, kodp_, val_);
+                        END IF;
+                     END IF;
+                  END LOOP;
+               end if;
+            END IF;
+         END IF;
+      END LOOP;
+
+      CLOSE opl_dok;
    END LOOP;
 
    CLOSE c_main;
@@ -1914,7 +1922,6 @@ then
    for k in ( SELECT t.kv, t.ref,
                      SUM ( NVL(round(z.s2 / 0.50,0), t.s_nom) ) s_nom, 
                      SUM (t.s_eqv) s_eqv
-              --FROM otcn_f70_temp t, zayavka z
                FROM (select a.kv, a.nls nlsk, o.ref, o.s s_nom,o.sq s_eqv 
                      from opldok o, accounts a 
                      where o.fdat = dat_ 
@@ -1976,7 +1983,6 @@ then
         end if;
 
         -- сума в единицах валюты (код 12)
-        --p_ins (nnnn_, '20', TO_CHAR (round(k.s_nom / dig_ * 0.75,0)));
         p_ins (nnnn_, '20', TO_CHAR (k.s_nom));
 
      end loop;

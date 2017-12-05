@@ -1,4 +1,21 @@
-﻿var save_try = false;
+﻿var _useNewNbs = useNewNbs();
+
+function useNewNbs() {
+    var res = 'true';
+    $.ajax({
+        type: "POST",
+        url: bars.config.urlContent("/webservices/NewNbs.asmx/UseNewNbs"),
+
+        async: false,
+        success: function (result) {
+            if (result)
+                res = result.text || result.children[0].innerHTML;
+        }
+    });
+    return res.toLowerCase() == 'true';
+};
+
+var save_try = false;
 var isNewAcc = false;
 var dpt_param = null;
 var flagEnhCheck = false;
@@ -120,7 +137,7 @@ function onPopulate(result) {
 //Показать список валют
 function fnShowValutes() {
     var result = window.showModalDialog("ListValuts.aspx", "", "dialogWidth:800px;dialogHeight:800px;center:yes;edge:sunken;help:no;status:no;");
-    if (result != null) {        
+    if (result != null) {
         document.getElementById("cbOnAllValuts").disabled = true;
         codValutes = result;
         OnAllValuts = true;
@@ -155,7 +172,7 @@ function CloseAccount() {
                     <div><label><input type="radio" id="closureReason3" name="closureReason" value="3" /> за ініциативою клієнта</label> </div>\
                     <div><label><input type="radio" id="closureReason5" name="closureReason" value="5" /> не за ініциативою клієнта</label> </div>\
                     ';
-        alertify.confirm(html, function(e) {
+        alertify.confirm(html, function (e) {
             if (e) {
                 var closureReason = null;
                 if (document.getElementById('closureReason3').checked) {
@@ -214,12 +231,12 @@ function CloseWindow() {
 }
 function CheckChange() {
     if (!OnAllValuts &&
-     edit_data.value.general.edit == false &&
-     edit_data.value.sp.edit == false &&
-     edit_data.value.percent.edit == false &&
-     edit_data.value.percent.edittbl == false &&
-     edit_data.value.rates.edit == false &&
-     edit_data.value.sob.edit == false)
+        edit_data.value.general.edit == false &&
+        edit_data.value.sp.edit == false &&
+        edit_data.value.percent.edit == false &&
+        edit_data.value.percent.edittbl == false &&
+        edit_data.value.rates.edit == false &&
+        edit_data.value.sob.edit == false)
         return false;
     else {
         if (Dialog(LocalizedString('Message7'), 0) == 0)
@@ -241,12 +258,12 @@ function Print() {
 
 function AskParamsAndShowDialog(callback, apiMethod, account) {
     var contractOptions = null;
-    $.get("/barsroot/PrintContract/" + apiMethod + "?templates=" + _templateId + "&ids=" + acc, function(data) {
+    $.get("/barsroot/PrintContract/" + apiMethod + "?templates=" + _templateId + "&ids=" + acc, function (data) {
         contractOptions = data;
-        })
-        .done(function() {
+    })
+        .done(function () {
             callback(contractOptions);
-    });
+        });
 }
 
 function onGetMaxSum(result) {
@@ -258,7 +275,7 @@ function onGetMaxSum(result) {
             $.get("/barsroot/PrintContract/SetUpCreditOptions?ids=" + acc + "&maxSum=" + result.maxSum +
                 "&desiredSum=" + result.desiredSum +
                 "&installedSum=" + result.installedSum
-            ).done(function() {
+            ).done(function () {
                 $('iframe[id=Tab1]').contents().find('#tbLimitOs').val(result.maxSum);
                 getReportFile();
             });
@@ -274,7 +291,7 @@ function onGetMaxSum(result) {
         $("#desiredSum").data("kendoNumericTextBox").value(result.desiredSum);
         $("#installedSum").data("kendoNumericTextBox").value(result.installedSum);
         $("#window").data("kendoWindow").center().open();
-        $("#window #saveBtn").unbind("click").on("click", function() {
+        $("#window #saveBtn").unbind("click").on("click", function () {
             $("#window").data("kendoWindow").close();
             result.maxSum = $("#maxSum").val();
             result.desiredSum = $("#desiredSum").val();
@@ -317,14 +334,14 @@ function GetErrAccount() {
         var spErr = "";
         for (i = 0; i < spRequiredParams.length; i++) {
             var o = spRequiredParams[i];
-            var editVal = (localSP[o.Id])?(localSP[o.Id].v):(null);
+            var editVal = (localSP[o.Id]) ? (localSP[o.Id].v) : (null);
             if (!o.Val && !editVal) {
                 // исключение для S260
-                if (o.Name == "S260" && !(edit_data.value.general.data["tbLimitOs"]>0)) continue;
+                if (o.Name == "S260" && !(edit_data.value.general.data["tbLimitOs"] > 0)) continue;
                 spErr += " - " + o.Desc + nl;
             }
         }
-        if(spErr)
+        if (spErr)
             err += "Не заповнено спец. параметр(и):\n" + spErr;
 
         var stage1 = ",2600,2560,2570,2602,2603,2604,2605,2650,";
@@ -334,7 +351,14 @@ function GetErrAccount() {
                 // до выяснения
             }
         }
-        var stage2 = ",2062,2063,2067,2071,2072,2073,2074,2077,2082,2083,2089,";
+
+        var stage2;
+        if (_useNewNbs) {
+            stage2 = ",2063,2071,2072,2073,2074,2083,2088,";
+        } else {
+            stage2 = ",2062,2063,2067,2071,2072,2073,2074,2077,2082,2083,2089,";
+        }
+
         if (stage2.indexOf(nbs) > 0) {
             if (!page_p.tbKvA.value) err += "Не задано валюту рахунку нарахованих відсотків" + nl;
             if (!page_p.tbNlsA.value) err += "Не задано рахунок нарахованих відсотків" + nl;
@@ -348,12 +372,12 @@ function SaveAccount() {
     var err = GetErrAccount();
     if (err != "" && !OnAllValuts) { alert(err); return; }
     if (!OnAllValuts &&
-     edit_data.value.general.edit == false &&
-     edit_data.value.sp.edit == false &&
-     edit_data.value.percent.edit == false &&
-     edit_data.value.percent.edittbl == false &&
-     edit_data.value.rates.edit == false &&
-     edit_data.value.sob.edit == false) {
+        edit_data.value.general.edit == false &&
+        edit_data.value.sp.edit == false &&
+        edit_data.value.percent.edit == false &&
+        edit_data.value.percent.edittbl == false &&
+        edit_data.value.rates.edit == false &&
+        edit_data.value.sob.edit == false) {
         Dialog(LocalizedString('Message16'), 1);
         return;
     }
@@ -423,7 +447,7 @@ function SaveAccount() {
                 // end
             } else if (result.rez === 2) {
                 //debugger;
-                bars.ui.confirm({ text: "Зарезевувати рахунок?" }, function() {
+                bars.ui.confirm({ text: "Зарезевувати рахунок?" }, function () {
                     ReservedAcct();
                 });
             } else {
@@ -443,39 +467,39 @@ function onSaving(result) {
     });
     if (result.error && (exStr = result.errorDetail.string).indexOf("CheckSP::") > 0) {
 
-            alert(exStr.substring(exStr.indexOf("CheckSP::") + 9, exStr.indexOf("::CheckSP")));
-            return;
+        alert(exStr.substring(exStr.indexOf("CheckSP::") + 9, exStr.indexOf("::CheckSP")));
+        return;
     }
     else if (result.error && (exStr = result.errorDetail.string).indexOf("NotValidCust::") > 0) {
         var text = exStr.substring(exStr.indexOf("NotValidCust::") + 14, exStr.indexOf("::NotValidCust"));
 
         barsUiAlert({
             id: 'uiDialod',
-            title:'Помилка!!!',
+            title: 'Помилка!!!',
             text: text,
             winType: 'error',
             minWidth: '500',
             minHeight: '150',
             buttons: [
-              {
-                  text: 'заповнити поля',
-                  click: function () {
-                       
-                      $('#uiDialod').dialog('close');
+                {
+                    text: 'заповнити поля',
+                    click: function () {
 
-                      var klWin = window.open('/barsroot/clientregister/registration.aspx?readonly=0&rnk=' + rnk,
-                          '', //'KlientWindow',
-                          'width=880, height=580, scrollbars=yes, resizable=yes');
-                      //$('body').loader();
-                      //document.location.href = '/barsroot/clientregister/registration.aspx?readonly=0&rnk=' + rnk;
-                  }
-              }, {
-                  text: 'зарезервувати рах.',
-                  click: function () {
-                      ReservedAcct();
-                      $('#uiDialod').dialog('close');
-                  }
-              }/*, {
+                        $('#uiDialod').dialog('close');
+
+                        var klWin = window.open('/barsroot/clientregister/registration.aspx?readonly=0&rnk=' + rnk,
+                            '', //'KlientWindow',
+                            'width=880, height=580, scrollbars=yes, resizable=yes');
+                        //$('body').loader();
+                        //document.location.href = '/barsroot/clientregister/registration.aspx?readonly=0&rnk=' + rnk;
+                    }
+                }, {
+                    text: 'зарезервувати рах.',
+                    click: function () {
+                        ReservedAcct();
+                        $('#uiDialod').dialog('close');
+                    }
+                }/*, {
                   text: 'відмінити',
                   'class': 'ui-button-link',
                   click: function() {
@@ -483,23 +507,23 @@ function onSaving(result) {
                   }
             }*/]
         });
-       
+
         return;
     } else if (result.error && (exStr = result.errorDetail.string).indexOf("CheckGP::") > 0) {
         alert(
             exStr.substring(exStr.indexOf("CheckGP::") + 9,
-            exStr.indexOf("::CheckGP"))
-            );
+                exStr.indexOf("::CheckGP"))
+        );
         return;
     }
     else if (result.error && (exStr = result.errorDetail.string).indexOf("CheckDbP::") > 0) {
         alert(
             exStr.substring(exStr.indexOf("CheckDbP::") + 9,
-            exStr.indexOf("::CheckDbP"))
-            );
+                exStr.indexOf("::CheckDbP"))
+        );
         return;
     }
-    else if (!getError(result,true)) return;
+    else if (!getError(result, true)) return;
     if (acc == 0) {
         isNewAcc = true;
         acc_obj.value[2].text = document.frames("Tab0").document.all.tbNbs.value;
@@ -565,7 +589,8 @@ function ReservedAcct() {
             func: function () {
                 $('body').loader();
                 document.location.href = '/barsroot/customerlist/CustAcc.aspx?type=0&rnk=' + rnk;
-        } });
+            }
+        });
     }).error(function (request) {
         $('body').loader('remove');
         barsUiError(request.responseJSON.ExceptionMessage);
@@ -580,7 +605,7 @@ function ForUpdateAccount() {
     result[2] = data[3].text;
     result[3] = data[24].text;
     result[4] = rnk;
-    result[5] = data[0].text;    
+    result[5] = data[0].text;
     result[6] = data[1].text;
     result[7] = data[4].text;
     result[8] = data[6].text;
@@ -630,14 +655,14 @@ function ForUpdateAccount() {
 
     var n_data = document.all.edit_data.value.general.data;
     for (key in n_data) {
-    //for (var key = 0; key <= n_data.length; key++) {
+        //for (var key = 0; key <= n_data.length; key++) {
         val = n_data[key];
         switch (key) {
             case "tbNms": result[7] = val; break;
             case "tbNls": result[5] = val; break;
             case "tbNbs": result[10] = val; break;
             case "tbNlsAlt": result[2] = val; break;
-            case "ddValuta": result[6] = val.substr(0, (val.indexOf(" ") > 0 ?(val.indexOf(" ")) : (val.length)));  break;
+            case "ddValuta": result[6] = val.substr(0, (val.indexOf(" ") > 0 ? (val.indexOf(" ")) : (val.length))); break;
             case "tbLspCode": result[9] = val; break;
             case "ddUser": result[9] = val; break;
             case "ddPap": result[11] = val; break;
@@ -677,7 +702,7 @@ function ForUpdateAccount() {
 10 == Dazg;		21 == Lim;			32 == nDig;
 */
 function ForUpdatePercent() {
-    
+
     var result = new Array();
     var data = document.all.per_obj.value;
     result[0] = data[0].text;
@@ -701,7 +726,7 @@ function ForUpdatePercent() {
     result[18] = data[30].text; //okpo
     var n_data = document.all.edit_data.value.percent.data;
     for (key in n_data) {
-    //for(var key = 0; key <= n_data.length; key++){
+        //for(var key = 0; key <= n_data.length; key++){
         val = n_data[key];
         switch (key) {
             case "ddMetr": result[0] = val; break;
@@ -742,5 +767,5 @@ function LocalizeHtmlTitles() {
     LocalizeHtmlTitle("btClose");
     LocalizeHtmlTitle("btPrint");
     LocalizeHtmlTitle("btDiscard");
-}           
-                
+}
+

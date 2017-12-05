@@ -7,13 +7,23 @@ PROMPT =========================================================================
 
 PROMPT *** ALTER_POLICY_INFO to OTCN_F42_TEMP ***
 
-
 BEGIN 
         execute immediate  
           'begin  
+               bpa.alter_policy_info(''OTCN_F42_TEMP'', ''FILIAL'' , null, null, null, null);
+               bpa.alter_policy_info(''OTCN_F42_TEMP'', ''WHOLE'' , null, null, null, null);
                null;
            end; 
           '; 
+END; 
+/
+
+BEGIN 
+        execute immediate  
+          'drop TABLE BARS.OTCN_F42_TEMP'; 
+exception
+    when others then
+        if sqlcode = -942 then null; else raise; end if;          
 END; 
 /
 
@@ -34,7 +44,8 @@ begin
 	R020 CHAR(4), 
 	ACCC NUMBER(*,0), 
 	ZAL NUMBER, 
-	RNK NUMBER
+	RNK NUMBER,
+    OB22 varchar2(2)
    ) ON COMMIT PRESERVE ROWS ';
 exception when others then       
   if sqlcode=-955 then null; else raise; end if; 

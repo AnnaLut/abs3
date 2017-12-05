@@ -52,7 +52,8 @@ begin
 	KOL_SP NUMBER, 
 	S250 VARCHAR2(1), 
 	GRP NUMBER(*,0), 
-	NOT_USE_REZ23 DATE
+	NOT_USE_REZ23 DATE,
+	KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo'')
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -101,7 +102,12 @@ COMMENT ON COLUMN BARS.W4_ACC.ACC_3579 IS 'Прострочені нараховані доходи (комісі
 COMMENT ON COLUMN BARS.W4_ACC.ACC_2209 IS 'Прострочені нараховані доходи за кредитами ';
 COMMENT ON COLUMN BARS.W4_ACC.CARD_CODE IS 'Тип карты';
 
-
+begin 
+   execute immediate ' alter table W4_ACC add CONSTRAINT CC_W4ACC_KF_NN NOT NULL';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/   
 
 
 PROMPT *** Create  constraint FK_W4ACCW4CARD ***
@@ -126,6 +132,8 @@ exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
+
+
 
 
 

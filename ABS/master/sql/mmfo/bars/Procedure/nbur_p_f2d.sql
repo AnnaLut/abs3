@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure NBUR_P_F2D ***
 
-  CREATE OR REPLACE PROCEDURE BARS.NBUR_P_F2D (p_kod_filii        varchar2,
+CREATE OR REPLACE PROCEDURE BARS.NBUR_P_F2D (p_kod_filii        varchar2,
                                              p_report_date      date,
                                              p_form_id          number,
                                              p_scheme           varchar2 default 'C',
@@ -18,9 +18,9 @@ is
 % DESCRIPTION : Процедура формирования #2D для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.16.005  23.03.2017
+% VERSION     :  v.16.008  15.11.2017
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_          char(30)  := 'v.16.005  23.03.2017';
+  ver_          char(30)  := 'v.16.008  15.11.2017';
 /*
    Структура показника DD NNN
 
@@ -43,7 +43,6 @@ is
     l_file_code     varchar2(2) := substr(p_file_code, 2, 2);
     l_file_id       number;
     l_fmt           varchar2(20):='999990D0000';
-    l_gr_sum_840    number         := 100000; -- гранична сума
     l_kurs_840      number := F_NBUR_RET_KURS (840, p_report_date);
     l_ourGLB        varchar2(20);
     l_last_nnn      number := 0;
@@ -69,20 +68,22 @@ BEGIN
             l_ourGLB := null;
     end;
 
-    -- підготовка даних
-    insert into NBUR_TMP_TRANS_1 (REPORT_DATE, KF, REF, TT, RNK, ACC, NLS, KV,
-        P10, P20, P31, P40, P62, REFD,
-        D1#E2, D6#E2, D7#E2, D8#E2, DA#E2, KOD_G, NB, NAZN, NMK)
-    select REPORT_DATE, KF, REF, TT, CUST_ID, ACC_ID, ACC_NUM, KV,
-        P10, P20, P31, D1#E2 P40, P62, REFD,
-        D1#E2, D6#E2, D7#E2, D8#E2, DA#E2, KOD_G, NB, substr(NAZN, 1, 70), NMK
-    from (select  /*+ ordered */
-            unique t.report_date, t.kf, t.ref, t.tt,
-            c.cust_id, t.acc_id_db acc_id, t.acc_num_db acc_num, t.kv,
-            lpad((dense_rank() over (order by t.ref)), 3, '0') nnn,
-            lpad(t.kv, 3, '0') P10,
-            TO_CHAR (t.bal) P20,
-            (case when t.kf = '300465' and
+  -- підготовка даних
+  insert
+    into NBUR_TMP_TRANS_1
+       ( REPORT_DATE, KF, REF, TT, RNK, ACC, NLS, KV,
+         P10, P20, P31, P40, P62, REFD,
+         D1#E2, D6#E2, D7#E2, D8#E2, DA#E2, KOD_G, NB, NAZN, NMK )
+  select REPORT_DATE, KF, REF, TT, CUST_ID, ACC_ID, ACC_NUM, KV,
+         P10, P20, P31, D1#E2 P40, P62, REFD,
+         D1#E2, D6#E2, D7#E2, D8#E2, DA#E2, KOD_G, NB, substr(NAZN, 1, 70), NMK
+    from ( select /*+ ordered */
+                  unique t.report_date, t.kf, t.ref, t.tt,
+                  c.cust_id, t.acc_id_db acc_id, t.acc_num_db acc_num, t.kv,
+                  lpad((dense_rank() over (order by t.ref)), 3, '0') nnn,
+                  lpad(t.kv, 3, '0') P10,
+                  TO_CHAR (t.bal) P20,
+                  (case when t.kf = '300465' and
                     t.acc_num_cr like '1500%' and
                     (t.acc_num_db in ('29091000580557',
                                      '29092000040557',
@@ -128,36 +129,41 @@ BEGIN
             end) kod_g,
             substr(trim(u.nb), 1, 70) nb,
             o.nazn, C.CUST_NAME nmk
-        from NBUR_DM_TRANSACTIONS t
-        join NBUR_REF_SEL_TRANS r
-        on (t.acc_num_db like r.acc_num_db||'%' and
-            t.acc_num_cr like r.acc_num_cr||'%')
-        left outer join NBUR_DM_ADL_DOC_RPT_DTL p
-        on (t.report_date = p.report_date and
-            t.kf = p.kf and
-            t.ref = p.ref)
-        join NBUR_DM_CUSTOMERS c
-        on (t.report_date = c.report_date and
-            t.kf = c.kf and
-            t.cust_id_db = c.cust_id)
-        left outer join rcukru u
-        on (trim(c.cust_type) = trim(u.ikod))
-        join oper o
-        on (t.ref = o.ref)
-        left outer join bopcount b
-        on (b.iso_countr = SUBSTR (trim(p.KOD_G), 1, 3))
-        where t.report_date = p_report_date and
-            t.kf = p_kod_filii and
-            t.kv not in (959, 961, 962, 964, 980) and
-            r.file_id = l_file_id and
-            gl.p_ncurval(840, t.bal_uah, t.report_date) > l_gr_sum_840 and
-            t.ref not in (select ref from NBUR_TMP_DEL_70 where kodf = l_file_code and datf = p_report_date) and
-            not (o.nlsa like '1500%' and o.nlsb like '1500%' or
-                 o.kf = '300465' and o.mfoa <> o.mfob or
-                 t.kf = '300465' and t.r020_db in ('2600', '2620') and t.r020_cr in ('1919','2909','3739') or
-                 o.nlsa like '1500%' and o.nlsb like '7100%' and
-                 o.dk=0 and round(t.bal_uah / l_kurs_840, 0) < 100000
-            ) --and substr(trim(p.D1#2D), 1, 2) in ('01','02','03','04','05','06','07','08')
+         from NBUR_DM_TRANSACTIONS t
+         join NBUR_REF_SEL_TRANS   r
+           on ( t.acc_num_db like r.acc_num_db||'%' and
+                t.acc_num_cr like r.acc_num_cr||'%' )
+         left outer
+         join NBUR_DM_ADL_DOC_RPT_DTL p
+           on ( t.report_date = p.report_date and
+                t.kf          = p.kf          and
+                t.ref         = p.ref         )
+         join NBUR_DM_CUSTOMERS c
+           on ( t.REPORT_DATE = c.report_date and
+                t.KF          = c.kf          and
+                t.CUST_ID_DB  = c.cust_id     )
+         left outer 
+         join RCUKRU u
+           on ( u.IKOD = c.CUST_CODE )
+         join OPER o
+           on ( t.ref = o.ref)
+         left outer
+         join BOPCOUNT b
+           on ( b.iso_countr = SUBSTR( trim(p.KOD_G), 1, 3 ) )
+        where t.report_date = p_report_date
+          and t.kf = p_kod_filii
+          and t.kv not in (959, 961, 962, 964, 980)
+          and r.file_id = l_file_id
+          and t.ref not in ( select ref from NBUR_TMP_DEL_70 where kodf = l_file_code and datf = p_report_date )
+          and not ( o.nlsa like '1500%' and o.nlsb like '1500%'
+                    or
+                    o.kf = '300465' and o.mfoa <> o.mfob
+                    or
+                    t.kf = '300465' and t.r020_db in ('2600', '2620') and t.r020_cr in ('1919','2909','3739')
+                    or
+                    o.nlsa like '1500%' and (o.nlsb like '7100%' or o.nlsb like '7500%') and 
+                    o.dk = 0 and round(t.bal_uah / l_kurs_840, 0) < 100000
+                  ) 
       );
 
    commit;
@@ -181,7 +187,7 @@ BEGIN
     SELECT report_date,
            kf,
            p_file_code,
-           l_nbuc nbuc,
+           (case when l_type = 0 then l_nbuc else nbuc end) nbuc,
            substr(colname,2,2)||nnn field_code,
            value field_value,
            'Part 1' description,
@@ -192,7 +198,7 @@ BEGIN
            rnk,
            ref,
            NULL nd,
-           null branch
+           branch
     FROM (select z.report_date,
                z.kf,
                z.ref,
@@ -208,7 +214,7 @@ BEGIN
                    'код краiни у яку переказана валюта' ) p64,
                nvl(nvl(substr(trim (z.D7#E2), 1, 10),
                    f_get_swift_bank_code(z.ref)), '0000000000') p65,
-              z.p62, z.p67,
+              z.p62, z.p67, z.nbuc, z.branch,
               lpad((dense_rank() over (order by z.rnk, z.ref)), 3, '0') nnn
         from (
             select a.report_date,
@@ -216,11 +222,15 @@ BEGIN
                 a.p10, a.p20, a.p31, a.p40, a.refd,
                 20+t.id_oper D1#E2,
                 nvl(t.bankcountry, nvl(a.D6#E2, a.kod_g)) D6#E2,
-                rpad(trim(t.bank_code), 10, '0') D7#E2,
+                a.D7#E2,
                 nvl(t.benefbank, a.D8#E2) D8#E2,
                 a.nb, a.nazn,
-                a.p62, a.nmk p67
+                a.p62, a.nmk p67, b.nbuc, b.branch
             from NBUR_TMP_TRANS_1 a
+            left outer join NBUR_DM_ACCOUNTS b
+            on (b.report_date = p_report_date and
+                b.kf = p_kod_filii and
+                b.acc_id = a.acc)
             left outer join (select ref, pid,
                                     min(pid) id_min,
                                     max(id) id,
@@ -269,7 +279,7 @@ BEGIN
     SELECT report_date,
            kf,
            p_file_code,
-           l_nbuc nbuc,
+           (case when l_type = 0 then l_nbuc else nbuc end) nbuc,
            substr(colname,2,2)||nnn field_code,
            value field_value,
            'Part 2 refd='||to_char(refd) description,
@@ -280,7 +290,7 @@ BEGIN
            rnk,
            ref,
            refd nd,
-           null branch
+           branch
     FROM (select z.report_date,
                z.kf,
                z.ref,
@@ -299,7 +309,7 @@ BEGIN
                nvl(nvl(substr(trim (z.D7#E2), 1, 10),
                    f_get_swift_bank_code(z.ref)),
                    rpad(nvl(trim (z.D7#E2), z.kod_g), 10, '0')) p65,
-              z.p62, z.p67, z.refd,
+              z.p62, z.p67, z.refd, z.nbuc, z.branch,
               lpad((dense_rank() over (order by z.rnk, z.ref)) + l_last_nnn, 3, '0') nnn
         from (select  /*+ parallel(4) leading(a) */
                     a.report_date,
@@ -323,7 +333,7 @@ BEGIN
                     a.NAZN,
                     nvl(decode(f.kva, 980, '30', '28'), a.p40) d1#E2,
                     t1.ref refd,
-                    nvl(C.CUST_NAME, a.nmk) p67
+                    nvl(C.CUST_NAME, a.nmk) p67, b.nbuc, b.branch
                 from NBUR_TMP_TRANS_1 a
                 left outer join oper x
                 on (x.vdat between p_report_date - 7 and p_report_date
@@ -345,6 +355,10 @@ BEGIN
                 on (c.report_date = p_report_date and
                     c.kf = p_kod_filii and
                     f.rnk = c.cust_id)
+                left outer join NBUR_DM_ACCOUNTS b
+                on (b.report_date = p_report_date and
+                    b.kf = p_kod_filii and
+                    b.acc_id = t1.accd)
                 where nvl(nvl(a.d6#E2, a.kod_g), 'ZZZ') not in ('804','UKR')
                       and ((a.nls like '1919%' or
                             a.nls like '3739%' ) and
@@ -382,7 +396,7 @@ BEGIN
     SELECT report_date,
            kf,
            p_file_code,
-           l_nbuc nbuc,
+           (case when l_type = 0 then l_nbuc else nbuc end) nbuc,
            substr(colname,2,2)||nnn field_code,
            value field_value,
            'Part 3 refd='||to_char(refd) description,
@@ -393,7 +407,7 @@ BEGIN
            rnk,
            ref,
            refd nd,
-           null branch
+           branch
     FROM (select z.report_date,
                z.kf,
                z.ref,
@@ -414,7 +428,7 @@ BEGIN
                    rpad(nvl(trim (z.D7#E2), z.kod_g), 10, '0')) p65,
               (case when z.p31 = '0' or z.p62 = '2' then '0' else z.p62 end) p62,
               lpad((dense_rank() over (order by z.rnk, z.ref)) + l_last_nnn, 3, '0') nnn,
-              z.refd, z.p67
+              z.refd, z.p67, z.nbuc, z.branch
         from (select  /*+ parallel(4) leading(a) */
                     a.report_date,
                     a.kf,
@@ -433,13 +447,13 @@ BEGIN
                     substr(nvl(trim(y.value), trim(z.value)), 1, 2) p40,
                     nvl(c.k030, a.p62) p62,
                     nvl(t.bankcountry, nvl(a.D6#E2, a.kod_g)) D6#E2,
-                    rpad(trim(t.bank_code), 10, '0') D7#E2,
+                    a.D7#E2,
                     nvl(t.benefbank, a.D8#E2) D8#E2,
                     a.KOD_G,
                     a.NB,
                     a.NAZN,
                     a.p40 d1#E2,
-                    x.ref refd,
+                    x.ref refd, b.nbuc, b.branch,
                     nvl(C.CUST_NAME, a.nmk) p67
                 from NBUR_TMP_TRANS_1 a
                 left outer join oper x
@@ -499,17 +513,17 @@ BEGIN
       WHERE     report_date = p_report_date
             AND report_code = p_file_code
             AND kf = p_kod_filii;
-            
-      -- вставка даних для функції довведення допреквізитів            
+
+      -- вставка даних для функції довведення допреквізитів
       DELETE FROM OTCN_TRACE_70 WHERE kodf = l_file_code and datf = p_report_date and kf = p_kod_filii;
 
       insert into OTCN_TRACE_70(KODF, DATF, USERID, NLS, KV, ODATE, KODP, ZNAP, NBUC, ISP, RNK, ACC, REF, COMM, ND, MDATE, TOBO)
-      select l_file_code, p_report_date, USER_ID, ACC_NUM, KV, p_report_date, FIELD_CODE, FIELD_VALUE, NBUC, null ISP, 
+      select l_file_code, p_report_date, USER_ID, ACC_NUM, KV, p_report_date, FIELD_CODE, FIELD_VALUE, NBUC, null ISP,
              CUST_ID, ACC_ID, REF, DESCRIPTION, ND, MATURITY_DATE, BRANCH
       FROM nbur_detail_protocols
       WHERE     report_date = p_report_date
             AND report_code = p_file_code
-            AND kf = p_kod_filii;               
+            AND kf = p_kod_filii;
 
     logger.info ('NBUR_P_F2D end for date = '||to_char(p_report_date, 'dd.mm.yyyy'));
 

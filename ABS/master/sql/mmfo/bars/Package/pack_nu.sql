@@ -1,4 +1,10 @@
-CREATE OR REPLACE PACKAGE pack_nu
+
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/package/pack_nu.sql =========*** Run *** ===
+ PROMPT ===================================================================================== 
+ 
+  CREATE OR REPLACE PACKAGE BARS.PACK_NU 
 AS
    G_HEADER_VERSION  CONSTANT VARCHAR2(64)  := 'version 1.0.0  09.08.2016';
 
@@ -8,34 +14,31 @@ AS
 -------------------------------
 
  /**
- * header_version - возвращает версию заголовка пакета  
+ * header_version - возвращает версию заголовка пакета
  */
 function header_version return varchar2;
 
 
 /**
- * body_version - возвращает версию тела пакета  
+ * body_version - возвращает версию тела пакета
  */
 function body_version   return varchar2;
 
 
-PROCEDURE P_OB22NU_WEB (p_dat1 date,  p_dat2 date );  
- 
+PROCEDURE P_OB22NU_WEB (p_dat1 date,  p_dat2 date );
+
 procedure pay_stmt (p_stmt opldok.stmt%type);
 
 END pack_nu;
-
 /
-
-
-CREATE OR REPLACE PACKAGE BODY pack_nu
+CREATE OR REPLACE PACKAGE BODY BARS.PACK_NU 
 AS
 
  G_BODY_VERSION  CONSTANT VARCHAR2(64)  :=  'version 1.0.0 09.08.2016';
- 
- 
+
+
  /**
- * header_version - возвращает версию заголовка пакета  
+ * header_version - возвращает версию заголовка пакета
  */
 function header_version return varchar2 is
 begin
@@ -43,11 +46,11 @@ begin
 end header_version;
 
 /**
- * body_version - возвращает версию тела пакета  
+ * body_version - возвращает версию тела пакета
  */
- 
 
- 
+
+
 function body_version return varchar2 is
 begin
   return 'Package body PACK_NU '||G_BODY_VERSION;
@@ -68,7 +71,7 @@ l_prizn char(1) ;
 
 01-07-2014   nvv  ƒобавив обработку ј/ѕ (6204)
                     + v_ob22nu.vie  01/07/2014
-					
+
 27-02-2014   qwa добавили к vob=96 также vob=99 (годовые)
 
 14-07-2011   qwa обработаем также документы за предыдущий банк день,
@@ -157,7 +160,7 @@ for d in ( select /*+ INDEX(o)  INDEX(ob) INDEX(t1) INDEX(t2)*/
                 and  o.acc=t1.acc    and ob.acc=t2.acc(+)
                 and  o.sos>=4  and o.tt not in ('ZG1','ZG2','ZG8','ZG9')
                 and  BITAND (NVL (o.otm, 0), 1) = 0
-                and  BITAND (NVL (o.otm, 0), 2) = 0  
+                and  BITAND (NVL (o.otm, 0), 2) = 0
 				-- and o.fdat  between l_dat1 and p_dat2
 				-- and ob.fdat between l_dat1 and p_dat2
                 and  o.tt<>'PO3' --and p.vob<>96
@@ -208,9 +211,9 @@ for k in ( select /*+ INDEX(o) INDEX(ob) INDEX(t1) INDEX(t2)*/ o.ref,      a.acc
            and o.tt<>'PO3' --and p.vob<>96   ---- потом убрать, нужно дл€ просчета начала апрел€
            and not exists (select   /*+ INDEX(tmp_ob22_funu_auto)*/
                      1 from tmp_ob22_funu_auto where ref=o.ref and stmt =o.stmt)
-           and  a.nbs not in ('2065','2075','2085','2105',
-                                    '2115','2125','2135','2205',
-                                    '2235','2636')-- пока нет формального признака только дебетовые обороты - оставим в коде
+           and  a.nbs not in ('2066','2076','2086','2106',
+                                    '2116','2126','2136','2206',
+                                    '2236','2636')-- пока нет формального признака только дебетовые обороты - оставим в коде
 --           and a.nbs  not in ('3400','3410','3500','3600','4500')    -- вс€ друга€ экзотика не 6 и 7 класс
 --           and ab.nbs not in ('3400','3410','3500','3600','4500')    -- вс€ друга€ экзотика не 6 и 7 класс
            )
@@ -250,7 +253,7 @@ commit;
 end  P_OB22NU;
 
 
-PROCEDURE P_OB22NU_WEB (p_dat1 date,  p_dat2 date ) 
+PROCEDURE P_OB22NU_WEB (p_dat1 date,  p_dat2 date )
 is
 l_nu_ob22_fun nu_ob22_funu%rowtype;
 l_sql varchar2(4000);
@@ -258,21 +261,21 @@ l_iduser staff$base.id%type := user_id;
 c0    SYS_REFCURSOR;
 begin
 
-  
+
   execute immediate  'delete from  nu_ob22_funu where id_user='||to_char(l_iduser);
 
     P_OB22NU(p_dat1,  p_dat2);
-     
+
     l_sql := 'select '|| to_char(l_iduser)||' id_user, PRIZN,PRIZN_D,ACCD,NLSN_D, OB22_D, PRIZN_K, ACCK, NLSN_K, OB22_K, FDAT, REF , NLSD , NLSK, S, NAZN, VOB, VDAT, STMT, nvl(OTM,0) otm, TT, KSN_D, KSN_K, NMSN_D, NMSN_K from tmp_ob22_funu_auto a';
-  
+
 	    OPEN c0 FOR l_sql ;
 		 LOOP
-		   FETCH c0 INTO l_nu_ob22_fun ; 
-		   EXIT WHEN c0%NOTFOUND; 
-         
+		   FETCH c0 INTO l_nu_ob22_fun ;
+		   EXIT WHEN c0%NOTFOUND;
+
 		  insert into nu_ob22_funu values l_nu_ob22_fun;
-		 
-		 end loop; 
+
+		 end loop;
 
 end;
 
@@ -284,7 +287,7 @@ is
 begin
 
  savepoint nal#ob22#autopay;
- 
+
   begin
     l_kk:=0;
     select  /*+ INDEX(o)  INDEX(s)*/
@@ -296,20 +299,20 @@ begin
        and bitand(nvl(o.otm,0),1) = 1   -- не оплачена в Ќ”
        and bitand(nvl(o.otm,0),2) = 2   -- не сн€та с визы в Ќ”
        and o.tt<>'PO3' ;
-       exception when no_data_found then 
+       exception when no_data_found then
 	       null;
 		                       rollback to nal#ob22#autopay;
                                goto CONTIN;
 							   update nu_ob22_funu  set otm= bitand(nvl(otm,0),254)+2 where  stmt=p_stmt;
    end;
 
-    
+
    update opldok             set otm= bitand(nvl(otm,0),254)+2 where  stmt=p_stmt;
    update nu_ob22_funu  set otm= bitand(nvl(otm,0),254)+2 where  stmt=p_stmt;
-   
+
      -- commit;
    <<contin>> null;
-   
+
 end;
 
 procedure pay_stmt (p_stmt opldok.stmt%type)
@@ -334,7 +337,7 @@ for t in (
               nlsn_d,  ksn_d , nlsn_k ,  ksn_k
        from  nu_ob22_funu
        where bitand(nvl(otm,0),1)   = 0
-         and bitand(nvl(otm,0),2)   = 0 
+         and bitand(nvl(otm,0),2)   = 0
 		 and stmt = p_stmt
 		 and id_user = gl.aUID
 		 )
@@ -354,7 +357,7 @@ loop
        and bitand(nvl(o.otm,0),1) = 1   -- не оплачена в Ќ”
        and bitand(nvl(o.otm,0),2) = 2   -- не сн€та с визы в Ќ”
        and o.tt<>'PO3' ;
-       exception when no_data_found then 
+       exception when no_data_found then
 	       null;
 		                       rollback to nal#ob22#autopay;
                                goto CONTIN;
@@ -382,10 +385,10 @@ loop
    update opldok             set otm= bitand(nvl(otm,0),254)+1 where ref=t.ref  and stmt=t.stmt;
    update nu_ob22_funu  set otm= bitand(nvl(otm,0),254)+1 where ref=t.ref  and stmt=t.stmt;
 
-   
 
-   
-   
+
+
+
    -- проводка с t.stmt обработана, но возможно остались еще
    -- проставим признак об оплате, если все проводки уже обработаны
    begin
@@ -399,7 +402,7 @@ loop
        and bitand(nvl(o.otm,0),1) = 0   -- не оплачена в Ќ”
        and bitand(nvl(o.otm,0),2) = 0   -- не сн€та с визы в Ќ”
        and o.tt<>'PO3' ;
-       exception when no_data_found then 
+       exception when no_data_found then
 	       null;
    end;
    if l_kk=0 then
@@ -416,13 +419,14 @@ end;
 
 END pack_nu;
 /
+ show err;
+ 
+PROMPT *** Create  grants  PACK_NU ***
+grant EXECUTE                                                                on PACK_NU         to BARS_ACCESS_DEFROLE;
 
-
-show err;
-
-grant execute on pack_nu to bars_access_defrole;
-
-
-
-
-
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/package/pack_nu.sql =========*** End *** ===
+ PROMPT ===================================================================================== 
+ 

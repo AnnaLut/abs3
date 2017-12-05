@@ -1,5 +1,3 @@
-
- 
  PROMPT ===================================================================================== 
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/wcs_register.sql =========*** Run **
  PROMPT ===================================================================================== 
@@ -3383,15 +3381,16 @@ CREATE OR REPLACE PACKAGE BODY BARS.WCS_REGISTER IS
     --------------------------------------------------------------------------------
     -- l_AIM           int,    -- Цель кредитования
     --найти цель
-    SELECT nvl(MIN(aim), 62)
-      INTO l_aim
-      FROM cc_aim
-     WHERE substr(l_prod, 1, 4) IN
-           (nvl(nbs, '2062')
-           ,nvl(nbs2, '2063')
-           ,nvl(nbsf, '2202')
-           ,nvl(nbsf2, '2203'))
-       AND rownum = 1;
+    select nvl(min(AIM), 62)
+      into l_aim
+      from cc_aim
+     where substr(l_prod, 1, 4) in
+           (nvl(NBS,decode(NEWNBS.GET_STATE,0,'2062','2063') ),
+            nvl(NBS2, '2063'),
+            nvl(NBSF, decode(NEWNBS.GET_STATE,0,'2202','2203')),
+            nvl(NBSF2, '2203'))
+	   and d_close is null
+       and rownum = 1;
 
     --------------------------------------------------------------------------------
     --l_MS_NX    varchar2,    -- Галузь (S260)
@@ -4896,7 +4895,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.WCS_REGISTER IS
 
 END wcs_register;
 /
- show err;
+show err;
  
 PROMPT *** Create  grants  WCS_REGISTER ***
 grant EXECUTE                                                                on WCS_REGISTER    to BARS_ACCESS_DEFROLE;

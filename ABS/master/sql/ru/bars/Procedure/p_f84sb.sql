@@ -12,11 +12,12 @@ PROMPT *** Create  procedure P_F84SB ***
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирования ручных файлов КБ (универсальная)
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     : 04.11.2009 (27.05.2008)
+% VERSION     : 10.11.2017 (04.11.2009) 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
-04.11.2009 - для Сбербанка и кода файла 84 будет ручное формирование и
+10.11.2017 - изменил некоторые блоки формирования 
+04.11.2009 - для Сбербанка и кода файла 84 будет ручное формирование и 
              необходимо вытягивать из табл. TMP_IREP а не из TMP_NBU
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 typ_     number;
@@ -46,15 +47,14 @@ branch_id_ Varchar2(15);
 BEGIN
    execute immediate 'ALTER SESSION SET NLS_NUMERIC_CHARACTERS=''.,''';
 -------------------------------------------------------------------
-   SELECT id INTO userid_ FROM staff WHERE upper(logname)=upper(USER);
-   DELETE FROM RNBU_TRACE WHERE userid = userid_;
+   userid_ := user_id;
+   EXECUTE IMMEDIATE 'TRUNCATE TABLE RNBU_TRACE';
 -------------------------------------------------------------------
-
    BEGIN
-      select max(datf)
+      select max(datf) 
          into datz_
       from tmp_irep
-      where kodf='84' and datf < Datf_;
+      where kodf = '84' and datf < Datf_;
    EXCEPTION WHEN NO_DATA_FOUND THEN
       datz_ := Datf_;
    END;
@@ -68,25 +68,20 @@ BEGIN
 
 --  logger.info('P_F00: '||to_char(datf_)||', '||to_char(datz_)||', '||kodf_ );
 
-
-insert into rnbu_trace
-(nls, kv, odate, kodp, znap, nbuc)
-select 1, 1, datz_, kodp, znap, nbuc
+ 
+insert into rnbu_trace 
+(nls, kv, odate, kodp, znap, nbuc)  
+select 1, 1, datz_, kodp, znap, nbuc 
 from tmp_irep
-where kodf=kodf_
-  and datf=datz_;
-
+where kodf = kodf_
+  and datf = datz_;
 ---------------------------------------------------
-DELETE FROM tmp_irep where kodf=kodf_ and datf= datf_;
+DELETE FROM tmp_irep where kodf = kodf_ and datf = datf_;
 ---------------------------------------------------
-INSERT INTO tmp_irep (kodp, datf, kodf, znap, nbuc)
-   SELECT kodp, Datf_, kodf_, znap, nbuc
-   FROM rnbu_trace
-   WHERE userid=userid_;
+INSERT INTO tmp_irep (kodf, kodp, datf, znap, nbuc)
+   SELECT kodf_, kodp, Datf_, znap, nbuc
+   FROM rnbu_trace;
 
---exception
---   when others then
---       raise_application_error(-20000, 'Error in p_fd0_nn: '||sqlerrm);
 ----------------------------------------
 END p_f84sb;
 /

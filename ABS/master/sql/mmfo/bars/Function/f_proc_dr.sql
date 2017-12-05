@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/function/f_proc_dr.sql =========*** Run *** 
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE FUNCTION BARS.F_PROC_DR 
+CREATE OR REPLACE FUNCTION BARS.F_PROC_DR
    (p_acc   INT,
     p_sour  INT       DEFAULT 4,      -- источник финансирования
     p_type  INT       DEFAULT 0,      -- 1 = НЕ перех.мес
@@ -12,6 +6,7 @@
     p_nbs   VARCHAR2  DEFAULT NULL,   -- БС
     p_kv    INT       DEFAULT NULL)   -- код валюты
 RETURN INT
+--29.11.2017 Sta Поиск в accounts по NLS (NLSALT) = счету из PROC_DR 
 -- ============================================================================
 --        Функция расчета контрсчета для начисления %%
 --   из справочника "Счета доходов-расходов по процентных Акт-Пас" (PROC_DR)
@@ -155,8 +150,7 @@ BEGIN
 
   END IF;
 
-  BEGIN
-    SELECT acc INTO l_acc67 FROM accounts WHERE nls = l_nls67 AND kv = l_kvb;
+  BEGIN    SELECT acc INTO l_acc67 FROM accounts WHERE l_nls67 in (nls, NVL(nlsalt, nls) )  AND kv = l_kvb;
   EXCEPTION
     WHEN NO_DATA_FOUND THEN
       --erm := '9300 - No account found for nls = '||l_nls67||' !';
@@ -168,23 +162,3 @@ BEGIN
 
 END F_PROC_DR;
 /
- show err;
- 
-PROMPT *** Create  grants  F_PROC_DR ***
-grant EXECUTE                                                                on F_PROC_DR       to ABS_ADMIN;
-grant EXECUTE                                                                on F_PROC_DR       to BARS010;
-grant EXECUTE                                                                on F_PROC_DR       to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on F_PROC_DR       to CUST001;
-grant EXECUTE                                                                on F_PROC_DR       to DPT_ROLE;
-grant EXECUTE                                                                on F_PROC_DR       to FOREX;
-grant EXECUTE                                                                on F_PROC_DR       to RCC_DEAL;
-grant EXECUTE                                                                on F_PROC_DR       to WR_ACRINT;
-grant EXECUTE                                                                on F_PROC_DR       to WR_ALL_RIGHTS;
-grant EXECUTE                                                                on F_PROC_DR       to WR_VIEWACC;
-
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/function/f_proc_dr.sql =========*** End *** 
- PROMPT ===================================================================================== 
- 

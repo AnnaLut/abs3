@@ -8,7 +8,7 @@ is
   %param p_dpu_id   - ідентифікатор депозитного траншу (дод.дог.)
   %param p_ref      - ідентифікатор документу
   
-  %version 1.3
+  %version 1.4
   %usage   вставка проводки в дебетову операцію по рахунку ген. дог.
   */
   title    constant  varchar2(60) := 'dpu.adj_discrepancy_balances';
@@ -64,7 +64,12 @@ begin
                           join ACCOUNTS a
                             on ( a.ACC = t.ACC )
                          where t.REF = p_ref
-                           and a.NBS in ('2525','2528','2546','2548','2600','2608','2610','2615','2618','2650','2651','2652','2658')
+                           and a.NBS in ( select NBS_DEP
+                                            from DPU_NBS4CUST
+                                           union all
+                                          select NBS_INT
+                                            from DPU_NBS4CUST
+                                        )
                       )
        and DEP_ID = p_dpu_id;
   exception
@@ -130,4 +135,4 @@ begin
 end ADJ_DISCREPANCY_BALANCES;
 /
 
-show err
+show errors;

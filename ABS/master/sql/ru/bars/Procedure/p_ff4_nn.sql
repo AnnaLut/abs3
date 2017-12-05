@@ -3,11 +3,15 @@ CREATE OR REPLACE PROCEDURE BARS.P_FF4_NN (Dat_ DATE ,
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :	Процедура формирования #F4
 % COPYRIGHT   :	Copyright UNITY-BARS Limited, 2009.  All Rights Reserved.
-% VERSION     : 16/06/2017 (04/04/2017, 06/03/2017)
+% VERSION     : 14/11/2017 (06/07/2017, 20/06/2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+14/11/2017 - изменил вызов процедуры P_POPULATE_KOR для разных отчетных 
+             месяцев (было на ММФО)
+06/07/2017 - для некоторых значений K072 устанавливаем K140='9'
+             для показателя кредитовых оборотов  k140='9'                
 12/06/2017 - с 30/06/2017 добавляется часть кода показателя 
              "Код розміру суб'єкта господарювання" (доп.параметр K140)
 04/04/2017  добавлены исправления выполненные 26/11/2015
@@ -163,7 +167,7 @@ CURSOR SaldoKor IS
             FROM RNBU_TRACE a
             WHERE SUBSTR (a.kodp, 1, 1) = '1'
             UNION ALL
-            SELECT a.nbuc NBUC, '1'||substr(a.kodp,2,15) KODP, '0' ZNAP,
+            SELECT a.nbuc NBUC, '1'||substr(a.kodp,2,16) KODP, '0' ZNAP,
                    a.znap ZNAP_PR
             FROM RNBU_TRACE a
             WHERE SUBSTR (a.kodp, 1, 1) = '3')
@@ -195,7 +199,11 @@ Dat2_ := TRUNC(Dat_ + 28);
 
 p_proc_set(kodf_,sheme_,nbuc1_,typ_);
 
-p_populate_kor(Dat1_,Dat2_,'');
+if to_char(Dat_,'MM') = '12' then
+   p_populate_kor(Dat1_,Dat2_,'', 0);
+else
+   p_populate_kor(Dat1_,Dat2_,'', 3);
+end if;      
 -------------------------------------------------------------------
 mfo_:=F_OURMFO();
 
@@ -238,7 +246,7 @@ LOOP
 
     k140_ := '9';
 
-    if nls_ like '20%'
+    if nls_ like '20%' or nls_ like '260%'
     then
        BEGIN
           select nvl(substr(trim(cw.value), 1, 1), '9')
@@ -249,6 +257,11 @@ LOOP
        EXCEPTION WHEN NO_DATA_FOUND THEN
           k140_ := '9';
        END;
+    end if;
+
+    if k072_ in ('0','5','6','7','H','I','J','K','N','R','Z','Y')
+    then
+       k140_ := '9';
     end if;
     
     if typ_ > 0 then
@@ -333,7 +346,7 @@ LOOP
           else 
              kodp_ := '6' || nbs_ || r013_ || K112_ || K072_ ||
                        s180_ || to_char(2-Cntr_) || d020_ ||
-                       lpad(Kv_, 3, '0') || k140_;
+                       lpad(Kv_, 3, '0') || '9';
           end if;
 
           -- Кт. обороты
@@ -409,7 +422,7 @@ LOOP
              else
                 kodp_ := '6' || nbs_ || r013_ || K112_ || K072_ ||
                          s180_ || to_char(2-Cntr_) || d020_ ||
-                         lpad(Kv_, 3, '0') || k140_;
+                         lpad(Kv_, 3, '0') || '9';
              end if;
 
              -- Кт. обороты
@@ -443,7 +456,8 @@ LOOP
            else
              kodp_ := (case when se_ < 0 then '5' else '6' end) ||
                       nbs_ || r013_ || K112_ || K072_ || s180_ ||
-                      to_char(2-Cntr_) || d020_ || lpad(Kv_, 3, '0') || k140_;
+                      to_char(2-Cntr_) || d020_ || lpad(Kv_, 3, '0') || 
+                      (case when se_ < 0 then k140_ else '9' end);
            end if;
 
            -- Кт. обороты
@@ -557,7 +571,7 @@ LOOP
           else
              kodp_ := '6' || nbs_ || r013_ || K112_ || K072_ ||
                       s180_ || to_char(2-Cntr_) || d020_ ||
-                      lpad(Kv_, 3, '0') || k140_;
+                      lpad(Kv_, 3, '0') || '9';
           end if;
 
           -- Кт. обороты
@@ -572,7 +586,7 @@ LOOP
 
 END LOOP;
 CLOSE SaldoKor;
----------------------------------------------------
+-------------------------------------------------
 DELETE FROM tmp_nbu WHERE kodf=kodf_ AND datf= Dat_;
 ---------------------------------------------------
 OPEN BaseL;
@@ -589,7 +603,7 @@ LOOP
    END IF;
 
    INSERT INTO tmp_nbu (kodf, datf, kodp, znap, nbuc) VALUES
-                      (kodf_, Dat_, '2'||substr(kodp_,2,15), sPCnt1_, nbuc_);
+                      (kodf_, Dat_, '2'||substr(kodp_,2,16), sPCnt1_, nbuc_);
 
 END LOOP;
 CLOSE BaseL;

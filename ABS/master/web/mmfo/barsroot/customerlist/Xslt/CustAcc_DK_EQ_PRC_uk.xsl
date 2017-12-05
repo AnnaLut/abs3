@@ -17,6 +17,12 @@
           </xsl:attribute>
           <xsl:text>Номер рахунку</xsl:text>
         </TD>
+        <TD width="15%">
+          <xsl:attribute name="onclick">
+            <xsl:text>Sort('NLSALT')</xsl:text>
+          </xsl:attribute>
+          <xsl:text>Альт. номер рахунку</xsl:text>
+        </TD>
         <TD>
           <xsl:attribute name="onclick">
             <xsl:text>Sort('LCV')</xsl:text>
@@ -228,6 +234,15 @@
               <xsl:value-of select="concat('NLS_',position())" />
             </xsl:attribute>
             <xsl:value-of select="NLS" />
+          </TD>
+          <TD>
+            <xsl:if test="$blk>0">
+              <xsl:attribute name="style">color:white;background-color:purple</xsl:attribute>
+            </xsl:if>
+            <xsl:attribute name="id">
+              <xsl:value-of select="concat('NLSALT_',position())" />
+            </xsl:attribute>
+            <xsl:value-of select="NLSALT" />
           </TD>
           <TD>
             <xsl:if test="$blk>0">

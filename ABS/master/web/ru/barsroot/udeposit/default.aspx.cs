@@ -12,7 +12,12 @@ namespace barsroot.udeposit
 				throw new Exception("Не задан параметр flt!");
 
 			decimal mode = Convert.ToDecimal(Request.Params.Get("mode"));
-			if(mode != 0 && mode != 1 && mode != 2)
+            // mode:
+            // 0 - повний доступ
+            // 1 - інспектор
+            // 2 - бухгалтер
+            // 3 - лише перегляд
+            if (mode != 0 && mode != 1 && mode != 2 && mode != 3)
 				throw new Exception("Недопустимое значение параметра mode!");
 		}
 		#region Web Form Designer generated code

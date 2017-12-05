@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/dpu_utils.sql =========*** Run *** =
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.DPU_UTILS 
+create or replace package DPU_UTILS
 is
   -------------------------------------------------------------
   --                                                         --
@@ -15,7 +9,7 @@ is
   --
   -- constants
   --
-  head_ver     constant varchar2(64)  := 'version 1.19 09.03.2017';
+  head_ver     constant varchar2(64)  := 'version 1.21 16.11.2017';
   head_awk     constant varchar2(512) := '';
 
   --
@@ -107,7 +101,7 @@ is
   , p_ccy_id       in     dpu_vidd.kv%type
   , p_nbs_dep      in     dpu_vidd.bsd%type
   , p_nbs_int      in     dpu_vidd.bsn%type
-  , p_prd_tp_id    in     dpu_vidd.dpu_type%type
+  , p_prd_tp_id    in     number -- deprecated
   , p_term_tp      in     dpu_vidd.term_type%type
   , p_term_min     in     dpu_vidd.term_min%type
   , p_term_max     in     dpu_vidd.term_max%type
@@ -118,7 +112,7 @@ is
   , p_longation    in     dpu_vidd.fl_autoextend%type default 0
   , p_replenish    in     dpu_vidd.fl_add%type        default 0
   , p_comproc      in     dpu_vidd.COMPROC%type       default 0
-  , p_irvcbl       in     dpu_vidd.irrevocable%type   default 1
+  , p_irvcbl       in     dpu_vidd.IRVK%type          default 1
   , p_basey        in     dpu_vidd.basey%type         default 0
   , p_metr         in     dpu_vidd.metr%type          default 0
   , p_freq         in     dpu_vidd.freq_v%type        default 5
@@ -149,7 +143,7 @@ is
   , p_longation    in     dpu_vidd.fl_autoextend%type
   , p_replenish    in     dpu_vidd.fl_add%type
   , p_comproc      in     dpu_vidd.COMPROC%type
-  , p_irvcbl       in     dpu_vidd.irrevocable%type
+  , p_irvcbl       in     dpu_vidd.IRVK%type
   , p_freq         in     dpu_vidd.freq_v%type
   , p_br_id        in     dpu_vidd.br_id%type
   , p_tt           in     dpu_vidd.tt%type
@@ -182,6 +176,15 @@ is
   --
   procedure DEL_SUBTYPE
   ( p_sbtp_id      in     dpu_vidd.vidd%type
+  );
+
+  --
+  -- Експорт вид депозиту в SQL-сценарій
+  --
+  procedure EXPRT_SUBTYPE
+  ( p_sbtp_id      in     dpu_vidd.vidd%type
+  , p_script          out clob
+  , p_file_nm         out varchar2
   );
 
   --
@@ -312,12 +315,15 @@ is
 
 END DPU_UTILS;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.DPU_UTILS 
+
+show errors;
+
+create or replace package body DPU_UTILS
 is
   --
   -- constants
   --
-  body_ver    constant varchar2(64)   := 'version 1.30 13.03.2017';
+  body_ver    constant varchar2(64)   := 'version 1.32 17.11.2017';
   body_awk    constant varchar2(512)  := ''||
 $if DPU_PARAMS.SBER
 $then
@@ -673,11 +679,11 @@ $then
 
         l_text := l_text ||'  begin '||nlchr;
         l_text := l_text ||'    insert into dpu_types_ob22  '||nlchr;
-        l_text := l_text ||'      ( type_id, k013, s181, R034, nbs_dep, ob22_dep, nbs_int, ob22_int, nbs_exp, ob22_exp, nbs_red, ob22_red ) '||nlchr;
+        l_text := l_text ||'      ( type_id, k013, IRVK, R034, nbs_dep, ob22_dep, nbs_int, ob22_int, nbs_exp, ob22_exp, nbs_red, ob22_red ) '||nlchr;
         l_text := l_text ||'    values '||nlchr;
         l_text := l_text ||'      ( '   || nvl( to_char(l_ob22(o).type_id ), 'null') ||  ', ' ;
         l_text := l_text ||       ''''  || nvl(dblquote(l_ob22(o).k013    ),     '') ||''', ' ;
-        l_text := l_text ||       ''''  || nvl(dblquote(l_ob22(o).s181    ),     '') ||''', ' ;
+        l_text := l_text ||       ''''  || nvl(dblquote(l_ob22(o).IRVK    ),     '') ||''', ' ;
         l_text := l_text ||       ''''  || nvl(dblquote(l_ob22(o).R034    ),     '') ||''', ' ;
         l_text := l_text ||       ''''  || nvl(dblquote(l_ob22(o).nbs_dep ),     '') ||''', ' ;
         l_text := l_text ||       ''''  || nvl(dblquote(l_ob22(o).ob22_dep),     '') ||''', ' ;
@@ -703,7 +709,7 @@ $then
         l_text := l_text ||'             ob22_red = '||''''||nvl(dblquote(l_ob22(o).ob22_red), '') ||'''  '||nlchr;
         l_text := l_text ||'       where type_id  = '|| to_char(l_ob22(o).type_id)    ||nlchr;
         l_text := l_text ||'         and K013     = '||''''|| l_ob22(o).k013 || ''' ' ||nlchr;
-        l_text := l_text ||'         and S181     = '||''''|| l_ob22(o).s181 || ''' ' ||nlchr;
+        l_text := l_text ||'         and IRVK     = '||''''|| l_ob22(o).IRVK || ''' ' ||nlchr;
         l_text := l_text ||'         and R034     = '||''''|| l_ob22(o).R034 || ''';' ||nlchr;
         l_text := l_text ||nlchr;
         l_text := l_text ||'    dbms_output.put_line(''Оновлено ОБ22 для типу договору № '||to_char(l_viddrow.type_id)||''' );'||nlchr;
@@ -1137,14 +1143,13 @@ $then
     title      constant varchar2(30) := 'dpu_utils.type_constructor:';
     l_type     dpu_types%rowtype;
 
-    type t_rec is record ( term        dpu_vidd.srok%type,
-                           fl_add      dpu_vidd.fl_add%type,
+    type t_rec is record ( fl_add      dpu_vidd.fl_add%type,
                            curr_id     dpu_vidd.kv%type,
                            freq_id     dpu_vidd.freq_v%type,
                            freq_name   freq.name%type,
                            nbs_dep     dpu_vidd.bsd%type,
                            nbs_int     dpu_vidd.bsn%type,
-                           s181        dpu_types_ob22.s181%type,
+                           IRVK        dpu_vidd.IRVK%type,
                            term_type   dpu_types.term_type%type,
                            term_min    dpu_types.term_min%type,
                            term_max    dpu_types.term_max%type,
@@ -1184,14 +1189,7 @@ $then
 
       Else -- Діапазон
 
-        Case
-          When p_rec.s181 = '1' Then
-            l_name := l_type.type_name ||' < року ';
-          When p_rec.s181 = '2' Then
-            l_name := l_type.type_name ||' > року ';
-          Else
-            l_name := l_type.type_name;
-        End Case;
+        l_name := l_type.type_name;
 
       End If;
 
@@ -1201,32 +1199,31 @@ $then
         l_name := l_name || '(% '|| p_rec.freq_name ||')';
       End If;
 
-      update BARS.DPU_VIDD
-         set name      = l_name,
-             srok      = p_rec.term,
-             id_stop   = l_type.stop_id,
-             br_id     = l_type.br_id,
-             metr      = l_type.metr_id,
-             tt        = 'DU%',
-             tip_ost   = 1,
-             min_summ  = l_type.sum_min,
-             max_summ  = l_type.sum_max,
-             limit     = l_type.sum_add,
-             shablon   = l_type.shablon,
-             dpu_type  = to_number(p_rec.s181),
-             fl_add    = p_rec.fl_add,
-             flag      = 1,
-             fl_extend = 0,
-             term_min  = p_rec.term_min,
-             term_max  = p_rec.term_max,
-             term_add  = p_rec.term_add
-       where type_id   = p_typeid
-         and kv        = p_rec.curr_id
-         and bsd       = p_rec.nbs_dep
-         and freq_v    = p_rec.freq_id
-         and comproc   = p_cap
-         and flag      = 0
-         and term_type = p_rec.term_type
+      update DPU_VIDD
+         set NAME      = l_name,
+             ID_STOP   = l_type.stop_id,
+             BR_ID     = l_type.br_id,
+             METR      = l_type.metr_id,
+             TT        = 'DU%',
+             TIP_OST   = 1,
+             MIN_SUMM  = l_type.sum_min,
+             MAX_SUMM  = l_type.sum_max,
+             LIMIT     = l_type.sum_add,
+             SHABLON   = l_type.shablon,
+             IRVK      = p_rec.IRVK,
+             FL_ADD    = p_rec.fl_add,
+             FLAG      = 1,
+             FL_EXTEND = 0,
+             TERM_MIN  = p_rec.term_min,
+             TERM_MAX  = p_rec.term_max,
+             TERM_ADD  = p_rec.term_add
+       where TYPE_ID   = p_typeid
+         and KV        = p_rec.curr_id
+         and BSD       = p_rec.nbs_dep
+         and FREQ_V    = p_rec.freq_id
+         and COMPROC   = p_cap
+         and FLAG      = 0
+         and TERM_TYPE = p_rec.term_type
          and ( ( term_type = 1 and term_max  = p_rec.term_max) or (term_type = 2) )
          and rownum    = 1
       returning vidd into l_vidd;
@@ -1236,22 +1233,23 @@ $then
         select s_dpu_vidd.nextval
           into l_vidd from dual;
 
-        insert into BARS.DPU_VIDD
+        insert
+          into DPU_VIDD
           ( vidd, name, dpu_code, kv,
-            srok, bsd, bsn,
+            bsd, bsn,
             tt, basey, freq_n, tip_ost, flag, fl_extend, fl_autoextend,
             min_summ,  max_summ, limit,
             id_stop,   br_id,    metr,
-            dpu_type,  shablon,  fl_add,
+            shablon,   fl_add,   IRVK,
             comproc,   freq_v,   type_id,
             term_type, term_min, term_max, term_add )
         values
           ( l_vidd, l_name,  l_type.type_code, p_rec.curr_id,
-            p_rec.term,      p_rec.nbs_dep,    p_rec.nbs_int,
+            p_rec.nbs_dep,    p_rec.nbs_int,
             'DU%', 0, 1, 0, 1, 0, 0,
             l_type.sum_min,  l_type.sum_max,   l_type.sum_add,
             l_type.stop_id,  l_type.br_id,     l_type.metr_id,
-            p_rec.s181,      l_type.shablon,   p_rec.fl_add,
+            l_type.shablon,  p_rec.fl_add,     p_rec.IRVK,
             p_cap,           p_rec.freq_id,    l_type.type_id,
             p_rec.term_type, p_rec.term_min,   p_rec.term_max, p_rec.term_add );
 
@@ -1294,56 +1292,30 @@ $then
     If (l_type.term_type = 1)
     Then -- якщо терміни депозиту фіксовані
 
-      select m.term_id * 100,
-             decode(l_type.sum_add, null, 0, 1) as fl_add,
+      select nvl2(l_type.sum_add, 1, 0)  as fl_add,
              c.curr_id, f.freq_id, q.name as freq_name,
-             o.nbs_dep, o.nbs_int, o.s181,
+             o.NBS_DEP, o.NBS_INT, o.IRVK,
              l_type.term_type, m.term_id, m.term_id, l_type.term_add
         bulk collect
         into l_tab
-        from BARS.dpu_types_ob22     o,
-             BARS.dpu_types_term     m,
-             BARS.dpu_types_currency c,
-             BARS.dpu_types_freq     f,
-             BARS.freq               q
+        from DPU_TYPES_OB22     o,
+             DPU_TYPES_TERM     m,
+             DPU_TYPES_CURRENCY c,
+             DPU_TYPES_FREQ     f,
+             FREQ               q
        where o.type_id = p_typeid
          and o.r034    = decode(c.curr_id, 980, 1, 2)
          and m.type_id = o.type_id
          and c.type_id = o.type_id
          and f.type_id = o.type_id
          and q.freq    = f.freq_id
-         and o.s181    = case
-                           -- термін в днях
-                           when ( m.term_id > 0 and m.term_id <= 0.0365 ) then 1
-                           when ( m.term_id > 0.0365 and m.term_id < 1 )  then 2
-                           -- термін в місяцях
-                           when ( m.term_id >=1 and m.term_id <= 12 )     then 1
-                           else 2
-                         end
-       order by o.s181, c.curr_id, o.nbs_dep, f.freq_id;
+       order by o.IRVK, c.CURR_ID, o.NBS_DEP, f.FREQ_ID;
 
     Else -- якщо термін діапазон
 
-      select case
-               When o.s181 = '1' then
-                 -- короткострокові
-                 case
-                   when (l_type.term_min >= 1)
-                   then trunc(l_type.term_min)
-                   else (l_type.term_min * 100)
-                 end
-               When o.s181 = '2' then
-                 -- довгострокові
-                 case
-                   when (l_type.term_max >= 1)
-                   then trunc(l_type.term_max)
-                   else (l_type.term_max * 100)
-                 end
-               Else 0
-             end as term,
-             nvl2(l_type.sum_add, 1, 0)  as fl_add,
+      select nvl2(l_type.sum_add, 1, 0)  as fl_add,
              c.curr_id, f.freq_id, q.name as freq_name,
-             o.nbs_dep, o.nbs_int, o.s181,
+             o.nbs_dep, o.nbs_int, o.IRVK,
              l_type.term_type, l_type.term_min, l_type.term_max, l_type.term_add
         bulk collect
         into l_tab
@@ -1356,12 +1328,13 @@ $then
          and c.type_id = o.type_id
          and f.type_id = o.type_id
          and q.freq    = f.freq_id
-       order by o.s181, c.curr_id, o.nbs_dep, f.freq_id;
+       order by o.IRVK, c.curr_id, o.nbs_dep, f.freq_id;
 
     End If;
 
     -- for k in 1 .. l_tab.count
-    If (l_tab.count > 0) Then
+    If (l_tab.count > 0) 
+    Then
 
       for k in l_tab.first .. l_tab.last
       Loop
@@ -1393,7 +1366,7 @@ $end
   , p_ccy_id       in     dpu_vidd.kv%type
   , p_nbs_dep      in     dpu_vidd.bsd%type
   , p_nbs_int      in     dpu_vidd.bsn%type
-  , p_prd_tp_id    in     dpu_vidd.dpu_type%type
+  , p_prd_tp_id    in     number -- deprecated
   , p_term_tp      in     dpu_vidd.term_type%type
   , p_term_min     in     dpu_vidd.term_min%type
   , p_term_max     in     dpu_vidd.term_max%type
@@ -1403,8 +1376,8 @@ $end
   , p_line         in     dpu_vidd.FL_EXTEND%type     default 0
   , p_longation    in     dpu_vidd.fl_autoextend%type default 0
   , p_replenish    in     dpu_vidd.fl_add%type        default 0
-  , p_comproc      in     dpu_vidd.COMPROC%type       default 0
-  , p_irvcbl       in     dpu_vidd.irrevocable%type   default 1
+  , p_comproc      in     dpu_vidd.comproc%type       default 0
+  , p_irvcbl       in     dpu_vidd.irvk%type          default 1
   , p_basey        in     dpu_vidd.basey%type         default 0
   , p_metr         in     dpu_vidd.metr%type          default 0
   , p_freq         in     dpu_vidd.freq_v%type        default 5
@@ -1425,13 +1398,13 @@ $end
   %version 1.0
   %usage    створення зв`язку між групою рахунків та групою користувачів
   */
-    title       constant  varchar2(60) := 'dpu_utils.ADD_SUBTYPE';
-    l_srok                dpu_vidd.srok%type;
+    title       constant  varchar2(64) := $$PLSQL_UNIT||'.ADD_SUBTYPE';
   begin
 
-    bars_audit.trace( '%s: Entry with many parameters.', title );
+    bars_audit.trace( '%s: Entry with ( p_tp_id=%s, p_ccy_id=%s, p_term_tp=%s ).'
+                    , title, to_char(p_tp_id), to_char(p_ccy_id), to_char(p_term_tp) );
 
-    bars_audit.trace( '%s:( term_min=%s, term_max=%s, amnt_min=%s, amnt_max=%s, amnt_add=%s, p_tpl_id=%s, p_irvcbl=%s ).'
+    bars_audit.trace( '%s:( p_term_min=%s, p_term_max=%s, p_amnt_min=%s, p_amnt_max=%s, p_amnt_add=%s, p_tpl_id=%s, p_irvcbl=%s ).'
                     , title, to_char(p_term_min), to_char(p_term_max), to_char(p_amnt_min)
                     , to_char(p_amnt_max), to_char(p_amnt_add), p_tpl_id, to_char(p_irvcbl) );
 
@@ -1439,7 +1412,10 @@ $end
       when ( p_prd_tp_id Is Null )
       then
         bars_error.raise_nerror( 'DPU', 'GENERAL_ERROR_CODE', 'Не вказано строковість (S181) для виду депозту!' );
-      when ( p_term_min Is Null  )
+      when ( p_term_tp Is Null )
+      then
+        bars_error.raise_nerror( 'DPU', 'GENERAL_ERROR_CODE', 'Не вказано тип терміну для виду депозту!' );
+      when ( p_term_min Is Null )
       then
         bars_error.raise_nerror( 'DPU', 'GENERAL_ERROR_CODE', 'Не вказано мінімальний термін договору для виду депозту!' );
       when ( p_term_max is Null )
@@ -1447,33 +1423,30 @@ $end
         bars_error.raise_nerror( 'DPU', 'GENERAL_ERROR_CODE', 'Не вказано максимальний термін договору для виду депозту!' );
       when ( p_term_min > p_term_max )
       then
-        bars_error.raise_nerror( 'DPU', 'GENERAL_ERROR_CODE', 'Мінімальний термін перевищує максимальний термін!' );
+        bars_error.raise_nerror( 'DPU', 'GENERAL_ERROR_CODE', 'Мінімальний термін > Максимального терміну!' );
+      when ( p_term_min = p_term_max and p_term_tp = 2 )
+      then
+        bars_error.raise_nerror( 'DPU', 'GENERAL_ERROR_CODE', 'Мінімальний термін = Максимальному терміну!' );
       else
-        l_srok := case
-                    when ( p_prd_tp_id = 1 ) -- короткостроковий ( до року )
-                    then (trunc(p_term_min) + (p_term_min - trunc(p_term_min)) * 100)
-                    when ( p_prd_tp_id = 2 ) -- довгостроковий (більше року)
-                    then (trunc(p_term_max) + (p_term_max - trunc(p_term_max)) * 100)
-                    else 0
-                  end;
+        null;
     end case;
 
     begin
 
       insert
-        into BARS.DPU_VIDD
-        ( TYPE_ID, DPU_CODE, NAME, KV, SROK, BSD, BSN
-        , DPU_TYPE, TERM_TYPE, TERM_MIN, TERM_MAX, MIN_SUMM,  MAX_SUMM, LIMIT
-        , FLAG, FL_EXTEND, FL_AUTOEXTEND, FL_ADD, COMPROC, IRREVOCABLE
+        into DPU_VIDD
+        ( TYPE_ID, DPU_CODE, NAME, KV, BSD, BSN
+        , TERM_TYPE, TERM_MIN, TERM_MAX, MIN_SUMM,  MAX_SUMM, LIMIT
+        , FLAG, FL_EXTEND, FL_AUTOEXTEND, FL_ADD, COMPROC
         , BASEY, METR, TIP_OST, FREQ_N, FREQ_V, BR_ID, TT, ID_STOP, PENYA
-        , SHABLON, COMMENTS, EXN_MTH_ID
+        , SHABLON, COMMENTS, EXN_MTH_ID, IRVK
         , VIDD )
       values
-        ( p_tp_id, p_sbtp_code, p_sbtp_nm, p_ccy_id, l_srok, p_nbs_dep, p_nbs_int
-        , p_prd_tp_id, p_term_tp, p_term_min, p_term_max, p_amnt_min, p_amnt_max, p_amnt_add
-        , 0, p_line, p_longation, p_replenish, p_comproc, p_irvcbl
+        ( p_tp_id, p_sbtp_code, p_sbtp_nm, p_ccy_id, p_nbs_dep, p_nbs_int
+        , p_term_tp, p_term_min, p_term_max, p_amnt_min, p_amnt_max, p_amnt_add
+        , 0, p_line, p_longation, p_replenish, p_comproc
         , p_basey, p_metr, 1, 1, p_freq, p_br_id, p_tt, p_pny_id, p_fine
-        , p_tpl_id, p_comment, p_exn_mth
+        , p_tpl_id, p_comment, p_exn_mth, p_irvcbl
         , S_DPU_VIDD.NextVal )
       returning VIDD
            into p_sbtp_id;
@@ -1595,8 +1568,8 @@ $end
   , p_amnt_add     in     dpu_vidd.limit%type
   , p_longation    in     dpu_vidd.fl_autoextend%type
   , p_replenish    in     dpu_vidd.fl_add%type
-  , p_comproc      in     dpu_vidd.COMPROC%type
-  , p_irvcbl       in     dpu_vidd.irrevocable%type
+  , p_comproc      in     dpu_vidd.comproc%type
+  , p_irvcbl       in     dpu_vidd.irvk%type
   , p_freq         in     dpu_vidd.freq_v%type
   , p_br_id        in     dpu_vidd.br_id%type
   , p_tt           in     dpu_vidd.tt%type
@@ -1621,7 +1594,6 @@ $end
   %param p_longation -
   %param p_replenish -
   %param p_comproc   -
-  %param p_irvcbl    -
   %param p_freq      -
   %param p_br_id     -
   %param p_tt        -
@@ -1647,7 +1619,7 @@ $end
                     , to_char(p_irvcbl), p_tpl_id );
 
     case
-      when ( p_term_min Is Null  )
+      when ( p_term_min Is Null )
       then
         bars_error.raise_nerror( 'DPU', 'GENERAL_ERROR_CODE', 'Не вказано мінімальний термін договору для виду депозту!' );
       when ( p_term_max is Null )
@@ -1662,16 +1634,9 @@ $end
 
     begin
 
-      update BARS.DPU_VIDD
+      update DPU_VIDD
          set DPU_CODE      = p_sbtp_code
            , NAME          = p_sbtp_nm
-           , SROK          = case
-                               when ( DPU_TYPE = 1 and TERM_MIN <> p_term_min )
-                               then (trunc(p_term_min) + (p_term_min - trunc(p_term_min)) * 100)
-                               when ( DPU_TYPE = 2 and TERM_MAX <> p_term_max )
-                               then (trunc(p_term_max) + (p_term_max - trunc(p_term_max)) * 100)
-                               else SROK
-                             end
            , TERM_TYPE     = p_term_tp
            , TERM_MIN      = p_term_min
            , TERM_MAX      = p_term_max
@@ -1688,11 +1653,10 @@ $end
            , FL_AUTOEXTEND = p_longation
            , FL_ADD        = p_replenish
            , COMPROC       = p_comproc
-           , IRREVOCABLE   = p_irvcbl
            , EXN_MTH_ID    = p_exn_mth
        where VIDD = p_sbtp_id;
 
-      if (sql%rowcount > 0)
+      if ( sql%rowcount > 0 )
       then
         bars_audit.trace( '%s: changed parameters of deposit subtype #%s.', title, to_char(p_sbtp_id) );
       end if;
@@ -1742,6 +1706,42 @@ $end
   end SUBTYPE_CHG_STE;
 
   --
+  -- Експорт вид депозиту в SQL-сценарій
+  --
+  procedure EXPRT_SUBTYPE
+  ( p_sbtp_id      in     dpu_vidd.vidd%type
+  , p_script          out clob
+  , p_file_nm         out varchar2
+  ) is
+  /**
+  <b>SUBTYPE_CHG_STE</b> - Експорт вид депозиту в SQL-сценарій
+  %param p_sbtp_id   - Ід. виду депозиту
+  %param p_script    - SQL-сценарій створення/оновлення виду депозиту
+  %paramp_file_nm    - Назва файлу SQL-сценарію (містить Ід. виду депозиту)
+
+  %version 1.0
+  %usage   Експорт вид депозиту
+  */
+    title       constant  varchar2(64) := $$PLSQL_UNIT||'.EXPRT_SUBTYPE';
+  begin
+
+    bars_audit.trace( '%s: Entry with ( sbtp_id=%s ).', title, to_char(p_sbtp_id) );
+
+    GEN_SCRIPT4VIDD( p_sbtp_id );
+
+    select CLOBDATA
+      into p_script
+      from TMP_EXPDPTYPE
+     where MODCODE = c_modcode
+       and TYPEID  = p_sbtp_id;
+
+    p_file_nm := 'dputype_'||to_char(p_sbtp_id,'FM0000')||'.sql';
+
+    bars_audit.trace( '%s: Exit.', title );
+
+  end EXPRT_SUBTYPE;
+
+  --
   -- Новий код штрафу
   --
   procedure CRT_PENALTY
@@ -1774,7 +1774,7 @@ $end
   --
   -- Новий код штрафу
   --
-  procedure add_penalty
+  procedure ADD_PENALTY
   ( penalty_nm     in     dpt_stop.name%type
   , msr_prd_id     in     dpt_stop.fl%type       default 0 -- В %-ах від строку
   , pny_bal_tp     in     dpt_stop.sh_ost%type   default 2 -- По історії залишку
@@ -1850,12 +1850,12 @@ $end
 
     bars_audit.trace( '%s: Exit.', title );
 
-  end add_penalty;
+  end ADD_PENALTY;
 
   --
   -- Зміна параметрів штрафу
   --
-  procedure upd_penalty
+  procedure UPD_PENALTY
   ( penalty_id     in     dpt_stop.id%type
   , penalty_nm     in     dpt_stop.name%type
   , msr_prd_id     in     dpt_stop.fl%type
@@ -1927,7 +1927,7 @@ $end
 
     bars_audit.trace( '%s: Exit.', title );
 
-  end upd_penalty;
+  end UPD_PENALTY;
 
   ---
   --
@@ -1945,7 +1945,7 @@ $end
       into l_qty
       from BARS.DPT_STOP
      where ID = penalty_id
-       and MOD_CODE = 'DPU' ;
+       and MOD_CODE = 'DPU';
 
     if ( l_qty = 0 )
     then
@@ -2403,7 +2403,7 @@ $end
         if ( l_nls_exp is not null )
         then
           begin
-            insert into bars.proc_dr$base
+            insert into PROC_DR$BASE
               (         NBS,       G67,       V67, SOUR,         NBSN,      G67N,      V67N,         REZID, IO,          BRANCH,    KF)
             values
               (l_tab(k).bsd, l_nls_exp, l_nls_exp,    4, l_tab(k).bsn, l_nls_red, l_nls_red, l_tab(k).vidd,  1, l_tab(k).branch, p_kf );
@@ -2651,16 +2651,9 @@ BEGIN
   NULL;
 END DPU_UTILS;
 /
- show err;
- 
-PROMPT *** Create  grants  DPU_UTILS ***
-grant EXECUTE                                                                on DPU_UTILS       to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on DPU_UTILS       to DPT;
-grant EXECUTE                                                                on DPU_UTILS       to DPT_ADMIN;
 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/dpu_utils.sql =========*** End *** =
- PROMPT ===================================================================================== 
- 
+show errors;
+
+grant EXECUTE on DPU_UTILS to BARS_ACCESS_DEFROLE;
+grant EXECUTE on DPU_UTILS to DPT;
+grant EXECUTE on DPU_UTILS to DPT_ADMIN;

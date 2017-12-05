@@ -37,8 +37,10 @@ GRANT EXECUTE ON KWT_2924 TO BARS_ACCESS_DEFROLE;
 
 ---------------------------------------------------------
 CREATE OR REPLACE PACKAGE BODY KWT_2924 IS
- G_BODY_VERSION  CONSTANT VARCHAR2(64)  :=   'ver.4. 01.11.2017';
+ G_BODY_VERSION  CONSTANT VARCHAR2(64)  :=   'ver.4. 15.11.2017';
 /*
+
+ 15.11.2017 Sta -- Трансфер 2017 6399.01 => 6340.01
 
  01.11.2017 Sta дох/расх за прошліе 180 дней
  21.09.2017 Sta Внебаланс при закр на расходы
@@ -57,24 +59,25 @@ CREATE OR REPLACE PACKAGE BODY KWT_2924 IS
 ---================================================================
 procedure CLS_ATM  ( p_DAT date,    p_acc number , p_pap int ) is
   oo oper%rowtype;   l_DAT date ; l_OST number;   l_dk1 int  ; l_dk2 int ;   l_D1  number; l_D2   number;
+  BBBBOO varchar2 (6) ;
 begin
 --l_dat := NVL(p_DAT, add_months( gl.bdate, -1) ) ;
   l_dat := NVL(p_DAT,  gl.bdate) - 180 ;
-
   for k in (select a.* from accounts a where  a.tip in ('AT7', 'AT8') and a.dazs is null and kv = gl.baseval and p_acc in ( 0, a.acc ) and a.pap = p_pap )
   loop
      If k.ostc = 0 then
-
         delete from atm_ref2 where ref1 in (select ref1 from atm_ref1 where acc = k.acc);
         delete from atm_ref1 where acc = k.acc ;
-
      else
         l_ost := fost ( k.acc, (l_dat-1) );
-
         l_dk1 := k.pap - 1 ;
         l_DK2 := 2 - k.pap ;
+        -- 
+        begin select r020||ob22 into BBBBOO from sb_ob22 where r020||ob22  in ('639901','634001') and d_close is null and rownum = 1 ;  -- Трансфер 2017
+        EXCEPTION WHEN NO_DATA_FOUND THEN raise_application_error( n_err, 'В довіднику SB_OB22 відсутня аналітика для 63**' )  ;
+        end;
 
-        OP_BS_OB1( substr(k.branch,1,15), '639901' ) ;
+        OP_BS_OB1( substr(k.branch,1,15),  BBBBOO  ) ;
         OP_BS_OB1( substr(k.branch,1,15), '739940' ) ;
         OP_BS_OB1( substr(k.branch,1,15), '961804' ) ;
 
@@ -86,14 +89,14 @@ begin
                  If oo.s <> 0 then
                     If oo.s > 0 then oo.dk := l_dk1 ;         Else             oo.dk := l_dk2 ;           end if;
                     oo.s := LEAST ( ABS(oo.s), abs(k.Ostc) ) ;
-                    If oo.dk = 1 then oo.nlsb := nbs_ob22_null('6399', '01', k.branch); oo.nam_b :=  'Надлишки грошових коштів,виявл. в АТМ' ;
-                    else              oo.nlsb := nbs_ob22_null('7399', '40', k.branch); oo.nam_b :=  'Нестачі грошових коштів, виявл. в АТМ' ;
+                    If oo.dk = 1 then oo.nlsb := nbs_ob22_null( Substr( BBBBOO,1,4), Substr( BBBBOO,5,2), k.branch); oo.nam_b :=  'Надлишки грошових коштів,виявл. в АТМ' ;
+                    else              oo.nlsb := nbs_ob22_null(        '7399',                  '40'    , k.branch); oo.nam_b :=  'Нестачі грошових коштів, виявл. в АТМ' ;
                     end if ;
 /*
 А для переноса сумм на расходы нужно использовать D66 – Внутрішн МемОрд по Доходах/Витратах
-и бух модель  Дебет              7399/40 Кредит           2924/08
+и бух модель Дебет 7399/40 Кредит    2924/08
 Одночасно повинна бути сформована проводка по відображенню суми, списаної у збиток заборгованості за позабалансовим рахунком:
-Дебет              9618/04Кредит           9910
+Дебет              9618/04Кредит     9910
 */
                     select substr(nms,1,38) into oo.nam_b from accounts where kv = gl.baseval and nls = oo.nlsb;
                     gl.ref (oo.REF);  oo.nd := trim (Substr( '          '||to_char(oo.ref) , -10 ) ) ;

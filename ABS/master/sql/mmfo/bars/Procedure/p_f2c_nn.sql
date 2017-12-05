@@ -14,7 +14,7 @@ IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :   Процедура формирования #2C для КБ (универсальная)
 % COPYRIGHT   :   Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     :   22/03/2017 (12/01/2017, 15/11/2016)
+% VERSION     :   10/11/2017 (04/09/2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
       sheme_ - схема формирования
@@ -174,68 +174,6 @@ branch_    customer.tobo%TYPE;
 kod_obl_   VARCHAR2 (2);
 l_         VARCHAR2 (1);
 
---курсор по контрагентам
-CURSOR c_main
-IS
-     SELECT t.ko,
-            NVL (
-               DECODE (SUBSTR (b.b040, 9, 1),
-                       '2', SUBSTR (b.b040, 15, 2),
-                       SUBSTR (b.b040, 10, 2)),
-               nbuc_),
-            c.rnk,
-            c.okpo,
-            c.nmk,
-            TO_CHAR (c.country),
-            c.adr,
-            NVL (c.ved, '00000'),
-            c.codcagent,
-            t.kv,
-            SUM (t.s_eqv),
-            NVL (SUM (gl.p_icurval (t.kv, t.s_kom, dat_)), 0)
-       --сумма в формате грн.коп
-       FROM OTCN_PROV_TEMP t, customer c, tobo b                 --branch b
-      WHERE t.rnk = c.rnk AND c.tobo = b.tobo(+)      --c.branch = b.branch
-   GROUP BY t.ko,
-            NVL (
-               DECODE (SUBSTR (b.b040, 9, 1),
-                       '2', SUBSTR (b.b040, 15, 2),
-                       SUBSTR (b.b040, 10, 2)),
-               nbuc_),
-            c.rnk,
-            c.okpo,
-            c.nmk,
-            TO_CHAR (c.country),
-            c.adr,
-            NVL (c.ved, '00000'),
-            c.codcagent,
-            t.kv
-   ORDER BY 2;
-
---- Намір покупки
-CURSOR opl_dok
-IS
-     SELECT t.ko,
-            t.REF,
-            t.accd,
-            t.nlsd,
-            t.kv,
-            t.acck,
-            t.nlsk,
-            t.nazn,
-            SUM (t.s_nom),
-            SUM (t.s_kom)
-       FROM OTCN_PROV_TEMP t
-      WHERE t.rnk = rnk_
-   GROUP BY t.ko,
-            t.REF,
-            t.acck,
-            t.nlsk,
-            t.kv,
-            t.accd,
-            t.nlsd,
-            t.nazn;
-
 -------------------------------------------------------------------
 PROCEDURE p_ins (p_np_     IN NUMBER,
                  p_kodp_   IN VARCHAR2,
@@ -263,154 +201,6 @@ BEGIN
                 ref_,
                 rnk_,
                 TO_CHAR (refd_));
-END;
-
--------------------------------------------------------------------
-FUNCTION f_benef_country (p_ref_ IN NUMBER)
-   RETURN VARCHAR2
-IS
-   code_     NUMBER;
-   v_code_   VARCHAR2 (3) := NULL;
-   sql_      VARCHAR2 (200);
-BEGIN
-   IF flag_ >= 1
-   THEN
-      sql_ :=
-            'select t.benefcountry '
-         || 'from zayavka z, TOP_CONTRACTS t '
-         || 'where z.ref=:p_ref_ and '
-         || '        z.dk=1 and '
-         || '        z.pid=t.pid';
-
-      EXECUTE IMMEDIATE sql_ INTO code_ USING p_ref_;
-
-      v_code_ := LPAD (TRIM (code_), 3, '0');
-   END IF;
-
-   RETURN v_code_;
-EXCEPTION
-   WHEN NO_DATA_FOUND
-   THEN
-      RETURN NULL;
-END;
-
--------------------------------------------------------------------
-FUNCTION f_benef_bic (p_ref_ IN NUMBER)
-   RETURN VARCHAR2
-IS
-   bic_   VARCHAR2 (12) := NULL;
-   sql_   VARCHAR2 (200);
-BEGIN
-   IF flag_ >= 1
-   THEN
-      sql_ :=
-            'select t.benefbic '
-         || 'from zayavka z, TOP_CONTRACTS t '
-         || 'where z.ref=:p_ref_ and '
-         || '      z.dk=1 and '
-         || '      z.pid=t.pid';
-
-      EXECUTE IMMEDIATE sql_ INTO bic_ USING p_ref_;
-   END IF;
-
-   RETURN bic_;
-EXCEPTION
-   WHEN NO_DATA_FOUND
-   THEN
-      RETURN NULL;
-END;
-
--------------------------------------------------------------------
-FUNCTION f_benef_bank (p_ref_ IN NUMBER)
-   RETURN VARCHAR2
-IS
-   nam_b   VARCHAR2 (70) := NULL;
-   sql_    VARCHAR2 (200);
-BEGIN
-   IF flag_ >= 1
-   THEN
-      sql_ :=
-            'select t.benefbank '
-         || 'from zayavka z, TOP_CONTRACTS t '
-         || 'where z.ref=:p_ref_ and '
-         || '      z.dk=1 and '
-         || '      z.pid=t.pid';
-
-      EXECUTE IMMEDIATE sql_ INTO nam_b USING p_ref_;
-   END IF;
-
-   RETURN nam_b;
-EXCEPTION
-   WHEN NO_DATA_FOUND
-   THEN
-      RETURN NULL;
-END;
-
--------------------------------------------------------------------
-PROCEDURE p_tag (p_i_       IN     NUMBER,
-                 p_value_   IN OUT VARCHAR2,
-                 p_kodp_       OUT VARCHAR2,
-                 p_ref_     IN     NUMBER DEFAULT NULL)
-IS
-BEGIN
-   IF p_i_ = 7
-   THEN
-      p_kodp_ := '04' || l_ || LPAD (kv_, 3, '0') || LPAD (k040_, 3, '0');
-
-      p_value_ :=
-         NVL (SUBSTR (TRIM (p_value_), 1, 70),
-              'пiдстава для придбання');
-
-      d7#70_ := p_value_;
-   ELSIF p_i_ = 2
-   THEN
-      p_kodp_ := '08' || l_ || LPAD (kv_, 3, '0') || LPAD (k040_, 3, '0');
-      p_value_ := NVL (SUBSTR (TRIM (p_value_), 1, 70), 'N контр.');
-   ELSIF p_i_ = 3
-   THEN
-      p_kodp_ := '09' || l_ || LPAD (kv_, 3, '0') || LPAD (k040_, 3, '0');
-      p_value_ := NVL (SUBSTR (TRIM (p_value_), 1, 70), 'DDMMYYYY');
-   --ELSIF p_i_ = 8
-   --THEN
-   --   p_kodp_ := '64';
-
-   --   IF p_value_ IS NULL
-   --   THEN
-   --      p_value_ := f_benef_country (p_ref_);
-   --   END IF;
-
-   --   IF p_value_ IS NOT NULL
-   --   THEN
-   --      p_value_ := LPAD (p_value_, 3, '0');
-   --   END IF;
-
-   --   p_value_ :=
-   --      NVL (SUBSTR (TRIM (p_value_), 1, 70),
-   --           'код краiни клiєнта-бенефiцiара'
-   --          );
-   ELSIF p_i_ = 9
-   THEN
-      p_kodp_ := '06' || l_ || LPAD (kv_, 3, '0') || LPAD (k040_, 3, '0');
-
-      IF p_value_ IS NULL
-      THEN
-         p_value_ :=
-            NVL (SUBSTR (TRIM (p_value_), 1, 70),
-                 'код iноземного банку');
-      END IF;
-   ELSIF p_i_ = 10
-   THEN
-      p_kodp_ := '07' || l_ || LPAD (kv_, 3, '0') || LPAD (k040_, 3, '0');
-
-      IF p_value_ IS NULL
-      THEN
-         p_value_ :=
-            NVL (SUBSTR (TRIM (nb_), 1, 70),
-                 'назва iноземного банку');
-      END IF;
-   ELSE
-      p_kodp_ := 'NN';
-   END IF;
 END;
 
 --------------------------------------------------------------------------
@@ -484,353 +274,6 @@ BEGIN
       gr_sum_ := 100;
    END IF;
    
-   IF mfou_ NOT IN (300120, 300465)
-   THEN
-      -- отбор проводок, удовлетворяющих условию
-      INSERT INTO OTCN_PROV_TEMP (ko,
-                               rnk,
-                               REF,
-                               acck,
-                               nlsk,
-                               kv,
-                               accd,
-                               nlsd,
-                               nazn,
-                               s_nom,
-                               s_eqv)
-      SELECT *
-        FROM (                                   --про намiр куп_влі валюти
-              SELECT   '1' ko,
-                       ca.rnk,
-                       o.REF,
-                       o.acck,
-                       o.nlsk,
-                       o.kv,
-                       o.accd,
-                       o.nlsd,
-                       o.nazn,
-                       SUM (o.s * 100) s_nom,
-                       SUM (gl.p_icurval (o.kv, o.s * 100, dat_)) s_eqv
-                  FROM provodki o, cust_acc ca
-                 WHERE     o.fdat = dat_
-                       AND o.kv = 980
-                       AND (   (    SUBSTR (o.nlsd, 1, 4) = '2600'
-                                AND SUBSTR (o.nlsk, 1, 4) = '2900')
-                            OR (    SUBSTR (o.nlsd, 1, 4) = '3929'
-                                AND SUBSTR (o.nlsk, 1, 4) = '2900'))
-                       AND o.accd = ca.acc
-              GROUP BY '1',
-                       ca.rnk,
-                       o.REF,
-                       o.acck,
-                       o.nlsk,
-                       o.kv,
-                       o.accd,
-                       o.nlsd,
-                       o.nazn)
-       WHERE ROUND (s_eqv / kurs_, 0) >= gr_sum_;
-   END IF;
-
-   IF pr_s3_ >= 1
-   THEN
-      sql_z :=
-            'UPDATE OTCN_PROV_TEMP t '
-         || 'SET t.s_kom=(SELECT z.s3 FROM ZAYAVKA z WHERE z.REF=t.REF) '
-         || 'WHERE t.REF IN (SELECT REF FROM ZAYAVKA WHERE NVL(s3,0)<>0)';
-   
-      EXECUTE IMMEDIATE sql_z;
-   END IF;
-   
-   OPEN c_main;
-   
-   LOOP
-      FETCH c_main
-         INTO ko_,
-           kod_obl_,
-           rnk_,
-           okpo_,
-           nmk_,
-           k040_,
-           adr_,
-           k110_,
-           codc_,
-           kv1_,
-           sum1_,
-           sumk1_;
-
-   EXIT WHEN c_main%NOTFOUND;
-
-   sum1_ := sum1_ - NVL (sumk1_, 0);
-   rez_ := MOD (codc_, 2);
-
-   -- 10.06.2009 изменил на следующее
-   IF LENGTH (TRIM (okpo_)) <= 8
-   THEN
-      okpo_ := LPAD (TRIM (okpo_), 8, '0');
-   ELSE
-      okpo_ := LPAD (TRIM (okpo_), 10, '0');
-   END IF;
-
-   -- для банков по коду ОКПО из RCUKRU(IKOD)
-   -- определяем код банка поле GLB
-   IF codc_ IN (1, 2)
-   THEN
-      BEGIN
-         SELECT GLB
-           INTO okpo_
-           FROM rcukru
-          WHERE TRIM (ikod) = TRIM (okpo_) AND ROWNUM = 1;
-      EXCEPTION
-         WHEN NO_DATA_FOUND
-         THEN
-            NULL;
-      END;
-   END IF;
-
-   IF ( (pr_op_ = 1 AND ko_ = '1' AND sum1_ > gr_sum_))
-   THEN
-      ---Намір купівлі валюти
-      OPEN opl_dok;
-
-      LOOP
-         FETCH opl_dok
-            INTO ko_1,
-                 ref_,
-                 acc_,
-                 nls_,
-                 kv_,
-                 acck_,
-                 nlsk_,
-                 nazn_,
-                 sum0_,
-                 sumk0_;
-
-         EXIT WHEN opl_dok%NOTFOUND;
-
-         --IF kodf_='2C'
-         --THEN
-         IF typ_ > 0
-         THEN
-            nbuc_ := NVL (f_codobl_tobo (acc_, typ_), nbuc1_);
-         ELSE
-            nbuc_ := nbuc1_;
-         END IF;
-
-         s0_ := TO_CHAR (sum0_ / 100, '999999999999.99');
-
-         nnnn_ := nnnn_ + 1;
-         sum0_ := sum0_ - NVL (sumk0_, 0);
-         d1#D3_ := NULL;
-         l_ := '0';
-
-         -- проверка есть ли для данной проводки доп. реквизиты
-         SELECT COUNT (*)
-           INTO koldop_
-           FROM operw
-          WHERE REF = ref_ AND tag LIKE 'D_#70';
-
-         IF koldop_ > 0
-         THEN
-            refd_ := ref_;
-         ELSE
-            IF ko_ = 2 AND nls_ LIKE '2600%' AND nlsk_ LIKE '2900%'
-            THEN
-               BEGIN
-                  SELECT REF
-                    INTO refd_
-                    FROM provodki p
-                   WHERE     fdat = dat_
-                         AND accd = acck_
-                         AND kv = kv_
-                         AND s = s0_
-                         AND EXISTS
-                                (SELECT 1
-                                   FROM operw o
-                                  WHERE o.REF = p.REF AND tag LIKE 'D_#70')
-                         AND ROWNUM = 1;
-               EXCEPTION
-                  WHEN NO_DATA_FOUND
-                  THEN
-                     refd_ := NULL;
-               END;
-            ELSE
-               refd_ := NULL;
-            END IF;
-         END IF;
-
-         d6#70_ := NULL;
-
-         BEGIN
-            SELECT SUBSTR (VALUE, 1, 3)
-              INTO val_
-              FROM operw
-             WHERE REF = refd_ AND tag = 'D6#70';
-         EXCEPTION
-            WHEN NO_DATA_FOUND
-            THEN
-               val_ := '000';
-         END;
-
-         k040_ := val_;
-
-         IF INSTR (LOWER (nazn_), 'дол') > 0
-         THEN
-            kv_ := 840;
-         ELSIF INSTR (LOWER (nazn_), 'евро') > 0
-         THEN
-            kv_ := 978;
-         ELSIF INSTR (LOWER (nazn_), 'руб') > 0
-         THEN
-            kv_ := 643;
-         ELSIF INSTR (LOWER (nazn_), 'фунт') > 0
-         THEN
-            kv_ := 826;
-         ELSE
-            kv_ := 999;
-         END IF;
-
-         IF (d6#70_ IS NULL OR d6#70_ <> '804')
-         THEN                            --and ROUND (sum0_ / dig_, 0) >= 1
-            -- сума в коп
-            p_ins (
-               nnnn_,
-               '70' || l_ || LPAD (kv_, 3, '0') || LPAD (k040_, 3, '0'),
-               TO_CHAR (sum0_));
-
-            -- сума в валюте
-            p_ins (
-               nnnn_,
-               '71' || l_ || LPAD (kv_, 3, '0') || LPAD (k040_, 3, '0'),
-               '0');
-
-            IF     dat_ >= TO_DATE ('25022015', 'ddmmyyyy')
-               AND dat_ <= TO_DATE ('23092015', 'ddmmyyyy')
-            THEN
-               -- сума контракту
-               p_ins (
-                  nnnn_,
-                  '72' || l_ || LPAD (kv_, 3, '0') || LPAD (k040_, 3, '0'),
-                  '0');
-            END IF;
-
-            IF dat_ >= TO_DATE ('25022015', 'ddmmyyyy')
-            THEN
-               -- загальна сума платежів
-               p_ins (
-                  nnnn_,
-                  '73' || l_ || LPAD (kv_, 3, '0') || LPAD (k040_, 3, '0'),
-                  '0');
-            END IF;
-
-            -- ОКПО клiєнта
-            IF rez_ = 0 AND TRIM (okpo_) IS NULL        -- для нерезидентiв
-            THEN
-               okpo_ := '0';
-            END IF;
-
-            IF okpo_ = ourOKPO_
-            THEN
-               okpo_ := ourGLB_;
-               codc_ := 1;
-            END IF;
-
-            -- код ЄДРПОУ (ДРФО)
-            p_ins (
-               nnnn_,
-               '01' || l_ || LPAD (kv_, 3, '0') || LPAD (k040_, 3, '0'),
-               TRIM (okpo_));
-
-            -- назва клiєнта
-            p_ins (
-               nnnn_,
-               '02' || l_ || LPAD (kv_, 3, '0') || LPAD (k040_, 3, '0'),
-               TRIM (nmk_));
-            -- адреса клiєнта
-            p_ins (
-               nnnn_,
-               '03' || l_ || LPAD (kv_, 3, '0') || LPAD (k040_, 3, '0'),
-               TRIM (adr_));
-         END IF;
-
-         -- додатковi параметри
-         IF dat_ >= TO_DATE ('03072006', 'ddmmyyyy')
-         THEN
-            n_ := 11;
-         END IF;
-
-         FOR i IN 1 .. n_
-         LOOP
-            IF i < 10
-            THEN
-               tag_ := 'D' || TO_CHAR (i) || '#70';
-            ELSIF i = 10
-            THEN
-               tag_ := 'DA#70';
-            ELSIF i = 11
-            THEN
-               tag_ := 'DB#70';
-            ELSIF i = 12
-            THEN
-               tag_ := 'DC#70';
-            ELSE
-               tag_ := 'DD#70';
-            END IF;
-
-            -- для покупки нужны все доп.реквизиты (D1#70 - DA#70)
-            IF pr_op_ = 1 AND ko_ = 1 AND i IN (2, 3, 7, 9, 10)
-            THEN
-               BEGIN
-                  SELECT SUBSTR (VALUE, 1, 70)
-                    INTO val_
-                    FROM operw
-                   WHERE REF = refd_ AND tag = tag_;
-               EXCEPTION
-                  WHEN NO_DATA_FOUND
-                  THEN
-                     val_ := NULL;
-               END;
-
-               IF dat_ >= TO_DATE ('14022014', 'ddmmyyyy')
-               THEN
-                  -- код показника та default-значення
-                  p_tag (i,
-                         val_,
-                         kodp_,
-                         ref_);
-                  -- запис показника
-                  p_ins (nnnn_, kodp_, val_);
-               END IF;
-            END IF;
-         END LOOP;
-
-         -- назва бенефіціара
-         p_ins (nnnn_,
-                '05' || l_ || LPAD (kv_, 3, '0') || LPAD (k040_, 3, '0'),
-                'назва бенефіціара');
-
-         -- дата заявки
-         p_ins (nnnn_,
-                '11' || l_ || LPAD (kv_, 3, '0') || LPAD (k040_, 3, '0'),
-                'дата заявки');
-
-         -- новий показник з 24.09.2015 (примітка)
-         IF dat_ >= TO_DATE ('24092015', 'ddmmyyyy')
-         THEN
-            -- примітка
-            p_ins (
-               nnnn_,
-               '12' || l_ || LPAD (kv_, 3, '0') || LPAD (k040_, 3, '0'),
-               ' ');
-         END IF;
-      --END IF;
-      END LOOP;
-
-      CLOSE opl_dok;
-   END IF;
-END LOOP;
-
-CLOSE c_main;
-
 ---------------------------------------------------
 -- для всех РУ Сбербанка  300465
 IF mfou_ = 300465
@@ -839,8 +282,7 @@ THEN
    nnnn_ := 0;
 
    FOR k
-      IN (
-      select d.t, d.l, d.vvv as kv, d.mmm, decode(d.n, -1, '0', c.okpo) as p01, 
+      IN (select d.t, d.l, d.vvv as kv, d.mmm, decode(d.n, -1, '0', c.okpo) as p01, 
                      decode(d.n, -1, to_char(d.p02, 'fm999999'), c.nmk) as p02,
                      decode(d.n, -1, '0', 
                       decode( (select count(*) from customer_address where type_id=1 and rnk=d.rnk), 1,
@@ -860,27 +302,14 @@ THEN
                            decode(y.n, -1, '0', min(y.bank_name)) as p07, 
                            decode(y.n, -1, '0', min(y.p08)) as p08, 
                            decode(y.n, -1, '0', to_char(min(y.p09),'ddmmyyyy')) as p09, 
-                           min(y.p11) as p11,--decode(y.n, -1, to_date(null), min(y.p11)) as p11, 
-                           sum(y.p70) as p70 ,--decode(y.t, 1, '0', p_icurval(y.vvv, sum(y.p71), dat_)) as p70,
+                           min(y.p11) as p11, 
+                           sum(y.p70) as p70 ,
                            sum(y.p71) as p71, 
                            decode(y.n, -1, '0', min(y.p72)) as p72, 
-                           case when y.n = -1 or y.l in (0, 1, 5, 6, 7, 8) then '0' else to_char(min(y.p73), 'fm999999999999') end as p73, min(y.p12) as p12           
+                           case when y.n = -1 or y.l in ('0', '1', '5', '6', '7', '8') then '0' else to_char(min(y.p73), 'fm999999999999') end as p73, min(y.p12) as p12           
                     from
                         (select --Умова консолідації
-                                 /*case /* when t=0 and 
-                                           (decode(x.vvv, 840, x.p71, p_ncurval(840,p_icurval(x.vvv,x.p71,dat_),dat_))<5000000 or 
-                                              decode(x.vvv, 840, x.p71, p_ncurval(840,p_icurval(x.vvv,x.p71,dat_),dat_))=5000000 and x.l=2) and 
-                                           (x.l in (0, 1) or not (k.sk>5000000 or 
-                                                                  k.p72=0 and k.sp+decode(x.vvv, 840, x.p71, p_ncurval(840,p_icurval(x.vvv,x.p71,k.open_date),k.open_date))>5000000 or 
-                                                                  k.smp>5000000) and k.contr_type in (1,3) and k.rnk is not null) then -1 
-                                      when t=1 and 
-                                           (decode(x.vvv, 840, x.p71, p_ncurval(840,p_icurval(x.vvv,x.p71,dat_),dat_))<5000000 or 
-                                             decode(x.vvv, 840, x.p71, p_ncurval(840,p_icurval(x.vvv,x.p71,dat_),dat_))=5000000 and x.l in(3, 4)) and 
-                                           (x.l=5 or not (k.sk>5000000 or 
-                                                          k.p72=0 and k.sp+decode(x.vvv, 840, x.p71, p_ncurval(840,p_icurval(x.vvv,x.p71,k.open_date),k.open_date))>5000000 or 
-                                                          k.smp>5000000) and k.contr_type = 1 and k.rnk is not null) then -9 
-                                      else x.n end as n */ 
-                                  x.n, x.t, x.p11, x.l, x.vvv, x.p71, x.rnk, x.p04, x.p08, x.p09, k.num, k.open_date, k.benef_id, 
+                               x.n, x.t, x.p11, x.l, x.vvv, x.p71, x.rnk, x.p04, x.p08, x.p09, k.num, k.open_date, k.benef_id, 
                                   case when x.p04 in ('3.1.а.1', '3.1.А.1', '3.1.a.1','3.1.A.1') 
                                          then (select name from cim_journal_num where branch = '/'||f_ourmfo||'/')
                                        when x.p04 in ('2.1.б.1', '2.1.Б.1', '2.1.б.2', '2.1.Б.2', '2.4','2.5') then '0'
@@ -907,10 +336,14 @@ THEN
                                        substr(w.value,1,1) as l, o.kv as vvv, o.s as p71, a.rnk,
                                        '00000000000' as p04,
                                        (select value from operw where tag='D2#70' and ref=o.ref) as p08,
-                                       (select to_date(nvl2(regexp_substr(substr(value,1,2)||
+                                       (select (case when is_date(nvl2(regexp_substr(substr(value,1,2)||
                                                   substr(value,4,2)||substr(value,7,4),
                                                   '[[:digit:]][[:digit:]][[:digit:]][[:digit:]][[:digit:]][[:digit:]][[:digit:]][[:digit:]]'),
-                                                   substr(value,1,2)||substr(value,4,2)||substr(value,7,4), null), 'ddmmyyyy')
+                                                   substr(value,1,2)||substr(value,4,2)||substr(value,7,4), null), 'ddmmyyyy') = 1 then
+                                                  to_date(nvl2(regexp_substr(substr(value,1,2)||
+                                                  substr(value,4,2)||substr(value,7,4),
+                                                  '[[:digit:]][[:digit:]][[:digit:]][[:digit:]][[:digit:]][[:digit:]][[:digit:]][[:digit:]]'),
+                                                   substr(value,1,2)||substr(value,4,2)||substr(value,7,4), null), 'ddmmyyyy') else null end) 
                                         from operw where tag='D3#70' and ref=o.ref) as p09, null as p06, null as p07, nvl( www.value, '?') as p12, 0 as p70
                                 from ( select kf, acc, nls, kv from accounts where dazs is null and (nls like '1919%' or nls like '3739%' and tip='T00') ) b  
                                      join opldok p on p.kf=b.kf and p.dk=1 and p.sos=5 and p.acc=b.acc and p.fdat=dat_ 
@@ -918,7 +351,6 @@ THEN
                                      join oper o on case when o.tt in ('001', '002', '010') and w.value in ('6', '7') and 
                                                               substr(o.nlsa,1,4) in ( '2520', '2530', '2541', '2542', '2544', '2545', '2600', '2650' ) 
                                                               and o.nlsb like '1919%' and o.kv=980 then 1
-                                                         /*when substr(o.nlsa,1,4)='2603' and o.kv=980 then 1 */
                                                          when ( substr(o.nlsa,1,4) in ( '2062', '2063', '2600', '2602', '2620', '2625' ) or substr(o.nlsa,1,4)='2909' and w.value is not null )
                                                               and o.nlsb='191992' and o.kv<>980 then 1 
                                                          else 0 end = 1 
@@ -933,18 +365,9 @@ THEN
                                         min(benef_name) as benef_name, 
                                         min(b010) as b010,  
                                         min(bank_name) as bank_name,
-                                        /*p_ncurval(840, sum(p_icurval(v.kv,(select nvl(sum(s_vk)*100,0) from v_cim_bound_payments b 
-                                                                            where b.direct=1 and b.type_id in (0, 1, 4) and pay_flag=0 and 
-                                                                            to_char(b.vdat,'yyyymm')=to_char(dat_,'yyyymm') and b.contr_id=v.contr_id),
-                                                                            open_date) ), open_date) as smp, */
                                         min(f_cim_2c_p73(dat_, v.rnk, v.benef_id)) as p73,
-                                        --sum( decode(v.kv, 840, nvl(v.s*100,0), p_ncurval(840, p_icurval(v.kv, nvl(v.s*100,0), v.open_date), v.open_date) ) ) as sk,
                                         sum( decode(v.kv, 840, nvl((v.s-v.s_pl)*100,0), p_ncurval(840, p_icurval(v.kv, nvl((v.s-v.s_pl)*100,0), dat_), dat_) ) ) as p72,
                                         case when min(benef_id)=max(benef_id) and min(contr_type)=max(contr_type) then 1 else 0 end as cim_ok 
-                                        /*p_ncurval(840, sum(p_icurval(v.kv,(select nvl(sum(s_vk)*100,0) from v_cim_bound_payments b 
-                                                                            where b.direct=1 and b.type_id in (0, 1, 4) and pay_flag=0 and 
-                                                                             b.vdat>=to_date('24/02/2015', 'dd/mm/yyyy') and b.contr_id=v.contr_id),
-                                                                             open_date) ), open_date) as sp */
                                  from v_cim_trade_contracts v 
                                  where status_id != 1 and contr_type != 0 
                                  group by rnk, num, open_date, benef_id
@@ -955,22 +378,13 @@ THEN
                                         min(benef_name) as benef_name, 
                                         min(b010) as b010,  
                                         min(bank_name) as bank_name,
-                                        /*p_ncurval(840, sum(p_icurval(v.kv,(select nvl(sum(s_vk)*100,0) from v_cim_bound_payments b 
-                                                                            where b.direct=1 and b.type_id in (0, 1, 4) and pay_flag=0 and 
-                                                                            to_char(b.vdat,'yyyymm')=to_char(dat_,'yyyymm') and b.contr_id=v.contr_id),
-                                                                            open_date) ), open_date) as smp,*/
                                         0 as p73,
-                                        --sum( decode(v.kv, 840, nvl(v.s*100,0), p_ncurval(840, p_icurval(v.kv, nvl(v.s*100,0), v.open_date), v.open_date) ) ) as sk,
                                         sum( decode(v.kv, 840, nvl( (v.s-( select sum(s_vk) from v_cim_bound_payments b 
                                                                            where b.direct=1 and b.type_id in (0, 1, 4) and pay_flag=0 and b.contr_id=v.contr_id ))*100,0), 
                                                                p_ncurval(840, p_icurval(v.kv, nvl((v.s-( select sum(s_vk) from v_cim_bound_payments b 
                                                                                                           where b.direct=1 and b.type_id in (0, 1, 4) and pay_flag=0 and b.contr_id=v.contr_id ))*100,0), 
                                                                          dat_), dat_) ) ) as p72,
                                         case when min(benef_id)=max(benef_id) and min(contr_type)=max(contr_type) then 1 else 0 end as cim_ok  
-                                        /*p_ncurval(840, sum(p_icurval(v.kv,(select nvl(sum(s_vk)*100,0) from v_cim_bound_payments b 
-                                                                            where b.direct=1 and b.type_id in (0, 1, 4) and pay_flag=0 and 
-                                                                             b.vdat>=to_date('24/02/2015', 'dd/mm/yyyy') and b.contr_id=v.contr_id),
-                                                                             open_date) ), open_date) as sp*/ 
                                   from v_cim_all_contracts v 
                                  where contr_type in (2, 3)
                                  group by rnk, num, open_date 
@@ -983,20 +397,6 @@ THEN
    LOOP
       nnnn_ := nnnn_ + 1;
 
-      --nnnn_ := k.n;
-
-/*      
-      --if ROUND (k.p70 / kurs_, 0) >= gr_sum_
-      --then
-      -- сума в коп
-      IF k.t = 0
-      THEN
-         p_ins (
-            nnnn_,
-            '70' || k.l || LPAD (k.kv, 3, '0') || LPAD (k.mmm, 3, '0'),
-            TO_CHAR (k.p70, 'fm99999999999999'));
-      END IF;
-*/
       -- сума в валюте
       p_ins (nnnn_,
              '71' || k.l || LPAD (k.kv, 3, '0') || LPAD (k.mmm, 3, '0'),
@@ -1066,14 +466,6 @@ THEN
              '09' || k.l || LPAD (k.kv, 3, '0') || LPAD (k.mmm, 3, '0'),
              TRIM (k.p09));
 
-/*      -- дата заявки
-      IF dat_ < TO_DATE ('22032017', 'ddmmyyyy')
-      THEN
-         p_ins (nnnn_,
-                '11' || k.l || LPAD (k.kv, 3, '0') || LPAD (k.mmm, 3, '0'),
-                TRIM (k.p11));
-      END IF;          
-*/
       -- новий показник з 24.09.2015 (примітка)
       IF dat_ >= TO_DATE ('24092015', 'ddmmyyyy')
       THEN

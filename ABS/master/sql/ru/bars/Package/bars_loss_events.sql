@@ -44,8 +44,9 @@ show err
 
 CREATE OR REPLACE PACKAGE BODY BARS.BARS_LOSS_EVENTS
 is
-  g_body_version  constant varchar2(64)  := 'version 5.4 11.07.2017';
+  g_body_version  constant varchar2(64)  := 'version 5.6  16.11.2017';
 /*
+  02.10.2017 KVA - COBUSUPABS-6451 - ... не для всех типов договоров учитывается признак корректирующих проводок
   11.07.2017 LSO - COBUPRVNIX-30 - Розрахунок подій дефолту для хоз.дебиторки
   14.03.2017 BAA - COBUPRVNIX-7 - "просрочка по ФДЗ не должна влиять на событие дефолта самого кредита"
   26.09.2016 BAA - додано розрахунок к-ті днів прострочки для OVR
@@ -472,7 +473,7 @@ is
 
           if ( g_receivables )
           then -- без врахування рах. фін.деб.
-            select min(DAT_SPZ(a.ACC, p_date, 0))
+            select min(DAT_SPZ(a.ACC, p_date, l_ZO))
               into x_event_date
               from BARS.ACCOUNTS a
               join BARS.ND_ACC   n
@@ -480,13 +481,13 @@ is
              where n.nd = p_nd
                and a.TIP in ( 'SP ', 'SPN' );
           else -- з врахуванням рах. фін.деб.
-            select min(DAT_SPZ(a.ACC, p_date, 0))
+            select min(DAT_SPZ(a.ACC, p_date, l_ZO))
               into x_event_date
               from BARS.ACCOUNTS a
               join BARS.ND_ACC   n
                 on ( n.ACC = a.ACC )
              where n.nd = p_nd
-               and ( a.TIP in ( 'SP ', 'SPN', 'SK9' ) or a.TIP = 'ODB' and a.NBS = '3579' );
+               and  a.TIP in ( 'SP ', 'SPN', 'SK9',  'OFR' );
           end if;
 
         end if;
@@ -496,13 +497,13 @@ is
 
         if ( p_date >= p_sdate )
         then
-          select min(DAT_SPZ(a.ACC, p_date, 0))
+          select min(DAT_SPZ(a.ACC, p_date, l_ZO))
             into x_event_date
             from BARS.ACCOUNTS a
             join BARS.ND_ACC   n
               on ( n.ACC = a.ACC )
            where n.nd = p_nd
-             and (a.nbs like '15_7' or a.nbs like '15_9');
+             and (a.nbs like '15_7' or a.nbs like '15_8');
         end if;
 
       when g_OVR
@@ -510,13 +511,14 @@ is
 
         if ( p_date >= p_sdate )
         then
-          select min(DAT_SPZ(a.ACC, p_date, 0))
+          select min(DAT_SPZ(a.ACC, p_date, l_ZO))
             into x_event_date
-            from BARS.ACCOUNTS a
-            join BARS.ND_ACC   n
+            from ACCOUNTS a
+            join ND_ACC   n
               on ( n.ACC = a.ACC )
-            where n.nd = p_nd
-              and a.nbs in ( '2067', '2069' );
+           where n.nd = p_nd
+             and ( a.nbs = '2063' and a.TIP = 'SP ' or
+                   a.nbs = '2068' and a.TIP = 'SPN' );
         end if;
 
       when g_CP
@@ -524,7 +526,7 @@ is
 
         begin
 
-          select dat_spz(accEXPN, p_date, 0), dat_spz(accEXPR, p_date, 0)
+          select dat_spz(accEXPN, p_date, l_ZO), dat_spz(accEXPR, p_date, l_ZO)
             into l_D1, l_D2
             from cp_deal
            where ref = p_nd ;
@@ -549,7 +551,7 @@ is
       when g_DEB
       then -- Фін.Деб.
 
-        x_event_date := dat_spz(p_accr, p_date, 0);
+        x_event_date := dat_spz(p_accr, p_date, l_ZO);
 
       when g_XOZ
       then -- Госп.Деб.
@@ -563,7 +565,7 @@ is
                        and  a.tip in ('W4X', 'XOZ')
                        AND id = p_nd;
 
-		      if x_event_date > p_date then
+              if x_event_date > p_date then
                     x_event_date := null;
               end if;
 
@@ -934,7 +936,7 @@ begin
     into ND_ACC ( ACC, ND )
   select a9.acc,  min(n.ND)
     from accounts a9, nd_acc n, accounts a0, cc_deal d
-   where a9.nbs in ('1509','1508') and a9.dazs is null and not exists ( select 1 from nd_acc where acc = a9.acc)
+   where a9.nbs = '1508' and a9.dazs is null and not exists ( select 1 from nd_acc where acc = a9.acc)
      and a0.nbs = '1500' and a0.dazs is null and a0.kv = a9.kv and a0.rnk = a9.rnk
      and a0.acc = n.acc  and n.nd = d.nd and d.vidd = 150
    group by a9.acc;
@@ -1001,8 +1003,8 @@ begin
               UNION ALL
               select -- 7) Госп.дебиторка
                      g_XOZ as TIP, x.id as GND, x.id as ND, a.RNK, x.FDAT, 21 as VIDD, x.MDATE
-               from xoz_ref x
-               join accounts a
+               from XOZ_REF  x
+               join ACCOUNTS a
                  on(x.acc = a.acc)
            )
     loop
@@ -1088,25 +1090,23 @@ begin
 
     -- Шахрайство Госп. деб.
     dbms_application_info.set_client_info( 'FRAUD: start at '||to_char(sysdate,'dd/mm/yyyy hh24:mi:ss') );
--- по методологии событие "Шахрайство" возникает в случае наличия остатка на счете
---   НО, если разбалансировки между xoz_ref и остатками на счетах быть НЕ ДОЛЖНО
---   ТО, алгоритм определения остатка (ost_korr или FOST) можно заменить на проверку полей xoz_ref (s и s0)
---   это облегчит выборку. Но надо проверить.
+--  по методологии событие "Шахрайство" возникает в случае наличия остатка на счете
+--  НО, если разбалансировки между xoz_ref и остатками на счетах быть НЕ ДОЛЖНО
+--  ТО, алгоритм определения остатка (ost_korr или FOST) можно заменить на проверку полей xoz_ref (s и s0)
+--  это облегчит выборку. Но надо проверить.
     FOR c_f IN ( SELECT x.id, A.RNK, g_XOZ as OBJ, 21 as vidd
-                  FROM xoz_ref x JOIN accounts A ON (a.acc = x.acc)
-                 WHERE     (   (    a.nbs = '3552'
-                                AND a.ob22 IN ('01',
-                                               '02',
-                                               '03',
-                                               '13'))
-                            OR (a.nbs = '3559' AND a.ob22 IN ('06', '07', '08')))
-                       AND (a.dazs IS NULL or a.dazs > l_dat31)                   -- учитывать при расчете счета, не закрытые на отчетную дату
-                       AND a.daos <= l_dat31
-                       AND decode(l_ZO, 1,                                        -- брать остаток на конец дня
-                                  bars.ost_korr(a.acc, l_dat31, 0, a.nbs),        --    c учетом корректирующих по AGG_MONBALS
-                                  BARS.FOST(a.acc, l_dat31)) <> 0                 --    либо без корректирующих по SALDOA
-                       AND (x.datz is null or x.datz > l_dat31)                   -- необходимо исключить из расчета договора, закрытые до отчетной даты
-                       AND x.fdat <= l_dat31
+                  FROM xoz_ref x 
+                  JOIN accounts a 
+                    ON (a.acc = x.acc)
+                 WHERE ( ( a.NBS = '3552' AND a.ob22 IN ('01','02','03','13') ) or
+                         ( a.NBS = '3559' AND a.ob22 IN ('06','07','08')      ) )
+                   AND ( a.dazs IS NULL or a.dazs > l_dat31)              -- учитывать при расчете счета, не закрытые на отчетную дату
+                   AND a.daos <= l_dat31
+                   AND decode( l_ZO, 1,                                   -- брать остаток на конец дня
+                               OST_KORR(a.acc, l_dat31, 0, a.nbs),        -- c учетом корректирующих по AGG_MONBALS
+                               FOST(a.acc, l_dat31) ) <> 0                -- либо без корректирующих по SALDOA
+                   AND (x.datz is null or x.datz > l_dat31)               -- необходимо исключить из расчета договора, закрытые до отчетной даты
+                   AND x.fdat <= l_dat31
                 )
      LOOP
        set_event( p_date, c_f.id, c_f.RNK, 5, p_date, c_f.OBJ, null, l_create_date, l_ZO, c_f.VIDD );
@@ -1123,4 +1123,5 @@ end loss_events;
 
 end bars_loss_events;
 /
+
 show err;

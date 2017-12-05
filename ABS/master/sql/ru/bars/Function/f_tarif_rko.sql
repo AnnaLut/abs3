@@ -15,8 +15,9 @@ CREATE OR REPLACE FUNCTION BARS.f_tarif_rko
                    REF_  NUMBER        -- REF 
                  )       
                             
-RETURN NUMERIC IS       
-    
+RETURN NUMERIC IS           
+--15.11.2017 Transfer-2017 
+
   OprTime   Char(4) ;      
   sk_       NUMERIC ;      
   not15_    Char(4) ;      
@@ -30,10 +31,8 @@ RETURN NUMERIC IS
   OprTime2  Char(4) ;
 
   maket_    NUMERIC ;
+  n_tar     NUMERIC ;     --  № тарифа
   okpo_     Char(12);
-
-  vvod_     NUMERIC ;    --  OperW/TAG='VVOD' = 1 - ввод було відкладено на ПісляОпЧас
-                         --  Для операцій 001,002
 
 --------------------------------------------------------------------------- 
 --
@@ -42,8 +41,8 @@ RETURN NUMERIC IS
 --------------------------------------------------------------------------- 
 BEGIN
 
-  vvod_ := 0;
-
+  bars_audit.trace( 'RKO.f_tarif_rko: kod_='||to_char(kod_)||', kv_='||to_char(kv_)||', nls_='||nls_||', s_'||to_char(s_)||', PDAT_='||to_char(PDAT_,'dd.mm.yyyy hh24:mi:ss')||', TT_='||TT_ );
+  
   If kod_<>15 and TT_ in ('001','002','PKR') then
 
     Begin 
@@ -57,18 +56,6 @@ BEGIN
     EXCEPTION  WHEN NO_DATA_FOUND THEN
       null;
     End;
-
-
-    Begin 
-
-      Select 1 into vvod_ 
-      from   OperW 
-      where  REF=REF_ and TAG='VVOD' and VALUE<>'0';
-
-    EXCEPTION  WHEN NO_DATA_FOUND THEN
-      vvod_ := 0;
-    End;
-
 
  End If;
 
@@ -111,12 +98,9 @@ BEGIN
 
     --  Не берем за Кт на балансовые  (кроме ПФУ и Укрпошты):
     ---------------------------------------------------------
-    if substr(NLSB_,1,4) in ('2525','2546','2610','2611',
-                             '2615','2651','2652','3570',
-                             '3579','2900','6110','6114'
-                            ) and
-       MFOA_=MFOB_            and        
-       kkk_ not in (1,2)     then
+--15.11.2017 Transfer-2017 
+    if     substr(NLSB_,1,4) in ('2525','2546','2610','2611','2615','2651','2652','3570', '3579','2900','6110','6114' ) and MFOA_=MFOB_ and kkk_ not in (1,2) and newnbs.g_state = 0  
+       OR  substr(NLSB_,1,4) in ('2525','2546','2610','2611',       '2651',       '3570', '3578','2900','6510','6514' ) and MFOA_=MFOB_ and kkk_ not in (1,2) and newnbs.g_state = 1    then
 
        RETURN 0;
 
@@ -528,10 +512,8 @@ BEGIN
     
    ELSIF  kkk_=2                          then  --- 2) Укрпошта
    
-          if  to_char(PDAT_,'D')='6'  then
-               OprTime:='1600';  --   Пятница  ( без ПредПразд.день !!! )
-          else                                  ------------------------
-               OprTime:='1700';  --   Обычный день             
+          if  to_char(PDAT_,'D')='6'  then  OprTime:='1600';  --   Пятница  ( без ПредПразд.день !!! )
+          else                              OprTime:='1700';  --   Обычный день             
           end if;
    
    ELSE                                         --- 3) Другие кл.
@@ -1230,13 +1212,16 @@ BEGIN
  END;
 
 
+ if    trunc(PDAT_) = to_date('29/06/2017','dd/mm/yyyy') 
+    or trunc(PDAT_) = to_date('30/06/2017','dd/mm/yyyy') then 
+     --and 
+     --    TT_ in ('IB1','IB2')    then
+     --
+    OprTime:='2400';       
 
--- if trunc(PDAT_)=to_date('12/10/2015','dd/mm/yyyy') and 
---    TT_ in ('IB1','IB2')    then
---
---    OprTime:='2400';       
---
--- end if;
+  end if;
+
+---============================================================
 
 
 
@@ -1342,12 +1327,11 @@ BEGIN
  -------------------------------------------
 
 
-
  if    kod_=13   then                     --  Папер.носiї
 
        If uz_=1  then   ---  "За межi ОБ"
 
-          if to_char(PDAT_,'HH24MI') <= OprTime  OR  vvod_ = 1  then     
+          if to_char(PDAT_,'HH24MI') <= OprTime   then 
              sk_:=F_TARIF(13, kv_, nls_, s_);
           else
              sk_:=F_TARIF(16, kv_, nls_, s_);
@@ -1355,7 +1339,7 @@ BEGIN
 
        Else             ---  "В межах ОБ"
 
-          if to_char(PDAT_,'HH24MI') <= OprTime  OR  vvod_ = 1  then    
+          if to_char(PDAT_,'HH24MI') <= OprTime   then 
              sk_:=F_TARIF(113, kv_, nls_, s_);
           else
              sk_:=F_TARIF(116, kv_, nls_, s_);
@@ -1451,9 +1435,10 @@ BEGIN
 
  end if;
 
+ bars_audit.trace( 'RKO.f_tarif_rko: sk_='||to_char(sk_) );
+ 
  RETURN sk_;
 
 
 END f_tarif_rko ;
 /
-

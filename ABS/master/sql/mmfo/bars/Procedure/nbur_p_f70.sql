@@ -15,12 +15,12 @@ CREATE OR REPLACE PROCEDURE BARS.NBUR_P_F70 (p_kod_filii        varchar2,
                                              p_file_code        varchar2 default '#70')
 is
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% DESCRIPTION : Процедура формирования #39 для Ощадного банку
+% DESCRIPTION : Процедура формирования #710 для Ощадного банку ММФО
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.16.015  09/11/2017
+% VERSION     :  v.16.016  10/11/2017
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_          char(30)  := 'v.16.015  09.11.2017';
+  ver_          char(30)  := 'v.16.016  10.11.2017';
 /*
    Структура показника DD NNN
 

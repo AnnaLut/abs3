@@ -5,14 +5,17 @@
 <html>
 <head>
     <title>Депозити юридичних осіб. Депозитний портфель</title>
-    <meta content="C#" name="CODE_LANGUAGE" />
-    <meta content="JavaScript" name="vs_defaultClientScript" />
     <link href="Styles.css" type="text/css" rel="stylesheet" />
     <link href="/Common/WebGrid/Grid.css" type="text/css" rel="stylesheet" />
     <script type="text/javascript" language="Javascript" src="/Common/Script/Localization.js"></script>
     <script type="text/javascript" language="JavaScript" src="/Common/WebGrid/Grid2005.js?v1.0"></script>
     <script type="text/javascript" language="JavaScript" src="Scripts/Default.js?v1.1"></script>
     <script type="text/javascript" language="JavaScript" src="Scripts/Common.js?v1.0"></script>
+
+    <link href="../lib/alertify/css/alertify.core.css" rel="stylesheet" />
+    <link href="../lib/alertify/css/alertify.default.css" rel="stylesheet" />
+    <script src="../lib/alertify/js/alertify.min.js"></script>
+
 </head>
 <body>
     <div style="background-color: lightgrey">
@@ -38,6 +41,8 @@
                         onclick="ShowModalFilter()" src="/Common/Images/FILTER_.gif" />
                     <img class="outset" id="btPrint" title="Друк" alt=""
                         onclick="printTable()" src="/Common/Images/PRINT.gif" style="visibility: visible" />
+                    <img class="outset" id="btExcelExport" title="Вивантажити в Excel" alt="Вивантажити в Excel"
+                        onclick="exportToExcel()" src="\Common\Images\default\16\export_excel.png" style="visibility: visible" />
                     &nbsp;
                 </td>
                 <td>
@@ -46,6 +51,14 @@
                         onclick="fnShowParam()" height="16" src="/Common/Images/OPEN_.gif" />
                     <img class="outset" id="btState" title="Поточний стан договору" alt=""
                         onclick="fnShowState()" height="16" src="/Common/Images/DOCVIEW.gif" />
+                    &nbsp;
+                    <img class="outset" id="btCalcInt" title="Нарахування %% по ВСЬОМУ портфелю (в кінці місяця)" alt=""
+                        onclick="fnCalcInt()" height="16" src="/Common/Images/A_PROC.BMP" />
+                    <img class="outset" id="btPayInt" title="Виплата %% по ВСЬОМУ портфелю" alt=""
+                        onclick="fnPayOutInt()" height="16" src="/Common/Images/CURRCONV.BMP" />
+                    &nbsp;
+                    <img class="outset" id="btState" title="Перевірка розходжень у залишках траншів та рах. ген. дог. деп. лінії" alt=""
+                        onclick="fnChkDiscrepancyBalances()" height="16" src="/Common/Images/CHEKIN.BMP" />
                     &nbsp;
                 </td>
             </tr>

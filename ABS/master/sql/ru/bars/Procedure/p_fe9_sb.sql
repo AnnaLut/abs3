@@ -12,36 +12,38 @@ PROMPT *** Create  procedure P_FE9_SB ***
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирования #E9 для КБ
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     : 06/04/2017 (03/04/2017, 02/02/2017)
+% VERSION     : 10/04/2017 (07/04/2017, 06/04/2017, 03/04/2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-06.04.2017 - не включаем проводки комиссии по системе Швидка копійка
+10.04.2017 - раскоментарил некоторые строки при наполнении
+07.04.2017 - оптимизация наполнения временной табл. OTCN_PROV_TEMP
+06.04.2017 - не включаем проводки комиссии по системе Швидка копійка 
              коды оперраций C55, C56, C57, CNC
 03.04.2017 - не будем включать проводки для которых Кт 2809 и OB22='24'
-             для проводок по системе "Швидка копійка" устанавливаем
+             для проводок по системе "Швидка копійка" устанавливаем 
              код страны равным 804
-02.02.2017 - на 01.02.2017 файл будет формироваться как месячный вместо
-             квартального
+02.02.2017 - на 01.02.2017 файл будет формироваться как месячный вместо 
+             квартального 
 09.06.2016 - для кода 42 будем включать проводки Дт 3739808 Кт 2809/24
              для ГОУ и для регионов Дт 3739 Кт 3739/10
 01.04.2016 - добавлен блок для 42 системы
-31.03.2016 - для 2909 изменил OB22 с 24 на 60
-23.04.2015 - изменено формирование начальной даты квартала (Dat1_)
+31.03.2016 - для 2909 изменил OB22 с 24 на 60 
+23.04.2015 - изменено формирование начальной даты квартала (Dat1_) 
 09.04.2015 - добавляются проводки по системе "Швидка копійка" KV=980
              только отправка (Кт 2909  OB22='60')
 06.04.2015 - добавляются проводки по системе "Швидка копійка" KV=980
              OB22  IN ('24','60')
 30.03.2015 - с 01.04.2015 новая структура показателя
-12.01.2015 - закоментировал часть блока для OB22='75' т.к. изменялся код
+12.01.2015 - закоментировал часть блока для OB22='75' т.к. изменялся код 
              системы переводов с 11 на другой (01,06 или другой)
-             (замечание Хмельницкого РУ)
+             (замечание Хмельницкого РУ) 
 09.12.2014 - добавлена обработка доп.реквизита D6#71
-             (Код країни перерах/надход.переказу) аналог кода D6#70
+             (Код країни перерах/надход.переказу) аналог кода D6#70 
              для определения кода страны
 08.10.2014 - изменен блок наполнения таблицы OTCN_PROV_TEMP
-             для Запорожья 313957 удаляем операции I00, I05
+             для Запорожья 313957 удаляем операции I00, I05     
 01.07.2014 - для операций I04,I05 будем обрабатывать доп.реквизит "F1"
 01.04.2014 - с 31.03.2014 новая структура показателя (добавлен код "KKK"
              код региона)
@@ -145,7 +147,7 @@ PROMPT *** Create  procedure P_FE9_SB ***
 
    TYPE temp_rec_t IS TABLE OF OTCN_PROV_TEMP%rowtype;
    l_temp_rec temp_rec_t := temp_rec_t();
-
+   
    TYPE ref_type_curs IS REF CURSOR;
 
    cur_temp        ref_type_curs;
@@ -217,21 +219,21 @@ BEGIN
    -- для месячного файла дата начала месяца
    --Dat1_ := TRUNC (Dat_, 'MM');
 
-   -- для квартального файла дата начала квартала
+   -- для квартального файла дата начала квартала 
    -- (если отчетная дата конечная дата квартала - было)
    --Dat1_ := TRUNC (ADD_MONTHS (Dat_, -2), 'MM');
    -- первое число квартала для любой отчетной даты квартала
-   if to_char(Dat_, 'MM') in ('01','02','03')
-   then
+   if to_char(Dat_, 'MM') in ('01','02','03') 
+   then 
       Dat1_ := to_date('0101' || god_, 'ddmmyyyy');
    elsif to_char(Dat_, 'MM') in ('04','05','06') then
       Dat1_ := to_date('0104' || god_, 'ddmmyyyy');
    elsif to_char(Dat_, 'MM') in ('07','08','09') then
       Dat1_ := to_date('0107' || god_, 'ddmmyyyy');
-   else
+   else 
       Dat1_ := to_date('0110' || god_, 'ddmmyyyy');
    end if;
-
+   
    if Dat_ >= dat_izm3
    then
       Dat1_ := TRUNC (Dat_, 'MM');
@@ -245,7 +247,7 @@ BEGIN
    if to_char(dat_,'MM')='12' then
       god_ := to_char(to_number(god_) + 1);
    end if;
-
+   
    last_dayF := last_day(Dat_);
    one_day_ := to_date('01'||to_char(add_months(dat_,1),'MM')||god_,'ddmmyyyy');
    dat2_ := one_day_;
@@ -268,9 +270,9 @@ BEGIN
    -- код "KKK" - код региона с 31.03.2014
    kkk_ := '';
 
-   -- код "GLB" из RCUKRU - код банка  с 31.03.2015
+   -- код "GLB" из RCUKRU - код банка  с 31.03.2015 
    BEGIN
-      select NVL(glb,0)
+      select NVL(glb,0) 
          into glb_
       from rcukru
       where mfo = mfou_;
@@ -286,57 +288,35 @@ BEGIN
    -- отбор проводок, удовлетворяющих условию
    -- переказ коштiв по мiжнароднiй системi переказу коштiв або отримання переказу
    -- переказ коштiв нерезидентам (отримання коштiв вiд нерезидентiв)
-   for k in (select fdat from fdat where fdat between Dat1_ AND Dat_ order by 1)
-   loop
-       cursor_sql := 'SELECT *
-                      FROM (SELECT k.d060, 1, o.ref, o.tt, o.fdat, o.acck, o.nlsk, o.kv,
-                                   o.accd, o.nlsd, o.s * 100 s_nom,
-                                   gl.p_icurval (o.kv, o.s * 100, o.fdat) s_eqv, 0 S_KOM,
-                                   o.nazn, o.branch
-                            FROM provodki_otc o, kl_fe9 k
-                            WHERE o.fdat = :dt_
-                              AND o.kv != 980
-                              AND o.nlsd LIKE k.nlsd || ''%''
-                              AND o.nlsk LIKE k.nlsk || ''%''
-                              AND decode(substr(o.nlsd,1,4),''2809'',o.OB22D,''2909'',o.OB22D,o.OB22K) = k.ob22
-                            UNION
-                            SELECT k.d060, 1, o.ref, o.tt, o.fdat, o.acck, o.nlsk, o.kv,
-                                   o.accd, o.nlsd, o.s * 100 s_nom,
-                                   gl.p_icurval (o.kv, o.s * 100, o.fdat) s_eqv, 0 S_KOM,
-                                   o.nazn, o.branch
-                            FROM provodki_otc o, kl_fe9 k
-                            WHERE o.fdat = :dt_
-                              AND o.kv = 980
-                              AND o.nlsd LIKE k.nlsd || ''%''
-                              AND (o.nlsk LIKE ''2909%'' OR o.nlsk LIKE ''3739%'')  --o.nlsk LIKE ''2809%'' OR
-                              AND ( (decode(substr(o.nlsk,1,4),''2909'',o.OB22K,o.OB22D) = k.ob22
-                                     AND k.ob22 in (''60'') and substr(o.nlsk,1,4) <> ''3739''
-                                    ) OR
-                                    (o.nlsk like ''3739%'' and trim(o.nlsk) = trim(k.nlsk) and o.OB22K = ''10''
-                                     AND o.tt not like ''R01%''
-                                     --AND (lower(o.nazn) like ''%виплачено%'' OR
-                                     --     lower(o.nazn) like ''%списання%''
-                                     --    )
-                                    ) --OR
-                                    --(o.nlsk like ''2809%'' and o.OB22K = ''24'')
-                                  )
-                           )';
-
-
-       OPEN cur_temp FOR cursor_sql USING k.fdat, k.fdat;
-       LOOP
-           FETCH cur_temp BULK COLLECT INTO l_temp_rec LIMIT 10000;
-           EXIT WHEN l_temp_rec.count = 0;
-
-           FORALL i IN 1 .. l_temp_rec.COUNT
-              insert /*+ append */  into OTCN_PROV_TEMP
-              values l_temp_rec(i);
-
-           l_temp_rec.delete;
-       end loop;
-       CLOSE cur_temp;
-       commit;
-   end loop;
+   INSERT INTO OTCN_PROV_TEMP
+   (ko, rnk, fdat, REF, tt, accd, nlsd, kv, acck, nlsk, s_nom, s_eqv, s_kom, nazn, branch)
+   select /*+ FULL(k) LEADING(k ad) */
+           k.d060, 1, od.fdat, od.ref, od.tt, 
+           ad.acc accd, ad.nls nlsd, ad.kv, ak.acc acck, ak.nls nlsk, od.s  s_nom,
+           gl.p_icurval (ad.kv, od.s, od.fdat) s_eqv, 
+           0 S_KOM, p.nazn, p.branch
+    from opldok od, accounts ad, kl_fe9 k, opldok ok, accounts ak, oper p
+    where od.fdat between dat1_ and dat_ and
+          od.acc = ad.acc and
+          od.DK = 0 and
+          ad.nls LIKE k.nlsd || '%' and
+          od.ref = ok.ref and
+          od.stmt = ok.stmt and
+          ok.fdat between dat1_ and dat_ and
+          ok.acc = ak.acc and
+          ok.DK = 1 and
+          ak.nls LIKE k.nlsk || '%' and
+          (regexp_like(ad.NLS,'^((2809)|(2909))') and ad.OB22 = k.ob22 or
+           regexp_like(ak.NLS,'^((2809)|(2909))') and ak.OB22 = k.ob22) and
+          od.tt NOT IN ('C55', 'C56', 'C57', 'CNC', 'R01') and
+          nvl(K.PR_DEL, 1) <> 0 and
+          not (ad.NLS like '2909%' and ak.NLS like '2909%' and ak.ob22 <> '60') and
+          not (ad.NLS  like '29091030046500%' and ak.NLS  like '29094030046530%') and 
+          not (substr(ad.NLS,1,4) = substr(ak.NLS,1,4) and ad.ob22 = ak.ob22 and lower(p.nazn) like '%перенес%') and
+          not (lower(p.nazn) like '%повернення%' and p.tt not in ('M37','MMV','CN3','CN4')) and  
+          od.ref = p.ref and 
+          lower(p.nazn) not like '%western%' and
+          p.sos = 5;  
 
    -- если отчетный день не последний день месяца то выпоняем включение в файл проводок
    -- введенных в последние календарные дни и проведенные в балансе 1 рабочего дня след. месяца
@@ -388,38 +368,19 @@ BEGIN
       end if;
    end if;
 
-   -- удаление типов проводок по кл-ру KL_FE9
-   for k in (select o.ko ko, o.ref REF, trim(o.nlsd) NLSD, trim(o.nlsk) NLSK,
-                    trim(f.tt) TT, f.pr_del PR_DEL
-             from otcn_prov_temp o, kl_fe9 f
-             where substr(trim(o.nlsd),1,length(trim(f.nlsd))) = trim(f.nlsd)
-               and substr(trim(o.nlsk),1,length(trim(f.nlsk))) = trim(f.nlsk)
-               and NVL(trim(f.tt),o.tt) = o.tt
-               and o.ko = f.d060
-               and f.pr_del = 0)
-      loop
-
-          DELETE FROM OTCN_PROV_TEMP
-          WHERE ko = k.ko
-            and nlsd like k.nlsd || '%'
-            and nlsk like k.nlsk || '%'
-            and ref = k.ref;
-
-      end loop;
-
    -- удаление док-тов принятых в предыдущем месяце и проведенных в первых числах отчетного месяца
    if mfou_ = 300465 then
       DELETE FROM otcn_prov_temp
       WHERE ref in ( select o.ref
                      from otcn_prov_temp o, oper p
-                     where o.fdat >= dat1_  --one_day_  --dat1_
+                     where o.fdat >= dat1_  
                        and o.ref = p.ref
                        and p.pdat < dat1_
-                       and to_char(p.pdat,'MM') != to_char(dat1_,'MM'));  --(p.pdat < dat1_ or p.datd < dat1_) );
+                       and to_char(p.pdat,'MM') != to_char(dat1_,'MM'));  
    end if;
 
    -- удаление проводок для проводок Дт 2909 Кт 2909 и OB22 != '60'
-   -- 31.03.2016 поменял для OB22 со значения 24 на 60
+   -- 31.03.2016 поменял для OB22 со значения 24 на 60 
    for k in (select o.ref REF, trim(o.nlsd) NLSD, trim(o.nlsk) NLSK,
                     NVL(trim(s.ob22),'00') OB22
              from otcn_prov_temp o, specparam_int s
@@ -429,12 +390,6 @@ BEGIN
       loop
 
           if k.ob22 != '60' then
-             DELETE FROM OTCN_PROV_TEMP
-             WHERE ref = k.ref;
-          end if;
-
-          if k.nlsd like '29091030046500%' and k.nlsk like '29094030046530%'
-          then
              DELETE FROM OTCN_PROV_TEMP
              WHERE ref = k.ref;
           end if;
@@ -455,7 +410,7 @@ BEGIN
           DELETE FROM OTCN_PROV_TEMP
           WHERE ref = k.ref and s_nom = k.s_nom and
                 trim(nlsd) = k.nlsd and trim(nlsk) = k.nlsk;
-
+   
       end loop;
 
    -- удаление проводок с назначением платежа "Повернення переказу"
@@ -476,25 +431,6 @@ BEGIN
 
           DELETE FROM OTCN_PROV_TEMP
           WHERE ref = k.ref;
-
-      end loop;
-
-   -- удаление проводок с назначением платежа "Комісія"
-   -- для проводок Дт 2909 Кт 100*
-   for k in ( select o.ref, o.tt, o.fdat, trim(o.nlsd) NLSD, trim(o.nlsk) NLSK, o.s_nom
-              from otcn_prov_temp o
-              where (o.nlsd LIKE '100%' or o.nlsd like '2909%')
-                and (o.nlsk LIKE '2909%'or o.nlsk like '6110%')
-                and o.kv = 980
-                and o.tt IN ('C55', 'C56', 'C57', 'CNC')
-            )
-      loop
-
-          DELETE FROM OTCN_PROV_TEMP
-          WHERE nlsd like k.nlsd||'%'
-            and nlsk like k.nlsk||'%'
-            and tt like k.tt||'%'
-            and s_nom = k.s_nom;
 
       end loop;
 
@@ -591,9 +527,9 @@ BEGIN
                select substr(nlsd,1,4), NVL(ob22d,'00')
                  into  nbs_k, ob22_k
                from provodki_otc
-               where ref = ref_
-                 and acck = acc_
-                 and nlsd LIKE '2809%'
+               where ref = ref_  
+                 and acck = acc_  
+                 and nlsd LIKE '2809%' 
                  and rownum = 1;
 
                BEGIN
@@ -652,7 +588,7 @@ BEGIN
             kod_a_ := '3';
          end if;
 
-         -- 31.03.2016 заменил для d060_ значение 11 на 42
+         -- 31.03.2016 заменил для d060_ значение 11 на 42 
          if Dat_ >= dat_izm2 and d060_ = '42' and kv_ = 980 then
             kod_f_ := '1';
             --d060_ := '42';
@@ -720,7 +656,7 @@ BEGIN
                   select max(substr(trim(k.value),1,3))
                   into kod_g_pb1
                   from operw k
-                  where ref = ref_
+                  where ref = ref_ 
                     and tag = 'KOD_G';
                exception
                   when others then kod_g_pb1 := null;
@@ -737,10 +673,10 @@ BEGIN
                D1#E9_ := kod_g_;
             end if;
 
-            if d060_ = '42' --AND D1#E9_ ='000'
+            if d060_ = '42' --AND D1#E9_ ='000' 
             then
                D1#E9_ := '804';
-            end if;
+            end if; 
 
             comm_ := 'код країни отримувача(вiдправника) '||d1#e9_;
             d2#e9_ := '804';
@@ -748,14 +684,14 @@ BEGIN
             if (nls_ like '2809%' or nls_ like '2909%') then
                ppp_ := kkk_ ;
                kkk_ := '000';
-
+            
                --01.04.2016
                if d060_ = '42' then
                   kkk_ := ppp_ ;
                   ppp_ := '000';
                end if;
-
-               if Dat_ < dat_izm2 then
+               
+               if Dat_ < dat_izm2 then 
                   kodp_ := '1'||lpad(to_char(d060_),2,'0')||
                                 lpad(to_char(kv_),3,'0')||
                                 lpad(d1#e9_,3,'0')||
@@ -763,7 +699,7 @@ BEGIN
                else
                   kodp_ := '1'|| kod_w_ || lpad(to_char(d060_),2,'0') ||
                                 kod_f_ || kod_a_ ||
-                                lpad(to_char(glb_),10,'0') ||
+                                lpad(to_char(glb_),10,'0') || 
                                 lpad(to_char(nn_),2,'0') ||
                                 lpad(to_char(kv_),3,'0') ||
                                 lpad(d1#e9_,3,'0') || kkk_ ||
@@ -780,10 +716,10 @@ BEGIN
                                 lpad(to_char(kv_),3,'0')||
                                 lpad(d2#e9_,3,'0')||
                                 lpad(d1#e9_,3,'0') || kkk_;
-               else
+               else 
                   kodp_ := '1'|| kod_w_ || lpad(to_char(d060_),2,'0') ||
                                 kod_f_ || kod_a_ ||
-                                lpad(to_char(glb_),10,'0') ||
+                                lpad(to_char(glb_),10,'0') || 
                                 lpad(to_char(nn_),2,'0') ||
                                 lpad(to_char(kv_),3,'0') ||
                                 lpad(d2#e9_,3,'0') || kkk_ ||

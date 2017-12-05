@@ -1,36 +1,40 @@
-CREATE OR REPLACE PACKAGE BARS.rko IS
+CREATE OR REPLACE PACKAGE rko IS
 /*
 --***************************************************************--
-                Плата за расчетно-кассовое обслуживание
-                           (C) Unity-BARS
+ Плата за расчетно-кассовое обслуживание
+ (C) Unity-BARS
 
 
-  Накопление идет по Opldok.FDAT !!!
-  ------------------------------------
+ 14/11/2017 COBUMMFO-5332:   3570 -> 3579 - переносится только ВХОДЯЩИЙ на 01 число остаток 3570
 
-  14.06.2007 SERG Адаптация к Мульти-МФО схеме.
-  Что сделано:
-        - изменены типы переменных *tobo* с varschar2(12) на tobo.tobo%type
-        - при сравнении кода отделения с нулем(0), сам ноль пишем как строку '0'
-          Требуются:
-        patchm73.rko (для всех)
-        patchm74.rko (только для Мульти-МФО)
+ 29-05-2014 Sta Новая процедура-обвертка START_FINISH для Старта-Финиша
+
+ Накопление идет по Opldok.FDAT !!!
+ ------------------------------------
+
+ 14.06.2007 SERG Адаптация к Мульти-МФО схеме.
+ Что сделано:
+ - изменены типы переменных *tobo* с varschar2(12) на tobo.tobo%type
+ - при сравнении кода отделения с нулем(0), сам ноль пишем как строку '0'
+ Требуются:
+ patchm73.rko (для всех)
+ patchm74.rko (только для Мульти-МФО)
 
 
-  Банк с ТОБО.   Взимание платы производится по всем счетам в Головном банке,
-  -----------    но, при этом, счет 6110 у ГБ и у каждого ТОБО - свой.
+ Банк с ТОБО. Взимание платы производится по всем счетам в Головном банке,
+ ----------- но, при этом, счет 6110 у ГБ и у каждого ТОБО - свой.
 
-  6110 берется из TOBO_PARAMS по коду ТОБО счета 2600 и  TAG='RKO6110'.
-  Для счетов 2600, по которым 6110 не найдется в TOBO_PARAMS, он будет
-  взят из операции "RKO" (  конкретный  или  из INI-файла, если в операции
-  счет-Б задан формулой типа  #(tobopack.GetToboParam('RKO6110'))   ).
+ 6110 берется из TOBO_PARAMS по коду ТОБО счета 2600 и TAG='RKO6110'.
+ Для счетов 2600, по которым 6110 не найдется в TOBO_PARAMS, он будет
+ взят из операции BARS."RKO" ( конкретный или из INI-файла, если в операции
+ счет-Б задан формулой типа #(tobopack.GetToboParam('RKO6110'))   ).
 
 --***************************************************************--
 */
 
 
   -- global consts
-  G_HEADER_VERSION constant varchar2(64)  := 'version 7.01  28/04/2009';
+  G_HEADER_VERSION constant varchar2(64)  := 'version 8  29/05/2017';
 
   ----
   -- header_version - возвращает версию заголовка пакета
@@ -42,6 +46,8 @@ CREATE OR REPLACE PACKAGE BARS.rko IS
   --
   function body_version return varchar2;
 
+PROCEDURE START_FINISH (p_mode int, p_dat DATE DEFAULT NULL);
+
 PROCEDURE acr(mode_ VARCHAR2, dat_ DATE,filt_ VARCHAR2 DEFAULT NULL);
 PROCEDURE acr2(mode_ VARCHAR2, dat_ DATE,filt_ VARCHAR2 DEFAULT NULL, p_acc number default null);
 PROCEDURE pay(mode_ VARCHAR2, dat_ DATE,filt_ VARCHAR2 DEFAULT NULL);
@@ -49,30 +55,86 @@ PROCEDURE pay2(mode_ VARCHAR2, dat_ DATE,filt_ VARCHAR2 DEFAULT NULL, p_acc numb
 PROCEDURE er(acc_ NUMBER);
 END;
 /
-SHOW ERRORS;
+
+
+-----------------------------------------------------------------------------------------------
 
 CREATE OR REPLACE PACKAGE BODY BARS.rko IS
 
+/*
+  
+  15.11.2017 Transfer-2017
+ 
+1.   Ищется индивидуальный 6110, как спецпараметр  AccountsW / TAG='S6110'    Если индивидуальный  не найден, то ищется на BRANCH-e  6110/06:+++
+     nlsb_tobo:=NBS_OB22_NULL('6110','06',tobo_a);
+ 
+2.   Открывается 3579/07   -   ты говоришь, что нового счета просрочки еще нет.         
+ 
 
-  -- global consts
-  G_BODY_VERSION constant varchar2(64)  := 'version 27.04.2010';
--- Изменения В Черкассах в РУ ОБ
 
-  ----
-  -- header_version - возвращает версию заголовка пакета
-  --
-  function header_version return varchar2 is
+
+
+  14/11/2017 COBUMMFO-5332:   3570 -> 3579 - переносится только ВХОДЯЩИЙ на 01 число остаток 3570
+
+  29-05-2014 Sta Новая процедура-обвертка START_FINISH для Старта-Финиша
+
+*/
+
+  G_BODY_VERSION constant varchar2(64)  := 'version 01.06.2017';
+
+  function header_version return varchar2 is -- возвращает версию заголовка пакета
+  begin    return 'Package header RKO '||G_HEADER_VERSION;  end header_version;
+
+  function body_version return varchar2 is ---возвращает версию тела пакета
+  begin    return 'Package body RKO '||G_BODY_VERSION;  end body_version;
+  ------------
+  function Get_NLS_random  (p_R4 accounts.NBS%type ) return accounts.NLS%type   is   --получение № лиц.сч по случ.числам
+                            nTmp_ number ;            l_nls accounts.NLS%type ;
   begin
-    return 'Package header RKO '||G_HEADER_VERSION;
-  end header_version;
+    While 1<2        loop nTmp_ := trunc ( dbms_random.value (1, 999999999 ) ) ;
+       begin select 1 into nTmp_ from accounts where nls like p_R4||'_'||nTmp_  ;
+       EXCEPTION WHEN NO_DATA_FOUND THEN EXIT ;
+       end;
+    end loop;         l_nls := vkrzn ( substr(gl.aMfo,1,5) , p_R4||'0'||nTmp_ );
+    RETURN l_Nls ;
+  end    Get_NLS_random ;
+----------------------------------
 
-  ----
-  -- body_version - возвращает версию тела пакета
-  --
-  function body_version return varchar2 is
-  begin
-    return 'Package body RKO '||G_BODY_VERSION;
-  end body_version;
+PROCEDURE START_FINISH (p_mode int, ---- 1 = фініш,  2 = старт,  .....НЕважл.
+                        p_dat DATE DEFAULT NULL  -- Банк.дата
+                       ) is    
+   l_dat date ;
+begin If p_mode not in (1,2) then RETURN; end if;
+
+   l_dat := NVL (p_dat, gl.BDATE) ;
+
+   If p_Mode = 1 then  --- = фініш
+
+      If trunc( l_dat, 'MM' ) < trunc ( DAT_NEXT_U (l_dat,1), 'MM' ) then
+         -- Нарахування комісії за РКО 3570-6110,
+         --регламентні роботи по закриттю місяця
+         RKO.ACR( 1, l_dat, NULL ); -- розрахунок
+         RKO.PAY( 1, l_dat, NULL ); -- проводки
+      end if;
+
+   ElsIf p_Mode = 2 then  --- = Старт
+
+      -- Перенесення заборгованості на прострочку 3570-3579
+      -- 6 числа кожного місяця
+
+      if To_Number( to_char (l_DAT,'DD') ) >= 6               and    --- тек  дд = 6 или  7, 8 если 6 -выходной
+         To_Number( to_char (DAT_NEXT_U(l_DAT,-1),'DD') ) < 6 then   -- -пред дд < 6 
+
+         RKO.PAY( 3, l_DAT, NULL );
+      end if;
+
+   end if;
+
+   --Погашення комісії за РКО 2600-3570,3579
+   --Кожного робочого дня на старты та фініші
+   RKO.PAY( 2, l_dat, ' and a.ACC not in (select ACC from RKO_3570) ' ) ;
+
+end  START_FINISH ;
 
 
 PROCEDURE acr(mode_ VARCHAR2, dat_ DATE, filt_ VARCHAR2 DEFAULT NULL) IS
@@ -103,21 +165,21 @@ PROCEDURE acr2(mode_ VARCHAR2, dat_ DATE, filt_ VARCHAR2 DEFAULT NULL, p_acc num
   daos_  DATE;
   nls_   VARCHAR2(15);
   c0     SYS_REFCURSOR;
-  fdat_2560   date;   --  Дата "ПО"+1 для 2560. Дата fdat_ нач.периода рассчета
+  --- fdat_2560   date;   --  Дата "ПО"+1 для 2560. Дата fdat_ нач.периода рассчета
   DKON_KV1    date;   --  ДАТА посл.раб.дня КВАРТАЛА рассчитанная для fdat_
   DKON_KV     date;   --  ДАТА посл.раб.дня КВАРТАЛА рассчитанная для dat_
   kol_2560    INT ;   --  количество счетов 2560
 
-  n_tarpak    INTEGER; -- № тарифного пакета
+  n_tarpak    NUMBER ; -- № тарифного пакета
   L_DOC_NOPAY INTEGER; --количество бесплатних документов
-
+  l_shtar     accountsw.value%type;
 BEGIN
 
    n_tarpak:= 0;
 
    If mode_<0 then
 
-      --  Определяем дату последнего раб.дня КВАРТАЛА, в который  
+      --  Определяем дату последнего раб.дня КВАРТАЛА, в который
       --  входит НАЧАЛЬНАЯ дата расчетного периода :
 
       EXECUTE IMMEDIATE ' TRUNCATE TABLE CCK_AN_TMP ' ;
@@ -134,29 +196,17 @@ BEGIN
       end if;
 
    else
-      --  Определяем дату последнего раб.дня КВАРТАЛА, в который  
-      --  входит НАЧАЛЬНАЯ дата расчетного периода 
 
-      --  За НАЧАЛЬНАУЮ дату расчетного периода принимаем дату
-      --  "ПО"+1 (DAT0B+1) для первого встретившегося 2560/03 
-      --  с НЕпустым DAT0B :
+      --  Определяем дату последнего раб.дня текущего КВАРТАЛА,  
+      --  по КОНЕЧНОЙ дате dat_ :
+             --------
 
-      Select DAT0B+1 into fdat_2560
-      From   RKO_LST
-      Where  ACC in (Select ACC from Accounts
-                     where NBS='2560' and OB22='03' and DAZS is NULL and
-                        RNK in (Select nvl(RNK,-1) from RNKP_KOD where KODK=1)
-                    )
-         and DAT0A is not NULL
-         and DAT0B is not NULL
-         and rownum=1;
-
-      If    to_char (fdat_2560,'MM') in ('03','06','09','12') then
-            DKON_KV := Dat_last( fdat_2560);
-      elsIf to_char (fdat_2560,'MM') in ('02','05','08','11') then
-            DKON_KV := Dat_last( add_months(fdat_2560,1) ) ;
+      If    to_char (dat_,'MM') in ('03','06','09','12') then
+            DKON_KV := Dat_last( dat_);
+      elsIf to_char (dat_,'MM') in ('02','05','08','11') then
+            DKON_KV := Dat_last( add_months(dat_,1) ) ;
       else
-            DKON_KV := Dat_last( add_months(fdat_2560,2) ) ;
+            DKON_KV := Dat_last( add_months(dat_,2) ) ;
       end if;
 
    end if;
@@ -177,18 +227,18 @@ BEGIN
 
    else
 
-      if p_acc is null then 
-      
+      if p_acc is null then
+
          OPEN c0 FOR
          'select r.acc,a.daos from rko_lst r,accounts a
           where r.acc=a.acc and ( dat0b<:dat_ or dat0b is null ) '|| filt_ USING dat_;
-      
+
       else
 
          OPEN c0 FOR
          'select r.acc,a.daos from rko_lst r,accounts a
           where r.acc=a.acc and ( dat0b<:dat_ or dat0b is null ) and r.acc= '|| p_acc ||' '|| filt_ USING dat_;
-      
+
       end if;
 
    end if;
@@ -231,18 +281,35 @@ BEGIN
           WHERE  w.ACC = acc_
              AND w.TAG = 'SHTAR'
              AND to_number(w.VALUE) = t.ID;
-       EXCEPTION WHEN NO_DATA_FOUND THEN
+       EXCEPTION
+         WHEN NO_DATA_FOUND THEN
           L_DOC_NOPAY := 0;
           n_tarpak    := 0;
+         when OTHERS then
+           if ( sqlcode = -01722 )
+           then
+             SELECT w.VALUE
+               INTO l_shtar
+               FROM ACCOUNTSW w
+              WHERE w.ACC = acc_
+                AND w.TAG = 'SHTAR';
+             bars_audit.error( $$PLSQL_UNIT||'.PAY2: l_shtar='||l_shtar );
+             l_shtar := replace( l_shtar, ',', '.' );
+             n_tarpak := to_number( l_shtar, 'FM999990D099', 'NLS_NUMERIC_CHARACTERS = ''. ''' );
+             select nvl(DOC_NOPAY,0)
+               into l_doc_nopay
+               from TARIF_SCHEME
+              where ID = n_tarpak;
+           end if;
        END;
 
 ----------------------   Р А С Ч Е Т   --------------------------
-                       
+
 
 IF  n_tarpak >= 38 THEN        ----     П А К Е Т Ы  >=  38    ----
- 
 
-      IF MODE_<0 THEN           ---<--  Для 412 отчета 
+
+      IF MODE_<0 THEN           ---<--  Для 412 отчета
 
          INSERT INTO CCK_AN_TMP ( reg, NLS, acc, N1, PR, N2 )
           ----------------------------------------------------------
@@ -252,9 +319,9 @@ IF  n_tarpak >= 38 THEN        ----     П А К Е Т Ы  >=  38    ----
           FROM (Select rnk, nls, acc, ref,s, pr , rownum R
                 From (SELECT a.rnk, a.NLS, a.acc, o.ref,
                              F_TARIF_RKO( t.NTAR,a.KV,a.NLS,d.S,
-                                          nvl((Select max(DAT)  
-                                               from   OPER_VISA 
-                                               where  REF=o.REF and GROUPID not in (30,80)), 
+                                          nvl((Select max(DAT)
+                                               from   OPER_VISA
+                                               where  REF=o.REF and GROUPID not in (30,80)),
                                                o.PDAT
                                               ),
                                           DKON_KV,
@@ -266,7 +333,7 @@ IF  n_tarpak >= 38 THEN        ----     П А К Е Т Ы  >=  38    ----
                       WHERE  a.acc=acc_
                          and a.acc=d.acc
                          and d.ref=o.ref
-                         and (t.TT like 'IB%' or  t.TT like 'CL%')  ---<-   Только IB*,CL*  
+                         and (t.TT like 'IB%' or  t.TT like 'CL%')  ---<-   Только IB*,CL*
                          and d.sos=5
                          and d.fdat >= to_date(filt_,'dd.mm.yyyy')
                          and d.fdat <  dat_+1
@@ -274,9 +341,9 @@ IF  n_tarpak >= 38 THEN        ----     П А К Е Т Ы  >=  38    ----
                          and (t.dk = 0 and d.dk = 0)          ---  за ДЕБЕТ (412)
                          and D.S > 0
                          and F_TARIF_RKO( t.NTAR,a.KV,a.NLS,d.S,
-                                          nvl((Select max(DAT)  
-                                               from   OPER_VISA 
-                                               where  REF=o.REF and GROUPID not in (30,80)), 
+                                          nvl((Select max(DAT)
+                                               from   OPER_VISA
+                                               where  REF=o.REF and GROUPID not in (30,80)),
                                                o.PDAT
                                               ),
                                           DKON_KV,
@@ -287,7 +354,7 @@ IF  n_tarpak >= 38 THEN        ----     П А К Е Т Ы  >=  38    ----
                      )
                )
           WHERE R > L_DOC_NOPAY
-          Group by rnk,nls,acc,s,pr 
+          Group by rnk,nls,acc,s,pr
                               UNION ALL
           ----------------------------------------------------------
           -- 2 --   По ДЕБЕТУ / кроме IB1,IB2,CL1,CL2      -- 412 --          n_tarpak >= 38
@@ -296,9 +363,9 @@ IF  n_tarpak >= 38 THEN        ----     П А К Е Т Ы  >=  38    ----
           FROM (Select rnk, nls, acc, ref,s, pr , rownum R
                 From (SELECT a.rnk, a.NLS, a.acc, o.ref,
                              F_TARIF_RKO( t.NTAR,a.KV,a.NLS,d.S,
-                                          nvl((Select max(DAT)  
-                                               from   OPER_VISA 
-                                               where  REF=o.REF and GROUPID not in (30,80)), 
+                                          nvl((Select max(DAT)
+                                               from   OPER_VISA
+                                               where  REF=o.REF and GROUPID not in (30,80)),
                                                o.PDAT
                                               ),
                                           DKON_KV,
@@ -310,7 +377,7 @@ IF  n_tarpak >= 38 THEN        ----     П А К Е Т Ы  >=  38    ----
                       WHERE  a.acc=acc_
                          and a.acc=d.acc
                          and d.ref=o.ref
-                         and t.TT not like 'IB%' and t.TT not like 'CL%'   ---<-  Kроме IB*,CL* 
+                         and t.TT not like 'IB%' and t.TT not like 'CL%'   ---<-  Kроме IB*,CL*
                          and d.sos=5
                          and d.fdat >= to_date(filt_,'dd.mm.yyyy')
                          and d.fdat <  dat_+1
@@ -318,9 +385,9 @@ IF  n_tarpak >= 38 THEN        ----     П А К Е Т Ы  >=  38    ----
                          and (t.dk = 0 and d.dk = 0)          ---  за ДЕБЕТ (412)
                          and D.S > 0
                          and F_TARIF_RKO( t.NTAR,a.KV,a.NLS,d.S,
-                                          nvl((Select max(DAT)  
-                                               from   OPER_VISA 
-                                               where  REF=o.REF and GROUPID not in (30,80)), 
+                                          nvl((Select max(DAT)
+                                               from   OPER_VISA
+                                               where  REF=o.REF and GROUPID not in (30,80)),
                                                o.PDAT
                                               ),
                                           DKON_KV,
@@ -331,7 +398,7 @@ IF  n_tarpak >= 38 THEN        ----     П А К Е Т Ы  >=  38    ----
                      )
                )
           ----  WHERE R > L_DOC_NOPAY
-          Group by rnk,nls,acc,s,pr 
+          Group by rnk,nls,acc,s,pr
                               UNION ALL
           ----------------------------------------------------------
           -- 3 --   По КРЕДИТУ                           -- 412 --         n_tarpak >= 38
@@ -340,9 +407,9 @@ IF  n_tarpak >= 38 THEN        ----     П А К Е Т Ы  >=  38    ----
           FROM (Select rnk, nls, acc, ref,s, pr , rownum R
                 From (SELECT a.rnk, a.NLS, a.acc, o.ref,
                              F_TARIF_RKO( t.NTAR,a.KV,a.NLS,d.S,
-                                          nvl((Select max(DAT)  
-                                               from   OPER_VISA 
-                                               where  REF=o.REF and GROUPID not in (30,80)), 
+                                          nvl((Select max(DAT)
+                                               from   OPER_VISA
+                                               where  REF=o.REF and GROUPID not in (30,80)),
                                                o.PDAT
                                               ),
                                           DKON_KV,
@@ -361,9 +428,9 @@ IF  n_tarpak >= 38 THEN        ----     П А К Е Т Ы  >=  38    ----
                          and (t.dk = 1 and d.dk = 1)         --- за КРЕДИТ (412)
                          and D.S > 0
                          and F_TARIF_RKO( t.NTAR,a.KV,a.NLS,d.S,
-                                          nvl((Select max(DAT)  
-                                               from   OPER_VISA 
-                                               where  REF=o.REF and GROUPID not in (30,80)), 
+                                          nvl((Select max(DAT)
+                                               from   OPER_VISA
+                                               where  REF=o.REF and GROUPID not in (30,80)),
                                                o.PDAT
                                               ),
                                           DKON_KV,
@@ -393,9 +460,9 @@ IF  n_tarpak >= 38 THEN        ----     П А К Е Т Ы  >=  38    ----
                (SELECT nls, S, SDOK, ref  FROM
                     (SELECT a.NLS nls,
                           F_TARIF_RKO( t.NTAR,a.KV,a.NLS,d.S,
-                                       nvl((Select max(DAT)  
-                                            from   OPER_VISA 
-                                            where  REF=o.REF and GROUPID not in (30,80)), 
+                                       nvl((Select max(DAT)
+                                            from   OPER_VISA
+                                            where  REF=o.REF and GROUPID not in (30,80)),
                                             o.PDAT
                                            ),
                                        DKON_KV,
@@ -430,9 +497,9 @@ IF  n_tarpak >= 38 THEN        ----     П А К Е Т Ы  >=  38    ----
                (SELECT nls, S, SDOK, ref  FROM
                     (SELECT a.NLS nls,
                           F_TARIF_RKO( t.NTAR,a.KV,a.NLS,d.S,
-                                       nvl((Select max(DAT)  
-                                            from   OPER_VISA 
-                                            where  REF=o.REF and GROUPID not in (30,80)), 
+                                       nvl((Select max(DAT)
+                                            from   OPER_VISA
+                                            where  REF=o.REF and GROUPID not in (30,80)),
                                             o.PDAT
                                            ),
                                        DKON_KV,
@@ -467,9 +534,9 @@ IF  n_tarpak >= 38 THEN        ----     П А К Е Т Ы  >=  38    ----
                (SELECT nls, S, SDOK, ref  FROM
                     (SELECT a.NLS nls,
                           F_TARIF_RKO( t.NTAR,a.KV,a.NLS,d.S,
-                                       nvl((Select max(DAT)  
-                                            from   OPER_VISA 
-                                            where  REF=o.REF and GROUPID not in (30,80)), 
+                                       nvl((Select max(DAT)
+                                            from   OPER_VISA
+                                            where  REF=o.REF and GROUPID not in (30,80)),
                                             o.PDAT
                                            ),
                                        DKON_KV,
@@ -491,7 +558,7 @@ IF  n_tarpak >= 38 THEN        ----     П А К Е Т Ы  >=  38    ----
                 WHERE S>0  order by REF
                )
              )
-     ---  WHERE R > L_DOC_NOPAY  -- за КРЕДИТ колич.бесплатных НЕ учитываем ! 
+     ---  WHERE R > L_DOC_NOPAY  -- за КРЕДИТ колич.бесплатных НЕ учитываем !
           Group by NLS
         )
         Group by NLS;
@@ -506,16 +573,16 @@ ELSE       ---   По-старому:   ПАКЕТЫ  0 - 37                             n_tarp
 
 
 
-      IF MODE_<0 THEN             ---<--  Для 412 отчета 
+      IF MODE_<0 THEN             ---<--  Для 412 отчета
 
          INSERT INTO CCK_AN_TMP ( reg, NLS, acc, N1, PR, N2 )
           SELECT rnk, nls , acc,  s,  pr,  COUNT(*)
           FROM (Select rnk, nls, acc, ref,s, pr , rownum R
                 From (SELECT a.rnk, a.NLS, a.acc, o.ref,
                              F_TARIF_RKO( t.NTAR,a.KV,a.NLS,d.S,
-                                          nvl((Select max(DAT)  
-                                               from   OPER_VISA 
-                                               where  REF=o.REF and GROUPID not in (30,80)), 
+                                          nvl((Select max(DAT)
+                                               from   OPER_VISA
+                                               where  REF=o.REF and GROUPID not in (30,80)),
                                                o.PDAT
                                               ),
                                           DKON_KV,
@@ -534,9 +601,9 @@ ELSE       ---   По-старому:   ПАКЕТЫ  0 - 37                             n_tarp
                          and (t.dk = 0 and d.dk = 0)          ---  за ДЕБЕТ (412)
                          and D.S > 0
                          and F_TARIF_RKO( t.NTAR,a.KV,a.NLS,d.S,
-                                          nvl((Select max(DAT)  
-                                               from   OPER_VISA 
-                                               where  REF=o.REF and GROUPID not in (30,80)), 
+                                          nvl((Select max(DAT)
+                                               from   OPER_VISA
+                                               where  REF=o.REF and GROUPID not in (30,80)),
                                                o.PDAT
                                               ),
                                           DKON_KV,
@@ -547,15 +614,15 @@ ELSE       ---   По-старому:   ПАКЕТЫ  0 - 37                             n_tarp
                      )
                )
           WHERE R > L_DOC_NOPAY
-          Group by rnk,nls,acc,s,pr 
+          Group by rnk,nls,acc,s,pr
                               UNION ALL
           SELECT rnk, nls , acc,  s,  pr,  COUNT(*)
           FROM (Select rnk, nls, acc, ref,s, pr , rownum R
                 From (SELECT a.rnk, a.NLS, a.acc, o.ref,
                              F_TARIF_RKO( t.NTAR,a.KV,a.NLS,d.S,
-                                          nvl((Select max(DAT)  
-                                               from   OPER_VISA 
-                                               where  REF=o.REF and GROUPID not in (30,80)), 
+                                          nvl((Select max(DAT)
+                                               from   OPER_VISA
+                                               where  REF=o.REF and GROUPID not in (30,80)),
                                                o.PDAT
                                               ),
                                           DKON_KV,
@@ -574,9 +641,9 @@ ELSE       ---   По-старому:   ПАКЕТЫ  0 - 37                             n_tarp
                          and (t.dk = 1 and d.dk = 1)         --- за КРЕДИТ (412)
                          and D.S > 0
                          and F_TARIF_RKO( t.NTAR,a.KV,a.NLS,d.S,
-                                          nvl((Select max(DAT)  
-                                               from   OPER_VISA 
-                                               where  REF=o.REF and GROUPID not in (30,80)), 
+                                          nvl((Select max(DAT)
+                                               from   OPER_VISA
+                                               where  REF=o.REF and GROUPID not in (30,80)),
                                                o.PDAT
                                               ),
                                           DKON_KV,
@@ -603,9 +670,9 @@ ELSE       ---   По-старому:   ПАКЕТЫ  0 - 37                             n_tarp
                (SELECT nls, S, SDOK, ref  FROM
                     (SELECT a.NLS nls,
                           F_TARIF_RKO( t.NTAR,a.KV,a.NLS,d.S,
-                                       nvl((Select max(DAT)  
-                                            from   OPER_VISA 
-                                            where  REF=o.REF and GROUPID not in (30,80)), 
+                                       nvl((Select max(DAT)
+                                            from   OPER_VISA
+                                            where  REF=o.REF and GROUPID not in (30,80)),
                                             o.PDAT
                                            ),
                                        DKON_KV,
@@ -636,9 +703,9 @@ ELSE       ---   По-старому:   ПАКЕТЫ  0 - 37                             n_tarp
                (SELECT nls, S, SDOK, ref  FROM
                     (SELECT a.NLS nls,
                           F_TARIF_RKO( t.NTAR,a.KV,a.NLS,d.S,
-                                       nvl((Select max(DAT)  
-                                            from   OPER_VISA 
-                                            where  REF=o.REF and GROUPID not in (30,80)), 
+                                       nvl((Select max(DAT)
+                                            from   OPER_VISA
+                                            where  REF=o.REF and GROUPID not in (30,80)),
                                             o.PDAT
                                            ),
                                        DKON_KV,
@@ -660,7 +727,7 @@ ELSE       ---   По-старому:   ПАКЕТЫ  0 - 37                             n_tarp
                 WHERE S>0  order by REF
                )
              )
-     ---  WHERE R > L_DOC_NOPAY  -- за КРЕДИТ колич.бесплатных НЕ учитываем ! 
+     ---  WHERE R > L_DOC_NOPAY  -- за КРЕДИТ колич.бесплатных НЕ учитываем !
           Group by NLS
         )
         Group by NLS;
@@ -730,17 +797,19 @@ PROCEDURE pay2(mode_ VARCHAR2, dat_ DATE,filt_ VARCHAR2 DEFAULT NULL, p_acc numb
 acc1_zakr  INT;
 acc2_zakr  INT;
 
-acc_     NUMBER;        --  ACC основного счета
-nlsosn_  VARCHAR2(15);  --  NLS   --//--
-rnk_osn  NUMBER;        --  RNK   --//--
-nam_osn  VARCHAR2(38);  --  NMS   --//--
+acc_     NUMBER;        --  ACC   основного счета
+nlsosn_  VARCHAR2(15);  --  NLS    --//--
+rnk_osn  NUMBER;        --  RNK    --//--
+nam_osn  VARCHAR2(38);  --  NMS    --//--
+br_osn   VARCHAR2(30);  --  BRANCH --//--
 
 
-accd_    NUMBER;        --  ACC счета-списания (счета-плательщика)
-nlsa_    VARCHAR2(15);  --  NLS   --//--
-rnk_     NUMBER;        --  RNK   --//--
-nam_a_   VARCHAR2(38);  --  NMS   --//--
-isp_     NUMBER;        --  ISP   --//--
+accd_    NUMBER;        --  ACC   счета-списания (счета-плательщика)
+nlsa_    VARCHAR2(15);  --  NLS    --//--
+rnk_     NUMBER;        --  RNK    --//--
+nam_a_   VARCHAR2(38);  --  NMS    --//--
+isp_     NUMBER;        --  ISP    --//--
+br_      VARCHAR2(30);  --  BRANCH --//--
 
 
 i        INT;
@@ -749,7 +818,9 @@ s0_    NUMBER(24);
 kol_   INT;           --  количество документов
 sdok_  NUMBER(24);    --  cумма документов
 s0a_   NUMBER(24);
-s1_    NUMBER(24);
+s1_    NUMBER(24);    --  текущий остаток 3570
+s1_01  NUMBER(24);    --  входящий на нач.месяца остаток 3570
+kos_3570  NUMBER(24); --  сумма KOS по 3570 с 01 по тек.день
 s1a_   NUMBER(24);
 s2_    NUMBER(24);
 s2a_   NUMBER(24);
@@ -757,11 +828,11 @@ ostc_  NUMBER(24);
 nls_   VARCHAR2(15);
 nlsb_  VARCHAR2(65);
 
-nlsc_  VARCHAR2(15);  --  NLS 3570
-acc1_  NUMBER;        --  ACC 3570
+nlsc_  VARCHAR2(15);   --  NLS 3570
+acc1_  NUMBER;         --  ACC 3570
 
-nlsd_  VARCHAR2(15);  --  NLS 3579
-acc2_  NUMBER;        --  ACC 3579
+nlsd_  VARCHAR2(15);   --  NLS 3579
+acc2_  NUMBER;         --  ACC 3579
 
 kkk_   number;
 
@@ -835,7 +906,7 @@ BEGIN
 
 ----=============    Начало цикла по счетам RKO_LST:   ================
 
-   if p_acc is null then 
+   if p_acc is null then
 
       OPEN c0 FOR
      'SELECT r.acc FROM rko_lst r,accounts a
@@ -849,7 +920,7 @@ BEGIN
       WHERE r.acc=a.acc AND ( dat0b<:1 OR dat0b IS NULL OR 1=1 ) and r.acc= '||p_acc||' '||filt_
        ||' order by DAT1B desc'  USING dat_;
 
-   end if;       
+   end if;
 
    LOOP
 
@@ -872,34 +943,34 @@ BEGIN
       END;
 
 
-      -- Определяем NLS,RNK,NMS основного счета  acc_ (для записи в oper.NAZN):
-      BEGIN                    ----------------------
-         SELECT NLS, RNK, substr(NMS,1,38)
-           INTO nlsosn_, rnk_osn, nam_osn
+      -- Определяем все по основному счету  acc_ :
+      BEGIN                ----------------------
+         SELECT NLS, RNK, substr(NMS,1,38), BRANCH
+           INTO nlsosn_, rnk_osn, nam_osn , br_osn
            FROM accounts
           WHERE acc=acc_;
       END;
 
 
-      --  Определяем все по счету-плательщику  accd_ :
-                           -------------------------
+      --  Определяем все по счету-списания accd_ :
+                            ----------------------
       SELECT a.nls,a.kv, a.ostc+nvl(a.lim,0), a.isp, a.grp, c.rnk,
              NVL(TRIM(c.nmkk),TRIM(SUBSTR(c.nmk,1,38))), c.okpo,
-             a.TOBO, a.BLKD
+             a.TOBO, a.BLKD, a.BRANCH
       INTO nlsa_,kva_,ostc_,isp_,grp_,rnk_,nam_a_,okpo_,tobo_a,
-           blkd_
+           blkd_, br_
       FROM accounts a,customer c
       WHERE a.acc=accd_ AND a.rnk=c.rnk;
 
 
-      kkk_:=0;              ----  Определяем kkk_ - Kод Корп.Клиента  
-      BEGIN  
-        Select KODK  Into  kkk_         
-        From   RNKP_KOD 
+      kkk_:=0;              ----  Определяем kkk_ - Kод Корп.Клиента
+      BEGIN
+        Select KODK  Into  kkk_
+        From   RNKP_KOD
         Where  RNK = rnk_  and  KODK is not NULL and rownum=1;
       EXCEPTION  WHEN NO_DATA_FOUND THEN
         kkk_:=0;
-      END;  
+      END;
 
 
 
@@ -932,11 +1003,10 @@ BEGIN
                                        -- 2). Ищем 6110 по ОВ22 в этом или
       IF nlsb_tobo is NULL THEN        --     вышестоящем BRANCH-e:
 
-         nlsb_tobo:=NBS_OB22_NULL('6110','06',tobo_a);
+         nlsb_tobo := NBS_OB22_NULL(  ( CASE WHEN newnbs.g_state = 1 then '6510' else '6110' end ) , '06', tobo_a );
 
-         IF nlsb_tobo is NULL  then
-            raise_application_error(-20000,'Не найден счет 6110/06 на '||substr(tobo_a,1,15)||' !', true);
-         END IF;
+         IF nlsb_tobo is NULL  then            raise_application_error(-20000,'Не найден счет 6_10/06 на '||substr(tobo_a,1,15)||' !', true);         END IF;
+
       END IF;
 
       BEGIN             ---  Определяем NMS счета  nlsb_tobo (6110)
@@ -954,14 +1024,16 @@ BEGIN
 
 
       nlsc_:= VKRZN(SUBSTR(gl.aMFO,1,5),'3570'||SUBSTR(nlsa_,5));
-      nlsd_:= VKRZN(SUBSTR(gl.aMFO,1,5),'3579'||SUBSTR(nlsa_,5));
+      nlsd_:= RKO.Get_NLS_random  ( CASE WHEN newnbs.g_state = 1 then '3570' else '3579' end  ) ;  --получение № лиц.сч по случ.числам
+
 
       IF acc1_ IS NULL THEN
-         s1_:=0;
+         s1_ := 0 ;
       ELSE                     --     s1_  - остаток на 3570
          BEGIN
-            SELECT nls,-ostc INTO nlsc_,s1_ FROM accounts
-                   WHERE acc=acc1_ ;   ------ AND  ostb=ostc;    ---  !!!
+            SELECT nls,-ostc INTO nlsc_, s1_ 
+            FROM   accounts
+            WHERE  acc=acc1_ ;   
          EXCEPTION WHEN NO_DATA_FOUND THEN
             s1_:=0;
          END;
@@ -971,8 +1043,9 @@ BEGIN
          s2_:=0;
       ELSE                     --     s2_  - остаток на 3579
          BEGIN
-            SELECT nls,-ostc INTO nlsd_,s2_ FROM accounts
-                   WHERE acc=acc2_ ;   ------ AND  ostb=ostc;    ---  !!!
+            SELECT nls,-ostc INTO nlsd_, s2_ 
+            FROM   accounts
+            WHERE  acc=acc2_ ;   
          EXCEPTION WHEN NO_DATA_FOUND THEN
             s2_:=0;
          END;
@@ -1038,12 +1111,12 @@ BEGIN
 
             acc1_zakr:=1;
             if acc1_ is not NULL then
-               Begin 
-                 Select 1 into acc1_zakr 
-                 from   Accounts 
+               Begin
+                 Select 1 into acc1_zakr
+                 from   Accounts
                  where  ACC=acc1_ and DAZS is NULL;
                EXCEPTION when no_data_found then
-                 acc1_zakr:=0;   --- acc1_ или ЗАКРЫТ или такого acc1_ 
+                 acc1_zakr:=0;   --- acc1_ или ЗАКРЫТ или такого acc1_
                END;              --- вообще нет в ACCOUNTS
             end if;
 
@@ -1055,95 +1128,15 @@ BEGIN
 
             IF acc1_ is NULL  or  acc1_zakr=0  THEN
 
-               BEGIN  ------  Подбор номера 3570*
-
-                nlsc_:= VKRZN(SUBSTR(gl.aMFO,1,5),'3570'||SUBSTR(nlsa_,5));
-
-                select xxx into tmp_3570 from
-                (
-                  Select a.NLS          xxx
-                  from   accounts a, Specparam_Int s
-                  where  a.NLS = nlsc_ and a.KV=980 and a.ACC=s.ACC and
-                         (a.RNK<>rnk_  OR  s.OB22<>'03'  OR  a.DAZS is not NULL)
-                   union all
-                  Select to_char(r.ACC) xxx
-                  from   Accounts a, RKO_LST r
-                  where  a.NLS=nlsc_ and a.KV=980 and a.ACC=r.ACC1 and
-                         r.ACC in (Select ACC from RKO_3570)
-                )
-                where  rownum<2;
-
-                   --   Cчет 3570<хвост 2600> уже есть, но он:
-                   --    -  НА ДРУГОМ RNK   и л и   с OB22<>'03'    и л и   он ЗАКРЫТ !
-                   --    -  этот 3570 привязан к счету из списка "Только нач. на 3570"
-                   --   Подбираем другой счет по маске:  3570 k S NN RRRRRR
-                   --   где:  S  - 6-ая цифра из 2600*
-
-                i:= 1;
-
-                loop
-
-                   nlsc_:= vkrzn(substr(gl.aMFO,1,5),
-                           '3570'||'0'|| substr(nlsa_,6,1) ||
-                           lpad(to_char(i),2,'0') || lpad(to_char(rnk_),6,'0'));
-
-                   Begin    -- Есть ли такой счет ?
-
-                       select xxx into tmp_3570 from
-                       (
-                         Select a.NLS          xxx
-                         from   accounts a, Specparam_Int s
-                         where  a.NLS = nlsc_ and a.KV=980 and a.ACC=s.ACC and
-                                (a.RNK<>rnk_  OR  s.OB22<>'03'  OR  a.DAZS is not NULL)
-                         union all
-                         Select to_char(r.ACC) xxx
-                         from   Accounts a, RKO_LST r
-                         where  a.NLS=nlsc_ and a.KV=980 and a.ACC=r.ACC1 and
-                                r.ACC in (Select ACC from RKO_3570)
-                       )
-                       where  rownum<2;
-
-                   Exception when no_data_found then
-                      EXIT;     -- такого счета еще нет, - открываем
-                   End;
-
-                   i := i + 1;
-                   if i = 100 then
-                      exit;
-                   end if;
-
-                end loop;
-
-               EXCEPTION when no_data_found then
-                null;
-               END;  ---------- END подбора номера 3570*  -----
-
-
-               OP_REG(99,0,0, grp_,tmp_, rnk_, nlsc_,kva_,
-                       substr('Нарах.РКО '||nam_a_,1,70),'ODB',isp_,acc1_);
-
+               nlsc_ := RKO.Get_NLS_random  ( '3570'  ) ;  --получение № лиц.сч по случ.числам
+               OP_REG(99,0,0, grp_,tmp_, rnk_, nlsc_,kva_, substr('Нарах.РКО '||nam_a_,1,70),'ODB',isp_,acc1_);
                p_setAccessByAccmask(acc1_,accd_);
-
+               Accreg.setAccountSParam( acc1_, 'OB22', '03' ) ;
+               Accreg.setAccountSParam( acc1_, 'R013', '3'  ) ;
+               Accreg.setAccountSParam( acc1_, 'S240', '1'  ) ;
                UPDATE rko_lst SET acc1=acc1_ WHERE acc=acc_;
+               UPDATE accounts set  TOBO =  br_  WHERE acc=acc1_;
 
-               UPDATE accounts SET (TOBO)=
-                               (select TOBO from Accounts WHERE acc=acc_)
-                               WHERE acc=acc1_;
-
-               ---INSERT into BANK_ACC (ACC,MFO)
-               ---       select acc1_, MFO from BANK_ACC where ACC=acc_;
-
-               BEGIN
-                 INSERT INTO Specparam (ACC,R013,S240)  VALUES (acc1_,'3','1');
-               EXCEPTION WHEN OTHERS THEN
-                 UPDATE Specparam SET R013='3', S240='1'  WHERE  ACC=acc1_;
-               END;
-
-               BEGIN
-                 INSERT INTO Specparam_INT (ACC,OB22)  VALUES (acc1_,'03');
-               EXCEPTION WHEN OTHERS THEN
-                 UPDATE Specparam_INT SET OB22='03'  WHERE  ACC=acc1_;
-               END;
 
             END IF;
             ----------  Еnd открытия 3570* ---------------
@@ -1162,7 +1155,7 @@ BEGIN
                ||TO_CHAR(dat0b_,'DD.MM.YYYY')||'. Документiв '
                ||trim(to_char(kol_))||', на суму '
                ||trim(to_char(sdok_/100,'9999999990D00'))||' грн.' ,
-              1,160 
+              1,160
              )
                    );
 
@@ -1178,18 +1171,18 @@ BEGIN
 
 
 
-            Select dat0a, dat0b  into  dat0a_t, dat0b_t 
+            Select dat0a, dat0b  into  dat0a_t, dat0b_t
             From   RKO_LST
             WHERE  acc=acc_;
 
-            UPDATE rko_lst SET  dat1a=dat0a_t, 
+            UPDATE rko_lst SET  dat1a=dat0a_t,
                                 dat1b=dat0b_t,
                                 s0=0, comm=NULL,
                                 KOLDOK=0,
                                 SUMDOK=0
                                                 WHERE acc=acc_;
 
-            UPDATE rko_lst SET  dat1a=dat0a_t, 
+            UPDATE rko_lst SET  dat1a=dat0a_t,
                                 dat1b=dat0b_t   WHERE ACC1=acc1_;
 
             UPDATE rko_lst SET  dat0a=dat0b+1   WHERE acc=acc_;
@@ -1276,7 +1269,7 @@ BEGIN
             ---  то их НЕ печатаем.
 
                  if (dat1a_ < gl.bDATE - 62 or dat1a_ is null) and
-                    (dat1b_ < gl.bDATE - 62 or dat1b_ is null) 
+                    (dat1b_ < gl.bDATE - 62 or dat1b_ is null)
                       or
                     kkk_ = 2                                   then
 
@@ -1289,7 +1282,7 @@ BEGIN
                               ||TO_CHAR(dat1b_,'DD-MM-YYYY')
                               ||'. Без НДС';
                  end if;
-          
+
 
                  If    nn2560=1  then
 
@@ -1322,8 +1315,8 @@ BEGIN
 
                  Else
 
-                    Select trim(NMK) into   scheta 
-                    from   Customer 
+                    Select trim(NMK) into   scheta
+                    from   Customer
                     where  RNK=(Select RNK from Accounts where NLS=nlsosn_
                            and KV=980);
 
@@ -1349,10 +1342,10 @@ BEGIN
 
 
             ---------------   Добавка  ND_RKO   -------------------
-               Begin 
+               Begin
 
-                  Select trim(VALUE) into nd_rko_ 
-                  From   AccountsW 
+                  Select trim(VALUE) into nd_rko_
+                  From   AccountsW
                   Where  ACC=acc_ and TAG='ND_RKO' and VALUE is not NULL;
 
                   nd_rko_:=' Дог.№ '||nd_rko_||'.';
@@ -1366,7 +1359,7 @@ BEGIN
 
 
                gl.ref (ref_);
-               
+
                INSERT INTO oper (ref,tt,vob,nd,dk,pdat,vdat,datd, datP,
                               nlsa,nam_a,mfoa,nlsb,nam_b,mfob,
                               kv,s,kv2,s2,id_a,id_b,userid,nazn)
@@ -1399,128 +1392,108 @@ BEGIN
 -- 3. Перенос долга на просрочку  (кнопка "3"):    3570 -> 3579
 ----------------------------------------------------------------------------
 
-      IF INSTR(mode_,'3') > 0 AND s1_ > 0 THEN -- переносим на просрочку
 
+      IF INSTR(mode_,'3') > 0  THEN -- переносим ВХОДЯЩИЙ на 01 остаток !!!
+
+
+
+
+         ---  s1_            (=-OSTC) - текущий ост.3570 c обратным знаком
+         ---  Находим s1_01  (= OSTC) - входящий на нач.месяца ост.3570:
          BEGIN
-            SAVEPOINT beforko6;
-
-            acc2_zakr:=1;
-            if acc2_ is not NULL then
-               Begin 
-                 Select 1 into acc2_zakr 
-                 from   Accounts 
-                 where  ACC=acc2_ and DAZS is NULL;
-               EXCEPTION when no_data_found then
-                 acc2_zakr:=0;   --- acc2_ или ЗАКРЫТ или такого acc2_ 
-               END;              --- вообще нет в ACCOUNTS
-            end if;
-
-            -------------------   Открытие 3579*  ---------------------
-            ---  Внимание !  Открытие идет по маске Счета Списания,
-            ---              а не по маске основного счета.
-            -----------------------------------------------------------
-            IF acc2_ IS NULL  or  acc2_zakr=0  THEN
-
-               BEGIN  ------  Подбор номера 3579*
-
-                nlsd_:= VKRZN(SUBSTR(gl.aMFO,1,5),'3579'||SUBSTR(nlsa_,5));
-
-                select a.NLS into tmp_3570
-                from   accounts a, Specparam_Int s
-                where  a.NLS = nlsd_ and a.KV=980 and a.ACC=s.ACC  and
-                       (a.RNK<>rnk_  OR  s.OB22<>'07'  OR  a.DAZS is not NULL);
-
-                   --   Cчет 3579<хвост 2600> уже есть:
-                   --        --  НА ДРУГОМ RNK   или
-                   --        --  с OB22<>'07'    или
-                   --        --  он ЗАКРЫТ !
-                   --   Подбираем другой счет по маске:  3579 k S NN RRRRRR
-                   --   где:  S  - 6-ая цифра из 2600*
-
-                i:= 1;
-                loop
-                   nlsd_:= vkrzn(substr(gl.aMFO,1,5),
-                           '3579'||'0'|| substr(nlsa_,6,1) ||
-                           lpad(to_char(i),2,'0') || lpad(to_char(rnk_),6,'0'));
-
-                   Begin    -- Есть ли такой счет ?
-
-                     Select a.NLS into tmp_3570
-                     from Accounts a, Specparam_Int s
-                     where a.NLS = nlsd_ and a.KV=980 and a.ACC=s.ACC and
-                           (a.RNK<>rnk_ OR s.OB22<>'07' OR a.DAZS is not NULL);
-
-                   Exception when no_data_found then
-                     EXIT;     -- такого счета еще нет, - открываем
-                   End;
-
-                   i := i + 1;
-                   if i = 100 then
-                      exit;
-                   end if;
-
-                end loop;
-
-               EXCEPTION when no_data_found then
-                null;
-               END;  ---------- END подбора номера 3579*  -----
-
-
-               OP_REG(99,0,0,grp_,tmp_,rnk_,nlsd_,kva_,
-               substr('Простр.РКО до 31д. '||nam_a_,1,70),'ODB',isp_,acc2_);
-
-               p_setAccessByAccmask(acc2_,accd_);
-
-               UPDATE rko_lst SET acc2=acc2_ WHERE acc=acc_;
-
-               UPDATE accounts SET (TOBO)=
-                               (select TOBO from Accounts WHERE acc=acc_)
-                               WHERE acc=acc2_;
-               ---INSERT into BANK_ACC (ACC,MFO)
-               ---           select acc2_, MFO from BANK_ACC where ACC=acc_;
-
-               BEGIN
-                 INSERT INTO Specparam (ACC,S240,S270)  VALUES (acc2_,'C','01');
-               EXCEPTION WHEN OTHERS THEN
-                 UPDATE Specparam SET S240='C', S270='01' WHERE  ACC=acc2_;
-               END;
-
-               BEGIN
-                 INSERT INTO Specparam_INT (ACC,OB22)  VALUES (acc2_,'07');
-               EXCEPTION WHEN OTHERS THEN
-                 UPDATE Specparam_INT SET OB22='07'  WHERE  ACC=acc2_;
-               END;
-
-            END IF; ---------------- END  открытия 3579*   -----------
-
-
-            gl.ref (ref_);
-
-            Insert into OPER (ref,tt,vob,nd,dk,pdat,vdat,datd, datP,
-                           nlsa,nam_a,mfoa,nlsb,nam_b,mfob,
-                           kv,s,kv2,s2,id_a,id_b,userid,nazn)
-            VALUES (ref_,tt_,6,case when length(ref_)>10 then substr(ref_, -10) else to_char(ref_) end,1,SYSDATE,gl.bDATE,gl.bDATE, gl.bDATE,
-                nlsd_,nam_a_,gl.aMFO,nlsc_,nam_a_,gl.aMFO,kva_,s1_,kvb_,s1_,
-                 okpo_,okpo_,gl.aUID,
-            'Прострочена сума комiсiї за розрахункове обслуговування рах. '||nlsosn_
-                   );
-
-
-            GL.PAYV(flg_,ref_,gl.bDATE,tt_,1,980,nlsd_,s1_,980,nlsc_,s1_);
-
-            insert into oper_visa (ref, dat, userid, status)
-            values (ref_, sysdate, user_id, 0);
-
-            IF s2_ > 0 THEN   -- раньше был долг
-               UPDATE rko_lst SET dat2b=dat1b,comm=NULL WHERE acc=acc_;
-            ELSE
-               UPDATE rko_lst SET dat2a=dat1a,dat2b=dat1b,comm=NULL WHERE acc=acc_;
-            END IF;
-
-         EXCEPTION
-            WHEN NO_MONEY THEN ROLLBACK TO beforko6; er(acc_); GOTO  nextrec3;
-            WHEN OTHERS   THEN ROLLBACK TO beforko6; er(acc_); GOTO  nextrec3;
+           Select nvl(ostf-dos+kos,0)
+           Into   s1_01 
+           From   SaldoA 
+           Where  ACC=acc1_ 
+             and  (ACC,FDAT)=
+                      (Select ACC, max(FDAT) from Saldoa 
+                       where ACC=acc1_ and 
+                         FDAT < ADD_MONTHS(TRUNC(gl.bdate,'MM'),0 )
+                       group by ACC)
+             and nvl(ostf-dos+kos,0)<0;
+         EXCEPTION WHEN OTHERS THEN
+           s1_01 := 0;
          END;
+
+         ---  Находим сумму KOS по 3570 с начала месяца по тек.момент:
+         Select nvl(sum(KOS),0)
+         Into   kos_3570
+         From   SaldoA 
+         Where  ACC=acc1_ 
+           and  FDAT>=ADD_MONTHS(TRUNC(gl.bdate,'MM'),0)  and
+                FDAT<=gl.bdate ;
+            
+         ---  Переносимая 3570 -> 3579 сумма:
+         s1_ := ABS( least( 0, s1_01 + kos_3570 ));
+
+
+
+
+         IF  s1_ > 0 THEN
+
+            BEGIN
+               SAVEPOINT beforko6;
+   
+               acc2_zakr:=1;
+               if acc2_ is not NULL then
+                  Begin
+                    Select 1 into acc2_zakr
+                    from   Accounts
+                    where  ACC=acc2_ and DAZS is NULL;
+                  EXCEPTION when no_data_found then
+                    acc2_zakr:=0;   --- acc2_ или ЗАКРЫТ или такого acc2_
+                  END;              --- вообще нет в ACCOUNTS
+               end if;
+   
+               -------------------   Открытие 3579*  ---------------------
+               ---  Внимание !  Открытие идет по маске Счета Списания,
+               ---              а не по маске основного счета.
+               -----------------------------------------------------------
+               IF acc2_ IS NULL  or  acc2_zakr=0  THEN
+   
+                  ------  Подбор номера 3579*
+                  nlsd_:= RKO.Get_NLS_random  ( CASE WHEN newnbs.g_state = 1 then '3570' else '3579' end  ) ;  --получение № лиц.сч по случ.числам
+  
+                  OP_REG(99,0,0,grp_,tmp_,rnk_,nlsd_,kva_,    substr('Простр.РКО до 31д. '||nam_a_,1,70),'ODB',isp_,acc2_);
+                  p_setAccessByAccmask(acc2_,accd_);
+                  Update RKO_LST  set ACC2 = acc2_  WHERE acc = acc_;
+                  Update ACCOUNTS set TOBO = br_    WHERE acc = acc2_;
+                  --3579.07	=> 3570.37 прострочені нараховані доходи за обслуговування суб`єктів господарювання
+                  Accreg.setAccountSParam( acc2_, 'OB22', CASE WHEN newnbs.g_state = 1 then '37' else '03' end  ) ; -- надо у
+                  Accreg.setAccountSParam( acc2_, 'S270', '01' ) ;
+                  Accreg.setAccountSParam( acc2_, 'S240', 'C'  ) ;
+
+               END IF; ---------------- END  открытия 3579*   -----------
+   
+   
+   
+               gl.ref (ref_);
+   
+               Insert into OPER (ref,tt,vob,nd,dk,pdat,vdat,datd, datP,   nlsa,nam_a,mfoa,nlsb,nam_b,mfob,  kv,s,kv2,s2,id_a,id_b,userid,nazn)
+               VALUES (ref_,tt_,6,case when length(ref_)>10 then substr(ref_, -10) else to_char(ref_) end,1,SYSDATE,gl.bDATE,gl.bDATE, gl.bDATE,
+                   nlsd_,nam_a_,gl.aMFO,nlsc_,nam_a_,gl.aMFO,kva_,s1_,kvb_,s1_,
+                    okpo_,okpo_,gl.aUID,
+               'Прострочена сума комiсiї за розрахункове обслуговування рах. '||nlsosn_
+                      );
+   
+   
+               GL.PAYV(flg_,ref_,gl.bDATE,tt_,1,980,nlsd_,s1_,980,nlsc_,s1_);
+   
+               insert into oper_visa (ref, dat, userid, status)
+               values (ref_, sysdate, user_id, 0);
+   
+               IF s2_ > 0 THEN   -- раньше был долг
+                  UPDATE rko_lst SET dat2b=dat1b,comm=NULL WHERE acc=acc_;
+               ELSE
+                  UPDATE rko_lst SET dat2a=dat1a,dat2b=dat1b,comm=NULL WHERE acc=acc_;
+               END IF;
+   
+            EXCEPTION
+               WHEN NO_MONEY THEN ROLLBACK TO beforko6; er(acc_); GOTO  nextrec3;
+               WHEN OTHERS   THEN ROLLBACK TO beforko6; er(acc_); GOTO  nextrec3;
+            END;
+
+         END IF;
       END IF;
 
 <<nextrec3>>
@@ -1550,6 +1523,3 @@ BEGIN
 END;
 END;
 /
-GRANT EXECUTE ON BARS.RKO TO BARS_ACCESS_DEFROLE;
-
-SHOW ERRORS;

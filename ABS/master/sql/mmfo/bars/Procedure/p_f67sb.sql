@@ -15,8 +15,9 @@ IS
 % FILE NAME   : otcn.sql
 % DESCRIPTION : ќтчетность —берЅанка: формирование файлов
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 2001.  All Rights Reserved.
-% VERSION     : 16/02/2016 (13/01/2016, 26/01/2012)
+% VERSION     : 13/11/2017 (16/02/2016, 13/01/2016)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 13/11/2017 - удалил ненужные строки и изменил некоторые блоки формировани€ 
 % 16/02/2016 - дл€ декабр€ мес€ца будут включатьс€ годовые корректирующие
 %              обороты
 % 12/01/2016 - вычитаем корректирующие обороты по перекрытию 6,7 классов 
@@ -85,11 +86,6 @@ CURSOR SALDO IS
    WHERE s.acc=a.acc
      and a.acc=sp.acc(+);
 -----------------------------------------------------------------------
-CURSOR BaseL IS
-    SELECT kodp, nbuc, SUM (znap)
-    FROM rnbu_trace
-    GROUP BY kodp, nbuc;
-
 BEGIN
 -------------------------------------------------------------------
 userid_ := user_id;
@@ -127,7 +123,8 @@ OPEN SALDO;
       comm_ := '';
       comm_ := substr(comm_ || tobo_ || '  ' || nms_, 1, 200);
 
-      IF typ_ > 0 THEN
+      IF typ_ > 0 
+      THEN
          nbuc_ := NVL(F_Codobl_Tobo(acc_,typ_),nbuc1_);
       ELSE
          nbuc_ := nbuc1_;
@@ -153,23 +150,27 @@ OPEN SALDO;
          END IF;
       END IF;
 
-      if nbs_ in ('5040','5041') then
+      if nbs_ in ('5040','5041') 
+      then
          Ostn_ := Ostn_-Dos96_+Kos96_;
       end if;
 
-      if nbs_ not in ('5040','5041') then
+      if nbs_ not in ('5040','5041') 
+      then
          Ostn_ := Ostn_ - Dos96_ + Kos96_ - Dos99_ + Kos99_;
       end if;
 
       Ostq_ := Ostq_ - Dosq96_ + Kosq96_ - Dosq99_ + Kosq99_;
 
-      IF kv_ <> 980 THEN
+      IF kv_ <> 980 
+      THEN
          se_ := Ostq_;
       ELSE
          se_ := Ostn_;
       END IF;
 
-      IF se_ <> 0 THEN
+      IF se_ <> 0 
+      THEN
          dk_ := IIF_N(se_,0,'1','2','2');
          kodp_ := dk_ || nbs_ || zz_ ;
          znap_ := TO_CHAR(ABS(se_)) ;
@@ -183,16 +184,11 @@ CLOSE SALDO;
 ---------------------------------------------------
 DELETE FROM tmp_irep WHERE kodf = '67' AND datf = Dat_;
 ---------------------------------------------------
-OPEN BaseL;
-LOOP
-   FETCH BaseL INTO  kodp_, nbuc_, znap_;
-   EXIT WHEN BaseL%NOTFOUND;
-   INSERT INTO tmp_irep
-        (kodf, datf, kodp, znap, nbuc)
-   VALUES
-        ('67', Dat_, kodp_, znap_, nbuc_);
-END LOOP;
-CLOSE BaseL;
+INSERT INTO tmp_irep (kodf, datf, kodp, znap, nbuc)
+select '67', Dat_, kodp, SUM (znap), nbuc
+FROM rnbu_trace
+GROUP BY kodp, nbuc;
+
 commit;
 ------------------------------------------------------------------
 END p_f67sb;

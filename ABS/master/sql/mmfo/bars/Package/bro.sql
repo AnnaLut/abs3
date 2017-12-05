@@ -3,6 +3,10 @@ CREATE OR REPLACE PACKAGE BARS.BRO IS
  G_HEADER_VERSION  CONSTANT VARCHAR2(64)  :=  'ver.3/ 19.07.2017';
  ern CONSTANT POSITIVE := 203;  erm VARCHAR2(250);  err EXCEPTION;
 /*
+
+                   Версия для ММФО под новый План счетов
+                   --------------------------------------
+
  19.07.2017 Поиск счета 2600 по РНК
  15.10.2015 Сухова Вводим гл.параметр = BRO_OB = Режим функционирования модуля БРО в Ощ.Банке
  20.08.2015 Сухова Добавлена проц начисления бонуса INT_BRO
@@ -120,11 +124,19 @@ function body_version return varchar2;
 
 END BRO;
 /
-------------------
+
+
+
+
 CREATE OR REPLACE PACKAGE BODY BARS.BRO IS
- G_BODY_VERSION  CONSTANT VARCHAR2(64)  :=   'ver.3.5 19.07.2017';
+ G_BODY_VERSION  CONSTANT VARCHAR2(64)  :=   'ver.4 15.11.2017';
 
 /*
+                       Версия для ММФО под новый План счетов
+                       --------------------------------------
+
+ 15.11.2017 Sta TransFer-2017  : 6399.L1 => 6350.L1,  6399.L2 => 6350.L2 
+
  19.07.2017 Suf COBUSUPMMFO-686 + COBUMMFOTEST-1274
  19.07.2017 Поиск счета 2600 по РНК
  23.10.2017 Sta Не введен счет при заведении дог. Ексепшен
@@ -165,17 +177,22 @@ PROCEDURE INT_BRO1 ( p_mode int,  -- = +1 - доначислить, =  0 - вернуть
  l_KNL number := 0   ;  l_KDO number := 0  ; l_dni_per int       ;  l_dni_all int  ;
  aa   accounts%rowtype; oo    oper%rowtype  ; aa2 accounts%rowtype;  aa7 accounts%rowtype;  ii int_accn%rowtype;
                                               cc2 customer%rowtype;  cc7 customer%rowtype;
- nbs_6  accounts.nbs%type  := '6399';   --- Счет 6* для возврата %%
- ob22_6 accounts.ob22%type := 'L1'  ;   --- при расторжении сделки
+ SB6 sb_ob22%rowtype ;  --- Счет 6* для возврата %% при расторжении сделки
+
  txt_6  varchar2(254 Byte);
  nls67  varchar2(15);
  nms67  accounts.nms%type;
+
 begin
  If p_mode not in (0,1) then RETURN ; end if;
 
+ begin select * into SB6 from sb_ob22 where r020||ob22 in ('6399L1','6350L1') and d_close is null and rownum = 1;  -- Transfer-2017
+ EXCEPTION WHEN NO_DATA_FOUND THEN    raise_application_error(-20100,'BRO-30.Не знайдені рах. 63**');
+ end ;
 --------------------------------------------------
- OP_BS_OB  (P_BBBOO => nbs_6||'L1') ; -- заведомое открытие 6399/L1
- OP_BS_OB  (P_BBBOO => nbs_6||'L2') ; -- заведомое открытие 6399/L2
+ OP_BS_OB  (P_BBBOO => SB6.R020||       SB6.OB22) ; -- заведомое открытие 6399/L1
+ OP_BS_OB  (P_BBBOO => SB6.R020||Substr(SB6.OB22,1,1) ||'2')  ; -- заведомое открытие 6399/L2
+
  begin select to_number(txt) into l_KNL from nd_txt where nd = dd.nd and tag ='KNL';  EXCEPTION WHEN NO_DATA_FOUND THEN null;  end;
  begin select to_number(txt) into l_KDO from nd_txt where nd = dd.nd and tag ='KDO';  EXCEPTION WHEN NO_DATA_FOUND THEN null;  end;
 
@@ -192,8 +209,7 @@ begin
     select a.* into aa2 from accounts a           where  rnk  = dd.rnk and tip   = 'BRO' ;  --- 2608/BRO
     select c.* into cc7 from customer c  where c.rnk = aa7.rnk ;
     select c.* into cc2 from customer c  where c.rnk = aa2.rnk ;
- EXCEPTION WHEN NO_DATA_FOUND THEN
-    raise_application_error(-20100,'BRO-30.Не знайдені рах. для нарахування бонусу');
+ EXCEPTION WHEN NO_DATA_FOUND THEN    raise_application_error(-20100,'BRO-30.Не знайдені рах. для нарахування бонусу');
  end;
 
 
@@ -202,10 +218,21 @@ begin
     If p_dat >  dd.wdate then
        oo.nazn  := to_char(dd.wdate,'dd.mm.yyyy');
        oo.s     := greatest (l_KNL - l_KDO , 0);
-    else oo.nazn:= to_char(p_dat   ,'dd.mm.yyyy');
-       l_dni_per:= (p_dat   - dd.sdate) ;
-       l_dni_all:= (dd.wdate-dd.sdate ) ;
-       oo.s     := round ( l_KNL * l_dni_per/l_dni_all, 0) - l_KDO ;
+    else
+       oo.nazn:= to_char(p_dat   ,'dd.mm.yyyy');
+    --   l_dni_per:= (p_dat   - dd.sdate) ;
+    --   l_dni_all:= (dd.wdate-dd.sdate ) ;
+    --   oo.s     := round ( l_KNL * l_dni_per/l_dni_all, 0) - l_KDO ;
+    --   Cуфтин:  "честный" расчет промежуточных %%
+
+       oo.s :=  calp ( s_     => dd.limit*100,                                 -- сумма капитала
+                       int_   => (dd.ir - acrn.fprocn (aa.acc, 1, dd.Sdate )), -- Ном.проц.ставка
+                       dat1_  => dd.sdate+1    , -- дата "С"  исключительно
+                       dat2_  => p_dat         , -- дата "ПО" включительно
+                       basey_ => ii.basey        -- код базы начисления
+                     )  - l_KDO ;
+
+
     end if;
 
 
@@ -214,8 +241,8 @@ begin
     ---  На экране же задачи Бонусная ставка показывается при том, что Текущая берется равной на gl.BDATE !!!
 
     oo.nazn     := Substr(
-       '%% по рах.' ||aa.nls   ||' по ' || oo.nazn ||' вкл. '||'Ставка ' || ( dd.ir - acrn.fprocn (aa.acc, 1, dd.wdate ) ) ||
-       '%. Угода № '||dd.cc_id ||' від '||to_char(dd.sdate,'dd.MM.yyyy') || ' р.', 1,160) ;                   ----------
+       '%% по рах.' ||aa.nls   ||' по ' || oo.nazn ||' вкл. '||'Ставка ' || ( dd.ir - acrn.fprocn (aa.acc, 1, dd.Sdate ) ) ||
+       '%. Угода № '||dd.cc_id ||' від '||to_char(dd.sdate,'dd.MM.yyyy') || ' р.', 1,160) ;
 
 
     nls67 := aa7.nls;          ---  7020  (ACRB из проц.карт.2600)
@@ -226,22 +253,13 @@ begin
     oo.s     := l_KDO ;
     oo.nazn  := substr( 'Повернення нарахованих відсотків згідно угоди № '||dd.CC_ID||' від '||to_char(dd.sdate,'dd.MM.yyyy')||' в зв`зку з достроковим витребуванням фіксованої суми',1,160);
 
-    if aa.KV = 980 then
-       ob22_6 := 'L1';
-
-    else
-       ob22_6 := 'L2';
+    if aa.KV = gl.baseval then SB6.ob22 := Substr( SB6.ob22 ,1,1) ||'1';
+    else                       SB6.ob22 := Substr( SB6.ob22 ,1,1) ||'2';
     end if;
 
-    Begin
-      Select NLS,NMS into nls67,nms67  --  6399 для возврата нач.%%
-      from   Accounts                  --  при расторжении сделки
-      where  BRANCH = substr(aa.BRANCH,1,15)          and
-             NBS=nbs_6  and  OB22=ob22_6  and  KV=980 and
-             DAZS is NULL and rownum=1;
-    EXCEPTION WHEN NO_DATA_FOUND THEN
-      nls67 := aa7.nls;                --  7020  (ACRB из проц.карт.2600)
-      nms67 := aa7.nms;
+    Begin --  6399 для возврата нач.%%  при расторжении сделки
+      Select NLS,NMS into nls67,nms67 from Accounts where BRANCH = substr(aa.BRANCH,1,15) and  NBS = SB6.R020 and OB22 = SB6.Ob22 and KV = gl.baseval and  DAZS is NULL and rownum=1;
+    EXCEPTION WHEN NO_DATA_FOUND THEN    nls67 := aa7.nls;    nms67 := aa7.nms;            --  7020  (ACRB из проц.карт.2600)
     end;
 
 
@@ -549,14 +567,14 @@ begin
 
      --  Cумму брони в Accounts.LIM проставляем при Активации !
 
-     l_ost := (aa.ostc + aa.lim) ;   -- Сверяем лимит с по факт.остатком на счете
+     l_ost := (aa.ostc + aa.lim) ;   -- Сверяем лимит с факт.остатком на счете
      If l_ost >= l_lim  then
         update accounts set lim = lim - l_lim  where acc = aa.acc;
      else raise_application_error(-20100,'Реф.дог бронювання ='||p_ND||': Вільний залишок на рахунку = '||(l_ost/100)||' МЕНШЕ суми броні='|| (l_lim/100)  );
      end  if;
 
 
-     l_ir := nvl(acrn.fprocn(aa.acc, 1, dd.sdate),0);
+     l_ir := nvl(acrn.fprocn(aa.acc, 1, dd.Sdate),0);
      If p_ir > l_IR  then                      -- Установка ставки + Окончательный ввод в действие
 
         --Расчитать прогноз-проценты и запомнить их
@@ -646,7 +664,7 @@ begin
                 'Виплата %% по рах.'|| aa.nls||
                 ' з '  || to_char( dd.sdate, 'dd.mm.yyyy') ||
                 ' по ' || to_char( dd.wdate, 'dd.mm.yyyy') ||
-                ' Ставка '|| ( dd.ir - acrn.fprocn (aa.acc, 1, dd.wdate ) ) || '%.'||
+                ' Ставка '|| ( dd.ir - acrn.fprocn (aa.acc, 1, dd.Sdate ) ) || '%.'||
                 ' Угода № '|| dd.cc_id   || ' від ' || to_char( dd.sdate, 'dd.MM.yyyy' ) ||'р.' , 1,160);
   else
      oo.nazn := substr(
@@ -740,3 +758,4 @@ begin
 
 END BRO;
 /
+

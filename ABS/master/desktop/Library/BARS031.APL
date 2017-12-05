@@ -3,10 +3,9 @@
 .head 1 +  Design-time Settings
 .data VIEWINFO
 0000: 6F00000001000000 FFFF01000D004347 5458566965775374 6174650400010000
-0020: 0000000000E90000 002C000000020000 0003000000000000 00BB010000FCFFFF
-0040: FFE9FFFFFFFFFFFF FF000000007C0200 004D010000010000 0000000000010000
-0060: 000F4170706C6963 6174696F6E497465 6D02000000075769 6E646F7773056672
-0080: 6D4B50
+0020: 0000000000E90000 002C000000020000 0003000000000000 00BB010000F8FFFF
+0040: FFE1FFFFFFFFFFFF FF000000007C0200 004D010000010000 0001000000010000
+0060: 000F4170706C6963 6174696F6E497465 6D00000000
 .enddata
 .data DT_MAKERUNDLG
 0000: 0200000000001D51 3A5C424152533938 5C4C494252415259 5C42415253303135
@@ -14,10 +13,11 @@
 0040: 706300000101011D 513A5C4241525339 385C4C4942524152 595C424152533031
 0060: 352E72756E1D513A 5C4241525339385C 4C4942524152595C 424152533031352E
 0080: 646C6C1D513A5C42 41525339385C4C49 42524152595C4241 52533031352E6170
-00A0: 6300000101011744 3A5C504342555C42 494E5C4241525330 33312E6170640C44
-00C0: 3A5C504342555C42 494E5C0C443A5C50 4342555C42494E5C 0000010101001D51
-00E0: 3A5C424152533938 5C4C494252415259 5C42415253303135 2E646C6C1D513A5C
-0100: 4241525339385C4C 4942524152595C42 4152533031352E61 70630000010101
+00A0: 6300000101011944 3A5C424152533938 5C42494E5C424152 533033312E617064
+00C0: 0E443A5C42415253 39385C42494E5C0E 443A5C4241525339 385C42494E5C0000
+00E0: 010101001D513A5C 4241525339385C4C 4942524152595C42 4152533031352E64
+0100: 6C6C1D513A5C4241 525339385C4C4942 524152595C424152 533031352E617063
+0120: 0000010101
 .enddata
 .head 2 -  Outline Window State: Normal
 .head 2 +  Outline Window Location and Size
@@ -218,10 +218,10 @@
 .head 4 -  ! История изменений: -----------------------------------------------------|
 .head 2 +  Resources
 .head 2 +  Variables
-.data RESOURCE 0 0 1 3462904155
-0000: 8600000039000000 0000000000000000 02000005000000B1 000000E0010D0000
-0020: 00FF3FBE00800000 0204000000FFFFE0 C200000002FE00FF 83C600000002FB00
-0040: FF0FCA000000EE02 00FF3F
+.data RESOURCE 0 0 1 2245890891
+0000: 8600000039000000 0000000000000000 02000005000000DB 000000E0010D0000
+0020: 00FF3FE800800000 0204000000FFFFE0 EC00000002FE00FF 83F000000002FB00
+0040: FF0FF4000000EE02 00FF3F
 .enddata
 .head 3 -  Window Handle: hWinI
 .head 3 -  String: sRet1
@@ -395,8 +395,8 @@
 .head 6 -  Call SalDestroyWindow ( hWndForm )
 .head 2 +  Named Menus
 .head 2 +  Class Definitions
-.data RESOURCE 0 0 1 3922564840
-0000: 9E02000049010000 0000000000000000 0200000400FFFF01 00160000436C6173
+.data RESOURCE 0 0 1 37876618
+0000: 2C03000080010000 0000000000000000 0200000500FFFF01 00160000436C6173
 0020: 73566172004F7574 6C696E6552006567 496E666F61003C00 000B5F005F457272
 0040: 6F72426100736556 0100000D003C0000 010DFA0000FF6F0D 00EE0100FF3F1A00
 0060: B800000100FFFFE0 2700000001FE00FF 03340000000204F8 000000FF0F380000
@@ -405,8 +405,10 @@
 00C0: 5400000001FB00FF 0F01800D00110001 0000065F005F466C 61671E0000EC0001
 00E0: 00D9010D00FF7F01 08801A0000020000 00000B6351756963 6B805461626C6538
 0100: 00EC000200D9010D 00FF7F0D73000100 FFFF010180220000 0003000000000A63
-0120: 47656E0046696C74 65727400D8000004 003302040001FA00 00078001000000FF
-0140: C60400010DFE00FF 831100000002FB00 FF0F15000000EE01 00FF3F
+0120: 47656E0046696C74 65727400D0000004 00003302040001FA 0000078001000000
+0140: FFC60400010DFE00 FF831100000002FB 00FF0F15000000EE 0100FF3F01806622
+0160: 0004001A0B474446 697F00F604008E02 000100FE00C98001 0000BF04B100010D
+0180: 00FFFFE6110002FE 00FF9B150001FB00 FF0F
 .enddata
 .head 3 +  Functional Class: cDocPerekryt
 .head 4 -  Description:
@@ -10700,126 +10702,6 @@ SalNumberToStrX( Vkv.dfSumA,2) ||' '|| Vkv.dfKvA ||
 .head 5 -  Background Color: Class Default
 .head 5 -  Input Mask: Class Default
 .head 4 -  Message Actions
-.head 3 +  Data Field: dfNssA
-.head 4 -  Class Child Ref Key: 159
-.head 4 -  Class ChildKey: 0
-.head 4 -  Class: cDocW
-.head 4 -  Property Template:
-.head 4 -  Class DLL Name:
-.head 4 -  Data
-.head 5 -  Maximum Data Length: Class Default
-.head 5 -  Data Type: Class Default
-.head 5 -  Editable? Class Default
-.head 4 -  Display Settings
-.head 5 -  Window Location and Size
-.head 6 -  Left:   Class Default
-.head 6 -  Top:    Class Default
-.head 6 -  Width:  Class Default
-.head 6 -  Width Editable? Class Default
-.head 6 -  Height: Class Default
-.head 6 -  Height Editable? Class Default
-.head 5 -  Visible? Class Default
-.head 5 -  Border? Class Default
-.head 5 -  Justify: Class Default
-.head 5 -  Format: Class Default
-.head 5 -  Country: Class Default
-.head 5 -  Font Name: Class Default
-.head 5 -  Font Size: Class Default
-.head 5 -  Font Enhancement: Class Default
-.head 5 -  Text Color: Class Default
-.head 5 -  Background Color: Class Default
-.head 5 -  Input Mask: Class Default
-.head 4 -  Message Actions
-.head 3 +  Data Field: dfSlashD
-.head 4 -  Class Child Ref Key: 162
-.head 4 -  Class ChildKey: 0
-.head 4 -  Class: cDocW
-.head 4 -  Property Template:
-.head 4 -  Class DLL Name:
-.head 4 -  Data
-.head 5 -  Maximum Data Length: Class Default
-.head 5 -  Data Type: Class Default
-.head 5 -  Editable? Class Default
-.head 4 -  Display Settings
-.head 5 -  Window Location and Size
-.head 6 -  Left:   Class Default
-.head 6 -  Top:    Class Default
-.head 6 -  Width:  Class Default
-.head 6 -  Width Editable? Class Default
-.head 6 -  Height: Class Default
-.head 6 -  Height Editable? Class Default
-.head 5 -  Visible? Class Default
-.head 5 -  Border? Class Default
-.head 5 -  Justify: Class Default
-.head 5 -  Format: Class Default
-.head 5 -  Country: Class Default
-.head 5 -  Font Name: Class Default
-.head 5 -  Font Size: Class Default
-.head 5 -  Font Enhancement: Class Default
-.head 5 -  Text Color: Class Default
-.head 5 -  Background Color: Class Default
-.head 5 -  Input Mask: Class Default
-.head 4 -  Message Actions
-.head 3 +  Data Field: dfNssB
-.head 4 -  Class Child Ref Key: 163
-.head 4 -  Class ChildKey: 0
-.head 4 -  Class: cDocW
-.head 4 -  Property Template:
-.head 4 -  Class DLL Name:
-.head 4 -  Data
-.head 5 -  Maximum Data Length: Class Default
-.head 5 -  Data Type: Class Default
-.head 5 -  Editable? Class Default
-.head 4 -  Display Settings
-.head 5 -  Window Location and Size
-.head 6 -  Left:   Class Default
-.head 6 -  Top:    Class Default
-.head 6 -  Width:  Class Default
-.head 6 -  Width Editable? Class Default
-.head 6 -  Height: Class Default
-.head 6 -  Height Editable? Class Default
-.head 5 -  Visible? Class Default
-.head 5 -  Border? Class Default
-.head 5 -  Justify: Class Default
-.head 5 -  Format: Class Default
-.head 5 -  Country: Class Default
-.head 5 -  Font Name: Class Default
-.head 5 -  Font Size: Class Default
-.head 5 -  Font Enhancement: Class Default
-.head 5 -  Text Color: Class Default
-.head 5 -  Background Color: Class Default
-.head 5 -  Input Mask: Class Default
-.head 4 -  Message Actions
-.head 3 +  Data Field: dfSlashK
-.head 4 -  Class Child Ref Key: 164
-.head 4 -  Class ChildKey: 0
-.head 4 -  Class: cDocW
-.head 4 -  Property Template:
-.head 4 -  Class DLL Name:
-.head 4 -  Data
-.head 5 -  Maximum Data Length: Class Default
-.head 5 -  Data Type: Class Default
-.head 5 -  Editable? Class Default
-.head 4 -  Display Settings
-.head 5 -  Window Location and Size
-.head 6 -  Left:   Class Default
-.head 6 -  Top:    Class Default
-.head 6 -  Width:  Class Default
-.head 6 -  Width Editable? Class Default
-.head 6 -  Height: Class Default
-.head 6 -  Height Editable? Class Default
-.head 5 -  Visible? Class Default
-.head 5 -  Border? Class Default
-.head 5 -  Justify: Class Default
-.head 5 -  Format: Class Default
-.head 5 -  Country: Class Default
-.head 5 -  Font Name: Class Default
-.head 5 -  Font Size: Class Default
-.head 5 -  Font Enhancement: Class Default
-.head 5 -  Text Color: Class Default
-.head 5 -  Background Color: Class Default
-.head 5 -  Input Mask: Class Default
-.head 4 -  Message Actions
 .head 3 +  Data Field: dfValD1N
 .head 4 -  Class Child Ref Key: 160
 .head 4 -  Class ChildKey: 0
@@ -10936,6 +10818,66 @@ SalNumberToStrX( Vkv.dfSumA,2) ||' '|| Vkv.dfKvA ||
 .head 4 -  Tile To Parent? Class Default
 .head 4 -  Border Color: Class Default
 .head 4 -  Background Color: Class Default
+.head 4 -  Message Actions
+.head 3 +  Data Field: dfSub
+.head 4 -  Class Child Ref Key: 167
+.head 4 -  Class ChildKey: 0
+.head 4 -  Class: cDocW
+.head 4 -  Property Template:
+.head 4 -  Class DLL Name:
+.head 4 -  Data
+.head 5 -  Maximum Data Length: Class Default
+.head 5 -  Data Type: Class Default
+.head 5 -  Editable? Class Default
+.head 4 -  Display Settings
+.head 5 -  Window Location and Size
+.head 6 -  Left:   Class Default
+.head 6 -  Top:    Class Default
+.head 6 -  Width:  Class Default
+.head 6 -  Width Editable? Class Default
+.head 6 -  Height: Class Default
+.head 6 -  Height Editable? Class Default
+.head 5 -  Visible? Class Default
+.head 5 -  Border? Class Default
+.head 5 -  Justify: Class Default
+.head 5 -  Format: Class Default
+.head 5 -  Country: Class Default
+.head 5 -  Font Name: Class Default
+.head 5 -  Font Size: Class Default
+.head 5 -  Font Enhancement: Class Default
+.head 5 -  Text Color: Class Default
+.head 5 -  Background Color: Class Default
+.head 5 -  Input Mask: Class Default
+.head 4 -  Message Actions
+.head 3 +  Data Field: dfSubN
+.head 4 -  Class Child Ref Key: 166
+.head 4 -  Class ChildKey: 0
+.head 4 -  Class: cDocW
+.head 4 -  Property Template:
+.head 4 -  Class DLL Name:
+.head 4 -  Data
+.head 5 -  Maximum Data Length: Class Default
+.head 5 -  Data Type: Class Default
+.head 5 -  Editable? Class Default
+.head 4 -  Display Settings
+.head 5 -  Window Location and Size
+.head 6 -  Left:   Class Default
+.head 6 -  Top:    Class Default
+.head 6 -  Width:  Class Default
+.head 6 -  Width Editable? Class Default
+.head 6 -  Height: Class Default
+.head 6 -  Height Editable? Class Default
+.head 5 -  Visible? Class Default
+.head 5 -  Border? Class Default
+.head 5 -  Justify: Class Default
+.head 5 -  Format: Class Default
+.head 5 -  Country: Class Default
+.head 5 -  Font Name: Class Default
+.head 5 -  Font Size: Class Default
+.head 5 -  Font Enhancement: Class Default
+.head 5 -  Text Color: Class Default
+.head 5 -  Background Color: Class Default
+.head 5 -  Input Mask: Class Default
 .head 4 -  Message Actions
 .head 2 +  Functions
 .head 3 +  Function: oDoc
@@ -14606,7 +14548,7 @@ and SqlFetchNext(hSql(), nFetchRes)
 .head 7 +  If NLS6F != STRING_Null 
 .head 8 +  If SqlPrepareAndExecute( hSql(),
 "SELECT acc,nms INTO :ACC6F,:NMS6F from accounts 
- where kv=:n980 and nls=:NLS6F and dazs is null and nbs='6110' ") 
+ where kv=:n980 and nls=:NLS6F and dazs is null and nbs='6510' ") 
  and not SqlFetchNext(hSql(), nFetchRes)
 .head 9 -  Set NMS6F = "! Ош.Счет"
 .head 9 -  Set ACC6F = NUMBER_Null
@@ -16340,7 +16282,7 @@ and SqlFetchNext(hSql(), nFetchRes)
 .head 4 +  Actions
 .head 5 -  Set sTmp=STRING_Null
 .head 5 -  Set sW = " ACCOUNTS.kv="||Str(n980)|| " and  ACCOUNTS.dazs is null and ACCOUNTS.nbs=" || 
-IifS( N=2 ,"'3570'" , "'6110'" )
+IifS( N=2 ,"'3570'" , "'6510'" )
 .head 5 -  Call FunNSIGetFiltered ("ACCOUNTS", "NLS", sW, sTmp, sName )
 .head 5 +  If sTmp !=STRING_Null
 .head 6 +  If N = 1
@@ -16637,14 +16579,14 @@ mfob=:MFOB, nlsb=:NLSB, polu=:NMSB,okpo=:OKPOB
 WHERE ids=:nIds and nlsb like '2600%' ")
 .head 6 -  ! 6110
 .head 6 +  If ACC6U != NUMBER_Null
-.head 7 +  If SqlPrepareAndExecute( hSql(), "SELECT * FROM perekr_b WHERE ids=:nIds and nlsb like '6110%' ") and not SqlFetchNext(hSql(), nFetchRes)
+.head 7 +  If SqlPrepareAndExecute( hSql(), "SELECT * FROM perekr_b WHERE ids=:nIds and nlsb like '6510%' ") and not SqlFetchNext(hSql(), nFetchRes)
 .head 8 -  Call SqlPrepareAndExecute( hSql(),"INSERT INTO perekr_b
 (ids, tt, mfob, nlsb, polu,nazn, kv, okpo, koef, vob, id)
 VALUES (:nIds, 'PS1', :sMfo, :NLS6U, :NMS6U,:NAZN, :n980, :sOkpo, :koef, 6, 0)")
 .head 7 +  Else
 .head 8 -  Call SqlPrepareAndExecute( hSql(),"UPDATE perekr_b SET
 nlsb=:NLS6U, polu=:NMS6U
-WHERE ids=:nIds and nlsb like '6110%'")
+WHERE ids=:nIds and nlsb like '6510%'")
 .head 5 -  Call SalSendClassMessage(UM_Update, 0, 0)
 .head 3 +  Function: F_FillFromPerek
 .head 4 -  Description:
@@ -16661,7 +16603,7 @@ WHERE ids=:nIds and nlsb like '6110%'")
 .head 5 +  If NLS6U != STRING_Null and SqlPrepareAndExecute( hSql(),
 "SELECT nlsb,polu
   INTO :NLS6U,:NMS6U
-  FROM perekr_b WHERE ids=:nIds AND nlsb like '6110%'") and SqlFetchNext(hSql(), nFetchRes) 
+  FROM perekr_b WHERE ids=:nIds AND nlsb like '6510%'") and SqlFetchNext(hSql(), nFetchRes) 
 .head 6 -  Call SqlPrepareAndExecute( hSql(), "SELECT acc into :ACC6U from accounts where nls = :NLS6U")
 .head 5 +  If SqlPrepareAndExecute( hSql(),
 "SELECT nlsb,polu

@@ -172,6 +172,16 @@ grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on 
 grant FLASHBACK,SELECT                                                       on CCK_OB22        to WR_REFREAD;
 
 
+begin
+    execute immediate 'alter table cck_ob22
+add D_CLOSE DATE';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+
+
 
 PROMPT ===================================================================================== 
 PROMPT *** End *** ========== Scripts /Sql/BARS/Table/CCK_OB22.sql =========*** End *** ====

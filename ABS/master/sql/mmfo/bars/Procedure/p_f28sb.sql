@@ -12,13 +12,14 @@ PROMPT *** Create  procedure P_F28SB ***
 % FILE NAME   : otcn.sql
 % DESCRIPTION : ќтчетность ЌЅ”: формирование файлов
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 2001.  All Rights Reserved.
-% VERSION     : 16/02/2016, 26/05/2012, 10/08/2011) 
+% VERSION     : 13/11/2017 (16/02/2016) 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-16/02/2016 - дл€ декабр€ мес€ца будут включатьс€ годовые корректирующие
+13.11.2017 - удалил ненужные строки и изменил некоторые блоки формировани€ 
+16.02.2016 - дл€ декабр€ мес€ца будут включатьс€ годовые корректирующие
              обороты
-26/05/2012 - формируем в разрезе кодов территорий
-10/08/2011 - исправление ошибки
-09/08/2011 - помен€ла f_pop_otcn на f_pop_otcn_snp 
+26.05.2012 - формируем в разрезе кодов территорий
+10.08.2011 - исправление ошибки
+09.08.2011 - помен€ла f_pop_otcn на f_pop_otcn_snp 
 30.04.2011 - добавил†acc,tobo в протокол
 28.02.2011 - в поле комментарий вносим код TOBO и название счета
 06.05.2010 - отключил блок заполнени€ спецпараметра OB22 
@@ -96,16 +97,11 @@ CURSOR Saldo IS
           s.doszg, s.koszg, s.dos96zg, s.kos96zg,
           a.tobo, a.nms, NVL(trim(sp.ob22),'00')  
     FROM  otcn_saldo s, otcn_acc a, specparam_int sp
-    WHERE s.acc=a.acc
-      and s.acc=sp.acc(+);
+    WHERE s.acc = a.acc
+      and s.acc = sp.acc(+);
 -----------------------------------------------------------------------
-CURSOR BaseL IS
-    SELECT kodp, nbuc, SUM (znap)
-    FROM rnbu_trace
-        WHERE userid=userid_
-    GROUP BY kodp, nbuc;
-
 BEGIN
+
 -------------------------------------------------------------------
 userid_ := user_id;
 EXECUTE IMMEDIATE 'TRUNCATE TABLE RNBU_TRACE';
@@ -140,14 +136,15 @@ OPEN Saldo;
 
    comm_ := '';
 
-   IF typ_>0 THEN
+   IF typ_ > 0 
+   THEN
       nbuc_ := NVL(F_Codobl_Tobo(acc_,typ_),nbuc1_);
    ELSE
       nbuc_ := nbuc1_;
    END IF;
 
-   sn_:=0;
-   se_:=0;
+   sn_ := 0;
+   se_ := 0;
 
    -- добавив 16.02.2016
    --- обороты по перекрытию 6,7 классов на 5040,5041
@@ -162,7 +159,8 @@ OPEN Saldo;
             acc  = acc_   AND
             (tt like 'ZG8%'  or tt like 'ZG9%');
 
-      IF Dos96_ <> 0 then 
+      IF Dos96_ <> 0 
+      then 
          Dos96_ := Dos96_ - d_sum_;
       END IF;
       IF Kos96_ <> 0 THEN
@@ -170,7 +168,8 @@ OPEN Saldo;
       END IF;
    END IF;
 
-   if nbs_ not in ('3902','3903','5040','5041') and nbs_ not like '6%' and nbs_ not like '7%' then
+   if nbs_ not in ('3902','3903','5040','5041') and nbs_ not like '6%' and nbs_ not like '7%' 
+   then
       Ostn_ := Ostn_-Dos96_+Kos96_-Dos99_+Kos99_;
    else
       Ostn_ := Ostn_-Dos96_+Kos96_-Dos99_+Kos99_-Dos96zg_+Kos96zg_-Dos99zg_+Kos99zg_-Doszg_+Koszg_;
@@ -178,7 +177,8 @@ OPEN Saldo;
 
    Ostq_ := Ostq_ - Dosq96_ + Kosq96_ - Dosq99_ + Kosq99_;
 
-   if kv_ = 980 then
+   if kv_ = 980 
+   then
       se_ := Ostn_;
    else
       sn_ := Ostn_;
@@ -187,7 +187,8 @@ OPEN Saldo;
 
    comm_ := substr(comm_ || tobo_ || '  ' || nms_, 1, 200);
 
-   IF se_ <> 0 THEN 
+   IF se_ <> 0 
+   THEN 
       dk_ := IIF_N(se_,0,'1','2','2') ;
       kk_ := nbs_ || zz_ || LPAD(to_char(kv_),3,'0') ;
       kodp_ := dk_ || '0' || kk_ ;
@@ -196,7 +197,8 @@ OPEN Saldo;
                              (nls_, kv_, data_, kodp_,znap_, acc_, comm_, tobo_, nbuc_) ;
    END IF;
 
-   IF sn_ <> 0 THEN 
+   IF sn_ <> 0 
+   THEN 
       dk_ := IIF_N(sn_,0,'1','2','2') ;
       kk_ := nbs_ || zz_ || LPAD(to_char(kv_),3,'0') ;
       kodp_ := dk_ || '1' || kk_ ;
@@ -210,8 +212,8 @@ CLOSE Saldo;
 ---------------------------------------------------
 DELETE FROM tmp_irep WHERE kodf = kodf_ AND datf = Dat_;
 ---------------------------------------------------
-INSERT INTO tmp_irep (kodf, datf, kodp, nbuc, znap)
-select kodf_, Dat_, KODP, nbuc, SUM(znap)
+INSERT INTO tmp_irep (kodf, datf, kodp, znap, nbuc)
+select '28', Dat_, KODP, SUM(znap), nbuc
 from  RNBU_TRACE   
 GROUP BY kodp, nbuc;
 

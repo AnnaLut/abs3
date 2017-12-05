@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure NBUR_P_F79 ***
 
-  CREATE OR REPLACE PROCEDURE BARS.NBUR_P_F79 (p_kod_filii        varchar2,
+CREATE OR REPLACE PROCEDURE BARS.NBUR_P_F79 (p_kod_filii        varchar2,
                                              p_report_date      date,
                                              p_form_id          number,
                                              p_scheme           varchar2 default 'C',
@@ -18,9 +18,9 @@ is
 % DESCRIPTION : Процедура формирования #79 для КБ
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.16.004  19.12.2016
+% VERSION     :  v.16.005  10.11.2017
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_          char(30)  := 'v.16.004  19.12.2016';
+  ver_          char(30)  := 'v.16.005  10.11.2017';
 /*
    Структура показника   DD ZZZZZZZZZZ VVV NNNN
 

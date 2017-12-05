@@ -92,6 +92,7 @@ begin
 , BDATE        DATE
 , OPT          INTEGER
 , SEND_SMS     VARCHAR2(1)
+, DAT_ALT      DATE
 , constraint PK_ACCOUNTS primary key (ACC) using index tablespace BRSBIGI
 , constraint UK_ACCOUNTS unique ( KF, ACC) using index tablespace BRSBIGI local compress 1
 , constraint FK_ACCOUNT_ACCOUNT foreign key ( ACCC ) references ACCOUNTS ( ACC )
@@ -137,6 +138,15 @@ end;
 /
 
 SET FEEDBACK ON
+
+
+begin  EXECUTE IMMEDIATE 'ALTER TABLE  bars.accounts  ADD  (DAT_ALT date ) ' ;
+exception when others then   if SQLCODE = - 01430 then null;   else raise; end if; -- ORA-01430: column being added already exists in table
+end;
+/
+
+COMMENT ON COLUMN BARS.ACCOUNTS.DAT_ALT IS 'Дата заміни NLS->NLSALT';
+
 
 prompt -- ======================================================
 prompt -- Apply policies

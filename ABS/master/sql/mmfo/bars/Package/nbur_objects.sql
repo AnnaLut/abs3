@@ -1,10 +1,10 @@
-CREATE OR REPLACE PACKAGE BARS.NBUR_OBJECTS 
+create or replace package NBUR_OBJECTS
 is
   
   --
   -- constants
   --
-  g_header_version  constant varchar2(64)  := 'version 17.2  2017.03.23';
+  g_header_version  constant varchar2(64)  := 'version 17.3  2017.10.23';
   g_header_defs     constant varchar2(512) := '';
   
   --
@@ -386,7 +386,18 @@ is
   , p_version_id   in     nbur_lst_objects.version_id%type
   , p_object_nm    in     nbur_ref_objects.object_name%type
   );
-  
+
+  --
+  -- REMOVE_INVALID_VERSIONS
+  -- 
+  --  p_report_date - Звітна дата
+  --  p_kf          - Код фiлiалу (МФО)
+  --
+  procedure REMOVE_INVALID_VERSIONS
+  ( p_report_date  in     nbur_lst_objects.report_date%type
+  , p_kf           in     nbur_lst_objects.kf%type
+  );
+
   --
   --
   --
@@ -415,15 +426,17 @@ is
 END NBUR_OBJECTS;
 /
 
-show errors;
+show err
 
-CREATE OR REPLACE package body BARS.NBUR_OBJECTS
+----------------------------------------------------------------------------------------------------
+
+create or replace package body NBUR_OBJECTS
 is
   
   --
   -- constants
   --
-  g_body_version  constant varchar2(64)  := 'version 17.10  2017.09.13';
+  g_body_version  constant varchar2(64)  := 'version 19.2  2017.11.13';
   g_body_defs     constant varchar2(512) := '';
 
   MODULE_PREFIX   constant varchar2(4)   := 'NBUR';
@@ -884,7 +897,7 @@ is
 
       select ID
         into l_object_id
-        from BARS.NBUR_REF_OBJECTS
+        from NBUR_REF_OBJECTS
        where OBJECT_NAME = p_object_name;
 
     exception
@@ -1069,7 +1082,7 @@ is
     dbms_application_info.set_client_info( title );
     
     execute immediate 'alter session ENABLE PARALLEL DDL';
-    execute immediate 'alter session SET DDL_LOCK_TIMEOUT=600';
+    execute immediate 'alter session SET DDL_LOCK_TIMEOUT=300';
 
     l_err_tag := to_char(p_report_date,'yyyymmdd') || '_' || p_kf || '_' || to_char(p_version_id,'FM00');
 
@@ -1358,7 +1371,7 @@ is
     if ( p_kf is null )
     then
       
-      insert /*+ append parallel(8) */
+      insert /*+ APPEND */
         into BARS.NBUR_DM_ACCOUNTS
            ( REPORT_DATE, KF, ACC_ID, ACC_NUM, ACC_NUM_ALT, ACC_TYPE, BRANCH, KV,
              OPEN_DATE, CLOSE_DATE, MATURITY_DATE, CUST_ID, ACC_PID, LIMIT, PAP, VID, BLC_CODE_DB, BLC_CODE_CR, NBS,
@@ -1412,11 +1425,13 @@ is
                       nvl(trim(S.S180), '0') S180,
                       nvl(trim(S.S240), '0') S240,
                       NVL(s.s580, '9') S580,
-                      BARS.F_NBUR_CODOBL_B040(b.b040, 4) nbuc, -- b.OBL
+                      b.OBL as NBUC,
                       lpad(nvl(trim(b.b040), '0'), 20, '0') b040
-                 from ACCOUNTS a
-                 left outer
-                 join SPECPARAM s
+                 FROM ACCOUNTS a
+                 JOIN NBUR_QUEUE_OBJECTS q
+                   ON ( q.KF = a.KF and q.REPORT_DATE = p_report_date and q.ID = l_object_id )
+                 LEFT OUTER
+                 JOIN SPECPARAM s
                    ON ( s.KF = a.KF and s.ACC = a.ACC )
                  JOIN BARS.BRANCH b
                    ON ( b.BRANCH = a.BRANCH )
@@ -1440,12 +1455,19 @@ is
 
       insert /* APPEND */
         into BARS.NBUR_DM_ACCOUNTS
-           ( REPORT_DATE, KF, ACC_ID, ACC_NUM, ACC_NUM_ALT, ACC_TYPE, BRANCH, KV,
-             OPEN_DATE, CLOSE_DATE, MATURITY_DATE, CUST_ID, ACC_PID, LIMIT, PAP, VID, BLC_CODE_DB, BLC_CODE_CR, NBS,
-             OB22, R011, R012, R013, R016, R030, R031, R032, R033, R034, S180, S181, S183, S240, S580, NBUC, B040 )
-      select p_report_date, c.kf, c.acc, c.nls, c.nlsalt, c.TIP
-           , c.branch, c.kv, c.daos, c.dazs, c.mdate, c.rnk, c.ACCC, c.lim, c.PAP, c.VID, c.BLKD, c.BLKK, c.NBS
-           , c.ob22, c.r011, c.r012, c.r013, c.R016, c.R030, r.R031, r.R032, r.R033, r.R034, c.S180
+           ( REPORT_DATE, KF, ACC_ID, ACC_TYPE, KV, BRANCH
+           , ACC_NUM, ACC_NUM_ALT, NBS, OB22, OB22_ALT, ACC_ALT_DT
+           , OPEN_DATE, CLOSE_DATE, MATURITY_DATE, CUST_ID, ACC_PID, LIMIT, PAP, VID, BLC_CODE_DB, BLC_CODE_CR
+           , R011, R012, R013, R016, R030, R031, R032, R033, R034, S180, S181, S183, S240, S580, NBUC, B040 )
+      select p_report_date, c.KF, c.ACC, c.TIP, c.KV, c.BRANCH
+           , case when p_report_date < c.DAT_ALT then c.NLSALT             else c.NLS      end as ACC_NUM
+           , case when p_report_date < c.DAT_ALT then null                 else c.NLSALT   end as ACC_NUM_ALT
+           , case when p_report_date < c.DAT_ALT then SubStr(c.NLSALT,1,4) else c.NBS      end as NBS
+           , case when p_report_date < c.DAT_ALT then c.OB22_ALT           else c.OB22     end as OB22
+           , case when p_report_date < c.DAT_ALT then null                 else c.OB22_ALT end as OB22_ALT
+           , case when p_report_date < c.DAT_ALT then null                 else c.DAT_ALT  end as ACC_ALT_DT
+           , c.daos, c.dazs, c.mdate, c.rnk, c.ACCC, c.lim, c.PAP, c.VID, c.BLKD, c.BLKK
+           , c.R011, c.r012, c.r013, c.R016, c.R030, r.R031, r.R032, r.R033, r.R034, c.S180
            , NVL(K.S181, '1') S181, NVL(K.S183, '1') S183
            , c.S240, c.S580, c.NBUC, c.B040
         from ( select /*+ PARALLEL( 4 ) LEADING( a ) USE_HASH( a s ) */
@@ -1453,6 +1475,7 @@ is
                       a.ACC,
                       a.NLS,
                       a.NLSALT,
+                      a.DAT_ALT,
                       nvl(a.TIP, 'ODB') tip,
                       a.branch,
                       a.KV,
@@ -1492,6 +1515,7 @@ is
                       nvl(trim(S.S180), '0') S180,
                       nvl(trim(S.S240), '0') S240,
                       NVL(s.s580, '9') S580,
+                      s.OB22_ALT,
                       b.OBL as NBUC,
                       lpad(nvl(trim(b.b040), '0'), 20, '0') b040
                  from ACCOUNTS a
@@ -1499,7 +1523,7 @@ is
                  join SPECPARAM s
                    on ( s.KF = a.KF and s.ACC = a.ACC )
                  join BRANCH   b
-                   on ( a.BRANCH = b.BRANCH)
+                   on ( a.BRANCH = b.BRANCH )
                 where a.KF = p_kf
                   and a.NBS IS NOT NULL
                   and regexp_like(a.NLS,'^(([1-7,9])|(86([1][0,5,8]|[5][1,2,8]))|(899(8|9)))')
@@ -1591,9 +1615,7 @@ is
   ( p_report_date  in     nbur_lst_objects.report_date%type
   , p_kf           in     nbur_lst_objects.kf%type
   ) is
-    title     constant    varchar2(64) := $$PLSQL_UNIT||'.CRT_DLY_SNPST';
-    l_errmsg              varchar2(512);
-    l_wait_tm             number(3) := 600;
+    title     constant    varchar2(60)  := $$PLSQL_UNIT||'.CRT_DLY_SNPST';
   begin
 
     bars_audit.trace( '%s: Entry with ( report_dt=%s, kf=%s ).'
@@ -1602,8 +1624,10 @@ is
     if ( p_kf is null )
     then -- запуск формування щоденного знімку балансу для всіх KF
 
-      for s in ( select KF
-                   from MV_KF
+      for s in ( select q.KF
+                   from NBUR_QUEUE_OBJECTS q
+                  where q.REPORT_DATE = p_report_date
+                    and q.ID          = l_object_id
                )
       loop
 
@@ -1618,29 +1642,24 @@ is
       -- Перевірка звітної дати на БАНКІВСЬКИЙ ДЕНЬ
       if ( CHK_RPT_DT_ON_BANK_DAY( p_report_date ) )
       then
-
+        
         BC.SUBST_MFO( p_kf );
-
-        bars_audit.trace( '%s: run SYNC_DLY_SNAP ( %s ).', title, to_char(p_report_date,'dd.mm.yyyy') );
-
-        loop
-          -- Перевірка наявності активного процесу формування знімку
-          l_errmsg := BARS_UTL_SNAPSHOT.CHECK_SNP_RUNNING( 'DAYBALS' );
-
-          -- якщо звільнилось, то виходимо
-          exit when ( l_errmsg is Null or l_wait_tm <= 0 );
-
-          -- чекаємо 10 хв. на звільнення ресурсу з перевіркою кожні 30 с.
-          l_wait_tm := l_wait_tm - 30;
+        
+        if ( BARS_UTL_SNAPSHOT.CHECK_SNP_RUNNING( 'DAYBALS' ) is Null )
+        then --
           
-          dbms_lock.sleep(30);
-
-        end loop;
-
-        BARS_UTL_SNAPSHOT.SYNC_SNAP( p_report_date );
-
+          bars_audit.trace( '%s: run SYNC_DLY_SNAP ( %s ).', title, to_char(p_report_date,'dd.mm.yyyy') );
+          
+          BARS_UTL_SNAPSHOT.SYNC_SNAP( p_report_date );
+          
+        else
+          
+          bars_audit.info( title||': SYNC_DLY_SNAP already running.' );
+          
+        end if;
+        
         BC.HOME;
-
+        
       else
         bars_audit.error( title||': дата '||to_char(p_report_date,'dd.mm.yyyy')||' не є банківським днем!' );
         raise_application_error( -20666, 'Звітна дата '||to_char(p_report_date,'dd.mm.yyyy')||' не є банківським днем.' );
@@ -1684,11 +1703,13 @@ is
       insert /*+ APPEND */
         into NBUR_DM_BALANCES_DAILY
            ( REPORT_DATE, KF, ACC_ID, CUST_ID, VOST, DOS, KOS, OST, VOSTQ, DOSQ, KOSQ, OSTQ )
-      select /*+ PARALLEL( 8 ) */ p_report_date, kf, acc, rnk,
-             ost +dos -kos,  dos,  kos,  ost,
-             ostq+dosq-kosq, dosq, kosq, ostq
-        from SNAP_BALANCES
-       where FDAT = p_report_date;
+      select /*+ PARALLEL( 8 ) */ p_report_date, b.KF, b.ACC, b.RNK,
+             b.OST + b.DOS - b.KOS,  b.DOS,  b.KOS,  b.OST,
+             b.OSTQ+ b.DOSQ- b.KOSQ, b.DOSQ, b.KOSQ, b.OSTQ
+        from SNAP_BALANCES b
+        join NBUR_QUEUE_OBJECTS q
+          on ( q.KF = b.KF and q.REPORT_DATE = b.FDAT and q.ID = l_object_id )
+       where b.FDAT = p_report_date;
 
     else
 
@@ -1772,8 +1793,10 @@ is
     then -- запуск формування щоденного знімку балансу для всіх KF
       
       -- temporarry (until BARS_SNAPSHOT.CREATE_MONTHLY_SNAPSHOT can`t run by all KF in parallel)
-      for s in ( select KF
-                   from BARS.MV_KF
+      for s in ( select q.KF
+                   from NBUR_QUEUE_OBJECTS q
+                  where q.REPORT_DATE = p_report_date
+                    and q.ID          = l_object_id
                )
       loop
         
@@ -1829,15 +1852,17 @@ is
 
       insert /*+ APPEND */
         into NBUR_DM_BALANCES_MONTHLY
-           ( report_date, kf, acc_id, cust_id, dos,
-             kos, ost, dosq, kosq, ostq, crdos, crkos, crdosq, crkosq, cudos, cukos,
-             cudosq, cukosq, adj_bal, adj_bal_uah)
-      select /*+ PARALLEL( 8 ) */ p_report_date, kf,
-             acc, rnk, dos, kos, ost, dosq, kosq, ostq,
-             crdos, crkos, crdosq, crkosq, cudos, cukos, cudosq, cukosq,
-             ost - crdos + crkos, ostq - crdosq + crkosq
-        from AGG_MONBALS
-       where fdat = trunc(p_report_date,'mm');
+           ( REPORT_DATE, KF, ACC_ID, CUST_ID, DOS,
+             KOS, OST, DOSQ, KOSQ, OSTQ, CRDOS, CRKOS, CRDOSQ, CRKOSQ, CUDOS, CUKOS,
+             CUDOSQ, CUKOSQ, ADJ_BAL, ADJ_BAL_UAH )
+      select /*+ PARALLEL( 8 ) */ p_report_date, b.KF,
+             b.ACC, b.RNK, b.DOS, b.KOS, b.OST, b.DOSQ, b.KOSQ, b.OSTQ,
+             b.CRDOS, b.CRKOS, b.CRDOSQ, b.CRKOSQ, b.CUDOS, b.CUKOS, b.CUDOSQ, b.CUKOSQ,
+             b.OST - b.CRDOS + b.CRKOS, b.OSTQ - b.CRDOSQ + b.CRKOSQ
+        from AGG_MONBALS b
+        join NBUR_QUEUE_OBJECTS q
+          on ( q.KF = b.KF and q.REPORT_DATE = b.FDAT and q.ID = l_object_id )
+       where b.FDAT = trunc(p_report_date,'mm');
       
     else
       
@@ -1926,35 +1951,39 @@ is
     then -- for all KF
 
       insert /*+ APPEND */
-        into BARS.NBUR_DM_BALANCES_YEARLY
+        into NBUR_DM_BALANCES_YEARLY
            ( REPORT_DATE, KF, ACC_ID, CUST_ID, BAL, BAL_UAH
            , DOS, DOSQ, KOS, KOSQ
            , CRDOS, CRDOSQ, CRKOS, CRKOSQ, CUDOS, CUDOSQ, CUKOS, CUKOSQ, ADJ_BAL, ADJ_BAL_UAH )
-      select /*+ PARALLEL( 8 ) */ p_report_date, KF, ACC, RNK, OST, OSTQ
-           , DOS,   DOSQ,   KOS,   KOSQ
-           , CRDOS, CRDOSQ, CRKOS, CRKOSQ
-           , CUDOS, CUDOSQ, CUKOS, CUKOSQ
-           , ( OST  - CRDOS  + CRKOS  ) as ADJ_BAL
-           , ( OSTQ - CRDOSQ + CRKOSQ ) as ADJ_BAL_UAH
-        from BARS.AGG_YEARBALS
-       where FDAT = trunc(p_report_date,'YY');
+      select /*+ PARALLEL( 8 ) */ p_report_date, b.KF
+           , b.ACC,   b.RNK,    b.OST,   b.OSTQ
+           , b.DOS,   b.DOSQ,   b.KOS,   b.KOSQ
+           , b.CRDOS, b.CRDOSQ, b.CRKOS, b.CRKOSQ
+           , b.CUDOS, b.CUDOSQ, b.CUKOS, b.CUKOSQ
+           , ( b.OST  - b.CRDOS  + b.CRKOS  ) as ADJ_BAL
+           , ( b.OSTQ - b.CRDOSQ + b.CRKOSQ ) as ADJ_BAL_UAH
+        from AGG_YEARBALS b
+        join NBUR_QUEUE_OBJECTS q
+          on ( q.KF = b.KF and q.REPORT_DATE = b.FDAT and q.ID = l_object_id )
+       where b.FDAT = trunc(p_report_date,'YY');
 
     else -- for one KF
 
       insert /* APPEND */
-        into BARS.NBUR_DM_BALANCES_YEARLY
+        into NBUR_DM_BALANCES_YEARLY
            ( REPORT_DATE, KF, ACC_ID, CUST_ID, BAL, BAL_UAH
            , DOS,   DOSQ,   KOS,   KOSQ
            , CRDOS, CRDOSQ, CRKOS, CRKOSQ
            , CUDOS, CUDOSQ, CUKOS, CUKOSQ
            , ADJ_BAL, ADJ_BAL_UAH )
-      select /*+ PARALLEL( 4 ) */ p_report_date, KF, ACC, RNK, OST, OSTQ
+      select /*+ PARALLEL( 4 ) */ p_report_date, KF
+           , ACC,   RNK,    OST,   OSTQ
            , DOS,   DOSQ,   KOS,   KOSQ
            , CRDOS, CRDOSQ, CRKOS, CRKOSQ
            , CUDOS, CUDOSQ, CUKOS, CUKOSQ
            , ( OST  - CRDOS  + CRKOS  ) as ADJ_BAL
            , ( OSTQ - CRDOSQ + CRKOSQ ) as ADJ_BAL_UAH
-        from BARS.AGG_YEARBALS
+        from AGG_YEARBALS
        where FDAT = trunc(p_report_date,'YY')
          and KF   = p_kf;
 
@@ -2017,14 +2046,18 @@ is
         from ( select p.REF, p.TT, p.DK, p.ACC, p.FDAT, p.S, p.SQ, p.TXT, p.STMT, p.SOS, p.KF
                     , a.ACC_NUM, a.KV, a.NBS, a.OB22, a.ACC_TYPE, a.CUST_ID, a.NBUC
                  from BARS.OPLDOK p
+                 join NBUR_QUEUE_OBJECTS q
+                   on ( q.KF = p.KF and q.REPORT_DATE = p.FDAT and q.ID = l_object_id )
                  join BARS.NBUR_DM_ACCOUNTS a
                    on ( a.KF = p.KF AND a.ACC_ID = p.ACC )
-                where p.fdat = p_report_date
+                where p.FDAT = p_report_date
                   and p.DK = 0
              ) d
         join ( select p.REF, p.TT, p.DK, p.ACC, p.FDAT, p.S, p.SQ, p.TXT, p.STMT, p.SOS, p.KF
                     , a.ACC_NUM, a.KV, a.NBS, a.OB22, a.ACC_TYPE, a.CUST_ID, a.NBUC
                  from BARS.OPLDOK p
+                 join NBUR_QUEUE_OBJECTS q
+                   on ( q.KF = p.KF and q.REPORT_DATE = p.FDAT and q.ID = l_object_id )
                  join BARS.NBUR_DM_ACCOUNTS a
                    on ( a.KF = p.KF AND a.ACC_ID = p.ACC )
                 where p.fdat = p_report_date
@@ -2035,36 +2068,33 @@ is
     else -- for one KF
 
       insert /* APPEND */
-        into NBUR_DM_TRANSACTIONS
+        into BARS.NBUR_DM_TRANSACTIONS
            ( REPORT_DATE, KF, REF, STMT, SOS, TT, TXT, KV, BAL, BAL_UAH
            , CUST_ID_DB, ACC_ID_DB, ACC_NUM_DB, ACC_TYPE_DB, R020_DB, OB22_DB, NBUC_DB
            , CUST_ID_CR, ACC_ID_CR, ACC_NUM_CR, ACC_TYPE_CR, R020_CR, OB22_CR, NBUC_CR )
-      select /*+ USE_HASH( k d ) */ 
-             p_report_date, p_kf, d.REF, d.STMT, d.SOS, d.TT, d.TXT, d.KV, d.S, d.SQ
+      select p_report_date, p_kf, d.REF, d.STMT, d.SOS, d.TT, d.TXT, d.KV, d.S, d.SQ
            , d.CUST_ID as CUST_ID_DB, d.ACC as ACC_ID_DB, d.ACC_NUM as ACC_NUM_DB, d.ACC_TYPE as ACC_TYPE_DB, d.nbs as R020_DB, d.ob22 as OB22_DB, d.NBUC as NBUC_DB
            , k.CUST_ID as CUST_ID_CR, k.ACC as ACC_ID_CR, k.ACC_NUM as ACC_NUM_CR, k.ACC_TYPE as ACC_TYPE_CR, k.nbs as R020_CR, k.OB22 as OB22_CR, k.NBUC as NBUC_CR
-        from ( select pd.REF, pd.STMT, pd.ACC
-                    , pd.SOS, pd.TT, pd.TXT, pd.S, pd.SQ
-                    , ad.ACC_NUM, ad.KV, ad.NBS, ad.OB22, ad.ACC_TYPE, ad.CUST_ID, ad.NBUC
-                 from OPLDOK pd
-                 join NBUR_DM_ACCOUNTS ad
-                   on ( ad.KF = pd.KF AND ad.ACC_ID = pd.ACC )
-                where pd.fdat = p_report_date
-                  and pd.KF   = p_kf
-                  and pd.SOS  = 5
-                  and pd.DK   = 0
-                  and ad.KF   = p_kf
+        from ( select p.REF, p.STMT, p.ACC
+                    , p.SOS, p.TT, p.TXT, p.S, p.SQ
+                    , a.ACC_NUM, a.KV, a.NBS, a.OB22, a.ACC_TYPE, a.CUST_ID, a.NBUC
+                 from BARS.OPLDOK p
+                 join BARS.NBUR_DM_ACCOUNTS a
+                   on ( a.KF = p.KF AND a.ACC_ID = p.ACC )
+                where p.fdat = p_report_date
+                  and p.KF = p_kf
+                  and p.SOS = 5
+                  and p.DK = 0
              ) d
-        join ( select pk.REF, pk.STMT, pk.ACC
-                    , ak.ACC_NUM, ak.KV, ak.NBS, ak.OB22, ak.ACC_TYPE, ak.CUST_ID, ak.NBUC
-                 from OPLDOK pk
-                 join NBUR_DM_ACCOUNTS ak
-                   on ( ak.KF = pk.KF AND ak.ACC_ID = pk.ACC )
-                where pk.fdat = p_report_date
-                  and pk.KF   = p_kf
-                  and pk.SOS  = 5
-                  and pk.DK   = 1
-                  and ak.KF   = p_kf
+        join ( select p.REF, p.STMT, p.ACC
+                    , a.ACC_NUM, a.KV, a.NBS, a.OB22, a.ACC_TYPE, a.CUST_ID, a.NBUC
+                 from BARS.OPLDOK p
+                 join BARS.NBUR_DM_ACCOUNTS a
+                   on ( a.KF = p.KF AND a.ACC_ID = p.ACC )
+                where p.fdat = p_report_date
+                  and p.KF = p_kf
+                  and p.SOS = 5
+                  and p.DK = 1
              ) k
           on (k.REF = d.REF AND k.STMT = d.STMT );
 
@@ -2460,11 +2490,10 @@ is
                     , w.TAG
                     , SubStr(trim(w.VALUE),1,64) as VALUE
                     , t.TT
-                 from BARS.OPERW w
-                 join ( select KF, REF, TT
-                          from BARS.NBUR_DM_TRANSACTIONS
-                      -- where REPORT_DATE = p_report_date
-                      ) t
+                 from OPERW w
+                 join NBUR_QUEUE_OBJECTS q
+                   on ( q.KF = w.KF and q.REPORT_DATE = p_report_date and q.ID = l_object_id )
+                 join NBUR_DM_TRANSACTIONS t
                    on ( t.KF = w.KF AND t.REF = w.REF )
                 where w.TAG in ( 'D1#70', 'D2#70', 'D3#70', 'D4#70', 'D5#70', 'D6#70'
                                , 'D7#70', 'D8#70', 'D9#70', 'DA#70', 'DB#70', 'DD#70'
@@ -2682,7 +2711,7 @@ is
            , SW53B, SW53D, SW54,  SW54A, SW54B, SW54D, SW55A, SW55B, SW55D, SW56,  SW56A, SW56C, SW56D
            , SW57,  SW57A, SW57B, SW57C, SW57D, SW58,  SW58A, SW58D, SW59,  SW59A, SW61,  SW70,  SW71A
            , SW71B, SW71F, SW71G, SW72,  SW76,  SW77A, SW77B, SW77T, SW79,  SWRCV, NOS_A, NOS_B, NOS_R )
-      select /*+ PARALLEL( 16 ) */ p_report_date, KF, REF
+      select p_report_date, KF, REF
            , SW11R, SW11S, SW13C, SW20,  SW21,  SW23B, SW23E, SW25,  SW26T, SW30,  SW32A, SW32B
            , SW32C, SW32D, SW33B, SW36,  SW50,  SW50A, SW50F, SW50K, SW51A, SW52A, SW52B, SW52D, SW53A
            , SW53B, SW53D, SW54,  SW54A, SW54B, SW54D, SW55A, SW55B, SW55D, SW56,  SW56A, SW56C, SW56D
@@ -2743,7 +2772,7 @@ is
            , SW53B, SW53D, SW54,  SW54A, SW54B, SW54D, SW55A, SW55B, SW55D, SW56,  SW56A, SW56C, SW56D
            , SW57,  SW57A, SW57B, SW57C, SW57D, SW58,  SW58A, SW58D, SW59,  SW59A, SW61,  SW70,  SW71A
            , SW71B, SW71F, SW71G, SW72,  SW76,  SW77A, SW77B, SW77T, SW79,  SWRCV, NOS_A, NOS_B, NOS_R )
-      select p_report_date, KF, REF
+      select /*+ PARALLEL( 8 ) */ p_report_date, KF, REF
            , SW11R, SW11S, SW13C, SW20,  SW21,  SW23B, SW23E, SW25,  SW26T, SW30,  SW32A, SW32B
            , SW32C, SW32D, SW33B, SW36,  SW50,  SW50A, SW50F, SW50K, SW51A, SW52A, SW52B, SW52D, SW53A
            , SW53B, SW53D, SW54,  SW54A, SW54B, SW54D, SW55A, SW55B, SW55D, SW56,  SW56A, SW56C, SW56D
@@ -3150,7 +3179,7 @@ is
     then -- for all KF
 
       insert /*+ APPEND */
-        into BARS.NBUR_DM_ACNT_RATES
+        into NBUR_DM_ACNT_RATES
            ( REPORT_DATE, KF, ACC_ID, RATE_TP
            , FRQ_TP, ACR_ACC_ID, PNL_ACC_ID, RATE_DT, RATE_VAL )
       select /*+ PARALLEL( 4 ) */ p_report_date
@@ -3174,18 +3203,20 @@ is
                   else Null -- r.OP = 0 OR r.OP Is Null
                 end
            end, 4 ), 999.9999 ) as CLC_RATE
-        from BARS.NBUR_DM_ACCOUNTS a
+        from NBUR_DM_ACCOUNTS a
+        join NBUR_QUEUE_OBJECTS q
+          on ( q.KF = a.KF and q.REPORT_DATE = p_report_date and q.ID = l_object_id )
         left
-        join BARS.NBUR_DM_BALANCES_DAILY b
+        join NBUR_DM_BALANCES_DAILY b
          on ( b.KF = a.KF and b.ACC_ID = a.ACC_ID )
         left
-        join BARS.INT_ACCN i
+        join INT_ACCN i
           on ( i.KF = a.KF and i.ACC = a.ACC_ID )
         left
         join ( select KF, ACC, ID, BDAT, IR, BR, OP
-                 from BARS.INT_RATN
+                 from INT_RATN
                 where ( ACC, ID, BDAT ) in ( select ACC, ID, max(BDAT)
-                                               from BARS.INT_RATN
+                                               from INT_RATN
                                               where BDAT <= p_report_date
                                               group by ACC, ID )
              ) r
@@ -3198,10 +3229,10 @@ is
                     , 999999999999999999999999 as UPR_LMT
                     , RATE
                     , 'N' as BR_TP
-                 from BARS.BR_NORMAL_EDIT
+                 from BR_NORMAL_EDIT
                 where ( KF, BR_ID, KV, BDATE ) in ( select rv.KF, rv.BR_ID, rv.KV, max(rv.BDATE)
-                                                      from BARS.BR_NORMAL_EDIT rv
-                                                      join BARS.BRATES rc
+                                                      from BR_NORMAL_EDIT rv
+                                                      join BRATES rc
                                                         on ( rv.BR_ID = rc.BR_ID )
                                                      where rc.BR_TYPE = 1
                                                        and rv.BDATE <= p_report_date
@@ -3214,10 +3245,10 @@ is
                     , S as UPR_LMT
                     , RATE
                     , 'T' as BR_TP
-                 from BARS.BR_TIER_EDIT
+                 from BR_TIER_EDIT
                 where ( KF, BR_ID, KV, S, BDATE ) in ( select rv.KF, rv.BR_ID, rv.KV, rv.S, max(rv.BDATE)
-                                                         from BARS.BR_TIER_EDIT rv
-                                                         join BARS.BRATES rc
+                                                         from BR_TIER_EDIT rv
+                                                         join BRATES rc
                                                            on ( rv.BR_ID = rc.BR_ID )
                                                         where rc.BR_TYPE > 1
                                                           and rv.BDATE <= p_report_date
@@ -3232,7 +3263,7 @@ is
     else -- for one KF
       
       insert /* APPEND */
-        into BARS.NBUR_DM_ACNT_RATES
+        into NBUR_DM_ACNT_RATES
            ( REPORT_DATE, KF, ACC_ID, RATE_TP
            , FRQ_TP, ACR_ACC_ID, PNL_ACC_ID, RATE_DT, RATE_VAL )
       select /*+ PARALLEL( 4 ) */ p_report_date
@@ -3377,8 +3408,10 @@ is
       select /*+ PARALLEL( 8 ) */ p_report_date
            , ac.KF, ac.AGRM_ID, ac.ACC_ID
            , ag.RATE_TP, ag.FRQ_TP, ag.ACR_ACC_ID, ag.PNL_ACC_ID, ag.RATE_DT, ag.RATE_VAL
-        from BARS.NBUR_DM_AGRM_ACCOUNTS ac
-        join BARS.NBUR_DM_ACNT_RATES ag
+        from NBUR_DM_AGRM_ACCOUNTS ac
+        join NBUR_QUEUE_OBJECTS q
+          on ( q.KF = ac.KF and q.REPORT_DATE = p_report_date and q.ID = l_object_id )
+        join NBUR_DM_ACNT_RATES ag
           on ( ag.KF = ac.KF and ag.ACC_ID = ac.ACC_ID )
        where ac.KF = p_kf
 --      select /*+ PARALLEL( 8 ) */ p_report_date
@@ -4001,7 +4034,7 @@ is
     then -- for all KF
 
       insert /*+ APPEND */
-        into BARS.NBUR_DM_TXN_SYMBOLS
+        into NBUR_DM_TXN_SYMBOLS
            ( REPORT_DATE, KF, REF, STMT, SYMB_TP, SYMB_VAL )
       select /*+ PARALLEL( 8 ) */ txn.REPORT_DATE, txn.KF, txn.REF, txn.STMT
            , 1 as SYMB_TP
@@ -4010,13 +4043,15 @@ is
                then lpad(nvl(doc.SK,tts.SK),2,'0')
                else lpad(nvl(tts.SK,dtl.SK),2,'0')
              end as SYMB_VAL
-        from BARS.NBUR_DM_TRANSACTIONS txn
+        from NBUR_DM_TRANSACTIONS txn
+        join NBUR_QUEUE_OBJECTS q
+          on ( q.KF = txn.KF and q.REPORT_DATE = p_report_date and q.ID = l_object_id )
         left
-        join BARS.OPER doc
+        join OPER doc
           on ( doc.KF = txn.KF and doc.ref = txn.REF )
         left
         join ( select TT, SK
-                 from BARS.TTS
+                 from TTS
                 where SK IS Not Null
              ) tts
           on ( tts.TT = txn.TT )
@@ -4027,7 +4062,7 @@ is
                         then VALUE
                         else Null
                       end as SK
-                 from BARS.OPERW
+                 from OPERW
                 where TAG = 'SK'
              ) dtl
           on ( dtl.REF = txn.REF )
@@ -4041,7 +4076,7 @@ is
     else -- for one KF
 
       insert /* APPEND */
-        into BARS.NBUR_DM_TXN_SYMBOLS
+        into NBUR_DM_TXN_SYMBOLS
            ( REPORT_DATE, KF, REF, STMT, SYMB_TP, SYMB_VAL )
       select /*+ PARALLEL( 4 ) */
              txn.REPORT_DATE, txn.KF, txn.REF, txn.STMT
@@ -4051,13 +4086,13 @@ is
                then lpad(nvl(doc.SK,tts.SK),2,'0')
                else lpad(nvl(tts.SK,dtl.SK),2,'0')
              end as SYMB_VAL
-        from BARS.NBUR_DM_TRANSACTIONS txn
+        from NBUR_DM_TRANSACTIONS txn
         left
-        join BARS.OPER doc
+        join OPER doc
           on ( doc.KF = txn.KF and doc.ref = txn.REF )
         left
         join ( select TT, SK
-                 from BARS.TTS
+                 from TTS
                 where SK IS Not Null
              ) tts
           on ( tts.TT = txn.TT )
@@ -4068,7 +4103,7 @@ is
                         then VALUE
                         else Null
                       end as SK
-                 from BARS.OPERW
+                 from OPERW
                 where TAG = 'SK'
              ) dtl
           on ( dtl.REF = txn.REF )
@@ -4140,7 +4175,7 @@ is
     then -- for all KF
 
       insert /*+ APPEND */
-        into BARS.NBUR_DM_BALANCES_CLT
+        into NBUR_DM_BALANCES_CLT
            ( REPORT_DATE, KF
            , CLT_ACC_ID, CLT_BAL, CLT_BAL_UAH, CLT_CUST_ID
            , AST_ACC_ID, AST_BAL, AST_BAL_UAH, AST_CUST_ID
@@ -4163,17 +4198,19 @@ is
            , round(abs(bc.OSTQ) * ratio_to_report(abs(ba.OSTQ)) over (partition by clt.ACC )) as CLT_AMNT_UAH
            , round(abs(ba.OST ) * ratio_to_report(abs(bc.OSTQ)) over (partition by clt.ACCS)) as AST_AMNT
            , round(abs(ba.OSTQ) * ratio_to_report(abs(bc.OSTQ)) over (partition by clt.ACCS)) as AST_AMNT_UAH
-        from BARS.CC_ACCP clt               -- relation            ( зв'язок рах. забезпечення з рах. активу )
-        join BARS.NBUR_DM_BALANCES_DAILY bc -- collateral balances ( залишки забезпечення )
+        from CC_ACCP clt               -- relation            ( зв'язок рах. забезпечення з рах. активу )
+        join NBUR_QUEUE_OBJECTS q
+          on ( q.KF = clt.KF and q.REPORT_DATE = p_report_date and q.ID = l_object_id )
+        join NBUR_DM_BALANCES_DAILY bc -- collateral balances ( залишки забезпечення )
           on ( bc.KF = clt.KF and bc.ACC_ID = clt.ACC )
-        join BARS.NBUR_DM_BALANCES_DAILY ba -- assets balances     ( залишки активів )
+        join NBUR_DM_BALANCES_DAILY ba -- assets balances     ( залишки активів )
           on ( ba.KF = clt.KF and ba.ACC_ID = clt.ACCS )
       ;
 
     else -- for one KF
 
       insert /* APPEND */
-        into BARS.NBUR_DM_BALANCES_CLT
+        into NBUR_DM_BALANCES_CLT
            ( REPORT_DATE, KF
            , CLT_ACC_ID, CLT_BAL, CLT_BAL_UAH, CLT_CUST_ID
            , AST_ACC_ID, AST_BAL, AST_BAL_UAH, AST_CUST_ID
@@ -4262,14 +4299,14 @@ is
     select last_day(max(DAT)) + 1
          , max(dat_bank) keep (DENSE_RANK LAST ORDER BY dat_bank)
       into l_prvn_dt, l_pymt_dt
-      from BARS.REZ_PROTOCOL
+      from REZ_PROTOCOL
      where DAT_BANK <= p_report_date;
 
     if ( ( p_kf Is Null ) AND ( l_usr_mfo Is Null ) )
     then -- for all KF
 
       insert /*+ APPEND */
-        into BARS.NBUR_DM_PROVISIONS
+        into NBUR_DM_PROVISIONS
            ( REPORT_DATE, KF
            , ID, CCY_ID, CUST_ID, AGRM_ID, AST_ACC_ID, AST_ACC_NUM, AST_CGY
            , PRVN_AMNT, PRVN_AMNT_UAH, PRVN_NIT_AMNT, PRVN_NIT_AMNT_UAH, PRVN_30D_AMNT, PRVN_30D_AMNT_UAH
@@ -4304,7 +4341,9 @@ is
            , r.DAT_MI         as MGTN_DT
            , nvl(p.BAL,    0) as REPYMT_AMNT
            , nvl(p.BAL_UAH,0) as REPYMT_AMNT_UAH
-        from BARS.NBU23_REZ r
+        from NBU23_REZ r
+        join NBUR_QUEUE_OBJECTS q
+          on ( q.KF = r.KF and q.REPORT_DATE = p_report_date and q.ID = l_object_id )
         left -- Сума списань забогованості за рахунок резерву
         join ( select /*+ PARALLEL( txn, 4 ) */ KF
                     , case when MPLR = 1 then ACC_ID_CR else ACC_ID_DB end as ACC_ID
@@ -4470,12 +4509,15 @@ is
     --        ( REPORT_DATE, KF
     --        )
     --   select /*+ PARALLEL( 8 ) */ p_report_date, a.KF
+    --    from
+    --    join NBUR_QUEUE_OBJECTS q
+    --      on ( q.KF = .KF and q.REPORT_DATE = p_report_date and q.ID = l_object_id )
     --   ;
     --
     else -- for one KF
 
       insert /* APPEND */
-        into BARS.NBUR_DM_PAYMENT_SHD
+        into NBUR_DM_PAYMENT_SHD
            ( REPORT_DATE, KF
            , AGRM_ID, ACC_ID, PYMT_DT, PYMT_AMNT, PYMT_AMNT_UAH, LMT_AMNT, LMT_AMNT_UAH, S240 )
       select p_report_date, lim.KF
@@ -4528,31 +4570,31 @@ is
                     , max( case when l.fdat >= p_report_date then l.FDAT else null end ) over ( partition by l.ND ) as MAX_PYMT_DT
                     , min( case when l.fdat >= p_report_date then l.FDAT else null end ) over ( partition by l.ND order by l.fdat ) as MIN_PYMT_DT
                     , sum( case when l.fdat >= p_report_date then l.SUMG else null end ) over ( partition by l.ND order by l.fdat ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) as CMLV_TOT  -- cumulative total
-                 from BARS.CC_LIM l
-                 join BARS.NBUR_DM_BALANCES_DAILY lb -- 8999
+                 from CC_LIM l
+                 join NBUR_DM_BALANCES_DAILY lb -- 8999
                    on ( lb.KF = l.KF and lb.ACC_ID = l.ACC )
                 where lb.KF = p_kf
-                  and lb.ost < 0 -- ??? як себе поведе при відновлювальній Кред. Лінії
+                  and lb.OST < 0 -- ??? як себе поведе при відновлювальній Кред. Лінії
                 ) lim
            join ( select aa.KF, aa.AGRM_ID, aa.ACC_ID, aa.CCY_ID
                        , a.ACC_NUM, a.OPEN_DATE, a.MATURITY_DATE
                        , b.OST, b.OSTQ
-                    from BARS.NBUR_DM_AGRM_ACCOUNTS aa
-                    join BARS.NBUR_DM_ACCOUNTS a
+                    from NBUR_DM_AGRM_ACCOUNTS aa
+                    join NBUR_DM_ACCOUNTS a
                       on ( a.KF = aa.KF and a.ACC_ID = aa.ACC_ID )
-                    join BARS.NBUR_DM_BALANCES_DAILY b
+                    join NBUR_DM_BALANCES_DAILY b
                       on ( b.KF = aa.KF and b.ACC_ID = aa.ACC_ID )
                    where a.ACC_TYPE = 'SS'
                 ) acc
              on ( acc.KF = lim.KF and acc.AGRM_ID = lim.AGRM_ID )
-           join ( select KV as CCY_ID
+           join ( select KV          as CCY_ID
                        , RATE_O/BSUM as RATE
-                    from BARS.CUR_RATES$BASE
-                   where ( KV, VDATE ) in ( select KV, max(VDATE)
-                                              from BARS.CUR_RATES$BASE
-                                             where vdate <= p_report_date
-                                               and branch = '/'
-                                             group by kv )
+                    from CUR_RATES$BASE
+                   where ( BRANCH, VDATE, KV ) in ( select BRANCH, max(VDATE), KV
+                                                      from CUR_RATES$BASE
+                                                     where VDATE <= p_report_date
+                                                       and BRANCH = '/'||p_kf||'/'
+                                                     group by BRANCH, KV )
                 ) rts
              on ( rts.CCY_ID = acc.CCY_ID )
           where PYMT_DT >= MIN_PYMT_DT
@@ -4616,7 +4658,7 @@ is
     then -- for all KF
 
       insert /*+ APPEND */
-        into BARS.NBUR_DM_CHRON_AVG_BALS
+        into NBUR_DM_CHRON_AVG_BALS
            ( REPORT_DATE, VERSION_ID, KF
            , ACC_ID, R020, R030, AVG_BAL, AVG_BAL_UAH
            , SUM_CR, SUM_CR_UAH, SUM_DB, SUM_DB_UAH )
@@ -4638,7 +4680,7 @@ is
                                       , extract( DAY from cdr.CDR_DT) as DAY_MUN
                                       , min( cdr.CDR_DT ) over () as MIN_DT
                                       , max( cdr.CDR_DT ) over () as MAX_DT
-                                      , ( select min(f.FDAT) from BARS.FDAT f where f.FDAT >= cdr.CDR_DT ) BNK_DT
+                                      , ( select min(f.FDAT) from FDAT f where f.FDAT >= cdr.CDR_DT ) BNK_DT
                                    from CDR_DYS cdr )
                select /*+ PARALLEL( 8 ) */ ac.CDR_DT, ac.BNK_DT, ac.DAY_MUN, ac.MIN_DT, ac.MAX_DT, ac.DYS_QTY
                     , ac.KF, ac.ACC_ID, ac.NBS, ac.KV
@@ -4651,11 +4693,21 @@ is
                              , a.KF, a.ACC_ID, a.NBS, a.KV
                           from CALENDAR c
                          cross
-                          join BARS.NBUR_DM_ACCOUNTS a
+                          join ( select t.KF, t.ACC_ID, t.NBS, t.KV 
+                                   from NBUR_DM_ACCOUNTS t
+                                   join NBUR_QUEUE_OBJECTS q
+                                      on ( q.KF = t.KF and q.REPORT_DATE = p_report_date and q.ID = l_object_id )
+                               ) a
                       ) ac
                  left
-                 join BARS.SNAP_BALANCES b -- BARS.NBUR_DM_BALANCES_DAILY_ARCH
-                   on ( b.FDAT = ac.BNK_DT and b.KF = ac.KF and b.ACC = ac.ACC_ID )
+--               join SNAP_BALANCES b 
+--                 on ( b.FDAT = ac.BNK_DT and b.KF = ac.KF and b.ACC = ac.ACC_ID )
+                 join NBUR_DM_BALANCES_DAILY_ARCH b
+                   on ( b.REPORT_DATE = ac.BNK_DT AND b.KF = ac.KF AND b.ACC_ID = ac.ACC_ID )
+                 join NBUR_LST_OBJECTS v
+                   on ( v.REPORT_DATE = b.REPORT_DATE AND v.KF = b.KF AND v.VERSION_ID = b.VERSION_ID )
+                where v.OBJECT_ID = l_object_id
+                  and v.VLD = 0
              )
        group by MIN_DT, KF, ACC_ID, NBS, KV, DYS_QTY
       ;
@@ -4803,15 +4855,17 @@ is
              txn.REPORT_DATE, txn.KF, txn.REF, txn.TT, txn.KV, txn.BAL, txn.BAL_UAH
            , CUST_ID_DB, ACC_ID_DB, ACC_NUM_DB, ACC_TYPE_DB, R020_DB, OB22_DB, NBUC_DB
            , CUST_ID_CR, ACC_ID_CR, ACC_NUM_CR, ACC_TYPE_CR, R020_CR, OB22_CR, NBUC_CR
-        from BARS.NBUR_DM_TRANSACTIONS_ARCH txn
-        join BARS.OPER doc
+        from NBUR_DM_TRANSACTIONS_ARCH txn
+        join NBUR_QUEUE_OBJECTS q
+          on ( q.KF   = txn.KF AND q.REPORT_DATE = p_report_date AND q.ID = l_object_id )
+        join OPER doc
           on ( doc.KF = txn.KF AND doc.REF = txn.REF )
        where ( txn.REPORT_DATE, txn.KF, txn.VERSION_ID ) in ( select report_date, kf, max(version_id)
                                                                 from NBUR_LST_OBJECTS
-                                                               where report_date between l_rpt_mo_frst_bnk_dt
+                                                               where REPORT_DATE between l_rpt_mo_frst_bnk_dt
                                                                                      and l_rpt_mo_last_bnk_dt
-                                                                 and object_id = l_txn_dm_id
-                                                                 and OBJECT_STATUS in ('FINISHED','BLOCKED')
+                                                                 and OBJECT_ID = l_txn_dm_id
+                                                                 and VLD = 0
                                                                group by report_date, kf )
          and doc.VDAT between l_rpt_mo_frst_bnk_dt
                           and l_rpt_mo_last_bnk_dt
@@ -4823,14 +4877,16 @@ is
            , CUST_ID_DB, ACC_ID_DB, ACC_NUM_DB, ACC_TYPE_DB, R020_DB, OB22_DB, NBUC_DB
            , CUST_ID_CR, ACC_ID_CR, ACC_NUM_CR, ACC_TYPE_CR, R020_CR, OB22_CR, NBUC_CR
         from BARS.NBUR_DM_TRANSACTIONS_ARCH txn
+        join NBUR_QUEUE_OBJECTS q
+          on ( q.KF   = txn.KF AND q.REPORT_DATE = p_report_date AND q.ID = l_object_id )
         join BARS.OPER doc
           on ( doc.KF = txn.KF AND doc.REF = txn.REF )
        where ( txn.REPORT_DATE, txn.KF, txn.VERSION_ID ) in ( select REPORT_DATE, KF, max(VERSION_ID)
                                                                 from NBUR_LST_OBJECTS
-                                                               where report_date between l_nxt_mo_frst_bnk_dt
+                                                               where REPORT_DATE between l_nxt_mo_frst_bnk_dt
                                                                                      and l_nxt_mo_last_bnk_dt
-                                                                 and object_id = l_txn_dm_id
-                                                                 and OBJECT_STATUS in ('FINISHED','BLOCKED')
+                                                                 and OBJECT_ID = l_txn_dm_id
+                                                                 and VLD = 0
                                                                group by report_date, kf )
          and doc.VDAT = l_rpt_mo_last_bnk_dt
          and doc.VOB in ( 96, 99 )
@@ -4974,7 +5030,9 @@ is
                     , nvl(cpc.ACC_ID_CR,   txn.ACC_ID_CR  ) as ACC_ID_CR
                     , nvl(cpc.ACC_NUM_CR,  txn.ACC_NUM_CR ) as ACC_NUM_CR
                     , nvl(cpc.BAL_CR,      txn.BAL        ) as AMNT_CR
-                 from BARS.NBUR_DM_TRANSACTIONS_CNSL txn
+                 from NBUR_DM_TRANSACTIONS_CNSL txn
+                 join NBUR_QUEUE_OBJECTS q
+                   on ( q.KF = txn.KF AND q.REPORT_DATE = p_report_date AND q.ID = l_object_id )
                  left
                  join ( select t.REF
                              , t.TT
@@ -5255,8 +5313,7 @@ is
     l_arc_col_lst         varchar2(3072);
     l_obj_col_lst         varchar2(3072);
   begin
-    commit;
-    
+
     bars_audit.trace( '%s: Entry with ( obj_nm=%s, kf=%s, vrsn_id=%s ).'
                     , title, p_obj_nm, p_kf, to_char(p_vrsn_id) );
 
@@ -5541,17 +5598,17 @@ is
             , p_kf        => null
             , p_vrsn_id   => l_vrsn_id
             );
-      
+
             if ( p_kf Is Null )
             then -- for all KF
-      
+
               DM_UTL.EXCHANGE_PARTITION( p_source_table_nm => 'NBUR_DM_CHRON_AVG_BALS_ARCH'
                                        , p_target_table_nm => 'NBUR_DM_CHRON_AVG_BALS'
-                                       , p_partition_nm    => 'P_'||to_char(p_report_date,'YYYYMMDD')||'_'|| to_char(l_vrsn_id,'FM00') );
-      
+                                       , p_partition_nm    => 'P_'||to_char(p_report_date,'YYYYMMDD')||'_'|| to_char(l_vrsn_id,'FM000') );
+
             else
-      
-              insert /* APPEND */
+
+              insert /*+ APPEND */
                 into BARS.NBUR_DM_CHRON_AVG_BALS_ARCH
                    ( REPORT_DATE, KF, VERSION_ID
                    , ACC_ID, R020, R030, AVG_BAL, AVG_BAL_UAH
@@ -5561,9 +5618,11 @@ is
                    , SUM_CR, SUM_CR_UAH, SUM_DB, SUM_DB_UAH
                 from BARS.NBUR_DM_CHRON_AVG_BALS
                where p_kf = KF;
-      
+
+              commit;
+
             end if;
-      
+
           else
             null;
       
@@ -5594,12 +5653,12 @@ is
     if ( p_kf is null )
     then
       update NBUR_LST_VERSIONS
-         set STATUS = 'FINISHED'
+         set STATUS = 'VALID'
        where REPORT_DATE = p_report_date
          and VERSION_ID  = l_vrsn_id;
     else
       update NBUR_LST_VERSIONS
-         set STATUS = 'FINISHED'
+         set STATUS = 'VALID'
        where REPORT_DATE = p_report_date
          and KF          = p_kf
          and VERSION_ID  = l_vrsn_id;
@@ -5866,7 +5925,7 @@ is
       execute immediate 'insert /*+ APPEND */'                ||chr(10)||
                         '  into BARS.'||p_object_nm           ||chr(10)||
                         '     ( '||l_col_lst||' )'            ||chr(10)||
-                        'select /*+ PARALLEL( 8 ) */ '||l_col_lst||chr(10)||
+                        'select /*+ PARALLEL( '||to_char(l_dop)||' ) */ '||l_col_lst||chr(10)||
                         '  from BARS.'||p_object_nm||'_ARCH'  ||chr(10)||
                         ' where REPORT_DATE = :p_report_date' ||chr(10)||
                         '   and VERSION_ID  = :p_version_id'
@@ -5875,7 +5934,7 @@ is
       execute immediate 'insert /*+ APPEND */'                ||chr(10)||
                         '  into BARS.'||p_object_nm           ||chr(10)||
                         '     ( '||l_col_lst||' )'            ||chr(10)||
-                        'select /*+ PARALLEL( 8 ) */ '||l_col_lst||chr(10)||
+                        'select /*+ PARALLEL( '||to_char(l_dop)||' ) */ '||l_col_lst||chr(10)||
                         '  from BARS.'||p_object_nm||'_ARCH'  ||chr(10)||
                         ' where REPORT_DATE = :p_report_date' ||chr(10)||
                         '   and KF          = :p_kf'          ||chr(10)||
@@ -5926,6 +5985,87 @@ is
   --
   --
   --
+  procedure REMOVE_INVALID_VERSIONS
+  ( p_report_date  in     nbur_lst_objects.report_date%type
+  , p_kf           in     nbur_lst_objects.kf%type
+  ) is
+  /**
+  <b>REMOVE_INVALID_VERSIONS</b> - Видалення інвалідних версій з вітрин
+  %param p_report_date - Звітна дата
+  %param p_kf          - Код фiлiалу (МФО)
+  %param p_object_id   - Iдентифiкатор об`єкту
+  %param p_version_id  - Iдентифiкатор версії
+
+  %version 1.0 (23/10/2017)
+  %usage   Видалення даних з архіву версій вітрин даних
+  */
+    title     constant    varchar2(64)  := $$PLSQL_UNIT||'.RETRIEVE_VERSION_BY_ID';
+  begin
+    
+    bars_audit.trace( '%s: Entry with ( p_report_date=%s, p_kf=%s ).', title, to_char(p_report_date,'dd.mm.yyyy'), p_kf );
+    
+    for tbl in ( select t1.TABLE_NAME
+                      , t1.IOT_TYPE
+                      , t2.PARTITIONING_TYPE
+                      , t2.PARTITIONING_KEY_COUNT
+                      , t2.SUBPARTITIONING_TYPE
+                      , t2.SUBPARTITIONING_KEY_COUNT
+                      , t2.PARTITIONING_KEY_COUNT + t2.SUBPARTITIONING_KEY_COUNT as KEY_COUNT
+                      , nvl2(t2.INTERVAL,1,0) as INTERVAL
+                   from ALL_TABLES t1
+                   join ALL_PART_TABLES t2
+                     on ( t2.OWNER = t1.OWNER and t2.TABLE_NAME = t1.TABLE_NAME )
+                  where t1.OWNER = 'BARS'
+                    and t1.TABLE_NAME like 'NBUR_DM_%_ARCH' )
+    loop
+
+      bars_audit.trace( '%s: TABLE_NAME=%s, KEY_COUNT=%s.', title, tbl.TABLE_NAME, to_char(tbl.KEY_COUNT) );  
+
+  --    if ( p_kf Is Null )
+  --    then
+  --      execute immediate 'delete /*+ PARALLEL( 8 ) */ ||chr(10)||
+  --                        '  from BARS.'||p_object_nm||'_ARCH'  ||chr(10)||
+  --                        ' where REPORT_DATE = :p_report_date' ||chr(10)||
+  --                        '   and VERSION_ID  = :p_version_id'
+  --      using p_report_date, p_version_id;
+  --    else
+
+      for vrsn in ( select o.ID
+                      from NBUR_REF_OBJECTS o
+                      join NBUR_LST_OBJECTS v
+                        on ( v.OBJECT_ID = o.ID )
+                     where o.OBJECT_NAME = tbl.TABLE_NAME
+                       and v.REPORT_DATE = p_report_date
+                       and v.KF          = p_kf
+                       and v.VLD         > 0 )
+      loop
+
+        bars_audit.trace( '%s: version_id=%s.', title, to_char(vrsn.ID) );
+
+        if ( tbl.KEY_COUNT = 3 )
+        then
+          execute immediate 'alter table '||tbl.TABLE_NAME||'_ARCH drop partition for ( to_date('''||
+                            to_char(p_report_date,'YYYYMMDD')||''',''YYYYMMDD''),'''||p_kf||''','||to_char(vrsn.ID)||' )';
+        else
+          execute immediate 'delete /*+ PARALLEL( 8 ) */ '        ||chr(10)||
+                            '  from '||tbl.TABLE_NAME||'_ARCH'    ||chr(10)||
+                            ' where REPORT_DATE = :p_report_date' ||chr(10)||
+                            '   and KF          = :p_kf'          ||chr(10)||
+                            '   and VERSION_ID  = :p_vrsn_id'
+          using p_report_date, p_kf, vrsn.ID;
+        end if;
+
+      end loop;
+
+    end loop;
+
+    bars_audit.trace( '%s: Exit.', title );
+
+  end REMOVE_INVALID_VERSIONS;
+
+  --
+  --
+  --
   procedure GATHER_DM_STATS
   ( p_start_id     in     number
   , p_end_id       in     number
@@ -5951,7 +6091,7 @@ is
     loop
 
       bars_audit.trace( '%s: Start GATHER_DM_STATS for %s.%s', title, k.OWN_NM, k.OBJ_NM );
-      
+
       DM.DM_UTL.GATHER_TBL_STATS
       ( p_own_name => k.OWN_NM
       , p_tab_name => k.OBJ_NM
@@ -5962,7 +6102,7 @@ is
     bars_audit.trace( '%s: Exit.', title );
 
   end GATHER_DM_STATS;
-  
+
   --
   --
   --
@@ -6160,7 +6300,7 @@ is
 --    );
 --    
 --  end if;
-            
+
     /*
     select o.ID, OBJECT_NAME, SCHEME||'.'||PROC_INSERT as PRC_NM
          , r.OBJECT_PID
@@ -6198,4 +6338,8 @@ BEGIN
 END NBUR_OBJECTS;
 /
 
-show errors;
+show err
+
+GRANT EXECUTE ON BARS.NBUR_OBJECTS TO BARS_ACCESS_DEFROLE;
+
+-- exec sys.utl_recomp.recomp_serial('BARS');

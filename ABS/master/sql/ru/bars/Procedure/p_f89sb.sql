@@ -7,15 +7,16 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure P_F89SB ***
 
-  CREATE OR REPLACE PROCEDURE BARS.P_F89SB (Datf_ DATE ,
+CREATE OR REPLACE PROCEDURE BARS.P_F89SB (Datf_ DATE ,
                                      kodf_    VARCHAR2 default '89') IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирования ручных файлов КБ (универсальная)
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     : 25.11.2013
+% VERSION     : 14.11.2017 (25.11.2013)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
+14.11.2017 - изменил некоторые блоки формирования 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 typ_     number;
 acc_     Number;
@@ -42,10 +43,11 @@ rez_     number;
 branch_id_ Varchar2(15);
 -----------------------------------------------------------------------------
 BEGIN
+
    execute immediate 'ALTER SESSION SET NLS_NUMERIC_CHARACTERS=''.,''';
 -------------------------------------------------------------------
-   SELECT id INTO userid_ FROM staff WHERE upper(logname)=upper(USER);
-   DELETE FROM RNBU_TRACE WHERE userid = userid_;
+   userid_ := user_id;
+   EXECUTE IMMEDIATE 'TRUNCATE TABLE RNBU_TRACE';
 -------------------------------------------------------------------
 
    BEGIN
@@ -59,21 +61,19 @@ BEGIN
 
    mfo_:=F_OURMFO();
 
-
-insert into rnbu_trace
-(nls, kv, odate, kodp, znap, nbuc)
-select 1, 1, datz_, kodp, znap, nbuc
-from tmp_irep
-where kodf=kodf_
-  and datf=datz_;
-
+   insert into rnbu_trace
+   (nls, kv, odate, kodp, znap, nbuc)
+   select 1, 1, datz_, kodp, znap, nbuc
+   from tmp_irep
+   where kodf = kodf_
+     and datf = datz_;
 ---------------------------------------------------
-DELETE FROM tmp_irep where kodf=kodf_ and datf= datf_;
+DELETE FROM tmp_irep where kodf = kodf_ and datf = datf_;
 ---------------------------------------------------
-INSERT INTO tmp_irep (kodp, datf, kodf, znap, nbuc)
-   SELECT kodp, Datf_, kodf_, znap, nbuc
-   FROM rnbu_trace
-   WHERE userid=userid_;
+INSERT INTO tmp_irep (kodf, datf, kodp, znap, nbuc)
+select '89', Datf_, kodp, SUM (znap), nbuc
+FROM rnbu_trace
+GROUP BY kodp, nbuc;
 
 END p_f89sb;
 /

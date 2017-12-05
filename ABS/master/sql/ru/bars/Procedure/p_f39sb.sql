@@ -7,17 +7,17 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure P_F39SB ***
 
-  CREATE OR REPLACE PROCEDURE BARS.P_F39SB (Dat_ DATE, sheme_ VARCHAR2 DEFAULT 'C')  IS
+CREATE OR REPLACE PROCEDURE BARS.P_F39SB (Dat_ DATE, sheme_ VARCHAR2 DEFAULT 'C')  IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :	Процедура формирование файла @39 для Ощадного Банку
 % COPYRIGHT   :	Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     : 18.12.2012 (30.11.12,13.09.12,30.12.10,16.12.10,09.12.10,
-%                           18.12.09,24.07.09,11.06.09,21.04.09,02.04.09)
+% VERSION     : 14/11/2017 (18/12/2012, 30/11/2012)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_ - отчетная дата
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 Изменеиия:
 
+14.11.2017 - удалил ненужные строки  
 18.12.2012 - для инвестиционных монет формируем коды 610-купiвля,620-продаж
              (type_=4 (набiр) и поле cena_nomi в BANK_METALS не пустое)
 30.11.2012 - для инвестиционных монет формируем коды 610-купiвля,620-продаж
@@ -228,7 +228,7 @@ LOOP
          SELECT nls
             into nls3800_
          FROM accounts
-         WHERE acc=acc3800_;
+         WHERE acc = acc3800_;
       EXCEPTION WHEN NO_DATA_FOUND THEN
          null;
       END;
@@ -236,7 +236,8 @@ LOOP
       comm_ := '';
 
 -- определяем базовую сумму введенных курсов
-      if kurs_ is not null then
+      if kurs_ is not null 
+      then
          begin
             buf_ := to_number(kurs_);
          exception when others then
@@ -251,105 +252,108 @@ LOOP
       end if;
 
 -- покупка
-   IF sum1_>0 AND sun1_>0 AND sum1_ <> sun1_ THEN
-
+   IF sum1_>0 AND sun1_>0 AND sum1_ <> sun1_ 
+   THEN
       -- определяем код области
-      if typ_>0 then
+      if typ_ > 0 
+      then
          nbuc_ := nvl(f_codobl_tobo(acc_,typ_),nbuc1_);
       else
          nbuc_ := nbuc1_;
       end if;
 
 
-      if dat_ < to_date('10112008','ddmmyyyy') then
+      if dat_ < to_date('10112008','ddmmyyyy') 
+      then
          ddd_:='210';
       else
          BEGIN
             SELECT substr(trim(value),1,2)
                INTO d#44_
             FROM operw
-            WHERE ref=ref_ AND tag='D#44';
+            WHERE ref = ref_ AND tag = 'D#44';
          EXCEPTION WHEN NO_DATA_FOUND THEN
             BEGIN
                SELECT to_char(b.type_), NVL(b.cena_nomi,0)
                   INTO d#44_, cena_nomi_
                FROM bank_metals b, operw w
-               WHERE w.ref=ref_
-                 AND w.tag='BM__C'
-                 AND b.kod=trim(w.value);
+               WHERE w.ref = ref_
+                 AND w.tag = 'BM__C'
+                 AND b.kod = trim(w.value);
             EXCEPTION WHEN NO_DATA_FOUND THEN
-                 d#44_:='14';
+                 d#44_ := '14';
             END;
          END;
 
-         if substr(d#44_,1,1)='2' or d#44_='2' then  -- or substr(trim(nls3800_),-1)='2' then
-            ddd_:='410';
+         if substr(d#44_,1,1) = '2' or d#44_ = '2' 
+         then  
+            ddd_ := '410';
          elsif substr(d#44_,1,1)='3' then
-            ddd_:='510';
+            ddd_ := '510';
          elsif substr(d#44_,1,1)='4' then
             if cena_nomi_ <> 0 then
-               ddd_:='610';
+               ddd_ := '610';
             else
-               ddd_:='410';
+               ddd_ := '410';
             end if;
          else
-            ddd_:='310';
+            ddd_ := '310';
          end if;
       end if;
 
       -- объем
-      a_:='1' || ddd_ || VVV ;
-      b_:=TO_CHAR(sum1_) ;
+      a_ := '1' || ddd_ || VVV ;
+      b_ := TO_CHAR(sum1_) ;
 
       INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, ref, comm, nbuc) VALUES
                              (nls_, kv_, datd_, a_, b_, ref_, comm_, nbuc_) ;
 
       -- курс
-      a_:='4' || ddd_ || VVV ;
+      a_ := '4' || ddd_ || VVV ;
       if kurs_ is null then -- розрахований курс
          if mfo_=333368 then
             BEGIN
                SELECT NVL(sum(p.s*100),0)
                   into sum_eqv_
                from provodki p, vp_list v
-               where p.fdat=Dat_
-                 and p.isp=userid1_
-                 and p.kv=980
-                 and v.acc3800=acc3800_
-                 and p.acck=v.acc3801;
+               where p.fdat = Dat_
+                 and p.isp = userid1_
+                 and p.kv = 980
+                 and v.acc3800 = acc3800_
+                 and p.acck = v.acc3801;
             EXCEPTION WHEN NO_DATA_FOUND THEN
                BEGIN
                   select rate_o
                      into kurs1_
                   from cur_rates$base
-                  where vdate=datd_
-                    and kv=kv1_
-                    and branch=branch_;
+                  where vdate = datd_
+                    and kv = kv1_
+                    and branch = branch_;
                EXCEPTION WHEN NO_DATA_FOUND THEN
                   null;
                END;
             END;
-            if sum_eqv_ <> 0 then
-
+            if sum_eqv_ <> 0 
+            then
                if sum1_ = 8 then
                   kol_ := 1;
                else
                   kol_ := 0;
                end if;
 
-               b_:=ltrim(TO_CHAR((sum_eqv_/(round(sum1_*31.1/100,kol_))*31.1034807/100),fmt_));
+               b_ := ltrim(TO_CHAR((sum_eqv_/(round(sum1_*31.1/100,kol_))*31.1034807/100),fmt_));
                comm_ := comm_||' курс розрахований '||b_||
                         ' сума екв. = '||to_char(sum_eqv_/100,'999999999999D00');
             else
-               b_:=ltrim(TO_CHAR(kurs1_,fmt_));
+               b_ := ltrim(TO_CHAR(kurs1_,fmt_));
                comm_ := comm_||' курс вибраний iз таблицi курсiв '||b_;
             end if;
          else
-            b_:=LTRIM(TO_CHAR(ROUND(sun1_*bsu_/sum1_,5)*dig_/dl_,fmt_));
+            b_ := LTRIM(TO_CHAR(ROUND(sun1_*bsu_/sum1_,5)*dig_/dl_,fmt_));
             comm_ := comm_ || ' курс розрахований ' || b_;
          end if;
       else -- введений курс
-         b_:=ltrim(TO_CHAR(to_number(kurs_)*bsu_/dl_,fmt_));
+         b_ := ltrim(TO_CHAR(to_number(kurs_)*bsu_/dl_,fmt_));
          comm_ := comm_ || ' курс введений в док-тi ' || b_;
       end if;
 
@@ -359,113 +363,117 @@ LOOP
                		     (nls_, kv_, datd_, a_, b_, ref_, comm_, nbuc_) ;
 
       -- объем**курс
-      a_:='3' || ddd_ || VVV;
-      b_:=TO_CHAR(sum1_*b_);
+      a_ := '3' || ddd_ || VVV;
+      b_ := TO_CHAR(sum1_*b_);
 
       INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, ref, comm, nbuc) VALUES
                              (nls_, kv_, datd_, a_, b_, ref_, comm_, nbuc_);
    END IF;
 
 -- продажа
-   IF sum0_>0 AND sun0_>0 AND sum0_ <> sun0_ THEN
-
+   IF sum0_>0 AND sun0_>0 AND sum0_ <> sun0_ 
+   THEN
       -- определяем код области
-      if typ_>0 then
+      if typ_>0 
+      then
          nbuc_ := nvl(f_codobl_tobo(acc_,typ_),nbuc1_);
       else
          nbuc_ := nbuc1_;
       end if;
 
-      if dat_ < to_date('10112008','ddmmyyyy') then
-         ddd_:='220';
+      if dat_ < to_date('10112008','ddmmyyyy') 
+      then
+         ddd_ := '220';
       else
          BEGIN
             SELECT substr(trim(value),1,2)
                INTO d#44_
             FROM operw
-            WHERE ref=ref_ AND tag='D#44';
+            WHERE ref = ref_ AND tag = 'D#44';
          EXCEPTION WHEN NO_DATA_FOUND THEN
             BEGIN
                SELECT to_char(b.type_), NVL(b.cena_nomi,0)
                   INTO d#44_, cena_nomi_
                FROM bank_metals b, operw w
-               WHERE w.ref=ref_
-                 AND w.tag='BM__C'
-                 AND b.kod=trim(w.value);
+               WHERE w.ref = ref_
+                 AND w.tag = 'BM__C'
+                 AND b.kod = trim(w.value);
             EXCEPTION WHEN NO_DATA_FOUND THEN
-               d#44_:='17';
+               d#44_ := '17';
             END;
          END;
 
-         if substr(d#44_,1,1)='2' or d#44_='2' then  -- or substr(trim(nls3800_),-1)='2' then
-            ddd_:='420';
-         elsif substr(d#44_,1,1)='3' then
+         if substr(d#44_,1,1) = '2' or d#44_ = '2' 
+         then  
+            ddd_ := '420';
+         elsif substr(d#44_,1,1) = '3' then
             ddd_:='520';
-         elsif substr(d#44_,1,1)='4' then
+         elsif substr(d#44_,1,1) = '4' then
             if cena_nomi_ <> 0 then
-               ddd_:='620';
+               ddd_ := '620';
             else
-               ddd_:='420';
+               ddd_ := '420';
             end if;
-
          else
-            ddd_:='320';
+            ddd_ := '320';
          end if;
       end if;
 
       -- объем
-      a_:='1' || ddd_ || VVV ;
-      b_:=TO_CHAR(sum0_) ;
+      a_ := '1' || ddd_ || VVV ;
+      b_ := TO_CHAR(sum0_) ;
 
       INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, ref, comm, nbuc) VALUES
                       	     (nls_, kv_, datd_, a_, b_, ref_, comm_, nbuc_) ;
 
       -- курс
-      a_:='4' || ddd_ || VVV ;
-      if kurs_ is null then
-         if mfo_=333368 then
+      a_ := '4' || ddd_ || VVV ;
+      if kurs_ is null 
+      then
+         if mfo_=333368 
+         then
             BEGIN
                SELECT NVL(sum(p.s*100),0)
                   into sum_eqv_
                from provodki p, vp_list v
-               where p.fdat=Dat_
-                 and p.isp=userid1_
-                 and p.kv=980
-                 and v.acc3800=acc3800_
-                 and p.acck=v.acc3801;
+               where p.fdat = Dat_
+                 and p.isp = userid1_
+                 and p.kv = 980
+                 and v.acc3800 = acc3800_
+                 and p.acck = v.acc3801;
             EXCEPTION WHEN NO_DATA_FOUND THEN
                BEGIN
                   select rate_o
                      into kurs1_
                   from cur_rates$base
-                  where vdate=datd_
-                    and kv=kv1_
-                    and branch=branch_;
+                  where vdate = datd_
+                    and kv = kv1_
+                    and branch = branch_;
                EXCEPTION WHEN NO_DATA_FOUND THEN
                   null;
                END;
             END;
-            if sum_eqv_ <> 0 then
-
+            if sum_eqv_ <> 0 
+            then
                if sum0_ = 8 then
                   kol_ := 1;
                else
                   kol_ := 0;
                end if;
 
-               b_:=ltrim(TO_CHAR((sum_eqv_/(round(sum0_*31.1/100,kol_))*31.1034807/100),fmt_));
+               b_ := ltrim(TO_CHAR((sum_eqv_/(round(sum0_*31.1/100,kol_))*31.1034807/100),fmt_));
                comm_ := comm_||' курс розрахований '||b_||
                         ' сума екв. = '||to_char(sum_eqv_/100,'999999999999D00') ;
             else
-               b_:=ltrim(TO_CHAR(kurs1_,fmt_));
+               b_ := ltrim(TO_CHAR(kurs1_,fmt_));
                comm_ := comm_||' курс вибраний iз таблицi курсiв '||b_;
             end if;
          else
-            b_:=LTRIM(TO_CHAR(ROUND(sun0_*bsu_/sum0_,5)*dig_/dl_,fmt_)) ;
+            b_ := LTRIM(TO_CHAR(ROUND(sun0_*bsu_/sum0_,5)*dig_/dl_,fmt_)) ;
             comm_ := comm_ || ' курс розрахований ' || b_;
          end if;
       else
-         b_:=ltrim(TO_CHAR(to_number(kurs_)*bsu_/dl_,fmt_));
+         b_ := ltrim(TO_CHAR(to_number(kurs_)*bsu_/dl_,fmt_));
          comm_ := comm_ || ' курс введений в док-тi ' || b_;
       end if;
 
@@ -475,8 +483,8 @@ LOOP
                              (nls_, kv_, datd_, a_, b_, ref_, comm_, nbuc_) ;
 
       -- объем**курс
-      a_:='3' || ddd_ || VVV;
-      b_:=TO_CHAR(sum0_*b_);
+      a_ := '3' || ddd_ || VVV;
+      b_ := TO_CHAR(sum0_*b_);
 
       INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, ref, comm, nbuc) VALUES
                              (nls_, kv_, datd_, a_, b_, ref_, comm_, nbuc_);
@@ -485,10 +493,9 @@ END LOOP;
 CLOSE oper959;
 END LOOP;
 CLOSE tval;
-------------------------------------------------------
----------------------------------------------------
+----------------------------------------------------
 DELETE FROM tmp_irep where kodf=kodf_ and datf=dat_;
----------------------------------------------------
+----------------------------------------------------
 OPEN basel;
    LOOP
       FETCH basel

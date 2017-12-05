@@ -11,22 +11,29 @@ PROMPT *** Create  procedure P_F39_NN ***
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :	Процедура формирование файла #39 для КБ (универсальная)
 % COPYRIGHT   :	Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     : 29/08/2014 (12/01/2012)
+% VERSION     : 06/11/2017 (01/06/2016, 24/09/2015)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_ - отчетная дата
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 Изменеиия:
              Версия только для мульти МФО (Сбербанк области) !!!
-
+06/11/2017   удалил блоки для закрытых МФО
+01/06/2016   добавил условие and o2.fdat = o.fdat в курсорах 
+             OPERVAL, OPER959
+24/09/2015   дополнительно выбираем проводки для 3800 и OB22 = '03'
+             (замечание Киевгорода)
+14/10/2014   исключаем проводки для NLSA like '390%' or NLSB like '390%'
+             (было включено в какой-то версии и не включено в текущей)
+             закоментарил "*+parallel(o) parallel(v)*" в ГОУ висело
 12/01/2012   не выбираем проводки для 3800 OB22='10' и Кт 1001(1002)
              назначение платежа "передан"  (замечание Луганска)
 22/12/2011   доработка для Надр: если курс не введен, то берем его из
-             официального курса и подправила вывод счета в протокол
+             официального курса и подправила вывод счета в протокол 
              (при выкупе центов неправильно отображался счет)
 17/11/2011   выбираем проводки для 3800 и OB22 in ('10','11','12')
-             (в Луганске включались проводки с OB22='20' в OPER
+             (в Луганске включались проводки с OB22='20' в OPER 
               Дт 3907(980) --> Кт 1001(840) передана валюта)
-27/10/2011   оптимизация запросов
+27/10/2011   оптимизация запросов 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 kodf_    varchar2(2):='39';
 fmt_     varchar2(20):='999990D0000';
@@ -94,8 +101,8 @@ select b.ref, b.acc, b.nls, b.kv, b.fdat, b.kurs, b.datd, b.branch,
    sum(b.ds), sum(b.ks),
    sum(b.pds2) dsq, sum(b.pks2) ksq
 from
-(select   /*+parallel(o) parallel(v)*/
-         a.acc, p.tt ptt, o.tt ott,
+(select   --/*+parallel(o) parallel(v)*/ 
+         a.acc, p.tt ptt, o.tt ott, 
          a.nls, a.kv, o.fdat, p.ref,
 	     translate(w.value,',','.') kurs, p.datd, p.branch,
          decode (o2.dk, 0, o.s, 0) ds,
@@ -105,40 +112,42 @@ from
          decode(o2.dk,1,decode(p.tt,o.tt,decode(p.kv2,a.kv,p.s,p.s2),
          f_d3801(p.ref,o.tt,v.ACC3801,o2.dk,v.ACC_RRD,v.ACC_RRR)),0) pks2
 from opldok o, vp_list v, opldok o2, accounts a, oper p, operw w
-where o.fdat = Dat_
+where o.fdat = Dat_     
+      and o2.fdat = o.fdat  
       and o.tt not in ('BAK')
-      and o.sos=5
-      and o.acc=v.ACC3800
-      and o.ref=o2.ref
-      AND o.dk != o2.dk
-      AND o.tt = o2.tt
-      AND o.stmt = o2.stmt
-      and o2.acc=a.acc
+      and o.sos = 5
+      and o.acc = v.ACC3800
+      and o.ref = o2.ref
+      and o.dk != o2.dk
+      and o.tt = o2.tt
+      and o.stmt = o2.stmt
+      and o2.acc = a.acc
       and a.nls like '100%'
-      and a.kv=kv_ and ((p.kv != 980 and p.kv2=980) or
-                        (p.kv=980 and p.kv2 != 980) or
-                        (p.kv = p.kv2))
-      and o.ref=p.ref
-      and p.sos=5
+      and a.kv = kv_ and ((p.kv != 980 and p.kv2=980) or
+                          (p.kv=980 and p.kv2 != 980) or
+                          (p.kv = p.kv2))
+      and o.ref = p.ref
+      and p.sos = 5
+      and p.nlsa not like '390%' and p.nlsb not like '390%'
       and ((o2.tt = p.tt and NOT exists (select 1
                   from operw z
-                  where p.ref=z.ref and
+                  where p.ref = z.ref and
                         z.tag in ('D#73','73'||o2.tt) and
                         substr(z.value,1,3) in ('220','221','222','223','270',
                                                 '321','322','325','323','370')))
            OR
            (o2.tt != p.tt and NOT exists (select 1
                   from operw z
-                  where p.ref=z.ref and
+                  where p.ref = z.ref and
                         z.tag = '73'||o2.tt and
                         substr(z.value,1,3) in ('220','221','222','223','270',
                                                 '321','322','325','323','370'))))
-      and p.ref=w.ref(+)
+      and p.ref = w.ref(+)
       and w.tag(+) LIKE 'KURS%'
 union
-select  /*+parallel(o) parallel(v)*/
-     a.acc, p.tt ptt, o.tt ott,
-     a.nls,
+select  --/*+parallel(o) parallel(v)*/ 
+     a.acc, p.tt ptt, o.tt ott, 
+     a.nls, 
      a.kv, o.fdat, p.ref,
 	 null kurs, p.datd, p.branch,
          decode (o2.dk, 0, o.s, 0) ds,
@@ -146,19 +155,21 @@ select  /*+parallel(o) parallel(v)*/
          decode(o2.dk,0,f_d3801(p.ref,o.tt,v.ACC3801,o2.dk,v.ACC_RRD,v.ACC_RRR),0) pds2,
          decode(o2.dk,1,f_d3801(p.ref,o.tt,v.ACC3801,o2.dk,v.ACC_RRD,v.ACC_RRR),0) pks2
 from opldok o, vp_list v, opldok o2, accounts a, oper p, operw w
-where o.fdat = Dat_
+where o.fdat = Dat_     
+      and o2.fdat = o.fdat
       and o.tt not in ('BAK')
-      and o.sos=5
-      and o.acc=v.ACC3800
-      and o.ref=o2.ref
-      AND o.dk != o2.dk
-      AND o.tt = o2.tt
-      AND o.stmt = o2.stmt
-      and o2.acc=a.acc
+      and o.sos = 5
+      and o.acc = v.ACC3800
+      and o.ref = o2.ref
+      and o.dk != o2.dk
+      and o.tt = o2.tt
+      and o.stmt = o2.stmt
+      and o2.acc = a.acc
       and a.nls like '100%'
-      and a.kv=kv_ and ((p.kv != p.kv2 and p.kv != 980 and p.kv2 != 980))
-      and o.ref=p.ref
-      and p.sos=5
+      and a.kv = kv_ and ((p.kv != p.kv2 and p.kv != 980 and p.kv2 != 980))
+      and o.ref = p.ref
+      and p.sos = 5
+      and p.nlsa not like '390%' and p.nlsb not like '390%'
       and ((o2.tt = p.tt and NOT exists (select 1
                   from operw z
                   where p.ref=z.ref and
@@ -172,7 +183,7 @@ where o.fdat = Dat_
                         z.tag = '73'||o2.tt and
                         substr(z.value,1,3) in ('220','221','222','223','270',
                                                 '321','322','325','323','370'))))
-      and p.ref=w.ref(+)
+      and p.ref = w.ref(+)
       and w.tag(+) LIKE 'KURS%') b
 where b.pds2 != 0 or b.pks2 != 0
 group by b.ref, b.acc, b.nls, b.kv, b.fdat, b.kurs, b.datd, b.branch;
@@ -183,26 +194,27 @@ select b.acc, b.nls, b.kv, b.fdat,
    sum(b.ds), sum(b.ks),
    sum(b.pds2) dsq, sum(b.pks2) ksq
 from
-(select   /*+parallel(o) parallel(v)*/
+(select   /*+parallel(o) parallel(v)*/ 
      a.acc, p.tt ptt, o.tt ott, p.nlsa nls, a.kv, o.fdat,
      decode (o2.dk, 0, o.s, 0) ds,
      decode (o2.dk, 1, o.s, 0) ks,
 	 decode(o2.dk,0,f_d3801(p.ref,o.tt,v.ACC3801,o2.dk,v.ACC6204,v.ACC6204),0) pds2,
 	 decode(o2.dk,1,f_d3801(p.ref,o.tt,v.ACC3801,o2.dk,v.ACC6204,v.ACC6204),0) pks2
 from opldok o, vp_list v, opldok o2, accounts a, oper p
-where o.fdat = Dat_
+where o.fdat = Dat_   
+      and o2.fdat = o.fdat
       and o.tt not in ('BAK')
-      and o.sos=5
-      and o.acc=v.ACC3800
-      and o.ref=o2.ref
-      AND o.dk != o2.dk
-      AND o.tt = o2.tt
-      AND o.stmt = o2.stmt
-      and o2.acc=a.acc
+      and o.sos = 5
+      and o.acc = v.ACC3800
+      and o.ref = o2.ref
+      and o.dk != o2.dk
+      and o.tt = o2.tt
+      and o.stmt = o2.stmt
+      and o2.acc = a.acc
       and a.nls like '110%'
-      and a.kv=kv_ and ((p.kv != 980 and p.kv2=980) or (p.kv=980 and p.kv != 980) or (p.kv=p.kv2))
-      and o.ref=p.ref
-      and p.sos=5) b
+      and a.kv = kv_ and ((p.kv != 980 and p.kv2=980) or (p.kv=980 and p.kv != 980) or (p.kv=p.kv2))
+      and o.ref = p.ref
+      and p.sos = 5) b
 where b.pds2 != 0 or b.pks2 != 0
 group by b.acc, b.nls, b.kv, b.fdat;
 
@@ -215,17 +227,17 @@ CURSOR OPL_DOK IS
          a.acc =c.acc               AND
          a.nls not like '8%'        AND
          c.fdat = dat_              AND
-         c.dk=0                     AND
-         c.sos=5                    AND
-         a1.acc=c1.acc              AND
-         c1.dk=1-c.dk               AND
-         c.stmt=c1.stmt             AND
+         c.dk = 0                   AND
+         c.sos = 5                  AND
+         a1.acc = c1.acc            AND
+         c1.dk = 1-c.dk             AND
+         c.stmt = c1.stmt           AND
          c.tt not in ('FX3','FX4','NOS') AND
-         c.ref=k.ref                AND
-         c.ref=o.ref                AND
-         o.sos=5                    AND
-         (k.tag='D#39' AND substr(k.value,1,3) in ('112','122'))  AND
-         c.ref=p.ref                AND
+         c.ref = k.ref              AND
+         c.ref = o.ref              AND
+         o.sos = 5                  AND
+         (k.tag = 'D#39' AND substr(k.value,1,3) in ('112','122'))  AND
+         c.ref = p.ref              AND
          p.tag LIKE 'KURS%'         AND
          SUBSTR(LOWER(TRIM(o.nazn)),1,4) != 'конв'
 GROUP BY a.acc, a.nls, a.kv, a1.acc, a1.nls, o.ref, o.mfoa, o.mfob,
@@ -235,7 +247,7 @@ ORDER BY 1, 2, 3, 9, 10;
 CURSOR tval IS
     SELECT  t.kv, POWER(10,t.dig), r.bsum, r.rate_o
     FROM tabval t, cur_rates r   -- cur_rates$base
-    WHERE t.kv=r.kv                AND
+    WHERE t.kv = r.kv              AND
           t.kv != 980              AND
           r.vdate IN (SELECT max(rr.vdate) FROM cur_rates rr
                       WHERE rr.kv=r.kv and rr.vdate<=dat_);
@@ -282,7 +294,8 @@ EXECUTE IMMEDIATE 'alter session set NLS_NUMERIC_CHARACTERS = ''.,'' ';
 logger.info ('P_F39_NN: Begin for datf = '||to_char(dat_, 'dd/mm/yyyy'));
 -------------------------------------------------------------------
 userid_ := user_id;
-DELETE FROM RNBU_TRACE WHERE userid = userid_;
+
+EXECUTE IMMEDIATE 'TRUNCATE TABLE RNBU_TRACE';
 -------------------------------------------------------------------
 mfo_ := F_OURMFO();
 
@@ -332,196 +345,207 @@ LOOP
          where ref=ref_
            and fdat=dat_
            and ((nlsd like '3800%' and exists (select 1 from specparam_int sp
-                                               where sp.acc=accd
-                                                 and sp.ob22 not in ('10','11','12'))) or
+                                               where sp.acc=accd 
+                                                 and sp.ob22 not in ('03','10','11','12'))) or 
                 (nlsk like '3800%' and exists (select 1 from specparam_int sp1
-                                               where sp1.acc=acck
-                                                 and sp1.ob22 not in ('10','11','12'))));
+                                               where sp1.acc=acck 
+                                                 and sp1.ob22 not in ('03','10','11','12'))));
       exception when others then
          flag_ := 0;
       end;
 
-      if flag_ = 0 then
+      if flag_ = 0 
+      then
          begin
-         select count(*)
-            into flag_
-         from provodki_otc
-         where ref=ref_
-           and fdat=dat_
-           and ((nlsd like '3800%' and exists (select 1 from specparam_int sp
-                                               where sp.acc=accd
-                                                 and sp.ob22 in ('10'))
-                 and LOWER(trim(nazn)) like '%передан%') or
-                (nlsk like '3800%' and exists (select 1 from specparam_int sp1
-                                               where sp1.acc=acck
-                                                 and sp1.ob22 not in ('10'))
-                 and LOWER(trim(nazn)) like '%передан%'));
-      exception when others then
-         flag_ := 0;
-      end;
-      end if;
-
-   if flag_ = 0
-   then
--- определяем базовую сумму введенных курсов
-      if kurs_ is not null then
-         begin
-            buf_ := to_number(kurs_);
+            select count(*)
+               into flag_
+            from provodki_otc
+            where ref=ref_
+              and fdat=dat_
+              and ((nlsd like '3800%' and exists (select 1 from specparam_int sp
+                                                  where sp.acc=accd 
+                                                    and sp.ob22 in ('10'))
+                    and LOWER(trim(nazn)) like '%передан%') or 
+                   (nlsk like '3800%' and exists (select 1 from specparam_int sp1
+                                                  where sp1.acc=acck 
+                                                    and sp1.ob22 not in ('10'))
+                    and LOWER(trim(nazn)) like '%передан%'));
          exception when others then
-            if sqlcode=-6502 then
-               raise_application_error(-20001,'Помилка: введений курс містить не числове значення (ref='||ref_||', kurs='''||kurs_||''')');
-            else
-               raise_application_error(-20002,'Помилка: '||sqlerrm);
-            end if;
+            flag_ := 0;
          end;
-
-         div_ := f_div( kurs_ , rate_o_ / bsu_);
-      end if;
-
--- определяем код области
-      if typ_>0 then
-         nbuc_ := nvl(f_codobl_tobo(acc_,typ_),nbuc1_);
-      else
-         nbuc_ := nbuc1_;
-      end if;
-
-      IF (dat_ < to_date('01082008','ddmmyyyy') and kv_ != 0) OR
-         (dat_ >= to_date('01082008','ddmmyyyy') and kv_ not in (959,961,962,964))
-      THEN
-
-         -- покупка наличной валюты
-         IF sum1_>0 AND sun1_>0 THEN
-            -- объем
-            a_:='1210' || VVV;
-            b_:=TO_CHAR(sum1_);
-
-            INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, nbuc, ref, comm) VALUES
-                                   (nls_, kv_, datd_, a_, b_, nbuc_, ref_, comm_);
-
-            -- курс
-            a_:='4210' || VVV;
-            if kurs_ is null then -- розрахований курс
-
-               if mfou_ = 300465 and mfou_ != mfo_ or mfou_ = 380764 then
-                  if count_ = 0 then
-                     BEGIN
-                        select rate_b
-                           into kurs1_
-                        from cur_rates$base
-                        where vdate in (select max(r.vdate)
-                                        from cur_rates$base r
-                                        where r.vdate <= decode(mfo_,351823,datd_-1,datd_))
-                                    and kv=kv1_
-                          and branch=branch_;
-                     EXCEPTION WHEN NO_DATA_FOUND THEN
-                        null;
-                     END;
-                  else
-                     BEGIN
-                        select rate_b
-                           into kurs1_
-                        from cur_rates$base
-                        where vdate in (select min(r.vdate)
-                                        from cur_rates$base r
-                                        where r.vdate > decode(mfo_,351823,datd_-1,datd_))
-                          and kv=kv1_
-                          and branch=branch_;
-                     EXCEPTION WHEN NO_DATA_FOUND THEN
-                        null;
-                     END;
-                  end if;
-                  b_:=ltrim(TO_CHAR(kurs1_,fmt_));
-                  comm_ := comm_||' курс вибраний iз таблицi курсiв '||b_;
+      end if; 
+   
+      if flag_ = 0
+      then
+         -- определяем базовую сумму введенных курсов
+         if kurs_ is not null 
+         then
+            begin
+               buf_ := to_number(kurs_);
+            exception when others then
+               if sqlcode=-6502 then
+                  raise_application_error(-20001,'Помилка: введений курс містить не числове значення (ref='||ref_||', kurs='''||kurs_||''')');
                else
-                  b_:=LTRIM(TO_CHAR(ROUND(sun1_*bsu_/sum1_,4),fmt_));
-                  comm_ := comm_ || ' курс розрахований ' || b_;
+                  raise_application_error(-20002,'Помилка: '||sqlerrm);
                end if;
-            else -- введений курс
-               b_:=ltrim(TO_CHAR(to_number(kurs_)*bsu_/div_,fmt_));
-               comm_ := comm_ || ' курс введений в док-тi ' || b_;
-            end if;
+            end;
 
-            INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, nbuc, ref, comm) VALUES
-                                   (nls_, kv_, datd_, a_, b_, nbuc_, ref_, comm_);
+            div_ := f_div( kurs_ , rate_o_ / bsu_);
+         end if;
 
-            -- объем**курс
-            a_:='3210' || VVV;
-            b_:=TO_CHAR(sum1_*b_);
+         -- определяем код области
+         if typ_>0 
+         then
+            nbuc_ := nvl(f_codobl_tobo(acc_,typ_),nbuc1_);
+         else
+            nbuc_ := nbuc1_;
+         end if;
 
-            INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, nbuc, ref) VALUES
-                                   (nls_, kv_, datd_, a_, b_, nbuc_, ref_);
-         END IF;
+         IF (dat_ < to_date('01082008','ddmmyyyy') and kv_ != 0) OR
+            (dat_ >= to_date('01082008','ddmmyyyy') and kv_ not in (959,961,962,964))
+         THEN
 
-         -- продажа наличной валюты
-         IF sum0_>0 AND sun0_>0 THEN
-            -- объем
-            a_:='1220' || VVV;
-            b_:=TO_CHAR(sum0_);
+            -- покупка наличной валюты
+            IF sum1_>0 AND sun1_>0 
+            THEN
+               -- объем
+               a_:='1210' || VVV;
+               b_:=TO_CHAR(sum1_);
 
-            INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, nbuc, ref, comm) VALUES
-                                   (nls_, kv_, datd_, a_, b_, nbuc_, ref_, comm_);
+               INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, nbuc, ref, comm) VALUES
+                                      (nls_, kv_, datd_, a_, b_, nbuc_, ref_, comm_);
 
-            -- курс
-            a_:='4220' || VVV ;
-
-            if kurs_ is null then
-
-               if mfou_ = 300465 and mfou_ != mfo_ or mfou_ = 380764 then
-                  if count_ = 0 then
-                     BEGIN
-                        select rate_s
-                           into kurs1_
-                        from cur_rates$base
-                        where vdate in (select max(r.vdate)
-                                        from cur_rates$base r
-                                        where r.vdate <= decode(mfo_,351823,datd_-1,datd_))
-                          and kv=kv1_
-                          and branch=branch_;
-                     EXCEPTION WHEN NO_DATA_FOUND THEN
-                        null;
-                     END;
+               -- курс
+               a_:='4210' || VVV;
+               if kurs_ is null     -- розрахований курс
+               then 
+                  if mfou_ = 300465 and mfou_ != mfo_  
+                  then
+                     if count_ = 0 
+                     then
+                        BEGIN
+                           select rate_b
+                              into kurs1_
+                           from cur_rates$base
+                           where vdate in (select max(r.vdate)
+                                           from cur_rates$base r
+                                           where r.vdate <= decode(mfo_,351823,datd_-1,datd_))
+                             and kv=kv1_
+                             and branch=branch_;
+                        EXCEPTION WHEN NO_DATA_FOUND THEN
+                           null;
+                        END;
+                     else
+                        BEGIN
+                           select rate_b
+                              into kurs1_
+                           from cur_rates$base
+                           where vdate in (select min(r.vdate)
+                                           from cur_rates$base r
+                                           where r.vdate > decode(mfo_,351823,datd_-1,datd_))
+                             and kv=kv1_
+                             and branch=branch_;
+                        EXCEPTION WHEN NO_DATA_FOUND THEN
+                           null;
+                        END;
+                     end if;
+                     b_:=ltrim(TO_CHAR(kurs1_,fmt_));
+                     comm_ := comm_||' курс вибраний iз таблицi курсiв '||b_;
                   else
-                     BEGIN
-                        select rate_s
-                           into kurs1_
-                        from cur_rates$base
-                        where vdate in (select min(r.vdate)
-                                        from cur_rates$base r
-                                        where r.vdate > decode(mfo_,351823,datd_-1,datd_))
-                          and kv=kv1_
-                          and branch=branch_;
-                     EXCEPTION WHEN NO_DATA_FOUND THEN
-                        null;
-                     END;
+                     b_:=LTRIM(TO_CHAR(ROUND(sun1_*bsu_/sum1_,4),fmt_));
+                     comm_ := comm_ || ' курс розрахований ' || b_;
                   end if;
-
-                  b_:=ltrim(TO_CHAR(kurs1_,fmt_));
-                  comm_ := comm_||' курс вибраний iз таблицi курсiв '||b_;
-               else
-                  b_:=LTRIM(TO_CHAR(ROUND(sun0_*bsu_/sum0_,4),fmt_));
-                  comm_ := comm_ || ' курс розрахований ' || b_;
+               else -- введений курс
+                  b_:=ltrim(TO_CHAR(to_number(kurs_)*bsu_/div_,fmt_));
+                  comm_ := comm_ || ' курс введений в док-тi ' || b_;
                end if;
-            else
-               b_:=ltrim(TO_CHAR(to_number(kurs_)*bsu_/div_,fmt_));
-               comm_ := comm_ || ' курс введений в док-тi ' || b_;
-            end if;
 
-            INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, nbuc, ref, comm) VALUES
-                                   (nls_, kv_, datd_, a_, b_, nbuc_, ref_, comm_);
+               INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, nbuc, ref, comm) VALUES
+                                      (nls_, kv_, datd_, a_, b_, nbuc_, ref_, comm_);
+              
+               -- объем**курс
+               a_:='3210' || VVV;
+               b_:=TO_CHAR(sum1_*b_);
 
-            -- объем**курс
-            a_:='3220' || VVV;
-            b_:=TO_CHAR(sum0_*b_);
+               INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, nbuc, ref) VALUES
+                                      (nls_, kv_, datd_, a_, b_, nbuc_, ref_);
+            END IF;
 
-            INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, nbuc, ref) VALUES
-                                   (nls_, kv_, datd_, a_, b_, nbuc_, ref_);
+            -- продажа наличной валюты
+            IF sum0_>0 AND sun0_>0 
+            THEN
+               -- объем
+               a_:='1220' || VVV;
+               b_:=TO_CHAR(sum0_);
+
+               INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, nbuc, ref, comm) VALUES
+                                      (nls_, kv_, datd_, a_, b_, nbuc_, ref_, comm_);
+
+               -- курс
+               a_:='4220' || VVV ;
+
+               if kurs_ is null 
+               then
+
+                  if mfou_ = 300465 and mfou_ != mfo_  
+                  then
+                     if count_ = 0 
+                     then
+                        BEGIN
+                           select rate_s
+                              into kurs1_
+                           from cur_rates$base
+                           where vdate in (select max(r.vdate)
+                                           from cur_rates$base r
+                                           where r.vdate <= decode(mfo_,351823,datd_-1,datd_))
+                             and kv=kv1_
+                             and branch=branch_;
+                        EXCEPTION WHEN NO_DATA_FOUND THEN
+                           null;
+                        END;
+                     else
+                        BEGIN
+                           select rate_s
+                              into kurs1_
+                           from cur_rates$base
+                           where vdate in (select min(r.vdate)
+                                           from cur_rates$base r
+                                           where r.vdate > decode(mfo_,351823,datd_-1,datd_))
+                             and kv=kv1_
+                             and branch=branch_;
+                        EXCEPTION WHEN NO_DATA_FOUND THEN
+                           null;
+                        END;
+                     end if;
+
+                     b_:=ltrim(TO_CHAR(kurs1_,fmt_));
+                     comm_ := comm_||' курс вибраний iз таблицi курсiв '||b_;
+                  else
+                     b_:=LTRIM(TO_CHAR(ROUND(sun0_*bsu_/sum0_,4),fmt_));
+                     comm_ := comm_ || ' курс розрахований ' || b_;
+                  end if;
+               else
+                  b_:=ltrim(TO_CHAR(to_number(kurs_)*bsu_/div_,fmt_));
+                  comm_ := comm_ || ' курс введений в док-тi ' || b_;
+               end if;
+
+               INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, nbuc, ref, comm) VALUES
+                                      (nls_, kv_, datd_, a_, b_, nbuc_, ref_, comm_);
+
+               -- объем**курс
+               a_:='3220' || VVV;
+               b_:=TO_CHAR(sum0_*b_);
+
+               INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, nbuc, ref) VALUES
+                                      (nls_, kv_, datd_, a_, b_, nbuc_, ref_);
+            END IF;
          END IF;
-      END IF;
-   end if;
+      end if;
    END LOOP;
    CLOSE operval;
 
-   if dat_ < to_date('01082008','ddmmyyyy') THEN
+   if dat_ < to_date('01082008','ddmmyyyy') 
+   THEN
       -- Покупка/продажа металлов
       -- отменено формирование с 01.08.2008
       OPEN OPER959;
@@ -530,14 +554,16 @@ LOOP
          EXIT WHEN oper959%NOTFOUND ;
 
          -- определяем код области
-         if typ_>0 then
+         if typ_>0 
+         then
             nbuc_ := nvl(f_codobl_tobo(acc_,typ_),nbuc1_);
          else
             nbuc_ := nbuc1_;
          end if;
 
          -- покупка
-         IF sum1_>0 AND sun1_>0 THEN
+         IF sum1_>0 AND sun1_>0 
+         THEN
             -- объем
             a_:='1210' || VVV ;
             b_:=TO_CHAR(sum1_) ;
@@ -561,7 +587,8 @@ LOOP
          END IF;
 
          -- продажа
-         IF sum0_>0 AND sun0_>0 THEN
+         IF sum0_>0 AND sun0_>0 
+         THEN
             -- объем
             a_:='1220' || VVV ;
             b_:=TO_CHAR(sum0_) ;
@@ -590,7 +617,8 @@ END LOOP;
 CLOSE tval;
 ------------------------------------------------------
 -- межбанк  только до 01.01.2010
-if dat_ < to_date('01012010','ddmmyyyy') then
+if dat_ < to_date('01012010','ddmmyyyy') 
+then
    OPEN OPL_DOK;
    LOOP
       FETCH OPL_DOK INTO accd_, nls_, kv_, acck_, nlsk_, ref_, mfoa_, mfob_,
@@ -602,7 +630,8 @@ if dat_ < to_date('01012010','ddmmyyyy') then
       THEN
 
          kol_:=0;
-         IF mfoa_ != mfob_ THEN
+         IF mfoa_ != mfob_ 
+         THEN
             SELECT count(*) INTO kol_ FROM v_branch
             WHERE mfob_=mfo and mfo != mfou;
          END IF;
@@ -612,17 +641,21 @@ if dat_ < to_date('01012010','ddmmyyyy') then
          IF SUM1_ != 0 and (substr(nlsb_,1,4)='2600' or not ((d39_='112' and
                           '3901' in (substr(nls_,1,4), substr(nlsk_,1,4)) and
                            mfoa_=mfob_) or
-                         (d39_='122' and kol_ != 0))) then
+                         (d39_='122' and kol_ != 0))) 
+         then
 
             VVV:=lpad(kv_,3,'0');
 
-            IF substr(tag_,1,4)='D#39' THEN
+            IF substr(tag_,1,4)='D#39' 
+            THEN
                -- покупка или продажа?
-               IF substr(nls_,1,4)='3800' and d39_='112' THEN
+               IF substr(nls_,1,4)='3800' and d39_='112' 
+               THEN
                   d39_:='122';
                END IF;
 
-               IF d39_='112' THEN
+               IF d39_='112' 
+               THEN
                   nls1_:=nlsk_;
                   acc_:=acck_;
                ELSE
@@ -631,7 +664,8 @@ if dat_ < to_date('01012010','ddmmyyyy') then
                END IF;
 
                -- определяем код области
-               if typ_>0 then
+               if typ_>0 
+               then
                   nbuc_ := nvl(f_codobl_tobo(acc_,typ_),nbuc1_);
                else
                   nbuc_ := nbuc1_;
@@ -661,7 +695,8 @@ if dat_ < to_date('01012010','ddmmyyyy') then
                   bsu_ := 1;
                end;
 
-               if kurs_='1' then
+               if kurs_='1' 
+               then
                   kurs_ := rate_o_;
                end if;
                -- курс
@@ -706,8 +741,8 @@ OPEN basel;
       INTO nbuc_, kodp_, sum0_, sum1_;
       EXIT WHEN basel%NOTFOUND;
 
-      IF sum0_ != 0 then
-
+      IF sum0_ != 0 
+      then
          -- сумма
          kv_:=to_number(substr(kodp_,5,3));
 

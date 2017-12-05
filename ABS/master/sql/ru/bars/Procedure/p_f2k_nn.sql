@@ -4,7 +4,7 @@ CREATE OR REPLACE PROCEDURE BARS.P_F2K_NN (dat_ DATE ,
 % DESCRIPTION : Процедура формирование файла #2K
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
 %
-% VERSION     : v.17.002     21.08.2017
+% VERSION     : v.17.005     06.11.2017
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: dat_ - отчетная дата
            sheme_ - схема формирования
@@ -18,8 +18,12 @@ CREATE OR REPLACE PROCEDURE BARS.P_F2K_NN (dat_ DATE ,
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
- 21.08.2017 значение DDD=260 определяется по признаку блокировки счета
- 14.06.2017 создание процедуры
+ 07.11.2017  новый план счетов: исключены счета 2615,2635,2652,3330,3340
+ 06.11.2017
+ 01.11.2017  обработка ситуаций с незаполенной датой в параметре RNBOD
+ 02.10.2017  расширена длина переменной p_391
+ 21.08.2017  значение DDD=260 определяется по признаку блокировки счета
+ 14.06.2017  создание процедуры
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 kodf_       varchar2(2):='2K';
@@ -44,15 +48,17 @@ nnno_       number;
 flag_acc_   number;
 flag_opp_   number;
 
-dat_rnbo_      date;
+dat_rnbo_         date;
+is_dat_exist_     number;
+
 p_210          number;
 p_260          varchar2(10);
 p_310          varchar2(1);
 p_330          varchar2(20);
-p_340          varchar2(100);
+p_340          varchar2(70);
 p_350          varchar2(10);
-p_360          varchar2(100);
-p_391          varchar2(1);
+p_360          varchar2(70);
+p_391          varchar2(10);
 
 --    операции DDD начинающиеся с 0..
 procedure p_ins_0( p_rnk number, p_kodp varchar2,
@@ -91,12 +97,18 @@ begin
 --    120  номер указу
           insert into rnbu_trace
                     ( rnk, kodp, znap )
-             values ( p_rnk, '120'||p_kodp, p_rnbou );
+             values ( p_rnk, '120'||p_kodp, 
+                     (case when p_rnbou is null  then 'немае даних'
+                          else p_rnbou end)
+                    );
 
 --    130  санкцiя
           insert into rnbu_trace
                     ( rnk, kodp, znap )
-             values ( p_rnk, '130'||p_kodp, p_rnbos );
+             values ( p_rnk, '130'||p_kodp,
+                     (case when p_rnbos is null  then 'немае даних'
+                          else p_rnbos end)
+                    );
 
 end;
 
@@ -104,7 +116,7 @@ end;
 procedure p_ins_2( p_rnk number, p_kodp varchar2,
                    p_210 number, p_nls varchar2, p_kv number,
                    p_daos varchar2, p_dazs varchar2, 
-                   p_260 varchar2, p_270 number, p_280 number )
+                   p_260 varchar2, p_270 varchar2, p_280 varchar2 )
    is
 begin
 
@@ -140,12 +152,12 @@ begin
                     ( rnk, kodp, znap )
              values ( p_rnk, '260'||p_kodp, p_260 );
 
---    270  залишок коштiв 1
+--    270  залишок коштiв 1 -на дату введення санкцiй
           insert into rnbu_trace
                     ( rnk, kodp, znap )
              values ( p_rnk, '270'||p_kodp, p_270 );
 
---    280  залишок коштiв 2
+--    280  залишок коштiв 2 -на звiтну дату
           insert into rnbu_trace
                     ( rnk, kodp, znap )
              values ( p_rnk, '280'||p_kodp, p_280 );
@@ -165,47 +177,47 @@ begin
                     ( rnk, kodp, znap )
              values ( p_rnk, '310'||p_kodp, p_310 );
 
---    320  код виду фiнансовоi операцii
+--    320  дата спроби проведення фiнансовоi операцii
           insert into rnbu_trace
                     ( rnk, kodp, znap )
              values ( p_rnk, '320'||p_kodp, p_320 );
 
---    330  код виду фiнансовоi операцii
+--    330  номер рахунку отримувача/платника
           insert into rnbu_trace
                     ( rnk, kodp, znap )
              values ( p_rnk, '330'||p_kodp, p_330 );
                                                 
---    340  код виду фiнансовоi операцii
+--    340  наiменування отримувача/платника
           insert into rnbu_trace
                     ( rnk, kodp, znap )
              values ( p_rnk, '340'||p_kodp, p_340 );
 
---    350  код виду фiнансовоi операцii
+--    350  код едрпоу/iпн отримувача/платника
           insert into rnbu_trace
                     ( rnk, kodp, znap )
              values ( p_rnk, '350'||p_kodp, p_350 );
 
---    360  код виду фiнансовоi операцii
+--    360  наiменування банку отримувача/платника
           insert into rnbu_trace
                     ( rnk, kodp, znap )
              values ( p_rnk, '360'||p_kodp, p_360 );
 
---    370  код виду фiнансовоi операцii
+--    370  сума фiнансовоi операцii
           insert into rnbu_trace
                     ( rnk, kodp, znap )
              values ( p_rnk, '370'||p_kodp, to_char(p_ostf) );
 
---    380  код виду фiнансовоi операцii
+--    380  код валюти фiнансовоi операцii
           insert into rnbu_trace
                     ( rnk, kodp, znap )
              values ( p_rnk, '380'||p_kodp, lpad(trim(to_char(p_kv)),3,'0') );
 
---    390  код виду фiнансовоi операцii
+--    390  призначення платежу фiнансовоi операцii
           insert into rnbu_trace
                     ( rnk, kodp, znap )
              values ( p_rnk, '390'||p_kodp, p_390 );
 
---    391  код виду фiнансовоi операцii
+--    391  дii банку при спробi фiнансовоi операцii
           insert into rnbu_trace
                     ( rnk, kodp, znap )
              values ( p_rnk, '391'||p_kodp, p_391 );
@@ -221,7 +233,7 @@ logger.info ('P_F2K_NN: Begin for datf = '||to_char(dat_, 'dd/mm/yyyy'));
 userid_ := user_id;
 DELETE FROM RNBU_TRACE WHERE userid = userid_;
 -------------------------------------------------------------------
-mfo_ := F_OURMFO();
+   mfo_ := F_OURMFO();
 
 -- МФО "родителя"
    BEGIN
@@ -243,13 +255,16 @@ mfo_ := F_OURMFO();
    dats_ := trunc(dat_, 'mm');
    
    for k in ( select c.rnk, c.okpo, c.codcagent, c.nmk, c.adr, 
-                     re.rnbor, re.rnbou, re.rnbos, re.rnbod
+                     trim(re.rnbor) rnbor, trim(re.rnbou) rnbou,
+                     trim(re.rnbos) rnbos, trim(re.rnbod) rnbod
                 from customer c,
                      ( select *
                          from ( select u.rnk, u.tag, u.value
                                   from customerw u
                                  where exists (select 1 from customerw p
                                                 where p.tag like 'RNBO_'
+                                                  and 
+decode( upper(trim(p.value)),'НЕМАЄ','','НІ','', trim(p.value) ) is not null
                                                   and p.rnk=u.rnk) 
                               ) pivot
                               ( max(trim(value))
@@ -258,6 +273,7 @@ mfo_ := F_OURMFO();
                               )
                      ) re
                where c.rnk = re.rnk
+                 and re.rnbor is not null
             )
    loop
        if     k.codcagent =1   then    segm_a :='3';
@@ -269,8 +285,18 @@ mfo_ := F_OURMFO();
        end if;
        segm_z := lpad(k.okpo,10);
 
-       dat_rnbo_ := to_date(k.rnbod,'dd/mm/yyyy');
+       is_dat_exist_ := 0;
+       begin
+         dat_rnbo_ := to_date(k.rnbod,'dd/mm/yyyy');
+         is_dat_exist_ := 1;
+       exception
+           when others  then  dat_rnbo_ :=dat_;
+       end;
        
+--  правильная дата в dat_rnbo_ + RNBOS начинается с цифры
+    if is_dat_exist_ =1 and substr(k.rnbos,1,1) between '0' and '9'
+    then
+
        flag_acc_ := 0;
        flag_opp_ := 0;
 
@@ -278,8 +304,8 @@ mfo_ := F_OURMFO();
        for u in ( select a.acc, a.kv, a.nbs, a.nls, a.daos, a.dazs,
                          to_char(a.daos,'ddmmyyyy') c_daos,
                          decode(a.dazs,null,null,to_char(a.dazs,'ddmmyyyy') ) c_dazs,
-                         fost(a.acc,dat_rnbo_) p_270,
-                         fost(a.acc,dat_) p_280,
+                         to_char( round(0.01*fost(a.acc,dat_rnbo_)) ) p_270,
+                         to_char( round(0.01*fost(a.acc,dat_)) ) p_280,
                          nvl(a.blkd,0)+nvl(a.blkk,0) acc_blk
                     from accounts a
                    where a.rnk = k.rnk 
@@ -287,8 +313,8 @@ mfo_ := F_OURMFO();
             '2512', '2513', '2520', '2523', '2525', '2530', '2541', '2542',
             '2544', '2545', '2546', '2550', '2551', '2553', '2555', '2556',
             '2560', '2561', '2562', '2565', '2600', '2604', '2605', '2610',
-            '2615', '2620', '2625', '2630', '2635', '2650', '2651', '2652',
-            '2655', '3320', '3330', '3340' )
+            '2620', '2625', '2630', '2650', '2651', '2655', '3320' )
+                     and a.daos < dat_rnbo_
                      and ( a.dazs is null
                         or a.dazs is not null and
                            a.dazs > to_date('20150922','yyyymmdd') )
@@ -368,15 +394,15 @@ mfo_ := F_OURMFO();
              if u.acc = v.accd  then
                 p_310 :='1';
                 p_330 := v.nlsk;
-                p_340 := v.nam_b;
+                p_340 := substr(trim(v.nam_b),1,70);
                 p_350 := lpad(v.okpo_b,10,'0');
-                p_360 := v.namb_b;
+                p_360 := substr(trim(v.namb_b),1,70);
              else
                 p_310 :='2';
                 p_330 := v.nlsd;
-                p_340 := v.nam_a;
+                p_340 := substr(trim(v.nam_a),1,70);
                 p_350 := lpad(v.okpo_a,10,'0');
-                p_360 := v.namb_a;
+                p_360 := substr(trim(v.namb_a),1,70);
              end if;
              
              p_391 := p_260;
@@ -393,7 +419,7 @@ mfo_ := F_OURMFO();
                       p_260, u.p_270, u.p_280 );
 
              p_ins_3( k.rnk, kodp_, p_310, v.pdat, p_330, p_340,
-                      p_350, p_360, v.ostf, v.kv, v.nazn, p_391 );
+                      p_350, p_360, v.ostf, v.kv, substr(v.nazn,1,70), p_391 );
 
           end loop;                --цикл по операциям
 
@@ -412,6 +438,11 @@ mfo_ := F_OURMFO();
                       u.c_daos, u.c_dazs,
                       p_260, u.p_270, u.p_280 );
 
+--    380  код валюти фiнансовоi операцii при вiдсутностi операцiй
+             insert into rnbu_trace
+                       ( rnk, kodp, znap )
+                values ( k.rnk, '380'||kodp_, '000' );
+
           end if;
        end loop;                   --цикл по счетам
 
@@ -426,6 +457,9 @@ mfo_ := F_OURMFO();
     
           p_ins_1( k.rnk, kodp_, k.rnbor, k.rnbou, k.rnbos );
        end if;
+
+   end if;
+
    end loop;                       --цикл по клиентам
 
 ------------------------------------------------------

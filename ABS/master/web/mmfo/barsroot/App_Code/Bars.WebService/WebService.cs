@@ -1,4 +1,4 @@
-using System;
+п»їusing System;
 using System.ComponentModel;
 using System.Data;
 using System.Collections;
@@ -14,7 +14,11 @@ using BarsWeb.Areas.Kernel.Infrastructure.DI.Implementation;
 using BarsWeb.Areas.Kernel.Models;
 using Kendo.Mvc;
 using Kendo.Mvc.UI;
+using Microsoft.Ajax.Utilities;
 using CommandType = System.Data.CommandType;
+using barsroot.core;
+using System.Linq;
+using BarsWeb.Core.Logger;
 
 namespace Bars
 {
@@ -66,7 +70,7 @@ namespace Bars
             base.Dispose(disposing);
         }
         /// <summary>
-        /// Первичная проверка на доступ к сервису
+        /// РџРµСЂРІРёС‡РЅР°СЏ РїСЂРѕРІРµСЂРєР° РЅР° РґРѕСЃС‚СѓРї Рє СЃРµСЂРІРёСЃСѓ
         /// </summary>
         public virtual void PrimaryCheckAccess()
         {
@@ -74,9 +78,9 @@ namespace Bars
         }
 
         /// <summary>
-        /// Сохраняем выброшенное исключение 
+        /// РЎРѕС…СЂР°РЅСЏРµРј РІС‹Р±СЂРѕС€РµРЅРЅРѕРµ РёСЃРєР»СЋС‡РµРЅРёРµ 
         /// </summary>
-        /// <param name="ex">Исключение</param>
+        /// <param name="ex">РСЃРєР»СЋС‡РµРЅРёРµ</param>
         public void SaveExeption(System.Exception ex)
         {
             if (HttpContext.Current.Session != null)
@@ -96,7 +100,7 @@ namespace Bars
         }
 
         /// <summary>
-        /// Инициализация работы с базой(создаем экземпляр интерфейса Bars.Oracle.Connection )
+        /// РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ СЂР°Р±РѕС‚С‹ СЃ Р±Р°Р·РѕР№(СЃРѕР·РґР°РµРј СЌРєР·РµРјРїР»СЏСЂ РёРЅС‚РµСЂС„РµР№СЃР° Bars.Oracle.Connection )
         /// </summary>
         public IOraConnection hsql
         {
@@ -111,10 +115,10 @@ namespace Bars
         }
 
         /// <summary>
-        /// Строка соединения
+        /// РЎС‚СЂРѕРєР° СЃРѕРµРґРёРЅРµРЅРёСЏ
         /// </summary>
-        /// <param name="ctx">Контекст</param>
-        /// <returns>строка соединения</returns>
+        /// <param name="ctx">РљРѕРЅС‚РµРєСЃС‚</param>
+        /// <returns>СЃС‚СЂРѕРєР° СЃРѕРµРґРёРЅРµРЅРёСЏ</returns>
         public string ConnectionString(HttpContext ctx)
         {
             return hsql.GetUserConnectionString(ctx);
@@ -134,9 +138,9 @@ namespace Bars
         }
 
         /// <summary>
-        /// Инициализация работы с базой
+        /// РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ СЂР°Р±РѕС‚С‹ СЃ Р±Р°Р·РѕР№
         /// </summary>
-        /// <param name="ctx">Контекст</param>
+        /// <param name="ctx">РљРѕРЅС‚РµРєСЃС‚</param>
         public void InitOraConnection(HttpContext ctx)
         {
             if (_connect == null)
@@ -144,9 +148,9 @@ namespace Bars
             _command = new OracleCommand();
         }
         /// <summary>
-        /// Инициализация работы с базой
+        /// РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ СЂР°Р±РѕС‚С‹ СЃ Р±Р°Р·РѕР№
         /// </summary>
-        /// <param name="connstr">строка соединения</param>
+        /// <param name="connstr">СЃС‚СЂРѕРєР° СЃРѕРµРґРёРЅРµРЅРёСЏ</param>
         public void InitOraConnection(string connstr)
         {
             if (_connect == null)
@@ -155,7 +159,7 @@ namespace Bars
             _command = new OracleCommand();
         }
         /// <summary>
-        /// Инициализация работы с базой
+        /// РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ СЂР°Р±РѕС‚С‹ СЃ Р±Р°Р·РѕР№
         /// </summary>
         public void InitOraConnection()
         {
@@ -164,30 +168,30 @@ namespace Bars
             _command = new OracleCommand();
         }
         /// <summary>
-        /// Начать транзакцию
+        /// РќР°С‡Р°С‚СЊ С‚СЂР°РЅР·Р°РєС†РёСЋ
         /// </summary>
         public void BeginTransaction()
         {
             _transaction = _connect.BeginTransaction();
         }
         /// <summary>
-        /// Commit транзакции
+        /// Commit С‚СЂР°РЅР·Р°РєС†РёРё
         /// </summary>
         public void CommitTransaction()
         {
             _transaction.Commit();
         }
         /// <summary>
-        /// Rollback  транзакции
+        /// Rollback  С‚СЂР°РЅР·Р°РєС†РёРё
         /// </summary>
         public void RollbackTransaction()
         {
             _transaction.Rollback();
         }
         /// <summary>
-        /// Установка роли
+        /// РЈСЃС‚Р°РЅРѕРІРєР° СЂРѕР»Рё
         /// </summary>
-        /// <param name="role">имя роли</param>
+        /// <param name="role">РёРјСЏ СЂРѕР»Рё</param>
         public void SetRole(string role)
         {
             _command.Connection = _connect;
@@ -202,7 +206,7 @@ namespace Bars
             }
         }
         /// <summary>
-        /// Commit текущего соединения
+        /// Commit С‚РµРєСѓС‰РµРіРѕ СЃРѕРµРґРёРЅРµРЅРёСЏ
         /// </summary>
         public void Commit()
         {
@@ -211,12 +215,12 @@ namespace Bars
             _command.ExecuteNonQuery();
         }
         /// <summary>
-        /// Добавить параметр запроса
+        /// Р”РѕР±Р°РІРёС‚СЊ РїР°СЂР°РјРµС‚СЂ Р·Р°РїСЂРѕСЃР°
         /// </summary>
-        /// <param name="name">имя параметра</param>
-        /// <param name="type">тип(перечисление DB_TYPE)</param>
-        /// <param name="val">значение параметра</param>
-        /// <param name="direct">direction(перечисление DIRECTION)</param>
+        /// <param name="name">РёРјСЏ РїР°СЂР°РјРµС‚СЂР°</param>
+        /// <param name="type">С‚РёРї(РїРµСЂРµС‡РёСЃР»РµРЅРёРµ DB_TYPE)</param>
+        /// <param name="val">Р·РЅР°С‡РµРЅРёРµ РїР°СЂР°РјРµС‚СЂР°</param>
+        /// <param name="direct">direction(РїРµСЂРµС‡РёСЃР»РµРЅРёРµ DIRECTION)</param>
         public void SetParameters(string name, DB_TYPE type, object val, DIRECTION direct)
         {
             _command.Parameters.Add(name, (OracleDbType)type, val, (ParameterDirection)direct);
@@ -237,26 +241,26 @@ namespace Bars
             _command.Parameters.Add(name, (OracleDbType)type, size, val, (ParameterDirection)direct);
         }
         /// <summary>
-        /// Удалить все параметры текущего OracleCommand 
+        /// РЈРґР°Р»РёС‚СЊ РІСЃРµ РїР°СЂР°РјРµС‚СЂС‹ С‚РµРєСѓС‰РµРіРѕ OracleCommand 
         /// </summary>
         public void ClearParameters()
         {
             _command.Parameters.Clear();
         }
         /// <summary>
-        /// Получить параметр
+        /// РџРѕР»СѓС‡РёС‚СЊ РїР°СЂР°РјРµС‚СЂ
         /// </summary>
-        /// <param name="name">имя параметра</param>
-        /// <returns>значение параметра</returns>
+        /// <param name="name">РёРјСЏ РїР°СЂР°РјРµС‚СЂР°</param>
+        /// <returns>Р·РЅР°С‡РµРЅРёРµ РїР°СЂР°РјРµС‚СЂР°</returns>
         public object GetParameter(string name)
         {
             return _command.Parameters[name].Value;
         }
         /// <summary>
-        /// Значение параметра из таблицы WEB_USERPARAMS
+        /// Р—РЅР°С‡РµРЅРёРµ РїР°СЂР°РјРµС‚СЂР° РёР· С‚Р°Р±Р»РёС†С‹ WEB_USERPARAMS
         /// </summary>
-        /// <param name="param">имя параметра</param>
-        /// <returns>значение</returns>
+        /// <param name="param">РёРјСЏ РїР°СЂР°РјРµС‚СЂР°</param>
+        /// <returns>Р·РЅР°С‡РµРЅРёРµ</returns>
         public string GetUserParam(string param)
         {
             _command.CommandText = "SELECT VAL FROM V_WEB_USERPARAMS WHERE PAR=:PAR";
@@ -272,7 +276,7 @@ namespace Bars
             }
         }
         /// <summary>
-        /// Взять глобальный параметр из таблицы Params
+        /// Р’Р·СЏС‚СЊ РіР»РѕР±Р°Р»СЊРЅС‹Р№ РїР°СЂР°РјРµС‚СЂ РёР· С‚Р°Р±Р»РёС†С‹ Params
         /// </summary>
         /// <param name="parName"></param>
         /// <returns></returns>
@@ -293,11 +297,11 @@ namespace Bars
         }
 
         /// <summary>
-        /// Возвращает строку запроса с пейджингом
+        /// Р’РѕР·РІСЂР°С‰Р°РµС‚ СЃС‚СЂРѕРєСѓ Р·Р°РїСЂРѕСЃР° СЃ РїРµР№РґР¶РёРЅРіРѕРј
         /// </summary>
-        /// <param name="query">входной запрос</param>
-        /// <param name="startpos">позиция с</param>
-        /// <param name="maxpos">количество строк</param>
+        /// <param name="query">РІС…РѕРґРЅРѕР№ Р·Р°РїСЂРѕСЃ</param>
+        /// <param name="startpos">РїРѕР·РёС†РёСЏ СЃ</param>
+        /// <param name="maxpos">РєРѕР»РёС‡РµСЃС‚РІРѕ СЃС‚СЂРѕРє</param>
         /// <returns></returns>
         private string MakePagingQuery(string query, int startpos, int maxpos)
         {
@@ -310,9 +314,9 @@ namespace Bars
                    "where rnum >= :MIN_ROW_TO_FETCH";
         }
         /// <summary>
-        /// Заполняет DataSet заданым запросом
+        /// Р—Р°РїРѕР»РЅСЏРµС‚ DataSet Р·Р°РґР°РЅС‹Рј Р·Р°РїСЂРѕСЃРѕРј
         /// </summary>
-        /// <param name="query">запрос</param>
+        /// <param name="query">Р·Р°РїСЂРѕСЃ</param>
         /// <returns>DataSet</returns>
         public DataSet SQL_SELECT_dataset(string query)
         {
@@ -334,11 +338,11 @@ namespace Bars
             return result;
         }
         /// <summary>
-        /// Заполняет DataSet строками начиная с номера [startpos] и количеством [maxpos] строк
+        /// Р—Р°РїРѕР»РЅСЏРµС‚ DataSet СЃС‚СЂРѕРєР°РјРё РЅР°С‡РёРЅР°СЏ СЃ РЅРѕРјРµСЂР° [startpos] Рё РєРѕР»РёС‡РµСЃС‚РІРѕРј [maxpos] СЃС‚СЂРѕРє
         /// </summary>
-        /// <param name="query">запрос</param>
-        /// <param name="startpos">начальный номер строки</param>
-        /// <param name="takeRows">количество строк</param>
+        /// <param name="query">Р·Р°РїСЂРѕСЃ</param>
+        /// <param name="startpos">РЅР°С‡Р°Р»СЊРЅС‹Р№ РЅРѕРјРµСЂ СЃС‚СЂРѕРєРё</param>
+        /// <param name="takeRows">РєРѕР»РёС‡РµСЃС‚РІРѕ СЃС‚СЂРѕРє</param>
         /// <returns></returns>
         public DataSet SQL_SELECT_dataset(string query, int startpos, int takeRows)
         {
@@ -352,7 +356,7 @@ namespace Bars
             return ds;
         }
 
-        public DataSet SQL_SELECT_dataset(string query, int startpos, int takeRows, string[] data)
+        public DataSet SQL_SELECT_dataset(string query, int startpos, int takeRows, string[] data, LogParams lParams = null)
         {
             OracleDataAdapter adapter = new OracleDataAdapter();
             DataSet ds = new DataSet();
@@ -361,8 +365,8 @@ namespace Bars
 
             int pageSize = takeRows;
 
-            //трансформируем запрос согласно щтатного кенду трасфортматорв
-            //1. конвертнем данные запроса в кендо DataSourceRequest
+            //С‚СЂР°РЅСЃС„РѕСЂРјРёСЂСѓРµРј Р·Р°РїСЂРѕСЃ СЃРѕРіР»Р°СЃРЅРѕ С‰С‚Р°С‚РЅРѕРіРѕ РєРµРЅРґСѓ С‚СЂР°СЃС„РѕСЂС‚РјР°С‚РѕСЂРІ
+            //1. РєРѕРЅРІРµСЂС‚РЅРµРј РґР°РЅРЅС‹Рµ Р·Р°РїСЂРѕСЃР° РІ РєРµРЅРґРѕ DataSourceRequest
             DataSourceRequest request = new DataSourceRequest()
             {
                 Page = startpos / (pageSize - 1) + 1,
@@ -371,8 +375,8 @@ namespace Bars
             };
             if (!String.IsNullOrEmpty(data[3]))
             {
-                //сортировки передаются сюда по-разному 
-                //бывает просто перечень полей для сортировки через запятую
+                //СЃРѕСЂС‚РёСЂРѕРІРєРё РїРµСЂРµРґР°СЋС‚СЃСЏ СЃСЋРґР° РїРѕ-СЂР°Р·РЅРѕРјСѓ 
+                //Р±С‹РІР°РµС‚ РїСЂРѕСЃС‚Рѕ РїРµСЂРµС‡РµРЅСЊ РїРѕР»РµР№ РґР»СЏ СЃРѕСЂС‚РёСЂРѕРІРєРё С‡РµСЂРµР· Р·Р°РїСЏС‚СѓСЋ
                 if (data[3].IndexOf(", ") >= 0)
                 {
                     string[] sort = data[3].Split(new[] {", "}, StringSplitOptions.None);
@@ -387,26 +391,39 @@ namespace Bars
                 }
                 else
                 {
-                    //бывает название колонки - направление
+                    //Р±С‹РІР°РµС‚ РЅР°Р·РІР°РЅРёРµ РєРѕР»РѕРЅРєРё - РЅР°РїСЂР°РІР»РµРЅРёРµ
                     string[] sort = data[3].Split(' ');
+                    
+                    var orderParam = GetOrderParameter(query, sort[0]);
+
                     request.Sorts.Add(new SortDescriptor()
                     {
-                        Member = sort[0],
-                        SortDirection = sort[1].ToUpper() == "DESC" ? ListSortDirection.Descending : ListSortDirection.Ascending
+                        //Member = sort[0],
+                        
+                        Member = orderParam,
+                        SortDirection = sort.Length>1 && sort[1].ToUpper() == "DESC" ? ListSortDirection.Descending : ListSortDirection.Ascending
                     });
                 }
                 
             }
-            //2. Создадим конвертер и произведем конвертацию
+            //2. РЎРѕР·РґР°РґРёРј РєРѕРЅРІРµСЂС‚РµСЂ Рё РїСЂРѕРёР·РІРµРґРµРј РєРѕРЅРІРµСЂС‚Р°С†РёСЋ
             KendoSqlTransformer sqlTransformer = new KendoSqlTransformer(null);
             BarsSql barssql = new BarsSql() { SqlText = query };
 
             var transFormedSql = sqlTransformer.TransformSql(barssql, request);
-            //3. Пересчитаем параметри постраничной разбивки по правилам Grid2005
+            //3. РџРµСЂРµСЃС‡РёС‚Р°РµРј РїР°СЂР°РјРµС‚СЂРё РїРѕСЃС‚СЂР°РЅРёС‡РЅРѕР№ СЂР°Р·Р±РёРІРєРё РїРѕ РїСЂР°РІРёР»Р°Рј Grid2005
             int shiftRow = request.Page - 1;
             _command.Parameters.Add("p_startNumRow", OracleDbType.Decimal, Int32.Parse(((OracleParameter)transFormedSql.SqlParams[0]).Value.ToString()) - shiftRow, ParameterDirection.Input);
             _command.Parameters.Add("p_endNumRow", OracleDbType.Decimal, Int32.Parse(((OracleParameter)transFormedSql.SqlParams[1]).Value.ToString()) - shiftRow, ParameterDirection.Input);
             _command.CommandText = transFormedSql.SqlText;
+
+            //4. Р›РѕРіРёСЂСѓРµРј Р·Р°РїСЂРѕСЃ (РµСЃР»Рё РЅРµРѕР±С…РѕРґРёРјРѕ)
+            if (null != lParams)
+            {
+                string sqlQuery = _command.CommandText;
+                _command.Parameters.Cast<OracleParameter>().ForEach(p => { sqlQuery = sqlQuery.Replace(":" + p.ParameterName, p.Value.ToString()); });
+                DbLoggerConstruct.NewDbLogger().Info(sqlQuery, lParams.CallerName);
+            }
 
             adapter.Fill(ds);
             adapter.Dispose();
@@ -414,11 +431,46 @@ namespace Bars
         }
 
         /// <summary>
-        ///  Строка значений параметров из web_userparams
+        /// РћС‚СЂРёРјСѓС” РЅР°Р·РІСѓ РїРѕР»СЏ, РїРѕ СЏРєРѕРјСѓ Р±СѓРґРµ РІС–РґР±СѓРІР°С‚РёСЃСЏ СЃРѕСЂС‚СѓРІР°РЅРЅСЏ
         /// </summary>
-        /// <param name="params_str">строка имен параметров через запятую</param>
-        /// <param name="role">имя роли</param>
-        /// <returns>строка значений</returns>
+        /// <param name="query">Р—Р°РїРёС‚, Р· СЏРєРѕРіРѕ Р±СѓРґРµ РІРёР±РёСЂР°С‚РёСЃСЏ Р°Р±Рѕ РїСЃРµРІРґРѕРЅС–Рј РїРѕР»СЏ РґР»СЏ СЃРѕСЂСѓС‚РІР°РЅРЅСЏ, Р°Р±Рѕ СЃР°РјР° РЅР°Р·РІР° РїРѕР»СЏ</param>
+        /// <param name="sort">РџРѕР»Рµ, РїРѕ СЏРєРѕРјСѓ Р±СѓРґРµ РІС–РґР±СѓРІР°С‚РёСЃСЏ СЃРѕСЂС‚СѓРІР°РЅРЅСЏ</param>
+        /// <returns></returns>
+        private static string GetOrderParameter(string query, string sort)
+        {
+            if (sort.IsNullOrWhiteSpace())
+            {
+                return string.Empty;
+            }
+
+            int startPos = query.IndexOf(sort);
+            int endPosComa = query.IndexOf(",", startPos);
+            int endPosFrom = query.ToLower().IndexOf("from", startPos);
+            int endPos = endPosComa < endPosFrom ? endPosComa : endPosFrom;
+            string orderParamsStr = query.Substring(startPos, endPos - startPos);
+            string[] orderParams = orderParamsStr.Split(' ');
+            string orderParam = string.Empty;
+            if (orderParams.Length > 1)
+            {
+                orderParam = orderParams[orderParams.Length - 1];
+            }
+            else if (orderParams[0].Contains("."))
+            {
+                orderParam = orderParams[0].Substring(orderParams[0].IndexOf("."));
+            }
+            else
+            {
+                orderParam = orderParams[0];
+            }
+            return orderParam;
+        }
+
+        /// <summary>
+        ///  РЎС‚СЂРѕРєР° Р·РЅР°С‡РµРЅРёР№ РїР°СЂР°РјРµС‚СЂРѕРІ РёР· web_userparams
+        /// </summary>
+        /// <param name="params_str">СЃС‚СЂРѕРєР° РёРјРµРЅ РїР°СЂР°РјРµС‚СЂРѕРІ С‡РµСЂРµР· Р·Р°РїСЏС‚СѓСЋ</param>
+        /// <param name="role">РёРјСЏ СЂРѕР»Рё</param>
+        /// <returns>СЃС‚СЂРѕРєР° Р·РЅР°С‡РµРЅРёР№</returns>
         [WebMethod(EnableSession = true)]
         public string GetUserParams(string params_str, string role)
         {
@@ -441,6 +493,74 @@ namespace Bars
             }
             return result;
         }
+		
+		protected string GetHostName()
+        {
+            string userHost = HttpContext.Current.Request.ServerVariables["HTTP_X_FORWARDED_FOR"];
+
+            if (String.IsNullOrEmpty(userHost) || String.Compare(userHost, "unknown", true) == 0)
+                userHost = HttpContext.Current.Request.UserHostAddress;
+
+            if (String.Compare(userHost, HttpContext.Current.Request.UserHostName) != 0)
+                userHost += " (" + HttpContext.Current.Request.UserHostName + ")";
+
+            return userHost;
+        }
+        protected void LoginUser(String userName)
+        {
+            // РёРЅС„РѕСЂРјР°С†РёСЏ Рѕ С‚РµРєСѓС‰РµРј РїРѕР»СЊР·РѕРІР°С‚РµР»Рµ
+            UserMap userMap = Bars.Configuration.ConfigurationSettings.GetUserInfo(userName);
+
+            try
+            {
+                InitOraConnection();
+                // СѓСЃС‚Р°РЅРѕРІРєР° РїРµСЂРІРёС‡РЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ
+                SetParameters("p_session_id", DB_TYPE.Varchar2, Session.SessionID, DIRECTION.Input);
+                SetParameters("p_user_id", DB_TYPE.Varchar2, userMap.user_id, DIRECTION.Input);  //ERROR
+                SetParameters("p_hostname", DB_TYPE.Varchar2, GetHostName(), DIRECTION.Input);
+                SetParameters("p_appname", DB_TYPE.Varchar2, "barsroot", DIRECTION.Input);
+                SQL_PROCEDURE("bars.bars_login.login_user");
+            }
+            finally
+            {
+                DisposeOraConnection();
+            }
+
+            // Р•СЃР»Рё РІС‹РїРѕР»РЅРёР»Рё СѓСЃС‚Р°РЅРѕРІРєСѓ РїР°СЂР°РјРµС‚СЂРѕРІ
+            Session["UserLoggedIn"] = true;
+        }
+
+        protected void LoginUserInt(String userName)
+        {
+            // РёРЅС„РѕСЂРјР°С†РёСЏ Рѕ С‚РµРєСѓС‰РµРј РїРѕР»СЊР·РѕРІР°С‚РµР»Рµ
+            UserMap userMap = Bars.Configuration.ConfigurationSettings.GetUserInfo(userName);
+
+            try
+            {
+                InitOraConnection();
+                // СѓСЃС‚Р°РЅРѕРІРєР° РїРµСЂРІРёС‡РЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ
+                ClearParameters();
+                SetParameters("p_session_id", DB_TYPE.Varchar2, Session.SessionID, DIRECTION.Input);
+                SetParameters("p_user_id", DB_TYPE.Varchar2, userMap.user_id, DIRECTION.Input);
+                SetParameters("p_hostname", DB_TYPE.Varchar2, RequestHelpers.GetClientIpAddress(HttpContext.Current.Request), DIRECTION.Input);
+                SetParameters("p_appname", DB_TYPE.Varchar2, "barsroot", DIRECTION.Input);
+                SQL_PROCEDURE("bars.bars_login.login_user");
+
+                ClearParameters();
+                SetParameters("p_info", DB_TYPE.Varchar2,
+                    String.Format("STOService: Р°РІС‚РѕСЂРёР·Р°С†РёСЏ. РҐРѕСЃС‚ {0}, РїРѕР»СЊР·РѕРІР°С‚РµР»СЊ {1}", RequestHelpers.GetClientIpAddress(HttpContext.Current.Request), userName),
+                    DIRECTION.Input);
+                SQL_PROCEDURE("bars_audit.info");
+            }
+            finally
+            {
+                DisposeOraConnection();
+            }
+
+            // Р•СЃР»Рё РІС‹РїРѕР»РЅРёР»Рё СѓСЃС‚Р°РЅРѕРІРєСѓ РїР°СЂР°РјРµС‚СЂРѕРІ
+            Session["UserLoggedIn"] = true;
+        }
+		
         /// <summary>
         /// 
         /// </summary>
@@ -772,7 +892,7 @@ namespace Bars
         }
 
 
-        public object[] BindTableWithNewFilter(string fields, string tables, string cond, string[] data)
+        public object[] BindTableWithNewFilter(string fields, string tables, string cond, string[] data, LogParams lParams = null)
         {
             //_command.Parameters.Clear();
             object[] obj = new object[3];
@@ -782,7 +902,7 @@ namespace Bars
             int startpos = Convert.ToInt32(data[4]);
             int pageSize = Convert.ToInt32(data[5]);
 
-            ds = SQL_SELECT_dataset(query, startpos, pageSize + 1, data);
+            ds = SQL_SELECT_dataset(query, startpos, pageSize + 1, data, lParams);
 
             int count = 0;
             if (ds.Tables[0].Rows.Count == pageSize + 1)
@@ -988,7 +1108,7 @@ namespace Bars
             Output = ParameterDirection.Output,
             ReturnValue = ParameterDirection.ReturnValue
         };
-        //Константы из Century
+        //РљРѕРЅСЃС‚Р°РЅС‚С‹ РёР· Century
         public enum CUST_TYPE
         {
             BANK = 1,
@@ -1050,5 +1170,10 @@ namespace Bars
             ACCESS_READONLY,
             ACCESS_HOLDING
         };
+    }
+
+    public class LogParams
+    {
+        public string CallerName { get; set; }
     }
 }

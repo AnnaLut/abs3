@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure NBUR_P_I39 ***
 
-  CREATE OR REPLACE PROCEDURE BARS.NBUR_P_I39 (p_kod_filii        varchar2,
+CREATE OR REPLACE PROCEDURE BARS.NBUR_P_I39 (p_kod_filii        varchar2,
                                              p_report_date      date,
                                              p_form_id          number,
                                              p_scheme           varchar2 default 'C',
@@ -18,9 +18,9 @@ is
 % DESCRIPTION : Процедура формирования #39 для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.16.003  02.03.2017
+% VERSION     :  v.16.007  23.08.2017
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_          char(30)  := 'v.16.003  02.03.2017';
+  ver_          char(30)  := 'v.16.007  23.08.2017';
 /*
    Структура показника  L DDD VVV
 
@@ -129,12 +129,12 @@ BEGIN
                         s.branch, s.nbuc
                     from
                        (select t.report_date, t.kf, t.ref, t.tt,
-                               (case when t.acc_num_db like '100%' then t.cust_id_db else t.cust_id_cr end) cust_id,
-                               (case when t.acc_num_db like '100%' then t.acc_id_db else t.acc_id_cr end) acc_id,
-                               (case when t.acc_num_db like '100%' then t.acc_num_db else t.acc_num_cr end) acc_num,
-                               (case when t.acc_num_db like '100%' then t.cust_id_cr else t.cust_id_db end) cust_id2,
-                               (case when t.acc_num_db like '100%' then t.acc_id_cr else t.acc_id_db end) acc_id2,
-                               (case when t.acc_num_db like '100%' then t.acc_num_cr else t.acc_num_db end) acc_num2,
+                               (case when t.acc_num_db like '110%' then t.cust_id_db else t.cust_id_cr end) cust_id,
+                               (case when t.acc_num_db like '110%' then t.acc_id_db else t.acc_id_cr end) acc_id,
+                               (case when t.acc_num_db like '110%' then t.acc_num_db else t.acc_num_cr end) acc_num,
+                               (case when t.acc_num_db like '110%' then t.cust_id_cr else t.cust_id_db end) cust_id2,
+                               (case when t.acc_num_db like '110%' then t.acc_id_cr else t.acc_id_db end) acc_id2,
+                               (case when t.acc_num_db like '110%' then t.acc_num_cr else t.acc_num_db end) acc_num2,
                                t.kv, t.bal, t.bal_uah,
                                (case when p.kv != p.kv2 and p.kv != 980 and p.kv2 != 980
                                      then null
@@ -143,11 +143,11 @@ BEGIN
                                (case when (p.kv != p.kv2 and p.kv != 980 and p.kv2 != 980) or
                                            p.tt <> t.tt
                                      then F_NBUR_D3801(p.ref,t.tt,v.ACC3801,
-                                        (case when t.acc_num_db like '100%' then 0 else 1 end),
+                                        (case when t.acc_num_db like '110%' then 0 else 1 end),
                                         v.ACC_RRD,v.ACC_RRR, p_report_date, p_kod_filii)
                                      else decode(p.kv2,t.kv,p.s,p.s2)
                                end) bal_uah_cent,
-                               (case when t.acc_num_db like '100%' then 0 else 1 end) dk,
+                               (case when t.acc_num_db like '110%' then 0 else 1 end) dk,
                                p.nlsa, p.nlsb, p.kv kvo, p.kv2, p.s, p.s2
                         from NBUR_DM_TRANSACTIONS t, vp_list v, oper p, operw w
                         where t.report_date = p_report_date and
@@ -198,7 +198,8 @@ BEGIN
                     where a.kurs is not null or
                           nvl(a.bal, 0) <> 0 and nvl(a.bal_uah_cent, 0) <> 0))
                      UNPIVOT (VALUE FOR colname IN  (s1, s3, s4)
-            ) d;
+            ) d
+            where d.type_op not in ('610', '620');
     EXCEPTION
        WHEN OTHERS
        THEN
@@ -262,15 +263,19 @@ BEGIN
                         nbuc,
                         substr(field_code, 2)) a
          join
-         (  SELECT substr(field_code, 2) field_code,
-                   SUM (field_value) field_value
-            FROM nbur_detail_protocols
-                  WHERE     report_date = p_report_date
-                        AND report_code = p_file_code
-                        AND kf = p_kod_filii
-                        and field_code like '1%'
-               GROUP BY substr(field_code, 2)) b
-          on (a.field_code = b.field_code);
+             (  SELECT kf,
+                       nbuc,
+                       substr(field_code, 2) field_code,
+                       SUM (field_value) field_value
+                FROM nbur_detail_protocols
+                      WHERE     report_date = p_report_date
+                            AND report_code = p_file_code
+                            AND kf = p_kod_filii
+                            and field_code like '1%'
+                   GROUP BY kf, nbuc, substr(field_code, 2)) b
+              on (a.kf = b.kf and
+                  a.nbuc = b.nbuc and
+                  a.field_code = b.field_code);
 
     logger.info ('NBUR_P_I39 end for date = '||to_char(p_report_date, 'dd.mm.yyyy'));
 

@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/function/get_zay_nls29.sql =========*** Run 
- PROMPT ===================================================================================== 
- 
- CREATE OR REPLACE function BARS.get_zay_nls29(p_mode integer)
+CREATE OR REPLACE function BARS.get_zay_nls29(p_mode integer)
 -- Функция возвращает счет 2900 прописанный в справочнике zay_mfo_nls29
 -- если входящий параметр:
 --  - равен 1, то возвращаем счет nls29ca - торговый счет РУ открытый в ЦА;
@@ -35,7 +29,7 @@ begin
 begin
   select val into l_par from params where par = 'IS_MMFO';
   exception when no_data_found then l_par := 0;
-end;  
+end;
 
 /*if l_par = 1 then l_result := '29003';
                   return l_result;
@@ -56,7 +50,7 @@ end;
       end if;
     when p_mode = 3 then
       if l_nls6 is null or l_nls6 = '' then
-        raise_application_error(-20001,'Не прописан счет доходов РУ, Бал=6114 в таблице ZAY_MFO_NLS29.');
+        raise_application_error(-20001,'Не прописан счет доходов РУ, Бал='||case when newnbs.g_state= 1 then '6514' else'6114' end ||' в таблице ZAY_MFO_NLS29.');
       else
         l_result := l_nls6;
       end if;
@@ -67,16 +61,3 @@ end;
   return l_result;
 end get_zay_nls29;
 /
-
- show err;
- 
-PROMPT *** Create  grants  GET_ZAY_NLS29 ***
-grant EXECUTE                                                                on GET_ZAY_NLS29   to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on GET_ZAY_NLS29   to START1;
-
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/function/get_zay_nls29.sql =========*** End 
- PROMPT ===================================================================================== 
- 

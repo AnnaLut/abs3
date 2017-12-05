@@ -5,9 +5,11 @@ PROMPT *** Create  procedure P_KOL_ND_OVER ***
 
 CREATE OR REPLACE PROCEDURE BARS.P_KOL_ND_OVER (p_dat01 date, p_mode integer) IS
 
-/* Версия 4.1  17-10-2017 22-06-2017  24-01-2017 18-01-2017  10-10-2016
+/* Версия 4.2  16-11-2017  17-10-2017 22-06-2017  24-01-2017 18-01-2017  10-10-2016
    Кількість днів прострочки по договорам ОВЕРДРАФТА
    -------------------------------------
+
+  5) 16-11-2017(4.2) - Убрала отладку logg (проверена по новый план счетов) 
   4) 17-10-2017(4.1) - Овердрафт холдинга + бал.счета через REZ_DEB
   3) 22-06-2017 - NVL при определении фин.класа
   2) 24-01-2017 - Добавлен параметр S080 в p_get_nd_val
@@ -82,16 +84,16 @@ begin
             --LOOP
                --FETCH c1 INTO s;
                --EXIT WHEN c0%NOTFOUND;
-            logger.info('OVER  1 : nd = ' || k.nd || ' k.rnk = '|| k.rnk || ' l_kol = '|| l_kol  ) ;
+            --logger.info('OVER  1 : nd = ' || k.nd || ' k.rnk = '|| k.rnk || ' l_kol = '|| l_kol  ) ;
             if l_custtype=2 THEN l_tip := 2; l_f := 56;
             else                 l_tip := 1; l_f := 60;
             end if;
             l_fin23 := k.fin23;
             --l_kol := greatest(l_kol,s.kol);
-            logger.info('OVER  2 : nd = ' || k.nd || ' k.rnk = '|| k.rnk || ' l_f = '|| l_f  ) ;
+            --logger.info('OVER  2 : nd = ' || k.nd || ' k.rnk = '|| k.rnk || ' l_f = '|| l_f  ) ;
             if l_f = 56 THEN
                l_cls := fin_nbu.zn_p_nd('CLS',  l_f, p_dat01, k.nd, k.rnk);
-               logger.info('OVER  3 : nd = ' || k.nd || ' k.rnk = '|| k.rnk || ' l_cls = '|| l_cls  ) ;
+               --logger.info('OVER  3 : nd = ' || k.nd || ' k.rnk = '|| k.rnk || ' l_cls = '|| l_cls  ) ;
                Case
                   when l_kol between 31 and 60 then  l_fin := greatest(l_cls,  5 );
                   when l_kol between 61 and 90 then  l_fin := greatest(l_cls,  8 );
@@ -103,7 +105,7 @@ begin
             else
                l_fin := fin_nbu.zn_p_nd('CLS',  l_f, p_dat01, k.nd, k.rnk);
             end if;
-               logger.info('OVER  4 : nd = ' || k.nd || ' k.rnk = '|| k.rnk || ' l_fin = '|| l_fin  ) ;
+               --logger.info('OVER  4 : nd = ' || k.nd || ' k.rnk = '|| k.rnk || ' l_fin = '|| l_fin  ) ;
             if l_fin is null or l_fin = 0 and l_custtype = 2 THEN
                l_txt := 'ОВЕР.';
                p_error_351( P_dat01, k.nd, user_id,15, k.nd, l_custtype,  null, NULL, l_txt, k.rnk, NULL);
@@ -111,9 +113,9 @@ begin
             elsif l_custtype = 3 THEN
                l_fin := nvl(l_fin,f_fin23_fin351(l_fin23,l_kol));
             end if;
-            logger.info('OVER  5 : nd = ' || k.nd || ' k.rnk = '|| k.rnk || ' l_fin = '|| l_fin  ) ;
+            --logger.info('OVER  5 : nd = ' || k.nd || ' k.rnk = '|| k.rnk || ' l_fin = '|| l_fin  ) ;
             if l_fin is null or l_fin=0 THEN  l_fin := nvl(l_fin23,1);  end if;
-            logger.info('OVER  6 : nd = ' || k.nd || ' k.rnk = '|| k.rnk || ' l_fin = '|| l_fin  ) ;
+            --logger.info('OVER  6 : nd = ' || k.nd || ' k.rnk = '|| k.rnk || ' l_fin = '|| l_fin  ) ;
             fin_nbu.record_fp_nd('CLSP', l_fin, l_f, p_dat01, k.nd, k.rnk); -- фін.стан зкоригований на к-ть днів прострочки
             l_s080 := f_get_s080(p_dat01, l_tip, l_fin);
             p_get_nd_val( p_dat01, k.nd, 10, l_kol, k.rnk, l_tip, l_fin, l_s080 );

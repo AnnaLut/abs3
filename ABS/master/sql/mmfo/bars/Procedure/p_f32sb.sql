@@ -7,12 +7,12 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure P_F32SB ***
 
-  CREATE OR REPLACE PROCEDURE BARS.P_F32SB (Dat_ DATE, sheme_ VARCHAR2 DEFAULT 'C' )  IS
+CREATE OR REPLACE PROCEDURE BARS.P_F32SB (Dat_ DATE, sheme_ VARCHAR2 DEFAULT 'C' )  IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % FILE NAME   :    otcn.sql
 % DESCRIPTION :    ќтчетность —берЅанка: формирование файлов
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 2001.  All Rights Reserved.
-% VERSION     :    13/05/2017 (08/02/2016)
+% VERSION     :    08/06/2017 (13/05/2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 08,02.2016 - вместо пол€ MFO из SPECPARAM_INT будем использовать поле
 %              MFO из таблицы CUSTBANK
@@ -94,7 +94,7 @@ CURSOR Saldo IS
           s.dos99, s.dosq99, s.kos99, s.kosq99,
           s.doszg, s.koszg, s.dos96zg, s.kos96zg,
           a.tobo, a.nms, NVL(trim(a.ob22),'00'),
-          nvl(trim(cb.mfo), nvl(trim(sp.mfo),'000000'))
+          nvl(nvl(trim(sp.mfo), trim(cb.mfo)), '000000')
     FROM  otcn_saldo s, accounts a, specparam_int sp, custbank cb
     WHERE s.acc = a.acc
       and a.rnk = cb.rnk(+)

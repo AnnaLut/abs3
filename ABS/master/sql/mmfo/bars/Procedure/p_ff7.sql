@@ -12,7 +12,7 @@ PROMPT *** Create  procedure P_FF7 ***
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирования файла #F7 для КБ
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     : 10/03/2017 (01/02/2017, 24/01/2017)
+% VERSION       18/10/2017 (11/10/2017)
 %%%%%%%%%%%%%%%%/%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -197,11 +197,6 @@ nbuc_ := nbuc1_;
 --Кроме ГОУ Сбербанка.
 if 300465 not in  (mfo_) then
     sql_acc_ := 'select distinct r020 from kl_f3_29 where kf=''F7'' and r020 not like ''1%'' ';
-
---       sql_acc_ := 'select * from accounts a where rnk =500485 and nvl(a.nbs, substr(a.nls,1,4)) in ';
---       sql_acc_ := 'select distinct nbs from accounts where rnk = 1814928 and nbs in ';
---      sql_acc_ := sql_acc_ || '(select distinct r020 from kl_f3_29 where kf=''F7'' and r020 not like ''1%'') ';
-
 else
     sql_acc_ := 'select distinct r020 from kl_f3_29 where kf=''F7'' ';
 end if;
@@ -227,7 +222,6 @@ if dat_ = to_date('31012013','ddmmyyyy') then
    datp_ := to_date('29122012','ddmmyyyy');
 end if;
 
---ret_ := f_pop_otcn(Dat_, 3, sql_acc_, null, 0, 1);   -- если запускать с одним клиентом
 ret_ := f_pop_otcn(Dat_, 3, sql_acc_);                 -- внутри вызывается f_pop_otcn_snp
 
 delete from otc_ff7_history_acc where datf=dat_ ;
@@ -237,24 +231,16 @@ delete from otc_ff7_history_acc where datf=dat_ ;
 insert into otc_ff7_history_acc(DATF, ACC, ACCC, NBS, SGN, NLS, KV, NMS, DAOS, DAZS, OST,
        OSTQ, DOSQ, KOSQ, ND, NKD, SDATE, WDATE, SOS, RNK, STAFF, TOBO, s260, k110, s031
        ,tip, ostq_kd, r_dos, cc_id)
-select dat_, tt.ACC, tt.ACCC, tt.NBS, tt.SGN, tt.NLS, tt.KV, tt.NMS, tt.DAOS, tt.DAZS, tt.OST,
+select unique 
+       dat_, tt.ACC, tt.ACCC, tt.NBS, tt.SGN, tt.NLS, tt.KV, tt.NMS, tt.DAOS, tt.DAZS, tt.OST,
        tt.OSTQ, tt.DOSQ, tt.KOSQ, tt.ND, tt.NKD, tt.SDATE, tt.WDATE, tt.SOS, tt.RNK, tt.u_id, tt.TOBO, tt.s260, tt.ved, tt.s031
        ,tt.tip, tt.ostq_kd,
       --Для оверов r.ost, для остальных - r.dos
-      --Для УПБ берем сумму выдач в эквиваленте на отчетную дату по валютным счетам
-       sum(decode(nvl(r.odate,to_date('01012000','ddmmyyyy')),to_date('01012000','ddmmyyyy'),0,
-            decode(is_upb, 0,
-              decode(instr('1600,2600,2605,2620,2625,2650,2655,8025,',tt.nbs||','), 0 ,r.dos, r.ost),
-              decode(tt.kv,980,
-                       decode(instr('1600,2600,2605,2620,2625,2650,2655,8025,',tt.nbs||','), 0 ,r.dos, decode(r.dos+r.kos,0,r.ost,0)),
-                       decode(instr('1600,2600,2605,2620,2625,2650,2655,8025,',tt.nbs||','), 0 ,
-                               gl.p_icurval(tt.kv, (gl.p_ncurval(tt.kv,r.dos,r.odate)), dat_),
-                               gl.p_icurval(tt.kv, (gl.p_ncurval(tt.kv,decode(r.dos+r.kos,0,r.ost,0),r.odate)), dat_))
-                    )
-            ))) r_dos --суммы выдачи
-            ,tt.cc_id
+       nvl(rr.r_dos, 0) --суммы выдачи
+       ,tt.cc_id
 from (
-select s.acc, o.isp accc, substr(o.nls,1,4) nbs, decode(sign(s.ost-s.dos96+s.kos96),-1,'1',1,'2','0') sgn,
+select /*+ leading(s) hash(s) full(o) */
+       s.acc, o.isp accc, substr(o.nls,1,4) nbs, decode(sign(s.ost-s.dos96+s.kos96),-1,'1',1,'2','0') sgn,
        o.nls, o.kv, o.nms, o.daos, o.dazs, s.ost-s.dos96+s.kos96 ost,
        decode(o.kv, 980, s.ost-s.dos96+s.kos96, s.ostq-s.dosq96+s.kosq96) ostq,
        decode(o.kv, 980, s.dos+s.dos96-s.dos96p, gl.p_icurval (o.kv, s.dos+s.dos96-s.dos96p, dat_)) dosq,
@@ -263,7 +249,7 @@ select s.acc, o.isp accc, substr(o.nls,1,4) nbs, decode(sign(s.ost-s.dos96+s.kos
        null nkd, -- якщо немає ND, то підставляємо ACC
        c.sdate, c.wdate, c.sos, s.rnk, user_id u_id, o.tobo,
        f_get_s260(c.nd, s.acc, p.s260, s.rnk, o.nbs,default_) s260,
-       z.ved, p.s031, o.tip,
+       z.ved, p.s031, nvl(c.tip, o.tip) tip,
        --в сумму по договору включаем остатки с учетом знака по таблице kl_f3_29
        --например для 2625 только активные остатки
        sum(decode(decode(sign(decode(o.kv, 980, s.ost-s.dos96+s.kos96, s.ostq-s.dosq96+s.kosq96)),-1,'1','2'),n.r012,
@@ -273,195 +259,62 @@ select s.acc, o.isp accc, substr(o.nls,1,4) nbs, decode(sign(s.ost-s.dos96+s.kos
        sum(s.dos+s.dos96) over(partition by nvl(to_char(c.nd), decode(trim(p.nkd), null,'-'||to_char(s.acc), '№'||trim(p.nkd))), s.rnk) dos_kd,
        --сумма Кт оборотов по договору
        sum(s.kos+s.kos96) over(partition by nvl(to_char(c.nd), decode(trim(p.nkd), null,'-'||to_char(s.acc), '№'||trim(p.nkd))), s.rnk) kos_kd,
-       n.r012  , n.s240, c.cc_id
+       n.r012  , n.s240, c.cc_id, o.dapp
 from OTCN_SALDO s, OTCN_ACC o,
    (select a.acc,
            -- Для ГОУ Сбербанка ND проставляем NULL -
            --номер договора будет браться со счета
            a.nd ,
-           b.sdate, b.wdate, b.sos, 0 ost_9129, b.cc_id
+           b.sdate, b.wdate, b.sos, 0 ost_9129, b.cc_id, a.tip
     from
-         (select n.acc, max(n.nd) nd
+         (select n.acc, max(n.nd) nd, decode(C.VIDD, 10, 'LVR', null) tip
              from nd_acc n, cc_deal c
-             where n.nd=c.nd and c.sdate <= dat_
-             group by n.acc
+             where n.nd=c.nd and c.sdate <= dat_  and 
+                   c.vidd <> 110 
+             group by n.acc, decode(C.VIDD, 10, 'LVR', null)
          ) a
          join cc_deal b on a.nd=b.nd
          --для кредитных линий в ситуации если все остатки и обороты по счетам нулевые, но есть лимит 9129
    ) c,
       specparam p, customer z, kl_f3_29 n
 where s.acc = o.acc and
-     -- s.acc = o.acc and
-     --не МБК
-     --Для ГОУ Сбербанка включаем и МБК
-     (o.nls not like '1%'  or 300465 in (mfo_)) and
      not (substr(o.nls,1,4) in ('1508','1509') and nvl(trim(p.r011),1) = '1') and
      s.acc=c.acc(+) and
      s.acc=p.acc(+) and
      s.rnk=z.rnk and
      o.nls like n.r020 || '%' and
      n.kf='F7'
-     --не овера
-     --Для ГОУ Сбербанка выводим и овера
-     and not exists
-                 (select 1
-                 from acc_over v, accounts a
-                 where o.acc = decode(substr(o.nls,1,4),'9129',v.acc_9129, '2067',v.acc_2067,'2069',v.acc_2069, '8027',v.acc_2067,'8028',v.acc_2069,v.acco) --and v.sos is null
-                      and (300465 not in  (mfo_) ) -- Для ГОУ Сбербанка выводим и овера
-                      and a.acc = v.acco and a.nbs <> '2203'
-                 )
-     and not exists ( select 1 from w4_acc vv
-                       where vv.acc_pk = o.acc )
-     and not  exists
-                 (select 1
-                 from acc_over_archive vv, accounts a
-                 where o.acc = decode(substr(o.nls,1,4),'9129',vv.acc_9129, '2067',vv.acc_2067,'2069',vv.acc_2069, '8027',vv.acc_2067,'8028',vv.acc_2069,vv.acco) --and vv.deldate >= dat_ and vv.sos is null
-                       and (300465 not in  (mfo_) )--Для ГОУ Сбербанка выводим и овера
-                       and a.acc = vv.acco and a.nbs <> '2203'
-                 )
-    and nvl(o.dazs, to_date('01014999','ddmmyyyy')) >= trunc(dat_,'mm')
+     and s.acc not in (select vv.acc_pk from w4_acc vv)
+     and nvl(o.dazs, to_date('01014999','ddmmyyyy')) >= trunc(dat_,'mm')
     --было сделано для ГОУ Сбербанка - не уитывать счета 9603 для юр лиц
     and not (o.nls like '9603%' and z.custtype = 2)
 ) tt
-left join rnbu_history r on tt.acc = r.acc and r.odate between trunc(dat_,'mm') and dat_ and trim(r.d020) != '03'
+left join (select r.acc, sum(decode(r.kv, 980,
+                       decode(instr('1600,2600,2605,2620,2625,2650,2655,8025,',substr(r.nls,1,4)||','), 0 ,r.dos, decode(r.dos+r.kos,0,r.ost,0)),
+                       decode(instr('1600,2600,2605,2620,2625,2650,2655,8025,',substr(r.nls,1,4)||','), 0 ,
+                               gl.p_icurval(r.kv, (gl.p_ncurval(r.kv,r.dos,r.odate)), dat_),
+                               gl.p_icurval(r.kv, (gl.p_ncurval(r.kv,decode(r.dos+r.kos,0,r.ost,0),r.odate)), dat_))
+                    )) r_dos
+from rnbu_history r, kl_f3_29 k
+where r.odate between trunc(dat_,'mm') and dat_ and 
+      trim(r.d020) != '03' and
+      k.kf = 'F7' and
+      r.nls like k.r020||'%'
+group by r.acc) rr
+on (tt.acc = rr.acc)
 where (tt.nbs not in ('9129', '9020') and
        (tt.ostq_kd <> 0 or tt.dos_kd <> 0 or tt.kos_kd <> 0) and --есть остатки или обороты по какому-то из счетов договора
-        not(tt.ost = 0 and tt.dosq = 0 and tt.kosq = 0 and nvl(tt.s240,'0') = '1') and -- не отображать счета %, диск/премии с нулевыми остатками и оборотами
-        -- убрать овера с пассивными остатками
-         --not (tt.ostq_kd > 0 and
-         --   tt.nbs in ('1600','2600','2605','2620','2625','2650','2655','8025')
-         --   )
-         --and
-         (decode(sign(tt.ost),-1,'1','2') in ('1','2') -- = tt.r012  --не показывать пассивные остатки
-          or tt.ost = 0)
+        not(tt.ost = 0 and tt.dosq = 0 and tt.kosq = 0 and nvl(tt.s240,'0') = '1')  -- не отображать счета %, диск/премии с нулевыми остатками и оборотами
          )
-      or (mfou_ in (300465) and tt.nbs in ('9020','9129') and tt.ostq_kd = tt.ost and tt.nms not like '%2625%')
-group by   tt.acc, tt.accc,tt.nbs, tt.sgn,
-       tt.nls, tt.kv, tt.nms, tt.daos, tt.dazs,
-       tt.ost,tt.ostq, tt.dosq, tt.kosq,tt.nd, tt.nkd,
-       tt.sdate, tt.wdate, tt.sos, tt.rnk, tt.tobo,
-       tt.s260, tt.ved, tt.s031 ,tt.tip, tt.ostq_kd ,tt.dos_kd,tt.kos_kd, tt.u_id, tt.cc_id
-     ;
+      or (mfou_ in (300465) and 
+          tt.nbs in ('9020','9129') and 
+          tt.ostq_kd = tt.ost and 
+          tt.nms not like '%2625%' and 
+          tt.dapp is not null and tt.dapp not in (tt.sdate, tt.daos)); -- перевірка чи видавався вже овердрафт 
 
 logger.info ('P_FF7: etap 1 for datf = '||to_char(dat_, 'dd/mm/yyyy'));
 
---Кроме ГОУ Сбербанка. Для них выборка всех счетов в предыдущем запросе
-if 300465 not in  (mfo_) then
-    --МБК
-    insert into otc_ff7_history_acc(DATF, ACC, ACCC, NBS, SGN, NLS, KV, NMS, DAOS, DAZS, OST,
-           OSTQ, DOSQ, KOSQ, ND, NKD, SDATE, WDATE, SOS, RNK, STAFF, TOBO, s260, k110, s031
-           ,tip, ostq_kd, r_dos)
-    select dat_ ,t.acc, t.accc, t.nbs, decode(sign(t.ost),-1,'1',1,'2','0') sgn,
-           t.nls, t.kv, t.nms, t.daos, t.dazs,
-           t.ost,
-           t.ostq,
-           t.dosq,
-           t.kosq,
-           t.nd,
-           t.nkd,
-           t.sdate, t.wdate, t.sos, t.rnk, t.u_id, t.tobo,
-           t.s260,
-           t.ved, t.s031
-           ,t.tip
-           --в случае если счет привязан к нескольким договорам
-           --остаток по договору определяем для договора с максимальным нолмером
-           -- для остальных договоров = 0
-           ,decode(nvl(to_char(max_nd), nd), nd, sum(decode(t.rn,1,t.ostq,0)) over(partition by t.nd, rnk) , 0) ostq_kd
-           --Для оверов r.ost, для остальных - r.dos
-          --Для УПБ берем сумму выдач в эквиваленте на отчетную дату по валютным счетам
-          ,
-           sum(decode(nvl(r.odate,to_date('01012000','ddmmyyyy')),to_date('01012000','ddmmyyyy'),0,
-                decode(is_upb, 0,
-                  decode(instr('1600,2600,2605,2620,2625,2650,2655,8025,',t.nbs||','), 0 ,r.dos, r.ost),
-                  decode(t.kv,980,
-                           decode(instr('1600,2600,2605,2620,2625,2650,2655,8025,',t.nbs||','), 0 ,r.dos, decode(r.dos+r.kos,0,r.ost,0)),
-                           decode(instr('1600,2600,2605,2620,2625,2650,2655,8025,',t.nbs||','), 0 ,
-                                   gl.p_icurval(t.kv, (gl.p_ncurval(t.kv,r.dos,r.odate)), dat_),
-                                   gl.p_icurval(t.kv, (gl.p_ncurval(t.kv,decode(r.dos+r.kos,0,r.ost,0),r.odate)), dat_))
-                        )
-                ))) r_dos --суммы выдачи
-    from
-    ( select /*parallel */
-           a.acc, a.isp accc, a.nbs,
-           a.nls, a.kv, a.nms, a.daos, a.dazs,
-           s.ostf-s.dos+s.kos ost,
-           decode(a.kv, 980, s.ostf-s.dos+s.kos, gl.p_icurval(a.kv,s.ostf-s.dos+s.kos, dat_)) ostq,
-           --Дт и Кт обороты берем только за текущий месяц
-           --из-за ролл-оверов считаем что в дату открытия договора не может быть погашений по договору
-           -- поэтому выбираем суммы погашений (КТ-обороты) в диапазоне с sdate+1
-           --ДТ-оборотов это не касается,т.к. это выдачи .
-           --если договор открыт в середине месяца (напр 15,03,2010) то
-           --из saldoa суммируем обороты начиная с 15,03,2010  (условие sign(s.fdat-greatest(trunc(dat_,'mm'), nvl(c.sdate+1, trunc(dat_,'mm')) <> -1)
-           --иначе из saldoa берем 0
-           sum(decode(sign(s.fdat-greatest(trunc(dat_,'mm'), nvl(c.sdate, trunc(dat_,'mm')))),-1,0,decode(a.kv, 980, s.dos, gl.p_icurval (a.kv, s.dos, dat_)))) over(partition by a.acc, c.nd) dosq,
-           sum(decode(sign(s.fdat-greatest(trunc(dat_,'mm'), nvl(c.sdate+1, trunc(dat_,'mm')))),-1,0,decode(a.kv, 980, s.kos, gl.p_icurval (a.kv, s.kos, dat_)))) over(partition by a.acc, c.nd) kosq,
-           nvl(to_char(c.nd), decode(trim(p.nkd), null,'-'||to_char(s.acc), '№'||trim(p.nkd))) nd,
-           null nkd,
-           s.fdat,
-           --порядковый номер договора по счету.
-           row_number() over(partition by a.acc, c.nd order by s.fdat desc) rn,
-           --референс последнего договора по счету
-           max(c.nd) over(partition by a.acc) max_nd,
-           c.sdate, c.wdate, c.sos, a.rnk, user_id u_id, a.tobo,
-           f_get_s260(c.nd, s.acc, p.s260, a.rnk, a.nbs,default_) s260,
-           z.ved, p.s031
-           , a.tip
-    from  accounts a
-         left join nd_acc n  on n.acc = a.acc   --(n.kf = a.kf and n.acc = a.acc)
-        -- join ps on ps.nbs = a.nbs
-         left join cc_deal c on n.nd = c.nd   --(n.kf = c.kf and n.nd = c.nd)
-         /*left*/ join saldoa s on s.acc = a.acc and s.fdat between (select max(fdat)
-                                                                     from saldoa ss
-                                                                     where ss.acc = s.acc and ss.fdat <= greatest(trunc(dat_,'mm'), nvl(c.sdate, trunc(dat_,'mm')))
-                                                                    )
-                                                                    and least(nvl(c.wdate,dat_),dat_)
-         left join specparam p on a.acc = p.acc   --(a.kf = p.kf and a.acc = p.acc)
-         join customer z on a.rnk = z.rnk   --(a.kf = z.kf and a.rnk = z.rnk)
-         join kl_f3_29 nn on a.nbs = nn.r020
-    where a.nbs like '1%' and
-          nn.kf = 'F7'
-          and (c.sdate <= dat_ and c.wdate >= trunc(dat_,'mm') or (c.sdate is null and a.daos <= dat_))
-          and ((s.ostf-s.dos+s.kos) <> 0 or s.dos <> 0 or s.kos <> 0)
-          and not (a.nbs in ('1508','1509') and nvl(trim(p.r011),1) = '1')
-          and nvl(a.dazs, to_date('01014999','ddmmyyyy')) >= trunc(dat_,'mm')
-    ) t
-    --из-за ролл-оверов считаем что в дату закрытия договора не может быть выдач по договору
-    -- поэтому выбираем суммы выдач в диапазоне по wdate-1
-    left join  rnbu_history r on t.acc = r.acc and trim(r.d020) != '03' and
-               r.odate between greatest(nvl(sdate, trunc(dat_,'mm')),trunc(dat_,'mm')) and least(nvl(wdate-1,dat_),dat_)--trunc(::dat_,'mm') and ::dat_
-    where (t.rn = 1 and (t.ostq <> 0 or t.dosq <> 0 or t.kosq <> 0) ) and
-          t.nbs not in ('9129', '9020') and
-          ((t.nbs, decode(sign(t.ost),-1,'1','2')) in
-               (select n.r020,n.r012
-               from kl_f3_29 n
-               where n.kf='F7') or
-             t.ost = 0
-          )
-    group by t.acc, t.accc, t.nbs, t.rn,
-           t.nls, t.kv, t.nms, t.daos, t.dazs,
-           t.ost,
-           t.ostq,
-           t.dosq,
-           t.kosq,
-           t.nd, t.max_nd,
-           t.nkd,
-           t.sdate, t.wdate, t.sos, t.rnk, t.u_id, t.tobo,
-           t.s260,
-           t.ved, t.s031, t.tip;
-
 execute immediate 'truncate table OTCN_F71_TEMP';
-
---  union all
---select vv.acc_pk acco, null acc_9129, null acc_2067, null acc_2069, 
---       vv.acc_ovr acc, 
---       dat_begin sdate, null sos,
---       dat_end wdate, vv.nd, 0 lim. 
---       null lim_hist, 
---       to_date('01014999','ddmmyyyy') deldate, 
---       substr(vv.card_code,1,30) NDOC
---from w4_acc vv, accounts a
---where vv.acc_pk = a.acc 
---  and a.nbs = '2605' 
 
 insert into OTCN_F71_TEMP
 (
@@ -490,328 +343,201 @@ from w4_acc vv, accounts a
 where vv.acc_pk = a.acc                                             
   and a.nbs = '2605';                                                
 
-    -- овердрафты
-    insert into otc_ff7_history_acc(DATF, ACC, ACCC, NBS, SGN, NLS, KV, NMS, DAOS, DAZS, OST,
-           OSTQ, DOSQ, KOSQ, ND, NKD, SDATE, WDATE, SOS, RNK, STAFF, TOBO, s260, k110, s031
-           ,tip, ostq_kd, r_dos,cc_id)
-    select dat_,
-           tt.acc, tt.accc,tt.nbs, decode(sign(tt.ost),1,'2',-1, '1','0') sgn,
-           tt.nls, tt.kv, tt.nms, tt.daos, tt.dazs,
-           tt.ost,tt.ostq, tt.dosq,
-           /*Для овердрафтов считаем КТ-обороты (погашение) по схеме -
-             1. Вх >= 0  Исх = 0  -  Погаш = Выдача
-             2. Вх >= 0  Исх < 0  -  Погаш = Выдача - abs(Исх)
-             3. Вх < 0  Исх = 0  -  Погаш = Выдача + abs(Вх)
-             4. Вх < 0  Исх < 0  -  Погаш = Выдача + abs(Вх) - abs(Исх)
-
-             здесь  t.h_ostq -  Вх ,  tt.ostq - исх,  sum( r.ost) - Выдача
-           */
-           decode(sign(nvl(tt.h_ostq,0)), -1,-- Вх < 0
-                                    decode(sign(nvl(tt.ostq,0)), -1, --Исх < 0
-                                           sum( nvl(decode(instr('1600,2600,2605,2620,2625,2650,2655,8025,',tt.nbs||','), 0 ,r.dos, decode(r.dos+r.kos,0,r.ost,0)),0))
-                                           + abs(nvl(tt.h_ostq,0)) - abs(nvl(tt.ostq,0)),--4. Вх < 0  Исх < 0  -  Погаш = Выдача + abs(Вх) - abs(Исх)
-                                          -- 0,--Исх = 0
-                                           sum(nvl(decode(instr('1600,2600,2605,2620,2625,2650,2655,8025,',tt.nbs||','), 0 ,r.dos, decode(r.dos+r.kos,0,r.ost,0)),0))
-                                           + abs(nvl(tt.h_ostq,0))  --3. Вх < 0  Исх = 0  -  Погаш = Выдача + abs(Вх)
-                                          ),
-                                    --Вх >= 0
-                                    decode(sign(nvl(tt.ostq,0)), -1, --Исх < 0
-                                           sum( nvl(decode(instr('1600,2600,2605,2620,2625,2650,2655,8025,',tt.nbs||','), 0 ,r.dos, decode(r.dos+r.kos,0,r.ost,0)),0))
-                                           - abs(nvl(tt.ostq,0)), --2. Вх >= 0  Исх < 0  -  Погаш = Выдача - abs(Исх)
-                                          -- 0,--Исх = 0
-                                           sum( nvl(decode(instr('1600,2600,2605,2620,2625,2650,2655,8025,',tt.nbs||','), 0 ,r.dos, decode(r.dos+r.kos,0,r.ost,0)),0))  -- 1. Вх >= 0  Исх = 0  -  Погаш = Выдача
-                                          )
-                 ) kosq,
-           tt.nd, tt.nkd,
-           tt.sdate, tt.wdate, tt.sos, tt.rnk, tt.u_id  ,tt.tobo,
-           tt.s260, tt.ved, tt.s031 ,tt.tip, --tt.ostq_kd
-           --в случае если счет привязан к нескольким договорам
-           --остаток по договору определяем для договора с максимальным номером
-           -- для остальных договоров = 0
-           decode(nvl('-'||to_char(max_nd), nd), nd, tt.ostq_kd , 0) ostq_kd
-           , sum( nvl(decode(instr('1600,2600,2605,2620,2625,2650,2655,8025,',tt.nbs||','), 0 ,r.dos, decode(r.dos+r.kos,0,r.ost,0)),0))  r_dos
-           ,tt.ndoc
-     from (
-    select t.*,
-           sum(decode(decode(sign(t.ostq),-1,'1','2'), r012, abs(t.ostq), 0))
-           over(partition by t.nd, t.rnk) ostq_kd -- к общей сумме по договору прибавляем лимит овердрафта по счету 8021 (для Демарка)
-           ,hi.ostq  h_ostq
-    from(
-    select /*parallel */
-           s.acc, o.isp accc, substr(o.nls,1,4) nbs, decode(sign(s.ost-s.dos96+s.kos96),-1,'1','2') sgn,
-           o.nls, o.kv, o.nms, o.daos, o.dazs,
-           decode(n.r012, 2, s.ost-s.dos96+s.kos96,least(0, s.ost-s.dos96+s.kos96)) ost,
-           decode(n.r012, 2, decode(o.kv, 980, s.ost-s.dos96+s.kos96, s.ostq-s.dosq96+s.kosq96),
-                               least(0, decode(o.kv, 980, s.ost-s.dos96+s.kos96, s.ostq-s.dosq96+s.kosq96))) ostq,
-           decode(o.kv, 980, s.dos+s.dos96-s.dos96p, gl.p_icurval (o.kv, s.dos+s.dos96-s.dos96p, dat_)) dosq,
-           decode(o.kv, 980, s.kos+s.kos96-s.kos96p, gl.p_icurval (o.kv, s.kos+s.kos96-s.kos96p, dat_)) kosq,
-           '-'||to_char(c.nd) nd,
-           null nkd, -- якщо немає ND, то підставляємо ACC
-           max(c.nd) over(partition by s.acc) max_nd,
-           c.sdate, c.wdate, c.sos, s.rnk, user_id u_id, o.tobo,
-           f_get_s260(null, s.acc, p.s260, s.rnk, o.nbs,default_) s260,
-           z.ved, p.s031
-           ,'OVR' tip
-           ,c.deldate, n.r012, c.ndoc
-    from OTCN_SALDO s, OTCN_ACC o, ( --выбираем договора овердрафта
-                                      select v.acco, v.acc_9129, v.acc_2067,v.acc_2069,v.acc, datd sdate, v.sos, datd2 wdate  , v.nd,
-                                             decode(a.nbs,'8021',a.lim,0) lim --У Демарка лимит овердрафта живет в поле accounts.lim
-                                              ,  null lim_hist, to_date('01014999','ddmmyyyy') deldate, v.NDOC
-                                      from acc_over v   , accounts a, accounts a1
-                                      where /*v.sos is null and*/ datd <= dat_ and a.acc = v.acc
-                                            and a1.acc = v.acco and a1.nbs <> '2203'
-                                        union all
-                                      select vv.acco, vv.acc_9129, vv.acc_2067,vv.acc_2069, vv.acc, datd sdate, vv.sos, datd2 wdate, vv.nd ,
-                                             decode(a.nbs,'8021',a.lim,0) lim
-                                             , null lim_hist, nvl(vv.deldate,to_date('01014999','ddmmyyyy') ) deldate, vv.NDOC
-                                      from acc_over_archive vv   , accounts a, accounts a1
-                                      where /*vv.sos is null and*/ vv.datd <= dat_ and vv.deldate >= trunc(dat_,'mm')  and a.acc = vv.acc
-                                            and a1.acc = vv.acco and a1.nbs <> '2203'
-                                            and vv.acco not in (select acco from acc_over)
-                                        union all
-                                      select vv.acc acco, null acc_9129, null acc_2067, null acc_2069, vv.p150 acc, 
-                                             vv.p111 sdate, vv.tp sos,
-                                             vv.p112 wdate, vv.nd, p110 lim, 
-                                             isp lim_hist, p113 deldate, substr(vv.p090,1,30) NDOC
-                                      from otcn_f71_temp vv
-                                    ) c,
-          specparam p, customer z,
-           kl_f3_29 n
-    where --s.fdat=:dat_ and
-          ((s.ost-s.dos96+s.kos96) <> 0 or s.dos+s.dos96-s.dos96p <> 0 or s.kos+s.kos96-s.kos96p <> 0 ) and
-          s.acc = o.acc and
-          --Для Демарка убираем счета 8025. Они обрабатываются отдельно
-          not(substr(o.nls,1,4) like '8%' and 353575 in (mfo_, mfou_)) and
-         o.acc = decode(substr(o.nls,1,4),'9129',c.acc_9129,'2067',c.acc_2067,'2069',c.acc_2069, c.acco) and
-        -- s.acc=c.acc(+) and
-         s.acc=p.acc(+) and
-         s.rnk=z.rnk and
-         n.r020 = substr(o.nls,1,4) and
-         n.kf='F7' and
-         (decode(n.r012, 2, decode(sign(s.ost-s.dos96+s.kos96),-1,'1','2'), 1 ) = n.r012 or (s.ost-s.dos96+s.kos96) = 0 )
-         and nvl(o.dazs, to_date('01014999','ddmmyyyy')) >= trunc(dat_,'mm')
-    )t
-    --обращаемся к otc_ff7_history_acc чтобы найти входящий остаток на начало отчетного месяца
-    -- 10.12.2010 OAB добавил условие t.nd = hi.nd т.к. для овердрафтов используется один и тотже счет а № дог. разные
-    left join otc_ff7_history_acc hi on t.acc = hi.acc and t.nd = hi.nd and hi.datf = datp_
-    group by   t.acc, t.accc,t.nbs, t.sgn,
-           t.nls, t.kv, t.nms, t.daos, t.dazs,
-           t.ost,t.ostq, t.dosq, t.kosq,t.nd, t.nkd,
-           t.sdate, t.wdate, t.sos, t.rnk, t.tobo,
-           t.s260, t.ved, t.s031 ,t.tip,  t.u_id ,hi.ostq ,t.deldate, t.r012, t.ndoc,max_nd
-    ) tt
-    left join  rnbu_history r on tt.acc = r.acc and trim(r.d020) != '03' and
-               r.odate between greatest(trunc(dat_,'mm'),nvl(tt.sdate,trunc(dat_,'mm'))) and least(dat_,nvl(tt.wdate,dat_) )  --вместо tt.date было tt.deldate-1
-    where tt.nbs not in ('9129', '9020')
-    group by   tt.acc, tt.accc,tt.nbs, tt.sgn,
-           tt.nls, tt.kv, tt.nms, tt.daos, tt.dazs,
-           tt.ost,tt.ostq, tt.dosq, tt.kosq,tt.nd, tt.nkd,
-           tt.sdate, tt.wdate, tt.sos, tt.rnk, tt.tobo,
-           tt.s260, tt.ved, tt.s031 ,tt.tip, tt.ostq_kd , tt.u_id ,tt.h_ostq ,tt.deldate, tt.ndoc, max_nd
-    ;
-
-   -- 09.08.2013
-   -- для отрицательных сумм погашения оведрафтов KOSQ < 0 изменям данное поле
-   -- ABS(OSTQ) - ABS(KOSQ)
-   update otc_ff7_history_acc
-   set kosq = ABS(ostq) - ABS(kosq)
-   where datf = dat_
-     and tip in ('OVR', 'W4B')
-     and kosq < 0;
-end if;
+-- овердрафты
+insert into otc_ff7_history_acc(DATF, ACC, ACCC, NBS, SGN, NLS, KV, NMS, DAOS, DAZS, OST,
+       OSTQ, DOSQ, KOSQ, ND, NKD, SDATE, WDATE, SOS, RNK, STAFF, TOBO, s260, k110, s031
+       ,tip, ostq_kd, r_dos,cc_id)
+select *
+from (
+with sel_over as (select value acc, sdate, sos, wdate, nd, lim, lim_hist, deldate, ndoc
+from (   
+   select v.acco, v.acc_9129, v.acc_2067,v.acc_2069, datd sdate, v.sos, datd2 wdate  , v.nd,
+                                         decode(a.nbs,'8021',a.lim,0) lim --У Демарка лимит овердрафта живет в поле accounts.lim
+                                          ,  null lim_hist, to_date('01014999','ddmmyyyy') deldate, v.NDOC
+                                  from acc_over v   , accounts a, accounts a1
+                                  where datd <= dat_ and datd2 >= trunc(dat_, 'mm') and a.acc = v.acc
+                                        and a1.acc = v.acco and a1.nbs <> '2203'
+                                        and v.nd not in (select nd from cc_deal where vidd in (10, 110))
+                                    union all
+                                  select vv.acco, vv.acc_9129, vv.acc_2067,vv.acc_2069, datd sdate, vv.sos, datd2 wdate, vv.nd ,
+                                         decode(a.nbs,'8021',a.lim,0) lim
+                                         , null lim_hist, nvl(vv.deldate,to_date('01014999','ddmmyyyy') ) deldate, vv.NDOC
+                                  from acc_over_archive vv   , accounts a, accounts a1
+                                  where vv.datd <= dat_ and vv.datd2 >= trunc(dat_, 'mm') and vv.deldate >= trunc(dat_,'mm')  and a.acc = vv.acc
+                                        and a1.acc = vv.acco and a1.nbs <> '2203'
+                                        and vv.acco not in (select acco from acc_over)
+                                        and vv.nd not in (select nd from cc_deal where vidd in (10, 110))
+                                    union all
+                                  select vv.acc acco, null acc_9129, null acc_2067, null acc_2069, 
+                                         vv.p111 sdate, vv.tp sos,
+                                         vv.p112 wdate, vv.nd, p110 lim, 
+                                         vv.isp lim_hist, p113 deldate, substr(vv.p090,1,30) NDOC
+                                  from otcn_f71_temp vv) UNPIVOT (VALUE
+                                                                    FOR colname
+                                                                    IN  (acc_9129,
+                                                                        acc_2067,
+                                                                        acc_2069,
+                                                                        acco))      )
+select dat_ fdat,
+       tt.acc, tt.accc,tt.nbs, decode(sign(tt.ost),1,'2',-1, '1','0') sgn,
+       tt.nls, tt.kv, tt.nms, tt.daos, tt.dazs,
+       tt.ost,tt.ostq, tt.dosq, 
+       decode(sign(nvl(tt.h_ostq,0)), -1,-- Вх < 0
+                                decode(sign(nvl(tt.ostq,0)), -1, --Исх < 0
+                                       sum( nvl(decode(instr('1600,2600,2605,2620,2625,2650,2655,8025,',tt.nbs||','), 0 ,r.dos, decode(r.dos+r.kos,0,r.ost,0)),0))
+                                       + abs(nvl(tt.h_ostq,0)) - abs(nvl(tt.ostq,0)),--4. Вх < 0  Исх < 0  -  Погаш = Выдача + abs(Вх) - abs(Исх)
+                                      -- 0,--Исх = 0
+                                       sum(nvl(decode(instr('1600,2600,2605,2620,2625,2650,2655,8025,',tt.nbs||','), 0 ,r.dos, decode(r.dos+r.kos,0,r.ost,0)),0))
+                                       + abs(nvl(tt.h_ostq,0))  --3. Вх < 0  Исх = 0  -  Погаш = Выдача + abs(Вх)
+                                      ),
+                                --Вх >= 0
+                                decode(sign(nvl(tt.ostq,0)), -1, --Исх < 0
+                                       sum( nvl(decode(instr('1600,2600,2605,2620,2625,2650,2655,8025,',tt.nbs||','), 0 ,r.dos, decode(r.dos+r.kos,0,r.ost,0)),0))
+                                       - abs(nvl(tt.ostq,0)), --2. Вх >= 0  Исх < 0  -  Погаш = Выдача - abs(Исх)
+                                      -- 0,--Исх = 0
+                                       sum( nvl(decode(instr('1600,2600,2605,2620,2625,2650,2655,8025,',tt.nbs||','), 0 ,r.dos, decode(r.dos+r.kos,0,r.ost,0)),0))  -- 1. Вх >= 0  Исх = 0  -  Погаш = Выдача
+                                      )
+             ) kosq,
+       tt.nd, tt.nkd,
+       tt.sdate, tt.wdate, tt.sos, tt.rnk, tt.u_id, tt.tobo,
+       tt.s260, tt.ved, tt.s031 ,tt.tip, 
+       --в случае если счет привязан к нескольким договорам
+       --остаток по договору определяем для договора с максимальным номером
+       -- для остальных договоров = 0
+       decode(nvl('-'||to_char(max_nd), tt.nd), tt.nd, tt.ostq_kd , 0) ostq_kd
+       , sum( nvl(decode(instr('1600,2600,2605,2620,2625,2650,2655,8025,',tt.nbs||','), 0 ,r.dos, decode(r.dos+r.kos, 0, r.ost, 0)),0))  r_dos
+       ,tt.ndoc
+from (
+select t.*,
+       sum(decode(decode(sign(t.ostq),-1,'1','2'), r012, abs(t.ostq), 0))
+       over(partition by t.nd, t.rnk) ostq_kd -- к общей сумме по договору прибавляем лимит овердрафта по счету 8021 (для Демарка)
+       ,hi.ostq  h_ostq
+from(
+select  /*+ leading(c) full(o) */
+       s.acc, o.isp accc, substr(o.nls,1,4) nbs, decode(sign(s.ost-s.dos96+s.kos96),-1,'1','2') sgn,
+       o.nls, o.kv, o.nms, o.daos, o.dazs,
+       decode(n.r012, 2, s.ost-s.dos96+s.kos96,least(0, s.ost-s.dos96+s.kos96)) ost,
+       decode(n.r012, 2, decode(o.kv, 980, s.ost-s.dos96+s.kos96, s.ostq-s.dosq96+s.kosq96),
+                           least(0, decode(o.kv, 980, s.ost-s.dos96+s.kos96, s.ostq-s.dosq96+s.kosq96))) ostq,
+       decode(o.kv, 980, s.dos+s.dos96-s.dos96p, gl.p_icurval (o.kv, s.dos+s.dos96-s.dos96p, dat_)) dosq,
+       decode(o.kv, 980, s.kos+s.kos96-s.kos96p, gl.p_icurval (o.kv, s.kos+s.kos96-s.kos96p, dat_)) kosq,
+       '-'||to_char(c.nd) nd,
+       null nkd, -- якщо немає ND, то підставляємо ACC
+       max(c.nd) over(partition by s.acc) max_nd,
+       c.sdate, c.wdate, c.sos, s.rnk, user_id u_id, o.tobo,
+       f_get_s260(null, s.acc, p.s260, s.rnk, o.nbs,default_) s260,
+       z.ved, p.s031
+       ,'OVR' tip
+       ,c.deldate, n.r012, c.ndoc
+from sel_over c, OTCN_SALDO s, OTCN_ACC o, 
+      specparam p, customer z,
+       kl_f3_29 n
+where ((s.ost-s.dos96+s.kos96) <> 0 or s.dos+s.dos96-s.dos96p <> 0 or s.kos+s.kos96-s.kos96p <> 0 ) and
+      s.acc = o.acc and
+      s.acc = c.acc and
+      s.acc=p.acc(+) and
+      s.rnk=z.rnk and
+      s.nls like n.r020 || '%' and
+      n.kf='F7' and
+      (decode(n.r012, 2, decode(sign(s.ost-s.dos96+s.kos96),-1,'1','2'), 1 ) = n.r012 or (s.ost-s.dos96+s.kos96) = 0 )
+      and nvl(o.dazs, to_date('01014999','ddmmyyyy')) >= trunc(dat_,'mm')
+)t
+--обращаемся к otc_ff7_history_acc чтобы найти входящий остаток на начало отчетного месяца
+-- 10.12.2010 OAB добавил условие t.nd = hi.nd т.к. для овердрафтов используется один и тотже счет а № дог. разные
+left join otc_ff7_history_acc hi 
+on (t.acc = hi.acc and t.nd = hi.nd and hi.datf = datp_)
+group by   t.acc, t.accc,t.nbs, t.sgn,
+       t.nls, t.kv, t.nms, t.daos, t.dazs,
+       t.ost,t.ostq, t.dosq, t.kosq,t.nd, t.nkd,
+       t.sdate, t.wdate, t.sos, t.rnk, t.tobo,
+       t.s260, t.ved, t.s031 ,t.tip,  t.u_id ,hi.ostq ,t.deldate, t.r012, t.ndoc,max_nd
+) tt
+left join  (select '-'||ttt.nd nd, rr.acc, sum(rr.dos) dos, sum(rr.kos) kos, sum(rr.ost) ost
+            from rnbu_history rr, sel_over ttt 
+            where trim(rr.d020) != '03' and
+            ttt.acc = rr.acc and
+            rr.odate between greatest(trunc(dat_,'mm'),nvl(ttt.sdate,trunc(dat_,'mm'))) and least(dat_,nvl(ttt.wdate,dat_) )
+            group by '-'||ttt.nd, rr.acc) r
+on (tt.acc = r.acc and
+    tt.nd = r.nd)   --вместо tt.date было tt.deldate-1
+where tt.nbs not in ('9129', '9020')
+group by   tt.acc, tt.accc,tt.nbs, tt.sgn,
+       tt.nls, tt.kv, tt.nms, tt.daos, tt.dazs,
+       tt.ost,tt.ostq, tt.dosq, tt.kosq,tt.nd, tt.nkd,
+       tt.sdate, tt.wdate, tt.sos, tt.rnk, tt.tobo,
+       tt.s260, tt.ved, tt.s031 ,tt.tip, tt.ostq_kd , tt.u_id ,tt.h_ostq ,tt.deldate, tt.ndoc, max_nd)
+;
+--для правильної кількості договорів (показник 20)
+insert into otc_ff7_history_acc(
+       DATF, ACC, ACCC, NBS,
+       SGN, NLS, KV, NMS, DAOS, DAZS, OST, OSTQ, ND, NKD,
+       SDATE, WDATE, SOS, RNK, STAFF, TOBO, s260, k110, s031, 
+       OSTQ_KD, R_DOS, TPA, S080, tip)
+select dat_, o.acc, o.accc, substr(o.nls,1,4),
+       '0',  o.nls, o.kv, o.nms, o.daos, o.dazs, 0 ost,0 ostq,
+       nvl(c.nd, -o.acc) nd, (case when c.nd is null then trim(p.nkd) else null end), -- якщо немає ND, то підставляємо ACC
+       c.sdate, c.wdate, c.sos, o.rnk, userid_, o.tobo,
+       f_get_s260(c.nd, o.acc, p.s260, o.rnk, o.nbs, default_) s260,
+       z.ved, p.s031, 0, 0, k.tpa, nvl(p.s080,0), o.tip
+from   OTCN_ACC          o,
+       (select a.acc, a.nd, b.sdate, b.wdate, b.sos
+        from   (select n.acc, max(n.nd) nd
+                from   nd_acc n, cc_deal c
+                where  n.nd=c.nd and
+                       c.sdate <= dat_ and
+                       c.VIDD not in (10, 26) -- убираем бронирование средств
+                group by n.acc) a, cc_deal b
+        where a.nd=b.nd) c,
+       specparam         p,
+       customer          z,
+       accounts a,
+       (select r020, max(decode(trim(s240), null, '1', '2')) tpa from kl_f3_29 where kf='F7' group by r020) k
+where  o.acc=c.acc(+)             and
+       o.acc=p.acc(+)             and
+       o.rnk=z.rnk and
+       o.acc not in (select acc from otc_ff7_history_acc where datf=dat_) and
+       nvl(o.dazs, dat_+1) > dat_ and
+       o.nbs = k.r020 and 
+       k.tpa in (1, 3, 4) and  
+       o.acc=a.acc and
+       a.dapp is not null and a.dapp not in (c.sdate, a.daos) and -- перевірка чи видавався вже овердрафт 
+       exists (select 1
+               from nd_acc n, sal s
+               where n.nd=c.nd and
+                     n.acc=s.acc and
+                     s.fdat=dat_ and
+                     s.nls like '9129%' and
+                     s.ost<>0);
+   
+-- вилучаємо ті договора, по яких був рух по ліміту, а по інших рахунках договору - ні                  
+delete
+from otc_ff7_history_acc o
+where o.datf = dat_ and
+    o.nls like '9129%' and 
+    (o.ostq_kd = o.ost or o.ost = 0) and
+    not exists (select 1
+                from otc_ff7_history_acc o1, accounts a
+                where o1.datf = dat_ and
+                      o1.nd = o.nd and
+                      o1.acc = a.acc and
+                      o1.nls like '2%' and
+                      o1.kv = o.kv and
+                      (o1.ost <> 0 or 
+                       o1.ost = 0 and a.dapp is not null));                     
+                     
+-- 09.08.2013
+-- для отрицательных сумм погашения оведрафтов KOSQ < 0 изменям данное поле
+-- ABS(OSTQ) - ABS(KOSQ)
+update otc_ff7_history_acc
+set kosq = ABS(ostq) - ABS(kosq)
+where datf = dat_
+ and tip in ('OVR', 'W4B')
+ and kosq < 0;
 
 logger.info ('P_FF7: etap 2 for datf = '||to_char(dat_, 'dd/mm/yyyy'));
 
 update  OTC_FF7_HISTORY_ACC t
 set tpa = (select max(decode(trim(s240), null, '1', '2')) from kl_f3_29 where kf='F7' and r020 = t.nbs),
-    daos = (case when tobo in ('/305482/000376/') and
-                      dat_ = to_date('31012012','ddmmyyyy') and
-                      (nd is null and
-                       daos between to_date('23012012','ddmmyyyy') and to_date('27012012','ddmmyyyy')
-                            or
-                       nd is not null and
-                       (select count(*)
-                        from cc_deal
-                        where to_char(nd)=t.nd and
-                              sdate between to_date('01012012','ddmmyyyy') and to_date('31012012','ddmmyyyy'))=0
-                       )
-                       or
-                      tobo in ('/305482/000407/') and
-                      dat_ = to_date('29022012','ddmmyyyy') and
-                      (nd is null and
-                       daos between to_date('06022012','ddmmyyyy') and to_date('11022012','ddmmyyyy')
-                            or
-                       nd is not null and
-                       (select count(*)
-                        from cc_deal
-                        where to_char(nd)=t.nd and
-                              sdate between to_date('01022012','ddmmyyyy') and to_date('29022012','ddmmyyyy'))=0
-                       )
-                       or
-                      tobo in ('/305482/000357/') and
-                      dat_ = to_date('29022012','ddmmyyyy') and
-                      (nd is null and
-                       daos between to_date('13022012','ddmmyyyy') and to_date('18022012','ddmmyyyy')
-                            or
-                       nd is not null and
-                       (select count(*)
-                        from cc_deal
-                        where to_char(nd)=t.nd and
-                              sdate between to_date('01022012','ddmmyyyy') and to_date('29022012','ddmmyyyy'))=0
-                       )
-                       or
-                      tobo in ('/305482/000385/') and
-                      dat_ = to_date('29022012','ddmmyyyy') and
-                      (nd is null and
-                       daos between to_date('20022012','ddmmyyyy') and to_date('26022012','ddmmyyyy')
-                            or
-                       nd is not null and
-                       (select count(*)
-                        from cc_deal
-                        where to_char(nd)=t.nd and
-                              sdate between to_date('01022012','ddmmyyyy') and to_date('29022012','ddmmyyyy'))=0
-                       )
-                       ---------------------------------------
-                       or
-                      tobo in ('/305482/000448/') and
-                      dat_ = to_date('30032012','ddmmyyyy') and
-                      (nd is null and
-                       daos between to_date('12032012','ddmmyyyy') and to_date('1703012','ddmmyyyy')
-                            or
-                       nd is not null and
-                       (select count(*)
-                        from cc_deal
-                        where to_char(nd)=t.nd and
-                              sdate between to_date('01032012','ddmmyyyy') and to_date('30032012','ddmmyyyy'))=0
-                       )
-                       or
-                      tobo in ('/305482/000490/') and
-                      dat_ = to_date('30032012','ddmmyyyy') and
-                      (nd is null and
-                       daos between to_date('19032012','ddmmyyyy') and to_date('24032012','ddmmyyyy')
-                            or
-                       nd is not null and
-                       (select count(*)
-                        from cc_deal
-                        where to_char(nd)=t.nd and
-                              sdate between to_date('01032012','ddmmyyyy') and to_date('30032012','ddmmyyyy'))=0
-                       )
-                       or
-                      tobo in ('/305482/000511/') and
-                      dat_ = to_date('30032012','ddmmyyyy') and
-                      (nd is null and
-                       daos between to_date('26032012','ddmmyyyy') and to_date('31032012','ddmmyyyy')
-                            or
-                       nd is not null and
-                       (select count(*)
-                        from cc_deal
-                        where to_char(nd)=t.nd and
-                              sdate between to_date('01032012','ddmmyyyy') and to_date('30032012','ddmmyyyy'))=0
-                       )
-                       or
-                      tobo in ('/305482/000422/') and
-                      dat_ = to_date('28042012','ddmmyyyy') and
-                      (nd is null and
-                       daos between to_date('23042012','ddmmyyyy') and to_date('27042012','ddmmyyyy')
-                            or
-                       nd is not null and
-                       (select count(*)
-                        from cc_deal
-                        where to_char(nd)=t.nd and
-                              sdate between to_date('01042012','ddmmyyyy') and to_date('30042012','ddmmyyyy'))=0
-                       )
-                       or
-                      tobo in ('/305482/000461/') and
-                      dat_ = to_date('31052012','ddmmyyyy') and
-                      (nd is null and
-                       daos between to_date('07052012','ddmmyyyy') and to_date('13052012','ddmmyyyy')
-                            or
-                       nd is not null and
-                       (select count(*)
-                        from cc_deal
-                        where to_char(nd)=t.nd and
-                              sdate between to_date('01052012','ddmmyyyy') and to_date('31052012','ddmmyyyy'))=0
-                       )
-                       or
-                      tobo in ('/305482/000547/') and
-                      dat_ = to_date('31052012','ddmmyyyy') and
-                      (nd is null and
-                       daos between to_date('14052012','ddmmyyyy') and to_date('20052012','ddmmyyyy')
-                            or
-                       nd is not null and
-                       (select count(*)
-                        from cc_deal
-                        where to_char(nd)=t.nd and
-                              sdate between to_date('01052012','ddmmyyyy') and to_date('31052012','ddmmyyyy'))=0
-                       )
-                       or
-                      tobo in ('/305482/000528/') and
-                      dat_ = to_date('31072012','ddmmyyyy') and
-                      (nd is null and
-                       daos between to_date('04072012','ddmmyyyy') and to_date('15072012','ddmmyyyy')
-                            or
-                       nd is not null and
-                       (select count(*)
-                        from cc_deal
-                        where to_char(nd)=t.nd and
-                              sdate between to_date('01072012','ddmmyyyy') and to_date('31072012','ddmmyyyy'))=0
-                       )
-                       ---------------------------------------
-                     or
-                      tobo in ('/328845/000510/060510/') and
-                      dat_ = to_date('27062012','ddmmyyyy') and
-                      (nd is null and
-                       daos between to_date('27062012','ddmmyyyy') and to_date('30062012','ddmmyyyy')
-                            or
-                       nd is not null and
-                       (select count(*)
-                        from cc_deal
-                        where to_char(nd)=t.nd and
-                              sdate between to_date('27062012','ddmmyyyy') and to_date('30062012','ddmmyyyy'))=0
-                       )
-
-                      or
-                      tobo in ('/328845/000456/', '/328845/000456/060456/') and
-                      dat_ = to_date('27062012','ddmmyyyy') and
-                      (nd is null and
-                       daos between to_date('01062012','ddmmyyyy') and to_date('03062012','ddmmyyyy')
-                            or
-                       nd is not null and
-                       (select count(*)
-                        from cc_deal
-                        where to_char(nd)=t.nd and
-                              sdate between to_date('01062012','ddmmyyyy') and to_date('03062012','ddmmyyyy'))=0
-                       )
-                       ---------------------------------------
-                      or
-                      tobo in ('/305482/000564/') and
-                      dat_ = to_date('2809012','ddmmyyyy') and
-                      (nd is null and
-                       daos between to_date('17092012','ddmmyyyy') and to_date('23092012','ddmmyyyy')
-                            or
-                       nd is not null and
-                       (select count(*)
-                        from cc_deal
-                        where to_char(nd)=t.nd and
-                              sdate between to_date('17092012','ddmmyyyy') and to_date('23092012','ddmmyyyy'))=0
-                       )
-                      or
-                      tobo in ('/305482/000603/', '/305482/000643/') and
-                      dat_ = to_date('2809012','ddmmyyyy') and
-                      (nd is null and
-                       daos between to_date('24092012','ddmmyyyy') and to_date('30092012','ddmmyyyy')
-                            or
-                       nd is not null and
-                       (select count(*)
-                        from cc_deal
-                        where to_char(nd)=t.nd and
-                              sdate between to_date('24092012','ddmmyyyy') and to_date('30092012','ddmmyyyy'))=0
-                       )
-                then to_date('01012011','ddmmyyyy')
-                when daos = to_date('28022013','ddmmyyyy') and substr(nbs,1,3) in ('206','208')
-                then to_date('01012011','ddmmyyyy')
-                else daos
-            end),
     dazs = (case when dazs = to_date('01032013','ddmmyyyy') and substr(nbs,1,3) = '207'
                     then to_date('01014999','ddmmyyyy')
                  else dazs
@@ -842,13 +568,13 @@ insert into OTCN_F42_TEMP
   FDAT     ,
   ZAL
 )
-select /*+ ordered*/
+select /*+ ordered */
     O.ACC, 1, O.DATF,
     GREATEST (O.KOSQ - SUM ((case when ok.sos >= 4 then gl.p_icurval(o.kv,ok.S,dat_) else 0 end)), 0) SQ
 from OTC_FF7_HISTORY_ACC O, opldok ok, opldok od, accounts ad
 where O.DATF = dat_
   AND NVL (O.KOSQ, 0) <> 0
-  AND O.TIP not in ('OVR', 'W4B')
+  AND O.TIP not in ('LVR','OVR','W4B')
   AND O.NBS NOT IN
                      ('1502',
                       '1600',
@@ -863,22 +589,21 @@ where O.DATF = dat_
                       '2657',
                       '8025')
   and o.tpa in (1,2,3)
-  and ok.FDAT = any (select fdat from fdat where fdat between trunc(dat_, 'mm') and dat_)
+  and ok.FDAT = any (select fdat from fdat where fdat between trunc(dat_, 'mm') and dat_ + 10)
+  and (ok.FDAT <= dat_ or ok.tt = 'IRR')
   and o.acc = ok.ACC
-  --and o.kf = ok.kf  
   and ok.DK = 1
-  --and od.kf = ok.kf  
   and od.ref = ok.ref
   and od.dk = 0
   and od.stmt = ok.stmt
   and od.fdat = ok.fdat
   and od.acc = ad.acc
-  --and od.kf = ad.kf  
   and (ad.nls like substr(o.nls,1,3)||'%' or
        ok.tt = '024' and o.nls like '207%' and ad.nls like '206%' or
        ok.tt = '024' and o.nls like '207%' and ad.nls like '208%' or
        ok.tt = '024' and o.nls like '206%' and ad.nls like '207%' or
-       ok.tt = '024' and o.nls like '208%' and ad.nls like '207%')
+       ok.tt = '024' and o.nls like '208%' and ad.nls like '207%' or
+       ok.tt = 'IRR' and o.nls like '2068%' and ad.nls like '6026%')
 group by O.ACC, O.DATF, O.KOSQ;
 
 commit;
@@ -903,13 +628,13 @@ insert into OTCN_F42_TEMP
   FDAT     ,
   ZAL
 )
-select /*+ PARALLEL LEADING(o) */
+select /*+ ordered */
     O.ACC, 1, O.DATF,
     GREATEST (O.DOSQ - SUM ((case when ok.sos >= 4 then gl.p_icurval(o.kv,ok.S,dat_) else 0 end)), 0) SQ
 from OTC_FF7_HISTORY_ACC O, opldok ok, opldok od, accounts ad
 where O.DATF = dat_
   AND NVL (O.DOSQ, 0) <> 0
-  AND O.tip not in ('OVR', 'W4B')
+  AND O.tip not in ('LVR', 'OVR','W4B')
   AND O.NBS NOT IN
                      ('1502',
                       '1600',
@@ -926,20 +651,18 @@ where O.DATF = dat_
   and o.tpa in (1,2,3)
   and ok.FDAT = any (select fdat from fdat where fdat between trunc(dat_, 'mm') and dat_)
   and o.acc = ok.ACC
-  --and o.kf = ok.kf  
   and ok.DK = 0
-  --and od.kf = ok.kf  
   and od.ref = ok.ref
   and od.dk = 1
   and od.stmt = ok.stmt
   and od.fdat = ok.fdat
   and od.acc = ad.acc
-  --and od.kf = ad.kf  
   and (ad.nls like substr(o.nls,1,3)||'%' or
        ok.tt = '024' and o.nls like '206%' and ad.nls like '207%' or
        ok.tt = '024' and o.nls like '208%' and ad.nls like '207%' or
        ok.tt = '024' and o.nls like '207%' and ad.nls like '206%' or
-       ok.tt = '024' and o.nls like '207%' and ad.nls like '208%')
+       ok.tt = '024' and o.nls like '207%' and ad.nls like '208%' or
+       ok.tt = '015' and o.nls like '2068%' and ad.nls like '3739%')
 group by O.ACC, O.DATF, O.DOSQ;
 commit;
 
@@ -951,35 +674,80 @@ using (select fdat, acc, nvl(zal, 0) zal
 on (o.acc = a.acc and o.datf = a.fdat)
 when matched then update set o.dosq = a.zal
 where o.datf = dat_;
+commit;
+
+ --потому что ...!!!!! счета процентов не ведуться в портфеле овердрафтов ...!!! а только в процентной карточке!!!!
+ --из процентной карточки находим счет 2600, а по нему из acc_over находим номер договора
+update otc_ff7_history_acc o
+ set o.nd = '-'||nvl(( select trim(to_char(nvl(v.nd,vv.nd)))
+             from int_accn i, acc_over v, accounts a, acc_over_archive vv
+             where i.acra = o.acc
+               and i.acc=v.acco(+)
+               and i.acc=a.acc
+               and i.acc=vv.acco(+)
+               and vv.datd(+) <= dat_
+               and vv.datd2(+) >= trunc(dat_, 'mm') 
+               and vv.deldate(+) >= trunc(dat_,'mm')
+               and i.id = 0 and a.nbs <> '9129' 
+               and v.nd not in (select nd from cc_deal where vidd in (10, 110))
+               and vv.nd not in (select nd from cc_deal where vidd in (10, 110))
+               and rownum = 1
+          ),trim(leading '-' from o.nd))
+ where (nbs in ('2607','2627') or
+        nbs in ('2607','2627','2067','9129') and nd in (select nd from cc_deal where vidd in (10, 110))) and
+       datf = dat_;
+
+update otc_ff7_history_acc o
+ set o.nd = '-'||nvl(( select max(trim(to_char(nvl(v.nd,vv.nd))))
+             from  accounts a, acc_over v, acc_over_archive vv
+             where a.acc = o.acc 
+               and o.acc = v.acco(+)
+               and a.acc = vv.acco(+)
+               and vv.datd(+) <= dat_
+               and vv.datd2(+) >= trunc(dat_, 'mm') 
+               and vv.deldate(+) >= trunc(dat_,'mm')
+               and v.nd not in (select nd from cc_deal where vidd in (10, 110))
+          ),trim(leading '№' from o.nd))
+ where nbs in ('2600','2620','2625') and datf = dat_;
 
 logger.info ('P_FF7: etap 7 for datf = '||to_char(dat_, 'dd/mm/yyyy'));
 
-merge into otc_ff7_history_acc o
-using (select o.datf, o.acc,
-           decode(sign(nvl(o1.ostq,0)), -1,-- Вх < 0
-                   decode(sign(nvl(o.ostq,0)), -1, --Исх < 0
-                           ( nvl(o.r_dos,0)) + abs(nvl(o1.ostq,0)) - abs(nvl(o.ostq,0)),--4. Вх < 0  Исх < 0  -  Погаш = Выдача + abs(Вх) - abs(Исх)
-                          -- 0,--Исх = 0
-                           (nvl(o.r_dos,0)) + abs(nvl(o1.ostq,0))  --3. Вх < 0  Исх = 0  -  Погаш = Выдача + abs(Вх)
-                          ),
-                    --Вх >= 0
-                   decode(sign(nvl(o.ostq,0)), -1, --Исх < 0
-                           ( nvl(o.r_dos,0)) - abs(nvl(o.ostq,0)), --2. Вх >= 0  Исх < 0  -  Погаш = Выдача - abs(Исх)
-                          -- 0,--Исх = 0
-                           ( nvl(o.r_dos,0))  -- 1. Вх >= 0  Исх = 0  -  Погаш = Выдача
-                          )
-                 ) kosq
-     from (select *
-           from otc_ff7_history_acc o
-           where  o.datf = dat_  and
-                  o.tip not in ('OVR', 'W4B', 'PK9') and
-                  o.tip not like 'W4%' and
-                  o.nbs in ('1600','2600','2605','2620','2625','2650','2655','8025') ) o
-     left join otc_ff7_history_acc o1 on o.acc = o1.acc and o.nd=o1.nd and o1.datf = datp_
-     where o1.ostq<0 or o.ostq<0) a
-on (o.acc = a.acc and o.datf = a.datf)
-when matched then update set o.kosq = a.kosq
-where o.datf = dat_;
+for k in (select o.datf, o.acc, o.nd, 
+                  decode(sign(nvl(o1.ostq,0)), -1,-- Вх < 0
+                          decode(sign(nvl(o.ostq,0)), -1, --Исх < 0
+                                   ( nvl(o.r_dos,0)) + abs(nvl(o1.ostq,0)) - abs(nvl(o.ostq,0)),--4. Вх < 0  Исх < 0  -  Погаш = Выдача + abs(Вх) - abs(Исх)
+                                  -- 0,--Исх = 0
+                                   (nvl(o.r_dos,0)) + abs(nvl(o1.ostq,0))  --3. Вх < 0  Исх = 0  -  Погаш = Выдача + abs(Вх)
+                                  ),
+                            --Вх >= 0
+                           decode(sign(nvl(o.ostq,0)), -1, --Исх < 0
+                                   ( nvl(o.r_dos,0)) - abs(nvl(o.ostq,0)), --2. Вх >= 0  Исх < 0  -  Погаш = Выдача - abs(Исх)
+                                  -- 0,--Исх = 0
+                                   ( nvl(o.r_dos,0))  -- 1. Вх >= 0  Исх = 0  -  Погаш = Выдача
+                                  )
+                         ) kosq
+             from (select *
+                   from otc_ff7_history_acc o
+                   where  o.datf = dat_  and
+                          o.tip not in ('OVR', 'W4B', 'PK9') and
+                          o.tip not like 'W4%' and
+                          o.nbs in ('1600','2600','2605','2620','2625','2650','2655') ) o
+             left join (select * from otc_ff7_history_acc where datf = datp_) o1 
+             on (o.acc = o1.acc and o.nd = o1.nd) 
+             where (nvl(o1.ostq, 0) < 0 or 
+                    nvl(o.ostq, 0) < 0  or
+                    nvl(o.ostq_kd, 0) < 0 or
+                    o.tip = 'LVR')
+         )
+loop
+     update otc_ff7_history_acc
+     set kosq = k.kosq
+     where datf = k.datf and
+        acc = k.acc and
+        nd = k.nd;     
+end loop;
+     
+commit;
 
 logger.info ('P_FF7: etap 8 for datf = '||to_char(dat_, 'dd/mm/yyyy'));
 
@@ -995,116 +763,92 @@ where o.datf = dat_ and
         (select 1
           from saldoa ss
           where ss.acc = o.acc and
-                --ss.kf = o.kf and  
                 (o.nbs, decode(sign(ss.ostf-ss.dos+ss.kos),-1,'1','2')) in
                                                             (select n.r020,n.r012
                                                             from kl_f3_29 n
                                                             where n.kf='F7') and
                 ss.fdat between trunc(dat_,'mm') and  dat_) and  
-      not exists ( select 1 from acc_over v 
+      not (tpa = 1 and
+           exists ( select 1 from acc_over v 
                    where v.acco = o.acc 
-                     and v.sos is null 
-                     and v.datd <= dat_ );
+                     and nvl(v.sos, 110) = 110
+                     and v.datd <= dat_
+                     and v.datd2(+) >= trunc(dat_, 'mm')  )  or tpa = 2) 
+;
 
 logger.info ('P_FF7: etap 9 for datf = '||to_char(dat_, 'dd/mm/yyyy'));
 
   -- удаляем кредиты, по которым есть 9129, но никогда они не выдавались
-  delete
-    from otc_ff7_history_acc a
-    where datf = dat_
-      and nls like '9%'
-      and ostq = 0
-      and ostq_kd < 0
-      and not exists (select 1
-                      from saldoa
-                      where acc = a.acc
-                        --and kf = a.kf 
-                        and ostf-dos+kos<0
-                        and fdat <= dat_);
+delete
+from otc_ff7_history_acc a
+where datf = dat_
+  and nls like '9%'
+  and ostq = 0
+  and ostq_kd < 0
+  and not exists (select 1
+                  from saldoa
+                  where acc = a.acc
+                    and ostf-dos+kos<0
+                    and fdat <= dat_);
 
 logger.info ('P_FF7: etap 10 for datf = '||to_char(dat_, 'dd/mm/yyyy'));
 
   -- удаляем кредиты, по которым выдача была после отчетной даты
-  delete
-    from otc_ff7_history_acc a
-    where datf = dat_
-      and nls not like '9%'
-      and ostq = 0
-      and ostq_kd < 0
-      and not exists (select 1
-                      from saldoa
-                      where acc = a.acc
-                        and (ostf-dos+kos < 0 or dos+kos <> 0)
-                        and fdat <= dat_);
+delete
+from otc_ff7_history_acc a
+where datf = dat_
+  and nls not like '9%'
+  and ostq = 0
+  and ostq_kd < 0
+  and not exists (select 1
+                  from saldoa
+                  where acc = a.acc
+                    and (ostf-dos+kos < 0 or dos+kos <> 0)
+                    and fdat <= dat_);
 
 logger.info ('P_FF7: etap 11 for datf = '||to_char(dat_, 'dd/mm/yyyy'));
 
   -- удаляем возможные овердрафты, которые никогда они не выдавались
-  delete
-    from otc_ff7_history_acc a
-    where a.datf = dat_ and
-        a.nbs in ('1600', '2600', '2605', '2620', '2625', '2650', '2655', '8025') and
-        a.ostq >= 0 and
-        a.ostq_kd < 0 and
-        not exists (select 1
-                    from saldoa s
-                    where s.acc = a.acc and 
-                          s.fdat between a.daos and dat_ and 
-                          --s.kf = a.kf and  
-                          s.ostf-s.dos+s.kos < 0);
+delete
+from otc_ff7_history_acc a
+where a.datf = dat_ and
+    a.nbs in ('1600', '2600', '2605', '2620', '2625', '2650', '2655', '8025') and
+    a.ostq >= 0 and
+    a.ostq_kd < 0 and
+    not exists (select 1
+                from saldoa s
+                where s.acc = a.acc and 
+                      s.fdat between a.daos and dat_ and 
+                      s.ostf-s.dos+s.kos < 0);
 
 logger.info ('P_FF7: etap 12 for datf = '||to_char(dat_, 'dd/mm/yyyy'));
 
-  delete
-    from otc_ff7_history_acc a
-    where datf = dat_ and
-        nbs = '3548' and
-        acc in (SELECT s.ACC
-                FROM SPECPARAM s, accounts a
-                WHERE NVL (TRIM (s.R011), '0') NOT IN ('1', '2', '3', '4') and
-                       --s.kf = a.kf and 
-                       s.acc = a.acc and
-                       a.nbs = '3548');
+delete
+from otc_ff7_history_acc a
+where datf = dat_ and
+    nbs = '3548' and
+    acc in (SELECT s.ACC
+            FROM SPECPARAM s, accounts a
+            WHERE NVL (TRIM (s.R011), '0') NOT IN ('1', '2', '3', '4') and
+                   s.acc = a.acc and
+                   a.nbs = '3548');
+
+-- видаляємо технічні овери, бо всі інші тепер в портфелі                   
+delete
+from otc_ff7_history_acc a
+where datf = dat_ and
+    nbs = '2600' and
+    tip = 'ODB' and
+    abs(nd) not in (select nd from cc_deal);                   
 
 logger.info ('P_FF7: etap 13 for datf = '||to_char(dat_, 'dd/mm/yyyy'));
 
- --потому что ...!!!!! счета процентов не ведуться в портфеле овердрафтов ...!!! а только в процентной карточке!!!!
- --из процентной карточки находим счет 2600, а по нему из acc_over находим номер договора
---if 300465 not in  (mfo_) then
- --Кроме ГОУ Сбербанка - у них все равно нет портфеля оверов
- -- 28/09/2016 и для ГОУ также т.к. уже существует портфель оверов 
-  update otc_ff7_history_acc o
-     set o.nd = '-'||nvl(( select trim(to_char(nvl(v.nd,vv.nd)))
-                 from int_accn i, acc_over v, accounts a, acc_over_archive vv
-                 where i.acra = o.acc
-                   and i.acc=v.acco(+)
-                   and i.acc=a.acc
-                   and i.acc=vv.acco(+)
-                   and vv.datd(+) <= dat_
-                   and vv.deldate(+) >= trunc(dat_,'mm')
-                   and i.id = 0 and a.nbs <> '9129' and rownum = 1
-              ),trim(leading '-' from o.nd))
-     where nbs in ('2607','2627') and datf = dat_;
-
-  update otc_ff7_history_acc o
-     set o.nd = '-'||nvl(( select trim(to_char(nvl(v.nd,vv.nd)))
-                 from  accounts a, acc_over v, acc_over_archive vv
-                 where a.acc = o.acc 
-                   and o.acc = v.acco(+)
-                   and a.acc = vv.acco(+)
-                   and vv.datd(+) <= dat_
-                   and vv.deldate(+) >= trunc(dat_,'mm')
-                   and rownum = 1
-              ),trim(leading '№' from o.nd))
-     where nbs in ('2600','2620','2625') and datf = dat_;
-
- update otc_ff7_history_acc o
-     set ostq_kd = greatest(nvl(( select max(o1.ostq_kd)
-                 from otc_ff7_history_acc o1
-                 where o1.datf = dat_ and o.rnk = o1.rnk and o.nd = o1.nd
-              ),o.ostq_kd),o.ostq_kd)
-     where nbs = '2607' and datf = dat_;
---end if;
+update otc_ff7_history_acc o
+ set ostq_kd = -1 * greatest(nvl(( select max(abs(o1.ostq_kd))
+             from otc_ff7_history_acc o1
+             where o1.datf = dat_ and o.rnk = o1.rnk and o.nd = o1.nd and o1.ostq_kd<>0
+          ),abs(o.ostq_kd)),abs(o.ostq_kd))
+ where nbs in ('2607', '2067', '9129') and datf = dat_;
 
 -- (12/08/2016) замена ND для счетов 2607,2627 отсутсвующих в INT_ACCN
 BEGIN
@@ -1182,7 +926,7 @@ if  mfou_ = 300465 then
                  from v_otc_w4_nd_acc v, otc_ff7_history_acc f
                  where v.acc = f.acc and
                        f.datf = dat_ and
-                       f.tip like 'W4%' and
+                       --f.tip like 'W4%' and
                        (f.nd like '-%' or f.nd like '№%')
                  group by f.datf, v.acc, f.s260)
            ) a
@@ -1264,6 +1008,11 @@ logger.info ('P_FF7: etap 15 for datf = '||to_char(dat_, 'dd/mm/yyyy'));
 -- изменение S080 на новые значения "A" или "M" в соответствии с KL_S080
 if dat_ >= to_date('31012017','ddmmyyyy') then
     update otc_ff7_history_acc o
+    set o.s080 = (select max(o1.s080) from otc_ff7_history_acc o1 where o1.datf = dat_ and o1.rnk = o.rnk and o1.nd = o.nd and o1.ost <> 0)
+    where o.datf = dat_ and
+          (NVL(o.s080, '0') = '0' or o.ost = 0);
+
+    update otc_ff7_history_acc o
     set o.s080 = 'A'
     where o.datf = dat_ and
           o.cc = '21' and
@@ -1285,7 +1034,6 @@ where o.s260='00'
 
 logger.info ('P_FF7: etap 14 for datf = '||to_char(dat_, 'dd/mm/yyyy'));
 
----------
 --------- Наполнение tmp_file03 и корректировка оборотов в otc_ff7_history_acc
 begin
    insert into tmp_file03
@@ -1296,12 +1044,12 @@ begin
             decode(a.dk, 0, a.nls, d.nls) nlsd, a.s, a.sq, a.fdat,
             c.nazn, decode(a.dk, 1, a.acc, b.acc) acck,
              decode(a.dk, 1, a.nls, d.nls) nlsk
-        from (select /*+ PARALLEL (8) LEADING(h) */
+        from (select /*+ leading(h) */
                     o1.fdat, o1.ref, o1.stmt, o1.dk, o1.tt,
                     o1.acc, o1.s, o1.sq, a.nls, a.kv
                 from otc_ff7_history_acc h, opldok o1, accounts a
                 where h.datf=dat_ and
-                    o1.fdat = any(select fdat from fdat where fdat between datb_ and dat_) and
+                    o1.fdat between datb_ and dat_ and
                     o1.acc = h.acc and
                     o1.acc = a.acc and
                     o1.sos >= 4) a, opldok b, accounts d, oper c
@@ -1318,15 +1066,27 @@ begin
     logger.info ('P_FF7: etap 16 for datf = '||to_char(dat_, 'dd/mm/yyyy'));
 
     for k in
-    (select acc, sum(dos) dos, sum(kos) kos from
-    (
-    with t as
-    (select accd,acck,sq from tmp_file03 where (substr(nlsd,1,4) in ('3600','2066') and substr(nlsk,1,4) in ('3600','2066')) and tt<>'013')
-    select accd acc, sq dos, 0 kos from t where exists (select 1 from otc_ff7_history_acc where datf=dat_ and acc=accd)
-    union all
-    select acck acc, 0 dos, sq kos from t where exists (select 1 from otc_ff7_history_acc where datf=dat_ and acc=acck)
-    )
-    group by acc)
+        (SELECT acc, SUM (dos) dos, SUM (kos) kos
+         FROM (WITH t
+                   AS (SELECT accd, acck, sq
+                         FROM tmp_file03
+                        WHERE     (    SUBSTR (nlsd, 1, 4) IN ('3600', '2066')
+                                   AND SUBSTR (nlsk, 1, 4) IN ('3600', '2066'))
+                              AND tt <> '013')
+              SELECT accd acc, sq dos, 0 kos
+                FROM t
+               WHERE EXISTS
+                        (SELECT 1
+                           FROM otc_ff7_history_acc
+                          WHERE datf = dat_ AND acc = accd)
+              UNION ALL
+              SELECT acck acc, 0 dos, sq kos
+                FROM t
+               WHERE EXISTS
+                        (SELECT 1
+                           FROM otc_ff7_history_acc
+                          WHERE datf = dat_ AND acc = acck))
+         GROUP BY acc)
     loop
        update otc_ff7_history_acc set dosq=dosq-k.dos, kosq=kosq-k.kos where acc=k.acc;
     end loop;

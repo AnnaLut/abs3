@@ -11,37 +11,37 @@ using BarsWeb.Core.Logger;
 /// </summary>
 public partial class DepositCardAcc : Bars.BarsPage
 {
-	protected OracleDataAdapter adapterSearchCard;
-	protected DataSet dsCards;
-        private readonly IDbLogger _dbLogger;
-        public DepositCardAcc()
+    protected OracleDataAdapter adapterSearchCard;
+    protected DataSet dsCards;
+    private readonly IDbLogger _dbLogger;
+    public DepositCardAcc()
     {
         _dbLogger = DbLoggerConstruct.NewDbLogger();
     }
 
-	/// <summary>
-	/// 
-	/// </summary>
-	/// <param name="sender"></param>
-	/// <param name="e"></param>
-	private void Page_Load(object sender, System.EventArgs e)
-	{
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void Page_Load(object sender, System.EventArgs e)
+    {
         Page.Header.Title = Resources.Deposit.GlobalResources.hDepositCardAcc;
 
         if (Request["rnk"] == null)
-		{
-			gridCardAcc.Visible = false;
-			return;
-		}
+        {
+            gridCardAcc.Visible = false;
+            return;
+        }
 
         if (Request["cur_id"] == null)
-		{
-			gridCardAcc.Visible = false;
-			return;
-		}
-			
-		ReadInfo();
-	}
+        {
+            gridCardAcc.Visible = false;
+            return;
+        }
+
+        ReadInfo();
+    }
     /// <summary>
     /// Локализация DataGrid
     /// </summary>
@@ -59,71 +59,75 @@ public partial class DepositCardAcc : Bars.BarsPage
             */
         }
     }
-	#region Web Form Designer generated code
-	override protected void OnInit(EventArgs e)
-	{
-		//
-		// CODEGEN: This call is required by the ASP.NET Web Form Designer.
-		//
-		InitializeComponent();
-		base.OnInit(e);
-	}
-	
-	/// <summary>
-	/// Required method for Designer support - do not modify
-	/// the contents of this method with the code editor.
-	/// </summary>
-	private void InitializeComponent()
-	{    
-		this.dsCards = new System.Data.DataSet();
-		((System.ComponentModel.ISupportInitialize)(this.dsCards)).BeginInit();
-		// 
-		// dsCards
-		// 
-		this.dsCards.DataSetName = "NewDataSet";
-		this.dsCards.Locale = new System.Globalization.CultureInfo("uk-UA");
-		;
-		((System.ComponentModel.ISupportInitialize)(this.dsCards)).EndInit();
+    #region Web Form Designer generated code
+    override protected void OnInit(EventArgs e)
+    {
+        //
+        // CODEGEN: This call is required by the ASP.NET Web Form Designer.
+        //
+        InitializeComponent();
+        base.OnInit(e);
+    }
 
-	}
-	#endregion
-	/// <summary>
-	/// 
-	/// </summary>
-	private void ReadInfo()
-	{
-		OracleConnection connect = new OracleConnection();
-		try 
-		{
-			// Создаем соединение
-			IOraConnection conn = (IOraConnection)this.Application["OracleConnectClass"];
-			connect = conn.GetUserConnection();
+    /// <summary>
+    /// Required method for Designer support - do not modify
+    /// the contents of this method with the code editor.
+    /// </summary>
+    private void InitializeComponent()
+    {
+        this.dsCards = new System.Data.DataSet();
+        ((System.ComponentModel.ISupportInitialize)(this.dsCards)).BeginInit();
+        // 
+        // dsCards
+        // 
+        this.dsCards.DataSetName = "NewDataSet";
+        this.dsCards.Locale = new System.Globalization.CultureInfo("uk-UA");
+        ;
+        ((System.ComponentModel.ISupportInitialize)(this.dsCards)).EndInit();
 
-			// Установка роли
-			OracleCommand cmdSetRole = new OracleCommand();
-			cmdSetRole.Connection = connect;
-			cmdSetRole.CommandText = conn.GetSetRoleCommand("DPT_ROLE");
-			cmdSetRole.ExecuteNonQuery();
+    }
+    #endregion
+    /// <summary>
+    /// 
+    /// </summary>
+    private void ReadInfo()
+    {
+        OracleConnection connect = new OracleConnection();
+        try
+        {
+            // Создаем соединение
+            IOraConnection conn = (IOraConnection)this.Application["OracleConnectClass"];
+            connect = conn.GetUserConnection();
+
+            // Установка роли
+            OracleCommand cmdSetRole = new OracleCommand();
+            cmdSetRole.Connection = connect;
+            cmdSetRole.CommandText = conn.GetSetRoleCommand("DPT_ROLE");
+            cmdSetRole.ExecuteNonQuery();
+
+            // tmp decision for new nbs prj
+            Bars.WebServices.NewNbs ws = new Bars.WebServices.NewNbs();
+            string a = "";
 
             OracleCommand cmdGetCardAcc = connect.CreateCommand();
 
             switch (Request["mode"])
             {
-                  case "cardn":
-                                _dbLogger.Info("Користувач зайшов на сторінку вибору рахунків клієнта для виплати депозиту та відсотків на карткові рахунки",
-                        "deposit");
-                          cmdGetCardAcc.CommandText =
-                              "select '<A href=# onclick=\"returnAcc('''||bankcode||''','''||balacc||''','''||replace(custname,'''','`')||''','''||custcode||''')\">Вибрати</a>', " +
-                              "       cardnum, balacc, currency, custname, bankcode, custcode " +
-                              " from ( "+
-                              " select distinct a.acc as cardnum, a.nls as balacc, A.KV as currency, A.NMS as custname, A.KF as bankcode, b.OKPO as custcode" +
-                              " from ACCOUNTS a, customer b, saldo s " +
-                              " where a.nbs in ('2620','2625') and a.dazs Is Null and a.RNK = b.RNK and s.acc = a.acc" +
-                              " and a.rnk = :rnk and a.kv = 980 and A.BRANCH = sys_context('bars_context','user_branch') )";
+                case "cardn":
+                    _dbLogger.Info("Користувач зайшов на сторінку вибору рахунків клієнта для виплати депозиту та відсотків на карткові рахунки",
+            "deposit");
+                    cmdGetCardAcc.CommandText =
+                        "select '<A href=# onclick=\"returnAcc('''||bankcode||''','''||balacc||''','''||replace(custname,'''','`')||''','''||custcode||''')\">Вибрати</a>', " +
+                        "       cardnum, balacc, currency, custname, bankcode, custcode " +
+                        " from ( " +
+                        " select distinct a.acc as cardnum, a.nls as balacc, A.KV as currency, A.NMS as custname, A.KF as bankcode, b.OKPO as custcode" +
+                        " from ACCOUNTS a, customer b, saldo s " +
+                        " where a.nbs in ('2620','2625') and a.dazs Is Null and a.RNK = b.RNK and s.acc = a.acc" +
+                        " and a.rnk = :rnk and a.kv = 980 and A.BRANCH = sys_context('bars_context','user_branch') )";
 
-                          cmdGetCardAcc.Parameters.Add("rnk", OracleDbType.Decimal, Convert.ToString(Request["rnk"]), ParameterDirection.Input);
-                        //  cmdGetCardAcc.Parameters.Add("cur_id", OracleDbType.Decimal, Convert.ToString(Request["cur_id"]), ParameterDirection.Input);
-                      break;
+                    cmdGetCardAcc.Parameters.Add("rnk", OracleDbType.Decimal, Convert.ToString(Request["rnk"]), ParameterDirection.Input);
+                    //  cmdGetCardAcc.Parameters.Add("cur_id", OracleDbType.Decimal, Convert.ToString(Request["cur_id"]), ParameterDirection.Input);
+                    break;
                 case "CARDS":
                     _dbLogger.Info("CARDS!! Користувач зайшов на сторінку вибору рахунків клієнта для виплати депозиту та відсотків на карткові рахунки", "deposit");
                     cmdGetCardAcc.BindByName = true;
@@ -138,21 +142,31 @@ public partial class DepositCardAcc : Bars.BarsPage
                 case "NOTCARDS":
                     _dbLogger.Info("NOTCARDS! Користувач зайшов на сторінку вибору рахунків клієнта для виплати депозиту та відсотків на рахунки банку (не картки)", "deposit");
                     cmdGetCardAcc.BindByName = true;
+
+                    if (ws.UseNewNbs())
+                    {
+                        a = "('2620','2630')";
+                    }
+                    else
+                    {
+                        a = "('2620','2630','2635')";
+                    }
+
                     cmdGetCardAcc.CommandText =
                         "select '<A href=# onclick=\"returnAcc('''||bankcode||''','''||balacc||''','''||replace(custname,'''','`')||''','''||custcode||''')\">Вибрати</a>', " +
                         "       cardnum, balacc, currency, custname, bankcode, custcode " +
                         " from ( " +
                         " select distinct a.acc as cardnum, a.nls as balacc, A.KV as currency, A.NMS as custname, A.KF as bankcode, b.OKPO as custcode" +
                         " from ACCOUNTS a, customer b " +
-                        " where a.nbs in ('2620','2630','2635') and a.dazs Is Null and a.RNK = b.RNK and a.kv = :cur_id" +
+                        " where a.nbs in " + a + " and a.dazs Is Null and a.RNK = b.RNK and a.kv = :cur_id" +
                         " and a.rnk = :rnk )";
 
                     cmdGetCardAcc.Parameters.Add("rnk", OracleDbType.Decimal, Convert.ToString(Request["rnk"]), ParameterDirection.Input);
                     cmdGetCardAcc.Parameters.Add("cur_id", OracleDbType.Decimal, Convert.ToString(Request["cur_id"]), ParameterDirection.Input);
                     break;
                 case "pawn":
-                        _dbLogger.Info("Користувач зайшов на сторінку вибору рахунків клієнта для виплати депозиту та відсотків на кредитні рахунки",
-                        "deposit");
+                    _dbLogger.Info("Користувач зайшов на сторінку вибору рахунків клієнта для виплати депозиту та відсотків на кредитні рахунки",
+                    "deposit");
                     cmdGetCardAcc.BindByName = true;
                     cmdGetCardAcc.CommandText =
                         "select '<A href=# onclick=\"returnAcc('''||bankcode||''','''||balacc||''','''||replace(custname,'''','`')||''','''||custcode||''')\">Вибрати</a>', " +
@@ -166,9 +180,19 @@ public partial class DepositCardAcc : Bars.BarsPage
                     break;
 
                 default:
-                _dbLogger.Info("Користувач зайшов на сторінку вибору рахунків клієнта для виплати депозиту та відсотків на депозитні/поточні рахунки",
-                "deposit");
+                    _dbLogger.Info("Користувач зайшов на сторінку вибору рахунків клієнта для виплати депозиту та відсотків на депозитні/поточні рахунки",
+                    "deposit");
                     cmdGetCardAcc.BindByName = true;
+
+                    if (ws.UseNewNbs())
+                    {
+                        a = "('2620','2630')";
+                    }
+                    else
+                    {
+                        a = "('2620','2630','2635')";
+                    }
+
                     cmdGetCardAcc.CommandText =
                         "select '<A href=# onclick=\"returnAcc('''||bankcode||''','''||balacc||''','''||replace(custname,'''','`')||''','''||custcode||''')\">Вибрати</a>', " +
                         "       cardnum, balacc, currency, custname, bankcode, custcode " +
@@ -177,7 +201,7 @@ public partial class DepositCardAcc : Bars.BarsPage
                         " union all " +
                         " select a.acc, a.nls, a.kv, a.nms, a.kf, b.okpo " +
                         " from ACCOUNTS a, customer b" +
-                        " where a.nbs in ('2630','2635','2620') and a.dazs Is Null and a.RNK = b.RNK" +
+                        " where a.nbs in " + a + " and a.dazs Is Null and a.RNK = b.RNK" +
                         " and a.rnk = :rnk and a.kv =  :cur_id)";
 
                     cmdGetCardAcc.Parameters.Add("rnk", OracleDbType.Decimal, Convert.ToString(Request["rnk"]), ParameterDirection.Input);
@@ -185,31 +209,31 @@ public partial class DepositCardAcc : Bars.BarsPage
                     break;
             }
 
-			
-			adapterSearchCard = new OracleDataAdapter();
-			adapterSearchCard.SelectCommand = cmdGetCardAcc;
-			adapterSearchCard.Fill(dsCards);
-            
-			dsCards.Tables[0].Columns[0].ColumnName = "*";
-			dsCards.Tables[0].Columns[1].ColumnName = "№ договору";
-			dsCards.Tables[0].Columns[2].ColumnName = "№ рахунку";
-			dsCards.Tables[0].Columns[3].ColumnName = "Валюта";
+
+            adapterSearchCard = new OracleDataAdapter();
+            adapterSearchCard.SelectCommand = cmdGetCardAcc;
+            adapterSearchCard.Fill(dsCards);
+
+            dsCards.Tables[0].Columns[0].ColumnName = "*";
+            dsCards.Tables[0].Columns[1].ColumnName = "№ договору";
+            dsCards.Tables[0].Columns[2].ColumnName = "№ рахунку";
+            dsCards.Tables[0].Columns[3].ColumnName = "Валюта";
             dsCards.Tables[0].Columns[4].ColumnName = "Клієнт";
             dsCards.Tables[0].Columns[5].ColumnName = "МФО";
             dsCards.Tables[0].Columns[6].ColumnName = "ОКПО";
 
-            
-			gridCardAcc.DataSource = dsCards;
-			gridCardAcc.DataBind();
 
-			gridCardAcc.HeaderStyle.BackColor = Color.Gray;
-			gridCardAcc.HeaderStyle.Font.Bold = true;
-			gridCardAcc.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;	
-		}
-		finally
-		{
-			if (connect.State != ConnectionState.Closed)
-			{connect.Close();connect.Dispose();}
-		}
-	}
+            gridCardAcc.DataSource = dsCards;
+            gridCardAcc.DataBind();
+
+            gridCardAcc.HeaderStyle.BackColor = Color.Gray;
+            gridCardAcc.HeaderStyle.Font.Bold = true;
+            gridCardAcc.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+        }
+        finally
+        {
+            if (connect.State != ConnectionState.Closed)
+            { connect.Close(); connect.Dispose(); }
+        }
+    }
 }

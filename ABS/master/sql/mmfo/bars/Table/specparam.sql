@@ -67,7 +67,8 @@ begin
 	R012 VARCHAR2(1), 
 	S580 VARCHAR2(1), 
 	KVD NUMBER, 
-	R016 VARCHAR2(2)
+	R016 VARCHAR2(2),
+        Ob22_alt char(2)
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -76,6 +77,13 @@ exception when others then
   if sqlcode=-955 then null; else raise; end if; 
 end; 
 /
+
+begin  EXECUTE IMMEDIATE 'ALTER TABLE  bars.specparam ADD  (Ob22_alt char(2) ) ' ;
+exception when others then   if SQLCODE = - 01430 then null;   else raise; end if; -- ORA-01430: column being added already exists in table
+end;
+/
+
+COMMENT ON COLUMN BARS.SPECPARAM.OB22_alt IS 'Ob22 для рах NLSALT';
 
 
 

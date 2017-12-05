@@ -29,7 +29,8 @@ begin
 	KV NUMBER, 
 	TIPD NUMBER, 
 	QUALITY NUMBER, 
-	SERIES CHAR(3)
+	SERIES CHAR(3),
+        D_Close date
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -39,6 +40,10 @@ exception when others then
 end; 
 /
 
+begin EXECUTE IMMEDIATE 'alter table bars.CP_RYN add ( D_Close date) ';
+exception when others then   if SQLCODE = -01430 then null;   else raise; end if;   -- ORA-01430: column being added already exists in table
+end;
+/
 
 
 
@@ -53,7 +58,7 @@ COMMENT ON COLUMN BARS.CP_RYN.KV IS 'Код валюти (null - мультивалютний)';
 COMMENT ON COLUMN BARS.CP_RYN.TIPD IS 'Власні/Чужі ЦП';
 COMMENT ON COLUMN BARS.CP_RYN.QUALITY IS 'Ознака якостi портфелю (-1 = "гнилой потфель"), 0 - нормальный';
 COMMENT ON COLUMN BARS.CP_RYN.SERIES IS 'Серія';
-
+COMMENT ON COLUMN BARS.CP_RYN.D_Close IS 'Дата закр Суб.Портф';
 
 
 

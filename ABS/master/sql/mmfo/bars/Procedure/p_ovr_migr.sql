@@ -1,5 +1,5 @@
 CREATE OR REPLACE procedure BARS.p_OVR_MIGR  (p_mode int, p_kf varchar2 )  is    --p_mode = 0   = Выполнить миграцию
-
+-- 15.11.2017 sTA TRANSFER-2017
 -- 14.08.2017 Sta  OVR_LIM_dog 
 -- 24.07.2017 STA +KVA (Вася Х.) Разное
 
@@ -13,12 +13,17 @@ CREATE OR REPLACE procedure BARS.p_OVR_MIGR  (p_mode int, p_kf varchar2 )  is   
   dTmp_ date  ;
   a07 accounts%rowtype; 
   Datx_ date  ;
+  
+  SB_2067  SB_OB22%ROWTYPE;
+  SB_2069  SB_OB22%ROWTYPE;
+  SB_6020  SB_OB22%ROWTYPE;
+  SB_6111  SB_OB22%ROWTYPE;
   -----------------------
 
   procedure a3600 (DatX_ date ) is       oo oper%rowtype;    dat0_ date  ;    
   begin
      oo.tt    := '%%1' ;  
-     oo.nlsb  := nbs_ob22( '6020', '06');
+     oo.nlsb  := nbs_ob22(sb_6020.R020,sb_6020.OB22);
      oo.nam_b := 'Амортизац.дох. вiд дог.ОВР';
 
      for k in (select a.nls, a.nms, a.ostc, v.datd2, c.okpo, a.branch, a.ostf, v.ndoc , v.datd, a.kv , a.acc    
@@ -52,7 +57,23 @@ CREATE OR REPLACE procedure BARS.p_OVR_MIGR  (p_mode int, p_kf varchar2 )  is   
 
   end a3600;
   --------------
-begin   bars.bc.go (p_kf);
+begin   
+
+
+ begin select 0 into OVRN.G_2017 from SB_OB22  where         r020  = '2067'      and ob22  = '01'   and d_close is null ;
+       SB_2067.R020 := '2067';   SB_2067.OB22 := '01' ; -- короткостроковў кредити в поточну дўяльнўсть
+       SB_2069.R020 := '2069';   SB_2069.OB22 := '04' ; -- простроченў нарахованў доходи за короткостроковими кредитами в поточну дўяльнўсть
+       SB_6020.R020 := '6020';   SB_6020.ob22 := '06' ; -- за рахунками клўїнтўв банку за овердрафтом в нацўональнўй валютў (рахунок 2600)
+       SB_6111.R020 := '6111';   SB_6111.ob22 := '05' ; -- за супроводження кредитів, наданих юридичним особам та іншим суб`єктам підприємницької діяльності
+ EXCEPTION WHEN NO_DATA_FOUND THEN OVRN.G_2017 := 1;  
+       SB_2067.R020 := '2063';   SB_2067.OB22 := '33' ; -- короткостроковў кредити в поточну дўяльнўсть                                     
+       SB_2069.R020 := '2068';   SB_2069.OB22 := '46' ; -- простроченў нарахованў доходи за короткостроковими кредитами в поточну дўяльнўсть
+       SB_6020.R020 := '6020';   SB_6020.ob22 := '06' ; -- за рахунками клўїнтўв банку за овердрафтом в нацўональнўй валютў (рахунок 2600)
+       SB_6111.R020 := '6511';   SB_6111.ob22 := '05' ; -- за супроводження кредитів, наданих юридичним особам та іншим суб`єктам підприємницької діяльності
+ end;
+
+
+  bars.bc.go (p_kf);
   begin Insert into TARIF (KOD, KV, NAME, TAR, PR, SMIN, TIP, kf ) Values   (141, 980, 'Комісія за надання Овердрафту (% від ліміту)', 0, 1,   0, 0, p_KF );
   exception when dup_val_on_index then null;  
   end;
@@ -156,11 +177,11 @@ begin   bars.bc.go (p_kf);
        -- 05.04.2017 типы счетов
        for k in  (select a.*  from accounts a where  a.tip = 'ODB' and a.acc in (select n.acc from nd_acc n where n.nd = xx.ND) )
        loop
-          If    k.NBS like '26_7'  then    update accounts set tip ='SN ' where acc = k.acc;  
-          ElsIf k.NBS like '2067'  then    update accounts set tip ='SP ' where acc = k.acc;  
-          ElsIf k.NBS like '2069'  then    update accounts set tip ='SPN' where acc = k.acc;  
-          ElsIf k.NBS like '3739'  then    update accounts set tip ='SG ' where acc = k.acc;  
-          ElsIf k.NBS like '9129'  then    update accounts set tip ='CR9' where acc = k.acc;  
+          If    k.NBS like '26_7'                                then    update accounts set tip ='SN ' where acc = k.acc;  
+          ElsIf k.NBS = sb_2067.R020  AND K.OB22 = sb_2067.OB22  then    update accounts set tip ='SP ' where acc = k.acc;  
+          ElsIf k.NBS = sb_2069.R020  AND K.OB22 = sb_2069.OB22  then    update accounts set tip ='SPN' where acc = k.acc;  
+          ElsIf k.NBS like '3739'                                then    update accounts set tip ='SG ' where acc = k.acc;  
+          ElsIf k.NBS like '9129'                                then    update accounts set tip ='CR9' where acc = k.acc;  
           end if;
        end loop;
 

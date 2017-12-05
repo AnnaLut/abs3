@@ -1,13 +1,4 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Trigger/TBI_ND_ACC_PROD.sql =========*** Run
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  trigger TBI_ND_ACC_PROD ***
-
-  CREATE OR REPLACE TRIGGER BARS.TBI_ND_ACC_PROD 
+CREATE OR REPLACE TRIGGER BARS.TBI_ND_ACC_PROD
 BEFORE INSERT ON BARS.ND_ACC
 FOR EACH ROW
 DECLARE
@@ -33,6 +24,18 @@ begin
     else
       
       begin
+        bars_audit.info('TBI_ND_ACC_PROD1 dd.prod = '||dd.prod||' aa.tip= '||aa.tip); 
+         if newnbs.g_state= 1 then
+            begin
+                SELECT r020_new||ob_new
+                  INTO dd.prod
+                  FROM TRANSFER_2017
+                 WHERE r020_old||ob_old = dd.prod and r020_old <> r020_new;
+            EXCEPTION WHEN NO_DATA_FOUND THEN null;
+            end;
+         end if;
+         
+         bars_audit.info('TBI_ND_ACC_PROD2 dd.prod = '||dd.prod||' aa.tip= '||aa.tip); 
         -- вычитка из описания продукта
         select case aa.tip
                  when 'SS ' then OB22
@@ -77,9 +80,3 @@ begin
   
 end TBI_ND_ACC_PROD;
 /
-ALTER TRIGGER BARS.TBI_ND_ACC_PROD ENABLE;
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Trigger/TBI_ND_ACC_PROD.sql =========*** End
-PROMPT ===================================================================================== 

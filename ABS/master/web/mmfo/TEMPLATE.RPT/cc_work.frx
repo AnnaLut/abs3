@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReportInfo.Created="11/19/2014 10:35:14" ReportInfo.Modified="09/08/2015 17:47:42" ReportInfo.CreatorVersion="2014.1.2.0">
+<Report ScriptLanguage="CSharp" ReportInfo.Created="11/19/2014 10:35:14" ReportInfo.Modified="11/20/2017 15:24:19" ReportInfo.CreatorVersion="2014.1.2.0">
   <Dictionary>
-    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqD6nWZEExUJ9MEhdFZpB1A6ZfSeiTM+6WLeB8pW5aURqkGwhV134I2SUIQGUGXcXiKs6FOThyOpdcxlTX0EnM4A==">
-      <TableDataSource Name="Table" Alias="t1" DataType="System.Int32" Enabled="true" SelectCommand="select cl.okpo, cl.NMK, cl.RNK, a.ND,a.cc_id,&#13;&#10; A.PROD||' - '||(select TXT from SB_OB22 where R020=substr(a.prod,1,4) and OB22= substr(a.prod,5,2)) prod,&#13;&#10;(select listagg(('По рахунку  - '|| ac.nls||chr(10)||'залишок складає = '|| ac.ostc/100),chr(13)||chr(10)) within group (order by 'По рахунку договору КД - '|| ac.nls||'залишок складає = '|| ac.ostc)   from accounts ac, nd_acc n where n.nd = a.nd and ac.acc=n.acc and ac.DAZS is null and substr(ac.nls,1,4) not in ('8999','6042'))  ost,&#13;&#10;&#13;&#10;a.air, a.sdate, a.wdate, a.afdat, (select BRANCH from cc_deal where nd=a.nd) branch&#13;&#10;    from V_CC_ACCRATN a, (Select c.rnk, c.nmk, c.okpo  from customer c, &#13;&#10;    (select rnk from customerw where tag = 'WORKB' and value = '1') cw where c.rnk = cw.rnk and c.date_off is null) cl&#13;&#10;where  cl.rnk = A.RNK&#13;&#10;and a.sdate &gt;=  to_date(:sFdat1,'dd/MM/YYYY') &#13;&#10;and a.sdate &lt;= to_date(:sFdat2,'dd/MM/YYYY')&#13;&#10;and trunc(a.afdat) &gt;= to_date('01/03/2015','dd/MM/YYYY')&#13;&#10;&#13;&#10;ORDER BY cl.rnk">
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqD6nWZEExUJ9MEhdFZpB1A6ZfSeiTM+6WLeB8pW5aURqkGwhV134I2SUIQGUGXcXip8NiAYg2iv3Vuof2DTRz3A==">
+      <TableDataSource Name="Table" Alias="t1" DataType="System.Int32" Enabled="true" SelectCommand="select cl.okpo,&#13;&#10;       cl.NMK,&#13;&#10;       cl.RNK,&#13;&#10;       a.ND,&#13;&#10;       a.cc_id,&#13;&#10;       A.PROD || ' - ' ||&#13;&#10;       (select TXT&#13;&#10;          from SB_OB22&#13;&#10;         where R020 = substr(a.prod, 1, 4)&#13;&#10;           and OB22 = substr(a.prod, 5, 2)) prod,&#13;&#10;       (select listagg(('По рахунку  - ' || ac.nls || chr(10) ||&#13;&#10;                       'залишок складає = ' || ac.ostc / 100),&#13;&#10;                       chr(13) || chr(10)) within group(order by 'По рахунку договору КД - ' || ac.nls || 'залишок складає = ' || ac.ostc)&#13;&#10;          from accounts ac, nd_acc n&#13;&#10;         where n.nd = a.nd&#13;&#10;           and ac.acc = n.acc&#13;&#10;           and ac.DAZS is null&#13;&#10;           and substr(ac.nls, 1, 4) not in ('8999', '6052')) ost,&#13;&#10;       &#13;&#10;       a.air,&#13;&#10;       a.sdate,&#13;&#10;       a.wdate,&#13;&#10;       a.afdat,&#13;&#10;       (select BRANCH from cc_deal where nd = a.nd) branch&#13;&#10;  from V_CC_ACCRATN a,&#13;&#10;       (Select c.rnk, c.nmk, c.okpo&#13;&#10;          from customer c,&#13;&#10;               (select rnk&#13;&#10;                  from customerw&#13;&#10;                 where tag = 'WORKB'&#13;&#10;                   and value = '1') cw&#13;&#10;         where c.rnk = cw.rnk&#13;&#10;           and c.date_off is null) cl&#13;&#10; where cl.rnk = A.RNK&#13;&#10;   and a.sdate &gt;= to_date(:sFdat1, 'dd/MM/YYYY')&#13;&#10;   and a.sdate &lt;= to_date(:sFdat2, 'dd/MM/YYYY')&#13;&#10;   and trunc(a.afdat) &gt;= to_date('01/03/2015', 'dd/MM/YYYY')&#13;&#10;&#13;&#10; ORDER BY cl.rnk&#13;&#10;">
         <Column Name="NMK" DataType="System.String"/>
         <Column Name="RNK" DataType="System.Decimal"/>
         <Column Name="OST" DataType="System.String"/>
@@ -35,7 +35,7 @@
     <ReportTitleBand Name="ReportTitle1" Width="1171.8" Height="56.7">
       <TextObject Name="Text1" Width="1048.95" Height="56.7" Text="Звіт щодо позичальників- працівників Банку  у яких наявні кредити за новими умовами кредитування співробітників/які перейшли із старої схеми кредитування на нову з [t2.SUBSTR(F_DAT_LIT(:SFDAT1),1,25)] по [t3.SUBSTR(F_DAT_LIT(:SFDAT2),1,25)]" Format="Date" Format.Format="d" HorzAlign="Center" Font="Times New Roman, 11pt, style=Bold"/>
     </ReportTitleBand>
-    <DataBand Name="Data1" Top="121.4" Width="1171.8" Height="37.8" CanGrow="true" CanShrink="true" DataSource="Table">
+    <DataBand Name="Data1" Top="118.99" Width="1171.8" Height="37.8" CanGrow="true" CanShrink="true" DataSource="Table">
       <TableObject Name="Table1" Width="1171.78" Height="37.8">
         <TableColumn Name="Column1" Width="75.6"/>
         <TableColumn Name="Column2" Width="170.09"/>
@@ -64,7 +64,7 @@
           <TableCell Name="Cell50" Border.Lines="All" Text="[t1.BRANCH]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
         </TableRow>
       </TableObject>
-      <DataHeaderBand Name="DataHeader1" Top="60.7" Width="1171.8" Height="56.7">
+      <DataHeaderBand Name="DataHeader1" Top="59.5" Width="1171.8" Height="56.7">
         <TableObject Name="Table1" Width="1171.8" Height="56.7">
           <TableColumn Name="Column19" Width="75.6"/>
           <TableColumn Name="Column13" Width="170.1"/>
@@ -94,7 +94,7 @@
           </TableRow>
         </TableObject>
       </DataHeaderBand>
-      <DataFooterBand Name="DataFooter1" Top="163.2" Width="1171.8" Height="18.9">
+      <DataFooterBand Name="DataFooter1" Top="159.59" Width="1171.8" Height="18.9">
         <TableObject Name="Table1" Width="245.71" Height="18.9">
           <TableColumn Name="Column7" Width="75.61"/>
           <TableColumn Name="Column12" Width="170.1"/>

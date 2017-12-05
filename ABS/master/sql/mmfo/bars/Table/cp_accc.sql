@@ -71,7 +71,8 @@ begin
 	NLS_1819 VARCHAR2(15), 
 	NLS_1919 VARCHAR2(15), 
 	UNREC VARCHAR2(15), 
-	NLSFD VARCHAR2(15)
+	NLSFD VARCHAR2(15),
+        D_Close date
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -80,6 +81,12 @@ exception when others then
   if sqlcode=-955 then null; else raise; end if; 
 end; 
 /
+
+begin EXECUTE IMMEDIATE 'alter table bars.CP_ACCC add ( D_Close date) ';
+exception when others then   if SQLCODE = -01430 then null;   else raise; end if;   -- ORA-01430: column being added already exists in table
+end;
+/
+
 
 
 
@@ -137,7 +144,7 @@ COMMENT ON COLUMN BARS.CP_ACCC.NLS_1819 IS 'Рах-к Деб. заборгованост_';
 COMMENT ON COLUMN BARS.CP_ACCC.NLS_1919 IS 'Рах-к Кред. заборгованост_';
 COMMENT ON COLUMN BARS.CP_ACCC.UNREC IS 'Сч невизнаних доходів';
 COMMENT ON COLUMN BARS.CP_ACCC.NLSFD IS 'Сч ФинДебеторки для портфеля ФД(-3)';
-
+COMMENT ON COLUMN BARS.CP_ACCC.D_Close IS 'Дата закр Суб.Портф';
 
 
 

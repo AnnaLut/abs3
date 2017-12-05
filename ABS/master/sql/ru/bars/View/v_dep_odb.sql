@@ -42,12 +42,12 @@ PROMPT *** Create  view V_DEP_ODB ***
                                              (SELECT val FROM dpt_vidd_params WHERE vidd = o.vidd AND tag = 'INT_OB22') as ob22_int,
                                              DECODE (SUBSTR (d.bsd, 1, 3), '263', '7041', '7040') as nbs_exp,
                                              (SELECT val FROM dpt_vidd_params WHERE vidd = o.vidd AND tag = 'DB7_OB22') as ob22_exp,
-                                             '6399' as nbs_red,
+                                             decode(newnbs.get_state, 0, '6399', '6350') as nbs_red,
                                              (SELECT val FROM dpt_vidd_params WHERE vidd = o.vidd AND tag = 'KR7_OB22') as ob22_red,
                                              '2636' as nbs_amr,
                                              (SELECT val FROM dpt_vidd_params WHERE vidd = o.vidd AND tag = 'AMR_OB22') as ob22_amr,
                                              d.bsn  as nbs_ZAR,
-                                             DECODE (d.bsd, 2630, 11, 2635, 12, 2620, (DECODE (o.val, 05, 15, 17, 14, 20, 14, 21, 14, '')), '') as ob22_ZAR
+                                             DECODE (d.bsd, 2630, 11, 2620, (DECODE (o.val, 05, 15, 17, 14, 20, 14, 21, 14, '')), '') as ob22_ZAR
                                         FROM dpt_vidd_params o, dpt_vidd d
                                        WHERE o.tag = 'DPT_OB22'
                                          AND o.vidd = d.vidd

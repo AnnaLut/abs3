@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/cck.sql =========*** Run *** =======
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.CCK IS
+CREATE OR REPLACE PACKAGE CCK IS
  G_HEADER_VERSION  CONSTANT VARCHAR2(64)  :=  'ver.3.8 23.01.2017';
 
 /*
@@ -690,7 +684,7 @@ function body_version return varchar2;
 
 END CCK;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.CCK IS
+CREATE OR REPLACE PACKAGE BODY CCK IS
   -------------------------------------------------------------------
   g_body_version CONSTANT VARCHAR2(64) := 'ver.3.23  22/02/2017 ';
   ------------------------------------------------------------------
@@ -8453,7 +8447,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK IS
        AND par_ = '1' THEN
       cck.cc_9819(nd_, 0);
     END IF;
-
+--COBUSUPABS-6618 
+if dd.prod in ('220347', '220257','220258', '220348', '220373', '220374') then
     cc_escr_check(nd_, l_err_code);
     IF l_err_code = 1 THEN
       raise_application_error(-20203
@@ -8474,7 +8469,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK IS
       bars_audit.info('CCK.cc_autor: nd_:=' || nd_ ||
                       ' не авторизовано.Вже отримано КД по дежржпрограмі по матеріалам');
     END IF;
-
+END IF;
     UPDATE cc_deal SET sos = 10 WHERE nd = nd_;
 
     FOR k IN (SELECT a.acc
@@ -8534,7 +8529,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK IS
         COBUSUPABS-4376
         Забезпечення неможливості авторизації заявок на кредитні угоди (окрім кредитів по БПК),
         якщо позичальник є інсайдером.
-    
+
 
 
 
@@ -9562,6 +9557,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK IS
                      AND (tip_ = 2 AND d.vidd IN (1, 2, 3) OR
                          tip_ = 3 AND d.vidd IN (11, 12, 13) OR tip_ = 0))
         LOOP
+
           BEGIN
             SELECT a9.acc, a9.nls, substr(a9.nms, 1, 38), a9.dazs
               INTO acc9_, nls9_, nms9_, dazs9_
@@ -11065,6 +11061,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK IS
             ,6
             ,2
         FROM (SELECT nvl(MAX(id), 0) id
+
                 FROM cc_sob
                WHERE nd = p_nd
                  AND fdat = gl.bdate
@@ -11461,6 +11458,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK IS
     kv8_  INT;
     dos_  NUMBER;
     kos_  NUMBER;
+
     dat_  DATE;
     doss_ NUMBER;
     koss_ NUMBER;
@@ -14760,8 +14758,9 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK IS
            WHERE rownum = 1;
         EXCEPTION
           WHEN no_data_found THEN
-            nlsd_ := vkrzn(substr(gl.amfo, 1, 5)
-                          ,substr(p.nlsk, 1, 3) || '9' ||
+          if NEWNBS.GET_STATE = 0 then -- Разпаралеливание кода
+            nlsd_ := vkrzn(substr(gl.amfo, 1, 5),
+                           substr(p.nlsk, 1, 3) || '9' ||
                            substr(p.nlsk, 5, 10));
             SELECT COUNT(*)
               INTO l_present_nls
@@ -14769,12 +14768,29 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK IS
              WHERE nls = nlsd_
                AND kv = p.kv;
             IF l_present_nls > 0 THEN
-              nlsd_ := bars.f_newnls2(p.acc8
-                                     ,p.tipn
-                                     ,substr(p.nlsk, 1, 3) || '9'
-                                     ,p.rnk
-                                     ,NULL);
+              nlsd_ := bars.f_newnls2(p.acc8,
+                                      p.tipn,
+                                      substr(p.nlsk, 1, 3) || '9',
+                                      p.rnk,
+                                      NULL);
             END IF;
+          else
+            nlsd_ := vkrzn(substr(gl.amfo, 1, 5),
+                           substr(p.nlsk, 1, 3) || '8' ||
+                           substr(p.nlsk, 5, 10));
+            SELECT COUNT(*)
+              INTO l_present_nls
+              FROM accounts
+             WHERE nls = nlsd_
+               AND kv = p.kv;
+            IF l_present_nls > 0 THEN
+              nlsd_ := bars.f_newnls2(p.acc8,
+                                      p.tipn,
+                                      substr(p.nlsk, 1, 3) || '8',
+                                      p.rnk,
+                                      NULL);
+            END IF;
+          end if;   
             cck.cc_op_nls(p_nd
                          ,p.kv
                          ,nlsd_
@@ -15478,7 +15494,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK IS
       WHEN no_data_found THEN
         l_nazn := NULL;
     END;
-    IF substr(l_cc_deal.prod, 1, 6) IN ('206219', '206309')
+    IF substr(l_cc_deal.prod, 1, 6) IN ('206219', '206309', '206325')
        AND l_cc_deal.ndi IS NOT NULL
        AND l_cc_deal.ndi <> l_nd THEN
       BEGIN
@@ -15558,18 +15574,3 @@ BEGIN
   END IF;
 END cck;
 /
- show err;
- 
-PROMPT *** Create  grants  CCK ***
-grant EXECUTE                                                                on CCK             to BARS009;
-grant EXECUTE                                                                on CCK             to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on CCK             to RCC_DEAL;
-grant EXECUTE                                                                on CCK             to WR_ALL_RIGHTS;
-grant EXECUTE                                                                on CCK             to WR_CREDIT;
-
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/cck.sql =========*** End *** =======
- PROMPT ===================================================================================== 
- 

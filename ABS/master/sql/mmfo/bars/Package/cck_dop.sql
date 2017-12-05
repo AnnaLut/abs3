@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/cck_dop.sql =========*** Run *** ===
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.CCK_DOP IS
+CREATE OR REPLACE PACKAGE BARS.CCK_dop IS
 
   G_HEADER_VERSION CONSTANT VARCHAR2(64) := 'version 6.0 17.11.2016';
 
@@ -169,6 +163,8 @@ PROCEDURE CC_OPEN(ND_         in OUT int,    CC_ID_      in varchar2,      nRNK 
   procedure cc_autor(p_nd   in number,
                      p_saim in varchar2 default null,
                      p_urov in varchar2 default null);
+
+function get_prod_old(p_prod varchar2) return varchar2;
 -------------------------------------------------------
   /**
   * header_version - возвращает версию заголовка пакета CCK
@@ -183,9 +179,9 @@ PROCEDURE CC_OPEN(ND_         in OUT int,    CC_ID_      in varchar2,      nRNK 
 
 END CCK_DOP;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.CCK_DOP IS
+CREATE OR REPLACE PACKAGE BODY BARS.cck_dop IS
 
-  G_BODY_VERSION CONSTANT VARCHAR2(64) :=  'ver.5.10 05/04/2017';
+  G_BODY_VERSION CONSTANT VARCHAR2(64) :=  'ver.6.00 PLAN 08/11/2017';
 
   /*
   28/03/2017 Приведение дисконта в формат NNNNNN.NN
@@ -278,17 +274,20 @@ BEGIN
     if prod_ is null then
        ERR_Message := 'Не знайдений код продукту. Виїдете з функцiї й увiйдiть у неї ще раз';    ERR_Code    := 1;
        raise STOP_PRC;
-    elsif (WDATE_ - SDATE_ > 366) and substr(prod_, 4, 1) = 2 then
+    elsif (WDATE_ - SDATE_ > 366) and substr(get_prod_old(prod_), 4, 1) = 2 then
       ERR_Message := 'Для даного продукту не вiрно зазначений строк договору ' || to_char(WDATE_ - SDATE_) || ' дн.';
       ERR_Code    := 1;    raise STOP_PRC;
-    elsif (WDATE_ - SDATE_ < 366) and substr(prod_, 4, 1) = 3 then
+    elsif (WDATE_ - SDATE_ < 366) and substr(get_prod_old(prod_), 4, 1) = 3 then
       ERR_Message := 'Для даного продукту не вiрно зазначений строк договору ' || to_char(WDATE_ - SDATE_) || ' дн.';
       ERR_Code    := 1;     raise STOP_PRC;
     end if;
-
+    
     -- узнаем цель
-    select nvl(min(AIM),62) into aim_ from cc_aim where substr(PROD_,1,4) in ( nvl(NBS,'2062'), nvl(NBS2,'2063'), nvl(NBSF,'2202'), nvl(NBSF2,'2203'));
-
+    if NEWNBS.GET_STATE = 1 then
+     select nvl(min(AIM),62) into aim_ from cc_aim where substr(PROD_,1,4) in ( nvl(NBS,'2063'), nvl(NBS2,'2063'), nvl(NBSF,'2203'), nvl(NBSF2,'2203'));  
+    else
+     select nvl(min(AIM),62) into aim_ from cc_aim where substr(PROD_,1,4) in ( nvl(NBS,'2062'), nvl(NBS2,'2063'), nvl(NBSF,'2202'), nvl(NBSF2,'2203'));
+    end if;
     -- pасчитываем дату первого гашения
 
     -- отбраковываем несуществующий день
@@ -437,7 +436,7 @@ BEGIN
     rollback;
     if ERR_Message is null then
        ERR_Code:=0;
-       ERR_Message:=SQLERRM;
+       ERR_Message:=nvl(ERR_Message, DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());--SQLERRM;
     end if;
 
 
@@ -1468,7 +1467,7 @@ begin
   select * into l_cd_row from cc_deal where nd = p_nd;
   if l_cd_row.sos > 5 then     RETURN;  end if;
   ----------------------------------------------
-
+ 
   -- COBUSUPABS-4863
   If l_cd_row.vidd in (11,12,13) then 
    
@@ -1501,8 +1500,8 @@ begin
 
   
 
-  -- Если это дог гарантий выходим (защита от дурака)
-  if substr (l_cd_row.prod,1,1)='9' then    return;  end if;
+/*  -- Если это дог гарантий выходим (защита от дурака)
+  if substr (l_cd_row.prod,1,1)='9' then    return;  end if;*/
 
   If l_RomStal  = 1 then  ---- COBUSUPABS-4863 увеличим сумму дисконта на расчетную
      --Сума даної комісії повинна враховуватись при розрахунку ЕПС, разом з сумою комісії за надання, яку сплачує позичальник та в подальшому амортизуватись. 
@@ -1631,6 +1630,10 @@ begin
      end loop;
      RETURN;
   end if;
+  
+/*     if p_nd=5911154601 then
+      raise_application_error(-20005,'cck.AUTOR');
+    end if;*/
 -- вызов стандартной процедуры авторизации
   cck.cc_autor(p_nd, p_saim, p_urov);
   -- во всех остальных случаях по старому
@@ -1791,6 +1794,22 @@ begin
   end;
 
 end cc_autor;
+
+function get_prod_old(p_prod varchar2) return varchar2 is
+l_prod_old varchar2(6);
+begin
+   l_prod_old := p_prod;
+  begin 
+   SELECT r020_old || ob_old
+      INTO l_prod_old
+      FROM transfer_2017
+     WHERE r020_new || ob_new = p_prod AND r020_new > r020_old;
+   exception when others then
+     return l_prod_old;
+   end;
+return l_prod_old;
+end get_prod_old;
+
 -----------------------------------
 
   function header_version return varchar2 is
@@ -1805,16 +1824,3 @@ end cc_autor;
 
 end cck_dop;
 /
- show err;
- 
-PROMPT *** Create  grants  CCK_DOP ***
-grant EXECUTE                                                                on CCK_DOP         to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on CCK_DOP         to WR_ALL_RIGHTS;
-grant EXECUTE                                                                on CCK_DOP         to WR_CREDIT;
-
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/cck_dop.sql =========*** End *** ===
- PROMPT ===================================================================================== 
- 

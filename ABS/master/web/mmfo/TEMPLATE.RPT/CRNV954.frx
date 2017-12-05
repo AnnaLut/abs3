@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReportInfo.Created="07/08/2014 10:45:16" ReportInfo.Modified="07/08/2014 12:41:43" ReportInfo.CreatorVersion="2013.2.2.0">
+<Report ScriptLanguage="CSharp" ReportInfo.Created="07/08/2014 10:45:16" ReportInfo.Modified="11/22/2017 09:18:17" ReportInfo.CreatorVersion="2014.1.2.0">
   <Dictionary>
-    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqMOPMRy9z3M7hmaW+Mo54ZDMv8QqtMLtjN9KNriywCKg35JuC5UwUaJKKBD0/zykorYnekW/zr183mVClc23xFA==">
-      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select rownum, t.*, t.ost3902-t.ost2620 diff from (&#13;&#10;select &#13;&#10;substr(a.nls,length(a.nls)-5) mfo,&#13;&#10;(select NB from banks where mfo = substr(a.nls,length(a.nls)-5)) name,&#13;&#10;a.kv,&#13;&#10;-(a.ostc)/100 ost3902,&#13;&#10;(&#13;&#10;select sum(ostc)/100  from accounts where nls like substr(nls,1,4)||'_'||&#13;&#10;case substr(nls,1,4)&#13;&#10;  when '2635' then '038'&#13;&#10;  when '2630' then '046'&#13;&#10;  when '2620' then '030'&#13;&#10;end&#13;&#10;|| substr(a.nls,length(a.nls)-5)&#13;&#10;and kv=a.kv&#13;&#10;and nbs in('2620','2630','2635')&#13;&#10;) ost2620 &#13;&#10;from accounts a  &#13;&#10;where a.nbs='3902') t">
+    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqMOPMRy9z3M7hmaW+Mo54ZDMv8QqtMLtjN9KNriywCKg35JuC5UwUaJKKBD0/zykoqkSe2oESGMJpCHtUt+lZZw==">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select rownum, t.*, t.ost3902-t.ost2620 diff from (&#13;&#10;select &#13;&#10;substr(a.nls,length(a.nls)-5) mfo,&#13;&#10;(select NB from banks where mfo = substr(a.nls,length(a.nls)-5)) name,&#13;&#10;a.kv,&#13;&#10;-(a.ostc)/100 ost3902,&#13;&#10;(&#13;&#10;select sum(ostc)/100  from accounts where nls like substr(nls,1,4)||'_'||&#13;&#10;case substr(nls,1,4)&#13;&#10;  when '2630' then '046'&#13;&#10;  when '2620' then '030'&#13;&#10;end&#13;&#10;|| substr(a.nls,length(a.nls)-5)&#13;&#10;and kv=a.kv&#13;&#10;and nbs in('2620','2630')&#13;&#10;) ost2620 &#13;&#10;from accounts a  &#13;&#10;where a.nbs='3902') t">
         <Column Name="ROWNUM" DataType="System.Decimal"/>
         <Column Name="KV" DataType="System.Decimal"/>
         <Column Name="MFO" DataType="System.String"/>
@@ -20,7 +20,7 @@
     <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="56.7">
       <TextObject Name="Text1" Left="9.45" Top="9.45" Width="699.3" Height="47.25" Text="Протокол звірки за розрахунками за операціями з нерухомими вкладами" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 12pt, style=Bold"/>
     </ReportTitleBand>
-    <DataBand Name="Data1" Top="158.34" Width="718.2" Height="18.9" CanGrow="true" CanShrink="true" CanBreak="true" DataSource="Table">
+    <DataBand Name="Data1" Top="156.79" Width="718.2" Height="18.9" CanGrow="true" CanShrink="true" CanBreak="true" DataSource="Table">
       <TableObject Name="Table2" Left="9.45" Width="699.45" Height="18.9" GrowToBottom="true">
         <TableColumn Name="Column7" Width="44.09"/>
         <TableColumn Name="Column8" Width="299.25"/>
@@ -37,7 +37,7 @@
           <TableCell Name="Cell32" Border.Lines="All" Text="[Table.DIFF]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 9pt"/>
         </TableRow>
       </TableObject>
-      <DataHeaderBand Name="DataHeader1" Top="60.27" Width="718.2" Height="94.5">
+      <DataHeaderBand Name="DataHeader1" Top="59.5" Width="718.2" Height="94.5">
         <TableObject Name="Table1" Left="9.45" Width="699.45" Height="94.5">
           <TableColumn Name="Column1" Width="44.09"/>
           <TableColumn Name="Column2" Width="299.25"/>
@@ -55,7 +55,7 @@
           </TableRow>
         </TableObject>
       </DataHeaderBand>
-      <DataFooterBand Name="DataFooter1" Top="180.81" Width="718.2" Height="18.9">
+      <DataFooterBand Name="DataFooter1" Top="178.49" Width="718.2" Height="18.9">
         <TableObject Name="Table1" Left="9.45" Width="699.45" Height="18.9">
           <TableColumn Name="Column13" Width="44.09"/>
           <TableColumn Name="Column14" Width="299.25"/>
@@ -74,6 +74,6 @@
         </TableObject>
       </DataFooterBand>
     </DataBand>
-    <PageFooterBand Name="PageFooter1" Top="203.29" Width="718.2" Height="18.9"/>
+    <PageFooterBand Name="PageFooter1" Top="200.19" Width="718.2" Height="18.9"/>
   </ReportPage>
 </Report>

@@ -1,14 +1,8 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/cin.sql =========*** Run *** =======
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.CIN IS
+CREATE OR REPLACE PACKAGE BARS.CIN IS
 
 /*
- 17.12.2014 Процедура предварительной подготовки даннях для расчета за прошлый кал.месяц
-
+26-09-2016 Коррекция вюшки 
+17.12.2014 Процедура предварительной подготовки даннях для расчета за прошлый кал.месяц
  11.03.2013
  Заявка № 719. Возможность расчетов комиссии (прогноз+финиш) по одному или всем  клиентам
  Заявка № 721. Расчет абонплаты
@@ -23,6 +17,8 @@
  FUNCTION E return date   ;
  FUNCTION R return number ;
 
+ --- корректировка сумм комисии по протоколу 
+ procedure UPD1 ( p_RI varchar2, p_kc0 number,  p_ka1 number,  p_ka2 number,  p_kb1 number, p_kb2 number, p_kb3 number); 
 --------------------------------------------------------------------
 -- SK_A1 : Pасчет суммы (или комиссии)  по одному доп реквизиту
 --------------------------------------------------------------------
@@ -52,7 +48,10 @@
  PROCEDURE  KOM_GOU( p_mode int);
 
 END CIN;
+
 /
+
+
 CREATE OR REPLACE PACKAGE BODY BARS.CIN IS
   k_branch  varchar2(30);
 
@@ -63,6 +62,11 @@ CREATE OR REPLACE PACKAGE BODY BARS.CIN IS
 --В0 : Абонплата
 
 /*
+ 15.11.2017 Пееход на нов.план счетов
+r020 = '6119'; ob22 = '16'  ;  TRANSFER_2017 : 6119 =>6519 , об22 не изм в новом
+
+
+
  20.09.2016 Переменные пакеджа - в пул гл.переменных. т.к. в ВЕБ обрывается сессия.
  20.01.2015 Расчет комис Б3 за холостой выезд - c Выводом в конечную таблицу CIN_TKR
  12.01.2015 Перекриття 3739 та 3578
@@ -94,6 +98,11 @@ CREATE OR REPLACE PACKAGE BODY BARS.CIN IS
  FUNCTION B return date   is begin   return to_date   (pul.Get_Mas_Ini_Val('sFdat1'), 'dd.mm.yyyy'); end B;
  FUNCTION E return date   is begin   return to_date   (pul.Get_Mas_Ini_Val('sFdat2'), 'dd.mm.yyyy'); end E;
  FUNCTION R return number is begin   return to_number (pul.Get_Mas_Ini_Val('RNK'   )              ); end R;
+
+ --- корректировка сумм комисии по протоколу 
+ procedure UPD1 ( p_RI varchar2, p_kc0 number,  p_ka1 number,  p_ka2 number,  p_kb1 number, p_kb2 number, p_kb3 number) is
+begin   update CIN_TKR set  kc0 = p_kc0 , ka1 = p_ka1 , ka2 = p_ka2 , kb1=p_kb1 , kb2 = p_kb2 , kb3 = p_kb3 where rowid = p_RI;
+end UPD1;
 
 --------------------------------------------------------------------
 -- SK_A1 : Pасчет суммы (или комиссии)  по одному доп реквизиту
@@ -331,8 +340,8 @@ If p_mode = 1 then
    execute immediate 'truncate TABLE cin_tkr ' ;
    --архив расчетов
    insert into cin_tkr
-         (RNK,NMK,NLS_2909,ID,NAME,MFO,NLS,REF,S,KA2,KA1,KB2,KB1,DAT1,DAT2,VDAT,KC0,A2,B1, SB1_MIN, B2,C0,NLSR,REC,SR,BRANCH,  b3,kb3,s3)
-   select RNK,NMK,NLS_2909,ID,NAME,MFO,NLS,REF,S,KA2,KA1,KB2,KB1,DAT1,DAT2,VDAT,KC0,A2,B1, SB1_MIN, B2,C0,NLSR,REC,SR,BRANCH,  b3,kb3,s3
+         (RNK,NMK,NLS_2909,ID,NAME,MFO,NLS,REF,S,KA2,KA1,KB2,KB1,DAT1,DAT2,VDAT,KC0,A2,B1, SB1_MIN, B2,C0,NLSR,REC,SR,BRANCH,  b3,kb3,s3 )
+   select RNK,NMK,NLS_2909,ID,NAME,MFO,NLS,REF,S,KA2,KA1,KB2,KB1,DAT1,DAT2,VDAT,KC0,A2,B1, SB1_MIN, B2,C0,NLSR,REC,SR,BRANCH,  b3,kb3,s3 
    from cin_kom1 u   where l_RNK in (0, u.rnk);
 
 end if;
@@ -353,7 +362,8 @@ PROCEDURE  KOM_GOU( p_mode int) is
   l_tt2  oper.tt%type       := 'CS2';
   aa61   accounts%rowtype   ;
   ----------------------------
-  l_ob22 specparam_int.ob22%type :='16';
+  SBO sb_ob22%Rowtype       ; --   r020 = '6119'; ob22 = '16'  ;  TRANSFER_2017 : 6119 =>6519 , об22 не изм в новом
+  ---------------------------
   l_rec  arc_rrp.REC%type   ;
   l_sos  oper.sos%type      ;
   n_Tmp  int                ;
@@ -392,11 +402,19 @@ begin
      select max(fdat) into  r_oper.vdat from fdat where fdat <= p_dat2;  r_oper.vob := 96 ;
   else                      r_oper.vdat := gl.bdate ;                    r_oper.vob :=  6 ;
   end if;
-  -------------------
-  begin
-      select * into aa61 from accounts where kv=980 and nbs= '6119' and dazs is null and ob22 = l_ob22 and rownum = 1;
+
+
+  ------------------------------- TRANSFER_2017 : 6119 =>6519 , об22 не изм в новом
+  begin select * into SBO from sb_ob22 where r020 = '6519' and ob22 ='16' and d_close is null;  
+  EXCEPTION WHEN NO_DATA_FOUND THEN 
+        begin select * into SBO from sb_ob22 where r020 = '6119' and ob22 ='16' and d_close is null;
+        EXCEPTION WHEN NO_DATA_FOUND then raise_application_error(-20100, 'Не знайдено аналітики в SB_Ob22 рах R020=6519(6119), Ob22=16 ' ) ;
+        end;
+  end ;
+
+  begin select * into aa61 from accounts where kv=980 and nbs = SBO.r020 and dazs is null and ob22 = SBO.ob22 and rownum = 1;
       aa61.nms := substr(aa61.nms,1,38);
-  EXCEPTION WHEN NO_DATA_FOUND THEN  raise_application_error(-20100, 'Не найден счет 6119/'||l_ob22|| ' в ГОУ ' ) ;
+  EXCEPTION WHEN NO_DATA_FOUND       THEN raise_application_error(-20100, 'Не знайдено особового рах. "За послуги служби інкасації" '|| SBO.R020 || '.'|| SBO.OB22 || '  в ГОУ ' ) ;
   end;
 
   r_cust.rnk  := -1  ;
@@ -446,11 +464,9 @@ begin
 
        r_oper.nam_b := substr(r_br.name,1,38);
 
---- OLD:  Структура рахунку має бути така:        ААААК00НН00FFF
----    r_oper.nlsb  := vkrzn( substr(k.MFO,1,5), '6119000'|| l_ob22 ||'00'||substr (k.branch,12,3)  );
-
---- 20.03.15  Теперь все доходы должны поступать на один счет:  6119К001600000
-       r_oper.nlsb  := vkrzn( substr(k.MFO,1,5), '6119000'|| l_ob22 ||'00000' );
+--- OLD:  Структура рахунку має бути така:        ААААК00НН00FFF-    r_oper.nlsb  := vkrzn( substr(k.MFO,1,5), '6119000'|| l_ob22 ||'00'||substr (k.branch,12,3)  );
+--- 10.11.2017  Теперь все доходы должны поступать на один счет:  6519К001600000 ( 6119*001600000 )
+       r_oper.nlsb  := vkrzn( substr(k.MFO,1,5), SBO.R020 ||'000'|| SBO.ob22 ||'00000' );
 
     end if;
     s_GOU := round( k.KC0 * r_cust.PC0
@@ -514,15 +530,5 @@ end KOM_GOU;
 
 END CIN;
 /
- show err;
- 
-PROMPT *** Create  grants  CIN ***
-grant EXECUTE                                                                on CIN             to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on CIN             to PYOD001;
 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/cin.sql =========*** End *** =======
- PROMPT ===================================================================================== 
- 
+GRANT execute ON BARS.CIN TO BARS_ACCESS_DEFROLE;

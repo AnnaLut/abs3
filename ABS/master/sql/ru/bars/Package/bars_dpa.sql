@@ -46,6 +46,21 @@ procedure import_ticket (
 --
 procedure check_files (p_mode number);
 
+    -- процедура на для отправки данных в дпа по нотариусам COBUMMFO-4028
+  PROCEDURE accounts_tax(p_acc     accounts.acc%TYPE
+                        ,p_daos    accounts.daos%TYPE
+                        ,p_dazs    accounts.dazs%TYPE
+                        ,p_kv      accounts.kv%TYPE
+                        ,p_nbs     accounts.nbs%TYPE
+                        ,p_nls     accounts.nls%TYPE
+                        ,p_ob22    accounts.ob22%TYPE
+                        ,p_pos     accounts.pos%TYPE
+                        ,p_vid     accounts.vid%TYPE
+                        ,p_rnk     accounts.rnk%TYPE
+                        );
+  FUNCTION dpa_nbs(p_nbs  varchar2
+                 ,p_ob22 accounts.OB22%TYPE DEFAULT NULL) RETURN NUMBER;
+                 
 end;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.BARS_DPA is
@@ -641,9 +656,9 @@ procedure iparse_ticket (
   p_errcode  out varchar2 )
 is
 
-  l_tick_name  zag_f.fn%type;		-- Назва файла
-  l_tick_date  zag_f.dat%type;		-- Дата створення файла
-  l_tick_rec   zag_f.n%type;		-- К_льк_сть _нформац_йних рядк_в у файл_
+  l_tick_name  zag_f.fn%type;   -- Назва файла
+  l_tick_date  zag_f.dat%type;    -- Дата створення файла
+  l_tick_rec   zag_f.n%type;    -- К_льк_сть _нформац_йних рядк_в у файл_
 
   l_tick_n       lines_r.n%type;
   l_bank_mfo     lines_r.mfo%type;
@@ -655,14 +670,14 @@ is
   l_account      lines_r.nls%type;
   l_currency     lines_r.kv%type;
   l_resid        lines_r.resid%type;
-  l_receive_date lines_r.dat_in_dpa%type;	-- Дата отримання ДПС України Пов_домлення
-  l_sts_date     lines_r.dat_acc_dpa%type;	-- Дата взяття рахунка на обл_к в орган_ ДПС
-  l_reason       lines_r.id_pr%type;		-- Код причини в_дмови у взятт_ на обл_к рахунка
-  l_sts_reg      lines_r.id_dpa%type;		-- Код органу ДПС рег_онального р_вня
-  l_sts_rai      lines_r.id_dps%type;		-- Код органу ДПС районного р_вня
-  l_rec_id       lines_r.id_rec%type;		-- _дентиф_катор запису
-  l_f_name       lines_r.fn_f%type;		-- Назва файла, що квитується
-  l_f_rec        lines_r.n_f%type;		-- К_льк_сть _нформац_йних рядк_в у файл_, що квитується
+  l_receive_date lines_r.dat_in_dpa%type; -- Дата отримання ДПС України Пов_домлення
+  l_sts_date     lines_r.dat_acc_dpa%type;  -- Дата взяття рахунка на обл_к в орган_ ДПС
+  l_reason       lines_r.id_pr%type;    -- Код причини в_дмови у взятт_ на обл_к рахунка
+  l_sts_reg      lines_r.id_dpa%type;   -- Код органу ДПС рег_онального р_вня
+  l_sts_rai      lines_r.id_dps%type;   -- Код органу ДПС районного р_вня
+  l_rec_id       lines_r.id_rec%type;   -- _дентиф_катор запису
+  l_f_name       lines_r.fn_f%type;   -- Назва файла, що квитується
+  l_f_rec        lines_r.n_f%type;    -- К_льк_сть _нформац_йних рядк_в у файл_, що квитується
 
   l_err_code    varchar2(4);
   l_err         varchar2(4);
@@ -911,9 +926,9 @@ procedure iparse_ticket1 (
   p_errcode  out varchar2 )
 is
 
-  l_f_name    varchar2(30);	-- Назва файла, що квитується
-  l_err_code  varchar2(4);	-- Код помилки за файлом
-  l_resp_text varchar2(254);	-- _нформац_йний текст квитанц_ї
+  l_f_name    varchar2(30); -- Назва файла, що квитується
+  l_err_code  varchar2(4);  -- Код помилки за файлом
+  l_resp_text varchar2(254);  -- _нформац_йний текст квитанц_ї
 
   c_declarbody  varchar2(100) := '/DECLAR/DECLARBODY/';
   l_tmp  varchar2(2000);
@@ -986,11 +1001,11 @@ procedure iparse_ticket2 (
   p_errcode  out varchar2 )
 is
 
-  l_tick_date date;		-- Дата створення файла
-  l_tick_rec  number;		-- К_льк_сть _нформац_йних рядк_в у файл_
-  l_f_name    varchar2(30);	-- Назва файла, що квитується
-  l_f_rec     number;		-- К_льк_сть _нформац_йних рядк_в у файл_, що квитується
-  l_err_code  varchar2(4);	-- Код помилки за файлом
+  l_tick_date date;   -- Дата створення файла
+  l_tick_rec  number;   -- К_льк_сть _нформац_йних рядк_в у файл_
+  l_f_name    varchar2(30); -- Назва файла, що квитується
+  l_f_rec     number;   -- К_льк_сть _нформац_йних рядк_в у файл_, що квитується
+  l_err_code  varchar2(4);  -- Код помилки за файлом
   l_f_rownum  number;
   l_f_rowerr  varchar2(4);
 
@@ -1321,6 +1336,185 @@ begin
   end loop;
 
 end check_files;
+
+    -- процедура на для отправки данных в дпа по нотариусам COBUMMFO-4028
+     -- в дополнению триггеру tai_accounts_tax. не вставленно в триггер т.к. какая-то процедура затирает параметр ob22
+    PROCEDURE accounts_tax(p_acc     accounts.acc%TYPE
+                          ,p_daos    accounts.daos%TYPE
+                          ,p_dazs    accounts.dazs%TYPE
+                          ,p_kv      accounts.kv%TYPE
+                          ,p_nbs     accounts.nbs%TYPE
+                          ,p_nls     accounts.nls%TYPE
+                          ,p_ob22    accounts.ob22%TYPE
+                          ,p_pos     accounts.pos%TYPE
+                          ,p_vid     accounts.vid%TYPE
+                          ,p_rnk     accounts.rnk%TYPE
+                          )
+    IS
+       nbs_             VARCHAR2(4);
+       mfo_             VARCHAR2(12);
+       okpo_            VARCHAR2(14);
+       tgr_             NUMBER(1);
+       bank_date        DATE;
+       acct_open_date   DATE;
+       nls_             VARCHAR2(15);
+       pos_             NUMBER(1);
+       kv_              NUMBER;
+       rez_in           NUMBER;
+       rez_out          NUMBER;
+       nmk_             VARCHAR2(38);
+       creg_            NUMBER(38);
+       cdst_            NUMBER(38);
+       ot_              NUMBER;
+       acc_             NUMBER;
+       l_adr            customer.adr%TYPE;
+       l_custtype       customer.custtype%TYPE;
+       l_passp          VARCHAR2(14);
+       l_notarius       NUMBER;
+    BEGIN
+       -- Account already closed, do nothing
+       IF p_dazs IS NOT NULL THEN
+          RETURN;
+       END IF;
+
+       -- Account type don't interest Tax Police, do nothing...
+       IF p_vid = 0
+       OR p_vid IS NULL THEN
+          RETURN;
+       END IF;
+
+       -- если счёт отностися к ДПА, то продолжам с ним работать
+       IF  bars_dpa.dpa_nbs(p_nbs, p_ob22) = 1 THEN
+         NULL;
+       ELSE
+         RETURN;
+       END IF;
+
+       bank_date       := COALESCE(NVL(gl.bd, glb_bankdate), TRUNC(SYSDATE));
+       mfo_            := gl.amfo;
+       nls_            := p_nls;
+       pos_            := p_pos;
+       kv_             := p_kv;
+       acc_            := p_acc;
+       ot_             := 1;
+       acct_open_date  := p_daos;
+
+       -- данные клиента
+       SELECT okpo
+             ,tgr
+             ,NVL(nmkk, SUBSTR(nmk, 1, 38))
+             ,c_reg
+             ,c_dst
+             ,codcagent
+             ,adr
+             ,custtype
+         INTO okpo_
+             ,tgr_
+             ,nmk_
+             ,creg_
+             ,cdst_
+             ,rez_in
+             ,l_adr
+             ,l_custtype
+         FROM customer
+        WHERE rnk = p_rnk;
+
+       -- резидентность
+       SELECT rezid
+         INTO rez_out
+         FROM codcagent
+        WHERE codcagent = rez_in;
+
+       -- для религиозных берутся данные паспорта
+       IF l_custtype = 3
+      AND SUBSTR(okpo_, 1, 5) IN ('99999', '00000') THEN
+          BEGIN
+             SELECT SUBSTR(TRIM(ser) || TRIM(numdoc), 1, 14)
+               INTO l_passp
+               FROM person
+              WHERE rnk = p_rnk
+                AND passp = 1;
+          EXCEPTION
+             WHEN NO_DATA_FOUND THEN
+                l_passp  := NULL;
+          END;
+
+          IF l_passp IS NULL THEN
+             RETURN;
+          ELSE
+             okpo_  := l_passp;
+             tgr_   := 4;
+          -- tgr = 4 - сер_я та номер паспорта ф_зичної особи, яка через свої
+          -- рел_г_йн_ переконання в_дмовилась в_д прийняття реєстрац_йного
+          -- номера обл_кової картки платника податк_в та пов_домила про це
+          -- в_дпов_дний орган ДПС _ має в_дм_тку у паспорт_
+          END IF;
+       END IF;
+
+       INSERT INTO ree_tmp(mfo
+                          ,id_a
+                          ,rt
+                          ,ot
+                          ,nls
+                          ,odat
+                          ,kv
+                          ,c_ag
+                          ,nmk
+                          ,nmkw
+                          ,c_reg
+                          ,c_dst
+                          ,prz)
+            VALUES (mfo_
+                   ,okpo_
+                   ,tgr_
+                   ,ot_
+                   ,nls_
+                   ,NVL(acct_open_date, TRUNC(SYSDATE))
+                   ,kv_
+                   ,rez_out
+                   ,nmk_
+                   ,nmk_
+                   ,creg_
+                   ,cdst_
+                   ,pos_);
+        -- установим блокировку счёта
+      IF SQL%rowcount > 0 THEN
+        UPDATE accounts a
+           SET a.blkd = nvl(trim(getglobaloption('DPA_BLK')), 0)
+         WHERE a.acc = p_acc;
+      END IF;
+    EXCEPTION
+       WHEN NO_DATA_FOUND THEN
+          RETURN;
+    END accounts_tax;
+
+  -- функция определения относится относится ли балансовый к счетам на отправку в налоговую
+  -- параметр p_ob22 необходим чтобы для счетов 2620 с ob22 in (07,32) отправлять в налоговую COBUMMFO-5343
+  FUNCTION dpa_nbs(p_nbs  varchar2 --DPA_NBS.NBS%TYPE
+                  ,p_ob22 accounts.OB22%TYPE DEFAULT NULL) RETURN NUMBER IS
+    l_dpa NUMBER;
+  BEGIN
+    l_dpa := 0; -- 0 - не относится к счетам ДПА, 1 - относится
+
+    IF p_nbs = '2620' AND p_ob22 IN ('07'
+                                    ,'32') THEN
+      l_dpa := 0; -- для ммфо 1, для ру такого функционала не было, оставляем как было ранее
+    ELSE
+      BEGIN
+        SELECT UNIQUE 1
+          INTO l_dpa
+          FROM dpa_nbs
+         WHERE TYPE IN ('DPA'
+                       ,'DPK'
+                       ,'DPP')
+           AND nbs = p_nbs;
+      EXCEPTION
+        WHEN no_data_found THEN
+          l_dpa := 0;
+      END;
+    END IF;
+    RETURN l_dpa;
+  END dpa_nbs;
 
 end bars_dpa;
 /

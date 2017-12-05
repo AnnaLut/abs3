@@ -1,4 +1,4 @@
-create or replace package GL
+CREATE OR REPLACE PACKAGE BARS.GL
 IS
 --***************************************************************--
 --                 General Ledger Package Header
@@ -30,14 +30,14 @@ IS
   aRNK     NUMBER      DEFAULT 1   ;  -- Local bank RNK
   fRCVR    NUMBER      DEFAULT 0;     -- Recovery flag
   fSOS0    NUMBER      DEFAULT 0;     -- Normal=0/Clearing=1 transaction
-  
+
   aREF     NUMBER      DEFAULT NULL;  -- current refrence
   aSTMT    NUMBER      DEFAULT 0;     -- current statement number
   aOROW    UROWID      DEFAULT NULL;  -- current opldok rowid
   aTT      CHAR(3)     DEFAULT NULL;  -- current tt
   aSOS     NUMBER      DEFAULT NULL;  -- current doc payment status
   aFMcheck SMALLINT    DEFAULT NULL;  -- FM-check status
-  
+
   acc_rec  accounts%ROWTYPE;       -- Transit record of accounts update(TRIG)
   acc_otm  SMALLINT;               -- Flag of kind changing for Accounts_Update
 
@@ -523,11 +523,9 @@ function USR_ID return number;
 END gl;
 /
 
-show errors
+show err;
 
-----------------------------------------------------------------------------------------------------
-
-create or replace package body GL
+CREATE OR REPLACE PACKAGE BODY BARS.GL
 is
   --***************************************************************--
   --                     General Ledger Package
@@ -540,7 +538,7 @@ is
   G_BODY_VERSION  CONSTANT VARCHAR2(100)  := '$7.11 2017-10-26';
 
   G_AWK_BODY_DEFS CONSTANT VARCHAR2(512) := '';
-  
+
   gbDATE     DATE   := NULL;      -- Current Banking day (global)
   pay_schema NUMBER := 3;         -- MultiCurrency Payment Schema
   aEQIV      NUMBER := 0;         -- Current document equivalent
@@ -549,16 +547,16 @@ is
 
   TYPE TDig IS TABLE OF BINARY_INTEGER INDEX BY BINARY_INTEGER;
   Dig  TDig;
-  
+
   --
   -- именованные исключения
   --
   PART_NOT_EXISTS exception;
   pragma exception_init(PART_NOT_EXISTS, -2149);
-  
+
   RESOURCE_BUSY   exception;
   pragma exception_init(RESOURCE_BUSY,   -54  );
-  
+
   /**
    * version - возвращает версию пакета
    */
@@ -569,7 +567,7 @@ is
     ||'AWK definition: '||chr(10)
     ||G_AWK_HEADER_DEFS;
   end header_version;
-  
+
   function body_version return varchar2
   is
   begin
@@ -577,7 +575,7 @@ is
       ||'AWK definition: '||chr(10)
       ||G_AWK_BODY_DEFS;
   end body_version;
-  
+
   function version return varchar2
   is
   begin
@@ -588,7 +586,7 @@ is
       ||'AWK definition: '||chr(10)
       ||G_AWK_BODY_DEFS;
   end version;
-  
+
   --
   --
   --
@@ -616,7 +614,7 @@ is
     l_clientid   varchar2(64);
   BEGIN
 
-    IF deb.debug 
+    IF deb.debug
     THEN
       deb.trace( ern, 'module/0', 'reinit');
     END IF;
@@ -714,7 +712,7 @@ is
       END;
 
       BEGIN
-        SELECT val 
+        SELECT val
           INTO aRNK
           FROM params
          WHERE par='OUR_RNK';
@@ -729,11 +727,11 @@ is
       sys.dbms_session.set_context( 'bars_gl', 'rnk',        aRNK,                client_id=> l_clientid );
 
     end if;
-    
+
     -- Устанавливаем признак инициализации и базовую валюту
     sys.dbms_session.set_context( 'bars_gl', 'baseval',   to_char(baseval), client_id => l_clientid );
     sys.dbms_session.set_context( 'bars_gl', 'last_init', to_char(sysdate, 'dd.mm.yyyy hh24:mi:ss'), client_id =>l_clientid );
-    
+
   EXCEPTION
     WHEN err    THEN
       raise_application_error(-(20000+ern),chr(92)||erm,TRUE);
@@ -790,7 +788,7 @@ IS
   l_bankdate   VARCHAR2(10);
 BEGIN
 
-  IF deb.debug 
+  IF deb.debug
   THEN
     deb.trace( ern, 'module/0', 'param' );
   END IF;
@@ -801,7 +799,7 @@ BEGIN
   then
     reinit(0);
   else
-    
+
     -- Читаем параметры из сохраненного контекста
     gl.baseval    := sys_context('bars_gl',     'baseval');
     gl.pay_schema := sys_context('bars_gl',     'pay_schema');
@@ -810,10 +808,10 @@ BEGIN
     gl.aMFO       := sys_context('bars_gl',     'mfo');
     gl.aOKPO      := sys_context('bars_gl',     'okpo');
     gl.aRNK       := sys_context('bars_gl',     'rnk');
-    
+
     -- global bank date
     l_bankdate := sys_context('bars_context','global_bankdate');
-    
+
     if ( l_bankdate is null )
     then
       l_bankdate := BRANCH_ATTRIBUTE_UTL.GET_ATTRIBUTE_VALUE('/','BANKDATE');
@@ -1368,6 +1366,7 @@ IF p_flag IS NULL OR p_flag IN (0,1) THEN
           WHERE nls=nls_ AND kv=kv_
             AND BITAND(NVL(opt,0),1)=0
             FOR UPDATE OF ostb,ostf NOWAIT;
+
       END IF;
    EXCEPTION
       WHEN NO_DATA_FOUND THEN
@@ -1389,8 +1388,32 @@ IF p_flag IS NULL OR p_flag IN (0,1) THEN
 
             END IF;
          EXCEPTION WHEN NO_DATA_FOUND THEN
-            erm := '9300 - No account found '||get_account_desc(p_flag, acc_, nls_, kv_);
-            RAISE err;
+           BEGIN
+               kv_ := p_kv;
+
+               SELECT acc, accc, daos, dazs ,nls ,kv, nbs, opt, 1
+                   INTO acc_,accc_,daos_,dazs_,nls_,kv_,nbs_,opt_,sos_
+               FROM accounts
+               WHERE nlsalt=nls_ AND kv=kv_ AND dat_alt IS NOT NULL
+                 AND BITAND(NVL(opt,0),1)=0
+                FOR UPDATE OF ostb,ostf NOWAIT;
+
+            EXCEPTION WHEN NO_DATA_FOUND THEN
+
+               BEGIN
+
+                 SELECT acc, accc, daos, dazs ,nls ,kv, nbs, opt, 0
+                   INTO acc_,accc_,daos_,dazs_,nls_,kv_,nbs_,opt_,sos_
+                 FROM accounts
+                 WHERE nlsalt=nls_ AND kv=kv_ AND dat_alt IS NOT NULL
+                 AND BITAND(NVL(opt,0),1)=1;
+
+               EXCEPTION WHEN NO_DATA_FOUND THEN
+                  erm := '9300 - No account found '||get_account_desc(p_flag, acc_, nls_, kv_);
+                  RAISE err;
+                END;
+           END;
+
          END;
 
       WHEN locked_acc THEN
@@ -1962,7 +1985,7 @@ IS
 
   CURSOR c0 IS
   SELECT ref,fdat,tt,dk,acc,s,sq,stmt,
-         txt, NVL(sos,0) sos, rowid 
+         txt, NVL(sos,0) sos, rowid
     FROM opldok
    WHERE ref = ref_
      AND NVL(sos,0) <= lev_
@@ -1970,7 +1993,7 @@ IS
      FOR UPDATE OF ref NOWAIT;
 
   CURSOR c1 IS
-  SELECT fdat 
+  SELECT fdat
     FROM opldok
    WHERE ref = ref_
    GROUP BY fdat
@@ -1991,7 +2014,7 @@ BEGIN
 
    IF lev_>=5 THEN -- ful_bak
       BEGIN
-         SELECT 1 INTO sos_ 
+         SELECT 1 INTO sos_
            FROM dual
           WHERE EXISTS(SELECT 1 FROM opldok WHERE ref = ref_ AND sos=5 AND fdat > GL.BD() );
 
@@ -2230,9 +2253,9 @@ BEGIN
                  AND a.fdat=b.fdat
                  AND a.stmt=b.stmt
                  AND rownum=1;
-           
+
               DELETE FROM opldok WHERE rowid IN (x.rwa,x.rwb,rw0_,rw1_);
-           
+
            EXCEPTION
              WHEN NO_DATA_FOUND THEN NULL;
            END;
@@ -3204,32 +3227,32 @@ is
   ref_       NUMBER(38);
   fdat#      DATE        := NULL;
   fdat_      DATE;
-  
+
   acc#       NUMBER(38)  := NULL;
   acc_       NUMBER(38);
-  
+
   vob#       SMALLINT   := NULL;
   vob_       SMALLINT;
   vobO_      SMALLINT   := 0;
-  
+
   dk#        opldok.dk%type;
   s#         opldok.s%type;
   sq#        opldok.sq%type;
-  
+
   sde_       NUMBER(38) := 0;
   sdeq_      NUMBER(38) := 0;
-  
+
   skr_       NUMBER(38) := 0;
   skrq_      NUMBER(38) := 0;
-  
+
   rowid#     UROWID;
   i          INTEGER    := 0;
   j          INTEGER    := 0;
   k          INTEGER    := 0;
-  
+
   l_kf       oper.kf%type := gl.aMFO;
   l_branch   oper.branch%type := sys_context('bars_context','user_branch');
-  
+
   CURSOR c0 ( v_min_dt date, v_max_dt date )
   IS
   select o.ref, o.acc, o.fdat, decode(p.VOB,96,96,99,99,6) as VOB
@@ -3244,34 +3267,34 @@ is
      and o.FDAT between v_min_dt and v_max_dt
    order by 4, o.ACC, o.FDAT
      FOR UPDATE OF q.ref NOWAIT;
-  
+
 --r_txn  c0%rowtype;
-  
+
 BEGIN
 
   bars_audit.info( 'SOS0 STARTED' );
-  
+
   gl.fSOS0 := 1;
 
   OPEN c0( DAT_NEXT_U( GL.GBD, -1 ), GL.GBD );
-  
+
   savepoint this#accountT00;
-  
+
   LOOP
-    
+
     FETCH c0
      INTO ref#, acc#, fdat#, vob#, dk#, s#, sq#, rowid#;
-    
+
     IF c0%NOTFOUND AND ref# IS NULL
     THEN EXIT;
     END IF;
-    
+
     IF c0%NOTFOUND
     OR acc#  <> acc_
     OR fdat# <> fdat_
     OR vob#  <> vob_
     THEN
-      
+
       begin
 
 --      gl.bDATE := fdat_;
@@ -3290,7 +3313,7 @@ BEGIN
 --        if ( sql%rowcount = 0 )
 --        then
           gl.ref( ref_ );
-          insert 
+          insert
             into OPER ( REF, TT, PDAT, VDAT, VOB, KF, BRANCH, TOBO )
           values ( ref_,'R00', fdat_, fdat_, vob_, l_kf, l_branch, l_branch )
           return VOB
@@ -3307,7 +3330,7 @@ BEGIN
             into OPLDOK ( REF, TT, ACC, FDAT, DK, S, SQ, SOS, STMT ,KF )
           values ( ref_, 'R00', acc_, fdat_, 0 ,sde_, sdeq_, 4, 1, l_kf );
         END IF;
-        
+
         IF ( skr_ > 0 )
         THEN
           INSERT
@@ -3340,7 +3363,7 @@ BEGIN
     END IF;
 
     EXIT WHEN c0%NOTFOUND;
-    
+
     IF dk#=0
     THEN
       sde_  := sde_ +s#;
@@ -3349,36 +3372,36 @@ BEGIN
       skr_  := skr_ +s#;
       skrq_ := skrq_+sq#;
     END IF;
-    
+
     acc_  := acc#;
     fdat_ := fdat#;
     vob_  := vob#;
-    
+
     UPDATE opldok
        SET sos = 5
      WHERE rowid = rowid#;
-    
+
     DELETE sos0que
      WHERE ref = ref#
        AND NOT EXISTS (SELECT 1 FROM opldok WHERE sos=4 AND ref = ref#);
-   
+
     k := k + 1;
-   
+
     bars_audit.trace('SOS0 SELECTED ref:'||ref#);
-   
+
   END LOOP;
-  
+
   CLOSE c0;
-  
+
   gl.fSOS0 := 0;
-  
+
   -- не удаляем запись из OPER, т.к. это приводит к блокировкам по внешним ключам !!!
   --IF i>0 THEN DELETE FROM oper WHERE ref=ref_; END IF;
-  
+
   GL.PL_DAT( gl.gbDATE );
-  
+
   bars_audit.info('SOS0 COMPLETED. Success:'||i||', Errors:'||j);
-  
+
 END paysos0;
 
 --
@@ -3414,7 +3437,7 @@ begin
 
   if ( sql%rowcount = 0 )
   then
-    insert 
+    insert
       into OPER
          ( REF, TT, PDAT, VDAT, VOB, SOS, MFOA, MFOB, KF, BRANCH, TOBO )
     values
@@ -3660,7 +3683,7 @@ begin
       when NO_DATA_FOUND then
         raise_application_error( -20666, 'Банківська дата ' || to_char(dat_,'dd/mm/yyyy') || ' ще не відкрита!', true );
     end;
-  
+
     if ( l_bnk_dt_st = 9 )
     then
       raise_application_error( -20666, 'Банківська дата ' || to_char(dat_,'dd/mm/yyyy') || ' закрита для входу!', true );
@@ -3768,3 +3791,14 @@ grant EXECUTE on GL to WR_DEPOSIT_U;
 grant EXECUTE on GL to WR_DOCHAND;
 grant EXECUTE on GL to WR_DOC_INPUT;
 grant EXECUTE on GL to WR_IMPEXP;
+
+
+
+
+
+
+
+
+
+
+

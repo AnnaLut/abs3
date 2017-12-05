@@ -1,10 +1,5 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/function/f_elt_sber.sql =========*** Run ***
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE FUNCTION BARS.F_ELT_SBER (p_acc int, p_dat date,
+create or replace function 
+F_Elt_sber  (p_acc int, p_dat date,
               p_id int default null,
               p_ost number default 0, p_otl number default 0)
               return NUMBER IS
@@ -111,6 +106,27 @@ end if;
      l_dos1:=0; l_kos1:=0;
 
        -- ! 12/05-16    19/01-16
+
+if newnbs.g_state= 1 then  --переход на новый план счетов
+     for r in (select acc,nls,ob22 from accounts where rnk=l_rnk
+                   and acc=p_acc      --  ! уточнити список рах-в 19/01-16
+                   and dazs is null
+                   order by nls)
+  loop
+  SELECT
+  nvl(sum(o.S*DECODE(o.DK,0,1,0)),0), nvl(sum(o.S*DECODE(o.DK,0,0,1)),0)
+  INTO l_dos, l_kos
+  FROM opldok o, opldok ok, accounts d, accounts k
+  WHERE o.sos=5
+        and o.acc=p_acc  and o.acc=d.acc and ok.acc=k.acc
+        and o.ref=ok.ref and o.stmt=ok.stmt and o.dk!=ok.dk
+        and (o.dk=1 or o.dk=0 and k.nbs not in ('3570','3578'))
+        and (o.dk=0 or o.dk=1 and k.nbs not in ('2608','2618','2568','2658','2528','2548','2628','2638'))
+        and o.fdat>=l_dat1 AND o.fdat<=l_dat2;
+
+  l_dos1:=l_dos1+l_dos; l_kos1:=l_kos1+l_kos;
+  end loop;  
+else     
      for r in (select acc,nls,ob22 from accounts where rnk=l_rnk
                    and acc=p_acc      --  ! уточнити список рах-в 19/01-16
                    and dazs is null
@@ -129,6 +145,7 @@ end if;
 
   l_dos1:=l_dos1+l_dos; l_kos1:=l_kos1+l_kos;
   end loop;
+end if;  
 
 
     if l_otl=1 then
@@ -204,11 +221,5 @@ END;
  show err;
  
 PROMPT *** Create  grants  F_ELT_SBER ***
+grant EXECUTE                                                                on F_ELT_SBER      to BARS_ACCESS_DEFROLE;
 grant EXECUTE                                                                on F_ELT_SBER      to ELT;
-
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/function/f_elt_sber.sql =========*** End ***
- PROMPT ===================================================================================== 
- 

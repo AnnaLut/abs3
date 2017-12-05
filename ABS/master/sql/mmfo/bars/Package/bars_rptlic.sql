@@ -279,6 +279,7 @@ is
 
     type t_acc     is record( acc     number           ,
                               nls     accounts.nls%type,
+							  nlsalt  accounts.nlsalt%type,
                               kv      number           ,
                               tip     accounts.tip%type,
                               fdat    date             ,
@@ -1490,11 +1491,11 @@ is
           bars_audit.trace(l_trace||'производим вставку в tmp_licm счета' );
           insert into tmp_licm(
                    fdat,    tip,     acc,     nls,     kv,     nms,
-                   okpo,    nmk,     isp,     dapp,
+                   okpo,    nmk,     isp,     dapp,    nlsalt,
                    ostf,    ostfq,
                    rowtype)
           values( l_acc.fdat, l_acc.tip,  l_acc.acc,  l_acc.nls,  l_acc.kv,  l_acc.nms,
-                  l_acc.okpo, l_acc.nmk,  l_acc.isp,  l_acc.dapp,
+                  l_acc.okpo, l_acc.nmk,  l_acc.isp,  l_acc.dapp, l_acc.nlsalt,
                   l_acc.ostf, l_ostfq,
                   G_ROWTYPE_ACC);
 
@@ -1532,11 +1533,11 @@ is
               insert into tmp_licm(
                       fdat,      tip,     acc,    nls,      kv,        nms,
                       okpo,      nmk,     isp,
-                      ostfr,     dosr,    kosr,
+                      ostfr,     dosr,    kosr, nlsalt,
                       rowtype)
               values( l_acc.fdat, l_acc.tip,  l_acc.acc,  l_acc.nls,  l_acc.kv,     l_acc.nms,
                       l_acc.okpo, l_acc.nmk,  l_acc.isp,
-                      l_ostfr, l_dosr,  l_kosr,
+                      l_ostfr, l_dosr,  l_kosr, l_acc.nlsalt,
                       G_ROWTYPE_REV);
           end if;
 
@@ -1654,7 +1655,7 @@ is
       l_nbsmask  := get_nbs(p_mask);
 
 	  --сформировать строку запроса для выбора счетов
-      l_sql := 'select a.acc,  a.nls, a.kv, a.tip, s.fdat, s.dos, s.kos,                '||
+      l_sql := 'select a.acc,  a.nls, a.nlsalt, a.kv, a.tip, s.fdat, s.dos, s.kos,                '||
                '       s.ostf, s.dapp, a.isp, a.nms,  cus.nmk, cus.okpo                 '||
                '  from                                                                  '||
 			   '       customer cus, saldo so,                                          '||

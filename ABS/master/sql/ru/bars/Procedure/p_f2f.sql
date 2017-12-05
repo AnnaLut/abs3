@@ -1,18 +1,9 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_F2F.sql =========*** Run *** ===
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure P_F2F ***
-
-  CREATE OR REPLACE PROCEDURE BARS.P_F2F (dat_ IN DATE)
+CREATE OR REPLACE PROCEDURE BARS.P_F2F(dat_ IN DATE) 
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% DESCRIPTION :    Процедура формирования файла
+% DESCRIPTION :    Процедура формирования файла 
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
 %
-% VERSION     :  v.17.002        10.04.2017
+% VERSION     :  v.17.005        13.11.2017
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
    Структура показателя   L DDD N R E KKK ЛЛ MMM VVV H
@@ -30,6 +21,7 @@ PROMPT *** Create  procedure P_F2F ***
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+13.11.2017 переход на новый план счетов
 10.04.2017 DDD=208 исключена корреспонденция дт 2630,2635 -кт 3800
 07.04.2017 DDD=208 исключена корреспонденция дт 2620,2625 -кт 3800
            DDD=211 сегмент MMM:  при счете кт=2900 код страны =804
@@ -49,12 +41,12 @@ PROMPT *** Create  procedure P_F2F ***
               условие включения "своих" документов для РЦ
 17.08.2016 -сегм.214 -в корреспонденцию со счетами 110% добавлена связь с OB22=01
 04.08.2016 -объединение с вариантом процедуры для РасчЦентра (мфо 344443)
-20/07/2016 -кол-во клиентов (коды 101-111) будем выбирать по условию
+20/07/2016 -кол-во клиентов (коды 101-111) будем выбирать по условию 
             DDD in ('100','101' ранее было отдельно по каждому коду DDD)
 15/07/2016 -добавлено формирование кода 214 покупка/продаж металлов (только наличные)
-11/07/2016 -добавлено формирование кодов 218, 220
-            значение доп.параметра "RIZIK" = 1 или 2 или 3
-            будут перекодированы в значение 'низький'
+11/07/2016 -добавлено формирование кодов 218, 220 
+            значение доп.параметра "RIZIK" = 1 или 2 или 3 
+            будут перекодированы в значение 'низький' 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 IS
     kodf_    varchar2(2):='2F';
@@ -92,8 +84,8 @@ IS
     kod_g_pb1 Varchar2(3);
 
     formOk_  boolean;
-    comm_    varchar2 (200);
-    k044_    varchar2(2);
+    comm_    varchar2 (200);    
+    k044_    varchar2(2);  
     ref_m37  number;
     dat_m37  date;
 
@@ -106,12 +98,12 @@ IS
 
     TYPE temp_rec_t IS TABLE OF OTCN_PROV_TEMP%rowtype;
     l_temp_rec temp_rec_t := temp_rec_t();
-
+   
     TYPE ref_type_curs IS REF CURSOR;
 
     cur_temp        ref_type_curs;
     cursor_sql      clob;
-
+    
     function is_in_country ( p_country varchar2 )
           return integer
       is
@@ -127,8 +119,8 @@ IS
     end;
 
     procedure p_form_pok(p_form in number, -- =1 - NBS, =2 - NBS + OB22
-                         p_pok in varchar2,
-                         p_typ_cust in varchar2,
+                         p_pok in varchar2, 
+                         p_typ_cust in varchar2, 
                          p_typ_ap in number,
                          p_dk in number) is
        l_pok varchar2(200);
@@ -139,24 +131,24 @@ IS
        EXECUTE IMMEDIATE 'TRUNCATE TABLE OTCN_SALDO ';
        EXECUTE IMMEDIATE 'TRUNCATE TABLE KOR_PROV';
        EXECUTE IMMEDIATE 'TRUNCATE TABLE OTCN_OPERW';
-
+       
        if l_pok in ('001','002') then
           l_pok := '213';
        else
           l_pok := p_pok;
-       end if;
-
+       end if;       
+    
        if l_pok = '202' then
           -- кредити, видані під депозити
-          insert /*+APPEND PARALLEL (8) */
-          into OTCN_ACC (ACC, NLS, KV, NBS, RNK, DAOS, DAPP, ISP, NMS,
-               LIM, PAP, TIP, VID, MDATE, DAZS, ACCC, TOBO)
-          select a.acc, a.nls, a.kv, a.nbs, a.rnk, a.daos, a.dapp, a.isp, a.nms,
-                 a.lim, a.pap, a.tip, a.vid, a.mdate, a.dazs, a.accc, a.tobo
-          from accounts a
-          where a.nbs in (select r020
-                          from kl_f3_29 k
-                          where k.kf = '2F' and
+          insert /*+APPEND PARALLEL (8) */ 
+          into OTCN_ACC (ACC, NLS, KV, NBS, RNK, DAOS, DAPP, ISP, NMS, 
+               LIM, PAP, TIP, VID, MDATE, DAZS, ACCC, TOBO) 
+          select a.acc, a.nls, a.kv, a.nbs, a.rnk, a.daos, a.dapp, a.isp, a.nms, 
+                 a.lim, a.pap, a.tip, a.vid, a.mdate, a.dazs, a.accc, a.tobo 
+          from accounts a 
+          where a.nbs in (select unique r020 
+                          from kl_f3_29 k 
+                          where k.kf = '2F' and 
                                 k.ddd = p_pok) and
                 a.acc in (select c.accs
                           from pawn_acc p, cc_accp c
@@ -165,82 +157,82 @@ IS
                 A.DAOS <= dat_ and
                (a.dazs is null or a.dazs >= dat1_) and
                 a.dapp is not null and
-                a.pap = p_typ_ap;
+                a.pap = p_typ_ap;           
            commit;
        else
            if p_typ_cust is null then
                if p_form = 1 then
-                   insert /*+APPEND PARALLEL (8) */
-                   into OTCN_ACC (ACC, NLS, KV, NBS, RNK, DAOS, DAPP, ISP, NMS,
-                        LIM, PAP, TIP, VID, MDATE, DAZS, ACCC, TOBO)
-                   select a.acc, a.nls, a.kv, a.nbs, a.rnk, a.daos, a.dapp, a.isp, a.nms,
-                        a.lim, a.pap, a.tip, a.vid, a.mdate, a.dazs, a.accc, a.tobo
-                   from accounts a
-                   where a.nbs in (select r020
-                                   from kl_f3_29 k
-                                   where k.kf = '2F' and
+                   insert /*+APPEND PARALLEL (8) */ 
+                   into OTCN_ACC (ACC, NLS, KV, NBS, RNK, DAOS, DAPP, ISP, NMS, 
+                        LIM, PAP, TIP, VID, MDATE, DAZS, ACCC, TOBO) 
+                   select a.acc, a.nls, a.kv, a.nbs, a.rnk, a.daos, a.dapp, a.isp, a.nms, 
+                        a.lim, a.pap, a.tip, a.vid, a.mdate, a.dazs, a.accc, a.tobo 
+                   from accounts a 
+                   where a.nbs in (select unique r020 
+                                   from kl_f3_29 k 
+                                   where k.kf = '2F' and 
                                          k.ddd = p_pok) and
                          A.DAOS <= dat_ and
                         (a.dazs is null or a.dazs >= dat1_) and
                         a.dapp is not null and
-                        a.pap = p_typ_ap;
+                        a.pap = p_typ_ap;           
                    commit;
                else
-                   insert /*+APPEND PARALLEL (8) */
-                   into OTCN_ACC (ACC, NLS, KV, NBS, RNK, DAOS, DAPP, ISP, NMS,
-                        LIM, PAP, TIP, VID, MDATE, DAZS, ACCC, TOBO)
-                   select a.acc, a.nls, a.kv, a.nbs, a.rnk, a.daos, a.dapp, a.isp, a.nms,
-                        a.lim, a.pap, a.tip, a.vid, a.mdate, a.dazs, a.accc, a.tobo
-                   from accounts a
-                   where (a.nbs, a.ob22) in (select r020, r050
-                                             from kl_f3_29 k
-                                             where k.kf = '2F' and
+                   insert /*+APPEND PARALLEL (8) */ 
+                   into OTCN_ACC (ACC, NLS, KV, NBS, RNK, DAOS, DAPP, ISP, NMS, 
+                        LIM, PAP, TIP, VID, MDATE, DAZS, ACCC, TOBO) 
+                   select a.acc, a.nls, a.kv, a.nbs, a.rnk, a.daos, a.dapp, a.isp, a.nms, 
+                        a.lim, a.pap, a.tip, a.vid, a.mdate, a.dazs, a.accc, a.tobo 
+                   from accounts a 
+                   where (a.nbs, a.ob22) in (select unique r020, r050 
+                                             from kl_f3_29 k 
+                                             where k.kf = '2F' and 
                                                      k.ddd = p_pok) and
                          A.DAOS <= dat_ and
                         (a.dazs is null or a.dazs >= dat1_) and
                         a.dapp is not null and
-                        a.pap = p_typ_ap;
-                   commit;
+                        a.pap = p_typ_ap;           
+                   commit;       
                end if;
            else
                if p_form = 1 then
-                   insert /*+APPEND PARALLEL (8) */
-                   into OTCN_ACC (ACC, NLS, KV, NBS, RNK, DAOS, DAPP, ISP, NMS,
-                        LIM, PAP, TIP, VID, MDATE, DAZS, ACCC, TOBO)
-                   select a.acc, a.nls, a.kv, a.nbs, a.rnk, a.daos, a.dapp, a.isp, a.nms,
-                        a.lim, a.pap, a.tip, a.vid, a.mdate, a.dazs, a.accc, a.tobo
-                   from accounts a
-                   where a.nbs in (select r020
-                                   from kl_f3_29 k
-                                   where k.kf = '2F' and
-                                         k.ddd = p_pok and
+                   insert /*+APPEND PARALLEL (8) */ 
+                   into OTCN_ACC (ACC, NLS, KV, NBS, RNK, DAOS, DAPP, ISP, NMS, 
+                        LIM, PAP, TIP, VID, MDATE, DAZS, ACCC, TOBO) 
+                   select a.acc, a.nls, a.kv, a.nbs, a.rnk, a.daos, a.dapp, a.isp, a.nms, 
+                        a.lim, a.pap, a.tip, a.vid, a.mdate, a.dazs, a.accc, a.tobo 
+                   from accounts a 
+                   where a.nbs in (select unique r020 
+                                   from kl_f3_29 k 
+                                   where k.kf = '2F' and 
+                                         k.ddd = p_pok and 
                                          k.s240 = p_typ_cust) and
                          A.DAOS <= dat_ and
                         (a.dazs is null or a.dazs >= dat1_) and
                         a.dapp is not null and
-                        a.pap = p_typ_ap;
+                        a.pap = p_typ_ap;           
                    commit;
                else
-                   insert /*+APPEND PARALLEL (8) */
-                   into OTCN_ACC (ACC, NLS, KV, NBS, RNK, DAOS, DAPP, ISP, NMS,
-                        LIM, PAP, TIP, VID, MDATE, DAZS, ACCC, TOBO)
-                   select a.acc, a.nls, a.kv, a.nbs, a.rnk, a.daos, a.dapp, a.isp, a.nms,
-                        a.lim, a.pap, a.tip, a.vid, a.mdate, a.dazs, a.accc, a.tobo
-                   from accounts a
-                   where (a.nbs, a.ob22) in (select r020, r050
-                                             from kl_f3_29 k
-                                             where k.kf = '2F' and
-                                                     k.ddd = p_pok and
+                   insert /*+APPEND PARALLEL (8) */ 
+                   into OTCN_ACC (ACC, NLS, KV, NBS, RNK, DAOS, DAPP, ISP, NMS, 
+                        LIM, PAP, TIP, VID, MDATE, DAZS, ACCC, TOBO) 
+                   select a.acc, a.nls, a.kv, a.nbs, a.rnk, a.daos, a.dapp, a.isp, a.nms, 
+                        a.lim, a.pap, a.tip, a.vid, a.mdate, a.dazs, a.accc, a.tobo 
+                   from accounts a 
+                   where (a.nbs, a.ob22) in (select unique r020, r050 
+                                             from kl_f3_29 k 
+                                             where k.kf = '2F' and 
+                                                     k.ddd = p_pok and 
                                                      k.s240 = p_typ_cust) and
                          A.DAOS <= dat_ and
                         (a.dazs is null or a.dazs >= dat1_) and
                         a.dapp is not null and
-                        a.pap = p_typ_ap;
-                   commit;
-               end if;
+                        a.pap = p_typ_ap;           
+                   commit;       
+               end if;       
            end if;
        end if;
-
+       
        INSERT /*+APPEND PARALLEL  (8) */
        INTO OTCN_SALDO (ODATE, FDAT, ACC, NLS, KV, NBS, RNK,
                VOST, VOSTQ, OST, OSTQ,
@@ -263,95 +255,98 @@ IS
              b.ACC = a.acc and
              decode(p_dk, 0, b.dos, b.kos)<>0;
        commit;
-
+       
        if p_pok not in ('201', '211') then
-           if p_typ_cust is null then
-               INSERT /*+APPEND PARALLEL (8) */
-               INTO  rnbu_trace(recid, kodp, znap, acc, nls, kv, rnk, ref, comm, nbuc)
-               select
-                    s_rnbu_record.nextval,
+           if p_typ_cust is null then     
+               INSERT /*+APPEND PARALLEL (8) */ 
+               INTO  rnbu_trace(recid, kodp, znap, acc, nls, kv, rnk, ref, comm, nbuc)    
+               select  
+                    s_rnbu_record.nextval, 
                     pok1||(case when segm_H = '2' then '0' else pok2 end)||pok3||segm_E||
                     (case when segm_KKK = '000' then obl_ else segm_KKK end)||
-                    '10804'||segm_VVV||segm_H,
+                    '10804'||segm_VVV||segm_H, 
                     gl.p_icurval(kv, s, dat_), acc, nls, kv, rnk, ref, comm, nbuc_
-               from (select '1'||l_pok pok1,
-                        (case when ltrim(c.okpo, '0')=OUR_OKPO_
+               from (select '1'||l_pok pok1, 
+                        (case when ltrim(c.okpo, '0')=OUR_OKPO_  
                                 then (case when lower(nazn) like '%ф_з%ос_б%' then '3'
-                                            when lower(nazn) like '%фоп%' then '2'
-                                       else '1' end)
-                                else decode(c.custtype, '3', decode(NVL(trim(c.sed),'00'),'91','2','3'), '1')
+                                            when lower(nazn) like '%фоп%' then '2'     
+                                       else '1' end)                                   
+                                else decode(c.custtype, '3', decode(NVL(trim(c.sed),'00'),'91','2','3'), '1') 
                         end) pok2,
-                        decode(NVL(c.country,'804'),'804','1','2') pok3,
-                        decode(substr(decode(p.dk, p_dk, nlsa, nlsb), 1, 3), '100', '2', '1') segm_H,
-                        decode((case when mfo_!=344443 and trim(r.risk_id) in (2, 3, 64) then '101'
+                        decode(NVL(c.country,'804'),'804','1','2') pok3, 
+                        decode(substr(decode(p.dk, p_dk, nlsa, nlsb), 1, 3), '100', '2', '1') segm_H, 
+                        decode((case when mfo_!=344443 and trim(r.risk_id) in (2, 3, 64) then '101' 
                                      when mfo_!=344443 and trim(r.risk_id) in (62, 65) then '102'
                                      when mfo_!=344443 and trim(r.risk_id) in (63) then '103'
-                                     when mfo_ =344443 and trim(r.risk_id) in (2, 3) then '101'
+                                     when mfo_ =344443 and trim(r.risk_id) in (2, 3) then '101' 
                                       else 'XXX'
-                                 end),'101','1','102','2','103','3','4')  segm_E,
+                                 end),'101','1','102','2','103','3','4')  segm_E, 
                                  lpad(F_Codobl_branch(p.branch, 4),3,'0') segm_KKK,
                                  lpad(a.kv, 3, '0') segm_VVV,
-                                 o.s, a.acc, a.nls, a.kv, a.rnk, p.ref,
+                                 o.s, a.acc, a.nls, a.kv, a.rnk, p.ref, 
                                  p.dk||' '||p.nlsa||' '||p.nlsb||' '||p.nazn comm
                     from opldok o, otcn_acc a, customer c, customer_risk r, oper p
                     where o.fdat between dat1_ and dat_ and
                        (o.fdat, o.acc) in (select fdat, acc from otcn_saldo) and
                         o.acc = a.acc and
                         a.rnk = c.rnk and
-                        c.rnk = r.rnk(+) and
+                        c.rnk = r.rnk(+) and 
                         nvl(trim(r.risk_id(+)),0) in (2, 3, 62, 63, 64, 65) and
                         dat_ between nvl(r.dat_begin(+),dat_) and nvl(r.dat_end(+),dat_) and
                         o.dk = p_dk and
                         p.pdat between dat1_ - 10 and dat_ + 10 and
                         o.sos = 5 and
                         o.ref = p.ref);
-               commit;
+               commit;         
            else
-               INSERT /*+APPEND PARALLEL (8) */
-               INTO  rnbu_trace(recid, kodp, znap, acc, nls, kv, rnk, ref, comm, nbuc)
+               INSERT /*+APPEND PARALLEL (8) */ 
+               INTO  rnbu_trace(recid, kodp, znap, acc, nls, kv, rnk, ref, comm, nbuc)    
                select s_rnbu_record.nextval, pok1||segm_E||
                     (case when segm_KKK = '000' then obl_ else segm_KKK end)||
-                    '10804'||segm_VVV||segm_H,
+                    '10804'||segm_VVV||segm_H, 
                     gl.p_icurval(kv, s, dat_), acc, nls, kv, rnk, ref, comm, nbuc_
                from (select '1'||l_pok||decode(c.custtype, '3', decode(NVL(trim(c.sed),'00'),'91','2','3'), '1')||
-                        decode(NVL(c.country,'804'),'804','1','2') pok1,
-                        decode(substr(decode(p.dk, p_dk, nlsa, nlsb), 1, 3), '100', '2', '1') segm_H,
-                        decode((case when mfo_!=344443 and trim(r.risk_id) in (2, 3, 64) then '101'
+                        decode(NVL(c.country,'804'),'804','1','2') pok1, 
+                        decode(substr(decode(p.dk, p_dk, nlsa, nlsb), 1, 3), '100', '2', '1') segm_H, 
+                        decode((case when mfo_!=344443 and trim(r.risk_id) in (2, 3, 64) then '101' 
                                      when mfo_!=344443 and trim(r.risk_id) in (62, 65) then '102'
                                      when mfo_!=344443 and trim(r.risk_id) in (63) then '103'
-                                     when mfo_ =344443 and trim(r.risk_id) in (2, 3) then '101'
+                                     when mfo_ =344443 and trim(r.risk_id) in (2, 3) then '101' 
                                       else 'XXX'
-                                 end),'101','1','102','2','103','3','4')  segm_E,
+                                 end),'101','1','102','2','103','3','4')  segm_E, 
                                  lpad(F_Codobl_branch(p.branch, 4),3,'0') segm_KKK,
                                  lpad(a.kv, 3, '0') segm_VVV,
-                                 o.s, a.acc, a.nls, a.kv, a.rnk, p.ref,
-                                 p.dk||' '||p.nlsa||' '||p.nlsb||' '||p.nazn comm
+                                 o.s, a.acc, a.nls, a.kv, a.rnk, p.ref, 
+                                 p.dk||' '||p.nlsa||' '||p.nlsb||' '||p.nazn comm 
                     from opldok o, otcn_acc a, customer c, customer_risk r, oper p
-                    where o.fdat between dat1_ and dat_ and
+                    where o.fdat between dat1_ and dat_ and 
                         (o.fdat, o.acc) in (select fdat, acc from otcn_saldo) and
                         o.acc = a.acc and
                         a.rnk = c.rnk and
-                        c.rnk = r.rnk(+) and
+                        c.rnk = r.rnk(+) and 
                         nvl(trim(r.risk_id(+)),0) in (2, 3, 62, 63, 64, 65) and
                         dat_ between nvl(r.dat_begin(+),dat_) and nvl(r.dat_end(+),dat_) and
                         o.dk = p_dk and
                         o.sos = 5 and
-                        o.ref = p.ref and
+                        o.ref = p.ref and 
                         p.pdat between dat1_ - 10 and dat_ + 10);
-               commit;
+               commit;                
            end if;
        elsif p_pok = '201' then
-           insert /*+APPEND parallel (8)*/ into KOR_PROV (REF, DK, ACC, S, FDAT)
-           select ref, dk, acc, s, fdat
-           from opldok o
-           where o.fdat between dat1_ and dat_ and
-                (o.fdat, o.acc) in (select fdat, acc from otcn_saldo) and
-                 o.sos = 5;
+           insert /*+APPEND */  
+           into KOR_PROV (REF, DK, ACC, S, FDAT)
+           select  /*+ leading(s)*/ o.ref, o.dk, o.acc, o.s, o.fdat
+           from opldok o, otcn_saldo s
+           where o.fdat between dat1_ and dat_ and 
+                 o.fdat = s.fdat and
+                 o.acc = s.acc and 
+                 o.sos = 5; 
            commit;
-
+           
 -------------------------------------------------------------------------
-           for k in ( select /*+ parallel (8) */ref from operw o
-                       where exists ( select 1 from kor_prov k where k.ref=o.ref)
+           for k in ( select /*+ parallel (8) */ref 
+                      from operw o
+                       where o.ref in (select k.ref from kor_prov k)
                          and ( tag LIKE 'n%' or
                                tag LIKE 'D6#7%' or
                                tag = 'KOD_G' or
@@ -361,7 +356,7 @@ IS
                     )
            loop
               l_country := '   ';
-
+        
               begin
                 SELECT translate(trim(value),'1234567890OPОП', '1234567890')
                   into l_country
@@ -373,7 +368,7 @@ IS
                  when others then
                     l_country := '   ';
               end;
-
+        
               if trim(l_country) is null  then
                     begin
                       SELECT translate(trim(value),'1234567890OPОП', '1234567890')
@@ -381,13 +376,13 @@ IS
                         FROM OPERW
                        WHERE REF = k.ref
                          AND TAG = 'KOD_G' and rownum=1;
-
+        
                     exception
                        when others then
                           l_country := '   ';
                     end;
               end if;
-
+        
               if trim(l_country) is null  then
                     begin
                       SELECT lpad(translate(trim(value),'1234567890OPОП', '1234567890'),3,'0')
@@ -395,31 +390,31 @@ IS
                         FROM OPERW
                        WHERE REF = k.ref
                          AND TAG like 'D6#7%' and rownum=1;
-
+        
                     exception
                        when others then
                           l_country := '   ';
                     end;
               end if;
-
+        
               if trim(l_country) is null  then
                     begin
                       select l.k040
                         into l_country
                         from ( SELECT ref, value,
                                       substr(trim(value), instr(UPPER(trim(value)),'3/')+2, 2) swift_k
-                                 FROM OPERW
+                                 FROM OPERW 
                                 WHERE REF = k.ref
                                   AND TAG = '50F' and rownum=1
                              ) o, kl_k040 l
                        where o.swift_k = l.a2;
-
+        
                     exception
                        when others then
                           l_country := '   ';
                     end;
               end if;
-
+        
               if trim(l_country) is null  then
                     begin
                       select l.k040
@@ -433,82 +428,62 @@ IS
                          where o.swift_k = l.swift_code
                             or        substr(o.swift_k,1,4)||' '||substr(o.swift_k,5,2)
                                ||' '||substr(o.swift_k,7,2) = l.swift_code;
-
+        
                     exception
                        when others then l_country :='804';
-
+        
                     end;
               end if;
-
+        
               if is_in_country(l_country)!=0 and trim(l_country) is not null then
-
+        
                   insert into otcn_operw (ref, value)
                        values (k.ref, l_country);
               end if;
-
+        
            end loop;
+                   
+            commit;      
 
---           insert /*+APPEND PARALLEL (8) */ into OTCN_OPERW
---           select *
---           from (select ref, max(trim(translate(
---                       (case when instr(upper(value), 'UKRAINE') > 0 or
---                                   instr(upper(value), 'UKR') > 0 or
---                                   substr (trim (value), 1, 3) = '/UA'
---                              then '804'
---                              else trim(value)
---                        end), '1234567890OPОП', '1234567890'))) country
---                from operw
---                where ref in (select ref from KOR_PROV) and
---                    (tag LIKE 'n%' or
---                     tag LIKE 'D6#7%' or
---                     tag LIKE 'D6#E2%' or
---                     tag LIKE 'D1#E9%' or
---                     tag LIKE 'F1%' or
---                     tag = 'KOD_G' or
---                     tag LIKE '59%')
---                    group by ref)
---            where country in (select to_char(country) from country);
-            commit;
-
-            INSERT /*+APPEND PARALLEL (8) */
-            INTO  rnbu_trace(recid, kodp, znap, acc, nls, kv, rnk, ref, comm, nbuc, isp)
-            select /*+leading(a.o)*/
-                s_rnbu_record.nextval,
-                pok1 || pok2  || --/*(case when segm_H = '2' then '0' else pok2 end)*/
+            INSERT /*+APPEND  parallel(8) */
+            INTO  rnbu_trace(recid, kodp, znap, acc, nls, kv, rnk, ref, comm, nbuc, isp)    
+            select s_rnbu_record.nextval, 
+                pok1 || pok2  || 
                 pok3 || segm_E||
-                (case when segm_KKK = '000' and segm_MMM = '804' then obl_
+                (case when segm_KKK = '000' and segm_MMM = '804' then obl_ 
                       when segm_MMM <> '804' then '000'
                       else segm_KKK end)||
-                nvl(b.k044, '25')||segm_MMM||segm_VVV||segm_H,
-                gl.p_icurval(kv, s, dat_), acc, nls, kv, rnk, ref, comm, nbuc_, p_dk
-            from (select '1'||l_pok pok1,
-                    (case when ltrim(c.okpo, '0')=OUR_OKPO_
-                            then (case when lower(nazn) like '%ф_з%ос_б%' then '3'
+                nvl(b.k044, '25')||segm_MMM||segm_VVV||segm_H, 
+                gl.p_icurval(kv, s, dat_), acc, nls, kv, rnk, ref, comm, nbuc_, p_dk 
+            from (select /*+ leading(o) hash(o) */ 
+                    '1'||l_pok pok1,  
+                    (case when ltrim(c.okpo, '0')=OUR_OKPO_  
+                            then (case when lower(nazn) like '%ф_з%ос_б%' then '3' 
                                        when lower(nazn) like '%фоп%' then '2'
-                                    else '1' end)
-                            else decode(c.custtype, '3', decode(NVL(trim(c.sed),'00'),'91','2','3'), '1')
+                                    else '1' end) 
+                            else decode(c.custtype, '3', decode(NVL(trim(c.sed),'00'),'91','2','3'), '1') 
                     end) pok2,
-                    decode(NVL(c.country,'804'),'804','1','2') pok3,
-                    (case when substr(decode(p.dk, p_dk, nlsa, nlsb), 1, 3) = '100' and
-                               NVL(w.value,'804') = '804'
-                            then '2'
+                    decode(NVL(c.country,'804'),'804','1','2') pok3, 
+                    (case when substr(decode(p.dk, p_dk, nlsa, nlsb), 1, 3) = '100' and 
+                               NVL(w.value,'804') = '804' 
+                            then '2' 
                             else '1'
-                    end) segm_H,
-                    decode((case when mfo_!=344443 and trim(r.risk_id) in (2, 3, 64) then '101'
+                    end) segm_H, 
+                    decode((case when mfo_!=344443 and trim(r.risk_id) in (2, 3, 64) then '101' 
                                  when mfo_!=344443 and trim(r.risk_id) in (62, 65) then '102'
                                  when mfo_!=344443 and trim(r.risk_id) in (63) then '103'
-                                 when mfo_ =344443 and trim(r.risk_id) in (2, 3) then '101'
+                                 when mfo_ =344443 and trim(r.risk_id) in (2, 3) then '101' 
                                   else 'XXX'
-                    end),'101','1','102','2','103','3','4')  segm_E,
+                    end),'101','1','102','2','103','3','4')  segm_E, 
                     lpad(F_Codobl_branch(p.branch, 4),3,'0') segm_KKK,
                     lpad(a.kv, 3, '0') segm_VVV,
                     decode(substr(p.nlsb,1,4),'2900','804',lpad(NVL(w.value,'804'), 3, '0')) segm_MMM,
-                    o.s, a.acc, a.nls, a.kv, a.rnk, p.ref,
+                    o.s, a.acc, a.nls, a.kv, a.rnk, p.ref, 
                     p.dk||' '||p.nlsa||' '||p.nlsb||' '||p.nazn comm
                 from kor_prov o, otcn_acc a, customer c, customer_risk r, oper p, otcn_operw w
                 where o.acc = a.acc and
                     a.rnk = c.rnk and
-                    c.rnk = r.rnk(+) and
+                    c.rnk = r.rnk(+) and 
                     nvl(trim(r.risk_id(+)),0) in (2, 3, 62, 63, 64, 65) and
                     dat_ between nvl(r.dat_begin(+),dat_) and nvl(r.dat_end(+),dat_) and
                     o.dk = p_dk and
@@ -519,43 +494,17 @@ IS
            where a.segm_MMM = b.k040(+);
            commit;
 
-           --if p_dk = 1 then
-              -- надходження з інших країн для 210 показника
-           --   insert into rnbu_trace(RECID, USERID, NLS, KV, ODATE, KODP, ZNAP, NBUC, ISP, RNK, ACC, REF, COMM, ND, MDATE, TOBO)
-           --   select s_rnbu_record.nextval, USERID, NLS, KV, ODATE, '1210'||substr(KODP, 5), ZNAP, NBUC, ISP, RNK, ACC, REF, COMM, ND, MDATE, TOBO
-           --   from rnbu_trace
-           --   where kodp like '1201%' and
-           --         isp = 1 and  -- (Кт обороти)
-           --         kodp not like '1201________804%';
-
-              -- надходження з інших країн для 212 показника
-           --   insert into rnbu_trace(RECID, USERID, NLS, KV, ODATE, KODP, ZNAP, NBUC, ISP, RNK, ACC, REF, COMM, ND, MDATE, TOBO)
-           --   select s_rnbu_record.nextval, USERID, NLS, KV, ODATE, '1212'||substr(KODP, 5, 14)||'1', ZNAP, NBUC, ISP, RNK, ACC, REF, COMM, ND, MDATE, TOBO
-           --   from rnbu_trace
-           --   where kodp like '1201%' and
-           --         isp = 1 and  -- (Кт обороти)
-           --         kodp not like '1201________804%';
-
-              -- в межах України через коррахунки для 212 показника
-           --   insert into rnbu_trace(RECID, USERID, NLS, KV, ODATE, KODP, ZNAP, NBUC, ISP, RNK, ACC, REF, COMM, ND, MDATE, TOBO)
-           --   select /*+leading(r)*/
-           --        s_rnbu_record.nextval, r.USERID, r.NLS, r.KV, r.ODATE, '1212'||substr(KODP, 5, 14)||'1', r.ZNAP, r.NBUC, r.ISP, r.RNK, r.ACC, r.REF,
-           --        r.COMM, r.ND, r.MDATE, r.TOBO
-           --   from rnbu_trace r, oper p
-           --   where r.kodp like '1201________804%' and
-           --         r.isp = 1 and  -- (Кт обороти)
-           --         r.ref = p.ref and
-           --         p.mfoa <> p.mfob;
-           --end if;
        elsif p_pok = '211' then
-           insert /*+APPEND parallel (8)*/ into KOR_PROV (REF, DK, ACC, S, FDAT)
-           select ref, dk, acc, s, fdat
-           from opldok o
-           where o.fdat between dat1_ and dat_ and
-                 (o.fdat, o.acc) in (select fdat, acc from otcn_saldo) and
-                 o.sos = 5;
+           insert /*+APPEND */  
+           into KOR_PROV (REF, DK, ACC, S, FDAT)
+           select  /*+ leading(s)*/ o.ref, o.dk, o.acc, o.s, o.fdat
+           from opldok o, otcn_saldo s
+           where o.fdat between dat1_ and dat_ and 
+                 o.fdat = s.fdat and
+                 o.acc = s.acc and 
+                 o.sos = 5;            
            commit;
-
+           
 -------------------------------------------------------------------------
            for k in ( select /*+ parallel (8) */ref from operw o
                        where exists ( select 1 from kor_prov k where k.ref=o.ref)
@@ -568,7 +517,7 @@ IS
                     )
            loop
               l_country := '   ';
-
+        
               begin
                 SELECT translate(trim(value),'1234567890OPОП', '1234567890')
                   into l_country
@@ -580,7 +529,7 @@ IS
                  when others then
                     l_country := '   ';
               end;
-
+        
               if trim(l_country) is null  then
                     begin
                       SELECT translate(trim(value),'1234567890OPОП', '1234567890')
@@ -588,13 +537,13 @@ IS
                         FROM OPERW
                        WHERE REF = k.ref
                          AND TAG = 'KOD_G' and rownum=1;
-
+        
                     exception
                        when others then
                           l_country := '   ';
                     end;
               end if;
-
+        
               if trim(l_country) is null  then
                     begin
                       SELECT lpad(translate(trim(value),'1234567890OPОП', '1234567890'),3,'0')
@@ -602,31 +551,31 @@ IS
                         FROM OPERW
                        WHERE REF = k.ref
                          AND TAG like 'D6#7%' and rownum=1;
-
+        
                     exception
                        when others then
                           l_country := '   ';
                     end;
               end if;
-
+        
               if trim(l_country) is null  then
                     begin
                       select l.k040
                         into l_country
                         from ( SELECT ref, value,
                                       substr(trim(value), instr(UPPER(trim(value)),'3/')+2, 2) swift_k
-                                 FROM OPERW
+                                 FROM OPERW 
                                 WHERE REF = k.ref
                                   AND TAG = '50F' and rownum=1
                              ) o, kl_k040 l
                        where o.swift_k = l.a2;
-
+        
                     exception
                        when others then
                           l_country := '   ';
                     end;
               end if;
-
+        
               if trim(l_country) is null  then
                     begin
                       select l.k040
@@ -640,97 +589,77 @@ IS
                          where o.swift_k = l.swift_code
                             or        substr(o.swift_k,1,4)||' '||substr(o.swift_k,5,2)
                                ||' '||substr(o.swift_k,7,2) = l.swift_code;
-
+        
                     exception
                        when others then l_country :='804';
-
+        
                     end;
               end if;
-
+        
               if is_in_country(l_country)!=0 and trim(l_country) is not null then
-
+        
                   insert into otcn_operw (ref, value)
                        values (k.ref, l_country);
               end if;
-
+        
            end loop;
+                   
+            commit;      
 
---           insert /*+APPEND PARALLEL (8) */ into OTCN_OPERW
---           select *
---           from (select ref, max(trim(translate(
---                               (case when instr(upper(value), 'UKRAINE') > 0 or
---                                           instr(upper(value), 'UKR') > 0 or
---                                           instr(UPPER(trim(value)),'3/UA') > 0
---                                      then '804'
---                                      else trim(value)
---                                end), '1234567890OPОП', '1234567890'))) country
---                    from operw
---                    where ref in (select ref from KOR_PROV) and
---                        (tag LIKE 'n%' or
---                         tag LIKE 'D6#7%' or
---                         tag LIKE 'D6#E2%' or
---                         tag LIKE 'D1#E9%' or
---                         tag LIKE 'F1%' or
---                         tag = 'KOD_G' or
---                         tag LIKE '50F')
---                    group by ref)
---            where country in (select to_char(country) from country);
-            commit;
-
-            INSERT /*+APPEND PARALLEL (8) */
-            INTO  rnbu_trace(recid, kodp, znap, acc, nls, kv, rnk, ref, comm, nbuc)
-            select /*+leading(a.o)*/
-                s_rnbu_record.nextval,
+            INSERT /*+APPEND parallel(8) */
+            INTO  rnbu_trace(recid, kodp, znap, acc, nls, kv, rnk, ref, comm, nbuc)    
+            select s_rnbu_record.nextval, 
                 pok1||(case when segm_H = '2' then '0' else pok2 end)||pok3||segm_E||
-                (case when segm_KKK = '000' and segm_MMM = '804' then obl_
+                (case when segm_KKK = '000' and segm_MMM = '804' then obl_ 
                       when segm_MMM <> '804' then '000'
                       else segm_KKK end)||
-                nvl(b.k044, '25')||segm_MMM||segm_VVV||segm_H,
+                nvl(b.k044, '25')||segm_MMM||segm_VVV||segm_H, 
                 gl.p_icurval(kv, s, dat_), acc, nls, kv, rnk, ref, comm, nbuc_
-            from (select '1'||l_pok pok1,
-                    (case when ltrim(c.okpo, '0')=OUR_OKPO_
+            from (select /*+ leading(o) hash(o) */ 
+                    '1'||l_pok pok1, 
+                    (case when ltrim(c.okpo, '0')=OUR_OKPO_  
                             then (case when lower(nazn) like '%ф_з%ос_б%' then '3'
-                                       when lower(nazn) like '%фоп%' then '2'
-                                    else '1' end)
-                            else decode(c.custtype, '3', decode(NVL(trim(c.sed),'00'),'91','2','3'), '1')
+                                       when lower(nazn) like '%фоп%' then '2'     
+                                    else '1' end)                                   
+                            else decode(c.custtype, '3', decode(NVL(trim(c.sed),'00'),'91','2','3'), '1') 
                     end) pok2,
-                    decode(NVL(c.country,'804'),'804','1','2') pok3,
-                    (case when substr(decode(p.dk, p_dk, nlsa, nlsb), 1, 3) = '100' and
-                               NVL(w.value,'804') = '804'
-                            then '2'
+                    decode(NVL(c.country,'804'),'804','1','2') pok3, 
+                    (case when substr(decode(p.dk, p_dk, nlsa, nlsb), 1, 3) = '100' and 
+                               NVL(w.value,'804') = '804' 
+                            then '2' 
                             else '1'
-                    end) segm_H,
-                    decode((case when mfo_!=344443 and trim(r.risk_id) in (2, 3, 64) then '101'
+                    end) segm_H, 
+                    decode((case when mfo_!=344443 and trim(r.risk_id) in (2, 3, 64) then '101' 
                                  when mfo_!=344443 and trim(r.risk_id) in (62, 65) then '102'
                                  when mfo_!=344443 and trim(r.risk_id) in (63) then '103'
-                                 when mfo_ =344443 and trim(r.risk_id) in (2, 3) then '101'
+                                 when mfo_ =344443 and trim(r.risk_id) in (2, 3) then '101' 
                                   else 'XXX'
-                             end),'101','1','102','2','103','3','4')  segm_E,
+                             end),'101','1','102','2','103','3','4')  segm_E, 
                              lpad(F_Codobl_branch(p.branch, 4),3,'0') segm_KKK,
                              lpad(a.kv, 3, '0') segm_VVV,
                     decode(substr(p.nlsb,1,4),'2900','804',lpad(NVL(w.value,'804'), 3, '0')) segm_MMM,
 --                                                           lpad(NVL(w.value,'804'), 3, '0') segm_MMM,
-                             o.s, a.acc, a.nls, a.kv, a.rnk, p.ref,
+                             o.s, a.acc, a.nls, a.kv, a.rnk, p.ref, 
                              p.dk||' '||p.nlsa||' '||p.nlsb||' '||p.nazn comm,
-                             p.mfoa, p.mfob, p.nlsb, p.tt
+                             p.mfoa, p.mfob, p.nlsb, p.tt 
                 from kor_prov o, otcn_acc a, customer c, customer_risk r, oper p, otcn_operw w
                 where o.acc = a.acc and
                     a.rnk = c.rnk and
-                    c.rnk = r.rnk(+) and
+                    c.rnk = r.rnk(+) and 
                     nvl(trim(r.risk_id(+)),0) in (2, 3, 62, 63, 64, 65) and
                     dat_ between nvl(r.dat_begin(+),dat_) and nvl(r.dat_end(+),dat_) and
                     o.dk = p_dk and
                     p.sos = 5 and
-                    o.ref = p.ref and
+                    o.ref = p.ref and 
                     p.pdat between dat1_ - 10 and dat_ + 10 and
                     o.ref = w.ref(+)) a, KL_K044N b
            where a.segm_MMM = b.k040(+)
              and (  a.segm_MMM <> '804'
-                 or a.mfoa <> a.mfob
+                 or a.mfoa <> a.mfob 
                  or mfo_ = 300465 and a.tt like 'IBO%'
                  or mfo_ = 344443 and a.nlsb like '29092000000001%' );
            commit;
-
+           
            -- відправка до інших країн для 209 показника
            insert into rnbu_trace(RECID, USERID, NLS, KV, ODATE, KODP, ZNAP, NBUC, ISP, RNK, ACC, REF, COMM, ND, MDATE, TOBO)
            select s_rnbu_record.nextval, USERID, NLS, KV, ODATE, '1209'||substr(KODP, 5), ZNAP, NBUC, ISP, RNK, ACC, REF, COMM, ND, MDATE, TOBO
@@ -744,7 +673,7 @@ BEGIN
 
    EXECUTE IMMEDIATE 'ALTER SESSION ENABLE PARALLEL DML';
    EXECUTE IMMEDIATE 'ALTER SESSION SET SORT_AREA_SIZE = 131072';
-
+   
    -------------------------------------------------------------------
    logger.info ('P_F2F: Begin for '||to_char(dat_,'dd.mm.yyyy'));
 
@@ -767,113 +696,72 @@ BEGIN
 
    Dat1_ := add_months(TRUNC(Dat_,'MM'),-2); -- початок кварталу
    --Dat1_ := to_date('30052016','ddmmyyyy');
-
-   if mfo_ = 344443 then
+    
+   if mfo_ = 344443 then 
       sheme_ := 'D';
 --                      пока наличие финмониторинга определяем по МФО  РЦ
-      is_finmon := 1;
+      is_finmon := 1;       
    else
 
       is_finmon := 0;
    end if;
-
+   
    -- параметры формирования файла
    p_proc_set(kodf_,sheme_, nbuc1_, typ_);
 
    nbuc_ := nbuc1_;
-
+   
    ------  ПЕРША ЧАСТИНА
-   -- публічні особи
-   -- 20/07/2016 объединили коды "DDD" 100 и 101 из KL_F3_29
-   insert /*+APPEND PARALLEL (8) */
-   into rnbu_trace(recid, kodp, znap, rnk, comm, nbuc)
-   select s_rnbu_record.nextval,
+   -- публічні особи 
+   -- 20/07/2016 объединили коды "DDD" 100 и 101 из KL_F3_29    
+   insert /*+APPEND PARALLEL (8) */ 
+   into rnbu_trace(recid, kodp, znap, rnk, comm, nbuc)     
+   select s_rnbu_record.nextval, 
         '3'||pok||'00'||decode(pok,'101','1','102','2','103','3','0')||
-        '000000000000' kodp,
+        '000000000000' kodp, 
         to_char(cnt) znap, rnk, nmk, nbuc_
    from (
-       select c.rnk,
-            (case when trim(r.risk_id) in (2, 3, 64) then '101'
+       select c.rnk, 
+            (case when trim(r.risk_id) in (2, 3, 64) then '101' 
                   when trim(r.risk_id) in (62, 65) then '102'
                   when trim(r.risk_id) in (63) then '103'
                   else 'XXX'
              end) pok,
-            1 cnt,
-            trim(c.okpo) || '  ' || trim(c.nmk) nmk
+            1 cnt, 
+            trim(c.okpo) || '  ' || trim(c.nmk) nmk      
        from customer c
-       join (select *
-             from customer_risk
-             where (   mfo_!=344443 and trim(risk_id) in (2, 3, 62, 63, 64, 65)
-                    or mfo_ =344443 and trim(risk_id) in (2, 3) )
+       join (select * 
+             from customer_risk 
+             where (   mfo_!=344443 and trim(risk_id) in (2, 3, 62, 63, 64, 65) 
+                    or mfo_ =344443 and trim(risk_id) in (2, 3) ) 
                and  dat_ between nvl(dat_begin, dat_) and nvl(dat_end, dat_)) r
-       on (c.rnk = r.rnk)
+       on (c.rnk = r.rnk)     
        where nvl(c.date_off, dat_+1) > dat_
-         and (   c.country  ='804'  and
+         and (   c.country  ='804'  and 
                                ( ltrim(c.okpo, '0') is null
                                       or ltrim(c.okpo,'0') is not null
-                                       and ltrim(c.okpo,'0') != OUR_OKPO_)
+                                       and ltrim(c.okpo,'0') != OUR_OKPO_)      
               or c.country !='804' )
-         and exists (select 1
-                    from accounts a
-                    where a.nbs in (select r020
+         and exists (select 1 
+                    from accounts a 
+                    where a.nbs in (select unique r020 
                                   from kl_f3_29
                                   where kf='2F' and
                                     ddd in ('100','101'))
-                       and a.rnk = c.rnk
-                       and a.daos <= dat_
-                       and (a.dazs is null or a.dazs > dat_))
+                       and a.rnk = c.rnk 
+                       and a.daos <= dat_ 
+                       and (a.dazs is null or a.dazs > dat_))                       
        group by c.rnk,
-            (case when trim(r.risk_id) in (2, 3, 64) then '101'
+            (case when trim(r.risk_id) in (2, 3, 64) then '101' 
                   when trim(r.risk_id) in (62, 65) then '102'
                   when trim(r.risk_id) in (63) then '103'
                   else 'XXX'
              end), trim(c.okpo) || '  ' || trim(c.nmk));
-
+             
    logger.info ('P_F2F: part 1.1 '||to_char(dat_,'dd.mm.yyyy'));
-
---   insert /*+APPEND PARALLEL (8) */
---   into rnbu_trace(recid, kodp, znap, rnk, comm, nbuc)
---   select s_rnbu_record.nextval,
---        '3'||pok||'00'||decode(pok,'101','1','102','2','103','3','0')||
---        '000000000000' kodp,
---        to_char(cnt) znap, rnk, nmk, nbuc_
---   from (
---       select c.rnk,
---            (case when trim(r.risk_id) in (2, 3, 64) then '101'
---                  when trim(r.risk_id) in (62, 65) then '102'
---                  when trim(r.risk_id) in (63) then '103'
---                  else 'XXX'
---             end) pok,
---            1 cnt,
---            trim(c.okpo) || '  ' || trim(c.nmk) nmk
---       from customer c
---       join (select *
---             from customer_risk
---             where trim(risk_id) in (2, 3, 62, 63, 64, 65) and
---                   dat_ between nvl(dat_begin, dat_) and nvl(dat_end, dat_)) r
---       on (c.rnk = r.rnk)
---       where nvl(c.date_off, dat_+1) > dat_ and
---            c.rnk not in (select rnk from rnbu_trace) and
---            exists (select 1
---                    from accounts a
---                    where a.nbs in (select r020
---                                  from kl_f3_29
---                                  where kf='2F' and
---                                    ddd = '101')
---                       and a.rnk = c.rnk
---                       and a.daos <= dat_
---                       and (a.dazs is null or a.dazs > dat_))
---       group by c.rnk,
---            (case when trim(r.risk_id) in (2, 3, 64) then '101'
---                  when trim(r.risk_id) in (62, 65) then '102'
---                  when trim(r.risk_id) in (63) then '103'
---                  else 'XXX'
---             end), trim(c.okpo) || '  ' || trim(c.nmk));
-
---   logger.info ('P_F2F: part 2 '||to_char(dat_,'dd.mm.yyyy'));
-
-   -- розподіл по ризику
-   -- 20/07/2016 объединили коды "DDD" 100 и 101 из Kl_F3_29
+             
+   -- розподіл по ризику      
+   -- 20/07/2016 объединили коды "DDD" 100 и 101 из Kl_F3_29  
    insert /*-+APPPEND PARALLEL (2) */
     into rnbu_trace(recid, kodp, znap, rnk, comm, nbuc)
     select s_rnbu_record.nextval,
@@ -890,10 +778,10 @@ BEGIN
            rnk,
            trim(okpo) || '  ' || trim(nmk) nmk,
            nbuc_
-    from   (select c.rnk, c.nmk, c.okpo,
+    from   (select c.rnk, c.nmk, c.okpo, 
                    min(decode(trim(u.value), '1', 'низький',
-                                             '2', 'низький',
-                                             '3', 'низький',
+                                             '2', 'низький', 
+                                             '3', 'низький', 
                        trim(u.value))) keep (dense_rank last order by u.chgdate) rizik_value
             from   customer c
             join   customerw_update u on u.rnk = c.rnk and
@@ -901,14 +789,14 @@ BEGIN
                                          u.chgaction in (1, 2) and
                                          trunc(u.chgdate) <= dat_
             where nvl(c.date_off, dat_+1) > dat_
-              and (   c.country  ='804'  and
+              and (   c.country  ='804'  and        
                                ( ltrim(c.okpo, '0') is null
                                       or ltrim(c.okpo,'0') is not null
-                                       and ltrim(c.okpo,'0') != OUR_OKPO_)
+                                       and ltrim(c.okpo,'0') != OUR_OKPO_)      
                    or c.country !='804' )
               and exists (select 1
                          from accounts a
-                         where a.nbs in (select r020
+                         where a.nbs in (select unique r020
                                          from   kl_f3_29
                                          where  kf='2F' and
                                                 ddd in ('100','101'))
@@ -925,26 +813,26 @@ BEGIN
            to_char(1) znap,
            rnk,
            trim(okpo) || '  ' || trim(nmk) nmk, nbuc_
-      from ( select c.rnk, c.nmk, c.okpo,
+      from ( select c.rnk, c.nmk, c.okpo, 
                     min(decode(trim(u.value), '1', 'низький',
-                                              '2', 'низький',
-                                              '3', 'низький',
+                                              '2', 'низький', 
+                                              '3', 'низький', 
                        trim(u.value))) keep (dense_rank last order by u.chgdate) rizik_value
                from customer c
                join     customerw_update u on
                            u.rnk = c.rnk
-                       and u.tag = 'RIZIK'
+                       and u.tag = 'RIZIK' 
                        and u.chgaction in (1, 2)
                        and trunc(u.chgdate) <= dat_
               where nvl(c.date_off, dat_+1) > dat_
-                and (   c.country  ='804'  and
+                and (   c.country  ='804'  and        
                                ( ltrim(c.okpo, '0') is null
                                       or ltrim(c.okpo,'0') is not null
-                                       and ltrim(c.okpo,'0') != OUR_OKPO_)
+                                       and ltrim(c.okpo,'0') != OUR_OKPO_)      
                      or c.country !='804' )
                 and exists (select 1
                               from accounts a
-                             where a.nbs in (select r020
+                             where a.nbs in (select unique r020
                                                from kl_f3_29
                                               where kf='2F'
                                                 and ddd in ('100','101'))
@@ -954,114 +842,75 @@ BEGIN
               group by c.rnk, c.okpo, c.nmk
            )
      where lower(trim(rizik_value)) like '%неприйнятно%в_сокий%';
-
+   
    logger.info ('P_F2F: part 1.2 '||to_char(dat_,'dd.mm.yyyy'));
-
---   insert /*-+APPPEND PARALLEL (2) */
---    into rnbu_trace(recid, kodp, znap, rnk, comm, nbuc)
---    select s_rnbu_record.nextval,
---           '3' ||
---               (case when lower(trim(rizik_value)) like '%низький%' then '104'
---                         when lower(trim(rizik_value)) like '%середн_й%' then '105'
---                         when lower(trim(rizik_value)) like '%високий%' then '106'
---                         when lower(trim(rizik_value)) like '%неприйнятно%в_сокий%' then '107'
---                         else '104'
---                    end) ||
---               '000'||
---               '000000000000' kodp,
---           to_char(1) znap,
---           rnk,
---           trim(okpo) || '  ' || trim(nmk) nmk,
---           nbuc_
---    from   (select c.rnk, c.nmk, c.okpo,
---                   min(decode(trim(u.value), '1', 'низький',
---                                             '2', 'низький',
---                                             '3', 'низький',
---                       trim(u.value))) keep (dense_rank last order by u.chgdate) rizik_value
---            from   customer c
---            join   customerw_update u on u.rnk = c.rnk and
---                                         u.tag = 'RIZIK' and
---                                         u.chgaction in (1, 2) and
---                                         trunc(u.chgdate) <= dat_
---            where nvl(c.date_off, dat_+1) > dat_  and
---              c.rnk not in (select rnk from rnbu_trace)
---              and exists (select 1
---                         from accounts a
---                         where a.nbs in (select r020
---                                         from   kl_f3_29
---                                         where  kf='2F' and
---                                                ddd = '101')
---                            and a.rnk = c.rnk
---                            and a.daos <= dat_
---                            and (a.dazs is null or a.dazs > dat_))
---            group by c.rnk, c.okpo, c.nmk);
-
+             
    -- дозаполненние RNK не вошедших в коды 104-108 (нет параметра RIZIK)
-   insert /*+APPEND PARALLEL (8) */
-   into rnbu_trace(recid, kodp, znap, rnk, comm, nbuc)
-   select s_rnbu_record.nextval,
+   insert /*+APPEND PARALLEL (8) */ 
+   into rnbu_trace(recid, kodp, znap, rnk, comm, nbuc)     
+   select s_rnbu_record.nextval, 
         '3'||decode( mfo_, 344443,'108','104' )||'000'||
-        '000000000000' kodp,
+        '000000000000' kodp, 
         to_char(cnt) znap, rnk, nmk, nbuc_
    from (
-         select c.rnk,
-                1 cnt,
-                trim(c.okpo) || '  ' || trim(c.nmk) nmk
+         select c.rnk, 
+                1 cnt, 
+                trim(c.okpo) || '  ' || trim(c.nmk) nmk      
          from customer c
          where nvl(c.date_off, dat_+1) > dat_
-           and (   c.country  ='804'  and
+           and (   c.country  ='804'  and       
                                ( ltrim(c.okpo, '0') is null
                                       or ltrim(c.okpo,'0') is not null
-                                       and ltrim(c.okpo,'0') != OUR_OKPO_)
+                                       and ltrim(c.okpo,'0') != OUR_OKPO_)      
                 or c.country !='804' )
            and c.rnk not in (select rnk from rnbu_trace
                              where substr(kodp, 1, 4) in ('3104','3105','3106',
                                                           '3107','3108')
-                            ) and
-               exists (select 1
-                       from accounts a
-                       where a.nbs in ( select r020
+                            ) and 
+               exists (select 1 
+                       from accounts a 
+                       where a.nbs in ( select unique r020 
                                           from kl_f3_29
-                                         where kf='2F'
+                                         where kf='2F' 
                                            and ddd in ('100','101') )
-                         and a.rnk = c.rnk
-                         and a.daos <= dat_
+                         and a.rnk = c.rnk 
+                         and a.daos <= dat_ 
                          and (a.dazs is null or a.dazs > dat_)
                       )
         );
 
    -- новый блок по формированию показателей 109, 110, 111
-   insert /*+APPEND PARALLEL (8) */
-   into rnbu_trace(recid, kodp, znap, rnk, comm, nbuc)
-   select s_rnbu_record.nextval,
+   insert /*+APPEND PARALLEL (8) */ 
+   into rnbu_trace(recid, kodp, znap, rnk, comm, nbuc)     
+   select s_rnbu_record.nextval, 
         '3'||pok||'00'||
-        '000000000000' kodp,
+        '000000000000' kodp, 
         to_char(cnt) znap, rnk, nmk, nbuc_
    from (
-       select c.rnk,
+       select c.rnk, 
             (case when c.custtype in (1,2) then '1091'
                   when c.custtype = 3 and NVL(trim(c.sed), '00') = '91' then '1112'
                   when c.custtype = 3 and NVL(trim(c.sed), '00') <> '91' then '1103'
                   else '1091'
              end) pok,
             1 cnt,
-            c.nmk nmk
+            c.nmk nmk      
        from customer c
        where nvl(c.date_off, dat_+1) > dat_
-         and (   c.country  ='804'  and
+         and (   c.country  ='804'  and       
                                ( ltrim(c.okpo, '0') is null
                                       or ltrim(c.okpo,'0') is not null
-                                       and ltrim(c.okpo,'0') != OUR_OKPO_)
+                                       and ltrim(c.okpo,'0') != OUR_OKPO_)      
               or c.country !='804' )
-         and exists (select 1
-                    from accounts a
-                    where a.nbs in ( select r020
+         and exists (select 1 
+                    from accounts a 
+                    where a.nbs in ( select unique r020 
                                      from kl_f3_29
                                      where kf='2F' and
                                            ddd in ('100','101') )
-                       and a.rnk = c.rnk
-                       and a.daos <= dat_
-                       and (a.dazs is null or a.dazs > dat_))
+                       and a.rnk = c.rnk 
+                       and a.daos <= dat_ 
+                       and (a.dazs is null or a.dazs > dat_))                       
        group by c.rnk,
             (case when c.custtype in (1,2) then '1091'
                   when c.custtype = 3 and NVL(trim(c.sed), '00') = '91' then '1112'
@@ -1069,100 +918,60 @@ BEGIN
                   else '1091'
              end), c.nmk);
 
---   объединено с вышестоящим блоком 4.08.16
---   insert /*+APPEND PARALLEL (8) */
---   into rnbu_trace(recid, kodp, znap, rnk, comm, nbuc)
---   select s_rnbu_record.nextval,
---        '3'||pok||'00'||
---        '000000000000' kodp,
---        to_char(cnt) znap, rnk, nmk, nbuc_
---	   from (
---       select c.rnk,
---            (case when c.custtype in (1,2) then '1091'
---                  when c.custtype = 3 and NVL(trim(c.sed), '00') = '91' then '1112'
---                  when c.custtype = 3 and NVL(trim(c.sed), '00') <> '91' then '1103'
---                  else '1091'
---             end) pok,
---            1 cnt,
---            c.nmk nmk
---       from customer c
---       where nvl(c.date_off, dat_+1) > dat_
---         and c.rnk not in ( select rnk from rnbu_trace
---                            where (kodp like '3109%' or
---                                   kodp like '3110%' or
---                                   kodp like '3111%')
---                          ) and
---            exists (select 1
---                    from accounts a
---                    where a.nbs in (select r020
---                                    from kl_f3_29
---                                    where kf='2F' and
---                                          ddd = '101'
---                                   )
---                       and a.rnk = c.rnk
---                       and a.daos <= dat_
---                       and (a.dazs is null or a.dazs > dat_))
---       group by c.rnk,
---            (case when c.custtype in (1,2) then '1091'
---                  when c.custtype = 3 and NVL(trim(c.sed), '00') = '91' then '1112'
---                  when c.custtype = 3 and NVL(trim(c.sed), '00') <> '91' then '1103'
---                  else '1091'
---             end), c.nmk);
-
    delete from tmp_nbu where datf = dat_ and kodf = kodf_;
-
+   
    INSERT INTO tmp_nbu(datf, kodf, kodp, znap, nbuc)
    select Dat_, kodf_, kodp, to_char(sum(to_number(znap))), nbuc
    from rnbu_trace
    where kodp like '3%'
-   group by kodp, nbuc;
+   group by kodp, nbuc; 
 
    logger.info ('P_F2F: part 1.3 '||to_char(dat_,'dd.mm.yyyy'));
-
+   
    ------  ДРУГА ЧАСТИНА
    -- показник 201 пасив кредитові обороти
    p_form_pok(1, '201', null, 2, 1);
 
+   logger.info ('P_F2F: part 1.4 '||to_char(dat_,'dd.mm.yyyy'));
+
    -- показник 201 пасив дебетові обороти
    p_form_pok(1, '201', null, 2, 0);
 
+   logger.info ('P_F2F: part 1.5 '||to_char(dat_,'dd.mm.yyyy'));
+
 -----------------------------------------
    -- блок для заміни коду країни для надходження (код 201)
-   for k in ( select /*+parallel (8)*/
-                     od.ref,
-                     NVL(substr(trim(w.value),1,3),'804') country,
-                     NVL(b.k044,'25') k044
-              from opldok od, accounts ad, opldok ok, accounts ak,
-                   zay_debt z, kl_k044N b, operw w
-              where od.fdat between dat1_-3 and dat_ and
-                    od.dk = 0 and
-                    od.sos = 5 and
-                    od.acc = ad.acc and
-                    ok.fdat between dat1_-3 and dat_ and
-                    od.ref = ok.ref and
-                    od.fdat = ok.fdat and
-                    od.stmt = ok.stmt and
-                    ok.dk = 1 and
-                    ok.sos = 5 and
-                    ok.acc = ak.acc and
-                    ad.nbs like '2603%' and
-                    ak.nbs like '2600%' and
-                    od.ref = z.refd and
-                    z.ref = w.ref(+) and
-                    w.tag like 'D6#70%'and
-                    substr(trim(w.value), 1, 3) = b.k040(+)
-            )
+    merge into rnbu_trace r 
+    using ( select /* leading(ad) */
+                         od.ref, 
+                         NVL(substr(trim(w.value),1,3),'804') country,
+                         NVL(b.k044,'25') k044
+                  from opldok od, accounts ad, opldok ok, accounts ak, 
+                       zay_debt z, kl_k044N b, operw w
+                  where od.fdat between dat1_-3 and dat_ and 
+                        od.dk = 0 and
+                        od.sos = 5 and
+                        od.acc = ad.acc and
+                        ok.fdat between dat1_-3 and dat_ and
+                        od.ref = ok.ref and
+                        od.fdat = ok.fdat and 
+                        od.stmt = ok.stmt and
+                        ok.dk = 1 and
+                        ok.sos = 5 and
+                        ok.acc = ak.acc and
+                        ad.nbs like '2603%' and
+                        ak.nbs like '2600%' and 
+                        od.ref = z.refd and 
+                        z.ref = w.ref(+) and
+                        w.tag like 'D6#70%'and 
+                        substr(trim(w.value), 1, 3) = b.k040(+) and
+                        NVL(substr(trim(w.value),1,3),'804') <> '804'
+                ) k
+    on (r.ref = k.ref)
+    when matched then update set r.kodp = substr(r.kodp,1,7) || '000' || k.k044 || k.country || substr(r.kodp,16)
+    where r.kodp like '1201%';
 
-       loop
-
-          if k.country <> '804'
-          then
-             update rnbu_trace r set
-                r.kodp = substr(r.kodp,1,7) || '000' || k.k044 || k.country || substr(r.kodp,16)
-             where r.kodp like '1201%' and r.ref = k.ref;
-          end if;
-
-       end loop;
+   logger.info ('P_F2F: part 1.6 '||to_char(dat_,'dd.mm.yyyy'));
 
    -- надходження з інших країн для 210 показника
    insert into rnbu_trace(RECID, USERID, NLS, KV, ODATE, KODP, ZNAP, NBUC, ISP, RNK, ACC, REF, COMM, ND, MDATE, TOBO)
@@ -1172,25 +981,29 @@ BEGIN
          isp = 1 and  -- (Кт обороти)
          kodp not like '1201________804%';
 
-   -- надходження з інших країн для 212 показника
+   logger.info ('P_F2F: part 1.7 '||to_char(dat_,'dd.mm.yyyy'));
+     
+   -- надходження з інших країн для 212 показника     
    insert into rnbu_trace(RECID, USERID, NLS, KV, ODATE, KODP, ZNAP, NBUC, ISP, RNK, ACC, REF, COMM, ND, MDATE, TOBO)
    select s_rnbu_record.nextval, USERID, NLS, KV, ODATE, '1212'||substr(KODP, 5, 14)||'1', ZNAP, NBUC, ISP, RNK, ACC, REF, COMM, ND, MDATE, TOBO
    from rnbu_trace
    where kodp like '1201%' and
-         isp = 1 and  -- (Кт обороти)
+         isp = 1 and  -- (Кт обороти) 
          kodp not like '1201________804%';
 
-   -- в межах України через коррахунки для 212 показника
+   logger.info ('P_F2F: part 1.8 '||to_char(dat_,'dd.mm.yyyy'));
+
+   -- в межах України через коррахунки для 212 показника       
    insert into rnbu_trace(RECID, USERID, NLS, KV, ODATE, KODP, ZNAP, NBUC, ISP, RNK, ACC, REF, COMM, ND, MDATE, TOBO)
-   select /*+leading(r)*/
+   select /*+ leading(r) index(p, PK_OPER) */
         s_rnbu_record.nextval, r.USERID, r.NLS, r.KV, r.ODATE,
-       '1212'||substr(KODP, 5, 14)||'1', r.ZNAP, r.NBUC, r.ISP, r.RNK, r.ACC, r.REF,
+       '1212'||substr(KODP, 5, 14)||'1', r.ZNAP, r.NBUC, r.ISP, r.RNK, r.ACC, r.REF, 
         r.COMM, r.ND, r.MDATE, r.TOBO
    from rnbu_trace r, oper p
    where r.kodp like '1201________804%'
      and r.isp = 1        -- (Кт обороти)
      and r.ref = p.ref
-     and p.pdat between dat1_ - 10 and dat_ + 10
+     and p.pdat between dat1_ - 10 and dat_ + 10 
      and (    p.mfoa <> p.mfob
            or mfo_ =344443  and  p.nlsa like '1500%'
            or mfo_ =300465  and  p.nlsa like '373980501061%'
@@ -1198,246 +1011,263 @@ BEGIN
 -----------------------------------------
 
    logger.info ('P_F2F: part 2.1 '||to_char(dat_,'dd.mm.yyyy'));
-
+   
    -- показник 202 актив дебетові обороти
    p_form_pok(1, '202', null, 1, 0);
-
+   
    logger.info ('P_F2F: part 2.2 '||to_char(dat_,'dd.mm.yyyy'));
 
    -- показник 204 пасив кредитові обороти
-   p_form_pok(2, '204', null, 2, 1);
+   p_form_pok(2, '204', null, 2, 1); 
 
    logger.info ('P_F2F: part 2.3 '||to_char(dat_,'dd.mm.yyyy'));
-
+   
    -- показник 205 пасив дебетові обороти
-   p_form_pok(2, '205', null, 2, 1);
+   p_form_pok(2, '205', null, 2, 1); 
 
    logger.info ('P_F2F: part 2.4 '||to_char(dat_,'dd.mm.yyyy'));
-
+     
    -- показник 206 актив дебетові обороти
    p_form_pok(2, '206', null, 1, 0);
 
    logger.info ('P_F2F: part 2.5 '||to_char(dat_,'dd.mm.yyyy'));
-
+   
    -- купівля - продаж готівкової валюти
-   INSERT /*+APPEND PARALLEL (8) */
-   INTO  rnbu_trace(recid, kodp, znap, acc, nls, kv, rnk, ref, comm, nbuc)
+   INSERT /*+APPEND */
+   INTO  rnbu_trace(recid, kodp, znap, acc, nls, kv, rnk, ref, comm, nbuc)    
    select s_rnbu_record.nextval, pok1||segm_E||
         (case when segm_KKK = '000' then obl_ else segm_KKK end)||
-        '10804'||segm_VVV||segm_H,
-        gl.p_icurval(kv, s, dat_), acc, nls, kv, rnk, ref,
+        '10804'||segm_VVV||segm_H, 
+        gl.p_icurval(kv, s, dat_), acc, nls, kv, rnk, ref, 
         comm, nbuc_
    from (
     select '1207'||'3'||
-        decode(NVL(c.country,'804'),'804','1','2')  pok1,
-        '2' segm_H,
-        decode((case when mfo_!=344443 and trim(r.risk_id) in (2, 3, 64) then '101'
+        decode(NVL(c.country,'804'),'804','1','2')  pok1, 
+        '2' segm_H, 
+        decode((case when mfo_!=344443 and trim(r.risk_id) in (2, 3, 64) then '101' 
                      when mfo_!=344443 and trim(r.risk_id) in (62, 65) then '102'
                      when mfo_!=344443 and trim(r.risk_id) in (63) then '103'
-                     when mfo_ =344443 and trim(r.risk_id) in (2, 3) then '101'
+                     when mfo_ =344443 and trim(r.risk_id) in (2, 3) then '101' 
                       else 'XXX'
-                 end),'101','1','102','2','103','3','4')  segm_E,
+                 end),'101','1','102','2','103','3','4')  segm_E, 
                  lpad(F_Codobl_branch(p.branch, 4),3,'0') segm_KKK,
                  lpad(a.kv, 3, '0') segm_VVV,
-                                  o.s, a1.acc, a1.nls, a1.kv, a1.rnk, p.ref,
+                                  o.s, a1.acc, a1.nls, a1.kv, a1.rnk, p.ref, 
                  p.dk||' '||p.nlsa||' '||p.nlsb||' '||p.nazn comm
     from opldok o, accounts a, opldok o1, accounts a1, customer c, customer_risk r, oper p
-    where o.fdat between dat1_ and dat_ and
+    where o.fdat between dat1_ and dat_ and 
         o.ref in (select ref from OTCN_TRACE_39 where datf between dat1_ and dat_) and
         o.acc = a.acc and
         a.nls like '3800%' and
         a1.rnk = c.rnk and
-        c.rnk = r.rnk(+) and
+        c.rnk = r.rnk(+) and 
         nvl(trim(r.risk_id(+)),0) in (2, 3, 62, 63, 64, 65) and
         o.ref = p.ref and
         p.pdat between dat1_ - 10 and dat_ + 10 and
         o1.fdat between dat1_ and dat_ and
         o.ref = o1.ref and
-        o.fdat = o1.fdat and
+        o.fdat = o1.fdat and 
         o.stmt = o1.stmt and
         o.dk <> o1.dk and
-        o1.acc = a1.acc);
-   commit;
+        o1.acc = a1.acc); 
+   commit;    
 
    logger.info ('P_F2F: part 2.6 '||to_char(dat_,'dd.mm.yyyy'));
-
+   
    -- купівля БЕЗготівкової валюти
-   INSERT /*+APPEND PARALLEL (8) */
-   INTO  rnbu_trace(recid, kodp, znap, acc, nls, kv, rnk, ref, comm, nbuc)
-   select s_rnbu_record.nextval,
+   INSERT /*+APPEND */ 
+   INTO  rnbu_trace(recid, kodp, znap, acc, nls, kv, rnk, ref, comm, nbuc)    
+   select s_rnbu_record.nextval, 
         pok1||segm_E||
         (case when segm_KKK = '000' then obl_ else segm_KKK end)||
-        '10804'||segm_VVV||segm_H,
-        decode(kv, 980, s, gl.p_icurval(kv, s, dat_)),
+        '10804'||segm_VVV||segm_H, 
+        decode(kv, 980, s, gl.p_icurval(kv, s, dat_)), 
         acc, nls, kv, rnk, ref, comm, nbuc_
     from (
     select '1208'||decode(c.custtype, 3, decode(NVL(trim(c.sed),'00'),'91','2','3'), '1')||
-        decode(NVL(c.country,'804'),'804','1','2')  pok1,
-        '1' segm_H,
-        decode((case when mfo_!=344443 and trim(r.risk_id) in (2, 3, 64) then '101'
+        decode(NVL(c.country,'804'),'804','1','2')  pok1, 
+        '1' segm_H, 
+        decode((case when mfo_!=344443 and trim(r.risk_id) in (2, 3, 64) then '101' 
                      when mfo_!=344443 and trim(r.risk_id) in (62, 65) then '102'
                      when mfo_!=344443 and trim(r.risk_id) in (63) then '103'
-                     when mfo_ =344443 and trim(r.risk_id) in (2, 3) then '101'
+                     when mfo_ =344443 and trim(r.risk_id) in (2, 3) then '101' 
                       else 'XXX'
-                 end),'101','1','102','2','103','3','4')  segm_E,
+                 end),'101','1','102','2','103','3','4')  segm_E, 
                  lpad(F_Codobl_branch(a.branch, 4),3,'0') segm_KKK,
                  lpad(a.kv_doc, 3, '0') segm_VVV,
-                 a.s, a.acc, a.nls, a.kv, a.rnk, a.ref, a.comm
+                 a.s, a.acc, a.nls, a.kv, a.rnk, a.ref, a.comm 
     from (
-    select od.ref, od.s, ak.acc, ak.nls, ak.kv, ak.rnk,
-        p.kv kv_doc, p.branch,
+    select /*+ leading(ad) */
+        od.ref, od.s, ak.acc, ak.nls, ak.kv, ak.rnk, 
+        p.kv kv_doc, p.branch, 
         p.dk||' '||p.nlsa||' '||p.nlsb||' '||p.kv||' '||p.kv2||' '||p.nazn comm
     from opldok od, accounts ad, opldok ok, accounts ak, oper p
-    where od.fdat between dat1_ and dat_ and
+    where od.fdat between dat1_ and dat_ and 
         od.dk = 0 and
         od.sos = 5 and
         od.acc = ad.acc and
         ok.fdat between dat1_ and dat_ and
         od.ref = ok.ref and
-        od.fdat = ok.fdat and
+        od.fdat = ok.fdat and 
         od.stmt = ok.stmt and
         ok.dk = 1 and
         ok.sos = 5 and
         ok.acc = ak.acc and
         od.ref = p.ref and
         ad.nbs = '2900' and
-        ak.nbs in ('1600', '1602', '2520', '2530',
-                   '2541', '2542', '2544', '2545',
+        ak.nbs in ('1600', '1602', '2520', '2530', 
+                   '2541', '2542', '2544', '2545', 
                    '2600', '2602', '2620', '2650') and
         p.kv not in (959, 961, 962, 964, 980) and
         p.pdat between dat1_ - 10 and dat_ + 10 and
         p.sos = 5 and
-        LOWER (TRIM (p.nazn)) not like '%конверс%' and
+        LOWER (TRIM (p.nazn)) not like '%конверс%' and 
         LOWER (TRIM (p.nazn)) not like '%конверт%' and
         LOWER (TRIM (p.nazn)) not like '%за рахунок _ншо_%'
-    ) a,
+    ) a, 
         customer c, customer_risk r
    where a.rnk = c.rnk and
-         c.rnk = r.rnk(+) and
+         c.rnk = r.rnk(+) and 
          nvl(trim(r.risk_id(+)),0) in (2, 3, 62, 63, 64, 65)
         );
 
    -- продаж БЕЗготівкової валюти
-   INSERT /*+APPEND PARALLEL (8) */
-   INTO  rnbu_trace(recid, kodp, znap, acc, nls, kv, rnk, ref, comm, nbuc)
-   select s_rnbu_record.nextval,
+   INSERT /*+APPEND */ 
+   INTO  rnbu_trace(recid, kodp, znap, acc, nls, kv, rnk, ref, comm, nbuc)    
+   select s_rnbu_record.nextval, 
         pok1||segm_E||
         (case when segm_KKK = '000' then obl_ else segm_KKK end)||
-        '10804'||segm_VVV||segm_H,
-        decode(kv, 980, s, gl.p_icurval(kv, s, dat_)),
+        '10804'||segm_VVV||segm_H, 
+        decode(kv, 980, s, gl.p_icurval(kv, s, dat_)), 
         acc, nls, kv, rnk, ref, comm, nbuc_
     from (
     select '1208'||decode(c.custtype, 3, decode(NVL(trim(c.sed),'00'),'91','2','3'), '1')||
-        decode(NVL(c.country,'804'),'804','1','2')  pok1,
-        '1' segm_H,
-        decode((case when mfo_!=344443 and trim(r.risk_id) in (2, 3, 64) then '101'
+        decode(NVL(c.country,'804'),'804','1','2')  pok1, 
+        '1' segm_H, 
+        decode((case when mfo_!=344443 and trim(r.risk_id) in (2, 3, 64) then '101' 
                      when mfo_!=344443 and trim(r.risk_id) in (62, 65) then '102'
                      when mfo_!=344443 and trim(r.risk_id) in (63) then '103'
-                     when mfo_ =344443 and trim(r.risk_id) in (2, 3) then '101'
+                     when mfo_ =344443 and trim(r.risk_id) in (2, 3) then '101' 
                       else 'XXX'
-                 end),'101','1','102','2','103','3','4')  segm_E,
+                 end),'101','1','102','2','103','3','4')  segm_E, 
                  lpad(F_Codobl_branch(a.branch, 4),3,'0') segm_KKK,
                  lpad(a.kv_doc, 3, '0') segm_VVV,
-                 a.s, a.acc, a.nls, a.kv, a.rnk, a.ref, a.comm
-    from (
-        select od.ref, od.s, ad.acc, ad.nls, p.kv, ad.rnk,
-        p.kv kv_doc, p.branch,
-        p.dk||' '||p.nlsa||' '||p.nlsb||' '||p.kv||' '||p.kv2||' '||p.nazn comm
-    from opldok od, accounts ad, opldok ok, accounts ak, oper p
-    where od.fdat between dat1_ and dat_ and
-        od.dk = 0 and
-        od.sos = 5 and
-        od.acc = ad.acc and
-        ok.fdat between dat1_ and dat_ and
-        od.ref = ok.ref and
-        od.fdat = ok.fdat and
-        od.stmt = ok.stmt and
-        ok.dk = 1 and
-        ok.sos = 5 and
-        ok.acc = ak.acc and
-        od.ref = p.ref and
-        (ad.nbs in ('1600', '1602', '2520', '2530',
-                    '2541', '2544', '2600', '2603',
-                    '2620', '2650', '3640','2062','2063','2072','2073')
-          and  ak.nbs = '2900' or
-        ad.nbs in ('2610', '2615' )   -- '2630','2635', '2620','2625'
-          and  ak.nbs = '3800') and
-        p.kv not in (959, 961, 962, 964, 980) and
-        p.pdat between dat1_ - 10 and dat_ + 10 and
-        p.sos = 5 and
-        LOWER (TRIM (p.nazn)) not like '%конверс%' and
-        LOWER (TRIM (p.nazn)) not like '%конверт%' and
-        LOWER (TRIM (p.nazn)) not like '%за рахунок _ншо_%') a,
-        customer c, customer_risk r
-   where a.rnk = c.rnk and
-         c.rnk = r.rnk(+) and
-         nvl(trim(r.risk_id(+)),0) in (2, 3, 62, 63, 64, 65)
-        );
+                 a.s, a.acc, a.nls, a.kv, a.rnk, a.ref, a.comm 
+    from (select /*+ leading(ak) */
+                od.ref, od.s, ad.acc, ad.nls, p.kv, ad.rnk, 
+                p.kv kv_doc, p.branch, 
+                p.dk||' '||p.nlsa||' '||p.nlsb||' '||p.kv||' '||p.kv2||' '||p.nazn comm
+            from opldok od, accounts ad, opldok ok, accounts ak, oper p
+            where od.fdat between dat1_ and dat_ and 
+                od.dk = 0 and
+                od.sos = 5 and
+                od.acc = ad.acc and
+                ok.fdat between dat1_ and dat_ and
+                od.ref = ok.ref and
+                od.fdat = ok.fdat and 
+                od.stmt = ok.stmt and
+                ok.dk = 1 and
+                ok.sos = 5 and
+                ok.acc = ak.acc and
+                od.ref = p.ref and
+                (ad.nbs in ('1600', '1602', '2520', '2530', 
+                            '2541', '2544', '2600', '2603',
+                            '2620', '2650', '3640',
+                            '2043','2063','2301','2303','2390' )
+                                      --'2062','2063','2072','2073') 
+                  and  ak.nbs = '2900' or
+                ad.nbs = '2610'
+                  and  ak.nbs = '3800') and
+                p.kv not in (959, 961, 962, 964, 980) and
+                p.pdat between dat1_ - 10 and dat_ + 10 and
+                p.sos = 5 and
+                LOWER (TRIM (p.nazn)) not like '%конверс%' and 
+                LOWER (TRIM (p.nazn)) not like '%конверт%' and
+                LOWER (TRIM (p.nazn)) not like '%за рахунок _ншо_%') a, 
+                customer c, customer_risk r
+           where a.rnk = c.rnk and
+                 c.rnk = r.rnk(+) and 
+                 nvl(trim(r.risk_id(+)),0) in (2, 3, 62, 63, 64, 65)
+                );
 
    logger.info ('P_F2F: part 2.7 '||to_char(dat_,'dd.mm.yyyy'));
 
    -- показник 211 пасив дебетові обороти
    p_form_pok(1, '211', null, 2, 0);
-
+   
    -- показник 213 актив дебетові обороти
-   p_form_pok(2, '001', null, 2, 1);
-   p_form_pok(2, '002', null, 1, 0);
+   p_form_pok(2, '001', null, 2, 1); 
+   p_form_pok(2, '002', null, 1, 0);  
 
    -- купівля готівкових металів
-   INSERT /*+APPEND PARALLEL (8) */
-   INTO  rnbu_trace(recid, kodp, znap, acc, nls, kv, rnk, ref, comm, nbuc)
+   INSERT /*+APPEND NOPARALLEL*/  
+   INTO  rnbu_trace(recid, kodp, znap, acc, nls, kv, rnk, ref, comm, nbuc)    
    select s_rnbu_record.nextval, pok1||segm_E||
         (case when segm_KKK = '000' then obl_ else segm_KKK end)||
-        '10804'||segm_VVV||segm_H,
-        gl.p_icurval(kv, s*100, dat_), acc, nls, kv, rnk, ref,
+        '10804'||segm_VVV||segm_H, 
+        gl.p_icurval(kv, s*100, dat_), acc, nls, kv, rnk, ref, 
         comm, nbuc_
    from (
     select '1214'||'3'||
-        '1'  pok1,   -- резидентность
-        '2' segm_H,
+        '1'  pok1,   -- резидентность 
+        '2' segm_H, 
         '4' segm_E,
         lpad(F_Codobl_branch(p.branch, 4),3,'0') segm_KKK,
         lpad(o.kv, 3, '0') segm_VVV,
-        o.s, o.accd acc, o.nlsd nls, o.kv, o.rnkd rnk, p.ref,
+        o.s, o.accd acc, o.nlsd nls, o.kv, o.rnkd rnk, p.ref, 
         p.dk||' '||p.nlsa||' '||p.nlsb||' '||p.nazn comm
     from provodki_otc o, oper p
     where o.fdat between dat1_ and dat_
-      and o.nlsd like '110%'   and o.ob22d ='01'
+      and o.ref = any (select o.ref
+                       from opldok o, accounts a
+                       where o.fdat between dat1_ and dat_ and
+                          o.dk = 0 and
+                          o.acc = a.acc and
+                          a.nls like '110%'   and 
+                          a.ob22 ='01'      )
+      and o.nlsd like '110%' and o.ob22d ='01'  
       and o.nlsk like '3800%'
       and o.ref = p.ref
       and substr(p.nlsa,1,3) in ('100','110')
       and substr(p.nlsb,1,3) in ('100','110')
-      and p.pdat between dat1_ - 10 and dat_ + 10);
-   commit;
+      and p.pdat between dat1_ - 10 and dat_ + 10); 
+   commit;    
 
    -- продаж готівкових металів
-   INSERT /*+APPEND PARALLEL (8) */
-   INTO  rnbu_trace(recid, kodp, znap, acc, nls, kv, rnk, ref, comm, nbuc)
+   INSERT /*+APPEND NOPARALLEL*/  
+   INTO  rnbu_trace(recid, kodp, znap, acc, nls, kv, rnk, ref, comm, nbuc)    
    select s_rnbu_record.nextval, pok1||segm_E||
         (case when segm_KKK = '000' then obl_ else segm_KKK end)||
-        '10804'||segm_VVV||segm_H,
-        gl.p_icurval(kv, s*100, dat_), acc, nls, kv, rnk, ref,
+        '10804'||segm_VVV||segm_H, 
+        gl.p_icurval(kv, s*100, dat_), acc, nls, kv, rnk, ref, 
         comm, nbuc_
    from (
     select '1214'||'3'||
-        '1'  pok1,   -- резидентность
-        '2' segm_H,
+        '1'  pok1,   -- резидентность 
+        '2' segm_H, 
         '4' segm_E,
         lpad(F_Codobl_branch(p.branch, 4),3,'0') segm_KKK,
         lpad(o.kv, 3, '0') segm_VVV,
-        o.s, o.accd acc, o.nlsd nls, o.kv, o.rnkd rnk, p.ref,
+        o.s, o.accd acc, o.nlsd nls, o.kv, o.rnkd rnk, p.ref, 
         p.dk||' '||p.nlsa||' '||p.nlsb||' '||p.nazn comm
     from provodki_otc o, oper p
     where o.fdat between dat1_ and dat_
       and o.nlsd like '3800%'
-      and o.nlsk like '110%'   and o.ob22k ='01'
+      and o.nlsk like '110%' and o.ob22k ='01'  
+      and o.ref = any (select o.ref
+                       from opldok o, accounts a
+                       where o.fdat between dat1_ and dat_ and
+                          o.dk = 1 and
+                          o.acc = a.acc and
+                          a.nls like '110%'   and 
+                          a.ob22 ='01'      )
       and o.ref = p.ref
       and substr(p.nlsa,1,3) in ('100','110')
       and substr(p.nlsb,1,3) in ('100','110')
-      and p.pdat between dat1_ - 10 and dat_ + 10);
-   commit;
+      and p.pdat between dat1_ - 10 and dat_ + 10); 
+   commit;    
 
-   -- изменение кода 201 на 215 (Кт обороты) или 216 (Дт обороты)
+   -- изменение кода 201 на 215 (Кт обороты) или 216 (Дт обороты) 
    update rnbu_trace set kodp = '1' || '215' || substr(kodp,5)
    where kodp like '1201%' and isp = 1;
 
@@ -1450,201 +1280,43 @@ BEGIN
 -- отбор проводок, удовлетворяющих условию
    -- переказ коштiв по мiжнароднiй системi переказу коштiв або отримання переказу
    -- переказ коштiв нерезидентам (отримання коштiв вiд нерезидентiв)
-
-   for k in (select fdat from fdat where fdat between Dat1_ AND Dat_ order by 1)
-   loop
-       cursor_sql := 'SELECT /*+parallel (8)*/ *
-                      FROM (SELECT k.d060, 1, o.ref, o.tt, o.fdat, o.acck, o.nlsk, o.kv,
-                                   o.accd, o.nlsd, o.s * 100 s_nom,
-                                   gl.p_icurval (o.kv, o.s * 100, o.fdat) s_eqv, 0 S_KOM,
-                                   o.nazn, o.branch
-                            FROM provodki_otc o, kl_fe9 k
-                            WHERE o.fdat = :dt_
-                              AND o.kv != 980
-                              AND o.nlsd LIKE k.nlsd || ''%''
-                              AND o.nlsk LIKE k.nlsk || ''%''
-                              AND decode(substr(o.nlsd,1,4),''2809'',o.OB22D,''2909'',o.OB22D,o.OB22K) = k.ob22
-                            UNION
-                            SELECT k.d060, 1, o.ref, o.tt, o.fdat, o.acck, o.nlsk, o.kv,
-                                   o.accd, o.nlsd, o.s * 100 s_nom,
-                                   gl.p_icurval (o.kv, o.s * 100, o.fdat) s_eqv, 0 S_KOM,
-                                   o.nazn, o.branch
-                            FROM provodki_otc o, kl_fe9 k
-                            WHERE o.fdat = :dt_
-                              AND o.kv = 980
-                              AND o.nlsd LIKE k.nlsd || ''%''
-                              AND (o.nlsk LIKE ''2809%'' OR o.nlsk LIKE ''2909%'' OR o.nlsk LIKE ''3739%'')
-                              AND ( (decode(substr(o.nlsk,1,4),''2909'',o.OB22K,o.OB22D) = k.ob22
-                                     AND k.ob22 in (''60'') and substr(o.nlsk,1,4) <> ''3739''
-                                    ) OR
-                                    (o.nlsk like ''3739%'' and trim(o.nlsk) = trim(k.nlsk) and o.OB22K = ''10''
-                                     AND o.tt not like ''R01%''
-                                     --AND (lower(o.nazn) like ''%виплачено%'' OR
-                                     --     lower(o.nazn) like ''%списання%''
-                                     --    )
-                                    ) OR
-                                    (o.nlsk like ''2809%'' and o.OB22K = ''24'')
-                                  )
-                           )';
-
-
-       OPEN cur_temp FOR cursor_sql USING k.fdat, k.fdat;
-       LOOP
-           FETCH cur_temp BULK COLLECT INTO l_temp_rec LIMIT 10000;
-           EXIT WHEN l_temp_rec.count = 0;
-
-           FORALL i IN 1 .. l_temp_rec.COUNT
-              insert /*+ append */ into OTCN_PROV_TEMP
-              values l_temp_rec(i);
-
-           l_temp_rec.delete;
-       end loop;
-       CLOSE cur_temp;
-       commit;
-   end loop;
-
-   -- удаление типов проводок по кл-ру KL_FE9
-   for k in (select o.ref REF, trim(o.nlsd) NLSD, trim(o.nlsk) NLSK,
-                    trim(f.tt) TT, f.pr_del PR_DEL
-             from otcn_prov_temp o, kl_fe9 f
-             where substr(trim(o.nlsd),1,length(trim(f.nlsd))) = trim(f.nlsd)
-               and substr(trim(o.nlsk),1,length(trim(f.nlsk))) = trim(f.nlsk)
-               and NVL(trim(f.tt),o.tt) = o.tt
-               and f.pr_del = 0)
-      loop
-
-          DELETE FROM OTCN_PROV_TEMP
-          WHERE ref = k.ref;
-
-      end loop;
-
-   -- удаление док-тов принятых в предыдущем месяце и проведенных в первых числах отчетного месяца
-   if mfou_ = 300465 then
-      DELETE FROM otcn_prov_temp
-      WHERE ref in ( select o.ref
-                     from otcn_prov_temp o, oper p
-                     where o.fdat >= dat1_  --one_day_  --dat1_
-                       and o.ref = p.ref
-                       and p.pdat < dat1_
-                       and to_char(p.pdat,'MM') != to_char(dat1_,'MM'));  --(p.pdat < dat1_ or p.datd < dat1_) );
-   end if;
-
-   -- удаление проводок для проводок Дт 2909 Кт 2909 и OB22 != '60'
-   -- 31.03.2016 поменял для OB22 со значения 24 на 60
-   for k in (select o.ref REF, trim(o.nlsd) NLSD, trim(o.nlsk) NLSK,
-                    NVL(trim(s.ob22),'00') OB22
-             from otcn_prov_temp o, specparam_int s
-             where o.nlsd LIKE '2909%'
-               and o.nlsk LIKE '2909%'
-               and o.acck = s.acc(+) )
-      loop
-
-          if k.ob22 != '60' then
-             DELETE FROM OTCN_PROV_TEMP
-             WHERE ref = k.ref;
-          end if;
-
-          if k.nlsd like '29091030046500%' and k.nlsk like '29094030046530%'
-          then
-             DELETE FROM OTCN_PROV_TEMP
-             WHERE ref = k.ref;
-          end if;
-
-      end loop;
-
-   -- удаление проводок для проводок Дт 2809 Кт 2909 и OB22 = '75'
-   for k in ( select o.ref REF, trim(o.nlsd) NLSD, trim(o.nlsk) NLSK,
-                     o.s_nom S_NOM, NVL(trim(s.ob22),'00') OB22
-              from otcn_prov_temp o, specparam_int s
-              where o.nlsd LIKE '2809%'
-                and o.nlsk LIKE '2909%'
-                and o.acck = s.acc(+)
-                and nvl(s.ob22,'00') = '75'
-            )
-      loop
-
-          DELETE FROM OTCN_PROV_TEMP
-          WHERE ref = k.ref and s_nom = k.s_nom and
-                trim(nlsd) = k.nlsd and trim(nlsk) = k.nlsk;
-
-      end loop;
-
-   -- удаление проводок с назначением платежа "Повернення переказу"
-   -- для проводок Дт 2909 Кт 100*
-   for k in ( select o.ref, o.fdat, trim(o.nlsd) NLSD, trim(o.nlsk) NLSK, o.s_nom
-              from otcn_prov_temp o
-              where o.nlsd LIKE '2909%'
-                and o.nlsk LIKE '100%'
-                and LOWER(o.nazn) like '%повернення переказу%'
-            )
-      loop
-
-          DELETE FROM OTCN_PROV_TEMP
-          WHERE nlsk like k.nlsd||'%'
-            and nlsd like k.nlsk||'%'
-            and s_nom = k.s_nom
-            and to_char(fdat,'Q') = to_char(k.fdat,'Q');
-
-          DELETE FROM OTCN_PROV_TEMP
-          WHERE ref = k.ref;
-
-      end loop;
-
-   -- удаление сторнированных проводок
-   DELETE FROM otcn_prov_temp
-   WHERE ref in ( select o.ref
-                  from otcn_prov_temp o, oper p
-                  where o.ref = p.ref
-                    and p.sos <> 5);
-
-   logger.info ('P_F2F: part 2.9 '||to_char(dat_,'dd.mm.yyyy'));
-
-   if mfou_ = 300465 then
-      -- анулювання відкликання переказів в IВ
-      for k in ( select o.ref REF, o.nlsd, o.nlsk, o.fdat
-                 from otcn_prov_temp o
-                 where (o.nlsd LIKE '2809%' OR o.nlsd like '2909%')
-                   and o.nlsk LIKE '100%'
-                   and o.tt in ('M37','MMV','CN3','CN4') )
-      loop
-         begin
-            select trim(w.value),
-               to_date(substr(replace(replace(trim(w1.value), ',','/'),'.','/'),1,10), 'dd/mm/yyyy')
-            into ref_m37, dat_m37
-            from operw w, operw w1
-            where w.ref = k.ref
-              and (w.tag like 'D_REF%' or w.tag like 'REFT%')
-              and w1.ref = k.ref
-              and (w1.tag like 'D_1PB%' or w1.tag like 'DATT%');
-
-            if to_char(k.fdat,'Q') = to_char(dat_m37,'Q') then
-               delete from otcn_prov_temp
-               where ref in (k.ref, ref_m37);
-            end if;
-         EXCEPTION
-            WHEN NO_DATA_FOUND THEN
-                null;
-            when others then
-                raise_application_error(-20000, 'Помилка для РЕФ = '||to_char(k.ref)||
-                                        ': перевірте доп.реквізити D_1PB(DATT) та D_REF(REFT)! '||sqlerrm);
-         end;
-      end loop;
-   end if;
-
-   -- для Запорожья 313957 убираем операции I00, I05
-   if mfo_ = 313957 then
-      delete from otcn_prov_temp
-      where tt in ('I00', 'I05');
-   end if;
-
+   INSERT INTO OTCN_PROV_TEMP
+   (ko, rnk, fdat, REF, tt, accd, nlsd, kv, acck, nlsk, s_nom, s_eqv, s_kom, nazn, branch)
+   select /*+ FULL(k) LEADING(k ad) */
+           k.d060, 1, od.fdat, od.ref, od.tt, 
+           ad.acc accd, ad.nls nlsd, ad.kv, ak.acc acck, ak.nls nlsk, od.s  s_nom,
+           gl.p_icurval (ad.kv, od.s, od.fdat) s_eqv, 
+           0 S_KOM, p.nazn, p.branch
+    from opldok od, accounts ad, kl_fe9 k, opldok ok, accounts ak, oper p
+    where od.fdat between dat1_ and dat_ and
+          od.acc = ad.acc and
+          od.DK = 0 and
+          ad.nls LIKE k.nlsd || '%' and
+          od.ref = ok.ref and
+          od.stmt = ok.stmt and
+          ok.fdat between dat1_ and dat_ and
+          ok.acc = ak.acc and
+          ok.DK = 1 and
+          ak.nls LIKE k.nlsk || '%' and
+          (regexp_like(ad.NLS,'^((2809)|(2909))') and ad.OB22 = k.ob22 or
+           regexp_like(ak.NLS,'^((2809)|(2909))') and ak.OB22 = k.ob22) and
+          od.tt NOT IN ('C55', 'C56', 'C57', 'CNC') and
+          nvl(K.PR_DEL, 1) <> 0 and
+          not (ad.NLS like '2909%' and ak.NLS like '2909%' and ak.ob22 <> '60') and
+          not (ad.NLS  like '29091030046500%' and ak.NLS  like '29094030046530%') and 
+          not (substr(ad.NLS,1,4) = substr(ak.NLS,1,4) and ad.ob22 = ak.ob22 and lower(p.nazn) like '%перенес%') and
+          od.ref = p.ref and 
+          lower(p.nazn) not like '%western%' and
+          p.sos = 5;    
+   
    -- переказ коштiв по мiжнароднiй системi переказу коштiв або отримання переказу
-   for z in ( SELECT t.ko, t.fdat, t.REF, t.TT, t.accd, t.nlsd, t.kv,
-                     t.acck, t.nlsk, max(t.s_nom) sum0, max(t.s_eqv) sum1,
+   for z in ( SELECT t.ko, t.fdat, t.REF, t.TT, t.accd, t.nlsd, t.kv, 
+                     t.acck, t.nlsk, max(t.s_nom) sum0, max(t.s_eqv) sum1, 
                      t.nazn, t.branch
-              FROM OTCN_PROV_TEMP t
+              FROM OTCN_PROV_TEMP t  
               WHERE t.nlsd is not null
                 and t.nlsk is not null
-              GROUP BY t.ko, t.fdat, t.REF, t.TT, t.accd, t.nlsd, t.kv,
+              GROUP BY t.ko, t.fdat, t.REF, t.TT, t.accd, t.nlsd, t.kv, 
                        t.acck, t.nlsk, t.nazn, t.branch
             )
 
@@ -1669,18 +1341,6 @@ BEGIN
             nls1_ := z.nlsk;
          end if;
 
-         --comm_ := 'код країни отримувача(вiдправника) '||'XXX';
-
-         --kodp_ := '1' || '217' || '3' || '1' || 'X' || '026' || '10' ||
-         --               '804' || lpad(to_char(z.kv),3,'0') || '1';
-
-         -- запис показника суми
-         --INSERT INTO rnbu_trace
-         --   (recid, nls, kv, odate, kodp, znap, nbuc, ref, comm, tobo)
-         --VALUES
-         --   (s_rnbu_record.nextval, nls1_, z.kv, z.fdat, kodp_, to_char(z.sum1), nbuc_, z.ref, comm_, nbuc_);
-
-
          if d060_ = '11' and z.nlsd like '2909%' then
             BEGIN
                select ob22
@@ -1697,10 +1357,10 @@ BEGIN
                select substr(nlsd,1,4), NVL(ob22d,'00')
                  into  nbs_k, ob22_k
                from provodki_otc
-               where ref = z.ref
-                 and fdat = z.fdat
-                 and acck = z.accd
-                 and nlsd LIKE '2809%'
+               where ref = z.ref  
+                 and fdat = z.fdat 
+                 and acck = z.accd  
+                 and nlsd LIKE '2809%' 
                  and rownum = 1;
 
                BEGIN
@@ -1785,7 +1445,7 @@ BEGIN
                   select max(substr(trim(k.value),1,3))
                   into kod_g_pb1
                   from operw k
-                  where ref = z.ref
+                  where ref = z.ref 
                     and tag = 'KOD_G';
                exception
                   when others then kod_g_pb1 := null;
@@ -1802,10 +1462,10 @@ BEGIN
                D1#E9_ := LPAD (kod_g_, 3, '0');
             end if;
 
-            if d060_ = '42' AND D1#E9_ ='000'
+            if d060_ = '42' AND D1#E9_ ='000' 
             then
                D1#E9_ := '804';
-            end if;
+            end if; 
 
             comm_ := 'код країни отримувача(вiдправника) '||d1#e9_;
             d2#e9_ := '804';
@@ -1830,21 +1490,15 @@ BEGIN
                if z.nlsk like '100%'
                then
                   d110_ := '2';
-               else
+               else 
                   d110_ := '1';
                end if;
-
-               --01.04.2016
-               --if d060_ = '42' then
-               --   kkk_ := ppp_ ;
-               --   ppp_ := '000';
-               --end if;
-
+            
                kodp_ := '1'|| '219' || '3' || '1' || '4' || kkk_ || K044_ ||
                         ppp_ || lpad(to_char(z.kv),3,'0') || d110_;
             else
-               if (z.nlsd like '100%' or z.nlsd like '262%') and
-                  (z.nlsk like '2809%' or z.nlsk like '2909%')
+               if (z.nlsd like '100%' or z.nlsd like '262%') and 
+                  (z.nlsk like '2809%' or z.nlsk like '2909%') 
                then
                   d2#e9_ := '804';
                end if;
@@ -1858,11 +1512,11 @@ BEGIN
                if z.nlsd like '100%'
                then
                   d110_ := '2';
-               else
+               else 
                   d110_ := '1';
                end if;
-
-               if z.nlsd like '100%'
+  
+               if z.nlsd like '100%' 
                then
                   kodp_ := '1'|| '217' || '3' || '1' || '4' || kkk_ || K044_ ||
                            ppp_ || lpad(to_char(z.kv),3,'0') || d110_;
@@ -1881,206 +1535,205 @@ BEGIN
 
    end loop;
    commit;
----------
-logger.info ('P_F2F: part 2.10 '||to_char(dat_,'dd.mm.yyyy'));
+   
+   ---------
+   logger.info ('P_F2F: part 2.10 '||to_char(dat_,'dd.mm.yyyy'));
 
-------------------------------------------------------------------
-if mfo_ = 300465
-then
+    ------------------------------------------------------------------
+    if mfo_ = 300465
+    then
 
-   EXECUTE IMMEDIATE 'TRUNCATE TABLE KOR_PROV';
+       EXECUTE IMMEDIATE 'TRUNCATE TABLE KOR_PROV';
 
--- фоормирование кодов 218, 220
-   insert /*+ APPEND parallel (8)*/ into KOR_PROV (REF, DK, ACC, S, FDAT)
-           select ref, dk, acc, s, fdat
-           from opldok o
-           where o.fdat between dat1_ and dat_
-             and o.acc in ( select a.acc
-                            from accounts a, customer c
-                            where a.nls like '1600%'
-                              and a.rnk = c.rnk
-                              and c.codcagent = '2'
-                          ) and
-                 o.sos = 5;
-           commit;
-
-           delete from kor_prov k1
-           where k1.ref in
-                   ( select ref from kor_prov k2
-                      where 0 = ( select count( * )
-                                    from provodki_otc
-                                   where fdat= k2.fdat
-                                     and ref = k2.ref
-                                     and (  k2.dk =0 and nlsk like '3739%'
-                                                     and nlsd like '26%'
-                                        or  k2.dk =1 and nlsd like '3720%' )
-                                )
-                   );
-
-
-           insert /*+APPEND PARALLEL (8) */ into OTCN_OPERW
-           select *
-           from (select ref, max(trim(translate(
-                       (case when instr(upper(value), 'UKRAINE') > 0 or
-                                   instr(upper(value), 'UKR') > 0 or
-                                   substr (trim (value), 1, 3) = '/UA'
-                              then '804'
-                              else trim(value)
-                        end), '1234567890OPОП', '1234567890'))) country
-                from operw
-                where ref in (select ref from KOR_PROV) and
-                    (tag LIKE 'n%' or
-                     tag LIKE 'D6#7%' or
-                     tag LIKE 'D6#E2%' or
-                     tag LIKE 'D1#E9%' or
-                     tag LIKE 'F1%' or
-                     tag = 'KOD_G' or
-                     tag LIKE '59%')
-                    group by ref)
-            where country in (select to_char(country) from country);
-            commit;
-
-            INSERT /*+APPEND PARALLEL (8) */
-            INTO  rnbu_trace(recid, kodp, znap, acc, nls, kv, rnk, ref, comm, nbuc, isp)
-            select /*+leading(a.o)*/
-                s_rnbu_record.nextval,
-                pok1 || pok2  ||
-                pok3 || segm_E||
-                (case when segm_KKK = '000' and segm_MMM = '804' then obl_
-                      when segm_MMM <> '804' then '000'
-                      else segm_KKK end)||
-                nvl(b.k044, '25')||segm_MMM||segm_VVV||segm_H,
-                gl.p_icurval(kv, s, dat_), acc, nls, kv, rnk, ref, comm, nbuc_, 1
-            from (select '1'||'218' pok1,
-                    '1' pok2,
-                    '1' pok3,
-                    (case when substr(decode(p.dk, '1', nlsa, nlsb), 1, 3) = '100' and
-                               NVL(w.value,'804') = '804'
-                            then '2'
-                            else '1'
-                    end) segm_H,
-                    '4' segm_E,
-                    lpad(F_Codobl_branch(p.branch, 4),3,'0') segm_KKK,
-                    lpad(a.kv, 3, '0') segm_VVV,
-                    decode(substr(p.nlsb,1,4),'2900','804',lpad(NVL(w.value,'804'), 3, '0')) segm_MMM,
-                    o.s, a.acc, a.nls, a.kv, a.rnk, p.ref,
-                    p.dk||' '||p.nlsa||' '||p.nlsb||' '||p.nazn comm
-                from kor_prov o, accounts a, customer c, oper p, otcn_operw w
-                where o.acc = a.acc and
-                    o.dk = 1 and
-                    a.rnk = c.rnk and
-                    --o.dk = p_dk and
-                    p.sos = 5 and
-                    o.ref = p.ref and
-                    p.pdat between dat1_ - 10 and dat_ + 10 and
-                    o.ref = w.ref(+)) a, KL_K044N b
-           where a.segm_MMM = b.k040(+);
-           commit;
-
-            INSERT /*+APPEND PARALLEL (8) */
-            INTO  rnbu_trace(recid, kodp, znap, acc, nls, kv, rnk, ref, comm, nbuc, isp)
-            select /*+ leading(a.o)*/
-                s_rnbu_record.nextval,
-                pok1 || pok2  ||
-                pok3 || segm_E||
-                (case when segm_KKK = '000' and segm_MMM = '804' then obl_
-                      when segm_MMM <> '804' then '000'
-                      else segm_KKK end)||
-                nvl(b.k044, '25')||segm_MMM||segm_VVV||segm_H,
-                gl.p_icurval(kv, s, dat_), acc, nls, kv, rnk, ref, comm, nbuc_, 0
-            from (select '1'||'220' pok1,
-                    (case when lower(p.nam_b) like '%ФОП%фоп%' then '2'
-                                  else '1' end) pok2,
-                    '1' pok3,
-                    (case when substr(decode(p.dk, 0, nlsa, nlsb), 1, 3) = '100' and
-                               NVL(w.value,'804') = '804'
-                            then '2'
-                            else '1'
-                    end) segm_H,
-                    '4' segm_E,
-                    lpad(F_Codobl_branch(p.branch, 4),3,'0') segm_KKK,
-                    lpad(a.kv, 3, '0') segm_VVV,
-                    decode(substr(p.nlsb,1,4),'2900','804',lpad(NVL(w.value,'804'), 3, '0')) segm_MMM,
-                    o.s, a.acc, a.nls, a.kv, a.rnk, p.ref,
-                    p.dk||' '||p.nlsa||' '||p.nlsb||' '||p.nazn comm
-                from kor_prov o, accounts a, customer c, oper p, otcn_operw w
-                where o.acc = a.acc and
-                    o.dk = 0 and
-                    a.rnk = c.rnk and
-                    --o.dk = p_dk and
-                    p.sos = 5 and
-                    o.ref = p.ref and
-                    p.pdat between dat1_ - 10 and dat_ + 10 and
-                    o.ref = w.ref(+)) a, KL_K044N b
-           where a.segm_MMM = b.k040(+);
-           commit;
+    -- фоормирование кодов 218, 220
+       insert into KOR_PROV (REF, DK, ACC, S, FDAT)
+               select ref, dk, acc, s, fdat
+               from opldok o
+               where o.fdat between dat1_ and dat_ 
+                 and o.acc in ( select a.acc 
+                                from accounts a, customer c
+                                where a.nls like '1600%'
+                                  and a.rnk = c.rnk
+                                  and c.codcagent = '2'
+                              ) and
+                     o.sos = 5; 
+               commit;
+               
+               delete from kor_prov k1
+               where k1.ref in
+                       ( select ref from kor_prov k2
+                          where 0 = ( select count( * )
+                                        from provodki_otc
+                                       where fdat= k2.fdat
+                                         and ref = k2.ref
+                                         and (  k2.dk =0 and nlsk like '3739%'
+                                                         and nlsd like '26%' 
+                                            or  k2.dk =1 and nlsd like '3720%' )
+                                    )
+                       );
 
 
---     код 220 - платежи по корсчету
-           INSERT /*+APPEND PARALLEL (8) */
-             INTO  rnbu_trace(recid, kodp, znap, acc, nls, kv, rnk, ref, comm, nbuc, isp)
-           select /*+ leading(a.o)*/
-                  s_rnbu_record.nextval,
-                  pok1 || pok2  || pok3 || segm_E||
-                 (case when segm_KKK = '000' and segm_MMM = '804' then obl_
-                       when segm_MMM <> '804' then '000'
-                        else segm_KKK end)||
-                  nvl(b.k044, '25')||segm_MMM||segm_VVV||segm_H,
-                  gl.p_icurval(kv, s, dat_), acc, nls, kv, rnk, ref, comm, nbuc_, 0
-             from ( select '1'||'220' pok1,
-                           '1' pok2, '1' pok3, '1' segm_H, '4' segm_E,
-                           lpad(F_Codobl_branch(op.branch, 4),3,'0') segm_KKK,
-                           lpad(a.kv, 3, '0') segm_VVV,
-                           lpad(NVL(op.kod_g,'804'), 3, '0') segm_MMM,
-                           o.s, a.acc, a.nls, a.kv, a.rnk, op.ref,
-                           op.dk||' '||op.nlsa||' '||op.nlsb||' '||op.nazn comm
-                      from accounts a, customer c, opldok o,
-                           ( select substr(v1.value,1,3) kod_g,
-                                    o.ref, o.tt, o.nd, o.pdat, o.kv, o.dk, o.s, o.sq,
-                                    o.nam_a, o.nlsa, o.mfoa, o.id_a, o.nam_b, o.nlsb, o.mfob, o.id_b,
-                                    o.nazn, o.id_o, o.sos, o.s2, o.kv2, o.branch
-                              from operw v1, operw v2, operw v3,
-                                   oper o
-                             where o.nlsa like '1500%'
-                               and o.nlsb like '1600%'
-                               and o.sos = '5'
-                               and o.mfoa = o.mfob
---   and o.pdat between to_date('20160801','yyyymmdd')
---                  and to_date('20160831','yyyymmdd')
-                                 and o.pdat between dat1_ and dat_
-                                 and v1.tag(+) = 'KOD_G'
-                                 and v1.value(+) != '804'
-                                 and trim(v1.value(+)) is not null
-                                 and v1.ref (+)= o.ref
-                               and v2.tag = 'KOD_N'
-                               and v2.value not in ( '8424010','8442001' )
-                               and v2.value not like '8445%'
-                               and v2.value not like '8443%'
-                               and trim(v2.value) is not null
-                               and v2.ref = o.ref
-                                 and v3.tag(+) = 'KOD_B'
-                                 and v3.value(+) != '6'
-                                 and trim(v3.value(+)) is not null
-                                 and v3.ref(+) = o.ref
-                           ) op
-                     where op.ref = o.ref
-                       and o.dk = 0
-                       and o.acc = a.acc
-                       and a.rnk = c.rnk
-                  ) a, kl_k044N b
-            where a.segm_MMM = b.k040(+);
-            commit;
+               insert into OTCN_OPERW
+               select *
+               from (select ref, max(trim(translate(
+                           (case when instr(upper(value), 'UKRAINE') > 0 or
+                                       instr(upper(value), 'UKR') > 0 or
+                                       substr (trim (value), 1, 3) = '/UA' 
+                                  then '804'
+                                  else trim(value) 
+                            end), '1234567890OPОП', '1234567890'))) country
+                    from operw
+                    where ref in (select ref from KOR_PROV) and
+                        (tag LIKE 'n%' or 
+                         tag LIKE 'D6#7%' or 
+                         tag LIKE 'D6#E2%' or
+                         tag LIKE 'D1#E9%' or 
+                         tag LIKE 'F1%' or
+                         tag = 'KOD_G' or
+                         tag LIKE '59%')
+                        group by ref)
+                where country in (select to_char(country) from country);      
+                commit;      
+
+                INSERT INTO rnbu_trace(recid, kodp, znap, acc, nls, kv, rnk, ref, comm, nbuc, isp)    
+                select /*+leading(a.o)*/
+                    s_rnbu_record.nextval, 
+                    pok1 || pok2  || 
+                    pok3 || segm_E||
+                    (case when segm_KKK = '000' and segm_MMM = '804' then obl_ 
+                          when segm_MMM <> '804' then '000'
+                          else segm_KKK end)||
+                    nvl(b.k044, '25')||segm_MMM||segm_VVV||segm_H, 
+                    gl.p_icurval(kv, s, dat_), acc, nls, kv, rnk, ref, comm, nbuc_, 1 
+                from (select '1'||'218' pok1,  
+                        '1' pok2,
+                        '1' pok3, 
+                        (case when substr(decode(p.dk, '1', nlsa, nlsb), 1, 3) = '100' and 
+                                   NVL(w.value,'804') = '804' 
+                                then '2' 
+                                else '1'
+                        end) segm_H, 
+                        '4' segm_E, 
+                        lpad(F_Codobl_branch(p.branch, 4),3,'0') segm_KKK,
+                        lpad(a.kv, 3, '0') segm_VVV,
+                        decode(substr(p.nlsb,1,4),'2900','804',lpad(NVL(w.value,'804'), 3, '0')) segm_MMM,
+                        o.s, a.acc, a.nls, a.kv, a.rnk, p.ref, 
+                        p.dk||' '||p.nlsa||' '||p.nlsb||' '||p.nazn comm
+                    from kor_prov o, accounts a, customer c, oper p, otcn_operw w
+                    where o.acc = a.acc and
+                        o.dk = 1 and 
+                        a.rnk = c.rnk and
+                        --o.dk = p_dk and
+                        p.sos = 5 and
+                        o.ref = p.ref and
+                        p.pdat between dat1_ - 10 and dat_ + 10 and
+                        o.ref = w.ref(+)) a, KL_K044N b
+               where a.segm_MMM = b.k040(+);
+               commit;
+
+                INSERT INTO  rnbu_trace(recid, kodp, znap, acc, nls, kv, rnk, ref, comm, nbuc, isp)    
+                select /*+ leading(a.o)*/
+                    s_rnbu_record.nextval, 
+                    pok1 || pok2  || 
+                    pok3 || segm_E||
+                    (case when segm_KKK = '000' and segm_MMM = '804' then obl_ 
+                          when segm_MMM <> '804' then '000'
+                          else segm_KKK end)||
+                    nvl(b.k044, '25')||segm_MMM||segm_VVV||segm_H, 
+                    gl.p_icurval(kv, s, dat_), acc, nls, kv, rnk, ref, comm, nbuc_, 0 
+                from (select '1'||'220' pok1,  
+                        (case when lower(p.nam_b) like '%ФОП%фоп%' then '2' 
+                                      else '1' end) pok2,
+                        '1' pok3, 
+                        (case when substr(decode(p.dk, 0, nlsa, nlsb), 1, 3) = '100' and 
+                                   NVL(w.value,'804') = '804' 
+                                then '2' 
+                                else '1'
+                        end) segm_H, 
+                        '4' segm_E, 
+                        lpad(F_Codobl_branch(p.branch, 4),3,'0') segm_KKK,
+                        lpad(a.kv, 3, '0') segm_VVV,
+                        decode(substr(p.nlsb,1,4),'2900','804',lpad(NVL(w.value,'804'), 3, '0')) segm_MMM,
+                        o.s, a.acc, a.nls, a.kv, a.rnk, p.ref, 
+                        p.dk||' '||p.nlsa||' '||p.nlsb||' '||p.nazn comm
+                    from kor_prov o, accounts a, customer c, oper p, otcn_operw w
+                    where o.acc = a.acc and
+                        o.dk = 0 and 
+                        a.rnk = c.rnk and
+                        --o.dk = p_dk and
+                        p.sos = 5 and
+                        o.ref = p.ref and
+                        p.pdat between dat1_ - 10 and dat_ + 10 and
+                        o.ref = w.ref(+)) a, KL_K044N b
+               where a.segm_MMM = b.k040(+);
+               commit;
+
+               --     код 220 - платежи по корсчету
+               INSERT  INTO  rnbu_trace(recid, kodp, znap, acc, nls, kv, rnk, ref, comm, nbuc, isp)    
+               select s_rnbu_record.nextval, 
+                      pok1 || pok2  || pok3 || segm_E||
+                     (case when segm_KKK = '000' and segm_MMM = '804' then obl_ 
+                           when segm_MMM <> '804' then '000'
+                            else segm_KKK end)||
+                      nvl(b.k044, '25')||segm_MMM||segm_VVV||segm_H, 
+                      gl.p_icurval(kv, s, dat_), acc, nls, kv, rnk, ref, comm, nbuc_, 0 
+                 from ( select '1'||'220' pok1,
+                               '1' pok2, '1' pok3, '1' segm_H, '4' segm_E,
+                               lpad(F_Codobl_branch(op.branch, 4),3,'0') segm_KKK,
+                               lpad(a.kv, 3, '0') segm_VVV,
+                               lpad(NVL(op.kod_g,'804'), 3, '0') segm_MMM,
+                               o.s, a.acc, a.nls, a.kv, a.rnk, op.ref, 
+                               op.dk||' '||op.nlsa||' '||op.nlsb||' '||op.nazn comm
+                          from accounts a, customer c, opldok o,
+                               (select substr(v1.value,1,3) kod_g,
+                                        o.ref, o.tt, o.nd, o.pdat, o.kv, o.dk, o.s, o.sq, 
+                                        o.nam_a, o.nlsa, o.mfoa, o.id_a, o.nam_b, o.nlsb, o.mfob, o.id_b,
+                                        o.nazn, o.id_o, o.sos, o.s2, o.kv2, o.branch
+                                  from operw v1, operw v2, operw v3, oper o
+                                 where o.ref in (select o.ref
+                                                 from opldok o, accounts a
+                                                 where o.fdat between dat1_ and dat_ and
+                                                       o.acc = a.acc and
+                                                       a.nbs in ('1500', '1600'))
+                                   and o.nlsa like '1500%'
+                                   and o.nlsb like '1600%'
+                                   and o.sos = '5'
+                                   and o.mfoa = o.mfob
+                                     and o.pdat between dat1_ and dat_
+                                     and v1.tag(+) = 'KOD_G'
+                                     and v1.value(+) != '804'
+                                     and trim(v1.value(+)) is not null
+                                     and v1.ref (+)= o.ref 
+                                   and v2.tag = 'KOD_N'
+                                   and v2.value not in ( '8424010','8442001' )
+                                   and v2.value not like '8445%'
+                                   and v2.value not like '8443%'
+                                   and trim(v2.value) is not null
+                                   and v2.ref = o.ref 
+                                     and v3.tag(+) = 'KOD_B'
+                                     and v3.value(+) != '6'
+                                     and trim(v3.value(+)) is not null
+                                     and v3.ref(+) = o.ref 
+                               ) op
+                         where op.ref = o.ref
+                           and o.dk = 0
+                           and o.acc = a.acc
+                           and a.rnk = c.rnk
+                      ) a, kl_k044N b
+                where a.segm_MMM = b.k040(+);
+                commit;
 
 
-end if;
-   logger.info ('P_F2F: part 2.8 '||to_char(dat_,'dd.mm.yyyy'));
----------------------------------------------------------------------------
+    end if;
+
+   logger.info ('P_F2F: part 2.11 '||to_char(dat_,'dd.mm.yyyy'));
+---------------------------------------------------------------------------                   
    INSERT INTO tmp_nbu(datf, kodf, kodp, znap, nbuc)
    select Dat_, kodf_, kodp, to_char(sum(to_number(znap))), nbuc
    from rnbu_trace
    where kodp like '1%'
-   group by kodp, nbuc;
-
+   group by kodp, nbuc; 
+   
 --   сохранение в архив для банков без финмониторинга
 --      нет смысла архивировать ТРЕТЬЮ часть -она строится по #
    if is_finmon =0  then
@@ -2093,13 +1746,12 @@ end if;
 
    logger.info ('P_F2F: part 3.1 '||to_char(dat_,'dd.mm.yyyy'));
 
-   -- ТРЕТЯ ЧАСТИНА
-   -- Загальна кількість фінансових операцій
-   INSERT /*+APPEND PARALLEL (8) */
-   INTO tmp_nbu(datf, kodf, kodp, znap, nbuc)
-   select dat_, kodf_, '3301000000000000000' kodp,
-        sum(znap), nbuc_
-   from (select
+   -- ТРЕТЯ ЧАСТИНА 
+   -- Загальна кількість фінансових операцій     
+   INSERT INTO tmp_nbu(datf, kodf, kodp, znap, nbuc)
+   select dat_, kodf_, '3301000000000000000' kodp, 
+        sum(znap), nbuc_ 
+   from (select 
               count(distinct p.ref) znap
          from opldok o, oper p
          where o.fdat between dat1_ and dat_ and
@@ -2109,20 +1761,20 @@ end if;
                (o.fdat, o.acc) in (select s.fdat, s.acc
                                     from saldoa s
                                     where s.fdat between dat1_ and dat_ and
-                                        S.ACC in (select a.acc
+                                        S.ACC in (select unique a.acc
                                                   from kl_f3_29 k, accounts a
                                                   where k.kf = '2F' and
                                                         k.ddd = '102' and
                                                         a.nbs = k.r020) and
                                     s.dos+s.kos<>0));
-
+                                    
    logger.info ('P_F2F: part 3.2 '||to_char(dat_,'dd.mm.yyyy'));
-
+   
    -- процедура, що доформовує по можливості показники 3-го розділу
    --              (для Ощадного банку - з файлу D0 [p_f2f_pok_unit3.sql],
-   --                 а для РЦ - з фінмоніторингу [p_f2f_pok_unit3.prc])
-   p_f2f_pok_unit3(dat_, dat1_, nbuc_);
-
+   --                 а для РЦ - з фінмоніторингу [p_f2f_pok_unit3.prc])                                  
+   p_f2f_pok_unit3(dat_, dat1_, nbuc_); 
+                 
 --   сохранение в архив для РЦ (c финмониторингом)
    if is_finmon =1  then
 
@@ -2137,17 +1789,6 @@ end if;
    commit;
 --exception
 --    when others then
---        logger.info ('P_F2F: Error '||sqlerrm||' '||to_char(dat_,'dd.mm.yyyy'));
+--        logger.info ('P_F2F: Error '||sqlerrm||' '||to_char(dat_,'dd.mm.yyyy'));   
 END;
 /
-show err;
-
-PROMPT *** Create  grants  P_F2F ***
-grant EXECUTE                                                                on P_F2F           to RPBN002;
-grant EXECUTE                                                                on P_F2F           to WR_ALL_RIGHTS;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_F2F.sql =========*** End *** ===
-PROMPT ===================================================================================== 

@@ -8,11 +8,11 @@ PROMPT =========================================================================
 PROMPT *** Create  procedure P_FF1_NN ***
 
   CREATE OR REPLACE PROCEDURE BARS.P_FF1_NN ( dat_     DATE,
-                                       sheme_   VARCHAR2 DEFAULT 'G') IS
+                                           sheme_   VARCHAR2 DEFAULT 'G') IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирования #F1 для КБ
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     : 02/03/2017 (15/12/2015, 29/04/2015)
+% VERSION     : 10/07/2017 (02/06/2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
@@ -148,6 +148,7 @@ PROMPT *** Create  procedure P_FF1_NN ***
    ref_m37    number;
    dat_m37    date;
    swift_k_   VARCHAR2 (12);
+   ob22_      VARCHAR2 (2);
 
 -- переказ коштiв по мiжнароднiй системi переказу коштiв або отримання переказу
    CURSOR opl_dok
@@ -183,7 +184,6 @@ BEGIN
    commit;
 
    EXECUTE IMMEDIATE 'ALTER SESSION ENABLE PARALLEL DML';
-   EXECUTE IMMEDIATE 'ALTER SESSION SET SORT_AREA_SIZE = 131072';
 
    EXECUTE IMMEDIATE 'ALTER SESSION SET NLS_NUMERIC_CHARACTERS=''.,''';
    -------------------------------------------------------------------
@@ -278,7 +278,7 @@ BEGIN
                        o.s * 100 s_nom,
                        gl.p_icurval (o.kv, o.s * 100, o.fdat) s_eqv, o.nazn, o.branch
                   FROM provodki_otc o
-                  WHERE o.fdat between Dat1_ AND Dat_
+                  WHERE o.fdat = Dat_
                     AND o.kv != 980
                     AND (mfou_ = 300465 and mfo_ = mfou_)
                     AND (o.nbsd IN ('2620','2902','2924')  AND
@@ -298,7 +298,7 @@ BEGIN
                        o.s * 100 s_nom,
                        gl.p_icurval (o.kv, o.s * 100, o.fdat) s_eqv, o.nazn, o.branch
                   FROM provodki_otc o, kl_ff1 k
-                  WHERE o.fdat between Dat1_ AND Dat_
+                  WHERE o.fdat = Dat_
                     AND o.kv != 980
                     AND (mfou_ = 300465 and mfo_ = mfou_)
                     AND (o.nbsd IN ('1001','1002') AND
@@ -315,7 +315,7 @@ BEGIN
                        o.s * 100 s_nom,
                        gl.p_icurval (o.kv, o.s * 100, o.fdat) s_eqv, o.nazn, o.branch
                   FROM provodki_otc o, kl_ff1 k
-                  WHERE o.fdat between Dat1_ AND Dat_
+                  WHERE o.fdat = Dat_
                     AND o.kv != 980
                     AND (mfou_ = 300465 and mfo_ = mfou_)
                     AND o.nbsd IN ('1001','1002')
@@ -330,7 +330,7 @@ BEGIN
                        o.s * 100 s_nom,
                        gl.p_icurval (o.kv, o.s * 100, o.fdat) s_eqv, o.nazn, o.branch
                   FROM provodki_otc o
-                  WHERE o.fdat between Dat1_ AND Dat_
+                  WHERE o.fdat = Dat_
                     AND o.kv != 980
                     AND (mfou_ = 300465 and mfo_ = mfou_)
                     AND (o.nbsd IN ('1500','1600','2603','3720','3739','3900',
@@ -345,7 +345,7 @@ BEGIN
                        o.s * 100 s_nom,
                        gl.p_icurval (o.kv, o.s * 100, o.fdat) s_eqv, o.nazn, o.branch
                   FROM provodki_otc o
-                  WHERE o.fdat between Dat1_ AND Dat_
+                  WHERE o.fdat = Dat_
                     AND o.kv != 980
                     AND (mfou_ = 300465 and mfo_ = mfou_)
                     AND (o.nbsd IN ('2809','2909') AND
@@ -361,7 +361,7 @@ BEGIN
                        o.s * 100 s_nom,
                        gl.p_icurval (o.kv, o.s * 100, o.fdat) s_eqv, o.nazn, o.branch
                   FROM provodki_otc o, kl_ff1 k
-                  WHERE o.fdat between Dat1_ AND Dat_
+                  WHERE o.fdat = Dat_
                     AND o.kv != 980
                     AND (mfou_ = 300465 and mfo_ = mfou_)
                     AND o.nbsd IN ('2809', '2909')
@@ -375,7 +375,7 @@ BEGIN
                        o.s * 100 s_nom,
                        gl.p_icurval (o.kv, o.s * 100, o.fdat) s_eqv, o.nazn, o.branch
                   FROM provodki_otc o, kl_ff1 k
-                  WHERE o.fdat between Dat1_ AND Dat_
+                  WHERE o.fdat = Dat_
                     AND o.kv != 980
                     AND (mfou_ = 300465 and mfo_ = mfou_)
                     AND o.nbsd IN ('1500','1600','2603', '3720','3739','3900',
@@ -390,7 +390,7 @@ BEGIN
                        o.s * 100 s_nom,
                        gl.p_icurval (o.kv, o.s * 100, o.fdat) s_eqv, o.nazn, o.branch
                   FROM provodki_otc o, kl_ff1 k
-                  WHERE o.fdat between Dat1_ AND Dat_
+                  WHERE o.fdat = Dat_
                     AND o.kv != 980
                     AND (mfou_ = 300465 and mfo_ = mfou_)
                     -- включаем проводки вида Дт 2809, 2909 Кт 1001,1002 по значению OB22 для СБ
@@ -398,22 +398,24 @@ BEGIN
                     AND o.nbsk IN ('1001','1002','2620','2625','2902','2909','2924')
                     AND o.nlsd LIKE k.nlsd || '%'
                     AND o.nlsk LIKE k.nlsk || '%'
-                    AND NVL(k.ob22,o.ob22d) = o.ob22d);
+                    AND NVL(k.ob22,o.ob22d) = o.ob22d)
+      where upper(nazn) not like '%(VO70040)%';
    ELSIF (mfo_ <> mfou_ and mfou_ in (300465)) THEN
        INSERT  /*+APPEND */
         INTO OTCN_PROV_TEMP
             (ko, rnk, fdat, REF, tt, accd, nlsd, kv, acck, nlsk, s_nom, s_eqv, nazn, branch)
        SELECT  /*+noparallel*/  *
        FROM (-- ТIЛЬКИ ДЛЯ ВС?Х ОБЛУПРАВЛIННЬ ОЩАДБАНКУ    перерахування переказiв
-                  SELECT   1 ko, o.rnkd rnk, o.fdat, o.ref, o.tt, o.accd, o.nlsd, o.kv,
+                  SELECT   
+                       1 ko, 
+                       o.rnkd rnk, o.fdat, o.ref, o.tt, o.accd, o.nlsd, o.kv,
                        o.acck, o.nlsk,
                        o.s * 100 s_nom,
                        gl.p_icurval (o.kv, o.s * 100, o.fdat) s_eqv, o.nazn, o.branch
                   FROM provodki_otc o, kl_ff1 k
-                  WHERE o.fdat between Dat1_ AND Dat_
+                  WHERE o.fdat = Dat_
                     AND o.kv != 980
                     -- включаем проводки вида Дт 1001,1002 Кт 2909 по параметру OB22 для СБ
-                    AND (mfo_ <> mfou_ and mfou_ in (300465))
                     AND o.nlsd LIKE k.nlsd || '%'
                     AND o.nlsk LIKE k.nlsk || '%'
                     and k.ob22 is not null
@@ -426,128 +428,18 @@ BEGIN
                        o.s * 100 s_nom,
                        gl.p_icurval (o.kv, o.s * 100, o.fdat) s_eqv, o.nazn, o.branch
                   FROM provodki_otc o, kl_ff1 k
-                  WHERE o.fdat between Dat1_ AND Dat_
+                  WHERE o.fdat = Dat_
                     AND o.kv != 980
                     -- включаем проводки вида Дт 2809, 2909 Кт 1001,1002 по значению OB22 для СБ
-                    AND ((mfo_ <> mfou_ and mfou_ in (300465)) or (mfou_ = 380764))
                     AND o.nlsd LIKE k.nlsd || '%'
                     AND o.nlsk LIKE k.nlsk || '%'
                     and k.ob22 is not null
                     AND k.ob22 = o.ob22d
-                    AND NVL(k.tt,o.tt) = o.tt);
-   END IF;
-
-   -- если отчетный день не последний день месяца то выпоняем включение в файл проводок
-   -- введенных в последние календарные дни и проведенные в балансе 1 рабочего дня след. месяца
-   IF Dat_ < to_date('23092014','ddmmyyyy') and mfou_ = 300465
-   THEN
-      IF last_dayF != Dat_ THEN
-         if mfou_ not in (300465,380764) OR (mfou_ = 300465 and mfo_ = mfou_) then
-             INSERT INTO OTCN_PROV_TEMP
-              (ko, rnk, fdat, REF, tt, accd, nlsd, kv, acck, nlsk, s_nom, s_eqv, nazn, branch)
-             SELECT *
-             FROM (
-                    SELECT   1 ko, o.rnkk, o.fdat, o.ref, o.tt, o.accd, o.nlsd, o.kv,
-                             o.acck, o.nlsk,
-                             o.s * 100 s_nom,
-                             gl.p_icurval (o.kv, o.s * 100, o.fdat) s_eqv, o.nazn, o.branch
-                    FROM provodki_otc o, kl_ff1 k
-                    WHERE o.fdat = one_day_
-                      AND o.kv != 980
-                      AND (mfou_ <> 300465 OR (mfou_ = 300465 and mfo_ = mfou_))
-                      AND SUBSTR (o.nlsd, 1, 4) IN ('1001','1002')
-                      AND SUBSTR (o.nlsk, 1, 4) IN ('2909')
-                      AND o.nlsd LIKE k.nlsd || '%'
-                      AND o.nlsk LIKE k.nlsk || '%'
-                      AND to_char(o.pdat,'MM') = to_char(dat_,'MM')
-                      AND o.pdat < one_day_
-                    UNION
-                    SELECT   1 ko, o.rnkk, o.fdat, o.ref, o.tt, o.accd, o.nlsd, o.kv,
-                             o.acck, o.nlsk,
-                             o.s * 100 s_nom,
-                             gl.p_icurval (o.kv, o.s * 100, o.fdat) s_eqv, o.nazn, o.branch
-                    FROM provodki_otc o, kl_ff1 k
-                    WHERE o.fdat = one_day_
-                      AND o.kv != 980
-                      AND (mfou_ <> 300465 OR (mfou_ = 300465 and mfo_ = mfou_))
-                      AND SUBSTR (o.nlsd, 1, 4) IN ('2620','2902','2924')
-                      AND SUBSTR (o.nlsk, 1, 4) IN ('1500','1919','2909')
-                      AND o.nlsd LIKE k.nlsd || '%'
-                      AND o.nlsk LIKE k.nlsk || '%'
-                      AND to_char(o.pdat,'MM') = to_char(dat_,'MM')
-                      AND o.pdat < one_day_
-                    UNION
-                    SELECT   2 ko, o.rnkd, o.fdat, o.ref, o.tt, o.accd, o.nlsd, o.kv,
-                             o.acck, o.nlsk,
-                             o.s * 100 s_nom,
-                             gl.p_icurval (o.kv, o.s * 100, o.fdat) s_eqv, o.nazn, o.branch
-                    FROM provodki_otc o, cust_acc ca, kl_ff1 k, oper p
-                    WHERE o.fdat = one_day_
-                      AND o.kv != 980
-                      AND (mfou_ <> 300465 OR (mfou_ = 300465 and mfo_ = mfou_))
-                      AND SUBSTR (o.nlsd, 1, 4) IN ('2809', '2909')
-                      AND SUBSTR (o.nlsk, 1, 4) IN ('1001','1002')
-                      AND o.nlsd LIKE k.nlsd || '%'
-                      AND o.nlsk LIKE k.nlsk || '%'
-                      AND to_char(o.pdat,'MM') = to_char(dat_,'MM')
-                      AND o.pdat < one_day_
-                    UNION
-                    SELECT   2 ko, o.rnkd, o.fdat, o.ref, o.tt, o.accd, o.nlsd, o.kv,
-                             o.acck, o.nlsk,
-                             o.s * 100 s_nom,
-                             gl.p_icurval (o.kv, o.s * 100, o.fdat) s_eqv, o.nazn, o.branch
-                    FROM provodki_otc o, kl_ff1 k
-                    WHERE o.fdat = one_day_
-                      AND o.kv != 980
-                      AND (mfou_ <> 300465 OR (mfou_ = 300465 and mfo_ = mfou_))
-                      AND SUBSTR (o.nlsd, 1, 4) IN ('1500','1600','2603',
-                                                    '3720','3739','3900',
-                                                    '2809','2909')
-                      AND o.nlsd LIKE k.nlsd || '%'
-                      AND o.nlsk LIKE k.nlsk || '%'
-                      AND to_char(o.pdat,'MM') = to_char(dat_,'MM')
-                      AND o.pdat < one_day_);
-         ELSIF mfo_ <> mfou_ and mfou_ in (300465) THEN
-             INSERT INTO OTCN_PROV_TEMP
-              (ko, rnk, fdat, REF, tt, accd, nlsd, kv, acck, nlsk, s_nom, s_eqv, nazn, branch)
-             SELECT *
-             FROM ( -- ТIЛЬКИ ДЛЯ ВС?Х ОБЛУПРАВЛIННЬ ОЩАДБАНКУ    перерахування переказiв
-                    SELECT   1 ko, o.rnkk, o.fdat, o.ref, o.tt, o.accd, o.nlsd, o.kv,
-                             o.acck, o.nlsk,
-                             o.s * 100 s_nom,
-                             gl.p_icurval (o.kv, o.s * 100, o.fdat) s_eqv, o.nazn, o.branch
-                    FROM provodki_otc o, kl_ff1 k, specparam_int s
-                    WHERE o.fdat = one_day_
-                      AND o.kv != 980
-                      AND mfo_ <> mfou_ and mfou_ in (300465)
-                      AND o.nlsd LIKE k.nlsd || '%'
-                      AND o.nlsk LIKE k.nlsk || '%'
-                      AND o.acck = s.acc(+)
-                      AND NVL(k.ob22,s.ob22) = s.ob22
-                      AND NVL(k.tt,o.tt) = o.tt
-                      AND to_char(o.pdat,'MM') = to_char(dat_,'MM')
-                      AND o.pdat < one_day_
-                    UNION
-                    -- надходження переказiв (видача переказiв)
-                    SELECT   2 ko, o.rnkd, o.fdat, o.ref, o.tt, o.accd, o.nlsd, o.kv,
-                             o.acck, o.nlsk,
-                             o.s * 100 s_nom,
-                             gl.p_icurval (o.kv, o.s * 100, o.fdat) s_eqv, o.nazn, o.branch
-                    FROM provodki_otc o, kl_ff1 k, specparam_int s
-                    WHERE o.fdat = one_day_
-                      AND o.kv != 980
-                      AND mfo_ <> mfou_ and mfou_ in (300465)
-                      AND o.nlsd LIKE k.nlsd || '%'
-                      AND o.nlsk LIKE k.nlsk || '%'
-                      AND o.accd = s.acc(+)
-                      AND NVL(k.ob22,s.ob22) = s.ob22
-                      AND NVL(k.tt,o.tt) = o.tt
-                      AND to_char(o.pdat,'MM') = to_char(dat_,'MM')
-                      AND o.pdat < one_day_ );
-         END IF;
-      END IF;
+                    AND NVL(k.tt,o.tt) = o.tt)
+      where upper(nazn) not like '%(VO70040)%';
    END IF;
    commit;
+   
    -- удаление типов проводок по кл-ру KL_FF1
    DELETE FROM OTCN_PROV_TEMP
    WHERE ref in (select o.ref
@@ -557,18 +449,6 @@ BEGIN
                    and NVL(trim(f.tt),o.tt) = o.tt
                    and f.pr_del = 0);
 
-   -- удаление док-тов принятых в предыдущем месяце и проведенных в первых числах отчетного месяца
-   IF Dat_ < to_date('23092014','ddmmyyyy') and mfou_ = 300465
-   THEN
-      DELETE FROM otcn_prov_temp
-      WHERE ref in ( select o.ref
-                     from otcn_prov_temp o, oper p
-                     where o.fdat >= dat1_ 
-                       and o.ref = p.ref
-                       and p.pdat < dat1_
-                       and to_char(p.pdat,'MM') != to_char(dat1_,'MM')); 
-   end if;
-
    -- удаление проводок для проводок Дт 2909 Кт 2909 и OB22 != '24'
    for k in (select o.ref REF, trim(o.nlsd) NLSD, trim(o.nlsk) NLSK,
                     NVL(trim(s.ob22),'00') OB22
@@ -576,14 +456,12 @@ BEGIN
              where o.nlsd LIKE '2909%'
                and o.nlsk LIKE '2909%'
                and o.acck = s.acc(+) )
-      loop
-
-          if k.ob22 != '24' then
-             DELETE FROM OTCN_PROV_TEMP
-             WHERE ref = k.ref;
-          end if;
-
-      end loop;
+   loop
+      if k.ob22 != '24' then
+         DELETE FROM OTCN_PROV_TEMP
+         WHERE ref = k.ref;
+      end if;
+   end loop;
 
    -- удаление сторнированных проводок
    DELETE FROM otcn_prov_temp
@@ -650,29 +528,29 @@ BEGIN
    end if;
 
       -- переказ коштiв фiз. особами за межi України (отримання коштiв фiз. особами)
-      OPEN opl_dok;
+   OPEN opl_dok;
 
-      LOOP
-         FETCH opl_dok
-          INTO d060_, rnk_, fdat_, ref_, tt_, acc_, nls_, kv_, acck_, nlsk_,
-               sum0_, sumk0_, nazn_, tobo_;
+   LOOP
+      FETCH opl_dok
+      INTO d060_, rnk_, fdat_, ref_, tt_, acc_, nls_, kv_, acck_, nlsk_,
+           sum0_, sumk0_, nazn_, tobo_;
 
-         EXIT WHEN opl_dok%NOTFOUND;
+      EXIT WHEN opl_dok%NOTFOUND;
 
-         comm_ := '';
-         pasp_ := '';
-         paspn_ := '';
-         pr_pasp_ := 0;
-         atrt_ := '';
-         d#73_ := null;
+      comm_ := '';
+      pasp_ := '';
+      paspn_ := '';
+      pr_pasp_ := 0;
+      atrt_ := '';
+      d#73_ := null;
 
-         BEGIN
-            select 2 - mod(codcagent,2)
-               INTO rez_
-            from customer
-            where rnk = rnk_;
-         EXCEPTION WHEN NO_DATA_FOUND THEN
-            rez_ := 1;
+      BEGIN
+         select 2 - mod(codcagent,2)
+           INTO rez_
+         from customer
+         where rnk = rnk_;
+      EXCEPTION WHEN NO_DATA_FOUND THEN
+         rez_ := 1;
       END;
 
       BEGIN
@@ -766,7 +644,7 @@ BEGIN
 
       IF sum0_ <> 0 THEN
 
-         for k in (select * from operw where ref=ref_)
+         for k in (select * from operw where ref=ref_ and tag like 'PASP%')
 
          loop
             if k.tag = 'PASP' then
@@ -776,179 +654,39 @@ BEGIN
             if k.tag = 'PASPN' then
                paspn_ := substr(trim(k.value),1,20);
             end if;
-
-            -- с 01.08.2012 добавляется код страны отправителя или получателя перевода
-            if k.tag like 'n%' and substr(trim(k.value),1,1) in ('O','P','О','П') then
-               kod_g_ := substr(trim(k.value),2,3);
-            end if;
-
-            if kod_g_ is null and k.tag like 'n%' and substr(trim(k.value),1,1) not in ('O','P','О','П') then
-               kod_g_ := substr(trim(k.value),1,3);
-            end if;
-
-            if kod_g_ is null and k.tag like 'D6#7%' and substr(trim(k.value),1,1) in ('O','P','О','П') then
-               kod_g_ := substr(trim(k.value),2,3);
-            end if;
-
-            if kod_g_ is null and k.tag like 'D6#7%' and substr(trim(k.value),1,1) not in ('O','P','О','П') then
-               kod_g_ := substr(trim(k.value),1,3);
-            end if;
-
-            if kod_g_ is null and k.tag like 'D6#E2%' and substr(trim(k.value),1,1) in ('O','P','О','П') then
-               kod_g_ := substr(trim(k.value),2,3);
-            end if;
-
-            if kod_g_ is null and k.tag like 'D6#E2%' and substr(trim(k.value),1,1) not in ('O','P','О','П') then
-               kod_g_ := substr(trim(k.value),1,3);
-            end if;
-
-            if kod_g_ is null and k.tag like 'D1#E9%' and substr(trim(k.value),1,1) in ('O','P','О','П') then
-               kod_g_ := substr(trim(k.value),2,3);
-            end if;
-
-            if kod_g_ is null and k.tag like 'D1#E9%' and substr(trim(k.value),1,1) not in ('O','P','О','П') then
-               kod_g_ := substr(trim(k.value),1,3);
-            end if;
-
-            if kod_g_ is null and k.tag like 'F1%' then
-               kod_g_ := substr(trim(k.value),8,3);
-            end if;
-
-            if kod_g_ is null and   
-               k.tag = 'KOD_G'
-            then
-               kod_g_pb1 := substr(trim(k.value),1,3);
-            end if;
          end loop;
 
-         if kod_g_ is null and kod_g_pb1 is not null then
-            kod_g_ := kod_g_pb1;
-         end if;
-
-         IF kod_g_ is null 
-         THEN
-            BEGIN
-               SELECT substr(trim(value), 1, 10)
-                  INTO swift_k_
-               FROM OPERW
-               WHERE REF = REF_
-                 AND TAG = '52A'
-                 AND length(trim(value)) > 3
-                 AND ROWNUM = 1;
-
-               BEGIN
-                  SELECT k040
-                     INTO kod_g_
-                  FROM RC_BNK
-                  WHERE SWIFT_CODE LIKE swift_k_||'%'
-                    AND ROWNUM = 1;
-               EXCEPTION WHEN NO_DATA_FOUND THEN
-                  swift_k_ := substr(swift_k_,1,4)||' '||substr(swift_k_,5,2)||
-                            ' '||substr(swift_k_,7,2);
-                  BEGIN
-                     SELECT k040
-                        INTO kod_g_
-                     FROM RC_BNK
-                     WHERE SWIFT_CODE LIKE swift_k_||'%'
-                       AND ROWNUM = 1;
-                  EXCEPTION WHEN NO_DATA_FOUND THEN
-                     null;
-                  END;
-               END;
-            EXCEPTION WHEN NO_DATA_FOUND THEN
-               BEGIN
-                  SELECT substr(trim(value), 10, 10)
-                     INTO swift_k_
-                  FROM OPERW
-                  WHERE REF = REF_
-                    AND TAG = '52A'
-                    AND length(trim(value)) > 10
-                    AND ROWNUM = 1;
-
-                  BEGIN
-                     SELECT k040
-                        INTO kod_g_
-                     FROM RC_BNK
-                     WHERE SWIFT_CODE LIKE swift_k_||'%'
-                       AND ROWNUM=1;
-                  EXCEPTION WHEN NO_DATA_FOUND THEN
-                     swift_k_ := substr(swift_k_,1,4)||' '||substr(swift_k_,5,2)||
-                               ' '||substr(swift_k_,7,2);
-                     BEGIN
-                        SELECT k040
-                           INTO kod_g_
-                        FROM RC_BNK
-                        WHERE SWIFT_CODE LIKE swift_k_||'%'
-                          AND ROWNUM = 1;
-                     EXCEPTION WHEN NO_DATA_FOUND THEN
-                        null;
-                     END;
-                  END;
-               EXCEPTION WHEN NO_DATA_FOUND THEN
-                  null;
-               END;
-            END;
-         END IF;
-
-         IF kod_g_ is null
-         THEN
-            BEGIN
-               SELECT '804'
-                  INTO kod_g_
-               FROM OPERW
-               WHERE REF = ref_
-                 AND tag like '59%'
-                 AND substr(trim(value),1,3) = '/UA';
-            EXCEPTION WHEN NO_DATA_FOUND THEN
-               BEGIN
-                  SELECT '804'
-                     INTO kod_g_
-                  FROM OPERW
-                  WHERE REF = ref_
-                    AND tag like '59%'
-                    AND instr(UPPER(trim(value)),'UKRAINE') > 0;
-               EXCEPTION WHEN NO_DATA_FOUND THEN
-                  kod_g_ := NULL;
-               END;
-            END;
-         END IF;
-
-         IF kod_g_ is null
-         THEN
-            country_ := '000';
-         else
-            country_ := kod_g_;
-         END IF;
-
-         IF mfou_ = 300465 THEN 
-            BEGIN
-               select substr(trim(value),1,1), substr(trim(value),1,10)
-                  INTO D#73_, value_
-               from operw
-               where ref = ref_
-                 and tag = 'REZID' ;
-               if D#73_ not in ('1','2') then
-                  if LOWER(value_) like '%нерез%' then
-                     D#73_ := '2';
-                  else
-                     D#73_ := '1';
-                  end if;
+         BEGIN
+            select substr(trim(value),1,1), substr(trim(value),1,10)
+              INTO D#73_, value_
+            from operw
+            where ref = ref_
+              and tag = 'REZID' ;
+              
+            if D#73_ not in ('1','2') then
+               if LOWER(value_) like '%нерез%' then
+                 D#73_ := '2';
+               else
+                 D#73_ := '1';
                end if;
+            end if;
+         EXCEPTION WHEN NO_DATA_FOUND THEN
+            BEGIN
+              select '1'
+                 INTO D#73_
+              from operw
+              where ref = ref_
+                and tag  LIKE '%OKPO%'
+                and rownum = 1;
             EXCEPTION WHEN NO_DATA_FOUND THEN
-               BEGIN
-                  select '1'
-                     INTO D#73_
-                  from operw
-                  where ref = ref_
-                    and tag  LIKE '%OKPO%'
-                    and rownum = 1;
-               EXCEPTION WHEN NO_DATA_FOUND THEN
-                  d#73_ := null;
-               END;
+              d#73_ := null;
             END;
-         END IF;
+         END;
 
-         IF d060_ = 1 THEN
+         IF d060_ = 1 or ( d060_ = 2 and nls_ like '2909%' and nlsk_ like '3739%') THEN
+            kod_g_ := f_nbur_get_kod_g(ref_, 2); 
+            country_ := nvl(kod_g_, '000');
+            
             if mfou_ = 300465 and d#73_ is not null then
                rez_ := d#73_;
             end if;
@@ -966,55 +704,35 @@ BEGIN
             ELSE
                nbuc_ := nbuc1_;
             END IF;
+            
+            if nls_ like '2909%' then
+               select ob22
+               into ob22_
+               from accounts
+               where acc = acc_;
+            end if;
 
-            IF nls_ not like '26%' and nls_ not like '29%' THEN
-
-               if dat_ <= to_date('30062012','ddmmyyyy') then
-                  kodp_ := '1' || '10' || to_char(rez_) || lpad(to_char(kv_),3,'0');
-               else
-                  kodp_ := '1' || '11' || to_char(rez_) || lpad(to_char(kv_),3,'0') || country_;
-               end if;
-
+            IF nls_ not like '26%' and 
+               nls_ not like '29%' or
+               nls_ like '2909%' and ob22_ = '35' -- прийнято для переказів готівкою                
+            THEN
+               kodp_ := '1' || '11' || to_char(rez_) || lpad(to_char(kv_),3,'0') || country_;
+ 
                if kod_g_ is null or (kod_g_ is not null and kod_g_ != '804') then
                   -- запис показника суми
                   p_ins (kodp_, to_char(sum0_) );
-                  
-                  -- запис показника кiлькостi
-                  if dat_ <= to_date('30062012','ddmmyyyy') then
-                     kodp_ := '3' || substr(kodp_,2);
-                     p_ins (kodp_, '1' );
-                  end if;
                end if;
             ELSE
-               IF dat_ <= to_date('30062012','ddmmyyyy') THEN
-                  if sumk0_ <= 1500000 then
-                     if kod_g_ is null or (kod_g_ is not null and kod_g_ != '804') then
-                        kodp_ := '1' || '21' || to_char(rez_) || lpad(to_char(kv_),3,'0');
-                        -- запис показника суми
-                        p_ins (kodp_, to_char(sum0_) );
-                        -- запис показника кiлькостi
-                        kodp_ := '3' || substr(kodp_,2);
-                        p_ins (kodp_, '1' );
-                     end if;
-                  else
-                     if kod_g_ is null or (kod_g_ is not null and kod_g_ != '804') then
-                        kodp_ := '1' || '22' || to_char(rez_) || lpad(to_char(kv_),3,'0');
-                        -- запис показника суми
-                        p_ins (kodp_, to_char(sum0_) );
-                        -- запис показника кiлькостi
-                        kodp_ := '3' || substr(kodp_,2);
-                        p_ins (kodp_, '1' );
-                     end if;
-                  end if;
-               ELSE
-                  if kod_g_ is null or (kod_g_ is not null and kod_g_ != '804') then
-                     kodp_ := '1' || '12' || to_char(rez_) || lpad(to_char(kv_),3,'0') || country_;
-                     -- запис показника суми
-                     p_ins (kodp_, to_char(sum0_) );
-                  end if;
-               END IF;
+               if kod_g_ is null or (kod_g_ is not null and kod_g_ != '804') then
+                 kodp_ := '1' || '12' || to_char(rez_) || lpad(to_char(kv_),3,'0') || country_;
+                 -- запис показника суми
+                 p_ins (kodp_, to_char(sum0_) );
+               end if;
             END IF;
          ELSE
+            kod_g_ := f_nbur_get_kod_g(ref_, 1); 
+            country_ := nvl(kod_g_, '000');
+
             if d#73_ is not null then
                rez_ := d#73_;
             end if;
@@ -1034,31 +752,14 @@ BEGIN
             END IF;
 
             if kod_g_ is null or (kod_g_ is not null and kod_g_ != '804') then
-               if dat_ <= to_date('30062012','ddmmyyyy') then
-                  kodp_ := '1' || '40' || to_char(rez_) || lpad(to_char(kv_),3,'0');
+               if nlsk_ like '262%' or nlsk_ like '2900%' or nlsk_ like '2924%' then
+                  kodp_ := '1' || '42' || to_char(rez_) || lpad(to_char(kv_),3,'0') || country_;
+                 -- запис показника суми
+                  p_ins (kodp_, to_char(sum0_) );
+               else
+                  kodp_ := '1' || '41' || to_char(rez_) || lpad(to_char(kv_),3,'0') || country_;
                   -- запис показника суми
                   p_ins (kodp_, to_char(sum0_) );
-                  -- запис показника кiлькостi
-                  kodp_ := '3' || substr(kodp_,2);
-                  p_ins (kodp_, '1' );
-               end if;
-
-               if dat_ > to_date('30062012','ddmmyyyy') then
-                  if nlsk_ like '262%' or nlsk_ like '2900%' or nlsk_ like '2924%' then
-                     kodp_ := '1' || '42' || to_char(rez_) || lpad(to_char(kv_),3,'0') || country_;
-                     -- запис показника суми
-                     p_ins (kodp_, to_char(sum0_) );
-                  else
-                     if nls_ like '2909%' and nlsk_ like '3739%' then
-                        kodp_ := '1' || '12' || to_char(rez_) || lpad(to_char(kv_),3,'0') || country_;
-                        -- запис показника суми
-                        p_ins (kodp_, to_char(sum0_) );
-                     else
-                        kodp_ := '1' || '41' || to_char(rez_) || lpad(to_char(kv_),3,'0') || country_;
-                        -- запис показника суми
-                        p_ins (kodp_, to_char(sum0_) );
-                     end if;
-                  end if;
                end if;
             end if;
          END IF;

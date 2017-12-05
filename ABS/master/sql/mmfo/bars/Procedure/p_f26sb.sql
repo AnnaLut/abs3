@@ -11,14 +11,18 @@ PROMPT *** Create  procedure P_F26SB ***
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :	Процедура формирование файла @26 для СБ
 % COPYRIGHT   :	Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     : 11.05.2011 (30.04.11,26/02/11,17/03/09) для Сбербанка
+% VERSION     : 13/11/2017 (26/05/2012) для Сбербанка
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 13.11.2017 - удалил ненужные строки и изменил некоторые блоки формирования 
+% 26.05.2012 - формируем в разрезе кодов территорий
 % 11.05.2011 - включаем корректирующие проводки
 % 30.04.2011 - добавил acc,tobo в протокол
 % 26.02.2011 - в поле комментарий вносим код TOBO и название счета
-% 17.03.2009 - обороти включались тiльки за один день а потрiбно за
-%              мiсяць. Виправлено.
+% 17.03.2009 - обороти включались тiльки за один день а потрiбно за 
+%              мiсяць. Виправлено.       
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
+kodf_    varchar2(2) := '26'; 
+sheme_   varchar2(1) := 'С';    
 acc_     Number;
 Dos_     DECIMAL(24);
 Dosq_    DECIMAL(24);
@@ -72,6 +76,9 @@ comm_    rnbu_trace.comm%TYPE;
 sql_acc_ varchar2(2000):='';
 sql_doda_ varchar2(200):='';
 ret_	 number;
+typ_     Number; 
+nbuc1_   VARCHAR2(12);
+nbuc_    VARCHAR2(12);
 
 
 CURSOR SaldoASeekOstf IS
@@ -81,29 +88,21 @@ CURSOR SaldoASeekOstf IS
           s.dos96, s.dosq96, s.kos96, s.kosq96,
           s.dos99, s.dosq99, s.kos99, s.kosq99,
           s.doszg, s.koszg, s.dos96zg, s.kos96zg,
-          a.tobo, a.nms, NVL(trim(sp.ob22),'00')
+          a.tobo, a.nms, NVL(trim(sp.ob22),'00') 
    FROM  otcn_saldo s, otcn_acc a, specparam_int sp
-   WHERE s.acc=a.acc
-     and s.kv=980
+   WHERE s.acc=a.acc      
+     and s.kv=980 
      and a.acc=sp.acc(+);
 
 CURSOR KOL_NLS IS
-   SELECT acc, nls, kv, substr(kodp,2,6), count(*), comm, tobo
+   SELECT acc, nls, kv, nbuc, substr(kodp,2,6), count(*), comm, tobo
    FROM rnbu_trace
    WHERE userid=userid_
-   GROUP BY acc, nls, kv, substr(kodp,2,6), comm, tobo;
-
-CURSOR BaseL IS
-   SELECT kodp, SUM (znap)
-   FROM rnbu_trace
-   WHERE userid=userid_
-   GROUP BY kodp;
+   GROUP BY acc, nls, kv, nbuc, substr(kodp,2,6), comm, tobo;
 
 BEGIN
 -------------------------------------------------------------------
---SELECT id INTO userid_ FROM staff WHERE upper(logname)=upper(USER);
 userid_ := user_id;
---DELETE FROM RNBU_TRACE WHERE userid = userid_;
 EXECUTE IMMEDIATE 'TRUNCATE TABLE RNBU_TRACE';
 -------------------------------------------------------------------
 sql_acc_ := 'select r020 from kl_f3_29_int where kf=''26'' ';
@@ -112,6 +111,9 @@ ret_ := f_pop_otcn(Dat_, 3, sql_acc_);
 
 Dat1_ := TRUNC(Dat_,'MM');
 Dat2_ := TRUNC(Dat_ + 28);
+
+-- определение начальных параметров
+P_Proc_Set_Int(kodf_,sheme_,nbuc1_,typ_);
 -------------------------------------------------------------------
 OPEN SaldoASeekOstf;
 LOOP
@@ -131,30 +133,41 @@ LOOP
 
    comm_ := '';
 
-   IF Ostn_<>0 THEN
-      comm_ := substr(comm_ || tobo_ || '  ' || nms_, 1, 200);
-      dk_:=IIF_N(Ostn_,0,'1','2','2');
-      kodp_:=dk_ || Nbs_ || ob22_ ;
-      znap_:=TO_CHAR(ABS(Ostn_));
-
-      INSERT INTO rnbu_trace(nls, kv, odate, kodp, znap, acc, comm, tobo)
-        VALUES  (nls_, kv_, data_, kodp_, znap_, acc_, comm_, tobo_) ;
+   IF typ_ > 0 
+   THEN
+      nbuc_ := NVL(F_Codobl_Tobo(acc_,typ_),nbuc1_);
+   ELSE
+      nbuc_ := nbuc1_;
    END IF;
 
-   IF Dos_ > 0 OR Kos_ > 0 THEN
+   IF Ostn_ <> 0 
+   THEN
       comm_ := substr(comm_ || tobo_ || '  ' || nms_, 1, 200);
-      IF Dos_ > 0 THEN
-         kodp_:='5' || Nbs_ || ob22_ ;
-         znap_:=TO_CHAR(Dos_);
-         INSERT INTO rnbu_trace(nls, kv, odate, kodp, znap, acc, comm, tobo)
-         VALUES  (nls_, kv_, dat_, kodp_, znap_, acc_, comm_, tobo_) ;
+      dk_ := IIF_N(Ostn_,0,'1','2','2');
+      kodp_ := dk_ || Nbs_ || ob22_ ;
+      znap_ := TO_CHAR(ABS(Ostn_));
+
+      INSERT INTO rnbu_trace(nls, kv, odate, kodp, znap, acc, comm, tobo, nbuc)
+        VALUES  (nls_, kv_, data_, kodp_, znap_, acc_, comm_, tobo_, nbuc_) ;
+   END IF;
+
+   IF Dos_ > 0 OR Kos_ > 0 
+   THEN
+      comm_ := substr(comm_ || tobo_ || '  ' || nms_, 1, 200);
+      IF Dos_ > 0 
+      THEN
+         kodp_ := '5' || Nbs_ || ob22_ ;
+         znap_ := TO_CHAR(Dos_);
+         INSERT INTO rnbu_trace(nls, kv, odate, kodp, znap, acc, comm, tobo, nbuc)
+         VALUES  (nls_, kv_, dat_, kodp_, znap_, acc_, comm_, tobo_, nbuc_) ;
       END IF;
 
-      IF Kos_ > 0 THEN
-         kodp_:='6' || Nbs_ || ob22_ ;
-         znap_:=TO_CHAR(Kos_) ;
-         INSERT INTO rnbu_trace(nls, kv, odate, kodp, znap, acc, comm, tobo)
-         VALUES  (nls_, kv_, dat_, kodp_, znap_, acc_, comm_, tobo_) ;
+      IF Kos_ > 0 
+      THEN
+         kodp_ := '6' || Nbs_ || ob22_ ;
+         znap_ := TO_CHAR(Kos_) ;
+         INSERT INTO rnbu_trace(nls, kv, odate, kodp, znap, acc, comm, tobo, nbuc)
+         VALUES  (nls_, kv_, dat_, kodp_, znap_, acc_, comm_, tobo_, nbuc_) ;
       END IF;
    END IF;
 
@@ -164,29 +177,24 @@ CLOSE SaldoASeekOstf;
 --- кол-во счетов
 OPEN KOL_NLS;
 LOOP
-   FETCH KOL_NLS INTO  acc_, nls_, kv_, kodp_, Ostn_, comm_, tobo_;
+   FETCH KOL_NLS INTO  acc_, nls_, kv_, nbuc_, kodp_, Ostn_, comm_, tobo_;
    EXIT WHEN KOL_NLS%NOTFOUND;
-   IF Ostn_ > 0 THEN
-         kodp_:='3' || substr(nls_,1,4) || substr(kodp_,5,2) ;
-         znap_:=TO_CHAR(Ostn_);
-         INSERT INTO rnbu_trace(nls, kv, odate, kodp, znap, acc, comm, tobo)
-         VALUES  (nls_, kv_, dat_, kodp_, '1', acc_, comm_, tobo_) ;
+   IF Ostn_ > 0 
+   THEN
+      kodp_ := '3' || substr(nls_,1,4) || substr(kodp_,5,2) ;
+      znap_ := TO_CHAR(Ostn_);
+      INSERT INTO rnbu_trace(nls, kv, odate, kodp, znap, acc, comm, tobo, nbuc)
+      VALUES  (nls_, kv_, dat_, kodp_, '1', acc_, comm_, tobo_, nbuc_) ;
    END IF;
 END LOOP;
 CLOSE KOL_NLS;
 ------------------------------------------------------------------
 DELETE FROM tmp_irep where kodf='26' and datf= dat_;
 ------------------------------------------------------------------
-OPEN BaseL;
-LOOP
-   FETCH BaseL INTO  kodp_, znap_;
-   EXIT WHEN BaseL%NOTFOUND;
-   INSERT INTO tmp_irep
-        (kodf, datf, kodp, znap)
-   VALUES
-        ('26', Dat_, kodp_, znap_);
-END LOOP;
-CLOSE BaseL;
+INSERT INTO tmp_irep (kodf, datf, kodp, znap, nbuc)
+select '26', Dat_, kodp, SUM (znap), nbuc
+FROM rnbu_trace
+GROUP BY kodp, nbuc;
 ------------------------------------------------------------------
 END p_f26sb;
 /

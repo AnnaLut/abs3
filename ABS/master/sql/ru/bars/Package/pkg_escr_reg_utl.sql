@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/pkg_escr_reg_utl.sql =========*** Ru
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.PKG_ESCR_REG_UTL IS
+CREATE OR REPLACE PACKAGE BARS.pkg_escr_reg_utl IS
   c_branch VARCHAR2(4000) := sys_context(bars_context.context_ctx
                                         ,bars_context.ctxpar_userbranch);
   /**********************************************
@@ -96,7 +90,17 @@
    ,in_status_comment IN escr_reg_obj_state.status_comment%TYPE DEFAULT NULL
    ,in_set_date       IN DATE
   );
-  /**********************************************
+ /**********************************************
+     PROCEDURE P_get_reg_deals
+     DESCRIPTION: повертає колекцію кредитів, які включені в реєстр
+  *********************************************/
+  PROCEDURE p_get_reg_deals
+  (
+    in_reg_id     escr_register.id%TYPE
+   ,In_check_flag number default 0-- перевіряємо чи ні статуси КД
+   ,out_deal_list OUT number_list
+  ) ;
+ /**********************************************
      PROCEDURE P_SET_OBJ_STATUS
      DESCRIPTION: ВСТАНОВЛЮЄ СТАТУС РЕЄСТРУ ЧИ КРЕДИТУ В РЕЄСТРІ
   *********************************************/
@@ -221,19 +225,19 @@
   );
 END pkg_escr_reg_utl;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
+CREATE OR REPLACE PACKAGE BODY BARS.pkg_escr_reg_utl IS
 
-  g_body_version   CONSTANT VARCHAR2(64) := 'VERSION 8.5.2 02/03/2017';
-  g_header_version CONSTANT VARCHAR2(64) := 'VERSION 8.1.2 24/03/2017';
+  g_body_version   CONSTANT VARCHAR2(64) := 'VERSION 8.5.3 14/11/2017';
+  g_header_version CONSTANT VARCHAR2(64) := 'VERSION 8.2.5 25/04/2017';
 
   c_err_txt VARCHAR2(4000);
   --константи
   lc_new_line    CONSTANT VARCHAR2(5) := chr(13) || chr(10);
   lc_date_format CONSTANT VARCHAR2(10) := 'DD/MM/YYYY';
   --змінні, які викор в багатьох процедурах пакету
-  user_name        VARCHAR2(400);
-  p_new_id         NUMBER;
-  l_credit_id      cc_deal.nd%TYPE;
+  user_name VARCHAR2(400);
+  p_new_id  NUMBER;
+
   l_credit_list    number_list := number_list();
   l_reg_list       number_list := number_list();
   l_status_id      escr_reg_status.id%TYPE;
@@ -249,7 +253,6 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
   TYPE t_reg_header IS TABLE OF escr_reg_header%ROWTYPE;
   TYPE t_reg_body IS TABLE OF escr_reg_body%ROWTYPE;
   TYPE t_reg_mapping IS TABLE OF escr_reg_mapping%ROWTYPE;
-  TYPE t_reg_errors IS TABLE OF escr_errors_log%ROWTYPE;
   TYPE t_vw_escr_list_for_sync IS TABLE OF vw_escr_list_for_sync%ROWTYPE;
   /**********************************************
     FUNCTION HEADER_VERSION
@@ -494,15 +497,19 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
   PROCEDURE p_get_reg_deals
   (
     in_reg_id     escr_register.id%TYPE
+   ,in_check_flag NUMBER DEFAULT 0 -- перевіряємо чи ні статуси КД
    ,out_deal_list OUT number_list
   ) IS
-    p_reg_list     number_list := number_list();
-    out_deal_list1 number_list := number_list();
+
+    all_deal_list   number_list := number_list();
+    valid_deal_list number_list := number_list();
+    --final_deal_list number_list := number_list();
+
   BEGIN
 
     BEGIN
       SELECT t.out_doc_id BULK COLLECT
-        INTO out_deal_list1
+        INTO all_deal_list
         FROM escr_reg_mapping t
        WHERE t.in_doc_id = in_reg_id
          AND t.oper_type = 0;
@@ -510,9 +517,25 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
       WHEN no_data_found THEN
         NULL;
     END;
+    /*Якщо на ЦБД є несинхронізовані КД,
+    то важливо не перезатерти по ним статуси при оплаті і виключити їх зі списку для оплати*/
+    IF in_check_flag IN (7, 11) THEN
+      BEGIN
 
-    out_deal_list := out_deal_list1;
+        SELECT t.deal_id BULK COLLECT
+          INTO valid_deal_list
+          FROM escr_reg_header t
+         WHERE t.deal_id IN (SELECT * FROM TABLE(all_deal_list))
+           AND t.credit_status_id NOT IN (9, 5);
+      EXCEPTION
+        WHEN no_data_found THEN
+          NULL;
+      END;
+      out_deal_list := valid_deal_list;
+    ELSE
 
+      out_deal_list := all_deal_list;
+    END IF;
   END p_get_reg_deals;
   /**********************************************
      PROCEDURE P_SET_CREDIT_STATUS
@@ -566,164 +589,128 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
 
    IS
     l_obj_status_id escr_reg_status.id%TYPE;
+    l_max_status_id NUMBER;
     -- in_obj_type Тип вхідного  об'єкта (1 -реєстр,0-кредит)
     p_obj_list number_list := number_list();
   BEGIN
-
+    --   _escrRegister.SetComment(deals.deals.deal[i].deal_id, String.Empty, status_code, 0, 1, cmd);
     p_get_status_id(in_status_code => in_status_code
                    ,out_status_id  => l_status_id);
 
-    --ОТРИМУЄМО НОВИЙ ID
-    p_get_new_id(in_obj_name => 'ESCR_REG_OBJ_STATE', out_id => p_new_id);
-    -- ОТРИМУЄМО ПІБ КОРИСТУВАЧА
-    p_get_user_name(out_user_name => user_name);
-    -- Проставляємо статус об*єкту, для якого ініціалізували зміну  статусу
-    INSERT INTO escr_reg_obj_state
-      (id
-      ,obj_id
-      ,obj_type
-      ,status_id
-      ,status_comment
-      ,user_id
-      ,user_name
-      ,set_date)
-    VALUES
-      (p_new_id
-      ,in_obj_id
-      ,in_obj_type
-      ,l_status_id
-      ,in_status_comment
-      ,user_id
-      ,user_name
-      ,in_set_date) log errors INTO err$_escr_reg_obj_state
-      ('INSERT') reject LIMIT unlimited;
-    IF in_obj_type = 1
-       AND in_obj_check = 0 THEN
-      UPDATE escr_register t
-         SET t.status_id = l_status_id log errors INTO err$_escr_reg_obj_state('UPDATE') reject LIMIT unlimited;
+    -- Перевіряємо попередній статус об*єкта.Перевірку не виконуємо для помилки валідації.Вона може щоразу мат різні коментарі
+    IF l_status_id <> 16 THEN
+      BEGIN
+        SELECT MAX(t.status_id) keep(dense_rank LAST ORDER BY t.id)
+          INTO l_max_status_id
+          FROM bars.escr_reg_obj_state t
+         WHERE obj_id = in_obj_id;
+      EXCEPTION
+        WHEN no_data_found THEN
+          l_max_status_id := NULL;
+      END;
+    ELSE
+      l_max_status_id := NULL;
     END IF;
-    -- Якщо тип об*єкту,якому змінюють статус -0 (кредит), то вносимо відповідні зміни в доппараматри
-    IF in_obj_type = 0
-       AND in_obj_check = 0
-       AND in_oper_level = 0 THEN
-      p_set_credit_status(in_obj_id         => in_obj_id
-                         ,in_status_code    => in_status_code
-                         ,in_status_comment => in_status_comment
-                         ,in_set_date       => in_set_date);
-    END IF;
-    IF in_obj_type = 0
-       AND in_obj_check = 1 THEN
-      IF in_oper_level = 0 THEN
+ -- Якщо максимальний статус КД-11,тобто оплачений,то виходимо з процедури.
+    if l_max_status_id=11 then
+     return;
+    end if;
+
+    IF l_max_status_id <> l_status_id
+       OR l_max_status_id IS NULL THEN
+      --ОТРИМУЄМО НОВИЙ ID
+      p_get_new_id(in_obj_name => 'ESCR_REG_OBJ_STATE', out_id => p_new_id);
+      -- ОТРИМУЄМО ПІБ КОРИСТУВАЧА
+      p_get_user_name(out_user_name => user_name);
+      -- Проставляємо статус об*єкту, для якого ініціалізували зміну  статусу
+      INSERT INTO escr_reg_obj_state
+        (id
+        ,obj_id
+        ,obj_type
+        ,status_id
+        ,status_comment
+        ,user_id
+        ,user_name
+        ,set_date)
+      VALUES
+        (p_new_id
+        ,in_obj_id
+        ,in_obj_type
+        ,l_status_id
+        ,in_status_comment
+        ,user_id
+        ,user_name
+        ,in_set_date) log errors INTO err$_escr_reg_obj_state
+        ('INSERT') reject LIMIT unlimited;
+      IF in_obj_type = 1
+         AND in_obj_check = 0 THEN
+        UPDATE escr_register t
+           SET t.status_id = l_status_id log errors INTO err$_escr_reg_obj_state('UPDATE') reject LIMIT unlimited;
+      END IF;
+      -- Якщо тип об*єкту,якому змінюють статус -0 (кредит), то вносимо відповідні зміни в доппараматри
+      IF in_obj_type = 0
+         AND in_obj_check = 0
+         AND in_oper_level = 0 THEN
         p_set_credit_status(in_obj_id         => in_obj_id
                            ,in_status_code    => in_status_code
                            ,in_status_comment => in_status_comment
                            ,in_set_date       => in_set_date);
       END IF;
-      p_get_reg_id(in_obj_id    => in_obj_id
-                  ,in_oper_type => 0
-                  ,out_reg_id   => l_reg_id);
-      p_get_obj_status_id(in_obj_id     => l_reg_id
-                         ,in_obj_type   => 1
-                         ,out_status_id => l_obj_status_id);
-      IF l_status_id <> l_obj_status_id THEN
-        INSERT INTO escr_reg_obj_state
-          (id
-          ,obj_id
-          ,obj_type
-          ,status_id
-          ,status_comment
-          ,user_id
-          ,user_name
-          ,set_date)
-        VALUES
-          (p_new_id
-          ,l_reg_id
-          ,1
-          ,l_status_id
-          ,in_status_comment
-          ,user_id
-          ,user_name
-          ,in_set_date) log errors INTO err$_escr_reg_obj_state
-          ('INSERT') reject LIMIT unlimited;
+      IF in_obj_type = 0
+         AND in_obj_check = 1 THEN
+        IF in_oper_level = 0 THEN
+          p_set_credit_status(in_obj_id         => in_obj_id
+                             ,in_status_code    => in_status_code
+                             ,in_status_comment => in_status_comment
+                             ,in_set_date       => in_set_date);
+        END IF;
+        p_get_reg_id(in_obj_id    => in_obj_id
+                    ,in_oper_type => 0
+                    ,out_reg_id   => l_reg_id);
+        p_get_obj_status_id(in_obj_id     => l_reg_id
+                           ,in_obj_type   => 1
+                           ,out_status_id => l_obj_status_id);
+        IF l_status_id <> l_obj_status_id THEN
+          INSERT INTO escr_reg_obj_state
+            (id
+            ,obj_id
+            ,obj_type
+            ,status_id
+            ,status_comment
+            ,user_id
+            ,user_name
+            ,set_date)
+          VALUES
+            (p_new_id
+            ,l_reg_id
+            ,1
+            ,l_status_id
+            ,in_status_comment
+            ,user_id
+            ,user_name
+            ,in_set_date) log errors INTO err$_escr_reg_obj_state
+            ('INSERT') reject LIMIT unlimited;
+        END IF;
       END IF;
-    END IF;
-    --Перевірка чи має реєстр пов*язані реєстри
-    IF in_obj_type = 1
-       AND in_obj_check = 1 THEN
-      p_get_reg_union_flag(in_reg_id          => in_obj_id
-                          ,out_reg_union_flag => l_reg_union_flag);
-    END IF;
+      --Перевірка чи має реєстр пов*язані реєстри
+      IF in_obj_type = 1
+         AND in_obj_check = 1 THEN
+        p_get_reg_union_flag(in_reg_id          => in_obj_id
+                            ,out_reg_union_flag => l_reg_union_flag);
+      END IF;
 
-    --Якщо тип об*єкта 1 і рєєстр немає пов*язаних реєстрів, то оновлюємо статуси лише кредитам в цьому реєстрі
-    IF in_obj_type = 1
-       AND in_obj_check = 1
-       AND l_reg_union_flag = 0 THEN
-      UPDATE escr_register t
-         SET t.status_id = l_status_id
-            ,t.user_id   = user_id
-            ,t.user_name = user_name
-       WHERE t.id = in_obj_id;
-      p_get_reg_deals(in_reg_id     => in_obj_id
-                     ,out_deal_list => l_credit_list);
+      --Якщо тип об*єкта 1 і рєєстр немає пов*язаних реєстрів, то оновлюємо статуси лише кредитам в цьому реєстрі
+      IF in_obj_type = 1
+         AND in_obj_check = 1
+         AND l_reg_union_flag = 0 THEN
 
-      FOR i IN 1 .. l_credit_list.count
-      LOOP
-        INSERT INTO escr_reg_obj_state
-          (id
-          ,obj_id
-          ,obj_type
-          ,status_id
-          ,status_comment
-          ,user_id
-          ,user_name
-          ,set_date)
-        VALUES
-          (s_escr.nextval
-          ,l_credit_list(i)
-          ,0
-          ,l_status_id
-          ,in_status_comment
-          ,user_id
-          ,user_name
-          ,in_set_date);
-        p_set_credit_status(in_obj_id         => l_credit_list(i)
-                           ,in_status_code    => in_status_code
-                           ,in_status_comment => in_status_comment
-                           ,in_set_date       => in_set_date);
-      END LOOP;
-    END IF;
-    --Якщо тип об*єкта 1 і рєєстр МАЄ пов*язані реєстри, то оновлюємо статуси цим реєстрам
-    IF in_obj_type = 1
-       AND in_obj_check = 1
-       AND l_reg_union_flag = 1 THEN
-      UPDATE escr_register t
-         SET t.status_id = l_status_id
-            ,t.user_id   = user_id
-            ,t.user_name = user_name
-       WHERE t.id = in_obj_id;
-      p_get_reg_register(in_reg_id    => in_obj_id
-                        ,out_reg_list => l_reg_list);
-      FOR i IN 1 .. l_reg_list.count
-      LOOP
-        INSERT INTO escr_reg_obj_state
-          (id
-          ,obj_id
-          ,obj_type
-          ,status_id
-          ,status_comment
-          ,user_id
-          ,user_name
-          ,set_date)
-        VALUES
-          (s_escr.nextval
-          ,l_reg_list(i)
-          ,1
-          ,l_status_id
-          ,in_status_comment
-          ,user_id
-          ,user_name
-          ,in_set_date);
-        p_get_reg_deals(in_reg_id     => l_reg_list(i)
+        UPDATE escr_register t
+           SET t.status_id = l_status_id
+              ,t.user_id   = user_id
+              ,t.user_name = user_name
+         WHERE t.id = in_obj_id;
+        p_get_reg_deals(in_reg_id     => in_obj_id
+                       ,in_check_flag => l_status_id
                        ,out_deal_list => l_credit_list);
 
         FOR i IN 1 .. l_credit_list.count
@@ -751,9 +738,75 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
                              ,in_status_comment => in_status_comment
                              ,in_set_date       => in_set_date);
         END LOOP;
-      END LOOP;
-    END IF;
+      END IF;
+      --Якщо тип об*єкта 1 і рєєстр МАЄ пов*язані реєстри, то оновлюємо статуси цим реєстрам
+      IF in_obj_type = 1
+         AND in_obj_check = 1
+         AND l_reg_union_flag = 1 THEN
+        UPDATE escr_register t
+           SET t.status_id = l_status_id
+              ,t.user_id   = user_id
+              ,t.user_name = user_name
+         WHERE t.id = in_obj_id;
+        p_get_reg_register(in_reg_id    => in_obj_id
+                          ,out_reg_list => l_reg_list);
+        UPDATE escr_register t
+           SET t.status_id = l_status_id
+              ,t.user_id   = user_id
+              ,t.user_name = user_name
+         WHERE t.id IN (SELECT * FROM TABLE(l_reg_list));
+        FOR i IN 1 .. l_reg_list.count
+        LOOP
+          INSERT INTO escr_reg_obj_state
+            (id
+            ,obj_id
+            ,obj_type
+            ,status_id
+            ,status_comment
+            ,user_id
+            ,user_name
+            ,set_date)
+          VALUES
+            (s_escr.nextval
+            ,l_reg_list(i)
+            ,1
+            ,l_status_id
+            ,in_status_comment
+            ,user_id
+            ,user_name
+            ,in_set_date);
+          p_get_reg_deals(in_reg_id     => l_reg_list(i)
+                         ,in_check_flag => l_status_id
+                         ,out_deal_list => l_credit_list);
 
+          FOR i IN 1 .. l_credit_list.count
+          LOOP
+            INSERT INTO escr_reg_obj_state
+              (id
+              ,obj_id
+              ,obj_type
+              ,status_id
+              ,status_comment
+              ,user_id
+              ,user_name
+              ,set_date)
+            VALUES
+              (s_escr.nextval
+              ,l_credit_list(i)
+              ,0
+              ,l_status_id
+              ,in_status_comment
+              ,user_id
+              ,user_name
+              ,in_set_date);
+            p_set_credit_status(in_obj_id         => l_credit_list(i)
+                               ,in_status_code    => in_status_code
+                               ,in_status_comment => in_status_comment
+                               ,in_set_date       => in_set_date);
+          END LOOP;
+        END LOOP;
+      END IF;
+    END IF;
   END p_set_obj_status;
 
   /**********************************************
@@ -766,7 +819,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
    ,in_obj_type escr_reg_obj_state.obj_type%TYPE
    ,out_status  OUT escr_reg_status.id%TYPE
   ) IS
-    p_status_id escr_reg_status.id%TYPE;
+
   BEGIN
 
     BEGIN
@@ -882,7 +935,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
       END LOOP;
     END IF;
     out_branch_list :=  /*'24/' || l_reg_list_dif.count ||' '||lc_new_line
-                                                                                                                             ||*/
+                                                                                                                                               ||*/
      substr(out_branch_list
                              ,1
                              ,length(out_branch_list) - 1);
@@ -995,11 +1048,11 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
   BEGIN
     BEGIN
       SELECT COUNT(CASE
-                     WHEN substr(t.deal_product, 1, 6) IN ('220347', '220257') THEN
+                     WHEN substr(t.deal_product, 1, 6) IN ('220347', '220257', '220380') THEN
                       1
                    END) boiler_count
             ,COUNT(CASE
-                     WHEN substr(t.deal_product, 1, 6) IN ('220258', '220348') THEN
+                     WHEN substr(t.deal_product, 1, 6) IN ('220258', '220348', '220381') THEN
                       2
                    END) material_count
             ,t.customer_okpo BULK COLLECT
@@ -1015,7 +1068,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
         SELECT t.deal_id BULK COLLECT
           INTO l_deal_id
           FROM escr_reg_header t
-         WHERE substr(t.deal_product, 1, 6) IN ('220258', '220348')
+         WHERE substr(t.deal_product, 1, 6) IN ('220258', '220348','220381')
            AND extract(YEAR FROM t.deal_date_from) = '2017'
            AND t.customer_okpo IN (SELECT * FROM TABLE(l_customer_okpo));
       END;
@@ -1037,7 +1090,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
         SELECT t.deal_id BULK COLLECT
           INTO l_deal_id
           FROM escr_reg_header t
-         WHERE substr(t.deal_product, 1, 6) IN ('220347', '220257')
+         WHERE substr(t.deal_product, 1, 6) IN ('220347', '220257','220380')
            AND extract(YEAR FROM t.deal_date_from) = '2017'
            AND t.customer_okpo IN (SELECT * FROM TABLE(l_customer_okpo));
       END;
@@ -1068,43 +1121,27 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
    ,in_reg_kind    IN escr_reg_kind.code%TYPE DEFAULT NULL
    ,out_check_flag OUT NUMBER
   ) IS
-    l_obj_kind   number_list;
-    l_obj_type   number_list;
-    l_obj_status number_list;
-    l_deal_id    number_list;
-    l_distinct   number_list;
-    l_multiset   number_list;
-    in_oper_type NUMBER;
-    --l_DEAL_INFO      TYPE_deal_info;
-    l_deal_invalid_year NUMBER;
+    l_invalid  number_list;
+    l_deal_id  number_list;
+    l_multiset number_list;
+    l_improved number_list;
+
   BEGIN
-    in_oper_type   := 0;
+
     out_check_flag := 0;
     l_deal_id      := number_list();
-    /*out_check_flag:
-    -999 - є помилки в заповненні даних КД
-    0 - помилок в заповненні даних КД немає
-    -998 - в 2017 році і далі пробують створити реєстр з некоректним типом
-    */
-
-    /*КД 2017 року і далі  не можуть бути включені в реєстр з будь-яким видом,окрім 6 - UNION_AFTER_1909*/
-    BEGIN
-      SELECT COUNT(1)
-        INTO l_deal_invalid_year
-        FROM cc_deal d
-       WHERE d.nd IN (SELECT * FROM TABLE(in_obj_list))
-         AND extract(YEAR FROM d.sdate) < '2017'
-         AND in_reg_kind NOT IN
-             (SELECT t.code FROM escr_reg_kind t WHERE t.valid_until IS NULL);
-    END;
-    IF l_deal_invalid_year <> 0 THEN
-      out_check_flag := -998;
-    END IF;
-
-    /*    BEGIN
-          EXECUTE IMMEDIATE 'truncate  table  escr_errors_log';--зараз не використовується
-        END;
-    */
+    l_invalid      := number_list();
+    --  Відбираємо всі некоректні КД,для подальшого виправлення статусів (ДООПРАЦЮВАТИ)
+    /* BEGIN
+      SELECT t.nd BULK COLLECT
+        INTO l_invalid
+        FROM nd_txt t
+       WHERE t.tag = 'ES000'
+         AND t.txt = 16;
+    EXCEPTION
+      WHEN no_data_found THEN
+        NULL;
+    END;*/
     --Якщо в портфелі є хоч один КД з некоректною вартістю товару, то виходимо з процедури
     BEGIN
       SELECT COUNT(*)
@@ -1133,14 +1170,21 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
                  GROUP BY t.deal_id)
       LOOP
 
-        pkg_escr_reg_utl.p_set_credit_status(in_obj_id         => c.deal_id
-                                            ,in_status_code    => 'VALID_ERROR'
-                                            ,in_status_comment => substr(c.reg_errors
-                                                                        ,1
-                                                                        ,4000)
-                                            ,in_set_date       => SYSDATE);
+        /* pkg_escr_reg_utl.p_set_credit_status(in_obj_id         => c.deal_id
+        ,in_status_code    => 'VALID_ERROR'
+        ,in_status_comment => substr(c.reg_errors
+                                    ,1
+                                    ,4000)
+        ,in_set_date       => SYSDATE);
+        */
+        pkg_escr_reg_utl.p_set_obj_status(in_obj_id         => c.deal_id
+                                         ,in_obj_type       => 0
+                                         ,in_status_code    => 'VALID_ERROR'
+                                         ,in_status_comment => substr(c.reg_errors
+                                                                     ,1
+                                                                     ,4000));
       END LOOP;
-      COMMIT;
+      /*      COMMIT;*/
       BEGIN
         SELECT deal_id BULK COLLECT
           INTO l_deal_id
@@ -1150,6 +1194,16 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
         WHEN no_data_found THEN
           NULL;
       END;
+      -- Проставляємо статус Доопрацьовано по всім КД, які не попали в помилкові, але були невалідні при минулих перевірках (ДООПРАЦЮВАТИ)
+      /*    l_improved := l_invalid MULTISET except l_deal_id;
+      FOR i IN 1 .. l_improved.count
+      LOOP
+        pkg_escr_reg_utl.p_set_obj_status(in_obj_id         => l_improved(i)
+                                         ,in_obj_type       => 0
+                                         ,in_status_code    => 'IMPROVED'
+                                         ,in_status_comment => '');
+      END LOOP;*/
+      -- Перевірка чи намагаються включити в реєстр помилкові КД
       l_multiset := l_deal_id MULTISET INTERSECT in_obj_list;
       IF l_multiset.count > 0 THEN
         out_check_flag := -999;
@@ -1251,8 +1305,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
         DELETE FROM escr_reg_body t WHERE t.deal_id = in_doc_id(i);
       FORALL i IN in_doc_id.first .. in_doc_id.last
         DELETE FROM nd_txt t
-         WHERE t.tag = 'ES000'
-           AND t.tag = 'ES005'
+         WHERE (t.tag = 'ES000' OR t.tag = 'ES005')
            AND t.nd = in_doc_id(i);
     END IF;
     FOR i IN 1 .. in_doc_id.count
@@ -1291,26 +1344,13 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
                  ,out_kind_id  => l_reg_kind_id);
     p_get_type_id(in_type_code => in_reg_type
                  ,out_type_id  => l_reg_type_id);
-    p_check_before_create(in_obj_list    => in_obj_list
-                         ,in_reg_kind    => in_reg_kind
-                         ,out_check_flag => l_check_flag);
-    /*КД 2017 року не можуть бути включені в реєстр з будь-яким видом,окрім 6 - UNION_AFTER_1909*/
-    /*BEGIN
-      SELECT COUNT(1)
-        INTO l_deal_invalid_year
-        FROM cc_deal d
-       WHERE d.nd IN (SELECT * FROM TABLE(in_obj_list))
-         AND extract(YEAR FROM d.sdate) < '2017'
-         and in_reg_kind='UNION_AFTER_1909';
-    END;*/
-
-    /*В 2017 році за умовами клієнт повинен крім документу про цільове використання ще й АВР.
-    КД подається в реєстр за пізнішою з цих дат*/
-    /*begin
-     FOR CUR IN (SELECT d.nd,d.sdate from cc_deal d into l_DEAL_INFO  )
-
-    end; */
-
+    IF in_oper_type = 0 THEN
+      p_check_before_create(in_obj_list    => in_obj_list
+                           ,in_reg_kind    => in_reg_kind
+                           ,out_check_flag => l_check_flag);
+    ELSE
+      l_check_flag := 0;
+    END IF;
     --ДОДАЄМО НОВИЙ ЗАПИС В РЕЄСТР
 
     IF l_check_flag <> -999 THEN
@@ -1395,10 +1435,10 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
                  ,in_out_doc_type => 1
                  ,in_oper_type    => in_oper_type
                  ,in_oper_date    => SYSDATE);
-        p_set_obj_status(in_obj_id      => out_reg_id
+        /*p_set_obj_status(in_obj_id      => out_reg_id
                         ,in_obj_type    => 1
                         ,in_status_code => 'RECEIVED'
-                        ,in_set_date    => l_create_date);
+                        ,in_set_date    => l_create_date);*/
       END IF;
     ELSIF l_check_flag <> 0 THEN
       out_reg_id := l_check_flag; --веб виводить повідомлення, що є помилкові КД і реєстр не може бути створено
@@ -1517,9 +1557,6 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
    ,in_file_id NUMBER DEFAULT NULL
   ) IS
 
-    l_register_list dbms_xmldom.domnodelist;
-    l_register      dbms_xmldom.domnode;
-
     l_escrparamlist dbms_xmldom.domnodelist;
     l_escrparam     dbms_xmldom.domnode;
 
@@ -1599,7 +1636,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
       l_reg_rec(l_reg_rec.last).user_name :=  /*TRIM(convert(*/
        l_str
       /*,'CL8MSWIN1251'
-                                                                                                                                             ,'UTF8'))*/
+                                                                                                                                                               ,'UTF8'))*/
         ;
 
       dbms_xslprocessor.valueof(l_escrparam
@@ -2036,10 +2073,11 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
        SET t.new_good_cost = in_new_good_cost
      WHERE t.deal_id = in_deal_id;
     UPDATE bars.escr_reg_header t
-       SET t.new_deal_sum = t.deal_sum * (t.new_good_cost / t.good_cost);
+       SET t.new_deal_sum = t.deal_sum * (t.new_good_cost / t.good_cost)
+     WHERE t.deal_id = in_deal_id;
 
     FOR rez IN (SELECT *
-                  FROM bars.vw_escr_reg_header t
+                  FROM bars.vw_escr_reg_header_ca t
                  WHERE t.deal_id = in_deal_id)
     LOOP
       CASE
@@ -2153,7 +2191,9 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
           l_new_comp_sum := round(rez.new_deal_sum * 0.35, 2);
       END CASE;
     END LOOP;
-    UPDATE bars.escr_reg_header t SET t.new_comp_sum = l_new_comp_sum;
+    UPDATE bars.escr_reg_header t
+       SET t.new_comp_sum = l_new_comp_sum
+     WHERE t.deal_id = in_deal_id;
   END p_change_comp_sum;
   /**********************************************
      PROCEDURE   p_gen_pay
@@ -2232,7 +2272,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
     LOOP
 
       FOR k IN (SELECT DISTINCT rh.*, t1.outer_number reg_n
-                  FROM bars.vw_escr_reg_header rh, bars.escr_register t1
+                  FROM bars.vw_escr_reg_header_ca rh, bars.escr_register t1
                  WHERE t1.id = rh.reg_id
                    AND rh.credit_status_id = 7
                    AND rh.reg_id = in_reg_list(i))
@@ -2242,8 +2282,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
           USING IN OUT oo.ref;
         oo.s    := k.comp_sum * 100;
         oo.nlsb := vkrzn(substr(k.mfo, 1, 5), '3739005');
-        bars_audit.info('ESCR oo.nlsb =' || oo.nlsb || ' oo.nlsa =' ||
-                        oo.nlsa);
+        /* bars_audit.info('ESCR oo.nlsb =' || oo.nlsb || ' oo.nlsa =' ||
+        oo.nlsa);*/
         oo.nd   := substr(k.deal_number, 1, 10);
         oo.mfob := k.mfo;
 
@@ -2400,7 +2440,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
     RETURN l_clob;
   END;
 
-    PROCEDURE p_sync_state IS
+  PROCEDURE p_sync_state IS
     l_url         params$global.val%TYPE := getglobaloption('ESCR_URL_RU');
     l_wallet_path VARCHAR2(256); --:= getglobaloption('OWWALLETPATH');
     l_wallet_pwd  VARCHAR2(256); --:= getglobaloption('OWWALETPWD');
@@ -2424,16 +2464,20 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
 
     OPEN l_cursor FOR
     /*      SELECT rm.* \*DEAL_ID,
-                                     decode(rm.credit_status_id, 11, rm.credit_status_id, null) as state_id,
-                                     null as comment,
-                                     decode(rm.credit_status_id, 11, 'true', 'false') as is_set*\
-            FROM vw_escr_reg_header rm
-           WHERE rm.credit_status_id IN (1, 2, 3, 16, 6, 7, 5, 12, -999)
-             AND rm.credit_status_id IS NOT NULL;
-    */
-       SELECT t.deal_id ,t.credit_status_id ,TO_NUMBER(NULL) state_id   ,t.kf   ,'' AS "COMMENT"
-       ,'false' AS is_set
-    FROM vw_escr_list_for_sync t;
+                                                 decode(rm.credit_status_id, 11, rm.credit_status_id, null) as state_id,
+                                                 null as comment,
+                                                 decode(rm.credit_status_id, 11, 'true', 'false') as is_set*\
+                        FROM vw_escr_reg_header rm
+                       WHERE rm.credit_status_id IN (1, 2, 3, 16, 6, 7, 5, 12, -999)
+                         AND rm.credit_status_id IS NOT NULL;
+                */
+      SELECT t.deal_id
+            ,t.credit_status_id
+            ,to_number(NULL) state_id
+            ,t.kf
+            ,'' AS "COMMENT"
+             ,'false' AS is_set
+        FROM vw_escr_list_for_sync t;
     LOOP
       FETCH l_cursor BULK COLLECT
         INTO l_deals LIMIT 100;
@@ -2472,7 +2516,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
            SET c = l_root.getclobval()
          WHERE namef = 'EWA';
         /*bars.logger.info('ESCR syncstate body:' || '<?xml version="1.0"?>' ||
-                         l_root.getclobval());*/
+        l_root.getclobval());*/
         wsm_mgr.prepare_request(p_url         => l_url ||
                                                  'createregister/syncstate'
                                ,p_action      => NULL
@@ -2487,7 +2531,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
         -- iicaaou iaoia aaa-na?aena
         wsm_mgr.execute_api(l_response);
         /*bars.logger.info('ESCR l_response' || '<?xml version="1.0"?>' ||
-                         l_response.cdoc);*/
+        l_response.cdoc);*/
         l_response.cdoc := decodeclobfrombase64(dbms_lob.substr(l_response.cdoc
                                                                ,length(l_response.cdoc) - 2
                                                                ,2));
@@ -2513,7 +2557,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
                                                            ,2));*/
     --return l_response;
   END p_sync_state;
----old version
+  ---old version
 /*PROCEDURE p_sync_state IS
   l_url         params$global.val%TYPE := getglobaloption('ESCR_URL_RU');
   l_wallet_path VARCHAR2(256); --:= getglobaloption('OWWALLETPATH');
@@ -2592,14 +2636,4 @@ BEGIN
   END;
 END pkg_escr_reg_utl;
 /
- show err;
- 
-PROMPT *** Create  grants  PKG_ESCR_REG_UTL ***
-grant EXECUTE                                                                on PKG_ESCR_REG_UTL to BARS_ACCESS_DEFROLE;
 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/pkg_escr_reg_utl.sql =========*** En
- PROMPT ===================================================================================== 
- 

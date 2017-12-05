@@ -9,24 +9,25 @@ PROMPT *** Create  procedure P_F33SB ***
 
   CREATE OR REPLACE PROCEDURE BARS.P_F33SB (Dat_ DATE, sheme_ VARCHAR2 DEFAULT 'C') IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% FILE NAME   :    otcn.sql
-% DESCRIPTION :    Этчетность Чберљанка: формирование файлов
-% COPYRIGHT   :    Copyright UNITY-BARS Limited, 2001.  All Rights Reserved.
-% VERSION     : 30/03/2017 (24/01/2017, 13/01/2016)
+% FILE NAME   :	otcn.sql
+% DESCRIPTION :	ќтчетность —берЅанка: формирование файлов
+% COPYRIGHT   :	Copyright UNITY-BARS Limited, 2001.  All Rights Reserved.
+% VERSION     : 13/11/2017 (30/03/2017, 24/01/2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% 30.03.2017 - дл§ остатков добалены годовые корректирующие проводки
-% 24.01.2017 - дл§ Dos96_ и Kos96_ не будем вычитать обороты перекрыти§
+% 13.11.2017 - удалил ненужные строки и изменил некоторые блоки формировани€ 
+% 30.03.2017 - дл€ остатков добалены годовые корректирующие проводки
+% 24.01.2017 - дл€ Dos96_ и Kos96_ не будем вычитать обороты перекрыти€
 %              на 5040(5041) (операции ZG8,ZG9) если Dos96_, Kos96_
-%              имеют нулевые значени§ 
+%              имеют нулевые значени€ 
 % 13.01.2016 - убрал мусор
-% 17.01.2014 - исключаем проводки перекрыти§ корректирующих за декабрь
-% 23.01.2014 - дл§ vЭФ(300465) код ЮСЭ банка клиента выбираем из таблицы
-%              CUSTBANK дл§ остальных ЦФ из таблицы SPECPARAM_INT
-%              выбираютс§ счета которых нет в OTCN_SALDO и есть в KOR_PROV
+% 17.01.2014 - исключаем проводки перекрыти€ корректирующих за декабрь
+% 23.01.2014 - дл€ √ќ”(300465) код ћ‘ќ банка клиента выбираем из таблицы
+%              CUSTBANK дл€ остальных –” из таблицы SPECPARAM_INT
+%              выбираютс€ счета которых нет в OTCN_SALDO и есть в KOR_PROV
 % 26.05.2012 - формируем в разрезе кодов территорий
-% 19.01.2012 - дабавл§ютс§ счета отсутствующие в конце мес§ца
+% 19.01.2012 - дабавл€ютс€ счета отсутствующие в конце мес€ца
 % 13.09.2011 - вызов функции F_POP_OTCN с новыми параметрами
-% 30.04.2011 - добавилЖacc,tobo в протокол
+% 30.04.2011 - добавил†acc,tobo в протокол
 % 09.03.2011 - в поле комментарий вносим код TOBO и название счета
 % 21.01.2010 - сделано как в файле @32
 % 02.12.2009 - убрал во всех курсорах заполнение OB22 в таблице
@@ -90,7 +91,7 @@ f33k_    SMALLINT;
 userid_  Number;
 sql_acc_ varchar2(2000):='';
 sql_doda_ varchar2(200):='';
-ret_     number;
+ret_	 number;
 tobo_    accounts.tobo%TYPE;
 nms_     accounts.nms%TYPE;
 comm_    rnbu_trace.comm%TYPE;
@@ -100,7 +101,7 @@ nbuc_    VARCHAR2(12);
 d_sum_   DECIMAL(24);
 k_sum_   DECIMAL(24);
 
---Эстатки номиналы (грн.+валюта)+эквиваленты
+--ќстатки номиналы (грн.+валюта)+эквиваленты
 CURSOR Saldo IS
    SELECT s.rnk, s.acc, s.nls, s.kv, s.fdat, s.nbs, s.ost, s.ostq,
           s.dos, s.dosq, s.kos, s.kosq,
@@ -116,12 +117,6 @@ CURSOR Saldo IS
       and s.acc = sp.acc(+)
       and a.rnk = cb.rnk(+);
 -----------------------------------------------------------------------
-CURSOR BaseL IS
-    SELECT kodp, nbuc, SUM (znap)
-    FROM rnbu_trace
-    WHERE userid = userid_
-    GROUP BY kodp, nbuc;
-
 BEGIN
 -------------------------------------------------------------------
 userid_ := user_id;
@@ -232,16 +227,10 @@ CLOSE SALDO;
 -----------------------------------------------------------------------------
 DELETE FROM tmp_irep WHERE kodf = '33' AND datf = Dat_;
 ---------------------------------------------------
-OPEN BaseL;
-LOOP
-   FETCH BaseL INTO  kodp_, nbuc_, znap_;
-   EXIT WHEN BaseL%NOTFOUND;
-   INSERT INTO tmp_irep
-        (kodf, datf, kodp, znap, nbuc)
-   VALUES
-        ('33', Dat_, kodp_, znap_, nbuc_);
-END LOOP;
-CLOSE BaseL;
+INSERT INTO tmp_irep (kodf, datf, kodp, znap, nbuc)
+select '33', Dat_, kodp, SUM (znap), nbuc
+FROM rnbu_trace
+GROUP BY kodp, nbuc;
 ------------------------------------------------------------------
 END p_f33sb;
 /

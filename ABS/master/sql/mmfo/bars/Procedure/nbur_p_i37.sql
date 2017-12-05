@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure NBUR_P_I37 ***
 
-  CREATE OR REPLACE PROCEDURE BARS.NBUR_P_I37 (p_kod_filii         varchar2,
+CREATE OR REPLACE PROCEDURE BARS.NBUR_P_I37 (p_kod_filii         varchar2,
                                              p_report_date       date,
                                              p_form_id           number,
                                              p_scheme            varchar2 default 'C',
@@ -18,9 +18,9 @@ PROMPT *** Create  procedure NBUR_P_I37 ***
 % DESCRIPTION : Процедура формирования @37 для КБ
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     : v.18.002  11.08.2016
+% VERSION     : v.16.004   30.10.2017
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_          char(30)  := 'v.16.002  11.08.2016';
+  ver_          char(30)  := 'v.16.004  30.10.2017';
 /*
    Структура показника    DD BBBB OO VVV
 
@@ -41,7 +41,8 @@ BEGIN
     nbur_files.P_PROC_SET(p_kod_filii, p_file_code, p_scheme, l_datez, 2, l_file_code, l_nbuc, l_type);
 
     BEGIN
-       INSERT INTO nbur_detail_protocols (report_date,
+       INSERT /*+ APPEND */
+       INTO nbur_detail_protocols (report_date,
                                           kf,
                                           report_code,
                                           nbuc,
@@ -56,7 +57,8 @@ BEGIN
                                           REF,
                                           nd,
                                           branch)
-          SELECT p_report_date,
+          SELECT /*+ parallel(8) */
+                 p_report_date,
                  p_kod_filii,
                  p_file_code,
                  (case when l_type = 0 then l_nbuc else nbuc end) nbuc,
@@ -87,7 +89,8 @@ BEGIN
                          nbuc,
                          colname,
                          VALUE
-                    FROM (SELECT b.cust_id,
+                    FROM (SELECT /*+ index(a, IDX_DMACCOUNTS_NBS_OB22) */
+                                 b.cust_id,
                                  b.acc_id,
                                  a.maturity_date,
                                  a.kf,
@@ -122,6 +125,7 @@ BEGIN
                            WHERE     a.nbs = k.r020
                                  AND a.report_date = p_report_date
                                  AND a.kf = p_kod_filii
+                                 AND nvl(a.acc_alt_dt, p_report_date - 1) <> p_report_date
                                  AND b.acc_id = a.acc_id
                                  AND b.report_date = p_report_date
                                  AND b.kf = p_kod_filii)   UNPIVOT (VALUE
@@ -140,7 +144,106 @@ BEGIN
        THEN
           logger.info ('NBUR_P_I37 error: ' || SQLERRM);
     END;
+    
+    commit;
 
+    BEGIN
+       INSERT /*+ APPEND */
+       INTO nbur_detail_protocols (report_date,
+                                          kf,
+                                          report_code,
+                                          nbuc,
+                                          field_code,
+                                          field_value,
+                                          description,
+                                          acc_id,
+                                          acc_num,
+                                          kv,
+                                          maturity_date,
+                                          cust_id,
+                                          REF,
+                                          nd,
+                                          branch)
+          SELECT /*+ parallel(8) */
+                 p_report_date,
+                 p_kod_filii,
+                 p_file_code,
+                 (case when l_type = 0 then l_nbuc else nbuc end) nbuc,
+                    SUBSTR (d.colname, 2, 2)
+                 || d.nbs
+                 || d.ob22
+                 || SUBSTR ('000' || d.kv, -3)
+                    field_code,
+                 ABS (VALUE) field_value,
+                 NULL description,
+                 acc_id,
+                 acc_num,
+                 kv,
+                 maturity_date,
+                 cust_id,
+                 NULL,
+                 NULL,
+                 branch
+            FROM (SELECT acc_id,
+                         acc_num,
+                         nbs,
+                         kv,
+                         ob22,
+                         date_off,
+                         cust_id,
+                         maturity_date,
+                         branch,
+                         nbuc,
+                         colname,
+                         VALUE
+                    FROM (SELECT /*+ index(a, IDX_DMACCOUNTS_NBS_OB22) */
+                                 b.cust_id,
+                                 b.acc_id,
+                                 a.maturity_date,
+                                 a.kf,
+                                 b.acc_num,
+                                 b.kv,
+                                 b.acc_ob22 ob22,
+                                 substr(b.acc_num, 1, 4) nbs,
+                                 a.close_date date_off,
+                                 DECODE (SIGN (b.ostq_rep), 1, 0, -ostq_rep) P10,
+                                 DECODE (SIGN (b.ostq_rep), 1, ostq_rep, 0) P20,
+                                 DECODE (SIGN (b.ost_rep), 1, 0, -ost_rep) P11,
+                                 DECODE (SIGN (b.ost_rep), 1, ost_rep, 0) P21,
+                                 b.dosq_repd P50,
+                                 b.kosq_repd P60,
+                                 b.dos_repd P51,
+                                 b.kos_repd P61,
+                                 a.branch,
+                                 a.nbuc
+                            FROM nbur_tmp_kod_r020 k,
+                                 nbur_dm_accounts a,
+                                 nbur_kor_balances b
+                           WHERE     a.nbs = k.r020
+                                 AND a.report_date = p_report_date
+                                 AND a.kf = p_kod_filii
+                                 AND nvl(a.acc_alt_dt, p_report_date - 1) = p_report_date
+                                 AND b.acc_id = a.acc_id
+                                 AND b.report_date = p_report_date
+                                 AND b.kf = p_kod_filii)   UNPIVOT (VALUE
+                                                                    FOR colname
+                                                                    IN  (P10,
+                                                                        P20,
+                                                                        P11,
+                                                                        P21,
+                                                                        P50,
+                                                                        P60,
+                                                                        P51,
+                                                                        P61))) d
+           WHERE (d.kv != '980' OR d.colname LIKE 'P_0') AND d.VALUE != 0;
+    EXCEPTION
+       WHEN OTHERS
+       THEN
+          logger.info ('NBUR_P_I37 error: ' || SQLERRM);
+    END;
+    
+    commit;
+        
     -- формирование показателей файла  в  nbur_agg_protocols
     INSERT INTO nbur_agg_protocols (report_date,
                                     kf,

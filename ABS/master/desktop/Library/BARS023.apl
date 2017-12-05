@@ -4,8 +4,9 @@ Application Description: Казначейские штучки
 .data VIEWINFO
 0000: 6F00000001000000 FFFF01000D004347 5458566965775374 6174650400010000
 0020: 0000000000990000 002C000000020000 0003000000000000 00BB010000F8FFFF
-0040: FFE2FFFFFFFFFFFF FF000000007C0200 004D010000010000 0001000000010000
-0060: 000F4170706C6963 6174696F6E497465 6D00000000
+0040: FFE1FFFFFFFFFFFF FF000000007C0200 004D010000010000 0001000000010000
+0060: 000F4170706C6963 6174696F6E497465 6D02000000075769 6E646F77730A7370
+0080: 6C506C616E446F68
 .enddata
 .data DT_MAKERUNDLG
 0000: 02000000001D513A 5C4241525339385C 4C4942524152595C 424152533031352E
@@ -2489,11 +2490,11 @@ Application Description: Казначейские штучки
 					On SAM_AnyEdit
 						Set M00=(M01+M02+M03+M04+M05+M06+M07+M08+M09+M10+M11+M12)
 					! On SAM_Validate
-						                                                                                                                                                                                                        If (M01 < 0)
-							                                                                                                                                                                                                        Call SalMessageBox( 'Сумма меньше нуля !!!', 'Дотация ... ', MB_Ok )
-							                                                                                                                                                                                                        Return VALIDATE_Cancel
-						                                                                                                                                                                                                        Else 
-							                                                                                                                                                                                                        Return VALIDATE_Ok
+						                                                                                                                                                                                                         If (M01 < 0)
+							                                                                                                                                                                                                         Call SalMessageBox( 'Сумма меньше нуля !!!', 'Дотация ... ', MB_Ok )
+							                                                                                                                                                                                                         Return VALIDATE_Cancel
+						                                                                                                                                                                                                         Else 
+							                                                                                                                                                                                                         Return VALIDATE_Ok
 			Column: M02
 				Class Child Ref Key: 0
 				Class ChildKey: 0
@@ -2528,11 +2529,11 @@ Application Description: Казначейские штучки
 					On SAM_AnyEdit
 						Set M00=(M01+M02+M03+M04+M05+M06+M07+M08+M09+M10+M11+M12)
 					! On SAM_Validate
-						                                                                                                                                                                                                        If (M02 < 0)
-							                                                                                                                                                                                                        Call SalMessageBox( 'Сумма меньше нуля !!!', 'Дотация ... ', MB_Ok )
-							                                                                                                                                                                                                        Return VALIDATE_Cancel
-						                                                                                                                                                                                                        Else 
-							                                                                                                                                                                                                        Return VALIDATE_Ok
+						                                                                                                                                                                                                         If (M02 < 0)
+							                                                                                                                                                                                                         Call SalMessageBox( 'Сумма меньше нуля !!!', 'Дотация ... ', MB_Ok )
+							                                                                                                                                                                                                         Return VALIDATE_Cancel
+						                                                                                                                                                                                                         Else 
+							                                                                                                                                                                                                         Return VALIDATE_Ok
 			Column: M03
 				Class Child Ref Key: 0
 				Class ChildKey: 0
@@ -2567,11 +2568,11 @@ Application Description: Казначейские штучки
 					On SAM_AnyEdit
 						Set M00=(M01+M02+M03+M04+M05+M06+M07+M08+M09+M10+M11+M12)
 					! On SAM_Validate
-						                                                                                                                                                                                                        If (M03 < 0)
-							                                                                                                                                                                                                        Call SalMessageBox( 'Сумма меньше нуля !!!', 'Дотация ... ', MB_Ok )
-							                                                                                                                                                                                                        Return VALIDATE_Cancel
-						                                                                                                                                                                                                        Else 
-							                                                                                                                                                                                                        Return VALIDATE_Ok
+						                                                                                                                                                                                                         If (M03 < 0)
+							                                                                                                                                                                                                         Call SalMessageBox( 'Сумма меньше нуля !!!', 'Дотация ... ', MB_Ok )
+							                                                                                                                                                                                                         Return VALIDATE_Cancel
+						                                                                                                                                                                                                         Else 
+							                                                                                                                                                                                                         Return VALIDATE_Ok
 			Column: M04
 				Class Child Ref Key: 0
 				Class ChildKey: 0
@@ -2606,11 +2607,11 @@ Application Description: Казначейские штучки
 					On SAM_AnyEdit
 						Set M00=(M01+M02+M03+M04+M05+M06+M07+M08+M09+M10+M11+M12)
 					! On SAM_Validate
-						                                                                                                                                                                                                        If (M04 < 0)
-							                                                                                                                                                                                                        Call SalMessageBox( 'Сумма меньше нуля !!!', 'Дотация ... ', MB_Ok )
-							                                                                                                                                                                                                        Return VALIDATE_Cancel
-						                                                                                                                                                                                                        Else 
-							                                                                                                                                                                                                        Return VALIDATE_Ok
+						                                                                                                                                                                                                         If (M04 < 0)
+							                                                                                                                                                                                                         Call SalMessageBox( 'Сумма меньше нуля !!!', 'Дотация ... ', MB_Ok )
+							                                                                                                                                                                                                         Return VALIDATE_Cancel
+						                                                                                                                                                                                                         Else 
+							                                                                                                                                                                                                         Return VALIDATE_Ok
 			Column: M05
 				Class Child Ref Key: 0
 				Class ChildKey: 0
@@ -2645,11 +2646,11 @@ Application Description: Казначейские штучки
 					On SAM_AnyEdit
 						Set M00=(M01+M02+M03+M04+M05+M06+M07+M08+M09+M10+M11+M12)
 					! On SAM_Validate
-						                                                                                                                                                                                                        If (M05 < 0)
-							                                                                                                                                                                                                        Call SalMessageBox( 'Сумма меньше нуля !!!', 'Дотация ... ', MB_Ok )
-							                                                                                                                                                                                                        Return VALIDATE_Cancel
-						                                                                                                                                                                                                        Else 
-							                                                                                                                                                                                                        Return VALIDATE_Ok
+						                                                                                                                                                                                                         If (M05 < 0)
+							                                                                                                                                                                                                         Call SalMessageBox( 'Сумма меньше нуля !!!', 'Дотация ... ', MB_Ok )
+							                                                                                                                                                                                                         Return VALIDATE_Cancel
+						                                                                                                                                                                                                         Else 
+							                                                                                                                                                                                                         Return VALIDATE_Ok
 			Column: M06
 				Class Child Ref Key: 0
 				Class ChildKey: 0
@@ -2684,11 +2685,11 @@ Application Description: Казначейские штучки
 					On SAM_AnyEdit
 						Set M00=(M01+M02+M03+M04+M05+M06+M07+M08+M09+M10+M11+M12)
 					! On SAM_Validate
-						                                                                                                                                                                                                        If (M06 < 0)
-							                                                                                                                                                                                                        Call SalMessageBox( 'Сумма меньше нуля !!!', 'Дотация ... ', MB_Ok )
-							                                                                                                                                                                                                        Return VALIDATE_Cancel
-						                                                                                                                                                                                                        Else 
-							                                                                                                                                                                                                        Return VALIDATE_Ok
+						                                                                                                                                                                                                         If (M06 < 0)
+							                                                                                                                                                                                                         Call SalMessageBox( 'Сумма меньше нуля !!!', 'Дотация ... ', MB_Ok )
+							                                                                                                                                                                                                         Return VALIDATE_Cancel
+						                                                                                                                                                                                                         Else 
+							                                                                                                                                                                                                         Return VALIDATE_Ok
 			Column: M07
 				Class Child Ref Key: 0
 				Class ChildKey: 0
@@ -2723,11 +2724,11 @@ Application Description: Казначейские штучки
 					On SAM_AnyEdit
 						Set M00=(M01+M02+M03+M04+M05+M06+M07+M08+M09+M10+M11+M12)
 					! On SAM_Validate
-						                                                                                                                                                                                                        If (M07 < 0)
-							                                                                                                                                                                                                        Call SalMessageBox( 'Сумма меньше нуля !!!', 'Дотация ... ', MB_Ok )
-							                                                                                                                                                                                                        Return VALIDATE_Cancel
-						                                                                                                                                                                                                        Else 
-							                                                                                                                                                                                                        Return VALIDATE_Ok
+						                                                                                                                                                                                                         If (M07 < 0)
+							                                                                                                                                                                                                         Call SalMessageBox( 'Сумма меньше нуля !!!', 'Дотация ... ', MB_Ok )
+							                                                                                                                                                                                                         Return VALIDATE_Cancel
+						                                                                                                                                                                                                         Else 
+							                                                                                                                                                                                                         Return VALIDATE_Ok
 			Column: M08
 				Class Child Ref Key: 0
 				Class ChildKey: 0
@@ -2762,11 +2763,11 @@ Application Description: Казначейские штучки
 					On SAM_AnyEdit
 						Set M00=(M01+M02+M03+M04+M05+M06+M07+M08+M09+M10+M11+M12)
 					! On SAM_Validate
-						                                                                                                                                                                                                        If (M08 < 0)
-							                                                                                                                                                                                                        Call SalMessageBox( 'Сумма меньше нуля !!!', 'Дотация ... ', MB_Ok )
-							                                                                                                                                                                                                        Return VALIDATE_Cancel
-						                                                                                                                                                                                                        Else 
-							                                                                                                                                                                                                        Return VALIDATE_Ok
+						                                                                                                                                                                                                         If (M08 < 0)
+							                                                                                                                                                                                                         Call SalMessageBox( 'Сумма меньше нуля !!!', 'Дотация ... ', MB_Ok )
+							                                                                                                                                                                                                         Return VALIDATE_Cancel
+						                                                                                                                                                                                                         Else 
+							                                                                                                                                                                                                         Return VALIDATE_Ok
 			Column: M09
 				Class Child Ref Key: 0
 				Class ChildKey: 0
@@ -2801,11 +2802,11 @@ Application Description: Казначейские штучки
 					On SAM_AnyEdit
 						Set M00=(M01+M02+M03+M04+M05+M06+M07+M08+M09+M10+M11+M12)
 					! On SAM_Validate
-						                                                                                                                                                                                                        If (M09 < 0)
-							                                                                                                                                                                                                        Call SalMessageBox( 'Сумма меньше нуля !!!', 'Дотация ... ', MB_Ok )
-							                                                                                                                                                                                                        Return VALIDATE_Cancel
-						                                                                                                                                                                                                        Else 
-							                                                                                                                                                                                                        Return VALIDATE_Ok
+						                                                                                                                                                                                                         If (M09 < 0)
+							                                                                                                                                                                                                         Call SalMessageBox( 'Сумма меньше нуля !!!', 'Дотация ... ', MB_Ok )
+							                                                                                                                                                                                                         Return VALIDATE_Cancel
+						                                                                                                                                                                                                         Else 
+							                                                                                                                                                                                                         Return VALIDATE_Ok
 			Column: M10
 				Class Child Ref Key: 0
 				Class ChildKey: 0
@@ -2840,11 +2841,11 @@ Application Description: Казначейские штучки
 					On SAM_AnyEdit
 						Set M00=(M01+M02+M03+M04+M05+M06+M07+M08+M09+M10+M11+M12)
 					! On SAM_Validate
-						                                                                                                                                                                                                        If (M10 < 0)
-							                                                                                                                                                                                                        Call SalMessageBox( 'Сумма меньше нуля !!!', 'Дотация ... ', MB_Ok )
-							                                                                                                                                                                                                        Return VALIDATE_Cancel
-						                                                                                                                                                                                                        Else 
-							                                                                                                                                                                                                        Return VALIDATE_Ok
+						                                                                                                                                                                                                         If (M10 < 0)
+							                                                                                                                                                                                                         Call SalMessageBox( 'Сумма меньше нуля !!!', 'Дотация ... ', MB_Ok )
+							                                                                                                                                                                                                         Return VALIDATE_Cancel
+						                                                                                                                                                                                                         Else 
+							                                                                                                                                                                                                         Return VALIDATE_Ok
 			Column: M11
 				Class Child Ref Key: 0
 				Class ChildKey: 0
@@ -2879,11 +2880,11 @@ Application Description: Казначейские штучки
 					On SAM_AnyEdit
 						Set M00=(M01+M02+M03+M04+M05+M06+M07+M08+M09+M10+M11+M12)
 					! On SAM_Validate
-						                                                                                                                                                                                                        If (M11 < 0)
-							                                                                                                                                                                                                        Call SalMessageBox( 'Сумма меньше нуля !!!', 'Дотация ... ', MB_Ok )
-							                                                                                                                                                                                                        Return VALIDATE_Cancel
-						                                                                                                                                                                                                        Else 
-							                                                                                                                                                                                                        Return VALIDATE_Ok
+						                                                                                                                                                                                                         If (M11 < 0)
+							                                                                                                                                                                                                         Call SalMessageBox( 'Сумма меньше нуля !!!', 'Дотация ... ', MB_Ok )
+							                                                                                                                                                                                                         Return VALIDATE_Cancel
+						                                                                                                                                                                                                         Else 
+							                                                                                                                                                                                                         Return VALIDATE_Ok
 			Column: M12
 				Class Child Ref Key: 0
 				Class ChildKey: 0
@@ -2918,11 +2919,11 @@ Application Description: Казначейские штучки
 					On SAM_AnyEdit
 						Set M00=(M01+M02+M03+M04+M05+M06+M07+M08+M09+M10+M11+M12)
 					! On SAM_Validate
-						                                                                                                                                                                                                        If (M12 < 0)
-							                                                                                                                                                                                                        Call SalMessageBox( 'Сумма меньше нуля !!!', 'Дотация ... ', MB_Ok )
-							                                                                                                                                                                                                        Return VALIDATE_Cancel
-						                                                                                                                                                                                                        Else 
-							                                                                                                                                                                                                        Return VALIDATE_Ok
+						                                                                                                                                                                                                         If (M12 < 0)
+							                                                                                                                                                                                                         Call SalMessageBox( 'Сумма меньше нуля !!!', 'Дотация ... ', MB_Ok )
+							                                                                                                                                                                                                         Return VALIDATE_Cancel
+						                                                                                                                                                                                                         Else 
+							                                                                                                                                                                                                         Return VALIDATE_Ok
 			Column: ACC
 				Class Child Ref Key: 0
 				Class ChildKey: 0
@@ -5927,7 +5928,7 @@ Application Description: Казначейские штучки
 							     INTO :GR,:S230,:KKD,:S1,:S2,:S3
 							     FROM gr412"||IifS( nPar=1,'gb','mb' )||" g, sal s, specparam p
 							    WHERE (s.dos > 0 OR s.kos > 0 OR s.ost <> 0) 
-							      AND s.nbs IN ("||IifS(nPar=1,"'3111','3121','6111','6112','9311','9312'",
+							      AND s.nbs IN ("||IifS(nPar=1,"'3111','3121','6511','6112','9311','9312'",
 							                                   "'3141','3151','6121','6122','9323','9324'")||")
 							      AND s.acc = p.acc
 							      AND g.s230 = p.s230 AND g.gr IN ('1','2') AND ktk LIKE '"||sKtkMask||"' AND fdat=:dDat
@@ -6791,8 +6792,8 @@ Application Description: Казначейские штучки
 						Uncheck Value:
 						Ignore Case? Yes
 .end
-				             List Values 
-				             Message Actions 
+				              List Values 
+				              Message Actions 
 			Column: FDAT1
 				Class Child Ref Key: 0
 				Class ChildKey: 0
@@ -6889,8 +6890,8 @@ Application Description: Казначейские штучки
 						Uncheck Value:
 						Ignore Case? Yes
 .end
-				             List Values 
-				             Message Actions 
+				              List Values 
+				              Message Actions 
 			! Column: NAME
 .winattr
 				Class Child Ref Key: 0
@@ -6922,8 +6923,8 @@ Application Description: Казначейские штучки
 						Uncheck Value:
 						Ignore Case? Yes
 .end
-				             List Values 
-				             Message Actions 
+				              List Values 
+				              Message Actions 
 			Column: SD
 				Class Child Ref Key: 0
 				Class ChildKey: 0
@@ -7384,9 +7385,9 @@ Application Description: Казначейские штучки
 						Set nRmd = SalNumberMod(nDvd, 36)
 						Set nDvd = SalNumberTruncate(nDvd/36, 10, 0)
 						! If nRmd < 10
-							                                                                                                                                                                                   Set strHex = SalNumberToChar(nRmd+48) || strHex
+							                                                                                                                                                                                    Set strHex = SalNumberToChar(nRmd+48) || strHex
 						! Else
-							                                                                                                                                                                                   Set strHex = SalNumberToChar(nRmd+55) || strHex
+							                                                                                                                                                                                    Set strHex = SalNumberToChar(nRmd+55) || strHex
 						Set strHex = SalNumberToChar(nRmd+IifN(nRmd<10, 48, 55)) || strHex
 					If SalNumberMod(SalStrLength(strHex), 2) != 0
 						Set strHex = '0' || strHex
@@ -9764,7 +9765,7 @@ Application Description: Казначейские штучки
 								Return FALSE
 								! If SalMessageBox( 'Цей документ виписки вже було оброблено.
 										Виконати повторно?', 'Увага!', MB_IconQuestion | MB_YesNo ) != IDYES
-									                                                               Return FALSE
+									                                                                Return FALSE
 								! Call SaveFInfoToLog('Користувая вибрав ПОВТОРНУ обробку док.'||tbl2.colNd)
 								! Set nPvt=0    ! не оттнимать от общего счетчика док
 							Call SalDisableWindow(tbl2)
@@ -12703,7 +12704,7 @@ Application Description: Казначейские штучки
 							Call SalTblSetFocusRow( hWndForm, nRow )
 						! Call SalTblQueryScroll ( tbl, nTmp, nMinRow, nMaxRow )
 						! If nCurRow1 > nMaxRow
-							                                                                                                        Set nCurRow1=nMaxRow
+							                                                                                                         Set nCurRow1=nMaxRow
 						! Call SalTblSetContext( tbl, nCurRow1 )
 						! Call SalTblSetRowFlags( tbl, nCurRow1, ROW_Selected, TRUE )
 						! Call SalTblSetFocusRow( tbl, nCurRow1 )
@@ -12713,39 +12714,39 @@ Application Description: Казначейские штучки
 						! Call SalSendClassMessage( UM_Update, 0, 0 )
 						Call SalSendMsg(tbl2, UM_Update, 0, 0)
 					! On UM_Update
-						                                                                                                         Call SalWaitCursor(TRUE)
-						                                                                                                         Set nRow = TBL_MinRow
-						                                                                                                         Set nTmp = 0
-						                                                                                                         While SalTblFindNextRow ( hWndForm, nRow, 0, ROW_MarkDeleted )
-							                                                                                                         Call SalTblSetContext( hWndForm, nRow )
-							                                                                                                         If not SqlPLSQLCommand(hSql(),"a3125(splOp3522.tbl2.colKkd,splOp3522.tbl.colKPK,splOp3522.tbl.colKTK,splOp3522.tbl.colACC)")
-								                                                                                                         Break 
-							                                                                                                         Set nTmp=nTmp+colKoef
-						                                                                                                         If not nSch
-							                                                                                                         Set nSch=SalStrToNumber( tbl.colNlsA )
-							                                                                                                         Set tbl.colIds=nSch
-						                                                                                                         Call SqlPrepareAndExecute( hSql(), 'SELECT ids FROM perekr_s WHERE ids=:nSch')
-						                                                                                                         If not SqlFetchNext(hSql(),nFetchRes)
-							                                                                                                         Set sTmp='Схема для рах.'||tbl.colNlsA
-							                                                                                                         Call SqlPrepareAndExecute( hSql(), 'INSERT INTO perekr_s (ids,name) VALUES (:nSch,:sTmp)')
-							                                                                                                         Call SalTblSetRowFlags( tbl, SalTblQueryContext( tbl ), ROW_Edited, TRUE )
-						                                                                                                         If nTmp = 1 or nTmp=0
-							                                                                                                         Call SaveInfoToLog(MSG_SaveDataRef() || ' ' || strTitleAux)
-							                                                                                                         If strSqlDelete != ''
-								                                                                                                         Call SqlPrepare(tbl.cMain.hSql(), T(strSqlDelete))
-								                                                                                                         Call SalTblDoDeletes(hWndForm, tbl.cMain.hSql(), ROW_MarkDeleted)
-							                                                                                                         If strSqlInsert != ''
-								                                                                                                         Call SqlPrepare(tbl.cMain.hSql(), T(strSqlInsert))
-								                                                                                                         Call SalTblDoInserts(hWndForm, tbl.cMain.hSql(), TRUE)
-							                                                                                                         If strSqlUpdate != ''
-								                                                                                                         Call SqlPrepare(tbl.cMain.hSql(), T(strSqlUpdate))
-								                                                                                                         Call SalTblDoUpdates(hWndForm, tbl.cMain.hSql(), TRUE)
-							                                                                                                         Call SqlCommit(tbl.cMain.hSql())
-							                                                                                                         Call SalPostMsg(hWndForm, UM_Populate, 0, 0)
-						                                                                                                         Else 
-							                                                                                                         Call SqlRollback(tbl.cMain.hSql())
-							                                                                                                         Call SalMessageBox( 'Сумма коеф не равна 1 ', 'Внимание', MB_IconExclamation )
-						                                                                                                         Call SalWaitCursor(FALSE)
+						                                                                                                          Call SalWaitCursor(TRUE)
+						                                                                                                          Set nRow = TBL_MinRow
+						                                                                                                          Set nTmp = 0
+						                                                                                                          While SalTblFindNextRow ( hWndForm, nRow, 0, ROW_MarkDeleted )
+							                                                                                                          Call SalTblSetContext( hWndForm, nRow )
+							                                                                                                          If not SqlPLSQLCommand(hSql(),"a3125(splOp3522.tbl2.colKkd,splOp3522.tbl.colKPK,splOp3522.tbl.colKTK,splOp3522.tbl.colACC)")
+								                                                                                                          Break 
+							                                                                                                          Set nTmp=nTmp+colKoef
+						                                                                                                          If not nSch
+							                                                                                                          Set nSch=SalStrToNumber( tbl.colNlsA )
+							                                                                                                          Set tbl.colIds=nSch
+						                                                                                                          Call SqlPrepareAndExecute( hSql(), 'SELECT ids FROM perekr_s WHERE ids=:nSch')
+						                                                                                                          If not SqlFetchNext(hSql(),nFetchRes)
+							                                                                                                          Set sTmp='Схема для рах.'||tbl.colNlsA
+							                                                                                                          Call SqlPrepareAndExecute( hSql(), 'INSERT INTO perekr_s (ids,name) VALUES (:nSch,:sTmp)')
+							                                                                                                          Call SalTblSetRowFlags( tbl, SalTblQueryContext( tbl ), ROW_Edited, TRUE )
+						                                                                                                          If nTmp = 1 or nTmp=0
+							                                                                                                          Call SaveInfoToLog(MSG_SaveDataRef() || ' ' || strTitleAux)
+							                                                                                                          If strSqlDelete != ''
+								                                                                                                          Call SqlPrepare(tbl.cMain.hSql(), T(strSqlDelete))
+								                                                                                                          Call SalTblDoDeletes(hWndForm, tbl.cMain.hSql(), ROW_MarkDeleted)
+							                                                                                                          If strSqlInsert != ''
+								                                                                                                          Call SqlPrepare(tbl.cMain.hSql(), T(strSqlInsert))
+								                                                                                                          Call SalTblDoInserts(hWndForm, tbl.cMain.hSql(), TRUE)
+							                                                                                                          If strSqlUpdate != ''
+								                                                                                                          Call SqlPrepare(tbl.cMain.hSql(), T(strSqlUpdate))
+								                                                                                                          Call SalTblDoUpdates(hWndForm, tbl.cMain.hSql(), TRUE)
+							                                                                                                          Call SqlCommit(tbl.cMain.hSql())
+							                                                                                                          Call SalPostMsg(hWndForm, UM_Populate, 0, 0)
+						                                                                                                          Else 
+							                                                                                                          Call SqlRollback(tbl.cMain.hSql())
+							                                                                                                          Call SalMessageBox( 'Сумма коеф не равна 1 ', 'Внимание', MB_IconExclamation )
+						                                                                                                          Call SalWaitCursor(FALSE)
 					On SAM_KillFocus
 						Set nCurRow1 = SalTblQueryContext ( tbl )
 						Set nCurRow2 = 0
@@ -12965,7 +12966,7 @@ Application Description: Казначейские штучки
 						! ! Установить на старое место
 						! Call SalTblQueryScroll ( hWndForm, nTmp, nMinRow, nMaxRow )
 						! If nCurRow2 > nMaxRow
-							                                                                                                         Set nCurRow2=nMaxRow
+							                                                                                                          Set nCurRow2=nMaxRow
 						! Call SalTblSetContext( hWndForm, nCurRow2 )
 						! Call SalTblSetRowFlags( hWndForm, nCurRow2, ROW_Selected, TRUE )
 						! Call SalTblSetFocusRow( hWndForm, nCurRow2 )
@@ -12996,7 +12997,7 @@ Application Description: Казначейские штучки
 					On SAM_FetchRowDone
 						Set colOTM = IifN(SalStrRightX(colNLS,1)='n', 0, 1)
 					! On SAM_KillFocus
-						                                                                                                         Set nCurRow2 = SalTblQueryContext ( tbl2 )
+						                                                                                                          Set nCurRow2 = SalTblQueryContext ( tbl2 )
 		Functions
 			Function: PutFileToLob
 				Description: Загрузка данных из файла в поле BLOB с последующей записью в BLOB или CLOB
@@ -13466,8 +13467,8 @@ Application Description: Казначейские штучки
 					Background Color: Class Default
 					Message Actions
 						! On SAM_Click
-							                                                                                  Set sFilNem=GetFilNem('PREE'||SalFmtFormatDateTime(GetBankDate(),'ddMM'))
-							                                                                                  Call TablePrint(tblPerekryt, 'Перерахування коштів згідно реєстру',sFilNem,'')
+							                                                                                   Set sFilNem=GetFilNem('PREE'||SalFmtFormatDateTime(GetBankDate(),'ddMM'))
+							                                                                                   Call TablePrint(tblPerekryt, 'Перерахування коштів згідно реєстру',sFilNem,'')
 				Line
 					Resource Id: 13101
 					Class Child Ref Key: 41
@@ -14777,8 +14778,8 @@ Application Description: Казначейские штучки
 						Uncheck Value:
 						Ignore Case? Yes
 .end
-				                                                                                    List Values 
-				                                                                                    Message Actions 
+				                                                                                     List Values 
+				                                                                                     Message Actions 
 			! Column: colSumR
 .winattr
 				Class Child Ref Key: 0
@@ -14811,8 +14812,8 @@ Application Description: Казначейские штучки
 						Uncheck Value:
 						Ignore Case? Yes
 .end
-				                                                                                    List Values 
-				                                                                                    Message Actions 
+				                                                                                     List Values 
+				                                                                                     Message Actions 
 			! Column: colKoef
 .winattr
 				Class Child Ref Key: 0
@@ -14844,8 +14845,8 @@ Application Description: Казначейские штучки
 						Uncheck Value:
 						Ignore Case? Yes
 .end
-				                                                                                  List Values 
-				                                                                                  Message Actions 
+				                                                                                   List Values 
+				                                                                                   Message Actions 
 			Column: colKod
 				Class Child Ref Key: 0
 				Class ChildKey: 0
@@ -15203,9 +15204,9 @@ Application Description: Казначейские штучки
 				Set bSel = TRUE
 				Set sGrp='00'
 				! If SalStrScan(strTabN,'P') >= 0  ! Не ставить %% в назначении платежа 
-					                                                                       Set nFnp=1
+					                                                                        Set nFnp=1
 				! If SalStrScan(strTabN,'T') >= 0  ! Кнопка ТАЙМЕР
-					                                                                                    Call SalShowWindow(obTimer)
+					                                                                                     Call SalShowWindow(obTimer)
 				If SalStrScan(strTabPrcN,',') >= 0  ! Есть имя процедуры для вызова
 					Set strTabN = SalStrLeftX(strTabPrcN,SalStrScan(strTabPrcN,','))
 					Set strPrcN = SalStrRightX(strTabPrcN,SalStrLength(strTabPrcN)-SalStrScan(strTabPrcN,',')-1)

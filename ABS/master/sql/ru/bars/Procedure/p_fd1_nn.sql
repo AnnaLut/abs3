@@ -12,7 +12,7 @@ PROMPT *** Create  procedure P_FD1_NN ***
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирования #D1 для КБ (универсальная)
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     : 03/02/2015 (05/01/2015)
+% VERSION     : 24/11/2017 (03/02/2015)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
@@ -144,9 +144,11 @@ BEGIN
 
    nbuc_ := nbuc1_;
 
-   insert /*+APPEND PARALLEL(OTCN_ACC) */ into otcn_acc
-   select /*+PARALLEL(a) PARALLEL(c) */
-            a.acc,a.nls,a.kv,a.nbs,a.rnk,a.daos,a.dapp,
+   insert /*+APPEND  */ 
+   into otcn_acc(acc, nls, kv, nbs, rnk, daos, dapp, 
+        isp, nms, lim, pap, tip, vid, mdate, dazs, accc, tobo)
+   select /*+PARALLEL(8) */
+          a.acc,a.nls,a.kv,a.nbs,a.rnk,a.daos,a.dapp,
           0,null,0,0,null,0,null,a.dazs,0,a.tobo
    from accounts a
    where a.dapp is not null
@@ -157,9 +159,9 @@ BEGIN
           (a.nbs is not null and a.nbs in (select distinct r020 from kl_f3_29 where kf='D1') and
            Dat_ > dat_izm)) ;
 
-   insert /*+APPEND PARALLEL(OTCN_SALDO) */
+   insert /*+APPEND  */ 
    into otcn_saldo (odate, fdat, acc, nls, kv, nbs, rnk, ost, dos, kos)
-   select /*+PARALLEL(s) PARALLEL(a) */
+   select /*+PARALLEL(8) */
           dat_, dat_, a.acc, s.nls, s.kv, s.nbs, s.rnk, sum(a.ostf),
           sum(case when s.nbs = '8021' and mfo_ = 353575  then a.dos else 0 end),
           sum(case when s.nbs = '8021' and mfo_ = 353575  then a.kos else 0 end)
@@ -173,7 +175,7 @@ BEGIN
            Dat_ > dat_izm))
    group by dat_, dat_, a.acc, s.nls, s.kv, s.nbs, s.rnk ;
 
-   insert /*+APPEND PARALLEL(TMP_FILE03) */
+   insert /*+APPEND PARALLEL(8) */
    into TMP_FILE03(ACCD, TT, REF, KV, NLSD, S, SQ, FDAT, NAZN, ACCK, NLSK, ISP)
    select *
    from (select accd,tt,ref,kv,nlsd,s,sq,fdat,nazn,acck,nlsk,isp
@@ -189,8 +191,7 @@ BEGIN
                            (case when ad.nls like '3801%' or ak.nls like '3801%' then decode(p.kv, 980, p.kv2, p.kv) else ad.kv end) kv,
                            (case when ad.nls like '3801%' or ak.nls like '3801%' then decode(p.kv, 980, p.s2, p.s) else o.s end)/100 s
                     FROM oper p, accounts ad,   accounts ak,
-                         (SELECT /*+PARALLEL(p) PARALLEL(z)*/
-                                 p.fdat, p.REF, p.stmt, p.tt, p.s, p.sq, p.txt,
+                         (SELECT p.fdat, p.REF, p.stmt, p.tt, p.s, p.sq, p.txt,
                                  DECODE (p.dk,0,p.acc,z.acc) accd,
                                  DECODE (p.dk,1,p.acc,z.acc) acck
                           FROM opldok p, accounts a, opldok z
@@ -269,10 +270,9 @@ BEGIN
 
    -- изменяем Kт обороты только  по счетам не в кореспонденции с 6,7 классами
    -- и не внутри раздела
-   MERGE  /*+parallel(a)*/
+   MERGE  /*+parallel(8)*/
     INTO OTCN_SALDO A
-         USING (  SELECT  /*+parallel(t)*/
-                        ACCK, NVL (SUM (S * 100), 0) KOS
+         USING (  SELECT  ACCK, NVL (SUM (S * 100), 0) KOS
                     FROM TMP_FILE03 t
                    WHERE FDAT BETWEEN dat3_ AND dat_
                 GROUP BY ACCK) B
@@ -284,10 +284,9 @@ BEGIN
     THEN
        insert(acc, kos, odate, fdat) values (b.acck, b.kos, dat_, dat_);
 
-   MERGE  /*+parallel(a)*/
+   MERGE  /*+parallel(8)*/
     INTO OTCN_SALDO A
-         USING (  SELECT  /*+parallel(t)*/
-                        ACCD, NVL (SUM (S * 100), 0) DOS
+         USING (  SELECT  ACCD, NVL (SUM (S * 100), 0) DOS
                     FROM TMP_FILE03 t
                    WHERE FDAT BETWEEN dat3_ AND dat_
                 GROUP BY ACCD) B
@@ -1168,7 +1167,6 @@ show err;
 PROMPT *** Create  grants  P_FD1_NN ***
 grant EXECUTE                                                                on P_FD1_NN        to BARS_ACCESS_DEFROLE;
 grant EXECUTE                                                                on P_FD1_NN        to RPBN002;
-grant EXECUTE                                                                on P_FD1_NN        to WR_ALL_RIGHTS;
 
 
 

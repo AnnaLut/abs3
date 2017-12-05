@@ -29,8 +29,12 @@ for c in(select o.* from komis_non_cash k, oper o
       select branch, F_TARIF(70, kv, nls, c.s )
         into l_branch, l_s
         from accounts where nls=c.nlsb and kv=980;
-
-        gl.payv(0, c.ref, c.vdat, l_tt, 1, 980, c.nlsb, l_s, 980, nbs_ob22_null ('6110','17', l_branch), l_s);
+         if NEWNBS.GET_STATE = 0 then
+            gl.payv(0, c.ref, c.vdat, l_tt, 1, 980, c.nlsb, l_s, 980, nbs_ob22_null ('6110','17', l_branch), l_s);
+         else 
+            gl.payv(0, c.ref, c.vdat, l_tt, 1, 980, c.nlsb, l_s, 980, nbs_ob22_null ('6510','17', l_branch), l_s);
+         end if;
+        
         gl.pay2(2, c.ref, gl.bd);
      delete from komis_non_cash where ref=c.ref;
 

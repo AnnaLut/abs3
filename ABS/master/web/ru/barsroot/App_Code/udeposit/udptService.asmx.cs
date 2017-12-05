@@ -1,54 +1,60 @@
+﻿using System;
+using System.IO;
 using System.ComponentModel;
-using Bars;
+using System.Data;
 using System.Globalization;
 using System.Collections;
+using System.Web;
 using System.Web.Services;
-using System;
-using System.IO;
-using Bars.Doc;
+using Bars;
 using Bars.Web.Report;
-using System.Data;
+using Bars.Doc;
 using BarsWeb.Core.Logger;
 using Oracle.DataAccess.Client;
+using Oracle.DataAccess.Types;
+using System.Collections.Generic;
+using BarsWeb.Infrastructure.Helpers;
+using System.Text;
 
 namespace barsroot.udeposit
-{
+{   // 2017-10-03 //
     public class DptUService : BarsWebService
     {
         string base_role = "wr_deposit_u";
+        int rowsLimit = 2000;
         private IDbLogger DBLogger; 
 
         private struct oper_stuct
         {
             public OracleConnection con;
-            public long Ref;	        // референс (NUMBER_Null для новых)
-            public string TT;			// Код операции
-            public byte Dk;				// ДК (0-дебет, 1-кредит)
-            public short Vob;			// Вид обработки
-            public string Nd;			// № док
+            public long Ref;				// референс (NUMBER_Null для новых)
+            public string TT;				// Код операции
+            public byte Dk;					// ДК (0-дебет, 1-кредит)
+            public short Vob;				// Вид обработки
+            public string Nd;				// № док
             public DateTime DatD;		// Дата док
             public DateTime DatP;		// Дата ввода(поступления в банк)
-            public DateTime DatV1;		// Дата валютирования основной операции
-            public DateTime DatV2;		// Дата валютирования связаной операции
+            public DateTime DatV1;	// Дата валютирования основной операции
+            public DateTime DatV2;	// Дата валютирования связаной операции
             public string NlsA;			// Счет-А
             public string NamA;			// Наим-А
             public string BankA;		// МФО-А
             public string NbA;			// Наим банка-А(м.б. '')
-            public short KvA;			// Код вал-А
+            public short KvA;				// Код вал-А
             public decimal SA;			// Сумма-А
             public string OkpoA;		// ОКПО-А
             public string NlsB;			// Счет-Б
             public string NamB;			// Наим-Б
             public string BankB;		// МФО-Б
             public string NbB;			// Наим банка-Б(м.б. '')
-            public short KvB;			// Код вал-Б
+            public short KvB;				// Код вал-Б
             public decimal SB;			// Сумма-Б
             public string OkpoB;		// ОКПО-Б
             public string Nazn;			// Назначение пл
             public string Drec;			// Доп реквизиты
             public string OperId;		// Идентификатор ключа опрециониста
             public byte[] Sign;			// ЭЦП опрециониста
-            public byte Sk;				// СКП
+            public byte Sk;					// СКП
             public short Prty;			// Приоритет документа
             public decimal SQ;			// Эквивалент для одновалютной оп
         }
@@ -97,16 +103,19 @@ namespace barsroot.udeposit
                     "d.rnk RNK, d.nmk NMK, d.okpo OKPO, " +
                     "d.acc ACC, d.nls NLS, d.ostc/100 OST, d.ostb/100 OST_PL, d.ostq/100 OSTQ, " +
                     "d.acra ACCN, d.proc PROC, d.ostn/100 OSTN, " +
-                    "d.freqn nFREQN, d.freqv nFREQV, d.freq_name FREQV," +
-                    "TO_CHAR(d.dat_z,'DD.MM.YYYY') DATZ, TO_CHAR(d.dat_n,'DD.MM.YYYY') DATN, TO_CHAR(d.dat_o,'DD.MM.YYYY') DATO, TO_CHAR(d.dat_v,'DD.MM.YYYY') DATV," +
-                    "d.dat_z, d.dat_n, d.dat_o, d.dat_v," +
+                    "d.freqn nFREQN, d.freqv nFREQV, d.freq_name FREQV, " +
+                    "TO_CHAR(d.dat_z,'DD.MM.YYYY') DATZ, TO_CHAR(d.dat_n,'DD.MM.YYYY') DATN, " +
+                    "TO_CHAR(d.dat_o,'DD.MM.YYYY') DATO, TO_CHAR(d.dat_v,'DD.MM.YYYY') DATV, " +
+                    "d.dat_z DATZ_SORT, d.dat_n DAT_N_SORT, " +
+                    "d.dat_o DAT_O_SORT, d.dat_v DAT_V_SORT, " +
+                    "d.DAT_Z, d.DAT_N, d.DAT_O, d.DAT_V, d.branch BRANCH, " +
                     "d.mfod MFOD, d.nlsd ACCD, d.nmsd NMSD," +
                     "d.mfop MFOP, d.nlsp ACCP, d.nmsd NMSP," +
                     "SIGN(d.DAT_O - bankdate) FL_1, SIGN(d.DAT_O - bankdate - 7) FL_2, SIGN(d.DAT_O - bankdate - 30) FL_3, " +
                     "d.fl_add FL_ADD, d.id_stop ID_STOP, d.min_sum/100 MIN_SUM, d.user_id ISP, d.closed CLOSED",
                     "BARS.DPT_U d", filter, data);
-                arr[0] = tmp[0];
-                arr[1] = tmp[1];
+                arr[0] = tmp[0]; // XML with data
+                arr[1] = tmp[1]; // number of pages
                 ArrayList reader = SQL_reader("select f_ourmfo, nb, user_id, TO_CHAR(bankdate,'DD.MM.YYYY'), tobopack.gettobo, tobopack.GetTOBOName, TO_CHAR(bankdate-1,'DD.MM.YYYY') from banks where mfo=f_ourmfo");
                 if (reader.Count != 0)
                 {
@@ -181,71 +190,73 @@ namespace barsroot.udeposit
         [WebMethod(EnableSession = true)]
         public object[] GetDepositDealParams(string dpu_id)
         {
-            object[] result = new object[57];
+            object[] result = new object[59];
             try
             {
                 InitOraConnection();
-                SetRole(base_role);
+                
                 SetParameters("DPU_ID", DB_TYPE.Decimal, dpu_id, DIRECTION.Input);
-                ArrayList reader = SQL_reader("SELECT " +
-                                              "ND," + //0
-                                              "VIDD," + //1
-                                              "VIDD_NAME," + //2
-                                              "RNK," + //3
-                                              "SUM," + //4
-                                              "TO_CHAR(DAT_BEGIN,'DD.MM.YYYY')," + //5
-                                              "TO_CHAR(DAT_END,'DD.MM.YYYY')," + //6
-                                              "TO_CHAR(DATZ,'DD.MM.YYYY')," + //7
-                                              "TO_CHAR(DATV,'DD.MM.YYYY')," + //8
-                                              "MFO_D," + //9
-                                              "NLS_D," + //10
-                                              "NMS_D," + //11
-                                              "NB_D," +  //12
-                                              "MFO_P," + //13
-                                              "NLS_P," + //14
-                                              "NMS_P," + //15
-                                              "NB_P," +  //16
-                                              "COMMENTS," + //17
-                                              "KV," + //18
-                                              "LCV," + //19
-                                              "NAMEV," + //20
-                                              "NMK," + //21
-                                              "OKPO," + //22
-                                              "ADR," + //23
-                                              "TO_CHAR(BDAT,'DD.MM.YYYY')," + //24
-                                              "BR," + //25
-                                              "BR_NAME," +//26
-                                              "OP," +//27
-                                              "IR," +//28
-                                              "FREQV," +//29
-                                              "FREQV_NAME," +//30
-                                              "ACC," +//31
-                                              "NLS," +//32
-                                              "ACRA," +//33
-                                              "COMPROC," +//34
-                                              "DPU_ADD," +//35
-                                              "DPU_GEN," +//36
-                                              "ID_STOP," +//37
-                                              "STOP_NAME," +//38
-                                              "MIN_SUM, " +//39
-                                              "f_ourmfo, " +//40
-                                              "ACR_NLS, " +//41
-                                              "FL_EXT, " +//42	
-                                              "BRANCH, " +//43	
-                                              "BRANCH_NAME, " +//44
-                                              "DPU_CODE, " +//45
-                                              "TAS_ID, " +//46
-                                              "TAS_FIO, " +//47
-                                              "TAS_POS, " +//48
-                                              "TAS_DOC, " +//49
-                                              "ACC2, " +//50
-                                              "TEMPLATE_ID, " +//51
-                                              "K013, "        +//52
-                                              "TYPE_ID, "     + //53
-                                              "TYPE_NAME, "   + //54
-                                              "OKPO_P, "      + //55
-                                              "CNT_DUBL "     + //56  
-                                              "FROM V_DPU_DEAL_WEB WHERE DPU_ID=:DPU_ID");
+
+                ArrayList reader = SQL_reader("select ND" + //0
+                                              ", VIDD" + //1
+                                              ", VIDD_NAME" + //2
+                                              ", RNK" + //3
+                                              ", SUM" + //4
+                                              ", to_char(DAT_BEGIN,'dd.mm.yyyy')" + //5
+                                              ", to_char(DAT_END,'dd.mm.yyyy')" + //6
+                                              ", to_char(DATZ,'dd.mm.yyyy')" + //7
+                                              ", to_char(DATV,'dd.mm.yyyy')" + //8
+                                              ", MFO_D" + //9
+                                              ", NLS_D" + //10
+                                              ", NMS_D" + //11
+                                              ", NB_D" +  //12
+                                              ", MFO_P" + //13
+                                              ", NLS_P" + //14
+                                              ", NMS_P" + //15
+                                              ", NB_P" +  //16
+                                              ", COMMENTS" + //17
+                                              ", KV" + //18
+                                              ", LCV" + //19
+                                              ", NAMEV" + //20
+                                              ", NMK" + //21
+                                              ", OKPO" + //22
+                                              ", ADR" + //23
+                                              ", to_char(BDAT,'dd.mm.yyyy')" + //24
+                                              ", BR" + //25
+                                              ", BR_NAME" +//26
+                                              ", OP" +//27
+                                              ", IR" +//28
+                                              ", FREQV" +//29
+                                              ", FREQV_NAME"  + // 30
+                                              ", ACC"         + // 31
+                                              ", NLS"         + // 32
+                                              ", ACRA"        + // 33
+                                              ", COMPROC"     + // 34
+                                              ", DPU_ADD"     + // 35
+                                              ", DPU_GEN"     + // 36
+                                              ", ID_STOP"     + // 37
+                                              ", STOP_NAME"   + // 38
+                                              ", MIN_SUM"     + // 39
+                                              ", F_OURMFO()"  + // 40
+                                              ", ACR_NLS"     + // 41
+                                              ", FL_EXT"      + // 42
+                                              ", BRANCH"      + // 43
+                                              ", BRANCH_NAME" + // 44
+                                              ", DPU_CODE"    + // 45
+                                              ", TAS_ID"      + // 46
+                                              ", DPU_TYPE"    + // 47
+                                              ", TERM_TYPE"   + // 48
+                                              ", OSTC"        + // 49
+                                              ", ACC2"        + // 50
+                                              ", TEMPLATE_ID" + // 51
+                                              ", K013"        + // 52
+                                              ", TYPE_ID"     + // 53
+                                              ", TYPE_NAME"   + // 54
+                                              ", OKPO_P"      + // 55
+                                              ", CNT_DUBL"    + // 56
+                                              ", ( select nvl(min(FR),-1) from DOC_SCHEME where ID = TEMPLATE_ID ) as TPL_TP"  + // 57
+                                              ", ( select (greatest(length(BRANCH),length(sys_context('bars_context','user_branch')))-1)/7 from STAFF$BASE where ID = USER_ID ) as USR_LVL" + // 58
+                                              " from V_DPU_DEAL_WEB WHERE DPU_ID=:DPU_ID");
 
                 DBLogger.Info("Пользователь просматривает параметры депозитного договора № " + dpu_id, "BarsWeb.DepositU");
 
@@ -261,6 +272,7 @@ namespace barsroot.udeposit
                 DisposeOraConnection();
             }
         }
+
         //Доп. соглашения
         [WebMethod(EnableSession = true)]
         public object[] GetDepositAddDealParams(string dpu_id)
@@ -271,50 +283,49 @@ namespace barsroot.udeposit
                 InitOraConnection();
                 SetRole(base_role);
                 SetParameters("DPU_ID", DB_TYPE.Decimal, dpu_id, DIRECTION.Input);
-                ArrayList reader = SQL_reader("SELECT " +
-                    "to_char(dpu.f_next_add_number(dpu_id))," +//0
-                    "VIDD," +//1
-                    "VIDD_NAME," +//2
-                    "ACC," +//3
-                    "NLS," +//4
-                    "ACRA," +//5
-                    "RNK," +//6
-                    "NMK," +//7
-                    "OKPO," +//8
-                    "ADR," +//9
-                    "KV," +//10
-                    "LCV," +//11
-                    "NAMEV, " +//12
-                    "BRANCH, " +//13
-                    "BRANCH_NAME, " +//14
-                    "NLS, " +//15
-                    "ACR_NLS, " +//16
-                    "TAS_ID, " +//17
-                    "TAS_FIO, " +//18
-                    "TAS_POS, " +//19
-                    "TAS_DOC, " +//20
-                    "TO_CHAR(DAT_END,'DD.MM.YYYY'), " +//21
-                    "TO_CHAR(DATV,'DD.MM.YYYY'), " +//22
-                    "TYPE_ID, " +//23
-                    "K013, " + //24
-                    "FREQV, " +//25
-                    "FREQV_NAME, " +//26
-                    "ID_STOP, " +//27
-                    "STOP_NAME, " +//28
-                    "MFO_D, "   +//29
-                    "NLS_D, "   +//30
-                    "NMS_D, "   +//31
-                    "NB_D, "    +//32
-                    "MFO_P, "   +//33
-                    "NLS_P, "   +//34
-                    "NMS_P, "   +//35
-                    "NB_P, "    +//36
-                    "OKPO_P, "  +//37
-                    "BR, "      +//38
-                    "BR_NAME, " +//39
-                    "OP, "      +//40
-                    "IR "       +//41
-                    "FROM V_DPU_DEAL_WEB WHERE DPU_ID=:DPU_ID");
+                ArrayList reader = SQL_reader("select to_char(dpu.f_next_add_number(dpu_id))" + // 0
+                    ", VIDD"        + // 01
+                    ", VIDD_NAME"   + // 02
+                    ", ACC"         + // 03
+                    ", NLS"         + // 04
+                    ", ACRA"        + // 05
+                    ", RNK"         + // 06
+                    ", NMK"         + // 07
+                    ", OKPO"        + // 08
+                    ", ADR"         + // 09
+                    ", KV"          + // 10
+                    ", LCV"         + // 11
+                    ", NAMEV"       + // 12
+                    ", BRANCH"      + // 13
+                    ", BRANCH_NAME" + // 14
+                    ", NLS"         + // 15
+                    ", ACR_NLS"     + // 16
+                    ", TAS_ID"      + // 17
+                    ", TAS_FIO"     + // 18
+                    ", TAS_POS"     + // 19
+                    ", TAS_DOC"     + // 20
+                    ", to_char(DAT_END,'dd.mm.yyyy')" + // 21
+                    ", to_char(DATV,   'dd.mm.yyyy')" + // 22
+                    ", TYPE_ID"     + // 23
+                    ", K013"        + // 24
+                    ", FREQV"       + // 25
+                    ", FREQV_NAME"  + // 26
+                    ", ID_STOP"     + // 27
+                    ", STOP_NAME"   + // 28
+                    ", MFO_D"       + // 29
+                    ", NLS_D"       + // 30
+                    ", NMS_D"       + // 31
+                    ", NB_D"        + // 32
+                    ", MFO_P"       + // 33
+                    ", NLS_P"       + // 34
+                    ", NMS_P"       + // 35
+                    ", NB_P"        + // 36
+                    ", OKPO_P"      + // 37
+                    ", BR"          + // 38
+                    ", BR_NAME"     + // 39
+                    ", OP"          + // 40
+                    ", IR"          + // 41
+                    "  from V_DPU_DEAL_WEB where DPU_ID = :DPU_ID");
                 DBLogger.Info("Пользователь просматривает параметры доп. соглашения № " + dpu_id, "BarsWeb.DepositU");
                 if (reader.Count != 0)
                 {
@@ -333,6 +344,8 @@ namespace barsroot.udeposit
         [WebMethod(EnableSession = true)]
         public string MakeInt(decimal acc, string date)
         {
+            DBLogger.Info("Користувач розпочав нарахування %% по рахунку #" + acc.ToString(), "BarsWeb.DepositU");
+
             string result = string.Empty;
             DateTime pdat = (!string.IsNullOrEmpty(date)) ? (Convert.ToDateTime(date, cinfo)) : (DateTime.MinValue);
             try
@@ -355,6 +368,7 @@ namespace barsroot.udeposit
 								 and a.kv         = t.kv");
 
                 ClearParameters();
+
                 SetParameters("p_dat2", DB_TYPE.Date, pdat, DIRECTION.Input);
                 SetParameters("p_runmode", DB_TYPE.Decimal, 1, DIRECTION.Input);
                 SetParameters("p_runid", DB_TYPE.Decimal, 0, DIRECTION.Input);
@@ -364,14 +378,22 @@ namespace barsroot.udeposit
                 SQL_NONQUERY(@"declare p_errflg boolean; p_ret number;
 							   begin make_int(:p_dat2, :p_runmode, :p_runid, :p_intamount, p_errflg);
 							   if p_errflg
-								then p_ret := 1;
-								else  
-									p_ret := 0;
-								end if;
+							   then p_ret := 1;
+							   else p_ret := 0;
+							   end if;
 							   :p_err := p_ret;
 							   end; ");
 
                 result = Convert.ToString(GetParameter("p_err"));
+
+                if (result == "0")
+                {
+                    DBLogger.Info("Сума нарахованих %% по рахунку #" + acc.ToString() + " становить " + Convert.ToString(GetParameter("p_intamount")), "BarsWeb.DepositU");
+                }
+                else
+                {
+                    DBLogger.Info("Виникла помилка при нарахуванні %% по рахунку #" + acc.ToString(), "BarsWeb.DepositU");
+                }
             }
             finally
             {
@@ -385,7 +407,7 @@ namespace barsroot.udeposit
         [WebMethod(EnableSession = true)]
         public object[] GetDepositDealState(string dpu_id, string dpu_gen)
         {
-            object[] result = new object[45];
+            object[] result = new object[46];
             try
             {
                 InitOraConnection();
@@ -410,32 +432,32 @@ namespace barsroot.udeposit
                     "bankdate, " +//15
                     "DAT_BEGIN, " +//16
                     "DAT_END," +//17
-                    "FL_ADD, " +//18
-                    "ACR_DAT-bankdate+1, " +//19
-                    "nvl(ID_STOP,0), " +//20
-                    "KV, "    + //21  
-                    "MFO_D, " + //22
-                    "NLS_D, " + //23
-                    "NMS_D, " + //24
-                    "NB_D, "  + //25
-                    "SUM, "   + //26
-                    "VISED, " + //27
-                    "MFO_P, " + //28
-                    "NLS_P, " + //29
-                    "NMS_P, " + //30
-                    "OKPO_P " + //31
-                    " FROM V_DPU_DEAL_WEB WHERE DPU_ID=:DPU_ID");
+                    "FL_ADD " +//18
+                    ", d.ACR_DAT-bankdate+1" + // 19
+                    ", nvl(d.ID_STOP,0)"     + // 20
+                    ", d.KV"                 + // 21  
+                    ", d.MFO_D"              + // 22
+                    ", d.NLS_D"              + // 23
+                    ", d.NMS_D"              + // 24
+                    ", d.NB_D"               + // 25
+                    ", d.SUM"                + // 26
+                    ", d.VISED"              + // 27
+                    ", d.MFO_P"              + // 28
+                    ", d.NLS_P"              + // 29
+                    ", d.NMS_P"              + // 30
+                    ", d.OKPO_P"             + // 31
+                    ", d.OSTC"               + // 32
+                " from BARS.V_DPU_DEAL_WEB d where d.DPU_ID = :DPU_ID");
                 if (reader.Count != 0)
                     reader.CopyTo(result);
 
-                string kv = Convert.ToString(result[21]);
-                string mfo_d = Convert.ToString(result[22]);
-                string vised = Convert.ToString(result[27]);
+                result[37] = Convert.ToString(result[27]);
+
                 // реквізити для виплати %%
                 result[38] = Convert.ToString(result[28]);
                 result[39] = Convert.ToString(result[29]);
                 result[40] = Convert.ToString(result[30]);
-                result[44] = Convert.ToString(result[31]);
+                result[41] = Convert.ToString(result[31]);
 
                 if (Convert.ToString(result[14]) != "1")
                 {
@@ -443,46 +465,99 @@ namespace barsroot.udeposit
                     DateTime datZ = Convert.ToDateTime(result[1], cinfo);
                     DateTime datN = Convert.ToDateTime(result[16], cinfo);
                     DateTime datO = DateTime.MinValue;
+                    Int32 stopDone = 0;
+                    Int32 pny_id = Convert.ToInt32(result[20]);
+
                     if (Convert.ToString(result[17]) != "")
                         datO = Convert.ToDateTime(result[17], cinfo);
 
-                    //принять на депозит 
-                    if (Convert.ToDecimal(result[8], cinfo) == 0 && datO > bdate && datN <= bdate)
-                        result[27] = 1;
-                    else
-                        result[27] = 0;
+                    if (Convert.ToDecimal(result[32], cinfo) > 0)
+                    {
+                        if (datN <= bdate && ( datO > bdate || datO == DateTime.MinValue) )
+                        {
+                            // Поповнення
+                            if (Convert.ToDecimal(result[18], cinfo) == 1)
+                            {
+                                result[28] = 1;
+                            }
+                            else
+                            {
+                                result[28] = 0;
+                            }
 
-                    //пополнить депозит
-                    if (Convert.ToDecimal(result[18], cinfo) == 1 && datO > bdate && datZ <= bdate)
-                        result[28] = 1;
+                            // была ли операция штрафования
+                            if (pny_id > 0 && datO != DateTime.MinValue)
+                            {
+                                ClearParameters();
+
+                                SetParameters("DATN", DB_TYPE.Date, datN, DIRECTION.Input);
+
+                                SetParameters("DPU_ID", DB_TYPE.Decimal, dpu_id, DIRECTION.Input);
+
+                                stopDone = Convert.ToInt32(SQL_SELECT_scalar("select count( o.REF ) " +
+                                    "  from BARS.OPLDOK t " +
+                                    "  join BARS.OPER   o        on (  o.REF    = t.REF ) " +
+                                    "  join BARS.DPU_ACCOUNTS da on ( da.ACCID  = t.ACC ) " +
+                                    "  join BARS.DPU_PAYMENTS dp on ( dp.DPU_ID = da.DPUID  AND  dp.REF = t.REF )   " +
+                                    " where t.FDAT between :DATN AND greatest(trunc(SYSDATE), bankdate) " +
+                                    "   and t.dk = 0  " +
+                                    "   and t.sos > 0 " +
+                                    "   and o.TT IN ( 'DUS', 'DUT' ) " +
+                                    "   and dp.DPU_ID = :DPU_ID"));
+                            }
+
+                            // Штрафування ( відсутній факт штрафування )
+                            if (stopDone == 0)
+                            {
+                                result[30] = 1; // Enabled
+                            }
+                            else
+                                result[30] = 0; // Disabled
+                        }
+
+                        // Погашення ( є плановий залишок AND код штрафу = 0 
+                        // OR договір завершився 
+                        // OR договір дозапитання 
+                        // OR наявний факт штрафування 
+                        if (Convert.ToDecimal(result[8]) > 0 && (datO < bdate || datO == DateTime.MinValue || stopDone > 0 || pny_id == 0))
+                            result[31] = 1; // Enabled
+                        else
+                            result[31] = 0; // Disabled
+                    }
                     else
+                    {
+                        // розміщення (якщо договір ще не закінчився)
+                        if (datN <= bdate && datO > bdate)
+                        {
+                            result[27] = 1;
+                        }
+                        else
+                        {
+                            result[27] = 0;
+                        }
+
                         result[28] = 0;
-                    //перечислить %%
-                    if (Convert.ToDecimal(result[11], cinfo) > 0)
-                        result[29] = 1;
-                    else
                         result[29] = 0;
-                    // штрафование
-                    //была ли операция штрафования
-                    ClearParameters();
-                    SetParameters("accN", DB_TYPE.Decimal, result[9], DIRECTION.Input);
-                    int stopDone = Convert.ToInt32(SQL_SELECT_scalar("SELECT count(*) FROM opldok WHERE fdat = bankdate " +
-                                      " AND dk = 0 AND sos > 0 AND tt = 'DUS' AND acc = :accN"));
-                    if (Convert.ToDecimal(result[20]) > 0 && datN < bdate && datO > bdate && datO != DateTime.MinValue && Convert.ToDecimal(result[8], cinfo) > 0 && stopDone == 0)
-                        result[30] = 1;
-                    else
                         result[30] = 0;
-
-                    // погашение депозита
-                    if (Convert.ToDecimal(result[8]) > 0 && (Convert.ToDecimal(result[20]) == 0 || datO <= bdate || datO == DateTime.MinValue || stopDone > 0))
-                        result[31] = 1;
-                    else
                         result[31] = 0;
+
+                    }
+
+                    // Виплата. нарах. %% (якщо наявний план. залишок на рах. нарах.%%)
+                    if (Convert.ToDecimal(result[11], cinfo) > 0)
+                    {
+                        result[29] = 1;
+                    }
+                    else
+                    {
+                        result[29] = 0;
+                    }
                 }
+
+                //
                 ClearParameters();
                 SetParameters("dpu_gen", DB_TYPE.Decimal, dpu_gen, DIRECTION.Input);
                 result[36] = SQL_SELECT_scalar("SELECT ' №'||nd||' от '||to_char(datz,'dd/MM/yyyy') FROM dpu_deal WHERE dpu_id = :dpu_gen");
-                result[37] = vised;
 
                 // 
                 string nls = Convert.ToString(result[7]);
@@ -493,7 +568,9 @@ namespace barsroot.udeposit
                     result[42] = SQL_SELECT_scalar("SELECT a.nls FROM V_DPU_RELATION_ACC d, ACCOUNTS a WHERE d.DEP_ID = :dpu_id AND d.TIP_ACC = 'DEP' AND d.GEN_ACC = a.acc");
                 }
                 else
+                {
                     result[42] = result[7];
+                }
 
                 string nlsN = Convert.ToString(result[10]);
                 if (nlsN.StartsWith("8"))
@@ -503,56 +580,77 @@ namespace barsroot.udeposit
                     result[43] = SQL_SELECT_scalar("SELECT a.nls FROM V_DPU_RELATION_ACC d, ACCOUNTS a WHERE d.DEP_ID = :dpu_id AND d.TIP_ACC = 'DEN' AND d.GEN_ACC = a.acc");
                 }
                 else
+                {
                     result[43] = result[10];
-
-                //Tts 
-                ArrayList list = SQL_reader("SELECT val,f_ourmfo FROM params where par='BASEVAL'");
-                string baseval = Convert.ToString(list[0]);
-                string ourmfo = Convert.ToString(list[1]);
-                decimal fli = 0;
-
-                //Операция - прием депозита
-                ClearParameters();
-                SetParameters("op", DB_TYPE.Decimal, 0, DIRECTION.Input);
-                SetParameters("fli", DB_TYPE.Decimal, 0, DIRECTION.Input);
-                result[32] = Convert.ToString(SQL_SELECT_scalar("SELECT o.tt FROM tts t, op_rules o " +
-                              "WHERE t.tt=o.tt AND t.tt like 'DU%' AND o.tag='DPTOP' AND o.val=to_char(:op) AND t.fli=:fli"));
-                //Операция - Пополнение депозита
-                ClearParameters();
-                SetParameters("op", DB_TYPE.Decimal, 1, DIRECTION.Input);
-                SetParameters("fli", DB_TYPE.Decimal, 0, DIRECTION.Input);
-                result[33] = Convert.ToString(SQL_SELECT_scalar("SELECT o.tt FROM tts t, op_rules o " +
-                              "WHERE t.tt=o.tt AND t.tt like 'DU%' AND o.tag='DPTOP' AND o.val=to_char(:op) AND t.fli=:fli"));
-                //Операция - Погашение депозита
-                if (kv == baseval)
-                {
-                    if (mfo_d == ourmfo || mfo_d == "") fli = 0;
-                    else fli = 1;
                 }
-                else
+
+                // TTS
+                Int32 kv = Convert.ToInt32(result[21]);
+
+                ClearParameters();
+
+                SetParameters("p_curid", DB_TYPE.Decimal, kv, DIRECTION.Input);
+                SetParameters("p_curid", DB_TYPE.Decimal, kv, DIRECTION.Input);
+                SetParameters("p_curid", DB_TYPE.Decimal, kv, DIRECTION.Input);
+                SetParameters("p_mfod", DB_TYPE.Varchar2, Convert.ToString(result[22]), DIRECTION.Input);
+                SetParameters("p_curid", DB_TYPE.Decimal, kv, DIRECTION.Input);
+                SetParameters("p_mfop", DB_TYPE.Varchar2, Convert.ToString(result[38]), DIRECTION.Input);
+
+                ArrayList list = SQL_reader("select DPU.GET_TT( 0, :p_curid, gl.kf(), Null )" // 0 - Розміщення депозиту
+                                              + " , DPU.GET_TT( 1, :p_curid, gl.kf(), Null )" // 1 - Поповнення депозиту
+                                              + " , DPU.GET_TT( 2, :p_curid, :p_mfod, Null )" // 2 - Deposit  payout (2)
+                                              + " , DPU.GET_TT( 4, :p_curid, :p_mfop, Null )" // 3 - Interest payout (4)
+                                              + " from DUAL");
+
+                if (list.Count > 0)
                 {
-                    if (mfo_d == ourmfo || mfo_d == "") fli = 0;
-                    else fli = 2;
+                    result[32] = Convert.ToString(list[0]);
+                    result[33] = Convert.ToString(list[1]);
+                    result[34] = Convert.ToString(list[2]);
+                    result[35] = Convert.ToString(list[3]);
                 }
-                ClearParameters();
-                SetParameters("op", DB_TYPE.Decimal, 2, DIRECTION.Input);
-                SetParameters("fli", DB_TYPE.Decimal, fli, DIRECTION.Input);
-                result[34] = Convert.ToString(SQL_SELECT_scalar("SELECT o.tt FROM tts t, op_rules o " +
-                    "WHERE t.tt=o.tt AND t.tt like 'DU%' AND o.tag='DPTOP' AND o.val=to_char(:op) AND t.fli=:fli"));
 
-                if (mfo_d == ourmfo || mfo_d == "") fli = 0;
-                else fli = 1;
-                ClearParameters();
-                SetParameters("op", DB_TYPE.Decimal, 2, DIRECTION.Input);
-                SetParameters("fli", DB_TYPE.Decimal, fli, DIRECTION.Input);
-                result[35] = Convert.ToString(SQL_SELECT_scalar("SELECT o.tt FROM tts t, op_rules o " +
-                    "WHERE t.tt=o.tt AND t.tt like 'DU%' AND o.tag='DPTOP' AND o.val=to_char(:op) AND t.fli=:fli"));
+                if ( kv != 980 )
+                {
+                    ClearParameters();
+                    string bankMfo = GetGlobalParam("MFO", "BASIC_INFO");
 
-                ClearParameters();
-                SetParameters("op", DB_TYPE.Decimal, 4, DIRECTION.Input);
-                SetParameters("fli", DB_TYPE.Decimal, fli, DIRECTION.Input);
-                result[41] = Convert.ToString(SQL_SELECT_scalar("SELECT o.tt FROM tts t, op_rules o " +
-                    "WHERE t.tt=o.tt AND t.tt like 'DU%' AND o.tag='DPTOP' AND o.val=to_char(:op) AND t.fli=:fli"));
+                    if (Convert.ToString(result[22]) != bankMfo)
+                    {
+                        try
+                        {
+                            ClearParameters();
+                            SetParameters("p_mfo", DB_TYPE.Varchar2, Convert.ToString(result[22]), DIRECTION.Input);
+                            SetParameters("p_dpuid", DB_TYPE.Decimal, dpu_id, DIRECTION.Input);
+                            SetParameters("p_tt", DB_TYPE.Varchar2, Convert.ToString(result[34]), DIRECTION.Input);
+                            result[44] = Convert.ToString(SQL_SELECT_scalar("select case DPU.IS_OSCHADBANK( :p_mfo ) when 0 "
+                                                                                 + "then DPU.GET_SWT_DTL( :p_dpuid, :p_tt ) "
+                                                                                 + "else NULL end from DUAL"));
+                        }
+                        catch(Exception ex)
+                        {
+                            result[44] = string.Empty;
+                        }
+                    }
+
+                    if (Convert.ToString(result[38]) != bankMfo)
+                    {
+                        try
+                        {
+                            ClearParameters();
+                            SetParameters("p_mfo", DB_TYPE.Varchar2, Convert.ToString(result[22]), DIRECTION.Input);
+                            SetParameters("p_dpuid", DB_TYPE.Decimal, dpu_id, DIRECTION.Input);
+                            SetParameters("p_tt", DB_TYPE.Varchar2, Convert.ToString(result[35]), DIRECTION.Input);
+                            result[45] = Convert.ToString(SQL_SELECT_scalar("select case DPU.IS_OSCHADBANK( :p_mfo ) when 0 "
+                                                                                 + "then DPU.GET_SWT_DTL( :p_dpuid, :p_tt ) "
+                                                                                 + "else NULL end from DUAL"));
+                        }
+                        catch(Exception ex)
+                        {
+                            result[45] = string.Empty;
+                        }
+                    }
+                }
 
                 DBLogger.Info("Пользователь просматривает текущее состояние депозитного договора № " + dpu_id, "barsroot.udeposit");
             }
@@ -562,7 +660,13 @@ namespace barsroot.udeposit
             }
             return result;
         }
-        //Fill tables
+
+        /// <summary>
+        /// Fill tables
+        /// </summary>
+        /// <param name="acc"></param>
+        /// <param name="accN"></param>
+        /// <returns></returns>
         [WebMethod(EnableSession = true)]
         public string[] fillTables(string acc, string accN)
         {
@@ -598,220 +702,349 @@ namespace barsroot.udeposit
             }
             return result;
         }
-        // Штраф
+
+        ////// <summary>
+        ///// Штраф
+        ///// </summary>
+        //[WebMethod(EnableSession = true)]
+        //public string[] getPenalty(string dpt_id, string date)
+        //{
+        //    string[] result = new string[5];
+        //    try
+        //    {
+        //        DateTime bdate = Convert.ToDateTime(date, cinfo);
+        //        InitOraConnection();
+        //        SetParameters("p_dpu_id", DB_TYPE.Decimal, dpt_id, DIRECTION.Input);
+        //        SetParameters("p_dat", DB_TYPE.Date, bdate, DIRECTION.Input);
+        //        SetParameters("p_fact_sum", DB_TYPE.Decimal, 24, null, DIRECTION.Output);
+        //        SetParameters("p_penyasum", DB_TYPE.Decimal, 24, null, DIRECTION.Output);
+        //        SetParameters("p_penya_rate", DB_TYPE.Decimal, 24, null, DIRECTION.Output);
+        //        SetParameters("p_comment", DB_TYPE.Varchar2, 2000, null, DIRECTION.Output);
+
+        //        SQL_PROCEDURE("dpu.p_penalty");
+
+        //        result[0] = Convert.ToString(GetParameter("p_fact_sum"));
+        //        result[1] = Convert.ToString(GetParameter("p_penyasum"));
+        //        result[2] = Convert.ToString(GetParameter("p_penya_rate"));
+        //        result[3] = Convert.ToString(GetParameter("p_comment"));
+
+        //        string fileName = Path.GetTempFileName();
+        //        using (StreamWriter sw = new StreamWriter(fileName, false, System.Text.Encoding.GetEncoding(1251)))
+        //        {
+        //            sw.Write(result[3]);
+        //        }
+        //        result[4] = fileName;
+        //    }
+        //    finally
+        //    {
+        //        DisposeOraConnection();
+        //    }
+        //    return result;
+        //}
+        
+        /// <summary>
+        /// Розрахунок відсоткової ставки та сум штрафу при достроковому поверененні коштів по деп. дог.
+        /// </summary>
+        /// <param name="dpt_id"></param>
+        /// <param name="bnk_dt"></param>
+        /// <returns></returns>
         [WebMethod(EnableSession = true)]
-        public string[] getPenalty(string dpt_id, string date)
+        public string[] getPenaltyEx( string dpt_id, string bnk_dt )
         {
             string[] result = new string[5];
+
             try
             {
-                DateTime bdate = Convert.ToDateTime(date, cinfo);
+                DateTime bdate = Convert.ToDateTime(bnk_dt, cinfo);
+
+                Decimal amntRet = 0;
+                Decimal amntPay = 0;
+
                 InitOraConnection();
-                SetParameters("p_dpu_id", DB_TYPE.Decimal, dpt_id, DIRECTION.Input);
-                SetParameters("p_dat", DB_TYPE.Date, bdate, DIRECTION.Input);
-                SetParameters("p_fact_sum", DB_TYPE.Decimal, 24, null, DIRECTION.Output);
-                SetParameters("p_penyasum", DB_TYPE.Decimal, 24, null, DIRECTION.Output);
+
+                SetParameters("p_dpuid", DB_TYPE.Decimal, dpt_id, DIRECTION.Input);
+                SetParameters("p_bdate", DB_TYPE.Date, bdate, DIRECTION.Input);
+
+                SetParameters("p_totalint_nom", DB_TYPE.Decimal, 24, null, DIRECTION.Output);
+                SetParameters("p_totalint_eqv", DB_TYPE.Decimal, 24, null, DIRECTION.Output);
+                SetParameters("p_penyaint_nom", DB_TYPE.Decimal, 24, null, DIRECTION.Output);
+                SetParameters("p_penyaint_eqv", DB_TYPE.Decimal, 24, null, DIRECTION.Output);
+                SetParameters("p_intpay_nom", DB_TYPE.Decimal, 24, null, DIRECTION.Output);
+                SetParameters("p_intpay_eqv", DB_TYPE.Decimal, 24, null, DIRECTION.Output);
+                SetParameters("p_dptpay_nom", DB_TYPE.Decimal, 24, null, DIRECTION.Output);
+                SetParameters("p_dptpay_eqv", DB_TYPE.Decimal, 24, null, DIRECTION.Output);
+                
                 SetParameters("p_penya_rate", DB_TYPE.Decimal, 24, null, DIRECTION.Output);
-                SetParameters("p_comment", DB_TYPE.Varchar2, 2000, null, DIRECTION.Output);
+                
+                SetParameters("p_tax_inc_ret", DB_TYPE.Decimal, 24, null, DIRECTION.Output);
+                SetParameters("p_tax_mil_ret", DB_TYPE.Decimal, 24, null, DIRECTION.Output);
+                SetParameters("p_tax_inc_pay", DB_TYPE.Decimal, 24, null, DIRECTION.Output);
+                SetParameters("p_tax_mil_pay", DB_TYPE.Decimal, 24, null, DIRECTION.Output);
 
-                SQL_PROCEDURE("dpu.p_penalty");
+                SetParameters("p_details", DB_TYPE.Varchar2, 2000, null, DIRECTION.Output);
 
-                result[0] = Convert.ToString(GetParameter("p_fact_sum"));
-                result[1] = Convert.ToString(GetParameter("p_penyasum"));
-                result[2] = Convert.ToString(GetParameter("p_penya_rate"));
-                result[3] = Convert.ToString(GetParameter("p_comment"));
+                SQL_PROCEDURE("DPU.GET_PENALTY_EX");
+
+                result[0] = GetParameter("p_details").ToString().Trim();
+
+                amntRet = Convert.ToDecimal(GetParameter("p_totalint_nom").ToString());
+                amntPay = Convert.ToDecimal(GetParameter("p_penyaint_nom").ToString());
+
+                result[2] = Convert.ToString((amntRet - amntPay));
+
+                amntRet = Convert.ToDecimal(GetParameter("p_tax_inc_ret").ToString());
+                amntPay = Convert.ToDecimal(GetParameter("p_tax_inc_pay").ToString());
+
+                result[3] =  Convert.ToString((amntRet-amntPay));
+
+                amntRet = Convert.ToDecimal(GetParameter("p_tax_mil_ret").ToString());
+                amntPay = Convert.ToDecimal(GetParameter("p_tax_mil_pay").ToString());
+
+                result[4] = Convert.ToString((amntRet - amntPay));
 
                 string fileName = Path.GetTempFileName();
                 using (StreamWriter sw = new StreamWriter(fileName, false, System.Text.Encoding.GetEncoding(1251)))
                 {
-                    sw.Write(result[3]);
+                    sw.Write(result[0]);
                 }
-                result[4] = fileName;
+                result[1] = fileName;
             }
             finally
             {
                 DisposeOraConnection();
             }
+
             return result;
         }
 
         /// <summary>
-        /// Проводки по утриманню штрафу
+        /// Стягнення штрафу при достроковому поверененні коштів по деп. дог.
         /// </summary>
-        /// <param name="dpt_id"></param>
-        /// <param name="date"></param>
-        /// <param name="sPenalty"></param>
-        /// <param name="sKv"></param>
+        /// <param name="sDptId">ід. деп. дог.</param>
+        /// <param name="sTotPnyAmnt">сума штрафу в копійках</param>
+        /// <param name="sIntPnyAmnt">сума відсотків нарахованих по штрафній ставці</param>
+        /// <param name="sTaxIncAmnt">сума повернення утриманого податку на прибуток з ФО</param>
+        /// <param name="sTaxMilAmnt">сума повернення утриманого військового збору   з ФО</param>
         /// <returns></returns>
         [WebMethod(EnableSession = true)]
-        public string payPenalty(string dpt_id, string date, string sPenalty, string sKv)
+        public string payPenaltyEx(string sDptId, string sTotPnyAmnt, string sIntPnyAmnt, string sTaxIncAmnt, string sTaxMilAmnt)
         {
             string result = string.Empty;
-
+            
             try
             {
-                DateTime bdate = Convert.ToDateTime(date, cinfo);
-                oper_stuct oper = new oper_stuct();
-                string bankMfo = GetGlobalParam("MFO", "BASIC_INFO");
-
                 InitOraConnection();
-                SetParameters("p_dpuid", DB_TYPE.Decimal, dpt_id, DIRECTION.Input);
 
-                // НАДРА БАНК
-                if (bankMfo == "380764")
-                {
-                    SetParameters("p_penalty", DB_TYPE.Decimal, sPenalty, DIRECTION.Input);
-                    SQL_PROCEDURE("DPU.PENALTY_PAYMENT");
-                    DBLogger.Info("Користувач виконав штрафування депозитного договору № " + dpt_id, "barsroot.udeposit");
-                }
-                else
-                {
-                    ArrayList reader = SQL_reader(@"SELECT a.acc, a.nls, a.ostb, b.acc, b.nls, b.ostb, i.acrb, i.acr_dat, d.closed,
-													   d.mfo_p, d.nls_p, d.nms_p, d.nd, to_char(d.datz,'DD.mm.YYYY'), user_id
-												 FROM accounts a, dpu_deal d, int_accn i, accounts b 
-												WHERE d.acc = a.acc 
-												  AND a.acc = i.acc 
-												  AND i.id = 1 
-												  AND i.acra = b.acc 
-												  AND d.dpu_id = :dpt_id");
-                    string nls = Convert.ToString(reader[1]);
-                    string accn = Convert.ToString(reader[3]);
+                SetParameters("p_dpuid", DB_TYPE.Decimal, Convert.ToDecimal(sDptId), DIRECTION.Input);
+                SetParameters("p_penalty", DB_TYPE.Decimal, Convert.ToDecimal(sTotPnyAmnt), DIRECTION.Input);
+                SetParameters("p_int_pay", DB_TYPE.Decimal, Convert.ToDecimal(sIntPnyAmnt), DIRECTION.Input);
+                SetParameters("p_tax_inc_ret", DB_TYPE.Decimal, Convert.ToDecimal(sTaxIncAmnt), DIRECTION.Input);
+                SetParameters("p_tax_mil_ret", DB_TYPE.Decimal, Convert.ToDecimal(sTaxMilAmnt), DIRECTION.Input);
 
-                    decimal ostb_pl = Convert.ToDecimal(reader[5]);
-                    string acc7 = Convert.ToString(reader[6]);
-                    string nd = Convert.ToString(reader[12]);
-                    string datz = Convert.ToString(reader[13]);
-                    string user_id = Convert.ToString(reader[14]);
-                    short kv = Convert.ToInt16(sKv);
+                SQL_PROCEDURE("DPU.PENALTY_PAYMENT");
 
-                    ClearParameters();
-                    SetParameters("accn", DB_TYPE.Decimal, accn, DIRECTION.Input);
-                    reader = SQL_reader(@"SELECT a.nls, substr(a.nms,1,38), c.okpo
-									        FROM accounts a, customer c
-									       WHERE a.rnk = c.rnk AND a.acc = :accn");
-
-                    if (reader.Count > 0)
-                    {
-                        oper.NlsA = Convert.ToString(reader[0]);
-                        oper.NamA = Convert.ToString(reader[1]);
-                        oper.OkpoA = Convert.ToString(reader[2]);
-                        oper.KvA = kv;
-                    }
-                    else
-                    {
-                        return "Не знайдений рахунок нарахованих відсотків для депозитного договору  №" + dpt_id;
-                    }
-
-                    ClearParameters();
-                    SetParameters("acc7", DB_TYPE.Decimal, acc7, DIRECTION.Input);
-                    reader = SQL_reader(@"SELECT a.nls, substr(a.nms,1,38), c.okpo
-									        FROM accounts a, customer c
-									       WHERE a.rnk = c.rnk AND a.acc = :acc7");
-                    if (reader.Count > 0)
-                    {
-                        oper.NlsB = Convert.ToString(reader[0]);
-                        oper.NamB = Convert.ToString(reader[1]);
-                        oper.OkpoB = Convert.ToString(reader[2]);
-                        oper.KvB = 980;
-                    }
-                    else
-                    {
-                        return "Не знайдений рахунок витрат для депозитного договору №" + dpt_id;
-                    }
-
-                    string vob = "6";
-                    decimal penaltyQ = 0;
-                    decimal penalty = Convert.ToDecimal(sPenalty);
-                    decimal penaltyD = Math.Max(penalty - ostb_pl, 0);
-
-                    if (kv != 980)
-                    {
-                        vob = Convert.ToString(SQL_SELECT_scalar("SELECT min(vob) FROM tts_vob WHERE tt = 'DUS' AND vob <> 6"));
-                        if (string.IsNullOrEmpty(vob))
-                            vob = "16";
-                        //
-                        ClearParameters();
-                        SetParameters("RatO", DB_TYPE.Decimal, 0, DIRECTION.InputOutput);
-                        SetParameters("RatB", DB_TYPE.Decimal, 0, DIRECTION.InputOutput);
-                        SetParameters("RatS", DB_TYPE.Decimal, 0, DIRECTION.InputOutput);
-                        SetParameters("Kv1", DB_TYPE.Decimal, kv, DIRECTION.Input);
-                        SetParameters("Kv2", DB_TYPE.Decimal, 980, DIRECTION.Input);
-                        SetParameters("Dat", DB_TYPE.Date, bdate, DIRECTION.Input);
-                        SQL_PROCEDURE("gl.x_rat");
-                        string sRatO = Convert.ToString(GetParameter("RatO")).Replace(",", ".");
-                        decimal RatO = Convert.ToDecimal(sRatO, cinfo);
-                        penaltyQ = penalty * RatO;
-                    }
-                    else
-                    {
-                        vob = "6";
-                        penaltyQ = penalty;
-                    }
-                    oper.Vob = Convert.ToInt16(vob);
-                    oper.Nazn = "Повернення зайво нарахованих відсотків при достроковому розірванні депозитного договору №" + nd + " від " + datz;
-
-                    oper.con = Bars.Classes.OraConnector.Handler.UserConnection;
-
-                    oper.TT = "DUS";
-                    oper.Dk = 1;
-                    oper.Nd = "";
-                    oper.DatD = DateTime.Now;
-                    oper.DatP = DateTime.Now;
-                    oper.DatV1 = bdate;
-                    oper.DatV2 = bdate;
-                    oper.BankA = bankMfo;
-                    oper.BankB = bankMfo;
-                    oper.SA = Math.Abs(penalty);
-                    oper.SB = Math.Abs(penaltyQ);
-                    oper.OperId = user_id;
-
-                    cDoc ourDoc = new cDoc(oper.con, oper.Ref, oper.TT, oper.Dk, oper.Vob,
-                            oper.Nd,
-                            oper.DatD, oper.DatP, oper.DatV1, oper.DatV2,
-                            oper.NlsA, oper.NamA, oper.BankA, "", oper.KvA, oper.SA, oper.OkpoA,
-                            oper.NlsB, oper.NamB, oper.BankB, "", oper.KvB, oper.SB, oper.OkpoB,
-                            oper.Nazn, "", oper.OperId, oper.Sign, oper.Sk, oper.Prty, 0,
-                            "", "", "", "");
-                    if (ourDoc.oDoc())
-                    {
-                        long Ref = ourDoc.Ref;
-                        if (penaltyD > 0)
-                        {
-                            oper.Ref = Ref;
-                            oper.con = Bars.Classes.OraConnector.Handler.UserConnection;
-                            oper.TT = "DUT";
-                            oper.Dk = 1;
-                            oper.Vob = 6;
-
-                            oper.NlsB = oper.NlsA;
-                            oper.NamB = "";
-                            oper.OkpoB = "";
-                            oper.KvB = kv;
-
-                            oper.NlsA = nls;
-                            oper.NamA = "";
-                            oper.OkpoA = "";
-                            oper.KvA = kv;
-
-                            oper.SA = Math.Abs(penaltyD);
-                            oper.SB = 0;
-
-                            PayV(1, Ref, oper.DatV1, oper.TT, oper.Dk, oper.KvA, oper.NlsA, oper.SA, oper.KvB, oper.NlsB, oper.SB);
-
-                        }
-                    }
-                    else
-                    {
-                        return "Неможливо оплатити операцію DUS!";
-                    }
-                }
+                DBLogger.Info("Користувач виконав штрафування депозитного договору № " + sDptId, "barsroot.udeposit");
+            }
+            catch(Exception ex)
+            {
+                result = ex.Message;
             }
             finally
             {
                 DisposeOraConnection();
             }
+
             return result;
         }
+
+        ///// <summary>
+        ///// Проводки по утриманню штрафу
+        ///// </summary>
+        ///// <param name="dpt_id"></param>
+        ///// <param name="date"></param>
+        ///// <param name="sPenalty"></param>
+        ///// <param name="sKv"></param>
+        ///// <returns></returns>
+        //[WebMethod(EnableSession = true)]
+        //public string payPenalty(string dpt_id, string date, string sPenalty, string sKv)
+        //{
+        //    string result = string.Empty;
+
+        //    try
+        //    {
+        //        InitOraConnection();
+
+        //        string bankMfo = GetGlobalParam("MFO", "BASIC_INFO");
+
+        //        SetParameters("p_dpuid", DB_TYPE.Decimal, dpt_id, DIRECTION.Input);
+
+        //        // НАДРА БАНК
+        //        if (bankMfo == "380764")
+        //        {
+        //            SetParameters("p_penalty", DB_TYPE.Decimal, sPenalty, DIRECTION.Input);
+        //            SetParameters("p_int_pay", DB_TYPE.Decimal, 0, DIRECTION.Input);
+
+        //            SQL_PROCEDURE("DPU.PENALTY_PAYMENT");
+
+        //            DBLogger.Info("Користувач виконав штрафування депозитного договору № " + dpt_id, "barsroot.udeposit");
+        //        }
+        //        else
+        //        {
+        //            DateTime bdate = Convert.ToDateTime(date, cinfo);
+        //            oper_stuct oper = new oper_stuct();
+
+        //            ArrayList reader = SQL_reader(@"SELECT a.acc, a.nls, a.ostb, b.acc, b.nls, b.ostb, i.acrb, i.acr_dat, d.closed,
+        //                    d.mfo_p, d.nls_p, d.nms_p, d.nd, to_char(d.datz,'DD.mm.YYYY'), user_id
+        //               FROM accounts a, dpu_deal d, int_accn i, accounts b 
+        //              WHERE d.acc = a.acc 
+        //                AND a.acc = i.acc 
+        //                AND i.id = 1 
+        //                AND i.acra = b.acc 
+        //                AND d.dpu_id = :dpt_id");
+        //            string nls = Convert.ToString(reader[1]);
+        //            string accn = Convert.ToString(reader[3]);
+
+        //            decimal ostb_pl = Convert.ToDecimal(reader[5]);
+        //            string acc7 = Convert.ToString(reader[6]);
+        //            string nd = Convert.ToString(reader[12]);
+        //            string datz = Convert.ToString(reader[13]);
+        //            string user_id = Convert.ToString(reader[14]);
+        //            short kv = Convert.ToInt16(sKv);
+
+        //            ClearParameters();
+        //            SetParameters("accn", DB_TYPE.Decimal, accn, DIRECTION.Input);
+        //            reader = SQL_reader(@"SELECT a.nls, substr(a.nms,1,38), c.okpo
+        //              FROM accounts a, customer c
+        //             WHERE a.rnk = c.rnk AND a.acc = :accn");
+
+        //            if (reader.Count > 0)
+        //            {
+        //                oper.NlsA = Convert.ToString(reader[0]);
+        //                oper.NamA = Convert.ToString(reader[1]);
+        //                oper.OkpoA = Convert.ToString(reader[2]);
+        //                oper.KvA = kv;
+        //            }
+        //            else
+        //            {
+        //                return "Не знайдений рахунок нарахованих відсотків для депозитного договору  №" + dpt_id;
+        //            }
+
+        //            ClearParameters();
+        //            SetParameters("p_dpuid", DB_TYPE.Decimal, dpt_id, DIRECTION.Input);
+        //            reader = SQL_reader(@"SELECT a.nls, a.kv, substr(a.nms,1,38), c.okpo
+        //                FROM accounts a
+        //                JOIN customer c on ( c.RNK = a.rnk ) 
+        //               WHERE (a.kf, a.nls, a.kv) in ( select r.KF, r.G67N, 980 
+        //                                                from PROC_DR$base  r 
+        //                                                join DPU_VIDD v on ( v.vidd = r.rezid AND v.bsd = r.nbs )
+        //                                                join DPU_DEAL d on ( d.vidd = v.vidd  AND d.branch = r.branch ) 
+        //                                               where d.dpu_id = :p_dpuid 
+        //                             and r.sour = 4 )");
+        //            if (reader.Count > 0)
+        //            {
+        //                oper.NlsB  = Convert.ToString(reader[0]);
+        //                oper.KvB   = Convert.ToInt16(reader[1]);
+        //                oper.NamB  = Convert.ToString(reader[2]);
+        //                oper.OkpoB = Convert.ToString(reader[3]);
+        //            }
+        //            else
+        //            {
+        //                return "Не знайдений рахунок зменшення витрат для депозитного договору №" + dpt_id;
+        //            }
+                    
+        //            string vob = "6";
+        //            decimal penaltyQ = 0;
+        //            decimal penalty = Convert.ToDecimal(sPenalty);
+        //            decimal penaltyD = Math.Max(penalty - ostb_pl, 0);
+
+        //            if (kv != 980)
+        //            {
+        //                vob = Convert.ToString(SQL_SELECT_scalar("SELECT min(vob) FROM tts_vob WHERE tt = 'DUS' AND vob <> 6"));
+        //                if (string.IsNullOrEmpty(vob))
+        //                    vob = "16";
+        //                //
+        //                ClearParameters();
+        //                SetParameters("RatO", DB_TYPE.Decimal, 0, DIRECTION.InputOutput);
+        //                SetParameters("RatB", DB_TYPE.Decimal, 0, DIRECTION.InputOutput);
+        //                SetParameters("RatS", DB_TYPE.Decimal, 0, DIRECTION.InputOutput);
+        //                SetParameters("Kv1", DB_TYPE.Decimal, kv, DIRECTION.Input);
+        //                SetParameters("Kv2", DB_TYPE.Decimal, 980, DIRECTION.Input);
+        //                SetParameters("Dat", DB_TYPE.Date, bdate, DIRECTION.Input);
+        //                SQL_PROCEDURE("gl.x_rat");
+        //                string sRatO = Convert.ToString(GetParameter("RatO")).Replace(",", ".");
+        //                decimal RatO = Convert.ToDecimal(sRatO, cinfo);
+        //                penaltyQ = penalty * RatO;
+        //            }
+        //            else
+        //            {
+        //                vob = "6";
+        //                penaltyQ = penalty;
+        //            }
+        //            oper.Vob = Convert.ToInt16(vob);
+        //            oper.Nazn = "Повернення зайво нарахованих відсотків при достроковому розірванні депозитного договору №" + nd + " від " + datz;
+
+        //            oper.con = Bars.Classes.OraConnector.Handler.UserConnection;
+
+        //            oper.TT = "DUS";
+        //            oper.Dk = 1;
+        //            oper.Nd = "";
+        //            oper.DatD = DateTime.Now;
+        //            oper.DatP = DateTime.Now;
+        //            oper.DatV1 = bdate;
+        //            oper.DatV2 = bdate;
+        //            oper.BankA = bankMfo;
+        //            oper.BankB = bankMfo;
+        //            oper.SA = Math.Abs(penalty);
+        //            oper.SB = Math.Abs(penaltyQ);
+        //            oper.OperId = user_id;
+
+        //            cDoc ourDoc = new cDoc(oper.con, oper.Ref, oper.TT, oper.Dk, oper.Vob,
+        //                    oper.Nd,
+        //                    oper.DatD, oper.DatP, oper.DatV1, oper.DatV2,
+        //                    oper.NlsA, oper.NamA, oper.BankA, "", oper.KvA, oper.SA, oper.OkpoA,
+        //                    oper.NlsB, oper.NamB, oper.BankB, "", oper.KvB, oper.SB, oper.OkpoB,
+        //                    oper.Nazn, "", oper.OperId, oper.Sign, oper.Sk, oper.Prty, 0,
+        //                    "", "", "", "");
+        //            if (ourDoc.oDoc())
+        //            {
+        //                long Ref = ourDoc.Ref;
+        //                if (penaltyD > 0)
+        //                {
+        //                    oper.Ref = Ref;
+        //                    oper.con = Bars.Classes.OraConnector.Handler.UserConnection;
+        //                    oper.TT = "DUT";
+        //                    oper.Dk = 1;
+        //                    oper.Vob = 6;
+
+        //                    oper.NlsB = oper.NlsA;
+        //                    oper.NamB = "";
+        //                    oper.OkpoB = "";
+        //                    oper.KvB = kv;
+
+        //                    oper.NlsA = nls;
+        //                    oper.NamA = "";
+        //                    oper.OkpoA = "";
+        //                    oper.KvA = kv;
+
+        //                    oper.SA = Math.Abs(penaltyD);
+        //                    oper.SB = 0;
+
+        //                    PayV(1, Ref, oper.DatV1, oper.TT, oper.Dk, oper.KvA, oper.NlsA, oper.SA, oper.KvB, oper.NlsB, oper.SB);
+
+        //                }
+        //            }
+        //            else
+        //            {
+        //                return "Неможливо оплатити операцію DUS!";
+        //            }
+        //        }
+        //    }
+        //    finally
+        //    {
+        //        DisposeOraConnection();
+        //    }
+        //    return result;
+        //}
 
         private void PayV(decimal pay, decimal rf, DateTime datv, string tt, decimal dk, decimal kva, string nlsa, decimal sa, decimal kvb, string nlsb, decimal sb)
         {
@@ -918,9 +1151,10 @@ namespace barsroot.udeposit
                 }
                 else
                 {
-                    SetParameters("branch", DB_TYPE.Varchar2, branch, DIRECTION.Input);
-                    SetParameters("nd", DB_TYPE.Varchar2, nd, DIRECTION.Input);
-                    result = Convert.ToString(SQL_SELECT_scalar("SELECT SIGN(dpu.f_calc_nd(:branch) - :nd) from dual "));
+                    // SetParameters("branch", DB_TYPE.Varchar2, branch, DIRECTION.Input);
+                    // SetParameters("nd", DB_TYPE.Varchar2, nd, DIRECTION.Input);
+                    // result = Convert.ToString(SQL_SELECT_scalar("SELECT SIGN(dpu.f_calc_nd(:branch) - :nd) from dual "));
+                    result = "0";
                 }
 
             }
@@ -935,57 +1169,40 @@ namespace barsroot.udeposit
         [WebMethod(EnableSession = true)]
         public object[] getVal(string id, string dateN)
         {
-            object[] result = new object[20];
+            object[] result = new object[23];
             try
             {
                 InitOraConnection();
                 SetRole(base_role);
                 SetParameters("ID", DB_TYPE.Decimal, id, DIRECTION.Input);
-                ArrayList reader = SQL_reader("select d.srok, d.kv, t.lcv, t.name, d.freq_v,f.name, d.br_id,b.name, NVL(d.comproc,0), NVL(d.fl_extend,0), " + 
-                                              "       d.id_stop, s.name, d.bsd, d.bsn, d.dpu_type, br.branch, br.name, d.shablon " +
+                ArrayList reader = SQL_reader("select d.TERM_MAX, d.KV, t.lcv, t.name, d.freq_v, f.name, d.br_id, b.name, NVL(d.comproc,0), NVL(d.fl_extend,0)" +
+                                              "     , d.id_stop, s.name, d.bsd, d.bsn, d.IRVK, br.branch, br.name, d.SHABLON" +
+                                              "     , nvl(d.MIN_SUMM,0)/100, nvl(d.MAX_SUMM,0)/100, nvl(d.TERM_TYPE,2)" +
                                               "  from TABVAL t, DPU_VIDD d, FREQ f, BRATES b, DPT_STOP s, BRANCH br " + 
-                                              " where br.branch=sys_context('bars_context', 'user_branch') and d.kv=t.kv(+) and d.freq_v=f.freq(+) " +
-                                              "   and d.br_id=b.br_id(+) and d.id_stop=s.id(+) and d.vidd=:id" );
+                                              " where br.BRANCH = sys_context('bars_context', 'user_branch') and d.kv=t.kv(+) and d.freq_v=f.freq(+) " +
+                                              "   and d.BR_ID = b.BR_ID(+) and d.ID_STOP = s.ID(+) and d.VIDD = :id" );
                 if (reader.Count != 0)
                 {
                     reader.CopyTo(result);
                 }
                 if (result[0].ToString() != string.Empty && dateN != string.Empty)
                 {
-                    decimal srok = Convert.ToDecimal(result[0], cinfo);
-                    int month = (int)srok;
-                    int days = (int)((srok - month) * 100);
-
-                    // День розміщення враховується в термін договору
-                    days = days - 1;
+                    decimal term = Convert.ToDecimal(result[0], cinfo);
+                    int month = (int)term;
+                    int days = (int)((term - month) * 10000);
 
                     ClearParameters();
                     SetParameters("dateN", DB_TYPE.Date, Convert.ToDateTime(dateN, cinfo), DIRECTION.Input);
                     SetParameters("mnth", DB_TYPE.Decimal, month, DIRECTION.Input);
-                    SetParameters("days", DB_TYPE.Decimal, days, DIRECTION.Input);                   
+                    SetParameters("days", DB_TYPE.Decimal, days, DIRECTION.Input);
 
-                    string dateO = Convert.ToString(SQL_SELECT_scalar("SELECT add_months(:dateN,:mnth)+:days from dual"));
+                    string dateO = SQL_SELECT_scalar("select to_char(BARS.DPU.F_DURATION(:dateN,:mnth,:days),'dd.MM.yyyy') from DUAL").ToString();
 
-                    if (dateO != string.Empty)
-                        dateO = Convert.ToDateTime(dateO, cinfo).ToString("dd.MM.yyyy");
+                    result[21] = dateO;
 
-                    result[18] = dateO;
+                    string dateV = SQL_SELECT_scalar("select to_char(DAT_NEXT_U(BARS.DPU.F_DURATION(:dateN,:mnth,:days),1),'dd.MM.yyyy') from DUAL").ToString();
 
-                    String dateV = String.Empty;
-
-                    if (BankType.GetDptBankType() == BANKTYPE.SBER)
-                    {
-                        dateV = SQL_SELECT_scalar("select TO_CHAR(DAT_NEXT_U(add_months(:dateN,:mnth)+:days,1),'dd.MM.yyyy') from dual").ToString();
-                    }
-                    else
-                    {
-                        dateV = SQL_SELECT_scalar("select TO_CHAR(dpu.f_duration(:dateN,:mnth,:days),'dd.MM.yyyy') from dual").ToString();
-                    }
-
-                    //if (dateV != String.Empty)
-                    //    dateV = Convert.ToDateTime(dateV, cinfo).ToString("dd.MM.yyyy");
-
-                    result[19] = dateV;
+                    result[22] = dateV;
                 }
             }
             finally
@@ -1216,7 +1433,9 @@ namespace barsroot.udeposit
                 SQL_PROCEDURE("dpu.deal_prolongation");
 
                 CommitTransaction();
+
                 txCommited = true;
+
                 DBLogger.Info("Користувач пролонгував депозитний договір № " + data[1], "barsroot.udeposit");
             }
             finally
@@ -1234,93 +1453,50 @@ namespace barsroot.udeposit
         /// <param name="flag"></param>
         /// <returns></returns>
         [WebMethod(EnableSession = true)]
-        public string CloseDeal(string dpu_id, string flag)
+        public string CloseDeal(string dpu_id)
         {
             string result = string.Empty;
+
+            OracleString error_msg = null;
+            
             try
             {
                 InitOraConnection();
+                // BeginTransaction();
                 SetRole(base_role);
 
+                ClearParameters();
+
+                // id депозиту
                 SetParameters("dpu_id", DB_TYPE.Decimal, dpu_id, DIRECTION.Input);
-                ArrayList reader = SQL_reader("SELECT a.acc,i.acra,a.dapp,a.dazs,bankdate,i.stp_dat,i.acr_dat " +
-                                              "FROM accounts a, dpu_deal d, int_accn i, accounts b " +
-                                              "WHERE a.acc=d.acc AND d.dpu_id=:dpu_id AND " +
-                                              "a.acc=i.acc AND i.id=1 AND i.acra=b.acc AND " +
-                                              "a.ostc=0 AND a.ostf=0 AND a.ostb=0 AND " +
-                                              "b.ostc=0 AND b.ostf=0 AND b.ostb=0 AND " +
-                                              "nvl(a.dapp,bankdate-1)<bankdate  AND " +
-                                              "nvl(b.dapp,bankdate-1)<bankdate  AND " +
-                                              "nvl(fost(i.acra,bankdate),0)=0 ");
-                if (reader.Count == 0)
-                    return "Неможливо закрити договір № " + dpu_id;
+                SetParameters("p_errmsg", DB_TYPE.Varchar2, 2000, null, DIRECTION.Output);
+
+                SQL_PROCEDURE("dpu.close_deal");
+
+                error_msg = (OracleString)GetParameter("p_errmsg");
+
+                if (error_msg.IsNull)
+                {
+                    DBLogger.Info("Користувач закрив депозитний договір № " + dpu_id, "barsroot.udeposit");
+                }
                 else
                 {
-                    DateTime dapp = DateTime.MinValue;
-                    DateTime dazs = DateTime.MinValue;
-                    DateTime bdate = DateTime.MinValue;
-                    DateTime stp_dat = DateTime.MinValue;
-                    DateTime acr_dat = DateTime.MinValue;
-                    string acc = Convert.ToString(reader[0]);
-                    string accN = Convert.ToString(reader[1]);
-                    if (Convert.ToString(reader[2]) != "") dapp = Convert.ToDateTime(reader[2], cinfo);
-                    if (Convert.ToString(reader[3]) != "") dazs = Convert.ToDateTime(reader[3], cinfo);
-                    if (Convert.ToString(reader[4]) != "") bdate = Convert.ToDateTime(reader[4], cinfo);
-                    if (Convert.ToString(reader[5]) != "") stp_dat = Convert.ToDateTime(reader[5], cinfo);
-                    if (Convert.ToString(reader[6]) != "") acr_dat = Convert.ToDateTime(reader[6], cinfo);
-
-                    if ((stp_dat == DateTime.MinValue && acr_dat >= bdate) ||
-                        (stp_dat != DateTime.MinValue && acr_dat >= stp_dat) ||
-                        dapp == DateTime.MinValue || dazs != DateTime.MinValue && flag == "1")
-                    {
-                        try
-                        {
-                            SQL_NONQUERY("UPDATE dpu_deal SET closed=1 WHERE dpu_id=:dpu_id");
-
-                            ClearParameters();
-                            SetParameters("acc", DB_TYPE.Decimal, acc, DIRECTION.Input);
-                            SQL_NONQUERY("UPDATE accounts SET dazs=bankdate WHERE dazs IS NULL AND acc=:acc");
-
-                            ClearParameters();
-                            SetParameters("accN", DB_TYPE.Decimal, accN, DIRECTION.Input);
-                            SQL_NONQUERY("UPDATE accounts SET dazs=bankdate WHERE dazs IS NULL AND acc=:accN");
-
-                            DBLogger.Info("Пользователь закрыл депозитный договор № " + dpu_id, "BarsWeb.DepositU");
-                        }
-                        catch
-                        {
-                            return "Помилка при закритті депозитного договору № " + dpu_id;
-                        }
-                    }
-                    else
-                        return "1";
+                    result = error_msg.ToString();
                 }
             }
-            finally
+            catch (Exception ex)
             {
-                DisposeOraConnection();
-            }
-            return result;
-        }
-
-        //Get ND
-        [WebMethod(EnableSession = true)]
-        public string GetNd()
-        {
-            string result = string.Empty;
-            try
-            {
-                InitOraConnection();
-                SetRole(base_role);
-                result = Convert.ToString(SQL_SELECT_scalar("select dpu.f_calc_nd(tobopack.gettobo) from dual"));
+                result = ex.Message;
             }
             finally
             {
                 DisposeOraConnection();
             }
-            return result;
-        }
 
+            return result;
+
+        }
+        
         //GetProcs
         [WebMethod(EnableSession = true)]
         public string GetProcs(string vidd, string dat_open, string dat_close, string sum)
@@ -1391,58 +1567,6 @@ namespace barsroot.udeposit
             return result;
         }
 
-        /// <summary>
-        /// Дата закінчення депозитного договору
-        /// </summary>
-        /// <param name="sDateBegin">Дата початку договору</param>
-        /// <param name="sTerm">Термін депозиту</param>
-        /// <returns></returns>
-        [WebMethod(EnableSession = true)]
-        public string GetDateEnd(string sDateBegin, string sVIDD)
-        {
-            // DBLogger.Info("GetDateEnd(" + sDateBegin + ", " + sTerm + ").", "BarsWeb.DepositU");
-
-            string result = string.Empty;
-
-            if ((sDateBegin != string.Empty) && (sVIDD != string.Empty))
-            {
-                DateTime DateBegin = Convert.ToDateTime(sDateBegin, cinfo);
-                Decimal Vidd = Convert.ToDecimal(sVIDD, cinfo);
-
-                // Decimal Term = Convert.ToDecimal(sTerm, cinfo);
-                
-                // Int32 Month = (int)Term;
-                // Int32 Days = (int)((Term - Month) * 100);
-
-                // // День розміщення враховується в термін договору
-                // Days = Days - 1;
-
-                try
-                {
-                    InitOraConnection();
-
-                    // SetRole(base_role);
-                    // ClearParameters();
-
-                    SetParameters("dateN", DB_TYPE.Date, DateBegin, DIRECTION.Input);
-                    
-                    // SetParameters("mnth", DB_TYPE.Decimal, Month, DIRECTION.Input);
-                    // SetParameters("days", DB_TYPE.Decimal, Days, DIRECTION.Input);
-                    // result = Convert.ToString(SQL_SELECT_scalar("SELECT to_char(add_months(:dateN,:mnth)+:days,'dd.MM.yyyy') from dual"));
-
-                    SetParameters("vidd", DB_TYPE.Decimal, Vidd, DIRECTION.Input);
-
-                    result = SQL_SELECT_scalar("select TO_CHAR(add_months(:dateN, trunc(srok)) + ((srok - trunc(srok)) * 100 - 1),'DD.MM.YYYY') from BARS.DPU_VIDD where vidd = :vidd").ToString();
-                }
-                finally
-                {
-                    DisposeOraConnection();
-                }
-            }
-
-            return result;
-        }
-
         [WebMethod(EnableSession = true)]
         public string[] GetGenAccounts(string nGen)
         {
@@ -1491,6 +1615,53 @@ namespace barsroot.udeposit
             return null;
         }
 
+        /// <summary>
+        /// Дата закінчення депозитного договору
+        /// </summary>
+        /// <param name="sDateBegin">Дата початку договору</param>
+        /// <param name="sVIDD">Вид депозиту</param>
+        /// <returns></returns>
+        [WebMethod(EnableSession = true)]
+        public string GetDateEnd(string sDateBegin, string sVIDD)
+        {
+            string result = string.Empty;
+
+            if ((sDateBegin != string.Empty) && (sVIDD != string.Empty))
+            {
+                DBLogger.Info("GetDateEnd(sDateBegin=" + sDateBegin + ", sVIDD=" + sVIDD +")" );
+
+                DateTime DateBegin = Convert.ToDateTime(sDateBegin, cinfo);
+                Decimal Vidd = Convert.ToDecimal(sVIDD, cinfo);
+
+                try
+                {
+                    InitOraConnection();
+
+                    // SetRole(base_role);
+                    // ClearParameters();
+
+                    SetParameters("dateN", DB_TYPE.Date, DateBegin, DIRECTION.Input);
+
+                    SetParameters("vidd", DB_TYPE.Decimal, Vidd, DIRECTION.Input);
+
+                    result = SQL_SELECT_scalar("select to_char(add_months(:dateN, trunc(TERM_MAX)) + ((TERM_MAX - trunc(TERM_MAX)) * 10000 - 1),'DD.MM.YYYY') from DPU_VIDD where VIDD = :vidd").ToString();
+                }
+                finally
+                {
+                    DisposeOraConnection();
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="vidd"></param>
+        /// <param name="dateN"></param>
+        /// <param name="dateO"></param>
+        /// <returns></returns>
         [WebMethod(EnableSession = true)]
         public string DptValidateDate(string vidd, string dateN, string dateO)
         {
@@ -1512,7 +1683,7 @@ namespace barsroot.udeposit
         }
 
         /// <summary>
-        /// Дата повернення коштів 
+        /// Дата повернення
         /// </summary>
         /// <param name="kv"></param>
         /// <param name="start_date"></param>
@@ -1523,7 +1694,14 @@ namespace barsroot.udeposit
         {
             // DBLogger.Info("CorrectDate(" + kv + ", " + start_date + ", " + step + ").", "BarsWeb.DepositU");
 
-            DateTime startDate = Convert.ToDateTime(start_date, cinfo);
+            DateTime startDate;
+
+            if (string.IsNullOrEmpty(start_date)) {
+                startDate = Convert.ToDateTime(BankType.GetBankDate(), cinfo);
+            }
+            else {
+	        startDate = Convert.ToDateTime(start_date, cinfo);
+	    }
 
             if (BankType.GetDptBankType() == BANKTYPE.SBER)
             {
@@ -1692,6 +1870,787 @@ namespace barsroot.udeposit
             }
         }
 
+        #region AdditionalOptions
+
+        /// <summary>
+        /// Реквізити довіреної особи по депозитному договору
+        /// </summary>
+        /// <param name="trust_id"></param>
+        /// <returns></returns>
+        public object[] GetConfidantInfo(decimal trust_id)
+        {
+            object[] result = new object[3];
+
+            try
+            {
+                InitOraConnection();
+                SetRole(base_role);
+                
+                SetParameters("p_dpuid", DB_TYPE.Decimal, trust_id, DIRECTION.Input);
+
+                ArrayList reader = SQL_reader("select FIO, POSITION, DOCUMENT" +
+                                              "  from BARS.V_TRUSTEE_ALLOW2SIGN" +
+                                              " where ID = :trust_id" );
+                if (reader.Count != 0)
+                {
+                    reader.CopyTo(result);
+                }
+                //else
+                //{
+                //    result = null;
+                //}
+            }
+            catch (Exception ex)
+            {
+                DBLogger.Error(ex.Message);
+            }
+            finally
+            {
+                DisposeOraConnection();
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Збереження змін в додаткових парамерах депозитного договору
+        /// </summary>
+        /// <returns></returns>
+        [WebMethod(EnableSession = true)]
+        public string SetAdditionalOptions(decimal dpu_id, string[] data)
+        {
+            string result = string.Empty;
+
+            // 1st parteposit");
+            string trust_id = data[0].Trim();
+            string comments = data[1].Trim();
+
+            OracleConnection connect = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnection();
+
+            try
+            {
+                OracleCommand cmd = connect.CreateCommand();
+
+                cmd.CommandText = "update DPU_DEAL set TRUSTEE_ID = nvl(:trust_id,TRUSTEE_ID), COMMENTS = :comments where DPU_ID = :dpu_id";
+
+                // trust_id
+                if (string.IsNullOrEmpty(trust_id))
+                    cmd.Parameters.Add("trust_id", OracleDbType.Decimal, DBNull.Value, ParameterDirection.Input );
+                else
+                    cmd.Parameters.Add("trust_id", OracleDbType.Decimal, Convert.ToDecimal(trust_id), ParameterDirection.Input);
+
+                // comments
+                if (string.IsNullOrEmpty(comments))
+                    cmd.Parameters.Add("comments", OracleDbType.Varchar2, DBNull.Value, ParameterDirection.Input );
+                else
+                    cmd.Parameters.Add("comments", OracleDbType.Varchar2, comments, ParameterDirection.Input);
+
+                // dpu_id
+                cmd.Parameters.Add("dpu_id", OracleDbType.Decimal, dpu_id, ParameterDirection.Input);
+
+                cmd.ExecuteNonQuery();
+
+                DBLogger.Info("Користувач вніс зміни в параметри депозитного договору #" + dpu_id.ToString(), "barsroot.udeposit");
+
+            }
+            catch (Exception ex)
+            {
+                result = "Помилка при збереженні параметрів депозитного договору #" + dpu_id.ToString() + "\r\n(" + ex.Message + ")";
+                DBLogger.Info("data[0]=(" + trust_id + ")", "barsroot.udeposit");
+                DBLogger.Info("data[1]=(" + comments + ")", "barsroot.udeposit");
+                DBLogger.Error(ex.Message);
+            }
+            finally
+            {
+                if (connect.State != ConnectionState.Closed)
+                { connect.Close(); connect.Dispose(); }
+            }
+
+            // 2nd part
+            int objLendth = data.Length;
+
+            if (objLendth > 2)
+            {
+                string[] param = new string[2];
+
+                try
+                {
+                    InitOraConnection();
+                    SetRole(base_role);
+
+                    for (int i = 2; i < objLendth; i++)
+                    {
+
+                        DBLogger.Info("data[i]=" + data[i], "barsroot.udeposit");
+
+                        param = data[i].Split('|');
+
+                        ClearParameters();
+
+                        if (param[0] == "IS_PLEDGE")
+                        {
+                            // ід. депозитного договору
+                            SetParameters("p_dpuid", DB_TYPE.Decimal, dpu_id, DIRECTION.Input);
+
+                            if (String.IsNullOrWhiteSpace(param[1]))
+                            {
+                                // Розблокування депозиту
+                                SetParameters("p_nd", DB_TYPE.Decimal, DBNull.Value, DIRECTION.Input);
+                            }
+                            else
+                            {
+                                // блокування депозиту
+                                SetParameters("p_nd", DB_TYPE.Decimal, Convert.ToDecimal(param[1]), DIRECTION.Input);
+                            }
+
+                            //
+                            SetParameters("p_errmsg", DB_TYPE.Varchar2, 2000, null, DIRECTION.Output);
+
+                            SQL_PROCEDURE("dpu.block_contract");
+
+                            result = Convert.ToString(GetParameter("p_errmsg"));
+                        }
+                        else
+                        {
+                            // ід. депозитного договору
+                            SetParameters("p_dpuid", DB_TYPE.Decimal, dpu_id, DIRECTION.Input);
+
+                            // код додаткового параметру
+                            SetParameters("p_tag", DB_TYPE.Varchar2, param[0], DIRECTION.Input);
+
+                            // значення додаткового параметру
+                            SetParameters("p_value", DB_TYPE.Varchar2, param[1], DIRECTION.Input);
+
+                            SQL_PROCEDURE("dpu.set_parameters");
+
+                            DBLogger.Info("Користувач вніс зміни в дод. парам. депозитного договору #" + data[1], "barsroot.udeposit");
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    result = result + (String.IsNullOrEmpty(result) ? "<br>" : "") +
+                        "Помилка при збереженні дод.     парам. " + param[0] + " депозитного договору #" + dpu_id;
+                    DBLogger.Error(ex.Message);
+                }
+                finally
+                {
+                    DisposeOraConnection();
+                }
+            }
+            
+            return result;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="dpu_id"></param>
+        /// <returns></returns>
+        [WebMethod(EnableSession = true)]
+        public object[] GetAdditionalOptions(decimal dpu_id)
+        {
+            object[] result = new object[1];
+            ArrayList Options = new ArrayList();
+
+            try
+            {
+                InitOraConnection();
+                SetRole(base_role);
+
+                // TRUSTEE_ID and COMMENTS
+                SetParameters("p_dpuid", DB_TYPE.Decimal, dpu_id, DIRECTION.Input);
+
+                Options = SQL_reader("select d.TRUSTEE_ID, d.COMMENTS" +
+                                     "  from BARS.DPU_DEAL d" +
+                                     " where d.DPU_ID = :p_dpuid");
+
+                // TAGs
+                ClearParameters();
+
+                SetParameters("p_dpuid", DB_TYPE.Decimal, dpu_id, DIRECTION.Input);
+
+                SQL_Reader_Exec("select NAME, VALUE, TAG, DIRECTORY_NAME, KEY_FIELD" +
+                                "  from BARS.V_DPU_DEALW " +
+                                " where DPU_ID = :p_dpuid)" );
+
+                while (SQL_Reader_Read())
+                {
+                    ArrayList reader = SQL_Reader_GetValues();
+                    Options.Add(String.Format("{0};{1};{2};{3}:{4}", Convert.ToString(reader[0]), Convert.ToString(reader[1])
+                                      , Convert.ToString(reader[2]), Convert.ToString(reader[3]), Convert.ToString(reader[4])));
+                }
+                SQL_Reader_Close();
+            }
+            catch (Exception ex)
+            {
+                DBLogger.Error(ex.Message);
+                // HttpContext.Current.Session["AppError"] = ex;
+            }
+            finally
+            {
+                DisposeOraConnection();
+            }
+
+            if (Options.Count != 0)
+            {
+                // Resize the array to a bigger size
+                Array.Resize(ref result, Options.Count);
+                Options.CopyTo(result);
+            }
+            else
+            {
+                result = null;
+            }
+            
+            return result;
+        }
+        #endregion
+
+        #region SwiftDetails
+        /// <summary>
+        /// SWIFT реквізити для виплат по договору (read from DB)
+        /// </summary>
+        /// <param name="dpu_id"></param>
+        /// <returns></returns>
+        [WebMethod(EnableSession = true)]
+        public object[] GetSwiftDetails(Int64 dpu_id)
+        {
+            object[] result = new object[10];
+
+            try
+            {
+                InitOraConnection();
+
+                SetParameters("p_dpuid", DB_TYPE.Decimal, dpu_id, DIRECTION.Input);
+
+                ArrayList reader = SQL_reader("select TAG56_NAME, TAG56_ADR, TAG56_CODE" +
+                                              "     , TAG57_NAME, TAG57_ADR, TAG57_CODE, TAG57_ACC" +
+                                              "     , TAG59_NAME, TAG59_ADR, TAG59_ACC" +
+                                              "  from BARS.DPU_DEAL_SWTAGS" +
+                                              " where DPU_ID = :p_dpuid" );
+                if (reader.Count != 0)
+                {
+                    reader.CopyTo(result);
+                }
+                else //  if ( String.IsNullOrEmpty(Convert.ToString(reader[7])) && String.IsNullOrEmpty(Convert.ToString(reader[8])))
+                {
+                    reader = SQL_reader("select null, null, null, null, null, null, null" +
+                                        "     , BARS_SWIFT.STRVERIFY2( upper( coalesce(c.NMKV,F_TRANSLATE_KMU(c.NMK)) ), 'TRANS' )" +
+                                        "     , BARS_SWIFT.STRVERIFY2( upper( F_TRANSLATE_KMU(c.ADR) ), 'TRANS' )"+
+                                        "     , d.NLS_D" +
+                                        "  from DPU_DEAL d" +
+                                        "  join CUSTOMER c" +
+                                        "    on ( c.RNK = d.RNK )" +
+                                        " where d.DPU_ID = :p_dpuid" );
+                    reader.CopyTo(result);
+                }
+            }
+            finally
+            {
+                DisposeOraConnection();
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// SWIFT реквізити для виплат по договору (write to DB)
+        /// </summary>
+        /// <param name="dpu_id"></param>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        [WebMethod(EnableSession = true)]
+        public string SetSwiftDetails(Int64 dpu_id, string[] data)
+        {
+            string result = string.Empty;
+
+            try
+            {
+                InitOraConnection();
+
+                SetParameters("p_dpuid", DB_TYPE.Decimal, dpu_id, DIRECTION.Input);
+
+                SetParameters("p_tag56_name", DB_TYPE.Varchar2, data[0], DIRECTION.Input);
+                SetParameters("p_tag56_adr", DB_TYPE.Varchar2, data[1], DIRECTION.Input);
+                SetParameters("p_tag56_code", DB_TYPE.Varchar2, data[2], DIRECTION.Input);
+                SetParameters("p_tag57_name", DB_TYPE.Varchar2, data[3], DIRECTION.Input);
+                SetParameters("p_tag57_adr", DB_TYPE.Varchar2, data[4], DIRECTION.Input);
+                SetParameters("p_tag57_code", DB_TYPE.Varchar2, data[5], DIRECTION.Input);
+                SetParameters("p_tag57_acc", DB_TYPE.Varchar2, data[6], DIRECTION.Input);
+                SetParameters("p_tag59_name", DB_TYPE.Varchar2, data[7], DIRECTION.Input);
+                SetParameters("p_tag59_adr", DB_TYPE.Varchar2, data[8], DIRECTION.Input);
+                SetParameters("p_tag59_acc", DB_TYPE.Varchar2, data[9], DIRECTION.Input);
+
+                SQL_PROCEDURE("dpu.set_dealswtags");
+
+                DBLogger.Info("Користувач змінив SWIFT реквізити депозитного договру #" + dpu_id.ToString(), "barsroot.udeposit");
+            }
+            catch (Exception ex)
+            {
+                result = "Помилка збереження SWIFT реквізитів депозитного договору #" + dpu_id.ToString() + ": " + ex.Message;
+                DBLogger.Error(ex.Message);
+            }
+            finally
+            {
+                DisposeOraConnection();
+            }
+
+            return result;
+        }
+        #endregion
+
+        #region Agreements
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="dpu_id"></param>
+        /// <returns></returns>
+        [WebMethod(EnableSession = true)]
+        public object[] GetAgreementConditions(Int64 dpu_id)
+        {
+            object[] result = new object[10];
+
+            try
+            {
+                InitOraConnection();
+
+                SetParameters("p_dpuid", DB_TYPE.Decimal, dpu_id, DIRECTION.Input);
+
+                ArrayList reader = SQL_reader("select FREQV, STOP_ID, MIN_AMNT, MAX_AMNT, FL_AUTOEXTEND" +
+                                              "     , CAPITALIZATION, TERM_TYPE, DAT_END_MIN, DAT_END_MAX" +
+                                              "     , BARS.DPU_AGR.GET_NEXT_END_DATE(DPU_ID)" +
+                                              "  from BARS.V_DPU_AGRMNT_CONDITIONS" +
+                                              " where DPU_ID = :p_dpuid");
+                if (reader.Count != 0)
+                {
+                    reader.CopyTo(result);
+                }
+            }
+            finally
+            {
+                DisposeOraConnection();
+            }
+
+            return result;
+        }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="dpu_id"></param>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        [WebMethod(EnableSession = true)]
+        public string CreateAgreement(Int64 dpu_id, string[] data)
+        {
+            string result = string.Empty;
+
+            Int32 agrmnt_tp = Convert.ToInt32(data[0]);
+            DateTime? agrmnt_dt = Convert.ToDateTime(data[2], cinfo);
+
+            String details = null;
+            Int64? agrmnt_id = null;
+            Int64? amount = null;
+            Decimal? rate = null;
+            Int32? freq = null;
+            Int32? pny_id = null;
+            DateTime? beg_dt = null;
+            DateTime? end_dt = null;
+
+            switch (agrmnt_tp)
+            {
+                case 1:
+                    {
+                        // ДУ про зміну суми договору
+                        amount = Convert.ToInt64(data[3]) * 100;
+                        break;
+                    }
+                case 2:
+                    {
+                        // ДУ про зміну відсоткової ставки по договору
+                        rate = Convert.ToDecimal(data[4]);
+                        break;
+                    }
+                case 3:
+                    {
+                        // ДУ про зміну періодичності виплати відсотків
+                        freq = Convert.ToInt32(data[5]);
+                        break;
+                    }
+                case 4:
+                    {
+                        // ДУ про зміну рахунку повернення депозиту
+                        details = Uri.UnescapeDataString(data[9]);
+                        // HttpUtility.UrlDecode / HttpUtility.HtmlDecode
+                        break;
+                    }
+                case 5:
+                    {
+                        // ДУ про зміну терміну договору
+                        end_dt = Convert.ToDateTime(data[7], cinfo);
+                        break;
+                    }
+                case 6:
+                    {
+                        // ДУ про зміну періодичності виплати відсотків
+                        pny_id = Convert.ToInt32(data[8]);
+                        break;
+                    }
+                case 7:
+                    {
+                        // ДУ про пролонгацію договору
+                        beg_dt = Convert.ToDateTime(data[6], cinfo);
+                        end_dt = Convert.ToDateTime(data[7], cinfo);
+                        break;
+                    }
+                default:
+                    {
+                        break;
+                    }
+            }
+
+            try
+            {
+                InitOraConnection();
+
+                SetParameters("p_dpu_id", DB_TYPE.Decimal, dpu_id, DIRECTION.Input);
+                SetParameters("p_agrmnt_type", DB_TYPE.Decimal, agrmnt_tp, DIRECTION.Input);
+                SetParameters("p_agrmnt_num", DB_TYPE.Varchar2, data[1], DIRECTION.Input);
+                SetParameters("p_due_date", DB_TYPE.Date, agrmnt_dt, DIRECTION.Input);
+                SetParameters("p_amount", DB_TYPE.Decimal, amount, DIRECTION.Input);
+                SetParameters("p_rate", DB_TYPE.Decimal, rate, DIRECTION.Input);
+                SetParameters("p_freq", DB_TYPE.Decimal, freq, DIRECTION.Input);
+                SetParameters("p_begin_date", DB_TYPE.Date, beg_dt, DIRECTION.Input);
+                SetParameters("p_end_date", DB_TYPE.Date, end_dt, DIRECTION.Input);
+                SetParameters("p_stop_id", DB_TYPE.Decimal, pny_id, DIRECTION.Input);
+                SetParameters("p_payment_dtl", DB_TYPE.Varchar2, details, DIRECTION.Input);
+                SetParameters("p_agrmnt_id", DB_TYPE.Decimal, agrmnt_id, DIRECTION.Output);
+
+                SQL_PROCEDURE("DPU_AGR.CREATE_AGREEMENT");
+
+                DBLogger.Info("Користувач створив ДУ #" + agrmnt_id.ToString() + " до депозитного договру #" + dpu_id.ToString(), "barsroot.udeposit");
+            }
+            catch (Exception ex)
+            {
+                result = "Помилка при створенні ДУ до депозитного договору #" + dpu_id.ToString() + ": " + ex.Message;
+                DBLogger.Error(ex.Message);
+            }
+            finally
+            {
+                DisposeOraConnection();
+            }
+
+            return result;
+        }
+        # endregion
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        [WebMethod(EnableSession = true)]
+        public string DiscrepancyBalances()
+        {
+            string result = string.Empty;
+
+            try
+            {
+                InitOraConnection();
+                result = Convert.ToString(SQL_SELECT_scalar("select DPU.GET_DISCREPANCY_BALANCES(null) from DUAL"));
+            }
+            finally
+            {
+                DisposeOraConnection();
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        [WebMethod(EnableSession = true)]
+        public string CalcInt()
+        {
+            DBLogger.Info("Користувач підтвердив нарахування відсотків по депозитному портфелю", "barsroot.udeposit");
+            
+            string result = string.Empty;
+
+            DateTime? bankDate = null;
+
+            try
+            {
+                InitOraConnection();
+
+                string UserLevel = Convert.ToString(SQL_SELECT_scalar("select (length(sys_context('bars_context','user_branch'))-1)/7 from dual"));
+
+                if (UserLevel == "1")
+                {
+                    result = Convert.ToString(SQL_SELECT_scalar("select case " +
+                    "       when ( GL.GBD() = BARS.DAT_NEXT_U(trunc(sysdate), 0)   " + // -- first_work_day_cur_mon
+                    "          and GL.BD()  = BARS.DAT_NEXT_U(trunc(sysdate),-1) ) " + // -- last_work_day_prev_mon
+                    "       then GL.BD() " +
+                    "       else null " +
+                    "       end as BANK_DT " +
+                    "  from dual "));
+
+                    if (!String.IsNullOrEmpty(result))
+                    {
+                        bankDate = Convert.ToDateTime(result, cinfo);
+                    }
+
+                    ClearParameters();
+
+                    SetParameters("p_dpuid", DB_TYPE.Decimal, 0, DIRECTION.Input);
+                    SetParameters("p_bdate", DB_TYPE.Date, bankDate, DIRECTION.Input);
+
+                    SQL_PROCEDURE("DPU.AUTO_MAKE_INTEREST");
+                }
+                else
+                {
+                    result = "Заборонено виконання даної ф-ї на " + UserLevel + "-му рівні !";
+                }
+            }
+            catch (Exception ex)
+            {
+                result = ex.Message;
+
+                DBLogger.Error(result, "barsroot.udeposit");
+
+                result = result.Substring(0, result.IndexOf("ORA-06512") - 1);
+
+                Int32 pos = result.IndexOf("ORA-20");
+                
+                while (pos >= 0)
+                {
+                    result = result.Remove(pos, 11);
+                    pos = result.IndexOf("ORA-20");
+                }
+
+                pos = result.IndexOf("DPU-00666");
+
+                if (pos >= 0)
+                {
+                    result = result.Remove(pos, 10);
+                }
+
+                result = "Помилка при нарахуванні відсотків: <BR>" + result;
+            }
+            finally
+            {
+                DisposeOraConnection();
+            }
+
+            return result;
+        }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        [WebMethod(EnableSession = true)]
+        public string PayOutInt()
+        {
+            DBLogger.Info("Користувач підтвердив виплату відсотків по депозитному портфелю", "barsroot.udeposit");
+
+            string errMsg = string.Empty;
+
+            try
+            {
+                InitOraConnection();
+
+                string UserLevel = Convert.ToString(SQL_SELECT_scalar("select (length(sys_context('bars_context','user_branch'))-1)/7 from dual"));
+
+                if ( UserLevel == "1" )
+                {
+                    ClearParameters();
+
+                    SetParameters("p_bdate", DB_TYPE.Date, null, DIRECTION.Input);
+
+                    SQL_PROCEDURE("DPU.AUTO_PAYOUT_INTEREST");
+                }
+                else
+                {
+                    errMsg = "Заборонено виконання даної ф-ї на " + UserLevel + "-му рівні !";
+                }
+
+            }
+            catch (Exception ex)
+            {
+                errMsg = ex.Message;
+
+                DBLogger.Error(errMsg, "barsroot.udeposit");
+
+                errMsg = errMsg.Substring(0, errMsg.IndexOf("ORA-06512")-1);
+
+                Int32 pos = errMsg.IndexOf("ORA-20");
+
+                while (pos >= 0)
+                {
+                    errMsg = errMsg.Remove(pos, 11);
+                    pos = errMsg.IndexOf("ORA-20");
+                }
+
+                pos = errMsg.IndexOf("DPU-00666");
+
+                if (pos >= 0)
+                {
+                    errMsg = errMsg.Remove(pos, 10);
+                }
+
+                errMsg = "Помилка при виплаті відсотків:<BR>" + errMsg;
+            }
+            finally
+            {
+                DisposeOraConnection();
+            }
+
+            return errMsg;
+        }
+
+        [WebMethod(EnableSession = true)]
+        public string ExportToExcel(string[] data, bool? forceExecute = null)
+        {
+            try
+            {
+                InitOraConnection();
+
+                string sql = GetSqlTemplate(data);
+                string selStatement = BuildSelectStatementForTable(sql, "BARS.DPT_U d", "", data, false);
+
+                int rowsCount = 0;
+
+                if (false == forceExecute && (rowsCount = GetRowsCount(selStatement, sql)) > rowsLimit)
+                {
+                    return rowsCount.ToString();
+                }
+
+                if (!string.IsNullOrEmpty(data[3]))
+                {
+                    selStatement = AppendSorting(data, selStatement, "d");
+                }
+
+                DataSet ds = SQL_SELECT_dataset(selStatement);
+
+                return CreateExcelFile(ds);
+            }
+			catch
+			{
+				throw;
+			}
+            finally
+            {
+                DisposeOraConnection();
+            }
+
+        }
+
+        private string GetSqlTemplate(string[] data)
+        {
+            string sqlStr = " d.DPU_ID \"Реф. деп. дог.\", d.DPU_GEN \"Реф. ген. дог.\", d.DPU_ADD \"№ дод. угоди.\", " +
+                "d.ND \"Номер депоз. дог. \", d.RNK \"РНК \", d.NMK \"КЛІЄНТ \", d.ISO \"Вал \", d.NLS  \"Депозитний рахунок \", " +
+                "d.SUM/100 /*SUM*/ \"Загальна сума \", d.PROC \"% ставка \",  d.OSTC/100 /*OSTC*/ \"Cума на рах. депозиту \", d.OSTN/100 /*OSTN*/ \"Cума нарах. %% \", " +
+                "d.FREQ_NAME \"Періодичність погашення %% \", TO_CHAR(d.dat_z,'DD.MM.YYYY') /*DATZ*/ \"Дата заключення договору \", TO_CHAR(d.dat_n,'DD.MM.YYYY') /*DATN*/ \"Дата розміщення депозиту \", " +
+                "TO_CHAR(d.dat_o,'DD.MM.YYYY') /*DATO*/ \"Дата закінчення договору \", TO_CHAR(d.dat_v,'DD.MM.YYYY') /*DATV*/ \"Дата повернення депозиту \", d.BRANCH \"Код відділення \", d.MFOP \"МФО перерахув. %% \", " +
+                "d.nlsp /*ACCP*/ \"Рахунок для перерахув. %% \", d.MFOD \"МФО повернення депозиту \", d.nlsd /*ACCD*/ \"Рахунок повернення депозиту \", d.user_id /*ISP*/ \"Вик. \" ";
+
+            return sqlStr;
+        }
+        private int GetRowsCount(string sqlQueryString, string fields)
+        {
+            string countQuery = sqlQueryString.Replace(fields, "count(1)");
+
+            int rowsAmount;
+            int.TryParse(SQL_SELECT_scalar(countQuery).ToString(), out rowsAmount);
+
+            return rowsAmount;
+        }
+
+        private string AppendSorting(string[] data, string query, string tabAlias)
+        {
+            StringBuilder queryBuilder = new StringBuilder();
+            Dictionary<string, string> aliasesColumns = new Dictionary<string, string>()
+            {
+                {"DATZ_SORT", " dat_z"},
+                {"DAT_N_SORT", " dat_n"},
+                {"DAT_O_SORT", " dat_o"},
+                {"DAT_V_SORT", " dat_v"},
+                {"ACCP", " nlsd"},
+                {"ISP", " user_id"},
+                {"FREQV"," FREQ_NAME" }
+            };
+
+            queryBuilder.AppendFormat("{0} ORDER BY ", query);
+
+            var sortParams = data[3].Split(' ');
+            for (int i = 0; i < sortParams.Length; i += 2)
+            {
+                string colName = sortParams[i];
+                //sortParams[0,2,4..] is field and sortParams[1,3,5..] is asc|desc
+                if (aliasesColumns.ContainsKey(sortParams[i]))
+                {
+                    colName = aliasesColumns[sortParams[i]];
+                }
+                queryBuilder.Append(colName);
+
+                queryBuilder.AppendFormat(" {0}", sortParams[i+1]);
+            }
+
+            return queryBuilder.ToString();
+        }
+
+        private static string CreateExcelFile(DataSet ds)
+        {
+            var rep = new RegisterCountsDPARepository();
+            var userInf = rep.GetPrintHeader();
+            string fileXls = Path.GetTempFileName() + ".xls";
+            List<Dictionary<string, object>> res = new List<Dictionary<string, object>>();
+
+            for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+            {
+                Dictionary<string, object> row = new Dictionary<string, object>();
+                for (int j = 0; j < ds.Tables[0].Columns.Count; j++)
+                {
+                    string key = ds.Tables[0].Columns[j].Caption;
+                    var value = ds.Tables[0].Rows[i][j];
+                    row[key] = value;
+                }
+                res.Add(row);
+            }
+
+            List<string[]> fileContentHat = new List<string[]>();
+            for (int i = 0; i < ds.Tables[0].Columns.Count; i++)
+            {
+                string[] caption = new string[] { ds.Tables[0].Columns[i].ColumnName, ds.Tables[0].Columns[i].Caption };
+                fileContentHat.Add(caption);
+            }
+
+            List<TableInfo> tableInfo = new List<TableInfo>();
+            for (int i = 0; i < ds.Tables[0].Columns.Count; i++)
+            {
+                string colDataType = string.Empty;
+
+                tableInfo.Add(new TableInfo(ds.Tables[0].Columns[i].ColumnName, ds.Tables[0].Columns[i].MaxLength, colDataType, ds.Tables[0].Columns[i].AllowDBNull));
+            }
+
+            List<string> hat = new List<string>
+                {
+                    "АТ 'ОЩАДБАНК'",
+                    "Користувач:" + userInf.USER_NAME,
+                    "Дата: " + userInf.DATE.ToString("dd'.'MM'.'yyyy") + " Час: " + userInf.DATE.Hour + ":" + userInf.DATE.Minute + ":" + userInf.DATE.Second
+                };
+            var excel = new ExcelHelpers<List<Dictionary<string, object>>>(res, fileContentHat, tableInfo, null, hat);
+
+            using (MemoryStream ms = excel.ExportToMemoryStream())
+            {
+                ms.Position = 0;
+                File.WriteAllBytes(fileXls, ms.ToArray());
+            }
+            return fileXls;
+        }
+
         #region Component Designer generated code
 
         //Required by the Web Services Designer 
@@ -1718,6 +2677,5 @@ namespace barsroot.udeposit
         }
 
         #endregion
-
     }
 }

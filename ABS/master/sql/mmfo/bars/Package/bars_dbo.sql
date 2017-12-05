@@ -1,10 +1,5 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bars_dbo.sql =========*** Run *** ==
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.BARS_DBO is
+create or replace package BARS_DBO
+is
 
   -- Author  : LVO
   -- Created : 05/08/2013 09:36:58
@@ -219,12 +214,16 @@
                           p_errmessage    out varchar2);
 end bars_dbo;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.BARS_DBO is
+
+show errors;
+
+create or replace package body BARS_DBO
+is
 
   -- Author  : LVO
   -- Created : 05/08/2013 09:36:58
 
-g_body_version  constant varchar2(64)  := 'version 5.20 18/03/2015';
+g_body_version  constant varchar2(64)  := 'version 5.21 20/11/2017';
 g_awk_body_defs constant varchar2(512) := '';
 
 g_dbgcode constant varchar2(14) := 'bars_dbo.';
@@ -727,7 +726,7 @@ begin
     exception when no_data_found then
       bars_error.raise_nerror(g_modcode, 'ACC_NOTFOUND', p_nlsa, to_char(p_kv));
     end;
-    if l_nbs = 2924 then
+    if l_nbs = '2924' then
       if p_type = 3 then
         select tt into l_tt from dbo_tt_operationkind where operation_kind = p_type;
       elsif p_type = 4 then
@@ -1203,152 +1202,15 @@ is
   l_okpob customer.okpo%type;
   l_nlst varchar2(15);
 begin
-  /*bars_audit.trace('%s: entry function', l_th);
+
+  bars_audit.trace('%s: entry function', l_th);
+
   bars_audit.info(l_th||' start. Вхідні параметри: rnk - '||p_rnk);
 
-  savepoint sp_create_deposit;
-
-  select t.kv into l_kv from tabval t where t.lcv = p_kv;
-
-  begin
-    select * into l_customer from customer where rnk = p_rnk;
-  exception
-    when no_data_found then
-      bars_error.raise_nerror(g_modcode, 'RNK_NOTFOUND', to_char(p_rnk));
-  end;
-
-  begin
-    select * into l_vidd from dpt_vidd v where v.vidd = p_type and v.vidd > 0 and v.flag = 1 and v.datk is null;
-  exception
-    when no_data_found then
-      bars_error.raise_nerror(g_modcode, 'DPT_VIDD_NOTFOUND', to_char(p_type));
-  end;
-
-  --Номер счета для перечисления процентов
-  --if substr(p_percent_account,1,4) = '2625' and p_percent_account_branch is not null then
-    --begin
-      --select nlst into l_nlst from dbo_branch_acc where b040 = p_percent_account_branch;
-      --select a.nms, c.okpo, a.nls, a.kf into l_nms_p, l_okpo_p, l_nls_p, l_kf_p from accounts a, customer c where a.rnk = c.rnk and a.nls = l_nlst and a.kv = l_kv and a.dazs is null;
-    --exception
-      --when no_data_found then
-        --bars_error.raise_nerror(g_modcode, 'PER_ACC_NOTFOUND');
-    --end;
-  --else
-    begin
-      select a.nms, c.okpo, a.nls, a.kf into l_nms_p, l_okpo_p, l_nls_p, l_kf_p from accounts a, customer c where a.rnk = c.rnk and a.nls = p_percent_account and a.kv = l_kv and a.dazs is null;
-    exception
-      when no_data_found then
-        if l_vidd.comproc = 0 then
-          bars_error.raise_nerror(g_modcode, 'PER_ACC_NOTFOUND');
-        else
-          null;
-        end if;
-    end;
-  --end if;
-  --Номер счета для перевода средств по окончанию депозита
-  if substr(p_expire_account,1,4) = '2625' and p_expire_account_branch is not null then
-    begin
-      select nlst into l_nlst from dbo_branch_acc where b040 = p_expire_account_branch;
-      select a.nms, c.okpo, a.nls, a.kf into l_nms_d, l_okpo_d, l_nls_d, l_kf_d from accounts a, customer c where a.rnk = c.rnk and a.nls = l_nlst and a.kv = l_kv and a.dazs is null;
-    exception
-      when no_data_found then
-        bars_error.raise_nerror(g_modcode, 'EXP_ACC_NOTFOUND');
-    end;
-  else
-    begin
-      select a.nms, c.okpo, a.nls, a.kf into l_nms_d, l_okpo_d, l_nls_d, l_kf_d from accounts a, customer c where a.rnk = c.rnk and a.nls = p_expire_account and a.kv = l_kv and a.dazs is null;
-    exception
-      when no_data_found then
-        bars_error.raise_nerror(g_modcode, 'EXP_ACC_NOTFOUND');
-    end;
-  end if;
-
-  bc.subst_branch(l_customer.branch);
-
-  dpt_web.create_deposit(p_vidd => l_vidd.vidd,
-                         p_rnk => l_customer.rnk,
-                         p_nd => null,--p_doc_number,
-                         p_sum => p_ammount * 100,
-                         p_nocash => 1,
-                         p_datz => p_doc_date,
-                         p_namep => l_nms_p,
-                         p_okpop => l_okpo_p,
-                         p_nlsp => l_nls_p,
-                         p_mfop => l_kf_p,
-                         p_fl_perekr => 0,
-                         p_name_perekr => l_nms_d,
-                         p_okpo_perekr => l_okpo_d,
-                         p_nls_perekr => l_nls_d,
-                         p_mfo_perekr => l_kf_d,
-                         p_comment => null,
-                         p_dpt_id => l_dpt_id);
-
-  --Вкладка N2 в екселі від Дзюби Грегорія Івановича
-  bars_audit.info(l_th||' Додання параметру CARDA.');
-/*  if substr(p_percent_account,1,4) = '2625' then
-  begin
-    dpt.fill_dptparams(l_dpt_id,'CARDA',p_percent_account);
-    bars_audit.info(l_th||' Параметр CARDA додано успішно = '||p_percent_account);
-  exception
-    when others then
-      bars_error.raise_nerror(g_modcode, 'NO_ADD_REQW', to_char(l_dpt_id), 'CARDA',p_percent_account);
-  end;
-  end if;
-* /
-  begin
-    select * into l_rep_acc from accounts where nls = p_replanish_account and kv = l_kv and dazs is null;
-  exception
-    when no_data_found then
-      bars_error.raise_nerror(g_modcode, 'ACC_NOTFOUND', p_replanish_account);
-  end;
-
-  begin
-    select * into l_dpt_dep from dpt_deposit d where d.deposit_id = l_dpt_id;
-    select a.kf, a.nms, a.nls, c.okpo into l_mfob, l_nmkb, l_nlsb, l_okpob from accounts a, customer c where a.rnk = c.rnk and a.acc = (select da.acc from dpt_deposit dd, dpt_acc da where dd.deposit_id = da.deposit_id and dd.deposit_id = l_dpt_id);
-  exception
-    when no_data_found then
-      bars_error.raise_nerror(g_modcode, 'DPT_NOTFOUND', l_dpt_id);
-  end;
- /* payord(p_type => 20,
-         p_nd => l_dpt_dep.deposit_id,
-         p_datd => sysdate,
-         p_kv => p_kv,
-         p_vdat => trunc(sysdate),
-         p_s => l_dpt_dep.limit / 100,
-         p_nazn => 'Кошти на вклад  згідно договору №'||to_char(l_dpt_dep.deposit_id)||' від '||to_char(trunc(sysdate),'dd.mm.yyyy'),
-         p_rnka => l_rep_acc.rnk,
-         p_nlsa => l_rep_acc.nls,
-         p_mfob => l_mfob,
-         p_nmkb => l_nmkb,
-         p_nlsb => l_nlsb,
-         p_okpo => l_okpob,--l_dpt_dep.okpo_p,
-         p_passport => null,
-         p_param => null,
-         p_ref => l_doc_ref,
-         p_errcod => l_doc_err_code,
-         p_errmessage => l_doc_err_msg);
-* /
-  --l_branch := sys_context('bars_context','user_branch');
-
-  if l_doc_err_code is not null and l_doc_err_code <> 0 then
-    p_cust_id := null;
-    p_ref := null;
-    p_nls := null;
-    p_errcode := l_doc_err_code;
-    p_errmessage := l_doc_err_msg;
-    rollback to savepoint sp_create_deposit;
-    --bars_error.raise_nerror(g_modcode, 'PAYMENT_ERR', l_doc_err_msg);
-  else
-    p_cust_id := l_dpt_dep.rnk;
-    p_ref := l_dpt_dep.deposit_id;
-    p_nls := l_dpt_dep.nls_p;
-    p_errcode := 0;
-    p_errmessage := null;
-  end if;
-
   bars_audit.info(l_th||' exit.');
-  bars_audit.trace('%s: done. Out params: p_ref=%s', l_th, p_ref);*/
-  null;
+
+  bars_audit.trace('%s: done. Out params: p_ref=%s', l_th, p_ref);
+
 end create_deposit_dbo;
 
 --------------------------------------------------------------------------------
@@ -1397,61 +1259,11 @@ begin
     when no_data_found then
       bars_error.raise_nerror(g_modcode, 'DPT_VIDD_NOTFOUND', to_char(l_dpt_list.vidd_code));
   end;
+
   begin
     if p_prolongation = 'N' then
       dpt_web.fix_extcancel(l_dpt_list.dpt_id, 1);
     end if;
-  /*Пока оставим, может еще вернемся*/
-
-   /* --Номер счета для перечисления процентов
-    if substr(p_percent_account,1,4) = '2625' and p_percent_account_branch is not null then
-      begin
-        select nlst into l_nlst from dbo_branch_acc where b040 = p_percent_account_branch;
-        select a.nms, c.okpo, a.nls, a.kf into l_nms_p, l_okpo_p, l_nls_p, l_mfo_p from accounts a, customer c where a.rnk = c.rnk and a.nls = l_nlst and a.kv = l_dpt_list.dpt_curid and a.dazs is null;
-      exception
-        when no_data_found then
-          bars_error.raise_nerror(g_modcode, 'PER_ACC_NOTFOUND');
-      end;
-    else
-      begin
-        select a.nms, c.okpo, a.nls, a.kf into l_nms_p, l_okpo_p, l_nls_p, l_mfo_p from accounts a, customer c where a.rnk = c.rnk and a.nls = p_percent_account and a.kv = l_dpt_list.dpt_curid and a.dazs is null;
-      exception
-        when no_data_found then
-          if l_vidd.comproc = 0 then
-            bars_error.raise_nerror(g_modcode, 'PER_ACC_NOTFOUND');
-          else
-            null;
-          end if;
-      end;
-    end if;
-
-    --Номер счета для перевода средств по окончанию депозита
-    if substr(p_expire_account,1,4) = '2625' and p_expire_account_branch is not null then
-      begin
-        select nlst into l_nlst from dbo_branch_acc where b040 = p_expire_account_branch;
-        select a.nms, c.okpo, a.nls, a.kf into l_nms_d, l_okpo_d, l_nls_d, l_mfo_d from accounts a, customer c where a.rnk = c.rnk and a.nls = l_nlst and a.kv = l_dpt_list.dpt_curid and a.dazs is null;
-      exception
-        when no_data_found then
-          bars_error.raise_nerror(g_modcode, 'EXP_ACC_NOTFOUND');
-      end;
-    else
-      begin
-        select a.nms, c.okpo, a.nls, a.kf into l_nms_d, l_okpo_d, l_nls_d, l_mfo_d from accounts a, customer c where a.rnk = c.rnk and a.nls = p_expire_account and a.kv = l_dpt_list.dpt_curid and a.dazs is null;
-      exception
-        when no_data_found then
-          bars_error.raise_nerror(g_modcode, 'EXP_ACC_NOTFOUND');
-      end;
-    end if;
-
-    dpt_web.change_deposit_accounts(p_dptID => p_reftdn,
-                                    p_IntRcpName => l_nms_p,
-                                    p_IntRcpIDCode => l_okpo_p,
-                                    p_IntRcpAcc => l_nls_p,
-                                    p_IntRcpMFO => l_mfo_p,
-                                    p_RestRcpName => l_nms_d,
-                                    p_RestRcpIDCode => l_okpo_d,
-                                    p_RestRcpAcc => l_nls_d,
-                                    p_RestRcpMFO => l_mfo_d);*/
 
     p_reftdn := p_reftdn;
     p_rnk := l_dpt_list.cust_id;
@@ -2439,7 +2251,8 @@ procedure pay_operation(p_rnk           in     number,
         and dd.deposit_id = p_refTnd;
      l_nazn := 'Поповнення вкладу згідно договору №'||to_char(p_refTnd)||' від '||to_char(trunc(sysdate),'dd.mm.yyyy');
      /*Пополнение депозита*/
-     if (l_nbs = 2635 or l_nbs = 2630) and (l_limit is null or l_limit = 0) then
+     if (l_nbs = '2630' and (l_limit is null or l_limit = 0))
+     then
        bars_error.raise_nerror(g_modcode, 'DPT_MAKEDEP', p_refTnd);
      end if;
      /*Минимальная сумма пополнения*/
@@ -2495,7 +2308,8 @@ procedure pay_operation(p_rnk           in     number,
         and a.rnk=decode(l_rnk, -1, a.rnk, null, a.rnk, p_rnk);
      l_nazn := 'Повернення вкладу, виплата вкладу згідно договору №'||to_char(p_refTnd)||' від '||to_char(trunc(sysdate),'dd.mm.yyyy');
      /*Частичное снятие*/
-     if l_nbsa = 2630 or l_nbsa = 2635 then
+     if (l_nbsa = '2630')
+     then
        bars_error.raise_nerror(g_modcode, 'DPT_PARTIAL_WITHDRAWAL', p_refTnd);
      end if;
      /*Минимальная сумма депозита*/
@@ -2600,11 +2414,5 @@ procedure pay_operation(p_rnk           in     number,
 
 end bars_dbo;
 /
- show err;
- 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/bars_dbo.sql =========*** End *** ==
- PROMPT ===================================================================================== 
- 
+
+show errors;

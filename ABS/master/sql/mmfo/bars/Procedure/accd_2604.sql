@@ -15,6 +15,7 @@ PROMPT *** Create  procedure ACCD_2604 ***
  OB22_     varchar2(2);
  nls_      accounts.NLS%type;
  tag_      varchar2(15);
+ l_corp_income_nbs varchar2(4 char);
 begin
 -------------------------------------------------------------------------
 --                 "Плата за РО" и Проц.Карточки по 2600.
@@ -462,6 +463,11 @@ DELETE from PROC_DR$BASE p
 
 --  7).  Проставление ИНДИВИДУАЛЬНЫХ 6110 по Корпор.Клиентам
 
+ if newnbs.g_state= 1 then
+     l_corp_income_nbs := '6510';
+ else
+     l_corp_income_nbs := '6110';
+ end if;
 
  For n in ( Select KOD_CLI
             From   KOD_CLI
@@ -484,7 +490,7 @@ DELETE from PROC_DR$BASE p
               Where  NBS  in ('2560','2565','2600','2603','2604')
                 and  DAZS is NULL and   KV=980
                 and  RNK in (Select nvl(RNK,-1) from RNKP_KOD where KODK=n.KOD_CLI)
-                and  ACC not in (Select ACC from AccountsW where TAG='S6110' and substr(trim(VALUE),1,4)='6110')
+                and  ACC not in (Select ACC from AccountsW where TAG='S6110' and substr(trim(VALUE),1,4) = l_corp_income_nbs)
              )
     LOOP
 
@@ -494,7 +500,7 @@ DELETE from PROC_DR$BASE p
          from   Accounts
          where  DAZS is NULL                   and
                 BRANCH = substr(k.BRANCH,1,15) and
-                NBS='6110' and OB22=OB22_      and
+                NBS = l_corp_income_nbs and OB22=OB22_      and
                 rownum=1;
 
          Begin
@@ -512,7 +518,7 @@ DELETE from PROC_DR$BASE p
             from   Accounts
             where  DAZS is NULL                   and
                    BRANCH like '/______/000000/'  and
-                   NBS='6110' and OB22=OB22_      and
+                   NBS = l_corp_income_nbs and OB22=OB22_      and
                    rownum=1;
 
             Begin

@@ -14,7 +14,7 @@ RETURN NUMBER IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :    Функция наполнения таблиц для формирования отчетности
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     :    03/04/2017 (13/04/2016)
+% VERSION     :    15/11/2017 (08/09/2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 06/02/2015 - в таблице OTCN_SALDO не формировались годовые Кт обороты
              Исправлено.
@@ -123,27 +123,10 @@ END IF;
   
 DatN_ := TRUNC(Dat_ + 1); -- дата наступна за зв_тною
 
-if type_ = 1 then
-    dati_ := f_snap_dati(dat_, 1);
-    dats_ := f_snap_dat(dat_, 1);
-
---    BARS_UTL_SNAPSHOT.SYNC_SNAP(dat_);
-elsif type_ in (2, 3, 4, 5) then
-    dati_ := f_snap_dati(dat_, 2);
-    dats_ := f_snap_dat(dat_, 2);
-
---    BARS_UTL_SNAPSHOT.sync_month(dat_);
-else
-    dati_ := f_snap_dati(dat_, 3);
-    dats_ := f_snap_dat(dat_, 3);
-end if;
-
---BARS_UTL_SNAPSHOT.stop_running;
-
 -- отбор только нужных счетов
 if tp_sql_ = 0 then
-    sql_doda_ := 'insert /*+APPEND PARALLEL(8) */  into OTCN_ACC (ACC, NLS, KV, NBS, RNK, DAOS, DAPP, ISP, NMS, LIM, PAP, TIP, VID, MDATE, DAZS, ACCC, TOBO) '||
-                 'select a.acc, a.nls, a.kv, a.nbs, a.rnk, a.daos, a.dapp, a.isp, a.nms, a.lim, a.pap, a.tip, a.vid, a.mdate, a.dazs, a.accc, a.tobo '||
+    sql_doda_ := 'insert /*+APPEND PARALLEL(8) */  into OTCN_ACC (ACC, NLS, KV, NBS, RNK, DAOS, DAPP, ISP, NMS, LIM, PAP, TIP, VID, MDATE, DAZS, ACCC, TOBO, NLS_ALT, OB22_ALT, DAT_ALT) '||
+                 'select a.acc, a.nls, a.kv, a.nbs, a.rnk, a.daos, a.dapp, a.isp, a.nms, a.lim, a.pap, a.tip, a.vid, a.mdate, a.dazs, a.accc, a.tobo, a.nlsalt, s.ob22_alt, a.dat_alt '||
                  'from (select * from accounts where nbs ';
 
     IF Trim(sql_acc_) IS NULL THEN
@@ -152,10 +135,10 @@ if tp_sql_ = 0 then
        sql_doda_ := sql_doda_ || ' in (' || sql_acc_ ||')';
     END IF;
 
-    sql_doda_ := sql_doda_ || ') a ';
+    sql_doda_ := sql_doda_ || ') a, specparam s where a.acc = s.acc(+) ';
 else
-    sql_doda_ := 'insert /*+APPEND PARALLEL(8) */ into OTCN_ACC (ACC, NLS, KV, NBS, RNK, DAOS, DAPP, ISP, NMS, LIM, PAP, TIP, VID, MDATE, DAZS, ACCC, TOBO) '||
-                 'select distinct a.acc, a.nls, a.kv, a.nbs, a.rnk, a.daos, a.dapp, a.isp, a.nms, a.lim, a.pap, a.tip, a.vid, a.mdate, a.dazs, a.accc, a.tobo '||
+    sql_doda_ := 'insert /*+APPEND PARALLEL(8) */ into OTCN_ACC (ACC, NLS, KV, NBS, RNK, DAOS, DAPP, ISP, NMS, LIM, PAP, TIP, VID, MDATE, DAZS, ACCC, TOBO, NLS_ALT, OB22_ALT, DAT_ALT) '||
+                 'select distinct a.acc, a.nls, a.kv, a.nbs, a.rnk, a.daos, a.dapp, a.isp, a.nms, a.lim, a.pap, a.tip, a.vid, a.mdate, a.dazs, a.accc, a.tobo, a.nlsalt, s.ob22_alt, a.dat_alt '||
                  'from (';
 
     IF Trim(sql_acc_) IS NULL THEN
@@ -164,7 +147,7 @@ else
        sql_doda_ := sql_doda_ || sql_acc_;
     END IF;
 
-    sql_doda_ := sql_doda_ || ') a ';
+    sql_doda_ := sql_doda_ || ') a, specparam s where a.acc = s.acc(+) ';
 end if;
 
 EXECUTE IMMEDIATE sql_doda_;
@@ -217,15 +200,15 @@ if type_ = 1 then
            b.dos, decode(a.kv, 980, 0, b.dosq),
            b.Kos, decode(a.kv, 980, 0, b.Kosq),
            0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-    from accm_snap_balances b, OTCN_ACC a
-    where b.caldt_ID = dati_
+    from snap_balances b, OTCN_ACC a
+    where b.fdat = dat_
       and b.acc = a.acc
       and (b.ostq <> 0 or b.ost <> 0 or
            b.kosq <> 0 or b.kos <> 0 or
            b.dosq <> 0 or b.dos <> 0
           );
 elsif type_ in (2, 3, 5) then
-    INSERT /*+APPEND */
+    INSERT /*+APPEND  */
     INTO OTCN_SALDO (ODATE, FDAT, ACC, NLS, KV, NBS, RNK,
            VOST, VOSTQ, OST, OSTQ,
            DOS, DOSQ, KOS, KOSQ,
@@ -246,8 +229,8 @@ elsif type_ in (2, 3, 5) then
            b.CUdos, decode(a.kv, 980, 0, b.CUdosq),
            b.CUKos, decode(a.kv, 980, 0, b.CUKosq),
            0,0,0,0,0,0,0,0,0,0
-    from ACCM_AGG_MONBALS b, OTCN_ACC a
-    where b.caldt_ID = dati_
+    from AGG_MONBALS b, OTCN_ACC a
+    where b.fdat = trunc(dat_, 'mm')
       and b.ACC = a.acc
       and (b.ostq   <> 0 or b.ost <> 0 or
            b.kosq   <> 0 or b.kos <> 0 or
@@ -257,7 +240,7 @@ elsif type_ in (2, 3, 5) then
           );
 elsif type_ in (4) then
        
-    INSERT /*+APPEND */
+    INSERT /*+APPEND  */
     INTO OTCN_SALDO (ODATE, FDAT, ACC, NLS, KV, NBS, RNK,
            VOST, VOSTQ, OST, OSTQ,
            DOS, DOSQ, KOS, KOSQ,
@@ -278,13 +261,15 @@ elsif type_ in (4) then
            b.CUdos, decode(a.kv, 980, 0, b.CUdosq),
            b.CUKos, decode(a.kv, 980, 0, b.CUKosq),
            0,0,0,0,0,0,0,0,0,0
-    from ACCM_AGG_MONBALS b, OTCN_ACC a
-    where b.caldt_ID = dati_
+    from AGG_MONBALS b, OTCN_ACC a
+    where b.fdat = trunc(dat_, 'mm')
       and b.ACC = a.acc;    
       
     commit;  
+    
       
-    INSERT INTO OTCN_SALDO (ODATE, FDAT, ACC, NLS, KV, NBS, RNK,
+    INSERT /*+APPEND */
+    INTO OTCN_SALDO (ODATE, FDAT, ACC, NLS, KV, NBS, RNK,
            VOST, VOSTQ, OST, OSTQ,
            DOS, DOSQ, KOS, KOSQ,
            DOS96, DOSQ96, KOS96, KOSQ96,
@@ -305,7 +290,8 @@ elsif type_ in (4) then
 
    commit;
 
-    INSERT INTO OTCN_SALDO (ODATE, FDAT, ACC, NLS, KV, NBS, RNK,
+    INSERT /*+APPEND */ 
+    INTO OTCN_SALDO (ODATE, FDAT, ACC, NLS, KV, NBS, RNK,
            VOST, VOSTQ, OST, OSTQ,
            DOS, DOSQ, KOS, KOSQ,
            DOS96, DOSQ96, KOS96, KOSQ96,
@@ -324,7 +310,10 @@ elsif type_ in (4) then
      AND a.acc=s.acc
      AND s.acc not in (select acc from otcn_saldo);
 
-    INSERT INTO OTCN_SALDO (ODATE, FDAT, ACC, NLS, KV, NBS, RNK,
+commit;
+
+    INSERT /*+APPEND */
+    INTO OTCN_SALDO (ODATE, FDAT, ACC, NLS, KV, NBS, RNK,
            VOST, VOSTQ, OST, OSTQ,
            DOS, DOSQ, KOS, KOSQ,
            DOS96, DOSQ96, KOS96, KOSQ96,
@@ -440,6 +429,7 @@ elsif type_ in (4) then
                 p.dos99, p.dosq99,p.kos99, p.kosq99,
                 p.doszg, p.koszg,
                 p.dos96zg, p.kos96zg, p.dos99zg, p.kos99zg);
+                
 else
     null;
 end if;

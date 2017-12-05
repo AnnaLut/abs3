@@ -3,12 +3,14 @@ CREATE OR REPLACE PROCEDURE BARS.p_fd9_NN (Dat_ DATE ,
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирования #D9 для КБ (универсальная)
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     : 13/09/2017 (18/08/2017, 14/08/2017)
+% VERSION     : 13/10/2017 (13/09/2017, 18/08/2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-параметры: Dat_ - отчетная дата
+параметры: Dat_ - отчетная дата  
            sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-13.09/2017 - для ОКРО учасника у якого значення похоже на "D00000000_" 
+13.10.2017 - якщо код ОКПО сформований як серія и номер паспорта тоді  
+             K021 будемо заповнювати значенням '9' 
+13.09.2017 - для ОКРО учасника у якого значення похоже на "D00000000_" 
              K021 будемо заповнювати значенням '9'
 18.08.2017 - если для клиентов участников органов государственной власти
              (ISE=13110,13120,13131,13132) и поле OKPO_U имеет значение
@@ -120,6 +122,7 @@ tk_       Varchar2(1);
 cust_type number;
 glb_      number;
 dat_izm1     date := to_date('31/08/2013','dd/mm/yyyy');
+is_foreign_bank     number;
 
 -----------------------------------------------------------------------------
 BEGIN
@@ -326,7 +329,7 @@ BEGIN
           -- для ФЛ резидентов
           if k.codc in (5) then
              okpo_k := lpad(substr(ser_k||numdoc_k, 1, 10), 10, '0');
-             k021_k := '2';
+             k021_k := '9';
           end if;
           -- для ФЛ нерезидентов
           if k.codc = 6 and ser_k not in ('','00') and numdoc_k <> '000000' then
@@ -365,7 +368,7 @@ BEGIN
              okpo_ := lpad(substr(ser_ || numdoc_, 1, 10), 10, '0');
              okpo_u := ser_ || numdoc_;
              if k.tk = 2 then
-                k021_u := '2';
+                k021_u := '9';
              else
                 k021_u := '1';
              end if;
@@ -408,8 +411,18 @@ BEGIN
                                 )
        then
           if k040_ <> '804' then
-              okpo_ := 'IN' || lpad(substr(NVL(trim(okpo_u),'0'), 1, 8), 8, '0');
-              k021_u := '9';
+             select count(*)
+             into is_foreign_bank
+             from rc_bnk
+             where b010 = trim(k.okpo_u);
+             
+             if is_foreign_bank <> 0 then
+                okpo_ := lpad(substr(NVL(trim(okpo_u),'0'), 1, 10), 10, '0');
+                k021_u := '4';
+             else
+                okpo_ := 'IN' || lpad(substr(NVL(trim(okpo_u),'0'), 1, 8), 8, '0');
+                k021_u := '9';
+             end if;
           else
              okpo_ := substr(lpad(trim(k.okpo_u), 10, '0'), 1, 10);
              if k.tk = 2 then
@@ -600,4 +613,14 @@ BEGIN
    end loop;
   ----------------------------------------
 END p_fd9_NN;
+/
+
+CREATE OR REPLACE PUBLIC SYNONYM P_FD9_NN FOR BARS.P_FD9_NN
+/
+
+
+GRANT EXECUTE ON BARS.P_FD9_NN TO BARS_ACCESS_DEFROLE
+/
+
+GRANT EXECUTE ON BARS.P_FD9_NN TO RPBN002
 /

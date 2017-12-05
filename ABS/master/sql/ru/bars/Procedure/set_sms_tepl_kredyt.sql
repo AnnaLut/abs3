@@ -1,13 +1,4 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/SET_SMS_TEPL_KREDYT.sql =========*
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure SET_SMS_TEPL_KREDYT ***
-
-  CREATE OR REPLACE PROCEDURE BARS.SET_SMS_TEPL_KREDYT (in_ number) IS
+CREATE OR REPLACE PROCEDURE BARS.set_sms_tepl_kredyt(in_ number) IS
 
 err    EXCEPTION;
 BEGIN
@@ -21,9 +12,9 @@ select
 
 from accounts a, customerw c, nd_acc n, nd_acc n1, accounts a1
     where
-        ((a.nbs=2202 and a.ob22 in (57,58))
+        ((a.nbs=decode(NEWNBS.GET_STATE,0,'2202','2203') and a.ob22 in (decode(NEWNBS.GET_STATE,0,'57','80'),decode(NEWNBS.GET_STATE,0,'58','81')))
         or
-        (a.nbs=2203 and a.ob22 in (47,48) ))
+        (a.nbs='2203' and a.ob22 in ('47','48') ))
         and c.rnk=a.rnk
         and c.tag='MPNO'
         and n.acc=A.ACC
@@ -37,7 +28,7 @@ loop
     begin
         if  k.vt=1 then
         begin
-        update accounts set SEND_SMS=null where acc=k.acc_2620;
+        update accounts set SEND_SMS='Y' where acc=k.acc_2620;
         delete from ACC_SMS_PHONES where acc=k.acc_2620;
         Insert into ACC_SMS_PHONES
         (ACC, PHONE, PHONE1, PHONE2, ENCODE,
@@ -55,13 +46,3 @@ loop
  end loop;
 END set_sms_tepl_kredyt;
 /
-show err;
-
-PROMPT *** Create  grants  SET_SMS_TEPL_KREDYT ***
-grant EXECUTE                                                                on SET_SMS_TEPL_KREDYT to START1;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/SET_SMS_TEPL_KREDYT.sql =========*
-PROMPT ===================================================================================== 

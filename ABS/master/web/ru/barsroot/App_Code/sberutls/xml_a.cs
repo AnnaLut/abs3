@@ -167,7 +167,7 @@ namespace bars.sberimport
                 throw new Exception(LastError);
             }
         }
- 
+
         public override int ConvertBufferEx(String configFile,
                                    String settingsFile,
                                    String inputFileName,
@@ -272,8 +272,8 @@ namespace bars.sberimport
                         tmp = (getField(C, F[k + j - 1], "Details"));
                         if (tmp.IndexOf(DetailsDelimiter) != 0)
                         {
-                             throw new Exception(string.Format("Невірний формат БІР {0}. Відсутній початковий символ {1}.", k, DetailsDelimiter));
-                            }
+                            throw new Exception(string.Format("Невірний формат БІР {0}. Відсутній початковий символ {1}.", k, DetailsDelimiter));
+                        }
                         //обрезать решетки
                         a.Value = tmp.Substring(2, tmp.Length - 3).Trim();
                         Attrs.Add(a);
@@ -313,8 +313,8 @@ namespace bars.sberimport
                     String DK = getField(C, Line, "DK");
 
                     string PayerOkpo = getField(C, Line, "PayerOKPO");
-                    string PayerName = StrDosToWin( getField(C, Line, "PayerName") );
-                    string PayeeName = StrDosToWin( getField(C, Line, "PayeeName") );
+                    string PayerName = StrDosToWin(getField(C, Line, "PayerName"));
+                    string PayeeName = StrDosToWin(getField(C, Line, "PayeeName"));
 
                     String VOB = String.Empty;
                     String TT = String.Empty;
@@ -324,7 +324,7 @@ namespace bars.sberimport
                     //секция переворачивания счетов
                     if (isCash(PayerACC))
                     {
-                        
+
                         dummy = PayerACC;
                         PayerACC = PayeeACC;
                         PayeeACC = dummy;
@@ -423,17 +423,17 @@ namespace bars.sberimport
 
                     if (!String.IsNullOrEmpty(getField(C, Line, "Currency2")))
                     {
-                      if (( PayeeACC.Substring(0,1) == "6" && DK == "1" ) ||
-                          ( PayerACC.Substring(0,1) == "6" && DK == "0" ))  
-                      {
-                        TT = "D06";
-                      }
-                      else
-                      if (( PayeeACC.Substring(0,1) == "7" && (DK == "0") ) ||
-                          ( PayerACC.Substring(0,1) == "7" && (DK == "1") ))
-                      {
-                        TT = "D07";
-                      }
+                        if ((PayeeACC.Substring(0, 1) == "6" && DK == "1") ||
+                            (PayerACC.Substring(0, 1) == "6" && DK == "0"))
+                        {
+                            TT = "D06";
+                        }
+                        else
+                        if ((PayeeACC.Substring(0, 1) == "7" && (DK == "0")) ||
+                            (PayerACC.Substring(0, 1) == "7" && (DK == "1")))
+                        {
+                            TT = "D07";
+                        }
                     }
 
                     //
@@ -507,97 +507,101 @@ namespace bars.sberimport
                     else
                         //для первой структуры 
                         if (C.StructType == "1")
+                    {
+                        //если один из счетов - касса: считаем VOB правильной функцией
+                        if (isCash(PayerACC) || isCash(PayeeACC))
                         {
-                            //если один из счетов - касса: считаем VOB правильной функцией
-                            if (isCash(PayerACC) || isCash(PayeeACC))
+                            VOB = getCashVOB(PayerACC, PayeeACC, DK, TT);
+                            if (SK == 0)
                             {
-                                VOB = getCashVOB(PayerACC, PayeeACC, DK, TT);
-                                if (SK == 0)
+                                if (tmp != "" && tmp != "6")
                                 {
-                                    if (tmp != "" && tmp != "6")
+                                    if (int.TryParse(tmp, out tmpint))
                                     {
-                                        if (int.TryParse(tmp, out tmpint))
-                                        {
-                                            SK = tmpint;
-                                        }
+                                        SK = tmpint;
                                     }
-                                }
-                            }
-                            // если оба счета не кассовые
-                            else
-                            {
-                                //если в файле поле заполнено - выбираем его
-                                if (tmp != "")
-                                {
-                                    VOB = tmp;
-                                    //если поле пустое - подставляем значение по-умолчанию  
-                                }
-                                else
-                                {
-                                    VOB = "6";
                                 }
                             }
                         }
+                        // если оба счета не кассовые
                         else
+                        {
+                            //если в файле поле заполнено - выбираем его
+                            if (tmp != "")
+                            {
+                                VOB = tmp;
+                                //если поле пустое - подставляем значение по-умолчанию  
+                            }
+                            else
+                            {
+                                VOB = "6";
+                            }
+                        }
+                    }
+                    else
                             //разборки с полем VOB и СК для второй структуры
                             if (C.StructType == "2")
+                    {
+                        VOB = "";
+                        SK_ZB = "";
+                        SK = 0;
+                        //документ кассовый
+                        if (isCash(PayerACC) || isCash(PayeeACC))
+                        {
+                            //это символ кассы
+                            if (KV == "980")
                             {
-                                VOB = "";
-                                SK_ZB = "";
-                                SK = 0;
-                                //документ кассовый
-                                if (isCash(PayerACC) || isCash(PayeeACC))
+                                //для гривны должно быть заполнено
+                                if (tmp == "")
                                 {
-                                    //это символ кассы
-                                    if (KV == "980")
-                                    {
-                                        //для гривны должно быть заполнено
-                                        if (tmp == "")
-                                        {
-                                            throw new Exception("Для гривневого документа не указан " +
-                                              "символ кассового плана");
-                                        }
-                                        else
-                                        {
-                                            SK = Convert.ToInt64(tmp);
-                                        }
-                                    }
-                                    //для валютных платежей пофигу
-                                    else
-                                    {
-                                        SK = 0;
-                                    }
-                                    //вычисляем ВОБ
-                                    VOB = getCashVOB(PayerACC, PayeeACC, DK, TT);
+                                    throw new Exception("Для гривневого документа не указан " +
+                                      "символ кассового плана");
                                 }
                                 else
                                 {
-                                    //внебалансовый
-                                    if (
-                                        PayeeMFO == PayerMFO && 
+                                    SK = Convert.ToInt64(tmp);
+                                }
+                            }
+                            //для валютных платежей пофигу
+                            else
+                            {
+                                SK = 0;
+                            }
+                            //вычисляем ВОБ
+                            VOB = getCashVOB(PayerACC, PayeeACC, DK, TT);
+                        }
+                        else
+                        {
+
+
+                            Bars.WebServices.NewNbs ws = new Bars.WebServices.NewNbs();
+                            string _nbs = ws.UseNewNbs() ? "6510" : "6110";
+                            //внебалансовый
+                            if (
+                                        PayeeMFO == PayerMFO &&
                                         (
                                           PayerACC.Substring(0, 1) == "9" || PayeeACC.Substring(0, 1) == "9" ||
-                                          (PayerACC.Substring(0, 3) == "262" &&  PayeeACC.Substring(0, 4) != "6110" ) ||
+                                          (PayerACC.Substring(0, 3) == "262" && PayeeACC.Substring(0, 4) != _nbs) ||
                                           PayeeACC.Substring(0, 3) == "262"
                                         )
                                      )
-                                    {
-                                        if (tmp.Trim().Length > 1) SK_ZB = tmp;
-                                    }
-                                    else
-                                    {
-                                        //документ не кассовый и не внебалансовый
-                                        //это ВОБ
-                                        VOB = tmp;
-                                        SK = 0;
-                                    }
-                                }
+                            {
+                                if (tmp.Trim().Length > 1) SK_ZB = tmp;
                             }
+                            else
+                            {
+                                //документ не кассовый и не внебалансовый
+                                //это ВОБ
+                                VOB = tmp;
+                                SK = 0;
+                            }
+                        }
+                    }
 
-                    
-                    
+
+
                     //закончим переворачивать реквизиты
-                    if (isCash(PayeeACC)) 
+                    if (isCash(PayeeACC))
                     {
                         dummy = PayerOkpo;
                         PayerOkpo = PayeeOKPO;
@@ -633,7 +637,7 @@ namespace bars.sberimport
                     XmlElement Currency2 = doc.CreateElement("Currency");
                     if (String.IsNullOrEmpty(getField(C, Line, "Currency2")))
                     {
-                        setNodeValue(amount2, "Amount", getField(C, Line,"Amount1"));
+                        setNodeValue(amount2, "Amount", getField(C, Line, "Amount1"));
                         setNodeValue(Currency2, "NBUCode", KV);
                     }
                     else

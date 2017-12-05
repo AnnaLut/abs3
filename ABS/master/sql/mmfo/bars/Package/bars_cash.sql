@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bars_cash.sql =========*** Run *** =
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.BARS_CASH 
+CREATE OR REPLACE PACKAGE BARS.BARS_CASH 
 is
     -----------------------------------------------------------------
     --                                                             --
@@ -296,7 +290,10 @@ is
 
 end bars_cash;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.BARS_CASH 
+
+show error
+
+create or replace package body BARS_CASH 
 is
     -----------------------------------------------------------------
     --                                                             --
@@ -304,12 +301,11 @@ is
     --                                                             --
     -----------------------------------------------------------------
 
-
     -----------------------------------------------------------------
     -- Константы                                                   --
     -----------------------------------------------------------------
 
-    VERSION_BODY      constant varchar2(64)  := 'version 5.6 01.10.2015';
+    VERSION_BODY      constant varchar2(64)  := 'version 5.7 20.11.2017';
     G_MODULE          constant varchar2(4)   := 'CSH';
     G_CASH_JOURNAL    constant varchar2(4)   := 'CJ';
     G_SVOD_DAY        constant varchar2(4)   := 'SD';
@@ -323,13 +319,11 @@ is
     type t_cash_chklist is table of number index by binary_integer;
     g_cash_chklist t_cash_chklist;
 
-
     type t_tts is record (iscash number,  --   9-й флаг операции
                           sk     number,  --   символ кассплана
                           nazn   varchar2(160));
     type t_tts_list is table of t_tts index by varchar2(5);
     tts_list  t_tts_list;
-
 
     ------------------------------------------------------------------
     -- HEADER_VERSION
@@ -341,9 +335,6 @@ is
        return 'Package header bars_cash: '||VERSION_HEAD;
     end header_version;
 
-
-
-
     ------------------------------------------------------------------
     -- BODY_VERSION
     --
@@ -353,8 +344,6 @@ is
     begin
        return 'Package body bars_cash: '||VERSION_BODY;
     end body_version;
-
-
 
     ------------------------------------------------------------------
     -- CURRENT_SHITFT
@@ -377,8 +366,6 @@ is
        return l_shift;
 
     end;
-
-
 
     ------------------------------------------------------------------
     -- NEXT_SHIFT
@@ -1011,7 +998,7 @@ is
                   and o.userid = sb.id
                   and o.branch  = sys_context('bars_context','user_branch')
                   and sb.branch = sys_context('bars_context','user_branch')
-                  and substr(v.nls,1,4) in ('2620','2628','2630','2635','2638','9760');
+                  and substr(v.nls,1,4) in ('2620','2628','2630','2638','9760');
 
 
 
@@ -1133,7 +1120,7 @@ is
                  and o.userid = sb.id
                  and o.branch  = sys_context('bars_context','user_branch')
                  and sb.branch = sys_context('bars_context','user_branch')
-                 and substr(v.nls,1,4) in ('2620','2628','2630','2635','2638','9760');
+                 and substr(v.nls,1,4) in ('2620','2628','2630','2638','9760');
 
 
            else
@@ -1353,9 +1340,9 @@ is
                           from cash_lastvisa  -- Если есть виза нашего отделения
                          where ref = ov.ref and branch  = sys_context('bars_context','user_branch')
                        ),
-                       case when (nbs in ('2630','2635','2620','2628','2638')) or
-                                 (a2.nbs like '380%' and o.nlsa = v.nls and substr(o.nlsb,1,4) in ('2630','2635','2620','2628','2638')  )  or
-                                 (a2.nbs like '380%' and o.nlsb = v.nls and substr(o.nlsa,1,4) in ('2630','2635','2620','2628','2638')  )
+                       case when (nbs in ('2630','2620','2628','2638')) or
+                                 (a2.nbs like '380%' and o.nlsa = v.nls and substr(o.nlsb,1,4) in ('2630','2620','2628','2638') )  or
+                                 (a2.nbs like '380%' and o.nlsb = v.nls and substr(o.nlsa,1,4) in ('2630','2620','2628','2638') )
                             then 1
                             else 0
                        end isdptdoc
@@ -1461,7 +1448,7 @@ is
                   and o.userid = sb.id
                   and o.branch  = sys_context('bars_context','user_branch')
                   and sb.branch = sys_context('bars_context','user_branch')
-                  and substr(v.nls,1,4) in ('2620','2628','2630','2635','2638','9760');
+                  and substr(v.nls,1,4) in ('2620','2628','2630','2638','9760');
 
 
            ----------
@@ -2056,15 +2043,8 @@ begin
    init_pack;
 end bars_cash;
 /
- show err;
- 
-PROMPT *** Create  grants  BARS_CASH ***
-grant EXECUTE                                                                on BARS_CASH       to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on BARS_CASH       to RPBN001;
 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/bars_cash.sql =========*** End *** =
- PROMPT ===================================================================================== 
- 
+show err;
+
+grant EXECUTE on BARS_CASH to BARS_ACCESS_DEFROLE;
+grant EXECUTE on BARS_CASH to RPBN001;

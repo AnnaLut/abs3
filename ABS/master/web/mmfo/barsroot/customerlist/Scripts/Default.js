@@ -361,8 +361,8 @@ function builtFastFilter() {
 }
 
 function refreshGridwithSimpleFilter() {
-    debugger;
-    v_data[1] = builtFastFilter();
+    CheckCustType();
+    v_data[1] += builtFastFilter();
     ReInitGrid();
 }
 

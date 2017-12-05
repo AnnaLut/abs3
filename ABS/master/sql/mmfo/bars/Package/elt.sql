@@ -313,6 +313,16 @@ begin
      ||G_AWK_BODY_DEFS;
 end body_version;
 
+function Get_NLS_random  (p_R4 accounts.NBS%type ) return accounts.NLS%type   is   --получение № лиц.сч по случ.числам
+                          nTmp_ number ;            l_nls accounts.NLS%type ;
+begin
+  While 1<2        loop nTmp_ := trunc ( dbms_random.value (1, 999999999 ) ) ;
+     begin select 1 into nTmp_ from accounts where nls like p_R4||'_'||nTmp_  ;
+     EXCEPTION WHEN NO_DATA_FOUND THEN EXIT ;
+     end;
+  end loop;         l_nls := vkrzn ( substr(gl.aMfo,1,5) , p_R4||'0'||nTmp_ );
+  RETURN l_Nls ;
+end    Get_NLS_random ;
 ---=====================
 FUNCTION  F_All (nd_ int, id_ int, sdate_ date, p_wdate_ date) RETURN number is
 --общее по всем функциям
@@ -1004,7 +1014,7 @@ declare
    c int; i int;  -- хандлер курсора и перем
    dSql_ varchar2(200):='****'; -- тело формулы
    nTmp_ int; sTmp_ varchar2(250); -- тело SELECT
-   l_ob22 varchar2(2):='67'; l_nbs6 char(4):='6110';
+   l_ob22 varchar2(2):='67'; l_nbs6 char(4);
    l_tar number :=0; s_kontr number :=0;
 
   l_dat_b date; l_dat_e date; S5 number:=0;
@@ -1012,6 +1022,11 @@ declare
   l_kol int:=0;
 
 begin
+   if newnbs.g_state= 1 then  --переход на новый план счетов
+    l_nbs6:='6510';
+   else
+    l_nbs6:='6110';
+   end if; 
    c:=DBMS_SQL.OPEN_CURSOR; --открыть курсор
 
    FOR d in (SELECT e.NLS6, e.NAME, NVL(e.NDS,pNDS_ ) NDS,
@@ -1201,7 +1216,12 @@ end;
   end;
 
   if l_MFOP ='300465' or l_MFO='300465' then null;       -- тимчасово  28/10-15
-     l_ob22:=d.ob22_6110; l_nbs6:='6110';
+     l_ob22:=d.ob22_6110; 
+       if newnbs.g_state= 1 then  --переход на новый план счетов
+        l_nbs6:='6510';
+       else
+        l_nbs6:='6110';
+       end if; 
   end if;
 
   l_ob22_6:= null;
@@ -1779,8 +1799,10 @@ end;
  TXT_:= TXT_||' аванс за надання ел.послуг в '|| MES_ ;
 
     logger.trace('ELT.BORG 0 '|| MODE_||' '||DAT1_||' '||NLS36_||' '||PAKET_ );
+ 
   descrname_:='ELT3579';
-  if Variant_ = 0 then descrname_:='ELT3578'; end if;
+  if Variant_ = 0 then descrname_:='ELT3578'; end if;   
+  
   begin
   SELECT UPPER(nvl(masknms,NULL))
     INTO suf_ FROM nlsmask WHERE UPPER(maskid)=UPPER(descrname_);
@@ -1930,7 +1952,64 @@ for k in (SELECT d.ND, d.CC_ID, d.SDATE, c.OKPO,
       if S_ >0 then
 -------
     if k.nls8 is NULL then     -- 5
+    if newnbs.g_state= 1 then  --переход на новый план счетов       
+    
+     select substr(F_NEWNMS(NULL,descrname_,NULL,k.rnk,NULL),1,70) into nms8p_  from dual;
+        if suf_ is NULL then nms8_:=nms8p_; end if;
+          nls8_ := Get_NLS_random  ( '3570'  ) ;  --получение № лиц.сч по случ.числам
+          OP_REG(9,0,0,0,tmp_,k.rnk,nls8_,n980_, nms8_,'OFR',k.isp,acc8_);
+          p_setAccessByAccMask(acc8_,k.acc);
+          update accounts set tobo=k.tobo where acc=acc8_;
+          r013f:='1'; s180f:=NULL; s240f:=NULL;
 
+          if l_mfop = '300465' or l_MFO='300465' then     -- Ощадбанк
+            if newnbs.g_state= 1 then  --переход на новый план счетов
+             r013f:='1'; s180f:='1'; s240f:='1';  ob22f:='24';
+            else
+             r013f:='1'; s180f:='1'; s240f:='1';  ob22f:='44';
+            end if; 
+          end if;
+
+          if l_mfo = '380764' then     -- НАДРА
+             r013f:='1'; s180f:='1'; s240f:='1';  ob22f:='74';
+          end if;               
+          Accreg.setAccountSParam(acc8_, 'R013', r013f);
+          Accreg.setAccountSParam(acc8_, 'S180', s180f);
+          Accreg.setAccountSParam(acc8_, 'S240', s240f);    
+
+          if l_mfo = '380764'
+          then      -- НАДРА
+            sql_:='select segm from customer where rnk=:rnk';
+            begin
+              EXECUTE IMMEDIATE sql_ into l_segm USING k.rnk;
+            exception when others then
+              raise_application_error(-(20203),'\9350 - no table Exist or others '||SQLERRM,TRUE);
+            END;
+
+            if l_segm like '1%'
+            then ob22f:='75';
+            else ob22f:='74';
+            end if;
+
+          end if;
+            l_ob22n:=f_get_elt_ob22(l_id,'3579');
+
+          if l_ob22n is not null
+          then ob22f:=l_ob22n;
+          end if;
+
+          Accreg.setAccountSParam( acc8_, 'OB22', ob22f );
+
+          if p_mfo_ is not NULL
+          then
+            begin
+              insert into bank_acc (acc,mfo) values (acc8_,p_mfo_);
+            exception
+              when others then
+                NULL;
+            end;
+          end if;
+     else
       begin
         select substr(decode(nmkk,NULL,nmk,nmkk),1,35)
           into nmkl_
@@ -2040,7 +2119,7 @@ for k in (SELECT d.ND, d.CC_ID, d.SDATE, c.OKPO,
           end if;
 
       END;
-
+     end if;    
       update E_DEAL set NLS_D=nls8_ where nd=k.nd;
 
     else
@@ -2147,7 +2226,7 @@ VALUES (REF_, case when length(ref_) > 10 then substr(ref_, -10) else to_char(re
          and NVL(k.ost8,0) < 0
          and k.nls8 is not NULL then
       --пересчитываем остатки по 26*  --COBUMMFO-4069
-      k.ost2:=  greatest(0,fost(k.acc,bankdate)+NVL(k.lim,0));    
+      k.ost2:=  greatest(0,fost(k.acc,bankdate)+NVL(k.lim,0));
       if k.accp is not null then
        k.ost_p:= greatest(0,nvl(fost(k.accp,bankdate),0));
       else k.ost_p:= 0;
@@ -2634,9 +2713,10 @@ BEGIN
   end ;
 
   Variant_  := 0;
-  descrname_:='ELT3579';
 
-  if Variant_s = '0' then descrname_:='ELT3578'; end if;
+    descrname_:='ELT3579';
+    if Variant_s = '0' then descrname_:='ELT3578'; end if;
+  
      Variant_ :=0;
   if Variant_s = '1' then
      Variant_:=1;

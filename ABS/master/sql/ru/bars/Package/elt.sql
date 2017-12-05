@@ -1,9 +1,4 @@
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/elt.sql =========*** Run *** =======
- PROMPT ===================================================================================== 
- 
-CREATE OR REPLACE PACKAGE BARS.ELT
+CREATE OR REPLACE PACKAGE ELT
 IS
 
 G_HEADER_VERSION  CONSTANT VARCHAR2(64)  := 'version 39.4 від 28/12/2016';
@@ -13,38 +8,38 @@ G_AWK_HEADER_DEFS CONSTANT VARCHAR2(512) := '';
  -- В дальнейшем м.б. и сами услуги
 
  -- 28/12/16     OPN_ACNT, SET_TARIFF, DEL_TARIFF
- --  9/08-16     Уточнено верс_ю п_сля включення opl_web, borg_web. 
+  --  9/08-16     Уточнено версію після включення opl_web, borg_web.
  -- 20/01-16     Нова F_ELT_TAR_PAK
  -- 15/03-12 KDI Уточнено R013=1 для рах-в 3579
  --  1/03-12 KDI mode=7 пошук segm
- -- 29/02-12 KDI Виправив опечатку not null при погашенн_
- -- 20/02-12 KDI для mode=3 уточнив критер_й NLS_P = NLS36 - для блокування погашення
- -- 15/02-12 KDI Адаптац_я для Ощадбанку. Ф-_я  F_CH_GASH - зовн_шня
- -- 18/01-12 KDI Прибрав запис деяких пов_домлень в журнал АБС
- --  3/01-12 KDI П_дм_на рах-ку-платника в пр-р_ погашення 3579 (mode=8)
- -- 30/12-11 KDI Узгодження пар-в для виклику зовн_шньої функц_ї анал_зу
- --              документообороту для р_зних код_в тариф_в.
- --  6/12-11 KDI Анал_з наявност_ рах-ку NLS_P в пр-р_ погашення 3579
+ -- 29/02-12 KDI Виправив опечатку not null при погашенні
+ -- 20/02-12 KDI для mode=3 уточнив критерій NLS_P = NLS36 - для блокування погашення
+ -- 15/02-12 KDI Адаптація для Ощадбанку. Ф-ія  F_CH_GASH - зовнішня
+ -- 18/01-12 KDI Прибрав запис деяких повідомлень в журнал АБС
+ --  3/01-12 KDI Підміна рах-ку-платника в пр-рі погашення 3579 (mode=8)
+ -- 30/12-11 KDI Узгодження пар-в для виклику зовнішньої функції аналізу
+ --              документообороту для різних кодів тарифів.
+ --  6/12-11 KDI Аналіз наявності рах-ку NLS_P в пр-рі погашення 3579
  -- 30/11-11 KDI F_ELT_RNK
- -- 18/11-11 KDI Можлив_сть додаткового анал_зу оборот_в по р-ку кл_єнта
- --              через зовн_шню функц_ю F_Elt_nadra (для кожного тарифу)
- -- 15/11-11 KDI Зм_ни стосовно визначення тарифу та рах-ку 6110
- --              Анал_з MFOP для НАДРА
+ -- 18/11-11 KDI Можливість додаткового аналізу оборотів по р-ку клієнта
+ --              через зовнішню функцію F_Elt_nadra (для кожного тарифу)
+ -- 15/11-11 KDI Зміни стосовно визначення тарифу та рах-ку 6110
+ --              Аналіз MFOP для НАДРА
  --  2/03-10 KDI Виправив синтаксис вставки запису в табл. Specparam_int
- --              (актуально т_льки для Ощадбанку)
- -- 05/11-09 KDI Вичитка глоб-го пар-ра MFOP - головний банк для ф_л_й.
- --              Визначення глобального та _ндив_дуальних рахунк_в ПДВ винесено
- --              в функц_ї зовн_шнього налаштування (в TNAZNF).
- --              Для Ощадбанку - залишився алгоритм в_д 02.04.09
- --              Зм_нив лог_ку по фрагментах специф_чних для Ощадбанку.
- --              Можна об_йтись без зм_нної препроцесора OSC
- -- 23/09-09 KDI Можлив_сть погашення абонплати (ДТ 26_0 - КР 3570) частинами
- --              по анал_зу глоб. пар-ра ELT_4
- -- 15/07-09 KDI Пр-ра ELT.BORG  для Mode 8. П_дправив визначення дати
- --              для включення правильного м_сяця в призначення платежу
+ --              (актуально тільки для Ощадбанку)
+ -- 05/11-09 KDI Вичитка глоб-го пар-ра MFOP - головний банк для філій.
+ --              Визначення глобального та індивідуальних рахунків ПДВ винесено
+ --              в функції зовнішнього налаштування (в TNAZNF).
+ --              Для Ощадбанку - залишився алгоритм від 02.04.09
+ --              Змінив логіку по фрагментах специфічних для Ощадбанку.
+ --              Можна обійтись без змінної препроцесора OSC
+ -- 23/09-09 KDI Можливість погашення абонплати (ДТ 26_0 - КР 3570) частинами
+ --              по аналізу глоб. пар-ра ELT_4
+ -- 15/07-09 KDI Пр-ра ELT.BORG  для Mode 8. Підправив визначення дати
+ --              для включення правильного місяця в призначення платежу
  --              док-та на погашення простроченої абонплати
- -- 04.06.09 KDI Вв_в зм_нну препроцесора OSC для присвоєння OB22 по р-ку 3579.
- --              Ще раз уточнення для спецпар-_в р-ку 3579 - r013,s180,s240.
+ -- 04.06.09 KDI Ввів змінну препроцесора OSC для присвоєння OB22 по р-ку 3579.
+ --              Ще раз уточнення для спецпар-ів р-ку 3579 - r013,s180,s240.
  -- 28.04.09 KDI Значение спецпар-ров для 3579 - r013,s180,s240.
  -- 10.04.09 KDI Исправил проверку наличия кода переданной в пр-ру операции.
  --              Урезал до 38 с. название счета 3579 при вставке в OPER.
@@ -223,7 +218,7 @@ PROCEDURE shnel
 ( DAT1_ date, DAT2_ date, KOL_ int, sErr_ OUT varchar2 );
 -- для ускорения по населению в режиме "з розрах. авансом"
 ---------------
-  
+
   --
   -- OPN_ACNT ( в_дкриття рахунку )
   --
@@ -232,7 +227,7 @@ PROCEDURE shnel
   , p_acc2600   in     accounts.acc%type
   , p_nls3570   in     accounts.nls%type
   );
-  
+
   --
   -- SET_TARIFF ( встановлення/зм_на параметр_в тарифу для дог. РКО )
   --
@@ -250,7 +245,7 @@ PROCEDURE shnel
   , p_trf1_amnt    in     e_tar_nd.s_tar_por1%type
   , p_trf2_amnt    in     e_tar_nd.s_tar_por2%type
   );
-  
+
   --
   -- DEL_TARIFF ( ввидалення тарифу з дог. РКО )
   --
@@ -261,17 +256,15 @@ PROCEDURE shnel
 
 END ELT;
 /
-
-
-CREATE OR REPLACE PACKAGE BODY BARS.ELT
+CREATE OR REPLACE PACKAGE BODY ELT
 IS
-  
+
   G_BODY_VERSION  CONSTANT VARCHAR2(64)  := 'version 45.5 від 12.05.2017';
   G_AWK_BODY_DEFS CONSTANT VARCHAR2(512) := '';    -- 45.2 в_д 18.03.2017
 
 /****
-12/05    KDI COBUSUPABS-5912. Правка пр-ри ROZ_AV, OPL + ACCREG 
-18/03    KDI COBUSUPABS-5576. Пр-ра BORG. Дод. рекв_зити SHTAR, KTAR для док-та погашення 3579 
+12/05    KDI COBUSUPABS-5912. Правка пр-ри ROZ_AV, OPL + ACCREG
+18/03    KDI COBUSUPABS-5576. Пр-ра BORG. Дод. рекв_зити SHTAR, KTAR для док-та погашення 3579
 16/03    KDI COBUSUPABS-5576. Дод. реквізити SHTAR, KTAR для док-та списання
  2/02    KDI COBUSUPABS-5068 - рах-к 'W4A', tt='PKH' (для ПЦ)
 10/01-17 KDI COBUSUPABS-5068 - рах-к 'W4A', tt='ELP' (для ПЦ)
@@ -320,6 +313,16 @@ begin
 	   ||G_AWK_BODY_DEFS;
 end body_version;
 
+function Get_NLS_random  (p_R4 accounts.NBS%type ) return accounts.NLS%type   is   --получение № лиц.сч по случ.числам
+                          nTmp_ number ;            l_nls accounts.NLS%type ;
+begin
+  While 1<2        loop nTmp_ := trunc ( dbms_random.value (1, 999999999 ) ) ;
+     begin select 1 into nTmp_ from accounts where nls like p_R4||'_'||nTmp_  ;
+     EXCEPTION WHEN NO_DATA_FOUND THEN EXIT ;
+     end;
+  end loop;         l_nls := vkrzn ( substr(gl.aMfo,1,5) , p_R4||'0'||nTmp_ );
+  RETURN l_Nls ;
+end    Get_NLS_random ;  
 ---=====================
 FUNCTION  F_All (nd_ int, id_ int, sdate_ date, p_wdate_ date) RETURN number is
 --общее по всем функциям
@@ -459,16 +462,16 @@ is -- розрахунковий тариф
   dtl_b date;      dtl_e date;
   l_nls varchar2(14); l_kv26 int; l_acc26 int;
 begin
-  
+
   select n.sumt, t.sumt, n.dat_lb, n.dat_le, nls26, kv26, acc26
     into S_tari, S_tar, dtl_b, dtl_e, l_nls, l_kv26, l_acc26
     from e_tar_nd n, e_tarif t, e_deal e
-   where n.nd=nd_ 
+   where n.nd=nd_
      and n.id=t.id
      and e.nd=n.nd
      and n.id=ID_;
-  
-  if s_tari is not NULL 
+
+  if s_tari is not NULL
   then
 
         if NVL(dtl_b,dat1_) > NVL(dtl_e,dat2_) then   -- НЕ коректный период
@@ -483,29 +486,29 @@ begin
 
     if ( l_mfo = '380764' )
     then -- НАДРА
-      
+
       S_tar := f_tarif(ID_,l_kv26,l_nls,0,1);
-      
+
       RETURN nvl(S_tar,0);
-      
+
     end if;
-    
+
     if ( ID_ = 204 ) -- what the hell is this?
     then
-       
-      if NVL(F_ELT_TAR_PAK(ND_),0) = 0 
+
+      if NVL(F_ELT_TAR_PAK(ND_),0) = 0
       then
-        
+
         null;
-        
+
       else
-        
+
         S_tar := f_tarif(ID_,l_kv26,l_nls,0,1);
-        
+
         return nvl(S_tar,0);
-        
+
       end if;
-      
+
     end if;
 
 
@@ -582,7 +585,7 @@ FUNCTION  ROZ_AV ( DAT1_ date, DAT2_ date, KOL_ int, ND_ INT) RETURN NUMBER is
   l_id int; l_fl1 int; fl5 int:=1;
   l_kol int;
 begin
-  if KOL_ = 0 then return 0; end if; 
+  if KOL_ = 0 then return 0; end if;
   l_kol:=KOL_; S_:=0; S5:=0;
 
   if DAT1_ <= JAN1_ and DAT2_ is null then
@@ -595,14 +598,14 @@ begin
 
   else
 
-     for k in 
-     (select           --greatest(nvl(n.dat_beg,DAT1_),DAT1_), least(nvl(n.dat_end,DAT2_),DAT2_), 
-            nvl(n.dat_beg,DAT1_) dat_b, nvl(n.dat_end,DAT2_) dat_e, n.id, e.fl1 
-     --into l_dat_b, l_dat_e, l_id, l_fl1 
+     for k in
+     (select           --greatest(nvl(n.dat_beg,DAT1_),DAT1_), least(nvl(n.dat_end,DAT2_),DAT2_),
+            nvl(n.dat_beg,DAT1_) dat_b, nvl(n.dat_end,DAT2_) dat_e, n.id, e.fl1
+     --into l_dat_b, l_dat_e, l_id, l_fl1
      FROM e_tar_nd n, e_tarif e
      WHERE n.nd=ND_ and n.id=e.id)
      loop
-     l_dat_b:=k.dat_b; l_dat_e:=k.dat_e; l_id:=k.id; l_fl1:=k.fl1; fl5:=1; S5:=0;   
+     l_dat_b:=k.dat_b; l_dat_e:=k.dat_e; l_id:=k.id; l_fl1:=k.fl1; fl5:=1; S5:=0;
 
      if l_dat_b < DAT1_ then l_dat_b := DAT1_;
      elsif l_dat_b > DAT2_ then S5:=0; S_:=S_+S5; fl5:=0;
@@ -613,10 +616,10 @@ begin
      elsif l_dat_e < DAT1_ then S5:=0; S_:=S_+S5; fl5:=0;
      else if l_fl1= 1 then l_dat_e:=DAT2_; end if;
      end if;
-     
+
      if fl5=0 then null;
-     else 
-     l_kol := elt.RAB_DNI(l_dat_b,l_dat_e); 
+     else
+     l_kol := elt.RAB_DNI(l_dat_b,l_dat_e);
      S5:= round(ELT.Tarif(DAT1_, DAT2_, ND_, l_id) * l_kol / KOL_,0);
      S_ := S_ + S5;
      end if;
@@ -682,8 +685,8 @@ PROCEDURE OPL
  l_npd_3570 varchar2(160); l_npk_3570 varchar2(160);
  FL_ int  ;  FL_Y int;  pNDS_ number;
  STXT_ varchar2(35);
- datm_ date; 
- datlit_ varchar2(25); 
+ datm_ date;
+ datlit_ varchar2(25);
  datlit_f varchar2(25); -- нарахування наперед
  t_pdv varchar2(12);
  t_pdv1 varchar2(12);
@@ -715,7 +718,7 @@ PROCEDURE OPL
  l_tip accounts.tip%type;
  l_tt tts.tt%type;
  l_id_glob e_tarif.id_glob%type;
- ern CONSTANT POSITIVE   := 208; 
+ ern CONSTANT POSITIVE   := 208;
  err1 EXCEPTION;
  erm VARCHAR2(400);
  err EXCEPTION;
@@ -732,29 +735,29 @@ PROCEDURE OPL
   END INS_OPERW;
   ---
 BEGIN
-  
+
   delete from tmp_ovr where id=36;
-  
+
   JAN1_:= ADD_MONTHS(LAST_DAY(DAT1_),-1)+1;
-  
+
   case
-    when MODE_ = 0 
+    when MODE_ = 0
     then
       STXT_ :='Повернути надлишки ав.(3600->26_0)';
       TXT_  :='Повернення. ';
-    when MODE_ = 1 
+    when MODE_ = 1
     then
       STXT_ :='Стягнути розрах.аванс (26_0->3600)';
     when MODE_ = 2
     then
       STXT_ :='Сформувати доходи банку (3*->6*)';
-    when MODE_ = 3 
+    when MODE_ = 3
     then
       STXT_ :='Закрити заб-ть (26_0->3570*)';
     else
       null;
   end case;
-  
+
   -- флаг оплаты из TTS
   l_tt:=TT_;
   begin
@@ -765,7 +768,7 @@ BEGIN
       erm:='Операція НЕ знайдена '||l_tt;
       raise_application_error(-(20203),'\9350 - Cannot found '||erm||' '||SQLERRM,TRUE);
   end;
-  
+
   datlit_ := ''; datlit_f := '';
   ID_ :=USER_ID;
   TXT_:= TXT_||'Аванс за надання ел.послуг в '|| MES_ ;
@@ -773,8 +776,8 @@ BEGIN
   -- можливi послуги з ПДВ i без ПДВ
   l_pdvnls :='36220';
   nls_pdvr_:='36221';
-  
-  if nls_pdv_ like '3622%' 
+
+  if nls_pdv_ like '3622%'
   then    -- 4-й пар-р виклику ф-ії Sel001
     nls_pdvr_:=nls_pdv_;
   elsif fl_l_pdv=0 then  nls_pdvr_:=G_pdv;
@@ -785,9 +788,9 @@ BEGIN
   for k in ( SELECT d.ND, d.CC_ID, d.SDATE, c.OKPO,
                     a3.NLS NLS3, a3.ostc OST3, substr(a3.NMS,1,38) NMS3,
                     a2.NLS NLS2, greatest(0,a2.ostc+NVL(a2.lim,0)) OST2,
-                    a3.ostb OST3P, a3.acc acc3, 
+                    a3.ostb OST3P, a3.acc acc3,
                     a2.ostc OST2C, substr(a2.NMS,1,38) NMS2, d.WDATE,
-                    d.SA, a2.acc, d.accp, a2.kv KV2, 
+                    d.SA, a2.acc, d.accp, a2.kv KV2,
                     a2.tip tip2, p.tip tipp,
                     d.nls_p  NLS_P, p.ostc OST_P, substr(p.nms,1,38) NMS_P,
                     c.rnk, c.branch BRANCH_K, a2.branch BRANCH_R
@@ -800,29 +803,29 @@ BEGIN
                and d.sos<>15  -- без закритих угод
              order by d.nd )
   loop
-    
+
     pnt := 0;
-    
+
     BEGIN
       select substr(VALUE,1,1)
         into DEB_26_
         from CUSTOMERW
        where TAG = 'Y_ELT'
          and RNK = k.RNK
-         and VALUE Is Not Null -- = 'N' 
+         and VALUE Is Not Null -- = 'N'
          and ROWNUM = 1;
     exception
       when NO_DATA_FOUND then
         DEB_26_:='Y';
     end;
-    
+
     if to_char(k.wdate,'YYMM')<to_char(bankdate,'YYMM')
     then
       datm_:=dat1_;
     else
       datm_:=bankdate;
     end if;
-    
+
     datlit_ :=' '||F_Month_lit(datm_,1,4);
     datlit_f:=' '||F_Month_lit(ADD_MONTHS(datm_,+1),1,4);
 
@@ -838,7 +841,7 @@ BEGIN
     end;
 
     pnt:=-1;
-    
+
     begin
     select F_ELT_dt(k.nls3) into ELT_dt_ from dual;
     end;
@@ -904,37 +907,37 @@ BEGIN
       else  S_:= 0;
       end if ;
 
-      if S_ > 0 
+      if S_ > 0
       then
-        
-        if S_ = k.SA 
+
+        if S_ = k.SA
         then
-          
+
           S_NDS_:=0;
-          
+
        -- ?? треба думати як розр-ти ПДВ по кожнiй послузi окремо та просумувати....
        -- if d.NDS=0 then t_pdv1:=' без ПДВ.';
-          if 1=0 
+          if 1=0
           then
             t_pdv1:=' без ПДВ.';
             t_pdvs:=' без ПДВ.';
           else
             t_pdvs:='';
           end if;
-          
+
         else
           t_pdvs:='';
         end if;
-        
+
         savepoint DO_PROVODKI_1;
-        
+
         begin
-           
+
           GL.REF (REF_);
-          
+
           NAZN_:=substr(TXT5||'. Угода '||k.CC_ID||' вiд '||to_char(k.SDATE,'dd/mm/yyyy'),1,160);
-          
-          GL.IN_DOC3( ref_   => REF_, 
+
+          GL.IN_DOC3( ref_   => REF_,
                       tt_    => l_tt,          dk_    => MODE_,
                       vob_   => 6,            nd_    => SubStr(to_char(REF_),-10),
                       pdat_  => sysdate,      data_  => gl.bDATE,
@@ -950,20 +953,20 @@ BEGIN
                       id_o_  => null,         sign_  => null,
                       sos_   => null,         prty_  => null
                     );
-          
+
           GL.PAYV( FL_, REF_, GL.BDATE, l_tt, MODE_
                  , gl.baseval, K.NLS2, S_
                  , gl.baseval, K.NLS3, S_ );
-          
-        exception 
-          when others then 
+
+        exception
+          when others then
             rollback to DO_PROVODKI_1;
             begin
-              insert into TMP_OVR (DAT, ID, DK, NLSA, NLSB, S, txt ) 
+              insert into TMP_OVR (DAT, ID, DK, NLSA, NLSB, S, txt )
               values (GL.BDATE, 36, MODE_, K.NLS2, K.NLS3, S_,STXT_);
             end;
         end;
-        
+
       end if;
 
    elsIF MODE_ =2 and DAT1_ > k.WDATE and DEB_26_ = 'Y' then
@@ -998,14 +1001,14 @@ BEGIN
    if k.nls3 like '3570%'
       or (k.nls3 like '3600%' and k.ost3 >= k.SA and k.ost3=k.ost3p)
    then
-     
+
      logger.trace('ELT.OPL 2 ND='||k.ND);
 declare
    NLS6_ varchar2(15) ; NMS6_ varchar2(38);
    c int; i int;  -- хандлер курсора и перем
    dSql_ varchar2(200):='****'; -- тело формулы
    nTmp_ int; sTmp_ varchar2(250); -- тело SELECT
-   l_ob22 varchar2(2):='67'; l_nbs6 char(4):='6110';
+   l_ob22 varchar2(2):='67'; l_nbs6 char(4);
    l_tar number :=0; s_kontr number :=0;
 
   l_dat_b date; l_dat_e date; S5 number:=0;
@@ -1013,6 +1016,13 @@ declare
   l_kol int:=0;
 
 begin
+   if newnbs.g_state= 1 then  --переход на новый план счетов
+    l_nbs6:='6510';
+   else
+    l_nbs6:='6110';
+   end if; 
+  
+
    c:=DBMS_SQL.OPEN_CURSOR; --открыть курсор
 
    FOR d in (SELECT e.NLS6, e.NAME, NVL(e.NDS,pNDS_ ) NDS,
@@ -1026,26 +1036,26 @@ begin
              FROM e_tar_nd n, e_tarif e  WHERE n.nd=k.ND and n.id=e.id )
    LOOP
 
-             
+
      l_dat_b:=d.dat_b; l_dat_e:=d.dat_e; l_id:=d.id; l_fl1:=d.fl1; fl5:=1;
 
      if d.fl1=0 then null;
         l_kol := elt.RAB_DNI(l_dat_b,l_dat_e);
      else
      if l_dat_b < DAT1_ then l_dat_b := DAT1_;
-     elsif l_dat_b > DAT2_ then S5:=0;  fl5:=0;   
+     elsif l_dat_b > DAT2_ then S5:=0;  fl5:=0;
      else if l_fl1= 1 then l_dat_b:=DAT1_; end if;
      end if;
 
      if l_dat_e > DAT2_ then l_dat_e:=DAT2_;
-     elsif l_dat_e < DAT1_ then S5:=0;  fl5:=0;   
+     elsif l_dat_e < DAT1_ then S5:=0;  fl5:=0;
      else if l_fl1= 1 then l_dat_e:=DAT2_; end if;
      end if;
-     
+
      if fl5=0 then null; S_:=0; l_kol:=0;
-     else 
-     l_kol := elt.RAB_DNI(l_dat_b,l_dat_e); 
-     end if;         
+     else
+     l_kol := elt.RAB_DNI(l_dat_b,l_dat_e);
+     end if;
 
      end if;
 
@@ -1053,7 +1063,7 @@ begin
         S5:= round(ELT.Tarif(DAT1_, DAT2_, d.ND, l_id) * l_kol / KOL_,0);
         S_ := S5;
      end if;
-   
+
      d.s:=S_;
 
 
@@ -1103,7 +1113,7 @@ begin
     execute immediate ff_  into FL_Y;
     exception  when OTHERS then
     logger.error( 'ELT.OPL  Ошибка выполнения ф-ии '||int_Func_ || chr(10) ||
-                  ff_ || chr(10) || 
+                  ff_ || chr(10) ||
                   sqlerrm || chr(10) ||
                   DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
     FL_Y:=0;
@@ -1201,7 +1211,12 @@ end;
   end;
 
   if l_MFOP ='300465' or l_MFO='300465' then null;       -- тимчасово  28/10-15
-     l_ob22:=d.ob22_6110; l_nbs6:='6110';
+     l_ob22:=d.ob22_6110; 
+       if newnbs.g_state= 1 then  --переход на новый план счетов
+        l_nbs6:='6510';
+       else
+        l_nbs6:='6110';
+       end if; 
   end if;
 
   l_ob22_6:= null;
@@ -1228,7 +1243,7 @@ end;
   if l_ob22_6 is not null then l_ob22:=l_ob22_6; end if;
 
          savepoint DO_PROVODKI_2;
-         
+
          pnt:=3;
          begin
               -- logger.info('ELT.OPL dsql='||dsql_||' d.nls6='||d.nls6);
@@ -1337,7 +1352,7 @@ END;
       -- стягнення заборгованостi з р/р клiента
       If    MODE_= 3 and k.OST3<0 and (k.ost2>0 or k.ost_p>0)
             and k.ost3p = k.ost3
-            and l_ostc3 = l_ostb3  -- 9/08-16 дод. контроль для мультивалютних 26.. 
+            and l_ostc3 = l_ostb3  -- 9/08-16 дод. контроль для мультивалютних 26..
                                    -- на одному 3570 - погашення один раз
             and (k.nls_p != k.nls3 or k.nls_p is NULL)
             and DEB_26_ = 'Y' then
@@ -1360,7 +1375,7 @@ END;
 
 
   if reg_g='0' then         -- 3.5  погашення 26_0 -> 3570 загальною сумою
-    
+
     if S_ >0 then         -- 3.6
       logger.trace('ELT.OPL 3 ND='||k.ND);
       savepoint DO_PROVODKI_3;
@@ -1387,7 +1402,7 @@ END;
        begin
        select e.npk_3570, e.id_glob  into l_npk_3570, l_id_glob
              FROM e_tar_nd n, e_tarif e
-       WHERE n.nd=k.ND and n.id=e.id     --and e.npk_3570 is not null 
+       WHERE n.nd=k.ND and n.id=e.id     --and e.npk_3570 is not null
              and rownum=1;
        EXCEPTION WHEN NO_DATA_FOUND THEN l_npk_3570:=null;
        end;
@@ -1438,7 +1453,7 @@ END;
    INSERT INTO oper (ref, nd, tt, vob, dk, PDAT, VDAT, DATD, DATP,
           s, s2,nam_a, nlsa, mfoa, kv, nam_b, nlsb, mfob, kv2,
           nazn, userid, id_a, id_b)
-   VALUES (REF_, case when length(ref_) > 10 then substr(ref_, -10) else to_char(ref_) end, 
+   VALUES (REF_, case when length(ref_) > 10 then substr(ref_, -10) else to_char(ref_) end,
            l_tt,6, 1,sysdate, gl.bDATE,gl.bDATE,gl.bDATE,
            S_, S_, l_nmsp,l_nlsp, gl.AMFO, n980_, k.NMS3, k.NLS3, gl.AMFO, n980_,
            NAZN_,iD_, k.okpo, k.okpo);
@@ -1677,8 +1692,8 @@ PROCEDURE BORG
  l_npd_3579 varchar2(160); l_npk_3579 varchar2(160);
  FL_ int  ; pNDS_ number;
  STXT_ varchar2(35);
- datm_ date; 
- datlit_ varchar2(25); 
+ datm_ date;
+ datlit_ varchar2(25);
  datlit_f varchar2(25);
  t_pdv varchar2(12); t_pdv1 varchar2(12);
  pdv5 number; TXT5 varchar2(80);
@@ -1695,7 +1710,7 @@ PROCEDURE BORG
  l_elt_rnk varchar2(38);
  l_nlsp varchar2(15);  l_nmsp varchar2(38); l_ostp number;
  l_segm varchar2(4);
--- n_tar_pak int; 
+-- n_tar_pak int;
  l_id int; l_ob22n varchar2(2);
  l_tip accounts.tip%type;
  l_tt tts.tt%type;
@@ -1741,8 +1756,10 @@ end;
  TXT_:= TXT_||' аванс за надання ел.послуг в '|| MES_ ;
 
     logger.trace('ELT.BORG 0 '|| MODE_||' '||DAT1_||' '||NLS36_||' '||PAKET_ );
+
   descrname_:='ELT3579';
-  if Variant_ = 0 then descrname_:='ELT3578'; end if;
+  if Variant_ = 0 then descrname_:='ELT3578'; end if;   
+
   begin
   SELECT UPPER(nvl(masknms,NULL))
     INTO suf_ FROM nlsmask WHERE UPPER(maskid)=UPPER(descrname_);
@@ -1774,7 +1791,7 @@ for k in (SELECT d.ND, d.CC_ID, d.SDATE, c.OKPO,
   loop
 
     -- logger.trace('ELT.BORG k '|| MODE_||' '||DAT1_||' '||k.NLS3||' '||k.nls8 );
-    
+
     pnt:=0;
     begin
       select substr(VALUE,1,1)
@@ -1782,27 +1799,27 @@ for k in (SELECT d.ND, d.CC_ID, d.SDATE, c.OKPO,
         from CUSTOMERW
        where TAG = 'Y_ELT'
          and RNK = k.RNK
-         and VALUE Is Not Null -- = 'N' 
+         and VALUE Is Not Null -- = 'N'
          and ROWNUM = 1;
     exception
       when NO_DATA_FOUND then
         DEB_26_:='Y';
     end;
-    
+
     if to_char(k.wdate,'YYMM')<to_char(bankdate,'YYMM')
     then
       datm_:=dat1_;
     else
       datm_:=bankdate;
     end if;
-    
+
     datlit_ :=' '||F_Month_lit(datm_,1,4);
     datlit_f:=' '||F_Month_lit(ADD_MONTHS(datm_,+1),1,4);
 
     ELT_nd_ := F_ELT_nd(k.nls3);
     ELT_dt_ := F_ELT_dt(k.nls3);
 
-    if fl_ndw ='1' 
+    if fl_ndw ='1'
     then
        int_sql:='select '||nm_F_ndw||'('||k.nls3||')'||' from dual';
   --   logger.trace('ELT.int_sql='||int_sql);
@@ -1822,7 +1839,7 @@ for k in (SELECT d.ND, d.CC_ID, d.SDATE, c.OKPO,
     end;
 
     begin  pnt:=1;
-       select e.npd_3579, e.npk_3579, id_glob 
+       select e.npd_3579, e.npk_3579, id_glob
        into l_npd_3579, l_npk_3579, l_id_glob
              FROM e_tar_nd n, e_tarif e
        WHERE n.nd=k.ND and n.id=e.id and rownum=1;
@@ -1883,60 +1900,123 @@ for k in (SELECT d.ND, d.CC_ID, d.SDATE, c.OKPO,
       if S_ >0 then
 -------
     if k.nls8 is NULL then     -- 5
-      
+    if newnbs.g_state= 1 then  --переход на новый план счетов       
+    
+     select substr(F_NEWNMS(NULL,descrname_,NULL,k.rnk,NULL),1,70) into nms8p_  from dual;
+        if suf_ is NULL then nms8_:=nms8p_; end if;
+          nls8_ := Get_NLS_random  ( '3570'  ) ;  --получение № лиц.сч по случ.числам
+          OP_REG(9,0,0,0,tmp_,k.rnk,nls8_,n980_, nms8_,'OFR',k.isp,acc8_);
+          p_setAccessByAccMask(acc8_,k.acc);
+          update accounts set tobo=k.tobo where acc=acc8_;
+          r013f:='1'; s180f:=NULL; s240f:=NULL;
+
+          if l_mfop = '300465' or l_MFO='300465' then     -- Ощадбанк
+            if newnbs.g_state= 1 then  --переход на новый план счетов
+             r013f:='1'; s180f:='1'; s240f:='1';  ob22f:='24';
+            else
+             r013f:='1'; s180f:='1'; s240f:='1';  ob22f:='44';
+            end if; 
+          end if;
+
+          if l_mfo = '380764' then     -- НАДРА
+             r013f:='1'; s180f:='1'; s240f:='1';  ob22f:='74';
+          end if;               
+          Accreg.setAccountSParam(acc8_, 'R013', r013f);
+          Accreg.setAccountSParam(acc8_, 'S180', s180f);
+          Accreg.setAccountSParam(acc8_, 'S240', s240f);    
+
+          if l_mfo = '380764'
+          then      -- НАДРА
+            sql_:='select segm from customer where rnk=:rnk';
+            begin
+              EXECUTE IMMEDIATE sql_ into l_segm USING k.rnk;
+            exception when others then
+              raise_application_error(-(20203),'\9350 - no table Exist or others '||SQLERRM,TRUE);
+            END;
+
+            if l_segm like '1%'
+            then ob22f:='75';
+            else ob22f:='74';
+            end if;
+
+          end if;
+            l_ob22n:=f_get_elt_ob22(l_id,'3579');
+
+          if l_ob22n is not null
+          then ob22f:=l_ob22n;
+          end if;
+
+          Accreg.setAccountSParam( acc8_, 'OB22', ob22f );
+
+          if p_mfo_ is not NULL
+          then
+            begin
+              insert into bank_acc (acc,mfo) values (acc8_,p_mfo_);
+            exception
+              when others then
+                NULL;
+            end;
+          end if;
+     else
       begin
-        select substr(decode(nmkk,NULL,nmk,nmkk),1,35) 
+        select substr(decode(nmkk,NULL,nmk,nmkk),1,35)
           into nmkl_
           from customer where rnk=k.rnk;
       EXCEPTION WHEN NO_DATA_FOUND THEN nmkl_:='??';
       end;
 
-      if k.nls3 like '3600%' 
+      if k.nls3 like '3600%'
       then nls8_ := sb_acc('3578??????????',k.nls3);
       else nls8_ := sb_acc('3579??????????',k.nls3);
-      end if;
+      end if;      
+
 
       nls8_:=VKRZN(SUBSTR(gl.aMFO,1,5),nls8_);
       nms8_:=TRIM(SUBSTR(suf_||':'||nmkl_,1,70));
       -- logger.trace('ELT.BORG 7.11 '||k.nls3||' '||nls8_||' '||nms8_||' '||descrname_);
       begin
-        
+
         select substr(F_NEWNMS(NULL,descrname_,NULL,k.rnk,NULL),1,70) into nms8p_  from dual;
-        
+
         if suf_ is NULL then nms8_:=nms8p_; end if;
-        
+
       EXCEPTION
         WHEN OTHERS THEN NULL;
       end;
-      
+
       begin
         select mfo into p_mfo_
           from bank_acc where acc=k.acc3;
       EXCEPTION WHEN NO_DATA_FOUND THEN p_mfo_:=NULL;
       end;
-      
+
       -- logger.trace('ELT.BORG 7.12 '||k.nls3||' '||nls8_||' '||nms8_);
-      
+
       BEGIN
-        SELECT acc, nms 
+        SELECT acc, nms
           INTO acc8_, nms8_
           FROM accounts
          WHERE nls=nls8_ AND kv=n980_;    ---AND dazs IS NULL;
       EXCEPTION
         WHEN NO_DATA_FOUND THEN    pnt:=71;
-          
+
           OP_REG(9,0,0,0,tmp_,k.rnk,nls8_,n980_, nms8_,'ODB',k.isp,acc8_);
-          
+
           p_setAccessByAccMask(acc8_,k.acc);
-          
+
           update accounts set tobo=k.tobo where acc=acc8_;
 
           r013f:='1'; s180f:=NULL; s240f:=NULL;
 
           if l_mfop = '300465' or l_MFO='300465' then     -- Ощадбанк
+            if newnbs.g_state= 1 then  --переход на новый план счетов
              r013f:='1'; s180f:='1'; s240f:='1';  ob22f:='24';
+            else
+             r013f:='1'; s180f:='1'; s240f:='1';  ob22f:='44';
+            end if; 
           end if;
-          
+
+
           if l_mfo = '380764' then     -- НАДРА
              r013f:='1'; s180f:='1'; s240f:='1';  ob22f:='74';
           end if;
@@ -1955,33 +2035,34 @@ for k in (SELECT d.ND, d.CC_ID, d.SDATE, c.OKPO,
           Accreg.setAccountSParam(acc8_, 'R013', r013f);
           Accreg.setAccountSParam(acc8_, 'S180', s180f);
           Accreg.setAccountSParam(acc8_, 'S240', s240f);
-          
-          if l_mfo = '380764' 
+
+          if l_mfo = '380764'
           then      -- НАДРА
-            
+
             sql_:='select segm from customer where rnk=:rnk';
-          
+
             begin
               EXECUTE IMMEDIATE sql_ into l_segm USING k.rnk;
             exception when others then
               raise_application_error(-(20203),'\9350 - no table Exist or others '||SQLERRM,TRUE);
             END;
-          
+
             if l_segm like '1%'
             then ob22f:='75';
             else ob22f:='74';
             end if;
-            
+
           end if;
 
-          l_ob22n:=f_get_elt_ob22(l_id,'3579');
-          
-          if l_ob22n is not null 
+            l_ob22n:=f_get_elt_ob22(l_id,'3579');
+
+
+          if l_ob22n is not null
           then ob22f:=l_ob22n;
           end if;
-          
+
           Accreg.setAccountSParam( acc8_, 'OB22', ob22f );
-          
+
           if p_mfo_ is not NULL
           then
             begin
@@ -1991,19 +2072,19 @@ for k in (SELECT d.ND, d.CC_ID, d.SDATE, c.OKPO,
                 NULL;
             end;
           end if;
-          
+
       END;
-       
+    end if;
       update E_DEAL set NLS_D=nls8_ where nd=k.nd;
-       
+
     else
-      
+
       nls8_:=k.nls8; nms8_:=k.nms8;
-      
+
     end if;      -- 5
-    
+
     savepoint DO_PROVODKI_7;
-    
+
     begin
            GL.REF (REF_);
    --      logger.trace('ELT.BORG 7.2 '||nls8_||' '|| S_||' '||REF_);
@@ -2072,7 +2153,7 @@ for k in (SELECT d.ND, d.CC_ID, d.SDATE, c.OKPO,
 INSERT INTO oper (ref, nd, tt, vob, dk, PDAT, VDAT, DATD, DATP,
                   s, s2,nam_a, nlsa, mfoa, kv, nam_b, nlsb, mfob, kv2,
                   nazn, userid, id_a, id_b)
-VALUES (REF_, case when length(ref_) > 10 then substr(ref_, -10) else to_char(ref_) end, 
+VALUES (REF_, case when length(ref_) > 10 then substr(ref_, -10) else to_char(ref_) end,
      l_tt,6, 1,sysdate, gl.bDATE,gl.bDATE,gl.bDATE,
      S_, S_, NMS8_, NLS8_, gl.AMFO, n980_, k.NMS3, k.NLS3, gl.AMFO, n980_,
      NAZN_,iD_, k.okpo, k.okpo);
@@ -2194,7 +2275,7 @@ VALUES (REF_, case when length(ref_) > 10 then substr(ref_, -10) else to_char(re
 INSERT INTO oper (ref, nd, tt, vob, dk, PDAT, VDAT, DATD, DATP,
                   s, s2,nam_a, nlsa, mfoa, kv, nam_b, nlsb, mfob, kv2,
                   nazn, userid, id_a, id_b)
-VALUES (REF_, case when length(ref_) > 10 then substr(ref_, -10) else to_char(ref_) end, 
+VALUES (REF_, case when length(ref_) > 10 then substr(ref_, -10) else to_char(ref_) end,
    l_tt,6, 1,sysdate, gl.bDATE,gl.bDATE,gl.bDATE,
    S_, S_, l_nmsp,l_nlsp, gl.AMFO, n980_, k.NMS8, k.NLS8, gl.AMFO, n980_,
    NAZN_,iD_, k.okpo, k.okpo);
@@ -2207,7 +2288,7 @@ VALUES (REF_, case when length(ref_) > 10 then substr(ref_, -10) else to_char(re
 
   exception when others then rollback to DO_PROVODKI_8;
            begin
-             insert into TMP_OVR (DAT, ID, DK, NLSA, NLSB, S, txt ) 
+             insert into TMP_OVR (DAT, ID, DK, NLSA, NLSB, S, txt )
              values              (GL.BDATE, 36, MODE_, l_nlsp, K.NLS8, S_,STXT_);
              logger.error('ELT.BORG 8 отказ TMP_OVR '||mode_||' '||l_nlsp||' '||
                     k.nls8||' '|| S_||' '||REF_||' pnt='||pnt);
@@ -2249,7 +2330,7 @@ begin
  logger.info('ELT Shnel finish '|| to_char(sysdate,'ddmmyy,hh:mi:ss'));
 
 end shnel ;
-  
+
   --
   -- OPN_ACNT ( відкриття рахунку )
   --
@@ -2276,13 +2357,13 @@ end shnel ;
     l_branch              accounts.branch%type;
     l_mfo                 bank_acc.mfo%type;
   begin
-    
+
     bars_audit.trace( '%s: Entry with ( p_nd=%s, p_acc2600=%s, p_nls3570=%s ).'
                     , title, to_char(p_nd), to_char(p_acc2600), p_nls3570 );
-    
+
     l_usr_mfo := BARS.GL.AMFO;
     l_980     := BARS.GL.BASEVAL;
-    
+
     select a.RNK, a.ISP, a.GRP, a.BRANCH, b.MFO, nvl(c.NMKK,c.NMK)
       into l_rnk, l_isp, l_grp, l_branch, l_mfo, l_nmk
       from ACCOUNTS a
@@ -2293,12 +2374,12 @@ end shnel ;
         on ( b.ACC = a.ACC )
      where a.KF  = l_usr_mfo
        and a.ACC = p_acc2600;
-    
+
     if ( p_nls3570 Is Null )
     then
-      l_nls := BARS.F_NEWNLS2( null, 'ELT', '3570', l_rnk, null, l_980 ); 
+      l_nls := BARS.F_NEWNLS2( null, 'ELT', '3570', l_rnk, null, l_980 );
     else
-      
+
       begin
         select ACC
           into l_acc
@@ -2320,18 +2401,18 @@ end shnel ;
           l_acc := null;
           l_nls := p_nls3570;
       end;
-      
+
     end if;
-    
+
     If ( l_acc Is Null )
     then -- відкриваємо
-      
+
       l_nls := BARS.VKRZN( SubStr(l_usr_mfo,1,5), SubStr(l_nls,1,14) );
-    
+
       l_nms := BARS.F_NEWNMS( Null,'ELT', '3570', l_rnk, Null );
-    
+
       l_nms := SubStr(nvl(l_nms,'Абонплата '||l_nmk), 1, 70 );
-    
+
       OP_REG_EX( mod_  => 9
                , p1_   => 0
                , p2_   => 0
@@ -2345,26 +2426,26 @@ end shnel ;
                , isp_  => l_isp
                , accR_ => l_acc
                , tobo_ => l_branch );
-      
+
       if ( l_nls like '3570%' )
       then
-        
+
         l_s240 := '1';
         l_s180 := '1';
         l_r013 := '2';
-        
+
         If ( l_usr_mfo = '380764' )
         then -- НАДРА
-          
+
           execute immediate q'[select case SubStr(SEGM,1,1) when '1' then '05' when '2' then '09' else '02' end]'||
-                            q'[  from BARS.CUSTOMER where RNK = :l_rnk]' 
+                            q'[  from BARS.CUSTOMER where RNK = :l_rnk]'
              into l_ob22
             using l_rnk;
-          
+
         else -- Ощадбанк
-          
+
           begin
-            
+
             select unique OB22_3570
               into l_ob22
               from BARS.E_TAR_ND d
@@ -2374,12 +2455,12 @@ end shnel ;
 --             and t.OB22_3570 is not null
 --             and rownum = 1
             ;
-            
+
             if ( l_ob22 Is Null )
             then
               raise_application_error( -20666, 'Не вказано значення ОБ22 для тарифу!' );
             end if;
-            
+
           exception
             when NO_DATA_FOUND then
               -- l_ob22 := '02';
@@ -2387,22 +2468,22 @@ end shnel ;
             when TOO_MANY_ROWS then
               raise_application_error( -20666, 'Вказано тарифи з різними значеннями ОБ22!' );
           end;
-          
+
         end if;
-        
+
       end if;
-      
+
       bars_audit.trace( '%s: ( ACC=%s, R013=%s, S240=%s, S180=%s, OB22=%s ).', title
                       , to_char(l_acc), l_r013, l_s240, l_s180, l_OB22 );
-      
-      -- 
+
+      --
       /***
       insert
         into BARS.SPECPARAM
            ( ACC, R013, S240, S180 )
       values
            ( l_acc, l_r013, l_s240, l_s180 );
-      
+
       ***/
 
           Accreg.setAccountSParam(l_acc, 'R013', l_r013);
@@ -2410,41 +2491,41 @@ end shnel ;
           Accreg.setAccountSParam(l_acc, 'S240', l_s240);
 
       Accreg.setAccountSParam( l_acc, 'OB22', l_OB22 );
-      
+
       --
       If ( l_mfo Is Not Null )
       then
-        
+
         update BARS.BANK_ACC
            set mfo = l_mfo
          where acc = l_acc;
-        
+
         if ( sql%rowcount = 0 )
         then
           insert
             into BARS.BANK_ACC ( ACC, MFO )
           values ( l_acc, l_mfo );
         end if;
-        
+
       end if;
-      
+
       p_setAccessByAccMask( l_acc, p_acc2600 );
-      
+
       -- SEC.addagrp( l_acc, T0.pGr );
-      
+
     end if;
-    
+
     If ( l_acc Is Not Null )
     then
       update BARS.E_DEAL$BASE
          set ACC36 = l_acc
        where ND    = p_nd;
     end if;
-    
+
     bars_audit.trace( '%s: Exit.', title );
-    
+
   end OPN_ACNT;
-  
+
   --
   --
   --
@@ -2465,10 +2546,10 @@ end shnel ;
     title    constant     varchar2(60)  := $$PLSQL_UNIT||'.SET_TARIFF';
     l_qty                 number(1);
   begin
-    
+
     bars_audit.trace( '%s: Entry with ( p_nd=%s, p_id=%s, p_active=%s ).'
                     , title, to_char(p_nd), to_char(p_id), to_char(p_active) );
-    
+
     update E_TAR_ND
        set OTM        = p_active
          , SUMT       = p_amnt
@@ -2482,10 +2563,10 @@ end shnel ;
          , S_TAR_POR2 = p_trf2_amnt
      where ND = p_nd
        and ID = p_id;
-    
+
     if ( sql%rowcount = 0 )
     then
-      
+
       insert
         into E_TAR_ND
            ( ND, ID, OTM, DAT_BEG, DAT_END, SUMT
@@ -2493,26 +2574,26 @@ end shnel ;
       values
            ( p_nd, p_id, p_active, p_beg_dt, p_end_dt, p_amnt
            , p_idv_trf, p_exmpt_beg_dt, p_exmpt_enf_dt, p_incm_amnt, p_trf1_amnt, p_trf2_amnt );
-      
+
       select count( unique OB22_3570 ) -- unique values (ignore null)
         into l_qty
         from BARS.E_TAR_ND d
         join BARS.E_TARIF  t
           on ( t.ID = d.ID )
        where d.ND = p_nd;
-      
+
       if ( l_qty > 1 )
       then
         raise_application_error( -20666, 'Заборонено вказувати тарифи з різними значеннями ОБ22!' );
         -- або відкриття рах. 3570 з новим ОБ22...
       end if;
-      
+
     end if;
-    
+
     bars_audit.trace( '%s: Exit.', title );
-    
+
   end SET_TARIFF;
-  
+
   --
   --
   --
@@ -2522,21 +2603,21 @@ end shnel ;
   ) is
     title    constant     varchar2(60)  := $$PLSQL_UNIT||'.DEL_TARIFF';
   begin
-    
+
     bars_audit.trace( '%s: Entry with ( nd=%s, id=%s ).', title, to_char(p_nd), to_char(p_id) );
-    
-    delete BARS.E_TAR_ND 
+
+    delete BARS.E_TAR_ND
      where ND = p_nd
        and ID = p_id
        and nvl(OTM,0) = 0;
-    
+
     if ( sql%rowcount = 0 )
     then
       bars_audit.trace( '%s: tariff deleted.', title );
     end if;
-    
+
     bars_audit.trace( '%s: Exit.', title );
-    
+
   end DEL_TARIFF;
 
 
@@ -2544,11 +2625,11 @@ end shnel ;
 BEGIN
 
   JAN1_:= ADD_MONTHS (LAST_DAY(bankdate),-1)+1;
-  
+
   logger.trace('ELT  '||'JAN1_='|| JAN1_);
 
   select val into OKPO_ from params where par='OKPO';
- 
+
   select gl.aUID into us_id_ from dual;
 
   -- % НДС из PARAMS
@@ -2556,17 +2637,19 @@ BEGIN
   select NVL(to_number(VAL), 0) into pNDS_ from params where par='ELT_NDS';
   exception  when NO_DATA_FOUND THEN pNDS_:=0;
   end ;
-  
+
   begin
     select NVL(VAL,'0') into Variant_s from params where par='ELT_VAR';
   exception
     when NO_DATA_FOUND THEN Variant_s:='0';
   end ;
-  
+
   Variant_  := 0;
-  descrname_:='ELT3579';
   
-  if Variant_s = '0' then descrname_:='ELT3578'; end if;
+    descrname_:='ELT3579';
+
+    if Variant_s = '0' then descrname_:='ELT3578'; end if;
+
      Variant_ :=0;
   if Variant_s = '1' then
      Variant_:=1;
@@ -2607,9 +2690,9 @@ BEGIN
     WHEN NO_DATA_FOUND THEN
       G_PDV_sql := NULL;
   end;
-  
+
   bars_audit.trace( 'ELT. SQL-для інд.рах.ПДВ '||G_PDV_sql);
-  
+
  /****************
  -- контрольний виклик прописаної формули
    if g_pdv_sql is not NULL  then
@@ -2631,7 +2714,7 @@ BEGIN
   exception
     when NO_DATA_FOUND THEN N_Func_:=NULL;
   end ;
-  
+
   logger.info('ELT '||'N_Func_='|| N_Func_ );
 
   -- можлива зовнішня ф-ія контролю умов стягнення (погашення)
@@ -2639,39 +2722,26 @@ BEGIN
   select trim(VAL) into F_CH_GASH from params where par='ELT_GASH';
          exception  when NO_DATA_FOUND THEN F_CH_GASH:=NULL;
   end ;
-  
+
   -- Вичитуємо ф-ію для визначення інд-го рах-ку ПДВ  -- !! для філій Ощадбанку
   begin
     select trim(VAL) into PDV_Func_ from params where par='PDV_FUNC';
   exception
     when NO_DATA_FOUND THEN PDV_Func_:=NULL;
   end ;
-  
+
   logger.trace('ELT '||'PDV_Func_='|| PDV_Func_ );
 
   -- Перевірка наявності ф-ії додреквізитів  (заявка УПБ)
   nm_F_ndw:='F_ELT_NDW';
   int_sql:='select '||nm_F_ndw||'(''35700'')'||' from dual';
-  
+
   begin
     execute immediate int_sql into l_ndw;
   exception  when OTHERS then
     logger.info( 'ELT. incorrect SQL expr.- Ф-ія додреквізитів '||int_sql);
     fl_ndw:='0'; l_ndw:='0';
   end;
-  
+
 END ELT;
 /
-
-show err
-
-PROMPT *** Create  grants  ELT ***
-grant EXECUTE                                                                on ELT             to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on ELT             to ELT;
-grant EXECUTE                                                                on ELT             to WR_ALL_RIGHTS;
-
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/elt.sql =========*** End *** =======
- PROMPT ===================================================================================== 

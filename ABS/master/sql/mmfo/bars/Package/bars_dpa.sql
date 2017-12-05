@@ -6,7 +6,7 @@
  
 CREATE OR REPLACE PACKAGE "BARS"."BARS_DPA" is
 
-g_head_version constant varchar2(64)  := 'Version 1.31 08/08/2017';
+g_head_version constant varchar2(64)  := 'Version 1.32 09/11/2017';
 g_head_defs    constant varchar2(512) := '';
 
 /** header_version - возвращает версию заголовка пакета */
@@ -88,17 +88,19 @@ procedure ins_ticket(p_filename varchar2, p_filedata clob);
 procedure ins_r0(p_filename varchar2, p_filedata clob, p_tickname OUT varchar2);
 
     -- процедура на для отправки данных в дпа по нотариусам COBUMMFO-4028 
-    PROCEDURE accounts_tax(p_acc     accounts.acc%TYPE
-                          ,p_daos    accounts.daos%TYPE
-                          ,p_dazs    accounts.dazs%TYPE
-                          ,p_kv      accounts.kv%TYPE
-                          ,p_nbs     accounts.nbs%TYPE
-                          ,p_nls     accounts.nls%TYPE
-                          ,p_ob22    accounts.ob22%TYPE
-                          ,p_pos     accounts.pos%TYPE
-                          ,p_vid     accounts.vid%TYPE
-                          ,p_rnk     accounts.rnk%TYPE
-                          );
+  PROCEDURE accounts_tax(p_acc     accounts.acc%TYPE
+                        ,p_daos    accounts.daos%TYPE
+                        ,p_dazs    accounts.dazs%TYPE
+                        ,p_kv      accounts.kv%TYPE
+                        ,p_nbs     accounts.nbs%TYPE
+                        ,p_nls     accounts.nls%TYPE
+                        ,p_ob22    accounts.ob22%TYPE
+                        ,p_pos     accounts.pos%TYPE
+                        ,p_vid     accounts.vid%TYPE
+                        ,p_rnk     accounts.rnk%TYPE
+                        );
+  FUNCTION dpa_nbs(p_nbs  varchar2 
+                 ,p_ob22 accounts.OB22%TYPE DEFAULT NULL) RETURN NUMBER; 						  
 end;
 /
   GRANT EXECUTE ON "BARS"."BARS_DPA" TO "RPBN002";
@@ -107,7 +109,7 @@ end;
 
 CREATE OR REPLACE PACKAGE BODY "BARS"."BARS_DPA" is
 
-g_body_version constant varchar2(64)  := 'Version 1.23 13/09/2017';
+g_body_version constant varchar2(64)  := 'Version 1.25 09/11/2017';
 g_body_defs    constant varchar2(512) := '';
 
 g_modcode      constant varchar2(3)   := 'DPA';
@@ -288,7 +290,7 @@ begin
 
   l_mfo  := f_ourmfo;
 
-  for v in ( select * from DPA_ACC_USERID )
+  for v in ( select DISTINCT * from DPA_ACC_USERID )
   loop
 
      l_rownum := l_rownum + 1;
@@ -358,7 +360,7 @@ begin
   l_okpo := f_ourokpo;
   l_nb   := getglobaloption('NAME');
 
-  for v in ( select * from DPA_ACC_USERID )
+  for v in ( select DISTINCT * from DPA_ACC_USERID )
   loop
 
      l_rownum := l_rownum + 1;
@@ -426,7 +428,7 @@ begin
 
   l_okpo := f_ourokpo;
 
-  for v in ( select * from DPA_ACC_USERID )/*lypskykh 19.08.2016*/
+  for v in ( select DISTINCT * from DPA_ACC_USERID )/*lypskykh 19.08.2016*/
   loop
 
      l_rownum := l_rownum + 1;
@@ -1563,6 +1565,11 @@ procedure insert_data_to_temp(p_mfo varchar2, p_okpo varchar2, p_rp number, p_ot
 is
 begin
  bars_audit.trace('insert_data_to_temp starts');
+ 
+     if LENGTH(p_nmk) > 38 then
+        raise_application_error(-20000, 'Длина имени клиента должна быть в рамках 38-х символов');      
+     end if;
+	 
      insert into dpa_acc_userid (mfo, okpo, rt, ot, odat, nls, kv, c_ag, nmk, adr, c_reg, c_dst, bic, country, userid)
      values(p_mfo, p_okpo, p_rp, p_ot, p_odat, p_nls, p_kv, p_c_ag, p_nmk, p_adr, p_c_reg, p_c_dst, p_bic, p_country, user_id);
 
@@ -1799,7 +1806,7 @@ is
  l_filename  varchar2(100);
  p_ErrCode varchar2(500);
 begin
- bars_audit.trace(p|| 'ins_ticket start with parameters: p_filename = '||p_filename||', p_filedata='||p_filedata );
+ bars_audit.trace(p|| 'ins_ticket start with parameters: p_filename = '||p_filename||', p_filedata='||substrb(p_filedata, 1, 4000) );
  -- проверка, не принимался ли файл ранее
  begin
  select max(fn)
@@ -1865,10 +1872,6 @@ end;
                           ,p_rnk     accounts.rnk%TYPE
                           )
     IS
-       -----------------------------------------------------------------------------
-       -- version 1.01 08.08.17
-       -----------------------------------------------------------------------------
-       PRAGMA AUTONOMOUS_TRANSACTION;
        nbs_             VARCHAR2(4);
        mfo_             VARCHAR2(12);
        okpo_            VARCHAR2(14);
@@ -1901,18 +1904,11 @@ end;
           RETURN;
        END IF;
 
-       -- если нотариус и счёт 2620 - отправляем в ДПА (продолжаем процедуру)
-       IF (p_ob22 = '07'
-       AND p_nls LIKE '2620%') THEN
-          nbs_  := 2620;
+       -- если счёт отностися к ДПА, то продолжам с ним работать        
+       IF  bars_dpa.dpa_nbs(p_nbs, p_ob22) = 1 THEN
+         NULL;
        ELSE
          RETURN;
-          /*-- балансовые счета только из табл. dpa_nbs 
-          SELECT UNIQUE nbs
-            INTO nbs_
-            FROM dpa_nbs
-           WHERE TYPE IN ('DPA', 'DPK', 'DPP')
-             AND nbs = p_nbs;*/
        END IF;
 
        bank_date       := COALESCE(NVL(gl.bd, glb_bankdate), TRUNC(SYSDATE));
@@ -2002,11 +1998,44 @@ end;
                    ,creg_
                    ,cdst_
                    ,pos_);
-       COMMIT;
+        -- установим блокировку счёта
+      IF SQL%rowcount > 0 THEN
+        UPDATE accounts a
+           SET a.blkd = nvl(trim(getglobaloption('DPA_BLK')), 0)
+         WHERE a.acc = p_acc; 
+      END IF;           
     EXCEPTION
        WHEN NO_DATA_FOUND THEN
           RETURN;
     END accounts_tax;
+
+  -- функция определения относится относится ли балансовый к счетам на отправку в налоговую
+  -- параметр p_ob22 необходим чтобы для счетов 2620 с ob22 in (07,32) отправлять в налоговую COBUMMFO-5343
+  FUNCTION dpa_nbs(p_nbs  varchar2 --DPA_NBS.NBS%TYPE
+                  ,p_ob22 accounts.OB22%TYPE DEFAULT NULL) RETURN NUMBER IS
+    l_dpa NUMBER;
+  BEGIN
+    l_dpa := 0; -- 0 - не относится к счетам ДПА, 1 - относится
+
+    IF p_nbs = '2620' AND p_ob22 IN ('07'
+                                    ,'32') THEN
+      l_dpa := 1;
+    ELSE
+      BEGIN
+        SELECT UNIQUE 1
+          INTO l_dpa
+          FROM dpa_nbs
+         WHERE TYPE IN ('DPA'
+                       ,'DPK'
+                       ,'DPP')
+           AND nbs = p_nbs;
+      EXCEPTION
+        WHEN no_data_found THEN
+          l_dpa := 0;
+      END;
+    END IF;
+    RETURN l_dpa;
+  END dpa_nbs;
 
 end bars_dpa;
 /

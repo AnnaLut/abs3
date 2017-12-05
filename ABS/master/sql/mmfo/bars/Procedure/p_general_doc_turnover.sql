@@ -336,7 +336,7 @@ BEGIN
                     and o.nls = p.nlsa and p.tt not in ('102','012')
                     and p.kv  = o.kv and o.tt <> 'K25'
                     and substr(o.nls,1,1)='9'
-                    and substr(o.nls,1,4) not in ('9020',
+                    and substr(o.nls,1,4) not in (case NEWNBS.GET_STATE when 0 then '9020' else '9000' end,
                                                   '9030','9031',
                                                   '9111','9122','9129',
                                                   '9500','9510','9520','9521','9523',
@@ -419,7 +419,7 @@ BEGIN
                     substr(o2.nls,1,3) in ('206','207','208',
                                            '210','211',
                                            '220','223',
-                                           '902','903',
+                                           case NEWNBS.GET_STATE when 0 then '902' else '900' end,'903',
                                            '911',
                                            '912',
                                            '950','951','952',

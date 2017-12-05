@@ -149,7 +149,7 @@ union all
        customer c, int_accn i,   accounts b, specparam_int s,
        (select acc,rnk,ost,ostq,caldt_id from ACCM_SNAP_BALANCES where caldt_id=caldt_ID_) n
   where a.acc not in (select acc from dpt_deposit_clos)
-    and a.nbs in ('2620','2630','2635')
+    and ((newnbs.g_state = 1 and a.nbs in ('2620','2630')) or (newnbs.g_state = 0 and a.nbs in ('2620','2630','2635')))
     and a.acc=m.acc and   a.nbs not like '8%'   and a.nls not like '8%'
     and ( a.dazs is null or a.dazs > p_dat)
     and m.rnk=c.rnk
@@ -170,7 +170,7 @@ union all
        (select acc,rnk,ost,ostq,caldt_id from ACCM_SNAP_BALANCES where caldt_id=caldt_ID_) m,
         customer c,   specparam_int s
   where a.acc not in (select acc from dpt_deposit_clos)
-    and a.nbs in ('2620','2630','2635')
+    and ((newnbs.g_state = 1 and a.nbs in ('2620','2630')) or (newnbs.g_state = 0 and a.nbs in ('2620','2630','2635')))
     and a.acc=m.acc and   a.nbs not like '8%'   and a.nls not like '8%'
     and ( a.dazs is null or a.dazs > p_dat)
     and m.rnk=c.rnk
@@ -233,7 +233,7 @@ union all
          left outer join
        (select acc,rnk,ost,ostq,caldt_id from ACCM_SNAP_BALANCES where caldt_id=caldt_ID_) n on (b.acc = n.acc)
   where a.acc not in (select acc from dpt_deposit_clos)
-    and a.nbs in ('2620','2630','2635')
+    and ((newnbs.g_state = 1 and a.nbs in ('2620','2630')) or (newnbs.g_state = 0 and a.nbs in ('2620','2630','2635')))
     and a.acc=m.acc
     and   a.nbs not like '8%'     and a.nls not like '8%'
     and ( a.dazs is null or a.dazs > p_dat)
@@ -251,7 +251,7 @@ union all
        left outer join
         (select acc,rnk,ost,ostq,caldt_id from ACCM_SNAP_BALANCES where caldt_id=caldt_ID_) m on (a.acc = m.acc)
   where a.acc not in (select acc from dpt_deposit_clos)
-    and a.nbs in ('2620','2630','2635')
+    and ((newnbs.g_state = 1 and a.nbs in ('2620','2630')) or (newnbs.g_state = 0 and a.nbs in ('2620','2630','2635')))
     and  a.nbs not like '8%'   and a.nls not like '8%'
     and ( a.dazs is null or a.dazs > p_dat)
     and  not exists (select 1 from int_accn i where a.acc=i.acc and i.id=1 and i.acra is not null)
@@ -309,7 +309,7 @@ union all
        (select acc,rnk,ost,ostq,crdos,crkos,crdosQ,crkosQ,caldt_id
           from ACCM_AGG_MONBALS where caldt_id=caldt_ID_) n on (b.acc = n.acc)
   where a.acc not in (select acc from dpt_deposit_clos)
-    and a.nbs in ('2620','2630','2635')
+    and ((newnbs.g_state = 1 and a.nbs in ('2620','2630')) or (newnbs.g_state = 0 and a.nbs in ('2620','2630','2635')))
     and   a.nbs not like '8%'   and a.nls not like '8%'
     and ( a.dazs is null or a.dazs > p_dat)
     and a.rnk=c.rnk
@@ -331,7 +331,7 @@ union all
           from ACCM_AGG_MONBALS where caldt_id=caldt_ID_) m on (a.acc = m.acc),
        customer c
   where a.acc not in (select acc from dpt_deposit_clos)
-    and a.nbs in ('2620','2630','2635')
+    and ((newnbs.g_state = 1 and a.nbs in ('2620','2630')) or (newnbs.g_state = 0 and a.nbs in ('2620','2630','2635')))
     and   a.nbs not like '8%'   and a.nls not like '8%'
     and ( a.dazs is null or a.dazs > p_dat)
     and a.rnk=c.rnk
@@ -390,7 +390,7 @@ union all
        (select acc,rnk,ost,ostq,crdos,crkos,crdosQ,crkosQ,caldt_id
           from ACCM_AGG_MONBALS where caldt_id=caldt_ID_) n on (b.acc = n.acc)
   where a.acc not in (select acc from dpt_deposit_clos)
-    and a.nbs in ('2620','2630','2635')
+    and ((newnbs.g_state = 1 and a.nbs in ('2620','2630')) or (newnbs.g_state = 0 and a.nbs in ('2620','2630','2635')))
     and   a.nbs not like '8%'     and a.nls not like '8%'
     and ( a.dazs is null or a.dazs > p_dat)
     and a.rnk=c.rnk
@@ -412,7 +412,7 @@ union all
           from ACCM_AGG_MONBALS where caldt_id=caldt_ID_) m on (a.acc = m.acc),
        customer c
   where a.acc not in (select acc from dpt_deposit_clos)
-    and a.nbs in ('2620','2630','2635')
+    and ((newnbs.g_state = 1 and a.nbs in ('2620','2630')) or (newnbs.g_state = 0 and a.nbs in ('2620','2630','2635')))
     and   a.nbs not like '8%'     and a.nls not like '8%'
     and ( a.dazs is null or a.dazs > p_dat)
     and m.rnk=c.rnk

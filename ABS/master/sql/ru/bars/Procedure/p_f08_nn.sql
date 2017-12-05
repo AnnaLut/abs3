@@ -12,19 +12,21 @@ PROMPT *** Create  procedure P_F08_NN ***
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирование файла #08 для КБ
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     : 07/06/2016 (03/06/2016, 27/05/2016, 04/04/2016)
+% VERSION     : 20/03/2017 (19/01/2017, 07/06/2016)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+20.03.2017 объеденнены некоторые блоки для присвоения переменной S_  
+           значения 'I'
 07.06.2016 для групп бал.счетов 602,604,605 и Кт оборотов в кореспонденции
-           со счетами дискрнта формируем показатель со знаком плюс
+           со счетами дискрнта формируем показатель со знаком плюс 
 03.06.2016 при разбивке остатка по R013 не формировался код бал.счета
            Исправлено.
 04.04.2016 вместо значения '00' для S130 будет формироваться значение '90'
            которое имеется в классификаторе KL_S130
-30.03.2016 на 01.04.2016 будет формироваться новая часть показателя
-           "код виду цінних паперів" (параметр S130 2-х значный код)
+30.03.2016 на 01.04.2016 будет формироваться новая часть показателя 
+           "код виду цінних паперів" (параметр S130 2-х значный код) 
 20.01.2016 исключаем проводки перекрытия корректирующих за декабрь
            после перехода на новые DRAPSы
 03.07.2015 для ГОУ изменил формирование кода 704
@@ -35,7 +37,7 @@ PROMPT *** Create  procedure P_F08_NN ***
            проводки выполненные в следующем за отчетным месяце
 25.02.2015 для нерезидентов параметр K072 будет равен '0'
            (изменения необходимы для ФЛ предпринимателей Крыма)
-19.01.2015 для mfou_ <> 300465 и отчетного месяца 12 вызываем функцию
+19.01.2015 для mfou_ <> 300465 и отчетного месяца 12 вызываем функцию 
            f_pop_otcn(Dat_, 4, sql_acc_, null, 1)
 19.12.2013 в табл. OTCN_F08_HISTORY добавлено поле VOB для ускорения
            формирования файла
@@ -129,7 +131,7 @@ CURSOR Saldo IS
    select a.*, n.nd, i.freq
    from (
      SELECT s.rnk, s.acc, s.nls, s.kv, s.fdat, s.nbs,
-              NVL(cc.r011,'0') r011, NVL(cc.r013,'0') r013,
+              NVL(cc.r011,'0') r011, NVL(cc.r013,'0') r013, 
               NVL(trim(cc.k072),'X') k072,
               s.ost, s.ostq, s.dos96, s.kos96, s.dosq96, s.kosq96,
               s.dos99, s.kos99, s.dosq99, s.kosq99,
@@ -158,7 +160,7 @@ CURSOR Saldo IS
 procedure p_ins(p_dat_ date, p_tp_ varchar2, p_rnk_ number, p_nls_ varchar2,
                 p_nbs_ varchar2, p_kv_ smallint, p_r011_ varchar2,
                 p_r013_ varchar2, p_k072_ varchar2,
-                p_s183_ varchar2, p_s130_ varchar2,
+                p_s183_ varchar2, p_s130_ varchar2, 
                 p_znap_ varchar2, p_isp_ number, p_nbuc_ varchar2) IS
 
 kod_ varchar2(14);
@@ -183,13 +185,13 @@ begin
    end if;
 
    if (substr(p_nbs_,1,3) in ('600','700') OR p_nbs_ in ('6054','6055')) and
-       s_<>'4'
+       s_<>'4' 
    then
       s_:= '4';
    end if;
 
    if substr(p_nbs_,1,3) in ('601','608','701','708') and r_='1' and
-       s_ not in ('5','6','7')
+       s_ not in ('5','6','7') 
    then
       s_:= '6';
    end if;
@@ -202,7 +204,7 @@ begin
       s_:='H';
    end if;
 
-   if p_nbs_ in ('6031','6033') and s_<>'I' then
+   if p_nbs_ in ('6031','6033','7030') and s_<>'I' then
       s_:='I';
    end if;
 
@@ -212,10 +214,6 @@ begin
 
    if substr(p_nbs_,1,3) in ('604','704') and r_='2' and s_<>'0' then
       s_:= '0';
-   end if;
-
-   if p_nbs_ in ('7030') and s_<>'I' then
-      s_:='I';
    end if;
 
    if r_ = 2 then
@@ -248,7 +246,7 @@ begin
                 from otcn_f08_history
                 where fdat between Dat_+1 and Dat_+29 and
                       vob=96 and
-                      trim(nlsk)=trim(p_nls_)
+                      trim(nlsk)=trim(p_nls_) 
                 group by accd, nlsd, kv, acck, nlsk )
       loop
 
@@ -260,12 +258,12 @@ begin
             where ca.acc=k.accd and
                   ca.rnk=c.rnk  and
                   ca.acc=s.acc(+) and
-                  c.ise = p.k070(+) and
+                  c.ise = p.k070(+) and 
                   p.d_close is null ;
          else
             s1_:='X';
             r1_:='1';
-            s2_:=s_ ;
+            s2_:=s_ ;  
          end if;
 
          if s2_ <> '0' then  -- s1_ = 'X' and s2_<>'0' then
@@ -275,7 +273,7 @@ begin
          if p_tp_ = '1'
          then
             se_ := - k.s;
-         else
+         else 
             se_ := k.s;
          end if;
 
@@ -330,16 +328,16 @@ begin
             select NVL(p.k072,'0'), 2-mod(c.codcagent,2), nvl(trim(s.k072),'0'),
                    ca.tobo, ca.nms
               into s1_, r1_, s2_, tobo_, nms_
-            from accounts ca, customer c, kl_k070 p, specparam s
+            from accounts ca, customer c, kl_k070 p, specparam s  
            where ca.acc=k.acck and
                   ca.rnk=c.rnk  and
                   ca.acc=s.acc(+) and
-                  c.ise = p.k070(+) and
+                  c.ise = p.k070(+) and 
                   p.d_close is null;
          else
             s1_:='X';
             r1_:='1';
-            s2_:=s_ ;
+            s2_:=s_ ;  
          end if;
 
          if s2_<>'0' then
@@ -349,7 +347,7 @@ begin
          if p_tp_ = '1'
          then
             se_ := k.s;
-         else
+         else 
             se_ := - k.s;
          end if;
 
@@ -372,7 +370,7 @@ begin
                     (nls, kv, odate, kodp, znap, nbuc, rnk, isp, comm)
             VALUES  (k.nlsk, k.kv, dat_, kod_, to_char(se_), p_nbuc_, rnk_, isp_, comm1_);
 
-            Ostn_:= Ostn_ - se_;
+            Ostn_:= Ostn_ - se_;  
          end if;
 
          if se_ <> 0 and k.nlsk like '6%'  -- k.s > 0 and k.nlsk like '6%'
@@ -382,7 +380,7 @@ begin
                     (nls, kv, odate, kodp, znap, nbuc, rnk, isp, comm)
             VALUES  (k.nlsd, k.kv, dat_, kod_, to_char(se_), p_nbuc_, rnk_, isp_, comm_);
 
-            Ostn_:= Ostn_ - se_;
+            Ostn_:= Ostn_ - se_;  
          end if;
 
       end loop;
@@ -403,7 +401,7 @@ begin
                 from otcn_f08_history
                 where fdat between Dat_+1 and Dat_+29 and
                       vob=96 and
-                      trim(nlsd)=trim(p_nls_)
+                      trim(nlsd)=trim(p_nls_) 
                 group by accd, nlsd, kv, acck, nlsk )
       loop
 
@@ -418,7 +416,7 @@ begin
                where ca.acc=k.acck and
                      ca.rnk=c.rnk  and
                      ca.acc=s.acc(+) and
-                     c.ise = p.k070(+) and
+                     c.ise = p.k070(+) and 
                      p.d_close is null ;
                comm1_ := '';
                comm1_ := substr(comm1_ || tobo_ || '  ' || nms_, 1, 200);
@@ -431,7 +429,7 @@ begin
                where ca.acc=k.acck  and
                      ca.rnk=c.rnk  and
                      ca.acc=s.acc(+) and
-                     c.ise = p.k070(+) and
+                     c.ise = p.k070(+) and 
                      p.d_close is null;
 
                comm1_ := '';
@@ -440,7 +438,7 @@ begin
          else
             s1_:='X';
             r1_:='1';
-            s2_:=s_ ;
+            s2_:=s_ ;  
          end if;
 
          se_:= 0;  -- 09.06.2013 ниже есть блок для обратных проводок
@@ -452,7 +450,7 @@ begin
          if p_tp_ = '1'
          then
             se_ := k.s;
-         else
+         else 
             se_ := - k.s;
          end if;
 
@@ -500,26 +498,26 @@ begin
                select NVL(p.k072,'0'), 2-mod(c.codcagent,2), nvl(trim(s.k072),'0'),
                       ca.tobo, ca.nms
                  into s1_, r1_, s2_, tobo_, nms_
-               from accounts ca, customer c, kl_k070 p, specparam s
+               from accounts ca, customer c, kl_k070 p, specparam s  
                where ca.acc=k.accd and
                      ca.rnk=c.rnk  and
                      ca.acc=s.acc(+) and
-                     c.ise = p.k070(+) and
+                     c.ise = p.k070(+) and 
                      p.d_close is null;
 
                comm1_ := '';
                comm1_ := substr(comm1_ || tobo_ || '  ' || nms_, 1, 200);
             end if;
-
+            
             if k.nlsd like '8%' then
                select NVL(p.k072,'0'), 2-mod(c.codcagent,2), nvl(trim(s.k072),'0'),
                       ca.tobo, ca.nms
                  into s1_, r1_, s2_, tobo_, nms_
-               from accounts ca, customer c, kl_k070 p, specparam s
+               from accounts ca, customer c, kl_k070 p, specparam s 
                where ca.acc=k.accd  and
                      ca.rnk=c.rnk  and
                      ca.acc=s.acc(+) and
-                     c.ise = p.k070(+) and
+                     c.ise = p.k070(+) and 
                      p.d_close is null;
 
                comm1_ := '';
@@ -538,7 +536,7 @@ begin
          if p_tp_ = '1'
          then
             se_ := - k.s;
-         else
+         else 
             se_ := k.s;
          end if;
 
@@ -584,8 +582,8 @@ begin
                        acck, nlsk
                 from otcn_f08_history
                 where fdat between Dat_+1 and Dat_+29 and
-                      vob = 96 and
-                      trim(nlsd)=trim(p_nls_)
+                      vob = 96 and 
+                      trim(nlsd)=trim(p_nls_) 
                 group by accd, nlsd, kv, acck, nlsk )
       loop
          comm1_ := comm_;
@@ -594,11 +592,11 @@ begin
             select NVL(p.k072,'0'), 2-mod(c.codcagent,2), nvl(trim(s.k072),'0'),
                    ca.tobo, ca.nms
                  into s1_, r1_, s2_, tobo_, nms_
-            from accounts ca, customer c, kl_k070 p, specparam s
+            from accounts ca, customer c, kl_k070 p, specparam s  
             where ca.acc=k.acck and
                   ca.rnk=c.rnk  and
                   ca.acc=s.acc(+) and
-                  c.ise = p.k070(+) and
+                  c.ise = p.k070(+) and 
                   p.d_close is null;
 
             comm1_ := '';
@@ -606,7 +604,7 @@ begin
          else
             s1_:='X';
             r1_:='1';
-            s2_:=s_ ;
+            s2_:=s_ ;  
          end if;
 
          if s1_ = 'X' and s2_<>'0' then
@@ -620,7 +618,7 @@ begin
          if p_tp_ = '1'
          then
             se_ := k.s;
-         else
+         else 
             se_ := - k.s;
          end if;
 
@@ -654,8 +652,8 @@ begin
                        acck, nlsk
                 from otcn_f08_history
                 where fdat between Dat_+1 and Dat_+29 and
-                      vob = 96 and
-                      nlsk like p_nls_ || '%'
+                      vob = 96 and 
+                      nlsk like p_nls_ || '%' 
                 group by accd, nlsd, kv, acck, nlsk )
       loop
 
@@ -665,7 +663,7 @@ begin
             select NVL(p.k072,'0'), 2-mod(c.codcagent,2), nvl(trim(s.k072),'0'),
                    ca.tobo, ca.nms
                  into s1_, r1_, s2_, tobo_, nms_
-            from accounts ca, customer c, kl_k070 p, specparam s
+            from accounts ca, customer c, kl_k070 p, specparam s  
             where ca.acc=k.accd and
                   ca.rnk=c.rnk  and
                   ca.acc=s.acc(+) and
@@ -675,7 +673,7 @@ begin
          else
             s1_:='X';
             r1_:='1';
-            s2_:=s_ ;
+            s2_:=s_ ;  
          end if;
 
          if s1_ = 'X' and s2_<>'0' then
@@ -689,7 +687,7 @@ begin
          if p_tp_ = '1'
          then
             se_ := - k.s;
-         else
+         else 
             se_ := k.s;
          end if;
 
@@ -787,7 +785,7 @@ delete from otcn_f08_history
 where fdat between Dat1_ and Dat_;
 
 delete from otcn_f08_history
-where fdat between Dat_+1 and Dat_+29
+where fdat between Dat_+1 and Dat_+29 
   and vob = 96 ;
 
 -- для отбора проводок в первом месяце исключаем первый день года
@@ -801,79 +799,77 @@ commit;
 
 ---------------------------------------------------------------------
 -- новый вариант блока наполнения таблицы OTCN_F08_HISTORY
- insert /*+APPEND PARALLEL*/ into otcn_f08_history
-            (accd,tt,ref,kv,nlsd,s,sq,fdat,nazn,acck,nlsk,userid,tobo,vob)
- select accd,tt,ref,kv,nlsd,s,sq,fdat,nazn,acck,nlsk,isp,'0',vob
+ insert /*+ APPEND */ 
+ into otcn_f08_history
+            (accd,tt,ref,kv,nlsd,s,sq,fdat,nazn,acck,nlsk,userid,tobo,vob) 
+ select accd,tt,ref,kv,nlsd,s,sq,fdat,nazn,acck,nlsk,isp,'0',vob 
         from (SELECT p.userid isp, p.branch, p.mfoa, p.mfob, p.nam_a, p.nam_b, p.sos,
                        DECODE (o.tt, p.tt, p.nazn, DECODE (o.tt, 'PO3', p.nazn, t.NAME)) nazn,
                        o.tt, o.REF, o.sq/100 sq, o.fdat, o.stmt, o.txt,
-                       (case when ad.nls like '3801%' then 0 else o.accd end) accd,
-                       (case when ad.nls like '3801%' then decode(p.dk,1,p.nlsa,p.nlsb) else ad.nls end) nlsd,
-                       (case when ad.nls like '3801%' then substr(decode(p.dk,1,p.nlsa,p.nlsb),1,4) else ad.nbs end) nbsd,
-                       (case when ak.nls like '3801%' then 0 else o.acck end) acck,
-                       (case when ak.nls like '3801%' then decode(p.dk,0,p.nlsa,p.nlsb) else ak.nls end) nlsk,
+                       (case when ad.nls like '3801%' then 0 else o.accd end) accd,  
+                       (case when ad.nls like '3801%' then decode(p.dk,1,p.nlsa,p.nlsb) else ad.nls end) nlsd, 
+                       (case when ad.nls like '3801%' then substr(decode(p.dk,1,p.nlsa,p.nlsb),1,4) else ad.nbs end) nbsd, 
+                       (case when ak.nls like '3801%' then 0 else o.acck end) acck,  
+                       (case when ak.nls like '3801%' then decode(p.dk,0,p.nlsa,p.nlsb) else ak.nls end) nlsk, 
                        (case when ak.nls like '3801%' then substr(decode(p.dk,0,p.nlsa,p.nlsb),1,4) else ak.nbs end) nbsk,
                        (case when ad.nls like '3801%' or ak.nls like '3801%' then decode(p.kv, 980, p.kv2, p.kv) else ad.kv end) kv,
-                       (case when ad.nls like '3801%' or ak.nls like '3801%' then decode(p.kv, 980, p.s2, p.s) else o.s end)/100 s,
-                     p.vob
+                       (case when ad.nls like '3801%' or ak.nls like '3801%' then decode(p.kv, 980, p.s2, p.s) else o.s end)/100 s, 
+                     p.vob 
                 FROM oper p, tts t, accounts ad,   accounts ak,
                      (SELECT p.fdat, p.REF, p.stmt, p.tt, p.s, p.sq, p.txt,
-                             DECODE (p.dk,0,p.acc,z.acc) accd,
+                             DECODE (p.dk,0,p.acc,z.acc) accd,  
                              DECODE (p.dk,1,p.acc,z.acc) acck
                       FROM opldok p, accounts a, opldok z
-                      WHERE p.fdat between Dat1_ and Dat_
-                        and p.sos >= 4
-                        and p.acc = a.acc
-                        and (a.nls LIKE '602%' OR a.nls LIKE '605%' OR a.nls LIKE '609%' OR
-                             a.nls LIKE '702%' OR a.nls LIKE '704%' OR a.nls LIKE '707%' OR
-                             a.nls LIKE '709%')
+                      WHERE p.fdat between Dat1_ and Dat_  
+                        and p.sos >= 4  
+                        and p.acc = a.acc  
+                        and regexp_like(A.NLS, '^((602)|(605)|(609)|(702)|(704)|(707)|(709))')
                         and p.ref = z.ref
-                        and p.fdat = z.fdat
+                        and p.fdat = z.fdat 
                         and p.stmt = z.stmt
                         and p.dk <> z.dk) o
-                WHERE p.REF = o.REF
+                WHERE p.REF = o.REF 
                   and t.tt = o.tt
                   and o.accd = ad.acc
-                  and o.acck = ak.acc
+                  and o.acck = ak.acc 
                   and p.sos = 5
                   );
  commit;
-
+ 
  -- коректирующие проводки
- insert /*+APPEND PARALLEL*/ into otcn_f08_history
-            (accd,tt,ref,kv,nlsd,s,sq,fdat,nazn,acck,nlsk,userid,tobo,vob)
- select accd,tt,ref,kv,nlsd,s,sq,fdat,nazn,acck,nlsk,isp,'0',vob
+ insert /*+ APPEND */ 
+ into otcn_f08_history
+            (accd,tt,ref,kv,nlsd,s,sq,fdat,nazn,acck,nlsk,userid,tobo,vob) 
+ select accd,tt,ref,kv,nlsd,s,sq,fdat,nazn,acck,nlsk,isp,'0',vob  
         from (SELECT p.userid isp, p.branch, p.mfoa, p.mfob, p.nam_a, p.nam_b, p.sos,
                        DECODE (o.tt, p.tt, p.nazn, DECODE (o.tt, 'PO3', p.nazn, t.NAME)) nazn,
                        o.tt, o.REF, o.sq/100 sq, o.fdat, o.stmt, o.txt,
-                       (case when ad.nls like '3801%' then 0 else o.accd end) accd,
-                       (case when ad.nls like '3801%' then decode(p.dk,1,p.nlsa,p.nlsb) else ad.nls end) nlsd,
-                       (case when ad.nls like '3801%' then substr(decode(p.dk,1,p.nlsa,p.nlsb),1,4) else ad.nbs end) nbsd,
-                       (case when ak.nls like '3801%' then 0 else o.acck end) acck,
-                       (case when ak.nls like '3801%' then decode(p.dk,0,p.nlsa,p.nlsb) else ak.nls end) nlsk,
+                       (case when ad.nls like '3801%' then 0 else o.accd end) accd,  
+                       (case when ad.nls like '3801%' then decode(p.dk,1,p.nlsa,p.nlsb) else ad.nls end) nlsd, 
+                       (case when ad.nls like '3801%' then substr(decode(p.dk,1,p.nlsa,p.nlsb),1,4) else ad.nbs end) nbsd, 
+                       (case when ak.nls like '3801%' then 0 else o.acck end) acck,  
+                       (case when ak.nls like '3801%' then decode(p.dk,0,p.nlsa,p.nlsb) else ak.nls end) nlsk, 
                        (case when ak.nls like '3801%' then substr(decode(p.dk,0,p.nlsa,p.nlsb),1,4) else ak.nbs end) nbsk,
                        (case when ad.nls like '3801%' or ak.nls like '3801%' then decode(p.kv, 980, p.kv2, p.kv) else ad.kv end) kv,
-                       (case when ad.nls like '3801%' or ak.nls like '3801%' then decode(p.kv, 980, p.s2, p.s) else o.s end)/100 s,
+                       (case when ad.nls like '3801%' or ak.nls like '3801%' then decode(p.kv, 980, p.s2, p.s) else o.s end)/100 s, 
                      p.vob
                 FROM oper p, tts t, accounts ad, accounts ak,
                      (SELECT p.fdat, p.REF, p.stmt, p.tt, p.s, p.sq, p.txt,
-                             DECODE (p.dk,0,p.acc,z.acc) accd,
+                             DECODE (p.dk,0,p.acc,z.acc) accd,  
                              DECODE (p.dk,1,p.acc,z.acc) acck
                       FROM opldok p, accounts a, opldok z
-                      WHERE p.fdat between Dat_+1 and Dat_+29
-                        and p.sos >= 4
-                        and p.acc = a.acc
-                        and (a.nls LIKE '602%' OR a.nls LIKE '605%' OR a.nls LIKE '609%' OR
-                             a.nls LIKE '702%' OR a.nls LIKE '704%' OR a.nls LIKE '707%' OR
-                             a.nls LIKE '709%')
-                        and p.ref = z.ref
-                        and p.fdat = z.fdat
-                        and p.stmt = z.stmt
+                      WHERE p.fdat between Dat_+1 and Dat_+29  
+                        and p.sos >= 4  
+                        and p.acc = a.acc  
+                        and regexp_like(A.NLS, '^((602)|(605)|(609)|(702)|(704)|(707)|(709))')
+                        and p.ref = z.ref 
+                        and p.fdat = z.fdat 
+                        and p.stmt = z.stmt 
                         and p.dk <> z.dk) o
-                WHERE p.REF = o.REF
+                WHERE p.REF = o.REF 
                   and t.tt = o.tt
                   and o.accd = ad.acc
-                  and o.acck = ak.acc
+                  and o.acck = ak.acc 
                   and p.sos = 5
                   and p.vob = 96
                   );
@@ -923,12 +919,12 @@ end if;
 if (to_char(dat_,'MM') not in ('01','02') and mfo_=333368) or mfo_<>333368 then
    delete from otcn_f08_history
    where substr(nlsd,1,4)='3801' and
-         substr(nlsk,1,3) in ('602','605','609','702','704','707','709');
+         regexp_like(nlsk, '^((602)|(605)|(609)|(702)|(704)|(707)|(709))');
 end if;
 
 if (to_char(dat_,'MM') not in ('01','02') and mfo_=333368) or mfo_<>333368 then
    delete from otcn_f08_history
-   where substr(nlsd,1,3) in ('602','605','609','702','704','707','709') and
+   where regexp_like(nlsd, '^((602)|(605)|(609)|(702)|(704)|(707)|(709))') and
          substr(nlsk,1,4)='3801';
 end if;
 
@@ -965,7 +961,7 @@ LOOP
     SELECT NVL(SUM(decode(dk,0,1,0)*s),0),
                     NVL(SUM(decode(dk,1,1,0)*s),0)
              INTO d_sum_, k_sum_
-             FROM opldok
+             FROM opldok 
              WHERE fdat  between Dat_  AND Dat_+29 AND
                    acc  = acc_   AND
                    (tt like 'ZG8%'  or tt like 'ZG9%');

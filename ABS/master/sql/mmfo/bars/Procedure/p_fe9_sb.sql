@@ -12,7 +12,7 @@ PROMPT *** Create  procedure P_FE9_SB ***
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирования #E9 для КБ
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     : 10/04/2017 (07/04/2017, 06/04/2017, 03/04/2017)
+% VERSION     :08/08/2017 ( 10/04/2017))
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
@@ -290,7 +290,7 @@ BEGIN
    -- переказ коштiв нерезидентам (отримання коштiв вiд нерезидентiв)
    INSERT INTO OTCN_PROV_TEMP
    (ko, rnk, fdat, REF, tt, accd, nlsd, kv, acck, nlsk, s_nom, s_eqv, s_kom, nazn, branch)
-   select /*+ FULL(k) LEADING(k ad) */
+   select /*+ FULL(k) LEADING(k) */
            k.d060, 1, od.fdat, od.ref, od.tt, 
            ad.acc accd, ad.nls nlsd, ad.kv, ak.acc acck, ak.nls nlsk, od.s  s_nom,
            gl.p_icurval (ad.kv, od.s, od.fdat) s_eqv, 
@@ -314,6 +314,7 @@ BEGIN
           not (ad.NLS  like '29091030046500%' and ak.NLS  like '29094030046530%') and 
           not (substr(ad.NLS,1,4) = substr(ak.NLS,1,4) and ad.ob22 = ak.ob22 and lower(p.nazn) like '%перенес%') and
           not (lower(p.nazn) like '%повернення%' and p.tt not in ('M37','MMV','CN3','CN4')) and  
+          not (ad.kv = 980 and lower(od.txt) like '%ком_с_я%') and
           od.ref = p.ref and 
           lower(p.nazn) not like '%western%' and
           p.sos = 5;  
@@ -322,12 +323,12 @@ BEGIN
    -- введенных в последние календарные дни и проведенные в балансе 1 рабочего дня след. месяца
    if mfou_ = 300465 then
       if last_dayF != Dat_ then
-         INSERT /*+ APPEND PARALLEL(otcn_prov_temp) */ INTO OTCN_PROV_TEMP
+         INSERT /*+ APPEND */ INTO OTCN_PROV_TEMP
           (ko, rnk, fdat, REF, tt, accd, nlsd, kv, acck, nlsk, s_nom, s_eqv, nazn, branch)
          SELECT *
          FROM (
                 -- ТIЛЬКИ ДЛЯ ВС?Х ОБЛУПРАВЛIННЬ ОЩАДБАНКУ    перерахування переказiв
-                SELECT  /*+ PARALLEL(o.o) */
+                SELECT  /*+ PARALLEL(8) */
                      k.d060, ca.rnk, o.fdat, o.ref, o.tt, o.accd, o.nlsd, o.kv,
                      o.acck, o.nlsk,
                      o.s * 100 s_nom,
@@ -347,7 +348,7 @@ BEGIN
                   AND p.pdat < one_day_
                 UNION
                 -- надходження переказiв (видача переказiв)
-                SELECT /*+ PARALLEL(o.o) */
+                SELECT /*+ PARALLEL(8) */
                     k.d060, ca.rnk, o.fdat, o.ref, o.tt, o.accd, o.nlsd, o.kv,
                     o.acck, o.nlsk, o.s * 100 s_nom,
                     gl.p_icurval (o.kv, o.s * 100, o.fdat) s_eqv, o.nazn, o.branch

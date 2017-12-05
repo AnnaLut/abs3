@@ -1,12 +1,9 @@
 
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/FIN_BUDGET.sql =========*** Run **
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure FIN_BUDGET ***
-
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/procedure/fin_budget.sql =========*** Run **
+ PROMPT ===================================================================================== 
+ 
   CREATE OR REPLACE PROCEDURE BARS.FIN_BUDGET (fdat_ in date)
  is
     s integer;
@@ -633,14 +630,14 @@ PROMPT *** Create  procedure FIN_BUDGET ***
 	  select nvl(sum(ost),0) into s98
       from sal
       where fdat=fdat_ and
-            substr(nls,1,4) in ('7700','7705','6715','6710')
+            substr(nls,1,4) in ('7700','7707','6715','6710')
 			and ost>=0;
 
 
 	  select nvl(abs(sum(ost)),0) into s99
       from sal
       where fdat=fdat_ and
-            substr(nls,1,4) in ('7700','7705','7715','7710')
+            substr(nls,1,4) in ('7700','7707','7715','7710')
 			and ost<=0;
 
 	  s100:=s99-s98;
@@ -648,14 +645,14 @@ PROMPT *** Create  procedure FIN_BUDGET ***
 	  select nvl(sum(ost),0) into s101
       from sal
       where fdat=fdat_ and
-            substr(nls,1,4) in ('6717','7720')
+            substr(nls,1,4) in ('6717','7707')
 			and ost>=0;
 
 
 	  select nvl(abs(sum(ost)),0) into s102
       from sal
       where fdat=fdat_ and
-            substr(nls,1,4) in ('7717','7720')
+            substr(nls,1,4) in ('7717','7707')
 			and ost<=0;
 
 	  s103:=s96-s95;
@@ -703,10 +700,11 @@ PROMPT *** Create  procedure FIN_BUDGET ***
 
  end fin_budget;
 /
-show err;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/FIN_BUDGET.sql =========*** End **
-PROMPT ===================================================================================== 
+ show err;
+ 
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/procedure/fin_budget.sql =========*** End **
+ PROMPT ===================================================================================== 
+ 

@@ -1,13 +1,4 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_ELT_DEAL_UPD.sql =========*** Ru
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure P_ELT_DEAL_UPD ***
-
-  CREATE OR REPLACE PROCEDURE BARS.P_ELT_DEAL_UPD (
+create or replace procedure p_elt_deal_upd(
 p_nd       e_deal$base.nd%type,      -- Реф. угоди
 p_user_id  e_deal$base.user_id%type, -- Вик.
 p_cc_id    e_deal$base.cc_id%type,   -- Ідент. угоди
@@ -45,6 +36,20 @@ begin
   end;
 
   -- 3579 24 - прострочені нараховані доходи за обсл. Суб.Госп. через системи дистанційного обслуговування
+if newnbs.g_state= 1 then  --переход на новый план счетов
+   begin
+    select acc,     nbs,     nvl(ob22,'XX')
+      into l_acc_d, l_nbs_d, l_ob22_d
+      from accounts
+     where nls = p_nls_d and kv = 980;
+    case
+      when (l_nbs_d <> '3570') then raise_application_error( -20444, 'Недопустиме значення балансового рахунка!', true );
+      when (l_ob22_d not in ('38','47','49')) then raise_application_error( -20444, 'Недопустиме значення параметра ОБ22!', true );
+      else null;
+    end case;
+  exception when no_data_found then null;
+  end;
+else   
   begin
     select acc,     nbs,     nvl(ob22,'XX')
       into l_acc_d, l_nbs_d, l_ob22_d
@@ -57,6 +62,7 @@ begin
     end case;
   exception when no_data_found then null;
   end;
+end if;
 
   -- nls_p
   begin
@@ -91,13 +97,3 @@ begin
 
 end;
 /
-show err;
-
-PROMPT *** Create  grants  P_ELT_DEAL_UPD ***
-grant EXECUTE                                                                on P_ELT_DEAL_UPD  to BARS_ACCESS_DEFROLE;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_ELT_DEAL_UPD.sql =========*** En
-PROMPT ===================================================================================== 

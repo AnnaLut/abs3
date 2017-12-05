@@ -7,13 +7,13 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure P_FD6_NN ***
 
-  CREATE OR REPLACE PROCEDURE BARS.P_FD6_NN (Dat_ DATE,
+CREATE OR REPLACE PROCEDURE BARS.P_FD6_NN (Dat_ DATE,
                                            sheme_ VARCHAR2 DEFAULT 'G',
                                            prnk_   number   DEFAULT null) IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :	#D6 for KB
 % COPYRIGHT   :	Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     : 02/07/2015 (17/04/2015)
+% VERSION     : 22/11/2017 (09/07/2015)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 08/04/2014 - для МФО=300465 и бал.счета 2602 и S180_='1' будем формировать
 %              S180_ := '6'
@@ -94,6 +94,7 @@ k111_      CHAR(2);
 r031_      CHAR(1);
 k051_      CHAR(2);
 country_   NUMBER;
+countryh_  NUMBER;
 userid_    NUMBER;
 nbuc1_     VARCHAR2(12);
 nbuc_      VARCHAR2(12);
@@ -133,7 +134,7 @@ cursor_sql   varchar2(20000);
 FL_D8_   number := F_Get_Params('DPULINE8', -1);
 
 type rec_type is record
-    (rnk_       number,
+    (rnk_       number,                   
      acc_       number,
      nls_       varchar2(15),
      kv_        integer,
@@ -203,7 +204,7 @@ CURSOR BaseL1 IS
 procedure p_add_rec(p_recid rnbu_trace.recid%type, p_userid rnbu_trace.userid%type, p_nls rnbu_trace.nls%type,
                                 p_kv rnbu_trace.kv%type, p_odate rnbu_trace.odate%type, p_kodp rnbu_trace.kodp%type,
                                 p_znap rnbu_trace.znap%type, p_nbuc rnbu_trace.nbuc%type, p_isp rnbu_trace.isp%type,
-                                p_rnk rnbu_trace.rnk%type, p_acc rnbu_trace.acc%type, p_comm rnbu_trace.comm%type,
+                                p_rnk rnbu_trace.rnk%type, p_acc rnbu_trace.acc%type, p_comm rnbu_trace.comm%type, 
                                 p_tobo rnbu_trace.tobo%type, p_mdate rnbu_trace.mdate%type)
 is
     lr_rnbu_trace rnbu_trace%rowtype;
@@ -235,7 +236,7 @@ begin
       l_rnbu_trace.delete;
    end if;
 end;
-
+    
 -------------------------------------------------------------------
 PROCEDURE p_obrab_data(p_type_ IN NUMBER) IS
     nbs2_ varchar2(4) := (case when nbs_  not like '7%' then nbs_ else null end);
@@ -293,7 +294,7 @@ BEGIN
                         (select K080, K081, D_CLOSE
                          from kl_k080
                          where d_open <= :dat_spr_ and
-                              (d_close is null or d_close > :dat_spr_)) f,
+                              (d_close is null or d_close > :dat_spr_)) f, 
                         (select K070, K071, K072, D_CLOSE
                          from kl_k070
                          where d_open <= :dat_spr_ and
@@ -306,14 +307,18 @@ BEGIN
           EXECUTE IMMEDIATE sql_
           INTO re_, k111_, k071_, k072_, k081_, k051_, country_, d_close_
           USING dat_spr_, dat_spr_, dat_spr_, dat_spr_, dat_spr_, dat_spr_, rnk_;
-
-		  country_ := f_country_hist(rnk_, dat_);
-
+		  
+		  countryh_ := f_country_hist(rnk_, dat_);
+          
+          if countryh_ is not null then
+             country_ := countryh_;
+          end if;
+		  
 		  if country_ = '804' then
 			 re_ := 1;
 		  else
 			 re_ := 0;
-		  end if;
+		  end if;      
        END ;
 
        if (d_close_ is not null and d_close_ <= Dat_) OR nbs2_ in ('2601','2625','3652') then
@@ -389,10 +394,13 @@ BEGIN
    END ;
 
 --------------------------------------------------------------------------
---   телеграмма НБУ от 23.03.2007 №62-212/324 - 3062
-   IF nbs2_ in ('1610','1612','2610','2630','2651') THEN
-      s183_:='B';
-   END IF;
+   --   телеграмма НБУ от 23.03.2007 №62-212/324 - 3062
+   if newnbs.g_state = 0 then
+       --   телеграмма НБУ от 23.03.2007 №62-212/324 - 3062
+       IF nbs2_ in ('1610','1612','2610','2630','2651') THEN
+          s183_:='B';
+       END IF;
+   end if;
 
    comm_ := comm_ || ' s180=' || s180_ || ' s183=' || s183_;
 -------------------------------------------------------------------------
@@ -501,7 +509,7 @@ BEGIN
          znap_:= TO_CHAR(ABS(se_)) ;
          se_ := 0;
 
-         p_add_rec(s_rnbu_record.nextval, userid_, nls_, kv_, data_, kodp1_, znap_,
+         p_add_rec(s_rnbu_record.nextval, userid_, nls_, kv_, data_, kodp1_, znap_, 
              nbuc_, isp_, rnk_, acc_, comm_, tobo_, mdate_);
 
          -- процентна ставка i сума*процентну ставку код 2,3
@@ -514,8 +522,8 @@ BEGIN
 
             kodp1_ := '3' || kodp_;
             znap_ := TO_CHAR (ABS(se_)*ROUND(spcnt_,4));
-
-            p_add_rec(s_rnbu_record.nextval, userid_, nls_, kv_, data_, kodp1_, znap_,
+            
+            p_add_rec(s_rnbu_record.nextval, userid_, nls_, kv_, data_, kodp1_, znap_, 
                 nbuc_, isp_, rnk_, acc_, comm_, tobo_, mdate_);
 
             kodp1_ := '4' || kodp_;
@@ -525,7 +533,7 @@ BEGIN
                znap_ := TO_CHAR (ABS(se_));
             end if;
 
-            p_add_rec(s_rnbu_record.nextval, userid_, nls_, kv_, data_, kodp1_, znap_,
+            p_add_rec(s_rnbu_record.nextval, userid_, nls_, kv_, data_, kodp1_, znap_, 
                 nbuc_, isp_, rnk_, acc_, comm_, tobo_, mdate_);
          end if;
       end if;
@@ -533,8 +541,8 @@ BEGIN
       if ABS(se_) >= ABS(lim_) and ABS(lim_) != 0 then
          znap_:= TO_CHAR(ABS(lim_)) ;
          se_ := se_ - lim_;
-
-         p_add_rec(s_rnbu_record.nextval, userid_, nls_, kv_, data_, kodp1_, znap_,
+         
+         p_add_rec(s_rnbu_record.nextval, userid_, nls_, kv_, data_, kodp1_, znap_, 
             nbuc_, isp_, rnk_, acc_, comm_, tobo_, mdate_);
 
          -- процентна ставка ? сума*процентну ставку код 2,3
@@ -547,8 +555,8 @@ BEGIN
 
             kodp1_ := '3' || kodp_;
             znap_ := TO_CHAR (ABS(lim_)*ROUND(spcnt_,4));
-
-            p_add_rec(s_rnbu_record.nextval, userid_, nls_, kv_, data_, kodp1_, znap_,
+            
+            p_add_rec(s_rnbu_record.nextval, userid_, nls_, kv_, data_, kodp1_, znap_, 
                 nbuc_, isp_, rnk_, acc_, comm_, tobo_, mdate_);
 
             kodp1_ := '4' || kodp_;
@@ -557,8 +565,8 @@ BEGIN
             else
                znap_ := TO_CHAR (ABS(lim_));
             end if;
-
-            p_add_rec(s_rnbu_record.nextval, userid_, nls_, kv_, data_, kodp1_, znap_,
+            
+            p_add_rec(s_rnbu_record.nextval, userid_, nls_, kv_, data_, kodp1_, znap_, 
                 nbuc_, isp_, rnk_, acc_, comm_, tobo_, mdate_);
          end if;
 
@@ -612,7 +620,7 @@ BEGIN
 
          znap_:= TO_CHAR(ABS(se_)) ;
 
-         p_add_rec(s_rnbu_record.nextval, userid_, nls_, kv_, data_, kodp1_, znap_,
+         p_add_rec(s_rnbu_record.nextval, userid_, nls_, kv_, data_, kodp1_, znap_, 
             nbuc_, isp_, rnk_, acc_, comm_, tobo_, mdate_);
 
          -- процентна ставка ? сума*процентну ставку код 2,3
@@ -625,8 +633,8 @@ BEGIN
 
             kodp1_ := '3' || kodp_;
             znap_ := TO_CHAR (ABS(se_)*ROUND(spcnt_,4));
-
-            p_add_rec(s_rnbu_record.nextval, userid_, nls_, kv_, data_, kodp1_, znap_,
+            
+            p_add_rec(s_rnbu_record.nextval, userid_, nls_, kv_, data_, kodp1_, znap_, 
                 nbuc_, isp_, rnk_, acc_, comm_, tobo_, mdate_);
 
             kodp1_ := '4' || kodp_;
@@ -635,8 +643,8 @@ BEGIN
             else
                znap_ := TO_CHAR (ABS(se_));
             end if;
-
-            p_add_rec(s_rnbu_record.nextval, userid_, nls_, kv_, data_, kodp1_, znap_,
+            
+            p_add_rec(s_rnbu_record.nextval, userid_, nls_, kv_, data_, kodp1_, znap_, 
                 nbuc_, isp_, rnk_, acc_, comm_, tobo_, mdate_);
          end if;
 
@@ -669,7 +677,7 @@ BEGIN
          znap_:= TO_CHAR(ABS(lim_)) ;
          se_ := se_ + lim_;
 
-         p_add_rec(s_rnbu_record.nextval, userid_, nls_, kv_, data_, kodp1_, znap_,
+         p_add_rec(s_rnbu_record.nextval, userid_, nls_, kv_, data_, kodp1_, znap_, 
             nbuc_, isp_, rnk_, acc_, comm_, tobo_, mdate_);
 
          -- процентна ставка ? сума*процентну ставку код 2,3
@@ -682,8 +690,8 @@ BEGIN
 
             kodp1_ := '3' || kodp_;
             znap_ := TO_CHAR (ABS(lim_)*ROUND(spcnt_,4));
-
-            p_add_rec(s_rnbu_record.nextval, userid_, nls_, kv_, data_, kodp1_, znap_,
+            
+            p_add_rec(s_rnbu_record.nextval, userid_, nls_, kv_, data_, kodp1_, znap_, 
                 nbuc_, isp_, rnk_, acc_, comm_, tobo_, mdate_);
 
             kodp1_ := '4' || kodp_;
@@ -692,8 +700,8 @@ BEGIN
             else
                znap_ := TO_CHAR (ABS(lim_));
             end if;
-
-            p_add_rec(s_rnbu_record.nextval, userid_, nls_, kv_, data_, kodp1_, znap_,
+            
+            p_add_rec(s_rnbu_record.nextval, userid_, nls_, kv_, data_, kodp1_, znap_, 
                 nbuc_, isp_, rnk_, acc_, comm_, tobo_, mdate_);
          end if;
 
@@ -792,15 +800,15 @@ BEGIN
             kodp1_ := '1' || kodp_;
          end if;
       END IF;
-
+        
       begin
         select acc2
         into acc2_
         from (select acra acc, acc acc2, DENSE_RANK() over (partition by acra order by acc) rwn
-              FROM int_accn
+              FROM int_accn 
               WHERE ID = 1 and
                     (acra, acr_dat) in (select acra, max(acr_dat) acr_dat
-                                        FROM int_accn
+                                        FROM int_accn 
                                         WHERE ID = 1 and
                                             nvl(trim(acra),0)<>0 and
                                             acra = acc_
@@ -810,9 +818,9 @@ BEGIN
         when no_data_found then
             acc2_ := null;
       end;
-
+            
       acc1_ := acc2_;
-
+      
       koef_ := 1;
 
       if acc1_ is not null
@@ -870,7 +878,7 @@ BEGIN
                   kodp1_ := '1' || kodp_;
                end if;
 
-               p_add_rec(s_rnbu_record.nextval, userid_, nls_, kv_, data_, kodp1_, znap_,
+               p_add_rec(s_rnbu_record.nextval, userid_, nls_, kv_, data_, kodp1_, znap_, 
                     nbuc_, isp_, rnk_, acc_, comm_, tobo_, mdate_);
             end if;
 
@@ -909,7 +917,7 @@ BEGIN
                znap_:= TO_CHAR(ROUND(se_*koef_,0)) ;
                se_ := se_ - to_number(znap_);
 
-               p_add_rec(s_rnbu_record.nextval, userid_, nls_, kv_, data_, kodp1_, znap_,
+               p_add_rec(s_rnbu_record.nextval, userid_, nls_, kv_, data_, kodp1_, znap_, 
                     nbuc_, isp_, rnk_, acc_, comm_, tobo_, mdate_);
 
                -- 27.07.2010 вместо переменной S183_ заносим значение '1'
@@ -1008,7 +1016,7 @@ BEGIN
          kodp1_ := '3' || kodp_;
          znap_ := TO_CHAR (ABS(se_)*ROUND(spcnt_,4));
 
-         p_add_rec(s_rnbu_record.nextval, userid_, nls_, kv_, data_, kodp1_, znap_,
+         p_add_rec(s_rnbu_record.nextval, userid_, nls_, kv_, data_, kodp1_, znap_, 
             nbuc_, isp_, rnk_, acc_, comm_, tobo_, mdate_);
 
          kodp1_ := '4' || kodp_;
@@ -1019,7 +1027,7 @@ BEGIN
             znap_ := TO_CHAR (ABS(se_));
          end if;
 
-         p_add_rec(s_rnbu_record.nextval, userid_, nls_, kv_, data_, kodp1_, znap_,
+         p_add_rec(s_rnbu_record.nextval, userid_, nls_, kv_, data_, kodp1_, znap_, 
             nbuc_, isp_, rnk_, acc_, comm_, tobo_, mdate_);
       end if;
    end if;
@@ -1051,12 +1059,12 @@ BEGIN
         sql_acc_ := sql_acc_ || 'and (d_close is null or d_close>to_date('''||to_char(dat_kl_, 'ddmmyyyy')||''',''ddmmyyyy''))) ';
 
         if FL_D8_ = '8' then
-           sql_acc_ := sql_acc_ || ' and a.acc not in (SELECT GEN_ACC FROM V_DPU_REL_ACC_ALL) ';
-           sql_acc_ := sql_acc_ || ' UNION ALL ';
+           sql_acc_ := sql_acc_ || ' and a.acc not in (SELECT GEN_ACC FROM V_DPU_REL_ACC_ALL) '; 
+           sql_acc_ := sql_acc_ || ' UNION ALL '; 
            sql_acc_ := sql_acc_ || ' SELECT  /*+ parallel(v) */ s.ACC, s.KF, s.NLS, s.KV, s.BRANCH, s.NLSALT, '||
                             'substr(s.NLSALT,1,4) NBS, s.NBS2, s.DAOS, s.DAPP, s.ISP, s.NMS,
-                             s.LIM, s.OSTB, s.OSTC, s.OSTF, s.OSTQ, s.DOS, s.KOS, s.DOSQ, s.KOSQ, s.PAP, s.TIP, s.VID, s.TRCN,
-                             s.MDATE, s.DAZS, s.SEC, s.ACCC, s.BLKD, s.BLKK, s.POS, s.SECI, s.SECO, s.GRP, s.OSTX, s.RNK,
+                             s.LIM, s.OSTB, s.OSTC, s.OSTF, s.OSTQ, s.DOS, s.KOS, s.DOSQ, s.KOSQ, s.PAP, s.TIP, s.VID, s.TRCN, 
+                             s.MDATE, s.DAZS, s.SEC, s.ACCC, s.BLKD, s.BLKK, s.POS, s.SECI, s.SECO, s.GRP, s.OSTX, s.RNK, 
                              s.NOTIFIER_REF, s.TOBO, s.BDATE, s.OPT, s.OB22, s.DAPPQ, s.SEND_SMS
                      FROM ACCOUNTS a, V_DPU_REL_ACC_ALL v, accounts s
                      where a.nbs IN (
@@ -1067,8 +1075,8 @@ BEGIN
                            AND d_open between TO_DATE (''01011997'', ''ddmmyyyy'') and
                                to_date('''||to_char(dat_kl_,'ddmmyyyy')||''',''ddmmyyyy'')
                            and (d_close is null or
-                                d_close > to_date('''||to_char(dat_kl_,'ddmmyyyy')||''',''ddmmyyyy''))) and
-                           a.acc = v.GEN_ACC and
+                                d_close > to_date('''||to_char(dat_kl_,'ddmmyyyy')||''',''ddmmyyyy''))) and 
+                           a.acc = v.GEN_ACC and 
                            v.DEP_ACC = s.acc ';
         end if;
 
@@ -1185,7 +1193,7 @@ BEGIN
            r013_     := l_rec_t(i).r013_;
            s180_     := l_rec_t(i).s180_;
            acc2_     := l_rec_t(i).acc2_;
-
+           
            comm_ := '';
 
            if dat_ <= dat_izm2 then
@@ -1298,10 +1306,10 @@ BEGIN
                select acc, nls, kv, rnk, isp, accc, tip, 0, iacc, 0 sumh
                from (select a.acc, a.nls, a.kv, a.rnk, i.freq isp, a.accc, a.tip, i.acc iacc
                      from accounts a, int_accn i
-                     where a.nbs in (select r020
-                                     from kod_r020
-                                     where a010 = 'D6' and
-                                           (d_close is null or
+                     where a.nbs in (select r020 
+                                     from kod_r020 
+                                     where a010 = 'D6' and 
+                                           (d_close is null or 
                                             d_close > dat_kl_)
                                      ) and
                            a.acc not in (select acc from OTCN_FD5_PROC) and
@@ -1366,7 +1374,7 @@ BEGIN
                                 '7028','7030','7040','7041','7070','7071'));
 
            logger.info ('P_FD6_NN: Etap3 for datf = '||to_char(dat_, 'dd/mm/yyyy'));
-
+           
            -- вибираэмо рахунки, де один процентний рахунок выдповыдаэ рахунку активу
            for k in (select *
                      from (select /*+parallel(b) */

@@ -10,8 +10,8 @@ Application Description: •--------------------------------------•
 	Design-time Settings
 .data VIEWINFO
 0000: 6F00000001000000 FFFF01000D004347 5458566965775374 6174650400010000
-0020: 0000000000250000 002C000000030000 0003000000000000 005A020000F8FFFF
-0040: FFE2FFFFFF000000 00000000002C0300 0064020000010000 0000000000010000
+0020: 00000000009E0000 002C000000030000 0003000000000000 005A020000F8FFFF
+0040: FFE1FFFFFF000000 00000000002C0300 0064020000010000 0001000000010000
 0060: 000F4170706C6963 6174696F6E497465 6D00000000
 .enddata
 .data DT_MAKERUNDLG
@@ -463,33 +463,33 @@ Application Description: •--------------------------------------•
 						Else
 							! Call SalBringWindowToTop(dlg_kl_PostAll)
 					! Else If nPar = 11 !! Заключительная выписка ручной вариант
-						                                                       If not IsWindow(hWin1)
-							                                                       Call SalModalDialog(frm_VpOst, hW, 0)
-						                                                       Else 
-							                                                       Call SalBringWindowToTop(frm_VpOst)
+						                                                         If not IsWindow(hWin1)
+							                                                         Call SalModalDialog(frm_VpOst, hW, 0)
+						                                                         Else 
+							                                                         Call SalBringWindowToTop(frm_VpOst)
 					! Else If nPar = 12 !! Заключительная выписка автомат
-						                                                       If not IsWindow(hWin1)
-							                                                       Call SalModalDialog(frm_VpOst, hW, 1)
-						                                                       Else 
-							                                                       Call SalBringWindowToTop(frm_VpOst)
+						                                                         If not IsWindow(hWin1)
+							                                                         Call SalModalDialog(frm_VpOst, hW, 1)
+						                                                         Else 
+							                                                         Call SalBringWindowToTop(frm_VpOst)
 					! Else If nPar = 13 !! Просмотр файлов клиент-банка
-						                                                        If not IsWindow(hWin1)
-							                                                        Set hWin1 =  SalCreateWindow(tblKlbFiles, hW)
-						                                                        Else 
-							                                                        Call SalBringWindowToTop(tblKlbFiles)
+						                                                          If not IsWindow(hWin1)
+							                                                          Set hWin1 =  SalCreateWindow(tblKlbFiles, hW)
+						                                                          Else 
+							                                                          Call SalBringWindowToTop(tblKlbFiles)
 			! Function: Maska_NLS
-				                                                                                                         Description: 
-				                                                                                                         Returns 
-					                                                                                                         String: 
-				                                                                                                         Parameters 
-					                                                                                                         String: slovo
-				                                                                                                         Static Variables 
-					                                                                                                         String: mas
-				                                                                                                         Local variables 
-				                                                                                                         Actions 
-					                                                                                                         Set mas = '*'
-					                                                                                                         Call SalModalDialog(dlg_mas, hWndForm, mas, slovo)
-					                                                                                                         Return mas
+				                                                                                                           Description: 
+				                                                                                                           Returns 
+					                                                                                                           String: 
+				                                                                                                           Parameters 
+					                                                                                                           String: slovo
+				                                                                                                           Static Variables 
+					                                                                                                           String: mas
+				                                                                                                           Local variables 
+				                                                                                                           Actions 
+					                                                                                                           Set mas = '*'
+					                                                                                                           Call SalModalDialog(dlg_mas, hWndForm, mas, slovo)
+					                                                                                                           Return mas
 			Function: Tmp_Kurs
 				Description: !! построение временной таблицы лнкыщв на заданную дату
 				Returns
@@ -659,159 +659,159 @@ Application Description: •--------------------------------------•
 							     INTO :sESC,:sC12
 							     FROM reprint
 							     WHERE id=:nId and dvc=:sDevice'))
-						                                                                                                            If SqlFetchNext(hSql(), nE)
+						                                                                                                              If SqlFetchNext(hSql(), nE)
 							! Call Debug(sESC)
-							                                                                                                            If Len(sESC) > 0
-								                                                                                                            Loop 
-									                                                                                                            Set nL = At('<Esc>', sESC)
-									                                                                                                            If nL > 0
-										                                                                                                            Set sESC = Stuff(sESC, nL, 5, Chr(27))
-									                                                                                                            Else 
-										                                                                                                            Break 
-								                                                                                                            Loop 
-									                                                                                                            Set nL = At('<esc>', sESC)
-									                                                                                                            If nL > 0
-										                                                                                                            Set sESC = Stuff(sESC, nL, 5, Chr(27))
-									                                                                                                            Else 
-										                                                                                                            Break 
-								                                                                                                            Loop 
-									                                                                                                            Set nL = At('<ESC>', sESC)
-									                                                                                                            If nL > 0
-										                                                                                                            Set sESC = Stuff(sESC, nL, 5, Chr(27))
-									                                                                                                            Else 
-										                                                                                                            Break 
-								                                                                                                            Loop 
-									                                                                                                            Set nL = At('<Si>', sESC)
-									                                                                                                            If nL > 0
-										                                                                                                            Set sESC = Stuff(sESC, nL, 4, Chr(15))
-									                                                                                                            Else 
-										                                                                                                            Break 
-								                                                                                                            Loop 
-									                                                                                                            Set nL = At('<si>', sESC)
-									                                                                                                            If nL > 0
-										                                                                                                            Set sESC = Stuff(sESC, nL, 4, Chr(15))
-									                                                                                                            Else 
-										                                                                                                            Break 
-								                                                                                                            Loop 
-									                                                                                                            Set nL = At('<SI>', sESC)
-									                                                                                                            If nL > 0
-										                                                                                                            Set sESC = Stuff(sESC, nL, 4, Chr(15))
-									                                                                                                            Else 
-										                                                                                                            Break 
-								                                                                                                            Loop 
-									                                                                                                            Set nL = At('<So>', sESC)
-									                                                                                                            If nL > 0
-										                                                                                                            Set sESC = Stuff(sESC, nL, 4, Chr(14))
-									                                                                                                            Else 
-										                                                                                                            Break 
-								                                                                                                            Loop 
-									                                                                                                            Set nL = At('<so>', sESC)
-									                                                                                                            If nL > 0
-										                                                                                                            Set sESC = Stuff(sESC, nL, 4, Chr(14))
-									                                                                                                            Else 
-										                                                                                                            Break 
-								                                                                                                            Loop 
-									                                                                                                            Set nL = At('<SO>', sESC)
-									                                                                                                            If nL > 0
-										                                                                                                            Set sESC = Stuff(sESC, nL, 4, Chr(14))
-									                                                                                                            Else 
-										                                                                                                            Break 
+							                                                                                                              If Len(sESC) > 0
+								                                                                                                              Loop 
+									                                                                                                              Set nL = At('<Esc>', sESC)
+									                                                                                                              If nL > 0
+										                                                                                                              Set sESC = Stuff(sESC, nL, 5, Chr(27))
+									                                                                                                              Else 
+										                                                                                                              Break 
+								                                                                                                              Loop 
+									                                                                                                              Set nL = At('<esc>', sESC)
+									                                                                                                              If nL > 0
+										                                                                                                              Set sESC = Stuff(sESC, nL, 5, Chr(27))
+									                                                                                                              Else 
+										                                                                                                              Break 
+								                                                                                                              Loop 
+									                                                                                                              Set nL = At('<ESC>', sESC)
+									                                                                                                              If nL > 0
+										                                                                                                              Set sESC = Stuff(sESC, nL, 5, Chr(27))
+									                                                                                                              Else 
+										                                                                                                              Break 
+								                                                                                                              Loop 
+									                                                                                                              Set nL = At('<Si>', sESC)
+									                                                                                                              If nL > 0
+										                                                                                                              Set sESC = Stuff(sESC, nL, 4, Chr(15))
+									                                                                                                              Else 
+										                                                                                                              Break 
+								                                                                                                              Loop 
+									                                                                                                              Set nL = At('<si>', sESC)
+									                                                                                                              If nL > 0
+										                                                                                                              Set sESC = Stuff(sESC, nL, 4, Chr(15))
+									                                                                                                              Else 
+										                                                                                                              Break 
+								                                                                                                              Loop 
+									                                                                                                              Set nL = At('<SI>', sESC)
+									                                                                                                              If nL > 0
+										                                                                                                              Set sESC = Stuff(sESC, nL, 4, Chr(15))
+									                                                                                                              Else 
+										                                                                                                              Break 
+								                                                                                                              Loop 
+									                                                                                                              Set nL = At('<So>', sESC)
+									                                                                                                              If nL > 0
+										                                                                                                              Set sESC = Stuff(sESC, nL, 4, Chr(14))
+									                                                                                                              Else 
+										                                                                                                              Break 
+								                                                                                                              Loop 
+									                                                                                                              Set nL = At('<so>', sESC)
+									                                                                                                              If nL > 0
+										                                                                                                              Set sESC = Stuff(sESC, nL, 4, Chr(14))
+									                                                                                                              Else 
+										                                                                                                              Break 
+								                                                                                                              Loop 
+									                                                                                                              Set nL = At('<SO>', sESC)
+									                                                                                                              If nL > 0
+										                                                                                                              Set sESC = Stuff(sESC, nL, 4, Chr(14))
+									                                                                                                              Else 
+										                                                                                                              Break 
 								! Loop
-									                                                                                                                    Set nL = At('<0>', sESC)
-									                                                                                                                    If nL > 0
-										                                                                                                                    Set sESC = Stuff(sESC, nL, 3, Chr(0))
-									                                                                                                                    Else
-										                                                                                                                    Break
-								                                                                                                            Loop 
-									                                                                                                            Set nL = At('<1>', sESC)
-									                                                                                                            If nL > 0
-										                                                                                                            Set sESC = Stuff(sESC, nL, 3, Chr(1))
-									                                                                                                            Else 
-										                                                                                                            Break 
-								                                                                                                            Loop 
-									                                                                                                            Set nL = At('<2>', sESC)
-									                                                                                                            If nL > 0
-										                                                                                                            Set sESC = Stuff(sESC, nL, 3, Chr(2))
-									                                                                                                            Else 
-										                                                                                                            Break 
-								                                                                                                            Loop 
-									                                                                                                            Set nL = At('<4>', sESC)
-									                                                                                                            If nL > 0
-										                                                                                                            Set sESC = Stuff(sESC, nL, 3, Chr(4))
-									                                                                                                            Else 
-										                                                                                                            Break 
-								                                                                                                            Loop 
-									                                                                                                            Set nL = At('<ff>', sESC)
-									                                                                                                            If nL > 0
-										                                                                                                            Set sESC = Stuff(sESC, nL, 4, Chr(12))
-									                                                                                                            Else 
-										                                                                                                            Break 
-								                                                                                                            Loop 
-									                                                                                                            Set nL = At('<Ff>', sESC)
-									                                                                                                            If nL > 0
-										                                                                                                            Set sESC = Stuff(sESC, nL, 4, Chr(12))
-									                                                                                                            Else 
-										                                                                                                            Break 
-								                                                                                                            Loop 
-									                                                                                                            Set nL = At('<FF>', sESC)
-									                                                                                                            If nL > 0
-										                                                                                                            Set sESC = Stuff(sESC, nL, 4, Chr(12))
-									                                                                                                            Else 
-										                                                                                                            Break 
-								                                                                                                            Loop 
-									                                                                                                            Set nL = At('<Bel>', sESC)
-									                                                                                                            If nL > 0
-										                                                                                                            Set sESC = Stuff(sESC, nL, 5, Chr(7))
-									                                                                                                            Else 
-										                                                                                                            Break 
-								                                                                                                            Loop 
-									                                                                                                            Set nL = At('<bel>', sESC)
-									                                                                                                            If nL > 0
-										                                                                                                            Set sESC = Stuff(sESC, nL, 5, Chr(7))
-									                                                                                                            Else 
-										                                                                                                            Break 
-								                                                                                                            Loop 
-									                                                                                                            Set nL = At('<BEL>', sESC)
-									                                                                                                            If nL > 0
-										                                                                                                            Set sESC = Stuff(sESC, nL, 5, Chr(7))
-									                                                                                                            Else 
-										                                                                                                            Break 
-								                                                                                                            Loop 
-									                                                                                                            Set nL = At('<dc2>', sESC)
-									                                                                                                            If nL > 0
-										                                                                                                            Set sESC = Stuff(sESC, nL, 5, Chr(18))
-									                                                                                                            Else 
-										                                                                                                            Break 
-								                                                                                                            Loop 
-									                                                                                                            Set nL = At('<Dc2>', sESC)
-									                                                                                                            If nL > 0
-										                                                                                                            Set sESC = Stuff(sESC, nL, 5, Chr(18))
-									                                                                                                            Else 
-										                                                                                                            Break 
-								                                                                                                            Loop 
-									                                                                                                            Set nL = At('<DC2>', sESC)
-									                                                                                                            If nL > 0
-										                                                                                                            Set sESC = Stuff(sESC, nL, 5, Chr(18))
-									                                                                                                            Else 
-										                                                                                                            Break 
-								                                                                                                            Loop 
-									                                                                                                            Set nL = At('<dc4>', sESC)
-									                                                                                                            If nL > 0
-										                                                                                                            Set sESC = Stuff(sESC, nL, 5, Chr(20))
-									                                                                                                            Else 
-										                                                                                                            Break 
-								                                                                                                            Loop 
-									                                                                                                            Set nL = At('<Dc4>', sESC)
-									                                                                                                            If nL > 0
-										                                                                                                            Set sESC = Stuff(sESC, nL, 5, Chr(20))
-									                                                                                                            Else 
-										                                                                                                            Break 
-								                                                                                                            Loop 
-									                                                                                                            Set nL = At('<DC4>', sESC)
-									                                                                                                            If nL > 0
-										                                                                                                            Set sESC = Stuff(sESC, nL, 5, Chr(20))
-									                                                                                                            Else 
-										                                                                                                            Break 
+									                                                                                                                      Set nL = At('<0>', sESC)
+									                                                                                                                      If nL > 0
+										                                                                                                                      Set sESC = Stuff(sESC, nL, 3, Chr(0))
+									                                                                                                                      Else
+										                                                                                                                      Break
+								                                                                                                              Loop 
+									                                                                                                              Set nL = At('<1>', sESC)
+									                                                                                                              If nL > 0
+										                                                                                                              Set sESC = Stuff(sESC, nL, 3, Chr(1))
+									                                                                                                              Else 
+										                                                                                                              Break 
+								                                                                                                              Loop 
+									                                                                                                              Set nL = At('<2>', sESC)
+									                                                                                                              If nL > 0
+										                                                                                                              Set sESC = Stuff(sESC, nL, 3, Chr(2))
+									                                                                                                              Else 
+										                                                                                                              Break 
+								                                                                                                              Loop 
+									                                                                                                              Set nL = At('<4>', sESC)
+									                                                                                                              If nL > 0
+										                                                                                                              Set sESC = Stuff(sESC, nL, 3, Chr(4))
+									                                                                                                              Else 
+										                                                                                                              Break 
+								                                                                                                              Loop 
+									                                                                                                              Set nL = At('<ff>', sESC)
+									                                                                                                              If nL > 0
+										                                                                                                              Set sESC = Stuff(sESC, nL, 4, Chr(12))
+									                                                                                                              Else 
+										                                                                                                              Break 
+								                                                                                                              Loop 
+									                                                                                                              Set nL = At('<Ff>', sESC)
+									                                                                                                              If nL > 0
+										                                                                                                              Set sESC = Stuff(sESC, nL, 4, Chr(12))
+									                                                                                                              Else 
+										                                                                                                              Break 
+								                                                                                                              Loop 
+									                                                                                                              Set nL = At('<FF>', sESC)
+									                                                                                                              If nL > 0
+										                                                                                                              Set sESC = Stuff(sESC, nL, 4, Chr(12))
+									                                                                                                              Else 
+										                                                                                                              Break 
+								                                                                                                              Loop 
+									                                                                                                              Set nL = At('<Bel>', sESC)
+									                                                                                                              If nL > 0
+										                                                                                                              Set sESC = Stuff(sESC, nL, 5, Chr(7))
+									                                                                                                              Else 
+										                                                                                                              Break 
+								                                                                                                              Loop 
+									                                                                                                              Set nL = At('<bel>', sESC)
+									                                                                                                              If nL > 0
+										                                                                                                              Set sESC = Stuff(sESC, nL, 5, Chr(7))
+									                                                                                                              Else 
+										                                                                                                              Break 
+								                                                                                                              Loop 
+									                                                                                                              Set nL = At('<BEL>', sESC)
+									                                                                                                              If nL > 0
+										                                                                                                              Set sESC = Stuff(sESC, nL, 5, Chr(7))
+									                                                                                                              Else 
+										                                                                                                              Break 
+								                                                                                                              Loop 
+									                                                                                                              Set nL = At('<dc2>', sESC)
+									                                                                                                              If nL > 0
+										                                                                                                              Set sESC = Stuff(sESC, nL, 5, Chr(18))
+									                                                                                                              Else 
+										                                                                                                              Break 
+								                                                                                                              Loop 
+									                                                                                                              Set nL = At('<Dc2>', sESC)
+									                                                                                                              If nL > 0
+										                                                                                                              Set sESC = Stuff(sESC, nL, 5, Chr(18))
+									                                                                                                              Else 
+										                                                                                                              Break 
+								                                                                                                              Loop 
+									                                                                                                              Set nL = At('<DC2>', sESC)
+									                                                                                                              If nL > 0
+										                                                                                                              Set sESC = Stuff(sESC, nL, 5, Chr(18))
+									                                                                                                              Else 
+										                                                                                                              Break 
+								                                                                                                              Loop 
+									                                                                                                              Set nL = At('<dc4>', sESC)
+									                                                                                                              If nL > 0
+										                                                                                                              Set sESC = Stuff(sESC, nL, 5, Chr(20))
+									                                                                                                              Else 
+										                                                                                                              Break 
+								                                                                                                              Loop 
+									                                                                                                              Set nL = At('<Dc4>', sESC)
+									                                                                                                              If nL > 0
+										                                                                                                              Set sESC = Stuff(sESC, nL, 5, Chr(20))
+									                                                                                                              Else 
+										                                                                                                              Break 
+								                                                                                                              Loop 
+									                                                                                                              Set nL = At('<DC4>', sESC)
+									                                                                                                              If nL > 0
+										                                                                                                              Set sESC = Stuff(sESC, nL, 5, Chr(20))
+									                                                                                                              Else 
+										                                                                                                              Break 
 								! Call Debug(sESC)
 					Call DeleteBadSymbols(sFile,'', TRUE, TRUE)
 					Call SalWaitCursor(FALSE)
@@ -840,61 +840,61 @@ Application Description: •--------------------------------------•
 			! Functional Class: cKtk
 .winattr
 .end
-				                                                                                                                                                      Description: Класс территории казначества
-				                                                                                                                                                      Derived From 
-				                                                                                                                                                      Class Variables 
-				                                                                                                                                                      Instance Variables 
-					                                                                                                                                                      String: sKtk       !-- номер территории
-					                                                                                                                                                      String: sKod       !-- часть от  ktk  = substr(ktk, -6, ..)
-					                                                                                                                                                      String: sKtkName   !-- наименование территории
-					                                                                                                                                                      Number: nDpiId     !-- номер налоговой
-					                                                                                                                                                      String: sDpiName   !-- налоговой налоговой
-					                                                                                                                                                      String: sId_Key    !-- неомер по tl_terra 
-					                                                                                                                                                      Number: nParent  !-- родитель
-					                                                                                                                                                      Number: sSvod    !-- = '4' - если для территории в подчиненных нету никого
+				                                                                                                                                                        Description: Класс территории казначества
+				                                                                                                                                                        Derived From 
+				                                                                                                                                                        Class Variables 
+				                                                                                                                                                        Instance Variables 
+					                                                                                                                                                        String: sKtk       !-- номер территории
+					                                                                                                                                                        String: sKod       !-- часть от  ktk  = substr(ktk, -6, ..)
+					                                                                                                                                                        String: sKtkName   !-- наименование территории
+					                                                                                                                                                        Number: nDpiId     !-- номер налоговой
+					                                                                                                                                                        String: sDpiName   !-- налоговой налоговой
+					                                                                                                                                                        String: sId_Key    !-- неомер по tl_terra 
+					                                                                                                                                                        Number: nParent  !-- родитель
+					                                                                                                                                                        Number: sSvod    !-- = '4' - если для территории в подчиненных нету никого
 							                 !-- = '1' - если в подчиненных - есть одна территория
 							                 !-- = '0' - если в подчиненных - есть несколько территория
-				                                                                                                                                                      Functions 
+				                                                                                                                                                        Functions 
 			! Functional Class: сKtkObl
 .winattr
 .end
-				                                                                                                                                                      Description: Область со всеми своими территориями
-				                                                                                                                                                      Derived From 
-				                                                                                                                                                      Class Variables 
-				                                                                                                                                                      Instance Variables 
-					                                                                                                                                                      : Rn[*]  !-- районы
-					                                                                                                                                                      : Sr[*]  !-- сель рада
-					                                                                                                                                                      : Sl[*]  !-- село
-					                                                                                                                                                      Number: nRn
-					                                                                                                                                                      Number: nSr
-					                                                                                                                                                      Number: nSl
-				                                                                                                                                                      Functions 
-					                                                                                                                                                      Function: Init
-						                                                                                                                                                      Description: 
-						                                                                                                                                                      Returns 
-						                                                                                                                                                      Parameters 
-							                                                                                                                                                      Number: nLevel
+				                                                                                                                                                        Description: Область со всеми своими территориями
+				                                                                                                                                                        Derived From 
+				                                                                                                                                                        Class Variables 
+				                                                                                                                                                        Instance Variables 
+					                                                                                                                                                        : Rn[*]  !-- районы
+					                                                                                                                                                        : Sr[*]  !-- сель рада
+					                                                                                                                                                        : Sl[*]  !-- село
+					                                                                                                                                                        Number: nRn
+					                                                                                                                                                        Number: nSr
+					                                                                                                                                                        Number: nSl
+				                                                                                                                                                        Functions 
+					                                                                                                                                                        Function: Init
+						                                                                                                                                                        Description: 
+						                                                                                                                                                        Returns 
+						                                                                                                                                                        Parameters 
+							                                                                                                                                                        Number: nLevel
 							! --- nLevel = 1 - есть районы
 							! --- nLevel = 2 - есть сель рады
 							! --- nLevel = 3 - есть села
-						                                                                                                                                                      Static Variables 
-						                                                                                                                                                      Local variables 
-							                                                                                                                                                      String: sBigPayersMask
-							                                                                                                                                                      String: sSql
-							                                                                                                                                                      Number: i
-							                                                                                                                                                      Number: k
-							                                                                                                                                                      Number: nInd
-						                                                                                                                                                      Actions 
-							                                                                                                                                                      Call SalWaitCursor(TRUE)
-							                                                                                                                                                      Set sBigPayersMask = GetGlobalOption('KTKMASK')                   
-							                                                                                                                                                      Set nRn=0
-							                                                                                                                                                      Set nSr=0
-							                                                                                                                                                      Set nSl=0
-							                                                                                                                                                      Set i=0
+						                                                                                                                                                        Static Variables 
+						                                                                                                                                                        Local variables 
+							                                                                                                                                                        String: sBigPayersMask
+							                                                                                                                                                        String: sSql
+							                                                                                                                                                        Number: i
+							                                                                                                                                                        Number: k
+							                                                                                                                                                        Number: nInd
+						                                                                                                                                                        Actions 
+							                                                                                                                                                        Call SalWaitCursor(TRUE)
+							                                                                                                                                                        Set sBigPayersMask = GetGlobalOption('KTKMASK')                   
+							                                                                                                                                                        Set nRn=0
+							                                                                                                                                                        Set nSr=0
+							                                                                                                                                                        Set nSl=0
+							                                                                                                                                                        Set i=0
 							! ======================================
 							! ------ Выберем районы-----------
 							! ======================================
-							                                                                                                                                                      Set sSql =
+							                                                                                                                                                        Set sSql =
 									   " SELECT '*' kod, 0 id, '*********** ВСІ ***********' dpiname, 
 									            '*********** ВСІ ***********' ktkname, 0 ktk, '0' id_key, '0' svod, 0 as sortid
 									     INTO  :Rn[i].sKod,  :Rn[i].nDpiId,  :Rn[i].sDpiName, :Rn[i].sKtkName,  
@@ -917,15 +917,15 @@ Application Description: •--------------------------------------•
 									            "") || 
 									     " ORDER BY sortid, kod, id "
 							! Call Debug(sSql)
-							                                                                                                                                                      Call SqlPrepareAndExecute(hSql(), sSql)   
-							                                                                                                                                                      While SqlFetchNext ( hSql(), nInd )
-								                                                                                                                                                      Set i = i + 1
-							                                                                                                                                                      Set nRn = i
+							                                                                                                                                                        Call SqlPrepareAndExecute(hSql(), sSql)   
+							                                                                                                                                                        While SqlFetchNext ( hSql(), nInd )
+								                                                                                                                                                        Set i = i + 1
+							                                                                                                                                                        Set nRn = i
 							! ======================================
 							! ------ Выберем сельские рады-----------
 							! ======================================
-							                                                                                                                                                      Set i=0
-							                                                                                                                                                      Set sSql =
+							                                                                                                                                                        Set i=0
+							                                                                                                                                                        Set sSql =
 									   " SELECT '*' kod, 0 id, '*********** ВСІ ***********' dpiname, 
 									            '*********** ВСІ ***********' ktkname, 0 ktk, '0' id_key, '0' svod, 0 as sortid
 									     INTO  :Sr[i].sKod, :Sr[i].nDpiId,  :Sr[i].sDpiName, :Sr[i].sKtkName,  
@@ -943,16 +943,16 @@ Application Description: •--------------------------------------•
 									                    AND TR.sr(+)=substr(ktk, -6,4)
 									     ORDER BY sortid, kod , id  desc" 
 							! Call Debug(sSql)
-							                                                                                                                                                      Call SqlPrepareAndExecute(hSql(), sSql)   
-							                                                                                                                                                      While SqlFetchNext ( hSql(), nInd )
-								                                                                                                                                                      Set i = i + 1
-							                                                                                                                                                      Set nSr = i
+							                                                                                                                                                        Call SqlPrepareAndExecute(hSql(), sSql)   
+							                                                                                                                                                        While SqlFetchNext ( hSql(), nInd )
+								                                                                                                                                                        Set i = i + 1
+							                                                                                                                                                        Set nSr = i
 							! ======================================
 							! ------ Выберем села - если они есть -----------
 							! ======================================
-							                                                                                                                                                      If nLevel = 3
-								                                                                                                                                                      Set i=0
-								                                                                                                                                                      Set sSql =
+							                                                                                                                                                        If nLevel = 3
+								                                                                                                                                                        Set i=0
+								                                                                                                                                                        Set sSql =
 										   " SELECT  UNIQUE substr(ktk, -6,6) kod , d.id id , d.name dpiname, k.id_key||' - '||k.name ktkname, ktk, k.id_key, '1' svod 
 										     INTO  :Sl[i].sKod, :Sl[i].nDpiId,  :Sl[i].sDpiName, 
 										           :Sl[i].sKtkName,:Sl[i].sKtk, :Sl[i].sId_Key, , :Sl[i].sSvod
@@ -962,41 +962,41 @@ Application Description: •--------------------------------------•
 											   AND  substr(k2.idt, -6,2)=  substr(ktk, -6,2)
 											   AND substr(k2.idt, -2,2)<>'00'
 										     ORDER BY substr(ktk, -6,6) , d.id  " 
-								                                                                                                                                                      Call SqlPrepareAndExecute(hSql(), sSql)   
-								                                                                                                                                                      While SqlFetchNext ( hSql(), nInd )
+								                                                                                                                                                        Call SqlPrepareAndExecute(hSql(), sSql)   
+								                                                                                                                                                        While SqlFetchNext ( hSql(), nInd )
 									! Call Debug(Sl[i].sKod)
-									                                                                                                                                                      Set i = i + 1
-								                                                                                                                                                      Set nSl = i
+									                                                                                                                                                        Set i = i + 1
+								                                                                                                                                                        Set nSl = i
 							! ======================================
 							! ------ Сделаем связку - дерево
 							! ======================================
 							! -- найдем родителей для сел
-							                                                                                                                                                      If nLevel = 3
-								                                                                                                                                                      Set i=0
-								                                                                                                                                                      Set k=1
-								                                                                                                                                                      While i < nSl
-									                                                                                                                                                      Set Sl[i].nParent = -1
-									                                                                                                                                                      While ( k < nSr )
-										                                                                                                                                                      If Sr[k].sKod = SalStrLeftX(Sl[i].sKod, 4)
-											                                                                                                                                                      Set Sl[i].nParent = k
-											                                                                                                                                                      Break 
-										                                                                                                                                                      Set k = k +1 
-									                                                                                                                                                      Set i= i + 1
+							                                                                                                                                                        If nLevel = 3
+								                                                                                                                                                        Set i=0
+								                                                                                                                                                        Set k=1
+								                                                                                                                                                        While i < nSl
+									                                                                                                                                                        Set Sl[i].nParent = -1
+									                                                                                                                                                        While ( k < nSr )
+										                                                                                                                                                        If Sr[k].sKod = SalStrLeftX(Sl[i].sKod, 4)
+											                                                                                                                                                        Set Sl[i].nParent = k
+											                                                                                                                                                        Break 
+										                                                                                                                                                        Set k = k +1 
+									                                                                                                                                                        Set i= i + 1
 							! -- найдем родителей для сельских рад
-							                                                                                                                                                      Set i=0
-							                                                                                                                                                      Set k=0
-							                                                                                                                                                      While i < nSr
-								                                                                                                                                                      Set Sr[i].nParent = -1
+							                                                                                                                                                        Set i=0
+							                                                                                                                                                        Set k=0
+							                                                                                                                                                        While i < nSr
+								                                                                                                                                                        Set Sr[i].nParent = -1
 								! Call Debug('rada - Sr['||SalNumberToStrX(i,0)||'].sKod='|| Sr[i].sKod )
-								                                                                                                                                                      While ( k < nRn )
+								                                                                                                                                                        While ( k < nRn )
 									! Call Debug('Rn['||SalNumberToStrX(k,0)||'].sKod='|| Rn[k].sKod )
-									                                                                                                                                                      If Rn[k].sKod = SalStrLeftX(Sr[i].sKod, 2)
-										                                                                                                                                                      Set Sr[i].nParent = k
+									                                                                                                                                                        If Rn[k].sKod = SalStrLeftX(Sr[i].sKod, 2)
+										                                                                                                                                                        Set Sr[i].nParent = k
 										! Call Debug('For Sr[i].sKod: parent '||Rn[k].sKod)
-										                                                                                                                                                      Break 
-									                                                                                                                                                      Set k = k +1 
-								                                                                                                                                                      Set i= i + 1
-							                                                                                                                                                      Call SalWaitCursor(FALSE)
+										                                                                                                                                                        Break 
+									                                                                                                                                                        Set k = k +1 
+								                                                                                                                                                        Set i= i + 1
+							                                                                                                                                                        Call SalWaitCursor(FALSE)
 			Form Window Class: cGenericTableSpl3
 .data CLASSPROPSSIZE
 0000: 3C00
@@ -1527,7 +1527,7 @@ Application Description: •--------------------------------------•
 							Background Color: Dark Aqua
 							DLL Settings
 .end
-						                   Message Actions 
+						                     Message Actions 
 					Custom Control: ccSplitter
 						Class Child Ref Key: 0
 						Class ChildKey: 36
@@ -1702,26 +1702,26 @@ Application Description: •--------------------------------------•
 									Call XSalTooltipShow( hWndForm, strTitle ||PutLf()||PadL(strSuma,nH))
 									Call XSalTooltipSetColors( COLOR_Black, COLOR_White )
 					! Function: GetFirstEditableColumn
-						                 Description: Получить первую редактируюмую колонку
-						                 Returns 
-							                 Window Handle: 
-						                 Parameters 
-							                 Window Handle: hWndTbl
-						                 Static Variables 
-						                 Local variables 
-							                 Number: nCol
-							                 Window Handle: hWndCol
-						                 Actions 
-							                 Set nCol=1
-							                 Loop 
-								                 Set hWndCol = SalTblGetColumnWindow(hWndTbl, nCol, COL_GetPos)
-								                 If hWndCol=hWndNULL
-									                 Break 
-								                 If SalTblQueryColumnFlags(hWndCol, COL_Editable) AND
+						                   Description: Получить первую редактируюмую колонку
+						                   Returns 
+							                   Window Handle: 
+						                   Parameters 
+							                   Window Handle: hWndTbl
+						                   Static Variables 
+						                   Local variables 
+							                   Number: nCol
+							                   Window Handle: hWndCol
+						                   Actions 
+							                   Set nCol=1
+							                   Loop 
+								                   Set hWndCol = SalTblGetColumnWindow(hWndTbl, nCol, COL_GetPos)
+								                   If hWndCol=hWndNULL
+									                   Break 
+								                   If SalTblQueryColumnFlags(hWndCol, COL_Editable) AND
 										SalIsWindowVisible(hWndCol)
-									                 Break 
-								                 Set nCol=nCol+1
-							                 Return hWndCol
+									                   Break 
+								                   Set nCol=nCol+1
+							                   Return hWndCol
 				Message Actions
 					On UM_Create
 						Call SalWaitCursor(TRUE)
@@ -2976,22 +2976,22 @@ Application Description: •--------------------------------------•
 					! ========================================== 
 					! Set nAvtoGen = 0
 					! While SalTblFindNextRow (  tblReps, nInd, ROW_Selected, 0 )
-						                                                                                                                                                      Set nAvtoGen = nAvtoGen+1
+						                                                                                                                                                        Set nAvtoGen = nAvtoGen+1
 					! Set nCurLine=TBL_MinRow
 					! While SalTblFindNextRow (  tblReps, nCurLine, ROW_Selected, 0 )
-						                                                                                                                                                      Call SalTblSetContext( tblReps, nCurLine)
-						                                                                                                                                                      Set i=0
-						                                                                                                                                                      Set strTmp = tblReps.param
-						                                                                                                                                                      While SalStrScan (strTmp, ',') > -1
-							                                                                                                                                                      Set i = SalStrScan (strTmp,',')
-							                                                                                                                                                      Set i=i+1
-							                                                                                                                                                      Set strTmp = SalStrMidX(strTmp, i, SalStrLength(strTmp) - i )
-						                                                                                                                                                      Set nPar1 = SalStrToNumber( strTmp )
+						                                                                                                                                                        Call SalTblSetContext( tblReps, nCurLine)
+						                                                                                                                                                        Set i=0
+						                                                                                                                                                        Set strTmp = tblReps.param
+						                                                                                                                                                        While SalStrScan (strTmp, ',') > -1
+							                                                                                                                                                        Set i = SalStrScan (strTmp,',')
+							                                                                                                                                                        Set i=i+1
+							                                                                                                                                                        Set strTmp = SalStrMidX(strTmp, i, SalStrLength(strTmp) - i )
+						                                                                                                                                                        Set nPar1 = SalStrToNumber( strTmp )
 						! Set strPureMask = GetPureFileMask(tblReps.maska)
 						!
-						                                                                                                                                                      Set SHAP = SalNumberToStrX(tblReps.Kod, 0) || ' ' ||  tblReps.NAME
-						                                                                                                                                                      Set DRUK = 'Printed: ' || SalFmtFormatDateTime(SalDateCurrent(), "dd/MM/yyyy hh:mm:ss")
-						                                                                                                                                                      Set strTmplPath = IifS(FL_FORMAT, GetTemplateDir() || "\\" || tblReps.repw,  GetTemplateDir() || "\\" || tblReps.rep)
+						                                                                                                                                                        Set SHAP = SalNumberToStrX(tblReps.Kod, 0) || ' ' ||  tblReps.NAME
+						                                                                                                                                                        Set DRUK = 'Printed: ' || SalFmtFormatDateTime(SalDateCurrent(), "dd/MM/yyyy hh:mm:ss")
+						                                                                                                                                                        Set strTmplPath = IifS(FL_FORMAT, GetTemplateDir() || "\\" || tblReps.repw,  GetTemplateDir() || "\\" || tblReps.rep)
 		Window Parameters
 			Number: nMode
 		Window Variables
@@ -3104,40 +3104,40 @@ Application Description: •--------------------------------------•
 			Text Color: Default
 			Background Color: Default
 .end
-		                                                                                                         Description: Маска отбора
-		                                                                                                         Tool Bar 
-			                                                                                                         Contents 
-		                                                                                                         Contents 
-			                                                                                                         Background Text: "Маска"  ДЕБЕТА счета
-			                                                                                                         Data Field: masD
-				                                                                                                         Message Actions 
-			                                                                                                         Background Text: "Маска"  КРЕДИТА счета
-			                                                                                                         Data Field: masK
-				                                                                                                         Message Actions 
-			                                                                                                         Pushbutton: pb1
-				                                                                                                         Message Actions 
-					                                                                                                         On SAM_Click
-						                                                                                                         Set masD = SalStrTrimX(masD)
-						                                                                                                         Set masK = SalStrTrimX(masK)
-						                                                                                                         Call SalEndDialog(hWndForm, 0)
-			                                                                                                         Pushbutton: pb2
-				                                                                                                         Message Actions 
-					                                                                                                         On SAM_Click
-						                                                                                                         Set masD = '-'
-						                                                                                                         Call SalEndDialog(hWndForm, 0)
-		                                                                                                         Functions 
-		                                                                                                         Window Parameters 
-			                                                                                                         Receive String: maskD
-			                                                                                                         Receive String: maskK
-		                                                                                                         Window Variables 
-		                                                                                                         Message Actions 
-			                                                                                                         On SAM_Create
-				                                                                                                         Call SalCenterWindow(hWndForm)
-				                                                                                                         Set masD = '*'
-				                                                                                                         Set masK = '*'
-			                                                                                                         On SAM_Destroy
-				                                                                                                         Set maskD = StrMatches2Like(masD)
-				                                                                                                         Set maskK = StrMatches2Like(masK)
+		                                                                                                           Description: Маска отбора
+		                                                                                                           Tool Bar 
+			                                                                                                           Contents 
+		                                                                                                           Contents 
+			                                                                                                           Background Text: "Маска"  ДЕБЕТА счета
+			                                                                                                           Data Field: masD
+				                                                                                                           Message Actions 
+			                                                                                                           Background Text: "Маска"  КРЕДИТА счета
+			                                                                                                           Data Field: masK
+				                                                                                                           Message Actions 
+			                                                                                                           Pushbutton: pb1
+				                                                                                                           Message Actions 
+					                                                                                                           On SAM_Click
+						                                                                                                           Set masD = SalStrTrimX(masD)
+						                                                                                                           Set masK = SalStrTrimX(masK)
+						                                                                                                           Call SalEndDialog(hWndForm, 0)
+			                                                                                                           Pushbutton: pb2
+				                                                                                                           Message Actions 
+					                                                                                                           On SAM_Click
+						                                                                                                           Set masD = '-'
+						                                                                                                           Call SalEndDialog(hWndForm, 0)
+		                                                                                                           Functions 
+		                                                                                                           Window Parameters 
+			                                                                                                           Receive String: maskD
+			                                                                                                           Receive String: maskK
+		                                                                                                           Window Variables 
+		                                                                                                           Message Actions 
+			                                                                                                           On SAM_Create
+				                                                                                                           Call SalCenterWindow(hWndForm)
+				                                                                                                           Set masD = '*'
+				                                                                                                           Set masK = '*'
+			                                                                                                           On SAM_Destroy
+				                                                                                                           Set maskD = StrMatches2Like(masD)
+				                                                                                                           Set maskK = StrMatches2Like(masK)
 	! Dialog Box: dlg_mas
 .winattr
 		Class:
@@ -3164,36 +3164,36 @@ Application Description: •--------------------------------------•
 			Text Color: Default
 			Background Color: Default
 .end
-		                                                                                                         Description: Маска отбора
-		                                                                                                         Tool Bar 
-			                                                                                                         Contents 
-		                                                                                                         Contents 
-			                                                                                                         Background Text: "Маска" для отбора:
-			                                                                                                         Data Field: mas
-				                                                                                                         Message Actions 
-			                                                                                                         Pushbutton: pb1
-				                                                                                                         Message Actions 
-					                                                                                                         On SAM_Click
-						                                                                                                         Set mas = SalStrTrimX(mas)
-						                                                                                                         Call SalEndDialog(dlg_mas, 0)
-			                                                                                                         Pushbutton: pb2
-				                                                                                                         Message Actions 
-					                                                                                                         On SAM_Click
-						                                                                                                         Set mas = '-'
-						                                                                                                         Call SalEndDialog(dlg_mas, 0)
-		                                                                                                         Functions 
-		                                                                                                         Window Parameters 
-			                                                                                                         Receive String: mask
-			                                                                                                         String: slovo
-		                                                                                                         Window Variables 
-		                                                                                                         Message Actions 
-			                                                                                                         On SAM_Create
-				                                                                                                         Call SalCenterWindow(hWndItem)
-				                                                                                                         Call SalSetWindowText(hWndForm, " ОТБОР " || slovo ||
+		                                                                                                           Description: Маска отбора
+		                                                                                                           Tool Bar 
+			                                                                                                           Contents 
+		                                                                                                           Contents 
+			                                                                                                           Background Text: "Маска" для отбора:
+			                                                                                                           Data Field: mas
+				                                                                                                           Message Actions 
+			                                                                                                           Pushbutton: pb1
+				                                                                                                           Message Actions 
+					                                                                                                           On SAM_Click
+						                                                                                                           Set mas = SalStrTrimX(mas)
+						                                                                                                           Call SalEndDialog(dlg_mas, 0)
+			                                                                                                           Pushbutton: pb2
+				                                                                                                           Message Actions 
+					                                                                                                           On SAM_Click
+						                                                                                                           Set mas = '-'
+						                                                                                                           Call SalEndDialog(dlg_mas, 0)
+		                                                                                                           Functions 
+		                                                                                                           Window Parameters 
+			                                                                                                           Receive String: mask
+			                                                                                                           String: slovo
+		                                                                                                           Window Variables 
+		                                                                                                           Message Actions 
+			                                                                                                           On SAM_Create
+				                                                                                                           Call SalCenterWindow(hWndItem)
+				                                                                                                           Call SalSetWindowText(hWndForm, " ОТБОР " || slovo ||
 						     " для печати")
-				                                                                                                         Set mas = mask
-			                                                                                                         On SAM_Destroy
-				                                                                                                         Set mask = StrMatches2Like(mas)
+				                                                                                                           Set mas = mask
+			                                                                                                           On SAM_Destroy
+				                                                                                                           Set mask = StrMatches2Like(mas)
 				! Set mask = IifS(mas != '*', StrMatches2Like(mas), '')
 				! Set mask = IifS(mas != '*', " and trim(Nls) LIKE \'" ||
 						  StrMatches2Like(mas) || "\'", ' ')
@@ -3808,8 +3808,8 @@ Application Description: •--------------------------------------•
 								Uncheck Value:
 								Ignore Case? Yes
 .end
-						                                                                                                                                                          List Values
-						                                                                                                                                                          Message Actions
+						                                                                                                                                                            List Values
+						                                                                                                                                                            Message Actions
 					Column: Name1
 						Class Child Ref Key: 0
 						Class ChildKey: 0
@@ -4265,10 +4265,10 @@ Application Description: •--------------------------------------•
 								    ORDER BY 1,4,2,3"
 					! !! устарело
 					! Else If nPar1 = 43    !! Реестр по Пенс.Фонду Місц.бюджет
-						                                                                                                                   Set strBind   = 'K0,D1,NAME,S1,S0,S,SIM,NAZN, S2'
-						                                                                                                                   Set SHAP = ' місцевого бюджету за доходами '
-						                                                                                                                   Set ND    = ' (Пенсійний фонд)'
-						                                                                                                                   Set sSql="
+						                                                                                                                     Set strBind   = 'K0,D1,NAME,S1,S0,S,SIM,NAZN, S2'
+						                                                                                                                     Set SHAP = ' місцевого бюджету за доходами '
+						                                                                                                                     Set ND    = ' (Пенсійний фонд)'
+						                                                                                                                     Set sSql="
 								    SELECT sim, nam_a, okpo_a, datd, s, s_koef, s_back,nazn
 								    INTO :SIM, :NAME, :S1,:D1,:S0,:S, :S2, :NAZN
 								    FROM tmp_dkupfm p
@@ -4352,7 +4352,7 @@ Application Description: •--------------------------------------•
 								 INTO :K2,:K1,:REF,:TT,:NAME,:D2,:K3,:S2,:S3,:S0,:S1,:S6,:TNAME
 								 FROM opl l, specparam p, oper o, terrdpi t, dpa d
 								 WHERE l.fdat= :sFdat  AND substr(l.nls,1,4) IN
-								       ('6111','6112','6113','6211','6411','7113') AND
+								       ('6511','6112','6513','6211','6411','7113') AND
 								       t.ktk=p.KTK AND d.id=t.kod_dpi AND
 								       l.acc=p.acc AND l.ref=o.ref AND
 								       l.sos=5 AND" || sTmp || "
@@ -4884,16 +4884,16 @@ Application Description: •--------------------------------------•
 						Set nRet=0
 						! Call Debug('Всего файлов DBF:'||SalNumberToStrX(nCouDBFFilesToRename, 0))
 						! While nRet < nCouDBFFilesToRename
-							                         If VisFileFind(strPrintPath||'\\'||strDBFFilesToRename[nRet]||'.DBF')
-								                         Set sRenamedDBFFileName = SalStrLeftX(strDBFFilesToRename[nRet], SalStrLength(strDBFFilesToRename[nRet])-4)||'?.'||SalStrRightX(strDBFFilesToRename[nRet],3)
-								                         Set sRenamedDBFFileName = SalStrLeftX(sRenamedDBFFileName,7) ||GetNextFileSess(strPrintPath, sRenamedDBFFileName,1,0)||'.'||SalStrRightX(sRenamedDBFFileName,3)
+							                           If VisFileFind(strPrintPath||'\\'||strDBFFilesToRename[nRet]||'.DBF')
+								                           Set sRenamedDBFFileName = SalStrLeftX(strDBFFilesToRename[nRet], SalStrLength(strDBFFilesToRename[nRet])-4)||'?.'||SalStrRightX(strDBFFilesToRename[nRet],3)
+								                           Set sRenamedDBFFileName = SalStrLeftX(sRenamedDBFFileName,7) ||GetNextFileSess(strPrintPath, sRenamedDBFFileName,1,0)||'.'||SalStrRightX(sRenamedDBFFileName,3)
 										
-								                         Call Debug('Переимеов:'||strPrintPath||'\\'||strDBFFilesToRename[nRet]||'.DBF'||' ->> '||strPrintPath||'\\'||sRenamedDBFFileName)
-								                         If VisFileRename(strPrintPath||'\\'||strDBFFilesToRename[nRet]||'.DBF', strPrintPath||'\\'||sRenamedDBFFileName) < 0
-									                         Call SalMessageBox(' Невозможно переименовать ', 'Внимание!',0)
-									                         Call SalWaitCursor (FALSE )
-									                         Return -1
-							                         Set nRet=nRet+1
+								                           Call Debug('Переимеов:'||strPrintPath||'\\'||strDBFFilesToRename[nRet]||'.DBF'||' ->> '||strPrintPath||'\\'||sRenamedDBFFileName)
+								                           If VisFileRename(strPrintPath||'\\'||strDBFFilesToRename[nRet]||'.DBF', strPrintPath||'\\'||sRenamedDBFFileName) < 0
+									                           Call SalMessageBox(' Невозможно переименовать ', 'Внимание!',0)
+									                           Call SalWaitCursor (FALSE )
+									                           Return -1
+							                           Set nRet=nRet+1
 					!
 			Function: KtlLike
 				Description: Сравнивает, попадает ли даное sKtk под маску sKtkMask
@@ -5004,104 +5004,104 @@ Application Description: •--------------------------------------•
 						! Цыкл по nRepFileType сделан для случая, если нужно генерить один отчет в разных форматах
 						! Set i = nRepFileType
 						! While i>=0 
-							                                                                                                                                                 If nRepFileType >= 3
-								                                                                                                                                                 Set nRepFileType=nRepFileType-1
+							                                                                                                                                                   If nRepFileType >= 3
+								                                                                                                                                                   Set nRepFileType=nRepFileType-1
 							! ====================================
 							! == Если формат DBF - подготовить файл
 							! ====================================
-							                                                                                                                                                 Call Debug('Делаем nRepFileType='||Str(nRepFileType))
-							                                                                                                                                                 If nRepFileType=2
+							                                                                                                                                                   Call Debug('Делаем nRepFileType='||Str(nRepFileType))
+							                                                                                                                                                   If nRepFileType=2
 								! установим текущую директорию (все заточеноо под 412)
-								                                                                                                                                                 Call SalUseRegistry(FALSE, '')
-								                                                                                                                                                 Call SalGetProfileString('412', 'DbfPath', strPrintPath, strPrintPath, GetIniFileName())
-								                                                                                                                                                 If not SalFileSetCurrentDirectory(strPrintPath)
-									                                                                                                                                                 Call SalMessageBox(' Невозможно установить директорию '|| strPrintPath||' текущей ', 'Внимание!',0)
-									                                                                                                                                                 Call SalWaitCursor (FALSE )
-									                                                                                                                                                 Return -1
-								                                                                                                                                                 Set SqlDatabase = 'dBase_Files'
-								                                                                                                                                                 If not SqlConnect(hSqlA)
-									                                                                                                                                                 Call SalMessageBox(' Невозможно установить соединение с dBase_Files ', 'Внимание!',0)
-									                                                                                                                                                 Call SalWaitCursor (FALSE )
-									                                                                                                                                                 Return -1
-								                                                                                                                                                 If not VisFileFind(strPrintPath||"\\ft.dbf ") 
+								                                                                                                                                                   Call SalUseRegistry(FALSE, '')
+								                                                                                                                                                   Call SalGetProfileString('412', 'DbfPath', strPrintPath, strPrintPath, GetIniFileName())
+								                                                                                                                                                   If not SalFileSetCurrentDirectory(strPrintPath)
+									                                                                                                                                                   Call SalMessageBox(' Невозможно установить директорию '|| strPrintPath||' текущей ', 'Внимание!',0)
+									                                                                                                                                                   Call SalWaitCursor (FALSE )
+									                                                                                                                                                   Return -1
+								                                                                                                                                                   Set SqlDatabase = 'dBase_Files'
+								                                                                                                                                                   If not SqlConnect(hSqlA)
+									                                                                                                                                                   Call SalMessageBox(' Невозможно установить соединение с dBase_Files ', 'Внимание!',0)
+									                                                                                                                                                   Call SalWaitCursor (FALSE )
+									                                                                                                                                                   Return -1
+								                                                                                                                                                   If not VisFileFind(strPrintPath||"\\ft.dbf ") 
 									!
-									                                                                                                                                                 Call SqlPrepareAndExecute(hSqlA, "
+									                                                                                                                                                   Call SqlPrepareAndExecute(hSqlA, "
 											     CREATE
 											     TABLE " || strPrintPath||"\\ft.dbf "||strDBFStruct)
-								                                                                                                                                                 Set nCouDBFFilesToRename=0
+								                                                                                                                                                   Set nCouDBFFilesToRename=0
 							! ====================================
 							! == Выполним собственно отчет
 							! ====================================
 							! ------ Сводная-----------
-							                                                                                                                                                 If nType = 1 or nType = 4 or nType = 5
-								                                                                                                                                                 Call FU_1( 'x', GetBankSab(),GetBankName() , GetGlobalOption('AREACODE')||'00', '','2')
+							                                                                                                                                                   If nType = 1 or nType = 4 or nType = 5
+								                                                                                                                                                   Call FU_1( 'x', GetBankSab(),GetBankName() , GetGlobalOption('AREACODE')||'00', '','2')
 							! ------ Выбранные или Все--------
-							                                                                                                                                                 If nType > 1 
-								                                                                                                                                                 If nType = 3 or nType=5 !-- Все
-									                                                                                                                                                 If nLevel >= 1
-										                                                                                                                                                 Call SalTblSetFlagsAnyRows(tbl1, ROW_Selected, TRUE, 0, 0)
+							                                                                                                                                                   If nType > 1 
+								                                                                                                                                                   If nType = 3 or nType=5 !-- Все
+									                                                                                                                                                   If nLevel >= 1
+										                                                                                                                                                   Call SalTblSetFlagsAnyRows(tbl1, ROW_Selected, TRUE, 0, 0)
 										! Call SalTblSetRowFlags(tbl1, 0, ROW_Selected, FALSE)
-									                                                                                                                                                 If nLevel >= 2
-										                                                                                                                                                 Call SalTblSetFlagsAnyRows(frm_RegPart.tblRada, ROW_Selected, TRUE, 0, 0)
+									                                                                                                                                                   If nLevel >= 2
+										                                                                                                                                                   Call SalTblSetFlagsAnyRows(frm_RegPart.tblRada, ROW_Selected, TRUE, 0, 0)
 										! Call SalTblSetRowFlags(frm_RegPart.tblRada, 0, ROW_Selected, FALSE)
-									                                                                                                                                                 If nLevel >= 3
-										                                                                                                                                                 Call SalTblSetFlagsAnyRows(frm_RegPart.tblSelo, ROW_Selected, TRUE, 0, 0)
-									                                                                                                                                                 Set nTmp = 0
-								                                                                                                                                                 Else 
-									                                                                                                                                                 Set nTmp = ROW_Selected
+									                                                                                                                                                   If nLevel >= 3
+										                                                                                                                                                   Call SalTblSetFlagsAnyRows(frm_RegPart.tblSelo, ROW_Selected, TRUE, 0, 0)
+									                                                                                                                                                   Set nTmp = 0
+								                                                                                                                                                   Else 
+									                                                                                                                                                   Set nTmp = ROW_Selected
 								!
 								! -- по районам
-								                                                                                                                                                 If nLevel >= 1 
-									                                                                                                                                                 Set nTmp = ROW_Selected
-									                                                                                                                                                 Set nRow = TBL_MinRow
-									                                                                                                                                                 While SalTblFindNextRow(tbl1, nRow, nTmp, 0)
-										                                                                                                                                                 Call SalTblSetContext(tbl1, nRow)
-										                                                                                                                                                 Call FU_1(tbl1.Kod1, tbl1.colSab, tbl1.Name1, tbl1.colid_key, tbl1.ktk_name,'0')
+								                                                                                                                                                   If nLevel >= 1 
+									                                                                                                                                                   Set nTmp = ROW_Selected
+									                                                                                                                                                   Set nRow = TBL_MinRow
+									                                                                                                                                                   While SalTblFindNextRow(tbl1, nRow, nTmp, 0)
+										                                                                                                                                                   Call SalTblSetContext(tbl1, nRow)
+										                                                                                                                                                   Call FU_1(tbl1.Kod1, tbl1.colSab, tbl1.Name1, tbl1.colid_key, tbl1.ktk_name,'0')
 								! -- по сельским радам
-								                                                                                                                                                 If nLevel >= 2 
-									                                                                                                                                                 Set nTmp = ROW_Selected
-									                                                                                                                                                 Set nRow = TBL_MinRow
-									                                                                                                                                                 While SalTblFindNextRow(frm_RegPart.tblRada, nRow, nTmp, 0)
-										                                                                                                                                                 Call SalTblSetContext(frm_RegPart.tblRada, nRow)
-										                                                                                                                                                 Call FU_1(frm_RegPart.tblRada.Kod1, frm_RegPart.tblRada.colSab, frm_RegPart.tblRada.Name1,  frm_RegPart.tblRada.colid_key, frm_RegPart.tblRada.ktk_name, frm_RegPart.tblRada.colIsSvod )
+								                                                                                                                                                   If nLevel >= 2 
+									                                                                                                                                                   Set nTmp = ROW_Selected
+									                                                                                                                                                   Set nRow = TBL_MinRow
+									                                                                                                                                                   While SalTblFindNextRow(frm_RegPart.tblRada, nRow, nTmp, 0)
+										                                                                                                                                                   Call SalTblSetContext(frm_RegPart.tblRada, nRow)
+										                                                                                                                                                   Call FU_1(frm_RegPart.tblRada.Kod1, frm_RegPart.tblRada.colSab, frm_RegPart.tblRada.Name1,  frm_RegPart.tblRada.colid_key, frm_RegPart.tblRada.ktk_name, frm_RegPart.tblRada.colIsSvod )
 								! -- по селам
-								                                                                                                                                                 If nLevel >= 3 
-									                                                                                                                                                 Set nTmp = ROW_Selected
-									                                                                                                                                                 Set nRow = TBL_MinRow
-									                                                                                                                                                 While SalTblFindNextRow(frm_RegPart.tblSelo, nRow, nTmp, 0)
-										                                                                                                                                                 Call SalTblSetContext(frm_RegPart.tblSelo, nRow)
-										                                                                                                                                                 If nRow >= 0
-											                                                                                                                                                 Call FU_1(frm_RegPart.tblSelo.Kod1, frm_RegPart.tblSelo.colSab, frm_RegPart.tblSelo.Name1, frm_RegPart.tblSelo.colid_key, frm_RegPart.tblSelo.ktk_name,'1' )
+								                                                                                                                                                   If nLevel >= 3 
+									                                                                                                                                                   Set nTmp = ROW_Selected
+									                                                                                                                                                   Set nRow = TBL_MinRow
+									                                                                                                                                                   While SalTblFindNextRow(frm_RegPart.tblSelo, nRow, nTmp, 0)
+										                                                                                                                                                   Call SalTblSetContext(frm_RegPart.tblSelo, nRow)
+										                                                                                                                                                   If nRow >= 0
+											                                                                                                                                                   Call FU_1(frm_RegPart.tblSelo.Kod1, frm_RegPart.tblSelo.colSab, frm_RegPart.tblSelo.Name1, frm_RegPart.tblSelo.colid_key, frm_RegPart.tblSelo.ktk_name,'1' )
 								!
 								! ----
-								                                                                                                                                                 If nType = 3 or nType=5
-									                                                                                                                                                 If nLevel >= 1
-										                                                                                                                                                 Call SalTblSetFlagsAnyRows(tbl1, ROW_Selected, FALSE, 0, 0)
-									                                                                                                                                                 If nLevel >= 2
-										                                                                                                                                                 Call SalTblSetFlagsAnyRows(frm_RegPart.tblRada, ROW_Selected, FALSE, 0, 0)
-									                                                                                                                                                 If nLevel >= 3
-										                                                                                                                                                 Call SalTblSetFlagsAnyRows(frm_RegPart.tblSelo, ROW_Selected, FALSE, 0, 0)
+								                                                                                                                                                   If nType = 3 or nType=5
+									                                                                                                                                                   If nLevel >= 1
+										                                                                                                                                                   Call SalTblSetFlagsAnyRows(tbl1, ROW_Selected, FALSE, 0, 0)
+									                                                                                                                                                   If nLevel >= 2
+										                                                                                                                                                   Call SalTblSetFlagsAnyRows(frm_RegPart.tblRada, ROW_Selected, FALSE, 0, 0)
+									                                                                                                                                                   If nLevel >= 3
+										                                                                                                                                                   Call SalTblSetFlagsAnyRows(frm_RegPart.tblSelo, ROW_Selected, FALSE, 0, 0)
 								!
 								!
 							! ------ Если это dbf - переименовать(для того что б не делать для каждого файла connect) -----
-							                                                                                                                                                 If nRepFileType=2
-								                                                                                                                                                 Call SqlDisconnect(hSqlA)
+							                                                                                                                                                   If nRepFileType=2
+								                                                                                                                                                   Call SqlDisconnect(hSqlA)
 								! Call Debug('Всего файлов для переименовывания = '||Str(nCouDBFFilesToRename))
-								                                                                                                                                                 Set nRet=0
-								                                                                                                                                                 While nRet < nCouDBFFilesToRename
+								                                                                                                                                                   Set nRet=0
+								                                                                                                                                                   While nRet < nCouDBFFilesToRename
 									! Call Debug('Rename '||strPrintPath||'\\'||strDBFFilesToRename[nRet]||'.DBF'||'  TO -->>'||             
 											            strPrintPath||'\\'||SalStrLeftX(strDBFFilesToRename[nRet],SalStrLength(strDBFFilesToRename[nRet])-3)||'.'||SalStrRightX(strDBFFilesToRename[nRet],3))
-									                                                                                                                                                 If VisFileRename(strPrintPath||'\\'||strDBFFilesToRename[nRet]||'.DBF', 
+									                                                                                                                                                   If VisFileRename(strPrintPath||'\\'||strDBFFilesToRename[nRet]||'.DBF', 
 											                 strPrintPath||'\\'||SalStrLeftX(strDBFFilesToRename[nRet],SalStrLength(strDBFFilesToRename[nRet])-3)||'.'||SalStrRightX(strDBFFilesToRename[nRet],3)) < 0
-										                                                                                                                                                 Call SalMessageBox(' Невозможно преименовать ', 'Внимание!',0)
-										                                                                                                                                                 Call SalWaitCursor (FALSE )
-										                                                                                                                                                 Return -1
-									                                                                                                                                                 Set nRet=nRet+1
+										                                                                                                                                                   Call SalMessageBox(' Невозможно преименовать ', 'Внимание!',0)
+										                                                                                                                                                   Call SalWaitCursor (FALSE )
+										                                                                                                                                                   Return -1
+									                                                                                                                                                   Set nRet=nRet+1
 							!
 							! сначала делаеться DBF, а потом TXT 
-							                                                                                                                                                 If nRepFileType=0 OR  nRepFileType=1 OR  nRepFileType=2 
-								                                                                                                                                                 Break 
-							                                                                                                                                                 Set i=i-3
+							                                                                                                                                                   If nRepFileType=0 OR  nRepFileType=1 OR  nRepFileType=2 
+								                                                                                                                                                   Break 
+							                                                                                                                                                   Set i=i-3
 							!
 						If nRepFileType<3
 							Call Make_ReportFiles(nRepFileType, nType)
@@ -5981,10 +5981,10 @@ Application Description: •--------------------------------------•
 				! Set KL.Delta = KL.nS3
 				Call SalWaitCursor(FALSE)
 			! On SAM_FetchRowDone
-				                                                                                                                                                          Set KL.nS1 = KL.nS1 + KL.k3510
-				                                                                                                                                                          Set KL.nS2 = KL.nS2 + KL.d3510
-				                                                                                                                                                          Set KL.Delta = KL.k3510 - KL.d3510
-				                                                                                                                                                          Set KL.nS3=KL.nS3 + KL.Delta
+				                                                                                                                                                            Set KL.nS1 = KL.nS1 + KL.k3510
+				                                                                                                                                                            Set KL.nS2 = KL.nS2 + KL.d3510
+				                                                                                                                                                            Set KL.Delta = KL.k3510 - KL.d3510
+				                                                                                                                                                            Set KL.nS3=KL.nS3 + KL.Delta
 	Dialog Box: FormVW
 		Class:
 		Property Template:
@@ -7216,31 +7216,31 @@ Application Description: •--------------------------------------•
 					Call SalArrayGetUpperBound(smArr, 1, nBound)
 					Return nBound
 			! Function: StrWinToDosX1
-				                                                                                                                 Description: 
-				                                                                                                                 Returns 
-					                                                                                                                 String: 
-				                                                                                                                 Parameters 
-					                                                                                                                 String: sIn
-				                                                                                                                 Static Variables 
-				                                                                                                                 Local variables 
-					                                                                                                                 String: sWin
-					                                                                                                                 String: sDos
-					                                                                                                                 String: sOut
-					                                                                                                                 Number: nI
-					                                                                                                                 Number: nJ
-				                                                                                                                 Actions 
-					                                                                                                                 Set sWin = 'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЬЪЫЭЮЯІЇЄабвгдеёжзийклмнопрстуфхцчшщьъыэюяіїє№Ґґ'
-					                                                                                                                 Set sDos = 'ЂЃ‚ѓ„…р†‡€‰Љ‹ЊЌЋЏђ‘’“”•–—™њљ›ќћџIфт ЎўЈ¤Ґс¦§Ё©Є«¬­®Їабвгдежзиймклнопiхуьту'
-					                                                                                                                 Set nI = 1
-					                                                                                                                 Set sOut = ''
-					                                                                                                                 While nI <= Len(sIn)
-						                                                                                                                 Set nJ = At(Subs(sIn, nI, 1), sWin)
-						                                                                                                                 If nJ > 0
-							                                                                                                                 Set sOut = sOut || Subs(sDos, nJ, 1)
-						                                                                                                                 Else 
-							                                                                                                                 Set sOut = sOut || Subs(sIn, nI, 1)
-						                                                                                                                 Set nI = nI + 1
-					                                                                                                                 Return sOut
+				                                                                                                                   Description: 
+				                                                                                                                   Returns 
+					                                                                                                                   String: 
+				                                                                                                                   Parameters 
+					                                                                                                                   String: sIn
+				                                                                                                                   Static Variables 
+				                                                                                                                   Local variables 
+					                                                                                                                   String: sWin
+					                                                                                                                   String: sDos
+					                                                                                                                   String: sOut
+					                                                                                                                   Number: nI
+					                                                                                                                   Number: nJ
+				                                                                                                                   Actions 
+					                                                                                                                   Set sWin = 'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЬЪЫЭЮЯІЇЄабвгдеёжзийклмнопрстуфхцчшщьъыэюяіїє№Ґґ'
+					                                                                                                                   Set sDos = 'ЂЃ‚ѓ„…р†‡€‰Љ‹ЊЌЋЏђ‘’“”•–—™њљ›ќћџIфт ЎўЈ¤Ґс¦§Ё©Є«¬­®Їабвгдежзиймклнопiхуьту'
+					                                                                                                                   Set nI = 1
+					                                                                                                                   Set sOut = ''
+					                                                                                                                   While nI <= Len(sIn)
+						                                                                                                                   Set nJ = At(Subs(sIn, nI, 1), sWin)
+						                                                                                                                   If nJ > 0
+							                                                                                                                   Set sOut = sOut || Subs(sDos, nJ, 1)
+						                                                                                                                   Else 
+							                                                                                                                   Set sOut = sOut || Subs(sIn, nI, 1)
+						                                                                                                                   Set nI = nI + 1
+					                                                                                                                   Return sOut
 			Function: StrWinToDosX2
 				Description:
 				Returns
@@ -8881,44 +8881,44 @@ Application Description: •--------------------------------------•
 										    GROUP BY GR,S230,KEKD
 										    ORDER BY GR,S230,KEKD"))
 								! If bFL
-									                                                                                                                                                       Set bMakeFile = FALSE
-									                                                                                                                                                       Set nNewTek = -2
-									                                                                                                                                                       Set nNew = -1
-									                                                                                                                                                       Set bFL = FALSE
-									                                                                                                                                                       Set bEct = FALSE
-									                                                                                                                                                       While SqlFetchNext(hSql(), nFetchRes)
-										                                                                                                                                                       Set bEct = TRUE
+									                                                                                                                                                         Set bMakeFile = FALSE
+									                                                                                                                                                         Set nNewTek = -2
+									                                                                                                                                                         Set nNew = -1
+									                                                                                                                                                         Set bFL = FALSE
+									                                                                                                                                                         Set bEct = FALSE
+									                                                                                                                                                         While SqlFetchNext(hSql(), nFetchRes)
+										                                                                                                                                                         Set bEct = TRUE
 										! смена файла
-										                                                                                                                                                       If nNewTek != nNew
-											                                                                                                                                                       If bMakeFile
-												                                                                                                                                                       Call SqlCommit(hSqlA)
+										                                                                                                                                                         If nNewTek != nNew
+											                                                                                                                                                         If bMakeFile
+												                                                                                                                                                         Call SqlCommit(hSqlA)
 												! переименовать файл
-												                                                                                                                                                       Call SqlDisconnect(hSqlA)
-												                                                                                                                                                       Set bMakeFile = FALSE
-												                                                                                                                                                       Call VisFileCopy(sFile, Left(sFile, Len(sFile)-3) || '000')
-												                                                                                                                                                       Call VisFileDelete(sFile)
-											                                                                                                                                                       Set sFile1 = 'FT020' || MD(dYes) || '0.dbf'
-											                                                                                                                                                       Set sFile = sDbfPath || sFile1
-											                                                                                                                                                       Set nNewTek = nNew
+												                                                                                                                                                         Call SqlDisconnect(hSqlA)
+												                                                                                                                                                         Set bMakeFile = FALSE
+												                                                                                                                                                         Call VisFileCopy(sFile, Left(sFile, Len(sFile)-3) || '000')
+												                                                                                                                                                         Call VisFileDelete(sFile)
+											                                                                                                                                                         Set sFile1 = 'FT020' || MD(dYes) || '0.dbf'
+											                                                                                                                                                         Set sFile = sDbfPath || sFile1
+											                                                                                                                                                         Set nNewTek = nNew
 											! удалить файл
-											                                                                                                                                                       Set bNoFile = TRUE
-											                                                                                                                                                       If File(sFile)
-												                                                                                                                                                       Set nI = 0
-												                                                                                                                                                       While not SalFileOpen(hF, sFile, OF_Delete)
-													                                                                                                                                                       Set nI = nI + 1
-													                                                                                                                                                       If nI > 96
-														                                                                                                                                                       Call SalWaitCursor(FALSE)
-														                                                                                                                                                       Call MessageNoWait('Невозможно сформировать файл ' || sFile ||
+											                                                                                                                                                         Set bNoFile = TRUE
+											                                                                                                                                                         If File(sFile)
+												                                                                                                                                                         Set nI = 0
+												                                                                                                                                                         While not SalFileOpen(hF, sFile, OF_Delete)
+													                                                                                                                                                         Set nI = nI + 1
+													                                                                                                                                                         If nI > 96
+														                                                                                                                                                         Call SalWaitCursor(FALSE)
+														                                                                                                                                                         Call MessageNoWait('Невозможно сформировать файл ' || sFile ||
 																     ', возможно он занят другим приложением.', 'ВНИМАНИЕ !!!', 0, 1)
-														                                                                                                                                                       Set mlText = ''
-														                                                                                                                                                       Set bNoFile = FALSE
-														                                                                                                                                                       Break
+														                                                                                                                                                         Set mlText = ''
+														                                                                                                                                                         Set bNoFile = FALSE
+														                                                                                                                                                         Break
 											! создать новый файл
-											                                                                                                                                                       If not bNoFile ! остался файл
-												                                                                                                                                                       Break
-											                                                                                                                                                       Set SqlDatabase = 'dBase_Files'
-											                                                                                                                                                       If SqlConnect(hSqlA)
-												                                                                                                                                                       Call SqlPrepareAndExecute(hSqlA, "
+											                                                                                                                                                         If not bNoFile ! остался файл
+												                                                                                                                                                         Break
+											                                                                                                                                                         Set SqlDatabase = 'dBase_Files'
+											                                                                                                                                                         If SqlConnect(hSqlA)
+												                                                                                                                                                         Call SqlPrepareAndExecute(hSqlA, "
 														     CREATE
 														     TABLE " || sFile1 || " (DT   DATE,
 														                             KO   CHAR(3),
@@ -8927,32 +8927,32 @@ Application Description: •--------------------------------------•
 														                             KOD  CHAR(8),
 														                             T060 NUMBER(16),
 														                             T020 NUMBER(16))")
-												                                                                                                                                                       Set bMakeFile = TRUE
-										                                                                                                                                                       Set sKO = Subs(GetGlobalOption('KOBL_412') || '   ', 1, 3)
-										                                                                                                                                                       Set sKOD = Right('00000000' || sKOD, 8)
-										                                                                                                                                                       Set bFL = SqlPrepareAndExecute(hSqlA, "
+												                                                                                                                                                         Set bMakeFile = TRUE
+										                                                                                                                                                         Set sKO = Subs(GetGlobalOption('KOBL_412') || '   ', 1, 3)
+										                                                                                                                                                         Set sKOD = Right('00000000' || sKOD, 8)
+										                                                                                                                                                         Set bFL = SqlPrepareAndExecute(hSqlA, "
 												    INSERT
 												    INTO " || sFile1 || "
 												    VALUES (:dYes,:sKO,:sGR,:sS230,:sKOD,:nT060,:nT020)")
-										                                                                                                                                                       If not bFL
-											                                                                                                                                                       Break
-									                                                                                                                                                       If bEct
-										                                                                                                                                                       Call SqlCommit(hSqlA)
+										                                                                                                                                                         If not bFL
+											                                                                                                                                                         Break
+									                                                                                                                                                         If bEct
+										                                                                                                                                                         Call SqlCommit(hSqlA)
 										! переименовать последний файл
-										                                                                                                                                                       Call SqlDisconnect(hSqlA)
-										                                                                                                                                                       Set bMakeFile = FALSE
-										                                                                                                                                                       Call VisFileCopy(sFile, Left(sFile, Len(sFile)-3) || '000')
-										                                                                                                                                                       Call VisFileDelete(sFile)
-									                                                                                                                                                       If bFL
-										                                                                                                                                                       Set mlText = 'Файл ' || Left(sFile, Len(sFile)-3) || '000 за ' || Str(
+										                                                                                                                                                         Call SqlDisconnect(hSqlA)
+										                                                                                                                                                         Set bMakeFile = FALSE
+										                                                                                                                                                         Call VisFileCopy(sFile, Left(sFile, Len(sFile)-3) || '000')
+										                                                                                                                                                         Call VisFileDelete(sFile)
+									                                                                                                                                                         If bFL
+										                                                                                                                                                         Set mlText = 'Файл ' || Left(sFile, Len(sFile)-3) || '000 за ' || Str(
 												    SalDateDay(dYes)) || ' ' || GetMonthNameRus(SalDateMonth(dYes), TRUE) ||
 												    ' ' || Str(SalDateYear(dYes)) || ' г. создан.'
-									                                                                                                                                                       Else
-										                                                                                                                                                       Set mlText = 'Ошибка 2 (нет информации) отбора 412 формы за ' || Str(
+									                                                                                                                                                         Else
+										                                                                                                                                                         Set mlText = 'Ошибка 2 (нет информации) отбора 412 формы за ' || Str(
 												    SalDateDay(dYes)) || ' ' || GetMonthNameRus(SalDateMonth(dYes), TRUE) ||
 												    ' ' || Str(SalDateYear(dYes)) || ' г.'
 								! Else
-									                                                                                                                                                       Set mlText = 'Ошибка 1 (невозможно выполнить запрос ) отбора 412 формы за ' ||
+									                                                                                                                                                         Set mlText = 'Ошибка 1 (невозможно выполнить запрос ) отбора 412 формы за ' ||
 											    Str(SalDateDay(dYes)) || ' ' || GetMonthNameRus(SalDateMonth(dYes), TRUE) ||
 											    ' ' || Str(SalDateYear(dYes)) || ' г.'
 							If cbRaj
@@ -8976,46 +8976,46 @@ Application Description: •--------------------------------------•
 										    GROUP BY t.KOD_DPI,substr(p.ktk,-6,2),p.GR,p.S230,p.KEKD,k.id_key
 										    ORDER BY 1,2,3,4,5"))
 								! If bFL
-									                                                                                                                                                       Set bMakeFile = FALSE
-									                                                                                                                                                       Set nNewTek = -2
-									                                                                                                                                                       Set nNew = -1
-									                                                                                                                                                       Set bFL = FALSE
-									                                                                                                                                                       Set bEct = FALSE
-									                                                                                                                                                       While SqlFetchNext(hSql(), nFetchRes)
-										                                                                                                                                                       Set bEct = TRUE
-										                                                                                                                                                       Set nNew = Val(sTer)
+									                                                                                                                                                         Set bMakeFile = FALSE
+									                                                                                                                                                         Set nNewTek = -2
+									                                                                                                                                                         Set nNew = -1
+									                                                                                                                                                         Set bFL = FALSE
+									                                                                                                                                                         Set bEct = FALSE
+									                                                                                                                                                         While SqlFetchNext(hSql(), nFetchRes)
+										                                                                                                                                                         Set bEct = TRUE
+										                                                                                                                                                         Set nNew = Val(sTer)
 										! смена файла
-										                                                                                                                                                       If nNewTek != nNew
-											                                                                                                                                                       If bMakeFile
-												                                                                                                                                                       Call SqlCommit(hSqlA)
+										                                                                                                                                                         If nNewTek != nNew
+											                                                                                                                                                         If bMakeFile
+												                                                                                                                                                         Call SqlCommit(hSqlA)
 												! переименовать файл
-												                                                                                                                                                       Call SqlDisconnect(hSqlA)
-												                                                                                                                                                       Set bMakeFile = FALSE
-												                                                                                                                                                       Call VisFileCopy(sFile, Left(sFile, Len(sFile)-10) || '000' || MD(dYes) ||
+												                                                                                                                                                         Call SqlDisconnect(hSqlA)
+												                                                                                                                                                         Set bMakeFile = FALSE
+												                                                                                                                                                         Call VisFileCopy(sFile, Left(sFile, Len(sFile)-10) || '000' || MD(dYes) ||
 														     '0.' || Left(Right(sFile, 10), 3))
-												                                                                                                                                                       Call VisFileDelete(sFile)
-											                                                                                                                                                       Set sFile1 = 'FT' || sId_Key || MD(dYes) || '0.dbf'
-											                                                                                                                                                       Set sFile = sDbfPath || sFile1
-											                                                                                                                                                       Set nNewTek = nNew
+												                                                                                                                                                         Call VisFileDelete(sFile)
+											                                                                                                                                                         Set sFile1 = 'FT' || sId_Key || MD(dYes) || '0.dbf'
+											                                                                                                                                                         Set sFile = sDbfPath || sFile1
+											                                                                                                                                                         Set nNewTek = nNew
 											! удалить файл
-											                                                                                                                                                       Set bNoFile = TRUE
-											                                                                                                                                                       If File(sFile)
-												                                                                                                                                                       Set nI = 0
-												                                                                                                                                                       While not SalFileOpen(hF, sFile, OF_Delete)
-													                                                                                                                                                       Set nI = nI + 1
-													                                                                                                                                                       If nI > 96
-														                                                                                                                                                       Call SalWaitCursor(FALSE)
-														                                                                                                                                                       Call MessageNoWait('Невозможно сформировать файл ' || sFile ||
+											                                                                                                                                                         Set bNoFile = TRUE
+											                                                                                                                                                         If File(sFile)
+												                                                                                                                                                         Set nI = 0
+												                                                                                                                                                         While not SalFileOpen(hF, sFile, OF_Delete)
+													                                                                                                                                                         Set nI = nI + 1
+													                                                                                                                                                         If nI > 96
+														                                                                                                                                                         Call SalWaitCursor(FALSE)
+														                                                                                                                                                         Call MessageNoWait('Невозможно сформировать файл ' || sFile ||
 																     ', возможно он занят другим приложением.', 'ВНИМАНИЕ !!!', 0, 1)
-														                                                                                                                                                       Set mlText = ''
-														                                                                                                                                                       Set bNoFile = FALSE
-														                                                                                                                                                       Break
+														                                                                                                                                                         Set mlText = ''
+														                                                                                                                                                         Set bNoFile = FALSE
+														                                                                                                                                                         Break
 											! создать новый файл
-											                                                                                                                                                       If not bNoFile ! остался файл
-												                                                                                                                                                       Break
-											                                                                                                                                                       Set SqlDatabase = 'dBase_Files'
-											                                                                                                                                                       If SqlConnect(hSqlA)
-												                                                                                                                                                       Call SqlPrepareAndExecute(hSqlA, "
+											                                                                                                                                                         If not bNoFile ! остался файл
+												                                                                                                                                                         Break
+											                                                                                                                                                         Set SqlDatabase = 'dBase_Files'
+											                                                                                                                                                         If SqlConnect(hSqlA)
+												                                                                                                                                                         Call SqlPrepareAndExecute(hSqlA, "
 														     CREATE
 														     TABLE " || sFile1 || " (DT   DATE,
 														                             KO   CHAR(3),
@@ -9024,35 +9024,35 @@ Application Description: •--------------------------------------•
 														                             KOD  CHAR(8),
 														                             T060 NUMBER(16),
 														                             T020 NUMBER(16))")
-												                                                                                                                                                       Set bMakeFile = TRUE
-										                                                                                                                                                       Set bEct=TRUE
-										                                                                                                                                                       Set nNew = Val(sTer)
-										                                                                                                                                                       Set sKOD = Right('00000000' || sKOD, 8)
-										                                                                                                                                                       Set bFL = SqlPrepareAndExecute(hSqlA, "
+												                                                                                                                                                         Set bMakeFile = TRUE
+										                                                                                                                                                         Set bEct=TRUE
+										                                                                                                                                                         Set nNew = Val(sTer)
+										                                                                                                                                                         Set sKOD = Right('00000000' || sKOD, 8)
+										                                                                                                                                                         Set bFL = SqlPrepareAndExecute(hSqlA, "
 												    INSERT
 												    INTO " || sFile1 || "
 												    VALUES (:dYes,:sId_Key,:sGR,:sS230,:sKOD,:nT060,:nT020)")
-										                                                                                                                                                       If not bFL
-											                                                                                                                                                       Break
-									                                                                                                                                                       If bEct
-										                                                                                                                                                       Call SqlCommit(hSqlA)
+										                                                                                                                                                         If not bFL
+											                                                                                                                                                         Break
+									                                                                                                                                                         If bEct
+										                                                                                                                                                         Call SqlCommit(hSqlA)
 										! переименовать последний файл
-										                                                                                                                                                       Call SqlDisconnect(hSqlA)
-										                                                                                                                                                       Set bMakeFile = FALSE
-										                                                                                                                                                       Call VisFileCopy(sFile, Left(sFile, Len(sFile)-10) || '000' || MD(dYes) ||
+										                                                                                                                                                         Call SqlDisconnect(hSqlA)
+										                                                                                                                                                         Set bMakeFile = FALSE
+										                                                                                                                                                         Call VisFileCopy(sFile, Left(sFile, Len(sFile)-10) || '000' || MD(dYes) ||
 												     '0.' || Left(Right(sFile, 10), 3))
-										                                                                                                                                                       Call VisFileDelete(sFile)
-									                                                                                                                                                       If bFL
-										                                                                                                                                                       Set mlText = 'Файл ' || Left(sFile, Len(sFile)-10) || '000' || MD(dYes) ||
+										                                                                                                                                                         Call VisFileDelete(sFile)
+									                                                                                                                                                         If bFL
+										                                                                                                                                                         Set mlText = 'Файл ' || Left(sFile, Len(sFile)-10) || '000' || MD(dYes) ||
 												     '0.' || Left(Right(sFile, 10), 3) || ' за ' || Str(SalDateDay(dYes)) ||
 												     ' ' || GetMonthNameRus(SalDateMonth(dYes), TRUE) || ' ' || Str(
 												     SalDateYear(dYes)) || ' г. создан.'
-									                                                                                                                                                       Else
-										                                                                                                                                                       Set mlText = 'Ошибка 2 (нет информации) отбора 412 формы за ' || Str(
+									                                                                                                                                                         Else
+										                                                                                                                                                         Set mlText = 'Ошибка 2 (нет информации) отбора 412 формы за ' || Str(
 												    SalDateDay(dYes)) || ' ' || GetMonthNameRus(SalDateMonth(dYes), TRUE) ||
 												    ' ' || Str(SalDateYear(dYes)) || ' г.'
 								! Else
-									                                                                                                                                                       Set mlText = 'Ошибка 1 (невозможно выполнить запрос) отбора 412 формы за ' ||
+									                                                                                                                                                         Set mlText = 'Ошибка 1 (невозможно выполнить запрос) отбора 412 формы за ' ||
 											    Str(SalDateDay(dYes)) || ' ' || GetMonthNameRus(SalDateMonth(dYes), TRUE) ||
 											    ' ' || Str(SalDateYear(dYes)) || ' г.'
 								! територіальний
@@ -9077,46 +9077,46 @@ Application Description: •--------------------------------------•
 										    GROUP BY t.KOD_DPI,substr(p.ktk,-6,2),p.GR,p.S230,p.KEKD,k.id_key
 										    ORDER BY 1,2,3,4,5"))
 								! If bFL
-									                                                                                                                                                       Set bMakeFile = FALSE
-									                                                                                                                                                       Set nNewTek = -2
-									                                                                                                                                                       Set nNew = -1
-									                                                                                                                                                       Set bFL = FALSE
-									                                                                                                                                                       Set bEct = FALSE
-									                                                                                                                                                       While SqlFetchNext(hSql(), nFetchRes)
-										                                                                                                                                                       Set bEct = TRUE
-										                                                                                                                                                       Set nNew = Val(sTer)
+									                                                                                                                                                         Set bMakeFile = FALSE
+									                                                                                                                                                         Set nNewTek = -2
+									                                                                                                                                                         Set nNew = -1
+									                                                                                                                                                         Set bFL = FALSE
+									                                                                                                                                                         Set bEct = FALSE
+									                                                                                                                                                         While SqlFetchNext(hSql(), nFetchRes)
+										                                                                                                                                                         Set bEct = TRUE
+										                                                                                                                                                         Set nNew = Val(sTer)
 										! смена файла
-										                                                                                                                                                       If nNewTek != nNew
-											                                                                                                                                                       If bMakeFile
-												                                                                                                                                                       Call SqlCommit(hSqlA)
+										                                                                                                                                                         If nNewTek != nNew
+											                                                                                                                                                         If bMakeFile
+												                                                                                                                                                         Call SqlCommit(hSqlA)
 												! переименовать файл
-												                                                                                                                                                       Call SqlDisconnect(hSqlA)
-												                                                                                                                                                       Set bMakeFile = FALSE
-												                                                                                                                                                       Call VisFileCopy(sFile, Left(sFile, Len(sFile)-10) || '010' || MD(dYes) ||
+												                                                                                                                                                         Call SqlDisconnect(hSqlA)
+												                                                                                                                                                         Set bMakeFile = FALSE
+												                                                                                                                                                         Call VisFileCopy(sFile, Left(sFile, Len(sFile)-10) || '010' || MD(dYes) ||
 														     '0.' || Left(Right(sFile, 10), 3))
-												                                                                                                                                                       Call VisFileDelete(sFile)
-											                                                                                                                                                       Set sFile1 = 'FT' || sId_Key || MD(dYes) || '0.dbf'
-											                                                                                                                                                       Set sFile = sDbfPath || sFile1
-											                                                                                                                                                       Set nNewTek = nNew
+												                                                                                                                                                         Call VisFileDelete(sFile)
+											                                                                                                                                                         Set sFile1 = 'FT' || sId_Key || MD(dYes) || '0.dbf'
+											                                                                                                                                                         Set sFile = sDbfPath || sFile1
+											                                                                                                                                                         Set nNewTek = nNew
 											! удалить файл
-											                                                                                                                                                       Set bNoFile = TRUE
-											                                                                                                                                                       If File(sFile)
-												                                                                                                                                                       Set nI = 0
-												                                                                                                                                                       While not SalFileOpen(hF, sFile, OF_Delete)
-													                                                                                                                                                       Set nI = nI + 1
-													                                                                                                                                                       If nI > 96
-														                                                                                                                                                       Call SalWaitCursor(FALSE)
-														                                                                                                                                                       Call MessageNoWait('Невозможно сформировать файл ' || sFile ||
+											                                                                                                                                                         Set bNoFile = TRUE
+											                                                                                                                                                         If File(sFile)
+												                                                                                                                                                         Set nI = 0
+												                                                                                                                                                         While not SalFileOpen(hF, sFile, OF_Delete)
+													                                                                                                                                                         Set nI = nI + 1
+													                                                                                                                                                         If nI > 96
+														                                                                                                                                                         Call SalWaitCursor(FALSE)
+														                                                                                                                                                         Call MessageNoWait('Невозможно сформировать файл ' || sFile ||
 																     ', возможно он занят другим приложением.', 'ВНИМАНИЕ !!!', 0, 1)
-														                                                                                                                                                       Set mlText = ''
-														                                                                                                                                                       Set bNoFile = FALSE
-														                                                                                                                                                       Break
+														                                                                                                                                                         Set mlText = ''
+														                                                                                                                                                         Set bNoFile = FALSE
+														                                                                                                                                                         Break
 											! создать новый файл
-											                                                                                                                                                       If not bNoFile ! остался файл
-												                                                                                                                                                       Break
-											                                                                                                                                                       Set SqlDatabase = 'dBase_Files'
-											                                                                                                                                                       If SqlConnect(hSqlA)
-												                                                                                                                                                       Call SqlPrepareAndExecute(hSqlA, "
+											                                                                                                                                                         If not bNoFile ! остался файл
+												                                                                                                                                                         Break
+											                                                                                                                                                         Set SqlDatabase = 'dBase_Files'
+											                                                                                                                                                         If SqlConnect(hSqlA)
+												                                                                                                                                                         Call SqlPrepareAndExecute(hSqlA, "
 														     CREATE
 														     TABLE " || sFile1 || " (DT   DATE,
 														                             KO   CHAR(3),
@@ -9125,35 +9125,35 @@ Application Description: •--------------------------------------•
 														                             KOD  CHAR(8),
 														                             T060 NUMBER(16),
 														                             T020 NUMBER(16))")
-												                                                                                                                                                       Set bMakeFile = TRUE
-										                                                                                                                                                       Set bEct=TRUE
-										                                                                                                                                                       Set nNew = Val(sTer)
-										                                                                                                                                                       Set sKOD = Right('00000000' || sKOD, 8)
-										                                                                                                                                                       Set bFL = SqlPrepareAndExecute(hSqlA, "
+												                                                                                                                                                         Set bMakeFile = TRUE
+										                                                                                                                                                         Set bEct=TRUE
+										                                                                                                                                                         Set nNew = Val(sTer)
+										                                                                                                                                                         Set sKOD = Right('00000000' || sKOD, 8)
+										                                                                                                                                                         Set bFL = SqlPrepareAndExecute(hSqlA, "
 												    INSERT
 												    INTO " || sFile1 || "
 												    VALUES (:dYes,:sId_Key,:sGR,:sS230,:sKOD,:nT060,:nT020)")
-										                                                                                                                                                       If not bFL
-											                                                                                                                                                       Break
-									                                                                                                                                                       If bEct
-										                                                                                                                                                       Call SqlCommit(hSqlA)
+										                                                                                                                                                         If not bFL
+											                                                                                                                                                         Break
+									                                                                                                                                                         If bEct
+										                                                                                                                                                         Call SqlCommit(hSqlA)
 										! переименовать последний файл
-										                                                                                                                                                       Call SqlDisconnect(hSqlA)
-										                                                                                                                                                       Set bMakeFile = FALSE
-										                                                                                                                                                       Call VisFileCopy(sFile, Left(sFile, Len(sFile)-10) || '010' || MD(dYes) ||
+										                                                                                                                                                         Call SqlDisconnect(hSqlA)
+										                                                                                                                                                         Set bMakeFile = FALSE
+										                                                                                                                                                         Call VisFileCopy(sFile, Left(sFile, Len(sFile)-10) || '010' || MD(dYes) ||
 												     '0.' || Left(Right(sFile, 10), 3))
-										                                                                                                                                                       Call VisFileDelete(sFile)
-									                                                                                                                                                       If bFL
-										                                                                                                                                                       Set mlText = 'Файл ' || Left(sFile, Len(sFile)-10) || '010' || MD(dYes) ||
+										                                                                                                                                                         Call VisFileDelete(sFile)
+									                                                                                                                                                         If bFL
+										                                                                                                                                                         Set mlText = 'Файл ' || Left(sFile, Len(sFile)-10) || '010' || MD(dYes) ||
 												     '0.' || Left(Right(sFile, 10), 3) || ' за ' || Str(SalDateDay(dYes)) ||
 												     ' ' || GetMonthNameRus(SalDateMonth(dYes), TRUE) || ' ' || Str(
 												     SalDateYear(dYes)) || ' г. создан.'
-									                                                                                                                                                       Else
-										                                                                                                                                                       Set mlText = 'Ошибка 2 (нет информации) отбора 412 формы за ' || Str(
+									                                                                                                                                                         Else
+										                                                                                                                                                         Set mlText = 'Ошибка 2 (нет информации) отбора 412 формы за ' || Str(
 												    SalDateDay(dYes)) || ' ' || GetMonthNameRus(SalDateMonth(dYes), TRUE) ||
 												    ' ' || Str(SalDateYear(dYes)) || ' г.'
 								! Else
-									                                                                                                                                                       Set mlText = 'Ошибка 1 (невозможно выполнить запрос) отбора 412 формы за ' ||
+									                                                                                                                                                         Set mlText = 'Ошибка 1 (невозможно выполнить запрос) отбора 412 формы за ' ||
 											    Str(SalDateDay(dYes)) || ' ' || GetMonthNameRus(SalDateMonth(dYes), TRUE) ||
 											    ' ' || Str(SalDateYear(dYes)) || ' г.'
 							If cbSeS
@@ -9180,47 +9180,47 @@ Application Description: •--------------------------------------•
 										    GROUP BY (t.ktk-mod(t.ktk,100))/100,p.GR,p.S230,p.KEKD,k.id_key,p.ktk
 										    ORDER BY (t.ktk-mod(t.ktk,100))/100,p.GR,p.S230,p.KEKD,k.id_key,p.ktk"))
 								! If bFL
-									                                                                                                                                                       Set bMakeFile = FALSE
-									                                                                                                                                                       Set nNewTek = -2
-									                                                                                                                                                       Set nNew = -1
-									                                                                                                                                                       Set bFL = FALSE
-									                                                                                                                                                       Set bEct = FALSE
-									                                                                                                                                                       While SqlFetchNext(hSql(), nFetchRes)
-										                                                                                                                                                       Set bEct = TRUE
-										                                                                                                                                                       Set nNew = nDPI
+									                                                                                                                                                         Set bMakeFile = FALSE
+									                                                                                                                                                         Set nNewTek = -2
+									                                                                                                                                                         Set nNew = -1
+									                                                                                                                                                         Set bFL = FALSE
+									                                                                                                                                                         Set bEct = FALSE
+									                                                                                                                                                         While SqlFetchNext(hSql(), nFetchRes)
+										                                                                                                                                                         Set bEct = TRUE
+										                                                                                                                                                         Set nNew = nDPI
 										! смена файла
-										                                                                                                                                                       If nNewTek != nNew
-											                                                                                                                                                       If bMakeFile
-												                                                                                                                                                       Call SqlCommit(hSqlA)
+										                                                                                                                                                         If nNewTek != nNew
+											                                                                                                                                                         If bMakeFile
+												                                                                                                                                                         Call SqlCommit(hSqlA)
 												! переименовать файл
-												                                                                                                                                                       Call SqlDisconnect(hSqlA)
-												                                                                                                                                                       Set bMakeFile = FALSE
-												                                                                                                                                                       If bYesSelo
-													                                                                                                                                                       Call VisFileCopy(sFile, Left(sFile, Len(sFile)-10) || '000' || MD(dYes)
+												                                                                                                                                                         Call SqlDisconnect(hSqlA)
+												                                                                                                                                                         Set bMakeFile = FALSE
+												                                                                                                                                                         If bYesSelo
+													                                                                                                                                                         Call VisFileCopy(sFile, Left(sFile, Len(sFile)-10) || '000' || MD(dYes)
 															     || '0.' || Left(Right(sFile, 10), 3))
-												                                                                                                                                                       Call VisFileDelete(sFile)
-											                                                                                                                                                       Set sFile1 = 'FT' || sId_Key || MD(dYes) || '0.dbf'
-											                                                                                                                                                       Set sFile = sDbfPath || sFile1
-											                                                                                                                                                       Set nNewTek = nNew
+												                                                                                                                                                         Call VisFileDelete(sFile)
+											                                                                                                                                                         Set sFile1 = 'FT' || sId_Key || MD(dYes) || '0.dbf'
+											                                                                                                                                                         Set sFile = sDbfPath || sFile1
+											                                                                                                                                                         Set nNewTek = nNew
 											! удалить файл
-											                                                                                                                                                       Set bNoFile = TRUE
-											                                                                                                                                                       If File(sFile)
-												                                                                                                                                                       Set nI = 0
-												                                                                                                                                                       While not SalFileOpen(hF, sFile, OF_Delete)
-													                                                                                                                                                       Set nI = nI + 1
-													                                                                                                                                                       If nI > 96
-														                                                                                                                                                       Call SalWaitCursor(FALSE)
-														                                                                                                                                                       Call MessageNoWait('Невозможно сформировать файл ' || sFile ||
+											                                                                                                                                                         Set bNoFile = TRUE
+											                                                                                                                                                         If File(sFile)
+												                                                                                                                                                         Set nI = 0
+												                                                                                                                                                         While not SalFileOpen(hF, sFile, OF_Delete)
+													                                                                                                                                                         Set nI = nI + 1
+													                                                                                                                                                         If nI > 96
+														                                                                                                                                                         Call SalWaitCursor(FALSE)
+														                                                                                                                                                         Call MessageNoWait('Невозможно сформировать файл ' || sFile ||
 																     ', возможно он занят другим приложением.', 'ВНИМАНИЕ !!!', 0, 1)
-														                                                                                                                                                       Set mlText = ''
-														                                                                                                                                                       Set bNoFile = FALSE
-														                                                                                                                                                       Break
+														                                                                                                                                                         Set mlText = ''
+														                                                                                                                                                         Set bNoFile = FALSE
+														                                                                                                                                                         Break
 											! создать новый файл
-											                                                                                                                                                       If not bNoFile ! остался файл
-												                                                                                                                                                       Break
-											                                                                                                                                                       Set SqlDatabase = 'dBase_Files'
-											                                                                                                                                                       If SqlConnect(hSqlA)
-												                                                                                                                                                       Call SqlPrepareAndExecute(hSqlA, "
+											                                                                                                                                                         If not bNoFile ! остался файл
+												                                                                                                                                                         Break
+											                                                                                                                                                         Set SqlDatabase = 'dBase_Files'
+											                                                                                                                                                         If SqlConnect(hSqlA)
+												                                                                                                                                                         Call SqlPrepareAndExecute(hSqlA, "
 														     CREATE
 														     TABLE " || sFile1 || " (DT   DATE,
 														                             KO   CHAR(3),
@@ -9229,37 +9229,37 @@ Application Description: •--------------------------------------•
 														                             KOD  CHAR(8),
 														                             T060 NUMBER(16),
 														                             T020 NUMBER(16))")
-												                                                                                                                                                       Set bMakeFile = TRUE
-												                                                                                                                                                       Set bYesSelo = FALSE
-										                                                                                                                                                       Set nNew = nDPI
-										                                                                                                                                                       Set sKOD = Right('00000000' || sKOD, 8)
-										                                                                                                                                                       Set bYesSelo = Mod(nKtk, 100)>0 or bYesSelo
-										                                                                                                                                                       Set bFL = SqlPrepareAndExecute(hSqlA, "
+												                                                                                                                                                         Set bMakeFile = TRUE
+												                                                                                                                                                         Set bYesSelo = FALSE
+										                                                                                                                                                         Set nNew = nDPI
+										                                                                                                                                                         Set sKOD = Right('00000000' || sKOD, 8)
+										                                                                                                                                                         Set bYesSelo = Mod(nKtk, 100)>0 or bYesSelo
+										                                                                                                                                                         Set bFL = SqlPrepareAndExecute(hSqlA, "
 												    INSERT
 												    INTO " || sFile1 || "
 												    VALUES (:dYes,:sId_Key,:sGR,:sS230,:sKOD,:nT060,:nT020)")
-										                                                                                                                                                       If not bFL
-											                                                                                                                                                       Break
-									                                                                                                                                                       If bEct
-										                                                                                                                                                       Call SqlCommit(hSqlA)
+										                                                                                                                                                         If not bFL
+											                                                                                                                                                         Break
+									                                                                                                                                                         If bEct
+										                                                                                                                                                         Call SqlCommit(hSqlA)
 										! переименовать последний файл
-										                                                                                                                                                       Call SqlDisconnect(hSqlA)
-										                                                                                                                                                       Set bMakeFile = FALSE
-										                                                                                                                                                       If bYesSelo
-											                                                                                                                                                       Call VisFileCopy(sFile, Left(sFile, Len(sFile)-10) || '000' || MD(dYes) ||
+										                                                                                                                                                         Call SqlDisconnect(hSqlA)
+										                                                                                                                                                         Set bMakeFile = FALSE
+										                                                                                                                                                         If bYesSelo
+											                                                                                                                                                         Call VisFileCopy(sFile, Left(sFile, Len(sFile)-10) || '000' || MD(dYes) ||
 													     '0.' || Left(Right(sFile, 10), 3))
-										                                                                                                                                                       Call VisFileDelete(sFile)
-									                                                                                                                                                       If bFL
-										                                                                                                                                                       Set mlText = 'Файл ' || Left(sFile, Len(sFile)-10) || '000' || MD(dYes) ||
+										                                                                                                                                                         Call VisFileDelete(sFile)
+									                                                                                                                                                         If bFL
+										                                                                                                                                                         Set mlText = 'Файл ' || Left(sFile, Len(sFile)-10) || '000' || MD(dYes) ||
 												    '0.' || Left(Right(sFile, 10), 3) || ' за ' || Str(SalDateDay(dYes)) ||
 												    ' ' || GetMonthNameRus(SalDateMonth(dYes), TRUE) || ' ' || Str(
 												    SalDateYear(dYes)) || ' г. создан.'
-									                                                                                                                                                       Else
-										                                                                                                                                                       Set mlText = 'Ошибка 2 (нет информации) отбора 412 формы за ' || Str(
+									                                                                                                                                                         Else
+										                                                                                                                                                         Set mlText = 'Ошибка 2 (нет информации) отбора 412 формы за ' || Str(
 												    SalDateDay(dYes)) || ' ' || GetMonthNameRus(SalDateMonth(dYes), TRUE) ||
 												    ' ' || Str(SalDateYear(dYes)) || ' г.'
 								! Else
-									                                                                                                                                                       Set mlText = 'Ошибка 1 (невозможно выполнить запрос) отбора 412 формы за ' ||
+									                                                                                                                                                         Set mlText = 'Ошибка 1 (невозможно выполнить запрос) отбора 412 формы за ' ||
 											    Str(SalDateDay(dYes)) || ' ' || GetMonthNameRus(SalDateMonth(dYes), TRUE) ||
 											    ' ' || Str(SalDateYear(dYes)) || ' г.'
 								! територіальний
@@ -9285,46 +9285,46 @@ Application Description: •--------------------------------------•
 										    GROUP BY (t.ktk-mod(t.ktk,100))/100,p.GR,p.S230,p.KEKD,k.id_key
 										    ORDER BY (t.ktk-mod(t.ktk,100))/100,p.GR,p.S230,p.KEKD,k.id_key"))
 								! If bFL
-									                                                                                                                                                       Set bMakeFile = FALSE
-									                                                                                                                                                       Set nNewTek = -2
-									                                                                                                                                                       Set nNew = -1
-									                                                                                                                                                       Set bFL = FALSE
-									                                                                                                                                                       Set bEct = FALSE
-									                                                                                                                                                       While SqlFetchNext(hSql(), nFetchRes)
-										                                                                                                                                                       Set bEct = TRUE
-										                                                                                                                                                       Set nNew = nDPI
+									                                                                                                                                                         Set bMakeFile = FALSE
+									                                                                                                                                                         Set nNewTek = -2
+									                                                                                                                                                         Set nNew = -1
+									                                                                                                                                                         Set bFL = FALSE
+									                                                                                                                                                         Set bEct = FALSE
+									                                                                                                                                                         While SqlFetchNext(hSql(), nFetchRes)
+										                                                                                                                                                         Set bEct = TRUE
+										                                                                                                                                                         Set nNew = nDPI
 										! смена файла
-										                                                                                                                                                       If nNewTek != nNew
-											                                                                                                                                                       If bMakeFile
-												                                                                                                                                                       Call SqlCommit(hSqlA)
+										                                                                                                                                                         If nNewTek != nNew
+											                                                                                                                                                         If bMakeFile
+												                                                                                                                                                         Call SqlCommit(hSqlA)
 												! переименовать файл
-												                                                                                                                                                       Call SqlDisconnect(hSqlA)
-												                                                                                                                                                       Set bMakeFile = FALSE
-												                                                                                                                                                       Call VisFileCopy(sFile, Left(sFile, Len(sFile)-10) || '010' || MD(dYes) ||
+												                                                                                                                                                         Call SqlDisconnect(hSqlA)
+												                                                                                                                                                         Set bMakeFile = FALSE
+												                                                                                                                                                         Call VisFileCopy(sFile, Left(sFile, Len(sFile)-10) || '010' || MD(dYes) ||
 														     '0.' || Left(Right(sFile, 10), 3))
-												                                                                                                                                                       Call VisFileDelete(sFile)
-											                                                                                                                                                       Set sFile1 = 'FT' || sId_Key || MD(dYes) || '0.dbf'
-											                                                                                                                                                       Set sFile = sDbfPath || sFile1
-											                                                                                                                                                       Set nNewTek = nNew
+												                                                                                                                                                         Call VisFileDelete(sFile)
+											                                                                                                                                                         Set sFile1 = 'FT' || sId_Key || MD(dYes) || '0.dbf'
+											                                                                                                                                                         Set sFile = sDbfPath || sFile1
+											                                                                                                                                                         Set nNewTek = nNew
 											! удалить файл
-											                                                                                                                                                       Set bNoFile = TRUE
-											                                                                                                                                                       If File(sFile)
-												                                                                                                                                                       Set nI = 0
-												                                                                                                                                                       While not SalFileOpen(hF, sFile, OF_Delete)
-													                                                                                                                                                       Set nI = nI + 1
-													                                                                                                                                                       If nI > 96
-														                                                                                                                                                       Call SalWaitCursor(FALSE)
-														                                                                                                                                                       Call MessageNoWait('Невозможно сформировать файл ' || sFile ||
+											                                                                                                                                                         Set bNoFile = TRUE
+											                                                                                                                                                         If File(sFile)
+												                                                                                                                                                         Set nI = 0
+												                                                                                                                                                         While not SalFileOpen(hF, sFile, OF_Delete)
+													                                                                                                                                                         Set nI = nI + 1
+													                                                                                                                                                         If nI > 96
+														                                                                                                                                                         Call SalWaitCursor(FALSE)
+														                                                                                                                                                         Call MessageNoWait('Невозможно сформировать файл ' || sFile ||
 																     ', возможно он занят другим приложением.', 'ВНИМАНИЕ !!!', 0, 1)
-														                                                                                                                                                       Set mlText = ''
-														                                                                                                                                                       Set bNoFile = FALSE
-														                                                                                                                                                       Break
+														                                                                                                                                                         Set mlText = ''
+														                                                                                                                                                         Set bNoFile = FALSE
+														                                                                                                                                                         Break
 											! создать новый файл
-											                                                                                                                                                       If not bNoFile ! остался файл
-												                                                                                                                                                       Break
-											                                                                                                                                                       Set SqlDatabase = 'dBase_Files'
-											                                                                                                                                                       If SqlConnect(hSqlA)
-												                                                                                                                                                       Call SqlPrepareAndExecute(hSqlA, "
+											                                                                                                                                                         If not bNoFile ! остался файл
+												                                                                                                                                                         Break
+											                                                                                                                                                         Set SqlDatabase = 'dBase_Files'
+											                                                                                                                                                         If SqlConnect(hSqlA)
+												                                                                                                                                                         Call SqlPrepareAndExecute(hSqlA, "
 														     CREATE
 														     TABLE " || sFile1 || " (DT   DATE,
 														                             KO   CHAR(3),
@@ -9333,34 +9333,34 @@ Application Description: •--------------------------------------•
 														                             KOD  CHAR(8),
 														                             T060 NUMBER(16),
 														                             T020 NUMBER(16))")
-												                                                                                                                                                       Set bMakeFile = TRUE
-										                                                                                                                                                       Set nNew = nDPI
-										                                                                                                                                                       Set sKOD = Right('00000000' || sKOD, 8)
-										                                                                                                                                                       Set bFL = SqlPrepareAndExecute(hSqlA, "
+												                                                                                                                                                         Set bMakeFile = TRUE
+										                                                                                                                                                         Set nNew = nDPI
+										                                                                                                                                                         Set sKOD = Right('00000000' || sKOD, 8)
+										                                                                                                                                                         Set bFL = SqlPrepareAndExecute(hSqlA, "
 												    INSERT
 												    INTO " || sFile1 || "
 												    VALUES (:dYes,:sId_Key,:sGR,:sS230,:sKOD,:nT060,:nT020)")
-										                                                                                                                                                       If not bFL
-											                                                                                                                                                       Break
-									                                                                                                                                                       If bEct
-										                                                                                                                                                       Call SqlCommit(hSqlA)
+										                                                                                                                                                         If not bFL
+											                                                                                                                                                         Break
+									                                                                                                                                                         If bEct
+										                                                                                                                                                         Call SqlCommit(hSqlA)
 										! переименовать последний файл
-										                                                                                                                                                       Call SqlDisconnect(hSqlA)
-										                                                                                                                                                       Set bMakeFile = FALSE
-										                                                                                                                                                       Call VisFileCopy(sFile, Left(sFile, Len(sFile)-10) || '010' || MD(dYes) ||
+										                                                                                                                                                         Call SqlDisconnect(hSqlA)
+										                                                                                                                                                         Set bMakeFile = FALSE
+										                                                                                                                                                         Call VisFileCopy(sFile, Left(sFile, Len(sFile)-10) || '010' || MD(dYes) ||
 												     '0.' || Left(Right(sFile, 10), 3))
-										                                                                                                                                                       Call VisFileDelete(sFile)
-									                                                                                                                                                       If bFL
-										                                                                                                                                                       Set mlText = 'Файл ' || Left(sFile, Len(sFile)-10) || '010' || MD(dYes) ||
+										                                                                                                                                                         Call VisFileDelete(sFile)
+									                                                                                                                                                         If bFL
+										                                                                                                                                                         Set mlText = 'Файл ' || Left(sFile, Len(sFile)-10) || '010' || MD(dYes) ||
 												    '0.' || Left(Right(sFile, 10), 3) || ' за ' || Str(SalDateDay(dYes)) ||
 												    ' ' || GetMonthNameRus(SalDateMonth(dYes), TRUE) || ' ' || Str(
 												    SalDateYear(dYes)) || ' г. создан.'
-									                                                                                                                                                       Else
-										                                                                                                                                                       Set mlText = 'Ошибка 2 (нет информации) отбора 412 формы за ' || Str(
+									                                                                                                                                                         Else
+										                                                                                                                                                         Set mlText = 'Ошибка 2 (нет информации) отбора 412 формы за ' || Str(
 												    SalDateDay(dYes)) || ' ' || GetMonthNameRus(SalDateMonth(dYes), TRUE) ||
 												    ' ' || Str(SalDateYear(dYes)) || ' г.'
 								! Else
-									                                                                                                                                                       Set mlText = 'Ошибка 1 (невозможно выполнить запрос) отбора 412 формы за ' ||
+									                                                                                                                                                         Set mlText = 'Ошибка 1 (невозможно выполнить запрос) отбора 412 формы за ' ||
 											    Str(SalDateDay(dYes)) || ' ' || GetMonthNameRus(SalDateMonth(dYes), TRUE) ||
 											    ' ' || Str(SalDateYear(dYes)) || ' г.'
 							If cbSel
@@ -9381,46 +9381,46 @@ Application Description: •--------------------------------------•
 										    GROUP BY t.ktk,p.GR,p.S230,p.KEKD,k.id_key
 										    ORDER BY t.ktk,p.GR,p.S230,p.KEKD,k.id_key"))
 								! If bFL
-									                                                                                                                                                       Set bMakeFile = FALSE
-									                                                                                                                                                       Set nNewTek = -2
-									                                                                                                                                                       Set nNew = -1
-									                                                                                                                                                       Set bFL = FALSE
-									                                                                                                                                                       Set bEct = FALSE
-									                                                                                                                                                       While SqlFetchNext(hSql(), nFetchRes)
-										                                                                                                                                                       Set bEct = TRUE
-										                                                                                                                                                       Set nNew = nDPI
+									                                                                                                                                                         Set bMakeFile = FALSE
+									                                                                                                                                                         Set nNewTek = -2
+									                                                                                                                                                         Set nNew = -1
+									                                                                                                                                                         Set bFL = FALSE
+									                                                                                                                                                         Set bEct = FALSE
+									                                                                                                                                                         While SqlFetchNext(hSql(), nFetchRes)
+										                                                                                                                                                         Set bEct = TRUE
+										                                                                                                                                                         Set nNew = nDPI
 										! смена файла
-										                                                                                                                                                       If nNewTek != nNew
-											                                                                                                                                                       If bMakeFile
-												                                                                                                                                                       Call SqlCommit(hSqlA)
+										                                                                                                                                                         If nNewTek != nNew
+											                                                                                                                                                         If bMakeFile
+												                                                                                                                                                         Call SqlCommit(hSqlA)
 												! переименовать файл
-												                                                                                                                                                       Call SqlDisconnect(hSqlA)
-												                                                                                                                                                       Set bMakeFile = FALSE
-												                                                                                                                                                       Call VisFileCopy(sFile, Left(sFile, Len(sFile)-10) || '010' || MD(dYes) ||
+												                                                                                                                                                         Call SqlDisconnect(hSqlA)
+												                                                                                                                                                         Set bMakeFile = FALSE
+												                                                                                                                                                         Call VisFileCopy(sFile, Left(sFile, Len(sFile)-10) || '010' || MD(dYes) ||
 														     '0.' || Left(Right(sFile, 10), 3))
-												                                                                                                                                                       Call VisFileDelete(sFile)
-											                                                                                                                                                       Set sFile1 = 'FT' || sId_Key || MD(dYes) || '0.dbf'
-											                                                                                                                                                       Set sFile = sDbfPath || sFile1
-											                                                                                                                                                       Set nNewTek = nNew
+												                                                                                                                                                         Call VisFileDelete(sFile)
+											                                                                                                                                                         Set sFile1 = 'FT' || sId_Key || MD(dYes) || '0.dbf'
+											                                                                                                                                                         Set sFile = sDbfPath || sFile1
+											                                                                                                                                                         Set nNewTek = nNew
 											! удалить файл
-											                                                                                                                                                       Set bNoFile = TRUE
-											                                                                                                                                                       If File(sFile)
-												                                                                                                                                                       Set nI = 0
-												                                                                                                                                                       While not SalFileOpen(hF, sFile, OF_Delete)
-													                                                                                                                                                       Set nI = nI + 1
-													                                                                                                                                                       If nI > 96
-														                                                                                                                                                       Call SalWaitCursor(FALSE)
-														                                                                                                                                                       Call MessageNoWait('Невозможно сформировать файл ' || sFile ||
+											                                                                                                                                                         Set bNoFile = TRUE
+											                                                                                                                                                         If File(sFile)
+												                                                                                                                                                         Set nI = 0
+												                                                                                                                                                         While not SalFileOpen(hF, sFile, OF_Delete)
+													                                                                                                                                                         Set nI = nI + 1
+													                                                                                                                                                         If nI > 96
+														                                                                                                                                                         Call SalWaitCursor(FALSE)
+														                                                                                                                                                         Call MessageNoWait('Невозможно сформировать файл ' || sFile ||
 																     ', возможно он занят другим приложением.', 'ВНИМАНИЕ !!!', 0, 1)
-														                                                                                                                                                       Set mlText = ''
-														                                                                                                                                                       Set bNoFile = FALSE
-														                                                                                                                                                       Break
+														                                                                                                                                                         Set mlText = ''
+														                                                                                                                                                         Set bNoFile = FALSE
+														                                                                                                                                                         Break
 											! создать новый файл
-											                                                                                                                                                       If not bNoFile ! остался файл
-												                                                                                                                                                       Break
-											                                                                                                                                                       Set SqlDatabase = 'dBase_Files'
-											                                                                                                                                                       If SqlConnect(hSqlA)
-												                                                                                                                                                       Call SqlPrepareAndExecute(hSqlA, "
+											                                                                                                                                                         If not bNoFile ! остался файл
+												                                                                                                                                                         Break
+											                                                                                                                                                         Set SqlDatabase = 'dBase_Files'
+											                                                                                                                                                         If SqlConnect(hSqlA)
+												                                                                                                                                                         Call SqlPrepareAndExecute(hSqlA, "
 														     CREATE
 														     TABLE " || sFile1 || " (DT   DATE,
 														                             KO   CHAR(3),
@@ -9429,34 +9429,34 @@ Application Description: •--------------------------------------•
 														                             KOD  CHAR(8),
 														                             T060 NUMBER(16),
 														                             T020 NUMBER(16))")
-												                                                                                                                                                       Set bMakeFile = TRUE
-										                                                                                                                                                       Set nNew = nDPI
-										                                                                                                                                                       Set sKOD = Right('00000000' || sKOD, 8)
-										                                                                                                                                                       Set bFL = SqlPrepareAndExecute(hSqlA, "
+												                                                                                                                                                         Set bMakeFile = TRUE
+										                                                                                                                                                         Set nNew = nDPI
+										                                                                                                                                                         Set sKOD = Right('00000000' || sKOD, 8)
+										                                                                                                                                                         Set bFL = SqlPrepareAndExecute(hSqlA, "
 												    INSERT
 												    INTO " || sFile1 || "
 												    VALUES (:dYes,:sId_Key,:sGR,:sS230,:sKOD,:nT060,:nT020)")
-										                                                                                                                                                       If not bFL
-											                                                                                                                                                       Break
-									                                                                                                                                                       If bEct
-										                                                                                                                                                       Call SqlCommit(hSqlA)
+										                                                                                                                                                         If not bFL
+											                                                                                                                                                         Break
+									                                                                                                                                                         If bEct
+										                                                                                                                                                         Call SqlCommit(hSqlA)
 										! переименовать последний файл
-										                                                                                                                                                       Call SqlDisconnect(hSqlA)
-										                                                                                                                                                       Set bMakeFile = FALSE
-										                                                                                                                                                       Call VisFileCopy(sFile, Left(sFile, Len(sFile)-10) || '010' || MD(dYes) ||
+										                                                                                                                                                         Call SqlDisconnect(hSqlA)
+										                                                                                                                                                         Set bMakeFile = FALSE
+										                                                                                                                                                         Call VisFileCopy(sFile, Left(sFile, Len(sFile)-10) || '010' || MD(dYes) ||
 												     '0.' || Left(Right(sFile, 10), 3))
-										                                                                                                                                                       Call VisFileDelete(sFile)
-									                                                                                                                                                       If bFL
-										                                                                                                                                                       Set mlText = 'Файл ' || Left(sFile, Len(sFile)-10) || '010' || MD(dYes) ||
+										                                                                                                                                                         Call VisFileDelete(sFile)
+									                                                                                                                                                         If bFL
+										                                                                                                                                                         Set mlText = 'Файл ' || Left(sFile, Len(sFile)-10) || '010' || MD(dYes) ||
 												    '0.' || Left(Right(sFile, 10), 3) || ' за ' || Str(SalDateDay(dYes)) ||
 												    ' ' || GetMonthNameRus(SalDateMonth(dYes), TRUE) || ' ' || Str(
 												    SalDateYear(dYes)) || ' г. создан.'
-									                                                                                                                                                       Else
-										                                                                                                                                                       Set mlText = 'Ошибка 2 (нет информации) отбора 412 формы за ' || Str(
+									                                                                                                                                                         Else
+										                                                                                                                                                         Set mlText = 'Ошибка 2 (нет информации) отбора 412 формы за ' || Str(
 												    SalDateDay(dYes)) || ' ' || GetMonthNameRus(SalDateMonth(dYes), TRUE) ||
 												    ' ' || Str(SalDateYear(dYes)) || ' г.'
 								! Else
-									                                                                                                                                                       Set mlText = 'Ошибка 1 (невозможно выполнить запрос) отбора 412 формы за ' ||
+									                                                                                                                                                         Set mlText = 'Ошибка 1 (невозможно выполнить запрос) отбора 412 формы за ' ||
 											    Str(SalDateDay(dYes)) || ' ' || GetMonthNameRus(SalDateMonth(dYes), TRUE) ||
 											    ' ' || Str(SalDateYear(dYes)) || ' г.'
 							Set mlText = 'Отбор формы 412 по гос.бюджету за ' || Str(SalDateDay(dYes)) || ' ' ||
@@ -9479,44 +9479,44 @@ Application Description: •--------------------------------------•
 										    GROUP BY GR,S230,KEKD
 										    ORDER BY GR,S230,KEKD"))
 								! If bFL
-									                                                                                                                                                       Set bMakeFile = FALSE
-									                                                                                                                                                       Set nNewTek = -2
-									                                                                                                                                                       Set nNew = -1
-									                                                                                                                                                       Set bFL = FALSE
-									                                                                                                                                                       Set bEct = FALSE
-									                                                                                                                                                       While SqlFetchNext(hSql(), nFetchRes)
-										                                                                                                                                                       Set bEct = TRUE
+									                                                                                                                                                         Set bMakeFile = FALSE
+									                                                                                                                                                         Set nNewTek = -2
+									                                                                                                                                                         Set nNew = -1
+									                                                                                                                                                         Set bFL = FALSE
+									                                                                                                                                                         Set bEct = FALSE
+									                                                                                                                                                         While SqlFetchNext(hSql(), nFetchRes)
+										                                                                                                                                                         Set bEct = TRUE
 										! смена файла
-										                                                                                                                                                       If nNewTek != nNew
-											                                                                                                                                                       If bMakeFile
-												                                                                                                                                                       Call SqlCommit(hSqlA)
+										                                                                                                                                                         If nNewTek != nNew
+											                                                                                                                                                         If bMakeFile
+												                                                                                                                                                         Call SqlCommit(hSqlA)
 												! переименовать файл
-												                                                                                                                                                       Call SqlDisconnect(hSqlA)
-												                                                                                                                                                       Set bMakeFile = FALSE
-												                                                                                                                                                       Call VisFileCopy(sFile, Left(sFile, Len(sFile)-3) || '000')
-												                                                                                                                                                       Call VisFileDelete(sFile)
-											                                                                                                                                                       Set sFile1 = 'FT120' || MD(dYes) || '0.dbf'
-											                                                                                                                                                       Set sFile = sDbfPath || sFile1
-											                                                                                                                                                       Set nNewTek = nNew
+												                                                                                                                                                         Call SqlDisconnect(hSqlA)
+												                                                                                                                                                         Set bMakeFile = FALSE
+												                                                                                                                                                         Call VisFileCopy(sFile, Left(sFile, Len(sFile)-3) || '000')
+												                                                                                                                                                         Call VisFileDelete(sFile)
+											                                                                                                                                                         Set sFile1 = 'FT120' || MD(dYes) || '0.dbf'
+											                                                                                                                                                         Set sFile = sDbfPath || sFile1
+											                                                                                                                                                         Set nNewTek = nNew
 											! удалить файл
-											                                                                                                                                                       Set bNoFile = TRUE
-											                                                                                                                                                       If File(sFile)
-												                                                                                                                                                       Set nI = 0
-												                                                                                                                                                       While not SalFileOpen(hF, sFile, OF_Delete)
-													                                                                                                                                                       Set nI = nI + 1
-													                                                                                                                                                       If nI > 96
-														                                                                                                                                                       Call SalWaitCursor(FALSE)
-														                                                                                                                                                       Call MessageNoWait('Невозможно сформировать файл ' || sFile ||
+											                                                                                                                                                         Set bNoFile = TRUE
+											                                                                                                                                                         If File(sFile)
+												                                                                                                                                                         Set nI = 0
+												                                                                                                                                                         While not SalFileOpen(hF, sFile, OF_Delete)
+													                                                                                                                                                         Set nI = nI + 1
+													                                                                                                                                                         If nI > 96
+														                                                                                                                                                         Call SalWaitCursor(FALSE)
+														                                                                                                                                                         Call MessageNoWait('Невозможно сформировать файл ' || sFile ||
 																     ', возможно он занят другим приложением.', 'ВНИМАНИЕ !!!', 0, 1)
-														                                                                                                                                                       Set mlText = ''
-														                                                                                                                                                       Set bNoFile = FALSE
-														                                                                                                                                                       Break
+														                                                                                                                                                         Set mlText = ''
+														                                                                                                                                                         Set bNoFile = FALSE
+														                                                                                                                                                         Break
 											! создать новый файл
-											                                                                                                                                                       If not bNoFile ! остался файл
-												                                                                                                                                                       Break
-											                                                                                                                                                       Set SqlDatabase = 'dBase_Files'
-											                                                                                                                                                       If SqlConnect(hSqlA)
-												                                                                                                                                                       Call SqlPrepareAndExecute(hSqlA, "
+											                                                                                                                                                         If not bNoFile ! остался файл
+												                                                                                                                                                         Break
+											                                                                                                                                                         Set SqlDatabase = 'dBase_Files'
+											                                                                                                                                                         If SqlConnect(hSqlA)
+												                                                                                                                                                         Call SqlPrepareAndExecute(hSqlA, "
 														     CREATE
 														     TABLE " || sFile1 || " (DT   DATE,
 														                             KO   CHAR(3),
@@ -9525,32 +9525,32 @@ Application Description: •--------------------------------------•
 														                             KOD  CHAR(8),
 														                             T060 NUMBER(16),
 														                             T020 NUMBER(16))")
-												                                                                                                                                                       Set bMakeFile = TRUE
-										                                                                                                                                                       Set sKO = Subs(GetGlobalOption('KOBL_412') || '   ', 1, 3)
-										                                                                                                                                                       Set sKOD = Right('00000000' || sKOD, 8)
-										                                                                                                                                                       Set bFL = SqlPrepareAndExecute(hSqlA, "
+												                                                                                                                                                         Set bMakeFile = TRUE
+										                                                                                                                                                         Set sKO = Subs(GetGlobalOption('KOBL_412') || '   ', 1, 3)
+										                                                                                                                                                         Set sKOD = Right('00000000' || sKOD, 8)
+										                                                                                                                                                         Set bFL = SqlPrepareAndExecute(hSqlA, "
 												    INSERT
 												    INTO " || sFile1 || "
 												    VALUES (:dYes,:sKO,:sGR,:sS230,:sKOD,:nT060,:nT020)")
-										                                                                                                                                                       If not bFL
-											                                                                                                                                                       Break
-									                                                                                                                                                       If bEct
-										                                                                                                                                                       Call SqlCommit(hSqlA)
+										                                                                                                                                                         If not bFL
+											                                                                                                                                                         Break
+									                                                                                                                                                         If bEct
+										                                                                                                                                                         Call SqlCommit(hSqlA)
 										! переименовать последний файл
-										                                                                                                                                                       Call SqlDisconnect(hSqlA)
-										                                                                                                                                                       Set bMakeFile = FALSE
-										                                                                                                                                                       Call VisFileCopy(sFile, Left(sFile, Len(sFile)-3) || '000')
-										                                                                                                                                                       Call VisFileDelete(sFile)
-									                                                                                                                                                       If bFL
-										                                                                                                                                                       Set mlText = 'Файл ' || Left(sFile, Len(sFile)-3) || '000 за ' || Str(
+										                                                                                                                                                         Call SqlDisconnect(hSqlA)
+										                                                                                                                                                         Set bMakeFile = FALSE
+										                                                                                                                                                         Call VisFileCopy(sFile, Left(sFile, Len(sFile)-3) || '000')
+										                                                                                                                                                         Call VisFileDelete(sFile)
+									                                                                                                                                                         If bFL
+										                                                                                                                                                         Set mlText = 'Файл ' || Left(sFile, Len(sFile)-3) || '000 за ' || Str(
 												    SalDateDay(dYes)) || ' ' || GetMonthNameRus(SalDateMonth(dYes), TRUE) ||
 												    ' ' || Str(SalDateYear(dYes)) || ' г. создан.'
-									                                                                                                                                                       Else
-										                                                                                                                                                       Set mlText = 'Ошибка 2 (нет информации) отбора 412 формы за ' || Str(
+									                                                                                                                                                         Else
+										                                                                                                                                                         Set mlText = 'Ошибка 2 (нет информации) отбора 412 формы за ' || Str(
 												    SalDateDay(dYes)) || ' ' || GetMonthNameRus(SalDateMonth(dYes), TRUE) ||
 												    ' ' || Str(SalDateYear(dYes)) || ' г.'
 								! Else
-									                                                                                                                                                       Set mlText = 'Ошибка 1 (невозможно выполнить запрос ) отбора 412 формы за ' ||
+									                                                                                                                                                         Set mlText = 'Ошибка 1 (невозможно выполнить запрос ) отбора 412 формы за ' ||
 											    Str(SalDateDay(dYes)) || ' ' || GetMonthNameRus(SalDateMonth(dYes), TRUE) ||
 											    ' ' || Str(SalDateYear(dYes)) || ' г.'
 							If cbRaj
@@ -9574,46 +9574,46 @@ Application Description: •--------------------------------------•
 										    GROUP BY t.KOD_DPI,substr(p.ktk,-6,2),p.GR,p.S230,p.KEKD,k.id_key
 										    ORDER BY 1,2,3,4,5"))
 								! If bFL
-									                                                                                                                                                       Set bMakeFile = FALSE
-									                                                                                                                                                       Set nNewTek = -2
-									                                                                                                                                                       Set nNew = -1
-									                                                                                                                                                       Set bFL = FALSE
-									                                                                                                                                                       Set bEct = FALSE
-									                                                                                                                                                       While SqlFetchNext(hSql(), nFetchRes)
-										                                                                                                                                                       Set bEct = TRUE
-										                                                                                                                                                       Set nNew = Val(sTer)
+									                                                                                                                                                         Set bMakeFile = FALSE
+									                                                                                                                                                         Set nNewTek = -2
+									                                                                                                                                                         Set nNew = -1
+									                                                                                                                                                         Set bFL = FALSE
+									                                                                                                                                                         Set bEct = FALSE
+									                                                                                                                                                         While SqlFetchNext(hSql(), nFetchRes)
+										                                                                                                                                                         Set bEct = TRUE
+										                                                                                                                                                         Set nNew = Val(sTer)
 										! смена файла
-										                                                                                                                                                       If nNewTek != nNew
-											                                                                                                                                                       If bMakeFile
-												                                                                                                                                                       Call SqlCommit(hSqlA)
+										                                                                                                                                                         If nNewTek != nNew
+											                                                                                                                                                         If bMakeFile
+												                                                                                                                                                         Call SqlCommit(hSqlA)
 												! переименовать файл
-												                                                                                                                                                       Call SqlDisconnect(hSqlA)
-												                                                                                                                                                       Set bMakeFile = FALSE
-												                                                                                                                                                       Call VisFileCopy(sFile, Left(sFile, Len(sFile)-10) || '100' || MD(dYes) ||
+												                                                                                                                                                         Call SqlDisconnect(hSqlA)
+												                                                                                                                                                         Set bMakeFile = FALSE
+												                                                                                                                                                         Call VisFileCopy(sFile, Left(sFile, Len(sFile)-10) || '100' || MD(dYes) ||
 														     '0.' || Left(Right(sFile, 10), 3))
-												                                                                                                                                                       Call VisFileDelete(sFile)
-											                                                                                                                                                       Set sFile1 = 'FT' || sId_Key || MD(dYes) || '0.dbf'
-											                                                                                                                                                       Set sFile = sDbfPath || sFile1
-											                                                                                                                                                       Set nNewTek = nNew
+												                                                                                                                                                         Call VisFileDelete(sFile)
+											                                                                                                                                                         Set sFile1 = 'FT' || sId_Key || MD(dYes) || '0.dbf'
+											                                                                                                                                                         Set sFile = sDbfPath || sFile1
+											                                                                                                                                                         Set nNewTek = nNew
 											! удалить файл
-											                                                                                                                                                       Set bNoFile = TRUE
-											                                                                                                                                                       If File(sFile)
-												                                                                                                                                                       Set nI = 0
-												                                                                                                                                                       While not SalFileOpen(hF, sFile, OF_Delete)
-													                                                                                                                                                       Set nI = nI + 1
-													                                                                                                                                                       If nI > 96
-														                                                                                                                                                       Call SalWaitCursor(FALSE)
-														                                                                                                                                                       Call MessageNoWait('Невозможно сформировать файл ' || sFile ||
+											                                                                                                                                                         Set bNoFile = TRUE
+											                                                                                                                                                         If File(sFile)
+												                                                                                                                                                         Set nI = 0
+												                                                                                                                                                         While not SalFileOpen(hF, sFile, OF_Delete)
+													                                                                                                                                                         Set nI = nI + 1
+													                                                                                                                                                         If nI > 96
+														                                                                                                                                                         Call SalWaitCursor(FALSE)
+														                                                                                                                                                         Call MessageNoWait('Невозможно сформировать файл ' || sFile ||
 																     ', возможно он занят другим приложением.', 'ВНИМАНИЕ !!!', 0, 1)
-														                                                                                                                                                       Set mlText = ''
-														                                                                                                                                                       Set bNoFile = FALSE
-														                                                                                                                                                       Break
+														                                                                                                                                                         Set mlText = ''
+														                                                                                                                                                         Set bNoFile = FALSE
+														                                                                                                                                                         Break
 											! создать новый файл
-											                                                                                                                                                       If not bNoFile ! остался файл
-												                                                                                                                                                       Break
-											                                                                                                                                                       Set SqlDatabase = 'dBase_Files'
-											                                                                                                                                                       If SqlConnect(hSqlA)
-												                                                                                                                                                       Call SqlPrepareAndExecute(hSqlA, "
+											                                                                                                                                                         If not bNoFile ! остался файл
+												                                                                                                                                                         Break
+											                                                                                                                                                         Set SqlDatabase = 'dBase_Files'
+											                                                                                                                                                         If SqlConnect(hSqlA)
+												                                                                                                                                                         Call SqlPrepareAndExecute(hSqlA, "
 														     CREATE
 														     TABLE " || sFile1 || " (DT   DATE,
 														                             KO   CHAR(3),
@@ -9622,35 +9622,35 @@ Application Description: •--------------------------------------•
 														                             KOD  CHAR(8),
 														                             T060 NUMBER(16),
 														                             T020 NUMBER(16))")
-												                                                                                                                                                       Set bMakeFile = TRUE
-										                                                                                                                                                       Set bEct=TRUE
-										                                                                                                                                                       Set nNew = Val(sTer)
-										                                                                                                                                                       Set sKOD = Right('00000000' || sKOD, 8)
-										                                                                                                                                                       Set bFL = SqlPrepareAndExecute(hSqlA, "
+												                                                                                                                                                         Set bMakeFile = TRUE
+										                                                                                                                                                         Set bEct=TRUE
+										                                                                                                                                                         Set nNew = Val(sTer)
+										                                                                                                                                                         Set sKOD = Right('00000000' || sKOD, 8)
+										                                                                                                                                                         Set bFL = SqlPrepareAndExecute(hSqlA, "
 												    INSERT
 												    INTO " || sFile1 || "
 												    VALUES (:dYes,:sId_Key,:sGR,:sS230,:sKOD,:nT060,:nT020)")
-										                                                                                                                                                       If not bFL
-											                                                                                                                                                       Break
-									                                                                                                                                                       If bEct
-										                                                                                                                                                       Call SqlCommit(hSqlA)
+										                                                                                                                                                         If not bFL
+											                                                                                                                                                         Break
+									                                                                                                                                                         If bEct
+										                                                                                                                                                         Call SqlCommit(hSqlA)
 										! переименовать последний файл
-										                                                                                                                                                       Call SqlDisconnect(hSqlA)
-										                                                                                                                                                       Set bMakeFile = FALSE
-										                                                                                                                                                       Call VisFileCopy(sFile, Left(sFile, Len(sFile)-10) || '100' || MD(dYes) ||
+										                                                                                                                                                         Call SqlDisconnect(hSqlA)
+										                                                                                                                                                         Set bMakeFile = FALSE
+										                                                                                                                                                         Call VisFileCopy(sFile, Left(sFile, Len(sFile)-10) || '100' || MD(dYes) ||
 												     '0.' || Left(Right(sFile, 10), 3))
-										                                                                                                                                                       Call VisFileDelete(sFile)
-									                                                                                                                                                       If bFL
-										                                                                                                                                                       Set mlText = 'Файл ' || Left(sFile, Len(sFile)-10) || '100' || MD(dYes) ||
+										                                                                                                                                                         Call VisFileDelete(sFile)
+									                                                                                                                                                         If bFL
+										                                                                                                                                                         Set mlText = 'Файл ' || Left(sFile, Len(sFile)-10) || '100' || MD(dYes) ||
 												    '0.' || Left(Right(sFile, 10), 3) || ' за ' || Str(SalDateDay(dYes)) ||
 												    ' ' || GetMonthNameRus(SalDateMonth(dYes), TRUE) || ' ' || Str(
 												    SalDateYear(dYes)) || ' г. создан.'
-									                                                                                                                                                       Else
-										                                                                                                                                                       Set mlText = 'Ошибка 2 (нет информации) отбора 412 формы за ' || Str(
+									                                                                                                                                                         Else
+										                                                                                                                                                         Set mlText = 'Ошибка 2 (нет информации) отбора 412 формы за ' || Str(
 												    SalDateDay(dYes)) || ' ' || GetMonthNameRus(SalDateMonth(dYes), TRUE) ||
 												    ' ' || Str(SalDateYear(dYes)) || ' г.'
 								! Else
-									                                                                                                                                                       Set mlText = 'Ошибка 1 (невозможно выполнить запрос) отбора 412 формы за ' ||
+									                                                                                                                                                         Set mlText = 'Ошибка 1 (невозможно выполнить запрос) отбора 412 формы за ' ||
 											    Str(SalDateDay(dYes)) || ' ' || GetMonthNameRus(SalDateMonth(dYes), TRUE) ||
 											    ' ' || Str(SalDateYear(dYes)) || ' г.'
 								! територіальний
@@ -9675,46 +9675,46 @@ Application Description: •--------------------------------------•
 										    GROUP BY t.KOD_DPI,substr(p.ktk,-6,2),p.GR,p.S230,p.KEKD,k.id_key
 										    ORDER BY 1,2,3,4,5"))
 								! If bFL
-									                                                                                                                                                       Set bMakeFile = FALSE
-									                                                                                                                                                       Set nNewTek = -2
-									                                                                                                                                                       Set nNew = -1
-									                                                                                                                                                       Set bFL = FALSE
-									                                                                                                                                                       Set bEct = FALSE
-									                                                                                                                                                       While SqlFetchNext(hSql(), nFetchRes)
-										                                                                                                                                                       Set bEct = TRUE
-										                                                                                                                                                       Set nNew = Val(sTer)
+									                                                                                                                                                         Set bMakeFile = FALSE
+									                                                                                                                                                         Set nNewTek = -2
+									                                                                                                                                                         Set nNew = -1
+									                                                                                                                                                         Set bFL = FALSE
+									                                                                                                                                                         Set bEct = FALSE
+									                                                                                                                                                         While SqlFetchNext(hSql(), nFetchRes)
+										                                                                                                                                                         Set bEct = TRUE
+										                                                                                                                                                         Set nNew = Val(sTer)
 										! смена файла
-										                                                                                                                                                       If nNewTek != nNew
-											                                                                                                                                                       If bMakeFile
-												                                                                                                                                                       Call SqlCommit(hSqlA)
+										                                                                                                                                                         If nNewTek != nNew
+											                                                                                                                                                         If bMakeFile
+												                                                                                                                                                         Call SqlCommit(hSqlA)
 												! переименовать файл
-												                                                                                                                                                       Call SqlDisconnect(hSqlA)
-												                                                                                                                                                       Set bMakeFile = FALSE
-												                                                                                                                                                       Call VisFileCopy(sFile, Left(sFile, Len(sFile)-10) || '110' || MD(dYes) ||
+												                                                                                                                                                         Call SqlDisconnect(hSqlA)
+												                                                                                                                                                         Set bMakeFile = FALSE
+												                                                                                                                                                         Call VisFileCopy(sFile, Left(sFile, Len(sFile)-10) || '110' || MD(dYes) ||
 														     '0.' || Left(Right(sFile, 10), 3))
-												                                                                                                                                                       Call VisFileDelete(sFile)
-											                                                                                                                                                       Set sFile1 = 'FT' || sId_Key || MD(dYes) || '0.dbf'
-											                                                                                                                                                       Set sFile = sDbfPath || sFile1
-											                                                                                                                                                       Set nNewTek = nNew
+												                                                                                                                                                         Call VisFileDelete(sFile)
+											                                                                                                                                                         Set sFile1 = 'FT' || sId_Key || MD(dYes) || '0.dbf'
+											                                                                                                                                                         Set sFile = sDbfPath || sFile1
+											                                                                                                                                                         Set nNewTek = nNew
 											! удалить файл
-											                                                                                                                                                       Set bNoFile = TRUE
-											                                                                                                                                                       If File(sFile)
-												                                                                                                                                                       Set nI = 0
-												                                                                                                                                                       While not SalFileOpen(hF, sFile, OF_Delete)
-													                                                                                                                                                       Set nI = nI + 1
-													                                                                                                                                                       If nI > 96
-														                                                                                                                                                       Call SalWaitCursor(FALSE)
-														                                                                                                                                                       Call MessageNoWait('Невозможно сформировать файл ' || sFile ||
+											                                                                                                                                                         Set bNoFile = TRUE
+											                                                                                                                                                         If File(sFile)
+												                                                                                                                                                         Set nI = 0
+												                                                                                                                                                         While not SalFileOpen(hF, sFile, OF_Delete)
+													                                                                                                                                                         Set nI = nI + 1
+													                                                                                                                                                         If nI > 96
+														                                                                                                                                                         Call SalWaitCursor(FALSE)
+														                                                                                                                                                         Call MessageNoWait('Невозможно сформировать файл ' || sFile ||
 																     ', возможно он занят другим приложением.', 'ВНИМАНИЕ !!!', 0, 1)
-														                                                                                                                                                       Set mlText = ''
-														                                                                                                                                                       Set bNoFile = FALSE
-														                                                                                                                                                       Break
+														                                                                                                                                                         Set mlText = ''
+														                                                                                                                                                         Set bNoFile = FALSE
+														                                                                                                                                                         Break
 											! создать новый файл
-											                                                                                                                                                       If not bNoFile ! остался файл
-												                                                                                                                                                       Break
-											                                                                                                                                                       Set SqlDatabase = 'dBase_Files'
-											                                                                                                                                                       If SqlConnect(hSqlA)
-												                                                                                                                                                       Call SqlPrepareAndExecute(hSqlA, "
+											                                                                                                                                                         If not bNoFile ! остался файл
+												                                                                                                                                                         Break
+											                                                                                                                                                         Set SqlDatabase = 'dBase_Files'
+											                                                                                                                                                         If SqlConnect(hSqlA)
+												                                                                                                                                                         Call SqlPrepareAndExecute(hSqlA, "
 														     CREATE
 														     TABLE " || sFile1 || " (DT   DATE,
 														                             KO   CHAR(3),
@@ -9723,35 +9723,35 @@ Application Description: •--------------------------------------•
 														                             KOD  CHAR(8),
 														                             T060 NUMBER(16),
 														                             T020 NUMBER(16))")
-												                                                                                                                                                       Set bMakeFile = TRUE
-										                                                                                                                                                       Set bEct=TRUE
-										                                                                                                                                                       Set nNew = Val(sTer)
-										                                                                                                                                                       Set sKOD = Right('00000000' || sKOD, 8)
-										                                                                                                                                                       Set bFL = SqlPrepareAndExecute(hSqlA, "
+												                                                                                                                                                         Set bMakeFile = TRUE
+										                                                                                                                                                         Set bEct=TRUE
+										                                                                                                                                                         Set nNew = Val(sTer)
+										                                                                                                                                                         Set sKOD = Right('00000000' || sKOD, 8)
+										                                                                                                                                                         Set bFL = SqlPrepareAndExecute(hSqlA, "
 												    INSERT
 												    INTO " || sFile1 || "
 												    VALUES (:dYes,:sId_Key,:sGR,:sS230,:sKOD,:nT060,:nT020)")
-										                                                                                                                                                       If not bFL
-											                                                                                                                                                       Break
-									                                                                                                                                                       If bEct
-										                                                                                                                                                       Call SqlCommit(hSqlA)
+										                                                                                                                                                         If not bFL
+											                                                                                                                                                         Break
+									                                                                                                                                                         If bEct
+										                                                                                                                                                         Call SqlCommit(hSqlA)
 										! переименовать последний файл
-										                                                                                                                                                       Call SqlDisconnect(hSqlA)
-										                                                                                                                                                       Set bMakeFile = FALSE
-										                                                                                                                                                       Call VisFileCopy(sFile, Left(sFile, Len(sFile)-10) || '110' || MD(dYes) ||
+										                                                                                                                                                         Call SqlDisconnect(hSqlA)
+										                                                                                                                                                         Set bMakeFile = FALSE
+										                                                                                                                                                         Call VisFileCopy(sFile, Left(sFile, Len(sFile)-10) || '110' || MD(dYes) ||
 												     '0.' || Left(Right(sFile, 10), 3))
-										                                                                                                                                                       Call VisFileDelete(sFile)
-									                                                                                                                                                       If bFL
-										                                                                                                                                                       Set mlText = 'Файл ' || Left(sFile, Len(sFile)-10) || '110' || MD(dYes) ||
+										                                                                                                                                                         Call VisFileDelete(sFile)
+									                                                                                                                                                         If bFL
+										                                                                                                                                                         Set mlText = 'Файл ' || Left(sFile, Len(sFile)-10) || '110' || MD(dYes) ||
 												    '0.' || Left(Right(sFile, 10), 3) || ' за ' || Str(SalDateDay(dYes)) ||
 												    ' ' || GetMonthNameRus(SalDateMonth(dYes), TRUE) || ' ' || Str(
 												    SalDateYear(dYes)) || ' г. создан.'
-									                                                                                                                                                       Else
-										                                                                                                                                                       Set mlText = 'Ошибка 2 (нет информации) отбора 412 формы за ' || Str(
+									                                                                                                                                                         Else
+										                                                                                                                                                         Set mlText = 'Ошибка 2 (нет информации) отбора 412 формы за ' || Str(
 												    SalDateDay(dYes)) || ' ' || GetMonthNameRus(SalDateMonth(dYes), TRUE) ||
 												    ' ' || Str(SalDateYear(dYes)) || ' г.'
 								! Else
-									                                                                                                                                                       Set mlText = 'Ошибка 1 (невозможно выполнить запрос) отбора 412 формы за ' ||
+									                                                                                                                                                         Set mlText = 'Ошибка 1 (невозможно выполнить запрос) отбора 412 формы за ' ||
 											    Str(SalDateDay(dYes)) || ' ' || GetMonthNameRus(SalDateMonth(dYes), TRUE) ||
 											    ' ' || Str(SalDateYear(dYes)) || ' г.'
 							If cbSeS
@@ -9778,47 +9778,47 @@ Application Description: •--------------------------------------•
 										    GROUP BY (t.ktk-mod(t.ktk,100))/100,p.GR,p.S230,p.KEKD,k.id_key,p.ktk
 										    ORDER BY (t.ktk-mod(t.ktk,100))/100,p.GR,p.S230,p.KEKD,k.id_key,p.ktk"))
 								! If bFL
-									                                                                                                                                                       Set bMakeFile = FALSE
-									                                                                                                                                                       Set nNewTek = -2
-									                                                                                                                                                       Set nNew = -1
-									                                                                                                                                                       Set bFL = FALSE
-									                                                                                                                                                       Set bEct = FALSE
-									                                                                                                                                                       While SqlFetchNext(hSql(), nFetchRes)
-										                                                                                                                                                       Set bEct = TRUE
-										                                                                                                                                                       Set nNew = nDPI
+									                                                                                                                                                         Set bMakeFile = FALSE
+									                                                                                                                                                         Set nNewTek = -2
+									                                                                                                                                                         Set nNew = -1
+									                                                                                                                                                         Set bFL = FALSE
+									                                                                                                                                                         Set bEct = FALSE
+									                                                                                                                                                         While SqlFetchNext(hSql(), nFetchRes)
+										                                                                                                                                                         Set bEct = TRUE
+										                                                                                                                                                         Set nNew = nDPI
 										! смена файла
-										                                                                                                                                                       If nNewTek != nNew
-											                                                                                                                                                       If bMakeFile
-												                                                                                                                                                       Call SqlCommit(hSqlA)
+										                                                                                                                                                         If nNewTek != nNew
+											                                                                                                                                                         If bMakeFile
+												                                                                                                                                                         Call SqlCommit(hSqlA)
 												! переименовать файл
-												                                                                                                                                                       Call SqlDisconnect(hSqlA)
-												                                                                                                                                                       Set bMakeFile = FALSE
-												                                                                                                                                                       If bYesSelo
-													                                                                                                                                                       Call VisFileCopy(sFile, Left(sFile, Len(sFile)-10) || '100' || MD(dYes)
+												                                                                                                                                                         Call SqlDisconnect(hSqlA)
+												                                                                                                                                                         Set bMakeFile = FALSE
+												                                                                                                                                                         If bYesSelo
+													                                                                                                                                                         Call VisFileCopy(sFile, Left(sFile, Len(sFile)-10) || '100' || MD(dYes)
 															     || '0.' || Left(Right(sFile, 10), 3))
-												                                                                                                                                                       Call VisFileDelete(sFile)
-											                                                                                                                                                       Set sFile1 = 'FT' || sId_Key || MD(dYes) || '0.dbf'
-											                                                                                                                                                       Set sFile = sDbfPath || sFile1
-											                                                                                                                                                       Set nNewTek = nNew
+												                                                                                                                                                         Call VisFileDelete(sFile)
+											                                                                                                                                                         Set sFile1 = 'FT' || sId_Key || MD(dYes) || '0.dbf'
+											                                                                                                                                                         Set sFile = sDbfPath || sFile1
+											                                                                                                                                                         Set nNewTek = nNew
 											! удалить файл
-											                                                                                                                                                       Set bNoFile = TRUE
-											                                                                                                                                                       If File(sFile)
-												                                                                                                                                                       Set nI = 0
-												                                                                                                                                                       While not SalFileOpen(hF, sFile, OF_Delete)
-													                                                                                                                                                       Set nI = nI + 1
-													                                                                                                                                                       If nI > 96
-														                                                                                                                                                       Call SalWaitCursor(FALSE)
-														                                                                                                                                                       Call MessageNoWait('Невозможно сформировать файл ' || sFile ||
+											                                                                                                                                                         Set bNoFile = TRUE
+											                                                                                                                                                         If File(sFile)
+												                                                                                                                                                         Set nI = 0
+												                                                                                                                                                         While not SalFileOpen(hF, sFile, OF_Delete)
+													                                                                                                                                                         Set nI = nI + 1
+													                                                                                                                                                         If nI > 96
+														                                                                                                                                                         Call SalWaitCursor(FALSE)
+														                                                                                                                                                         Call MessageNoWait('Невозможно сформировать файл ' || sFile ||
 																     ', возможно он занят другим приложением.', 'ВНИМАНИЕ !!!', 0, 1)
-														                                                                                                                                                       Set mlText = ''
-														                                                                                                                                                       Set bNoFile = FALSE
-														                                                                                                                                                       Break
+														                                                                                                                                                         Set mlText = ''
+														                                                                                                                                                         Set bNoFile = FALSE
+														                                                                                                                                                         Break
 											! создать новый файл
-											                                                                                                                                                       If not bNoFile ! остался файл
-												                                                                                                                                                       Break
-											                                                                                                                                                       Set SqlDatabase = 'dBase_Files'
-											                                                                                                                                                       If SqlConnect(hSqlA)
-												                                                                                                                                                       Call SqlPrepareAndExecute(hSqlA, "
+											                                                                                                                                                         If not bNoFile ! остался файл
+												                                                                                                                                                         Break
+											                                                                                                                                                         Set SqlDatabase = 'dBase_Files'
+											                                                                                                                                                         If SqlConnect(hSqlA)
+												                                                                                                                                                         Call SqlPrepareAndExecute(hSqlA, "
 														     CREATE
 														     TABLE " || sFile1 || " (DT   DATE,
 														                             KO   CHAR(3),
@@ -9827,37 +9827,37 @@ Application Description: •--------------------------------------•
 														                             KOD  CHAR(8),
 														                             T060 NUMBER(16),
 														                             T020 NUMBER(16))")
-												                                                                                                                                                       Set bMakeFile = TRUE
-												                                                                                                                                                       Set bYesSelo = FALSE
-										                                                                                                                                                       Set nNew = nDPI
-										                                                                                                                                                       Set sKOD = Right('00000000' || sKOD, 8)
-										                                                                                                                                                       Set bYesSelo = bYesSelo or Mod(nKtk, 100)>0
-										                                                                                                                                                       Set bFL = SqlPrepareAndExecute(hSqlA, "
+												                                                                                                                                                         Set bMakeFile = TRUE
+												                                                                                                                                                         Set bYesSelo = FALSE
+										                                                                                                                                                         Set nNew = nDPI
+										                                                                                                                                                         Set sKOD = Right('00000000' || sKOD, 8)
+										                                                                                                                                                         Set bYesSelo = bYesSelo or Mod(nKtk, 100)>0
+										                                                                                                                                                         Set bFL = SqlPrepareAndExecute(hSqlA, "
 												    INSERT
 												    INTO " || sFile1 || "
 												    VALUES (:dYes,:sId_Key,:sGR,:sS230,:sKOD,:nT060,:nT020)")
-										                                                                                                                                                       If not bFL
-											                                                                                                                                                       Break
-									                                                                                                                                                       If bEct
-										                                                                                                                                                       Call SqlCommit(hSqlA)
+										                                                                                                                                                         If not bFL
+											                                                                                                                                                         Break
+									                                                                                                                                                         If bEct
+										                                                                                                                                                         Call SqlCommit(hSqlA)
 										! переименовать последний файл
-										                                                                                                                                                       Call SqlDisconnect(hSqlA)
-										                                                                                                                                                       Set bMakeFile = FALSE
-										                                                                                                                                                       If bYesSelo
-											                                                                                                                                                       Call VisFileCopy(sFile, Left(sFile, Len(sFile)-10) || '100' || MD(dYes) ||
+										                                                                                                                                                         Call SqlDisconnect(hSqlA)
+										                                                                                                                                                         Set bMakeFile = FALSE
+										                                                                                                                                                         If bYesSelo
+											                                                                                                                                                         Call VisFileCopy(sFile, Left(sFile, Len(sFile)-10) || '100' || MD(dYes) ||
 													     '0.' || Left(Right(sFile, 10), 3))
-										                                                                                                                                                       Call VisFileDelete(sFile)
-									                                                                                                                                                       If bFL
-										                                                                                                                                                       Set mlText = 'Файл ' || Left(sFile, Len(sFile)-10) || '100' || MD(dYes) ||
+										                                                                                                                                                         Call VisFileDelete(sFile)
+									                                                                                                                                                         If bFL
+										                                                                                                                                                         Set mlText = 'Файл ' || Left(sFile, Len(sFile)-10) || '100' || MD(dYes) ||
 												    '0.' || Left(Right(sFile, 10), 3) || ' за ' || Str(SalDateDay(dYes)) ||
 												    ' ' || GetMonthNameRus(SalDateMonth(dYes), TRUE) || ' ' || Str(
 												    SalDateYear(dYes)) || ' г. создан.'
-									                                                                                                                                                       Else
-										                                                                                                                                                       Set mlText = 'Ошибка 2 (нет информации) отбора 412 формы за ' || Str(
+									                                                                                                                                                         Else
+										                                                                                                                                                         Set mlText = 'Ошибка 2 (нет информации) отбора 412 формы за ' || Str(
 												    SalDateDay(dYes)) || ' ' || GetMonthNameRus(SalDateMonth(dYes), TRUE) ||
 												    ' ' || Str(SalDateYear(dYes)) || ' г.'
 								! Else
-									                                                                                                                                                       Set mlText = 'Ошибка 1 (невозможно выполнить запрос) отбора 412 формы за ' ||
+									                                                                                                                                                         Set mlText = 'Ошибка 1 (невозможно выполнить запрос) отбора 412 формы за ' ||
 											    Str(SalDateDay(dYes)) || ' ' || GetMonthNameRus(SalDateMonth(dYes), TRUE) ||
 											    ' ' || Str(SalDateYear(dYes)) || ' г.'
 								! територіальний
@@ -9883,46 +9883,46 @@ Application Description: •--------------------------------------•
 										    GROUP BY (t.ktk-mod(t.ktk,100))/100,p.GR,p.S230,p.KEKD,k.id_key
 										    ORDER BY (t.ktk-mod(t.ktk,100))/100,p.GR,p.S230,p.KEKD,k.id_key"))
 								! If bFL
-									                                                                                                                                                       Set bMakeFile = FALSE
-									                                                                                                                                                       Set nNewTek = -2
-									                                                                                                                                                       Set nNew = -1
-									                                                                                                                                                       Set bFL = FALSE
-									                                                                                                                                                       Set bEct = FALSE
-									                                                                                                                                                       While SqlFetchNext(hSql(), nFetchRes)
-										                                                                                                                                                       Set bEct = TRUE
-										                                                                                                                                                       Set nNew = nDPI
+									                                                                                                                                                         Set bMakeFile = FALSE
+									                                                                                                                                                         Set nNewTek = -2
+									                                                                                                                                                         Set nNew = -1
+									                                                                                                                                                         Set bFL = FALSE
+									                                                                                                                                                         Set bEct = FALSE
+									                                                                                                                                                         While SqlFetchNext(hSql(), nFetchRes)
+										                                                                                                                                                         Set bEct = TRUE
+										                                                                                                                                                         Set nNew = nDPI
 										! смена файла
-										                                                                                                                                                       If nNewTek != nNew
-											                                                                                                                                                       If bMakeFile
-												                                                                                                                                                       Call SqlCommit(hSqlA)
+										                                                                                                                                                         If nNewTek != nNew
+											                                                                                                                                                         If bMakeFile
+												                                                                                                                                                         Call SqlCommit(hSqlA)
 												! переименовать файл
-												                                                                                                                                                       Call SqlDisconnect(hSqlA)
-												                                                                                                                                                       Set bMakeFile = FALSE
-												                                                                                                                                                       Call VisFileCopy(sFile, Left(sFile, Len(sFile)-10) || '110' || MD(dYes) ||
+												                                                                                                                                                         Call SqlDisconnect(hSqlA)
+												                                                                                                                                                         Set bMakeFile = FALSE
+												                                                                                                                                                         Call VisFileCopy(sFile, Left(sFile, Len(sFile)-10) || '110' || MD(dYes) ||
 														     '0.' || Left(Right(sFile, 10), 3))
-												                                                                                                                                                       Call VisFileDelete(sFile)
-											                                                                                                                                                       Set sFile1 = 'FT' || sId_Key || MD(dYes) || '0.dbf'
-											                                                                                                                                                       Set sFile = sDbfPath || sFile1
-											                                                                                                                                                       Set nNewTek = nNew
+												                                                                                                                                                         Call VisFileDelete(sFile)
+											                                                                                                                                                         Set sFile1 = 'FT' || sId_Key || MD(dYes) || '0.dbf'
+											                                                                                                                                                         Set sFile = sDbfPath || sFile1
+											                                                                                                                                                         Set nNewTek = nNew
 											! удалить файл
-											                                                                                                                                                       Set bNoFile = TRUE
-											                                                                                                                                                       If File(sFile)
-												                                                                                                                                                       Set nI = 0
-												                                                                                                                                                       While not SalFileOpen(hF, sFile, OF_Delete)
-													                                                                                                                                                       Set nI = nI + 1
-													                                                                                                                                                       If nI > 96
-														                                                                                                                                                       Call SalWaitCursor(FALSE)
-														                                                                                                                                                       Call MessageNoWait('Невозможно сформировать файл ' || sFile ||
+											                                                                                                                                                         Set bNoFile = TRUE
+											                                                                                                                                                         If File(sFile)
+												                                                                                                                                                         Set nI = 0
+												                                                                                                                                                         While not SalFileOpen(hF, sFile, OF_Delete)
+													                                                                                                                                                         Set nI = nI + 1
+													                                                                                                                                                         If nI > 96
+														                                                                                                                                                         Call SalWaitCursor(FALSE)
+														                                                                                                                                                         Call MessageNoWait('Невозможно сформировать файл ' || sFile ||
 																     ', возможно он занят другим приложением.', 'ВНИМАНИЕ !!!', 0, 1)
-														                                                                                                                                                       Set mlText = ''
-														                                                                                                                                                       Set bNoFile = FALSE
-														                                                                                                                                                       Break
+														                                                                                                                                                         Set mlText = ''
+														                                                                                                                                                         Set bNoFile = FALSE
+														                                                                                                                                                         Break
 											! создать новый файл
-											                                                                                                                                                       If not bNoFile ! остался файл
-												                                                                                                                                                       Break
-											                                                                                                                                                       Set SqlDatabase = 'dBase_Files'
-											                                                                                                                                                       If SqlConnect(hSqlA)
-												                                                                                                                                                       Call SqlPrepareAndExecute(hSqlA, "
+											                                                                                                                                                         If not bNoFile ! остался файл
+												                                                                                                                                                         Break
+											                                                                                                                                                         Set SqlDatabase = 'dBase_Files'
+											                                                                                                                                                         If SqlConnect(hSqlA)
+												                                                                                                                                                         Call SqlPrepareAndExecute(hSqlA, "
 														     CREATE
 														     TABLE " || sFile1 || " (DT   DATE,
 														                             KO   CHAR(3),
@@ -9931,34 +9931,34 @@ Application Description: •--------------------------------------•
 														                             KOD  CHAR(8),
 														                             T060 NUMBER(16),
 														                             T020 NUMBER(16))")
-												                                                                                                                                                       Set bMakeFile = TRUE
-										                                                                                                                                                       Set nNew = nDPI
-										                                                                                                                                                       Set sKOD = Right('00000000' || sKOD, 8)
-										                                                                                                                                                       Set bFL = SqlPrepareAndExecute(hSqlA, "
+												                                                                                                                                                         Set bMakeFile = TRUE
+										                                                                                                                                                         Set nNew = nDPI
+										                                                                                                                                                         Set sKOD = Right('00000000' || sKOD, 8)
+										                                                                                                                                                         Set bFL = SqlPrepareAndExecute(hSqlA, "
 												    INSERT
 												    INTO " || sFile1 || "
 												    VALUES (:dYes,:sId_Key,:sGR,:sS230,:sKOD,:nT060,:nT020)")
-										                                                                                                                                                       If not bFL
-											                                                                                                                                                       Break
-									                                                                                                                                                       If bEct
-										                                                                                                                                                       Call SqlCommit(hSqlA)
+										                                                                                                                                                         If not bFL
+											                                                                                                                                                         Break
+									                                                                                                                                                         If bEct
+										                                                                                                                                                         Call SqlCommit(hSqlA)
 										! переименовать последний файл
-										                                                                                                                                                       Call SqlDisconnect(hSqlA)
-										                                                                                                                                                       Set bMakeFile = FALSE
-										                                                                                                                                                       Call VisFileCopy(sFile, Left(sFile, Len(sFile)-10) || '110' || MD(dYes) ||
+										                                                                                                                                                         Call SqlDisconnect(hSqlA)
+										                                                                                                                                                         Set bMakeFile = FALSE
+										                                                                                                                                                         Call VisFileCopy(sFile, Left(sFile, Len(sFile)-10) || '110' || MD(dYes) ||
 												     '0.' || Left(Right(sFile, 10), 3))
-										                                                                                                                                                       Call VisFileDelete(sFile)
-									                                                                                                                                                       If bFL
-										                                                                                                                                                       Set mlText = 'Файл ' || Left(sFile, Len(sFile)-10) || '110' || MD(dYes) ||
+										                                                                                                                                                         Call VisFileDelete(sFile)
+									                                                                                                                                                         If bFL
+										                                                                                                                                                         Set mlText = 'Файл ' || Left(sFile, Len(sFile)-10) || '110' || MD(dYes) ||
 												    '0.' || Left(Right(sFile, 10), 3) || ' за ' || Str(SalDateDay(dYes)) ||
 												    ' ' || GetMonthNameRus(SalDateMonth(dYes), TRUE) || ' ' || Str(
 												    SalDateYear(dYes)) || ' г. создан.'
-									                                                                                                                                                       Else
-										                                                                                                                                                       Set mlText = 'Ошибка 2 (нет информации) отбора 412 формы за ' || Str(
+									                                                                                                                                                         Else
+										                                                                                                                                                         Set mlText = 'Ошибка 2 (нет информации) отбора 412 формы за ' || Str(
 												    SalDateDay(dYes)) || ' ' || GetMonthNameRus(SalDateMonth(dYes), TRUE) ||
 												    ' ' || Str(SalDateYear(dYes)) || ' г.'
 								! Else
-									                                                                                                                                                       Set mlText = 'Ошибка 1 (невозможно выполнить запрос) отбора 412 формы за ' ||
+									                                                                                                                                                         Set mlText = 'Ошибка 1 (невозможно выполнить запрос) отбора 412 формы за ' ||
 											    Str(SalDateDay(dYes)) || ' ' || GetMonthNameRus(SalDateMonth(dYes), TRUE) ||
 											    ' ' || Str(SalDateYear(dYes)) || ' г.'
 							If cbSel
@@ -9979,46 +9979,46 @@ Application Description: •--------------------------------------•
 										    GROUP BY t.ktk,p.GR,p.S230,p.KEKD,k.id_key
 										    ORDER BY t.ktk,p.GR,p.S230,p.KEKD,k.id_key"))
 								! If bFL
-									                                                                                                                                                       Set bMakeFile = FALSE
-									                                                                                                                                                       Set nNewTek = -2
-									                                                                                                                                                       Set nNew = -1
-									                                                                                                                                                       Set bFL = FALSE
-									                                                                                                                                                       Set bEct = FALSE
-									                                                                                                                                                       While SqlFetchNext(hSql(), nFetchRes)
-										                                                                                                                                                       Set bEct = TRUE
-										                                                                                                                                                       Set nNew = nDPI
+									                                                                                                                                                         Set bMakeFile = FALSE
+									                                                                                                                                                         Set nNewTek = -2
+									                                                                                                                                                         Set nNew = -1
+									                                                                                                                                                         Set bFL = FALSE
+									                                                                                                                                                         Set bEct = FALSE
+									                                                                                                                                                         While SqlFetchNext(hSql(), nFetchRes)
+										                                                                                                                                                         Set bEct = TRUE
+										                                                                                                                                                         Set nNew = nDPI
 										! смена файла
-										                                                                                                                                                       If nNewTek != nNew
-											                                                                                                                                                       If bMakeFile
-												                                                                                                                                                       Call SqlCommit(hSqlA)
+										                                                                                                                                                         If nNewTek != nNew
+											                                                                                                                                                         If bMakeFile
+												                                                                                                                                                         Call SqlCommit(hSqlA)
 												! переименовать файл
-												                                                                                                                                                       Call SqlDisconnect(hSqlA)
-												                                                                                                                                                       Set bMakeFile = FALSE
-												                                                                                                                                                       Call VisFileCopy(sFile, Left(sFile, Len(sFile)-10) || '110' || MD(dYes) ||
+												                                                                                                                                                         Call SqlDisconnect(hSqlA)
+												                                                                                                                                                         Set bMakeFile = FALSE
+												                                                                                                                                                         Call VisFileCopy(sFile, Left(sFile, Len(sFile)-10) || '110' || MD(dYes) ||
 														     '0.' || Left(Right(sFile, 10), 3))
-												                                                                                                                                                       Call VisFileDelete(sFile)
-											                                                                                                                                                       Set sFile1 = 'FT' || sId_Key || MD(dYes) || '0.dbf'
-											                                                                                                                                                       Set sFile = sDbfPath || sFile1
-											                                                                                                                                                       Set nNewTek = nNew
+												                                                                                                                                                         Call VisFileDelete(sFile)
+											                                                                                                                                                         Set sFile1 = 'FT' || sId_Key || MD(dYes) || '0.dbf'
+											                                                                                                                                                         Set sFile = sDbfPath || sFile1
+											                                                                                                                                                         Set nNewTek = nNew
 											! удалить файл
-											                                                                                                                                                       Set bNoFile = TRUE
-											                                                                                                                                                       If File(sFile)
-												                                                                                                                                                       Set nI = 0
-												                                                                                                                                                       While not SalFileOpen(hF, sFile, OF_Delete)
-													                                                                                                                                                       Set nI = nI + 1
-													                                                                                                                                                       If nI > 96
-														                                                                                                                                                       Call SalWaitCursor(FALSE)
-														                                                                                                                                                       Call MessageNoWait('Невозможно сформировать файл ' || sFile ||
+											                                                                                                                                                         Set bNoFile = TRUE
+											                                                                                                                                                         If File(sFile)
+												                                                                                                                                                         Set nI = 0
+												                                                                                                                                                         While not SalFileOpen(hF, sFile, OF_Delete)
+													                                                                                                                                                         Set nI = nI + 1
+													                                                                                                                                                         If nI > 96
+														                                                                                                                                                         Call SalWaitCursor(FALSE)
+														                                                                                                                                                         Call MessageNoWait('Невозможно сформировать файл ' || sFile ||
 																     ', возможно он занят другим приложением.', 'ВНИМАНИЕ !!!', 0, 1)
-														                                                                                                                                                       Set mlText = ''
-														                                                                                                                                                       Set bNoFile = FALSE
-														                                                                                                                                                       Break
+														                                                                                                                                                         Set mlText = ''
+														                                                                                                                                                         Set bNoFile = FALSE
+														                                                                                                                                                         Break
 											! создать новый файл
-											                                                                                                                                                       If not bNoFile ! остался файл
-												                                                                                                                                                       Break
-											                                                                                                                                                       Set SqlDatabase = 'dBase_Files'
-											                                                                                                                                                       If SqlConnect(hSqlA)
-												                                                                                                                                                       Call SqlPrepareAndExecute(hSqlA, "
+											                                                                                                                                                         If not bNoFile ! остался файл
+												                                                                                                                                                         Break
+											                                                                                                                                                         Set SqlDatabase = 'dBase_Files'
+											                                                                                                                                                         If SqlConnect(hSqlA)
+												                                                                                                                                                         Call SqlPrepareAndExecute(hSqlA, "
 														     CREATE
 														     TABLE " || sFile1 || " (DT   DATE,
 														                             KO   CHAR(3),
@@ -10027,34 +10027,34 @@ Application Description: •--------------------------------------•
 														                             KOD  CHAR(8),
 														                             T060 NUMBER(16),
 														                             T020 NUMBER(16))")
-												                                                                                                                                                       Set bMakeFile = TRUE
-										                                                                                                                                                       Set nNew = nDPI
-										                                                                                                                                                       Set sKOD = Right('00000000' || sKOD, 8)
-										                                                                                                                                                       Set bFL = SqlPrepareAndExecute(hSqlA, "
+												                                                                                                                                                         Set bMakeFile = TRUE
+										                                                                                                                                                         Set nNew = nDPI
+										                                                                                                                                                         Set sKOD = Right('00000000' || sKOD, 8)
+										                                                                                                                                                         Set bFL = SqlPrepareAndExecute(hSqlA, "
 												    INSERT
 												    INTO " || sFile1 || "
 												    VALUES (:dYes,:sId_Key,:sGR,:sS230,:sKOD,:nT060,:nT020)")
-										                                                                                                                                                       If not bFL
-											                                                                                                                                                       Break
-									                                                                                                                                                       If bEct
-										                                                                                                                                                       Call SqlCommit(hSqlA)
+										                                                                                                                                                         If not bFL
+											                                                                                                                                                         Break
+									                                                                                                                                                         If bEct
+										                                                                                                                                                         Call SqlCommit(hSqlA)
 										! переименовать последний файл
-										                                                                                                                                                       Call SqlDisconnect(hSqlA)
-										                                                                                                                                                       Set bMakeFile = FALSE
-										                                                                                                                                                       Call VisFileCopy(sFile, Left(sFile, Len(sFile)-10) || '110' || MD(dYes) ||
+										                                                                                                                                                         Call SqlDisconnect(hSqlA)
+										                                                                                                                                                         Set bMakeFile = FALSE
+										                                                                                                                                                         Call VisFileCopy(sFile, Left(sFile, Len(sFile)-10) || '110' || MD(dYes) ||
 												     '0.' || Left(Right(sFile, 10), 3))
-										                                                                                                                                                       Call VisFileDelete(sFile)
-									                                                                                                                                                       If bFL
-										                                                                                                                                                       Set mlText = 'Файл ' || Left(sFile, Len(sFile)-10) || '110' || MD(dYes) ||
+										                                                                                                                                                         Call VisFileDelete(sFile)
+									                                                                                                                                                         If bFL
+										                                                                                                                                                         Set mlText = 'Файл ' || Left(sFile, Len(sFile)-10) || '110' || MD(dYes) ||
 												    '0.' || Left(Right(sFile, 10), 3) || ' за ' || Str(SalDateDay(dYes)) ||
 												    ' ' || GetMonthNameRus(SalDateMonth(dYes), TRUE) || ' ' || Str(
 												    SalDateYear(dYes)) || ' г. создан.'
-									                                                                                                                                                       Else
-										                                                                                                                                                       Set mlText = 'Ошибка 2 (нет информации) отбора 412 формы за ' || Str(
+									                                                                                                                                                         Else
+										                                                                                                                                                         Set mlText = 'Ошибка 2 (нет информации) отбора 412 формы за ' || Str(
 												    SalDateDay(dYes)) || ' ' || GetMonthNameRus(SalDateMonth(dYes), TRUE) ||
 												    ' ' || Str(SalDateYear(dYes)) || ' г.'
 								! Else
-									                                                                                                                                                       Set mlText = 'Ошибка 1 (невозможно выполнить запрос) отбора 412 формы за ' ||
+									                                                                                                                                                         Set mlText = 'Ошибка 1 (невозможно выполнить запрос) отбора 412 формы за ' ||
 											    Str(SalDateDay(dYes)) || ' ' || GetMonthNameRus(SalDateMonth(dYes), TRUE) ||
 											    ' ' || Str(SalDateYear(dYes)) || ' г.'
 							Set mlText = 'Отбор формы 412 по мест.бюджету за ' || Str(SalDateDay(dYes)) || ' '
@@ -10077,44 +10077,44 @@ Application Description: •--------------------------------------•
 										    GROUP BY GR,S230,KEKD
 										    ORDER BY GR,S230,KEKD"))
 								! If bFL
-									                                                                                                                                                       Set bMakeFile = FALSE
-									                                                                                                                                                       Set nNewTek = -2
-									                                                                                                                                                       Set nNew = -1
-									                                                                                                                                                       Set bFL = FALSE
-									                                                                                                                                                       Set bEct = FALSE
-									                                                                                                                                                       While SqlFetchNext(hSql(), nFetchRes)
-										                                                                                                                                                       Set bEct = TRUE
+									                                                                                                                                                         Set bMakeFile = FALSE
+									                                                                                                                                                         Set nNewTek = -2
+									                                                                                                                                                         Set nNew = -1
+									                                                                                                                                                         Set bFL = FALSE
+									                                                                                                                                                         Set bEct = FALSE
+									                                                                                                                                                         While SqlFetchNext(hSql(), nFetchRes)
+										                                                                                                                                                         Set bEct = TRUE
 										! смена файла
-										                                                                                                                                                       If nNewTek != nNew
-											                                                                                                                                                       If bMakeFile
-												                                                                                                                                                       Call SqlCommit(hSqlA)
+										                                                                                                                                                         If nNewTek != nNew
+											                                                                                                                                                         If bMakeFile
+												                                                                                                                                                         Call SqlCommit(hSqlA)
 												! переименовать файл
-												                                                                                                                                                       Call SqlDisconnect(hSqlA)
-												                                                                                                                                                       Set bMakeFile = FALSE
-												                                                                                                                                                       Call VisFileCopy(sFile, Left(sFile, Len(sFile)-3) || '000')
-												                                                                                                                                                       Call VisFileDelete(sFile)
-											                                                                                                                                                       Set sFile1 = 'FT020' || MD(dYes) || '0.dbf'
-											                                                                                                                                                       Set sFile = sDbfPath || sFile1
-											                                                                                                                                                       Set nNewTek = nNew
+												                                                                                                                                                         Call SqlDisconnect(hSqlA)
+												                                                                                                                                                         Set bMakeFile = FALSE
+												                                                                                                                                                         Call VisFileCopy(sFile, Left(sFile, Len(sFile)-3) || '000')
+												                                                                                                                                                         Call VisFileDelete(sFile)
+											                                                                                                                                                         Set sFile1 = 'FT020' || MD(dYes) || '0.dbf'
+											                                                                                                                                                         Set sFile = sDbfPath || sFile1
+											                                                                                                                                                         Set nNewTek = nNew
 											! удалить файл
-											                                                                                                                                                       Set bNoFile = TRUE
-											                                                                                                                                                       If File(sFile)
-												                                                                                                                                                       Set nI = 0
-												                                                                                                                                                       While not SalFileOpen(hF, sFile, OF_Delete)
-													                                                                                                                                                       Set nI = nI + 1
-													                                                                                                                                                       If nI > 96
-														                                                                                                                                                       Call SalWaitCursor(FALSE)
-														                                                                                                                                                       Call MessageNoWait('Невозможно сформировать файл ' || sFile ||
+											                                                                                                                                                         Set bNoFile = TRUE
+											                                                                                                                                                         If File(sFile)
+												                                                                                                                                                         Set nI = 0
+												                                                                                                                                                         While not SalFileOpen(hF, sFile, OF_Delete)
+													                                                                                                                                                         Set nI = nI + 1
+													                                                                                                                                                         If nI > 96
+														                                                                                                                                                         Call SalWaitCursor(FALSE)
+														                                                                                                                                                         Call MessageNoWait('Невозможно сформировать файл ' || sFile ||
 																     ', возможно он занят другим приложением.', 'ВНИМАНИЕ !!!', 0, 1)
-														                                                                                                                                                       Set mlText = ''
-														                                                                                                                                                       Set bNoFile = FALSE
-														                                                                                                                                                       Break
+														                                                                                                                                                         Set mlText = ''
+														                                                                                                                                                         Set bNoFile = FALSE
+														                                                                                                                                                         Break
 											! создать новый файл
-											                                                                                                                                                       If not bNoFile ! остался файл
-												                                                                                                                                                       Break
-											                                                                                                                                                       Set SqlDatabase = 'dBase_Files'
-											                                                                                                                                                       If SqlConnect(hSqlA)
-												                                                                                                                                                       Call SqlPrepareAndExecute(hSqlA, "
+											                                                                                                                                                         If not bNoFile ! остался файл
+												                                                                                                                                                         Break
+											                                                                                                                                                         Set SqlDatabase = 'dBase_Files'
+											                                                                                                                                                         If SqlConnect(hSqlA)
+												                                                                                                                                                         Call SqlPrepareAndExecute(hSqlA, "
 														     CREATE
 														     TABLE " || sFile1 || " (DT   DATE,
 														                             KO   CHAR(3),
@@ -10123,32 +10123,32 @@ Application Description: •--------------------------------------•
 														                             KOD  CHAR(8),
 														                             T060 NUMBER(16),
 														                             T020 NUMBER(16))")
-												                                                                                                                                                       Set bMakeFile = TRUE
-										                                                                                                                                                       Set sKO = Subs(GetGlobalOption('KOBL_412') || '   ', 1, 3)
-										                                                                                                                                                       Set sKOD = Right('00000000' || sKOD, 8)
-										                                                                                                                                                       Set bFL = SqlPrepareAndExecute(hSqlA, "
+												                                                                                                                                                         Set bMakeFile = TRUE
+										                                                                                                                                                         Set sKO = Subs(GetGlobalOption('KOBL_412') || '   ', 1, 3)
+										                                                                                                                                                         Set sKOD = Right('00000000' || sKOD, 8)
+										                                                                                                                                                         Set bFL = SqlPrepareAndExecute(hSqlA, "
 												    INSERT
 												    INTO " || sFile1 || "
 												    VALUES (:dYes,:sKO,:sGR,:sS230,:sKOD,:nT060,:nT020)")
-										                                                                                                                                                       If not bFL
-											                                                                                                                                                       Break
-									                                                                                                                                                       If bEct
-										                                                                                                                                                       Call SqlCommit(hSqlA)
+										                                                                                                                                                         If not bFL
+											                                                                                                                                                         Break
+									                                                                                                                                                         If bEct
+										                                                                                                                                                         Call SqlCommit(hSqlA)
 										! переименовать последний файл
-										                                                                                                                                                       Call SqlDisconnect(hSqlA)
-										                                                                                                                                                       Set bMakeFile = FALSE
-										                                                                                                                                                       Call VisFileCopy(sFile, Left(sFile, Len(sFile)-3) || '000')
-										                                                                                                                                                       Call VisFileDelete(sFile)
-									                                                                                                                                                       If bFL
-										                                                                                                                                                       Set mlText = 'Файл ' || Left(sFile, Len(sFile)-3) || '000 за ' || Str(
+										                                                                                                                                                         Call SqlDisconnect(hSqlA)
+										                                                                                                                                                         Set bMakeFile = FALSE
+										                                                                                                                                                         Call VisFileCopy(sFile, Left(sFile, Len(sFile)-3) || '000')
+										                                                                                                                                                         Call VisFileDelete(sFile)
+									                                                                                                                                                         If bFL
+										                                                                                                                                                         Set mlText = 'Файл ' || Left(sFile, Len(sFile)-3) || '000 за ' || Str(
 												    SalDateDay(dYes)) || ' ' || GetMonthNameRus(SalDateMonth(dYes), TRUE) ||
 												    ' ' || Str(SalDateYear(dYes)) || ' г. создан.'
-									                                                                                                                                                       Else
-										                                                                                                                                                       Set mlText = 'Ошибка 2 (нет информации) отбора 412 формы за ' || Str(
+									                                                                                                                                                         Else
+										                                                                                                                                                         Set mlText = 'Ошибка 2 (нет информации) отбора 412 формы за ' || Str(
 												    SalDateDay(dYes)) || ' ' || GetMonthNameRus(SalDateMonth(dYes), TRUE) ||
 												    ' ' || Str(SalDateYear(dYes)) || ' г.'
 								! Else
-									                                                                                                                                                       Set mlText = 'Ошибка 1 (невозможно выполнить запрос ) отбора 412 формы за ' ||
+									                                                                                                                                                         Set mlText = 'Ошибка 1 (невозможно выполнить запрос ) отбора 412 формы за ' ||
 											    Str(SalDateDay(dYes)) || ' ' || GetMonthNameRus(SalDateMonth(dYes), TRUE) ||
 											    ' ' || Str(SalDateYear(dYes)) || ' г.'
 							If cbRaj
@@ -10172,46 +10172,46 @@ Application Description: •--------------------------------------•
 										    GROUP BY t.KOD_DPI,substr(p.ktk,-6,2),p.GR,p.S230,p.KEKD,k.id_key
 										    ORDER BY 1,2,3,4,5"))
 								! If bFL
-									                                                                                                                                                       Set bMakeFile = FALSE
-									                                                                                                                                                       Set nNewTek = -2
-									                                                                                                                                                       Set nNew = -1
-									                                                                                                                                                       Set bFL = FALSE
-									                                                                                                                                                       Set bEct = FALSE
-									                                                                                                                                                       While SqlFetchNext(hSql(), nFetchRes)
-										                                                                                                                                                       Set bEct = TRUE
-										                                                                                                                                                       Set nNew = Val(sTer)
+									                                                                                                                                                         Set bMakeFile = FALSE
+									                                                                                                                                                         Set nNewTek = -2
+									                                                                                                                                                         Set nNew = -1
+									                                                                                                                                                         Set bFL = FALSE
+									                                                                                                                                                         Set bEct = FALSE
+									                                                                                                                                                         While SqlFetchNext(hSql(), nFetchRes)
+										                                                                                                                                                         Set bEct = TRUE
+										                                                                                                                                                         Set nNew = Val(sTer)
 										! смена файла
-										                                                                                                                                                       If nNewTek != nNew
-											                                                                                                                                                       If bMakeFile
-												                                                                                                                                                       Call SqlCommit(hSqlA)
+										                                                                                                                                                         If nNewTek != nNew
+											                                                                                                                                                         If bMakeFile
+												                                                                                                                                                         Call SqlCommit(hSqlA)
 												! переименовать файл
-												                                                                                                                                                       Call SqlDisconnect(hSqlA)
-												                                                                                                                                                       Set bMakeFile = FALSE
-												                                                                                                                                                       Call VisFileCopy(sFile, Left(sFile, Len(sFile)-10) || '000' || MD(dYes) ||
+												                                                                                                                                                         Call SqlDisconnect(hSqlA)
+												                                                                                                                                                         Set bMakeFile = FALSE
+												                                                                                                                                                         Call VisFileCopy(sFile, Left(sFile, Len(sFile)-10) || '000' || MD(dYes) ||
 														     '0.' || Left(Right(sFile, 10), 3))
-												                                                                                                                                                       Call VisFileDelete(sFile)
-											                                                                                                                                                       Set sFile1 = 'FT' || sId_Key || MD(dYes) || '0.dbf'
-											                                                                                                                                                       Set sFile = sDbfPath || sFile1
-											                                                                                                                                                       Set nNewTek = nNew
+												                                                                                                                                                         Call VisFileDelete(sFile)
+											                                                                                                                                                         Set sFile1 = 'FT' || sId_Key || MD(dYes) || '0.dbf'
+											                                                                                                                                                         Set sFile = sDbfPath || sFile1
+											                                                                                                                                                         Set nNewTek = nNew
 											! удалить файл
-											                                                                                                                                                       Set bNoFile = TRUE
-											                                                                                                                                                       If File(sFile)
-												                                                                                                                                                       Set nI = 0
-												                                                                                                                                                       While not SalFileOpen(hF, sFile, OF_Delete)
-													                                                                                                                                                       Set nI = nI + 1
-													                                                                                                                                                       If nI > 96
-														                                                                                                                                                       Call SalWaitCursor(FALSE)
-														                                                                                                                                                       Call MessageNoWait('Невозможно сформировать файл ' || sFile ||
+											                                                                                                                                                         Set bNoFile = TRUE
+											                                                                                                                                                         If File(sFile)
+												                                                                                                                                                         Set nI = 0
+												                                                                                                                                                         While not SalFileOpen(hF, sFile, OF_Delete)
+													                                                                                                                                                         Set nI = nI + 1
+													                                                                                                                                                         If nI > 96
+														                                                                                                                                                         Call SalWaitCursor(FALSE)
+														                                                                                                                                                         Call MessageNoWait('Невозможно сформировать файл ' || sFile ||
 																     ', возможно он занят другим приложением.', 'ВНИМАНИЕ !!!', 0, 1)
-														                                                                                                                                                       Set mlText = ''
-														                                                                                                                                                       Set bNoFile = FALSE
-														                                                                                                                                                       Break
+														                                                                                                                                                         Set mlText = ''
+														                                                                                                                                                         Set bNoFile = FALSE
+														                                                                                                                                                         Break
 											! создать новый файл
-											                                                                                                                                                       If not bNoFile ! остался файл
-												                                                                                                                                                       Break
-											                                                                                                                                                       Set SqlDatabase = 'dBase_Files'
-											                                                                                                                                                       If SqlConnect(hSqlA)
-												                                                                                                                                                       Call SqlPrepareAndExecute(hSqlA, "
+											                                                                                                                                                         If not bNoFile ! остался файл
+												                                                                                                                                                         Break
+											                                                                                                                                                         Set SqlDatabase = 'dBase_Files'
+											                                                                                                                                                         If SqlConnect(hSqlA)
+												                                                                                                                                                         Call SqlPrepareAndExecute(hSqlA, "
 														     CREATE
 														     TABLE " || sFile1 || " (DT   DATE,
 														                             KO   CHAR(3),
@@ -10220,35 +10220,35 @@ Application Description: •--------------------------------------•
 														                             KOD  CHAR(8),
 														                             T060 NUMBER(16),
 														                             T020 NUMBER(16))")
-												                                                                                                                                                       Set bMakeFile = TRUE
-										                                                                                                                                                       Set bEct=TRUE
-										                                                                                                                                                       Set nNew = Val(sTer)
-										                                                                                                                                                       Set sKOD = Right('00000000' || sKOD, 8)
-										                                                                                                                                                       Set bFL = SqlPrepareAndExecute(hSqlA, "
+												                                                                                                                                                         Set bMakeFile = TRUE
+										                                                                                                                                                         Set bEct=TRUE
+										                                                                                                                                                         Set nNew = Val(sTer)
+										                                                                                                                                                         Set sKOD = Right('00000000' || sKOD, 8)
+										                                                                                                                                                         Set bFL = SqlPrepareAndExecute(hSqlA, "
 												    INSERT
 												    INTO " || sFile1 || "
 												    VALUES (:dYes,:sId_Key,:sGR,:sS230,:sKOD,:nT060,:nT020)")
-										                                                                                                                                                       If not bFL
-											                                                                                                                                                       Break
-									                                                                                                                                                       If bEct
-										                                                                                                                                                       Call SqlCommit(hSqlA)
+										                                                                                                                                                         If not bFL
+											                                                                                                                                                         Break
+									                                                                                                                                                         If bEct
+										                                                                                                                                                         Call SqlCommit(hSqlA)
 										! переименовать последний файл
-										                                                                                                                                                       Call SqlDisconnect(hSqlA)
-										                                                                                                                                                       Set bMakeFile = FALSE
-										                                                                                                                                                       Call VisFileCopy(sFile, Left(sFile, Len(sFile)-10) || '000' || MD(dYes) ||
+										                                                                                                                                                         Call SqlDisconnect(hSqlA)
+										                                                                                                                                                         Set bMakeFile = FALSE
+										                                                                                                                                                         Call VisFileCopy(sFile, Left(sFile, Len(sFile)-10) || '000' || MD(dYes) ||
 												     '0.' || Left(Right(sFile, 10), 3))
-										                                                                                                                                                       Call VisFileDelete(sFile)
-									                                                                                                                                                       If bFL
-										                                                                                                                                                       Set mlText = 'Файл ' || Left(sFile, Len(sFile)-10) || '000' || MD(dYes) ||
+										                                                                                                                                                         Call VisFileDelete(sFile)
+									                                                                                                                                                         If bFL
+										                                                                                                                                                         Set mlText = 'Файл ' || Left(sFile, Len(sFile)-10) || '000' || MD(dYes) ||
 												     '0.' || Left(Right(sFile, 10), 3) || ' за ' || Str(SalDateDay(dYes)) ||
 												     ' ' || GetMonthNameRus(SalDateMonth(dYes), TRUE) || ' ' || Str(
 												     SalDateYear(dYes)) || ' г. создан.'
-									                                                                                                                                                       Else
-										                                                                                                                                                       Set mlText = 'Ошибка 2 (нет информации) отбора 412 формы за ' || Str(
+									                                                                                                                                                         Else
+										                                                                                                                                                         Set mlText = 'Ошибка 2 (нет информации) отбора 412 формы за ' || Str(
 												    SalDateDay(dYes)) || ' ' || GetMonthNameRus(SalDateMonth(dYes), TRUE) ||
 												    ' ' || Str(SalDateYear(dYes)) || ' г.'
 								! Else
-									                                                                                                                                                       Set mlText = 'Ошибка 1 (невозможно выполнить запрос) отбора 412 формы за ' ||
+									                                                                                                                                                         Set mlText = 'Ошибка 1 (невозможно выполнить запрос) отбора 412 формы за ' ||
 											    Str(SalDateDay(dYes)) || ' ' || GetMonthNameRus(SalDateMonth(dYes), TRUE) ||
 											    ' ' || Str(SalDateYear(dYes)) || ' г.'
 								! територіальний
@@ -10273,46 +10273,46 @@ Application Description: •--------------------------------------•
 										    GROUP BY t.KOD_DPI,substr(p.ktk,-6,2),p.GR,p.S230,p.KEKD,k.id_key
 										    ORDER BY 1,2,3,4,5"))
 								! If bFL
-									                                                                                                                                                       Set bMakeFile = FALSE
-									                                                                                                                                                       Set nNewTek = -2
-									                                                                                                                                                       Set nNew = -1
-									                                                                                                                                                       Set bFL = FALSE
-									                                                                                                                                                       Set bEct = FALSE
-									                                                                                                                                                       While SqlFetchNext(hSql(), nFetchRes)
-										                                                                                                                                                       Set bEct = TRUE
-										                                                                                                                                                       Set nNew = Val(sTer)
+									                                                                                                                                                         Set bMakeFile = FALSE
+									                                                                                                                                                         Set nNewTek = -2
+									                                                                                                                                                         Set nNew = -1
+									                                                                                                                                                         Set bFL = FALSE
+									                                                                                                                                                         Set bEct = FALSE
+									                                                                                                                                                         While SqlFetchNext(hSql(), nFetchRes)
+										                                                                                                                                                         Set bEct = TRUE
+										                                                                                                                                                         Set nNew = Val(sTer)
 										! смена файла
-										                                                                                                                                                       If nNewTek != nNew
-											                                                                                                                                                       If bMakeFile
-												                                                                                                                                                       Call SqlCommit(hSqlA)
+										                                                                                                                                                         If nNewTek != nNew
+											                                                                                                                                                         If bMakeFile
+												                                                                                                                                                         Call SqlCommit(hSqlA)
 												! переименовать файл
-												                                                                                                                                                       Call SqlDisconnect(hSqlA)
-												                                                                                                                                                       Set bMakeFile = FALSE
-												                                                                                                                                                       Call VisFileCopy(sFile, Left(sFile, Len(sFile)-10) || '010' || MD(dYes) ||
+												                                                                                                                                                         Call SqlDisconnect(hSqlA)
+												                                                                                                                                                         Set bMakeFile = FALSE
+												                                                                                                                                                         Call VisFileCopy(sFile, Left(sFile, Len(sFile)-10) || '010' || MD(dYes) ||
 														     '0.' || Left(Right(sFile, 10), 3))
-												                                                                                                                                                       Call VisFileDelete(sFile)
-											                                                                                                                                                       Set sFile1 = 'FT' || sId_Key || MD(dYes) || '0.dbf'
-											                                                                                                                                                       Set sFile = sDbfPath || sFile1
-											                                                                                                                                                       Set nNewTek = nNew
+												                                                                                                                                                         Call VisFileDelete(sFile)
+											                                                                                                                                                         Set sFile1 = 'FT' || sId_Key || MD(dYes) || '0.dbf'
+											                                                                                                                                                         Set sFile = sDbfPath || sFile1
+											                                                                                                                                                         Set nNewTek = nNew
 											! удалить файл
-											                                                                                                                                                       Set bNoFile = TRUE
-											                                                                                                                                                       If File(sFile)
-												                                                                                                                                                       Set nI = 0
-												                                                                                                                                                       While not SalFileOpen(hF, sFile, OF_Delete)
-													                                                                                                                                                       Set nI = nI + 1
-													                                                                                                                                                       If nI > 96
-														                                                                                                                                                       Call SalWaitCursor(FALSE)
-														                                                                                                                                                       Call MessageNoWait('Невозможно сформировать файл ' || sFile ||
+											                                                                                                                                                         Set bNoFile = TRUE
+											                                                                                                                                                         If File(sFile)
+												                                                                                                                                                         Set nI = 0
+												                                                                                                                                                         While not SalFileOpen(hF, sFile, OF_Delete)
+													                                                                                                                                                         Set nI = nI + 1
+													                                                                                                                                                         If nI > 96
+														                                                                                                                                                         Call SalWaitCursor(FALSE)
+														                                                                                                                                                         Call MessageNoWait('Невозможно сформировать файл ' || sFile ||
 																     ', возможно он занят другим приложением.', 'ВНИМАНИЕ !!!', 0, 1)
-														                                                                                                                                                       Set mlText = ''
-														                                                                                                                                                       Set bNoFile = FALSE
-														                                                                                                                                                       Break
+														                                                                                                                                                         Set mlText = ''
+														                                                                                                                                                         Set bNoFile = FALSE
+														                                                                                                                                                         Break
 											! создать новый файл
-											                                                                                                                                                       If not bNoFile ! остался файл
-												                                                                                                                                                       Break
-											                                                                                                                                                       Set SqlDatabase = 'dBase_Files'
-											                                                                                                                                                       If SqlConnect(hSqlA)
-												                                                                                                                                                       Call SqlPrepareAndExecute(hSqlA, "
+											                                                                                                                                                         If not bNoFile ! остался файл
+												                                                                                                                                                         Break
+											                                                                                                                                                         Set SqlDatabase = 'dBase_Files'
+											                                                                                                                                                         If SqlConnect(hSqlA)
+												                                                                                                                                                         Call SqlPrepareAndExecute(hSqlA, "
 														     CREATE
 														     TABLE " || sFile1 || " (DT   DATE,
 														                             KO   CHAR(3),
@@ -10321,35 +10321,35 @@ Application Description: •--------------------------------------•
 														                             KOD  CHAR(8),
 														                             T060 NUMBER(16),
 														                             T020 NUMBER(16))")
-												                                                                                                                                                       Set bMakeFile = TRUE
-										                                                                                                                                                       Set bEct=TRUE
-										                                                                                                                                                       Set nNew = Val(sTer)
-										                                                                                                                                                       Set sKOD = Right('00000000' || sKOD, 8)
-										                                                                                                                                                       Set bFL = SqlPrepareAndExecute(hSqlA, "
+												                                                                                                                                                         Set bMakeFile = TRUE
+										                                                                                                                                                         Set bEct=TRUE
+										                                                                                                                                                         Set nNew = Val(sTer)
+										                                                                                                                                                         Set sKOD = Right('00000000' || sKOD, 8)
+										                                                                                                                                                         Set bFL = SqlPrepareAndExecute(hSqlA, "
 												    INSERT
 												    INTO " || sFile1 || "
 												    VALUES (:dYes,:sId_Key,:sGR,:sS230,:sKOD,:nT060,:nT020)")
-										                                                                                                                                                       If not bFL
-											                                                                                                                                                       Break
-									                                                                                                                                                       If bEct
-										                                                                                                                                                       Call SqlCommit(hSqlA)
+										                                                                                                                                                         If not bFL
+											                                                                                                                                                         Break
+									                                                                                                                                                         If bEct
+										                                                                                                                                                         Call SqlCommit(hSqlA)
 										! переименовать последний файл
-										                                                                                                                                                       Call SqlDisconnect(hSqlA)
-										                                                                                                                                                       Set bMakeFile = FALSE
-										                                                                                                                                                       Call VisFileCopy(sFile, Left(sFile, Len(sFile)-10) || '010' || MD(dYes) ||
+										                                                                                                                                                         Call SqlDisconnect(hSqlA)
+										                                                                                                                                                         Set bMakeFile = FALSE
+										                                                                                                                                                         Call VisFileCopy(sFile, Left(sFile, Len(sFile)-10) || '010' || MD(dYes) ||
 												     '0.' || Left(Right(sFile, 10), 3))
-										                                                                                                                                                       Call VisFileDelete(sFile)
-									                                                                                                                                                       If bFL
-										                                                                                                                                                       Set mlText = 'Файл ' || Left(sFile, Len(sFile)-10) || '010' || MD(dYes) ||
+										                                                                                                                                                         Call VisFileDelete(sFile)
+									                                                                                                                                                         If bFL
+										                                                                                                                                                         Set mlText = 'Файл ' || Left(sFile, Len(sFile)-10) || '010' || MD(dYes) ||
 												     '0.' || Left(Right(sFile, 10), 3) || ' за ' || Str(SalDateDay(dYes)) ||
 												     ' ' || GetMonthNameRus(SalDateMonth(dYes), TRUE) || ' ' || Str(
 												     SalDateYear(dYes)) || ' г. создан.'
-									                                                                                                                                                       Else
-										                                                                                                                                                       Set mlText = 'Ошибка 2 (нет информации) отбора 412 формы за ' || Str(
+									                                                                                                                                                         Else
+										                                                                                                                                                         Set mlText = 'Ошибка 2 (нет информации) отбора 412 формы за ' || Str(
 												    SalDateDay(dYes)) || ' ' || GetMonthNameRus(SalDateMonth(dYes), TRUE) ||
 												    ' ' || Str(SalDateYear(dYes)) || ' г.'
 								! Else
-									                                                                                                                                                       Set mlText = 'Ошибка 1 (невозможно выполнить запрос) отбора 412 формы за ' ||
+									                                                                                                                                                         Set mlText = 'Ошибка 1 (невозможно выполнить запрос) отбора 412 формы за ' ||
 											    Str(SalDateDay(dYes)) || ' ' || GetMonthNameRus(SalDateMonth(dYes), TRUE) ||
 											    ' ' || Str(SalDateYear(dYes)) || ' г.'
 							If cbSeS
@@ -10376,47 +10376,47 @@ Application Description: •--------------------------------------•
 										    GROUP BY (t.ktk-mod(t.ktk,100))/100,p.GR,p.S230,p.KEKD,k.id_key,p.ktk
 										    ORDER BY (t.ktk-mod(t.ktk,100))/100,p.GR,p.S230,p.KEKD,k.id_key,p.ktk"))
 								! If bFL
-									                                                                                                                                                       Set bMakeFile = FALSE
-									                                                                                                                                                       Set nNewTek = -2
-									                                                                                                                                                       Set nNew = -1
-									                                                                                                                                                       Set bFL = FALSE
-									                                                                                                                                                       Set bEct = FALSE
-									                                                                                                                                                       While SqlFetchNext(hSql(), nFetchRes)
-										                                                                                                                                                       Set bEct = TRUE
-										                                                                                                                                                       Set nNew = nDPI
+									                                                                                                                                                         Set bMakeFile = FALSE
+									                                                                                                                                                         Set nNewTek = -2
+									                                                                                                                                                         Set nNew = -1
+									                                                                                                                                                         Set bFL = FALSE
+									                                                                                                                                                         Set bEct = FALSE
+									                                                                                                                                                         While SqlFetchNext(hSql(), nFetchRes)
+										                                                                                                                                                         Set bEct = TRUE
+										                                                                                                                                                         Set nNew = nDPI
 										! смена файла
-										                                                                                                                                                       If nNewTek != nNew
-											                                                                                                                                                       If bMakeFile
-												                                                                                                                                                       Call SqlCommit(hSqlA)
+										                                                                                                                                                         If nNewTek != nNew
+											                                                                                                                                                         If bMakeFile
+												                                                                                                                                                         Call SqlCommit(hSqlA)
 												! переименовать файл
-												                                                                                                                                                       Call SqlDisconnect(hSqlA)
-												                                                                                                                                                       Set bMakeFile = FALSE
-												                                                                                                                                                       If bYesSelo
-													                                                                                                                                                       Call VisFileCopy(sFile, Left(sFile, Len(sFile)-10) || '000' || MD(dYes)
+												                                                                                                                                                         Call SqlDisconnect(hSqlA)
+												                                                                                                                                                         Set bMakeFile = FALSE
+												                                                                                                                                                         If bYesSelo
+													                                                                                                                                                         Call VisFileCopy(sFile, Left(sFile, Len(sFile)-10) || '000' || MD(dYes)
 															     || '0.' || Left(Right(sFile, 10), 3))
-												                                                                                                                                                       Call VisFileDelete(sFile)
-											                                                                                                                                                       Set sFile1 = 'FT' || sId_Key || MD(dYes) || '0.dbf'
-											                                                                                                                                                       Set sFile = sDbfPath || sFile1
-											                                                                                                                                                       Set nNewTek = nNew
+												                                                                                                                                                         Call VisFileDelete(sFile)
+											                                                                                                                                                         Set sFile1 = 'FT' || sId_Key || MD(dYes) || '0.dbf'
+											                                                                                                                                                         Set sFile = sDbfPath || sFile1
+											                                                                                                                                                         Set nNewTek = nNew
 											! удалить файл
-											                                                                                                                                                       Set bNoFile = TRUE
-											                                                                                                                                                       If File(sFile)
-												                                                                                                                                                       Set nI = 0
-												                                                                                                                                                       While not SalFileOpen(hF, sFile, OF_Delete)
-													                                                                                                                                                       Set nI = nI + 1
-													                                                                                                                                                       If nI > 96
-														                                                                                                                                                       Call SalWaitCursor(FALSE)
-														                                                                                                                                                       Call MessageNoWait('Невозможно сформировать файл ' || sFile ||
+											                                                                                                                                                         Set bNoFile = TRUE
+											                                                                                                                                                         If File(sFile)
+												                                                                                                                                                         Set nI = 0
+												                                                                                                                                                         While not SalFileOpen(hF, sFile, OF_Delete)
+													                                                                                                                                                         Set nI = nI + 1
+													                                                                                                                                                         If nI > 96
+														                                                                                                                                                         Call SalWaitCursor(FALSE)
+														                                                                                                                                                         Call MessageNoWait('Невозможно сформировать файл ' || sFile ||
 																     ', возможно он занят другим приложением.', 'ВНИМАНИЕ !!!', 0, 1)
-														                                                                                                                                                       Set mlText = ''
-														                                                                                                                                                       Set bNoFile = FALSE
-														                                                                                                                                                       Break
+														                                                                                                                                                         Set mlText = ''
+														                                                                                                                                                         Set bNoFile = FALSE
+														                                                                                                                                                         Break
 											! создать новый файл
-											                                                                                                                                                       If not bNoFile ! остался файл
-												                                                                                                                                                       Break
-											                                                                                                                                                       Set SqlDatabase = 'dBase_Files'
-											                                                                                                                                                       If SqlConnect(hSqlA)
-												                                                                                                                                                       Call SqlPrepareAndExecute(hSqlA, "
+											                                                                                                                                                         If not bNoFile ! остался файл
+												                                                                                                                                                         Break
+											                                                                                                                                                         Set SqlDatabase = 'dBase_Files'
+											                                                                                                                                                         If SqlConnect(hSqlA)
+												                                                                                                                                                         Call SqlPrepareAndExecute(hSqlA, "
 														     CREATE
 														     TABLE " || sFile1 || " (DT   DATE,
 														                             KO   CHAR(3),
@@ -10425,37 +10425,37 @@ Application Description: •--------------------------------------•
 														                             KOD  CHAR(8),
 														                             T060 NUMBER(16),
 														                             T020 NUMBER(16))")
-												                                                                                                                                                       Set bMakeFile = TRUE
-												                                                                                                                                                       Set bYesSelo = FALSE
-										                                                                                                                                                       Set nNew = nDPI
-										                                                                                                                                                       Set sKOD = Right('00000000' || sKOD, 8)
-										                                                                                                                                                       Set bYesSelo = Mod(nKtk, 100)>0 or bYesSelo
-										                                                                                                                                                       Set bFL = SqlPrepareAndExecute(hSqlA, "
+												                                                                                                                                                         Set bMakeFile = TRUE
+												                                                                                                                                                         Set bYesSelo = FALSE
+										                                                                                                                                                         Set nNew = nDPI
+										                                                                                                                                                         Set sKOD = Right('00000000' || sKOD, 8)
+										                                                                                                                                                         Set bYesSelo = Mod(nKtk, 100)>0 or bYesSelo
+										                                                                                                                                                         Set bFL = SqlPrepareAndExecute(hSqlA, "
 												    INSERT
 												    INTO " || sFile1 || "
 												    VALUES (:dYes,:sId_Key,:sGR,:sS230,:sKOD,:nT060,:nT020)")
-										                                                                                                                                                       If not bFL
-											                                                                                                                                                       Break
-									                                                                                                                                                       If bEct
-										                                                                                                                                                       Call SqlCommit(hSqlA)
+										                                                                                                                                                         If not bFL
+											                                                                                                                                                         Break
+									                                                                                                                                                         If bEct
+										                                                                                                                                                         Call SqlCommit(hSqlA)
 										! переименовать последний файл
-										                                                                                                                                                       Call SqlDisconnect(hSqlA)
-										                                                                                                                                                       Set bMakeFile = FALSE
-										                                                                                                                                                       If bYesSelo
-											                                                                                                                                                       Call VisFileCopy(sFile, Left(sFile, Len(sFile)-10) || '000' || MD(dYes) ||
+										                                                                                                                                                         Call SqlDisconnect(hSqlA)
+										                                                                                                                                                         Set bMakeFile = FALSE
+										                                                                                                                                                         If bYesSelo
+											                                                                                                                                                         Call VisFileCopy(sFile, Left(sFile, Len(sFile)-10) || '000' || MD(dYes) ||
 													     '0.' || Left(Right(sFile, 10), 3))
-										                                                                                                                                                       Call VisFileDelete(sFile)
-									                                                                                                                                                       If bFL
-										                                                                                                                                                       Set mlText = 'Файл ' || Left(sFile, Len(sFile)-10) || '000' || MD(dYes) ||
+										                                                                                                                                                         Call VisFileDelete(sFile)
+									                                                                                                                                                         If bFL
+										                                                                                                                                                         Set mlText = 'Файл ' || Left(sFile, Len(sFile)-10) || '000' || MD(dYes) ||
 												    '0.' || Left(Right(sFile, 10), 3) || ' за ' || Str(SalDateDay(dYes)) ||
 												    ' ' || GetMonthNameRus(SalDateMonth(dYes), TRUE) || ' ' || Str(
 												    SalDateYear(dYes)) || ' г. создан.'
-									                                                                                                                                                       Else
-										                                                                                                                                                       Set mlText = 'Ошибка 2 (нет информации) отбора 412 формы за ' || Str(
+									                                                                                                                                                         Else
+										                                                                                                                                                         Set mlText = 'Ошибка 2 (нет информации) отбора 412 формы за ' || Str(
 												    SalDateDay(dYes)) || ' ' || GetMonthNameRus(SalDateMonth(dYes), TRUE) ||
 												    ' ' || Str(SalDateYear(dYes)) || ' г.'
 								! Else
-									                                                                                                                                                       Set mlText = 'Ошибка 1 (невозможно выполнить запрос) отбора 412 формы за ' ||
+									                                                                                                                                                         Set mlText = 'Ошибка 1 (невозможно выполнить запрос) отбора 412 формы за ' ||
 											    Str(SalDateDay(dYes)) || ' ' || GetMonthNameRus(SalDateMonth(dYes), TRUE) ||
 											    ' ' || Str(SalDateYear(dYes)) || ' г.'
 								! територіальний
@@ -10481,46 +10481,46 @@ Application Description: •--------------------------------------•
 										    GROUP BY (t.ktk-mod(t.ktk,100))/100,p.GR,p.S230,p.KEKD,k.id_key
 										    ORDER BY (t.ktk-mod(t.ktk,100))/100,p.GR,p.S230,p.KEKD,k.id_key"))
 								! If bFL
-									                                                                                                                                                       Set bMakeFile = FALSE
-									                                                                                                                                                       Set nNewTek = -2
-									                                                                                                                                                       Set nNew = -1
-									                                                                                                                                                       Set bFL = FALSE
-									                                                                                                                                                       Set bEct = FALSE
-									                                                                                                                                                       While SqlFetchNext(hSql(), nFetchRes)
-										                                                                                                                                                       Set bEct = TRUE
-										                                                                                                                                                       Set nNew = nDPI
+									                                                                                                                                                         Set bMakeFile = FALSE
+									                                                                                                                                                         Set nNewTek = -2
+									                                                                                                                                                         Set nNew = -1
+									                                                                                                                                                         Set bFL = FALSE
+									                                                                                                                                                         Set bEct = FALSE
+									                                                                                                                                                         While SqlFetchNext(hSql(), nFetchRes)
+										                                                                                                                                                         Set bEct = TRUE
+										                                                                                                                                                         Set nNew = nDPI
 										! смена файла
-										                                                                                                                                                       If nNewTek != nNew
-											                                                                                                                                                       If bMakeFile
-												                                                                                                                                                       Call SqlCommit(hSqlA)
+										                                                                                                                                                         If nNewTek != nNew
+											                                                                                                                                                         If bMakeFile
+												                                                                                                                                                         Call SqlCommit(hSqlA)
 												! переименовать файл
-												                                                                                                                                                       Call SqlDisconnect(hSqlA)
-												                                                                                                                                                       Set bMakeFile = FALSE
-												                                                                                                                                                       Call VisFileCopy(sFile, Left(sFile, Len(sFile)-10) || '010' || MD(dYes) ||
+												                                                                                                                                                         Call SqlDisconnect(hSqlA)
+												                                                                                                                                                         Set bMakeFile = FALSE
+												                                                                                                                                                         Call VisFileCopy(sFile, Left(sFile, Len(sFile)-10) || '010' || MD(dYes) ||
 														     '0.' || Left(Right(sFile, 10), 3))
-												                                                                                                                                                       Call VisFileDelete(sFile)
-											                                                                                                                                                       Set sFile1 = 'FT' || sId_Key || MD(dYes) || '0.dbf'
-											                                                                                                                                                       Set sFile = sDbfPath || sFile1
-											                                                                                                                                                       Set nNewTek = nNew
+												                                                                                                                                                         Call VisFileDelete(sFile)
+											                                                                                                                                                         Set sFile1 = 'FT' || sId_Key || MD(dYes) || '0.dbf'
+											                                                                                                                                                         Set sFile = sDbfPath || sFile1
+											                                                                                                                                                         Set nNewTek = nNew
 											! удалить файл
-											                                                                                                                                                       Set bNoFile = TRUE
-											                                                                                                                                                       If File(sFile)
-												                                                                                                                                                       Set nI = 0
-												                                                                                                                                                       While not SalFileOpen(hF, sFile, OF_Delete)
-													                                                                                                                                                       Set nI = nI + 1
-													                                                                                                                                                       If nI > 96
-														                                                                                                                                                       Call SalWaitCursor(FALSE)
-														                                                                                                                                                       Call MessageNoWait('Невозможно сформировать файл ' || sFile ||
+											                                                                                                                                                         Set bNoFile = TRUE
+											                                                                                                                                                         If File(sFile)
+												                                                                                                                                                         Set nI = 0
+												                                                                                                                                                         While not SalFileOpen(hF, sFile, OF_Delete)
+													                                                                                                                                                         Set nI = nI + 1
+													                                                                                                                                                         If nI > 96
+														                                                                                                                                                         Call SalWaitCursor(FALSE)
+														                                                                                                                                                         Call MessageNoWait('Невозможно сформировать файл ' || sFile ||
 																     ', возможно он занят другим приложением.', 'ВНИМАНИЕ !!!', 0, 1)
-														                                                                                                                                                       Set mlText = ''
-														                                                                                                                                                       Set bNoFile = FALSE
-														                                                                                                                                                       Break
+														                                                                                                                                                         Set mlText = ''
+														                                                                                                                                                         Set bNoFile = FALSE
+														                                                                                                                                                         Break
 											! создать новый файл
-											                                                                                                                                                       If not bNoFile ! остался файл
-												                                                                                                                                                       Break
-											                                                                                                                                                       Set SqlDatabase = 'dBase_Files'
-											                                                                                                                                                       If SqlConnect(hSqlA)
-												                                                                                                                                                       Call SqlPrepareAndExecute(hSqlA, "
+											                                                                                                                                                         If not bNoFile ! остался файл
+												                                                                                                                                                         Break
+											                                                                                                                                                         Set SqlDatabase = 'dBase_Files'
+											                                                                                                                                                         If SqlConnect(hSqlA)
+												                                                                                                                                                         Call SqlPrepareAndExecute(hSqlA, "
 														     CREATE
 														     TABLE " || sFile1 || " (DT   DATE,
 														                             KO   CHAR(3),
@@ -10529,34 +10529,34 @@ Application Description: •--------------------------------------•
 														                             KOD  CHAR(8),
 														                             T060 NUMBER(16),
 														                             T020 NUMBER(16))")
-												                                                                                                                                                       Set bMakeFile = TRUE
-										                                                                                                                                                       Set nNew = nDPI
-										                                                                                                                                                       Set sKOD = Right('00000000' || sKOD, 8)
-										                                                                                                                                                       Set bFL = SqlPrepareAndExecute(hSqlA, "
+												                                                                                                                                                         Set bMakeFile = TRUE
+										                                                                                                                                                         Set nNew = nDPI
+										                                                                                                                                                         Set sKOD = Right('00000000' || sKOD, 8)
+										                                                                                                                                                         Set bFL = SqlPrepareAndExecute(hSqlA, "
 												    INSERT
 												    INTO " || sFile1 || "
 												    VALUES (:dYes,:sId_Key,:sGR,:sS230,:sKOD,:nT060,:nT020)")
-										                                                                                                                                                       If not bFL
-											                                                                                                                                                       Break
-									                                                                                                                                                       If bEct
-										                                                                                                                                                       Call SqlCommit(hSqlA)
+										                                                                                                                                                         If not bFL
+											                                                                                                                                                         Break
+									                                                                                                                                                         If bEct
+										                                                                                                                                                         Call SqlCommit(hSqlA)
 										! переименовать последний файл
-										                                                                                                                                                       Call SqlDisconnect(hSqlA)
-										                                                                                                                                                       Set bMakeFile = FALSE
-										                                                                                                                                                       Call VisFileCopy(sFile, Left(sFile, Len(sFile)-10) || '010' || MD(dYes) ||
+										                                                                                                                                                         Call SqlDisconnect(hSqlA)
+										                                                                                                                                                         Set bMakeFile = FALSE
+										                                                                                                                                                         Call VisFileCopy(sFile, Left(sFile, Len(sFile)-10) || '010' || MD(dYes) ||
 												     '0.' || Left(Right(sFile, 10), 3))
-										                                                                                                                                                       Call VisFileDelete(sFile)
-									                                                                                                                                                       If bFL
-										                                                                                                                                                       Set mlText = 'Файл ' || Left(sFile, Len(sFile)-10) || '010' || MD(dYes) ||
+										                                                                                                                                                         Call VisFileDelete(sFile)
+									                                                                                                                                                         If bFL
+										                                                                                                                                                         Set mlText = 'Файл ' || Left(sFile, Len(sFile)-10) || '010' || MD(dYes) ||
 												    '0.' || Left(Right(sFile, 10), 3) || ' за ' || Str(SalDateDay(dYes)) ||
 												    ' ' || GetMonthNameRus(SalDateMonth(dYes), TRUE) || ' ' || Str(
 												    SalDateYear(dYes)) || ' г. создан.'
-									                                                                                                                                                       Else
-										                                                                                                                                                       Set mlText = 'Ошибка 2 (нет информации) отбора 412 формы за ' || Str(
+									                                                                                                                                                         Else
+										                                                                                                                                                         Set mlText = 'Ошибка 2 (нет информации) отбора 412 формы за ' || Str(
 												    SalDateDay(dYes)) || ' ' || GetMonthNameRus(SalDateMonth(dYes), TRUE) ||
 												    ' ' || Str(SalDateYear(dYes)) || ' г.'
 								! Else
-									                                                                                                                                                       Set mlText = 'Ошибка 1 (невозможно выполнить запрос) отбора 412 формы за ' ||
+									                                                                                                                                                         Set mlText = 'Ошибка 1 (невозможно выполнить запрос) отбора 412 формы за ' ||
 											    Str(SalDateDay(dYes)) || ' ' || GetMonthNameRus(SalDateMonth(dYes), TRUE) ||
 											    ' ' || Str(SalDateYear(dYes)) || ' г.'
 							If cbSel
@@ -10577,46 +10577,46 @@ Application Description: •--------------------------------------•
 										    GROUP BY t.ktk,p.GR,p.S230,p.KEKD,k.id_key
 										    ORDER BY t.ktk,p.GR,p.S230,p.KEKD,k.id_key"))
 								! If bFL
-									                                                                                                                                                       Set bMakeFile = FALSE
-									                                                                                                                                                       Set nNewTek = -2
-									                                                                                                                                                       Set nNew = -1
-									                                                                                                                                                       Set bFL = FALSE
-									                                                                                                                                                       Set bEct = FALSE
-									                                                                                                                                                       While SqlFetchNext(hSql(), nFetchRes)
-										                                                                                                                                                       Set bEct = TRUE
-										                                                                                                                                                       Set nNew = nDPI
+									                                                                                                                                                         Set bMakeFile = FALSE
+									                                                                                                                                                         Set nNewTek = -2
+									                                                                                                                                                         Set nNew = -1
+									                                                                                                                                                         Set bFL = FALSE
+									                                                                                                                                                         Set bEct = FALSE
+									                                                                                                                                                         While SqlFetchNext(hSql(), nFetchRes)
+										                                                                                                                                                         Set bEct = TRUE
+										                                                                                                                                                         Set nNew = nDPI
 										! смена файла
-										                                                                                                                                                       If nNewTek != nNew
-											                                                                                                                                                       If bMakeFile
-												                                                                                                                                                       Call SqlCommit(hSqlA)
+										                                                                                                                                                         If nNewTek != nNew
+											                                                                                                                                                         If bMakeFile
+												                                                                                                                                                         Call SqlCommit(hSqlA)
 												! переименовать файл
-												                                                                                                                                                       Call SqlDisconnect(hSqlA)
-												                                                                                                                                                       Set bMakeFile = FALSE
-												                                                                                                                                                       Call VisFileCopy(sFile, Left(sFile, Len(sFile)-10) || '010' || MD(dYes) ||
+												                                                                                                                                                         Call SqlDisconnect(hSqlA)
+												                                                                                                                                                         Set bMakeFile = FALSE
+												                                                                                                                                                         Call VisFileCopy(sFile, Left(sFile, Len(sFile)-10) || '010' || MD(dYes) ||
 														     '0.' || Left(Right(sFile, 10), 3))
-												                                                                                                                                                       Call VisFileDelete(sFile)
-											                                                                                                                                                       Set sFile1 = 'FT' || sId_Key || MD(dYes) || '0.dbf'
-											                                                                                                                                                       Set sFile = sDbfPath || sFile1
-											                                                                                                                                                       Set nNewTek = nNew
+												                                                                                                                                                         Call VisFileDelete(sFile)
+											                                                                                                                                                         Set sFile1 = 'FT' || sId_Key || MD(dYes) || '0.dbf'
+											                                                                                                                                                         Set sFile = sDbfPath || sFile1
+											                                                                                                                                                         Set nNewTek = nNew
 											! удалить файл
-											                                                                                                                                                       Set bNoFile = TRUE
-											                                                                                                                                                       If File(sFile)
-												                                                                                                                                                       Set nI = 0
-												                                                                                                                                                       While not SalFileOpen(hF, sFile, OF_Delete)
-													                                                                                                                                                       Set nI = nI + 1
-													                                                                                                                                                       If nI > 96
-														                                                                                                                                                       Call SalWaitCursor(FALSE)
-														                                                                                                                                                       Call MessageNoWait('Невозможно сформировать файл ' || sFile ||
+											                                                                                                                                                         Set bNoFile = TRUE
+											                                                                                                                                                         If File(sFile)
+												                                                                                                                                                         Set nI = 0
+												                                                                                                                                                         While not SalFileOpen(hF, sFile, OF_Delete)
+													                                                                                                                                                         Set nI = nI + 1
+													                                                                                                                                                         If nI > 96
+														                                                                                                                                                         Call SalWaitCursor(FALSE)
+														                                                                                                                                                         Call MessageNoWait('Невозможно сформировать файл ' || sFile ||
 																     ', возможно он занят другим приложением.', 'ВНИМАНИЕ !!!', 0, 1)
-														                                                                                                                                                       Set mlText = ''
-														                                                                                                                                                       Set bNoFile = FALSE
-														                                                                                                                                                       Break
+														                                                                                                                                                         Set mlText = ''
+														                                                                                                                                                         Set bNoFile = FALSE
+														                                                                                                                                                         Break
 											! создать новый файл
-											                                                                                                                                                       If not bNoFile ! остался файл
-												                                                                                                                                                       Break
-											                                                                                                                                                       Set SqlDatabase = 'dBase_Files'
-											                                                                                                                                                       If SqlConnect(hSqlA)
-												                                                                                                                                                       Call SqlPrepareAndExecute(hSqlA, "
+											                                                                                                                                                         If not bNoFile ! остался файл
+												                                                                                                                                                         Break
+											                                                                                                                                                         Set SqlDatabase = 'dBase_Files'
+											                                                                                                                                                         If SqlConnect(hSqlA)
+												                                                                                                                                                         Call SqlPrepareAndExecute(hSqlA, "
 														     CREATE
 														     TABLE " || sFile1 || " (DT   DATE,
 														                             KO   CHAR(3),
@@ -10625,34 +10625,34 @@ Application Description: •--------------------------------------•
 														                             KOD  CHAR(8),
 														                             T060 NUMBER(16),
 														                             T020 NUMBER(16))")
-												                                                                                                                                                       Set bMakeFile = TRUE
-										                                                                                                                                                       Set nNew = nDPI
-										                                                                                                                                                       Set sKOD = Right('00000000' || sKOD, 8)
-										                                                                                                                                                       Set bFL = SqlPrepareAndExecute(hSqlA, "
+												                                                                                                                                                         Set bMakeFile = TRUE
+										                                                                                                                                                         Set nNew = nDPI
+										                                                                                                                                                         Set sKOD = Right('00000000' || sKOD, 8)
+										                                                                                                                                                         Set bFL = SqlPrepareAndExecute(hSqlA, "
 												    INSERT
 												    INTO " || sFile1 || "
 												    VALUES (:dYes,:sId_Key,:sGR,:sS230,:sKOD,:nT060,:nT020)")
-										                                                                                                                                                       If not bFL
-											                                                                                                                                                       Break
-									                                                                                                                                                       If bEct
-										                                                                                                                                                       Call SqlCommit(hSqlA)
+										                                                                                                                                                         If not bFL
+											                                                                                                                                                         Break
+									                                                                                                                                                         If bEct
+										                                                                                                                                                         Call SqlCommit(hSqlA)
 										! переименовать последний файл
-										                                                                                                                                                       Call SqlDisconnect(hSqlA)
-										                                                                                                                                                       Set bMakeFile = FALSE
-										                                                                                                                                                       Call VisFileCopy(sFile, Left(sFile, Len(sFile)-10) || '010' || MD(dYes) ||
+										                                                                                                                                                         Call SqlDisconnect(hSqlA)
+										                                                                                                                                                         Set bMakeFile = FALSE
+										                                                                                                                                                         Call VisFileCopy(sFile, Left(sFile, Len(sFile)-10) || '010' || MD(dYes) ||
 												     '0.' || Left(Right(sFile, 10), 3))
-										                                                                                                                                                       Call VisFileDelete(sFile)
-									                                                                                                                                                       If bFL
-										                                                                                                                                                       Set mlText = 'Файл ' || Left(sFile, Len(sFile)-10) || '010' || MD(dYes) ||
+										                                                                                                                                                         Call VisFileDelete(sFile)
+									                                                                                                                                                         If bFL
+										                                                                                                                                                         Set mlText = 'Файл ' || Left(sFile, Len(sFile)-10) || '010' || MD(dYes) ||
 												    '0.' || Left(Right(sFile, 10), 3) || ' за ' || Str(SalDateDay(dYes)) ||
 												    ' ' || GetMonthNameRus(SalDateMonth(dYes), TRUE) || ' ' || Str(
 												    SalDateYear(dYes)) || ' г. создан.'
-									                                                                                                                                                       Else
-										                                                                                                                                                       Set mlText = 'Ошибка 2 (нет информации) отбора 412 формы за ' || Str(
+									                                                                                                                                                         Else
+										                                                                                                                                                         Set mlText = 'Ошибка 2 (нет информации) отбора 412 формы за ' || Str(
 												    SalDateDay(dYes)) || ' ' || GetMonthNameRus(SalDateMonth(dYes), TRUE) ||
 												    ' ' || Str(SalDateYear(dYes)) || ' г.'
 								! Else
-									                                                                                                                                                       Set mlText = 'Ошибка 1 (невозможно выполнить запрос) отбора 412 формы за ' ||
+									                                                                                                                                                         Set mlText = 'Ошибка 1 (невозможно выполнить запрос) отбора 412 формы за ' ||
 											    Str(SalDateDay(dYes)) || ' ' || GetMonthNameRus(SalDateMonth(dYes), TRUE) ||
 											    ' ' || Str(SalDateYear(dYes)) || ' г.'
 							Set mlText = 'Отбор формы 412 по гос.бюджету за ' || Str(SalDateDay(dYes)) || ' ' ||
@@ -12385,8 +12385,8 @@ Application Description: •--------------------------------------•
 						! !=========================================================================
 						! !== Населим села (если они есть ) в зависимости от выбранной сельской рады
 						! !=========================================================================
-						                                                                                                                                                      If (nLevel =3) and (SalStrLength(frm_DKU.tbl1.Kod1)!=8) and wParam=0
-							                                                                                                                                                      Set sSql=
+						                                                                                                                                                        If (nLevel =3) and (SalStrLength(frm_DKU.tbl1.Kod1)!=8) and wParam=0
+							                                                                                                                                                        Set sSql=
 									" SELECT  UNIQUE substr(ktk, -6,6), d.id, d.name, k.id_key||' - '||k.name, k.id_key
 									  INTO  :tblSelo.Kod1,  :tblSelo.colDPI,   :tblSelo.Name1, 
 									        :tblSelo.ktk_name, :tblSelo.colid_key
@@ -12398,7 +12398,7 @@ Application Description: •--------------------------------------•
 									IifS(tblRada.Kod1="*", IifS(frm_DKU.tbl1.Kod1="*","",frm_DKU.tbl1.Kod1)||"%",
 									     tblRada.Kod1) || "'"
 							! Call Debug(sSql)
-							                                                                                                                                                      Call SalTblPopulate(tblSelo, hSql(), sSql, TBL_FillAll)
+							                                                                                                                                                        Call SalTblPopulate(tblSelo, hSql(), sSql, TBL_FillAll)
 						! - -  выбрали несколько районов, в этом случае - показать все
 			Child Table: tblSelo !! Районные Казначейства
 				Class Child Ref Key: 0
@@ -12876,51 +12876,51 @@ Application Description: •--------------------------------------•
 					Return Chr(IifN(SalDateMonth(dDATA)<10, 48, 55) + SalDateMonth(dDATA)) ||
 							       Chr(IifN(SalDateDay(dDATA)<10, 48, 55) + SalDateDay(dDATA))
 			! Function: SobakiBe
-				             Description: Создать файл реестра документов для НИ без таблицы
-				             Returns 
-					             Boolean: 
-				             Parameters 
-					             String: strFileName
-					             Date/Time: dDatSobak
-				             Static Variables 
-				             Local variables 
+				               Description: Создать файл реестра документов для НИ без таблицы
+				               Returns 
+					               Boolean: 
+				               Parameters 
+					               String: strFileName
+					               Date/Time: dDatSobak
+				               Static Variables 
+				               Local variables 
 					! File Handle: hDelFile
-					             Number: hFile
-					             String: sDat1
-					             Number: nRec
-					             String: sId_key
+					               Number: hFile
+					               String: sDat1
+					               Number: nRec
+					               String: sId_key
 					!
-					             String: ID_KEY
-					             String: MFOA
-					             String: NLSA
-					             String: MFOB
-					             String: NLSB
-					             Number: DK
-					             Number: S
-					             Number: VOB
-					             String: ND
-					             Number: KV
-					             Date/Time: DATD
-					             Date/Time: DATP
-					             String: NAMA
-					             String: NAMB
-					             String: NAZN
-					             String: DREC
-					             String: NAZNK
-					             String: NAZNS
-					             String: OKPOA
-					             String: OKPOB
-					             String: REF_A
-					             Date/Time: DAT_A
-					             Date/Time: DAT_B
-					             String: sSql
-				             Actions 
-					             Call SalWaitCursor( TRUE )
-					             Set sDat1=SalFmtFormatDateTime(dDatSobak,'MM-dd-yyyy')
-					             Set hFile = 0
-					             Set nRec  = 0
-					             Set sId_key  = 'XXX'
-					             Set sSql=
+					               String: ID_KEY
+					               String: MFOA
+					               String: NLSA
+					               String: MFOB
+					               String: NLSB
+					               Number: DK
+					               Number: S
+					               Number: VOB
+					               String: ND
+					               Number: KV
+					               Date/Time: DATD
+					               Date/Time: DATP
+					               String: NAMA
+					               String: NAMB
+					               String: NAZN
+					               String: DREC
+					               String: NAZNK
+					               String: NAZNS
+					               String: OKPOA
+					               String: OKPOB
+					               String: REF_A
+					               Date/Time: DAT_A
+					               Date/Time: DAT_B
+					               String: sSql
+				               Actions 
+					               Call SalWaitCursor( TRUE )
+					               Set sDat1=SalFmtFormatDateTime(dDatSobak,'MM-dd-yyyy')
+					               Set hFile = 0
+					               Set nRec  = 0
+					               Set sId_key  = 'XXX'
+					               Set sSql=
 							"SELECT /*+ INDEX(o XIE_FDAT_ACC_SOS_OPLDOK) INDEX(o1 XAK_REF_OPLDOK) INDEX(x) INDEX(a) INDEX(a1) INDEX(s) INDEX(k1) INDEX(k2) */ 
 							        k2.id_key,
 							        DECODE(o.tt,'R01',x.mfoa,x.tt,x.mfoa,"||GetBankMfo()||"),
@@ -12963,33 +12963,33 @@ Application Description: •--------------------------------------•
 							  ORDER BY ID_KEY
 							 INTO :ID_KEY,:MFOA,:NLSA,:MFOB,:NLSB,:DK,:S,:VOB,:ND,:KV,
 							      :DATD,:DATP,:NAMA,:NAMB,:NAZN,:DREC,:OKPOA,:OKPOB,:REF_A,:DAT_A,:DAT_B "
-					             Call SqlPrepareAndExecute(hSqlAux(),sSql)
-					             While SqlFetchNext(hSqlAux(),nFetchRes)
+					               Call SqlPrepareAndExecute(hSqlAux(),sSql)
+					               While SqlFetchNext(hSqlAux(),nFetchRes)
 						! Set KTK = Right('000'||SalStrTrimX( KTK ),3)
-						             If sId_key != ID_KEY
-							             If hFile>0
-								             Call lllseek( hFile, 102+22, FILE_SeekBegin )
-								             Call llwrite( hFile, PadL(Str(nRec),6), 6 )
-								             Call llclose(hFile)
+						               If sId_key != ID_KEY
+							               If hFile>0
+								               Call lllseek( hFile, 102+22, FILE_SeekBegin )
+								               Call llwrite( hFile, PadL(Str(nRec),6), 6 )
+								               Call llclose(hFile)
 								! Пока без BACKUP
 								! Call FunBackUpFile( strFileName, Rep_Backup, FALSE )
-							             Set sId_key=ID_KEY
-							             Set strFileName=SalStrLeftX(strFileName,SalStrLength(strFileName)-3)||sId_key
-							             Call SalStatusSetText( hWndForm, strFileName )
-							             Set hFile = llcreat(strFileName, 0)
-							             Set nRec = 0
-							             If hFile<=0
-								             Call MessageInfoEx( 'Ошибка создания файла ' || strFileName )
-								             Return FALSE
+							               Set sId_key=ID_KEY
+							               Set strFileName=SalStrLeftX(strFileName,SalStrLength(strFileName)-3)||sId_key
+							               Call SalStatusSetText( hWndForm, strFileName )
+							               Set hFile = llcreat(strFileName, 0)
+							               Set nRec = 0
+							               If hFile<=0
+								               Call MessageInfoEx( 'Ошибка создания файла ' || strFileName )
+								               Return FALSE
 							! Служебная строка
-							             Call llwrite( hFile,SalStrRepeatX( ' ', 100 )||PutCrLf(), 102)
+							               Call llwrite( hFile,SalStrRepeatX( ' ', 100 )||PutCrLf(), 102)
 							! Заголовок
-							             Call llwrite(hFile, Right(strFileName,12) ||
+							               Call llwrite(hFile, Right(strFileName,12) ||
 									     SalFmtFormatDateTime(GetBankDate(), 'yyMMdd')   ||
 									     Right('0'||SalFmtFormatDateTime(SalDateCurrent(),'hhhhmm'),4)||
 									     PadL(Str(nRec),6) || SalStrRepeatX(' ', 166) || PutCrLf(), 196)
-							             Call SalStatusSetText( hWndForm, strFileName)
-						             Call llwrite(hFile,PadL(MFOA, 9)||PadL(NLSA,14)||PadL(MFOB, 9)||PadL(NLSB,14)||
+							               Call SalStatusSetText( hWndForm, strFileName)
+						               Call llwrite(hFile,PadL(MFOA, 9)||PadL(NLSA,14)||PadL(MFOB, 9)||PadL(NLSB,14)||
 								                 PadL(SalNumberToStrX(DK,0),1)||PadL(SalNumberToStrX(S,0),16)||
 								                 PadL(SalNumberToStrX(VOB,0),2)||
 								StrWinToDosX(PadR(ND,10)||PadL(SalNumberToStrX(KV,0),3 )||
@@ -13001,17 +13001,17 @@ Application Description: •--------------------------------------•
 								PadL(OKPOA,14)||PadL(OKPOB,14)||
 								PadL(REF_A,9) ||SalFmtFormatDateTime( DAT_A, 'yyMMdd' )||
 								IifS(DAT_B=DATETIME_Null,PadR(' ',6),SalFmtFormatDateTime( DAT_B, 'yyMMdd' ))||  PutCrLf() ,442 )
-						             Set nRec=nRec+1
-					             If hFile>0
-						             Call lllseek( hFile, 102+22, FILE_SeekBegin )
-						             Call llwrite( hFile, PadL(Str(nRec),6), 6 )
-						             Call llclose(hFile)
+						               Set nRec=nRec+1
+					               If hFile>0
+						               Call lllseek( hFile, 102+22, FILE_SeekBegin )
+						               Call llwrite( hFile, PadL(Str(nRec),6), 6 )
+						               Call llclose(hFile)
 						! без BACKUP
 						! Call FunBackUpFile( strFileName, Rep_Backup, FALSE )
-						             Call SalStatusSetText( hWndForm, 'Готово.')
+						               Call SalStatusSetText( hWndForm, 'Готово.')
 						! Call MessageInfoEx('Готово.')
-					             Call SalWaitCursor( FALSE )
-					             Return TRUE
+					               Call SalWaitCursor( FALSE )
+					               Return TRUE
 			Function: SobakiBe
 				Description: Создать файл реестра документов для НИ без таблицы
 				Returns
@@ -13380,29 +13380,29 @@ Application Description: •--------------------------------------•
 			Text Color: Default
 			Background Color: Default
 .end
-		                                                                                                                                                      Description: 
-		                                                                                                                                                      Tool Bar 
-			                                                                                                                                                      Contents 
-		                                                                                                                                                      Contents 
-			                                                                                                                                                      Pushbutton: pbCancel
-				                                                                                                                                                      Message Actions 
-					                                                                                                                                                      On SAM_Click
-						                                                                                                                                                      Call SalEndDialog(hWndForm, 0)
-					                                                                                                                                                      On SAM_SetFocus
-						                                                                                                                                                      Call SalStatusSetText(hWndForm, 'Завершить')
-			                                                                                                                                                      Pushbutton: pbOk
-				                                                                                                                                                      Message Actions 
-					                                                                                                                                                      On SAM_Click
-						                                                                                                                                                      Call frm_DKU.pbMaskClick(nPar1, dlg_KtkMask.dfKtkMask)
-						                                                                                                                                                      Call SalEndDialog(hWndForm, 0)
-			                                                                                                                                                      Frame 
-			                                                                                                                                                      Line 
-			                                                                                                                                                      Data Field: dfKtkMask
-				                                                                                                                                                      Message Actions 
-		                                                                                                                                                      Functions 
-		                                                                                                                                                      Window Parameters 
-		                                                                                                                                                      Window Variables 
-		                                                                                                                                                      Message Actions 
+		                                                                                                                                                        Description: 
+		                                                                                                                                                        Tool Bar 
+			                                                                                                                                                        Contents 
+		                                                                                                                                                        Contents 
+			                                                                                                                                                        Pushbutton: pbCancel
+				                                                                                                                                                        Message Actions 
+					                                                                                                                                                        On SAM_Click
+						                                                                                                                                                        Call SalEndDialog(hWndForm, 0)
+					                                                                                                                                                        On SAM_SetFocus
+						                                                                                                                                                        Call SalStatusSetText(hWndForm, 'Завершить')
+			                                                                                                                                                        Pushbutton: pbOk
+				                                                                                                                                                        Message Actions 
+					                                                                                                                                                        On SAM_Click
+						                                                                                                                                                        Call frm_DKU.pbMaskClick(nPar1, dlg_KtkMask.dfKtkMask)
+						                                                                                                                                                        Call SalEndDialog(hWndForm, 0)
+			                                                                                                                                                        Frame 
+			                                                                                                                                                        Line 
+			                                                                                                                                                        Data Field: dfKtkMask
+				                                                                                                                                                        Message Actions 
+		                                                                                                                                                        Functions 
+		                                                                                                                                                        Window Parameters 
+		                                                                                                                                                        Window Variables 
+		                                                                                                                                                        Message Actions 
 	Table Window: tbl_RepGroups
 		Class: cGenericTable
 		Property Template:
@@ -14930,63 +14930,63 @@ Application Description: •--------------------------------------•
 			Maximum Rows in Memory: Default
 			Discardable? No
 .end
-		                                 Description: 
-		                                 Named Menus 
-		                                 Menu 
-		                                 Tool Bar 
-			                                 Contents 
-				                                 Pushbutton: pbIns
-					                                 Message Actions 
-				                                 Pushbutton: pbDel
-					                                 Message Actions 
-				                                 Pushbutton: pbRefresh
-					                                 Message Actions 
-				                                 Pushbutton: pbUpdate
-					                                 Message Actions 
-				                                 Line 
-				                                 Pushbutton: pbSearch
-					                                 Message Actions 
-				                                 Pushbutton: pbFilter
-					                                 Message Actions 
-				                                 Pushbutton: pbDetails
-					                                 Message Actions 
-				                                 Pushbutton: pbPrint
-					                                 Message Actions 
-				                                 Line 
-				                                 Pushbutton: pbExit
-					                                 Message Actions 
-				                                 Line 
-		                                 Contents 
-		                                 Functions 
-		                                 Window Parameters 
-		                                 Window Variables 
-		                                 Message Actions 
+		                                   Description: 
+		                                   Named Menus 
+		                                   Menu 
+		                                   Tool Bar 
+			                                   Contents 
+				                                   Pushbutton: pbIns
+					                                   Message Actions 
+				                                   Pushbutton: pbDel
+					                                   Message Actions 
+				                                   Pushbutton: pbRefresh
+					                                   Message Actions 
+				                                   Pushbutton: pbUpdate
+					                                   Message Actions 
+				                                   Line 
+				                                   Pushbutton: pbSearch
+					                                   Message Actions 
+				                                   Pushbutton: pbFilter
+					                                   Message Actions 
+				                                   Pushbutton: pbDetails
+					                                   Message Actions 
+				                                   Pushbutton: pbPrint
+					                                   Message Actions 
+				                                   Line 
+				                                   Pushbutton: pbExit
+					                                   Message Actions 
+				                                   Line 
+		                                   Contents 
+		                                   Functions 
+		                                   Window Parameters 
+		                                   Window Variables 
+		                                   Message Actions 
 		! Description: 
 		! Named Menus 
 		! Menu 
 		! Tool Bar 
-			                                                Contents 
-				                                                Pushbutton: pbIns
-					                                                Message Actions 
-				                                                Pushbutton: pbDel
-					                                                Message Actions 
-				                                                Pushbutton: pbRefresh
-					                                                Message Actions 
-				                                                Pushbutton: pbUpdate
-					                                                Message Actions 
-				                                                Line 
-				                                                Pushbutton: pbSearch
-					                                                Message Actions 
-				                                                Pushbutton: pbFilter
-					                                                Message Actions 
-				                                                Pushbutton: pbDetails
-					                                                Message Actions 
-				                                                Pushbutton: pbPrint
-					                                                Message Actions 
-				                                                Line 
-				                                                Pushbutton: pbExit
-					                                                Message Actions 
-				                                                Line 
+			                                                  Contents 
+				                                                  Pushbutton: pbIns
+					                                                  Message Actions 
+				                                                  Pushbutton: pbDel
+					                                                  Message Actions 
+				                                                  Pushbutton: pbRefresh
+					                                                  Message Actions 
+				                                                  Pushbutton: pbUpdate
+					                                                  Message Actions 
+				                                                  Line 
+				                                                  Pushbutton: pbSearch
+					                                                  Message Actions 
+				                                                  Pushbutton: pbFilter
+					                                                  Message Actions 
+				                                                  Pushbutton: pbDetails
+					                                                  Message Actions 
+				                                                  Pushbutton: pbPrint
+					                                                  Message Actions 
+				                                                  Line 
+				                                                  Pushbutton: pbExit
+					                                                  Message Actions 
+				                                                  Line 
 		! Contents 
 		! Functions 
 		! Window Parameters 
@@ -14996,125 +14996,125 @@ Application Description: •--------------------------------------•
 		! Named Menus 
 		! Menu 
 		! Tool Bar 
-			                                                        Contents 
-				                                                        Pushbutton: pbIns
-					                                                        Message Actions 
-				                                                        Pushbutton: pbDel
-					                                                        Message Actions 
-				                                                        Pushbutton: pbRefresh
-					                                                        Message Actions 
-				                                                        Pushbutton: pbUpdate
-					                                                        Message Actions 
-				                                                        Line 
-				                                                        Pushbutton: pbSearch
-					                                                        Message Actions 
-				                                                        Pushbutton: pbFilter
-					                                                        Message Actions 
-				                                                        Pushbutton: pbDetails
-					                                                        Message Actions 
-				                                                        Pushbutton: pbPrint
-					                                                        Message Actions 
-				                                                        Line 
-				                                                        Pushbutton: pbExit
-					                                                        Message Actions 
-				                                                        Line 
-				                                                        Background Text: Для всех блокировка
-				                                                        Combo Box: cbBlkForAll
-					                                                        List Initialization 
-					                                                        Message Actions 
-						                                                        On SAM_Click
-							                                                        Set iBlkForAll=cbBlkForAll.GetKey(SalListQuerySelection( cbBlkForAll) )
-							                                                        Set iRow = TBL_MinRow
-							                                                        While SalTblFindNextRow(hWndForm, iRow, 0, 0)
-								                                                        Call SalTblSetContext( hWndForm, iRow )
-								                                                        Call frm_kl_blk.cbBlkCode.SetSelectById(iBlkForAll)
-								                                                        Call SalSendMsg(frm_kl_blk.cbBlkCode, SAM_AnyEdit, 0, 0)
-								                                                        Call SalTblSetRowFlags (hWndForm, iRow, ROW_Edited, TRUE )
-								                                                        Call SalSendMsg(frm_kl_blk, UM_Update, 0, 0)
-						                                                        On SAM_Create
-							                                                        If cbBlkForAll.Init(hWndItem)
-								                                                        Call cbBlkForAll.Add(0,"Нету")
-								                                                        Call cbBlkForAll.Add(0,"Входящих")
-								                                                        Call cbBlkForAll.Add(0,"Исходящих")
-								                                                        Call cbBlkForAll.Add(0,"Вход+Исход")
+			                                                          Contents 
+				                                                          Pushbutton: pbIns
+					                                                          Message Actions 
+				                                                          Pushbutton: pbDel
+					                                                          Message Actions 
+				                                                          Pushbutton: pbRefresh
+					                                                          Message Actions 
+				                                                          Pushbutton: pbUpdate
+					                                                          Message Actions 
+				                                                          Line 
+				                                                          Pushbutton: pbSearch
+					                                                          Message Actions 
+				                                                          Pushbutton: pbFilter
+					                                                          Message Actions 
+				                                                          Pushbutton: pbDetails
+					                                                          Message Actions 
+				                                                          Pushbutton: pbPrint
+					                                                          Message Actions 
+				                                                          Line 
+				                                                          Pushbutton: pbExit
+					                                                          Message Actions 
+				                                                          Line 
+				                                                          Background Text: Для всех блокировка
+				                                                          Combo Box: cbBlkForAll
+					                                                          List Initialization 
+					                                                          Message Actions 
+						                                                          On SAM_Click
+							                                                          Set iBlkForAll=cbBlkForAll.GetKey(SalListQuerySelection( cbBlkForAll) )
+							                                                          Set iRow = TBL_MinRow
+							                                                          While SalTblFindNextRow(hWndForm, iRow, 0, 0)
+								                                                          Call SalTblSetContext( hWndForm, iRow )
+								                                                          Call frm_kl_blk.cbBlkCode.SetSelectById(iBlkForAll)
+								                                                          Call SalSendMsg(frm_kl_blk.cbBlkCode, SAM_AnyEdit, 0, 0)
+								                                                          Call SalTblSetRowFlags (hWndForm, iRow, ROW_Edited, TRUE )
+								                                                          Call SalSendMsg(frm_kl_blk, UM_Update, 0, 0)
+						                                                          On SAM_Create
+							                                                          If cbBlkForAll.Init(hWndItem)
+								                                                          Call cbBlkForAll.Add(0,"Нету")
+								                                                          Call cbBlkForAll.Add(0,"Входящих")
+								                                                          Call cbBlkForAll.Add(0,"Исходящих")
+								                                                          Call cbBlkForAll.Add(0,"Вход+Исход")
 		! Contents 
-			                                                        Column: colRnk
-				                                                        List Values 
-				                                                        Message Actions 
-			                                                        Column: colSab
-				                                                        List Values 
-				                                                        Message Actions 
-			                                                        Column: colName
-				                                                        List Values 
-				                                                        Message Actions 
-			                                                        Column: cbBlkCode
-				                                                        List Values 
-				                                                        Message Actions 
-					                                                        On SAM_Create
-						                                                        If cbBlkCode.Init( hWndItem )
-							                                                        Call cbBlkCode.Add( 0, 'Нету' )
-							                                                        Call cbBlkCode.Add( 1, 'Входящих' )
-							                                                        Call cbBlkCode.Add( 2, 'Исходящих' )
-							                                                        Call cbBlkCode.Add( 3, 'Вход+Исход' )
-					                                                        On SAM_AnyEdit
-						                                                        Set colBlkCode=cbBlkCode.GetKey( SalListQuerySelection( cbBlkCode) )
-			                                                        Column: colBlkCode
-				                                                        List Values 
-				                                                        Message Actions 
+			                                                          Column: colRnk
+				                                                          List Values 
+				                                                          Message Actions 
+			                                                          Column: colSab
+				                                                          List Values 
+				                                                          Message Actions 
+			                                                          Column: colName
+				                                                          List Values 
+				                                                          Message Actions 
+			                                                          Column: cbBlkCode
+				                                                          List Values 
+				                                                          Message Actions 
+					                                                          On SAM_Create
+						                                                          If cbBlkCode.Init( hWndItem )
+							                                                          Call cbBlkCode.Add( 0, 'Нету' )
+							                                                          Call cbBlkCode.Add( 1, 'Входящих' )
+							                                                          Call cbBlkCode.Add( 2, 'Исходящих' )
+							                                                          Call cbBlkCode.Add( 3, 'Вход+Исход' )
+					                                                          On SAM_AnyEdit
+						                                                          Set colBlkCode=cbBlkCode.GetKey( SalListQuerySelection( cbBlkCode) )
+			                                                          Column: colBlkCode
+				                                                          List Values 
+				                                                          Message Actions 
 					! On SAM_AnyEdit
-						                                                                                                                                         Call frm_kl_blk.cbBlkCode.SetSelectById(iBlkForAll)
-			                                                        Column: colchbMakeVP
-				                                                        List Values 
-				                                                        Message Actions 
-			                                                        Column: colPostType
-				                                                        List Values 
-				                                                        Message Actions 
-			                                                        Column: cbPostType
-				                                                        List Values 
-				                                                        Message Actions 
-					                                                        On SAM_Create
-						                                                        If cbPostType.Init( hWndItem )
-							                                                        Call cbPostType.Add('O', 'Offline' )
-							                                                        Call cbPostType.Add('M', 'Mail' )
-					                                                        On SAM_AnyEdit
-						                                                        Set colPostType=cbPostType.GetKey( SalListQuerySelection( cbPostType) )
-						                                                        If (colPostType='M' and colEMail=STRING_Null)
-							                                                        Call SalMessageBox('Укажите сначала электронный адресс для клиента', 
+						                                                                                                                                           Call frm_kl_blk.cbBlkCode.SetSelectById(iBlkForAll)
+			                                                          Column: colchbMakeVP
+				                                                          List Values 
+				                                                          Message Actions 
+			                                                          Column: colPostType
+				                                                          List Values 
+				                                                          Message Actions 
+			                                                          Column: cbPostType
+				                                                          List Values 
+				                                                          Message Actions 
+					                                                          On SAM_Create
+						                                                          If cbPostType.Init( hWndItem )
+							                                                          Call cbPostType.Add('O', 'Offline' )
+							                                                          Call cbPostType.Add('M', 'Mail' )
+					                                                          On SAM_AnyEdit
+						                                                          Set colPostType=cbPostType.GetKey( SalListQuerySelection( cbPostType) )
+						                                                          If (colPostType='M' and colEMail=STRING_Null)
+							                                                          Call SalMessageBox('Укажите сначала электронный адресс для клиента', 
 									   'Внимание',  MB_IconExclamation) 
-							                                                        Set colPostType = 'O'
-							                                                        Call cbPostType.SetSelectById( colPostType )
-			                                                        Column: colchbAltEmail
-				                                                        List Values 
-				                                                        Message Actions 
-					                                                        On SAM_Click
-						                                                        If (colchbAltEmail=0 and colAltEMail=STRING_Null)
-							                                                        Call SalMessageBox('Укажите сначала альтернативный электронный адресс', 
+							                                                          Set colPostType = 'O'
+							                                                          Call cbPostType.SetSelectById( colPostType )
+			                                                          Column: colchbAltEmail
+				                                                          List Values 
+				                                                          Message Actions 
+					                                                          On SAM_Click
+						                                                          If (colchbAltEmail=0 and colAltEMail=STRING_Null)
+							                                                          Call SalMessageBox('Укажите сначала альтернативный электронный адресс', 
 									   'Внимание',  MB_IconExclamation) 
-							                                                        Set colchbAltEmail = 0
-			                                                        Column: colEMail
-				                                                        List Values 
-				                                                        Message Actions 
-			                                                        Column: colAltEMail
-				                                                        List Values 
-				                                                        Message Actions 
+							                                                          Set colchbAltEmail = 0
+			                                                          Column: colEMail
+				                                                          List Values 
+				                                                          Message Actions 
+			                                                          Column: colAltEMail
+				                                                          List Values 
+				                                                          Message Actions 
 		! Functions 
 		! Window Parameters 
 		! Window Variables 
-			                                                        Number: iBlkForAll
-			                                                        Number: iRow
+			                                                          Number: iBlkForAll
+			                                                          Number: iRow
 		! Message Actions 
-			                                                        On UM_Populate
-				                                                        Call SalSendClassMessage(UM_Populate, 0, 0)
-			                                                        On SAM_Create
-				                                                        Call SalDisableWindow(pbIns)
-				                                                        Call SalDisableWindow(pbDel)
-				                                                        Set frm_kl_blk.strSqlPopulate =
+			                                                          On UM_Populate
+				                                                          Call SalSendClassMessage(UM_Populate, 0, 0)
+			                                                          On SAM_Create
+				                                                          Call SalDisableWindow(pbIns)
+				                                                          Call SalDisableWindow(pbDel)
+				                                                          Set frm_kl_blk.strSqlPopulate =
 						   "SELECT cp.rnk, sab, nmk, blk, make_vp,email,post_type, alt_post,  alt_email
 						    INTO :frm_kl_blk.colRnk, :frm_kl_blk.colSab, :frm_kl_blk.colName, 
 						         :frm_kl_blk.colBlkCode, :colchbMakeVP, :colEMail, :colPostType, :colchbAltEmail, :colAltEMail
 						    FROM kl_customer_params cp, customer c 
 						    WHERE cp.rnk=c.rnk"
-				                                                        Set frm_kl_blk.strSqlUpdate =
+				                                                          Set frm_kl_blk.strSqlUpdate =
 						   "UPDATE kl_customer_params 
 						           SET  blk =      :frm_kl_blk.colBlkCode,
 						                email=     :frm_kl_blk.colEMail,
@@ -15123,10 +15123,10 @@ Application Description: •--------------------------------------•
 						                alt_post  = :frm_kl_blk.colchbAltEmail, 
 						                alt_email = :frm_kl_blk.colAltEMail  
 						    WHERE rnk=:frm_kl_blk.colRnk"
-				                                                        Call SalSendClassMessage(SAM_Create, 0, 0)
-			                                                        On SAM_FetchRowDone
-				                                                        Call cbBlkCode.SetSelectById( colBlkCode )
-				                                                        Call cbPostType.SetSelectById( colPostType )
+				                                                          Call SalSendClassMessage(SAM_Create, 0, 0)
+			                                                          On SAM_FetchRowDone
+				                                                          Call cbBlkCode.SetSelectById( colBlkCode )
+				                                                          Call cbPostType.SetSelectById( colPostType )
 	! Dialog Box: dlg_kl_PostAll
 .winattr
 		Class:
@@ -15153,64 +15153,64 @@ Application Description: •--------------------------------------•
 			Text Color: Default
 			Background Color: Default
 .end
-		                                                        Description: 
-		                                                        Tool Bar 
-			                                                        Contents 
-		                                                        Contents 
-			                                                        Child Table: tblCustomer
-				                                                        Contents 
-					                                                        Column: colSab
-						                                                        List Values 
-						                                                        Message Actions 
-					                                                        Column: colCustName
-						                                                        List Values 
-						                                                        Message Actions 
-				                                                        Functions 
-				                                                        Window Variables 
-					                                                        String: sSql
-				                                                        Message Actions 
-					                                                        On SAM_Create
-						                                                        Set sSql = "SELECT c.sab,  nmk
+		                                                          Description: 
+		                                                          Tool Bar 
+			                                                          Contents 
+		                                                          Contents 
+			                                                          Child Table: tblCustomer
+				                                                          Contents 
+					                                                          Column: colSab
+						                                                          List Values 
+						                                                          Message Actions 
+					                                                          Column: colCustName
+						                                                          List Values 
+						                                                          Message Actions 
+				                                                          Functions 
+				                                                          Window Variables 
+					                                                          String: sSql
+				                                                          Message Actions 
+					                                                          On SAM_Create
+						                                                          Set sSql = "SELECT c.sab,  nmk
 								    INTO :tblCustomer.colSab, :tblCustomer.colCustName
 								    FROM kl_customer_params cp, customer c 
 								    WHERE cp.rnk=c.rnk ORDER BY c.sab"
-						                                                        Call SalTblPopulate( tblCustomer, hSql(), sSql, TBL_FillAll )
-			                                                        Pushbutton: pbOk
-				                                                        Message Actions 
-					                                                        On SAM_Click
-						                                                        Call WaitCursorOn()
-						                                                        If (chbVP)
-							                                                        Call SalSendMsg (calVPFrom, SAM_User, 0, 0)
-							                                                        Call SalSendMsg (calVPTo, SAM_User, 0, 0 )
-							                                                        Set bRet = postRequest('DMVP', dFrom, dTo,'')
-							                                                        Set bRet = postRequest('DMVF', dFrom, dTo,'')
-						                                                        If (chbVal)
-							                                                        Call SalSendMsg (calVal, SAM_User, 0, 0 )
-							                                                        Set bRet = postRequest('CURV', dTo, dTo,'')
-						                                                        If (chbBanks)
-							                                                        Set bRet = postRequest('BNKS', GetBankDate(), GetBankDate(),'')
-						                                                        If (chbInfoMess)
+						                                                          Call SalTblPopulate( tblCustomer, hSql(), sSql, TBL_FillAll )
+			                                                          Pushbutton: pbOk
+				                                                          Message Actions 
+					                                                          On SAM_Click
+						                                                          Call WaitCursorOn()
+						                                                          If (chbVP)
+							                                                          Call SalSendMsg (calVPFrom, SAM_User, 0, 0)
+							                                                          Call SalSendMsg (calVPTo, SAM_User, 0, 0 )
+							                                                          Set bRet = postRequest('DMVP', dFrom, dTo,'')
+							                                                          Set bRet = postRequest('DMVF', dFrom, dTo,'')
+						                                                          If (chbVal)
+							                                                          Call SalSendMsg (calVal, SAM_User, 0, 0 )
+							                                                          Set bRet = postRequest('CURV', dTo, dTo,'')
+						                                                          If (chbBanks)
+							                                                          Set bRet = postRequest('BNKS', GetBankDate(), GetBankDate(),'')
+						                                                          If (chbInfoMess)
 							! Если текст был набран вручную или отредактирован  - записать измененное сообщение в таблицу
-							                                                        If nCheckedMsgId = 0
-								                                                        Set nCheckedMsgId = saveNewMessage(mlMsgText) 
-							                                                        If nCheckedMsgId > -1
-								                                                        Set bRet = postRequest('INFO', GetBankDate(), GetBankDate(), SalNumberToStrX(nCheckedMsgId,0)  )
+							                                                          If nCheckedMsgId = 0
+								                                                          Set nCheckedMsgId = saveNewMessage(mlMsgText) 
+							                                                          If nCheckedMsgId > -1
+								                                                          Set bRet = postRequest('INFO', GetBankDate(), GetBankDate(), SalNumberToStrX(nCheckedMsgId,0)  )
 						!
-						                                                        If bRet
-							                                                        Call SalMessageBox('Запрос сформирован и поставлен на отправку', 'Выполнение', 0  )
+						                                                          If bRet
+							                                                          Call SalMessageBox('Запрос сформирован и поставлен на отправку', 'Выполнение', 0  )
 						!
-						                                                        Call WaitCursorOff()
-			                                                        Group Box: Послать
-			                                                        Check Box: chbVP
-				                                                        Message Actions 
-					                                                        On SAM_Click
-						                                                        If chbVP
-							                                                        Call SalEnableWindow(calVPFrom)
-							                                                        Call SalEnableWindow(calVPTo)
-						                                                        Else 
-							                                                        Call SalDisableWindow(calVPFrom)
-							                                                        Call SalDisableWindow(calVPTo)
-			                                                        Custom Control: calVPFrom
+						                                                          Call WaitCursorOff()
+			                                                          Group Box: Послать
+			                                                          Check Box: chbVP
+				                                                          Message Actions 
+					                                                          On SAM_Click
+						                                                          If chbVP
+							                                                          Call SalEnableWindow(calVPFrom)
+							                                                          Call SalEnableWindow(calVPTo)
+						                                                          Else 
+							                                                          Call SalDisableWindow(calVPFrom)
+							                                                          Call SalDisableWindow(calVPTo)
+			                                                          Custom Control: calVPFrom
 .data CLASSPROPSSIZE
 0000: 4400
 .enddata
@@ -15222,34 +15222,34 @@ Application Description: •--------------------------------------•
 .data INHERITPROPS
 0000: 0100
 .enddata
-				                                                        Message Actions 
-					                                                        On SAM_Create
-						                                                        Call calVPFrom.SetMonthText( strMonth )
-						                                                        Call calVPFrom.SetWeekDayText( strWeekDays )
+				                                                          Message Actions 
+					                                                          On SAM_Create
+						                                                          Call calVPFrom.SetMonthText( strMonth )
+						                                                          Call calVPFrom.SetWeekDayText( strWeekDays )
 						! ! - - - - - - - - - - - - Инициализация дат календаря  cCalendarFrom - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  - -
-						                                                        Call calVPFrom.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Sunday, SEQ_Unset,  COLOR_Black, COLOR_Gray, TRUE)
-						                                                        Call calVPFrom.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Monday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
-						                                                        Call calVPFrom.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Tuesday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
-						                                                        Call calVPFrom.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Wednesday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
-						                                                        Call calVPFrom.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Thursday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
-						                                                        Call calVPFrom.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Friday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
-						                                                        Call calVPFrom.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Saturday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
-						                                                        Call calVPFrom.SpecialDate(SPECIAL_OneTime, GetBankDate(), DAY_Unset, SEQ_Unset, COLOR_Blue,  COLOR_Cyan, TRUE)
-						                                                        Call SqlPrepareAndExecute(  hSql(), T("SELECT fdat  INTO :dSelect  FROM fdat")  )
-						                                                        Set i = 0
-						                                                        While SqlFetchNext(hSql(), nFetchRes)
-							                                                        Call calVPFrom.SpecialDate(SPECIAL_OneTime, dSelect,  DAY_Unset, SEQ_Unset, COLOR_Blue, COLOR_Cyan, TRUE)
-							                                                        Set i = i + 1
-						                                                        If i = 0
-							                                                        Call SalMessageBox('Нет доступных дат для выбора','Внимание',0)
+						                                                          Call calVPFrom.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Sunday, SEQ_Unset,  COLOR_Black, COLOR_Gray, TRUE)
+						                                                          Call calVPFrom.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Monday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
+						                                                          Call calVPFrom.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Tuesday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
+						                                                          Call calVPFrom.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Wednesday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
+						                                                          Call calVPFrom.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Thursday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
+						                                                          Call calVPFrom.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Friday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
+						                                                          Call calVPFrom.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Saturday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
+						                                                          Call calVPFrom.SpecialDate(SPECIAL_OneTime, GetBankDate(), DAY_Unset, SEQ_Unset, COLOR_Blue,  COLOR_Cyan, TRUE)
+						                                                          Call SqlPrepareAndExecute(  hSql(), T("SELECT fdat  INTO :dSelect  FROM fdat")  )
+						                                                          Set i = 0
+						                                                          While SqlFetchNext(hSql(), nFetchRes)
+							                                                          Call calVPFrom.SpecialDate(SPECIAL_OneTime, dSelect,  DAY_Unset, SEQ_Unset, COLOR_Blue, COLOR_Cyan, TRUE)
+							                                                          Set i = i + 1
+						                                                          If i = 0
+							                                                          Call SalMessageBox('Нет доступных дат для выбора','Внимание',0)
 									
-						                                                        Call SalSetWindowText(  calVPFrom,  strBankDate)
-					                                                        On SAM_User
-						                                                        Call SalGetWindowText( hWndItem, strDateFrom, 12 )
-						                                                        Set dFrom =  SalDateConstruct ( SalDateYear( SalStrToDate(strDateFrom )), 
+						                                                          Call SalSetWindowText(  calVPFrom,  strBankDate)
+					                                                          On SAM_User
+						                                                          Call SalGetWindowText( hWndItem, strDateFrom, 12 )
+						                                                          Set dFrom =  SalDateConstruct ( SalDateYear( SalStrToDate(strDateFrom )), 
 								                                SalDateMonth( SalStrToDate(strDateFrom )),
 								                                SalDateDay( SalStrToDate(strDateFrom )), 0, 0, 0 )
-			                                                        Custom Control: calVPTo
+			                                                          Custom Control: calVPTo
 .data CLASSPROPSSIZE
 0000: 4400
 .enddata
@@ -15261,34 +15261,34 @@ Application Description: •--------------------------------------•
 .data INHERITPROPS
 0000: 0100
 .enddata
-				                                                        Message Actions 
-					                                                        On SAM_Create
-						                                                        Call calVPTo.SetMonthText( strMonth )
-						                                                        Call calVPTo.SetWeekDayText( strWeekDays )
+				                                                          Message Actions 
+					                                                          On SAM_Create
+						                                                          Call calVPTo.SetMonthText( strMonth )
+						                                                          Call calVPTo.SetWeekDayText( strWeekDays )
 						! ! - - - - - - - - - - - - Инициализация дат календаря  cCalendarFrom - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  - -
-						                                                        Call calVPTo.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Sunday, SEQ_Unset,  COLOR_Black, COLOR_Gray, TRUE)
-						                                                        Call calVPTo.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Monday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
-						                                                        Call calVPTo.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Tuesday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
-						                                                        Call calVPTo.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Wednesday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
-						                                                        Call calVPTo.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Thursday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
-						                                                        Call calVPTo.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Friday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
-						                                                        Call calVPTo.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Saturday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
-						                                                        Call calVPTo.SpecialDate(SPECIAL_OneTime, GetBankDate(), DAY_Unset, SEQ_Unset, COLOR_Blue,  COLOR_Cyan, TRUE)
-						                                                        Call SqlPrepareAndExecute(  hSql(), T("SELECT fdat  INTO :dSelect  FROM fdat")  )
-						                                                        Set i = 0
-						                                                        While SqlFetchNext(hSql(), nFetchRes)
-							                                                        Call calVPTo.SpecialDate(SPECIAL_OneTime, dSelect,  DAY_Unset, SEQ_Unset, COLOR_Blue, COLOR_Cyan, TRUE)
-							                                                        Set i = i + 1
-						                                                        If i = 0
-							                                                        Call SalMessageBox('Нет доступных дат для выбора','Внимание',0)
+						                                                          Call calVPTo.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Sunday, SEQ_Unset,  COLOR_Black, COLOR_Gray, TRUE)
+						                                                          Call calVPTo.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Monday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
+						                                                          Call calVPTo.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Tuesday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
+						                                                          Call calVPTo.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Wednesday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
+						                                                          Call calVPTo.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Thursday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
+						                                                          Call calVPTo.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Friday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
+						                                                          Call calVPTo.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Saturday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
+						                                                          Call calVPTo.SpecialDate(SPECIAL_OneTime, GetBankDate(), DAY_Unset, SEQ_Unset, COLOR_Blue,  COLOR_Cyan, TRUE)
+						                                                          Call SqlPrepareAndExecute(  hSql(), T("SELECT fdat  INTO :dSelect  FROM fdat")  )
+						                                                          Set i = 0
+						                                                          While SqlFetchNext(hSql(), nFetchRes)
+							                                                          Call calVPTo.SpecialDate(SPECIAL_OneTime, dSelect,  DAY_Unset, SEQ_Unset, COLOR_Blue, COLOR_Cyan, TRUE)
+							                                                          Set i = i + 1
+						                                                          If i = 0
+							                                                          Call SalMessageBox('Нет доступных дат для выбора','Внимание',0)
 									
-						                                                        Call SalSetWindowText(  calVPTo,  strBankDate)
-					                                                        On SAM_User
-						                                                        Call SalGetWindowText( hWndItem, strDateTo, 12 )
-						                                                        Set dTo =  SalDateConstruct ( SalDateYear( SalStrToDate(strDateTo )), 
+						                                                          Call SalSetWindowText(  calVPTo,  strBankDate)
+					                                                          On SAM_User
+						                                                          Call SalGetWindowText( hWndItem, strDateTo, 12 )
+						                                                          Set dTo =  SalDateConstruct ( SalDateYear( SalStrToDate(strDateTo )), 
 								                                SalDateMonth( SalStrToDate(strDateTo )),
 								                                SalDateDay( SalStrToDate(strDateTo )), 0, 0, 0 )
-			                                                        Custom Control: calVal
+			                                                          Custom Control: calVal
 .data CLASSPROPSSIZE
 0000: 4200
 .enddata
@@ -15300,177 +15300,177 @@ Application Description: •--------------------------------------•
 .data INHERITPROPS
 0000: 0100
 .enddata
-				                                                        Message Actions 
-					                                                        On SAM_Create
-						                                                        Call calVal.SetMonthText( strMonth )
-						                                                        Call calVal.SetWeekDayText( strWeekDays )
+				                                                          Message Actions 
+					                                                          On SAM_Create
+						                                                          Call calVal.SetMonthText( strMonth )
+						                                                          Call calVal.SetWeekDayText( strWeekDays )
 						! ! - - - - - - - - - - - - Инициализация дат календаря  cCalendarFrom - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  - -
-						                                                        Call calVal.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Sunday, SEQ_Unset,  COLOR_Black, COLOR_Gray, TRUE)
-						                                                        Call calVal.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Monday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
-						                                                        Call calVal.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Tuesday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
-						                                                        Call calVal.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Wednesday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
-						                                                        Call calVal.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Thursday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
-						                                                        Call calVal.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Friday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
-						                                                        Call calVal.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Saturday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
-						                                                        Call calVal.SpecialDate(SPECIAL_OneTime, GetBankDate(), DAY_Unset, SEQ_Unset, COLOR_Blue,  COLOR_Cyan, TRUE)
-						                                                        Call SqlPrepareAndExecute(  hSql(), T("SELECT fdat  INTO :dSelect  FROM fdat")  )
-						                                                        Set i = 0
-						                                                        While SqlFetchNext(hSql(), nFetchRes)
-							                                                        Call calVal.SpecialDate(SPECIAL_OneTime, dSelect,  DAY_Unset, SEQ_Unset, COLOR_Blue, COLOR_Cyan, TRUE)
-							                                                        Set i = i + 1
-						                                                        If i = 0
-							                                                        Call SalMessageBox('Нет доступных дат для выбора','Внимание',0)
+						                                                          Call calVal.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Sunday, SEQ_Unset,  COLOR_Black, COLOR_Gray, TRUE)
+						                                                          Call calVal.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Monday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
+						                                                          Call calVal.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Tuesday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
+						                                                          Call calVal.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Wednesday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
+						                                                          Call calVal.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Thursday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
+						                                                          Call calVal.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Friday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
+						                                                          Call calVal.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Saturday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
+						                                                          Call calVal.SpecialDate(SPECIAL_OneTime, GetBankDate(), DAY_Unset, SEQ_Unset, COLOR_Blue,  COLOR_Cyan, TRUE)
+						                                                          Call SqlPrepareAndExecute(  hSql(), T("SELECT fdat  INTO :dSelect  FROM fdat")  )
+						                                                          Set i = 0
+						                                                          While SqlFetchNext(hSql(), nFetchRes)
+							                                                          Call calVal.SpecialDate(SPECIAL_OneTime, dSelect,  DAY_Unset, SEQ_Unset, COLOR_Blue, COLOR_Cyan, TRUE)
+							                                                          Set i = i + 1
+						                                                          If i = 0
+							                                                          Call SalMessageBox('Нет доступных дат для выбора','Внимание',0)
 									
-						                                                        Call SalSetWindowText(  calVPTo,  strBankDate)
-					                                                        On SAM_User
-						                                                        Call SalGetWindowText( hWndItem, strDateTo, 12 )
-						                                                        Set dTo =  SalDateConstruct ( SalDateYear( SalStrToDate(strDateTo )), 
+						                                                          Call SalSetWindowText(  calVPTo,  strBankDate)
+					                                                          On SAM_User
+						                                                          Call SalGetWindowText( hWndItem, strDateTo, 12 )
+						                                                          Set dTo =  SalDateConstruct ( SalDateYear( SalStrToDate(strDateTo )), 
 								                                SalDateMonth( SalStrToDate(strDateTo )),
 								                                SalDateDay( SalStrToDate(strDateTo )), 0, 0, 0 )
-			                                                        Background Text: с
-			                                                        Background Text: по
-			                                                        Check Box: chbBanks
-				                                                        Message Actions 
-			                                                        Check Box: chbVal
-				                                                        Message Actions 
-					                                                        On SAM_Click
-						                                                        If chbVal
-							                                                        Call SalEnableWindow(calVal)
-						                                                        Else 
-							                                                        Call SalDisableWindow(calVal)
-			                                                        Pushbutton: pbCancel
-				                                                        Message Actions 
-					                                                        On SAM_Click
-						                                                        Call SalEndDialog(hWndForm, 0)
-			                                                        Frame 
-			                                                        Frame 
-			                                                        Check Box: chbInfoMess
-				                                                        Message Actions 
-					                                                        On SAM_Click
-						                                                        If chbInfoMess
-							                                                        Call SalEnableWindow(pbMsgFromFile)
-							                                                        Call SalEnableWindow(mlMsgText)
-							                                                        Call SalEnableWindow(pbMsgFromSavedList)
-						                                                        Else 
-							                                                        Call SalDisableWindow(pbMsgFromFile)
-							                                                        Call SalDisableWindow(mlMsgText)
-							                                                        Call SalDisableWindow(pbMsgFromSavedList)
-							                                                        Set mlMsgText=''
-			                                                        Pushbutton: pbMsgFromSavedList
-				                                                        Message Actions 
+			                                                          Background Text: с
+			                                                          Background Text: по
+			                                                          Check Box: chbBanks
+				                                                          Message Actions 
+			                                                          Check Box: chbVal
+				                                                          Message Actions 
+					                                                          On SAM_Click
+						                                                          If chbVal
+							                                                          Call SalEnableWindow(calVal)
+						                                                          Else 
+							                                                          Call SalDisableWindow(calVal)
+			                                                          Pushbutton: pbCancel
+				                                                          Message Actions 
+					                                                          On SAM_Click
+						                                                          Call SalEndDialog(hWndForm, 0)
+			                                                          Frame 
+			                                                          Frame 
+			                                                          Check Box: chbInfoMess
+				                                                          Message Actions 
+					                                                          On SAM_Click
+						                                                          If chbInfoMess
+							                                                          Call SalEnableWindow(pbMsgFromFile)
+							                                                          Call SalEnableWindow(mlMsgText)
+							                                                          Call SalEnableWindow(pbMsgFromSavedList)
+						                                                          Else 
+							                                                          Call SalDisableWindow(pbMsgFromFile)
+							                                                          Call SalDisableWindow(mlMsgText)
+							                                                          Call SalDisableWindow(pbMsgFromSavedList)
+							                                                          Set mlMsgText=''
+			                                                          Pushbutton: pbMsgFromSavedList
+				                                                          Message Actions 
 					! On SAM_Create
-						                                                                                                                          Set strTip = 'Редактирование'
-					                                                        On SAM_Click
-						                                                        Call SalCreateWindow(tbl_MsgList, hWndItem)
-					                                                        On SAM_TooltipSetText
-						                                                        Return XSalTooltipSetText( lParam, 'Сообщение из сохраненного списка' )
-			                                                        Pushbutton: pbMsgFromFile
-				                                                        Message Actions 
+						                                                                                                                            Set strTip = 'Редактирование'
+					                                                          On SAM_Click
+						                                                          Call SalCreateWindow(tbl_MsgList, hWndItem)
+					                                                          On SAM_TooltipSetText
+						                                                          Return XSalTooltipSetText( lParam, 'Сообщение из сохраненного списка' )
+			                                                          Pushbutton: pbMsgFromFile
+				                                                          Message Actions 
 					! On SAM_Create
-						                                                                                                                          Set strTip = 'Из файла'
-					                                                        On SAM_Click
-						                                                        Set nCheckedMsgId=0
-						                                                        Call getMessTextFromFile()
-					                                                        On SAM_TooltipSetText
-						                                                        Return XSalTooltipSetText( lParam, 'Сообщение из файла' )
-			                                                        Multiline Field: mlMsgText
-				                                                        Message Actions 
+						                                                                                                                            Set strTip = 'Из файла'
+					                                                          On SAM_Click
+						                                                          Set nCheckedMsgId=0
+						                                                          Call getMessTextFromFile()
+					                                                          On SAM_TooltipSetText
+						                                                          Return XSalTooltipSetText( lParam, 'Сообщение из файла' )
+			                                                          Multiline Field: mlMsgText
+				                                                          Message Actions 
 					!
-						                                                                                                                         Call SalCreateWindow(tbl_MsgList, hWndItem)
-					                                                        On SAM_FieldEdit
+						                                                                                                                           Call SalCreateWindow(tbl_MsgList, hWndItem)
+					                                                          On SAM_FieldEdit
 						! Если поле редактированли - то сообщение уже не такое, как выбрали из таблицы
 						! В этом случае - сохраним его потом в таблицу
-						                                                        Set nCheckedMsgId = 0
+						                                                          Set nCheckedMsgId = 0
 								
-		                                                        Functions 
-			                                                        Function: postRequest
-				                                                        Description: 
-				                                                        Returns 
-					                                                        Boolean: 
-				                                                        Parameters 
-					                                                        String: sRequestName
+		                                                          Functions 
+			                                                          Function: postRequest
+				                                                          Description: 
+				                                                          Returns 
+					                                                          Boolean: 
+				                                                          Parameters 
+					                                                          String: sRequestName
 					! Date: dat1
-					                                                        Date/Time: dat1
-					                                                        Date/Time: dat2
-					                                                        String: sInfo
-				                                                        Static Variables 
-				                                                        Local variables 
-					                                                        Number: iRow
-				                                                        Actions 
-					                                                        Set iRow = TBL_MinRow
-					                                                        While SalTblFindNextRow(tblCustomer, iRow, ROW_Selected, 0)
-						                                                        Call SalTblSetContext( tblCustomer, iRow )
-						                                                        If not SqlPLSQLCommand(hSql(), "POST_MODULE_REQUEST(sRequestName, tblCustomer.colSab, dat1, dat2, sInfo)")
-							                                                        Return FALSE
-						                                                        Call SqlCommitEx(hSql(),'')
-					                                                        Return TRUE
-			                                                        Function: getMessTextFromFile
-				                                                        Description: 
-				                                                        Returns 
+					                                                          Date/Time: dat1
+					                                                          Date/Time: dat2
+					                                                          String: sInfo
+				                                                          Static Variables 
+				                                                          Local variables 
+					                                                          Number: iRow
+				                                                          Actions 
+					                                                          Set iRow = TBL_MinRow
+					                                                          While SalTblFindNextRow(tblCustomer, iRow, ROW_Selected, 0)
+						                                                          Call SalTblSetContext( tblCustomer, iRow )
+						                                                          If not SqlPLSQLCommand(hSql(), "POST_MODULE_REQUEST(sRequestName, tblCustomer.colSab, dat1, dat2, sInfo)")
+							                                                          Return FALSE
+						                                                          Call SqlCommitEx(hSql(),'')
+					                                                          Return TRUE
+			                                                          Function: getMessTextFromFile
+				                                                          Description: 
+				                                                          Returns 
 					! String: sMsgText
-				                                                        Parameters 
-				                                                        Static Variables 
-				                                                        Local variables 
-					                                                        String: sFileNameFilters[*]
-					                                                        String: sSelectedFileName
-					                                                        String: sSelectedFilePath
-					                                                        String: sFileLine
-					                                                        Number: nSelectedFiltr
-					                                                        File Handle: hFile
-				                                                        Actions 
-					                                                        Set sFileNameFilters[0]='All files'
-					                                                        Set sFileNameFilters[1]='*.*'
-					                                                        Call SalDlgOpenFile (hWndNULL, 'Файл сообщения', sFileNameFilters, 2, nSelectedFiltr, sSelectedFileName, sSelectedFilePath )
-					                                                        If VisFileOpen (hFile, sSelectedFilePath, OF_Read) = VTERR_Ok
-						                                                        While VisFileReadString (hFile, sFileLine) = VTERR_Ok
-							                                                        Set mlMsgText = mlMsgText || sFileLine || SalNumberToChar( 13 ) || SalNumberToChar( 10 )
-			                                                        Function: saveNewMessage
-				                                                        Description: 
-				                                                        Returns 
-					                                                        Number: 
-				                                                        Parameters 
-					                                                        Long String: sMessText
-				                                                        Static Variables 
-				                                                        Local variables 
-					                                                        Number: nMessId
-				                                                        Actions 
-					                                                        If SqlPrepareAndExecute(hSql(), "SELECT nvl(max(id_mess),0)+1 INTO :nMessId FROM kl_info_messages") AND SqlFetchNext(hSql(), i) 
-						                                                        If SqlPrepareAndExecute(hSql(), "INSERT INTO kl_info_messages VALUES(:nMessId, :sMessText)")
-							                                                        Call SqlCommit(hSql())
-							                                                        Return nMessId
-						                                                        Else 
-							                                                        Call SalMessageBox('Невозможно вставить новое сообщение','Внимание!', MB_OK)
-							                                                        Return -1
-					                                                        Else 
-						                                                        Call SalMessageBox('Невозможно получить последующий номер для сообщения','Внимание!', MB_OK)
-						                                                        Return -1
-		                                                        Window Parameters 
-		                                                        Window Variables 
-			                                                        String: sCheckedMsgText
-			                                                        Number: nCheckedMsgId
-			                                                        String: sSql
-			                                                        String: strMonth[12]              !! Наименов. месяце для календаря
-			                                                        String: strWeekDays[7]         !! Дни недели для календаря
-			                                                        Number: nFetchRes
-			                                                        Number: i
-			                                                        Boolean: bRet
-			                                                        Date/Time: dSelect
-			                                                        Date/Time: dFrom
-			                                                        Date/Time: dTo
-		                                                        Message Actions 
-			                                                        On SAM_Create
-				                                                        Call GetMonthArray( strMonth )
-				                                                        Call GetWeekDayArray( strWeekDays )
-				                                                        Call SalDisableWindow(calVPFrom)
-				                                                        Call SalDisableWindow(calVPTo)
-				                                                        Call SalDisableWindow(calVal)
+				                                                          Parameters 
+				                                                          Static Variables 
+				                                                          Local variables 
+					                                                          String: sFileNameFilters[*]
+					                                                          String: sSelectedFileName
+					                                                          String: sSelectedFilePath
+					                                                          String: sFileLine
+					                                                          Number: nSelectedFiltr
+					                                                          File Handle: hFile
+				                                                          Actions 
+					                                                          Set sFileNameFilters[0]='All files'
+					                                                          Set sFileNameFilters[1]='*.*'
+					                                                          Call SalDlgOpenFile (hWndNULL, 'Файл сообщения', sFileNameFilters, 2, nSelectedFiltr, sSelectedFileName, sSelectedFilePath )
+					                                                          If VisFileOpen (hFile, sSelectedFilePath, OF_Read) = VTERR_Ok
+						                                                          While VisFileReadString (hFile, sFileLine) = VTERR_Ok
+							                                                          Set mlMsgText = mlMsgText || sFileLine || SalNumberToChar( 13 ) || SalNumberToChar( 10 )
+			                                                          Function: saveNewMessage
+				                                                          Description: 
+				                                                          Returns 
+					                                                          Number: 
+				                                                          Parameters 
+					                                                          Long String: sMessText
+				                                                          Static Variables 
+				                                                          Local variables 
+					                                                          Number: nMessId
+				                                                          Actions 
+					                                                          If SqlPrepareAndExecute(hSql(), "SELECT nvl(max(id_mess),0)+1 INTO :nMessId FROM kl_info_messages") AND SqlFetchNext(hSql(), i) 
+						                                                          If SqlPrepareAndExecute(hSql(), "INSERT INTO kl_info_messages VALUES(:nMessId, :sMessText)")
+							                                                          Call SqlCommit(hSql())
+							                                                          Return nMessId
+						                                                          Else 
+							                                                          Call SalMessageBox('Невозможно вставить новое сообщение','Внимание!', MB_OK)
+							                                                          Return -1
+					                                                          Else 
+						                                                          Call SalMessageBox('Невозможно получить последующий номер для сообщения','Внимание!', MB_OK)
+						                                                          Return -1
+		                                                          Window Parameters 
+		                                                          Window Variables 
+			                                                          String: sCheckedMsgText
+			                                                          Number: nCheckedMsgId
+			                                                          String: sSql
+			                                                          String: strMonth[12]              !! Наименов. месяце для календаря
+			                                                          String: strWeekDays[7]         !! Дни недели для календаря
+			                                                          Number: nFetchRes
+			                                                          Number: i
+			                                                          Boolean: bRet
+			                                                          Date/Time: dSelect
+			                                                          Date/Time: dFrom
+			                                                          Date/Time: dTo
+		                                                          Message Actions 
+			                                                          On SAM_Create
+				                                                          Call GetMonthArray( strMonth )
+				                                                          Call GetWeekDayArray( strWeekDays )
+				                                                          Call SalDisableWindow(calVPFrom)
+				                                                          Call SalDisableWindow(calVPTo)
+				                                                          Call SalDisableWindow(calVal)
 				!
-				                                                        Call SalDisableWindow(pbMsgFromFile)
-				                                                        Call SalDisableWindow(mlMsgText)
-				                                                        Call SalDisableWindow(pbMsgFromSavedList)
+				                                                          Call SalDisableWindow(pbMsgFromFile)
+				                                                          Call SalDisableWindow(mlMsgText)
+				                                                          Call SalDisableWindow(pbMsgFromSavedList)
 				!
-				                                                        Set nCheckedMsgId = 0
-				                                                        Set bRet = FALSE
+				                                                          Set nCheckedMsgId = 0
+				                                                          Set bRet = FALSE
 	Table Window: tbl_MsgList
 		Class: cGenericTable
 		Property Template:
@@ -15797,76 +15797,76 @@ Application Description: •--------------------------------------•
 		! Named Menus 
 		! Menu 
 		! Tool Bar 
-			                                                        Contents 
-				                                                        Pushbutton: pbIns
-					                                                        Message Actions 
-				                                                        Pushbutton: pbDel
-					                                                        Message Actions 
-				                                                        Pushbutton: pbRefresh
-					                                                        Message Actions 
-				                                                        Pushbutton: pbUpdate
-					                                                        Message Actions 
-				                                                        Line 
-				                                                        Pushbutton: pbSearch
-					                                                        Message Actions 
-				                                                        Pushbutton: pbFilter
-					                                                        Message Actions 
-				                                                        Pushbutton: pbDetails
-					                                                        Message Actions 
-				                                                        Pushbutton: pbPrint
-					                                                        Message Actions 
-				                                                        Line 
-				                                                        Pushbutton: pbExit
-					                                                        Message Actions 
-				                                                        Line 
+			                                                          Contents 
+				                                                          Pushbutton: pbIns
+					                                                          Message Actions 
+				                                                          Pushbutton: pbDel
+					                                                          Message Actions 
+				                                                          Pushbutton: pbRefresh
+					                                                          Message Actions 
+				                                                          Pushbutton: pbUpdate
+					                                                          Message Actions 
+				                                                          Line 
+				                                                          Pushbutton: pbSearch
+					                                                          Message Actions 
+				                                                          Pushbutton: pbFilter
+					                                                          Message Actions 
+				                                                          Pushbutton: pbDetails
+					                                                          Message Actions 
+				                                                          Pushbutton: pbPrint
+					                                                          Message Actions 
+				                                                          Line 
+				                                                          Pushbutton: pbExit
+					                                                          Message Actions 
+				                                                          Line 
 		! Contents 
-			                                                        Column: colID
-				                                                        List Values 
-				                                                        Message Actions 
-			                                                        Column: colMess
-				                                                        List Values 
-				                                                        Message Actions 
-			                                                        Column: colMessLength
-				                                                        List Values 
-				                                                        Message Actions 
+			                                                          Column: colID
+				                                                          List Values 
+				                                                          Message Actions 
+			                                                          Column: colMess
+				                                                          List Values 
+				                                                          Message Actions 
+			                                                          Column: colMessLength
+				                                                          List Values 
+				                                                          Message Actions 
 		! Functions 
 		! Window Parameters 
 		! Window Variables 
-			                                                        Number: i
-			                                                        Long String: lsInfoMess_Part
+			                                                          Number: i
+			                                                          Long String: lsInfoMess_Part
 		! Message Actions 
-			                                                        On UM_Populate
-				                                                        Call SalSendClassMessage(UM_Populate, 0, 0)
-			                                                        On SAM_Create
-				                                                        Call SalDisableWindow(pbFilter)
-				                                                        Call SalDisableWindow(pbPrint)
-				                                                        Call SalDisableWindow(pbDetails)
-				                                                        Set tbl_MsgList.strSqlPopulate =
+			                                                          On UM_Populate
+				                                                          Call SalSendClassMessage(UM_Populate, 0, 0)
+			                                                          On SAM_Create
+				                                                          Call SalDisableWindow(pbFilter)
+				                                                          Call SalDisableWindow(pbPrint)
+				                                                          Call SalDisableWindow(pbDetails)
+				                                                          Set tbl_MsgList.strSqlPopulate =
 						   "SELECT id_mess, dbms_lob.substr(info_text,100, 1), dbms_lob.getlength(info_text)
 						    INTO :tbl_MsgList.colID, :tbl_MsgList.colMess, :tbl_MsgList.colMessLength
 						    FROM kl_info_messages"
-				                                                        Set tbl_MsgList.strSqlUpdate =
+				                                                          Set tbl_MsgList.strSqlUpdate =
 						   "UPDATE kl_info_messages
 						    SET  info_text =  :tbl_MsgList.colMess           
 						    WHERE id_mess =:tbl_MsgList.colID"
-				                                                        Call SalSendClassMessage(SAM_Create, 0, 0)
-			                                                        On SAM_DoubleClick
-				                                                        Set dlg_kl_PostAll.nCheckedMsgId = colID
+				                                                          Call SalSendClassMessage(SAM_Create, 0, 0)
+			                                                          On SAM_DoubleClick
+				                                                          Set dlg_kl_PostAll.nCheckedMsgId = colID
 				! Поскольку поле типа CLOB и могут быть например файлы
 						! вычитаем по-очередно
 				!
-				                                                        Set i = 1
-				                                                        While i < colMessLength
-					                                                        Call SqlPrepareAndExecute(hSql(), "
+				                                                          Set i = 1
+				                                                          While i < colMessLength
+					                                                          Call SqlPrepareAndExecute(hSql(), "
 							SELECT dbms_lob.substr((SELECT info_text FROM kl_info_messages WHERE id_mess = :colID),2000,:i)
 							INTO :lsInfoMess_Part
 							FROM dual")
-					                                                        Call SqlFetchNext(hSql(), nFetchRes)
-					                                                        Set dlg_kl_PostAll.mlMsgText=dlg_kl_PostAll.mlMsgText||lsInfoMess_Part
-					                                                        Set i = i + 2000
+					                                                          Call SqlFetchNext(hSql(), nFetchRes)
+					                                                          Set dlg_kl_PostAll.mlMsgText=dlg_kl_PostAll.mlMsgText||lsInfoMess_Part
+					                                                          Set i = i + 2000
 				! Set dlg_kl_PostAll.mlMsgText = colMess
-				                                                        Set dlg_kl_PostAll.sCheckedMsgText =  dlg_kl_PostAll.mlMsgText
-				                                                        Call SalDestroyWindow(hWndItem)
+				                                                          Set dlg_kl_PostAll.sCheckedMsgText =  dlg_kl_PostAll.mlMsgText
+				                                                          Call SalDestroyWindow(hWndItem)
 	! Dialog Box: frm_VpOst
 .winattr
 		Class:
@@ -15893,56 +15893,56 @@ Application Description: •--------------------------------------•
 			Text Color: Default
 			Background Color: Default
 .end
-		                                                       Description: Формирование остатков и заключ. выписки на Казну(dbf)
+		                                                         Description: Формирование остатков и заключ. выписки на Казну(dbf)
 				Выписка WABS - она включает в себя данные для выписки в казну. Поэтому, 
 				если выбрано формирование выписок wabs и на казну - выполняется формирование только выписки 
 				wabs c последующим удалением ненужных данных для казны
 				
 				Список кодов блокировки нужен только для выписки казны. 
 				Поскольку выписка wabs включает всегда платежи, кот находятся на транзите 
-		                                                       Tool Bar 
-			                                                       Contents 
-		                                                       Contents 
-			                                                       Multiline Field: mlText
-				                                                       Message Actions 
-			                                                       Pushbutton: pbRun
-				                                                       Message Actions 
+		                                                         Tool Bar 
+			                                                         Contents 
+		                                                         Contents 
+			                                                         Multiline Field: mlText
+				                                                         Message Actions 
+			                                                         Pushbutton: pbRun
+				                                                         Message Actions 
 					!
-					                                                       On SAM_Click
-						                                                       Call SalWaitCursor(TRUE)
-						                                                       Set sFdat = SalFmtFormatDateTime(dYes, 'dd/MM/yyyy')
+					                                                         On SAM_Click
+						                                                         Call SalWaitCursor(TRUE)
+						                                                         Set sFdat = SalFmtFormatDateTime(dYes, 'dd/MM/yyyy')
 						!
-						                                                       If rbProcessChecked AND cbkazVP AND NOT cbVWABS
-							                                                       Call SalMessageBox('Виписки на казну формуються тільки по всім районам', 'Увага',MB_IconExclamation)
-							                                                       Set rbProcessChecked=FALSE
-							                                                       Set rbProcessAll=TRUE
-							                                                       Call SalWaitCursor(FALSE)
-						                                                       Else 
+						                                                         If rbProcessChecked AND cbkazVP AND NOT cbVWABS
+							                                                         Call SalMessageBox('Виписки на казну формуються тільки по всім районам', 'Увага',MB_IconExclamation)
+							                                                         Set rbProcessChecked=FALSE
+							                                                         Set rbProcessAll=TRUE
+							                                                         Call SalWaitCursor(FALSE)
+						                                                         Else 
 							!
-							                                                       Set sProcesTime= 'Початок: '||getCurrTime()
+							                                                         Set sProcesTime= 'Початок: '||getCurrTime()
 							!
-							                                                       Set sSabList=''
-							                                                       If rbProcessChecked
-								                                                       Set nRow = TBL_MinRow
-								                                                       While SalTblFindNextRow(tblRegions, nRow, 0, 0)
-									                                                       Call SalTblSetContext( tblRegions, nRow )
-									                                                       If tblRegions.colOTM='1'
-										                                                       Set sSabList=sSabList||IifS(SalStrLength(sSabList)=0, '',',' )||tblRegions.colSAB
-							                                                       Else 
-								                                                       Set sSabList='%'
+							                                                         Set sSabList=''
+							                                                         If rbProcessChecked
+								                                                         Set nRow = TBL_MinRow
+								                                                         While SalTblFindNextRow(tblRegions, nRow, 0, 0)
+									                                                         Call SalTblSetContext( tblRegions, nRow )
+									                                                         If tblRegions.colOTM='1'
+										                                                         Set sSabList=sSabList||IifS(SalStrLength(sSabList)=0, '',',' )||tblRegions.colSAB
+							                                                         Else 
+								                                                         Set sSabList='%'
 							!
-							                                                       Set nGetT00DocsForWabs  = SalStrToNumber(SalStrRightX(sVWABSParams, 1))
-							                                                       Set nGetT00DocsForKazna = SalStrToNumber(SalStrRightX(sKAZNAParams, 1))
+							                                                         Set nGetT00DocsForWabs  = SalStrToNumber(SalStrRightX(sVWABSParams, 1))
+							                                                         Set nGetT00DocsForKazna = SalStrToNumber(SalStrRightX(sKAZNAParams, 1))
 							! WABS.DBF 
 							!
-							                                                       If cbVWABS
-								                                                       Set mlText = 'формування VWABS.DBF ...'
+							                                                         If cbVWABS
+								                                                         Set mlText = 'формування VWABS.DBF ...'
 								!
 								! Параметры 
 								!
-								                                                       Set nInfoMsg = SalStrToNumber(SalStrLeftX(sVWABSParams, 1))
+								                                                         Set nInfoMsg = SalStrToNumber(SalStrLeftX(sVWABSParams, 1))
 								!
-								                                                       Call Debug('FOR WABS:  sBlkList='||sBlkList||' T00Docs='||SalNumberToStrX(nGetT00DocsForWabs,0)||' nInfoMsg='||SalNumberToStrX(nInfoMsg,0))
+								                                                         Call Debug('FOR WABS:  sBlkList='||sBlkList||' T00Docs='||SalNumberToStrX(nGetT00DocsForWabs,0)||' nInfoMsg='||SalNumberToStrX(nInfoMsg,0))
 								!
 								! Если нужно еще потом делать выписки на казну.
 										! Смысл в том, что бы выполнить процедуру населения выписок - один раз. 
@@ -15951,61 +15951,61 @@ Application Description: •--------------------------------------•
 										! А уже в ней удаляются доходные счета, док-ты на невыясненных, информационные, которые ненужны в выписке в казну.
 										! Единственное, если параметр nGetT00DocWabs <> nGetT00DocKazna, тогда прийдется выполнить две процедуры
 								!
-								                                                       If cbkazVP and nGetT00DocsForWabs=nGetT00DocsForKazna
-									                                                       Set sProcName = "p_dkuvwabs(dYes,sSabList, nInfoMsg, nGetT00DocsForWabs, 1,sBlkList)"
-								                                                       Else 
-									                                                       Set sProcName = "p_dkuvwabs(dYes,sSabList, nInfoMsg, nGetT00DocsForWabs, 0,sBlkList)"
-								                                                       If not SqlPLSQLCommand(hSql(), sProcName)
-									                                                       Call SalMessageBox( 'Ошибка выполнения процедуры '||sProcName, '', MB_Ok | MB_IconAsterisk )
-									                                                       Return FALSE
-								                                                       If not SqlPLSQLCommand(hSql(),"bars_dbf.make_dbf_fromtable('TMP_DKUVWABS','DOS')")
-									                                                       Call SalMessageBox( 'Ошибка формирования DBF файла', '', MB_Ok | MB_IconAsterisk )
-									                                                       Return FALSE
-								                                                       Call PutLoadedDBFToFile(hSql(), (sVWABSPath)||"\\vwabs.dbf")
+								                                                         If cbkazVP and nGetT00DocsForWabs=nGetT00DocsForKazna
+									                                                         Set sProcName = "p_dkuvwabs(dYes,sSabList, nInfoMsg, nGetT00DocsForWabs, 1,sBlkList)"
+								                                                         Else 
+									                                                         Set sProcName = "p_dkuvwabs(dYes,sSabList, nInfoMsg, nGetT00DocsForWabs, 0,sBlkList)"
+								                                                         If not SqlPLSQLCommand(hSql(), sProcName)
+									                                                         Call SalMessageBox( 'Ошибка выполнения процедуры '||sProcName, '', MB_Ok | MB_IconAsterisk )
+									                                                         Return FALSE
+								                                                         If not SqlPLSQLCommand(hSql(),"bars_dbf.make_dbf_fromtable('TMP_DKUVWABS','DOS')")
+									                                                         Call SalMessageBox( 'Ошибка формирования DBF файла', '', MB_Ok | MB_IconAsterisk )
+									                                                         Return FALSE
+								                                                         Call PutLoadedDBFToFile(hSql(), (sVWABSPath)||"\\vwabs.dbf")
 							!
 							! Выписки
 							!
-							                                                       If cbkazVP
-								                                                       Set mlText = 'формування заключ. виписки на Казну ...'
-								                                                       Set nInfoMsg = SalStrToNumber(SalStrLeftX(sKAZNAParams, 1))
-								                                                       Call Debug('FOR KAZNA:  sBlkList='||sBlkList||' T00Docs='||SalNumberToStrX(nGetT00DocsForKazna,0)||' nInfoMsg='||SalNumberToStrX(nInfoMsg,0))
+							                                                         If cbkazVP
+								                                                         Set mlText = 'формування заключ. виписки на Казну ...'
+								                                                         Set nInfoMsg = SalStrToNumber(SalStrLeftX(sKAZNAParams, 1))
+								                                                         Call Debug('FOR KAZNA:  sBlkList='||sBlkList||' T00Docs='||SalNumberToStrX(nGetT00DocsForKazna,0)||' nInfoMsg='||SalNumberToStrX(nInfoMsg,0))
 								!
 								! Если процедура по населению выписок еще не была выполнена
-								                                                       If not cbVWABS or (nGetT00DocsForWabs!=nGetT00DocsForKazna)
-									                                                       Set sProcName = "p_dkukazna(dYes,0, sBlkList, nGetT00DocsForKazna)"
-									                                                       If not SqlPLSQLCommand(hSql(), sProcName)
-										                                                       Call SalMessageBox( 'Ошибка выполнения процедуры '||sProcName, '', MB_Ok | MB_IconAsterisk )
-										                                                       Return FALSE
+								                                                         If not cbVWABS or (nGetT00DocsForWabs!=nGetT00DocsForKazna)
+									                                                         Set sProcName = "p_dkukazna(dYes,0, sBlkList, nGetT00DocsForKazna)"
+									                                                         If not SqlPLSQLCommand(hSql(), sProcName)
+										                                                         Call SalMessageBox( 'Ошибка выполнения процедуры '||sProcName, '', MB_Ok | MB_IconAsterisk )
+										                                                         Return FALSE
 								!
-								                                                       If not SqlPLSQLCommand(hSql(),"bars_dbf.make_dbf_fromtable('TMP_DKUZKLVP','WIN')")
-									                                                       Call SalMessageBox( 'Помилка формирмування DBF файлу', '', MB_Ok | MB_IconAsterisk )
-									                                                       Return FALSE
-								                                                       Call PutLoadedDBFToFile(hSql(), (sKAZNAPath)||"\\"||GetBankSab()||SalFmtFormatDateTime(dYes, 'dd')||SalFmtFormatDateTime(dYes, 'MM')||'.dbf')
+								                                                         If not SqlPLSQLCommand(hSql(),"bars_dbf.make_dbf_fromtable('TMP_DKUZKLVP','WIN')")
+									                                                         Call SalMessageBox( 'Помилка формирмування DBF файлу', '', MB_Ok | MB_IconAsterisk )
+									                                                         Return FALSE
+								                                                         Call PutLoadedDBFToFile(hSql(), (sKAZNAPath)||"\\"||GetBankSab()||SalFmtFormatDateTime(dYes, 'dd')||SalFmtFormatDateTime(dYes, 'MM')||'.dbf')
 								!
 								!
 							!
 							! Остатки  
 							!
-							                                                       If cbkazOST
-								                                                       Set mlText = 'Формирование остатков ...'
-								                                                       Set sProcName = "p_dkukazna(dYes,1,sBlkList,nGetT00Docs)"
-								                                                       If not SqlPLSQLCommand(hSql(), sProcName)
-									                                                       Call SalMessageBox( 'Ошибка выполнения процедуры '||sProcName, '', MB_Ok | MB_IconAsterisk )
-									                                                       Return FALSE
-								                                                       If not SqlPLSQLCommand(hSql(),"bars_dbf.make_dbf_fromtable('TMP_DKUOST','WIN')")
-									                                                       Call SalMessageBox( 'Ошибка формирования DBF файла', '', MB_Ok | MB_IconAsterisk )
-									                                                       Return FALSE
-								                                                       Call PutLoadedDBFToFile(hSql(), (sKAZNAPath)||"\\"||SalFmtFormatDateTime(dYes, 'dd')||SalFmtFormatDateTime(dYes, 'MM')||'_ost.dbf')
+							                                                         If cbkazOST
+								                                                         Set mlText = 'Формирование остатков ...'
+								                                                         Set sProcName = "p_dkukazna(dYes,1,sBlkList,nGetT00Docs)"
+								                                                         If not SqlPLSQLCommand(hSql(), sProcName)
+									                                                         Call SalMessageBox( 'Ошибка выполнения процедуры '||sProcName, '', MB_Ok | MB_IconAsterisk )
+									                                                         Return FALSE
+								                                                         If not SqlPLSQLCommand(hSql(),"bars_dbf.make_dbf_fromtable('TMP_DKUOST','WIN')")
+									                                                         Call SalMessageBox( 'Ошибка формирования DBF файла', '', MB_Ok | MB_IconAsterisk )
+									                                                         Return FALSE
+								                                                         Call PutLoadedDBFToFile(hSql(), (sKAZNAPath)||"\\"||SalFmtFormatDateTime(dYes, 'dd')||SalFmtFormatDateTime(dYes, 'MM')||'_ost.dbf')
 							!
-							                                                       Set mlText = 'Выгрузка завершена. '
-							                                                       Call SalWaitCursor(FALSE)
-							                                                       Set sProcesTime= sProcesTime||'  Окончание: '||getCurrTime()
-							                                                       Set mlText = mlText ||sProcesTime
-			                                                       Pushbutton: pbExit
-				                                                       Message Actions 
-					                                                       On SAM_Click
-						                                                       Call SalEndDialog(hWndForm, 0)
-			                                                       Custom Control: cc1
+							                                                         Set mlText = 'Выгрузка завершена. '
+							                                                         Call SalWaitCursor(FALSE)
+							                                                         Set sProcesTime= sProcesTime||'  Окончание: '||getCurrTime()
+							                                                         Set mlText = mlText ||sProcesTime
+			                                                         Pushbutton: pbExit
+				                                                         Message Actions 
+					                                                         On SAM_Click
+						                                                         Call SalEndDialog(hWndForm, 0)
+			                                                         Custom Control: cc1
 .data CLASSPROPSSIZE
 0000: 3600
 .enddata
@@ -16016,178 +16016,178 @@ Application Description: •--------------------------------------•
 .data INHERITPROPS
 0000: 0100
 .enddata
-				                                                       Message Actions 
-					                                                       On SAM_CustControlCmd
-						                                                       Call cc1.GetFocusDate(dDada)
-						                                                       If cc1.IsSpecialDate(SPECIAL_OneTime, dDada, DAY_Unset, SEQ_Unset)
-							                                                       Call cc1.SpecialDate(SPECIAL_OneTime, dYes, DAY_Unset, SEQ_Unset, COLOR_Blue,
+				                                                         Message Actions 
+					                                                         On SAM_CustControlCmd
+						                                                         Call cc1.GetFocusDate(dDada)
+						                                                         If cc1.IsSpecialDate(SPECIAL_OneTime, dDada, DAY_Unset, SEQ_Unset)
+							                                                         Call cc1.SpecialDate(SPECIAL_OneTime, dYes, DAY_Unset, SEQ_Unset, COLOR_Blue,
 									     COLOR_Cyan, TRUE)
-							                                                       Set dYes = dDada
-							                                                       Call cc1.SpecialDate(SPECIAL_OneTime, dYes, DAY_Unset, SEQ_Unset, COLOR_Blue,
+							                                                         Set dYes = dDada
+							                                                         Call cc1.SpecialDate(SPECIAL_OneTime, dYes, DAY_Unset, SEQ_Unset, COLOR_Blue,
 									     COLOR_Yellow, TRUE)
-					                                                       On SAM_Create
-						                                                       Call cc1.WeekStartSet(2)
-			                                                       Check Box: cbkazVP
-				                                                       Message Actions 
-			                                                       Check Box: cbkazOST
-				                                                       Message Actions 
-			                                                       Check Box: cbVWABS
-				                                                       Message Actions 
-			                                                       Group Box: Клиент-банк
-			                                                       Group Box: Казна
-			                                                       Child Table: tblRegions
-				                                                       Contents 
-					                                                       Column: colOTM
-						                                                       List Values 
-						                                                       Message Actions 
-							                                                       On SAM_AnyEdit
-								                                                       Call SalTblSetFlagsAnyRows(tblRegions,ROW_Edited, FALSE, 0, 0) 
-					                                                       Column: colSAB
-						                                                       List Values 
-						                                                       Message Actions 
-					                                                       Column: colNMK
-						                                                       List Values 
-						                                                       Message Actions 
-					                                                       Column: colMFOSAB
-						                                                       List Values 
-						                                                       Message Actions 
-				                                                       Functions 
-				                                                       Window Variables 
-				                                                       Message Actions 
-					                                                       On SAM_Create
-						                                                       Call WaitCursorOn()
-						                                                       Call SalTblPopulate(tblRegions, hSql(), T("
+					                                                         On SAM_Create
+						                                                         Call cc1.WeekStartSet(2)
+			                                                         Check Box: cbkazVP
+				                                                         Message Actions 
+			                                                         Check Box: cbkazOST
+				                                                         Message Actions 
+			                                                         Check Box: cbVWABS
+				                                                         Message Actions 
+			                                                         Group Box: Клиент-банк
+			                                                         Group Box: Казна
+			                                                         Child Table: tblRegions
+				                                                         Contents 
+					                                                         Column: colOTM
+						                                                         List Values 
+						                                                         Message Actions 
+							                                                         On SAM_AnyEdit
+								                                                         Call SalTblSetFlagsAnyRows(tblRegions,ROW_Edited, FALSE, 0, 0) 
+					                                                         Column: colSAB
+						                                                         List Values 
+						                                                         Message Actions 
+					                                                         Column: colNMK
+						                                                         List Values 
+						                                                         Message Actions 
+					                                                         Column: colMFOSAB
+						                                                         List Values 
+						                                                         Message Actions 
+				                                                         Functions 
+				                                                         Window Variables 
+				                                                         Message Actions 
+					                                                         On SAM_Create
+						                                                         Call WaitCursorOn()
+						                                                         Call SalTblPopulate(tblRegions, hSql(), T("
 								     SELECT '1',sab,nb,mfo
 								     FROM banks
 								     INTO :tblRegions.colOTM,:tblRegions.colSAB,:tblRegions.colNMK,:tblRegions.colMFOSAB
 								     WHERE kodn=4 and blk<>2 and blk<>3 and blk<>9 and fmi='$A' and fmo='$B'
 								     ORDER BY sab"), TBL_FillAll)
-						                                                       Call WaitCursorOff()
-			                                                       Radio Button: rbProcessAll
-				                                                       Message Actions 
-					                                                       On SAM_Click
-						                                                       If rbProcessAll
-							                                                       Call SalDisableWindow(tblRegions)
+						                                                         Call WaitCursorOff()
+			                                                         Radio Button: rbProcessAll
+				                                                         Message Actions 
+					                                                         On SAM_Click
+						                                                         If rbProcessAll
+							                                                         Call SalDisableWindow(tblRegions)
 							! Call XSalTblSetColumnBackColor(tblRegions.colOTM, COLOR_SysWindow)
-							                                                       Set nRow = TBL_MinRow
-							                                                       While SalTblFindNextRow(tblRegions, nRow, 0, 0)
-								                                                       Call SalTblSetContext( tblRegions, nRow )
-								                                                       Set tblRegions.colOTM = '1'
-			                                                       Radio Button: rbProcessChecked
-				                                                       Message Actions 
-					                                                       On SAM_Click
-						                                                       If rbProcessChecked
-							                                                       Call SalEnableWindow(tblRegions)
-							                                                       Set nRow = TBL_MinRow
-							                                                       While SalTblFindNextRow(tblRegions, nRow, 0, 0)
-								                                                       Call SalTblSetContext( tblRegions, nRow )
-								                                                       Set tblRegions.colOTM = '0'
-		                                                       Functions 
-			                                                       Function: getCurrTime
-				                                                       Description: 
-				                                                       Returns 
-					                                                       String: strTime
-				                                                       Parameters 
-				                                                       Static Variables 
-				                                                       Local variables 
-				                                                       Actions 
-					                                                       Return NumberToStrFormat( SalDateHour(SalDateCurrent()),2,'0' )||':'||
+							                                                         Set nRow = TBL_MinRow
+							                                                         While SalTblFindNextRow(tblRegions, nRow, 0, 0)
+								                                                         Call SalTblSetContext( tblRegions, nRow )
+								                                                         Set tblRegions.colOTM = '1'
+			                                                         Radio Button: rbProcessChecked
+				                                                         Message Actions 
+					                                                         On SAM_Click
+						                                                         If rbProcessChecked
+							                                                         Call SalEnableWindow(tblRegions)
+							                                                         Set nRow = TBL_MinRow
+							                                                         While SalTblFindNextRow(tblRegions, nRow, 0, 0)
+								                                                         Call SalTblSetContext( tblRegions, nRow )
+								                                                         Set tblRegions.colOTM = '0'
+		                                                         Functions 
+			                                                         Function: getCurrTime
+				                                                         Description: 
+				                                                         Returns 
+					                                                         String: strTime
+				                                                         Parameters 
+				                                                         Static Variables 
+				                                                         Local variables 
+				                                                         Actions 
+					                                                         Return NumberToStrFormat( SalDateHour(SalDateCurrent()),2,'0' )||':'||
 							       NumberToStrFormat( SalDateMinute(SalDateCurrent()),2,'0' )||':'||  
 							       NumberToStrFormat(  SalDateSecond (SalDateCurrent()),2,'0' )
-		                                                       Window Parameters 
+		                                                         Window Parameters 
 			! флаг =0 - ручной режим, =1 - авторежим
-			                                                       Number: nAvtoFlag 
-		                                                       Window Variables 
-			                                                       String: smWeek[7]
-			                                                       String: smMonth[12]
-			                                                       Date/Time: dYes
-			                                                       Date/Time: dSelect
-			                                                       String: sFdat
-			                                                       Number: nI
-			                                                       Date/Time: dDada
-			                                                       String: sVWABSParams
-			                                                       String: sKAZNAParams
-			                                                       String: sKAZNAPath
-			                                                       String: sVWABSPath
-			                                                       Number: nInfoMsg
-			                                                       String: sBlkList
-			                                                       Number: nGetT00DocsForWabs
-			                                                       Number: nGetT00DocsForKazna
-			                                                       String: sProcesTime
-			                                                       String: sProcName
-			                                                       String: sSabList
-			                                                       Number: nTimerCount
-			                                                       Number: nRow
-		                                                       Message Actions 
-			                                                       On SAM_Create
-				                                                       Call SalCenterWindow(hWndForm)
-				                                                       Set nTimerCount = 0
-				                                                       Set dYes = GetBankDate()
-				                                                       Call SalWaitCursor(TRUE)
-				                                                       Call cc1.ClearSpecials()
-				                                                       Call SalSetFocus(cc1)
-				                                                       Call GetMonthArrayRus(smMonth)
-				                                                       Call GetWeekDayArray(smWeek)
-				                                                       Call cc1.SetMonthText(smMonth)
-				                                                       Call cc1.SetWeekDayText(smWeek)
-				                                                       Call cc1.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Sunday, SEQ_Unset,    COLOR_Black,  COLOR_Gray, TRUE)
-				                                                       Call cc1.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Monday, SEQ_Unset,    COLOR_Black,     COLOR_Gray, TRUE)
-				                                                       Call cc1.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Tuesday, SEQ_Unset,   COLOR_Black,     COLOR_Gray, TRUE)
-				                                                       Call cc1.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Wednesday, SEQ_Unset, COLOR_Black,     COLOR_Gray, TRUE)
-				                                                       Call cc1.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Thursday, SEQ_Unset,  COLOR_Black,     COLOR_Gray, TRUE)
-				                                                       Call cc1.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Friday, SEQ_Unset,    COLOR_Black,     COLOR_Gray, TRUE)
-				                                                       Call cc1.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Saturday, SEQ_Unset,  COLOR_Black,     COLOR_Gray, TRUE)
-				                                                       Call SqlPrepareAndExecute(hSql(), T("
+			                                                         Number: nAvtoFlag 
+		                                                         Window Variables 
+			                                                         String: smWeek[7]
+			                                                         String: smMonth[12]
+			                                                         Date/Time: dYes
+			                                                         Date/Time: dSelect
+			                                                         String: sFdat
+			                                                         Number: nI
+			                                                         Date/Time: dDada
+			                                                         String: sVWABSParams
+			                                                         String: sKAZNAParams
+			                                                         String: sKAZNAPath
+			                                                         String: sVWABSPath
+			                                                         Number: nInfoMsg
+			                                                         String: sBlkList
+			                                                         Number: nGetT00DocsForWabs
+			                                                         Number: nGetT00DocsForKazna
+			                                                         String: sProcesTime
+			                                                         String: sProcName
+			                                                         String: sSabList
+			                                                         Number: nTimerCount
+			                                                         Number: nRow
+		                                                         Message Actions 
+			                                                         On SAM_Create
+				                                                         Call SalCenterWindow(hWndForm)
+				                                                         Set nTimerCount = 0
+				                                                         Set dYes = GetBankDate()
+				                                                         Call SalWaitCursor(TRUE)
+				                                                         Call cc1.ClearSpecials()
+				                                                         Call SalSetFocus(cc1)
+				                                                         Call GetMonthArrayRus(smMonth)
+				                                                         Call GetWeekDayArray(smWeek)
+				                                                         Call cc1.SetMonthText(smMonth)
+				                                                         Call cc1.SetWeekDayText(smWeek)
+				                                                         Call cc1.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Sunday, SEQ_Unset,    COLOR_Black,  COLOR_Gray, TRUE)
+				                                                         Call cc1.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Monday, SEQ_Unset,    COLOR_Black,     COLOR_Gray, TRUE)
+				                                                         Call cc1.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Tuesday, SEQ_Unset,   COLOR_Black,     COLOR_Gray, TRUE)
+				                                                         Call cc1.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Wednesday, SEQ_Unset, COLOR_Black,     COLOR_Gray, TRUE)
+				                                                         Call cc1.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Thursday, SEQ_Unset,  COLOR_Black,     COLOR_Gray, TRUE)
+				                                                         Call cc1.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Friday, SEQ_Unset,    COLOR_Black,     COLOR_Gray, TRUE)
+				                                                         Call cc1.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Saturday, SEQ_Unset,  COLOR_Black,     COLOR_Gray, TRUE)
+				                                                         Call SqlPrepareAndExecute(hSql(), T("
 						     SELECT fdat
 						     INTO :dSelect
 						     FROM fdat"))
-				                                                       Set nI = 0
-				                                                       While SqlFetchNext(hSql(), nFetchRes)
-					                                                       Call cc1.SpecialDate(SPECIAL_OneTime, dSelect, DAY_Unset, SEQ_Unset, COLOR_Blue,
+				                                                         Set nI = 0
+				                                                         While SqlFetchNext(hSql(), nFetchRes)
+					                                                         Call cc1.SpecialDate(SPECIAL_OneTime, dSelect, DAY_Unset, SEQ_Unset, COLOR_Blue,
 							     COLOR_Cyan, TRUE)
-					                                                       Set nI = nI + 1
-				                                                       If nI = 0
-					                                                       Set mlText = 'Нет информации для отбора выписки'
-					                                                       Call SalHideWindow(cc1)
-					                                                       Call SalHideWindow(pbRun)
-					                                                       Call SalSetFocus(pbExit)
-				                                                       Else 
-					                                                       Set mlText = ''
-					                                                       Call cc1.SetFocusDate(dYes)
-				                                                       Call SalWaitCursor(FALSE)
-				                                                       If nAvtoFlag=0
-					                                                       Set cbkazVP = FALSE
-					                                                       Set cbkazOST = FALSE
-					                                                       Set cbVWABS = TRUE
-				                                                       If nAvtoFlag=1
-					                                                       Set cbVWABS = TRUE
-					                                                       Set cbkazVP = FALSE
-					                                                       Set cbkazOST = FALSE
-					                                                       Call SalDisableWindow(cbkazVP)
-					                                                       Call SalDisableWindow(cbkazOST)
-					                                                       Call SalDisableWindow(cc1)
-					                                                       Call SalTimerSet ( hWndItem, 1, 1000 )
-					                                                       Set nTimerCount = 0
+					                                                         Set nI = nI + 1
+				                                                         If nI = 0
+					                                                         Set mlText = 'Нет информации для отбора выписки'
+					                                                         Call SalHideWindow(cc1)
+					                                                         Call SalHideWindow(pbRun)
+					                                                         Call SalSetFocus(pbExit)
+				                                                         Else 
+					                                                         Set mlText = ''
+					                                                         Call cc1.SetFocusDate(dYes)
+				                                                         Call SalWaitCursor(FALSE)
+				                                                         If nAvtoFlag=0
+					                                                         Set cbkazVP = FALSE
+					                                                         Set cbkazOST = FALSE
+					                                                         Set cbVWABS = TRUE
+				                                                         If nAvtoFlag=1
+					                                                         Set cbVWABS = TRUE
+					                                                         Set cbkazVP = FALSE
+					                                                         Set cbkazOST = FALSE
+					                                                         Call SalDisableWindow(cbkazVP)
+					                                                         Call SalDisableWindow(cbkazOST)
+					                                                         Call SalDisableWindow(cc1)
+					                                                         Call SalTimerSet ( hWndItem, 1, 1000 )
+					                                                         Set nTimerCount = 0
 				!
 				!
-				                                                       Call SalUseRegistry(FALSE, '')
-				                                                       Call SalGetProfileString('ElektroKlients', 'KaznaDocPath', GetPrnDir(), sKAZNAPath, GetIniFileName())
-				                                                       Call SalGetProfileString('ElektroKlients', 'BackDocPath',  GetPrnDir(), sVWABSPath, GetIniFileName())
-				                                                       Call SalGetProfileString('ElektroKlients', 'VWABSParams',  '1;0',       sVWABSParams, GetIniFileName())
-				                                                       Call SalGetProfileString('ElektroKlients', 'KAZNAParams',  '0;0',       sKAZNAParams, GetIniFileName()) 
-				                                                       Call SalGetProfileString('ElektroKlients', 'VPBlkCodes',   '', sBlkList, GetIniFileName()) 
+				                                                         Call SalUseRegistry(FALSE, '')
+				                                                         Call SalGetProfileString('ElektroKlients', 'KaznaDocPath', GetPrnDir(), sKAZNAPath, GetIniFileName())
+				                                                         Call SalGetProfileString('ElektroKlients', 'BackDocPath',  GetPrnDir(), sVWABSPath, GetIniFileName())
+				                                                         Call SalGetProfileString('ElektroKlients', 'VWABSParams',  '1;0',       sVWABSParams, GetIniFileName())
+				                                                         Call SalGetProfileString('ElektroKlients', 'KAZNAParams',  '0;0',       sKAZNAParams, GetIniFileName()) 
+				                                                         Call SalGetProfileString('ElektroKlients', 'VPBlkCodes',   '', sBlkList, GetIniFileName()) 
 				!
-			                                                       On SAM_Timer
-				                                                       If nAvtoFlag=1 and nTimerCount = 0
-					                                                       Call SalSendMsg( pbRun, SAM_Click, 0, 0 )
-					                                                       Set nTimerCount = 1 
-				                                                       Else 
-					                                                       If nAvtoFlag=1 and nTimerCount = 1
-						                                                       Call SalSendMsg( pbExit, SAM_Click, 0, 0 )
-					                                                       Call SalWaitCursor(FALSE)
-			                                                       On SAM_Destroy
-				                                                       If nAvtoFlag=1
-					                                                       Call SalTimerKill ( hWndItem, 1 )
+			                                                         On SAM_Timer
+				                                                         If nAvtoFlag=1 and nTimerCount = 0
+					                                                         Call SalSendMsg( pbRun, SAM_Click, 0, 0 )
+					                                                         Set nTimerCount = 1 
+				                                                         Else 
+					                                                         If nAvtoFlag=1 and nTimerCount = 1
+						                                                         Call SalSendMsg( pbExit, SAM_Click, 0, 0 )
+					                                                         Call SalWaitCursor(FALSE)
+			                                                         On SAM_Destroy
+				                                                         If nAvtoFlag=1
+					                                                         Call SalTimerKill ( hWndItem, 1 )
 	! cGenericTable: tblKlbFiles
 .winattr class Table Window:
 		Class: cGenericTable
@@ -16224,163 +16224,163 @@ Application Description: •--------------------------------------•
 			Maximum Rows in Memory: Default
 			Discardable? No
 .end
-		                                                        Description: 
-		                                                        Named Menus 
-		                                                        Menu 
-		                                                        Tool Bar 
-			                                                        Contents 
-				                                                        Pushbutton: pbIns
-					                                                        Message Actions 
-				                                                        Pushbutton: pbDel
-					                                                        Message Actions 
-				                                                        Pushbutton: pbRefresh
-					                                                        Message Actions 
-						                                                        On SAM_Create
-							                                                        Set strTip = 'Перечитать данные'
-						                                                        On SAM_Click
-							                                                        Call SalSendMsg(tblKlbFiles, UM_Populate, 0, 0)
-				                                                        Pushbutton: pbUpdate
-					                                                        Message Actions 
-				                                                        Line 
-				                                                        Pushbutton: pbSearch
-					                                                        Message Actions 
-				                                                        Pushbutton: pbFilter
-					                                                        Message Actions 
-				                                                        Pushbutton: pbDocs
-					                                                        Message Actions 
-						                                                        On SAM_Create
-							                                                        Set strTip = 'Просмотреть документы файла'
-						                                                        On SAM_Click
+		                                                          Description: 
+		                                                          Named Menus 
+		                                                          Menu 
+		                                                          Tool Bar 
+			                                                          Contents 
+				                                                          Pushbutton: pbIns
+					                                                          Message Actions 
+				                                                          Pushbutton: pbDel
+					                                                          Message Actions 
+				                                                          Pushbutton: pbRefresh
+					                                                          Message Actions 
+						                                                          On SAM_Create
+							                                                          Set strTip = 'Перечитать данные'
+						                                                          On SAM_Click
+							                                                          Call SalSendMsg(tblKlbFiles, UM_Populate, 0, 0)
+				                                                          Pushbutton: pbUpdate
+					                                                          Message Actions 
+				                                                          Line 
+				                                                          Pushbutton: pbSearch
+					                                                          Message Actions 
+				                                                          Pushbutton: pbFilter
+					                                                          Message Actions 
+				                                                          Pushbutton: pbDocs
+					                                                          Message Actions 
+						                                                          On SAM_Create
+							                                                          Set strTip = 'Просмотреть документы файла'
+						                                                          On SAM_Click
 							! sCond 
-							                                                        Call DocViewListInt(hWndMDI,  " ref in (select ref from operw where tag='KLBXF' and value='"||tblKlbFiles.colFileName ||"' )", "Документы" )
-				                                                        Pushbutton: pbPrint
-					                                                        Message Actions 
-				                                                        Line 
-				                                                        Pushbutton: pbExit
-					                                                        Message Actions 
-				                                                        Line 
-				                                                        Combo Box: cmbFileDate
-					                                                        List Initialization 
-					                                                        Message Actions 
-						                                                        On SAM_Create
-							                                                        Call cmbFileDate.Init(hWndItem)
-							                                                        Call cmbFileDate.Populate(hSql(), "rownum", "TO_CHAR(fdat,'DD-MM-YYYY')",
+							                                                          Call DocViewListInt(hWndMDI,  " ref in (select ref from operw where tag='KLBXF' and value='"||tblKlbFiles.colFileName ||"' )", "Документы" )
+				                                                          Pushbutton: pbPrint
+					                                                          Message Actions 
+				                                                          Line 
+				                                                          Pushbutton: pbExit
+					                                                          Message Actions 
+				                                                          Line 
+				                                                          Combo Box: cmbFileDate
+					                                                          List Initialization 
+					                                                          Message Actions 
+						                                                          On SAM_Create
+							                                                          Call cmbFileDate.Init(hWndItem)
+							                                                          Call cmbFileDate.Populate(hSql(), "rownum", "TO_CHAR(fdat,'DD-MM-YYYY')",
 									    "(select fdat from fdat)",
 									     "ORDER BY fdat DESC")
-							                                                        Call SalListSetSelect(cmbFileDate, 0)
-						                                                        On SAM_Click
-							                                                        Call SalSendClassMessage( SAM_Click, 0, 0 )
-							                                                        Set sTmp = cmbFileDate.GetNameById(cmbFileDate.GetKey(SalListQuerySelection(hWndItem)))
-							                                                        Set dDateSelected = SalDateConstruct(SalStrToNumber( SalStrRightX( sTmp, 4 )),
+							                                                          Call SalListSetSelect(cmbFileDate, 0)
+						                                                          On SAM_Click
+							                                                          Call SalSendClassMessage( SAM_Click, 0, 0 )
+							                                                          Set sTmp = cmbFileDate.GetNameById(cmbFileDate.GetKey(SalListQuerySelection(hWndItem)))
+							                                                          Set dDateSelected = SalDateConstruct(SalStrToNumber( SalStrRightX( sTmp, 4 )),
 									 SalStrToNumber( SalStrMidX( sTmp, 3, 2 )),
 									 SalStrToNumber(SalStrLeftX( sTmp, 2 )), 0, 0, 0)
-							                                                        Call SalSendMsg(cmbFileDate, SAM_User, 0, 0)
-						                                                        On SAM_User
-							                                                        Set nDay = SalDateDay(dDateSelected)
-							                                                        Set nMonth = SalDateMonth(dDateSelected)
-							                                                        Set nYear = SalDateYear(dDateSelected)
-							                                                        If cmbBanks = '*'
-								                                                        Set strSab = ''
-							                                                        Else 
-								                                                        If not SalIsNull(cmbBanks)
-									                                                        Set strSab = cmbBanks.GetKey(SalListQuerySelection(cmbBanks))
-							                                                        Set dfFileName = '*' || SalStrRightX(strSab,5) || GetCharForDigit(nMonth) || GetCharForDigit(nDay) ||'????'
-							                                                        Call SalSendMsg(pbSearchFiles, SAM_Click, 0, 0)
-				                                                        Data Field: dfFileName
-					                                                        Message Actions 
-				                                                        Combo Box: cmbBanks
-					                                                        List Initialization 
-					                                                        Message Actions 
-						                                                        On SAM_Create
-							                                                        Call cmbBanks.Init(hWndItem)
-							                                                        Call cmbBanks.Populate(hSql(), "sab", "nmk", "customer", " where sab is not null order by nmk")
-							                                                        Call cmbBanks.Add('*', '*')
-						                                                        On SAM_Click
-							                                                        Call SalSendMsg(cmbFileDate, SAM_User, 0, 0)
-				                                                        Frame 
-				                                                        Pushbutton: pbSearchFiles
-					                                                        Message Actions 
-						                                                        On SAM_Click
-							                                                        Call SalSendMsg(tblKlbFiles, UM_Populate, 0, 0)
-						                                                        On SAM_TooltipSetText
-							                                                        Return XSalTooltipSetText(lParam, 'Задействовать имя для поиска')
-				                                                        Group Box: Типи файлів
-				                                                        Group Box: Пошук
-				                                                        Radio Button: rbInDirect
-					                                                        Message Actions 
-				                                                        Radio Button: rbOutDirect
-					                                                        Message Actions 
-		                                                        Contents 
-			                                                        Column: colFileName
-				                                                        List Values 
-				                                                        Message Actions 
-			                                                        Column: colDatF
-				                                                        List Values 
-				                                                        Message Actions 
-			                                                        Column: colDatP
-				                                                        List Values 
-				                                                        Message Actions 
-			                                                        Column: colDocTotal
-				                                                        List Values 
-				                                                        Message Actions 
-			                                                        Column: colDocPayed
-				                                                        List Values 
-				                                                        Message Actions 
-		                                                        Functions 
-		                                                        Window Parameters 
-		                                                        Window Variables 
-			                                                        String: strSab
-			                                                        String: sTmp
-			                                                        Number: nTmp
-			                                                        Date/Time: dDateSelected
-			                                                        Number: nDay
-			                                                        Number: nMonth
-			                                                        Number: nYear
-			                                                        String: strSql
-			                                                        String: sCond
-		                                                        Message Actions 
-			                                                        On UM_Populate
-				                                                        Call SalSetWindowText(tblKlbFiles, 'Файлы клиент банка')
-				                                                        Set hWndCol = hWndNULL
-				                                                        Call SalDisableWindow(pbIns)
-				                                                        Call SalDisableWindow(pbDel)
-				                                                        Call SalDisableWindow(pbUpdate)
-				                                                        Call SalDisableWindow(pbPrint)
-				                                                        Call SalTblSetLockedColumns(tblKlbFiles, 2)
-				                                                        Set strSql = "
+							                                                          Call SalSendMsg(cmbFileDate, SAM_User, 0, 0)
+						                                                          On SAM_User
+							                                                          Set nDay = SalDateDay(dDateSelected)
+							                                                          Set nMonth = SalDateMonth(dDateSelected)
+							                                                          Set nYear = SalDateYear(dDateSelected)
+							                                                          If cmbBanks = '*'
+								                                                          Set strSab = ''
+							                                                          Else 
+								                                                          If not SalIsNull(cmbBanks)
+									                                                          Set strSab = cmbBanks.GetKey(SalListQuerySelection(cmbBanks))
+							                                                          Set dfFileName = '*' || SalStrRightX(strSab,5) || GetCharForDigit(nMonth) || GetCharForDigit(nDay) ||'????'
+							                                                          Call SalSendMsg(pbSearchFiles, SAM_Click, 0, 0)
+				                                                          Data Field: dfFileName
+					                                                          Message Actions 
+				                                                          Combo Box: cmbBanks
+					                                                          List Initialization 
+					                                                          Message Actions 
+						                                                          On SAM_Create
+							                                                          Call cmbBanks.Init(hWndItem)
+							                                                          Call cmbBanks.Populate(hSql(), "sab", "nmk", "customer", " where sab is not null order by nmk")
+							                                                          Call cmbBanks.Add('*', '*')
+						                                                          On SAM_Click
+							                                                          Call SalSendMsg(cmbFileDate, SAM_User, 0, 0)
+				                                                          Frame 
+				                                                          Pushbutton: pbSearchFiles
+					                                                          Message Actions 
+						                                                          On SAM_Click
+							                                                          Call SalSendMsg(tblKlbFiles, UM_Populate, 0, 0)
+						                                                          On SAM_TooltipSetText
+							                                                          Return XSalTooltipSetText(lParam, 'Задействовать имя для поиска')
+				                                                          Group Box: Типи файлів
+				                                                          Group Box: Пошук
+				                                                          Radio Button: rbInDirect
+					                                                          Message Actions 
+				                                                          Radio Button: rbOutDirect
+					                                                          Message Actions 
+		                                                          Contents 
+			                                                          Column: colFileName
+				                                                          List Values 
+				                                                          Message Actions 
+			                                                          Column: colDatF
+				                                                          List Values 
+				                                                          Message Actions 
+			                                                          Column: colDatP
+				                                                          List Values 
+				                                                          Message Actions 
+			                                                          Column: colDocTotal
+				                                                          List Values 
+				                                                          Message Actions 
+			                                                          Column: colDocPayed
+				                                                          List Values 
+				                                                          Message Actions 
+		                                                          Functions 
+		                                                          Window Parameters 
+		                                                          Window Variables 
+			                                                          String: strSab
+			                                                          String: sTmp
+			                                                          Number: nTmp
+			                                                          Date/Time: dDateSelected
+			                                                          Number: nDay
+			                                                          Number: nMonth
+			                                                          Number: nYear
+			                                                          String: strSql
+			                                                          String: sCond
+		                                                          Message Actions 
+			                                                          On UM_Populate
+				                                                          Call SalSetWindowText(tblKlbFiles, 'Файлы клиент банка')
+				                                                          Set hWndCol = hWndNULL
+				                                                          Call SalDisableWindow(pbIns)
+				                                                          Call SalDisableWindow(pbDel)
+				                                                          Call SalDisableWindow(pbUpdate)
+				                                                          Call SalDisableWindow(pbPrint)
+				                                                          Call SalTblSetLockedColumns(tblKlbFiles, 2)
+				                                                          Set strSql = "
 						    SELECT pnam, datf, datp, ndoctotal, ndocpayed
 						    FROM   xml_gate
 						    INTO :tblKlbFiles.colFileName,  :tblKlbFiles.colDatF, :tblKlbFiles.colDatP,
 						         :tblKlbFiles.colDocTotal, :tblKlbFiles.colDocPayed
 						    WHERE pnam LIKE '" || StrMatches2Like(dfFileName) || "' and
 						          datp>=:dDateSelected and datp-1<:dDateSelected ORDER BY pnam, datp"
-				                                                        Call WaitCursorOn()
-				                                                        Set nRow = 0
-				                                                        Call SalTblPopulate(tblKlbFiles, hSqlAux(), T(strSql), TBL_FillAll)
-				                                                        Call SalTblDefineSplitWindow (tblKlbFiles, 1, TRUE)
-				                                                        Set nTmp = SalTblInsertRow(tblKlbFiles, TBL_MinRow)
-				                                                        Call SalTblSetContext(tblKlbFiles, nTmp)
-				                                                        Call SalTblSetRowFlags(tblKlbFiles, nTmp, ROW_New, FALSE)
-				                                                        Call WaitCursorOff()
-			                                                        On SAM_Create
-				                                                        Set dDateSelected = GetBankDate()
-				                                                        Call PrepareWindow(hWndForm)
+				                                                          Call WaitCursorOn()
+				                                                          Set nRow = 0
+				                                                          Call SalTblPopulate(tblKlbFiles, hSqlAux(), T(strSql), TBL_FillAll)
+				                                                          Call SalTblDefineSplitWindow (tblKlbFiles, 1, TRUE)
+				                                                          Set nTmp = SalTblInsertRow(tblKlbFiles, TBL_MinRow)
+				                                                          Call SalTblSetContext(tblKlbFiles, nTmp)
+				                                                          Call SalTblSetRowFlags(tblKlbFiles, nTmp, ROW_New, FALSE)
+				                                                          Call WaitCursorOff()
+			                                                          On SAM_Create
+				                                                          Set dDateSelected = GetBankDate()
+				                                                          Call PrepareWindow(hWndForm)
 				! Call SetWindowFullSize(hWndForm)
-				                                                        Call XSalTooltipSetUserDefault()
-				                                                        Set nDay   = SalDateDay(GetBankDate())
-				                                                        Set nMonth = SalDateMonth(GetBankDate())
-				                                                        Set nYear  = SalDateYear(GetBankDate())
-				                                                        Set dfFileName = '*' || GetCharForDigit(nMonth) || GetCharForDigit(nDay) || '????'
-				                                                        Set rbInDirect = TRUE
-				                                                        Set rbOutDirect = FALSE
-				                                                        Call SalTblSetTableFlags(tblKlbFiles, TBL_Flag_SingleSelection, TRUE)
-				                                                        Call SalTblSetTableFlags(tblKlbFiles, TBL_Flag_SelectableCols, TRUE)
-				                                                        Call SalSetFocus(pbExit)
-			                                                        On SAM_CreateComplete
-				                                                        Call SalSendMsg( pbRefresh, SAM_Click, 0, 0 )
-				                                                        Call WaitCursorOff()
-			                                                        On SAM_DoubleClick
-				                                                        Call SalSendMsg(pbDocs, SAM_Click, 0, 0)
+				                                                          Call XSalTooltipSetUserDefault()
+				                                                          Set nDay   = SalDateDay(GetBankDate())
+				                                                          Set nMonth = SalDateMonth(GetBankDate())
+				                                                          Set nYear  = SalDateYear(GetBankDate())
+				                                                          Set dfFileName = '*' || GetCharForDigit(nMonth) || GetCharForDigit(nDay) || '????'
+				                                                          Set rbInDirect = TRUE
+				                                                          Set rbOutDirect = FALSE
+				                                                          Call SalTblSetTableFlags(tblKlbFiles, TBL_Flag_SingleSelection, TRUE)
+				                                                          Call SalTblSetTableFlags(tblKlbFiles, TBL_Flag_SelectableCols, TRUE)
+				                                                          Call SalSetFocus(pbExit)
+			                                                          On SAM_CreateComplete
+				                                                          Call SalSendMsg( pbRefresh, SAM_Click, 0, 0 )
+				                                                          Call WaitCursorOff()
+			                                                          On SAM_DoubleClick
+				                                                          Call SalSendMsg(pbDocs, SAM_Click, 0, 0)
 	! Form Window: frm_DKUCat
 .winattr
 		Class:
@@ -16416,51 +16416,51 @@ Application Description: •--------------------------------------•
 			Text Color: Default
 			Background Color: Default
 .end
-		                                                 Description: Ведомости по Казначейству
-		                                                 Named Menus 
-		                                                 Menu 
-		                                                 Tool Bar 
-			                                                 Contents 
-				                                                 List Box: lbStatus
-					                                                 List Initialization 
-					                                                 Message Actions 
-				                                                 Pushbutton: pbSvod
-					                                                 Message Actions 
-						                                                 On SAM_Click
-							                                                 Call makeRep(REPAGG_SVOD)
-				                                                 Pushbutton: pbSelected
-					                                                 Message Actions 
-						                                                 On SAM_Click
-							                                                 Call makeRep(REPAGG_SEL)
-				                                                 Pushbutton: pbSvodSelected
-					                                                 Message Actions 
-						                                                 On SAM_Click
-							                                                 Call makeRep(REPAGG_SVOD_AND_SEL)
-				                                                 Pushbutton: pbSvodAll
-					                                                 Message Actions 
-						                                                 On SAM_Click
-							                                                 Call makeRep(REPAGG_SVOD_AND_ALL)
-				                                                 Pushbutton: pbAll
-					                                                 Message Actions 
-						                                                 On SAM_Click
-							                                                 Call makeRep(REPAGG_ALL)
-				                                                 Pushbutton: pbExit
-					                                                 Message Actions 
-						                                                 On SAM_Click
-							                                                 Call SalDestroyWindow(hWndForm )
-							                                                 Set hWndDKU = hWndNULL
-							                                                 Set nAvtoGen=1
-				                                                 Line 
-				                                                 Line 
-		                                                 Contents 
-			                                                 Child Table: tbl1 !! Районные Казначейства
-				                                                 Contents 
-					                                                 Column: Kod1
-						                                                 List Values 
-						                                                 Message Actions 
-					                                                 Column: colDPI
-						                                                 List Values 
-						                                                 Message Actions 
+		                                                   Description: Ведомости по Казначейству
+		                                                   Named Menus 
+		                                                   Menu 
+		                                                   Tool Bar 
+			                                                   Contents 
+				                                                   List Box: lbStatus
+					                                                   List Initialization 
+					                                                   Message Actions 
+				                                                   Pushbutton: pbSvod
+					                                                   Message Actions 
+						                                                   On SAM_Click
+							                                                   Call makeRep(REPAGG_SVOD)
+				                                                   Pushbutton: pbSelected
+					                                                   Message Actions 
+						                                                   On SAM_Click
+							                                                   Call makeRep(REPAGG_SEL)
+				                                                   Pushbutton: pbSvodSelected
+					                                                   Message Actions 
+						                                                   On SAM_Click
+							                                                   Call makeRep(REPAGG_SVOD_AND_SEL)
+				                                                   Pushbutton: pbSvodAll
+					                                                   Message Actions 
+						                                                   On SAM_Click
+							                                                   Call makeRep(REPAGG_SVOD_AND_ALL)
+				                                                   Pushbutton: pbAll
+					                                                   Message Actions 
+						                                                   On SAM_Click
+							                                                   Call makeRep(REPAGG_ALL)
+				                                                   Pushbutton: pbExit
+					                                                   Message Actions 
+						                                                   On SAM_Click
+							                                                   Call SalDestroyWindow(hWndForm )
+							                                                   Set hWndDKU = hWndNULL
+							                                                   Set nAvtoGen=1
+				                                                   Line 
+				                                                   Line 
+		                                                   Contents 
+			                                                   Child Table: tbl1 !! Районные Казначейства
+				                                                   Contents 
+					                                                   Column: Kod1
+						                                                   List Values 
+						                                                   Message Actions 
+					                                                   Column: colDPI
+						                                                   List Values 
+						                                                   Message Actions 
 					! Column: col5
 .winattr
 						Class Child Ref Key: 0
@@ -16492,37 +16492,37 @@ Application Description: •--------------------------------------•
 								Uncheck Value:
 								Ignore Case? Yes
 .end
-						                                                                                                                                                          List Values
-						                                                                                                                                                          Message Actions
-					                                                 Column: Name1
-						                                                 List Values 
-						                                                 Message Actions 
-					                                                 Column: ktk_name
-						                                                 List Values 
-						                                                 Message Actions 
-					                                                 Column: colKtk
-						                                                 List Values 
-						                                                 Message Actions 
-					                                                 Column: colid_key
-						                                                 List Values 
-						                                                 Message Actions 
-					                                                 Column: colSab
-						                                                 List Values 
-						                                                 Message Actions 
-				                                                 Functions 
-				                                                 Window Variables 
-				                                                 Message Actions 
-					                                                 On SAM_Create
+						                                                                                                                                                            List Values
+						                                                                                                                                                            Message Actions
+					                                                   Column: Name1
+						                                                   List Values 
+						                                                   Message Actions 
+					                                                   Column: ktk_name
+						                                                   List Values 
+						                                                   Message Actions 
+					                                                   Column: colKtk
+						                                                   List Values 
+						                                                   Message Actions 
+					                                                   Column: colid_key
+						                                                   List Values 
+						                                                   Message Actions 
+					                                                   Column: colSab
+						                                                   List Values 
+						                                                   Message Actions 
+				                                                   Functions 
+				                                                   Window Variables 
+				                                                   Message Actions 
+					                                                   On SAM_Create
 						! - - -  Вытяним маску территории для БОЛЬШИХ плательщиков
 						! -- - 
-						                                                 Call SalUseRegistry(FALSE, '')
-						                                                 Call SalGetProfileString('DKU Reports', 'BigPayersMask', '', sBigPayersMask, GetIniFileName())
+						                                                   Call SalUseRegistry(FALSE, '')
+						                                                   Call SalGetProfileString('DKU Reports', 'BigPayersMask', '', sBigPayersMask, GetIniFileName())
 						! - - вычитаем параметр из таблицы params 
 						! ==============================================
 						! ==============================================
-						                                                 Set sBigPayersMask = GetGlobalOption('KTKMASK')
+						                                                   Set sBigPayersMask = GetGlobalOption('KTKMASK')
 								                   
-						                                                 Call SalTblPopulate(tbl1, hSql(), "
+						                                                   Call SalTblPopulate(tbl1, hSql(), "
 								        SELECT substr(ktk, -6, 2), d.id, d.name, 
 								               id_key||' - '||k.name, ktk, id_key, k.sab
 								        INTO  :Kod1,  :colDPI,   :Name1, :ktk_name, :colKtk, :colid_key, :colSab
@@ -16531,23 +16531,23 @@ Application Description: •--------------------------------------•
 								                          AND substr(ktk, -6,6)= substr(k.idt, -6,2)||'0000'         
 								        ORDER BY substr(ktk, length(ktk)-5,2), d.id", TBL_FillAll)
 						!
-						                                                 If sBigPayersMask!=''
-							                                                 Call SalTblInsertRow ( tbl1, 0 )
-							                                                 Call SalTblSetContext ( tbl1, 0 )
-							                                                 Call SalTblSetRowFlags( tbl1, 0 ,ROW_New, FALSE)
-							                                                 Set tbl1.Kod1 = sBigPayersMask
-							                                                 Set tbl1.ktk_name = "ВЕЛИКІ платники районів"
-							                                                 Set tbl1.colKtk = '0'
-							                                                 Set tbl1.colid_key = '000'
-							                                                 Call SqlPrepareAndExecute(hSql(), "SELECT kod_dpi, p.name
+						                                                   If sBigPayersMask!=''
+							                                                   Call SalTblInsertRow ( tbl1, 0 )
+							                                                   Call SalTblSetContext ( tbl1, 0 )
+							                                                   Call SalTblSetRowFlags( tbl1, 0 ,ROW_New, FALSE)
+							                                                   Set tbl1.Kod1 = sBigPayersMask
+							                                                   Set tbl1.ktk_name = "ВЕЛИКІ платники районів"
+							                                                   Set tbl1.colKtk = '0'
+							                                                   Set tbl1.colid_key = '000'
+							                                                   Call SqlPrepareAndExecute(hSql(), "SELECT kod_dpi, p.name
 									                                   INTO :nIdDpi, :sNameDpi
 									                                   FROM dpa p, terrdpi, ktk
 									                                   WHERE kod_dpi=p.id AND ktkmask=:sBigPayersMask 
 									                                         AND ktk.idt=ktk")
-							                                                 Set K2s=0
-							                                                 While SqlFetchNext ( hSql(), K2s )
-							                                                 Set tbl1.Name1 = sNameDpi
-							                                                 Set tbl1.colDPI = nIdDpi
+							                                                   Set K2s=0
+							                                                   While SqlFetchNext ( hSql(), K2s )
+							                                                   Set tbl1.Name1 = sNameDpi
+							                                                   Set tbl1.colDPI = nIdDpi
 						! - - -
 						! Call SalTblInsertRow ( tbl1, 0 )
 						! Call SalTblSetContext ( tbl1, 0 )
@@ -16559,108 +16559,108 @@ Application Description: •--------------------------------------•
 						! ==============================================
 						! ==============================================
 						! ==============================================
-			                                                 Custom Control: cSpltMain
-				                                                 Message Actions 
-		                                                 Functions 
+			                                                   Custom Control: cSpltMain
+				                                                   Message Actions 
+		                                                   Functions 
 			! Function: FU_1
-				                                                   Description: Печать по ОДНОМУ или свода
-				                                                   Returns 
-					                                                   Number: 
-				                                                   Parameters 
-					                                                   String: sKod          ! - - -  sKod = ktk или =хххх
-					                                                   String: sSab          ! - - -  sSab
-					                                                   String: sName
-					                                                   String: sId_key       ! - - id_key (влияет только на расширение файла)
-					                                                   String: sKtk_Name
-					                                                   String: sIsSvod       ! - - -  =0 - для зведенного   =1 для территоріального
-					                                                   Number: nRepType      ! - - -  Тип отчета =0 - rpt, =1- txt? =2 -dbf
-				                                                   Static Variables 
-				                                                   Local variables 
-					                                                   String: sXX
-					                                                   Number: nTmp
-					                                                   Number: nKtkLen
-					                                                   Number: i
-					                                                   File Handle: hFileIn
-					                                                   Long String: sFileLine
-					                                                   String: sFileTypeKey ! поскольку мой номер типа файла nRepType - не совпадает с типом файла в доку казны
-				                                                   Actions 
-					                                                   Call SalWaitCursor(TRUE)
-					                                                   Set K0 = 0
-					                                                   Set ID = GetUserId()
+				                                                     Description: Печать по ОДНОМУ или свода
+				                                                     Returns 
+					                                                     Number: 
+				                                                     Parameters 
+					                                                     String: sKod          ! - - -  sKod = ktk или =хххх
+					                                                     String: sSab          ! - - -  sSab
+					                                                     String: sName
+					                                                     String: sId_key       ! - - id_key (влияет только на расширение файла)
+					                                                     String: sKtk_Name
+					                                                     String: sIsSvod       ! - - -  =0 - для зведенного   =1 для территоріального
+					                                                     Number: nRepType      ! - - -  Тип отчета =0 - rpt, =1- txt? =2 -dbf
+				                                                     Static Variables 
+				                                                     Local variables 
+					                                                     String: sXX
+					                                                     Number: nTmp
+					                                                     Number: nKtkLen
+					                                                     Number: i
+					                                                     File Handle: hFileIn
+					                                                     Long String: sFileLine
+					                                                     String: sFileTypeKey ! поскольку мой номер типа файла nRepType - не совпадает с типом файла в доку казны
+				                                                     Actions 
+					                                                     Call SalWaitCursor(TRUE)
+					                                                     Set K0 = 0
+					                                                     Set ID = GetUserId()
 					! ================================================================
 					! ============ Создаем шаблон файла =============================
 					! ================================================================
 					! Директория для печати
-					                                                   Set strPrintPath=  GetDkuRepPath(sKod)
+					                                                     Set strPrintPath=  GetDkuRepPath(sKod)
 					! Если это 412 DBF - другая директория
-					                                                   If (nPar1 = 938 or nPar1 = 937) and nRepType=2
-						                                                   Call SalUseRegistry(FALSE, '')
-						                                                   Call SalGetProfileString('412', 'DbfPath', strPrintPath, strPrintPath, GetIniFileName())
-					                                                   If (nPar1 = 43) and nRepType=2
-						                                                   Call SalUseRegistry(FALSE, '')
-						                                                   Call SalGetProfileString('PF', 'DbfPath', strPrintPath, strPrintPath, GetIniFileName())
+					                                                     If (nPar1 = 938 or nPar1 = 937) and nRepType=2
+						                                                     Call SalUseRegistry(FALSE, '')
+						                                                     Call SalGetProfileString('412', 'DbfPath', strPrintPath, strPrintPath, GetIniFileName())
+					                                                     If (nPar1 = 43) and nRepType=2
+						                                                     Call SalUseRegistry(FALSE, '')
+						                                                     Call SalGetProfileString('PF', 'DbfPath', strPrintPath, strPrintPath, GetIniFileName())
 					! -- митниця --
-					                                                   If nPar1=922
-						                                                   Set strFileNameTxt = strPureMask || sId_key ||
+					                                                     If nPar1=922
+						                                                     Set strFileNameTxt = strPureMask || sId_key ||
 								   GetCharForDigit( SalStrToNumber(SalStrMidX(strDateFrom, 3, 2) ) )
 								   ||GetCharForDigit( SalStrToNumber(SalStrMidX(strDateFrom, 0, 2) ) ) 
 								   ||'.'||SalStrMidX(strDateFrom, 9, 1) || '??'
-						                                                   Set strFileNameTxt =  SalStrLeftX(strFileNameTxt,10) ||GetNextFileSess(strFileNameTxt,2,1)
-					                                                   Else 
+						                                                     Set strFileNameTxt =  SalStrLeftX(strFileNameTxt,10) ||GetNextFileSess(strFileNameTxt,2,1)
+					                                                     Else 
 						! мои форматы 0 - RPT формат, =1 - текстовый, =2 - DBF
 						! казначейские 0 - DBF 1 - текстовый,
-						                                                   Set sFileTypeKey=IifS(nRepType=0, '1', IifS(nRepType=2, '0', '0'))
-						                                                   Set strFileNameTxt =  strPureMask || sIsSvod
+						                                                     Set sFileTypeKey=IifS(nRepType=0, '1', IifS(nRepType=2, '0', '0'))
+						                                                     Set strFileNameTxt =  strPureMask || sIsSvod
 								                     || sFileTypeKey
 								                     || GetCharForDigit( SalStrToNumber(SalStrMidX(strDateFrom, 3, 2) ) )
 								                     || GetCharForDigit( SalStrToNumber(SalStrMidX(strDateFrom, 0, 2) ) ) || '?.'||sId_key
-						                                                   If nPar1 = 51
-							                                                   Set strFileNameRtf =  strPureMask
+						                                                     If nPar1 = 51
+							                                                     Set strFileNameRtf =  strPureMask
 									                     || GetCharForDigit( SalStrToNumber(SalStrMidX(strDateFrom, 3, 2) ) )
 									                     || GetCharForDigit( SalStrToNumber(SalStrMidX(strDateFrom, 0, 2) ) )
 									                     || '000.rtf '  ! - - - а потом переименуем в  sId_key.rtf
 									
-						                                                   Else 
-							                                                   Set strFileNameRtf =  strPureMask   || sIsSvod  ||'3'
+						                                                     Else 
+							                                                     Set strFileNameRtf =  strPureMask   || sIsSvod  ||'3'
 									                   || GetCharForDigit( SalStrToNumber(SalStrMidX(strDateFrom, 3, 2) ) )
 									                   || GetCharForDigit( SalStrToNumber(SalStrMidX(strDateFrom, 0, 2) ) ) || '?.rtf '  ! - - - а потом переименуем в  .'||sId_key
 									
-						                                                   Set strFileNameTxt =  SalStrLeftX(strFileNameTxt,7) ||GetNextFileSess(strFileNameTxt,1,0)||'.'||sId_key
+						                                                     Set strFileNameTxt =  SalStrLeftX(strFileNameTxt,7) ||GetNextFileSess(strFileNameTxt,1,0)||'.'||sId_key
 					!
-					                                                   Set strBankName = sName
-					                                                   Set strBankKod = sKtk_Name
-					                                                   Set sTmp = ' '
-					                                                   Set SHAP = ' '
+					                                                     Set strBankName = sName
+					                                                     Set strBankKod = sKtk_Name
+					                                                     Set sTmp = ' '
+					                                                     Set SHAP = ' '
 					! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 					! - - Если это не сводная  вычислим хвост для условия WHERE  (sTmp)
 					! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-					                                                   Set nKtkLen = SalStrLength( sKod )
+					                                                     Set nKtkLen = SalStrLength( sKod )
 					!
-					                                                   If SalStrScan (sKod, 'x' ) =  -1
-						                                                   If nPar1 = 400 or nPar1 = 401 or  nPar1 =51
-							                                                   Set sTmp = "  p.acc in (
+					                                                     If SalStrScan (sKod, 'x' ) =  -1
+						                                                     If nPar1 = 400 or nPar1 = 401 or  nPar1 =51
+							                                                     Set sTmp = "  p.acc in (
 									    SELECT acc
 									    FROM specparam
 									    WHERE "|| IifS(nKtkLen>6, 
 									                  " ktk like '"||sKod||"')", 
 									                  " substr(ktk, -6,"|| SalNumberToStrX(nKtkLen,0)|| ")  like  '"||sKod||"')" )
-						                                                   Else 
-							                                                   Set sTmp =  IifS(nKtkLen>6, 
+						                                                     Else 
+							                                                     Set sTmp =  IifS(nKtkLen>6, 
 									                 "  ktk like '"||sKod||"'", 
 									                 "  substr(ktk, -6 ,"|| SalNumberToStrX(nKtkLen,0)|| ") like '" || sKod||"'"
 									                 )
-					                                                   Else 
-						                                                   Set sTmp= " 1=1 " ! Для условия WHERE 
+					                                                     Else 
+						                                                     Set sTmp= " 1=1 " ! Для условия WHERE 
 					! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 					! - - Ведомость 2M (3411) - - - - - - - - - -
 					! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-					                                                   If ( nPar1 = 300 or nPar1 = 301  )
-						                                                   Call VisArrayFillNumber (R,  0, 10)
-						                                                   Call VisArrayFillNumber (R0, 0, 10)
+					                                                     If ( nPar1 = 300 or nPar1 = 301  )
+						                                                     Call VisArrayFillNumber (R,  0, 10)
+						                                                     Call VisArrayFillNumber (R0, 0, 10)
 						! - - - - - сжатая - - - - - - - - - - - - - - -
-						                                                   If nPar1 = 301
-							                                                   Set strBind='Group2mLine'
-							                                                   Set sSql="
+						                                                     If nPar1 = 301
+							                                                     Set strBind='Group2mLine'
+							                                                     Set sSql="
 									SELECT strformatN(kekd,8,' ')||strformatN(idr,2,' ' )||strformatN( s,15,' ')||strformatN(s1,15,' ')
 									FROM
 									             (SELECT kekd, idr, name,  sum(s) s, sum(s1) s1
@@ -16669,14 +16669,14 @@ Application Description: •--------------------------------------•
 									                          ORDER BY kekd, idr )
 									INTO  :Group2mLine
 									ORDER BY kekd "
-							                                                   Call SqlPrepareAndExecute(hSql(), T(sSql))
-							                                                   Set nCount=0
-							                                                   While SqlFetchNext(hSql(),nFetchRes)
-								                                                   Set nCount = nCount+1
+							                                                     Call SqlPrepareAndExecute(hSql(), T(sSql))
+							                                                     Set nCount=0
+							                                                     While SqlFetchNext(hSql(),nFetchRes)
+								                                                     Set nCount = nCount+1
 							! - - - - - - -   развенутая 2m - - - - - - - - - - - - - - - - - - - - - -
-						                                                   Else 
-							                                                   Set strBind='K0,K3,K1,K2,S1,S2,S3,S4,S5,S6,S0,S,NAME'
-							                                                   Set sSql ="    SELECT kekd, idr, name,  sum(s), sum(s1)
+						                                                     Else 
+							                                                     Set strBind='K0,K3,K1,K2,S1,S2,S3,S4,S5,S6,S0,S,NAME'
+							                                                     Set sSql ="    SELECT kekd, idr, name,  sum(s), sum(s1)
 									                          INTO :K2,:K1,:NAME,:S,:S0
 									                          FROM  tmp_dku2mg p    WHERE " || sTmp || "
 									                          GROUP BY kekd, idr, name
@@ -16685,9 +16685,9 @@ Application Description: •--------------------------------------•
 					! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 					! - - Ведомость 2M (3411, 3421) новая
 					! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-					                                                   Else If ( nPar1 = 299 OR nPar1 = 298)
-						                                                   Set strBind='K0, S1,S2,S3,S4,S5,S6,S7,S8,S9,S10, SY1,SY2,SY3,SY4,SY5,SY6,SY7,SY8,SY9,SY10'
-						                                                   Set sSql =" SELECT kekd, sum(sn1), sum(sn2), sum(sn3), sum(sn4),sum(sn5), sum(sn6),
+					                                                     Else If ( nPar1 = 299 OR nPar1 = 298)
+						                                                     Set strBind='K0, S1,S2,S3,S4,S5,S6,S7,S8,S9,S10, SY1,SY2,SY3,SY4,SY5,SY6,SY7,SY8,SY9,SY10'
+						                                                     Set sSql =" SELECT kekd, sum(sn1), sum(sn2), sum(sn3), sum(sn4),sum(sn5), sum(sn6),
 								                         sum(sn7), sum(sn8), sum(sn9), sum(sn10),
 								                         sum(syn1), sum(syn2), sum(syn3), sum(syn4),sum(syn5), sum(syn6),
 								                         sum(syn7), sum(syn8),sum(syn9), sum(syn10)
@@ -16698,11 +16698,11 @@ Application Description: •--------------------------------------•
 					! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 					! - - Ведомость 2M (3421) - - - - - - - - - -
 					! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-					                                                   Else If nPar1 = 302
-						                                                   Call VisArrayFillNumber (R,  0, 10)
-						                                                   Call VisArrayFillNumber (R0, 0, 10)
-						                                                   Set strBind=  'K0,K3,K1,K2,S1,S2,S3,S4,S5,S6,S0,S,NAME'
-						                                                   Set sSql ="
+					                                                     Else If nPar1 = 302
+						                                                     Call VisArrayFillNumber (R,  0, 10)
+						                                                     Call VisArrayFillNumber (R0, 0, 10)
+						                                                     Set strBind=  'K0,K3,K1,K2,S1,S2,S3,S4,S5,S6,S0,S,NAME'
+						                                                     Set sSql ="
 								SELECT  kekd, idr ,name, sum(s) , sum(s1)
 								INTO :K2,:K1,:NAME,:S,:S0
 								FROM  tmp_dku2mm p
@@ -16713,9 +16713,9 @@ Application Description: •--------------------------------------•
 					! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 					! - - Ведомость N2 (3321) - - - - - - - - - -
 					! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-					                                                   Else If nPar1 = 303
-						                                                   Set strBind= 'K1,S0,S,S1,S2,S3,S4,S5,S6,S7,S8,S9,S10'
-						                                                   Set sSql = "
+					                                                     Else If nPar1 = 303
+						                                                     Set strBind= 'K1,S0,S,S1,S2,S3,S4,S5,S6,S7,S8,S9,S10'
+						                                                     Set sSql = "
 								    SELECT KEKD, sum(S),sum(SY),sum(SDR),sum(SYR),sum(SO),sum(SOY),
 								           sum(SR),sum(SRY),sum(SS),sum(SSY),sum(PF),sum(PFY)
 								    INTO :K1,:S0,:S,:S9,:S10,:S1,:S2,:S3,:S4,:S5,:S6,:S7,:S8
@@ -16727,10 +16727,10 @@ Application Description: •--------------------------------------•
 					! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 					! - - Ведомость N2 (3311) - - - - - - - - - -
 					! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-					                                                   Else If nPar1 = 200
-						                                                   Set strBind = 'K0,K3,K1,K2,S1,S2,S3,S4,S5,S6,S0,S'
-						                                                   Set K0 = 3311
-						                                                   Set sSql = "  SELECT kekd , sum(s),  sum(sy), sum(so), sum(soy), sum(sr), sum(sry),  sum(ss), sum(ssy)
+					                                                     Else If nPar1 = 200
+						                                                     Set strBind = 'K0,K3,K1,K2,S1,S2,S3,S4,S5,S6,S0,S'
+						                                                     Set K0 = 3311
+						                                                     Set sSql = "  SELECT kekd , sum(s),  sum(sy), sum(so), sum(soy), sum(sr), sum(sry),  sum(ss), sum(ssy)
 								                          INTO :K2,:S0,:S1,:S2,:S3,:S4,:S5,:S6,:S
 								                          FROM  tmp_dkuN2g p
 								                          WHERE " || sTmp || "
@@ -16740,33 +16740,33 @@ Application Description: •--------------------------------------•
 					! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 					! - - Реестры по ПФ и ФСС - - - - - - - - - -
 					! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-					                                                   Else If nPar1 = 40    !! Реестр по Фонду Соц.страха - безробіття  Держ.бюджет
-						                                                   Set strBind   = 'K0,D1,NAME,S1,S0,S,SIM,NAZN, S2'
-						                                                   Set SHAP = ' державного бюджету за доходами '
-						                                                   Set ND    = ' ( Фонд занятості населення )'
-						                                                   Set sSql="
+					                                                     Else If nPar1 = 40    !! Реестр по Фонду Соц.страха - безробіття  Держ.бюджет
+						                                                     Set strBind   = 'K0,D1,NAME,S1,S0,S,SIM,NAZN, S2'
+						                                                     Set SHAP = ' державного бюджету за доходами '
+						                                                     Set ND    = ' ( Фонд занятості населення )'
+						                                                     Set sSql="
 								    SELECT sim, nam_a, okpo_a, datd, s, s_koef, s_back, nazn
 								    INTO :SIM, :NAME, :S1,:D1,:S0,:S, :S2, :NAZN
 								    FROM tmp_dkussg p
 								    WHERE " || sTmp || "
 								    ORDER BY 1,4,2,3"
-					                                                   Else If nPar1 = 41    !! Реестр по Пенс.Фонду Держ.бюджет
-						                                                   Set strBind   = 'K0,D1,NAME,S1,S0,S,SIM,NAZN, S2'
-						                                                   Set SHAP = ' державного бюджету за доходами '
-						                                                   Set ND    = ' (Пенсійний фонд)'
-						                                                   Set sSql="
+					                                                     Else If nPar1 = 41    !! Реестр по Пенс.Фонду Держ.бюджет
+						                                                     Set strBind   = 'K0,D1,NAME,S1,S0,S,SIM,NAZN, S2'
+						                                                     Set SHAP = ' державного бюджету за доходами '
+						                                                     Set ND    = ' (Пенсійний фонд)'
+						                                                     Set sSql="
 								    SELECT sim, nam_a, okpo_a, datd, s, s_koef, s_back, nazn
 								    INTO :SIM, :NAME, :S1,:D1,:S0,:S, :S2, :NAZN
 								    FROM tmp_dkupfg p
 								    WHERE " || sTmp || "
 								    ORDER BY 1,4,2,3"
-					                                                   Else If nPar1 = 42    !! Реестр Фонду Соц.страха Держ.бюджет
+					                                                     Else If nPar1 = 42    !! Реестр Фонду Соц.страха Держ.бюджет
 						! Set strBind   = 'K0,K3,K1,K2,NAME,D1,S1,S2,S3,S0,S4,S5,S6,D2,SIM,NAZN,REF'
-						                                                   Set strBind   = 'K0,D1,NAME,S1,S0,S,SIM,NAZN, S2'
-						                                                   Set SHAP = ' державного бюджету за доходами '
-						                                                   Set ND    = ' ( Фонд соціального страхування )'
+						                                                     Set strBind   = 'K0,D1,NAME,S1,S0,S,SIM,NAZN, S2'
+						                                                     Set SHAP = ' державного бюджету за доходами '
+						                                                     Set ND    = ' ( Фонд соціального страхування )'
 						! !
-						                                                   Set sSql="
+						                                                     Set sSql="
 								    SELECT sim, nam_a, okpo_a, datd, s, s_koef, s_back,nazn
 								    INTO :SIM, :NAME, :S1,:D1,:S0,:S,:S2, :NAZN
 								    FROM tmp_dkussg p
@@ -16774,30 +16774,30 @@ Application Description: •--------------------------------------•
 								    ORDER BY 1,4,2,3"
 					! !! устарело
 					! Else If nPar1 = 43    !! Реестр по Пенс.Фонду Місц.бюджет
-						                                                                                                                   Set strBind   = 'K0,D1,NAME,S1,S0,S,SIM,NAZN, S2'
-						                                                                                                                   Set SHAP = ' місцевого бюджету за доходами '
-						                                                                                                                   Set ND    = ' (Пенсійний фонд)'
-						                                                                                                                   Set sSql="
+						                                                                                                                     Set strBind   = 'K0,D1,NAME,S1,S0,S,SIM,NAZN, S2'
+						                                                                                                                     Set SHAP = ' місцевого бюджету за доходами '
+						                                                                                                                     Set ND    = ' (Пенсійний фонд)'
+						                                                                                                                     Set sSql="
 								    SELECT sim, nam_a, okpo_a, datd, s, s_koef, s_back,nazn
 								    INTO :SIM, :NAME, :S1,:D1,:S0,:S, :S2, :NAZN
 								    FROM tmp_dkupfm p
 								    WHERE  " || sTmp || "
 								    ORDER BY 1,4,2,3"
-					                                                   Else If nPar1 = 43    !! Реестр по Пенс.Фонду Місц.бюджет
-						                                                   Set strBind   = 'K0,D1,NAME,S1,S0,S,SIM,NAZN,S2'
-						                                                   Set SHAP = ' місцевого бюджету за доходами '
-						                                                   Set ND    = ' (Пенсійний фонд)'
-						                                                   Set sSql="SELECT SIM,MFOA,NLSA,OKPO_A,NAM_A,MFOB,NLSB,
+					                                                     Else If nPar1 = 43    !! Реестр по Пенс.Фонду Місц.бюджет
+						                                                     Set strBind   = 'K0,D1,NAME,S1,S0,S,SIM,NAZN,S2'
+						                                                     Set SHAP = ' місцевого бюджету за доходами '
+						                                                     Set ND    = ' (Пенсійний фонд)'
+						                                                     Set sSql="SELECT SIM,MFOA,NLSA,OKPO_A,NAM_A,MFOB,NLSB,
 								                 OKPO_B,NAM_B,VOB,ND,DATD,DATP,S,S_KOEF,S_BACK,NAZN
 								            INTO :SIM,:MFOA,:NLSA,:S1,:NAME,:MFOB,:NLSB,
 								                 :OKPO_B,:NAM_B,:vob,:NOM,:D1,:D2,:S0,:S,:S2,:NAZN
 								            FROM tmp_dkupfm p
 								           WHERE "|| sTmp ||" ORDER BY SIM,DATD,NAM_A,OKPO_A"
-					                                                   Else If nPar1 = 44    !! Реестр Фонду Соц.страха Місц.бюджет
-						                                                   Set strBind   = 'K0,D1,NAME,S1,S0,S,SIM,NAZN,S2'
-						                                                   Set SHAP = ' місцевого бюджету за доходами '
-						                                                   Set ND    = ' ( Фонд соціального страхування )'
-						                                                   Set sSql="SELECT sim, nam_a, okpo_a, datd, s, s_koef, s_back,nazn
+					                                                     Else If nPar1 = 44    !! Реестр Фонду Соц.страха Місц.бюджет
+						                                                     Set strBind   = 'K0,D1,NAME,S1,S0,S,SIM,NAZN,S2'
+						                                                     Set SHAP = ' місцевого бюджету за доходами '
+						                                                     Set ND    = ' ( Фонд соціального страхування )'
+						                                                     Set sSql="SELECT sim, nam_a, okpo_a, datd, s, s_koef, s_back,nazn
 								            INTO :SIM, :NAME, :S1,:D1,:S0,:S, :S2, :NAZN
 								            FROM tmp_dkussm p
 								           WHERE " || sTmp ||" ORDER BY 1,4,2,3"
@@ -16805,18 +16805,18 @@ Application Description: •--------------------------------------•
 					! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 					! - - - 412 (МБ/ДБ) - - - - - - - - - - - - -
 					! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-					                                                   Else If nPar1 = 62 or nPar1 = 938  !! 412 - ДБ (txt+dbf)
+					                                                     Else If nPar1 = 62 or nPar1 = 938  !! 412 - ДБ (txt+dbf)
 						!
-						                                                   Set strBind = 'K0,K3,K2,S0,S1,S2,S3,S4,K0s,K1s,K2s,K3s,S5'
-						                                                   Set sSql = "
+						                                                     Set strBind = 'K0,K3,K2,S0,S1,S2,S3,S4,K0s,K1s,K2s,K3s,S5'
+						                                                     Set sSql = "
 								    SELECT p.GR, p.KVK, p.S230, p.KEKD,Sum(p.DD),Sum(p.YYYY)
 								    INTO :K3,:K3s,:K2s,:K2,:S1,:S2
 								    FROM tmp_dku412g p WHERE " || sTmp || "
 								    GROUP BY GR,KVK,S230,KEKD
 								    ORDER BY GR,KVK,S230, KEKD"
-					                                                   Else If nPar1 = 63   or nPar1 = 937  !! 412 - МБ (txt+dbf)
-						                                                   Set strBind = 'K0,K3,K2,S0,S1,S2,S3,S4,K0s,K1s,K2s,K3s,S5'
-						                                                   Set sSql = "
+					                                                     Else If nPar1 = 63   or nPar1 = 937  !! 412 - МБ (txt+dbf)
+						                                                     Set strBind = 'K0,K3,K2,S0,S1,S2,S3,S4,K0s,K1s,K2s,K3s,S5'
+						                                                     Set sSql = "
 								    SELECT p.GR,p.KVK,p.S230,p.KEKD,Sum(p.DD),Sum(p.YYYY)
 								    INTO :K3,:K3s,:K2s,:K2,:S1,:S2
 								    FROM tmp_dku412m p
@@ -16827,10 +16827,10 @@ Application Description: •--------------------------------------•
 					! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 					! - - - - выписки (+ без информационных 939, 940) - - - - - - - - - - - - - -
 					! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-					                                                   Else If (nPar1>=411 and nPar1<=414) or (nPar1>=939 and nPar1<=940)
-						                                                   Set strBind = 'ACC,NLS,KV,ISO,FDAT,S,ND,MFO,NLSK, NAMK,' ||
+					                                                     Else If (nPar1>=411 and nPar1<=414) or (nPar1>=939 and nPar1<=940)
+						                                                     Set strBind = 'ACC,NLS,KV,ISO,FDAT,S,ND,MFO,NLSK, NAMK,' ||
 								    'USI,REF,RNK,NAZN,OSTF,TT,DAPP,SK,OKPO,NB,VOB,DATP,NMK,NMS'
-						                                                   Set sSql = "
+						                                                     Set sSql = "
 								    SELECT p.isp,p.nls,p.kv,p.nms,p.acc,p.fdat,
 								           p.s/100,p.nd,p.mfo,p.nlsk,p.namk,p.userid,
 								           p.ref,p.sk,p.nazn,p.tt,p.ostf/100,p.dapp,
@@ -16839,21 +16839,21 @@ Application Description: •--------------------------------------•
 								         :NLSK,:NAMK,:USI,:REF,:SK,:NAZN,:TT,:OSTF,:DAPP,
 								         :OKPO,:NB,:VOB,:DATP,:NMK,:RNK, :FIO
 								    FROM cust_acc c, customer m, staff s, "
-						                                                   If nPar1 = 411      !! Виписки з рахунків(MБ)-доходи
-							                                                   Set sSql = sSql||" tmp_dkuvpm  "
-						                                                   Else If nPar1 = 412 !! Виписки з рахунків(ДБ)-доходи
-							                                                   Set sSql = sSql||" tmp_dkuvpg "
-						                                                   Else If (nPar1 = 413 or nPar1 = 939)!! Виписки з рахунків(ДБ)-всі
-							                                                   Set sSql = sSql||" tmp_dkuvpg "
-						                                                   Else If (nPar1 = 414 or nPar1 = 940)!! Виписки з рахунків(МБ)-всі
-							                                                   Set sSql =  sSql||" tmp_dkuvpm "
+						                                                     If nPar1 = 411      !! Виписки з рахунків(MБ)-доходи
+							                                                     Set sSql = sSql||" tmp_dkuvpm  "
+						                                                     Else If nPar1 = 412 !! Виписки з рахунків(ДБ)-доходи
+							                                                     Set sSql = sSql||" tmp_dkuvpg "
+						                                                     Else If (nPar1 = 413 or nPar1 = 939)!! Виписки з рахунків(ДБ)-всі
+							                                                     Set sSql = sSql||" tmp_dkuvpg "
+						                                                     Else If (nPar1 = 414 or nPar1 = 940)!! Виписки з рахунків(МБ)-всі
+							                                                     Set sSql =  sSql||" tmp_dkuvpm "
 						!
-						                                                   Set sSql =  sSql||" p  WHERE p.acc=c.acc AND c.rnk=m.rnk AND s.id=p.isp AND "  ||  sTmp ||  "
+						                                                     Set sSql =  sSql||" p  WHERE p.acc=c.acc AND c.rnk=m.rnk AND s.id=p.isp AND "  ||  sTmp ||  "
 								    ORDER BY 2,3, 6,7, nvl(p.bis, 0) "
-					                                                   Else If nPar1 = 51    !! Реестр №1 (Гос.Бюджет)                                                                !! Реєстр № 1
-						                                                   Set K0 = 0
-						                                                   Set strBind ='K0,K3,S6,TNAME,K1,K2,D1,NAME,S1,S2,S3,S0,S4,S5,D2,REF,TT'
-						                                                   Set sSql = "
+					                                                     Else If nPar1 = 51    !! Реестр №1 (Гос.Бюджет)                                                                !! Реєстр № 1
+						                                                     Set K0 = 0
+						                                                     Set strBind ='K0,K3,S6,TNAME,K1,K2,D1,NAME,S1,S2,S3,S0,S4,S5,D2,REF,TT'
+						  Set sSql = "
 								 SELECT substr('0000' || p.kekd,-8,4),p.kekd,
 								        l.ref,l.tt,o.nd,o.datd,o.id_a,o.mfoa,o.nlsa,
 								        decode(l.dk,0,l.s,0),decode(l.dk,1,l.s,0),
@@ -16861,7 +16861,7 @@ Application Description: •--------------------------------------•
 								 INTO :K2,:K1,:REF,:TT,:NAME,:D2,:K3,:S2,:S3,:S0,:S1,:S6,:TNAME
 								 FROM opl l, specparam p, oper o, terrdpi t, dpa d
 								 WHERE l.fdat= :sFdat  AND substr(l.nls,1,4) IN
-								       ('6111','6112','6113','6211','6411','7113') AND
+								       ('6511','6112','6513','6211','6411','7113') AND
 								       t.ktk=p.KTK AND d.id=t.kod_dpi AND
 								       l.acc=p.acc AND l.ref=o.ref AND
 								       l.sos=5 AND" || sTmp || "
@@ -16870,8 +16870,8 @@ Application Description: •--------------------------------------•
 					! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 					! - - - - Митниця - - - - - - - - - - - - - -
 					! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-					                                                   Else If ( nPar1 = 920  or nPar1 = 922 )  !! 
-						                                                   Set sSql = "
+					                                                     Else If ( nPar1 = 920  or nPar1 = 922 )  !! 
+						                                                     Set sSql = "
 								SELECT decode(srt, '0', lpadchr(mfo, '0', 9)||rpad(nls,14)
 								||'UAH'||to_CHAR(fdat,'YYYYMMDD')||nvl(to_char(dapp,'YYYYMMDD'),'        ')
 								||lpad( to_char(ostf),19)||'                  0'||decode(sign(ostf),-1, '-','+')
@@ -16903,269 +16903,269 @@ Application Description: •--------------------------------------•
 								WHERE "  || sTmp || 
 								" order by fdat, nls, srt" 
 					!
-					                                                   Else 
-						                                                   Return 0
+					                                                     Else 
+						                                                     Return 0
 					!
-					                                                   Set sTmp = ''
+					                                                     Set sTmp = ''
 					! ! ==================================================
 					! ! Начинаем печать в отчет
 					! ! ==================================================
 					! - - - - предварителььно установим принтер  - Установка єтого принтера как default  нужна лишь для того чтоб
 					! - - - -  при формировании текстового отчета  -  были нормальные параметры вывода
-					                                                   Set strInput = strBind
-					                                                   Call SalWaitCursor ( TRUE )
+					                                                     Set strInput = strBind
+					                                                     Call SalWaitCursor ( TRUE )
 					! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 					! - - - - Будем учитывать сколько записей выбралось в отчет, если не выбралось ничего  - будем
 							! - - - - удалять эти файлы
 					! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-					                                                   Set nCou  = 0
-					                                                   Set nInd = 0
+					                                                     Set nCou  = 0
+					                                                     Set nInd = 0
 					! Call SalPrtGetDefault ( sDeviceDef, sDriverDef, sPortDef )
 					! Call Debug(' Default Printer:'||sDeviceDef||' : '||sDriverDef||' : '||sPortDef||PutCrLf()||
 							           ' ReportFileNme='||strPrintPath ||'/'|| IifS(FL_FORMAT, strFileNameRtf,  strFileNameTxt)||
 							           '  TemplateName='||strTmplPath   )
 					! Файл по шаблону RPT
-					                                                   If nRepType  = 0 
-						                                                   Call SaveInfoToLog('REP_DKU: Перед формированием файла '||strFileNameTxt)
-						                                                   Call SalReportPrintToFile(hWndForm,
+					                                                     If nRepType  = 0 
+						                                                     Call SaveInfoToLog('REP_DKU: Перед формированием файла '||strFileNameTxt)
+						                                                     Call SalReportPrintToFile(hWndForm,
 								           strTmplPath,
 								           strPrintPath ||'/'|| IifS(FL_FORMAT, strFileNameRtf,  strFileNameTxt),
 								           strBind,strInput,1,RPT_PrintAll,1,1,FL_FORMAT,nInd)
-						                                                   Call SaveInfoToLog('REP_DKU: После формирования файла '||strFileNameTxt)
-						                                                   If (nInd >4 )
-							                                                   Call SalMessageBox(' SalReportPrintToFile - возвратил ошибку '|| SalNumberToStrX(nInd,0) ,'Внимание',0 )
+						                                                     Call SaveInfoToLog('REP_DKU: После формирования файла '||strFileNameTxt)
+						                                                     If (nInd >4 )
+							                                                     Call SalMessageBox(' SalReportPrintToFile - возвратил ошибку '|| SalNumberToStrX(nInd,0) ,'Внимание',0 )
 							! Call SalPrtSetDefault(sDeviceDef, sDriverDef, sPortDef)
-							                                                   Call SalWaitCursor ( FALSE )
-							                                                   Return -1
+							                                                     Call SalWaitCursor ( FALSE )
+							                                                     Return -1
 						! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 						! - - - -  - -  выбрали ли в файл отчета что-то - если нет - удалим этот файл
 						! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-						                                                   If (nCou = 0 and  VisFileFind(strPrintPath ||'/'|| IifS(FL_FORMAT, strFileNameRtf,  strFileNameTxt))  )! - - в отчет не было выбрано не одной записи
-							                                                   If VisFileDelete (strPrintPath ||'\\'|| IifS(FL_FORMAT, strFileNameRtf,  strFileNameTxt) ) < 0
-								                                                   Call SalMessageBox('Не могу удалить файл нулевой длинны - '||strPrintPath ||'\\'|| IifS(FL_FORMAT, strFileNameRtf,  strFileNameTxt),'Внимание',0)
-								                                                   Call SalWaitCursor ( FALSE )
-								                                                   Return -1
-							                                                   Call SalWaitCursor ( FALSE )
-							                                                   Return -1
+						                                                     If (nCou = 0 and  VisFileFind(strPrintPath ||'/'|| IifS(FL_FORMAT, strFileNameRtf,  strFileNameTxt))  )! - - в отчет не было выбрано не одной записи
+							                                                     If VisFileDelete (strPrintPath ||'\\'|| IifS(FL_FORMAT, strFileNameRtf,  strFileNameTxt) ) < 0
+								                                                     Call SalMessageBox('Не могу удалить файл нулевой длинны - '||strPrintPath ||'\\'|| IifS(FL_FORMAT, strFileNameRtf,  strFileNameTxt),'Внимание',0)
+								                                                     Call SalWaitCursor ( FALSE )
+								                                                     Return -1
+							                                                     Call SalWaitCursor ( FALSE )
+							                                                     Return -1
 						! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 						! - - если это word формат - переименуем файл
 						! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-						                                                   If FL_FORMAT
-							                                                   If nPar1 = 51
-								                                                   If VisFileRename (strPrintPath ||'\\'|| strFileNameRtf, strPrintPath ||'\\'||  SalStrLeftX(strFileNameRtf,5)||sId_key||'.rtf'  )<0
-									                                                   Call SalMessageBox('Не могу переименовать файл - '||strPrintPath ||'\\'|| strFileNameRtf,  'Внимание', 0)
-									                                                   Call SalWaitCursor ( FALSE )
-									                                                   Return -1
-							                                                   Else 
-								                                                   If VisFileRename (strPrintPath ||'\\'|| strFileNameRtf, strPrintPath ||'\\'||  SalStrLeftX(strFileNameRtf,9)|| sId_key)<0
-									                                                   Call SalMessageBox('Не могу переименовать файл - '||strPrintPath ||'\\'|| strFileNameRtf,  'Внимание', 0)
-									                                                   Call SalWaitCursor ( FALSE )
-									                                                   Return -1
+						                                                     If FL_FORMAT
+							                                                     If nPar1 = 51
+								                                                     If VisFileRename (strPrintPath ||'\\'|| strFileNameRtf, strPrintPath ||'\\'||  SalStrLeftX(strFileNameRtf,5)||sId_key||'.rtf'  )<0
+									                                                     Call SalMessageBox('Не могу переименовать файл - '||strPrintPath ||'\\'|| strFileNameRtf,  'Внимание', 0)
+									                                                     Call SalWaitCursor ( FALSE )
+									                                                     Return -1
+							                                                     Else 
+								                                                     If VisFileRename (strPrintPath ||'\\'|| strFileNameRtf, strPrintPath ||'\\'||  SalStrLeftX(strFileNameRtf,9)|| sId_key)<0
+									                                                     Call SalMessageBox('Не могу переименовать файл - '||strPrintPath ||'\\'|| strFileNameRtf,  'Внимание', 0)
+									                                                     Call SalWaitCursor ( FALSE )
+									                                                     Return -1
 						! ANNY!!!!!
-						                                                   If not FL_FORMAT
-							                                                   Call SaveInfoToLog('REP_DKU: Начало обработки '|| strFileNameTxt)
-							                                                   Call zarezDKU(  strPrintPath ||'/'|| strFileNameTxt)
-							                                                   Call SaveInfoToLog('REP_DKU: Конец обработки '|| strFileNameTxt)
+						                                                     If not FL_FORMAT
+							                                                     Call SaveInfoToLog('REP_DKU: Начало обработки '|| strFileNameTxt)
+							                                                     Call zarezDKU(  strPrintPath ||'/'|| strFileNameTxt)
+							                                                     Call SaveInfoToLog('REP_DKU: Конец обработки '|| strFileNameTxt)
 					! Файл текстотвый
-					                                                   Else If nRepType  = 1
-						                                                   If not  SalFileOpen ( hFileIn,strPrintPath||'\\'||strFileNameTxt, OF_Write )
-							                                                   Call SalMessageBox(' Невозможно открыть для записи файл '|| strPrintPath||'\\'||strFileNameTxt, 'Внимание!',0)
-							                                                   Call SalWaitCursor (FALSE )
-							                                                   Return -1
-						                                                   Else 
-							                                                   If SqlPrepareAndExecute(hSql(), T(sSql) )
-								                                                   Set nTmp=0
-								                                                   Set i=0
-								                                                   While SqlFetchNext(hSql(), i)
-									                                                   Call SalFilePutStr ( hFileIn,  sFileLine )
-									                                                   Set nTmp=nTmp+1
-							                                                   If not SalFileClose ( hFileIn )
-								                                                   Call SalMessageBox(' Не возможно закрыть файл '||strPrintPath||'\\'||strFileNameTxt, 'Внимание!',0)
-								                                                   Call SalWaitCursor (FALSE )
-								                                                   Return -1
+					                                                     Else If nRepType  = 1
+						                                                     If not  SalFileOpen ( hFileIn,strPrintPath||'\\'||strFileNameTxt, OF_Write )
+							                                                     Call SalMessageBox(' Невозможно открыть для записи файл '|| strPrintPath||'\\'||strFileNameTxt, 'Внимание!',0)
+							                                                     Call SalWaitCursor (FALSE )
+							                                                     Return -1
+						                                                     Else 
+							                                                     If SqlPrepareAndExecute(hSql(), T(sSql) )
+								                                                     Set nTmp=0
+								                                                     Set i=0
+								                                                     While SqlFetchNext(hSql(), i)
+									                                                     Call SalFilePutStr ( hFileIn,  sFileLine )
+									                                                     Set nTmp=nTmp+1
+							                                                     If not SalFileClose ( hFileIn )
+								                                                     Call SalMessageBox(' Не возможно закрыть файл '||strPrintPath||'\\'||strFileNameTxt, 'Внимание!',0)
+								                                                     Call SalWaitCursor (FALSE )
+								                                                     Return -1
 							! -- если данных нету - удалить файл
-							                                                   If ( nTmp=0 and VisFileFind(strPrintPath||'/'||strFileNameTxt))
-								                                                   If VisFileDelete (strPrintPath||'\\'||strFileNameTxt) < 0
-									                                                   Call SalMessageBox('Не могу удалить файл нулевой длинны - '||strPrintPath||'\\'||strFileNameTxt,'Внимание',0)
-									                                                   Call SalWaitCursor ( FALSE )
-									                                                   Return -1
+							                                                     If ( nTmp=0 and VisFileFind(strPrintPath||'/'||strFileNameTxt))
+								                                                     If VisFileDelete (strPrintPath||'\\'||strFileNameTxt) < 0
+									                                                     Call SalMessageBox('Не могу удалить файл нулевой длинны - '||strPrintPath||'\\'||strFileNameTxt,'Внимание',0)
+									                                                     Call SalWaitCursor ( FALSE )
+									                                                     Return -1
 							!
 					! DBF формат
-					                                                   Else If nRepType  = 2 
+					                                                     Else If nRepType  = 2 
 						! Поставим расширение файла - DBF(потом переименуем)
 						! Создавать и населять файлы будем в директории PrnDir(), а затем помещать их в директории по территориям
 						!
-						                                                   If nPar1 = 43    !! Реестр по Пенс.Фонду Місц.бюджет
+						                                                     If nPar1 = 43    !! Реестр по Пенс.Фонду Місц.бюджет
 							! Set strFileNameTxt = SalStrLeftX(strFileNameTxt,SalStrLength(strFileNameTxt)-4)||'.DBF'
-							                                                   Set strFileNameTxt = SalStrLeftX(strFileNameTxt,SalStrLength(strFileNameTxt)-4)||sId_key||'.DBF'
-							                                                   Call VisFileCopy( strPrintPath||"\\pf.dbf", strPrintPath||'\\'||strFileNameTxt) 
+							                                                     Set strFileNameTxt = SalStrLeftX(strFileNameTxt,SalStrLength(strFileNameTxt)-4)||sId_key||'.DBF'
+							                                                     Call VisFileCopy( strPrintPath||"\\pf.dbf", strPrintPath||'\\'||strFileNameTxt) 
 							! Call Debug(strPrintPath||"\\pf.dbf"||'->'|| strPrintPath||'\\'||strFileNameTxt)
-						                                                   Else 
-							                                                   Set strFileNameTxt = SalStrLeftX(strFileNameTxt,SalStrLength(strFileNameTxt)-4)||sId_key||'.DBF'
-							                                                   Call VisFileCopy( strPrintPath||"\\ft.dbf", strPrintPath||'\\'||strFileNameTxt) 
+						                                                     Else 
+							                                                     Set strFileNameTxt = SalStrLeftX(strFileNameTxt,SalStrLength(strFileNameTxt)-4)||sId_key||'.DBF'
+							                                                     Call VisFileCopy( strPrintPath||"\\ft.dbf", strPrintPath||'\\'||strFileNameTxt) 
 						! Скопируем шаблон ft.dbf в имя нашего файла
 						!
 						! Соединения hSqlA было инициализировано в функе Make_DKuRep
 						! Во внутреннем поле "KO" для 412 должно стоять значение KOBL_412, а не AREACODE
-						                                                   If SalStrScan (sKod, 'x' ) >= 0
-							                                                   Set sId_key = GetGlobalOption('KOBL_412')
+						                                                     If SalStrScan (sKod, 'x' ) >= 0
+							                                                     Set sId_key = GetGlobalOption('KOBL_412')
 						! Счетик строк. (Если нету строк вообще - удаляем файл) 
-						                                                   Set nTmp=0
-						                                                   If SqlPrepareAndExecute(hSql(), T(sSql) )
-							                                                   Set dTmp=SalFmtFormatStrDateTime(strDateFrom,'dd-MM-yyyy') 
-							                                                   If nPar1 = 43
-								                                                   Set sSql=" INSERT INTO "||SalStrLeftX(strFileNameTxt,SalStrLength(strFileNameTxt)-4)||
+						                                                     Set nTmp=0
+						                                                     If SqlPrepareAndExecute(hSql(), T(sSql) )
+							                                                     Set dTmp=SalFmtFormatStrDateTime(strDateFrom,'dd-MM-yyyy') 
+							                                                     If nPar1 = 43
+								                                                     Set sSql=" INSERT INTO "||SalStrLeftX(strFileNameTxt,SalStrLength(strFileNameTxt)-4)||
 										"(DK,MFOA,NLSA,OKPO_A,NAM_A,MFOB,NLSB,OKPO_B,NAM_B,VOB,ND,S,DATD,DATP,NAZN)VALUES
 										 (:DK,:MFOA,:NLSA,:OKPO_A,:NAM_A,:MFOB,:NLSB,:OKPO_B,:NAM_B,:vob,:NOM,:S,:D1,:D2,:NAZN) "
-								                                                   While SqlFetchNext(hSql(), i)
-									                                                   Set nTmp=nTmp+1
+								                                                     While SqlFetchNext(hSql(), i)
+									                                                     Set nTmp=nTmp+1
 									! Set RN[0]=Str(K3)  ! группа
 									! Set RN[1]=StrToStrFormat(Str(K2s),3,'0',TRUE) ! символ s230
-									                                                   Set DK = IifS(S>=0,'+','-')
-									                                                   Set OKPO_A=Str(S1)
-									                                                   Set S=Abs(S)
-									                                                   Set NAM_A=StrWinToDosX(NAME)
-									                                                   Set NAM_B=StrWinToDosX(NAM_B)
-									                                                   Set NAZN=StrWinToDosX(NAZN)
-									                                                   If not SqlPrepareAndExecute(hSqlA, sSql)
+									                                                     Set DK = IifS(S>=0,'+','-')
+									                                                     Set OKPO_A=Str(S1)
+									                                                     Set S=Abs(S)
+									                                                     Set NAM_A=StrWinToDosX(NAME)
+									                                                     Set NAM_B=StrWinToDosX(NAM_B)
+									                                                     Set NAZN=StrWinToDosX(NAZN)
+									                                                     If not SqlPrepareAndExecute(hSqlA, sSql)
 										! Call Debug(strPrintPath||'\\'||strFileNameTxt)
-										                                                   Call SalMessageBox(' Невозможно вставить строку в файл '|| strPrintPath||'\\'||strFileNameTxt, 'Внимание!',0)
-										                                                   Call SalWaitCursor (FALSE )
-										                                                   Return -1
-							                                                   Else 
-								                                                   Set sSql=" INSERT INTO "||SalStrLeftX(strFileNameTxt,SalStrLength(strFileNameTxt)-4)||"(DT,KO,GR,S230,KOD,T060,T020)  VALUES( :dTmp,:sId_key,:RN[0],:RN[1],:RN[2],:S1,:S2) "
-								                                                   While SqlFetchNext(hSql(), i)
-									                                                   Set nTmp=nTmp+1
-									                                                   Set RN[0]=Str(K3)  ! группа
-									                                                   Set RN[1]=StrToStrFormat(Str(K2s),3,'0',TRUE) ! символ s230
-									                                                   Set RN[2]=Str(K2)  ! KEKD
-									                                                   If not SqlPrepareAndExecute(hSqlA, sSql)
+										                                                     Call SalMessageBox(' Невозможно вставить строку в файл '|| strPrintPath||'\\'||strFileNameTxt, 'Внимание!',0)
+										                                                     Call SalWaitCursor (FALSE )
+										                                                     Return -1
+							                                                     Else 
+								                                                     Set sSql=" INSERT INTO "||SalStrLeftX(strFileNameTxt,SalStrLength(strFileNameTxt)-4)||"(DT,KO,GR,S230,KOD,T060,T020)  VALUES( :dTmp,:sId_key,:RN[0],:RN[1],:RN[2],:S1,:S2) "
+								                                                     While SqlFetchNext(hSql(), i)
+									                                                     Set nTmp=nTmp+1
+									                                                     Set RN[0]=Str(K3)  ! группа
+									                                                     Set RN[1]=StrToStrFormat(Str(K2s),3,'0',TRUE) ! символ s230
+									                                                     Set RN[2]=Str(K2)  ! KEKD
+									                                                     If not SqlPrepareAndExecute(hSqlA, sSql)
 										! Call Debug(strPrintPath||'\\'||strFileNameTxt)
-										                                                   Call SalMessageBox(' Невозможно вставить строку в файл '|| strPrintPath||'\\'||strFileNameTxt, 'Внимание!',0)
-										                                                   Call SalWaitCursor (FALSE )
-										                                                   Return -1
+										                                                     Call SalMessageBox(' Невозможно вставить строку в файл '|| strPrintPath||'\\'||strFileNameTxt, 'Внимание!',0)
+										                                                     Call SalWaitCursor (FALSE )
+										                                                     Return -1
 						! -- если данных нету - удалить файл
-						                                                   If ( nTmp=0 and VisFileFind(strPrintPath||'\\'||strFileNameTxt))
-							                                                   If VisFileDelete (strPrintPath||'\\'||strFileNameTxt) < 0
-								                                                   Call SalMessageBox('Не могу удалить файл нулевой длинны - '||strPrintPath||'\\'||strFileNameTxt,'Внимание',0)
-								                                                   Call SalWaitCursor ( FALSE )
-								                                                   Return -1
-						                                                   Call SqlCommit(hSqlA)
-						                                                   Set nCouDBFFilesToRename=nCouDBFFilesToRename+1
-						                                                   Set strDBFFilesToRename[nCouDBFFilesToRename-1]= SalStrLeftX(strFileNameTxt,SalStrLength(strFileNameTxt)-4)
+						                                                     If ( nTmp=0 and VisFileFind(strPrintPath||'\\'||strFileNameTxt))
+							                                                     If VisFileDelete (strPrintPath||'\\'||strFileNameTxt) < 0
+								                                                     Call SalMessageBox('Не могу удалить файл нулевой длинны - '||strPrintPath||'\\'||strFileNameTxt,'Внимание',0)
+								                                                     Call SalWaitCursor ( FALSE )
+								                                                     Return -1
+						                                                     Call SqlCommit(hSqlA)
+						                                                     Set nCouDBFFilesToRename=nCouDBFFilesToRename+1
+						                                                     Set strDBFFilesToRename[nCouDBFFilesToRename-1]= SalStrLeftX(strFileNameTxt,SalStrLength(strFileNameTxt)-4)
 					! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 					! - - Посылаем сообщение чтоб перечитался список файлов для новой директории
 					! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-					                                                   Set frm_Out.dfPath = strPrintPath
-					                                                   Call SalSendMsg(frm_Out.dfPath, SAM_User, 0, 0)
-					                                                   Call SalWaitCursor(FALSE)
-					                                                   Return nInd
+					                                                     Set frm_Out.dfPath = strPrintPath
+					                                                     Call SalSendMsg(frm_Out.dfPath, SAM_User, 0, 0)
+					                                                     Call SalWaitCursor(FALSE)
+					                                                     Return nInd
 			! Function: GetDkuRepPath
-				                                                   Description: Возваращает путь к ящикам казначейств
-				                                                   Returns 
-					                                                   String: 
-				                                                   Parameters 
-					                                                   String: sKtk
-				                                                   Static Variables 
-				                                                   Local variables 
-					                                                   String: sTmp
-				                                                   Actions 
-					                                                   Set strPrintPath = GetPrnDir()
-					                                                   Call SalUseRegistry(FALSE, '')
-					                                                   Call SalGetProfileString('DKU Reports', 'OutBoxPath', strPrintPath, sTmp, GetIniFileName())
-					                                                   If SalStrUpperX(sTmp) != SalStrUpperX('None')
+				                                                     Description: Возваращает путь к ящикам казначейств
+				                                                     Returns 
+					                                                     String: 
+				                                                     Parameters 
+					                                                     String: sKtk
+				                                                     Static Variables 
+				                                                     Local variables 
+					                                                     String: sTmp
+				                                                     Actions 
+					                                                     Set strPrintPath = GetPrnDir()
+					                                                     Call SalUseRegistry(FALSE, '')
+					                                                     Call SalGetProfileString('DKU Reports', 'OutBoxPath', strPrintPath, sTmp, GetIniFileName())
+					                                                     If SalStrUpperX(sTmp) != SalStrUpperX('None')
 						! - - -Если это своодная
-						                                                   If sKtk='x'
-							                                                   Set sTmp =  sTmp || '\\' ||'00xx'
+						                                                     If sKtk='x'
+							                                                     Set sTmp =  sTmp || '\\' ||'00xx'
 						! - - -Если это НЕ своодная
-						                                                   Else 
+						                                                     Else 
 							! - - если KTK это маска
-							                                                   If SalStrScan(sKtk,'\\_') > 0
-								                                                   Set sTmp =  sTmp || '\\' ||'00bp'
-							                                                   Else 
-								                                                   Set sTmp =  sTmp || '\\' ||'00'||SalStrLeftX (sKtk, 2)
-					                                                   Else 
-						                                                   Set sTmp = strPrintPath
-					                                                   If not VisDosExist(sTmp)
-						                                                   If not SalFileCreateDirectory(sTmp)
-							                                                   Call SalMessageBox('Не могу создать каталог:' || sTmp, 'Внимание', MB_IconStop)
-							                                                   Return GetPrnDir()
-					                                                   Return sTmp
+							                                                     If SalStrScan(sKtk,'\\_') > 0
+								                                                     Set sTmp =  sTmp || '\\' ||'00bp'
+							                                                     Else 
+								                                                     Set sTmp =  sTmp || '\\' ||'00'||SalStrLeftX (sKtk, 2)
+					                                                     Else 
+						                                                     Set sTmp = strPrintPath
+					                                                     If not VisDosExist(sTmp)
+						                                                     If not SalFileCreateDirectory(sTmp)
+							                                                     Call SalMessageBox('Не могу создать каталог:' || sTmp, 'Внимание', MB_IconStop)
+							                                                     Return GetPrnDir()
+					                                                     Return sTmp
 			! Function: GetNextFileSess
-				                                                   Description: Дает новое расширение (сеанс файла)
-				                                                   Returns 
-					                                                   String: 
-				                                                   Parameters 
-					                                                   String: strFileName 
-					                                                   Number: nValLen
-					                                                   Number: nStart
-				                                                   Static Variables 
-				                                                   Local variables 
-					                                                   String: strRet
-					                                                   String: strTmp
-					                                                   Number: nTmp
-					                                                   String: strFileList[*]
-					                                                   Number: i
-					                                                   Number: nFiles
-					                                                   Number: nMaxNum
-					                                                   Number: nStartPos
-				                                                   Actions 
-					                                                   Set nFiles=VisDosEnumFiles( strPrintPath || '\\' || strFileName, FA_Standard, strFileList)
-					                                                   If nFiles < 0
-						                                                   Return NumberToStrFormat(nStart, nValLen,'0')
-					                                                   Set i=1
-					                                                   Set strTmp='?'
-					                                                   While i<nValLen
-						                                                   Set strTmp = strTmp||'?'
-						                                                   Set i=i+1
-					                                                   Set nMaxNum=0
-					                                                   Set i=0
-					                                                   Set nStartPos=SalStrScan(strFileName, strTmp)
-					                                                   While i <= nFiles -1
-						                                                   Set nTmp = SalStrToNumber(    SalStrMidX(strFileList[i],  nStartPos, nValLen  ) )
-						                                                   If (  nTmp > nMaxNum )
-							                                                   Set nMaxNum =nTmp
-						                                                   Set i=i+1
-					                                                   Return NumberToStrFormat(nMaxNum+1, nValLen,'0')
+				                                                     Description: Дает новое расширение (сеанс файла)
+				                                                     Returns 
+					                                                     String: 
+				                                                     Parameters 
+					                                                     String: strFileName 
+					                                                     Number: nValLen
+					                                                     Number: nStart
+				                                                     Static Variables 
+				                                                     Local variables 
+					                                                     String: strRet
+					                                                     String: strTmp
+					                                                     Number: nTmp
+					                                                     String: strFileList[*]
+					                                                     Number: i
+					                                                     Number: nFiles
+					                                                     Number: nMaxNum
+					                                                     Number: nStartPos
+				                                                     Actions 
+					                                                     Set nFiles=VisDosEnumFiles( strPrintPath || '\\' || strFileName, FA_Standard, strFileList)
+					                                                     If nFiles < 0
+						                                                     Return NumberToStrFormat(nStart, nValLen,'0')
+					                                                     Set i=1
+					                                                     Set strTmp='?'
+					                                                     While i<nValLen
+						                                                     Set strTmp = strTmp||'?'
+						                                                     Set i=i+1
+					                                                     Set nMaxNum=0
+					                                                     Set i=0
+					                                                     Set nStartPos=SalStrScan(strFileName, strTmp)
+					                                                     While i <= nFiles -1
+						                                                     Set nTmp = SalStrToNumber(    SalStrMidX(strFileList[i],  nStartPos, nValLen  ) )
+						                                                     If (  nTmp > nMaxNum )
+							                                                     Set nMaxNum =nTmp
+						                                                     Set i=i+1
+					                                                     Return NumberToStrFormat(nMaxNum+1, nValLen,'0')
 			! Function: Prepare_DkuRep
-				                                                   Description: ! - - тут подготавливаются временные таблицы для отчетности DKU
-				                                                   Returns 
-					                                                   Number: nRet
-				                                                   Parameters 
-					                                                   Number: nPar1
-				                                                   Static Variables 
-				                                                   Local variables 
+				                                                     Description: ! - - тут подготавливаются временные таблицы для отчетности DKU
+				                                                     Returns 
+					                                                     Number: nRet
+				                                                     Parameters 
+					                                                     Number: nPar1
+				                                                     Static Variables 
+				                                                     Local variables 
 					! String: strRBSName
-				                                                   Actions 
-					                                                   Set ID = GetUserId()
-					                                                   Call SalWaitCursor(TRUE)
-					                                                   Call SaveInfoToLog('REP_DKU: Начало накопления временной таблицы')
+				                                                     Actions 
+					                                                     Set ID = GetUserId()
+					                                                     Call SalWaitCursor(TRUE)
+					                                                     Call SaveInfoToLog('REP_DKU: Начало накопления временной таблицы')
 					! - - - - - - для выписок населим сначала tmp_lic
-					                                                   If (nPar1>=411 and nPar1<=414) or (nPar1>=939 and nPar1<=940)
-						                                                   If nPar1 = 411              ! - - - МБ (доходы)
-							                                                   Call Podgot_DKU(ID, sFdat, sFdat, 'DKZ', "vpm") ! накопление во  временные таблицы
-						                                                   If nPar1 = 412              ! - - - ДБ (доходы)
-							                                                   Call Podgot_DKU(ID, sFdat, sFdat, 'DKZ', "vpg") ! накопление во  временные таблицы
-						                                                   If nPar1 = 413              ! - - - ДБ  (ВСЕ)
-							                                                   Call Podgot_DKU(ID, sFdat, sFdat, '%', "vpg") ! накопление во  временные таблицы
-						                                                   If nPar1 = 414              ! - - - МБ (ВСЕ)
-							                                                   Call Podgot_DKU(ID, sFdat, sFdat, '%', "vpm") ! накопление во  временные таблицы
-						                                                   If nPar1 = 939              ! - - - ДБ (ВСЕ - без информационных)
-							                                                   Call Podgot_DKU(ID, sFdat, sFdat, '%&i', "vpg") ! накопление во  временные таблицы
-						                                                   If nPar1 = 940              ! - - - МБ (ВСЕ - без информационных)
-							                                                   Call Podgot_DKU(ID, sFdat, sFdat, '%&i', "vpm") ! накопление во  временные таблицы
+					                                                     If (nPar1>=411 and nPar1<=414) or (nPar1>=939 and nPar1<=940)
+						                                                     If nPar1 = 411              ! - - - МБ (доходы)
+							                                                     Call Podgot_DKU(ID, sFdat, sFdat, 'DKZ', "vpm") ! накопление во  временные таблицы
+						                                                     If nPar1 = 412              ! - - - ДБ (доходы)
+							                                                     Call Podgot_DKU(ID, sFdat, sFdat, 'DKZ', "vpg") ! накопление во  временные таблицы
+						                                                     If nPar1 = 413              ! - - - ДБ  (ВСЕ)
+							                                                     Call Podgot_DKU(ID, sFdat, sFdat, '%', "vpg") ! накопление во  временные таблицы
+						                                                     If nPar1 = 414              ! - - - МБ (ВСЕ)
+							                                                     Call Podgot_DKU(ID, sFdat, sFdat, '%', "vpm") ! накопление во  временные таблицы
+						                                                     If nPar1 = 939              ! - - - ДБ (ВСЕ - без информационных)
+							                                                     Call Podgot_DKU(ID, sFdat, sFdat, '%&i', "vpg") ! накопление во  временные таблицы
+						                                                     If nPar1 = 940              ! - - - МБ (ВСЕ - без информационных)
+							                                                     Call Podgot_DKU(ID, sFdat, sFdat, '%&i', "vpm") ! накопление во  временные таблицы
 					!
 					! - - для 412(txt and dbf)
-					                                                   If nPar1 = 63  or nPar1 = 62  or  nPar1 = 937  or nPar1 = 938
+					                                                     If nPar1 = 63  or nPar1 = 62  or  nPar1 = 937  or nPar1 = 938
 						! - - ( МБ)
-						                                                   If nPar1 = 63  or  nPar1 = 937
-							                                                   Call Podgot_DKU(ID, sFdat, sFdat, '1', "412") ! накопление во  временные таблицы
+						                                                     If nPar1 = 63  or  nPar1 = 937
+							                                                     Call Podgot_DKU(ID, sFdat, sFdat, '1', "412") ! накопление во  временные таблицы
 						! - - ( ДБ)
-						                                                   Else 
-							                                                   Call Podgot_DKU(ID, sFdat, sFdat, '0', "412") ! накопление во  временные таблицы
+						                                                     Else 
+							                                                     Call Podgot_DKU(ID, sFdat, sFdat, '0', "412") ! накопление во  временные таблицы
 						! Если это DBF - создать шаблон файла назначить струтуру файла
-						                                                   If nPar1 = 937  or nPar1 = 938
-							                                                   Set strDBFStruct = " (DT   DATE,
+						                                                     If nPar1 = 937  or nPar1 = 938
+							                                                     Set strDBFStruct = " (DT   DATE,
 									                      KO   CHAR(3),
 									                      GR   CHAR(1),
 									                      S230 CHAR(3),
@@ -17174,48 +17174,48 @@ Application Description: •--------------------------------------•
 									                      T020 NUMBER(16) )"
 					!
 					! Ведомость на N2
-					                                                   If nPar1 = 303 or nPar1 =  200
-						                                                   If nPar1 = 303
+					                                                     If nPar1 = 303 or nPar1 =  200
+						                                                     If nPar1 = 303
 							! - - - - 3321
-							                                                   Call Podgot_DKU(ID, sFdat, sFdat, '*', "N2m") ! накопление во  временные таблицы
-						                                                   If nPar1 =  200
-							                                                   Call Podgot_DKU(ID, sFdat, sFdat, '*', "N2g") ! накопление во  временные таблицы
+							                                                     Call Podgot_DKU(ID, sFdat, sFdat, '*', "N2m") ! накопление во  временные таблицы
+						                                                     If nPar1 =  200
+							                                                     Call Podgot_DKU(ID, sFdat, sFdat, '*', "N2g") ! накопление во  временные таблицы
 					!
 					! Ведомость 2M
-					                                                   If nPar1 = 300  or  nPar1 = 301 or  nPar1 = 302
-						                                                   Call SqlPrepareAndExecute(hSql(),'SELECT idr,name INTO :nTmp,:sSql FROM PEREKR_R')
-						                                                   While SqlFetchNext(hSql(),nFetchRes)
-							                                                   If nTmp>0 AND nTmp<=10
-								                                                   Set RN[nTmp]=sSql
-						                                                   Call VisArrayFillNumber (R,  0, 10)
-						                                                   Call VisArrayFillNumber (R0, 0, 10)
+					                                                     If nPar1 = 300  or  nPar1 = 301 or  nPar1 = 302
+						                                                     Call SqlPrepareAndExecute(hSql(),'SELECT idr,name INTO :nTmp,:sSql FROM PEREKR_R')
+						                                                     While SqlFetchNext(hSql(),nFetchRes)
+							                                                     If nTmp>0 AND nTmp<=10
+								                                                     Set RN[nTmp]=sSql
+						                                                     Call VisArrayFillNumber (R,  0, 10)
+						                                                     Call VisArrayFillNumber (R0, 0, 10)
 						! - - - госс бюдж.
-						                                                   If nPar1 = 300  
-							                                                   Call Podgot_DKU(ID, sFdat, sFdat, '0', "2m") ! накопление во  временные таблицы
-						                                                   If nPar1 = 301
-							                                                   Call Podgot_DKU(ID, sFdat, sFdat, '0', "2m") ! накопление во  временные таблицы
+						                                                     If nPar1 = 300  
+							                                                     Call Podgot_DKU(ID, sFdat, sFdat, '0', "2m") ! накопление во  временные таблицы
+						                                                     If nPar1 = 301
+							                                                     Call Podgot_DKU(ID, sFdat, sFdat, '0', "2m") ! накопление во  временные таблицы
 						! - - - местн бюдж.
-						                                                   If nPar1 = 302
-							                                                   Call Podgot_DKU(ID, sFdat, sFdat, '1', '2m') ! накопление во  временные таблицы
+						                                                     If nPar1 = 302
+							                                                     Call Podgot_DKU(ID, sFdat, sFdat, '1', '2m') ! накопление во  временные таблицы
 					!
 					! Ведомость 2M - новая
-					                                                   If nPar1 = 299 or nPar1 = 298 
+					                                                     If nPar1 = 299 or nPar1 = 298 
 						! госс  бюджет
-						                                                   If nPar1 = 299
-							                                                   Call Podgot_DKU(ID, sFdat, sFdat, '3411', "2mn") 
+						                                                     If nPar1 = 299
+							                                                     Call Podgot_DKU(ID, sFdat, sFdat, '3411', "2mn") 
 						! местный бюджет
-						                                                   Else 
-							                                                   Call Podgot_DKU(ID, sFdat, sFdat, '3421', "2mn") 
+						                                                     Else 
+							                                                     Call Podgot_DKU(ID, sFdat, sFdat, '3421', "2mn") 
 					!
 					! ! - - -ПФ - ФСС
-					                                                   If nPar1 >= 40 and  nPar1 <= 44
-						                                                   If nPar1 = 41    !! Реестр по Пенс.Фонду Держ.бюджет         
-							                                                   Call Podgot_DKU(ID, sFdat, sFdat, '3411_3', "sspf") ! накопление во  временные таблицы
-						                                                   Else If nPar1 = 42    !! Реестр Фонду Соц.страха Держ.бюджет 
-							                                                   Call Podgot_DKU(ID, sFdat, sFdat, '3411_4', "sspf") ! накопление во  временные таблицы
-						                                                   Else If nPar1 = 43    !! Реестр по Пенс.Фонду Місц.бюджет    
-							                                                   Call Podgot_DKU(ID, sFdat, sFdat, '3421_3', "sspf") ! накопление во  временные таблицы
-							                                                   Set strDBFStruct = " (
+					                                                     If nPar1 >= 40 and  nPar1 <= 44
+						                                                     If nPar1 = 41    !! Реестр по Пенс.Фонду Держ.бюджет         
+							                                                     Call Podgot_DKU(ID, sFdat, sFdat, '3411_3', "sspf") ! накопление во  временные таблицы
+						                                                     Else If nPar1 = 42    !! Реестр Фонду Соц.страха Держ.бюджет 
+							                                                     Call Podgot_DKU(ID, sFdat, sFdat, '3411_4', "sspf") ! накопление во  временные таблицы
+						                                                     Else If nPar1 = 43    !! Реестр по Пенс.Фонду Місц.бюджет    
+							                                                     Call Podgot_DKU(ID, sFdat, sFdat, '3421_3', "sspf") ! накопление во  временные таблицы
+							                                                     Set strDBFStruct = " (
 									  DK      CHAR(1),  
 									  MFOA    CHAR(9),
 									  NLSA    CHAR(14),
@@ -17232,184 +17232,389 @@ Application Description: •--------------------------------------•
 									  DATP    DATE,
 									  NAZN    CHAR(160)
 									) "
-						                                                   Else If nPar1 = 44    !! Реестр Фонду Соц.страха Місц.бюджет 
-							                                                   Call Podgot_DKU(ID, sFdat, sFdat, '3421_4', "sspf") ! накопление во  временные таблицы
-						                                                   Else If nPar1 = 40    !! Реестр Фонду Соц. страха Безробіття  Держ. Бюджет 
-							                                                   Call Podgot_DKU(ID, sFdat, sFdat, '3411_5', "sspf") ! накопление во  временные таблицы
+						                                                     Else If nPar1 = 44    !! Реестр Фонду Соц.страха Місц.бюджет 
+							                                                     Call Podgot_DKU(ID, sFdat, sFdat, '3421_4', "sspf") ! накопление во  временные таблицы
+						                                                     Else If nPar1 = 40    !! Реестр Фонду Соц. страха Безробіття  Держ. Бюджет 
+							                                                     Call Podgot_DKU(ID, sFdat, sFdat, '3411_5', "sspf") ! накопление во  временные таблицы
 					!
 					! ! - - - Митниця
-					                                                   If nPar1 = 920 or nPar1 = 922
-						                                                   Call Podgot_DKU(ID, sFdat, sFdat2, '%', "mv") ! накопление во  временные таблицы
+					                                                     If nPar1 = 920 or nPar1 = 922
+						                                                     Call Podgot_DKU(ID, sFdat, sFdat2, '%', "mv") ! накопление во  временные таблицы
 					! In preparing
-					                                                   Call SaveInfoToLog('REP_DKU: Конец накопления временной таблицы')
-					                                                   Return 1
+					                                                     Call SaveInfoToLog('REP_DKU: Конец накопления временной таблицы')
+					                                                     Return 1
 			! Function: UnPrepare_DkuRep
-				                                                   Description: ! - - тут очищаюся (вернее делатся rollback для временных таблиц
-				                                                   Returns 
-					                                                   Number: nRet
-				                                                   Parameters 
-					                                                   Number: nPar1
-				                                                   Static Variables 
-				                                                   Local variables 
-				                                                   Actions 
+				                                                     Description: ! - - тут очищаюся (вернее делатся rollback для временных таблиц
+				                                                     Returns 
+					                                                     Number: nRet
+				                                                     Parameters 
+					                                                     Number: nPar1
+				                                                     Static Variables 
+				                                                     Local variables 
+				                                                     Actions 
 					!
 					! - - для 412 - - - - - - - - - - - - -
 					! If nPar1 = 63  or nPar1 = 62
 					! Call UnPrepare_412()
 					!
-					                                                   Return 1
+					                                                     Return 1
 			! Function: Prepare_Rep_InCreate
-				                                                   Description: ! - - фактически это все действия которые выполняюся при создании формы frm_DKU - вынесено для автосоздания отчетов
+				                                                     Description: ! - - фактически это все действия которые выполняюся при создании формы frm_DKU - вынесено для автосоздания отчетов
 						! - - так как при следующем отчете (из списка выбранных ) эта форма не создается заново
-				                                                   Returns 
-				                                                   Parameters 
-					                                                   Number: nPar1
-				                                                   Static Variables 
-				                                                   Local variables 
-				                                                   Actions 
-					                                                   If nPar1 = 400 or nPar1 = 401
-						                                                   Set maska = '3%'
-						                                                   Set ID = GetUserId()
-						                                                   Call SalWaitCursor(TRUE)
-						                                                   Call Podgot_LICS(ID, sFdat, sFdat, maska, 20) ! накопление во
+				                                                     Returns 
+				                                                     Parameters 
+					                                                     Number: nPar1
+				                                                     Static Variables 
+				                                                     Local variables 
+				                                                     Actions 
+					                                                     If nPar1 = 400 or nPar1 = 401
+						                                                     Set maska = '3%'
+						                                                     Set ID = GetUserId()
+						                                                     Call SalWaitCursor(TRUE)
+						                                                     Call Podgot_LICS(ID, sFdat, sFdat, maska, 20) ! накопление во
 								                                            ! временные
 								                                            ! таблицы
-						                                                   Call SalWaitCursor(FALSE)
+						                                                     Call SalWaitCursor(FALSE)
 			! Function: Make_ReportFiles
-				                                                   Description: Функция после подготовки временных таблиц - режит на файлы
-				                                                   Returns 
-				                                                   Parameters 
-					                                                   Number: nFormat
-					                                                   Number: nType
-				                                                   Static Variables 
-				                                                   Local variables 
-				                                                   Actions 
+				                                                     Description: Функция после подготовки временных таблиц - режит на файлы
+				                                                     Returns 
+				                                                     Parameters 
+					                                                     Number: nFormat
+					                                                     Number: nType
+				                                                     Static Variables 
+				                                                     Local variables 
+				                                                     Actions 
 					! ====================================
 					! == Если формат DBF - подготовить файл
 					! ====================================
-					                                                   If nFormat=2
+					                                                     If nFormat=2
 						! установим текущую директорию (все заточеноо под 412 и PF)
-						                                                   Call SalUseRegistry(FALSE, '')
-						                                                   If nPar1 = 43
-							                                                   Call SalGetProfileString('PF', 'DbfPath', strPrintPath, strPrintPath, GetIniFileName())
-						                                                   Else 
-							                                                   Call SalGetProfileString('412','DbfPath', strPrintPath, strPrintPath, GetIniFileName())
-						                                                   If not SalFileSetCurrentDirectory(strPrintPath)
-							                                                   Call SalMessageBox(' Невозможно установить директорию '|| strPrintPath||' текущей ', 'Внимание!',0)
-							                                                   Call SalWaitCursor (FALSE )
-							                                                   Return -1
-						                                                   Set SqlDatabase = 'dBase_Files'
-						                                                   If not SqlConnect(hSqlA)
-							                                                   Call SalMessageBox(' Невозможно установить соединение с dBase_Files ', 'Внимание!',0)
-							                                                   Call SalWaitCursor (FALSE )
-							                                                   Return -1
-						                                                   If nPar1 = 43
-							                                                   If not VisFileFind(strPrintPath||"\\pf.dbf ") 
-								                                                   Call SqlPrepareAndExecute(hSqlA, "CREATE TABLE " || strPrintPath||"\\pf.dbf "||strDBFStruct)
-							                                                   Set nCouDBFFilesToRename=0
-						                                                   Else 
-							                                                   If not VisFileFind(strPrintPath||"\\ft.dbf ") 
-								                                                   Call SqlPrepareAndExecute(hSqlA, "CREATE TABLE " || strPrintPath||"\\ft.dbf "||strDBFStruct)
-							                                                   Set nCouDBFFilesToRename=0
+						                                                     Call SalUseRegistry(FALSE, '')
+						                                                     If nPar1 = 43
+							                                                     Call SalGetProfileString('PF', 'DbfPath', strPrintPath, strPrintPath, GetIniFileName())
+						                                                     Else 
+							                                                     Call SalGetProfileString('412','DbfPath', strPrintPath, strPrintPath, GetIniFileName())
+						                                                     If not SalFileSetCurrentDirectory(strPrintPath)
+							                                                     Call SalMessageBox(' Невозможно установить директорию '|| strPrintPath||' текущей ', 'Внимание!',0)
+							                                                     Call SalWaitCursor (FALSE )
+							                                                     Return -1
+						                                                     Set SqlDatabase = 'dBase_Files'
+						                                                     If not SqlConnect(hSqlA)
+							                                                     Call SalMessageBox(' Невозможно установить соединение с dBase_Files ', 'Внимание!',0)
+							                                                     Call SalWaitCursor (FALSE )
+							                                                     Return -1
+						                                                     If nPar1 = 43
+							                                                     If not VisFileFind(strPrintPath||"\\pf.dbf ") 
+								                                                     Call SqlPrepareAndExecute(hSqlA, "CREATE TABLE " || strPrintPath||"\\pf.dbf "||strDBFStruct)
+							                                                     Set nCouDBFFilesToRename=0
+						                                                     Else 
+							                                                     If not VisFileFind(strPrintPath||"\\ft.dbf ") 
+								                                                     Call SqlPrepareAndExecute(hSqlA, "CREATE TABLE " || strPrintPath||"\\ft.dbf "||strDBFStruct)
+							                                                     Set nCouDBFFilesToRename=0
 					! ====================================
 					! == Выполним собственно отчет
 					! ====================================
 					! ------ Сводная-----------
-					                                                   If nType = 1 or nType = 4 or nType = 5
-						                                                   Call FU_1( 'x', GetBankSab(),GetBankName() , GetGlobalOption('AREACODE')||'00' , '','2',nFormat)
+					                                                     If nType = 1 or nType = 4 or nType = 5
+						                                                     Call FU_1( 'x', GetBankSab(),GetBankName() , GetGlobalOption('AREACODE')||'00' , '','2',nFormat)
 					! ------ Выбранные или Все--------
-					                                                   If nType > 1 
-						                                                   If nType = 3 or nType=5 !-- Все
-							                                                   If nLevel >= 1
-								                                                   Call SalTblSetFlagsAnyRows(tbl1, ROW_Selected, TRUE, 0, 0)
+					                                                     If nType > 1 
+						                                                     If nType = 3 or nType=5 !-- Все
+							                                                     If nLevel >= 1
+								                                                     Call SalTblSetFlagsAnyRows(tbl1, ROW_Selected, TRUE, 0, 0)
 								! Call SalTblSetRowFlags(tbl1, 0, ROW_Selected, FALSE)
-							                                                   If nLevel >= 2
-								                                                   Call SalTblSetFlagsAnyRows(frm_RegPart.tblRada, ROW_Selected, TRUE, 0, 0)
+							                                                     If nLevel >= 2
+								                                                     Call SalTblSetFlagsAnyRows(frm_RegPart.tblRada, ROW_Selected, TRUE, 0, 0)
 								! Call SalTblSetRowFlags(frm_RegPart.tblRada, 0, ROW_Selected, FALSE)
-							                                                   If nLevel >= 3
-								                                                   Call SalTblSetFlagsAnyRows(frm_RegPart.tblSelo, ROW_Selected, TRUE, 0, 0)
-							                                                   Set nTmp = 0
-						                                                   Else 
-							                                                   Set nTmp = ROW_Selected
+							                                                     If nLevel >= 3
+								                                                     Call SalTblSetFlagsAnyRows(frm_RegPart.tblSelo, ROW_Selected, TRUE, 0, 0)
+							                                                     Set nTmp = 0
+						                                                     Else 
+							                                                     Set nTmp = ROW_Selected
 						!
 						! -- по районам
-						                                                   If nLevel >= 1 
-							                                                   Set nTmp = ROW_Selected
-							                                                   Set nRow = TBL_MinRow
-							                                                   While SalTblFindNextRow(tbl1, nRow, nTmp, 0)
-								                                                   Call SalTblSetContext(tbl1, nRow)
-								                                                   Call FU_1(tbl1.Kod1, tbl1.colSab, tbl1.Name1, tbl1.colid_key, tbl1.ktk_name,'0',nFormat)
+						                                                     If nLevel >= 1 
+							                                                     Set nTmp = ROW_Selected
+							                                                     Set nRow = TBL_MinRow
+							                                                     While SalTblFindNextRow(tbl1, nRow, nTmp, 0)
+								                                                     Call SalTblSetContext(tbl1, nRow)
+								                                                     Call FU_1(tbl1.Kod1, tbl1.colSab, tbl1.Name1, tbl1.colid_key, tbl1.ktk_name,'0',nFormat)
 						! -- по сельским радам
-						                                                   If nLevel >= 2 
-							                                                   Set nTmp = ROW_Selected
-							                                                   Set nRow = TBL_MinRow
-							                                                   While SalTblFindNextRow(frm_RegPart.tblRada, nRow, nTmp, 0)
-								                                                   Call SalTblSetContext(frm_RegPart.tblRada, nRow)
-								                                                   Call FU_1(frm_RegPart.tblRada.Kod1, frm_RegPart.tblRada.colSab, frm_RegPart.tblRada.Name1,  frm_RegPart.tblRada.colid_key, frm_RegPart.tblRada.ktk_name, frm_RegPart.tblRada.colIsSvod,nFormat )
+						                                                     If nLevel >= 2 
+							                                                     Set nTmp = ROW_Selected
+							                                                     Set nRow = TBL_MinRow
+							                                                     While SalTblFindNextRow(frm_RegPart.tblRada, nRow, nTmp, 0)
+								                                                     Call SalTblSetContext(frm_RegPart.tblRada, nRow)
+								                                                     Call FU_1(frm_RegPart.tblRada.Kod1, frm_RegPart.tblRada.colSab, frm_RegPart.tblRada.Name1,  frm_RegPart.tblRada.colid_key, frm_RegPart.tblRada.ktk_name, frm_RegPart.tblRada.colIsSvod,nFormat )
 						! -- по селам
-						                                                   If nLevel >= 3 
-							                                                   Set nTmp = ROW_Selected
-							                                                   Set nRow = TBL_MinRow
-							                                                   While SalTblFindNextRow(frm_RegPart.tblSelo, nRow, nTmp, 0)
-								                                                   Call SalTblSetContext(frm_RegPart.tblSelo, nRow)
-								                                                   If nRow >= 0
-									                                                   Call FU_1(frm_RegPart.tblSelo.Kod1, frm_RegPart.tblSelo.colSab, frm_RegPart.tblSelo.Name1, frm_RegPart.tblSelo.colid_key, frm_RegPart.tblSelo.ktk_name,'1',nFormat )
+						                                                     If nLevel >= 3 
+							                                                     Set nTmp = ROW_Selected
+							                                                     Set nRow = TBL_MinRow
+							                                                     While SalTblFindNextRow(frm_RegPart.tblSelo, nRow, nTmp, 0)
+								                                                     Call SalTblSetContext(frm_RegPart.tblSelo, nRow)
+								                                                     If nRow >= 0
+									                                                     Call FU_1(frm_RegPart.tblSelo.Kod1, frm_RegPart.tblSelo.colSab, frm_RegPart.tblSelo.Name1, frm_RegPart.tblSelo.colid_key, frm_RegPart.tblSelo.ktk_name,'1',nFormat )
 						!
 						! ----
-						                                                   If nType = 3 or nType=5
-							                                                   If nLevel >= 1
-								                                                   Call SalTblSetFlagsAnyRows(tbl1, ROW_Selected, FALSE, 0, 0)
-							                                                   If nLevel >= 2
-								                                                   Call SalTblSetFlagsAnyRows(frm_RegPart.tblRada, ROW_Selected, FALSE, 0, 0)
-							                                                   If nLevel >= 3
-								                                                   Call SalTblSetFlagsAnyRows(frm_RegPart.tblSelo, ROW_Selected, FALSE, 0, 0)
+						                                                     If nType = 3 or nType=5
+							                                                     If nLevel >= 1
+								                                                     Call SalTblSetFlagsAnyRows(tbl1, ROW_Selected, FALSE, 0, 0)
+							                                                     If nLevel >= 2
+								                                                     Call SalTblSetFlagsAnyRows(frm_RegPart.tblRada, ROW_Selected, FALSE, 0, 0)
+							                                                     If nLevel >= 3
+								                                                     Call SalTblSetFlagsAnyRows(frm_RegPart.tblSelo, ROW_Selected, FALSE, 0, 0)
 						!
 						!
 					! ------ Если это dbf - переименовать(для того что б не делать для каждого файла connect) -----
-					                                                   If nFormat=2
-						                                                   Call SqlDisconnect(hSqlA)
-						                                                   Set nRet=0
-						                                                   While nRet < nCouDBFFilesToRename
-							                                                   If VisFileFind(strPrintPath||'\\'||strDBFFilesToRename[nRet]||'.DBF')
-								                                                   If VisFileRename(strPrintPath||'\\'||strDBFFilesToRename[nRet]||'.DBF', 
+					                                                     If nFormat=2
+						                                                     Call SqlDisconnect(hSqlA)
+						                                                     Set nRet=0
+						                                                     While nRet < nCouDBFFilesToRename
+							                                                     If VisFileFind(strPrintPath||'\\'||strDBFFilesToRename[nRet]||'.DBF')
+								                                                     If VisFileRename(strPrintPath||'\\'||strDBFFilesToRename[nRet]||'.DBF', 
 										                 strPrintPath||'\\'||SalStrLeftX(strDBFFilesToRename[nRet],SalStrLength(strDBFFilesToRename[nRet])-3)||'.'||SalStrRightX(strDBFFilesToRename[nRet],3)) < 0
-									                                                   Call SalMessageBox(' Невозможно переименовать ', 'Внимание!',0)
-									                                                   Call SalWaitCursor (FALSE )
-									                                                   Return -1
-							                                                   Set nRet=nRet+1
+									                                                     Call SalMessageBox(' Невозможно переименовать ', 'Внимание!',0)
+									                                                     Call SalWaitCursor (FALSE )
+									                                                     Return -1
+							                                                     Set nRet=nRet+1
 					!
 			! Function: KtlLike
-				                                                   Description: Сравнивает, попадает ли даное sKtk под маску sKtkMask
-				                                                   Returns 
-					                                                   Boolean: bIsLike_
-				                                                   Parameters 
-					                                                   String: sKtk
-					                                                   String: sKtkMask
-				                                                   Static Variables 
-				                                                   Local variables 
-					                                                   Number: i
-					                                                   Boolean: bIsLike
-				                                                   Actions 
-					                                                   Set i=0
-					                                                   Set bIsLike=TRUE
-					                                                   While i<SalStrLength(sKtkMask)
-						                                                   If SalStrMidX ( sKtkMask, i, 1) !='_'
-							                                                   If SalStrMidX ( sKtkMask, i, 1) != SalStrMidX ( sKtkMask, i, 1)
-								                                                   Set bIsLike=FALSE
-								                                                   Return bIsLike
-					                                                   Return bIsLike
+				                                                     Description: Сравнивает, попадает ли даное sKtk под маску sKtkMask
+				                                                     Returns 
+					                                                     Boolean: bIsLike_
+				                                                     Parameters 
+					                                                     String: sKtk
+					                                                     String: sKtkMask
+				                                                     Static Variables 
+				                                                     Local variables 
+					                                                     Number: i
+					                                                     Boolean: bIsLike
+				                                                     Actions 
+					                                                     Set i=0
+					                                                     Set bIsLike=TRUE
+					                                                     While i<SalStrLength(sKtkMask)
+						                                                     If SalStrMidX ( sKtkMask, i, 1) !='_'
+							                                                     If SalStrMidX ( sKtkMask, i, 1) != SalStrMidX ( sKtkMask, i, 1)
+								                                                     Set bIsLike=FALSE
+								                                                     Return bIsLike
+					                                                     Return bIsLike
 			! Function: ParseParam
-				                                                   Description: 
-				                                                   Returns 
-				                                                   Parameters 
-				                                                   Static Variables 
-				                                                   Local variables 
-				                                                   Actions 
+				                                                     Description: 
+				                                                     Returns 
+				                                                     Parameters 
+				                                                     Static Variables 
+				                                                     Local variables 
+				                                                     Actions 
 			! Function: Make_DkuRep
+				                                                     Description: 
+				                                                     Returns 
+				                                                     Parameters 
+					                                                     Number: nType !-- (1-свод, 2-выборочные, 3-Все, 4-свод+выборочные, 5 - свод+все)
+				                                                     Static Variables 
+				                                                     Local variables 
+					                                                     String: sArr[5]
+					                                                     String: sRepParams[5]
+					                                                     String: sDeb
+					                                                     String: strTmp
+					                                                     Number: nCurLine
+				                                                     Actions 
+					! ===================================
+					! -- Инициализация
+					! ===================================
+					                                                     Set sArr[0]='"Свод"'
+					                                                     Set sArr[1]='"Выбор"'
+					                                                     Set sArr[2]='"Все"'
+					                                                     Set sArr[3]='"Свод+выбор"'
+					                                                     Set sArr[4]='"Свод+все"'
+					! ===================================
+					! == установим принтер как default нужно при формировании
+					! == текстового отчета  чтот б были нормальные параметры вывода
+					! ===================================
+					! If FL_FORMAT
+						                                                                                                                                                        Call SalPrtSetDefault(sDeviceDef, sDriverDef, sPortDef)
+					! Else
+						                                                                                                                                                        Call SalPrtSetDefault('Generic / Text Only', 'WINSPOOL', 'FILE:')
+					! ====================================
+					! == Для каждого выбранного отчета
+					! ====================================
+					!
+					                                                     Call SalWaitCursor(TRUE)
+					                                                     Set nCurLine=TBL_MinRow
+					                                                     While SalTblFindNextRow (  frm_Out.tblReps, nCurLine, ROW_Selected, 0 )
+						                                                     Call SalTblSetContext( frm_Out.tblReps, nCurLine)
+						                                                     Set strTmplPath = IifS(FL_FORMAT, GetTemplateDir() || "\\" || frm_Out.tblReps.repw,  GetTemplateDir() || "\\" || frm_Out.tblReps.rep)
+						                                                     Set SHAP = SalNumberToStrX(frm_Out.tblReps.Kod, 0) || ' ' ||  frm_Out.tblReps.NAME
+						                                                     Set DRUK = 'Printed: ' || SalFmtFormatDateTime(SalDateCurrent(), "dd/MM/yyyy hh:mm:ss")
+						!
+						                                                     Set sDeb=NumberToStrFormat( SalDateHour(SalDateCurrent()),2,'0' )||':'
+								         ||NumberToStrFormat( SalDateMinute(SalDateCurrent()),2,'0' )||':'  
+								         ||NumberToStrFormat(  SalDateSecond (SalDateCurrent()),2,'0' )||
+								         '-Нач.'||sArr[nType-1] ||frm_Out.tblReps.NAME 
+						                                                     Call SalListAdd ( lbStatus, sDeb)
+						! ===================================
+						! ==Вычленим параметры================
+						! ===================================
+						                                                     Set strPureMask = GetPureFileMask(frm_Out.tblReps.maska)
+						                                                     Set strTmp = frm_Out.tblReps.param
+						!
+						                                                     Set sRepParams[0]='0'
+						                                                     Set sRepParams[1]='0'
+						                                                     Set sRepParams[2]='0'
+						!
+						                                                     Set i = SalStrScan (strTmp,',')
+						                                                     Set sRepParams[0] = SalStrLeftX(strTmp, i)
+						!
+						                                                     Set strTmp = SalStrMidX(strTmp, i+1, SalStrLength(strTmp)- i )
+						                                                     Set i = SalStrScan (strTmp,',')
+						                                                     If i >-1
+							                                                     Set sRepParams[1] = SalStrLeftX(strTmp, i)
+							!
+							!
+							                                                     Set strTmp = SalStrMidX(strTmp, i+1, SalStrLength(strTmp)- i )
+							                                                     Set i = SalStrScan (strTmp,',')
+							                                                     If i >-1
+								                                                     Set sRepParams[2] = SalStrLeftX(strTmp, i)
+							                                                     Else 
+								                                                     Set sRepParams[2] = strTmp
+							!
+						                                                     Else 
+							                                                     Set sRepParams[1] =strTmp
+						!
+						                                                     Set nPar1 = SalStrToNumber( sRepParams[1] )
+						                                                     Set nRepFileType = SalStrToNumber( sRepParams[2] )
+						!
+						! ====================================
+						! == Подготовим временн. таблицы  
+						! ====================================
+						                                                     Call SalUpdateWindow ( lbStatus )
+						                                                     Call Prepare_Rep_InCreate(nPar1)
+						                                                     Call Prepare_DkuRep(nPar1)
+						!
+						! Цыкл по nRepFileType сделан для случая, если нужно генерить один отчет в разных форматах
+						! Set i = nRepFileType
+						! While i>=0 
+							                                                                                                                                                   If nRepFileType >= 3
+								                                                                                                                                                   Set nRepFileType=nRepFileType-1
+							! ====================================
+							! == Если формат DBF - подготовить файл
+							! ====================================
+							                                                                                                                                                   Call Debug('Делаем nRepFileType='||Str(nRepFileType))
+							                                                                                                                                                   If nRepFileType=2
+								! установим текущую директорию (все заточеноо под 412)
+								                                                                                                                                                   Call SalUseRegistry(FALSE, '')
+								                                                                                                                                                   Call SalGetProfileString('412', 'DbfPath', strPrintPath, strPrintPath, GetIniFileName())
+								                                                                                                                                                   If not SalFileSetCurrentDirectory(strPrintPath)
+									                                                                                                                                                   Call SalMessageBox(' Невозможно установить директорию '|| strPrintPath||' текущей ', 'Внимание!',0)
+									                                                                                                                                                   Call SalWaitCursor (FALSE )
+									                                                                                                                                                   Return -1
+								                                                                                                                                                   Set SqlDatabase = 'dBase_Files'
+								                                                                                                                                                   If not SqlConnect(hSqlA)
+									                                                                                                                                                   Call SalMessageBox(' Невозможно установить соединение с dBase_Files ', 'Внимание!',0)
+									                                                                                                                                                   Call SalWaitCursor (FALSE )
+									                                                                                                                                                   Return -1
+								                                                                                                                                                   If not VisFileFind(strPrintPath||"\\ft.dbf ") 
+									!
+									                                                                                                                                                   Call SqlPrepareAndExecute(hSqlA, "
+											     CREATE
+											     TABLE " || strPrintPath||"\\ft.dbf "||strDBFStruct)
+								                                                                                                                                                   Set nCouDBFFilesToRename=0
+							! ====================================
+							! == Выполним собственно отчет
+							! ====================================
+							! ------ Сводная-----------
+							                                                                                                                                                   If nType = 1 or nType = 4 or nType = 5
+								                                                                                                                                                   Call FU_1( 'x', GetBankSab(),GetBankName() , GetGlobalOption('AREACODE')||'00', '','2')
+							! ------ Выбранные или Все--------
+							                                                                                                                                                   If nType > 1 
+								                                                                                                                                                   If nType = 3 or nType=5 !-- Все
+									                                                                                                                                                   If nLevel >= 1
+										                                                                                                                                                   Call SalTblSetFlagsAnyRows(tbl1, ROW_Selected, TRUE, 0, 0)
+										! Call SalTblSetRowFlags(tbl1, 0, ROW_Selected, FALSE)
+									                                                                                                                                                   If nLevel >= 2
+										                                                                                                                                                   Call SalTblSetFlagsAnyRows(frm_RegPart.tblRada, ROW_Selected, TRUE, 0, 0)
+										! Call SalTblSetRowFlags(frm_RegPart.tblRada, 0, ROW_Selected, FALSE)
+									                                                                                                                                                   If nLevel >= 3
+										                                                                                                                                                   Call SalTblSetFlagsAnyRows(frm_RegPart.tblSelo, ROW_Selected, TRUE, 0, 0)
+									                                                                                                                                                   Set nTmp = 0
+								                                                                                                                                                   Else 
+									                                                                                                                                                   Set nTmp = ROW_Selected
+								!
+								! -- по районам
+								                                                                                                                                                   If nLevel >= 1 
+									                                                                                                                                                   Set nTmp = ROW_Selected
+									                                                                                                                                                   Set nRow = TBL_MinRow
+									                                                                                                                                                   While SalTblFindNextRow(tbl1, nRow, nTmp, 0)
+										                                                                                                                                                   Call SalTblSetContext(tbl1, nRow)
+										                                                                                                                                                   Call FU_1(tbl1.Kod1, tbl1.colSab, tbl1.Name1, tbl1.colid_key, tbl1.ktk_name,'0')
+								! -- по сельским радам
+								                                                                                                                                                   If nLevel >= 2 
+									                                                                                                                                                   Set nTmp = ROW_Selected
+									                                                                                                                                                   Set nRow = TBL_MinRow
+									                                                                                                                                                   While SalTblFindNextRow(frm_RegPart.tblRada, nRow, nTmp, 0)
+										                                                                                                                                                   Call SalTblSetContext(frm_RegPart.tblRada, nRow)
+										                                                                                                                                                   Call FU_1(frm_RegPart.tblRada.Kod1, frm_RegPart.tblRada.colSab, frm_RegPart.tblRada.Name1,  frm_RegPart.tblRada.colid_key, frm_RegPart.tblRada.ktk_name, frm_RegPart.tblRada.colIsSvod )
+								! -- по селам
+								                                                                                                                                                   If nLevel >= 3 
+									                                                                                                                                                   Set nTmp = ROW_Selected
+									                                                                                                                                                   Set nRow = TBL_MinRow
+									                                                                                                                                                   While SalTblFindNextRow(frm_RegPart.tblSelo, nRow, nTmp, 0)
+										                                                                                                                                                   Call SalTblSetContext(frm_RegPart.tblSelo, nRow)
+										                                                                                                                                                   If nRow >= 0
+											                                                                                                                                                   Call FU_1(frm_RegPart.tblSelo.Kod1, frm_RegPart.tblSelo.colSab, frm_RegPart.tblSelo.Name1, frm_RegPart.tblSelo.colid_key, frm_RegPart.tblSelo.ktk_name,'1' )
+								!
+								! ----
+								                                                                                                                                                   If nType = 3 or nType=5
+									                                                                                                                                                   If nLevel >= 1
+										                                                                                                                                                   Call SalTblSetFlagsAnyRows(tbl1, ROW_Selected, FALSE, 0, 0)
+									                                                                                                                                                   If nLevel >= 2
+										                                                                                                                                                   Call SalTblSetFlagsAnyRows(frm_RegPart.tblRada, ROW_Selected, FALSE, 0, 0)
+									                                                                                                                                                   If nLevel >= 3
+										                                                                                                                                                   Call SalTblSetFlagsAnyRows(frm_RegPart.tblSelo, ROW_Selected, FALSE, 0, 0)
+								!
+								!
+							! ------ Если это dbf - переименовать(для того что б не делать для каждого файла connect) -----
+							                                                                                                                                                   If nRepFileType=2
+								                                                                                                                                                   Call SqlDisconnect(hSqlA)
+								! Call Debug('Всего файлов для переименовывания = '||Str(nCouDBFFilesToRename))
+								                                                                                                                                                   Set nRet=0
+								                                                                                                                                                   While nRet < nCouDBFFilesToRename
+									! Call Debug('Rename '||strPrintPath||'\\'||strDBFFilesToRename[nRet]||'.DBF'||'  TO -->>'||             
+											            strPrintPath||'\\'||SalStrLeftX(strDBFFilesToRename[nRet],SalStrLength(strDBFFilesToRename[nRet])-3)||'.'||SalStrRightX(strDBFFilesToRename[nRet],3))
+									                                                                                                                                                   If VisFileRename(strPrintPath||'\\'||strDBFFilesToRename[nRet]||'.DBF', 
+											                 strPrintPath||'\\'||SalStrLeftX(strDBFFilesToRename[nRet],SalStrLength(strDBFFilesToRename[nRet])-3)||'.'||SalStrRightX(strDBFFilesToRename[nRet],3)) < 0
+										                                                                                                                                                   Call SalMessageBox(' Невозможно преименовать ', 'Внимание!',0)
+										                                                                                                                                                   Call SalWaitCursor (FALSE )
+										                                                                                                                                                   Return -1
+									                                                                                                                                                   Set nRet=nRet+1
+							!
+							! сначала делаеться DBF, а потом TXT 
+							                                                                                                                                                   If nRepFileType=0 OR  nRepFileType=1 OR  nRepFileType=2 
+								                                                                                                                                                   Break 
+							                                                                                                                                                   Set i=i-3
+							!
+						                                                     If nRepFileType<3
+							                                                     Call Make_ReportFiles(nRepFileType, nType)
+						                                                     Else 
+							                                                     If nRepFileType=3
+								                                                     Call Make_ReportFiles(0,nType) !-- текст
+								                                                     Call Make_ReportFiles(2,nType) !-- dbf 
+						                                                     Set sDeb=NumberToStrFormat( SalDateHour(SalDateCurrent()),2,'0' )||':'
+								         ||NumberToStrFormat( SalDateMinute(SalDateCurrent()),2,'0' )||':'  
+								         ||NumberToStrFormat(  SalDateSecond (SalDateCurrent()),2,'0' )||
+								         '-Зак.'||sArr[nType-1]||frm_Out.tblReps.NAME 
+						                                                     Call SalListAdd ( lbStatus, sDeb)
+						                                                     Call SalUpdateWindow ( lbStatus )
+						                                                     Call UnPrepare_DkuRep(nPar1) 
+					!
+					                                                     Call SalWaitCursor(FALSE)
+					! ----- поставим назад принтер ------------
+					! If not FL_FORMAT
+						                                                                                                                                                        Call SalPrtSetDefault(sDeviceDef, sDriverDef, sPortDef)
+			                                                   Function: makeRep
 				                                                   Description: 
 				                                                   Returns 
 				                                                   Parameters 
-					                                                   Number: nType !-- (1-свод, 2-выборочные, 3-Все, 4-свод+выборочные, 5 - свод+все)
+					                                                   Number: nType !- тип агрегирования территорий для отчета см. константы REPAGG_*
 				                                                   Static Variables 
 				                                                   Local variables 
 					                                                   String: sArr[5]
@@ -17418,25 +17623,12 @@ Application Description: •--------------------------------------•
 					                                                   String: strTmp
 					                                                   Number: nCurLine
 				                                                   Actions 
-					! ===================================
 					! -- Инициализация
-					! ===================================
 					                                                   Set sArr[0]='"Свод"'
 					                                                   Set sArr[1]='"Выбор"'
 					                                                   Set sArr[2]='"Все"'
 					                                                   Set sArr[3]='"Свод+выбор"'
 					                                                   Set sArr[4]='"Свод+все"'
-					! ===================================
-					! == установим принтер как default нужно при формировании
-					! == текстового отчета  чтот б были нормальные параметры вывода
-					! ===================================
-					! If FL_FORMAT
-						                                                                                                                                                      Call SalPrtSetDefault(sDeviceDef, sDriverDef, sPortDef)
-					! Else
-						                                                                                                                                                      Call SalPrtSetDefault('Generic / Text Only', 'WINSPOOL', 'FILE:')
-					! ====================================
-					! == Для каждого выбранного отчета
-					! ====================================
 					!
 					                                                   Call SalWaitCursor(TRUE)
 					                                                   Set nCurLine=TBL_MinRow
@@ -17493,104 +17685,104 @@ Application Description: •--------------------------------------•
 						! Цыкл по nRepFileType сделан для случая, если нужно генерить один отчет в разных форматах
 						! Set i = nRepFileType
 						! While i>=0 
-							                                                                                                                                                 If nRepFileType >= 3
-								                                                                                                                                                 Set nRepFileType=nRepFileType-1
+							                                                                                                                                                   If nRepFileType >= 3
+								                                                                                                                                                   Set nRepFileType=nRepFileType-1
 							! ====================================
 							! == Если формат DBF - подготовить файл
 							! ====================================
-							                                                                                                                                                 Call Debug('Делаем nRepFileType='||Str(nRepFileType))
-							                                                                                                                                                 If nRepFileType=2
+							                                                                                                                                                   Call Debug('Делаем nRepFileType='||Str(nRepFileType))
+							                                                                                                                                                   If nRepFileType=2
 								! установим текущую директорию (все заточеноо под 412)
-								                                                                                                                                                 Call SalUseRegistry(FALSE, '')
-								                                                                                                                                                 Call SalGetProfileString('412', 'DbfPath', strPrintPath, strPrintPath, GetIniFileName())
-								                                                                                                                                                 If not SalFileSetCurrentDirectory(strPrintPath)
-									                                                                                                                                                 Call SalMessageBox(' Невозможно установить директорию '|| strPrintPath||' текущей ', 'Внимание!',0)
-									                                                                                                                                                 Call SalWaitCursor (FALSE )
-									                                                                                                                                                 Return -1
-								                                                                                                                                                 Set SqlDatabase = 'dBase_Files'
-								                                                                                                                                                 If not SqlConnect(hSqlA)
-									                                                                                                                                                 Call SalMessageBox(' Невозможно установить соединение с dBase_Files ', 'Внимание!',0)
-									                                                                                                                                                 Call SalWaitCursor (FALSE )
-									                                                                                                                                                 Return -1
-								                                                                                                                                                 If not VisFileFind(strPrintPath||"\\ft.dbf ") 
+								                                                                                                                                                   Call SalUseRegistry(FALSE, '')
+								                                                                                                                                                   Call SalGetProfileString('412', 'DbfPath', strPrintPath, strPrintPath, GetIniFileName())
+								                                                                                                                                                   If not SalFileSetCurrentDirectory(strPrintPath)
+									                                                                                                                                                   Call SalMessageBox(' Невозможно установить директорию '|| strPrintPath||' текущей ', 'Внимание!',0)
+									                                                                                                                                                   Call SalWaitCursor (FALSE )
+									                                                                                                                                                   Return -1
+								                                                                                                                                                   Set SqlDatabase = 'dBase_Files'
+								                                                                                                                                                   If not SqlConnect(hSqlA)
+									                                                                                                                                                   Call SalMessageBox(' Невозможно установить соединение с dBase_Files ', 'Внимание!',0)
+									                                                                                                                                                   Call SalWaitCursor (FALSE )
+									                                                                                                                                                   Return -1
+								                                                                                                                                                   If not VisFileFind(strPrintPath||"\\ft.dbf ") 
 									!
-									                                                                                                                                                 Call SqlPrepareAndExecute(hSqlA, "
+									                                                                                                                                                   Call SqlPrepareAndExecute(hSqlA, "
 											     CREATE
 											     TABLE " || strPrintPath||"\\ft.dbf "||strDBFStruct)
-								                                                                                                                                                 Set nCouDBFFilesToRename=0
+								                                                                                                                                                   Set nCouDBFFilesToRename=0
 							! ====================================
 							! == Выполним собственно отчет
 							! ====================================
 							! ------ Сводная-----------
-							                                                                                                                                                 If nType = 1 or nType = 4 or nType = 5
-								                                                                                                                                                 Call FU_1( 'x', GetBankSab(),GetBankName() , GetGlobalOption('AREACODE')||'00', '','2')
+							                                                                                                                                                   If nType = 1 or nType = 4 or nType = 5
+								                                                                                                                                                   Call FU_1( 'x', GetBankSab(),GetBankName() , GetGlobalOption('AREACODE')||'00', '','2')
 							! ------ Выбранные или Все--------
-							                                                                                                                                                 If nType > 1 
-								                                                                                                                                                 If nType = 3 or nType=5 !-- Все
-									                                                                                                                                                 If nLevel >= 1
-										                                                                                                                                                 Call SalTblSetFlagsAnyRows(tbl1, ROW_Selected, TRUE, 0, 0)
+							                                                                                                                                                   If nType > 1 
+								                                                                                                                                                   If nType = 3 or nType=5 !-- Все
+									                                                                                                                                                   If nLevel >= 1
+										                                                                                                                                                   Call SalTblSetFlagsAnyRows(tbl1, ROW_Selected, TRUE, 0, 0)
 										! Call SalTblSetRowFlags(tbl1, 0, ROW_Selected, FALSE)
-									                                                                                                                                                 If nLevel >= 2
-										                                                                                                                                                 Call SalTblSetFlagsAnyRows(frm_RegPart.tblRada, ROW_Selected, TRUE, 0, 0)
+									                                                                                                                                                   If nLevel >= 2
+										                                                                                                                                                   Call SalTblSetFlagsAnyRows(frm_RegPart.tblRada, ROW_Selected, TRUE, 0, 0)
 										! Call SalTblSetRowFlags(frm_RegPart.tblRada, 0, ROW_Selected, FALSE)
-									                                                                                                                                                 If nLevel >= 3
-										                                                                                                                                                 Call SalTblSetFlagsAnyRows(frm_RegPart.tblSelo, ROW_Selected, TRUE, 0, 0)
-									                                                                                                                                                 Set nTmp = 0
-								                                                                                                                                                 Else 
-									                                                                                                                                                 Set nTmp = ROW_Selected
+									                                                                                                                                                   If nLevel >= 3
+										                                                                                                                                                   Call SalTblSetFlagsAnyRows(frm_RegPart.tblSelo, ROW_Selected, TRUE, 0, 0)
+									                                                                                                                                                   Set nTmp = 0
+								                                                                                                                                                   Else 
+									                                                                                                                                                   Set nTmp = ROW_Selected
 								!
 								! -- по районам
-								                                                                                                                                                 If nLevel >= 1 
-									                                                                                                                                                 Set nTmp = ROW_Selected
-									                                                                                                                                                 Set nRow = TBL_MinRow
-									                                                                                                                                                 While SalTblFindNextRow(tbl1, nRow, nTmp, 0)
-										                                                                                                                                                 Call SalTblSetContext(tbl1, nRow)
-										                                                                                                                                                 Call FU_1(tbl1.Kod1, tbl1.colSab, tbl1.Name1, tbl1.colid_key, tbl1.ktk_name,'0')
+								                                                                                                                                                   If nLevel >= 1 
+									                                                                                                                                                   Set nTmp = ROW_Selected
+									                                                                                                                                                   Set nRow = TBL_MinRow
+									                                                                                                                                                   While SalTblFindNextRow(tbl1, nRow, nTmp, 0)
+										                                                                                                                                                   Call SalTblSetContext(tbl1, nRow)
+										                                                                                                                                                   Call FU_1(tbl1.Kod1, tbl1.colSab, tbl1.Name1, tbl1.colid_key, tbl1.ktk_name,'0')
 								! -- по сельским радам
-								                                                                                                                                                 If nLevel >= 2 
-									                                                                                                                                                 Set nTmp = ROW_Selected
-									                                                                                                                                                 Set nRow = TBL_MinRow
-									                                                                                                                                                 While SalTblFindNextRow(frm_RegPart.tblRada, nRow, nTmp, 0)
-										                                                                                                                                                 Call SalTblSetContext(frm_RegPart.tblRada, nRow)
-										                                                                                                                                                 Call FU_1(frm_RegPart.tblRada.Kod1, frm_RegPart.tblRada.colSab, frm_RegPart.tblRada.Name1,  frm_RegPart.tblRada.colid_key, frm_RegPart.tblRada.ktk_name, frm_RegPart.tblRada.colIsSvod )
+								                                                                                                                                                   If nLevel >= 2 
+									                                                                                                                                                   Set nTmp = ROW_Selected
+									                                                                                                                                                   Set nRow = TBL_MinRow
+									                                                                                                                                                   While SalTblFindNextRow(frm_RegPart.tblRada, nRow, nTmp, 0)
+										                                                                                                                                                   Call SalTblSetContext(frm_RegPart.tblRada, nRow)
+										                                                                                                                                                   Call FU_1(frm_RegPart.tblRada.Kod1, frm_RegPart.tblRada.colSab, frm_RegPart.tblRada.Name1,  frm_RegPart.tblRada.colid_key, frm_RegPart.tblRada.ktk_name, frm_RegPart.tblRada.colIsSvod )
 								! -- по селам
-								                                                                                                                                                 If nLevel >= 3 
-									                                                                                                                                                 Set nTmp = ROW_Selected
-									                                                                                                                                                 Set nRow = TBL_MinRow
-									                                                                                                                                                 While SalTblFindNextRow(frm_RegPart.tblSelo, nRow, nTmp, 0)
-										                                                                                                                                                 Call SalTblSetContext(frm_RegPart.tblSelo, nRow)
-										                                                                                                                                                 If nRow >= 0
-											                                                                                                                                                 Call FU_1(frm_RegPart.tblSelo.Kod1, frm_RegPart.tblSelo.colSab, frm_RegPart.tblSelo.Name1, frm_RegPart.tblSelo.colid_key, frm_RegPart.tblSelo.ktk_name,'1' )
+								                                                                                                                                                   If nLevel >= 3 
+									                                                                                                                                                   Set nTmp = ROW_Selected
+									                                                                                                                                                   Set nRow = TBL_MinRow
+									                                                                                                                                                   While SalTblFindNextRow(frm_RegPart.tblSelo, nRow, nTmp, 0)
+										                                                                                                                                                   Call SalTblSetContext(frm_RegPart.tblSelo, nRow)
+										                                                                                                                                                   If nRow >= 0
+											                                                                                                                                                   Call FU_1(frm_RegPart.tblSelo.Kod1, frm_RegPart.tblSelo.colSab, frm_RegPart.tblSelo.Name1, frm_RegPart.tblSelo.colid_key, frm_RegPart.tblSelo.ktk_name,'1' )
 								!
 								! ----
-								                                                                                                                                                 If nType = 3 or nType=5
-									                                                                                                                                                 If nLevel >= 1
-										                                                                                                                                                 Call SalTblSetFlagsAnyRows(tbl1, ROW_Selected, FALSE, 0, 0)
-									                                                                                                                                                 If nLevel >= 2
-										                                                                                                                                                 Call SalTblSetFlagsAnyRows(frm_RegPart.tblRada, ROW_Selected, FALSE, 0, 0)
-									                                                                                                                                                 If nLevel >= 3
-										                                                                                                                                                 Call SalTblSetFlagsAnyRows(frm_RegPart.tblSelo, ROW_Selected, FALSE, 0, 0)
+								                                                                                                                                                   If nType = 3 or nType=5
+									                                                                                                                                                   If nLevel >= 1
+										                                                                                                                                                   Call SalTblSetFlagsAnyRows(tbl1, ROW_Selected, FALSE, 0, 0)
+									                                                                                                                                                   If nLevel >= 2
+										                                                                                                                                                   Call SalTblSetFlagsAnyRows(frm_RegPart.tblRada, ROW_Selected, FALSE, 0, 0)
+									                                                                                                                                                   If nLevel >= 3
+										                                                                                                                                                   Call SalTblSetFlagsAnyRows(frm_RegPart.tblSelo, ROW_Selected, FALSE, 0, 0)
 								!
 								!
 							! ------ Если это dbf - переименовать(для того что б не делать для каждого файла connect) -----
-							                                                                                                                                                 If nRepFileType=2
-								                                                                                                                                                 Call SqlDisconnect(hSqlA)
+							                                                                                                                                                   If nRepFileType=2
+								                                                                                                                                                   Call SqlDisconnect(hSqlA)
 								! Call Debug('Всего файлов для переименовывания = '||Str(nCouDBFFilesToRename))
-								                                                                                                                                                 Set nRet=0
-								                                                                                                                                                 While nRet < nCouDBFFilesToRename
+								                                                                                                                                                   Set nRet=0
+								                                                                                                                                                   While nRet < nCouDBFFilesToRename
 									! Call Debug('Rename '||strPrintPath||'\\'||strDBFFilesToRename[nRet]||'.DBF'||'  TO -->>'||             
 											            strPrintPath||'\\'||SalStrLeftX(strDBFFilesToRename[nRet],SalStrLength(strDBFFilesToRename[nRet])-3)||'.'||SalStrRightX(strDBFFilesToRename[nRet],3))
-									                                                                                                                                                 If VisFileRename(strPrintPath||'\\'||strDBFFilesToRename[nRet]||'.DBF', 
+									                                                                                                                                                   If VisFileRename(strPrintPath||'\\'||strDBFFilesToRename[nRet]||'.DBF', 
 											                 strPrintPath||'\\'||SalStrLeftX(strDBFFilesToRename[nRet],SalStrLength(strDBFFilesToRename[nRet])-3)||'.'||SalStrRightX(strDBFFilesToRename[nRet],3)) < 0
-										                                                                                                                                                 Call SalMessageBox(' Невозможно преименовать ', 'Внимание!',0)
-										                                                                                                                                                 Call SalWaitCursor (FALSE )
-										                                                                                                                                                 Return -1
-									                                                                                                                                                 Set nRet=nRet+1
+										                                                                                                                                                   Call SalMessageBox(' Невозможно преименовать ', 'Внимание!',0)
+										                                                                                                                                                   Call SalWaitCursor (FALSE )
+										                                                                                                                                                   Return -1
+									                                                                                                                                                   Set nRet=nRet+1
 							!
 							! сначала делаеться DBF, а потом TXT 
-							                                                                                                                                                 If nRepFileType=0 OR  nRepFileType=1 OR  nRepFileType=2 
-								                                                                                                                                                 Break 
-							                                                                                                                                                 Set i=i-3
+							                                                                                                                                                   If nRepFileType=0 OR  nRepFileType=1 OR  nRepFileType=2 
+								                                                                                                                                                   Break 
+							                                                                                                                                                   Set i=i-3
 							!
 						                                                   If nRepFileType<3
 							                                                   Call Make_ReportFiles(nRepFileType, nType)
@@ -17607,464 +17799,272 @@ Application Description: •--------------------------------------•
 						                                                   Call UnPrepare_DkuRep(nPar1) 
 					!
 					                                                   Call SalWaitCursor(FALSE)
-					! ----- поставим назад принтер ------------
-					! If not FL_FORMAT
-						                                                                                                                                                      Call SalPrtSetDefault(sDeviceDef, sDriverDef, sPortDef)
-			                                                 Function: makeRep
-				                                                 Description: 
-				                                                 Returns 
-				                                                 Parameters 
-					                                                 Number: nType !- тип агрегирования территорий для отчета см. константы REPAGG_*
-				                                                 Static Variables 
-				                                                 Local variables 
-					                                                 String: sArr[5]
-					                                                 String: sRepParams[5]
-					                                                 String: sDeb
-					                                                 String: strTmp
-					                                                 Number: nCurLine
-				                                                 Actions 
-					! -- Инициализация
-					                                                 Set sArr[0]='"Свод"'
-					                                                 Set sArr[1]='"Выбор"'
-					                                                 Set sArr[2]='"Все"'
-					                                                 Set sArr[3]='"Свод+выбор"'
-					                                                 Set sArr[4]='"Свод+все"'
-					!
-					                                                 Call SalWaitCursor(TRUE)
-					                                                 Set nCurLine=TBL_MinRow
-					                                                 While SalTblFindNextRow (  frm_Out.tblReps, nCurLine, ROW_Selected, 0 )
-						                                                 Call SalTblSetContext( frm_Out.tblReps, nCurLine)
-						                                                 Set strTmplPath = IifS(FL_FORMAT, GetTemplateDir() || "\\" || frm_Out.tblReps.repw,  GetTemplateDir() || "\\" || frm_Out.tblReps.rep)
-						                                                 Set SHAP = SalNumberToStrX(frm_Out.tblReps.Kod, 0) || ' ' ||  frm_Out.tblReps.NAME
-						                                                 Set DRUK = 'Printed: ' || SalFmtFormatDateTime(SalDateCurrent(), "dd/MM/yyyy hh:mm:ss")
-						!
-						                                                 Set sDeb=NumberToStrFormat( SalDateHour(SalDateCurrent()),2,'0' )||':'
-								         ||NumberToStrFormat( SalDateMinute(SalDateCurrent()),2,'0' )||':'  
-								         ||NumberToStrFormat(  SalDateSecond (SalDateCurrent()),2,'0' )||
-								         '-Нач.'||sArr[nType-1] ||frm_Out.tblReps.NAME 
-						                                                 Call SalListAdd ( lbStatus, sDeb)
-						! ===================================
-						! ==Вычленим параметры================
-						! ===================================
-						                                                 Set strPureMask = GetPureFileMask(frm_Out.tblReps.maska)
-						                                                 Set strTmp = frm_Out.tblReps.param
-						!
-						                                                 Set sRepParams[0]='0'
-						                                                 Set sRepParams[1]='0'
-						                                                 Set sRepParams[2]='0'
-						!
-						                                                 Set i = SalStrScan (strTmp,',')
-						                                                 Set sRepParams[0] = SalStrLeftX(strTmp, i)
-						!
-						                                                 Set strTmp = SalStrMidX(strTmp, i+1, SalStrLength(strTmp)- i )
-						                                                 Set i = SalStrScan (strTmp,',')
-						                                                 If i >-1
-							                                                 Set sRepParams[1] = SalStrLeftX(strTmp, i)
-							!
-							!
-							                                                 Set strTmp = SalStrMidX(strTmp, i+1, SalStrLength(strTmp)- i )
-							                                                 Set i = SalStrScan (strTmp,',')
-							                                                 If i >-1
-								                                                 Set sRepParams[2] = SalStrLeftX(strTmp, i)
-							                                                 Else 
-								                                                 Set sRepParams[2] = strTmp
-							!
-						                                                 Else 
-							                                                 Set sRepParams[1] =strTmp
-						!
-						                                                 Set nPar1 = SalStrToNumber( sRepParams[1] )
-						                                                 Set nRepFileType = SalStrToNumber( sRepParams[2] )
-						!
-						! ====================================
-						! == Подготовим временн. таблицы  
-						! ====================================
-						                                                 Call SalUpdateWindow ( lbStatus )
-						                                                 Call Prepare_Rep_InCreate(nPar1)
-						                                                 Call Prepare_DkuRep(nPar1)
-						!
-						! Цыкл по nRepFileType сделан для случая, если нужно генерить один отчет в разных форматах
-						! Set i = nRepFileType
-						! While i>=0 
-							                                                                                                                                                 If nRepFileType >= 3
-								                                                                                                                                                 Set nRepFileType=nRepFileType-1
-							! ====================================
-							! == Если формат DBF - подготовить файл
-							! ====================================
-							                                                                                                                                                 Call Debug('Делаем nRepFileType='||Str(nRepFileType))
-							                                                                                                                                                 If nRepFileType=2
-								! установим текущую директорию (все заточеноо под 412)
-								                                                                                                                                                 Call SalUseRegistry(FALSE, '')
-								                                                                                                                                                 Call SalGetProfileString('412', 'DbfPath', strPrintPath, strPrintPath, GetIniFileName())
-								                                                                                                                                                 If not SalFileSetCurrentDirectory(strPrintPath)
-									                                                                                                                                                 Call SalMessageBox(' Невозможно установить директорию '|| strPrintPath||' текущей ', 'Внимание!',0)
-									                                                                                                                                                 Call SalWaitCursor (FALSE )
-									                                                                                                                                                 Return -1
-								                                                                                                                                                 Set SqlDatabase = 'dBase_Files'
-								                                                                                                                                                 If not SqlConnect(hSqlA)
-									                                                                                                                                                 Call SalMessageBox(' Невозможно установить соединение с dBase_Files ', 'Внимание!',0)
-									                                                                                                                                                 Call SalWaitCursor (FALSE )
-									                                                                                                                                                 Return -1
-								                                                                                                                                                 If not VisFileFind(strPrintPath||"\\ft.dbf ") 
-									!
-									                                                                                                                                                 Call SqlPrepareAndExecute(hSqlA, "
-											     CREATE
-											     TABLE " || strPrintPath||"\\ft.dbf "||strDBFStruct)
-								                                                                                                                                                 Set nCouDBFFilesToRename=0
-							! ====================================
-							! == Выполним собственно отчет
-							! ====================================
-							! ------ Сводная-----------
-							                                                                                                                                                 If nType = 1 or nType = 4 or nType = 5
-								                                                                                                                                                 Call FU_1( 'x', GetBankSab(),GetBankName() , GetGlobalOption('AREACODE')||'00', '','2')
-							! ------ Выбранные или Все--------
-							                                                                                                                                                 If nType > 1 
-								                                                                                                                                                 If nType = 3 or nType=5 !-- Все
-									                                                                                                                                                 If nLevel >= 1
-										                                                                                                                                                 Call SalTblSetFlagsAnyRows(tbl1, ROW_Selected, TRUE, 0, 0)
-										! Call SalTblSetRowFlags(tbl1, 0, ROW_Selected, FALSE)
-									                                                                                                                                                 If nLevel >= 2
-										                                                                                                                                                 Call SalTblSetFlagsAnyRows(frm_RegPart.tblRada, ROW_Selected, TRUE, 0, 0)
-										! Call SalTblSetRowFlags(frm_RegPart.tblRada, 0, ROW_Selected, FALSE)
-									                                                                                                                                                 If nLevel >= 3
-										                                                                                                                                                 Call SalTblSetFlagsAnyRows(frm_RegPart.tblSelo, ROW_Selected, TRUE, 0, 0)
-									                                                                                                                                                 Set nTmp = 0
-								                                                                                                                                                 Else 
-									                                                                                                                                                 Set nTmp = ROW_Selected
-								!
-								! -- по районам
-								                                                                                                                                                 If nLevel >= 1 
-									                                                                                                                                                 Set nTmp = ROW_Selected
-									                                                                                                                                                 Set nRow = TBL_MinRow
-									                                                                                                                                                 While SalTblFindNextRow(tbl1, nRow, nTmp, 0)
-										                                                                                                                                                 Call SalTblSetContext(tbl1, nRow)
-										                                                                                                                                                 Call FU_1(tbl1.Kod1, tbl1.colSab, tbl1.Name1, tbl1.colid_key, tbl1.ktk_name,'0')
-								! -- по сельским радам
-								                                                                                                                                                 If nLevel >= 2 
-									                                                                                                                                                 Set nTmp = ROW_Selected
-									                                                                                                                                                 Set nRow = TBL_MinRow
-									                                                                                                                                                 While SalTblFindNextRow(frm_RegPart.tblRada, nRow, nTmp, 0)
-										                                                                                                                                                 Call SalTblSetContext(frm_RegPart.tblRada, nRow)
-										                                                                                                                                                 Call FU_1(frm_RegPart.tblRada.Kod1, frm_RegPart.tblRada.colSab, frm_RegPart.tblRada.Name1,  frm_RegPart.tblRada.colid_key, frm_RegPart.tblRada.ktk_name, frm_RegPart.tblRada.colIsSvod )
-								! -- по селам
-								                                                                                                                                                 If nLevel >= 3 
-									                                                                                                                                                 Set nTmp = ROW_Selected
-									                                                                                                                                                 Set nRow = TBL_MinRow
-									                                                                                                                                                 While SalTblFindNextRow(frm_RegPart.tblSelo, nRow, nTmp, 0)
-										                                                                                                                                                 Call SalTblSetContext(frm_RegPart.tblSelo, nRow)
-										                                                                                                                                                 If nRow >= 0
-											                                                                                                                                                 Call FU_1(frm_RegPart.tblSelo.Kod1, frm_RegPart.tblSelo.colSab, frm_RegPart.tblSelo.Name1, frm_RegPart.tblSelo.colid_key, frm_RegPart.tblSelo.ktk_name,'1' )
-								!
-								! ----
-								                                                                                                                                                 If nType = 3 or nType=5
-									                                                                                                                                                 If nLevel >= 1
-										                                                                                                                                                 Call SalTblSetFlagsAnyRows(tbl1, ROW_Selected, FALSE, 0, 0)
-									                                                                                                                                                 If nLevel >= 2
-										                                                                                                                                                 Call SalTblSetFlagsAnyRows(frm_RegPart.tblRada, ROW_Selected, FALSE, 0, 0)
-									                                                                                                                                                 If nLevel >= 3
-										                                                                                                                                                 Call SalTblSetFlagsAnyRows(frm_RegPart.tblSelo, ROW_Selected, FALSE, 0, 0)
-								!
-								!
-							! ------ Если это dbf - переименовать(для того что б не делать для каждого файла connect) -----
-							                                                                                                                                                 If nRepFileType=2
-								                                                                                                                                                 Call SqlDisconnect(hSqlA)
-								! Call Debug('Всего файлов для переименовывания = '||Str(nCouDBFFilesToRename))
-								                                                                                                                                                 Set nRet=0
-								                                                                                                                                                 While nRet < nCouDBFFilesToRename
-									! Call Debug('Rename '||strPrintPath||'\\'||strDBFFilesToRename[nRet]||'.DBF'||'  TO -->>'||             
-											            strPrintPath||'\\'||SalStrLeftX(strDBFFilesToRename[nRet],SalStrLength(strDBFFilesToRename[nRet])-3)||'.'||SalStrRightX(strDBFFilesToRename[nRet],3))
-									                                                                                                                                                 If VisFileRename(strPrintPath||'\\'||strDBFFilesToRename[nRet]||'.DBF', 
-											                 strPrintPath||'\\'||SalStrLeftX(strDBFFilesToRename[nRet],SalStrLength(strDBFFilesToRename[nRet])-3)||'.'||SalStrRightX(strDBFFilesToRename[nRet],3)) < 0
-										                                                                                                                                                 Call SalMessageBox(' Невозможно преименовать ', 'Внимание!',0)
-										                                                                                                                                                 Call SalWaitCursor (FALSE )
-										                                                                                                                                                 Return -1
-									                                                                                                                                                 Set nRet=nRet+1
-							!
-							! сначала делаеться DBF, а потом TXT 
-							                                                                                                                                                 If nRepFileType=0 OR  nRepFileType=1 OR  nRepFileType=2 
-								                                                                                                                                                 Break 
-							                                                                                                                                                 Set i=i-3
-							!
-						                                                 If nRepFileType<3
-							                                                 Call Make_ReportFiles(nRepFileType, nType)
-						                                                 Else 
-							                                                 If nRepFileType=3
-								                                                 Call Make_ReportFiles(0,nType) !-- текст
-								                                                 Call Make_ReportFiles(2,nType) !-- dbf 
-						                                                 Set sDeb=NumberToStrFormat( SalDateHour(SalDateCurrent()),2,'0' )||':'
-								         ||NumberToStrFormat( SalDateMinute(SalDateCurrent()),2,'0' )||':'  
-								         ||NumberToStrFormat(  SalDateSecond (SalDateCurrent()),2,'0' )||
-								         '-Зак.'||sArr[nType-1]||frm_Out.tblReps.NAME 
-						                                                 Call SalListAdd ( lbStatus, sDeb)
-						                                                 Call SalUpdateWindow ( lbStatus )
-						                                                 Call UnPrepare_DkuRep(nPar1) 
-					!
-					                                                 Call SalWaitCursor(FALSE)
-		                                                 Window Parameters 
+		                                                   Window Parameters 
 			! String: sdat
 			! Number: nRepPar
-		                                                 Window Variables 
-			                                                 String: strNbuMfo
-			                                                 Number: nTmp
-			                                                 Number: R[*]
-			                                                 Number: R0[*]
-			                                                 String: RN[*]
-			                                                 String: sTmp
-			                                                 Date/Time: dTmp
-			                                                 Number: nRow
-			                                                 Boolean: bTest
-			                                                 String: sKtk
-			                                                 String: sSqlR
-			                                                 String: strBind
-			                                                 String: sSql
+		                                                   Window Variables 
+			                                                   String: strNbuMfo
+			                                                   Number: nTmp
+			                                                   Number: R[*]
+			                                                   Number: R0[*]
+			                                                   String: RN[*]
+			                                                   String: sTmp
+			                                                   Date/Time: dTmp
+			                                                   Number: nRow
+			                                                   Boolean: bTest
+			                                                   String: sKtk
+			                                                   String: sSqlR
+			                                                   String: strBind
+			                                                   String: sSql
 			!
-			                                                 String: SHAP
-			                                                 String: strBankName
-			                                                 String: strBankKod
-			                                                 String: RUK
-			                                                 String: NAME
-			                                                 String: TT
-			                                                 String: TNAME
-			                                                 Number: REF
+			                                                   String: SHAP
+			                                                   String: strBankName
+			                                                   String: strBankKod
+			                                                   String: RUK
+			                                                   String: NAME
+			                                                   String: TT
+			                                                   String: TNAME
+			                                                   Number: REF
 			!
-			                                                 String: sBigPayersMask
-			                                                 String: sNameDpi
-			                                                 Number: nIdDpi
+			                                                   String: sBigPayersMask
+			                                                   String: sNameDpi
+			                                                   Number: nIdDpi
 			!
-			                                                 Number: USI
-			                                                 Number: K2OLD
-			                                                 Number: K0
-			                                                 Number: K0s
-			                                                 Number: K1
-			                                                 Number: BIS
-			                                                 Number: K1s
-			                                                 Number: K2
-			                                                 Number: K2s
-			                                                 Number: K3
-			                                                 Number: K3s
-			                                                 Number: S1
-			                                                 Number: S2
-			                                                 Number: S3
-			                                                 Number: S4
-			                                                 Number: S5
-			                                                 Number: S6
-			                                                 Number: S7
-			                                                 Number: S8
-			                                                 Number: S9
-			                                                 Number: S10
-			                                                 Number: SY1
-			                                                 Number: SY2
-			                                                 Number: SY3
-			                                                 Number: SY4
-			                                                 Number: SY5
-			                                                 Number: SY6
-			                                                 Number: SY7
-			                                                 Number: SY8
-			                                                 Number: SY9
-			                                                 Number: SY10
-			                                                 Number: S41
-			                                                 Number: S51
-			                                                 Number: S61
-			                                                 Number: S0
-			                                                 Number: S
-			                                                 Date/Time: D1
-			                                                 Date/Time: D2
-			                                                 String: DK
-			                                                 String: NOM
-			                                                 String: NLSA
-			                                                 String: NLSB
-			                                                 String: MFOA
-			                                                 String: MFOB
-			                                                 String: NAM_A
-			                                                 String: NAM_B
-			                                                 String: OKPO_A
-			                                                 String: OKPO_B
-			                                                 String: sSqlS
-			                                                 String: sSqlV
-			                                                 Number: ACC
-			                                                 String: NLS
-			                                                 Number: KV
-			                                                 String: ISO
-			                                                 Date/Time: FDAT
-			                                                 String: ND
-			                                                 String: MFO
-			                                                 String: NLSK
-			                                                 String: NAMK
-			                                                 String: NAZN
-			                                                 String: SIM
-			                                                 String: NB
-			                                                 String: OKPO
-			                                                 Date/Time: DAPP
-			                                                 Number: ISP
-			                                                 Date/Time: DATP
-			                                                 String: NMK
-			                                                 Number: RNK
-			                                                 Number: SK
-			                                                 Number: WD
-			                                                 Number: VOB
-			                                                 String: vob
-			                                                 Number: OSTF
-			                                                 Number: OSTF1
-			                                                 Number: OBD
-			                                                 Number: OBK
-			                                                 Number: nCount
-			                                                 String: PROB
-			                                                 String: FIO
-			                                                 String: maska
-			                                                 String: maska2
-			                                                 Number: nrab
-			                                                 String: NMS
-			                                                 Number: nKtk   ! - -  Выбранные районы, рады для 412 ф
-			                                                 Number: i
-			                                                 Number: nCou
+			                                                   Number: USI
+			                                                   Number: K2OLD
+			                                                   Number: K0
+			                                                   Number: K0s
+			                                                   Number: K1
+			                                                   Number: BIS
+			                                                   Number: K1s
+			                                                   Number: K2
+			                                                   Number: K2s
+			                                                   Number: K3
+			                                                   Number: K3s
+			                                                   Number: S1
+			                                                   Number: S2
+			                                                   Number: S3
+			                                                   Number: S4
+			                                                   Number: S5
+			                                                   Number: S6
+			                                                   Number: S7
+			                                                   Number: S8
+			                                                   Number: S9
+			                                                   Number: S10
+			                                                   Number: SY1
+			                                                   Number: SY2
+			                                                   Number: SY3
+			                                                   Number: SY4
+			                                                   Number: SY5
+			                                                   Number: SY6
+			                                                   Number: SY7
+			                                                   Number: SY8
+			                                                   Number: SY9
+			                                                   Number: SY10
+			                                                   Number: S41
+			                                                   Number: S51
+			                                                   Number: S61
+			                                                   Number: S0
+			                                                   Number: S
+			                                                   Date/Time: D1
+			                                                   Date/Time: D2
+			                                                   String: DK
+			                                                   String: NOM
+			                                                   String: NLSA
+			                                                   String: NLSB
+			                                                   String: MFOA
+			                                                   String: MFOB
+			                                                   String: NAM_A
+			                                                   String: NAM_B
+			                                                   String: OKPO_A
+			                                                   String: OKPO_B
+			                                                   String: sSqlS
+			                                                   String: sSqlV
+			                                                   Number: ACC
+			                                                   String: NLS
+			                                                   Number: KV
+			                                                   String: ISO
+			                                                   Date/Time: FDAT
+			                                                   String: ND
+			                                                   String: MFO
+			                                                   String: NLSK
+			                                                   String: NAMK
+			                                                   String: NAZN
+			                                                   String: SIM
+			                                                   String: NB
+			                                                   String: OKPO
+			                                                   Date/Time: DAPP
+			                                                   Number: ISP
+			                                                   Date/Time: DATP
+			                                                   String: NMK
+			                                                   Number: RNK
+			                                                   Number: SK
+			                                                   Number: WD
+			                                                   Number: VOB
+			                                                   String: vob
+			                                                   Number: OSTF
+			                                                   Number: OSTF1
+			                                                   Number: OBD
+			                                                   Number: OBK
+			                                                   Number: nCount
+			                                                   String: PROB
+			                                                   String: FIO
+			                                                   String: maska
+			                                                   String: maska2
+			                                                   Number: nrab
+			                                                   String: NMS
+			                                                   Number: nKtk   ! - -  Выбранные районы, рады для 412 ф
+			                                                   Number: i
+			                                                   Number: nCou
 			!
-			                                                 Number: nTempRef
-			                                                 String: sdattarh
-			                                                 Long String: Group2mLine
+			                                                   Number: nTempRef
+			                                                   String: sdattarh
+			                                                   Long String: Group2mLine
 			! сKtkObl : DKU
 			!
-		                                                 Message Actions 
-			                                                 On SAM_Create
+		                                                   Message Actions 
+			                                                   On SAM_Create
 				! Set nPar1=nRepPar
-				                                                 If ( SqlPrepareAndExecute(hSqlAux(),
+				                                                   If ( SqlPrepareAndExecute(hSqlAux(),
 						      "SELECT idt INTO :sKtk FROM ktk
 						       WHERE substr(idt,-2,2)<>'00' " ) )
 						  and ( SqlFetchNext(hSqlAux(), nFetchRes) )
-					                                                 Set nLevel=3
-				                                                 Else 
-					                                                 Set nLevel=2
+					                                                   Set nLevel=3
+				                                                   Else 
+					                                                   Set nLevel=2
 				! - - инициализируем основной сплиттер
-				                                                 Call cSpltMain.setTopFrame(tbl1)
-				                                                 Call cSpltMain.setBarPosition( 300 )
-				                                                 Call cSpltMain.setBottomFrame( SalCreateWindowEx( frm_RegPart, hWndForm, 0,0,0,0, CREATE_AsChild ) )
-				                                                 Call cSpltMain.setBarSize(1)
-				                                                 If SqlPrepareAndExecute(hSqlAux(), "
+				                                                   Call cSpltMain.setTopFrame(tbl1)
+				                                                   Call cSpltMain.setBarPosition( 300 )
+				                                                   Call cSpltMain.setBottomFrame( SalCreateWindowEx( frm_RegPart, hWndForm, 0,0,0,0, CREATE_AsChild ) )
+				                                                   Call cSpltMain.setBarSize(1)
+				                                                   If SqlPrepareAndExecute(hSqlAux(), "
 						   SELECT val
 						   INTO :strNbuMfo
 						   FROM params
 						   WHERE par='MFOP'")
-					                                                 Call SqlFetchNext(hSqlAux(), nFetchRes)
-				                                                 Set strBankKod  = 'Зведена по області'
-				                                                 Call Prepare_Rep_InCreate(nPar1)
-			                                                 On SAM_ReportStart
-				                                                 Call SetPrinter(1)
-				                                                 Call SqlPrepare(hSql(), T(sSql))
-			                                                 On SAM_ReportFetchInit
-				                                                 If SqlExecute(hSql())
-					                                                 Return TRUE
-				                                                 Else 
-					                                                 Return FALSE
-			                                                 On SAM_ReportFetchNext
-				                                                 If SqlFetchNext(hSql(), nFetchRes)
-					                                                 If nPar1 = 3 or nPar1 = 12 or nPar1 = 300 or nPar1 = 302
-						                                                 Set R[K1] = R[K1] + S
-						                                                 Set R0[K1] = R0[K1] + S0
-					                                                 Else If nPar1 = 400 or nPar1 = 401 
-						                                                 If SqlPrepareAndExecute(hSqlAux(), sSqlR)
-							                                                 Call SqlFetchNext(hSqlAux(), nFetchRes)
-						                                                 If SqlPrepareAndExecute(hSqlAux(), sSqlS)
-							                                                 Call SqlFetchNext(hSqlAux(), nFetchRes)
-					                                                 Set nCou = nCou + 1
-					                                                 Return TRUE
-			                                                 On SAM_ReportNotify
-				                                                 If lParam = RPT_BeforeReportHeader
-					                                                 Call SalReportSetStringVar(SalNumberToWindowHandle(wParam),
+					                                                   Call SqlFetchNext(hSqlAux(), nFetchRes)
+				                                                   Set strBankKod  = 'Зведена по області'
+				                                                   Call Prepare_Rep_InCreate(nPar1)
+			                                                   On SAM_ReportStart
+				                                                   Call SetPrinter(1)
+				                                                   Call SqlPrepare(hSql(), T(sSql))
+			                                                   On SAM_ReportFetchInit
+				                                                   If SqlExecute(hSql())
+					                                                   Return TRUE
+				                                                   Else 
+					                                                   Return FALSE
+			                                                   On SAM_ReportFetchNext
+				                                                   If SqlFetchNext(hSql(), nFetchRes)
+					                                                   If nPar1 = 3 or nPar1 = 12 or nPar1 = 300 or nPar1 = 302
+						                                                   Set R[K1] = R[K1] + S
+						                                                   Set R0[K1] = R0[K1] + S0
+					                                                   Else If nPar1 = 400 or nPar1 = 401 
+						                                                   If SqlPrepareAndExecute(hSqlAux(), sSqlR)
+							                                                   Call SqlFetchNext(hSqlAux(), nFetchRes)
+						                                                   If SqlPrepareAndExecute(hSqlAux(), sSqlS)
+							                                                   Call SqlFetchNext(hSqlAux(), nFetchRes)
+					                                                   Set nCou = nCou + 1
+					                                                   Return TRUE
+			                                                   On SAM_ReportNotify
+				                                                   If lParam = RPT_BeforeReportHeader
+					                                                   Call SalReportSetStringVar(SalNumberToWindowHandle(wParam),
 							     'strBankName', strBankName)
-					                                                 Call SalReportSetStringVar(SalNumberToWindowHandle(wParam),
+					                                                   Call SalReportSetStringVar(SalNumberToWindowHandle(wParam),
 							     'strBankKod', strBankKod)
-					                                                 If nPar1 = 301  ! - - - -  сжатая 2m
-						                                                 Call SalReportSetStringVar(SalNumberToWindowHandle(wParam),
+					                                                   If nPar1 = 301  ! - - - -  сжатая 2m
+						                                                   Call SalReportSetStringVar(SalNumberToWindowHandle(wParam),
 								     'sd1',  SalStrMidX(strDateFrom,0,2) || SalStrMidX(strDateFrom,3,2)  || SalStrMidX(strDateFrom,6,4) ||  NumberToStrFormat(nCount, 6,' ')||strFileNameTxt )
-					                                                 Else 
-						                                                 Call SalReportSetStringVar(SalNumberToWindowHandle(wParam),'sd1', strDateFrom)
-					                                                 Call SalReportSetStringVar(SalNumberToWindowHandle(wParam), 'FIO', FIO)
-					                                                 Call SalReportSetNumberVar(SalNumberToWindowHandle(wParam), 'ISP', ISP)
-					                                                 Call SalReportSetStringVar(SalNumberToWindowHandle(wParam), 'NMS', NMS)
-					                                                 Call SalReportSetStringVar(SalNumberToWindowHandle(wParam), 'NMK', NMK)
-					                                                 If nPar1 = 299 
-						                                                 Call SalReportSetStringVar(SalNumberToWindowHandle(wParam), 'NBS', '3411')
-					                                                 If nPar1 = 298
-						                                                 Call SalReportSetStringVar(SalNumberToWindowHandle(wParam), 'NBS', '3421')
-				                                                 If lParam = RPT_BeforeBreakHeader1
-					                                                 Call SalReportSetStringVar(SalNumberToWindowHandle(wParam), 'strBankName', strBankName)
-					                                                 Call SalReportSetStringVar(SalNumberToWindowHandle(wParam), 'strBankKod', strBankKod)
-					                                                 Call SalReportSetStringVar(SalNumberToWindowHandle(wParam), 'sd1', strDateFrom)
-					                                                 Call SalReportSetStringVar(SalNumberToWindowHandle(wParam), 'FIO', FIO)
-					                                                 Call SalReportSetNumberVar(SalNumberToWindowHandle(wParam), 'ISP', ISP)
-					                                                 Call SalReportSetStringVar(SalNumberToWindowHandle(wParam),'NMS', NMS)
-					                                                 Call SalReportSetStringVar(SalNumberToWindowHandle(wParam), 'NMK', NMK)
-					                                                 If nPar1 = 400 or nPar1 = 401  or (nPar1>=411 and nPar1<=414)
-						                                                 Set OBD = 0
-						                                                 Set OBK = 0
-					                                                 Else If nPar1 = 41 or nPar1 = 42 or nPar1 = 43 or nPar1 = 44 or nPar1 = 40 
-						                                                 Call SalReportSetStringVar(SalNumberToWindowHandle(wParam), 'SHAP', SHAP)
-						                                                 Call SalReportSetStringVar(SalNumberToWindowHandle(wParam), 'ND', ND)
-				                                                 If lParam=RPT_BeforeBreakHeader2 !! Смена даты
-					                                                 Set OBD=0
-					                                                 Set OBK=0
-					                                                 Set rab=IifS(OSTF<0,'Дб:',IifS(OSTF>0,'Кр:',''))
-					                                                 Call SalReportSetStringVar(SalNumberToWindowHandle(wParam),'VS',rab)
-					                                                 Set OSTF1 = OSTF - OBD + OBK
-				                                                 If lParam = RPT_BeforeBreakHeader4
-					                                                 If nPar1=50 or nPar1=51
-						                                                 If SqlPrepareAndExecute(hSqlAux(), "
+					                                                   Else 
+						                                                   Call SalReportSetStringVar(SalNumberToWindowHandle(wParam),'sd1', strDateFrom)
+					                                                   Call SalReportSetStringVar(SalNumberToWindowHandle(wParam), 'FIO', FIO)
+					                                                   Call SalReportSetNumberVar(SalNumberToWindowHandle(wParam), 'ISP', ISP)
+					                                                   Call SalReportSetStringVar(SalNumberToWindowHandle(wParam), 'NMS', NMS)
+					                                                   Call SalReportSetStringVar(SalNumberToWindowHandle(wParam), 'NMK', NMK)
+					                                                   If nPar1 = 299 
+						                                                   Call SalReportSetStringVar(SalNumberToWindowHandle(wParam), 'NBS', '3411')
+					                                                   If nPar1 = 298
+						                                                   Call SalReportSetStringVar(SalNumberToWindowHandle(wParam), 'NBS', '3421')
+				                                                   If lParam = RPT_BeforeBreakHeader1
+					                                                   Call SalReportSetStringVar(SalNumberToWindowHandle(wParam), 'strBankName', strBankName)
+					                                                   Call SalReportSetStringVar(SalNumberToWindowHandle(wParam), 'strBankKod', strBankKod)
+					                                                   Call SalReportSetStringVar(SalNumberToWindowHandle(wParam), 'sd1', strDateFrom)
+					                                                   Call SalReportSetStringVar(SalNumberToWindowHandle(wParam), 'FIO', FIO)
+					                                                   Call SalReportSetNumberVar(SalNumberToWindowHandle(wParam), 'ISP', ISP)
+					                                                   Call SalReportSetStringVar(SalNumberToWindowHandle(wParam),'NMS', NMS)
+					                                                   Call SalReportSetStringVar(SalNumberToWindowHandle(wParam), 'NMK', NMK)
+					                                                   If nPar1 = 400 or nPar1 = 401  or (nPar1>=411 and nPar1<=414)
+						                                                   Set OBD = 0
+						                                                   Set OBK = 0
+					                                                   Else If nPar1 = 41 or nPar1 = 42 or nPar1 = 43 or nPar1 = 44 or nPar1 = 40 
+						                                                   Call SalReportSetStringVar(SalNumberToWindowHandle(wParam), 'SHAP', SHAP)
+						                                                   Call SalReportSetStringVar(SalNumberToWindowHandle(wParam), 'ND', ND)
+				                                                   If lParam=RPT_BeforeBreakHeader2 !! Смена даты
+					                                                   Set OBD=0
+					                                                   Set OBK=0
+					                                                   Set rab=IifS(OSTF<0,'Дб:',IifS(OSTF>0,'Кр:',''))
+					                                                   Call SalReportSetStringVar(SalNumberToWindowHandle(wParam),'VS',rab)
+					                                                   Set OSTF1 = OSTF - OBD + OBK
+				                                                   If lParam = RPT_BeforeBreakHeader4
+					                                                   If nPar1=50 or nPar1=51
+						                                                   If SqlPrepareAndExecute(hSqlAux(), "
 								   SELECT name INTO :sTmp FROM kkd
 								   WHERE ix" || Str(K1)) and
 								   SqlFetchNext(hSqlAux(), nFetchRes)
-							                                                 Call SalReportSetStringVar(SalNumberToWindowHandle(wParam), 'STT', sTmp)
-				                                                 If lParam = RPT_BeforeDetail
-					                                                 If nPar1 = 400 or nPar1 = 401  or (nPar1>=411 and nPar1<=414)
-						                                                 If S < 0
-							                                                 Set OBD = OBD - S
-						                                                 Else 
-							                                                 Set OBK = OBK + S
-							                                                 Set PROB=''
-						                                                 Set rab = SalNumberToStrX(SalNumberAbs(S),2) || PROB
-						                                                 Call SalReportSetStringVar(SalNumberToWindowHandle(wParam), 'SS', rab)
-				                                                 If lParam = RPT_BeforeBreakFooter2
-					                                                 If nPar1 = 400 or nPar1 = 401 or (nPar1>=411 and nPar1<=414)
-						                                                 Call SalReportSetNumberVar(SalNumberToWindowHandle(wParam),'OBD', OBD)
-						                                                 Call SalReportSetNumberVar(SalNumberToWindowHandle(wParam),'OBK', OBK)
-						                                                 Set rab=IifS(OSTF1<0,'Дб:',IifS(OSTF1>0,'Кр:',''))
-						                                                 Call SalReportSetStringVar(SalNumberToWindowHandle(wParam),'VYS',rab)
+							                                                   Call SalReportSetStringVar(SalNumberToWindowHandle(wParam), 'STT', sTmp)
+				                                                   If lParam = RPT_BeforeDetail
+					                                                   If nPar1 = 400 or nPar1 = 401  or (nPar1>=411 and nPar1<=414)
+						                                                   If S < 0
+							                                                   Set OBD = OBD - S
+						                                                   Else 
+							                                                   Set OBK = OBK + S
+							                                                   Set PROB=''
+						                                                   Set rab = SalNumberToStrX(SalNumberAbs(S),2) || PROB
+						                                                   Call SalReportSetStringVar(SalNumberToWindowHandle(wParam), 'SS', rab)
+				                                                   If lParam = RPT_BeforeBreakFooter2
+					                                                   If nPar1 = 400 or nPar1 = 401 or (nPar1>=411 and nPar1<=414)
+						                                                   Call SalReportSetNumberVar(SalNumberToWindowHandle(wParam),'OBD', OBD)
+						                                                   Call SalReportSetNumberVar(SalNumberToWindowHandle(wParam),'OBK', OBK)
+						                                                   Set rab=IifS(OSTF1<0,'Дб:',IifS(OSTF1>0,'Кр:',''))
+						                                                   Call SalReportSetStringVar(SalNumberToWindowHandle(wParam),'VYS',rab)
 				! If lParam = RPT_BeforeBreakFooter1
-				                                                 If lParam = RPT_BeforeReportFooter
-					                                                 If nPar1 = 3 or nPar1 = 12 or nPar1 = 300 or nPar1 = 302
-						                                                 Call SalReportSetNumberVar(SalNumberToWindowHandle(wParam),'R1',  R[1])
-						                                                 Call SalReportSetNumberVar(SalNumberToWindowHandle(wParam),'R2',  R[2])
-						                                                 Call SalReportSetNumberVar(SalNumberToWindowHandle(wParam),'R3',  R[3])
-						                                                 Call SalReportSetNumberVar(SalNumberToWindowHandle(wParam),'R4',  R[4])
-						                                                 Call SalReportSetNumberVar(SalNumberToWindowHandle(wParam),'R5',  R[5])
-						                                                 Call SalReportSetNumberVar(SalNumberToWindowHandle(wParam),'R6',  R[6])
-						                                                 Call SalReportSetNumberVar(SalNumberToWindowHandle(wParam),'R7',  R[7])
-						                                                 Call SalReportSetNumberVar(SalNumberToWindowHandle(wParam),'R8',  R[8])
-						                                                 Call SalReportSetNumberVar(SalNumberToWindowHandle(wParam),'R9',  R[9])
-						                                                 Call SalReportSetNumberVar(SalNumberToWindowHandle(wParam),'R10', R[10])
-						                                                 Call SalReportSetNumberVar(SalNumberToWindowHandle(wParam),'R_1', R0[1])
-						                                                 Call SalReportSetNumberVar(SalNumberToWindowHandle(wParam),'R_2', R0[2])
-						                                                 Call SalReportSetNumberVar(SalNumberToWindowHandle(wParam),'R_3', R0[3])
-						                                                 Call SalReportSetNumberVar(SalNumberToWindowHandle(wParam),'R_4', R0[4])
-						                                                 Call SalReportSetNumberVar(SalNumberToWindowHandle(wParam),'R_5', R0[5])
-						                                                 Call SalReportSetNumberVar(SalNumberToWindowHandle(wParam),'R_6', R0[6])
-						                                                 Call SalReportSetNumberVar(SalNumberToWindowHandle(wParam),'R_7', R0[7])
-						                                                 Call SalReportSetNumberVar(SalNumberToWindowHandle(wParam),'R_8', R0[8])
-						                                                 Call SalReportSetNumberVar(SalNumberToWindowHandle(wParam),'R_9', R0[9])
-						                                                 Call SalReportSetNumberVar(SalNumberToWindowHandle(wParam),'R_10',R0[10])
-						                                                 Call SalReportSetStringVar(SalNumberToWindowHandle(wParam),'RN1',RN[1])
-						                                                 Call SalReportSetStringVar(SalNumberToWindowHandle(wParam),'RN2',RN[2])
-						                                                 Call SalReportSetStringVar(SalNumberToWindowHandle(wParam),'RN3',RN[3])
-						                                                 Call SalReportSetStringVar(SalNumberToWindowHandle(wParam),'RN4',RN[4])
-						                                                 Call SalReportSetStringVar(SalNumberToWindowHandle(wParam),'RN5',RN[5])
-						                                                 Call SalReportSetStringVar(SalNumberToWindowHandle(wParam),'RN6',RN[6])
-						                                                 Call SalReportSetStringVar(SalNumberToWindowHandle(wParam),'RN7',RN[7])
-						                                                 Call SalReportSetStringVar(SalNumberToWindowHandle(wParam),'RN8',RN[8])
-						                                                 Call SalReportSetStringVar(SalNumberToWindowHandle(wParam),'RN9',RN[9])
-						                                                 Call SalReportSetStringVar(SalNumberToWindowHandle(wParam),'RN10',RN[10])
-			                                                 On SAM_Close
-				                                                 Set hWndDKU = hWndNULL
-			                                                 On SAM_CreateComplete
-				                                                 Set hWndDKU = hWndForm
-			                                                 On SAM_ReportFinish
-				                                                 Call SetPrinter(0)
+				                                                   If lParam = RPT_BeforeReportFooter
+					                                                   If nPar1 = 3 or nPar1 = 12 or nPar1 = 300 or nPar1 = 302
+						                                                   Call SalReportSetNumberVar(SalNumberToWindowHandle(wParam),'R1',  R[1])
+						                                                   Call SalReportSetNumberVar(SalNumberToWindowHandle(wParam),'R2',  R[2])
+						                                                   Call SalReportSetNumberVar(SalNumberToWindowHandle(wParam),'R3',  R[3])
+						                                                   Call SalReportSetNumberVar(SalNumberToWindowHandle(wParam),'R4',  R[4])
+						                                                   Call SalReportSetNumberVar(SalNumberToWindowHandle(wParam),'R5',  R[5])
+						                                                   Call SalReportSetNumberVar(SalNumberToWindowHandle(wParam),'R6',  R[6])
+						                                                   Call SalReportSetNumberVar(SalNumberToWindowHandle(wParam),'R7',  R[7])
+						                                                   Call SalReportSetNumberVar(SalNumberToWindowHandle(wParam),'R8',  R[8])
+						                                                   Call SalReportSetNumberVar(SalNumberToWindowHandle(wParam),'R9',  R[9])
+						                                                   Call SalReportSetNumberVar(SalNumberToWindowHandle(wParam),'R10', R[10])
+						                                                   Call SalReportSetNumberVar(SalNumberToWindowHandle(wParam),'R_1', R0[1])
+						                                                   Call SalReportSetNumberVar(SalNumberToWindowHandle(wParam),'R_2', R0[2])
+						                                                   Call SalReportSetNumberVar(SalNumberToWindowHandle(wParam),'R_3', R0[3])
+						                                                   Call SalReportSetNumberVar(SalNumberToWindowHandle(wParam),'R_4', R0[4])
+						                                                   Call SalReportSetNumberVar(SalNumberToWindowHandle(wParam),'R_5', R0[5])
+						                                                   Call SalReportSetNumberVar(SalNumberToWindowHandle(wParam),'R_6', R0[6])
+						                                                   Call SalReportSetNumberVar(SalNumberToWindowHandle(wParam),'R_7', R0[7])
+						                                                   Call SalReportSetNumberVar(SalNumberToWindowHandle(wParam),'R_8', R0[8])
+						                                                   Call SalReportSetNumberVar(SalNumberToWindowHandle(wParam),'R_9', R0[9])
+						                                                   Call SalReportSetNumberVar(SalNumberToWindowHandle(wParam),'R_10',R0[10])
+						                                                   Call SalReportSetStringVar(SalNumberToWindowHandle(wParam),'RN1',RN[1])
+						                                                   Call SalReportSetStringVar(SalNumberToWindowHandle(wParam),'RN2',RN[2])
+						                                                   Call SalReportSetStringVar(SalNumberToWindowHandle(wParam),'RN3',RN[3])
+						                                                   Call SalReportSetStringVar(SalNumberToWindowHandle(wParam),'RN4',RN[4])
+						                                                   Call SalReportSetStringVar(SalNumberToWindowHandle(wParam),'RN5',RN[5])
+						                                                   Call SalReportSetStringVar(SalNumberToWindowHandle(wParam),'RN6',RN[6])
+						                                                   Call SalReportSetStringVar(SalNumberToWindowHandle(wParam),'RN7',RN[7])
+						                                                   Call SalReportSetStringVar(SalNumberToWindowHandle(wParam),'RN8',RN[8])
+						                                                   Call SalReportSetStringVar(SalNumberToWindowHandle(wParam),'RN9',RN[9])
+						                                                   Call SalReportSetStringVar(SalNumberToWindowHandle(wParam),'RN10',RN[10])
+			                                                   On SAM_Close
+				                                                   Set hWndDKU = hWndNULL
+			                                                   On SAM_CreateComplete
+				                                                   Set hWndDKU = hWndForm
+			                                                   On SAM_ReportFinish
+				                                                   Call SetPrinter(0)
 	Dialog Box: dlg_kl_PostAll
 		Class:
 		Property Template:
@@ -18291,12 +18291,12 @@ Application Description: •--------------------------------------•
 				Background Color: Default
 				Message Actions
 					! On SAM_Click
-						                                      If chbVP
-							                                      Call SalEnableWindow(calVPFrom)
-							                                      Call SalEnableWindow(calVPTo)
-						                                      Else 
-							                                      Call SalDisableWindow(calVPFrom)
-							                                      Call SalDisableWindow(calVPTo)
+						                                        If chbVP
+							                                        Call SalEnableWindow(calVPFrom)
+							                                        Call SalEnableWindow(calVPTo)
+						                                        Else 
+							                                        Call SalDisableWindow(calVPFrom)
+							                                        Call SalDisableWindow(calVPTo)
 			! cCalendarDropDown: calVPFrom
 .data CLASSPROPSSIZE
 0000: 4400
@@ -18343,31 +18343,31 @@ Application Description: •--------------------------------------•
 					Background Color: Default
 					DLL Settings
 .end
-				                                                Message Actions 
-					                                                On SAM_Create
-						                                                Call calVPFrom.SetMonthText( strMonth )
-						                                                Call calVPFrom.SetWeekDayText( strWeekDays )
+				                                                  Message Actions 
+					                                                  On SAM_Create
+						                                                  Call calVPFrom.SetMonthText( strMonth )
+						                                                  Call calVPFrom.SetWeekDayText( strWeekDays )
 						! ! - - - - - - - - - - - - Инициализация дат календаря  cCalendarFrom - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  - -
-						                                                Call calVPFrom.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Sunday, SEQ_Unset,  COLOR_Black, COLOR_Gray, TRUE)
-						                                                Call calVPFrom.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Monday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
-						                                                Call calVPFrom.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Tuesday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
-						                                                Call calVPFrom.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Wednesday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
-						                                                Call calVPFrom.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Thursday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
-						                                                Call calVPFrom.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Friday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
-						                                                Call calVPFrom.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Saturday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
-						                                                Call calVPFrom.SpecialDate(SPECIAL_OneTime, GetBankDate(), DAY_Unset, SEQ_Unset, COLOR_Blue,  COLOR_Cyan, TRUE)
-						                                                Call SqlPrepareAndExecute(  hSql(), T("SELECT fdat  INTO :dSelect  FROM fdat")  )
-						                                                Set i = 0
-						                                                While SqlFetchNext(hSql(), nFetchRes)
-							                                                Call calVPFrom.SpecialDate(SPECIAL_OneTime, dSelect,  DAY_Unset, SEQ_Unset, COLOR_Blue, COLOR_Cyan, TRUE)
-							                                                Set i = i + 1
-						                                                If i = 0
-							                                                Call SalMessageBox('Нет доступных дат для выбора','Внимание',0)
+						                                                  Call calVPFrom.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Sunday, SEQ_Unset,  COLOR_Black, COLOR_Gray, TRUE)
+						                                                  Call calVPFrom.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Monday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
+						                                                  Call calVPFrom.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Tuesday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
+						                                                  Call calVPFrom.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Wednesday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
+						                                                  Call calVPFrom.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Thursday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
+						                                                  Call calVPFrom.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Friday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
+						                                                  Call calVPFrom.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Saturday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
+						                                                  Call calVPFrom.SpecialDate(SPECIAL_OneTime, GetBankDate(), DAY_Unset, SEQ_Unset, COLOR_Blue,  COLOR_Cyan, TRUE)
+						                                                  Call SqlPrepareAndExecute(  hSql(), T("SELECT fdat  INTO :dSelect  FROM fdat")  )
+						                                                  Set i = 0
+						                                                  While SqlFetchNext(hSql(), nFetchRes)
+							                                                  Call calVPFrom.SpecialDate(SPECIAL_OneTime, dSelect,  DAY_Unset, SEQ_Unset, COLOR_Blue, COLOR_Cyan, TRUE)
+							                                                  Set i = i + 1
+						                                                  If i = 0
+							                                                  Call SalMessageBox('Нет доступных дат для выбора','Внимание',0)
 									
-						                                                Call SalSetWindowText(  calVPFrom,  strBankDate)
-					                                                On SAM_User
-						                                                Call SalGetWindowText( hWndItem, strDateFrom, 12 )
-						                                                Set dFrom =  SalDateConstruct ( SalDateYear( SalStrToDate(strDateFrom )),
+						                                                  Call SalSetWindowText(  calVPFrom,  strBankDate)
+					                                                  On SAM_User
+						                                                  Call SalGetWindowText( hWndItem, strDateFrom, 12 )
+						                                                  Set dFrom =  SalDateConstruct ( SalDateYear( SalStrToDate(strDateFrom )),
 								                                SalDateMonth( SalStrToDate(strDateFrom )),
 								                                SalDateDay( SalStrToDate(strDateFrom )), 0, 0, 0 )
 			! cCalendarDropDown: calVPTo
@@ -18416,31 +18416,31 @@ Application Description: •--------------------------------------•
 					Background Color: Default
 					DLL Settings
 .end
-				                                                Message Actions 
-					                                                On SAM_Create
-						                                                Call calVPTo.SetMonthText( strMonth )
-						                                                Call calVPTo.SetWeekDayText( strWeekDays )
+				                                                  Message Actions 
+					                                                  On SAM_Create
+						                                                  Call calVPTo.SetMonthText( strMonth )
+						                                                  Call calVPTo.SetWeekDayText( strWeekDays )
 						! ! - - - - - - - - - - - - Инициализация дат календаря  cCalendarFrom - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  - -
-						                                                Call calVPTo.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Sunday, SEQ_Unset,  COLOR_Black, COLOR_Gray, TRUE)
-						                                                Call calVPTo.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Monday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
-						                                                Call calVPTo.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Tuesday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
-						                                                Call calVPTo.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Wednesday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
-						                                                Call calVPTo.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Thursday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
-						                                                Call calVPTo.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Friday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
-						                                                Call calVPTo.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Saturday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
-						                                                Call calVPTo.SpecialDate(SPECIAL_OneTime, GetBankDate(), DAY_Unset, SEQ_Unset, COLOR_Blue,  COLOR_Cyan, TRUE)
-						                                                Call SqlPrepareAndExecute(  hSql(), T("SELECT fdat  INTO :dSelect  FROM fdat")  )
-						                                                Set i = 0
-						                                                While SqlFetchNext(hSql(), nFetchRes)
-							                                                Call calVPTo.SpecialDate(SPECIAL_OneTime, dSelect,  DAY_Unset, SEQ_Unset, COLOR_Blue, COLOR_Cyan, TRUE)
-							                                                Set i = i + 1
-						                                                If i = 0
-							                                                Call SalMessageBox('Нет доступных дат для выбора','Внимание',0)
+						                                                  Call calVPTo.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Sunday, SEQ_Unset,  COLOR_Black, COLOR_Gray, TRUE)
+						                                                  Call calVPTo.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Monday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
+						                                                  Call calVPTo.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Tuesday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
+						                                                  Call calVPTo.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Wednesday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
+						                                                  Call calVPTo.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Thursday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
+						                                                  Call calVPTo.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Friday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
+						                                                  Call calVPTo.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Saturday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
+						                                                  Call calVPTo.SpecialDate(SPECIAL_OneTime, GetBankDate(), DAY_Unset, SEQ_Unset, COLOR_Blue,  COLOR_Cyan, TRUE)
+						                                                  Call SqlPrepareAndExecute(  hSql(), T("SELECT fdat  INTO :dSelect  FROM fdat")  )
+						                                                  Set i = 0
+						                                                  While SqlFetchNext(hSql(), nFetchRes)
+							                                                  Call calVPTo.SpecialDate(SPECIAL_OneTime, dSelect,  DAY_Unset, SEQ_Unset, COLOR_Blue, COLOR_Cyan, TRUE)
+							                                                  Set i = i + 1
+						                                                  If i = 0
+							                                                  Call SalMessageBox('Нет доступных дат для выбора','Внимание',0)
 									
-						                                                Call SalSetWindowText(  calVPTo,  strBankDate)
-					                                                On SAM_User
-						                                                Call SalGetWindowText( hWndItem, strDateTo, 12 )
-						                                                Set dTo =  SalDateConstruct ( SalDateYear( SalStrToDate(strDateTo )),
+						                                                  Call SalSetWindowText(  calVPTo,  strBankDate)
+					                                                  On SAM_User
+						                                                  Call SalGetWindowText( hWndItem, strDateTo, 12 )
+						                                                  Set dTo =  SalDateConstruct ( SalDateYear( SalStrToDate(strDateTo )),
 								                                SalDateMonth( SalStrToDate(strDateTo )),
 								                                SalDateDay( SalStrToDate(strDateTo )), 0, 0, 0 )
 			! cCalendarDropDown: calVal
@@ -18489,31 +18489,31 @@ Application Description: •--------------------------------------•
 					Background Color: Default
 					DLL Settings
 .end
-				                                                Message Actions 
-					                                                On SAM_Create
-						                                                Call calVal.SetMonthText( strMonth )
-						                                                Call calVal.SetWeekDayText( strWeekDays )
+				                                                  Message Actions 
+					                                                  On SAM_Create
+						                                                  Call calVal.SetMonthText( strMonth )
+						                                                  Call calVal.SetWeekDayText( strWeekDays )
 						! ! - - - - - - - - - - - - Инициализация дат календаря  cCalendarFrom - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  - -
-						                                                Call calVal.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Sunday, SEQ_Unset,  COLOR_Black, COLOR_Gray, TRUE)
-						                                                Call calVal.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Monday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
-						                                                Call calVal.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Tuesday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
-						                                                Call calVal.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Wednesday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
-						                                                Call calVal.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Thursday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
-						                                                Call calVal.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Friday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
-						                                                Call calVal.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Saturday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
-						                                                Call calVal.SpecialDate(SPECIAL_OneTime, GetBankDate(), DAY_Unset, SEQ_Unset, COLOR_Blue,  COLOR_Cyan, TRUE)
-						                                                Call SqlPrepareAndExecute(  hSql(), T("SELECT fdat  INTO :dSelect  FROM fdat")  )
-						                                                Set i = 0
-						                                                While SqlFetchNext(hSql(), nFetchRes)
-							                                                Call calVal.SpecialDate(SPECIAL_OneTime, dSelect,  DAY_Unset, SEQ_Unset, COLOR_Blue, COLOR_Cyan, TRUE)
-							                                                Set i = i + 1
-						                                                If i = 0
-							                                                Call SalMessageBox('Нет доступных дат для выбора','Внимание',0)
+						                                                  Call calVal.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Sunday, SEQ_Unset,  COLOR_Black, COLOR_Gray, TRUE)
+						                                                  Call calVal.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Monday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
+						                                                  Call calVal.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Tuesday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
+						                                                  Call calVal.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Wednesday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
+						                                                  Call calVal.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Thursday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
+						                                                  Call calVal.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Friday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
+						                                                  Call calVal.SpecialDate(SPECIAL_Weekly, DATETIME_Null, DAY_Saturday, SEQ_Unset, COLOR_Black, COLOR_Gray, TRUE)
+						                                                  Call calVal.SpecialDate(SPECIAL_OneTime, GetBankDate(), DAY_Unset, SEQ_Unset, COLOR_Blue,  COLOR_Cyan, TRUE)
+						                                                  Call SqlPrepareAndExecute(  hSql(), T("SELECT fdat  INTO :dSelect  FROM fdat")  )
+						                                                  Set i = 0
+						                                                  While SqlFetchNext(hSql(), nFetchRes)
+							                                                  Call calVal.SpecialDate(SPECIAL_OneTime, dSelect,  DAY_Unset, SEQ_Unset, COLOR_Blue, COLOR_Cyan, TRUE)
+							                                                  Set i = i + 1
+						                                                  If i = 0
+							                                                  Call SalMessageBox('Нет доступных дат для выбора','Внимание',0)
 									
-						                                                Call SalSetWindowText(  calVPTo,  strBankDate)
-					                                                On SAM_User
-						                                                Call SalGetWindowText( hWndItem, strDateTo, 12 )
-						                                                Set dTo =  SalDateConstruct ( SalDateYear( SalStrToDate(strDateTo )),
+						                                                  Call SalSetWindowText(  calVPTo,  strBankDate)
+					                                                  On SAM_User
+						                                                  Call SalGetWindowText( hWndItem, strDateTo, 12 )
+						                                                  Set dTo =  SalDateConstruct ( SalDateYear( SalStrToDate(strDateTo )),
 								                                SalDateMonth( SalStrToDate(strDateTo )),
 								                                SalDateDay( SalStrToDate(strDateTo )), 0, 0, 0 )
 			Background Text: по:
@@ -18666,7 +18666,7 @@ Application Description: •--------------------------------------•
 				Background Color: Default
 				Message Actions
 					! On SAM_Create
-						                                                              Set strTip = 'Редактирование'
+						                                                                Set strTip = 'Редактирование'
 					On SAM_Click
 						Call SalCreateWindow(tbl_MsgList, hWndItem)
 					On SAM_TooltipSetText
@@ -18697,7 +18697,7 @@ Application Description: •--------------------------------------•
 				Background Color: Default
 				Message Actions
 					! On SAM_Create
-						                                                              Set strTip = 'Из файла'
+						                                                                Set strTip = 'Из файла'
 					On SAM_Click
 						Set nCheckedMsgId=0
 						Call getMessTextFromFile()
@@ -18732,7 +18732,7 @@ Application Description: •--------------------------------------•
 					Background Color: Default
 				Message Actions
 					!
-						                                                             Call SalCreateWindow(tbl_MsgList, hWndItem)
+						                                                               Call SalCreateWindow(tbl_MsgList, hWndItem)
 					On SAM_FieldEdit
 						! Если поле редактированли - то сообщение уже не такое, как выбрали из таблицы
 						! В этом случае - сохраним его потом в таблицу
@@ -19422,23 +19422,23 @@ Application Description: •--------------------------------------•
 					Background Color: Default
 					Input Mask: Unformatted
 .end
-					                                List Initialization 
-					                                Message Actions 
-						                                On SAM_Click
-							                                Set iBlkForAll=cbBlkForAll.GetKey(SalListQuerySelection( cbBlkForAll) )
-							                                Set iRow = TBL_MinRow
-							                                While SalTblFindNextRow(hWndForm, iRow, 0, 0)
-								                                Call SalTblSetContext( hWndForm, iRow )
-								                                Call frm_kl_blk.cbBlkCode.SetSelectById(iBlkForAll)
-								                                Call SalSendMsg(frm_kl_blk.cbBlkCode, SAM_AnyEdit, 0, 0)
-								                                Call SalTblSetRowFlags (hWndForm, iRow, ROW_Edited, TRUE )
-								                                Call SalSendMsg(frm_kl_blk, UM_Update, 0, 0)
-						                                On SAM_Create
-							                                If cbBlkForAll.Init(hWndItem)
-								                                Call cbBlkForAll.Add(0,"Нету")
-								                                Call cbBlkForAll.Add(0,"Входящих")
-								                                Call cbBlkForAll.Add(0,"Исходящих")
-								                                Call cbBlkForAll.Add(0,"Вход+Исход")
+					                                  List Initialization 
+					                                  Message Actions 
+						                                  On SAM_Click
+							                                  Set iBlkForAll=cbBlkForAll.GetKey(SalListQuerySelection( cbBlkForAll) )
+							                                  Set iRow = TBL_MinRow
+							                                  While SalTblFindNextRow(hWndForm, iRow, 0, 0)
+								                                  Call SalTblSetContext( hWndForm, iRow )
+								                                  Call frm_kl_blk.cbBlkCode.SetSelectById(iBlkForAll)
+								                                  Call SalSendMsg(frm_kl_blk.cbBlkCode, SAM_AnyEdit, 0, 0)
+								                                  Call SalTblSetRowFlags (hWndForm, iRow, ROW_Edited, TRUE )
+								                                  Call SalSendMsg(frm_kl_blk, UM_Update, 0, 0)
+						                                  On SAM_Create
+							                                  If cbBlkForAll.Init(hWndItem)
+								                                  Call cbBlkForAll.Add(0,"Нету")
+								                                  Call cbBlkForAll.Add(0,"Входящих")
+								                                  Call cbBlkForAll.Add(0,"Исходящих")
+								                                  Call cbBlkForAll.Add(0,"Вход+Исход")
 				Combo Box: cbBlkForAll 
 					Class Child Ref Key: 0
 					Class ChildKey: 0
@@ -19615,16 +19615,16 @@ Application Description: •--------------------------------------•
 						Uncheck Value:
 						Ignore Case? Yes
 .end
-				                                List Values 
-				                                Message Actions 
-					                                On SAM_Create
-						                                If cbBlkCode.Init( hWndItem )
-							                                Call cbBlkCode.Add( 0, 'Нету' )
-							                                Call cbBlkCode.Add( 1, 'Входящих' )
-							                                Call cbBlkCode.Add( 2, 'Исходящих' )
-							                                Call cbBlkCode.Add( 3, 'Вход+Исход' )
-					                                On SAM_AnyEdit
-						                                Set colBlkCode = cbBlkCode.GetKey( SalListQuerySelection( cbBlkCode) )
+				                                  List Values 
+				                                  Message Actions 
+					                                  On SAM_Create
+						                                  If cbBlkCode.Init( hWndItem )
+							                                  Call cbBlkCode.Add( 0, 'Нету' )
+							                                  Call cbBlkCode.Add( 1, 'Входящих' )
+							                                  Call cbBlkCode.Add( 2, 'Исходящих' )
+							                                  Call cbBlkCode.Add( 3, 'Вход+Исход' )
+					                                  On SAM_AnyEdit
+						                                  Set colBlkCode = cbBlkCode.GetKey( SalListQuerySelection( cbBlkCode) )
 			Column: colBlkCode
 				Class Child Ref Key: 0
 				Class ChildKey: 0
@@ -19835,14 +19835,14 @@ Application Description: •--------------------------------------•
 						Uncheck Value:
 						Ignore Case? Yes
 .end
-				                                List Values 
-				                                Message Actions 
-					                                On SAM_Create
+				                                  List Values 
+				                                  Message Actions 
+					                                  On SAM_Create
 						! If cbPostType.Init( hWndItem )
-							                                                Call cbPostType.Add('O', 'Offline' )
-							                                                Call cbPostType.Add('M', 'Mail' )
-					                                On SAM_AnyEdit
-						                                Set colPostType=cbPostType.GetKey( SalListQuerySelection( cbPostType) )
+							                                                  Call cbPostType.Add('O', 'Offline' )
+							                                                  Call cbPostType.Add('M', 'Mail' )
+					                                  On SAM_AnyEdit
+						                                  Set colPostType=cbPostType.GetKey( SalListQuerySelection( cbPostType) )
 				! List Values 
 				! Message Actions 
 			Column: colEMail
@@ -20384,15 +20384,15 @@ Application Description: •--------------------------------------•
 						List Values
 						Message Actions
 							! On SAM_DoubleClick
-								                    If bInsertingMode AND (nChooseState=1)
-									                    Set bTmp=FALSE
-									                    Call SalModalDialog( dlg_RepReference, tbl_RepGroups, 
+								                      If bInsertingMode AND (nChooseState=1)
+									                      Set bTmp=FALSE
+									                      Call SalModalDialog( dlg_RepReference, tbl_RepGroups, 
 											2, cConn.hSql(), 
 											nTmp, sTmp, sTmp2, bTmp)
-									                    If bTmp
-										                    Set tbl_RepGroups.accgrp=nTmp
-										                    Set tbl_RepGroups.accgrp_name=sTmp
-										                    Set tbl_RepGroups.accgrp_filemask=sTmp2
+									                      If bTmp
+										                      Set tbl_RepGroups.accgrp=nTmp
+										                      Set tbl_RepGroups.accgrp_name=sTmp
+										                      Set tbl_RepGroups.accgrp_filemask=sTmp2
 					Column: accgrp_filemask
 						Class Child Ref Key: 0
 						Class ChildKey: 0
@@ -20489,9 +20489,9 @@ Application Description: •--------------------------------------•
 						Set hWndLost=hWndForm
 						Set nID=tbl.accgrp
 					! On SAM_Create
-						                 Set spl_RepGroups.strSqlDelete='DELETE FROM rep_accg_otchg
+						                   Set spl_RepGroups.strSqlDelete='DELETE FROM rep_accg_otchg
 								                   WHERE accgrp=:spl_RepGroups.tbl.accgrp AND otchgrp=:nGrp'
-						                 Set spl_RepGroups.strSqlInsert='
+						                   Set spl_RepGroups.strSqlInsert='
 								BEGIN
 								 INSERT INTO rep_accgrp (accgrp, name, filemask, grpdir)
 								     VALUES( :spl_RepGroups.tbl.accgrp, 
@@ -20505,14 +20505,14 @@ Application Description: •--------------------------------------•
 								             :tbl_RepGroups.accgrp_name,
 								             :tbl_RepGroups.accgrp_filemask,
 								             :tbl_RepGroups.accgrp_dir   ) ")
-							                 If not SqlPrepareAndExecute(cConn.hSql(), 
+							                   If not SqlPrepareAndExecute(cConn.hSql(), 
 									        " INSERT INTO rep_accg_otchg (accgrp, otchgrp)
 									          VALUES (:nTmp, :tbl_RepGroups.otchgrp) ")
-								                 Set sErrMsg='Ошибка вставки в таблицу rep_accg_otchg'
-								                 Return -1
+								                   Set sErrMsg='Ошибка вставки в таблицу rep_accg_otchg'
+								                   Return -1
 						! Set strSqlUpdate='
 								 UPDATE specparam SET idg=:colIdg,ids=:colIds,sps=nvl(:colSps,1)  WHERE acc=:colAcc'
-						                 Call SalSendClassMessage( SAM_Create, 0, 0 )
+						                   Call SalSendClassMessage( SAM_Create, 0, 0 )
 					On UM_Update
 						Call SalWaitCursor(TRUE)
 						! INSERT
@@ -20672,8 +20672,8 @@ Application Description: •--------------------------------------•
 								Uncheck Value:
 								Ignore Case? Yes
 .end
-						                  List Values 
-						                  Message Actions 
+						                    List Values 
+						                    Message Actions 
 					Column: nlsmask
 						Class Child Ref Key: 0
 						Class ChildKey: 0

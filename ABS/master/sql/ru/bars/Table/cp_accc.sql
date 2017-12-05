@@ -69,7 +69,8 @@ begin
 	NLSR3 VARCHAR2(15), 
 	NLS_1819 VARCHAR2(15), 
 	NLS_1919 VARCHAR2(15), 
-	UNREC VARCHAR2(15)
+	UNREC VARCHAR2(15),
+        D_CLOSE date
    ) SEGMENT CREATION DEFERRED 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -79,6 +80,13 @@ exception when others then
 end; 
 /
 
+
+begin   
+ execute immediate '  ALTER TABLE BARS.CP_ACCC ADD (d_close date)';
+exception when others then
+  if  sqlcode=-1430  then null; else raise; end if;
+ end;
+/
 
 
 
@@ -191,6 +199,17 @@ exception when others then
 
 
 
+begin
+    execute immediate 'alter table cp_accc
+add D_CLOSE  DATE';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+
+
+
 PROMPT *** Create  grants  CP_ACCC ***
 grant SELECT                                                                 on CP_ACCC         to BARS_ACCESS_DEFROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on CP_ACCC         to CP_ROLE;
@@ -202,3 +221,10 @@ grant FLASHBACK,SELECT                                                       on 
 PROMPT ===================================================================================== 
 PROMPT *** End *** ========== Scripts /Sql/BARS/Table/CP_ACCC.sql =========*** End *** =====
 PROMPT ===================================================================================== 
+
+
+
+
+
+
+

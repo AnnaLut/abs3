@@ -1,8 +1,12 @@
 CREATE OR REPLACE PROCEDURE BARS.OVER_351 (p_dat01 date, p_mode integer  default 0 ) IS
 
-/* Версия 10.0  04-05-2017   05-04-2017  06-03-2017  03-03-2017  06-02-2017  24-01-2017  10-01-2017  03-01-2017 
-   Розрахунок кредитного ризику по ОВЕРДРАФТАХ
-   -------------------------------------------
+/* Версия 10.3  28-11-2017  16-11-2017  12-09-2017  04-05-2017   05-04-2017  06-03-2017  
+ Розрахунок кредитного ризику по ОВЕРДРАФТАХ
+-------------------------------------------
+
+13) 28-11-2017(10.3) - Новый план счетов через REZ_DEB (2069 --> SPN)
+12) 27-11-2017(10.2) - LGD для 9129 безризикових =1 , по ризиковим розраховується
+11) 12-09-2017 - L_CR := round(l_pd * L_LGD *l_EAD,2);
 10) 04-05-2017 - Если есть две строки по одному договору и один счет начисл. %, то писало  2 строки нач. %
  9) 05-04-2017 - rnk = 90931101
  8) 06-03-2017 - LGD (округление 8 знаков)
@@ -13,7 +17,6 @@ CREATE OR REPLACE PROCEDURE BARS.OVER_351 (p_dat01 date, p_mode integer  default
  3) 03-01-2017 - wdate, sdate по договору 
  2) 25-11-2016 - Державна власність был только по ЮО 'UUDV'
  1) 23-11-2016 - zal_bv - #0.00
-
 */
 
  l_istval specparam.istval%type; kv_    accounts.kv%type; l_r013  specparam.r013%type; l_ovkr  rez_cr.ovkr%type   ;  
@@ -64,7 +67,8 @@ begin
                               substr( decode(c.custtype,3, c.nmk, nvl(c.nmkk,c.nmk) ) , 1,35) NMK, c.custtype, a.branch, 
                               DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6', 2, 1) RZ    
                       from accounts  a, customer c  
-                      where acc in (select acc from nd_acc where nd=d.nd) and nbs='2069' 
+                      where  acc in (select acc from nd_acc where nd=d.nd) 
+                        and  a.NBS IN (select nbs from rez_deb  where grupa = 4 and ( d_close is null or d_close > p_dat01)) or a.tip in ('SPN')   --and nbs='2069' 
                       and acc not in ( select a.acc from accounts a 
                                        where acc = (select acra from int_accn where id=0 and acc=d.acco) and nbs not like '8%'   and a.rnk=c.rnk)
                       and acc not in (select acc from rez_cr where fdat=p_dat01)
@@ -199,26 +203,16 @@ begin
             l_EAD     := round(l_EAD / 100,2);
             l_EADQ    := p_icurval(s.kv,l_EAD*100,l_dat31)/100;      
 
-            if s.nbs in ('9129','9122') and l_r013 = 9 THEN l_pd :=0; l_pd_0 := 1;  end if;
             if l_ead = 0 or nvl(l_s,0) + nvl(L_RC,0) = 0 THEN L_LGD := 1;
             else                                              l_LGD := round(greatest(0,1 - (l_zal_lgd + L_RC) / l_s),8);     
             end if;
 
-               IF l_dv >= 51 and  l_lgd >=l_lgd_51 then 
-                  if f_rnk_not_uudv(s.rnk) = 0 THEN l_LGD  := l_lgd_51; end if;
-               end if;
-
-
-            if l_dv >=51 and l_LGD >= l_lgd_51  THEN 
+            if s.nbs in ('9129','9122') and l_r013 = 9 THEN l_pd :=0; l_pd_0 := 1; l_lgd := 1;  end if;
+            IF l_dv >= 51 and  l_lgd >=l_lgd_51 then 
                if f_rnk_not_uudv(s.rnk) = 0 THEN l_LGD  := l_lgd_51; end if;
-               L_CR   := round(l_pd * L_LGD *l_EAD,2);
-            else   
-               --l_CR   := round(greatest(round(l_pd * (l_EAD - nvl(z.sall,0) * nvl(z.kl_351,0)),0),0)/100,2);
-               --logger.info('REZ_351 44: nd = ' || d.nd || ' l_EAD = '|| l_EAD || ' l_pd = ' || l_pd  || ' L_zal=' ||L_zal) ;   
-               l_CR   := round(greatest(l_pd * (l_EAD - l_zal),0),2);
---               l_CR   := l_pd * (l_EAD - l_zal);
-               --logger.info('REZ_351 66: nd = ' || d.nd || ' l_CR = '|| l_CR ) ;   
             end if;
+
+            L_CR      := round(l_pd * L_LGD *l_EAD,2);
             l_CRQ     := p_icurval(s.kv,L_CR*100,l_dat31)/100; 
             l_BV      := nvl(z.bv_all,nvl(z.bv02,z.bv))/100; 
             l_BV02    := z.osta /100;              
