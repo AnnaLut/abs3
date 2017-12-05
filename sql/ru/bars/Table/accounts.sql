@@ -66,7 +66,8 @@ begin
 	OPT NUMBER(*,0), 
 	OB22 CHAR(2), 
 	DAPPQ DATE, 
-	SEND_SMS VARCHAR2(1)
+	SEND_SMS VARCHAR2(1),
+        DAT_ALT DATE
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -77,7 +78,12 @@ end;
 /
 
 
+begin  EXECUTE IMMEDIATE 'ALTER TABLE  bars.accounts  ADD  (DAT_ALT date ) ' ;
+exception when others then   if SQLCODE = - 01430 then null;   else raise; end if; -- ORA-01430: column being added already exists in table
+end;
+/
 
+COMMENT ON COLUMN BARS.ACCOUNTS.DAT_ALT IS 'Дата заміни NLS->NLSALT';
 
 PROMPT *** ALTER_POLICIES to ACCOUNTS ***
  exec bpa.alter_policies('ACCOUNTS');

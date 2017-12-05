@@ -16,7 +16,10 @@ PROMPT *** Create  procedure RETURN_TRANFER ***
                        p_ref2          OUT number    -- Новий референс  створеного документа на возврат перевода
                        )
 is
+
 /*
+ 23.11.2017 Трансфер-2017 7109.02 ===> 7509.02	за операціями з клієнтами
+
  Заявка .....
  Гришков Максим Валерійович GrishkovMV@oschadbank.ua
  тел. +38(044)249-31-60
@@ -27,8 +30,11 @@ is
    ww operw%rowtype   ;
    aa accounts%rowtype;
    bb accounts%rowtype;
-
+   l_7109 accounts.NBS%type := '7509' ; 
 begin
+
+   If NVL(newnbs.g_state,0)  = 1 then null;  Else  l_7109 := '7109';  end if; 
+
 
    p_Code :=1 ;
    If nvl(length ( p_REASON ),0)  <5 then
@@ -100,8 +106,8 @@ begin
       gl.payv(0, oo.ref, gl.bdate, oo.tt, 0, oo.kv, oo.nlsa, oo.s, oo.kv, oo.nlsb, oo.s ) ;
 
 
-	  begin
-        oo.nlsb  := nbs_ob22_null ('7109','02', oo.branch );
+      begin
+        oo.nlsb  := nbs_ob22_null ( l_7109, '02', oo.branch );
         select * into bb from accounts where kv= 980 and nls = oo.nlsb and dazs is null;
         oo.nam_b := substr(bb.nms,1,38);
       EXCEPTION  WHEN NO_DATA_FOUND THEN  p_Message := 'Не знайдено рах 7109/02' ;  RETURN;
@@ -109,9 +115,7 @@ begin
 
       oo.s     := p_Kom * 100;
       oo.s2    := gl.p_icurval( oo.kv, oo.s,  gl.bdate  );
-      --oo.nlsb  := nbs_ob22_null ('7109','02', oo.branch );
       gl.payv(0, oo.ref, gl.bdate, 'D07', 0, oo.kv, oo.nlsa, oo.s, gl.baseval, oo.nlsb, oo.s2 );
-
    else
       --  повернення - в той же системный день
 	  -- oo.VOB :=	 224;

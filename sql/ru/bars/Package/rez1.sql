@@ -1,13 +1,10 @@
-
- 
  PROMPT ===================================================================================== 
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/rez1.sql =========*** Run *** ======
  PROMPT ===================================================================================== 
- 
+
   CREATE OR REPLACE PACKAGE BARS.REZ1 
 IS
 /*
-
 DESCRIPTION : Функции и процедуры для расчета резерва
 VERSION     : 11.07.2011
 СOMMENT     :
@@ -34,7 +31,7 @@ VERSION     : 11.07.2011
  'REZPAR4'  = 1 - не учитывать при расчете дисконт
  'REZPAR5'  = 1 - процент резервирования по 83 постанове (уст по умолч в пакете, нету в PARAMS !!!)
  'REZPAR6'  = 1 - расчет с учетом однородных кредитов (уст по умолч в пакете, нету в PARAMS !!!)
- 'REZPAR7'  = 1 - флаг - значение по умолчанию типа клиента для счетов 3579 (custtype=1) (АКБ Киев)
+ 'REZPAR7'  = 1 - флаг - значение по умолчанию типа клиента для счетов  (custtype=1) (АКБ Киев)
  'REZPAR8'  = 1 - при расчете резерва по счетам просроченных процентов используется "смешанный алгоритм"
                   т.е. если параметр R013 заполнен
                        = 2 - резервируем 100 % остатка на отчетную дату,
@@ -245,6 +242,13 @@ FUNCTION ostc96_3 (acc_ INT, dat_ IN DATE)
    -- Экранная форма связаная с отчетом, вызывается кнопкой "Резерв в разрезе валют и балансовых счетов НБУ"
    PROCEDURE p_finrez (dat1_ DATE, dat2_ DATE);
 
+   -- Процедура наполнения таблицы tmp_finrez_SB (для СБЕРБАНКА).
+   -- Данные таблицы представляют собой специфический отчет сделанный по просьбе Донецка.
+   -- Отчет представляет собой состояние фонда на предыдцщую и текущую отчетные даты,
+   -- а также сумму доформирования резерва (по расчетным данным).
+   -- Экранная форма связаная с отчетом, вызывается кнопкой "Резерв в разрезе валют и балансовых счетов НБУ"
+   PROCEDURE p_finrez_SB (dat1_ DATE, dat2_ DATE);
+
    -- процедура сверки 11 файла с расчетом резерва (устаревшая,не используется)
    PROCEDURE p_check_file11 (dat_ DATE);
 
@@ -326,35 +330,32 @@ FUNCTION ostc96_3 (acc_ INT, dat_ IN DATE)
 
 END rez1;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.REZ1 
+CREATE OR REPLACE PACKAGE BODY BARS.rez1
 /*
-
-  VERSION : 22-06-2012  (14/03/2012 )
-
-*/
+   VERSION : 15-11-2017  
+ */
 
 IS
 
-/*
+/* 
  Список параметров для AWK.exe или  AW.bat
- -- SB  Для Сбербанка
- вызов:   AWK REZ1.rez REZ.<xx> <параметры>
- AWK REZ1.rez REZ1.sb  SB        * для Сбербанка, НАДРА
- AWK REZ1.rez REZ1.sql           * эталон
+ -- SB  Для Сбербанка  
+ вызов:   AWK REZ1.rez REZ.<xx> <параметры> 
+ AWK REZ1.rez REZ1.sb  SB        * для Сбербанка     
+ AWK REZ1.rez REZ1.sql           * эталон      
 */
 
---22-06-2012 - для Сбербанка разделение резерва на налоговый и неналоговый учет
---21-12-2011 - округление дисконта (2 варианта)
+
+--21-12-2011 - 14.03.2012 округление дисконта (2 варианта)
 --           - первичный залог для демарка
 --11-10-2011 - фин.стан из кредитного договора
 --           - p_load_data в курсоре выборка по рнк (была по асс)
 
    -- версия пакета
    ind_            VARCHAR2 (30);
-   version_        VARCHAR2 (30)   := '22.06.2012';
+   version_        VARCHAR2 (30)   := '22.11.2017';
    sss varchar2(1000);
-   c_dt    date := to_date('28122008','ddmmyyyy');
-   dat_nal date := to_date('01042011','ddmmyyyy');
+   c_dt date := to_date('28122008','ddmmyyyy');
    curdate_        DATE;   -- текущая отчетная дата
    prevdate_       DATE;   -- дата начала отчетного периода
    rownumber_      NUMBER; -- номер строки для проткола в таблице cp_rez_log
@@ -378,7 +379,7 @@ IS
       := '2236,2226,2216,2206,2116,2106,2086,2076,2066,2036,2026,1626,1526,1326,1316,';
    -- балансовые счета премии
    nbspremiy_      VARCHAR2 (2000)
-      := '2075,2065,2085,2105,2115,2125,2135,2205,2215,2235,2617,2637,2653,2707,';
+      := '';
    -- балансовые счета страхового фонда
    nbsfond_        VARCHAR2 (2000)
            := ',1492,1590,1591,1592,1593,1790,2400,2401,2490,3291,3599,3690,';
@@ -510,11 +511,11 @@ IS
    BEGIN
       update cc_accp SET pr_12=2;
 
-      FOR k IN  (SELECT d.rnk,d.nd,sum(a.ostc) s
-                 FROM   cc_deal d,accounts a,nd_acc n
-                 WHERE  vidd in (1,2,3,11,12,13) and d.sos >=10 and d.sos<15
-                        and d.nd=n.nd and n.acc=a.acc
-                        and a.tip in ('SS ','SP ','SL ')
+      FOR k IN  (SELECT d.rnk,d.nd,sum(a.ostc) s 
+                 FROM   cc_deal d,accounts a,nd_acc n  
+                 WHERE  vidd in (1,2,3,11,12,13) and d.sos >=10 and d.sos<15 
+                        and d.nd=n.nd and n.acc=a.acc  
+                        and a.tip in ('SS ','SP ','SL ')  
                  group by d.rnk,d.nd
                  order by d.rnk,s )
 
@@ -537,21 +538,17 @@ IS
                             MAX (CASE WHEN ss.ostf - ss.dos + ss.kos = 0
                                  THEN ss.fdat
                                  ELSE NULL
-                                 END)
+                                 END) 
                 INTO datpr,datn
-                FROM (SELECT a.rnk, n.nd, s.fdat,SUM (s.dos) dos,
+                FROM (SELECT a.rnk, n.nd, s.fdat,SUM (s.dos) dos, 
                              SUM (s.kos) kos,SUM (s.ostf) ostf
                       FROM saldoa s,nd_acc n,accounts a,specparam p
                       WHERE s.acc = a.acc AND a.acc = n.acc and n.nd=k.nd
-                            AND a.acc = p.acc AND a.nbs IN ('2207','2217',
-                            '2227','2237','2290','2027','2037','2067','2077',
-                            '2087','2097','2209','2219','2229','2239','2029',
-                            '2039','2069','2079','2089','2097','2109','2119',
-                            '2129','2139','3579','3589')
+                            AND a.acc = p.acc AND a.tip in ('SP ','SPN','SK9','OFR')
                             AND a.rnk = k.rnk AND s.fdat <= dat_
                       GROUP BY a.rnk, n.nd, s.fdat) ss
                 GROUP BY ss.rnk, ss.nd;
-
+ 
                 EXCEPTION WHEN NO_DATA_FOUND THEN
                     datpr:=null;
                     datn :=null;
@@ -563,30 +560,30 @@ IS
                 -- кредиты просроченные > 30 дней
                 IF dnpr_ > 30 THEN
 
-                   FOR kz IN (select c.acc,c.nd
-                              from cc_accp c,pawn_acc cp
+                   FOR kz IN (select c.acc,c.nd 
+                              from cc_accp c,pawn_acc cp 
                               where nd=k.nd and c.acc=cp.acc -- and cp.pawn<>33  пока не помню зачем стоит ограничение
                               group by c.nd,c.acc)
                    LOOP
                       BEGIN
-                         select acc into l_acc
-                         from cc_accp p,cc_deal d
-                         where p.acc=kz.acc and p.nd<>kz.nd and rownum=1
-                               and p.nd=d.nd and sos<>15;
+                         select acc into l_acc 
+                         from cc_accp p,cc_deal d 
+                         where p.acc=kz.acc and p.nd<>kz.nd and rownum=1 
+                               and p.nd=d.nd and sos<>15; 
                       EXCEPTION WHEN NO_DATA_FOUND THEN l_acc:=null;
                       END;
-                      IF l_acc is not null then
+                      IF l_acc is not null then 
                          UPDATE cc_accp SET pr_12=1 where nd=k.nd and acc=kz.acc;
                          priz_:=1;
-                      END IF;
+                      END IF;  
                    END LOOP;
                 END IF;
              END IF;
           END IF;
       END LOOP;
-      BEGIN
+      BEGIN     
          FOR k IN  (select acc , count(*) cnt
-                    from (select p.nd, p.acc,count(*)
+                    from (select p.nd, p.acc,count(*) 
                           from cc_accp p,cc_deal d
          where p.nd=d.nd (+) and d.sos<>15
                           group by p.nd,p.acc )
@@ -596,8 +593,8 @@ IS
                    )
          LOOP
             IF k.cnt=1 THEN
-               UPDATE cc_accp SET pr_12=3 where acc=k.acc;
-            END IF;
+               UPDATE cc_accp SET pr_12=3 where acc=k.acc;       
+            END IF;  
          END LOOP;
       END;
    END;
@@ -914,41 +911,39 @@ BEGIN
       -- не нашли берем текущего пользователя
 --      formuserold_ := formuser_;
 --   END;
-
-   FOR k IN (select t.NBS_REZ, t.OB22_REZ, t.kv, t.branch, t.sz,t.szq,
+                              
+   FOR k IN (select t.NBS_REZ, t.OB22_REZ, t.kv, t.branch, t.sz,t.szq, 
                     t.s080,t.pr, t.r_s080, ConcatStr(ar.acc) r_acc,
                     ConcatStr(ar.nls) r_nls, count(*) cnt
-             from (select o.NBS_REZ, o.OB22_REZ, o.pr, r.KV,
-                          rtrim(substr(r.tobo||'/',1,
-                          instr(r.tobo||'/','/',1,3)-1),'/')||'/' branch,
-                          sum(decode(o.nal,'0', nvl(szn,0),'2',nvl(szn,0),
-                          sz-nvl(szn,0))) sz,
-                          gl.p_icurval (r.kv,sum(decode(o.nal,'0',
-                          nvl(szn,0),'2',nvl(szn,0),sz-nvl(szn,0))),dat2_) SZQ,
-                          r.s080 s080,decode(r.s080,1,0,9,0,r.s080) r_s080
+             from (select o.NBS_REZ, o.OB22_REZ, o.pr, r.KV, 
+                          rtrim(substr(r.tobo||'/',1, 
+                          instr(r.tobo||'/','/',1,3)-1),'/')||'/' branch, 
+                          sum(nvl(r.sz1, sz)) sz, gl.p_icurval (r.kv, 
+                          sum(nvl(r.sz1, sz)), dat2_) SZQ, 
+                          r.s080 s080,
+                          decode(r.s080,1,0,9,0,r.s080) r_s080
                    from tmp_rez_risk r
                    join v_gl ac on r.acc = ac.acc
-                   join srezerv_ob22 o on (ac.nbs = o.nbs and r.arjk=decode(o.nal,2,1,0) AND
-                                           ac.ob22 = decode(o.ob22,'0',ac.ob22,o.ob22) and
-                                           decode(r.s080,1,1,2) =
+                   join srezerv_ob22 o on (ac.nbs = o.nbs and ac.ob22 = 
+                                           decode(o.ob22,'0',ac.ob22,o.ob22) and 
+                                           decode(r.s080,1,1,2) = 
                                            decode(o.s080,'0',
-                                           decode(r.s080,1,1,2),o.s080) and
+                                           decode(r.s080,1,1,2),o.s080) and 
                                            r.custtype = decode(o.custtype,'0',
-                                           r.custtype,o.custtype) and
+                                           r.custtype,o.custtype) and 
                                            r.kv = decode(o.kv,'0',r.kv,o.kv) )
-                   where id = nvl(formuser_, user_id) and dat = dat2_
-                         and nvl(r.sz1, sz) <> 0
-                   group by o.NBS_REZ, o.OB22_REZ, o.pr, r.KV,
+                   where id = nvl(formuser_, user_id) and dat = dat2_ 
+                         and nvl(r.sz1, sz) <> 0   
+                   group by o.NBS_REZ, o.OB22_REZ, o.pr, r.KV, 
                             rtrim(substr(r.tobo||'/',1,instr(r.tobo||'/','/',
                             1,3)-1),'/')||'/',decode(r.s080,1,1,9,9,2),
                             r.s080) t
              left join v_gl ar on (t.NBS_REZ = ar.nbs and t.OB22_REZ = ar.ob22
-                                       and t.KV = ar.kv and t.branch = ar.BRANCH
-                                       and ar.dazs is null and t.r_s080 =
-                                       decode(t.r_s080,0,t.r_s080,
-                                      (select s080 from specparam s
+                                       and t.KV = ar.kv and t.branch = ar.BRANCH 
+                                       and ar.dazs is null and t.r_s080 = 
+                                       decode(t.r_s080,0,t.r_s080, 
+                                      (select s080 from specparam s 
                                        where s.acc = ar.acc)))
-            where  nvl(sz,0) <> 0
              group by t.NBS_REZ, t.OB22_REZ, t.kv, t.branch, t.sz,t.szq,
                       t.s080,t.pr,t.r_s080)
 
@@ -965,26 +960,26 @@ BEGIN
 
       BEGIN
 
-       if not (k.r_acc is null or instr(k.r_acc,',') > 0) then
+       if not (k.r_acc is null or instr(k.r_acc,',') > 0) then 
+          
 
-
-         select SNP.fost (k.r_acc, (select caldt_ID from accm_calendar
+         select SNP.fost (k.r_acc, (select caldt_ID from accm_calendar 
                                   where caldt_DATE=dat1_+1),1,7),
-                SNP.fost (k.r_acc, (select caldt_ID from accm_calendar
+                SNP.fost (k.r_acc, (select caldt_ID from accm_calendar 
                                   where caldt_DATE=dat1_)+1,1,8),
-                SNP.fost (k.r_acc, (select caldt_ID from accm_calendar
+                SNP.fost (k.r_acc, (select caldt_ID from accm_calendar 
                                   where caldt_DATE=dat2_),0,7),
-                SNP.fost (k.r_acc, (select caldt_ID from accm_calendar
-                                  where caldt_DATE=dat2_),0,8),
-                k.sz  - SNP.fost (k.r_acc, (select caldt_ID from accm_calendar
+                SNP.fost (k.r_acc, (select caldt_ID from accm_calendar 
+                                  where caldt_DATE=dat2_),0,8), 
+                k.sz  - SNP.fost (k.r_acc, (select caldt_ID from accm_calendar 
                                   where caldt_DATE=dat1_)+1,1,7),
-                k.szq - SNP.fost (k.r_acc, (select caldt_ID from accm_calendar
+                k.szq - SNP.fost (k.r_acc, (select caldt_ID from accm_calendar 
                                   where caldt_DATE=dat1_)+1,1,8)
          INTO r_old, r_oldq, r_t, r_tq, del, delq
          from dual;
-
+        
          txt_ := '';
-
+    
          IF k.nbs_rez = '2401' THEN
             txt_ := 'клиенты стандартные ';
          ELSIF k.nbs_rez = '2400' THEN
@@ -1038,28 +1033,28 @@ BEGIN
                END IF;
             END IF;
          END IF;
-
-         INSERT INTO tmp_finrez
+   
+         INSERT INTO tmp_finrez 
                  (branch, s080,    kv,     ob22,      nls_r,  acc,    fondid,
-                  s_oldf1,sq_oldf1,s_oldf2,sq_oldf2,  s_newf, sq_newf,s_del,
+                  s_oldf1,sq_oldf1,s_oldf2,sq_oldf2,  s_newf, sq_newf,s_del, 
                   sq_del, txt,     s_isp,   sq_isp, sq_curs)
-         VALUES  (k.branch,k.s080, k.kv,   k.ob22_rez,k.r_nls,k.r_acc,null,
-                  r_old,  r_oldq,  r_t,    r_tq,      k.sz,   k.szq,  del,
+         VALUES  (k.branch,k.s080, k.kv,   k.ob22_rez,k.r_nls,k.r_acc,null,  
+                  r_old,  r_oldq,  r_t,    r_tq,      k.sz,   k.szq,  del,   
                   delq,   txt_,    0,0,0);
        end if;
       END;
    END LOOP;
    INSERT INTO tmp_finrez (branch, s080,kv,  ob22,nls_r,  acc,fondid,
-                  s_oldf1,sq_oldf1,s_oldf2,sq_oldf2,  s_newf, sq_newf,s_del,
+                  s_oldf1,sq_oldf1,s_oldf2,sq_oldf2,  s_newf, sq_newf,s_del, 
                   sq_del, txt,     s_isp,   sq_isp, sq_curs)
    (select rtrim(substr(a.branch||'/',1,instr(a.branch||'/','/',1,3)-1),
            '/')||'/', sp.s080, a.kv,a.ob22,a.nls,a.acc,null,
            rez.ostc96(to_number(a.acc), dat1_),
-           gl.p_icurval (a.kv, rez.ostc96(to_number(a.acc), dat1_), dat1_),
+           gl.p_icurval (a.kv, rez.ostc96(to_number(a.acc), dat1_), dat1_), 
            rez.ostc96(to_number(a.acc), dat2_),
-           gl.p_icurval (a.kv, rez.ostc96(to_number(a.acc), dat2_), dat2_),
+           gl.p_icurval (a.kv, rez.ostc96(to_number(a.acc), dat2_), dat2_), 
            0,0,-rez.ostc96(to_number(a.acc), dat2_),
-           -gl.p_icurval (a.kv, rez.ostc96(to_number(a.acc), dat2_), dat2_),
+           -gl.p_icurval (a.kv, rez.ostc96(to_number(a.acc), dat2_), dat2_), 
            decode(a.nbs,'2400','клиенты нестандартные ',
                         '2401','клиенты стандартные ',
                         '1590','межбанк нестандартные ',
@@ -1069,19 +1064,19 @@ BEGIN
                         '1790','межбанк просроченные доходы ',
                         '2490','клиенты просроченные доходы ',
                         '3599','клиенты прочие начисленные доходы ',
-                        '3690','клиенты внебаланс ','') ||
+                        '3690','клиенты внебаланс ','') || 
            decode(sp.s080,2,'под контролем',
                           3,'субстандартные',
                           4,'сомнительные',
                           5,'безнадежные','') ,0,0,0
     from v_gl a
     left join specparam sp on a.acc=sp.acc
-    left join srezerv_ob22 o on a.nbs = o.nbs_rez and a.ob22 = o.ob22_rez
-    where a.nbs in ('2400','2401','3690','3599') and a.dazs is null
-          and rez.ostc96(to_number(a.acc), dat2_) <> 0 and
+    left join srezerv_ob22 o on a.nbs = o.nbs_rez and a.ob22 = o.ob22_rez 
+    where a.nbs in ('2400','2401','3690','3599') and a.dazs is null 
+          and rez.ostc96(to_number(a.acc), dat2_) <> 0 and 
           not exists (select 1 from tmp_finrez t where a.acc=t.acc )
     group by a.acc, a.ob22, a.nbs, rtrim(substr(a.branch||'/',1,instr(a.branch||'/','/',1,3)-1),'/')||'/' ,
-          sp.s080,a.nls, a.kv);
+          sp.s080,a.nls, a.kv); 
     COMMIT;
 END p_finrez_SB;
 ----------------------------------------
@@ -1497,8 +1492,6 @@ END p_finrez_SB;
       RETURN NUMBER
    IS
       sk1_                   NUMBER;                -- suma 1 kredita   в экв
-      sk1_31                 NUMBER;
-      kk_31                  NUMBER;
       sk2_                   NUMBER;
       sz_                    NUMBER;                -- suma zaloga all  в экв
       sz1_                   NUMBER;                -- suma 1 zaloga    в экв
@@ -1519,7 +1512,6 @@ END p_finrez_SB;
       kk_                    NUMBER (20, 10);
       kk2_                   NUMBER;
       ostc_zo_               NUMBER;       --  сумма счета залога с учетом ЗО
-      OSTC_Z31_              NUMBER;
       x9_                    VARCHAR2 (9);
       del_                   NUMBER;
       delq_                  NUMBER;
@@ -1536,7 +1528,6 @@ END p_finrez_SB;
       nd_                    NUMBER;
       ret_                   NUMBER;
       sl_                    NUMBER;
-      sall_                  NUMBER;
       nbs_                   VARCHAR2 (4);
       rnk_                   NUMBER;
       fl_use_as_first_zal_   NUMBER          := 0;
@@ -1551,11 +1542,11 @@ END p_finrez_SB;
       THEN
          RETURN 0;
       END IF;
---      if acc_=80727 then
---         uselog_:=1;
---      else
+--      if acc_=80727 then 
+--         uselog_:=1; 
+--      else 
 --         uselog_:=0;
---      end if;
+--      end if; 
       to_log (acc_, 'function ca_fq_obesp', '');
       sz_ := 0;
       zal_ := 0;
@@ -1583,7 +1574,6 @@ END p_finrez_SB;
                FROM v_gl a, specparam p
               WHERE a.acc = p.acc(+) AND a.acc = acc_;
 
-              sk1_31 := sk1_;
              to_log (acc_, 'mod=3,sk1_ остаток по '||acc_, TO_CHAR (sk1_));
              to_log (acc_, 's080_', s080_);
              to_log (acc_, 'istval_', istval_);
@@ -1612,11 +1602,11 @@ END p_finrez_SB;
             end if;
 
              to_log (acc_, 'mod=3,dni_', dni_);
-
+             
              --рассчитываем сумму дисконта по данному счету (если она не передана как входящий параметр)
-             if disc_ is null then
+             if disc_ is null then 
                 discont_ := rez1.ca_fq_discont (acc_, dat_, 1);
-             else
+             else 
                 discont_ := disc_;
              end if;
 
@@ -1631,19 +1621,16 @@ END p_finrez_SB;
              del_ := 0;
              delq_ := 0;
 
-             IF r013_ = '91299' OR r013_ = '90231' OR sk1_ > 0
+             IF r013_ = '91299' OR r013_ = '90031' OR sk1_ > 0
              THEN
-                to_log (acc_, 'спец обр 9129, 9023 sk1_=0', '');
-                sk1_31 := ROUND (0.5 * sk1_);
+                to_log (acc_, 'спец обр 9129, 9003 sk1_=0', '');
                 sk1_ := 0;
              ELSIF SUBSTR (r013_, 1, 4) IN ('9100', '9129')
              THEN
                 to_log (acc_, 'спец обр 9100, 9129 sk1_=50%sk1_', '');
-                sk1_31 := ROUND (0.5 * sk1_);
-                sk1_   := ROUND (0.5 * sk1_);
+                sk1_ := ROUND (0.5 * sk1_);
              ELSE
-                sk1_   := sk1_ + delq_ + discont_ + premiy_; --остаток с учетом дисконта и премии
-                sk1_31 := sk1_ + delq_ + discont_ + premiy_;
+                sk1_ := sk1_ + delq_ + discont_ + premiy_; --остаток с учетом дисконта и премии
              END IF;
              to_log (acc_, 'mod=3,sk1_ остаток по '||acc_||' +диск. и прем.', sk1_);
 
@@ -1657,22 +1644,22 @@ END p_finrez_SB;
 
 
       -- проверить все договора залога на этот кредит с ЗО
-      --цикл по всем счетам залога относящимся к данному счету
+      --цикл по всем счетам залога относящимся к данному счету 
       --и для каждого счета залога - по всем крединтым счетам
       FOR k IN (
                 SELECT z.ACC,--счет залога
-                             --следующий счет залога относящийся к данному счету
+                             --следующий счет залога относящийся к данному счету 
                        lead(z.acc,1,-1) over(order by z.acc, z.ACCS1 ) next_acc,
-                             --предыдущий счет залога относящийся к данному счету
+                             --предыдущий счет залога относящийся к данному счету 
                        lag(z.acc,1,-1) over(order by z.acc, z.ACCS1 ) prev_acc,
-                       z.KV,z.NLS,z.NBS,z.OSTC_Z ostc,z.ostc_z31 ostc31,
-                       z.PAWN,z.S031, z.R031,z.PR_12, z.PWN cnt, z.OSTC_s s,
-                       z.ACCS1,z.nd, p.s090, a.kv kv_,a.nls nls_,
+                       z.KV,z.NLS,z.NBS,z.OSTC_Z ostc,z.PAWN,z.S031, z.R031,
+                       z.PR_12, z.PWN cnt, z.OSTC_s s, z.ACCS1,z.nd, p.s090, 
+                       a.kv kv_,a.nls nls_, 
                        a.acc acc_,--другие кредитные счета, относящиеся к данному счету залога
                        a.nbs || DECODE (NVL (p.r013, '1'), '9', '9', '1') r013,
                        sum(decode(nvl(dp.pr,'*'),'P',dp.rest,0)) prm,
                        sum(decode(nvl(dp.pr,'*'),'D',dp.rest,0)) dsc,
-                       a_z.tobo,DECODE (TRIM (c_z.sed),'91',
+                       a_z.tobo,DECODE (TRIM (c_z.sed),'91', 
                                 DECODE (c_z.custtype, 3, 2, c_z.custtype),
                                 c_z.custtype) custtype,a.rnk
                  from REZ_ZAL z,v_gl a,v_gl a_z,customer c_z,specparam p,rez_dp dp
@@ -1680,10 +1667,10 @@ END p_finrez_SB;
                        a_z.acc = z.acc and c_z.rnk = a_z.rnk and
                        a.acc = p.acc(+) and rez1.f_nbs_is_prem (a.nbs) = 0
                        and z.nd = dp.nd(+) and z.OSTC_s <> 0
-                group by z.ACC,z.KV,z.NLS,z.NBS,z.OSTC_Z,z.OSTC_Z31,z.PAWN,z.S031,z.R031,
+                group by z.ACC,z.KV,z.NLS,z.NBS,z.OSTC_Z,z.PAWN,z.S031,z.R031,
                          z.PR_12,z.PWN,z.OSTC_s,z.ACCS1,z.nd,p.s090,a.kv,
-                         a.nls,a.acc,a.nbs|| DECODE (NVL (p.r013, '1'), '9',
-                         '9', '1'),a_z.tobo,DECODE (TRIM (c_z.sed),'91',
+                         a.nls,a.acc,a.nbs|| DECODE (NVL (p.r013, '1'), '9', 
+                         '9', '1'),a_z.tobo,DECODE (TRIM (c_z.sed),'91', 
                          DECODE (c_z.custtype, 3, 2, c_z.custtype),
                          c_z.custtype),a.rnk
       order by z.acc, z.ACCS1
@@ -1704,7 +1691,6 @@ END p_finrez_SB;
                    FROM v_gl a, specparam p
                   WHERE a.acc = p.acc(+) AND a.acc = acc_;
 
-                  sk1_31 := sk1_;
                  to_log (acc_, 'erm null,sk1_ остаток по '||acc_, TO_CHAR (sk1_));
                  to_log (acc_, 's080_', s080_);
                  to_log (acc_, 'istval_', istval_);
@@ -1750,20 +1736,17 @@ END p_finrez_SB;
                  del_ := 0;
                  delq_ := 0;
 
-                 --спец обработка 9129, 9023
-                 IF r013_ = '91299' OR r013_ = '90231' OR sk1_ > 0
+                 --спец обработка 9129, 9003
+                 IF r013_ = '91299' OR r013_ = '90031' OR sk1_ > 0
                  THEN
-                    to_log (acc_, 'спец обр 9129, 9023 sk1_=0', '');
-                    sk1_31 := ROUND (0.5 * sk1_);
+                    to_log (acc_, 'спец обр 9129, 9003 sk1_=0', '');
                     sk1_ := 0;
                  ELSIF SUBSTR (r013_, 1, 4) IN ('9100', '9129')
                  THEN
                     to_log (acc_, 'спец обр 9100, 9129 sk1_=50%sk1_', '');
-                    sk1_31 := ROUND (0.5 * sk1_);
-                    sk1_   := ROUND (0.5 * sk1_);
+                    sk1_ := ROUND (0.5 * sk1_);
                  ELSE
-                    sk1_   := sk1_ + delq_ + discont_ + premiy_;--остаток с учетом дисконта и премии
-                    sk1_31 := sk1_ + delq_ + discont_ + premiy_;
+                    sk1_ := sk1_ + delq_ + discont_ + premiy_;--остаток с учетом дисконта и премии
                  END IF;
                  to_log (acc_, 'erm null,sk1_ остаток по '||acc_||' +диск. и прем.', sk1_);
 
@@ -1793,7 +1776,6 @@ END p_finrez_SB;
                 ostc_zo_ := 0;
              ELSE
                 ostc_zo_ := gl.p_icurval (k.kv, k.ostc, dat_);
-                OSTC_Z31_:= gl.p_icurval (k.kv, k.ostc31, dat_);
              END IF;
 
              -- если данное обеспечение является первичным, а кредит просрочен > 30 дней
@@ -1808,7 +1790,7 @@ END p_finrez_SB;
                 IF NOT prcrd_.EXISTS (nd_)
                 THEN
                    ostc_zo_ := 0;
-                   IF k.pr_12=3 THEN
+                   IF k.pr_12=3 THEN 
                       fl_use_as_first_zal_ := 3;
              to_log (acc_, 'k.prev,fl_use_1', TO_CHAR ( fl_use_as_first_zal_));
                    ELSE
@@ -1816,7 +1798,7 @@ END p_finrez_SB;
              to_log (acc_, 'k.prev,fl_use_2', TO_CHAR ( fl_use_as_first_zal_));
                    END IF;
                 ELSE
-                   IF k.pr_12=3 THEN
+                   IF k.pr_12=3 THEN 
                       fl_use_as_first_zal_ := 3;
              to_log (acc_, 'k.prev,fl_use_3', TO_CHAR ( fl_use_as_first_zal_));
                    ELSE
@@ -1824,8 +1806,8 @@ END p_finrez_SB;
              to_log (acc_, 'k.prev,fl_use_4', TO_CHAR ( fl_use_as_first_zal_));
                    END IF;
                 END IF;
-             ELSE
-                IF k.pr_12=3 THEN
+             ELSE 
+                IF k.pr_12=3 THEN 
                    fl_use_as_first_zal_ := 3;
              to_log (acc_, 'k.prev,fl_use_5', TO_CHAR ( fl_use_as_first_zal_));
                 ELSE
@@ -1843,7 +1825,7 @@ END p_finrez_SB;
          end if;
 
            -- обрабтываем информацию по кредитным счетам, которые относятся к текущему счету залога
-            IF k.s < 0 AND k.r013 <> '91299' AND k.r013 <> '90231'
+            IF k.s < 0 AND k.r013 <> '91299' AND k.r013 <> '90031'
             THEN
                   -- 1. рассматриваем как кредиты все кроме однородных кредитов
                   -- 2. в расчете пропорции для первичного залога (cc_accp.pr_12 =1)
@@ -1852,7 +1834,7 @@ END p_finrez_SB;
 
                discont_ := 0;
                premiy_ := 0;
-
+              
                if k.dsc <> 0 then
                      discont_ := rez1.ca_fq_discont (k.accs1, dat_, 1,999,k.nd,null,gl.p_icurval (k.kv_, k.s,dat_));
                end if;
@@ -1906,7 +1888,7 @@ END p_finrez_SB;
 
                sk_ := sk_ + sk_s;
                to_log (acc_, 'k.prev,остаток с накоплением' ||k.nls_||'('||k.acc_||') =', TO_CHAR (sk_));
-               sk_s:=0;
+               sk_s:=0;   
 
             END IF;
          -- END IF;
@@ -1931,13 +1913,13 @@ END p_finrez_SB;
                       pr2_ := 0;
                       pr3_ := 0;
                       pr4_ := 0;
-                   if trim(k.pawn) is not null and k.s031 not in ('33','34') then
+                   if trim(k.pawn) is not null then
                    --в справочнике cc_pawn_s080 не найдены данные по виду залога и категории риска
                       p_error( 1, substr(k.nls,1,4),null, null, k.kv, k.tobo,
                          substr(k.nls,1,4), null, null, k.custtype*100,
                          k.nls||' (Вид залога ='||k.pawn||', S080 = '||s080_||')',
                          'Реф. КД = '||k.nd);
-                   elsif k.pawn not in ('33','34') THEN
+                   else
                       p_error( 10, substr(k.nls,1,4),null, null, k.kv, k.tobo,
                          substr(k.nls,1,4), null, null, k.custtype*100,
                          k.nls||' ( Вид залога )',
@@ -1957,7 +1939,7 @@ END p_finrez_SB;
                          pr_ := NVL (pr2_, pr_);
                       END IF;
                    END IF;
-                ELSIF k.s031 = '25' or k.s031 = '31'
+                ELSIF k.s031 = '25' or k.s031 = '31' 
                 THEN
                    IF kvk_ <> '980'
                    THEN
@@ -1981,16 +1963,16 @@ END p_finrez_SB;
                            r020 || R012 = r013_2
                      ;
                      if cnt <> 0 then
-
+                     
                            --стан обслуговування боргу
                          select min(d.obs)
                          into cnt
                          from nd_acc n, cc_deal d
                          where n.acc = acc_ and n.nd = d.nd;
-
+                         
                          if nvl(cnt,0) = 1 then --"ДОБРИЙ"
                            pr_ := NVL (pr2_, pr_) ;
-                         end if;
+                         end if;  
                      end if;
                     end if;
                 END IF;
@@ -2008,20 +1990,14 @@ END p_finrez_SB;
                 to_log (acc_, k.nls, '');
                 to_log (acc_, 'k.next,pr_', pr_);
 
-                kk_   := sk1_ / sk_;
-                kk_31 := sk1_31 / sk_;
-
+                kk_ := sk1_ / sk_;
                 zal1_ := ostc_zo_ * kk_ ; --T 24.02.2009
-                sall_:= ROUND (ABS (OSTC_Z31_*kk_31));
-
-                if NOT (k.s031=33 or k.s031=34) THEN
-                   zal_ := zal_ + ROUND (ABS (zal1_));
-                end if;
+                zal_ := zal_ + ROUND (ABS (zal1_)); --T 24.02.2009
 
 
                 --заносим информацию по текущему обеспечению в массив
---                IF pr_ <> 0
---                THEN
+                IF pr_ <> 0
+                THEN
                    --расчитываем сумму залога по данному счету залога
                    kk_ := sk1_ / sk_;
                    sz1_ := ostc_zo_ * kk_ * pr_ / 100;
@@ -2033,13 +2009,12 @@ END p_finrez_SB;
                    onezal_ (n1_).pawn := k.pawn;
                    onezal_ (n1_).s := ROUND (ABS (sz1_));
                    onezal_ (n1_).proc := pr_;
-                   onezal_ (n1_).sall := sall_;
                    sz_ := sz_ + ROUND (ABS (sz1_));
                    to_log (acc_, 'k.next,ostc_zo_ сумма текущего залога -'|| k.nls, ostc_zo_);
                    to_log (acc_, 'kk_ = sk1_(счет)/sk_(сумма всех счетов)', kk_);
                    to_log (acc_, 'sz1_ сумма по текущему счету залога = ostc_zo_*kk_*pr_/100', sz1_);
                    to_log (acc_, 'sz_ сумма по всем залогам', sz_);
- --               END IF;
+                END IF;
              END IF;
          end if;
       END LOOP;
@@ -2148,7 +2123,6 @@ END p_finrez_SB;
          onezal_ (n1_).pawn := '30';
          onezal_ (n1_).s := ROUND (ABS (sl_ * prliz_ / 100));
          onezal_ (n1_).proc := prliz_;
-         onezal_ (n1_).sall := sall_;
          sz_ := sz_ + ROUND (ABS (sl_ * prliz_ / 100));
       END IF;
 
@@ -2171,7 +2145,6 @@ END p_finrez_SB;
             allzal_ (n_).pawn := onezal_ (p).pawn;
             allzal_ (n_).s := onezal_ (p).s;
             allzal_ (n_).proc := onezal_ (p).proc;
-            allzal_ (n_).sall := onezal_ (p).sall;
             onezals_ := onezals_ + ROUND (onezal_ (p).s * k_);
 
             IF p = onezal_.LAST AND k_ <> 1
@@ -2394,9 +2367,9 @@ END p_finrez_SB;
              sk1_ := sk1_ + delq_ + discont_ + premiy_;
              to_log (acc_, 'sk1_ остаток по '||acc_||' +диск. и прем.', sk1_);
 
-             IF r013_ = '91299' OR r013_ = '90231' OR sk1_ > 0
+             IF r013_ = '91299' OR r013_ = '90031' OR sk1_ > 0
              THEN
-                to_log (acc_, 'спец обр 9129, 9023 sk1_=0', '');
+                to_log (acc_, 'спец обр 9129, 9003 sk1_=0', '');
                 sk1_ := 0;
              END IF;
 
@@ -2519,9 +2492,9 @@ END p_finrez_SB;
                  sk1_ := sk1_ + delq_ + discont_ + premiy_;
                  to_log (acc_, 'sk1_ остаток по '||acc_||' +диск. и прем.', sk1_);
 
-                 IF r013_ = '91299' OR r013_ = '90231' OR sk1_ > 0
+                 IF r013_ = '91299' OR r013_ = '90031' OR sk1_ > 0
                  THEN
-                    to_log (acc_, 'спец обр 9129, 9023 sk1_=0', '');
+                    to_log (acc_, 'спец обр 9129, 9003 sk1_=0', '');
                     sk1_ := 0;
                  END IF;
 
@@ -2567,7 +2540,7 @@ END p_finrez_SB;
                fl_use_as_first_zal_ := 1;
             END IF;
          END IF;
-           to_log (acc_, 'fl_use_as_first_zal_', TO_CHAR (fl_use_as_first_zal_)||ind_);
+           to_log (acc_, 'fl_use_as_first_zal_', TO_CHAR (fl_use_as_first_zal_)||ind_); 
          -- сумма всех кредитов, имеющих текущий k.NDZ общий дог залога
          -- только отрицательные  п2600 не брать !
          sk_ := 0;
@@ -2594,8 +2567,8 @@ END p_finrez_SB;
             --    OR fl_use_as_first_zal_ = 0 and not prcrezal_.EXISTS (k.acc,k.nd)
             -- THEN
                 --       to_log (acc_, '*** 1', '');
-            IF k1.s < 0 AND k1.r013 <> '91299' AND k1.r013 <> '90231'
-            THEN
+            IF k1.s < 0 AND k1.r013 <> '91299' AND k1.r013 <> '90031'
+            THEN                                                
 --            to_log (acc_, '*** 1', '');
                   -- 1. рассматриваем как кредиты все кроме однородных кредитов
                   -- 2. в расчете пропорции для первичного залога (cc_accp.pr_12 =1)
@@ -2711,7 +2684,6 @@ END p_finrez_SB;
                onezal_ (n1_).pawn := k.pawn;
                onezal_ (n1_).s := ROUND (ABS (sz1_));
                onezal_ (n1_).proc := pr_;
-               onezal_ (n1_).sall := zal_;
                sz_ := sz_ + ROUND (ABS (sz1_));
                to_log (acc_, 'ostc_zo_ сумма текущего залога -'|| k.nls, ostc_zo_);
                to_log (acc_, 'kk_ = sk1_(счет)/sk_(сумма всех счетов)', kk_);
@@ -2824,7 +2796,6 @@ END p_finrez_SB;
          onezal_ (n1_).pawn := '30';
          onezal_ (n1_).s := ROUND (ABS (sl_ * prliz_ / 100));
          onezal_ (n1_).proc := prliz_;
-         onezal_ (n1_).sall := zal_;
          sz_ := sz_ + ROUND (ABS (sl_ * prliz_ / 100));
       END IF;
 
@@ -2846,7 +2817,6 @@ END p_finrez_SB;
             allzal_ (n_).pawn := onezal_ (p).pawn;
             allzal_ (n_).s := onezal_ (p).s;
             allzal_ (n_).proc := onezal_ (p).proc;
-            allzal_ (n_).sall := onezal_ (p).sall;
             onezals_ := onezals_ + ROUND (onezal_ (p).s * k_);
 
             IF p = onezal_.LAST AND k_ <> 1
@@ -2973,8 +2943,8 @@ END p_finrez_SB;
 
       ndiscont1_ := 0;
       onedisc_.DELETE;
-
-      --1. определяем общую сумму остатков по осн. счетам договора - skqall_
+      
+      --1. определяем общую сумму остатков по осн. счетам договора - skqall_ 
       --   и остаток по данному счету - skq_
 
       if par_ = 999 then
@@ -2992,8 +2962,8 @@ END p_finrez_SB;
             FROM REZ_ACC a,REZ_ACC a1
            WHERE a.rnk = nd_
                  AND a.tip IN ('SS', 'SP', 'SL')
-                 AND f_nbs_is_disc (a.nbs) = 0
-                 and a1.acc=acc_ and substr(a1.nbs,1,3)=substr(a.nbs,1,3)
+                 AND f_nbs_is_disc (a.nbs) = 0 
+                 and a1.acc=acc_ and substr(a1.nbs,1,3)=substr(a.nbs,1,3) 
                  and a1.kv=a.kv;
     to_log (acc_,'REZ_ACC1 общ.S по дог.skqall_=', skqall_);
        else
@@ -3042,15 +3012,15 @@ END p_finrez_SB;
 
           --определяем общую сумму остатков по осн. счетам договора - skqall_
           if rez_disc_ = 1 then
-             SELECT NVL (ABS (SUM (gl.p_icurval (a.kv, rez1.ostc96 (a.acc, dat_),dat_))),0)
+             SELECT NVL (ABS (SUM (gl.p_icurval (a.kv, rez1.ostc96 (a.acc, dat_),dat_))),0) 
              INTO skqall_
              FROM v_gl a, nd_acc n,v_gl a1
-             WHERE a1.acc=acc_ and substr(a1.nbs,1,3)=substr(a.nbs,1,3)
-                   and a1.kv=a.kv and a.acc = n.acc
-                   AND a.tip IN ('SS', 'SP', 'SL')
+             WHERE a1.acc=acc_ and substr(a1.nbs,1,3)=substr(a.nbs,1,3) 
+                   and a1.kv=a.kv and a.acc = n.acc 
+                   AND a.tip IN ('SS', 'SP', 'SL') 
                    AND f_nbs_is_disc (a.nbs) = 0  AND n.nd = nd_;
    to_log (acc_,'v_gl1 общ.S по дог.skqall_=', skqall_);
-          else
+          else 
              SELECT NVL (ABS (SUM (gl.p_icurval (a.kv, rez1.ostc96 (a.acc, dat_),dat_))),0)
              INTO skqall_
              FROM v_gl a, nd_acc n
@@ -3074,10 +3044,10 @@ END p_finrez_SB;
                 skq_ := 0;
           END;
       end if;
-
+      
       --2. цикл по всем счетам дисконта данного договора (вдруг их несколько)
       --    находим общую сумму всех дисконтов - sdqall_
-      --    и остаток по текущему счету дисконта - sdq
+      --    и остаток по текущему счету дисконта - sdq 
 --      FOR k IN
 
       DECLARE
@@ -3090,36 +3060,36 @@ END p_finrez_SB;
 
       begin
       if rez_disc_=1 then
-         OPEN c0 FOR
+         OPEN c0 FOR 
            select s.acc acc, s.sdq sdq, sum(s.sdq) over() sdqall_
-           from  (SELECT a.acc,
+           from  (SELECT a.acc, 
                          gl.p_icurval (a.kv, rez1.ostc96 (a.acc, dat_),dat_) sdq
                   FROM v_gl a, nd_acc n,v_gl a1
-                  WHERE a1.acc=acc_ and substr(a1.nbs,1,3)=substr(a.nbs,1,3)
-                        and a1.kv=a.kv and a.acc = n.acc
-                        AND rez1.f_nbs_is_disc (a.nbs) = 1
+                  WHERE a1.acc=acc_ and substr(a1.nbs,1,3)=substr(a.nbs,1,3) 
+                        and a1.kv=a.kv and a.acc = n.acc 
+                        AND rez1.f_nbs_is_disc (a.nbs) = 1 
                         AND n.nd = nd_ and nvl(par_,0) <>999) s
            union all
-           select r.acc, gl.p_icurval (r.kv, r.rest, dat_) sdq,
+           select r.acc, gl.p_icurval (r.kv, r.rest, dat_) sdq, 
                   sum(gl.p_icurval (r.kv, r.rest, dat_)) over() sdqall_
            from (SELECT a.acc,n.nd,a.kv,
                         decode(rez1.f_nbs_is_disc(r020),1,'D','P') pr,
                         (nvl(s.ostf,0)-nvl(s.dos,0)+nvl(s.kos,0)+ nvl(kp.s,0)) rest
                  FROM kl_r020 k
                  join v_gl a on k.r020 = a.nbs
-                 join v_gl a1 on substr(a1.nbs,1,3)=substr(a.nbs,1,3)
+                 join v_gl a1 on substr(a1.nbs,1,3)=substr(a.nbs,1,3) 
                                  and a1.kv=a.kv and a1.acc=acc_
                  join nd_acc n on a.acc = n.acc
-                 left join saldoa s on s.acc = a.acc
+                 left join saldoa s on s.acc = a.acc  
                       and (a.acc, s.fdat) in (SELECT ss.acc, MAX (ss.fdat) fdat FROM saldoa ss
-                                         WHERE ss.fdat <= dat_
+                                         WHERE ss.fdat <= dat_ 
                                                and ss.acc = a.acc
                                          GROUP BY ss.acc)
                  left join rez_KOR_PROV kp on a.acc = kp.acc
                  WHERE rez1.f_nbs_is_prem(r020) = 1 or rez1.f_nbs_is_disc(r020) = 1) r
            where r.nd = nd_ and r.pr = 'D' and par_ = 999;
-      else
-         OPEN c0 FOR
+      else 
+         OPEN c0 FOR 
            select s.*, sum(s.sdq) over() sdqall_
             from (SELECT a.acc,
                        gl.p_icurval (a.kv, rez1.ostc96 (a.acc, dat_),
@@ -3133,16 +3103,16 @@ END p_finrez_SB;
                    sum(gl.p_icurval (r.kv, r.rest, dat_)) over() sdqall_
             from rez_dp r
             where r.nd = nd_ and r.pr = 'D' and par_ = 999;
-
+            
       END IF;
 
       LOOP
          FETCH c0 INTO k;
          EXIT WHEN c0%NOTFOUND;
 
-   to_log (acc_,'k. acc=', k.acc);
-   to_log (acc_,'k. sdq=', k.sdq);
-   to_log (acc_,'k. sdqall_=', k.sdqall_);
+   to_log (acc_,'k. acc=', k.acc); 
+   to_log (acc_,'k. sdq=', k.sdq); 
+   to_log (acc_,'k. sdqall_=', k.sdqall_); 
 
          sdqall_ := k.sdqall_;
          ndiscont1_ := ndiscont1_ + 1;
@@ -3155,7 +3125,7 @@ END p_finrez_SB;
             sdq_ := 0;
          END IF;
 
-   to_log (acc_,'sdq_=', sdq_);
+   to_log (acc_,'sdq_=', sdq_); 
          --записываем в массив информацию по текущему счету дисконта
          IF mode_ = 0
          THEN
@@ -3247,7 +3217,7 @@ END p_finrez_SB;
       acc_         INT,
       dat_         DATE,
       mode_   IN   INT DEFAULT 0,
-      par_         NUMBER DEFAULT NULL,
+      par_         NUMBER DEFAULT NULL, 
       p_nd         number DEFAULT NULL,
       p_skqall     number DEFAULT NULL,
       p_skq        number DEFAULT NULL
@@ -3280,9 +3250,9 @@ END p_finrez_SB;
       nprem1_ := 0;
       oneprem_.DELETE;
 
-      --1. определяем общую сумму остатков по осн. счетам договора - skqall_
+      --1. определяем общую сумму остатков по осн. счетам договора - skqall_ 
       --   и остаток по данному счету - skq_
-
+      
       if par_ = 999 then
         --остатки расчитыватеся по таблице REZ_ACC
         nd_ := p_nd;
@@ -3353,7 +3323,7 @@ END p_finrez_SB;
 
       --2. цикл по всем счетам премии данного договора (вдруг их несколько)
       --    находим общую сумму всех премий - spqall_
-      --    и остаток по текущему счету премии - spq
+      --    и остаток по текущему счету премии - spq 
       FOR k IN
       (select s.*, sum(spq) over() spqall_
         from
@@ -3631,7 +3601,7 @@ to_log (acc_,'rez_KOR_PROV sz_=', sz_);
       IF sz_ >= 0
       THEN
         begin
-          --от остатка отнимаем погашения за период
+          --от остатка отнимаем погашения за период 
           SELECT sz_ -  NVL (SUM (o.s), 0)
              INTO sz_
              FROM opldok o, oper p, ref_back r
@@ -3644,7 +3614,7 @@ to_log (acc_,'rez_KOR_PROV sz_=', sz_);
               AND (p.vob <> 96 AND o.fdat <= last_work_date_ )
               and p.REF = r.ref(+)
               --исключаем операцию СТОРНО
-              and o.tt <> 'BAK'
+              and o.tt <> 'BAK' 
               --исключаем проводку которая была СТОРНИРОВАНА, если дата сторнирования меньше отчетной
               and nvl(r.dt,to_date('01014000','ddmmyyyy')) >  last_work_date_
               ;
@@ -3688,10 +3658,10 @@ to_log (acc_,'exception when sz_=', sz_);
       prcrd_.DELETE;
       prcrezal_.DELETE;
 
-      -- портфель одородных кредитов
+      -- портфель одородных кредитов 
       -- для NBS '2202','2203','2207','2620','2625','2605'
-      -- спецпараметр по счету s090 = '4'.
-
+      -- спецпараметр по счету s090 = '4'. 
+      
       IF rezpar6_ = '1'
       THEN
          -- определяем максимальную просрочку на один RNK
@@ -3699,18 +3669,7 @@ to_log (acc_,'exception when sz_=', sz_);
          FOR k IN (SELECT DISTINCT a.rnk
                               FROM v_gl a, specparam s
                              WHERE a.acc = s.acc
-                               AND a.nbs IN
-                                      ('2202',
-                                       '2203',
-        -- пост.НБУ 114 (13.04.2011)   '2206',
-                                       '2207',
-        -- пост.НБУ 114 (13.04.2011)   '2290',
-                                       '2620',
-                                       '2625',
-                                       '2605'
-                                      --,
-                                               --'9129'
-                                      )
+                               AND a.nbs IN ('2203','2620')
                                AND s.s090 = '4'
                                --AND (   a.nbs <> '9129'
                                --     OR a.nbs = '9129' AND s.r013 <> '9'
@@ -3739,7 +3698,7 @@ to_log (acc_,'exception when sz_=', sz_);
       --         просрочки договора не превышающая отчетную дату
       -- datn  - максимальная дата погашения суммарного активного остатка на всех счетах
       --         просрочки договора не превышающая отчетной даты
-      -- prcrezal - признак первичности обеспечения
+      -- prcrezal - признак первичности обеспечения 
       -- ndacc_   - Номер договора для ACC
       -- korprov_ - корректирующие проводки за текущий месяц по всем счетам
       FOR k IN (SELECT   ss.s090, ss.rnk, ss.nd,
@@ -3767,21 +3726,9 @@ to_log (acc_,'exception when sz_=', sz_);
                              WHERE s.acc = a.acc
                                AND a.acc = n.acc
                                AND a.acc = p.acc
-                               AND a.nbs IN
-                                      ('2207','2217','2227','2237','2290','2027',
-                                       '2037','2067','2077','2087','2097',
--- згідно пост.НБУ 114 (13-04-2011)
-                                       '2209','2219','2229','2239','2029',
-                                       '2039','2069','2079','2089','2097',
-                                       '2109','2119','2129','2139','3579','3589'
-                                      )
---                             AND a.acc = NVL (acc_, a.acc)
+                               AND a.tip in ('SP ','SPN','SK9','OFR')
                                AND a.rnk = (select rnk from accounts where acc=NVL (acc_, a.acc))
-                             --AND p.s090 = '4'
                                AND s.fdat <= dat_
-                               /*AND n.nd IN (SELECT nd
-                                              FROM nd_acc
-                                             WHERE acc = NVL (acc_, acc))*/ --T 15.06.2009
                           GROUP BY p.s090, a.rnk, n.nd, s.fdat,a.acc) ss
                 GROUP BY ss.s090, ss.rnk, ss.nd)
       LOOP
@@ -3962,17 +3909,10 @@ to_log (acc_,'exception when sz_=', sz_);
       obs_             INT;
       srq_             NUMBER;
       nd_              INT;
-      N_N              NUMBER;
       szq_             NUMBER;
-      sznq_            NUMBER:=0;
-      sdq_             NUMBER;
       szq2_            NUMBER;
       grp_             INT;
-      arjk_            NUMBER;
       sz_              NUMBER;
-      s_kos            NUMBER:=0;
-      szn_             NUMBER:=0;
-      sd_              NUMBER;
       sz_60_           NUMBER;
       wdate_           DATE;
       pr_rez_          NUMBER;
@@ -4010,8 +3950,8 @@ to_log (acc_,'exception when sz_=', sz_);
       ern     CONSTANT POSITIVE      := 208;
       err              EXCEPTION;
       erm              VARCHAR2 (80);
-      qnt_             number;
-
+      qnt_             number; 
+      
       s270p_           VARCHAR2 (2);
       s270r_           VARCHAR2 (2);
 
@@ -4029,7 +3969,7 @@ to_log (acc_,'exception when sz_=', sz_);
       execute immediate 'truncate table rez_dp';
 
 --      logger.info ('REZ1.REZ_RISK');
-
+    
 
      --проверка - выбран ли рабочий день
       for r in
@@ -4073,15 +4013,15 @@ to_log (acc_,'exception when sz_=', sz_);
               FROM   holiday)
       WHERE  fdat <= LAST_DAY (ADD_MONTHS (dat_, -1));
 
-      -- находим пользователя, который делал проводки в последний день
+      -- находим пользователя, который делал проводки в последний день 
       -- предыдущего месяца. Если не нашла берем текущего пользователя.
       BEGIN
          SELECT userid
          INTO   oldrez_userid_
          FROM   rez_protocol
-         WHERE
-                branch=sys_context('bars_context','user_branch') and
-                dat = oldrez_date_;
+         WHERE 
+                branch=sys_context('bars_context','user_branch') and 
+                dat = oldrez_date_; 
       EXCEPTION
          WHEN NO_DATA_FOUND
          THEN
@@ -4093,20 +4033,20 @@ to_log (acc_,'exception when sz_=', sz_);
       THEN
          -- конкретный acc-счета - не определен
          acckr_ := NULL;
-
+         
          --предварительно накаплинваем данные в массивы
          p_load_data (dat_);
 
          --очищаем все таблицы
          if uselog_ <> 0 then
              DELETE FROM cp_rez_log
-             WHERE  userid = id_; -- Протокол сообщений (пишется при uselog_ ='1')
+             WHERE  userid = id_; -- Протокол сообщений (пишется при uselog_ ='1')  
          end if;
 
          -- Основная таблица расчета резерва
          -- Очищаем по данному исполнителю за выбранную дату
          DELETE FROM tmp_rez_risk
-         WHERE  ID = id_ AND dat = dat_;
+         WHERE  ID = id_ AND dat = dat_; 
 
          -- Расшифровка обеспечения в разрезе кредитных счетов
          DELETE FROM tmp_rez_risk2
@@ -4123,7 +4063,7 @@ to_log (acc_,'exception when sz_=', sz_);
          DELETE FROM tmp_rez_params
          WHERE  ID = id_ AND dat = dat_;
 
-         delete from srezerv_errors s
+         delete from srezerv_errors s 
          where  s.userid = id_;
 
          -- Кем и когда формировался резерв
@@ -4136,8 +4076,8 @@ to_log (acc_,'exception when sz_=', sz_);
 
          -- 1. залоги вне залогового портфеля
          INSERT INTO pawn_acc
-                     (acc,pawn)
-            SELECT DISTINCT p.acc,90
+                     (acc)
+            SELECT DISTINCT p.acc
                        FROM cc_accp p
                       WHERE NOT EXISTS (SELECT pp.acc
                                           FROM pawn_acc pp
@@ -4183,7 +4123,7 @@ to_log (acc_,'exception when sz_=', sz_);
 
         END LOOP;
 
-        --занесение данных по дисконту/премии
+        --занесение данных по дисконту/премии 
         insert into rez_dp
         (
           ACC  , -- счет дисконта/премии
@@ -4210,7 +4150,7 @@ to_log (acc_,'exception when sz_=', sz_);
         --занесение данных по  кредитным счетам
         --(по которых будем считать резерв)
         insert into REZ_ACC
-        ( ACC   ,
+        ( ACC   , 
           NLS   , -- кредитный счет
           KV    , -- код валюты
           NBS   , -- номер балансового счета
@@ -4226,60 +4166,29 @@ to_log (acc_,'exception when sz_=', sz_);
           MDATE , --не используется
           DAZS  , --не используется
           ACCC  , -- РНК клиента
-          TOBO    --
+          TOBO    -- 
          -- CODCAGENT
         )
         select *
-        from (
-            with nb as
-            ( --выбор балансовых счетов, которые должны резервироваться
-              SELECT r020, a010
-                FROM kod_r020
-                WHERE a010 = '11' AND prem = 'КБ '
-                -- балансові рах.виключені згідно пост. НБУ 114 13-04-2011
-                -- '1581','1582','1589','2092','2093','2095','2096','2097',
-                -- '2099','2190','2191','2198','2199','2292','2295','2299',
-                -- '9090','9091'
-                      AND r020 not in ('1581','1582','1589','1590','1591',
-                      '2092','2093','2095','2096','2097','2099','2190','2191',
-                      '2198','2199','2292','2295','2299','2400','2401','3690',
-                      '9090','9091')
-                      AND nbspremiy_ NOT LIKE '%' || r020 || '%'
-                group by r020, a010
-                union
-                (select '2600' r020, '11' a010 from dual union all
-                 select '1500' r020, '11' a010 from dual union all
-                 select '1515' r020, '11' a010 from dual union all
-                 select '1513' r020, '11' a010 from dual union all
-                 select '1514' r020, '11' a010 from dual union all
-                 select '3548' r020, '11' a010 from dual union all
-                 select '1520' r020, '11' a010 from dual
-
-                )
-            ),
-            nd as
-            (--выбор кредитных договоров
-             select acc, max(nd) nd
-                               from nd_acc
-                               group by acc
-            )
+        from ( with nb as ( select nbs r020, 11 a010 from rez_nls_23),
+                    nd as ( select acc, max(nd) nd from nd_acc group by acc )
              --нахождение остатков по счетам с учетом корректирующих
              select  --+ index(s PK_SALDOA) ordered full(a)
                         a.acc,
-                        a.nls,
-                        a.kv,
+                        a.nls,  
+                        a.kv, 
                         a.nbs ,
                         n.nd rnk,
                         a.DAOS, --T 09.01.2009
-                        null dapp,
-                        a.isp,
+                        null dapp, 
+                        a.isp, 
                         null nms,
-                        (nvl(s.ostf,0) - nvl(s.dos,0) + nvl(s.kos,0) +  nvl(kp.s,0)) lim,
+                        (nvl(s.ostf,0) - nvl(s.dos,0) + nvl(s.kos,0) +  nvl(kp.s,0)) lim, 
                         null pap,
-                        a.tip,
-                        null vid,
-                        null mdate,
-                        null dzs,
+                        a.tip, 
+                        null vid, 
+                        null mdate, 
+                        null dzs, 
                         a.rnk accc
                         , a.tobo--, null
             from       nb k,
@@ -4332,47 +4241,44 @@ to_log (acc_,'exception when sz_=', sz_);
                       and a.acc = s.acc
                               and a.nbs in  (SELECT r020 from nb where a010 || decode(a.acc,-1,'*','') = '11')
                               and a.acc  = n.acc(+));
-
+        
         --данные про залоги
         insert into rez_zal
-        ( ACC     , -- АСС счета залога
-          ACCS    , -- ФСС счета кредитного
-          KV      , -- код валюты
-          NLS     , -- счет залога
-          NBS     , -- балансовый счет
-          PAWN    , -- вид залога
-          S031    , -- вид залога НБУ
-          R031    , -- группа валют (1-НВ нац.валюта, 2- ВКВ вільно-конвертована 3-НКВ з обмеженою конвертацією
-          PR_12   , -- признак первичности кредита
-          PWN     , -- кол-во видов залога по одному основному счету
-          OSTC_Z  , -- остаток по счету залога
-          OSTC_Z31, -- для s031
-          ACCS1   , -- счет кредитный, который тоже онтосится к данному счету залога
-          OSTC_S  , -- остаток по кредитному счету
-          ND        -- РНК клиента
+        ( ACC   , -- АСС счета залога
+          ACCS  , -- ФСС счета кредитного
+          KV    , -- код валюты
+          NLS   , -- счет залога
+          NBS   , -- балансовый счет
+          PAWN  , -- вид залога
+          S031  , -- вид залога НБУ
+          R031  , -- группа валют (1-НВ нац.валюта, 2- ВКВ вільно-конвертована 3-НКВ з обмеженою конвертацією
+          PR_12 , -- признак первичности кредита
+          PWN   , -- кол-во видов залога по одному основному счету
+          OSTC_Z, -- остаток по счету залога
+          ACCS1 , -- счет кредитный, который тоже онтосится к данному счету залога 
+          OSTC_S, -- остаток по кредитному счету
+          ND      -- РНК клиента
         )
-        SELECT z.acc, z.accs, a.kv, a.nls, a.nbs, sz.pawn, c.s031, k.r031, z.pr_12,
+        SELECT z.acc, z.accs, a.kv, a.nls, a.nbs, sz.pawn, c.s031, k.r031, z.pr_12, 
                count(distinct c.s031) over(partition by z.accs) pwn,
                decode(zal_sp_,1,
                       nvl(sz.sv,(nvl(s.ostf,0) - nvl(s.dos,0) + nvl(s.kos,0) +  nvl(kp.s,0))),
-                     (nvl(s.ostf,0) - nvl(s.dos,0) + nvl(s.kos,0) +  nvl(kp.s,0))) ostc_z,
-               nvl(s.ostf,0) - nvl(s.dos,0) + nvl(s.kos,0) +  nvl(kp.s,0)   OSTC_Z31,
+                     (nvl(s.ostf,0) - nvl(s.dos,0) + nvl(s.kos,0) +  nvl(kp.s,0))) ostc_z, 
                z1.accs accs1, nvl(o.lim,0) ostc_s, o.rnk
          FROM cc_pawn c, pawn_acc sz, cc_accp z, v_gl a, kl_r030 k,
               (SELECT   acc, MAX (fdat) fdat FROM saldoa WHERE fdat <= dat_
-               GROUP BY acc) sel,
+               GROUP BY acc) sel, 
                saldoa s, rez_KOR_PROV kp,cc_accp z1,REZ_ACC o
          WHERE z.acc = a.acc AND sz.acc = z.acc AND c.pawn(+) = sz.pawn
-               AND TO_NUMBER (k.r030) = a.kv
-  --           and (par_ob22 = 0 or (par_ob22 = 1 and a.nbs <> '9031'))
-               and a.acc = sel.acc(+)
+               AND TO_NUMBER (k.r030) = a.kv and (par_ob22 = 0 or
+               (par_ob22 = 1 and a.nbs <> '9031')) and a.acc = sel.acc(+)
                and s.acc(+) = sel.acc and s.fdat(+) = sel. fdat
                and a.acc = kp.acc(+)  and z.acc  = z1.acc
                and z1.accs = o.acc(+) and nvl(o.lim,0)  <> 0
-               and (decode(zal_sp_,1,nvl(sz.sv,(nvl(s.ostf,0) - nvl(s.dos,0) +
-                          nvl(s.kos,0) +  nvl(kp.s,0))),(nvl(s.ostf,0) -
-                          nvl(s.dos,0) + nvl(s.kos,0) +  nvl(kp.s,0)))<>0 or
-                   nvl(s.ostf,0) - nvl(s.dos,0) + nvl(s.kos,0) +  nvl(kp.s,0)<>0) ;
+               and decode(zal_sp_,1,nvl(sz.sv,(nvl(s.ostf,0) - nvl(s.dos,0) + 
+                          nvl(s.kos,0) +  nvl(kp.s,0))),(nvl(s.ostf,0) - 
+                          nvl(s.dos,0) + nvl(s.kos,0) +  nvl(kp.s,0)))<>0 ;
+
 
 --         COMMIT;
       ELSE  -- по конкретному счету
@@ -4413,7 +4319,7 @@ to_log (acc_,'exception when sz_=', sz_);
               acc      accounts.acc%TYPE,
               kv       accounts.kv%TYPE,
               nls      accounts.nls%TYPE,
-              rez      crisk.rez%TYPE,
+              rez      crisk.rez%TYPE, 
               rez2     crisk.rez2%TYPE,
               rez3     crisk.rez3%TYPE,
               rez4     crisk.rez4%TYPE,
@@ -4434,9 +4340,9 @@ to_log (acc_,'exception when sz_=', sz_);
               ostc     accounts.ostc%TYPE,
               wdate    DATE,
               sm_nd    accounts.ostc%TYPE,
-              cc_id1   cc_deal.cc_id%TYPE,
+              cc_id1   cc_deal.cc_id%TYPE, 
               obs      cc_deal.obs%TYPE,
-              k_date   DATE,
+              k_date   DATE, 
               n        cc_deal.nd%TYPE,
               tip      accounts.tip%TYPE,
               ob22     specparam_int.ob22%TYPE,
@@ -4447,30 +4353,30 @@ to_log (acc_,'exception when sz_=', sz_);
       BEGIN
 
       IF acckr_ is null THEN  -- конкретный счет не задан
-         OPEN c0 FOR
+         OPEN c0 FOR 
          select s080,    -- категория риска
                 s090,    -- вид зодолженности по кредит.опер.(расшифр.KL_S090)
                 isp,     -- исполнитель
-                tobo,
-                r013,    -- NBS+R013
-                r013_2,  -- параметр r013 (описан в справочнике KL_R013 в зависимости от бал.счета),
+                tobo, 
+                r013,    -- NBS+R013  
+                r013_2,  -- параметр r013 (описан в справочнике KL_R013 в зависимости от бал.счета), 
                 istval,  -- источник вал.выручки
                 rnk,     -- РНК клиента
                 nmk,     -- наименование клиента
-                custtype,-- тип клиента
-                acc,     -- ACC кредитного счета
+                custtype,-- тип клиента 
+                acc,     -- ACC кредитного счета 
                 kv,      -- код валюты
-                nls,     -- кредитный счет
+                nls,     -- кредитный счет 
                 rez,     -- % резервирования (CRISK)
                 rez2, rez3, rez4, rez5,
-                NAME,    -- наименование категории риска
+                NAME,    -- наименование категории риска 
                 nbs,     -- балансовый счет
                 fin,     -- фин.стан
                 cc_id,   -- номер договора
                 country, -- код страны
                 rz,      -- 2 - нерезидент 1 - резидент
-                corp,
-                DAOS ,   -- дата открытия счета
+                corp,   
+                DAOS ,   -- дата открытия счета 
                 s182,    -- тип кредита (1-краткосроч.2-долгосроч.3-кред.линия)
                 otd ,    -- отдел
                 nd,      -- референц кредитного договора
@@ -4478,30 +4384,30 @@ to_log (acc_,'exception when sz_=', sz_);
                 dsc,     -- дисконт
                 ostc,    -- остаток по счету
                 wdate,   -- дата выдачи кредита
-                sum(decode(nvl(nd,-1), -1, 0,
-                    decode(tip,'SS ', ostc, 'SP ', ostc, 'SL ', ostc,0)))
+                sum(decode(nvl(nd,-1), -1, 0, 
+                    decode(tip,'SS ', ostc, 'SP ', ostc, 'SL ', ostc,0)))  
                     over(partition by nd) sm_nd,
-                -- сумма остатков по счетам данного кредитного договора
-                cc_id1,  -- номер кредитного договора
+                -- сумма остатков по счетам данного кредитного договора  
+                cc_id1,  -- номер кредитного договора  
                 obs,     -- обслуживание долга (1-добре, 2-слаб.3-незадов.)
-                k_date,  -- дата завершения кредитного договора
-                n,       -- референц договора ????
+                k_date,  -- дата завершения кредитного договора 
+                n,       -- референц договора ???? 
                 tip,     -- тип счета
                 ob22,    -- OB22 для сбербанка (sb_ob22 - расшифровка)
                 nd_2     -- для кредитов рефер ???
          from ( select NVL (p.s080, '1') s080, p.s090, a.isp, a.tobo,
                        a.nbs || DECODE (NVL (p.r013, '1'), '9', '9', '1') r013,
-                       p.r013 r013_2, NVL(p.istval, '0') istval, c.rnk,
+                       p.r013 r013_2, NVL (p.istval, '0') istval, c.rnk,
                        decode(c.custtype,3,SUBSTR (c.nmk, 1, 35),
                               nvl(substr(c.nmkk,1,35),SUBSTR (c.nmk, 1, 35))) nmk,
-                       DECODE (TRIM (c.sed), '91', DECODE (c.custtype, 3, 2,
+                       DECODE (TRIM (c.sed), '91', DECODE (c.custtype, 3, 2, 
                                c.custtype),c.custtype) custtype,
-                       a.acc, a.kv, a.nls, r.rez, r.rez2, r.rez3, r.rez4,
-                       r.rez5, r.NAME,a.nbs,
-                       nvl(dd.fin,c.crisk) fin,
+                       a.acc, a.kv, a.nls, r.rez, r.rez2, r.rez3, r.rez4, 
+                       r.rez5, r.NAME,a.nbs, 
+                       nvl(dd.fin,c.crisk) fin, 
                        SUBSTR (c.nd, 1, 20) cc_id,
                        NVL (c.country, acountry) country,
-                       DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6',
+                       DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6', 
                                2, 1) rz,MIN (cw.VALUE) corp,a.DAOS,p.s182,
                        min(o.otd) otd,a.rnk nd,
                        sum(decode(nvl(dp.pr,'*'),'P',dp.rest,0)) prm,
@@ -4512,7 +4418,7 @@ to_log (acc_,'exception when sz_=', sz_);
                        nvl(dd.obs,nvl(v.obs,vv.obs)) obs,
                        nvl(dd.wdate, nvl(v.datd2, vv.datd2)) k_date,
                        nvl(dd.nd,nvl(v.acc,vv.acc)) n,a.tip,
-                       i.ob22,
+                       i.ob22, 
                        nvl(dd.nd,nvl(v.nd,vv.nd)) nd_2
                 from REZ_ACC a
                 left join specparam p on a.acc = p.acc
@@ -4528,27 +4434,28 @@ to_log (acc_,'exception when sz_=', sz_);
                 left join cc_deal dd on a.rnk = dd.nd
                 -- по спецпараметру счета REZ_N=1 - не включаются в резерв (L.09-09-2010)
                 left join accountsw aw on a.acc=aw.acc and aw.tag='REZ_N'
-         where not(a.nbs = '3548' and nvl(p.r011,'0') <> '1')
+       
+                where not(a.nbs = '3548' and nvl(p.r011,'0') <> '1')
                       and NVL(aw.value,'0')<>'1'
-                group by NVL (p.s080, '1') , p.s090, a.isp, a.tobo, a.nbs ||
-                      DECODE (NVL (p.r013, '1'), '9', '9', '1'),p.r013 ,
+                group by NVL (p.s080, '1') , p.s090, a.isp, a.tobo, a.nbs || 
+                      DECODE (NVL (p.r013, '1'), '9', '9', '1'),p.r013 , 
                       NVL (p.istval, '0') , c.rnk,decode(c.custtype,3,
                       SUBSTR(c.nmk,1,35),nvl(substr(c.nmkk,1,35),
-                      SUBSTR (c.nmk, 1, 35))),DECODE(TRIM (c.sed),'91',
+                      SUBSTR (c.nmk, 1, 35))),DECODE(TRIM (c.sed),'91', 
                       DECODE (c.custtype, 3, 2, c.custtype), c.custtype ) ,
-                      a.acc, a.kv, a.nls, r.rez, r.rez2, r.rez3, r.rez4,
-                      r.rez5,r.NAME,a.nbs,
-                      nvl(dd.fin,c.crisk),
+                      a.acc, a.kv, a.nls, r.rez, r.rez2, r.rez3, r.rez4, 
+                      r.rez5,r.NAME,a.nbs, 
+                      nvl(dd.fin,c.crisk), 
                       SUBSTR (c.nd, 1, 20),NVL (c.country, acountry) ,
                       DECODE (NVL (c.codcagent, 1),'2',2,'4',2,'6',2,1),
-                      a.DAOS,p.s182,a.LIM,d.wdate,a.accc,a.tip,dd.cc_id,
-                      dd.obs, dd.wdate,v.datd,vv.datd,v.ndoc, vv.ndoc,
+                      a.DAOS,p.s182,a.LIM,d.wdate,a.accc,a.tip,dd.cc_id, 
+                      dd.obs, dd.wdate,v.datd,vv.datd,v.ndoc, vv.ndoc, 
                       v.obs,vv.obs,v.datd2, vv.datd2, dd.nd,v.acc,vv.acc,
                       to_number(a.NMS),a.rnk,
-                      i.ob22,
+                      i.ob22, 
                       nvl(dd.nd,nvl(v.nd,vv.nd))
         );
-      ELSE    -- задан конкретный счет
+      ELSE    -- задан конкретный счет 
         OPEN c0 FOR
         --по указанному счету
         select NVL (p.s080, '1') s080, p.s090, a.isp, a.tobo,
@@ -4561,8 +4468,8 @@ to_log (acc_,'exception when sz_=', sz_);
                          c.custtype) custtype,
                  a.acc, a.kv, a.nls, r.rez, r.rez2, r.rez3, r.rez4, r.rez5,
                  r.NAME,a.nbs,
-                 NVL((select FIN from cc_deal
-                      where nd=rez1.f_get_nd(a.acc)), c.CRISK ) fin,
+                 NVL((select FIN from cc_deal 
+                      where nd=rez1.f_get_nd(a.acc)), c.CRISK ) fin, 
                  SUBSTR (c.nd, 1, 20) cc_id,NVL (c.country, acountry) country,
                  DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6', 2, 1) rz,
                 (select MIN (VALUE) from customerw cw
@@ -4573,22 +4480,9 @@ to_log (acc_,'exception when sz_=', sz_);
                 (select wdate from cc_add
                  where nd = f_get_nd(a.acc) and adds = 0) wdate,null sm_nd,
                  null cc_id1,  null obs, null k_date,null n,null tip,
-                 null ob22,
+                 null ob22, 
                  null nd_2
-        from v_gl a,
-            (SELECT r020, '11' a010 FROM kod_r020
-             WHERE a010 = '11' AND prem = 'КБ '
-                   AND r020 not in ('1590','1591','2400','2401','3690')
-                   AND nbspremiy_ NOT LIKE '%' || r020 || '%'
-             group by r020
-             union
-            (select '2600' r020, '11' a010 from dual union all
-             select '1500' r020, '11' a010 from dual union all
-             select '1515' r020, '11' a010 from dual union all
-             select '1513' r020, '11' a010 from dual union all
-             select '1514' r020, '11' a010 from dual union all
-             select '1520' r020, '11' a010 from dual
-             )) k,specparam p,crisk r,customer c
+        from v_gl a, ( select nbs r020, 11 a010 from rez_nls_23) k,specparam p,crisk r,customer c
         where a.nbs = k.r020 AND (a.dazs IS NULL OR a.dazs > dat_)
               AND a.acc = p.acc(+) AND NVL (p.s080, '1') = r.crisk
               AND a.rnk = c.rnk and a.acc = acckr_
@@ -4637,13 +4531,13 @@ to_log (acc_,'exception when sz_=', sz_);
          IF dnprcre_.EXISTS (k.rnk)
          THEN
             dnipr_ := dnprcre_ (k.rnk);
-         else
+         else 
             dnipr_ := 0; --T 16.06.2009
          END IF;
 
          -- флаг - счет включен в портфель однородных кредитов
          IF     dodncre_.EXISTS (k.rnk)
-            AND k.nbs IN ('2202', '2203', '2207', '2290', '2620', '2625','2605')
+            AND k.nbs IN ('2203','2620')
             AND k.s090 = '4'
          THEN
             odncre_ := 'y';
@@ -4745,7 +4639,7 @@ to_log (acc_,'exception when sz_=', sz_);
             --находим сумму дисконта по данному счету
             --если по договору к которому относится счет есть дисконт
             --иначе сумма дисконта = 0
-            if nvl(k.dsc,0) <> 0 then
+            if nvl(k.dsc,0) <> 0 then  
                discont_ := NVL (rez1.ca_fq_discont (k.acc, dat_,0,999,k.nd,
                                                      gl.p_icurval (k.kv, k.sm_nd, dat_),
                                                      (case when instr('SS SP SL ', k.tip)= 0 then 0 else gl.p_icurval (k.kv, k.ostc, dat_) end)), 0);--T 26.02.2009
@@ -4781,16 +4675,16 @@ to_log (acc_,'exception when sz_=', sz_);
 --            if vid_zal=40 THEN
 --               vid_zal := f_rez_s031(dat_,id_,k.acc);
 --               s031_   := vid_zal;
---               to_log (k.acc, 'f_get_s031',vid_zal);
+--               to_log (k.acc, 'f_get_s031',vid_zal); 
 --            end if;
 
             --zal_ - сумма обеспечения по счету без процента от обеспечения
             zal_ := zal_/100; --T 24.02.2009
             prem_ := ABS (prem_);--T 26.02.2009
 
-/*            IF zal_=0 THEN
+            IF zal_=0 THEN
                vid_zal := null;
-            END IF; */
+            END IF; 
 
             --сумма кредитного риска
             srq_ := (ostq_ + del_) - discont_ + prem_ - soq_;
@@ -4888,7 +4782,7 @@ to_log (acc_,'exception when sz_=', sz_);
                   THEN
                      --параметры кредитного договора по договорам овердрафт
                      --(т.е. те которых нет в nd_acc)
-                     --Пластиковые карточки ???
+                     --Пластиковые карточки ??? 
                      BEGIN
                         --Оверд
                         SELECT SUBSTR (ndoc, 1, 20), obs, datd, datd2,
@@ -4947,10 +4841,10 @@ to_log (acc_,'exception when sz_=', sz_);
 
             --определяем дату открытия кредита
             k.daos := nvl(wdate_,  k.daos);--T 09.01.2009
-
+            
             -- определение процента резервирования по категории риска
             IF rezpar5_ = 0  --  процент резервирования по старому
-            THEN
+            THEN                                
                IF    k.istval = 1
                   OR k.kv = 980
                   OR (SUBSTR (k.nbs, 1, 3) IN ('151', '152'))
@@ -4962,7 +4856,7 @@ to_log (acc_,'exception when sz_=', sz_);
                   pr_rez_ := k.rez2;
                END IF;
             ELSIF rezpar5_ = 1  -- процент резервирования по 83 постанове
-            THEN
+            THEN                                       
                --% для счетов в гривне
                IF    k.kv = 980
                   OR (SUBSTR (k.nbs, 1, 3) IN ('151', --Строкові вклади (депозити), які розміщені в інших банках
@@ -5167,11 +5061,11 @@ to_log (acc_,'exception when sz_=', sz_);
                ostq_ := 0;
                srq_  := 0;
             --2. Авалі, що надані клієнтам за податковими векселями
-            ELSIF k.nbs = '9023' AND k.r013_2 = '1'
+            ELSIF k.nbs = '9003' AND k.r013_2 = '1'
             THEN
                to_log
                     (k.acc,
-                     'Специальная обработка: nbs = 9023 r013=1. Резерв = 0.',
+                     'Специальная обработка: nbs = 9003 r013=1. Резерв = 0.',
                      ''
                     );
                sz_   := 0;
@@ -5207,62 +5101,38 @@ to_log (acc_,'exception when sz_=', sz_);
            -- DBMS_OUTPUT.put_line (   'ostc_ + del_='
              --                     || TO_CHAR (ROUND (ostc_ + del_))
                --                  );
-
-
-           N_N:= cck_app.Get_ND_TXT_ex (nd_,'N_NAL',dat_);
-
-           begin
-              select 1 into ARJK_
-                     --d.*,to_date(cck_app.get_nd_txt(d.nd,'DINDU'),
-                     --'dd-mm-yyyy') dat_in_arjk,to_date(cck_app.get_nd_txt(d.nd,
-                     --'DO_DU'),'dd-mm-yyyy') dat_out_arjk
-              from cc_deal d
-              where vidd in (11,12,13) and d.nd=nd_ and
-                    to_date(cck_app.get_nd_txt(d.nd,'DINDU'),
-                    'dd-mm-yyyy') <= dat_ and nvl(to_date(cck_app.get_nd_txt (d.nd,
-                    'DO_DU'),'dd-mm-yyyy') , dat_+1) > dat_;
-              EXCEPTION WHEN NO_DATA_FOUND THEN ARJK_:=0;
-           end;
-
-           if N_N=1 or ARJK_=1 THEN
-              szn_  := sz_;
-              sznq_ := szq_;
-           else
-              szn_  := 0;
-              sznq_ := 0;
-           end if;
-
+           
            --проверка соответствия параметров OB22 и R013 по счетам 9129
            --только для СБЕРА
            if nvl(GetGlobalOption('OB22'),0) = 1 then
                if substr(k.nls ,1, 4) = '9129' then
---                  select count(*) into qnt_
---                  from srezerv_ob22
---                  where nbs = '9129' and ob22 = k.OB22;
-
+--                  select count(*) into qnt_ 
+--                  from srezerv_ob22 
+--                  where nbs = '9129' and ob22 = k.OB22; 
+                  
                   if ((k.r013_2 = '9' and (k.ob22 = '04' or
                                            k.ob22 = '05' or
                                            k.ob22 = '07' or
                                            k.ob22 = '03' or
                                            k.ob22 = '12' or
                                            k.ob22 = '13' or
-                                           k.ob22 = '11'))
+                                           k.ob22 = '11')) 
                    or (k.r013_2 = '1' and (k.ob22 <> '04' and
                                            k.ob22 <> '05' and
                                            k.ob22 <> '07' and
-                                           k.ob22 <> '03' and
+                                           k.ob22 <> '03' and 
                                            k.ob22 <> '12' and
                                            k.ob22 <> '13' and
                                            k.ob22 <> '11'))
                       ) then
-                    p_error( 4, substr(k.nls,1,4)||'/'||k.OB22,null, null,
-                             k.kv, k.tobo, substr(k.nls,1,4)||'/'||k.OB22,
+                    p_error( 4, substr(k.nls,1,4)||'/'||k.OB22,null, null, 
+                             k.kv, k.tobo, substr(k.nls,1,4)||'/'||k.OB22, 
                              null, null, k.custtype*100, k.nls||' (R013='||
                              k.r013_2||', OB22='||k.OB22||')','Реф. КД = '||
                              k.nd_2||', № КД = '||cc_id_);
                   end if;
                end if;
-           end if;
+           end if;      
             --записываем рассчитанный резерв
             IF mode_ <> 2
             THEN
@@ -5273,31 +5143,31 @@ to_log (acc_,'exception when sz_=', sz_);
                             s080_name,-- наименование категории риска
                             custtype, -- тип клиента
                             rnk,      -- РНК клиента
-                      -----------------------------
+                      -----------------------------     
                             nmk,      -- наименование клиента
                             kv,       -- код валюты
                             nls,      -- счет основного долга
-                            sk,       -- остаток в номинале на счете актива с
+                            sk,       -- остаток в номинале на счете актива с 
                                       -- учетом ЗО на отчетную дату
-                      -----------------------------
+                      ----------------------------- 
                             skq,      -- остаток в эквиваленте
-                            soq,      -- приведенное обеспечение
+                            soq,      -- приведенное обеспечение 
                       -----------------------------
-                            srq,      -- чистый кредитный риск = остаток на
-                                      -- счете кредита принятый в
-                                      -- расчет - дисконт - приведенное
+                            srq,      -- чистый кредитный риск = остаток на 
+                                      -- счете кредита принятый в 
+                                      -- расчет - дисконт - приведенное 
                                       -- обеспечение
                             szq,      -- резерв в эквиваленте
                             sz,       -- резерв в номинале
                             cc_id,    -- номер кредитного договора
                       -----------------------------
                             idr,      -- код вида резерва
-                            fin,      -- финстан
+                            fin,      -- финстан 
                             obs,      -- обслуживание долга
                             rs080,    -- расчетная категория риска
                       -----------------------------
-                            country,  -- страна контрагента
-                            pr_rez,   -- % резервирования
+                            country,  -- страна контрагента 
+                            pr_rez,   -- % резервирования 
                             rz,       -- резидентность
                             acc,      -- acc счета актива
                             nd,       -- референц кредитного договора
@@ -5315,20 +5185,19 @@ to_log (acc_,'exception when sz_=', sz_);
                             otd,      -- отдел отв.исполнителя
                             tobo,     -- ТОБО
                       -----------------------------
-                            skq2,     -- остаток на счете кредита принятый в
+                            skq2,     -- остаток на счете кредита принятый в 
                                       -- расчет, для 9129 = 50% и т.п.
                       -----------------------------
                             discont,  -- приведенный дисконт
                             prem,     -- премия
                             sn,       -- признак (стандартный/нестандартный
                             szq2,     -- резерв в эквиваленте без учета дисконта
-                            corp,     -- признак корпоративного клиента
-                      -----------------------------
+                            corp,     -- признак корпоративного клиента 
+                      ----------------------------- 
                             istval,   -- признак наличия источника вал.выручки
                             odncre,   -- признак однородного кредита
                             dnipr,    -- дни просрочки однородного кредита
                             fl_newacc -- 'n'-новый,'i'-в прошлом мес.был в этом - нет
-                            ,szn,sznq,arjk
                            )
                     VALUES (dat_, id_, s080_, s080_name_, custtype_, k.rnk,
                             k.nmk, k.kv, k.nls, ROUND (ostc_ + del_),
@@ -5341,16 +5210,15 @@ to_log (acc_,'exception when sz_=', sz_);
                             GREATEST (ostq_ - discont_ + prem_, 0),
                             discont_, prem_, sn_, ROUND (szq2_), k.corp,
                             istval_, odncre_, dnipr_,'n'
-                            ,round(szn_),round(sznq_),arjk_
                            );
 
               -- таблица параметров используемых при расчете резерва
               insert into TMP_REZ_PARAMS
                     (dat , id , acc  , r013    , s270, istval  , s090  ,
-                     ob22, s370,s080)
+                     ob22, s370)
               values(dat_, id_, k.acc, k.r013_2, null, k.istval, k.s090,
-                     k.ob22,
-                     null,s080_);
+                     k.ob22, 
+                     null);
 
 
             END IF;
@@ -5368,12 +5236,12 @@ to_log (acc_,'exception when sz_=', sz_);
                                              FROM holiday) AND
                             fdat <= add_months(LAST_DAY (dat_),-1);
 
-     IF (dat_ - 31) >=  datpr_ THEN
+     IF (dat_ - 31) >=  datpr_ THEN   
 
         INSERT INTO rez_KOR_PROV (acc, s, vdat)
           SELECT o.acc, NVL (SUM (DECODE (o.dk, 1, o.s, -o.s)), 0), p.vdat
              FROM opldok o, oper p, v_gl a
-            WHERE
+            WHERE 
               o.fdat > datpr_ --dat_- 31
               AND o.fdat <= datpr_ + 15 --dat_
               AND o.sos = 5
@@ -5381,7 +5249,7 @@ to_log (acc_,'exception when sz_=', sz_);
               AND p.vob = 96
               AND p.vdat = datpr_--dat_
 --            AND (dat_ - 31) >=  datpr_
-              and a.acc = o.acc and (a.nbs like '2__9' or a.nbs = '3579')
+              and a.acc = o.acc AND a.tip in ('SPN','SK9','OFR')
               group by o.acc, p.vdat;
      END IF;
 
@@ -5391,9 +5259,9 @@ to_log (acc_,'exception when sz_=', sz_);
 
 -- РЕЗЕРВЫ ПО ПРОСРОЧЕННЫМ ПРОЦЕНТАМ и СОМНИТЕЛЬНЫМ ПРОЦЕНТАМ
 --1. не учитывается обеспечение
---2. резервируются
+--2. резервируются  
      --2.1. просроченные свыше 30 дней всегда!!!!
-     --2.2. если параметр S270 = 08 - резервируются ВСЕ проценты
+     --2.2. если параметр S270 = 08 - резервируются ВСЕ проценты 
      --     (и начисленные, и просроченные до 30, и просроченные свыше)
      --      нужно ли учитывать S270 = 08 определяется параметром rezpar11_ = 1
 --3. % резервирования всегда 100%
@@ -5402,20 +5270,20 @@ to_log (acc_,'exception when sz_=', sz_);
 --    ОТСЮДА MIK 08-12-2010
       DECLARE
          TYPE r0Typ IS RECORD (
+              tip      accounts.tip%TYPE,
               rnk      customer.rnk%TYPE,
               nmk      customer.nmk%TYPE,
-              custtype customer.custtype%TYPE,
+              custtype customer.custtype%TYPE,  
               tobo     accounts.tobo%TYPE,
               s080     specparam.s080%TYPE,
               r013     specparam.r013%TYPE,
-              s370     specparam.s370%TYPE,
+              s370     specparam.s370%TYPE, 
               acc      accounts.acc%TYPE,
               kv       accounts.kv%TYPE,
               nls      accounts.nls%TYPE,
               isp      accounts.isp%TYPE,
               priz     VARCHAR2(2),
               nbs      accounts.nbs%TYPE,
-              istval   VARCHAR2(1),
               fin      customer.crisk%TYPE,
               country  customer.country%TYPE,
               rz       customer.codcagent%TYPE,
@@ -5429,8 +5297,7 @@ to_log (acc_,'exception when sz_=', sz_);
               wdate    DATE,
               cc_id    cc_deal.cc_id%TYPE,
               obs      cc_deal.obs%TYPE,
-              k_date   DATE,
-              ost_nal  accounts.ostc%TYPE
+              k_date   DATE
    );
    k r0Typ;
 
@@ -5439,7 +5306,8 @@ to_log (acc_,'exception when sz_=', sz_);
       IF acckr_ is null and rezpar11_ = 1 THEN
        --по всем счетам и учитываем S270 = 08 (т.е. резервироваться будуи ВСЕ %)
          OPEN c0 FOR
-         select c.rnk,      -- РНК клиента
+         select t.tip,
+                c.rnk,      -- РНК клиента
                 decode(c.custtype,3,SUBSTR (c.nmk, 1, 35),
                        nvl(substr(c.nmkk,1,35),SUBSTR (c.nmk, 1, 35))) nmk, --наименование клиента
                 DECODE (TRIM (c.sed),'91', DECODE (custtype, 3, 2, custtype),
@@ -5454,12 +5322,11 @@ to_log (acc_,'exception when sz_=', sz_);
                 t.isp,      -- ответственный исполнитель
                 t.priz,     -- SUBSTR (a.nbs, 3, 2) ='80'- сомнительная задолженность
                 t.nbs,      -- балансовый счет
-                istval,   -- источник валютной выручки
                 NVL( dd.FIN, c.CRISK ) fin,-- финстан
                 NVL (c.country, acountry) country, -- код страны
-                DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6', 2, 1) rz,
+                DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6', 2, 1) rz, 
                             -- резидентность 2 - нерезидент 1 - резидент
-                MIN (cw.VALUE) corp,
+                MIN (cw.VALUE) corp, 
                 t.daos,     -- дата открытия счета
                 t.s182,     -- тип кредита (1-краткосроч.2-долгосроч.3-кред.линия)
                 t.s270,     -- '08' - включать начисленные проценты в расчет резерва
@@ -5468,40 +5335,17 @@ to_log (acc_,'exception when sz_=', sz_);
                 t.nd,       -- референц кредитного договора
                 nvl(d.wdate,t.daos) wdate,      -- дата начала договора
                 SUBSTR (dd.cc_id, 1, 20) cc_id, -- номер договора
-                dd.obs obs, -- обслуживание долга (1-добре, 2-слаб.3-незадов.)
-                dd.wdate k_date,  -- дата завершения кредитного договора
-                nvl(abs(nvl(s1.ostf,0)-nvl(s1.dos,0)+nvl(s1.kos,0)),0) ost_nal
-         from ( select a.tobo,NVL (p.s080, '') s080, NVL (p.r013, '') r013,
-                       p.s370,a.acc, a.rnk, a.kv,a.nls, a.isp,
-                       NVL(p.istval,'0') istval,SUBSTR (a.nbs, 3, 2) priz,
-                       a.nbs,a.daos,p.s182,p.s270,(nvl(s.ostf,0)-nvl(s.dos,0)+
-                       nvl(s.kos,0)+nvl(kp.s,0)) ostc,n.nd
-                from ( SELECT  r020, SUBSTR (r020, 4, 1) sb FROM kl_r011 kk
-                       WHERE trim(prem) = 'КБ'
-                             AND SUBSTR (r020, 4, 1) in ('8','9')
-                             and d_close is null and kk.REM = 'D5'
-                       group by r020, SUBSTR (r020, 4, 1)
-                       union
-                      (select '2480' r020, '9' sb from dual union all
-                       select '1518' r020, '8' sb from dual union all
-                       select '1519' r020, '9' sb from dual union all
-                       select '1780' r020, '9' sb from dual union all
-                       select '3589' r020, '9' sb from dual union all
-                       select '2239' r020, '9' sb from dual union all
-                       select '2238' r020, '8' sb from dual union all
-                       select '3578' r020, '8' sb from dual union all
-                       select '3579' r020, '9' sb from dual union all
-                       select '3570' r020, '8' sb from dual union all
-                       select '2607' r020, '8' sb from dual union all
-                       select '2627' r020, '8' sb from dual union all
-                       select '2028' r020, '8' sb from dual union all
-                       select '2029' r020, '9' sb from dual union all
-                       select '2039' r020, '9' sb from dual union all
-                       select '2089' r020, '9' sb from dual )) k
-                join v_gl a on a.nbs = k.r020
+                dd.obs obs, -- обслуживание долга (1-добре, 2-слаб.3-незадов.) 
+                dd.wdate k_date  -- дата завершения кредитного договора 
+         from ( select a.tip, a.tobo,NVL (p.s080, '') s080, NVL (p.r013, '') r013,
+                       p.s370,a.acc, a.rnk, a.kv,a.nls, a.isp, 
+                       SUBSTR (a.nbs, 3, 2) priz, a.nbs,a.daos,p.s182,p.s270,
+                      (nvl(s.ostf,0)-nvl(s.dos,0)+nvl(s.kos,0)+nvl(kp.s,0)) ostc,
+                       n.nd
+                from  v_gl a 
                 left join specparam p on a.acc = p.acc
-                left join (SELECT acc, MAX ( case when fdat <= dat_
-                                                  then fdat
+                left join (SELECT acc, MAX ( case when fdat <= dat_ 
+                                                  then fdat 
                                              else null end ) fdat
                            FROM saldoa
                            GROUP BY acc) sel on a.acc = sel.acc
@@ -5511,30 +5355,26 @@ to_log (acc_,'exception when sz_=', sz_);
                            group by acc)n on a.acc = n.acc
                 -- по спецпараметру счета REZ_N=1 - не включаются в резерв (L.09-09-2010)
                 left join accountsw aw on a.acc=aw.acc and aw.tag='REZ_N'
-                where (a.dazs IS NULL OR a.dazs > dat_) AND k.sb in ('8', '9')
-                       and (nvl(s.ostf,0)-nvl(s.dos,0)+nvl(s.kos,0)+nvl(kp.s,0))<0
-                       and NVL(aw.value,'0')<>'1') t
+                where  (a.tip in ('SP ','SPN','SK9','OFR','SK0') or a.nbs='3570' ) and (a.dazs IS NULL OR a.dazs > dat_) 
+                       and (nvl(s.ostf,0)-nvl(s.dos,0)+nvl(s.kos,0)+nvl(kp.s,0))<0 and NVL(aw.value,'0')<>'1') t
          join customer c on t.rnk = c.rnk
          left join customerw cw on c.rnk + t.ostc*0=cw.rnk and cw.tag = 'CORP'
          left join otd_user o on t.isp + t.ostc*0=o.userid
          left join cc_add d on t.nd = d.nd  AND d.adds = 0
          left join cc_deal dd on t.nd = dd.nd
-         left join (SELECT acc, MAX (fdat) fdat FROM saldoa where fdat <dat_nal group by acc)  sn on t.acc=sn.acc
-         left join saldoa s1 on s1.acc = sn.acc and s1.fdat = sn.fdat
-       group by c.rnk, decode(c.custtype,3,SUBSTR (c.nmk, 1, 35),
+       group by t.tip, c.rnk, decode(c.custtype,3,SUBSTR (c.nmk, 1, 35),
                 nvl(substr(c.nmkk,1,35),SUBSTR (c.nmk, 1, 35))),
                 DECODE (TRIM (c.sed),'91', DECODE (custtype, 3, 2, custtype),
-                c.custtype),t.tobo,t.s080,t.r013,t.s370,t.acc, t.kv,t.nls,
-                t.isp, t.priz, t.nbs,t.istval,
+                c.custtype),t.tobo,t.s080,t.r013,t.s370,t.acc, t.kv,t.nls, 
+                t.isp, t.priz, t.nbs, 
                 NVL( dd.FIN, c.CRISK ),
-                NVL (c.country, acountry),DECODE (NVL (c.codcagent, 1), '2',
+                NVL (c.country, acountry),DECODE (NVL (c.codcagent, 1), '2', 
                 2, '4', 2, '6', 2, 1),t.daos,t.s182,t.s270,t.ostc,t.nd,
-                nvl(d.wdate,t.daos),SUBSTR (dd.cc_id, 1, 20),dd.obs,dd.wdate,
-                (nvl(s1.ostf,0)-nvl(s1.dos,0)+nvl(s1.kos,0));
-      ELSIF acckr_ IS NULL AND rezpar11_ = 0 THEN
+                nvl(d.wdate,t.daos),SUBSTR (dd.cc_id, 1, 20),dd.obs,dd.wdate;
+      ELSIF acckr_ IS NULL AND rezpar11_ = 0 THEN 
 --по всем счетам и не учитываем S270 = 08 (т.е. резервируем только просточенные %)
          OPEN c0 FOR
-         select c.rnk, decode(c.custtype,3,SUBSTR (c.nmk, 1, 35),
+         select a.tip, c.rnk, decode(c.custtype,3,SUBSTR (c.nmk, 1, 35),
                               nvl(substr(c.nmkk,1,35),SUBSTR (c.nmk, 1, 35))) nmk,
                  DECODE (TRIM (c.sed),
                          '91', DECODE (custtype, 3, 2, custtype),
@@ -5543,10 +5383,9 @@ to_log (acc_,'exception when sz_=', sz_);
                  a.tobo,
                  NVL (p.s080, '') s080,
                  NVL (p.r013, '') r013,
-                 p.s370,
+                 p.s370, 
                  a.acc, a.kv,
-                 a.nls, a.isp, SUBSTR (a.nbs, 3, 2) priz, a.nbs,
-                 NVL(p.istval,'0') istval,
+                 a.nls, a.isp, SUBSTR (a.nbs, 3, 2) priz, a.nbs, 
                  NVL((select FIN from cc_deal where nd=rez1.f_get_nd(a.acc)), c.CRISK ) fin,
                  NVL (c.country, acountry) country,
                  DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6', 2, 1) rz,
@@ -5559,59 +5398,26 @@ to_log (acc_,'exception when sz_=', sz_);
                 ,null nd
                 ,null  wdate
                  ,null cc_id,
-                 null obs, null k_date,0 ost_nal
-        from v_gl a,
-            (  SELECT  r020, SUBSTR (r020, 4, 1) sb
-                   FROM kl_r011 kk
-                  WHERE trim(prem) = 'КБ'
-                    AND SUBSTR (r020, 4, 1) in ('9')
-                     --AND r020r011 IS NOT NULL
-                        and d_close is null
-                         and kk.REM = 'D5'
-                        group by r020, SUBSTR (r020, 4, 1)
-                union
-                (select '2480' r020, '9' sb from dual union  all
-                 select '1780' r020, '9' sb from dual union all
-                 select '3589' r020, '9' sb from dual union all
-                 select '2239' r020, '9' sb from dual union all
-                 select '2238' r020, '8' sb from dual union all
-                 select '3578' r020, '8' sb from dual union all
-                 select '3579' r020, '9' sb from dual union all
-                 select '3570' r020, '8' sb from dual union all
-                 select '2607' r020, '8' sb from dual union all
-                 select '2627' r020, '8' sb from dual union all
-                 select '2028' r020, '8' sb from dual union all
-                 select '2029' r020, '9' sb from dual union all
-                 select '2039' r020, '9' sb from dual union all
-                 select '2089' r020, '9' sb from dual )
-             ) k,
-             customer c,
-             specparam p,
-             (select rnk,MIN (VALUE) corp
-                 from customerw cw
-                 WHERE tag = 'CORP'
-             group by rnk) cw
-             ,(select o.userid, min(o.otd) otd
-              FROM otd_user o
-             group by o.userid
-             ) o
-        where a.nbs = k.r020
+                 null obs, null k_date
+        from v_gl a, customer c, specparam p,
+             (select rnk,MIN (VALUE) corp      from customerw cw  WHERE tag = 'CORP' group by rnk) cw,
+             (select o.userid, min(o.otd) otd  FROM otd_user o    group by o.userid ) o
+        where (a.tip in ('SP ','SPN','SK9','OFR','SK0') or a.nbs='3570' )
                AND (a.dazs IS NULL OR a.dazs > dat_)
                AND a.rnk = c.rnk
                AND a.acc = p.acc(+)
                AND c.rnk = cw.rnk(+)
                and a.isp = o.userid(+);
-     ELSIF acckr_ IS NOT NULL THEN
---по одному счету
+     ELSIF acckr_ IS NOT NULL THEN 
+--по одному счету 
         OPEN c0 FOR
-        select c.rnk, decode(c.custtype,3,SUBSTR (c.nmk, 1, 35),
+        select a.tip, c.rnk, decode(c.custtype,3,SUBSTR (c.nmk, 1, 35),
                          nvl(substr(c.nmkk,1,35),SUBSTR (c.nmk, 1, 35))) nmk,
                DECODE (TRIM (c.sed),'91', DECODE (custtype, 3, 2, custtype),
-                       c.custtype) custtype,
-               a.tobo, NVL (p.s080, '') s080, NVL (p.r013, '') r013, p.s370,
-               a.acc, a.kv, a.nls, a.isp,
-               SUBSTR (a.nbs, 3, 2) priz, a.nbs, NVL(p.istval,'0') istval,
-               NVL((select FIN from cc_deal
+                       c.custtype) custtype,  
+               a.tobo, NVL (p.s080, '') s080, NVL (p.r013, '') r013, p.s370, 
+               a.acc, a.kv, a.nls, a.isp, SUBSTR (a.nbs, 3, 2) priz, a.nbs, 
+               NVL((select FIN from cc_deal 
                     where nd=rez1.f_get_nd(a.acc)),c.CRISK ) fin,
                NVL (c.country, acountry) country,
                DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6', 2, 1) rz,
@@ -5620,32 +5426,10 @@ to_log (acc_,'exception when sz_=', sz_);
                a.daos,p.s182,p.s270,
                (select  min(o.otd) otd FROM otd_user o
                 where a.isp = o.userid) otd,
-               null ostc,null nd,null wdate,null cc_id,null obs, null k_date,0 ost_nal
-        from v_gl a,
-            (SELECT  r020, SUBSTR (r020, 4, 1) sb FROM kl_r011 kk
-             WHERE prem = 'КБ ' AND SUBSTR (r020, 4, 1)
-                   in (decode(rezpar11_,1,'8','9'),'9') and d_close is null
-                   and kk.REM = 'D5'
-             group by r020, SUBSTR (r020, 4, 1)
-             union
-            (select '2480' r020, '9' sb from dual union all
-             select '1780' r020, '9' sb from dual union all
-             select '3589' r020, '9' sb from dual union all
-             select '2239' r020, '9' sb from dual union all
-             select '2238' r020, '8' sb from dual union all
-             select '3578' r020, '8' sb from dual union all
-             select '3579' r020, '9' sb from dual union all
-             select '3570' r020, '8' sb from dual union all
-             select '2607' r020, '8' sb from dual union all
-             select '2627' r020, '8' sb from dual union all
-             select '2028' r020, '8' sb from dual union all
-             select '2029' r020, '9' sb from dual union all
-             select '2039' r020, '9' sb from dual union all
-             select '2089' r020, '9' sb from dual )) k,
-             customer c, specparam p
-        where a.nbs = k.r020 AND (a.dazs IS NULL OR a.dazs > dat_)
-              AND k.sb in ('8', '9')  AND a.rnk = c.rnk
-               AND a.acc = p.acc(+) and a.acc = acckr_;
+               null ostc,null nd,null wdate,null cc_id,null obs, null k_date
+        from v_gl a, customer c, specparam p
+        where (a.tip in ('SP ','SPN','SK9','OFR','SK0') or a.nbs='3570' ) AND (a.dazs IS NULL OR a.dazs > dat_)
+               AND a.rnk = c.rnk AND a.acc = p.acc(+) and a.acc = acckr_;
       ELSE
          NULL;
       END IF;
@@ -5659,58 +5443,12 @@ to_log (acc_,'exception when sz_=', sz_);
          set_log(k.acc);
          to_log (k.acc,'Счет=', k.nls);
          to_log (k.acc,'k.R013=', k.r013);
-         to_log (k.acc,'k.S270=', k.s270);
+         to_log (k.acc,'k.S270=', k.s270);      
          to_log (k.acc,'k.S370=', k.s370);
          to_log (k.acc,'k.PRIZ=', k.priz);
-         to_log (k.acc,'k.OSTC=', k.ostc);
-         to_log (k.acc,'k.nd  =', k.nd);
+         to_log (k.acc,'k.OSTC=', k.ostc);  
+         to_log (k.acc,'k.nd  =', k.nd);                      
 
-         IF (SUBSTR (k.nbs, 4, 1) = '8'
-                  or k.nbs='2607'
-                  or k.nbs='2627'
-                  or k.nbs='3570') THEN
-             s080_name_ := 'Начисленные %';
-         ELSE
-             s080_name_ := 'Просроченные %';
-         END IF;
-         szn_:=0;
-
-         begin
-            select k.ost_nal + s into k.ost_nal
-            from rez_spn
-            where acc=k.acc;
-         EXCEPTION WHEN NO_DATA_FOUND THEN
-             NULL;
-         end;
-
-         if k.ost_nal>0 then
-
-            BEGIN
-               select sum (kos)
-               into s_kos
-               from saldoa
-               where fdat>=dat_nal and fdat<=dat_ and acc=k.acc;
-            EXCEPTION
-            WHEN NO_DATA_FOUND
-            THEN
-               s_kos := 0;
-            END;
-
-            if s_kos is null THEN
-               s_kos :=0;
-            end if;
-
-            if k.ost_nal>=s_kos then
-               szn_:= k.ost_nal - s_kos;
-            else
-               szn_:=0;
-            end if;
-
-         else
-            szn_:=0;
-         end if;
-
-         sznq_:= gl.p_icurval (k.kv, szn_, dat_);
          otd_ := nvl(k.otd,0);
          sz_ := 0;
          discont_ := 0;
@@ -5723,31 +5461,25 @@ to_log (acc_,'exception when sz_=', sz_);
         -- cc_id_ := nvl(k.cc_id1,k.cc_id);
          obs_ := k.obs;
          kdate_ := k.k_date;
-
-
+         
+         
          --если параметр s270 на счете не проставлен, рассчитываем его автоматически
          if k.s270 is null or trim(k.s270) = '00' then
             k.s270 := f_get_s270(dat_, k.s270, k.acc, k.nd);
-         end if;
-
+         end if; 
+         
          s370p_ := k.s370;
          s370r_ := f_get_s370(dat_, k.s370, k.acc, k.nd);
 
          k.s370 := s370r_;
-
+         
          to_log (k.acc,' s270=',k.s270);
          to_log (k.acc,' s370=',k.s370);
 
-         if k.ostc is not null then
-            sd_ := -k.ostc;
-         else
-            sd_ := -rez1.ostc96 (k.acc, dat_);
-         end if;
-
          --если s270 <> '08' то счета начисленных % не обрабатываем
-         if not ((SUBSTR (k.nbs, 4, 1) = '8'
-                  or k.nbs='2607'
-                  or k.nbs='2627'
+         if not ((SUBSTR (k.nbs, 4, 1) = '8' 
+                  or k.nbs='2607' 
+                  or k.nbs='2627' 
                   or k.nbs='3570')  and k.s270 <> '08') or k.s370='J' then
           --находим остаток по счету
              if k.ostc is not null then
@@ -5759,11 +5491,11 @@ to_log (acc_,'exception when sz_=', sz_);
              to_log (k.acc, 'sz_=', sz_);
              to_log (k.acc, '2.k.R013=', k.r013);
              if (k.s270 = '08' and rezpar11_ = 1) or k.s370='J' then --T19.03.2009
-                IF (k.r013 = '3' and
-                   (SUBSTR (k.nbs, 4, 1) <> '8' and
-                            k.nbs<>'2607' and
+                IF (k.r013 = '3' and 
+                   (SUBSTR (k.nbs, 4, 1) <> '8' and 
+                            k.nbs<>'2607' and 
                             k.nbs<>'2627' and
-                            k.nbs<>'3570')) or k.s370='J' then
+                            k.nbs<>'3570')) or k.s370='J' then 
                    s080_name_ := 'Сомнительные %';
              to_log (k.acc,'1 s080_name_=', s080_name_ );
                 else
@@ -5791,12 +5523,7 @@ to_log (acc_,'exception when sz_=', sz_);
 
                    --находим просрочку свыше 30 дней
                    sz_ := f_get_rest_over_30(k.acc, last_work_date_ , sz_); --T 24.03.2009
-                   if sz_<=0 THEN
-                      sz_ := 0;
-                      s080_name_ := 'Просроч.(<31д) % (P)';
-                   else
-                      s080_name_ := 'Просроч.(>31д) % (P)';
-                   end if;
+                   s080_name_ := 'Просроч.(>31д) % (P)';
              to_log (k.acc,'4 s080_name_=', s080_name_ );
              to_log (k.acc,'4 sz_=', sz_);
                 ELSIF rzprr013_ = '1'
@@ -5820,149 +5547,124 @@ to_log (acc_,'exception when sz_=', sz_);
 
              to_log (k.acc,'Itog sz_=', sz_);
              --находим сумму резерва только если есть АКТИВНЫЙ остаток
-         end if;
-         IF sz_ >= 0 THEN
-            -- dbms_output.put_line('5');
-            idr_ := rez1.id_nbs (k.nbs); --тип кредитного актива
-            szq_ := gl.p_icurval (k.kv, sz_, dat_); -- номинал резерва
-            sdq_ := gl.p_icurval (k.kv, sd_, dat_); -- номинал остатка
-            rezerv_ := sz_;
-            to_log (k.acc,'szq_=', szq_);
+             IF sz_ > 0
+             THEN
+                -- dbms_output.put_line('5');
+                idr_ := rez1.id_nbs (k.nbs); --тип кредитного актива
+                szq_ := gl.p_icurval (k.kv, sz_, dat_); -- номинал
+                rezerv_ := sz_;
+                IF    rezpar1_ = '1' AND k.custtype = '3'                                    THEN  custtype_ := '2';
+                ELSIF rezpar7_ = '1' AND k.custtype IN ('2', '3') AND k.tip in ('SK9','OFR') THEN  custtype_ := '1';
+                ELSE                                                                               custtype_ := k.custtype;
+                END IF;
 
-            IF rezpar1_ = '1' AND k.custtype = '3' THEN
-               custtype_ := '2';
-            ELSIF rezpar7_ = '1' AND k.custtype IN ('2', '3')
-                  AND k.nbs = '3579' THEN
-               custtype_ := '1';
-            ELSE
-               custtype_ := k.custtype;
-            END IF;
+                --находим параметры договора (для расчет неважно)
+                IF mode_ <> 2 AND calcdoppar_ = 1
+                THEN
+                   -- Вид обеспечения
 
-            --находим параметры договора (для расчет неважно)
-            IF mode_ <> 2 AND calcdoppar_ = 1 THEN
-               -- Вид обеспечения
-               --ном дог
-               BEGIN
-                  SELECT SUBSTR (cc_id, 1, 20), obs, wdate, vidd
-                     INTO cc_id_, obs_, kdate_, vidd_
-                     FROM cc_deal
-                    WHERE nd = nd_;
-               EXCEPTION
-                  WHEN NO_DATA_FOUND
-                  THEN
-                  cc_id_ := NULL;
-                  obs_ := NULL;
-                  nd_ := NULL;
-                  kdate_ := NULL;
-                  vidd_ := NULL;
-               END;
+                   --ном дог
+                   BEGIN
+                      SELECT SUBSTR (cc_id, 1, 20), obs, wdate, vidd
+                        INTO cc_id_, obs_, kdate_, vidd_
+                        FROM cc_deal
+                       WHERE nd = nd_;
+                   EXCEPTION
+                      WHEN NO_DATA_FOUND
+                      THEN
+                         cc_id_ := NULL;
+                         obs_ := NULL;
+                         nd_ := NULL;
+                         kdate_ := NULL;
+                         vidd_ := NULL;
+                   END;
 
-               -- все по номеру последнего договра
-               -- начало действия договора
-               BEGIN
-                  SELECT wdate
-                    INTO wdate_
-                    FROM cc_add
-                   WHERE nd = nd_ AND adds = 0;
-               EXCEPTION
-                   WHEN NO_DATA_FOUND
+                   -- все по номеру последнего договра
+                      -- начало действия договора
+                   BEGIN
+                      SELECT wdate
+                        INTO wdate_
+                        FROM cc_add
+                       WHERE nd = nd_ AND adds = 0;
+                   EXCEPTION
+                      WHEN NO_DATA_FOUND
+                      THEN
+                         --wdate_ := NULL;
+                         wdate_ := k.daos; --T 21.01.2009
+                   END;
+
+                   --для счетов относящихся к договорам кредитных линий
+                   --вместо даты открытия договора берем дату открытия счета -
+                   --т.к. дата открытия счета = дата транша
+                   if nvl(k.s182,0) = 3 then wdate_ := k.daos;--T 23.01.2009
+                   end if;
+
+                   -- Кол-во пролонгаций
+                   BEGIN
+                      SELECT COUNT (*)
+                        INTO kprolog_
+                        FROM cc_prol
+                       WHERE nd = nd_ AND acc = k.acc;
+                   EXCEPTION
+                      WHEN NO_DATA_FOUND
+                      THEN
+                         kprolog_ := 0;
+                   END;
+
+                   --КП ЮЛ, ФЛ, МБК (ном.дог,обсл.,дата оконч.договора)
+                   kvk_ := k.kv;
+
+                   IF vidd_ = 3
                    THEN
-                   --wdate_ := NULL;
-                   wdate_ := k.daos; --T 21.01.2009
-               END;
+                      BEGIN
+                         SELECT kv
+                           INTO kvk_
+                           FROM v_gl a, nd_acc n
+                          WHERE a.acc = n.acc
+                            AND a.nbs = '8999'
+                            AND nd = nd_
+                            AND ROWNUM = 1;
+                      EXCEPTION
+                         WHEN NO_DATA_FOUND
+                         THEN
+                            kvk_ := k.kv;
+                      END;
+                   END IF;
 
-               --для счетов относящихся к договорам кредитных линий
-               --вместо даты открытия договора берем дату открытия счета -
-               --т.к. дата открытия счета = дата транша
-               if nvl(k.s182,0) = 3 then wdate_ := k.daos;--T 23.01.2009
-               end if;
+                   --  начальная сумма в грн. и ном.
+                   BEGIN
+                      SELECT gl.p_icurval (kvk_, lim2 / 100, dat_), lim2 / 100
+                        INTO sg_, sv_
+                        FROM cc_lim c
+                       WHERE nd = nd_ AND fdat = (SELECT MIN (fdat)
+                                                    FROM cc_lim
+                                                   WHERE nd = nd_);
+                   EXCEPTION
+                      WHEN NO_DATA_FOUND
+                      THEN
+                         sg_ := 0;
+                         sv_ := 0;
+                   END;
 
-               -- Кол-во пролонгаций
-               BEGIN
-                  SELECT COUNT (*)
-                    INTO kprolog_
-                    FROM cc_prol
-                   WHERE nd = nd_ AND acc = k.acc;
-               EXCEPTION
-                   WHEN NO_DATA_FOUND
-                   THEN
-                     kprolog_ := 0;
-               END;
-
-               --КП ЮЛ, ФЛ, МБК (ном.дог,обсл.,дата оконч.договора)
-               kvk_ := k.kv;
-
-               IF vidd_ = 3 THEN
-                  BEGIN
-                     SELECT kv
-                       INTO kvk_
-                       FROM v_gl a, nd_acc n
-                      WHERE a.acc = n.acc
-                        AND a.nbs = '8999'
-                        AND nd = nd_
-                        AND ROWNUM = 1;
-                  EXCEPTION
-                       WHEN NO_DATA_FOUND
-                       THEN
-                           kvk_ := k.kv;
-                  END;
-               END IF;
-
-               --  начальная сумма в грн. и ном.
-               BEGIN
-                  SELECT gl.p_icurval (kvk_, lim2 / 100, dat_), lim2 / 100
-                  INTO sg_, sv_
-                  FROM cc_lim c
-                  WHERE nd = nd_ AND fdat = (SELECT MIN (fdat)
-                                             FROM cc_lim
-                                             WHERE nd = nd_);
-               EXCEPTION
-                  WHEN NO_DATA_FOUND
-                   THEN
-                     sg_ := 0;
-                     sv_ := 0;
-               END;
-
-               BEGIN
-                  SELECT DISTINCT fdat
-                        INTO dat_prol_
-                  FROM cc_prol
-                  WHERE nd = nd_
-                        AND fdat = (SELECT MIN (fdat)
-                                    FROM cc_prol
-                                    WHERE nd = nd_ AND npp <> 0);
-               EXCEPTION
-                  WHEN NO_DATA_FOUND
-                  THEN
-                     dat_prol_ := NULL;
-               END;
-          END IF;
+                   BEGIN
+                      SELECT DISTINCT fdat
+                                 INTO dat_prol_
+                                 FROM cc_prol
+                                WHERE nd = nd_
+                                  AND fdat = (SELECT MIN (fdat)
+                                                FROM cc_prol
+                                               WHERE nd = nd_ AND npp <> 0);
+                   EXCEPTION
+                      WHEN NO_DATA_FOUND
+                      THEN
+                         dat_prol_ := NULL;
+                   END;
+                END IF;
 
 --                curacc_ := NULL;
-           begin
-              select 1 into ARJK_
-                     --d.*,to_date(cck_app.get_nd_txt(d.nd,'DINDU'),
-                     --'dd-mm-yyyy') dat_in_arjk,to_date(cck_app.get_nd_txt(d.nd,
-                     --'DO_DU'),'dd-mm-yyyy') dat_out_arjk
-              from cc_deal d
-              where vidd in (11,12,13) and d.nd=nd_ and
-                    to_date(cck_app.get_nd_txt(d.nd,'DINDU'),
-                    'dd-mm-yyyy') <= dat_ and nvl(to_date(cck_app.get_nd_txt (d.nd,
-                    'DO_DU'),'dd-mm-yyyy') , dat_+1) > dat_;
-              EXCEPTION WHEN NO_DATA_FOUND THEN ARJK_:=0;
-           end;
 
-           if ARJK_=1 THEN
-              szn_  := sz_;
-              sznq_ := szq_;
-           end if;
-
-           if szn_ > sz_ THEN
-              szn_ := sz_;
-           end if;
-
-                --записываем рассчитанную информацию
-                IF mode_ <> 2 and sd_>0
+                --записываем рассчитанную информацию 
+                IF mode_ <> 2
                 THEN
              to_log (k.acc,'INSERT',k.nls);
                    INSERT INTO tmp_rez_risk
@@ -5972,35 +5674,34 @@ to_log (acc_,'exception when sz_=', sz_);
                                 rs080, country, pr_rez, rz,
                                 acc, nd, wdate, kdate, sg, sv, kprolog,
                                 pawn, obesp, dat_prol, isp, otd, tobo,
-                                skq2, discont, prem, sn, szq2, corp,fl_newacc,istval
-                                ,szn,sznq,arjk
+                                skq2, discont, prem, sn, szq2, corp
+                                ,fl_newacc
                                )
                         VALUES (dat_, id_, decode(k.s080,'8','8','9'), s080_name_, custtype_, k.rnk,
-                                k.nmk, k.kv, k.nls, sd_, sdq_, 0, szq_, szq_,
+                                k.nmk, k.kv, k.nls, sz_, szq_, 0, szq_, szq_,
                                 sz_, cc_id_, idr_, k.fin, obs_,
                                 rez1.r_s080 (k.fin, obs_), k.country, 100, k.rz,
                                 k.acc, nd_, wdate_, kdate_, sg_, sv_, kprolog_,
                                 vid_zal, zal_, dat_prol_, k.isp, otd_, k.tobo,
-                                szq_, discont_, prem_, sn_, szq_, k.corp,
-                                'n',k.istval
-                                ,decode(sz_,0,0,szn_),decode(sz_,0,0,sznq_),arjk_
+                                szq_, discont_, prem_, sn_, szq_, k.corp
+                                ,'n'
                                );
 
---                     logger.info ('REZZ1 - INSERT счет ' || k.nls || 'sz_ '|| sz_);
+--                     logger.info ('REZZ1 - INSERT счет ' || k.nls || 'sz_ '|| sz_); 
              to_log (k.acc,'INSERT TMP_REZ_PARAMS', k.nls);
                      insert into TMP_REZ_PARAMS
                      (dat , id  , acc , r013 ,
-                      s270 , istval , s090 ,ob22, s370,s080
+                      s270 , istval , s090 ,ob22, s370
                       )
                       values(dat_, id_, k.acc, k.r013,
-                      k.s270,decode(k.istval,'1',1,0), null,
+                      k.s270,null, null,
                      -- (select ob22 from specparam_int where acc = k.acc)
-                      null, k.s370,k.s080
+                      null, k.s370
                       );
                 END IF;
 --               curacc_ := NULL;
              END IF;
---        end if;
+        end if;
       END LOOP;
       CLOSE c0;
       END;
@@ -6020,7 +5721,7 @@ to_log (acc_,'exception when sz_=', sz_);
       end if;
 */
 
-      --находим данные расчета за предыдущий месяц
+      --находим данные расчета за предыдущий месяц 
       --и по каждому счету заносим разницу резерва в сравнении с предыдущим месяцем
       IF mode_ <> 2
       THEN
@@ -6033,7 +5734,7 @@ to_log (acc_,'exception when sz_=', sz_);
                           t.szq2, t.corp, t.istval, t.odncre, t.dnipr
                      FROM tmp_rez_risk t,v_gl a
                     WHERE dat = oldrez_date_ and t.acc=a.acc
-                      AND ID = oldrez_userid_
+                      AND ID = oldrez_userid_ 
                       AND (t.sz <> 0 OR t.sz1 <> 0)) o
             ON (
             n.ID = userid_ and
@@ -6059,9 +5760,9 @@ to_log (acc_,'exception when sz_=', sz_);
                        n.rnk, n.nmk, n.kv, n.nls, n.sk, n.skq, n.soq, n.srq,
                        n.szq, n.sz, n.cc_id, n.idr, n.fin, n.obs, n.rs080,
                        n.country, n.pr_rez, n.rz, n.nd, n.wdate, n.kdate,
-                       n.sg, n.sv, n.kprolog, n.obesp,
+                       n.sg, n.sv, n.kprolog, n.obesp, 
 --                     n.pawn, n.obesp, Убрано в связи с инвентаризацией.
---                     Для счетов, по которым нет резерва в этом месяце,
+--                     Для счетов, по которым нет резерва в этом месяце, 
 --                     не показывать залог (n.obesp=0)
                        n.dat_prol,
                        n.isp, n.otd, n.tobo, n.skq2, n.discont, n.prem, n.sn,
@@ -6074,8 +5775,8 @@ to_log (acc_,'exception when sz_=', sz_);
                        o.rnk, o.nmk, o.kv, o.nls, 0, 0, 0, 0, 0, 0, o.cc_id,
                        o.idr,
                        o.fin, o.obs, o.rs080, o.country, o.pr_rez,
-                       o.rz, o.nd, o.wdate, o.kdate, 0, 0, o.kprolog,0,
---                     o.pawn,o.obesp,
+                       o.rz, o.nd, o.wdate, o.kdate, 0, 0, o.kprolog,0, 
+--                     o.pawn,o.obesp, 
                        o.dat_prol, o.isp, o.otd, o.tobo, 0, 0, 0, 0,
                        0, o.corp, o.istval, o.odncre, o.dnipr, 'i',
                        NVL (o.sz, 0), -NVL (o.sz, 0), NVL (o.szq, 0),
@@ -6084,7 +5785,7 @@ to_log (acc_,'exception when sz_=', sz_);
                           + gl.p_icurval (o.kv, -NVL (o.sz, 0), dat_)
                          ));
 
---  Luda 03-09-2010 зачем удалялось не понятно!!!
+--  Luda 03-09-2010 зачем удалялось не понятно!!! 
 --                  (терялись данные за прошлый месяц, если полностью
 --                   погашена задолженность).
 --         delete from tmp_rez_risk --T 03.02.2009
@@ -6145,7 +5846,7 @@ to_log (acc_,'exception when sz_=', sz_);
       flagkorprov_ := 0;
       flagallrez_ := 0;
 
-      -- борьба с округлением дисконта (для общего и для округления в пределах бл. счета)
+      -- борьба с округлением дисконта (для общего и для округления в пределах бл. счета) 
 
       DECLARE
          TYPE r0Typ IS RECORD (
@@ -6155,7 +5856,7 @@ to_log (acc_,'exception when sz_=', sz_);
               ACCS    tmp_rez_risk3.accs%TYPE,
               ACCD    tmp_rez_risk3.accd%TYPE,
               ND      tmp_rez_risk3.nd%TYPE,
-              SK      tmp_rez_risk3.sk%TYPE,
+              SK      tmp_rez_risk3.sk%TYPE,    
               SDALL   tmp_rez_risk3.sdall%TYPE,
               SKALL   tmp_rez_risk3.skall%TYPE,
               SD      tmp_rez_risk3.sd%TYPE
@@ -6167,14 +5868,14 @@ to_log (acc_,'exception when sz_=', sz_);
 
          IF rez_disc_=0 then
 
-            -- дисконт по всем счетам дисконта
+            -- дисконт по всем счетам дисконта           
             OPEN c0 FOR
 
-            SELECT *
-            from  (select ROUND (sd ) + DECODE ((ROW_NUMBER () OVER
+            SELECT * 
+            from  (select ROUND (sd ) + DECODE ((ROW_NUMBER () OVER 
                          (PARTITION BY nd,dat,userid ORDER BY t.SD DESC)),
-                                    1, sdall - (SUM (sd) OVER
-                         (PARTITION BY nd,dat,userid ORDER BY t.SD) ),0) s, t.*
+                                    1, sdall - (SUM (sd) OVER 
+                         (PARTITION BY nd,dat,userid ORDER BY t.SD) ),0) s, t.* 
                    from tmp_rez_risk3 t order by nd)
             where s<>sd and trunc(dat)=dat_;
          ELSE
@@ -6182,13 +5883,13 @@ to_log (acc_,'exception when sz_=', sz_);
             OPEN c0 FOR
 
             SELECT *
-            from  (select ROUND (sd ) + DECODE ((ROW_NUMBER () OVER
+            from  (select ROUND (sd ) + DECODE ((ROW_NUMBER () OVER 
                          (PARTITION BY nd,dat,userid ORDER BY t.SD DESC)),
-                                    1, sdall - (SUM (sd) OVER
+                                    1, sdall - (SUM (sd) OVER 
                          (PARTITION BY nd,dat,userid,substr(ac.nls,1,3),ac.kv ORDER BY t.SD) ),0) s,
-                                    t.*
-                   from tmp_rez_risk3 t, v_gl ac, v_gl ad
-                   where trunc(dat)=dat_ and t.accs=ac.acc and t.accd=ad.acc
+                                    t.* 
+                   from tmp_rez_risk3 t, v_gl ac, v_gl ad 
+                   where trunc(dat)=dat_ and t.accs=ac.acc and t.accd=ad.acc 
                    order by nd)
              where s<>sd and trunc(dat)=dat_;
          END IF;
@@ -6197,10 +5898,10 @@ to_log (acc_,'exception when sz_=', sz_);
 
             FETCH c0 INTO k;
             EXIT WHEN c0%NOTFOUND;
-
-            UPDATE tmp_rez_risk3 SET sd = k.s
+       
+            UPDATE tmp_rez_risk3 SET sd = k.s 
             where nd=k.nd and accs=k.accs and accd=k.accd;
-
+ 
          END LOOP;
 
          CLOSE c0;
@@ -6208,22 +5909,26 @@ to_log (acc_,'exception when sz_=', sz_);
       END;
 
       -- изменения в TMP_REZ_RISK, того, что изменилось в TMP_REZ_RISK3
-      FOR K IN (select t.discont,t.acc,d.ds,t.nls
-                from tmp_rez_risk t,
-                     (select sum(sd) ds,accs from tmp_rez_risk3
+      FOR K IN (select t.discont,t.acc,d.ds,t.nls 
+                from tmp_rez_risk t, 
+                     (select sum(sd) ds,accs from tmp_rez_risk3 
                       where dat=dat_ and userid=id_ group by dat,userid,accs) d
-                where t.dat=dat_ and t.id=id_ and t.acc = d.accs
+                where t.dat=dat_ and t.id=id_ and t.acc = d.accs 
                       and t.discont<>d.ds)
       LOOP
          --logger.info ('DISK2 - k.nls ' || k.nls|| ' рез.='||k.discont || ' диск.='||k.ds);
-         UPDATE tmp_rez_risk SET discont = k.ds
+         UPDATE tmp_rez_risk SET discont = k.ds 
          where acc=k.acc and dat=dat_ and id=id_;
 
       END LOOP;
 
-      FOR K IN (select acc,pawn,s080 from tmp_rez_risk
+      FOR K IN (select acc,pawn,s080 from tmp_rez_risk 
                 where dat=dat_ and id=id_ and pawn is not null)
       LOOP
+         if k.s080=5 THEN
+            vid_zal := 90;
+            s031_   := 90; 
+         ELSE
          if k.pawn=40 then
             vid_zal := f_rez_s031(dat_,id_,k.acc);
             s031_   := vid_zal;
@@ -6235,36 +5940,30 @@ to_log (acc_,'exception when sz_=', sz_);
             EXCEPTION WHEN NO_DATA_FOUND THEN
                s031_:='33';
                vid_zal:=k.pawn;
-            end;
+            end;   
          END IF;
+         END IF;  
 
-         to_log (k.acc, 'f_rez_s031',vid_zal);
-         UPDATE tmp_rez_risk SET pawn = vid_zal
+         to_log (k.acc, 'f_rez_s031',vid_zal); 
+         UPDATE tmp_rez_risk SET pawn = vid_zal 
          where acc=k.acc and dat=dat_ and id=id_;
 
-         -- по ссудному счету записывается вид залога
-         FOR M IN (select a.acc from nd_acc n, accounts a
-                   where nd in ( select nd from nd_acc where  acc = k.acc)
-                         and n.acc=a.acc and a.dazs is null and
-                        (a.tip in ('SS ','SP ','SN ','SPN','SPI','SDI') or
-                         a.nbs in (3570,3578,3579,9129)))
-         loop
-             update specparam set s031=s031_ where acc=m.acc;
-             IF SQL%ROWCOUNT=0 then
-                Insert into specparam (acc,s031)
-                            Values    (m.acc,s031_);
-             END IF;
-         END LOOP;
+         -- по ссудному счету записывается вид залога 
+         update specparam set s031=s031_ where acc=k.acc;
+         IF SQL%ROWCOUNT=0 then 	
+           Insert into specparam (acc,s031)
+                       Values    (k.acc,s031_);
+         END IF;
 
       END LOOP;
-
+  
       IF mode_ = 10 then --T 04.12.2008 сделано для отчетов по резервам
                          -- поскольку перед вызовом отчета запускается ф-я расчета резерва
                          --нужно закомитить то что она посчитала
                          --т.к. больше некому)))
          commit;
       end if;
-
+      
    END rez_risk;
 
 --------------------------------------
@@ -8589,7 +8288,7 @@ BEGIN
    END;
 
 
-   -- флаг - включать дисконт в рамках балансового счета и валюты
+   -- флаг - включать дисконт в рамках балансового счета и валюты 
 
    BEGIN
       SELECT TO_NUMBER (NVL (val, '0'))
@@ -8603,7 +8302,7 @@ BEGIN
    END;
 
    -- флаг - автом.проставление признака первичного залога (заказ Демарк)
-   -- Если у клиента есть залог под несколько кредитов и по одному
+   -- Если у клиента есть залог под несколько кредитов и по одному 
    -- или нескольким из них есть просрочка > 30 дней, то первичным
    -- считается залог для кредита с наибольшей суммой задолженности
    -- из числа просроченных.
@@ -8654,7 +8353,7 @@ BEGIN
          rezpar4_ := 0;
    END;
 
-   -- флаг - считать 3579 внутрибанковским счетом (custtype=1)
+   -- флаг - считать SK9 внутрибанковским счетом (custtype=1)
    BEGIN
       SELECT TO_NUMBER (NVL (val, '0'))
         INTO rezpar7_
@@ -8745,8 +8444,6 @@ grant EXECUTE                                                                on 
 grant EXECUTE                                                                on REZ1            to RCC_DEAL;
 
  
- 
  PROMPT ===================================================================================== 
  PROMPT *** End *** ========== Scripts /Sql/BARS/package/rez1.sql =========*** End *** ======
  PROMPT ===================================================================================== 
- 

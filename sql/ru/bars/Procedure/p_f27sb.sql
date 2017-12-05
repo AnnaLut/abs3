@@ -11,24 +11,25 @@ PROMPT *** Create  procedure P_F27SB ***
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :	Процедура формирование файла @27 для КБ
 % COPYRIGHT   :	Copyright UNITY-BARS Limited, 2009.All Rights Reserved.
-% VERSION     : 18/02/2016 (17/02/2016, 08/02/2016)
+% VERSION     : 13/11/2017 (18/02/2016)
 %             :             Версия для Сбербанка)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-18.02.2016 - для файла за последний рабочий день года
-             из оборотов за месяц коды 50,51,60,61 не будут вычитаться
+13.11.2017 - удалил ненужные строки и изменил некоторые блоки формирования 
+18.02.2016 - для файла за последний рабочий день года 
+             из оборотов за месяц коды 50,51,60,61 не будут вычитаться 
              годовые корретирующие обороты
 17.02.2016 - для декабря месяца будут включаться годовые корректирующие
              обороты
 08.02.2016 изменения для успешного формирования кодов показателей 50, 51,
-           60, 61, 90, 91, 00, 01
+           60, 61, 90, 91, 00, 01 
 26.05.2012 формируем в разрезе кодов территорий
 07.09.2011 поменяла f_pop_otcn на f_pop_otcn_snp
 30.04.2011 добавил acc,tobo в протокол
 01.03.2011 в поле комментарий вносим код TOBO и название счета
-10.07.2009 убрал ORDER BY для табл. RNBU_TRACE
+10.07.2009 убрал ORDER BY для табл. RNBU_TRACE	
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 kodf_    varchar2(2):='27';
 rnk_     number;
@@ -103,23 +104,15 @@ CURSOR Saldo IS
           s.dos96, s.dosq96, s.kos96, s.kosq96,
           s.dos99, s.dosq99, s.kos99, s.kosq99,
           s.doszg, s.koszg, s.dos96zg, s.kos96zg,
-          nvl(l.k041,'1'), a.tobo, a.nms, NVL(trim(sp.ob22),'00')
+          nvl(l.k041,'1'), a.tobo, a.nms, NVL(trim(sp.ob22),'00') 
    FROM  otcn_saldo s, otcn_acc a, customer cc, kl_k040 l, specparam_int sp
-   WHERE s.acc=a.acc
-     and s.rnk=cc.rnk
-     and NVL(lpad(to_char(cc.country),3,'0'),'804')=l.k040(+)
+   WHERE s.acc=a.acc      
+     and s.rnk=cc.rnk   
+     and NVL(lpad(to_char(cc.country),3,'0'),'804')=l.k040(+) 
      and a.acc=sp.acc(+);
-
----------------------------------------------------------------------------
-CURSOR BaseL IS
-    SELECT kodp, nbuc, SUM (znap)
-    FROM rnbu_trace
-    WHERE userid=userid_
-    GROUP BY kodp, nbuc;
----------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 procedure p_ins(p_dat_ date, p_tp_ varchar2, p_acc_ number, p_nls_ varchar2,
-                p_nbs_ varchar2, p_ob22_ varchar2, p_kv_ smallint, p_k041_ varchar2,
+                p_nbs_ varchar2, p_ob22_ varchar2, p_kv_ smallint, p_k041_ varchar2, 
   		p_znap_ varchar2, p_comm_ varchar2, p_tobo_ varchar2, p_nbuc_ varchar2) IS
                 kod_ varchar2(12);
 
@@ -143,7 +136,6 @@ end;
 -------------------------------------------------------------------------------
 BEGIN
 -------------------------------------------------------------------
---SELECT id INTO userid_ FROM staff WHERE upper(logname)=upper(USER);
 userid_ := user_id;
 EXECUTE IMMEDIATE 'TRUNCATE TABLE RNBU_TRACE';
 -------------------------------------------------------------------
@@ -155,7 +147,7 @@ p_proc_set_int(kodf_,sheme_,nbuc1_,typ_);
 --- их остатков (номиналы+эквиваленты)+обороты+корректирующие обороты
 --- все эти действия выполняются в функции F_POP_OTCN
 
--- используем классификатор SB_R020
+-- используем классификатор SB_R020 
 sql_acc_ := 'select r020 from sb_r020 where f_27=''1'' ';
 
 if to_char(Dat_,'MM') in ('12','01','02','03','04','05','06') then
@@ -190,7 +182,7 @@ OPEN Saldo;
       SELECT NVL(SUM(decode(dk,0,1,0)*s),0),
              NVL(SUM(decode(dk,1,1,0)*s),0)
          INTO d_sum_, k_sum_
-      FROM opldok
+      FROM opldok 
       WHERE fdat  between Dat_  AND Dat_+29 AND
             acc  = acc_   AND
             (tt like 'ZG8%'  or tt like 'ZG9%');
@@ -272,7 +264,7 @@ OPEN Saldo;
       Dosq_:= Dosq_ - Dosq96p_;
       Kos_ := Kos_ - Kos96p_;
       Kosq_:= Kosq_ - Kosq96p_;
-   else
+   else    
       Dos_ := Dos_ - Dos96p_ - Dos99_;
       Dosq_:= Dosq_ - Dosq96p_ - Dosq99_;
       Kos_ := Kos_ - Kos96p_ - Kos99_;
@@ -288,7 +280,7 @@ OPEN Saldo;
              WHERE fdat  = trunc(Dat_, 'mm') AND
                    acc  = acc_   AND
                    (tt like 'ZG1%' OR tt like 'ZG2%');
-
+   
       Dos_ := Dos_ - d_sum_;
       Kos_ := Kos_ - k_sum_;
    END IF;
@@ -377,7 +369,7 @@ OPEN Saldo;
 
    if to_char(Dat_,'MM') = '12' then
       Ostq_ := Ostq_ - Dosq96_ + Kosq96_ - Dosq99_ + Kosq99_;
-   else
+   else 
       Ostq_ := Ostq_-Dosq96_+Kosq96_;
    end if;
 
@@ -394,17 +386,10 @@ CLOSE Saldo;
 ---------------------------------------------------
 DELETE FROM tmp_irep where kodf=kodf_ and datf=dat_;
 ---------------------------------------------------
-OPEN BaseL;
-LOOP
-   FETCH BaseL INTO  kodp_, nbuc_, znap_;
-   EXIT WHEN BaseL%NOTFOUND;
-
-   INSERT INTO tmp_irep
-	  (kodf, datf, kodp, znap, nbuc)
-   VALUES
-	  (kodf_, Dat_, kodp_, znap_, nbuc_);
-END LOOP;
-CLOSE BaseL;
+INSERT INTO tmp_irep (kodf, datf, kodp, znap, nbuc)
+select '27', Dat_, kodp, SUM (znap), nbuc
+FROM rnbu_trace
+GROUP BY kodp, nbuc;
 ------------------------------------------------------------------
 END p_f27sb;
 /

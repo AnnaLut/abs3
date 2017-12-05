@@ -854,7 +854,8 @@ IS
       l_BSD_REC r_BSD_REC;
       begin
       bars_audit.trace ('get_BSD start');
-      FOR i IN ( select nbs, name from ps where nbs in ('2620','2630','2635') and d_close is null and length(trunc(nbs))=4)
+      FOR i IN ( select nbs, name from ps where ((nbs in ('2620','2630') and newnbs.g_state = 1) or (newnbs.g_state = 0 and nbs in ('2620', '2630', '2635')))
+       and d_close is null and length(trunc(nbs))=4)
       LOOP
          l_BSD_REC.bsd := i.NBS  ;
          l_BSD_REC.name := i.NBS|| ' - ' ||i.name;

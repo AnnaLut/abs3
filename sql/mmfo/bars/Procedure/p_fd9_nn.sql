@@ -12,20 +12,31 @@ PROMPT *** Create  procedure P_FD9_NN ***
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирования #D9 для КБ (универсальная)
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     : 10/11/2016 (17/05/2016, 13/05/2016, 21/04/2016)
+% VERSION     : 13/10/2017 (13/09/2017, 18/08/2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+13.10.2017 - якщо код ОКПО сформований як серія и номер паспорта тоді  
+             K021 будемо заповнювати значенням '9' 
+13.09.2017 - для ОКРО учасника у якого значення похоже на "D00000000_" 
+             K021 будемо заповнювати значенням '9'
+18.08.2017 - если для клиентов участников органов государственной власти
+             (ISE=13110,13120,13131,13132) и поле OKPO_U имеет значение
+             '00000000' или '000000000' или '0000000000' или '99999' или 
+             '999999999' или '9999999999' 
+             то тогда для таких клиентов будет заполнено "D"||<номер п/п>
+14.08.2017 - для органів державної влади параметр K021 будемо заповнювати
+             значенням '9'
 10.11.2016 - для ФЛ включаются только контрагенты неинсайдеры
-17.05.2016 - для участников ФЛ нерезидентов и при пустом заполнении поля 
+17.05.2016 - для участников ФЛ нерезидентов и при пустом заполнении поля
              серия паспорта будет формироваться IN || <условный код>
-13.05.2106 - при отборе связанных лиц для ЮЛ будет отбираться 
-             ID_REL in (1,4) для ФЛ ID_REL in (5,12)  
+13.05.2106 - при отборе связанных лиц для ЮЛ будет отбираться
+             ID_REL in (1,4) для ФЛ ID_REL in (5,12)
 21.04.2016 - для расшифровки показателя 040 для ФЛ из CUST_BUN выбираем
              данные по условию RNKA=RNK  и не выбираем по RNKB
-             (замечание Киевгорода - Грунич Виктории Борисовны)  
-19.04.2016 - для ФЛ изменен алгоритм отбора связанных лиц 
+             (замечание Киевгорода - Грунич Виктории Борисовны)
+19.04.2016 - для ФЛ изменен алгоритм отбора связанных лиц
 13.04/2016 - для показателей 010, 019 вместо части кода показателя "Б"
              будет формироваться значение '9'.
 18.03.2016 - на 01.04.2016 будет формироваться новая часть показателя
@@ -120,6 +131,7 @@ tk_       Varchar2(1);
 cust_type number;
 glb_      number;
 dat_izm1     date := to_date('31/08/2013','dd/mm/yyyy');
+is_foreign_bank     number;
 
 -----------------------------------------------------------------------------
 BEGIN
@@ -179,7 +191,7 @@ BEGIN
                 and b.region_u = to_char(k.C_REG(+))
                 and c.rnk = b.rnka
                 and c.rnk <> 94809201
-                and c.custtype in (1, 2) 
+                and c.custtype in (1, 2)
                 and ( (b.id_rel in (select min(id_rel)
                                     from cust_bun
                                     where rnka = b.rnka
@@ -203,13 +215,13 @@ BEGIN
                      DECODE(b.country_u,804,1,2) REZ,
                      NVL(trim(b.doc_serial),'') SER, NVL(trim(b.doc_number),'000000') NUMDOC,
                      'XXXXX' TAG, '0' VALUE
-              from  customer c, cust_bun b, kodobl_reg k 
+              from  customer c, cust_bun b, kodobl_reg k
               where c.rnk in (select distinct rnk
                               from otcn_f71_history
                               where datf = Dat_
                                 and rnk is not null
                                 and p040 <> 0 )
-                and NVL(c.prinsider,99) = 99 
+                and NVL(c.prinsider,99) = 99
                 and b.region_u = to_char(k.C_REG(+))
                 and c.rnk = b.rnka
                 and c.rnk <> 94809201
@@ -326,7 +338,7 @@ BEGIN
           -- для ФЛ резидентов
           if k.codc in (5) then
              okpo_k := lpad(substr(ser_k||numdoc_k, 1, 10), 10, '0');
-             k021_k := '2';
+             k021_k := '9';
           end if;
           -- для ФЛ нерезидентов
           if k.codc = 6 and ser_k not in ('','00') and numdoc_k <> '000000' then
@@ -357,15 +369,27 @@ BEGIN
           end if;
        end if;
 
-       if trim(k.okpo_u) in ('00000000','000000000','0000000000')
+       if trim(k.okpo_u) in ('00000000','000000000','0000000000', 
+                             '99999','999999999','9999999999'
+                            )
        then
           if k040_ = '804' then
              okpo_ := lpad(substr(ser_ || numdoc_, 1, 10), 10, '0');
              okpo_u := ser_ || numdoc_;
              if k.tk = 2 then
-                k021_u := '2';
+                k021_u := '9';
              else
                 k021_u := '1';
+             end if;
+             if k.tk = 1 then
+                kol1_ := kol1_+1;
+                okpo_ := 'IN' || lpad(to_char(kol1_), 8, '0');
+                -- органи державної влади
+                if k.ise_u in ('13110','13120','13131','13132') then
+                   kol3_ := kol3_ + 1;
+                   okpo_ := 'D' || lpad(to_char(kol3_), 9, '0');
+                end if;
+                k021_u := '9';
              end if;
           else
              if k.tk = 2 and trim(k.ser) is not null then
@@ -381,33 +405,60 @@ BEGIN
              if k.tk = 1 then
                 kol1_ := kol1_+1;
                 okpo_ := 'IN' || lpad(to_char(kol1_), 8, '0');
+                -- органи державної влади
+                if k.ise_u in ('13110','13120','13131','13132') then
+                   kol3_ := kol3_ + 1;
+                   okpo_ := 'D' || lpad(to_char(kol3_), 9, '0');
+                end if;
                 k021_u := '9';
              end if;
           end if;
        end if;
 
-       if trim(k.okpo_u) not in ('00000000','000000000','0000000000')
+       if trim(k.okpo_u) not in ('00000000','000000000','0000000000',
+                                 '99999','999999999','9999999999' 
+                                )
        then
           if k040_ <> '804' then
-              okpo_ := 'IN' || lpad(substr(NVL(trim(okpo_u),'0'), 1, 8), 8, '0');
-              k021_u := '9';
+             select count(*)
+             into is_foreign_bank
+             from rc_bnk
+             where b010 = trim(k.okpo_u);
+             
+             if is_foreign_bank <> 0 then
+                okpo_ := lpad(substr(NVL(trim(okpo_u),'0'), 1, 10), 10, '0');
+                k021_u := '4';
+             else
+                okpo_ := 'IN' || lpad(substr(NVL(trim(okpo_u),'0'), 1, 8), 8, '0');
+                k021_u := '9';
+             end if;
           else
-             okpo_ := substr(trim(okpo_u),1,10);
+             okpo_ := substr(lpad(trim(k.okpo_u), 10, '0'), 1, 10);
              if k.tk = 2 then
                 k021_u := '2';
              else
                 k021_u := '1';
              end if;
+
+             if k.okpo_u like 'D%'
+             then
+                okpo_ := substr(lpad(trim(k.okpo_u), 10, '0'), 1, 10);
+                k021_u := '9';
+             end if;
+ 
              -- органи державної влади
              if k.ise_u in ('13110','13120','13131','13132') then
                 if k.okpo_u like 'D%'
                 then
                    okpo_ := substr(lpad(trim(k.okpo_u), 10, '0'), 1, 10);
+                   k021_u := '9';
                 else
                    kol3_ := kol3_ + 1;
                    okpo_ := 'D' || lpad(to_char(kol3_), 9, '0');
+                   k021_u := '9';
                 end if;
              end if;
+
           end if;
        end if;
 
@@ -444,7 +495,7 @@ BEGIN
 
 -- код 206
       kodp_ := '206'||lpad(okpo_k,10,'0')||lpad(okpo_,10,'0')||k021_k||k021_u||
-                 lpad(to_char(rnka_),6,'0')||lpad(to_char(k.rnkb),4,'0');
+      	       lpad(to_char(rnka_),6,'0')||lpad(to_char(k.rnkb),4,'0');
       znap_ := to_char(cust_);
 
       insert into bars.rnbu_trace
@@ -544,7 +595,7 @@ BEGIN
       if k040_<>'804' and length(trim(okpo_u))>8 then
 
          kodp_ := '219'||lpad(okpo_k,10,'0')||lpad(okpo_,10,'0')||k021_k||k021_u||
-                lpad(to_char(rnka_),6,'0')||lpad(to_char(k.rnkb),4,'0');
+      		  lpad(to_char(rnka_),6,'0')||lpad(to_char(k.rnkb),4,'0');
          znap_ := trim(okpo_u);
 
          insert into bars.rnbu_trace

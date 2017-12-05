@@ -299,7 +299,7 @@ IS
       l_nd                  VARCHAR2 (50);
       l_cnt number;
       l_warm_nls            accounts.nls%type;
-     
+
 
    BEGIN
       g_cyr_lat (1) := 'cyr';
@@ -515,7 +515,7 @@ THEN
 
       IF    (l_SMS_ACC_TEMPLATES.Acc_Nbs IN ('2620',
                                              '2630',
-                                             '2635',
+                                             '2635', -- TODO : по новому плану рахунків такого балансового більше не буде, на перехідний період запис залишається
                                              '2628',
                                              '2638'))
          OR (l_SMS_ACC_TEMPLATES.id = 3)
@@ -734,7 +734,7 @@ THEN
    IS
       l_phones   acc_sms_phones%ROWTYPE;
    BEGIN
-      logger.trace ( title || 
+      logger.trace ( title ||
                            'EVERYDAY SMS. start time='
                         || to_char(sysdate,'DD-MON-YYYY HH24:MI:SS'));
       FOR cur_phones

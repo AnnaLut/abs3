@@ -11,7 +11,6 @@ PROMPT *** ALTER_POLICY_INFO to OTCN_ACC ***
 BEGIN 
         execute immediate  
           'begin  
-               bpa.alter_policy_info(''OTCN_ACC'', ''CENTER'' , null, null, null, null);
                bpa.alter_policy_info(''OTCN_ACC'', ''FILIAL'' , null, null, null, null);
                bpa.alter_policy_info(''OTCN_ACC'', ''WHOLE'' , null, null, null, null);
                null;
@@ -20,41 +19,53 @@ BEGIN
 END; 
 /
 
+begin 
+  execute immediate '
+    DROP TABLE BARS.OTCN_ACC';
+exception when others then       
+  if sqlcode=-942 then null; else raise; end if; 
+end;
+/
+    
 PROMPT *** Create  table OTCN_ACC ***
 begin 
   execute immediate '
-  CREATE GLOBAL TEMPORARY TABLE BARS.OTCN_ACC 
-   (	ACC NUMBER, 
-	NLS VARCHAR2(15), 
-	KV NUMBER(38,0), 
-	NBS VARCHAR2(4), 
-	RNK NUMBER, 
-	DAOS DATE, 
-	DAPP DATE, 
-	ISP NUMBER, 
-	NMS VARCHAR2(70), 
-	LIM NUMBER(24,0), 
-	PAP NUMBER(38,0), 
-	TIP CHAR(3), 
-	VID NUMBER(*,0), 
-	MDATE DATE, 
-	DAZS DATE, 
-	ACCC NUMBER(38,0), 
-	TOBO VARCHAR2(30)
-   ) ON COMMIT PRESERVE ROWS ';
+    CREATE GLOBAL TEMPORARY TABLE BARS.OTCN_ACC
+    (
+      ACC    NUMBER                                 NOT NULL,
+      NLS    VARCHAR2(15 BYTE),
+      KV     NUMBER(38),
+      NBS    VARCHAR2(4 BYTE),
+      OB22   VARCHAR2(2 BYTE),
+      RNK    NUMBER,
+      DAOS   DATE,
+      DAPP   DATE,
+      ISP    NUMBER,
+      NMS    VARCHAR2(70 BYTE),
+      LIM    NUMBER(24),
+      PAP    NUMBER(38),
+      TIP    CHAR(3 BYTE),
+      VID    INTEGER,
+      MDATE  DATE,
+      DAZS   DATE,
+      ACCC   NUMBER(38),
+      TOBO   VARCHAR2(30 BYTE),
+      NLS_ALT   VARCHAR2(15 BYTE),
+      OB22_ALT  VARCHAR2(2 BYTE),
+      DAT_ALT   DATE
+    ) 
+    
+    ON COMMIT PRESERVE ROWS ';
 exception when others then       
   if sqlcode=-955 then null; else raise; end if; 
 end; 
 /
 
-
-
-
 PROMPT *** ALTER_POLICIES to OTCN_ACC ***
  exec bpa.alter_policies('OTCN_ACC');
 
 
-COMMENT ON TABLE BARS.OTCN_ACC IS '¬ременна¤ таблица дл¤ счетов участвующих в формировании файлов отчетности';
+COMMENT ON TABLE BARS.OTCN_ACC IS 'Временная таблица для счетов участвующих в формировании файлов отчетности';
 COMMENT ON COLUMN BARS.OTCN_ACC.ACC IS '';
 COMMENT ON COLUMN BARS.OTCN_ACC.NLS IS '';
 COMMENT ON COLUMN BARS.OTCN_ACC.KV IS '';
@@ -76,7 +87,7 @@ COMMENT ON COLUMN BARS.OTCN_ACC.TOBO IS '';
 
 
 
-PROMPT *** Create  constraint SYS_C0010295 ***
+PROMPT *** Create  constraint SYS_C001213030 ***
 begin   
  execute immediate '
   ALTER TABLE BARS.OTCN_ACC MODIFY (ACC NOT NULL ENABLE)';
@@ -88,6 +99,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  OTCN_ACC ***
+grant DELETE,INSERT,SELECT,UPDATE                                            on OTCN_ACC        to ABS_ADMIN;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OTCN_ACC        to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OTCN_ACC        to RPBN002;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on OTCN_ACC        to WR_ALL_RIGHTS;

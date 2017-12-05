@@ -58,6 +58,9 @@ PROMPT *** Create  procedure PAY_KK ***
   l_s     oper.s%type         ;
   -----------------------------
 begin  ------Есть ли "свой-2620" ?
+  if NEWNBS.GET_STATE = 1 then
+        l_nbs := '6510' ;
+  end if;
   begin
 
      select n.nd             into l_ND          from nd_acc n, accounts a

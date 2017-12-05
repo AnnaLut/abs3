@@ -13,7 +13,7 @@ PROMPT *** Create  view DPT_OB22 ***
           v.bsn,  p.ob22ie,
           v.bsa,  p.ob22am,
           decode( SUBStr(v.bsd,1,3), '263', '7041', '332', '7052', '7040') as nbs_exp, p.ob22d7,
-          decode( p.ob22k7, null, null, '6399') as nbs_red, p.ob22k7
+          decode( p.ob22k7, null, null, decode(newnbs.get_state, 0, '6399', '6350')) as nbs_red, p.ob22k7
      FROM dpt_vidd v,
           (SELECT vidd,
                   MIN (DECODE (tag, 'DPT_OB22', SUBSTR (val, 1, 2), '') ) as ob22_dep,

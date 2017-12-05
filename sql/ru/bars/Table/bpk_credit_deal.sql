@@ -37,7 +37,8 @@ begin
 	ACC_2207 NUMBER(24,0), 
 	ACC_2209 NUMBER(24,0), 
 	PC_TYPE VARCHAR2(3), 
-	CREATE_DT DATE DEFAULT sysdate
+	CREATE_DT DATE DEFAULT sysdate,
+	KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo'')
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -48,6 +49,21 @@ end;
 /
 
 
+begin   
+ execute immediate '
+  ALTER TABLE BARS.BPK_CREDIT_DEAL add ( KF varchar2(6) )';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+begin   
+ execute immediate '
+  ALTER TABLE BARS.BPK_CREDIT_DEAL MODIFY (KF CONSTRAINT CC_BPKCREDITDEAL_KF_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
 
 
 PROMPT *** ALTER_POLICIES to BPK_CREDIT_DEAL ***

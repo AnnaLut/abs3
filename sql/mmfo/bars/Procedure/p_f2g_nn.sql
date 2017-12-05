@@ -15,7 +15,7 @@ IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :   Процедура формирования #2G для КБ (универсальная)
 % COPYRIGHT   :   Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     :   19/03/2015 (17/03/2015, 16/03/2015, 13/03/2015) 
+% VERSION     :   10/11/2017 (19/03/2015) 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
       sheme_ - схема формирования
@@ -30,7 +30,7 @@ IS
    kodf_      VARCHAR2 (2)   := '2G';
    sql_z      VARCHAR2 (200);
    typ_       NUMBER;
-   gr_sum_    NUMBER         := 1;  --5000000;     --для покупки
+   gr_sum_    NUMBER         := 1;  
    -- для продажу i надходження вiд нерезидентiв
    flag_      NUMBER;
    -- флаг для определение наличия поля BENEFCOUNTRY т.TOP_CONTRACTS
@@ -43,7 +43,6 @@ IS
    kod_b      VARCHAR2 (10);                          -- код iноземного банку
    nam_b      VARCHAR2 (70);                        -- назва iноземного банку
    n_         NUMBER         := 10;
-   -- кол-во доп.параметров до 03.07.2006 после n_=11
    acc_       NUMBER;
    acck_       NUMBER;
    kv_        NUMBER;
@@ -178,38 +177,11 @@ BEGIN
                             AND LOWER (TRIM (o.nazn)) not like '%конверт%'
                             AND LOWER (TRIM (o.nazn)) not like '%куп_вля%' 
                            )
-                        --OR  mfo_ <> 300465 and
-                        --    (   SUBSTR (o.nlsd, 1, 4) in ('2625', '3570')  
-                        --    AND SUBSTR (o.nlsk, 1, 4) = '2900'  
-                        --   )
-                        OR (    o.nlsd like  '1919691%'
-                            AND SUBSTR (o.nlsk, 1, 4) = '2900'
-                            AND mfou_ = 300205 
-                           )
-                        OR (    o.nlsd like  '29004691%'
-                            AND SUBSTR (o.nlsk, 1, 4) = '2900'
-                            AND mfou_ = 300205 
-                           )
-                        OR (    SUBSTR (o.nlsd, 1, 4) = '1919'
-                            AND SUBSTR (o.nlsk, 1, 4) = '2900'
-                            AND mfou_ = 380764 
-                            AND (LOWER (TRIM (o.nazn)) like '%продажа валют_%' or 
-                                 LOWER (TRIM (o.nazn)) like '%продаж валют_%') 
-                           )
                         OR (    SUBSTR (o.nlsd, 1, 4) = '2900'
                             AND SUBSTR (o.nlsk, 1, 4) = '2900'
                             AND mfou_ = 300465 AND mfou_ <> mfo_ 
                             AND LOWER (TRIM (o.nazn)) like '%продаж%'                            
                           )
-                        OR (    SUBSTR (o.nlsd, 1, 4) = '2924'
-                            AND SUBSTR (o.nlsk, 1, 4) = '2900'
-                            AND mfou_ = 380764 
-                            AND LOWER (TRIM (o.nazn)) like '%перерахування кошт_в для в_льного продажу%' 
-                           )
-                        OR (    SUBSTR (o.nlsd, 1, 4) = '2924'
-                            AND SUBSTR (o.nlsk, 1, 4) = '2900'
-                            AND mfou_ = 300120 
-                           )
                         OR (    o.nlsd LIKE '2900205%'    -- по письму Уманец от 16.04.2013 
                             AND o.nlsk LIKE '29003%'
                             AND mfo_ = 300465 
@@ -224,29 +196,8 @@ BEGIN
                             AND mfou_ = 300465 
                             AND LOWER (TRIM (o.nazn)) like '%перерахування кошт_в на продаж%' 
                            )
-                        OR (    SUBSTR (o.nlsd, 1, 4) in ('2625','2909','2600')
-                            AND SUBSTR (o.nlsk, 1, 4) = '2900' 
-                            AND mfou_ = 300120
-                           )
-                        OR (    SUBSTR (o.nlsd, 1, 4) in ('2800','2900')
-                            AND SUBSTR (o.nlsk, 1, 4) = '3800' 
-                            AND mfou_ = 300120
-                           )
                         OR (    SUBSTR(o.nlsd, 1, 4) in ('3800')
                             AND SUBSTR (o.nlsk, 1, 4) = '1819' 
-                            AND mfou_ not in (300205)
-                            AND lower(nazn) like '%куп_вля%'
-                           )
-                        OR (    SUBSTR(o.nlsd, 1, 4) in ('1500')
-                            AND SUBSTR (o.nlsk, 1, 4) = '3540' 
-                            AND mfou_ = 300120
-                            AND LOWER (TRIM (o.nazn)) not like '%конверс%'
-                            AND LOWER (TRIM (o.nazn)) not like '%конверт%'
-                            AND LOWER (TRIM (o.nazn)) not like '%продаж%'
-                           )
-                        OR (    o.nlsd like '1819791%'
-                            AND SUBSTR(o.nlsk, 1, 4) in ('3800') 
-                            AND mfou_ = 300205 
                             AND lower(nazn) like '%куп_вля%'
                            )
                        ) 
@@ -275,33 +226,11 @@ BEGIN
                             AND LOWER (TRIM (o.nazn)) like '%куп_вля%'
                             AND mfou_ = 380764
                            )
-                        OR (    SUBSTR (o.nlsd, 1, 4) = '3640'
-                            AND SUBSTR (o.nlsk, 1, 4) = '1919' 
-                            --AND LOWER (TRIM (o.nazn)) not like '%продаж%'
-                            AND LOWER (TRIM (o.nazn)) not like '%конверс%'
-                            AND LOWER (TRIM (o.nazn)) not like '%конверт%'
-                            AND mfou_ = 300120
-                           )
                         OR (    SUBSTR (o.nlsd, 1, 4) IN ('1819', '2800', '2900')
                             AND SUBSTR (o.nlsk, 1, 4) in ('3800')  
-                            AND ( mfou_ not in (300120, 300205) --or
-				  --mfou_ = 300120 and LOWER (TRIM (o.nazn)) not like '%перероз%'
-                                )
                             AND LOWER (TRIM (o.nazn)) not like '%продаж%'
                             AND LOWER (TRIM (o.nazn)) not like '%конверс%'
                             AND LOWER (TRIM (o.nazn)) not like '%конверт%'
-                           )
-                        --OR (    SUBSTR (o.nlsd, 1, 4) IN ('1500','1819')
-                        --    AND SUBSTR (o.nlsk, 1, 4) in ('3540')  
-                        --    AND mfou_ = 300120
-                        --    AND LOWER (TRIM (o.nazn)) not like '%продаж%'
-                        --    AND LOWER (TRIM (o.nazn)) not like '%конверс%'
-                        --    AND LOWER (TRIM (o.nazn)) not like '%конверт%'
-                        --   )
-                        OR (    SUBSTR (o.nlsd, 1, 4) in ('3800')
-                            AND o.nlsk LIKE '1819791%'
-                            AND mfou_ = 300205
-                            AND LOWER (TRIM (o.nazn)) like '%продаж%'
                            )
                        )
                    AND o.acck = ca.acc
@@ -391,7 +320,6 @@ BEGIN
    (kodf, datf, kodp, znap, nbuc) 
       SELECT kodf_, dat_, kodp, sum(znap), nbuc
         FROM rnbu_trace
-       WHERE userid = userid_
       GROUP BY kodf_, dat_, kodp, nbuc ;
 ----------------------------------------
 END p_f2g_nn;

@@ -26,9 +26,10 @@
                             <td>
                                 &nbsp;
                                 <img class="outset" id="btDetail" title="Параметри договору" onclick="fnDetail()"
-                                    src="/Common/Images/OPEN_.gif">
+                                    src="/Common/Images/OPEN_.gif" alt="Параметри договору">
                                 &nbsp;
-                                <img class="outset" id="btRefresh" title="Перечитати" onclick="fnRefresh()" src="/Common/Images/REFRESH.gif">
+                                <img class="outset" id="btRefresh" title="Перечитати" onclick="fnRefresh()" 
+                                    src="/Common/Images/REFRESH.gif" alt="Перечитати">
                             </td>
                             <td>
                                 &nbsp;

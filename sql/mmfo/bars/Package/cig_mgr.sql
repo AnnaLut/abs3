@@ -105,7 +105,8 @@ create or replace package body cig_mgr is
   G_DOG_NONINSTDATA constant number := 5;
 
   g_currbranch varchar2(30) := null;
-
+  g_newnbs          number := newnbs.get_state;  -- Признак перехода на новый план счетов. (1-перешли, 0-нет)
+  
   TYPE dog_general_rec_type IS RECORD(
     nd                cc_deal.nd%TYPE,
     rnk               accounts.rnk%TYPE,
@@ -2797,7 +2798,7 @@ select
                          from nd_acc na, accounts a2
                           where na.nd = o.nd
                                 and na.acc = a2.acc
-                                and a2.NBS = ''3579''
+                                and a2.NBS in (select distinct decode (g_newnbs,1,t.r020_new,''3579'' ) from transfer_2017 t where t.r020_old = ''3579'') -- потом можно удалить и прописать в in (''3570'',''3578'')
                                 and a2.dazs is null) as acc2
                           from (select nd, datd, datd2, acc, sd, acc_9129, acc_2067, acc_8000, null as deldate
                                 from acc_over ao
@@ -2956,7 +2957,7 @@ select           aa.nd,
                          from nd_acc na, accounts a2
                           where na.nd = o.nd
                                 and na.acc = a2.acc
-                                and a2.NBS = ''3579''
+                                and a2.NBS in (select distinct decode (g_newnbs,1,t.r020_new,''3579'' ) from transfer_2017 t where t.r020_old = ''3579'') -- потом можно удалить и прописать в in (''3570'',''3578'')
                                 and a2.dazs is null) as acc2
                           from (select nd, datd, datd2, acc, sd, acc_9129, acc_2067, acc_8000, null as deldate
                                 from acc_over ao

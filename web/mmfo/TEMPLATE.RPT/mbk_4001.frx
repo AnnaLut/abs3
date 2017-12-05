@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReportInfo.Created="11/11/2015 12:51:33" ReportInfo.Modified="11/17/2015 15:42:18" ReportInfo.CreatorVersion="2014.1.2.0">
+<Report ScriptLanguage="CSharp" ReportInfo.Created="11/11/2015 12:51:33" ReportInfo.Modified="11/22/2017 09:38:39" ReportInfo.CreatorVersion="2014.1.2.0">
   <ScriptText>using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -36,8 +36,8 @@ namespace FastReport
 }
 </ScriptText>
   <Dictionary>
-    <OracleDataConnection Name="Connection" ConnectionString="rijcmlq/aVeGBEd5IyArDSDpS1mnEQWiK8SQhsWDPMpCsry+zWhQeBbANOg072LKEsCrBsICAF6aX4yRDieEGJ/FFH7iQ==">
-      <TableDataSource Name="Table" Alias="QMain" DataType="System.Int32" Enabled="true" SelectCommand="select q.fdat, q.customer_name, q.nbs, q.kv, sum(q.In_Rest)/1000000 In_Rest, sum(q.In_Base_Rest) /1000000 In_Base_Rest,:p_param par&#13;&#10;     from (select trunc(d.fdat)fdat,&#13;&#10;                  cus.nmk customer_name,&#13;&#10;                  a.nbs,&#13;&#10;                  a.kv,&#13;&#10;                  decode(:p_param,0,-1,1)*fost(a.acc, d.fdat ) / 100 In_Rest,&#13;&#10;                  gl.p_icurval(a.kv,decode(:p_param,0,-1,1)*fost(a.acc, d.fdat) / 100,d.fdat) In_Base_Rest&#13;&#10;             from accounts a, customer cus, fdat d&#13;&#10;            where ((a.nbs in ('1500',&#13;&#10;                              '1502',&#13;&#10;                              '1510',&#13;&#10;                              '1512',&#13;&#10;                              '1513',&#13;&#10;                              '1514',&#13;&#10;                              '1517',&#13;&#10;                              '1521',&#13;&#10;                              '1523',&#13;&#10;                              '1524',&#13;&#10;                              '1527') &#13;&#10;              and nvl(:p_param,0)=0) &#13;&#10;               or (a.nbs in  ('1600',&#13;&#10;                              '1602',&#13;&#10;                              '1610',&#13;&#10;                              '1612',&#13;&#10;                              '1613',&#13;&#10;                              '1614',&#13;&#10;                              '1617',&#13;&#10;                              '1621',&#13;&#10;                              '1623',&#13;&#10;                              '1624',&#13;&#10;                              '1627') &#13;&#10;              and :p_param=1))&#13;&#10;              and cus.rnk = a.rnk&#13;&#10;              and a.daos &lt;= :p_end_date&#13;&#10;              and (a.dazs is null or&#13;&#10;                  a.dazs &gt;= :p_end_date)&#13;&#10;              and d.fdat &gt;= :p_begin_date&#13;&#10;              and d.fdat &lt; :p_end_date + 1&#13;&#10;            order by d.fdat, a.rnk, a.nbs, a.kv) q&#13;&#10;    where q.In_Rest&lt;&gt;0            &#13;&#10;    group by q.fdat, q.customer_name, q.nbs, q.kv&#13;&#10;    order by q.fdat, q.customer_name, q.nbs, q.kv">
+    <OracleDataConnection Name="Connection" ConnectionString="rijcmlq/aVeGBEd5IyArDSDpS1mnEQWiK8SQhsWDPMpCsry+zWhQeBbANOg072LKEsCrBsIhGtjdrkcBc2sECKGG9BM7w==">
+      <TableDataSource Name="Table" Alias="QMain" DataType="System.Int32" Enabled="true" SelectCommand="select q.fdat, q.customer_name, q.nbs, q.kv, sum(q.In_Rest)/1000000 In_Rest, sum(q.In_Base_Rest) /1000000 In_Base_Rest,:p_param par&#13;&#10;     from (select trunc(d.fdat)fdat,&#13;&#10;                  cus.nmk customer_name,&#13;&#10;                  a.nbs,&#13;&#10;                  a.kv,&#13;&#10;                  decode(:p_param,0,-1,1)*fost(a.acc, d.fdat ) / 100 In_Rest,&#13;&#10;                  gl.p_icurval(a.kv,decode(:p_param,0,-1,1)*fost(a.acc, d.fdat) / 100,d.fdat) In_Base_Rest&#13;&#10;             from accounts a, customer cus, fdat d&#13;&#10;            where ((a.nbs in ('1500',&#13;&#10;                              '1502',&#13;&#10;                              '1510',&#13;&#10;                              '1513',&#13;&#10;                              '1514',&#13;&#10;                              '1521',&#13;&#10;                              '1524') &#13;&#10;              and nvl(:p_param,0)=0) &#13;&#10;               or (a.nbs in  ('1600',&#13;&#10;                              '1602',&#13;&#10;                              '1610',&#13;&#10;                              '1613',&#13;&#10;                              '1614',&#13;&#10;                              '1617',&#13;&#10;                              '1621',&#13;&#10;                              '1623') &#13;&#10;              and :p_param=1))&#13;&#10;              and cus.rnk = a.rnk&#13;&#10;              and a.daos &lt;= :p_end_date&#13;&#10;              and (a.dazs is null or&#13;&#10;                  a.dazs &gt;= :p_end_date)&#13;&#10;              and d.fdat &gt;= :p_begin_date&#13;&#10;              and d.fdat &lt; :p_end_date + 1&#13;&#10;            order by d.fdat, a.rnk, a.nbs, a.kv) q&#13;&#10;    where q.In_Rest&lt;&gt;0            &#13;&#10;    group by q.fdat, q.customer_name, q.nbs, q.kv&#13;&#10;    order by q.fdat, q.customer_name, q.nbs, q.kv">
         <Column Name="FDAT" DataType="System.DateTime"/>
         <Column Name="NBS" DataType="System.String"/>
         <Column Name="KV" DataType="System.Int16"/>
@@ -64,8 +64,8 @@ namespace FastReport
     <ReportTitleBand Name="ReportTitle1" Width="5594.4" Height="28.35" CanGrow="true">
       <TextObject Name="Text1" Width="1426.95" Height="28.35" CanGrow="true" BeforePrintEvent="Text1_BeforePrint" Text="Звіт про залишки коштів, що [IIf([QMain.PAR]==0,&quot;розміщені&quot;,&quot;залучені&quot;)] в інших банках&#13;&#10;з [QDate_Ukr.BEGIN_DATE] по [QDate_Ukr.END_DATE]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 12pt, style=Bold"/>
     </ReportTitleBand>
-    <PageHeaderBand Name="PageHeader1" Top="31.21" Width="5594.4"/>
-    <DataBand Name="Data1" Top="34.06" Width="5594.4" Height="94.5" CanGrow="true">
+    <PageHeaderBand Name="PageHeader1" Top="31.15" Width="5594.4"/>
+    <DataBand Name="Data1" Top="33.94" Width="5594.4" Height="94.5" CanGrow="true">
       <MatrixObject Name="Matrix1" Width="483.17" Height="94.5" Border.Lines="All" FixedRows="2" FixedColumns="3" RepeatHeaders="false" AutoSize="false" CellsSideBySide="true" DataSource="Table">
         <MatrixColumns>
           <Header Expression="[QMain.FDAT]" Sort="None" Totals="false"/>
@@ -121,6 +121,6 @@ namespace FastReport
         </TableRow>
       </MatrixObject>
     </DataBand>
-    <PageFooterBand Name="PageFooter1" Top="131.42" Width="5594.4"/>
+    <PageFooterBand Name="PageFooter1" Top="131.24" Width="5594.4"/>
   </ReportPage>
 </Report>

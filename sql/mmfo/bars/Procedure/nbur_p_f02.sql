@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure NBUR_P_F02 ***
 
-  CREATE OR REPLACE PROCEDURE BARS.NBUR_P_F02 (p_kod_filii        varchar2,
+CREATE OR REPLACE PROCEDURE BARS.NBUR_P_F02 (p_kod_filii        varchar2,
                                              p_report_date      date,
                                              p_form_id          number,
                                              p_scheme           varchar2 default 'G',
@@ -18,9 +18,9 @@ PROMPT *** Create  procedure NBUR_P_F02 ***
 % DESCRIPTION : Процедура формирования #02 для КБ
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.16.002  11.08.2016
+% VERSION     :  v.16.005  14.11.2017
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_          char(30)  := 'v.16.002  11.08.2016';
+  ver_          char(30)  := 'v.16.005  14.11.2017';
 /*
    Структура показника    DD BBBB VVV Y
 
@@ -40,7 +40,7 @@ BEGIN
    logger.info ('NBUR_P_F02 begin for date = '||to_char(p_report_date, 'dd.mm.yyyy'));
 
    -- определение начальных параметров (код области или МФО или подразделение)
-   nbur_files.P_PROC_SET(p_kod_filii, p_file_code, p_scheme, l_datez, 1, l_file_code, l_nbuc, l_type);
+   nbur_files.P_PROC_SET(p_kod_filii, p_file_code, p_scheme, l_datez, 1, l_file_code, l_nbuc, l_type, p_report_date);
 
     BEGIN
        INSERT /*+ APPEND */
@@ -89,7 +89,8 @@ BEGIN
                          nbuc,
                          colname,
                          ABS (VALUE) field_value
-                    FROM (SELECT b.cust_id,
+                    FROM (SELECT /*+ ordered*/
+                                 b.cust_id,
                                  b.acc_id,
                                  a.maturity_date,
                                  a.kf,
@@ -101,8 +102,18 @@ BEGIN
                                  DECODE (SIGN (b.adj_bal_uah), 1, adj_bal_uah, 0) P20,
                                  DECODE (SIGN (b.adj_bal), 1, 0, -adj_bal) P11,
                                  DECODE (SIGN (b.adj_bal), 1, adj_bal, 0) P21,
-                                 b.dosq - b.cudosq P50,
-                                 b.kosq - b.cukosq P60,
+                                 (CASE
+                                     WHEN b.kosq - b.cukosq < 0 THEN b.dosq - b.cudosq + ABS (b.kosq - b.cukosq)
+                                     WHEN b.dosq - b.cudosq < 0 THEN 0
+                                     ELSE b.dosq - b.cudosq
+                                  END)
+                                 P50,
+                                 (CASE
+                                     WHEN b.dosq - b.cudosq < 0 THEN b.kosq - b.cukosq + ABS (b.dosq - b.cudosq)
+                                     WHEN b.kosq - b.cukosq < 0 THEN 0
+                                     ELSE b.kosq - b.cukosq
+                                  END)
+                                 P60,
                                  (CASE
                                      WHEN b.kos - b.cukos < 0 THEN b.dos - b.cudos + ABS (b.kos - b.cukos)
                                      WHEN b.dos - b.cudos < 0 THEN 0
@@ -134,7 +145,143 @@ BEGIN
                                  AND b.kf = p_kod_filii
                                  AND a.cust_id = c.cust_id
                                  AND c.report_date = p_report_date
+                                 and trunc(nvl(a.acc_alt_dt, add_months(p_report_date, -1)), 'mm') <> trunc(p_report_date, 'mm')
                                  AND c.kf = p_kod_filii) UNPIVOT (VALUE
+                                                                    FOR colname
+                                                                    IN  (P10,
+                                                                        P20,
+                                                                        P11,
+                                                                        P21,
+                                                                        P50,
+                                                                        P60,
+                                                                        P51,
+                                                                        P61,
+                                                                        P70,
+                                                                        P80,
+                                                                        P71,
+                                                                        P81))) d
+       where (d.kv!='980' or d.colname like 'P_0') and d.field_value!=0;
+    EXCEPTION
+       WHEN OTHERS
+       THEN
+          logger.info ('NBUR_P_F02 error: ' || SQLERRM);
+    END;
+
+    commit;
+
+    BEGIN
+       INSERT /*+ APPEND */
+            INTO nbur_detail_protocols (report_date,
+                                          kf,
+                                          report_code,
+                                          nbuc,
+                                          field_code,
+                                          field_value,
+                                          description,
+                                          acc_id,
+                                          acc_num,
+                                          kv,
+                                          maturity_date,
+                                          cust_id,
+                                          REF,
+                                          nd,
+                                          branch)
+          SELECT /*+ parallel(8) */p_report_date,
+                 p_kod_filii,
+                 p_file_code,
+                 (case when l_type = 0 then l_nbuc else d.nbuc end) nbuc,
+                 SUBSTR (d.colname, 2, 2)
+                 || d.nbs
+                 || SUBSTR ('000' || d.kv, -3)
+                 || k041 field_code,
+                 field_value,
+                 NULL description,
+                 acc_id,
+                 acc_num,
+                 kv,
+                 maturity_date,
+                 cust_id,
+                 NULL,
+                 NULL,
+                 branch
+            FROM (SELECT acc_id,
+                         acc_num,
+                         nbs,
+                         kv,
+                         date_off,
+                         maturity_date,
+                         cust_id,
+                         k041,
+                         branch,
+                         nbuc,
+                         colname,
+                         ABS (VALUE) field_value
+                    FROM (SELECT /*+ ordered*/
+                                 d.cust_id,
+                                 d.acc_id,
+                                 a.maturity_date,
+                                 a.kf,
+                                 a.acc_num,
+                                 a.kv,
+                                 substr(d.acc_num, 1, 4) NBS,
+                                 a.close_date date_off,
+                                 (case when sign(b.adj_bal_uah) = 1 or d.acc_type = 'OLD' then 0 else -adj_bal_uah end) P10,
+                                 (case when sign(b.adj_bal_uah) <> 1 or d.acc_type = 'OLD' then 0 else adj_bal_uah end) P20,
+                                 (case when sign(b.adj_bal) = 1 or d.acc_type = 'OLD' then 0 else -adj_bal end) P11,
+                                 (case when sign(b.adj_bal) <> 1 or d.acc_type = 'OLD' then 0 else adj_bal end) P21,
+                                 (case when d.acc_type = 'OLD' 
+                                       then 
+                                          d.dosq_repm - b.cudosq
+                                       else
+                                          b.dosq - d.dosq_repm
+                                 end)
+                                 P50,
+                                 (case when d.acc_type = 'OLD' 
+                                       then 
+                                          d.kosq_repm - b.cukosq
+                                       else
+                                          b.kosq - d.kosq_repm
+                                 end)
+                                 P60,
+                                 (case when d.acc_type = 'OLD' 
+                                       then 
+                                          d.dos_repm - b.cudos
+                                       else
+                                          b.dos - d.dos_repm
+                                 end)
+                                 P51,
+                                 (case when d.acc_type = 'OLD' 
+                                       then 
+                                          d.kos_repm - b.cukos
+                                       else
+                                          b.kos - d.kos_repm
+                                 end)
+                                 P61,
+                                 (case when d.acc_type = 'OLD' then 0 else b.crdosq end) P70,
+                                 (case when d.acc_type = 'OLD' then 0 else b.crkosq end) P80,
+                                 (case when d.acc_type = 'OLD' then 0 else b.crdos end)  P71,
+                                 (case when d.acc_type = 'OLD' then 0 else b.crkos end)  P81,
+                                 a.branch,
+                                 a.nbuc,
+                                 c.K041
+                            FROM nbur_tmp_kod_r020 k,
+                                 nbur_dm_accounts a,
+                                 nbur_dm_customers c,
+                                 nbur_dm_balances_monthly b,
+                                 nbur_kor_balances d
+                           WHERE     a.nbs = k.r020
+                                 AND a.report_date = p_report_date
+                                 AND a.kf = p_kod_filii
+                                 AND b.acc_id = a.acc_id
+                                 AND b.report_date = p_report_date
+                                 AND b.kf = p_kod_filii
+                                 AND a.cust_id = c.cust_id
+                                 AND c.report_date = p_report_date
+                                 and trunc(a.acc_alt_dt, 'mm') = trunc(p_report_date, 'mm')
+                                 AND c.kf = p_kod_filii
+                                 AND d.report_date between trunc(p_report_date, 'mm') and p_report_date
+                                 and d.kf = p_kod_filii
+                                 and b.acc_id = d.acc_id) UNPIVOT (VALUE
                                                                     FOR colname
                                                                     IN  (P10,
                                                                         P20,

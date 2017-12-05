@@ -105,7 +105,8 @@ IS
     l_portfolio r_portfolio;
    begin
     l_stmt_str := 'select * from (WITH cust AS (SELECT c1.rnk,c1.nmk,c1.okpo,p.bday,p.ser,p.numdoc,p.organ,p.pdate FROM customer c1, person p WHERE c1.rnk = p.rnk AND canilookclient (c1.rnk) = 1 AND c1.rnk = '||to_char(p_rnk)||'),
-         accmainlst as (select a.acc, da.dptid dpt_id,a.nls,a.nms,a.kv,a.ostc,a.ostb,SIGN (a.blkd) blk, a.daos from accounts a, cust, dpt_accounts da where a.rnk = cust.rnk and a.nbs in (''2620'',''2630'',''2635'') and da.accid = a.acc),
+         accmainlst as (select a.acc, da.dptid dpt_id,a.nls,a.nms,a.kv,a.ostc,a.ostb,SIGN (a.blkd) blk, a.daos from accounts a, cust, dpt_accounts da where a.rnk = cust.rnk and 
+         ((a.nbs in (''2620'',''2630'') and newnbs.get_state = 1) or (a.nbs in (''2620'',''2630'',''2635'') and newnbs.get_state = 0)) and da.accid = a.acc),
          accintlst  as (select a.acc, da.dptid dpt_id,a.nls,a.nms,a.kv,a.ostc,a.ostb,SIGN (a.blkd) blk, a.daos from accounts a, cust, dpt_accounts da where a.rnk = cust.rnk and a.nbs in (''2628'',''2638'') and da.accid = a.acc),
          lst AS (SELECT dc.rnk,
                        dc.acc,

@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/function/cc_o_nls_ext.sql =========*** Run *
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE FUNCTION BARS.CC_O_NLS_EXT 
+CREATE OR REPLACE function BARS.CC_O_NLS_EXT
   (bal_     in varchar2,
    RNK_     in int,
    sour_    in int,
@@ -32,9 +26,10 @@ RETURN number IS
   NBS_SS  accounts.NBS%type :=null ;
    KV_SS   accounts.KV%type :=null ;
   OB22_SS  specparam_int.OB22%type  ;
-
+  l_newnbs number; 
 BEGIN
-
+   l_newnbs := NEWNBS.GET_STATE;   
+   
    TT_:=substr(rtrim(ltrim(nvl(TT_,'%%1'))),1,3);
    tip_:=rtrim(ltrim(tip3_));
    tip_NLS:=rtrim(ltrim(tip_bal_));
@@ -101,7 +96,7 @@ ELSIF tip_='SD'   and tip_id=2 and substr(bal_,1,4) = '8999' THEN
           from
                (select a.acc
                   from accounts a,specparam_int i
-                 where i.acc=a.acc and a.dazs is null and a.nbs=decode(substr(NBS_SS,1,1),'9','6118','6111') and
+                 where i.acc=a.acc and a.dazs is null and a.nbs=decode(substr(NBS_SS,1,1),'9',decode(l_newnbs,0,'6118','6518'),decode(l_newnbs,0,'6111','6511')) and
                       ( a.tobo =BRA_SS or a.tobo = substr(BRA_SS,1,length(BRA_SS)-7)
                         or a.tobo = substr(BRA_SS,1,length(BRA_SS)-7)||'000000/') and
                         i.ob22=(select SD_SK0 from cck_ob22 where nbs=NBS_SS and ob22=OB22_SS)
@@ -165,7 +160,7 @@ ELSIF tip_='SD'   and tip_id=0 and (substr(bal_,1,1) = '9' or tip_NLS='CR9') THE
         from
              (select a.acc
                 from accounts a,specparam_int i
-               where i.acc=a.acc and a.dazs is null and a.nbs='6118' and
+               where i.acc=a.acc and a.dazs is null and a.nbs=decode(l_newnbs,0,'6118','6518') and
                     ( a.tobo =BRA_SS or a.tobo = substr(BRA_SS,1,length(BRA_SS)-7)
                       or a.tobo = substr(BRA_SS,1,length(BRA_SS)-7)||'000000/') and
                       i.ob22=(select SD_9129 from cck_ob22 where nbs=NBS_SS and ob22=OB22_SS)
@@ -183,14 +178,14 @@ ELSIF tip_='SD'   and (substr(bal_,4,1) = '5' or (substr(bal_,4,1) = '6') or (su
        from cc_deal
        where nd=nd_;
 
-     If    nbs_SS in ('2202', '2203') then NBS_SD:='6042';
+     If    nbs_SS in (case when l_newnbs = 0 then '2202' else '2203' end, '2203') then NBS_SD:= case when l_newnbs = 0 then '6042' else '6052' end;
      elsIf nbs_SS in ('2212', '2213') then NBS_SD:='6043';
-     elsIf nbs_SS in ('2232', '2233') then NBS_SD:='6046';
-     elsIf nbs_SS in ('2020')         then NBS_SD:='6022'; -- Для вексельных кредитов
-     elsIf nbs_SS in ('2062', '2063') then NBS_SD:='6026';
+     elsIf nbs_SS in ('2232', '2233') then NBS_SD:= case when l_newnbs = 0 then '6046' else '6055' end;
+     elsIf nbs_SS in ('2020')         then NBS_SD:= case when l_newnbs = 0 then '6022' else '6023' end; -- Для вексельных кредитов
+     elsIf nbs_SS in (case when l_newnbs = 0 then '2062' else '2063' end, '2063') then NBS_SD:=case when l_newnbs = 0 then '6026' else '6025' end;
      elsIf nbs_SS in ('2072', '2073') then NBS_SD:='6027';
-     elsIf nbs_SS in ('2082', '2083') then NBS_SD:='6029';
-     elsIf nbs_SS in ('9020', '9023','9122') then NBS_SD:='6118';
+     elsIf nbs_SS in (case when l_newnbs = 0 then '2082' else '2083' end, '2083') then NBS_SD:=case when l_newnbs = 0 then '6029' else '6027' end;
+     elsIf nbs_SS in (case when l_newnbs = 0 then '9020' else '9000' end, case when l_newnbs = 0 then '9023' else '9003' end ,'9122') then NBS_SD:=case when l_newnbs = 0 then '6118' else '6518' end;   
      end if;
 
     select acc
@@ -244,7 +239,7 @@ ELSIF tip_='SD' and tip_id=4 THEN
             where
               ( a.tobo =BRA_SS or a.tobo = substr(BRA_SS,1,length(BRA_SS)-7)
                 or a.tobo = substr(BRA_SS,1,length(BRA_SS)-7)||'000000/')
-              and a.KV=980 and a.nbs='6110'
+              and a.KV=980 and a.nbs= decode(l_newnbs,0,'6110','6510')
               and a.acc=s.ACC and s.ob22=OB2_SD
               and a.dazs is null
               order by a.tobo desc
@@ -284,13 +279,13 @@ ELSIF tip_='SD'   and substr(bal_,1,1)<>9  THEN
        BRA_SS := SUBSTR (SYS_CONTEXT ('bars_context', 'user_branch'), 1, 30);
      end;
 
-     If    nbs_SS in ('2202', '2203') then NBS_SD:='6042';
+     If    nbs_SS in (case when l_newnbs = 0 then '2202' else '2203' end, '2203') then NBS_SD:= case when l_newnbs = 0 then '6042' else '6052' end;
      elsIf nbs_SS in ('2212', '2213') then NBS_SD:='6043';
-     elsIf nbs_SS in ('2232', '2233') then NBS_SD:='6046';
-     elsIf nbs_SS in ('2020')         then NBS_SD:='6022'; -- Для вексельных кредитов
-     elsIf nbs_SS in ('2062', '2063') then NBS_SD:='6026';
+     elsIf nbs_SS in ('2232', '2233') then NBS_SD:= case when l_newnbs = 0 then '6046' else '6055' end;
+     elsIf nbs_SS in ('2020')         then NBS_SD:= case when l_newnbs = 0 then '6022' else '6023' end; -- Для вексельных кредитов
+     elsIf nbs_SS in (case when l_newnbs = 0 then '2062' else '2063' end, '2063') then NBS_SD:=case when l_newnbs = 0 then '6026' else '6025' end;
      elsIf nbs_SS in ('2072', '2073') then NBS_SD:='6027';
-     elsIf nbs_SS in ('2082', '2083') then NBS_SD:='6029';
+     elsIf nbs_SS in (case when l_newnbs = 0 then '2082' else '2083' end, '2083') then NBS_SD:=case when l_newnbs = 0 then '6029' else '6027' end;
      end if;
      BEGIN
         select decode(KV_, 980, sd_n, sd_i) into OB2_SD  from CCK_OB22
@@ -316,15 +311,3 @@ END IF;
 RETURN ACC_;
 END CC_O_NLS_EXT;
 /
- show err;
- 
-PROMPT *** Create  grants  CC_O_NLS_EXT ***
-grant EXECUTE                                                                on CC_O_NLS_EXT    to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on CC_O_NLS_EXT    to RCC_DEAL;
-
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/function/cc_o_nls_ext.sql =========*** End *
- PROMPT ===================================================================================== 
- 

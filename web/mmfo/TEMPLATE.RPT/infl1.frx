@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReportInfo.Created="04/09/2013 18:54:47" ReportInfo.Modified="05/27/2015 16:44:24" ReportInfo.CreatorVersion="1.7.1.0">
+<Report ScriptLanguage="CSharp" ReportInfo.Created="04/09/2013 18:54:47" ReportInfo.Modified="11/20/2017 15:57:12" ReportInfo.CreatorVersion="2014.1.2.0">
   <Dictionary>
     <OracleDataConnection Name="khrsn72" ConnectionString="rijcmlq9SEZoacNJntaKIKp6mVF12Jc6VA4pf/8RrGHV3rJ5fRI/+1i800gk2EU5LvmIVqP4R0Cw2jEV17btBGSD0tx9A==">
       <TableDataSource Name="Table2" Alias="Rekv_tvbv" DataType="System.Int32" Enabled="true" SelectCommand="select&#13;&#10;BRANCH_USR.GET_BRANCH_PARAM2('NAME_BRANCH')  name,&#13;&#10;(SELECT val  FROM params where par = 'NAME') name_bank,&#13;&#10;(select fio from staff$base where id = user_id) fio&#13;&#10;from dual;">
@@ -7,7 +7,7 @@
         <Column Name="NAME_BANK" DataType="System.String"/>
         <Column Name="FIO" DataType="System.String"/>
       </TableDataSource>
-      <TableDataSource Name="Table" Alias="r_sp" DataType="System.Int32" Enabled="true" SelectCommand="select &#13;&#10;t.ND, &#13;&#10;a.tip,&#13;&#10;t.ACC ACC_SP, &#13;&#10;a.nls,&#13;&#10;a.kv,&#13;&#10;t.dat_irr,&#13;&#10;dat_next_u(t.FDAT_BEG,-1) FDAT,  &#13;&#10;t.FDAT_END,&#13;&#10;(case when trunc(DAT_BEG_K,'mm')=trunc(DAT_END_K-1,'mm') then &#13;&#10;          (select name_plain from meta_month where n=to_char(DAT_BEG_K, 'mm')) ||' '|| to_char(DAT_BEG_K, 'yyyy') &#13;&#10;  else&#13;&#10;          (select name_plain from meta_month where n=to_char(DAT_BEG_K, 'mm')) ||' '|| to_char(DAT_BEG_K, 'yyyy')||' - '||&#13;&#10;          (select name_plain from meta_month where n=to_char(DAT_END_K-1, 'mm')) ||' '|| to_char(DAT_END_K-1, 'yyyy')&#13;&#10;   end) LIT_DAT,&#13;&#10;t.DAT_BEG_K,         &#13;&#10;t.DAT_END_K,        &#13;&#10;round(t.S_nom)/100 S_nom,           &#13;&#10;round(t.S/100,2) S,      &#13;&#10;round((round(t.S_K)-round(t.S))/100,2) S_K,       &#13;&#10;t.K*100 K,           &#13;&#10;t.COMM &#13;&#10;from tmp_inflation_court t,  accounts a&#13;&#10;where t.acc=a.acc and (a.tip='SP ' or a.nbs in (2207, 2237))&#13;&#10;          and t.dat_beg_k&lt;t.dat_end_k&#13;&#10;          and trunc(t.FDAT_BEG,'MM')&lt;trunc(t.fdat_end,'MM')&#13;&#10;          and t.nd=:ND&#13;&#10;          and t.typ_kod=:TYP&#13;&#10;order by  t.FDAT_BEG">
+      <TableDataSource Name="Table" Alias="r_sp" DataType="System.Int32" Enabled="true" SelectCommand="select &#13;&#10;t.ND, &#13;&#10;a.tip,&#13;&#10;t.ACC ACC_SP, &#13;&#10;a.nls,&#13;&#10;a.kv,&#13;&#10;t.dat_irr,&#13;&#10;dat_next_u(t.FDAT_BEG,-1) FDAT,  &#13;&#10;t.FDAT_END,&#13;&#10;(case when trunc(DAT_BEG_K,'mm')=trunc(DAT_END_K-1,'mm') then &#13;&#10;          (select name_plain from meta_month where n=to_char(DAT_BEG_K, 'mm')) ||' '|| to_char(DAT_BEG_K, 'yyyy') &#13;&#10;  else&#13;&#10;          (select name_plain from meta_month where n=to_char(DAT_BEG_K, 'mm')) ||' '|| to_char(DAT_BEG_K, 'yyyy')||' - '||&#13;&#10;          (select name_plain from meta_month where n=to_char(DAT_END_K-1, 'mm')) ||' '|| to_char(DAT_END_K-1, 'yyyy')&#13;&#10;   end) LIT_DAT,&#13;&#10;t.DAT_BEG_K,         &#13;&#10;t.DAT_END_K,        &#13;&#10;round(t.S_nom)/100 S_nom,           &#13;&#10;round(t.S/100,2) S,      &#13;&#10;round((round(t.S_K)-round(t.S))/100,2) S_K,       &#13;&#10;t.K*100 K,           &#13;&#10;t.COMM &#13;&#10;from tmp_inflation_court t,  accounts a&#13;&#10;where t.acc=a.acc and (a.tip='SP ' or a.nbs in (2203, 2233))&#13;&#10;          and t.dat_beg_k&lt;t.dat_end_k&#13;&#10;          and trunc(t.FDAT_BEG,'MM')&lt;trunc(t.fdat_end,'MM')&#13;&#10;          and t.nd=:ND&#13;&#10;          and t.typ_kod=:TYP&#13;&#10;order by  t.FDAT_BEG">
         <Column Name="ND" DataType="System.Char"/>
         <Column Name="TIP" DataType="System.String"/>
         <Column Name="NLS" DataType="System.String"/>
@@ -27,7 +27,7 @@
         <CommandParameter Name="ND" DataType="126" Expression="[ND]"/>
         <CommandParameter Name="TYP" DataType="126" Expression="[TYP]"/>
       </TableDataSource>
-      <TableDataSource Name="Table1" Alias="r_spn" DataType="System.Int32" Enabled="true" SelectCommand="select &#13;&#10;t.ND, &#13;&#10;a.tip,&#13;&#10;t.ACC ACC_SPN, &#13;&#10;a.nls,&#13;&#10;a.kv,&#13;&#10;t.dat_irr,&#13;&#10;dat_next_u(t.FDAT_BEG,-1) FDAT,  &#13;&#10;t.FDAT_END,&#13;&#10;(case when trunc(DAT_BEG_K,'mm')=trunc(DAT_END_K-1,'mm') then &#13;&#10;          (select name_plain from meta_month where n=to_char(DAT_BEG_K, 'mm')) ||' '|| to_char(DAT_BEG_K, 'yyyy') &#13;&#10;  else&#13;&#10;          (select name_plain from meta_month where n=to_char(DAT_BEG_K, 'mm')) ||' '|| to_char(DAT_BEG_K, 'yyyy')||' - '||&#13;&#10;          (select name_plain from meta_month where n=to_char(DAT_END_K-1, 'mm')) ||' '|| to_char(DAT_END_K-1, 'yyyy')&#13;&#10;   end) LIT_DAT,&#13;&#10;t.DAT_BEG_K,         &#13;&#10;t.DAT_END_K,        &#13;&#10;round(t.S_nom)/100 S_nom,           &#13;&#10;round(t.S/100,2) S,      &#13;&#10;round((round(t.S_K)-round(t.s))/100,2) S_K,       &#13;&#10;t.K*100 K,           &#13;&#10;t.COMM &#13;&#10;from tmp_inflation_court t,  accounts a&#13;&#10;where t.acc=a.acc and (a.tip='SPN' or a.nbs in (2209, 2239))&#13;&#10;          and t.dat_beg_k&lt;t.dat_end_k&#13;&#10;          and trunc(t.FDAT_BEG,'MM')&lt;trunc(t.fdat_end,'MM')&#13;&#10;          and t.nd=:ND&#13;&#10;          and t.typ_kod=:TYP&#13;&#10;order by  t.FDAT_BEG">
+      <TableDataSource Name="Table1" Alias="r_spn" DataType="System.Int32" Enabled="true" SelectCommand="select &#13;&#10;t.ND, &#13;&#10;a.tip,&#13;&#10;t.ACC ACC_SPN, &#13;&#10;a.nls,&#13;&#10;a.kv,&#13;&#10;t.dat_irr,&#13;&#10;dat_next_u(t.FDAT_BEG,-1) FDAT,  &#13;&#10;t.FDAT_END,&#13;&#10;(case when trunc(DAT_BEG_K,'mm')=trunc(DAT_END_K-1,'mm') then &#13;&#10;          (select name_plain from meta_month where n=to_char(DAT_BEG_K, 'mm')) ||' '|| to_char(DAT_BEG_K, 'yyyy') &#13;&#10;  else&#13;&#10;          (select name_plain from meta_month where n=to_char(DAT_BEG_K, 'mm')) ||' '|| to_char(DAT_BEG_K, 'yyyy')||' - '||&#13;&#10;          (select name_plain from meta_month where n=to_char(DAT_END_K-1, 'mm')) ||' '|| to_char(DAT_END_K-1, 'yyyy')&#13;&#10;   end) LIT_DAT,&#13;&#10;t.DAT_BEG_K,         &#13;&#10;t.DAT_END_K,        &#13;&#10;round(t.S_nom)/100 S_nom,           &#13;&#10;round(t.S/100,2) S,      &#13;&#10;round((round(t.S_K)-round(t.s))/100,2) S_K,       &#13;&#10;t.K*100 K,           &#13;&#10;t.COMM &#13;&#10;from tmp_inflation_court t,  accounts a&#13;&#10;where t.acc=a.acc and (a.tip='SPN' or a.nbs in (2208, 2238))&#13;&#10;          and t.dat_beg_k&lt;t.dat_end_k&#13;&#10;          and trunc(t.FDAT_BEG,'MM')&lt;trunc(t.fdat_end,'MM')&#13;&#10;          and t.nd=:ND&#13;&#10;          and t.typ_kod=:TYP&#13;&#10;order by  t.FDAT_BEG">
         <Column Name="ND" DataType="System.Decimal"/>
         <Column Name="TIP" DataType="System.String"/>
         <Column Name="NLS" DataType="System.String"/>
@@ -58,7 +58,7 @@
         <CommandParameter Name="ND" DataType="126" Expression="[ND]"/>
         <CommandParameter Name="TYP" DataType="126" Expression="[TYP]"/>
       </TableDataSource>
-      <TableDataSource Name="Table4" Alias="r3_sp" DataType="System.Int32" Enabled="true" SelectCommand="select &#13;&#10;t.ND, &#13;&#10;a.tip,&#13;&#10;t.ACC ACC3_SP, &#13;&#10;a.nls,&#13;&#10;a.kv,&#13;&#10;t.dat_irr,&#13;&#10;dat_next_u(t.FDAT_BEG,-1) FDAT,  &#13;&#10;t.FDAT_END,&#13;&#10;to_char(FDAT_BEG, 'dd/mm/yyyy')||' - '||to_char(FDAT_END, 'dd/mm/yyyy') LIT_DAT,&#13;&#10;t.S_nom/100 S_nom,           &#13;&#10;round(t.S3/100,2) S3,     &#13;&#10;round(t.S/100,2) S,       &#13;&#10;FDAT_END-FDAT_BEG+1 K,           &#13;&#10;t.COMM &#13;&#10;from tmp_inflation_court t,  accounts a&#13;&#10;where t.acc=a.acc and (a.tip='SP ' or a.nbs in (2207, 2237))&#13;&#10;          and t.nd=:ND&#13;&#10;          and t.typ_kod=:TYP&#13;&#10;order by  t.FDAT_BEG">
+      <TableDataSource Name="Table4" Alias="r3_sp" DataType="System.Int32" Enabled="true" SelectCommand="select &#13;&#10;t.ND, &#13;&#10;a.tip,&#13;&#10;t.ACC ACC3_SP, &#13;&#10;a.nls,&#13;&#10;a.kv,&#13;&#10;t.dat_irr,&#13;&#10;dat_next_u(t.FDAT_BEG,-1) FDAT,  &#13;&#10;t.FDAT_END,&#13;&#10;to_char(FDAT_BEG, 'dd/mm/yyyy')||' - '||to_char(FDAT_END, 'dd/mm/yyyy') LIT_DAT,&#13;&#10;t.S_nom/100 S_nom,           &#13;&#10;round(t.S3/100,2) S3,     &#13;&#10;round(t.S/100,2) S,       &#13;&#10;FDAT_END-FDAT_BEG+1 K,           &#13;&#10;t.COMM &#13;&#10;from tmp_inflation_court t,  accounts a&#13;&#10;where t.acc=a.acc and (a.tip='SP ' or a.nbs in (2203, 2233))&#13;&#10;          and t.nd=:ND&#13;&#10;          and t.typ_kod=:TYP&#13;&#10;order by  t.FDAT_BEG">
         <Column Name="ND" DataType="System.Decimal"/>
         <Column Name="TIP" DataType="System.String"/>
         <Column Name="NLS" DataType="System.String"/>
@@ -76,7 +76,7 @@
         <CommandParameter Name="ND" DataType="126" Expression="[ND]"/>
         <CommandParameter Name="TYP" DataType="126" Expression="[TYP]"/>
       </TableDataSource>
-      <TableDataSource Name="Table5" Alias="r3_spn" DataType="System.Int32" Enabled="true" SelectCommand="select &#13;&#10;t.ND, &#13;&#10;a.tip,&#13;&#10;t.ACC ACC3_SPN, &#13;&#10;a.nls,&#13;&#10;a.kv,&#13;&#10;t.dat_irr,&#13;&#10;dat_next_u(t.FDAT_BEG,-1) FDAT,  &#13;&#10;t.FDAT_END,&#13;&#10;to_char(FDAT_BEG, 'dd/mm/yyyy')||' - '||to_char(FDAT_END, 'dd/mm/yyyy') LIT_DAT,&#13;&#10;round(t.S_nom)/100 S_nom,           &#13;&#10;round(round(t.S3)/100,2) S3,     &#13;&#10;round(t.S/100,2) S,       &#13;&#10;FDAT_END-FDAT_BEG+1 K,                &#13;&#10;t.COMM &#13;&#10;from tmp_inflation_court t,  accounts a&#13;&#10;where t.acc=a.acc and (a.tip='SPN' or a.nbs in (2209, 2239))&#13;&#10;          and t.nd=:ND&#13;&#10;          and t.typ_kod=:TYP&#13;&#10;order by  t.FDAT_BEG">
+      <TableDataSource Name="Table5" Alias="r3_spn" DataType="System.Int32" Enabled="true" SelectCommand="select &#13;&#10;t.ND, &#13;&#10;a.tip,&#13;&#10;t.ACC ACC3_SPN, &#13;&#10;a.nls,&#13;&#10;a.kv,&#13;&#10;t.dat_irr,&#13;&#10;dat_next_u(t.FDAT_BEG,-1) FDAT,  &#13;&#10;t.FDAT_END,&#13;&#10;to_char(FDAT_BEG, 'dd/mm/yyyy')||' - '||to_char(FDAT_END, 'dd/mm/yyyy') LIT_DAT,&#13;&#10;round(t.S_nom)/100 S_nom,           &#13;&#10;round(round(t.S3)/100,2) S3,     &#13;&#10;round(t.S/100,2) S,       &#13;&#10;FDAT_END-FDAT_BEG+1 K,                &#13;&#10;t.COMM &#13;&#10;from tmp_inflation_court t,  accounts a&#13;&#10;where t.acc=a.acc and (a.tip='SPN' or a.nbs in (2208, 2238))&#13;&#10;          and t.nd=:ND&#13;&#10;          and t.typ_kod=:TYP&#13;&#10;order by  t.FDAT_BEG">
         <Column Name="ND" DataType="System.Decimal"/>
         <Column Name="TIP" DataType="System.String"/>
         <Column Name="NLS" DataType="System.String"/>
@@ -127,8 +127,8 @@
       <TextObject Name="Text52" Left="302.4" Top="207.9" Width="311.85" Height="18.9" Border.Lines="Left, Right, Bottom" Text="[main.TIP]" Font="Arial, 11pt"/>
       <TextObject Name="Text110" Left="18.9" Top="245.7" Width="652.05" Height="18.9" Text="Розрахунок сум інфляційних втрат від прострочених сум заборгованості за кредитом" Font="Calibri, 10pt, style=Bold, Underline"/>
     </ReportTitleBand>
-    <PageHeaderBand Name="PageHeader1" Top="266.89" Width="718.2" Height="28.35" Guides="0,18.9"/>
-    <GroupHeaderBand Name="GroupHeader1" Top="297.52" Width="718.2" Height="113.4" Condition="[r_sp.ACC_SP]">
+    <PageHeaderBand Name="PageHeader1" Top="267.4" Width="718.2" Height="28.35" Guides="0,18.9"/>
+    <GroupHeaderBand Name="GroupHeader1" Top="298.54" Width="718.2" Height="113.4" Condition="[r_sp.ACC_SP]">
       <TextObject Name="Text106" Left="18.9" Width="94.5" Height="18.9" Text="Рахунок:" HorzAlign="Center"/>
       <TextObject Name="Text107" Left="122.85" Width="179.55" Height="18.9" Text="[r_sp.NLS] ([r_sp.KV])" HorzAlign="Center"/>
       <TextObject Name="Text32" Left="141.75" Top="18.9" Width="103.95" Height="94.5" Border.Lines="All" Text="Сума простроченого кредиту, грн" HorzAlign="Center" VertAlign="Center" Font="Calibri, 10pt, style=Bold"/>
@@ -137,7 +137,7 @@
       <TextObject Name="Text34" Left="245.7" Top="18.9" Width="94.5" Height="94.5" Border.Lines="All" Text="Термін сплати щомісячних платежів за кредитом" HorzAlign="Center" VertAlign="Center" Font="Calibri, 10pt, style=Bold"/>
       <TextObject Name="Text35" Left="340.2" Top="18.9" Width="170.1" Height="94.5" Border.Lines="All" Text="Період, за який визнається індекс інфляції" HorzAlign="Center" Font="Calibri, 10pt, style=Bold"/>
       <TextObject Name="Text36" Left="510.3" Top="18.9" Width="103.95" Height="94.5" Border.Lines="All" Text="Індекс інфляції в цілому за період, %" HorzAlign="Center" Font="Calibri, 10pt, style=Bold"/>
-      <DataBand Name="Data1" Top="413.21" Width="718.2" Height="56.7" DataSource="Table">
+      <DataBand Name="Data1" Top="414.74" Width="718.2" Height="56.7" DataSource="Table">
         <TextObject Name="Text25" Left="141.75" Width="103.95" Height="56.7" Border.Lines="All" Text="[r_sp.S]" Format="Currency" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.CurrencySymbol="" Format.PositivePattern="1" Format.NegativePattern="5" HorzAlign="Right" WordWrap="false" Font="Calibri, 9pt" Trimming="EllipsisCharacter"/>
         <TextObject Name="Text24" Left="245.7" Width="94.5" Height="56.7" Border.Lines="All" Text="[r_sp.FDAT]" Format="Date" Format.Format="d" Font="Calibri, 9pt"/>
         <TextObject Name="Text26" Left="510.3" Width="103.95" Height="56.7" Border.Lines="All" Text="[r_sp.K]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="1" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="0" HorzAlign="Right" WordWrap="false" Font="Calibri, 9pt" Trimming="EllipsisCharacter"/>
@@ -149,12 +149,12 @@
           <Sort Expression="[r_sp.FDAT_END]"/>
         </Sort>
       </DataBand>
-      <GroupFooterBand Name="GroupFooter1" Top="472.19" Width="718.2" Height="28.35">
+      <GroupFooterBand Name="GroupFooter1" Top="474.24" Width="718.2" Height="28.35">
         <TextObject Name="Text72" Left="18.9" Width="94.5" Height="18.9" Text="Всього:&#13;&#10;" Font="Calibri, 10pt, style=Bold, Underline"/>
         <TextObject Name="Text73" Left="519.75" Width="189" Height="18.9" CanBreak="false" Text="[Total_sp_s_k]" HorzAlign="Right" Font="Calibri, 10pt, style=Bold"/>
       </GroupFooterBand>
     </GroupHeaderBand>
-    <GroupHeaderBand Name="GroupHeader2" Top="502.83" Width="718.2" Height="132.3" Condition="[r_spn.ACC_SPN]">
+    <GroupHeaderBand Name="GroupHeader2" Top="505.39" Width="718.2" Height="132.3" Condition="[r_spn.ACC_SPN]">
       <TextObject Name="Text48" Left="510.3" Top="113.4" Width="103.95" Height="18.9" Border.Lines="All" Text="5" HorzAlign="Center" Font="Calibri, 10pt, style=Bold"/>
       <TextObject Name="Text49" Left="614.25" Top="113.4" Width="94.5" Height="18.9" Border.Lines="All" Text="6" HorzAlign="Center" Font="Calibri, 10pt, style=Bold"/>
       <TextObject Name="Text44" Left="18.9" Top="113.4" Width="122.85" Height="18.9" Border.Lines="All" Text="1" HorzAlign="Center" Font="Calibri, 10pt, style=Bold"/>
@@ -175,7 +175,7 @@
       <TextObject Name="Text21" Left="340.2" Top="18.9" Width="170.1" Height="94.5" Border.Lines="All" Text="Період, за який визнається індекс інфляції" HorzAlign="Center" Font="Calibri, 10pt, style=Bold"/>
       <TextObject Name="Text22" Left="510.3" Top="18.9" Width="103.95" Height="94.5" Border.Lines="All" Text="Індекс інфляції в цілому за період, %" HorzAlign="Center" Font="Calibri, 10pt, style=Bold"/>
       <TextObject Name="Text23" Left="614.25" Top="18.9" Width="94.5" Height="94.5" Border.Lines="All" Text="Сума втрат від інфляції, грн.&#13;&#10;(гр.2 × гр.5 / 100% - гр.2)&#13;&#10;" HorzAlign="Center" Font="Calibri, 10pt, style=Bold"/>
-      <DataBand Name="Data2" Top="637.41" Width="718.2" Height="56.7" DataSource="Table1">
+      <DataBand Name="Data2" Top="640.48" Width="718.2" Height="56.7" DataSource="Table1">
         <TextObject Name="Text38" Left="141.75" Width="103.95" Height="56.7" Border.Lines="All" Text="[r_spn.S]" Format="Currency" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.CurrencySymbol="" Format.PositivePattern="1" Format.NegativePattern="5" HorzAlign="Right" WordWrap="false" Font="Calibri, 9pt" Trimming="EllipsisCharacter"/>
         <TextObject Name="Text39" Left="245.7" Width="94.5" Height="56.7" Border.Lines="All" Text="[r_spn.FDAT]" Format="Date" Format.Format="d" Font="Calibri, 9pt"/>
         <TextObject Name="Text40" Left="510.3" Width="103.95" Height="56.7" Border.Lines="All" Text="[r_spn.K]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="1" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="0" HorzAlign="Right" WordWrap="false" Font="Calibri, 9pt" Trimming="EllipsisCharacter"/>
@@ -187,15 +187,15 @@
           <Sort Expression="[r_spn.FDAT_END]"/>
         </Sort>
       </DataBand>
-      <GroupFooterBand Name="GroupFooter2" Top="696.4" Width="718.2" Height="28.35">
+      <GroupFooterBand Name="GroupFooter2" Top="699.98" Width="718.2" Height="28.35">
         <TextObject Name="Text96" Left="18.9" Width="94.5" Height="18.9" Text="Всього:&#13;&#10;" Font="Calibri, 10pt, style=Bold, Underline"/>
         <TextObject Name="Text111" Left="519.75" Width="189" Height="18.9" CanBreak="false" Text="[Total_spn_s_k]" HorzAlign="Right" Font="Calibri, 10pt, style=Bold"/>
       </GroupFooterBand>
     </GroupHeaderBand>
-    <DataBand Name="Data3" Top="727.04" Width="718.2" Height="85.05" DataSource="Table2">
+    <DataBand Name="Data3" Top="731.13" Width="718.2" Height="85.05" DataSource="Table2">
       <TextObject Name="Text53" Left="47.25" Top="18.9" Width="567" Height="37.8" Text="Розрахунок 3% річних від прострочених сум заборгованості за кредитним договором." Font="Calibri, 10pt, style=Bold, Underline"/>
     </DataBand>
-    <GroupHeaderBand Name="GroupHeader4" Top="814.37" Width="718.2" Height="132.3" Condition="[r3_sp.ACC3_SP]">
+    <GroupHeaderBand Name="GroupHeader4" Top="818.97" Width="718.2" Height="132.3" Condition="[r3_sp.ACC3_SP]">
       <TextObject Name="Text54" Left="614.25" Top="18.9" Width="94.5" Height="94.5" Border.Lines="All" Text="Розмір 3% річних, грн." HorzAlign="Center" Font="Calibri, 10pt, style=Bold"/>
       <TextObject Name="Text55" Left="18.9" Top="18.9" Width="122.85" Height="94.5" Border.Lines="All" Text="Сума щомісячного платежу за кредитом, грн." HorzAlign="Center" VertAlign="Center" Font="Calibri, 10pt, style=Bold"/>
       <TextObject Name="Text57" Left="141.75" Top="18.9" Width="151.2" Height="94.5" Border.Lines="All" Text="Термін сплати щомісячних платежів за кредитом" HorzAlign="Center" VertAlign="Center" Font="Calibri, 10pt, style=Bold"/>
@@ -208,7 +208,7 @@
       <TextObject Name="Text65" Left="292.95" Top="113.4" Width="217.35" Height="18.9" Border.Lines="All" Text="4" HorzAlign="Center" Font="Calibri, 10pt, style=Bold"/>
       <TextObject Name="Text75" Left="18.9" Width="94.5" Height="18.9" Text="Рахунок:" HorzAlign="Center"/>
       <TextObject Name="Text76" Left="122.85" Width="179.55" Height="18.9" Text="[r3_sp.NLS] ([r3_sp.KV])" HorzAlign="Center"/>
-      <DataBand Name="Data4" Top="948.96" Width="718.2" Height="56.7" DataSource="Table4">
+      <DataBand Name="Data4" Top="954.07" Width="718.2" Height="56.7" DataSource="Table4">
         <TextObject Name="Text66" Left="18.9" Width="122.85" Height="56.7" Border.Lines="All" Text="[r3_sp.S]" Format="Currency" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.CurrencySymbol="" Format.PositivePattern="1" Format.NegativePattern="5" HorzAlign="Right" WordWrap="false" Font="Calibri, 9pt" Trimming="EllipsisCharacter"/>
         <TextObject Name="Text67" Left="141.75" Width="151.2" Height="56.7" Border.Lines="All" Text="[r3_sp.FDAT]" Format="Date" Format.Format="d" Font="Calibri, 9pt"/>
         <TextObject Name="Text68" Left="510.3" Width="103.95" Height="56.7" Border.Lines="All" Text="[r3_sp.K]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" WordWrap="false" Font="Calibri, 9pt" Trimming="EllipsisCharacter"/>
@@ -219,12 +219,12 @@
           <Sort Expression="[r3_sp.FDAT_END]"/>
         </Sort>
       </DataBand>
-      <GroupFooterBand Name="GroupFooter3" Top="1007.94" Width="718.2" Height="18.9">
+      <GroupFooterBand Name="GroupFooter3" Top="1013.57" Width="718.2" Height="18.9">
         <TextObject Name="Text98" Left="18.9" Width="94.5" Height="18.9" Text="Всього:&#13;&#10;" Font="Calibri, 10pt, style=Bold, Underline"/>
         <TextObject Name="Text99" Left="614.25" Width="94.5" Height="18.9" CanBreak="false" Text="[Total_r3_sp]" HorzAlign="Right" Font="Calibri, 10pt, style=Bold"/>
       </GroupFooterBand>
     </GroupHeaderBand>
-    <GroupHeaderBand Name="GroupHeader5" Top="1029.13" Width="718.2" Height="132.3" Condition="[r3_spn.ACC3_SPN]">
+    <GroupHeaderBand Name="GroupHeader5" Top="1035.27" Width="718.2" Height="132.3" Condition="[r3_spn.ACC3_SPN]">
       <TextObject Name="Text78" Left="510.3" Top="113.4" Width="103.95" Height="18.9" Border.Lines="All" Text="5" HorzAlign="Center" Font="Calibri, 10pt, style=Bold"/>
       <TextObject Name="Text79" Left="614.25" Top="113.4" Width="94.5" Height="18.9" Border.Lines="All" Text="6" HorzAlign="Center" Font="Calibri, 10pt, style=Bold"/>
       <TextObject Name="Text80" Left="18.9" Top="113.4" Width="122.85" Height="18.9" Border.Lines="All" Text="1" HorzAlign="Center" Font="Calibri, 10pt, style=Bold"/>
@@ -239,7 +239,7 @@
       <TextObject Name="Text95" Left="510.3" Top="18.9" Width="103.95" Height="94.5" Border.Lines="All" Text="Кількість днів" HorzAlign="Center" Font="Calibri, 10pt, style=Bold"/>
       <TextObject Name="Text102" Left="18.9" Width="94.5" Height="18.9" Text="Рахунок:" HorzAlign="Center"/>
       <TextObject Name="Text103" Left="122.85" Width="179.55" Height="18.9" Text="[r3_spn.NLS] ([r3_spn.KV])" HorzAlign="Center"/>
-      <DataBand Name="Data5" Top="1163.71" Width="718.2" Height="56.7" DataSource="Table5">
+      <DataBand Name="Data5" Top="1170.36" Width="718.2" Height="56.7" DataSource="Table5">
         <TextObject Name="Text87" Left="614.25" Width="94.5" Height="56.7" Border.Lines="All" Text="[r3_spn.S3]" Format="Currency" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.CurrencySymbol="" Format.PositivePattern="1" Format.NegativePattern="5" HorzAlign="Right" WordWrap="false" Font="Calibri, 9pt" Trimming="EllipsisCharacter"/>
         <TextObject Name="Text84" Left="141.75" Width="103.95" Height="56.7" Border.Lines="All" Text="[r3_spn.S]" Format="Currency" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.CurrencySymbol="" Format.PositivePattern="1" Format.NegativePattern="5" HorzAlign="Right" WordWrap="false" Font="Calibri, 9pt" Trimming="EllipsisCharacter"/>
         <TextObject Name="Text85" Left="245.7" Width="94.5" Height="56.7" Border.Lines="All" Text="[r3_spn.FDAT]" Format="Date" Format.Format="d" Font="Calibri, 9pt"/>
@@ -251,12 +251,12 @@
           <Sort Expression="[r3_spn.FDAT_END]"/>
         </Sort>
       </DataBand>
-      <GroupFooterBand Name="GroupFooter4" Top="1222.7" Width="718.2" Height="28.35">
+      <GroupFooterBand Name="GroupFooter4" Top="1229.86" Width="718.2" Height="28.35">
         <TextObject Name="Text100" Left="18.9" Width="94.5" Height="18.9" Text="Всього:&#13;&#10;" Font="Calibri, 10pt, style=Bold, Underline"/>
         <TextObject Name="Text101" Left="614.25" Width="94.5" Height="18.9" CanBreak="false" Text="[Total_r3_spn]" HorzAlign="Right" Font="Calibri, 10pt, style=Bold"/>
       </GroupFooterBand>
     </GroupHeaderBand>
-    <PageFooterBand Name="PageFooter1" Top="1253.34" Width="718.2" Height="47.25">
+    <PageFooterBand Name="PageFooter1" Top="1261.01" Width="718.2" Height="47.25">
       <TextObject Name="Text77" Left="18.9" Width="198.45" Height="37.8" CanBreak="false" Text="[Rekv_tvbv.FIO]" TextFill.Color="LightGray"/>
       <TextObject Name="Text108" Left="245.7" Width="311.85" Height="37.8" CanBreak="false" Text="[Rekv_tvbv.NAME_BANK]" HorzAlign="Center" TextFill.Color="LightGray"/>
       <TextObject Name="Text109" Left="614.25" Width="94.5" Height="18.9" CanBreak="false" Text="[Page]" HorzAlign="Right" TextFill.Color="LightGray"/>

@@ -446,11 +446,32 @@ namespace ViewAccounts
                     if ("2604".Contains(nbs))
                         paramsList = "('S260','R012')";
 
-                    if ("2062, 2063, 2067, 2071, 2072, 2073, 2074,  2077, 2082, 2083, 2089".Contains(nbs))
-                        paramsList = "('S182','S031','DEB02','S080','DEB03','MDATE','S180','S260','S270','DEB04','K072','OB22','S090','R012','D020','K150','NKD','DEB06')";
 
-                    if ("2068,2069,2078,2079,2088,2089,2607".Contains(nbs))
-                        paramsList = "('S182','R011','R013','S031','DEB02','S080','DEB03','MDATE','S180','S260','S270','DEB04','K072','OB22','S090','R012','NKD','DEB06')";
+                    if (IsNew())
+                    {
+                        // new nbs
+                        if ("2063, 2071, 2072, 2073, 2074, 2071, 2083, 2088".Contains(nbs))
+                            paramsList = "('S182','S031','DEB02','S080','DEB03','MDATE','S180','S260','S270','DEB04','K072','OB22','S090','R012','D020','K150','NKD','DEB06')";
+
+                        if ("2068, 2078, 2088, 2607".Contains(nbs))
+                            paramsList = "('S182','R011','R013','S031','DEB02','S080','DEB03','MDATE','S180','S260','S270','DEB04','K072','OB22','S090','R012','NKD','DEB06')";
+                    }
+                    else
+                    {
+                        // old nbs
+                        if ("2062, 2063, 2067, 2071, 2072, 2073, 2074,  2077, 2082, 2083, 2089".Contains(nbs))
+                            paramsList = "('S182','S031','DEB02','S080','DEB03','MDATE','S180','S260','S270','DEB04','K072','OB22','S090','R012','D020','K150','NKD','DEB06')";
+
+                        if ("2068,2069,2078,2079,2088,2089,2607".Contains(nbs))
+                            paramsList = "('S182','R011','R013','S031','DEB02','S080','DEB03','MDATE','S180','S260','S270','DEB04','K072','OB22','S090','R012','NKD','DEB06')";
+                    }
+
+
+                    //if ("2062, 2063, 2067, 2071, 2072, 2073, 2074,  2077, 2082, 2083, 2089".Contains(nbs))
+                    //    paramsList = "('S182','S031','DEB02','S080','DEB03','MDATE','S180','S260','S270','DEB04','K072','OB22','S090','R012','D020','K150','NKD','DEB06')";
+
+                    //if ("2068,2069,2078,2079,2088,2089,2607".Contains(nbs))
+                    //    paramsList = "('S182','R011','R013','S031','DEB02','S080','DEB03','MDATE','S180','S260','S270','DEB04','K072','OB22','S090','R012','NKD','DEB06')";
 
                     if ("9129,9500,9520,9521,9523,9531".Contains(nbs))
                         paramsList = "('DEB06','R013','S182','S031','DEB02','S080','DEB03','MDATE','S180','S260','DEB06','OB22','S090','R012')";
@@ -533,8 +554,14 @@ namespace ViewAccounts
 			}
 		}
 
-		//Load SParams
-		[WebMethod(EnableSession = true)]
+        private bool IsNew()
+        {
+            Bars.WebServices.NewNbs ws = new Bars.WebServices.NewNbs();
+            return ws.UseNewNbs();
+        }
+
+        //Load SParams
+        [WebMethod(EnableSession = true)]
 		public object[] GetSParams(string[] data)
 		{
 			object[] obj = new object[3];

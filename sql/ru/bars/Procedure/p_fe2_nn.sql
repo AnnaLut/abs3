@@ -4,7 +4,7 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe2_nn ( dat_     DATE,
 % DESCRIPTION : Процедура формирования #E2 для КБ
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     : v.17.001      06.06.2017 (30.05.2017, 01.03.2017)
+% VERSION     : v.17.002      07.11.2017 (06.06.2017, 30.05.2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
@@ -15,6 +15,7 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe2_nn ( dat_     DATE,
    NNN        условный порядковый номер
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+07.11.2017 удалил блоки для закрытых МФО
 06.06.2017 будут включаться все суммы док-тов >= 0.01 (0.01 USD)
 30.05.2017 на 02.06.2017 будут включаться все суммы док-тов > 100 (1 USD)
 01.03.2017 для банка 344443 (расч.центр) дополнено проводкой Дт 3500 Кт 1500
@@ -347,7 +348,7 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe2_nn ( dat_     DATE,
                d1#E2_ := '38';  -- с 26.07.2012 согласно письма Рощиной от 11.07.2012
             end if;
             
-            if mfo_ <> 300120 and instr(lower(nazn_),'комерц') > 0 then
+            if instr(lower(nazn_),'комерц') > 0 then
                d1#E2_ := '38';  -- с 26.07.2012 согласно письма Рощиной от 11.07.2012
             end if;
             
@@ -360,20 +361,16 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe2_nn ( dat_     DATE,
             end if;
          end if;
 
-         if mfo_ = 353575 then
+         if TRIM (p_value_) is null and d1#E2_ is not null then
+            p_value_ := NVL (SUBSTR (TRIM (d1#E2_), 1, 2), '00');
+         else
             p_value_ := NVL (SUBSTR (TRIM (p_value_), 1, 2), '00');
-         else 
-            if TRIM (p_value_) is null and d1#E2_ is not null then
-               p_value_ := NVL (SUBSTR (TRIM (d1#E2_), 1, 2), '00');
-            else
-               p_value_ := NVL (SUBSTR (TRIM (p_value_), 1, 2), '00');
-               if p_value_ = '00' then
-                  if kod_n_='8445' then
-                     p_value_ := '30';
-                  end if;
+            if p_value_ = '00' then
+               if kod_n_='8445' then
+                  p_value_ := '30';
                end if;
-               d1#E2_ := p_value_;
             end if;
+            d1#E2_ := p_value_;
          end if;
       ELSIF p_i_ = 2
       THEN
@@ -443,12 +440,8 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe2_nn ( dat_     DATE,
          b010_ := null;
          p_kodp_ := '65';
 
-         if mfo_ = 353575 then
-            p_value_ := NVL (SUBSTR (TRIM (p_value_), 1, 10), 'код банку');
-         else
-            if TRIM (p_value_) is null and d7#E2_ is not null then
-               p_value_ := NVL (SUBSTR (TRIM (d7#E2_), 1, 10), 'код банку');
-            end if;
+         if TRIM (p_value_) is null and d7#E2_ is not null then
+            p_value_ := NVL (SUBSTR (TRIM (d7#E2_), 1, 10), 'код банку');
          end if;
 
          if TRIM (p_value_) is null and d7#E2_ is null then
@@ -501,12 +494,12 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe2_nn ( dat_     DATE,
 
          end if;
 
-         if mfo_ != 353575 and p_value_ IS NULL AND trim(d8#E2_) is not null then  --nb_ = 'назва банку' and trim(d8#E2_) is not null then
+         if p_value_ IS NULL AND trim(d8#E2_) is not null then  
             p_value_ := NVL (SUBSTR (TRIM (d8#E2_), 1, 70), 'назва банку');
             nb_ := p_value_;
          end if;
 
-         IF mfo_ != 353575 and p_value_ IS NULL AND nb_ != 'назва банку'
+         IF p_value_ IS NULL AND nb_ != 'назва банку'
          THEN
             p_value_ :=
                    NVL (SUBSTR (TRIM (nb_), 1, 70), 'назва банку');
@@ -616,19 +609,15 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe2_nn ( dat_     DATE,
             p_kodp_ := '41';
             -- з 01.06.2009 новий показник
             --  (код переказу валюти вiдповiдно до платiжного календаря)
-            if mfo_ = 353575 then
-               p_value_ := NVL (SUBSTR (TRIM (p_value_), 1, 3), 'код переказу'); 
-            else  
-               if TRIM (p_value_) is null and de#E2_ is not null then
-                  p_value_ := NVL (SUBSTR (TRIM (de#E2_), 1, 3), 'код переказу');
-               else
-                  p_value_ := NVL (SUBSTR (TRIM (p_value_), 1, 3), 'код переказу');
-               end if;
+            if TRIM (p_value_) is null and de#E2_ is not null then
+               p_value_ := NVL (SUBSTR (TRIM (de#E2_), 1, 3), 'код переказу');
+            else
+               p_value_ := NVL (SUBSTR (TRIM (p_value_), 1, 3), 'код переказу');
             end if;
-            IF mfo_ != 353575 and trim(d1#E2_) not in ('23','24','34','35') THEN
+            IF trim(d1#E2_) not in ('23','24','34','35') THEN
                p_value_:='999';
             end if;
-            IF mfo_ != 353575 and trim(d1#E2_) in ('23','24','34','35') and p_value_='999' THEN
+            IF trim(d1#E2_) in ('23','24','34','35') and p_value_='999' THEN
                p_value_:='000';
             end if;
          END IF;
@@ -737,7 +726,7 @@ BEGIN
         AND (
                        (SUBSTR (o.nlsd, 1, 4) in ('2600', '2620') and
                         SUBSTR (o.nlsk, 1, 4) in ('1919','2909','3739') and
-                        ((mfou_=300465 and mfou_ <> mfo_) or mfou_=380764) ) -- BAP
+                        (mfou_=300465 and mfou_ <> mfo_) ) -- BAP
                    OR  (SUBSTR (o.nlsd, 1, 4) in ('2909') and
                         SUBSTR (o.nlsk, 1, 4) in ('1919','3739') and
                         mfou_=333368 ) 
@@ -783,7 +772,7 @@ BEGIN
                           AND SUBSTR (LOWER (TRIM (o.nazn)), 1, 4) != 'конв')
                    OR (o.nlsd LIKE '1919%'     and
                        o.nlsk LIKE '1500%'     and
-                       mfo_ in (300465,300205,380764) and
+                       mfo_ = 300465           and
                        SUBSTR (LOWER (TRIM (o.nazn)), 1, 4) = 'конв')
                    OR (o.nlsd LIKE '191992%'     and
                        (o.nlsk LIKE '1500%' or o.nlsk like '1600%') and
@@ -826,22 +815,6 @@ BEGIN
                  where a.ref in (select b.ref from otcn_prov_temp b)
                    and a.nlsa like '1500%' and a.nlsb like '1500%')
           AND SUBSTR (LOWER (TRIM (nazn)), 1, 4) != 'конв';
-
-        -- удаляем проводки пополнения коррсчета с ЛОРО счета(Дт 1600 Кт 1500)
-        ----if mfo_ <> 300465 
-        ----then
-        --   delete from otcn_prov_temp o
-        --   where exists ( select 1 
-        --                  from customer c 
-        --                  where c.rnk = o.rnk 
-        --                    and c.country = 804 
-        --                )   
-        --     and o.ref in ( select a.ref
-        --                    from oper a
-        --                    where a.ref in (select b.ref from otcn_prov_temp b)
-        --                      and a.nlsa like '1600%' and a.nlsb like '1500%' 
-        --                  );
-        ----end if;
 
         -- для MFO=300465 удаляем проводки у которых MFOA<>MFOB проводки областей
         IF mfo_ = 300465 THEN

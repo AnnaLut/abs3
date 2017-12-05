@@ -1,13 +1,4 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_INV_CCK_FL_23.sql =========*** R
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure P_INV_CCK_FL_23 ***
-
-  CREATE OR REPLACE PROCEDURE BARS.P_INV_CCK_FL_23 (p_dat date, p_frm int) is
+CREATE OR REPLACE PROCEDURE BARS.P_INV_CCK_FL_23 (p_dat date, p_frm int) is
 -- ============================================================================
 --                    Инвентаризационная ведомость - 23 постанова
 --                          VERSION 7.0 (14/05/2013)
@@ -44,12 +35,14 @@ PROMPT *** Create  procedure P_INV_CCK_FL_23 ***
   l_count_s031   number;
   l_time_start   varchar2(20);
   l_time_finish  varchar2(20);
+  l_newnbs number;
 
   l_usedwh    char(1);        -- использование загрузки в ЦАС
   l_errmsg    varchar2(500);  -- сообщение
   l_errcode   number;         -- код выполнения
 
 begin
+   l_newnbs := NEWNBS.GET_STATE;
    --
    -- проверка на возможность пересчета инв. ведомости
    -- Выполняется только для тех у кого работает загрузка в ЦАС
@@ -847,7 +840,7 @@ bars_audit.trace('%s 17-1.Вставляем данные по БПК ФЛ расширенные.',l_title);
             and fdat = trunc(last_day(l_dat)+1,'MM')  and substr(id,1,2) in ('BP','W4') ) t36
   where ba.acc_ovr is not null
     and ba.acc_ovr = a.acc
-    and a.nbs in ('2202','2203')
+    and a.nbs in (decode(l_newnbs,0,'2202','2203'),'2203')
     and a.daos <= l_dat
     and nvl(a.branch,'/') = b.branch
     and a.rnk      = c.rnk
@@ -1220,32 +1213,32 @@ execute immediate
     -- кред.счета, которые не попали в ведомость, но есть в снапах
        (select b.name G01, a.kf G02, a.branch G03,  substr(''Iншi ''||c.nmk,1,70) G04, a.kv G07,
                a.nbs G19, a.ob22 G20,
-               decode (a.nbs, ''2202'', -f_get_ost(a.acc,di_,1,7),
+               decode (a.nbs, decode(l_newnbs,0,''2202'',''2203''), -f_get_ost(a.acc,di_,1,7),
                               ''2203'', -f_get_ost(a.acc,di_,1,7),
-                      	      ''2207'', -f_get_ost(a.acc,di_,1,7),
+                      	      decode(l_newnbs,0,''2207'',''2203''), -f_get_ost(a.acc,di_,1,7),
                       	      ''2232'', -f_get_ost(a.acc,di_,1,7),
                       	      ''2233'', -f_get_ost(a.acc,di_,1,7),
-                      	      ''2237'', -f_get_ost(a.acc,di_,1,7),
+                      	      decode(l_newnbs,0,''2237'',''2233''), -f_get_ost(a.acc,di_,1,7),
         	      0 )/100 G21,
-               decode (a.nbs, ''2202'', -f_get_ost(a.acc,di_,1,8),
+               decode (a.nbs, decode(l_newnbs,0,''2202'',''2203''), -f_get_ost(a.acc,di_,1,8),
                       	      ''2203'', -f_get_ost(a.acc,di_,1,8),
-                      	      ''2207'', -f_get_ost(a.acc,di_,1,8),
+                      	      decode(l_newnbs,0,''2207'',''2203''), -f_get_ost(a.acc,di_,1,8),
                       	      ''2232'', -f_get_ost(a.acc,di_,1,8),
                       	      ''2233'', -f_get_ost(a.acc,di_,1,8),
-                      	      ''2237'', -f_get_ost(a.acc,di_,1,8),
+                      	      decode(l_newnbs,0,''2237'',''2233''), -f_get_ost(a.acc,di_,1,8),
                        0 )/100 G22,
                decode (a.nbs, ''9129'', -f_get_ost(a.acc,di_,1,8),
                        0 )/100 G25,
                decode (a.nbs, ''2208'', -f_get_ost(a.acc,di_,1,8),
                               ''2238'', -f_get_ost(a.acc,di_,1,8),
                        0 )/100 G29,
-               decode (a.nbs, ''2209'', -f_get_ost(a.acc,di_,1,8),
-                              ''2239'', -f_get_ost(a.acc,di_,1,8),
+               decode (a.nbs, decode(l_newnbs,0,''2209'',''2208''), -f_get_ost(a.acc,di_,1,8),
+                              decode(l_newnbs,0,''2239'',''2238''), -f_get_ost(a.acc,di_,1,8),
                        0 )/100 G30,
 	       a.acc acc, a.rnk rnk
           from ACCM_AGG_MONBALS bb, accounts a, customer c, branch b
          where bb.acc = a.acc
-           and (   a.nbs in (''2202'',''2203'',''2207'',''2208'',''2209'',''2232'',''2233'',''2237'',''2238'',''2239'')
+           and (   a.nbs in (decode(l_newnbs,0,''2202'',''2203''),''2203'',decode(l_newnbs,0,''2207'',''2203''),''2208'',decode(l_newnbs,0,''2209'',''2208''),''2232'',''2233'',decode(l_newnbs,0,''2237'',''2233''),''2238'',decode(l_newnbs,0,''2239'',''2238''))
 	        or (a.nbs = ''9129'' and c.custtype = 3 and nvl(trim(c.sed),''00'')<>''91'') )
            and caldt_ID = di_
            -- смотрим, что счета нет среди INV_CCK_FL_23.ACC
@@ -1303,15 +1296,3 @@ exception when others then
 
 end P_INV_CCK_FL_23 ;
 /
-show err;
-
-PROMPT *** Create  grants  P_INV_CCK_FL_23 ***
-grant EXECUTE                                                                on P_INV_CCK_FL_23 to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on P_INV_CCK_FL_23 to RCC_DEAL;
-grant EXECUTE                                                                on P_INV_CCK_FL_23 to START1;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_INV_CCK_FL_23.sql =========*** E
-PROMPT ===================================================================================== 

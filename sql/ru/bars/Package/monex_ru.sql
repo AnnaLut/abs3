@@ -1,9 +1,3 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/monex_ru.sql =========*** Run *** ==
- PROMPT ===================================================================================== 
- 
 CREATE OR REPLACE PACKAGE BARS.MONEX_RU IS
 
  -- Системы педеводов. Единое онко. Клиринг. Профикс.
@@ -46,16 +40,21 @@ procedure OP_nls_MTI (b1_ varchar2, b2_ varchar2, b3_ varchar2, b4_ varchar2, b5
 end monex_RU;
 /
 
+GRANT execute ON BARS.monex_RU  TO BARS_ACCESS_DEFROLE;
+
+
 CREATE OR REPLACE PACKAGE BODY BARS.monex_RU IS
 
  -- Системы педеводов. Единое онко. Клиринг. Профикс.
  -- Уровень РУ (там, где есть точки обслуживания клиентов)
  -- Сам пакедж  monex(порождение клиринговых платежей - в ГОУ)
 
-   g_body_version   CONSTANT VARCHAR2 (64) := 'version 1.3  12/06/2017';
+   g_body_version   CONSTANT VARCHAR2 (64) := 'version 2  08.11.2017 ';
 
 /*
-21.07.2017    Сухова  Реанимация существующего счета при открытии нового.   
+15.11.2017 Sta Изменения, связанные с Трансф.БС 2017   6110.хх => 6510.хх
+
+21.07.2017    Сухова  Реанимация существующего счета при открытии нового.
 12.06.2017    COBUSUPMMFO-851  Sta Авто-Спец парам для счетоа 2909 и 2809
           для 2809 R011=9, S180=3, S240=2
           для 2909 R011=2, S180=3, S240=2
@@ -80,13 +79,24 @@ end OB3 ;
 
 
 -------работа с одним счетом---------------------------
-procedure op_NLSM ( p_nbs    accounts.nbs%type,    p_ob22   accounts.ob22%type,
-                    p_branch accounts.branch%type, p_kv     accounts.kv%type      )  IS
-   nls_ accounts.nls%type; ra   accounts%rowtype ; p4_ int;
+procedure op_NLSM ( p_nbs    accounts.nbs%type,    p_ob22   accounts.ob22%type,    p_branch accounts.branch%type, p_kv     accounts.kv%type      )  IS
+                    ra       accounts%rowtype ;    p4_ int;
 begin
-   nls_ := vkrzn( substr(p_branch,2,5),  p_nbs || '00' || MONEX_RU.ob3(p_ob22) || '00' || substr( substr(p_branch,-4), 1,3)   ) ;
 
-   begin  select * into ra from accounts where kv = p_kv and nls = nls_;
+  begin select substr( P_ob22||' '|| replace (txt,'у','i'), 1,50), r020        into ra.nms, ra.nbs  from sb_ob22 where r020 = p_NBS   and ob22= P_OB22 and d_close is null;
+  EXCEPTION WHEN NO_DATA_FOUND THEN   
+     If p_NBS ='6110' then 
+        begin select substr( P_ob22||' '|| replace (txt,'у','i'), 1,50), r020  into ra.nms, ra.nbs  from sb_ob22  where r020 = '6510' and ob22= P_OB22 and d_close is null;
+        EXCEPTION WHEN NO_DATA_FOUND THEN   null ;
+        end;
+     end if;
+  end ;
+
+  If ra.NBS is null then raise_application_error(-20100, '     : Недопустима пара ' || p_NBS || '/' || P_OB22  ); end if;
+  --------------------------------------------------------------------------------------------------------------------------
+  ra.nls := vkrzn( substr(p_branch,2,5),    ra.nbs || '00' || MONEX_RU.ob3(p_ob22) || '00' || substr( substr(p_branch,-4), 1,3)   ) ;
+
+   begin  select * into ra from accounts where kv = p_kv and nls = ra.nls;
           If ra.dazs is NOT null  then  update accounts set dazs = null     where acc=ra.acc;    end if ;
    EXCEPTION WHEN NO_DATA_FOUND THEN
 
@@ -98,23 +108,19 @@ begin
       EXCEPTION WHEN NO_DATA_FOUND THEN  ra.ISP := gl.aUid ;      -- найти исполнителя для сч
       end;
 
-      begin select id into ra.GRP from  groups_nbs where nbs=P_NBS and rownum=1;
+      begin select id into ra.GRP from  groups_nbs where nbs=ra.NBS and rownum=1;
       EXCEPTION WHEN NO_DATA_FOUND THEN ra.grp := null;       -- найти группу дост для бал.сч
       end;
 
-      begin select substr( P_ob22||' '|| replace (txt,'у','i'), 1,50) into ra.nms from sb_ob22 where r020 = P_NBS and ob22= P_OB22 and d_close is null;
-      EXCEPTION WHEN NO_DATA_FOUND THEN   raise_application_error(-20100, '     : Недопустима пара ' || P_NBS || '/' || P_OB22  );
-      end;      -- название счета
-
-      op_reg (99,0,0, ra.GRP, p4_, ra.RNK, nls_, p_kv, ra.NMS, 'ODB', ra.isp, ra.ACC );
+      op_reg (99,0,0, ra.GRP, p4_, ra.RNK, ra.nls, p_kv, ra.NMS, 'ODB', ra.isp, ra.ACC );
 
    end;
 
    -- дополнительно к открытию счета + 12.06.2017    COBUSUPMMFO-851  Sta Авто-Спец парам для счетоа 2909 и 2809
    update accounts set tobo = p_branch where acc=ra.acc ;
    Accreg.setAccountSParam ( ra.acc, 'OB22', p_OB22 )   ;
-   If    p_nbs='2809' then Accreg.setAccountSParam(ra.acc,'R011',9); Accreg.setAccountSParam(ra.acc,'S180',3); Accreg.setAccountSParam(ra.acc,'S240',2) ;
-   elsIf p_nbs='2909' then Accreg.setAccountSParam(ra.acc,'R011',2); Accreg.setAccountSParam(ra.acc,'S180',3); Accreg.setAccountSParam(ra.acc,'S240',2) ;
+   If    ra.nbs='2809' then Accreg.setAccountSParam(ra.acc,'R011',9); Accreg.setAccountSParam(ra.acc,'S180',3); Accreg.setAccountSParam(ra.acc,'S240',2) ;
+   elsIf ra.nbs='2909' then Accreg.setAccountSParam(ra.acc,'R011',2); Accreg.setAccountSParam(ra.acc,'S180',3); Accreg.setAccountSParam(ra.acc,'S240',2) ;
    end if ;
 
    declare
@@ -124,7 +130,7 @@ begin
      ro oper%rowtype;
    begin
      ro.tt  := '015';
-     for k in (select * from accounts  where nbs = p_nbs and ob22= p_ob22 and branch=p_branch and kv =p_kv and nls <> nls_ and dazs is null     )
+     for k in (select * from accounts  where nbs = ra.nbs and ob22= p_ob22 and branch=p_branch and kv =p_kv and nls <> ra.nls and dazs is null     )
      loop
         If k.ostc <>0 then
            If k.ostc >0 then ro.dk := 1; ro.s :=  k.ostc;
@@ -137,12 +143,12 @@ begin
               kv_   => k.kv    , s_ => ro.s,  kv2_  => k.kv    ,  s2_   => ro.s    ,  sk_   => NULL   ,
               data_ => gl.BDATE, datp_ => gl.bdate             ,
               nam_a_=> substr(k.nms,1,38)  ,  nlsa_ => k.nls   ,  mfoa_ => gl.aMfo ,
-              nam_b_=> substr(ra.nms,1,38) ,  nlsb_ => nls_    ,  mfob_ => gl.aMfo ,
+              nam_b_=> substr(ra.nms,1,38) ,  nlsb_ => ra.nls  ,  mfob_ => gl.aMfo ,
               nazn_ => 'Автоматичне згорнення залишку в зв`язку з вiдкриттям нового рахунку',
               d_rec_=> null,id_a_=>gl.aOkpo,  id_b_ => gl.aOkpo,
               id_o_ => null,sign_=>null    ,  sos_  => 1       ,  prty_ => null,  uid_  => null );
 
-           gl.payv(0,ro.REF,gl.bDATE,ro.tt,ro.dk, k.kv ,k.nls, ro.s, k.kv, nls_, ro.s);
+           gl.payv(0,ro.REF,gl.bDATE,ro.tt,ro.dk, k.kv ,k.nls, ro.s, k.kv, ra.nls, ro.s);
            gl.pay (2,ro.REF,gl.bDATE);
 
         end if;
@@ -215,17 +221,4 @@ end OP_nls_MTI ;
 
 
 end monex_RU;
-/ 
-
-show err;
- 
-PROMPT *** Create  grants  MONEX_RU ***
-grant EXECUTE                                                                on MONEX_RU        to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on MONEX_RU        to CUST001;
-
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/monex_ru.sql =========*** End *** ==
- PROMPT ===================================================================================== 
- 
+/

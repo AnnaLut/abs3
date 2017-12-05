@@ -6,7 +6,7 @@ create or replace procedure make_int
   p_errflg    out boolean          -- флаг ошибки                 (для 1-го счета)
 ) is
   -- ====================================================================================
-  -- процедура начисления процентов (прогноз +/- оплата) version 1.8.7 14.09.2017
+  -- процедура начисления процентов (прогноз +/- оплата) version 1.8.8 14.11.2017
   -- dptweb - расширенный функционал депозитной системы
   -- acr_dat - с возможностью сторно процентов
   -- sber - специфика сбербанка
@@ -15,8 +15,8 @@ create or replace procedure make_int
   --
   -- константы
   --
-  modcode    constant char(3) not null := 'INT';
-  title      constant char(4) not null := 'INT:';
+  modcode    constant char(3)    not null := 'INT';
+  title      constant char(4)    not null := 'INT:';
   errmsgdim  constant number(38) not null := 3000;
   rowslimit  constant number(38) not null := 1000;
   autocommit constant number(38) not null := 1000;
@@ -26,9 +26,9 @@ create or replace procedure make_int
   --
   tax_tt     constant varchar2(3) := '%15';
   tax_mil_tt constant varchar2(3) := 'MIL';
-  l_tax_method            int := f_get_params('TAX_METHOD', 2); -- 2 - сплата податку та запис в проток / 3 - лише запис в протокол
-  l_tax_required          int := 0; -- переменная для определения необходимости снятия налога по ряду критериев
-  l_tax_socfactor         int := 1; -- переменная для определения необходимости снятия налога с учетом разделяемого остатка
+  l_tax_method            int    := F_GET_PARAMS('TAX_METHOD', 2); -- 2 - сплата податку та запис в проток / 3 - лише запис в протокол
+  l_tax_required          int    := 0; -- переменная для определения необходимости снятия налога по ряду критериев
+  l_tax_socfactor         int    := 1; -- переменная для определения необходимости снятия налога с учетом разделяемого остатка
   l_tax_s                 number := 0; -- временная переменная для суммирования налога по периодам в цикле
   l_tax_sq                number := 0; -- временная переменная для суммирования налога по периодам в цикле (в эквиваленте)
   l_tax_mil_s             number := 0; -- временная переменная для суммирования налога по периодам в цикле
@@ -36,24 +36,24 @@ create or replace procedure make_int
   l_taxrow_tax_base_s     number := 0; -- база налогообложения для пдфо
   l_taxrow_mil_tax_base_s number := 0; -- база налогообложения для военного сбора
 
-  l_tax_base_soc    number := 0; -- сумма начисленных %% за период "социального остатка"
-  l_tax_base_soc_sq number := 0; -- сумма начисленных (экв) %% за период "социального остатка"
+  l_tax_base_soc          number := 0; -- сумма начисленных %% за период "социального остатка"
+  l_tax_base_soc_sq       number := 0; -- сумма начисленных (экв) %% за период "социального остатка"
 
-  l_tmp_s_soc      number := 0;
-  l_tmp_sq_soc     number := 0;
-  l_tmp_mil_s_soc  number := 0;
-  l_tmp_mil_sq_soc number := 0;
+  l_tmp_s_soc             number := 0;
+  l_tmp_sq_soc            number := 0;
+  l_tmp_mil_s_soc         number := 0;
+  l_tmp_mil_sq_soc        number := 0;
 
-  l_tax_s_soc      number := 0;
-  l_tax_sq_soc     number := 0;
-  l_tax_mil_s_soc  number := 0;
-  l_tax_mil_sq_soc number := 0;
+  l_tax_s_soc             number := 0;
+  l_tax_sq_soc            number := 0;
+  l_tax_mil_s_soc         number := 0;
+  l_tax_mil_sq_soc        number := 0;
 
   type t_tax_settings is record(
-    tax_type       number,
-    tax_int        number, -- % налога;
-    tax_date_begin date, -- начало действия периода налогообложения;
-    tax_date_end   date -- конец  действия периода налогообложения пост 4110; если дата конца действия постановы не установлена, то принимаем, +1 месяц от сегодня
+    tax_type          number, -- 
+    tax_int           number, -- % налога;
+    tax_date_begin    date,   -- начало действия периода налогообложения;
+    tax_date_end      date    -- конец  действия периода налогообложения пост 4110; если дата конца действия постановы не установлена, то принимаем, +1 месяц от сегодня
     );
 
   type t_taxdata is table of t_tax_settings;
@@ -61,8 +61,8 @@ create or replace procedure make_int
   type t_soc_turns_rec is record(
     accd       number,
     soc_factor number, -- коэффициент социальной составляющей остатка;
-    date_begin date, -- начало действия периода разделяемого остатка;
-    date_end   date -- конец  действия периода разделяемого остатка;
+    date_begin date,   -- начало действия периода разделяемого остатка;
+    date_end   date    -- конец  действия периода разделяемого остатка;
     );
 
   type t_soc_turns_data is table of t_soc_turns_rec;
@@ -184,26 +184,24 @@ create or replace procedure make_int
 
     if (p_acrdat is null) or
        (p_acrdat is not null and p_acrdat < p_dat2 and p_stpdat is null) or
-       (p_acrdat is not null and p_acrdat < p_dat2 and p_acrdat < p_stpdat) then
-      -- стартовая дата начисления (дата "с")
+       (p_acrdat is not null and p_acrdat < p_dat2 and p_acrdat < p_stpdat)
+    then -- стартовая дата начисления (дата "с")
       p_acrdat := case
-                    when (p_acrdat is not null) then
-                     p_acrdat + 1
-                    when (p_intid in (0, 2)) then
-                     p_opendat
-                    when (p_amount is null) then
-                     p_opendat
-                    else
-                     p_opendat + 1
+                  when (p_acrdat is not null)
+                  then p_acrdat + 1
+                  when (p_intid in (0, 2))
+                  then p_opendat
+                  when (p_amount is null) 
+                  then p_opendat
+                  else p_opendat + 1
                   end;
       -- конечная дата начисления (дата "по")
       p_stpdat := case
-                    when (p_stpdat is null) then
-                     p_dat2
-                    when (p_dat2 < p_stpdat) then
-                     p_dat2
-                    else
-                     p_stpdat
+                  when (p_stpdat is null)
+                  then p_dat2
+                  when (p_dat2 < p_stpdat) 
+                  then p_dat2
+                  else p_stpdat
                   end;
     else
       p_acrdat := null;
@@ -228,9 +226,7 @@ create or replace procedure make_int
   begin
 
     bars_audit.trace('%s get_docaccs: запуск, {acra, acrb} = {%s, %s}',
-                     title,
-                     to_char(p_acra),
-                     to_char(p_acrb));
+                     title, to_char(p_acra), to_char(p_acrb) );
 
     -- процентный счет и контрсчет доходов/расходов
     select case -- для траншів деп. ліні
@@ -263,10 +259,7 @@ create or replace procedure make_int
        and ap.rnk = cp.rnk
        and ae.rnk = ce.rnk;
 
-    bars_audit.trace('%s get_docaccs: счета = {%s, %s}',
-                     title,
-                     p_docrec.nlsa,
-                     p_docrec.nlsb);
+    bars_audit.trace( '%s get_docaccs: счета = {%s, %s}', title, p_docrec.nlsa, p_docrec.nlsb );
 
   exception
     when no_data_found then
@@ -310,10 +303,9 @@ create or replace procedure make_int
     end if;
 
     p_docrec.vob := case
-                      when p_docrec.kv = p_docrec.kv2 then
-                       6
-                      else
-                       16
+                    when p_docrec.kv = p_docrec.kv2 
+                    then 6
+                    else 16
                     end;
 
     p_docrec.s := abs(p_docrec.s);
@@ -503,20 +495,23 @@ create or replace procedure make_int
   --
   -- пошук рахунків для сплати податку
   --
-  procedure init_taxnls_list is
+  procedure INIT_TAXNLS_LIST
+  ( p_kf in accounts.kf%type
+  ) is
   begin
-    bars_audit.info(title || 'INIT_TAXNLS_LIST: entry.');
+    bars_audit.info(title || 'INIT_TAXNLS_LIST: Entry.');
 
-    for k in ( with tab as (select nls, branch
-                              from ACCOUNTS
-                             where nbs  = '3622'
-                               and kv   = 980
-                               and ob22 = '37'
-                               and dazs is null)
-                select branch, nls
+    for k in ( with tab as ( select nls, branch
+                               from ACCOUNTS
+                              where KF   = p_kf
+                                and NBS  = '3622'
+                                and KV   = 980
+                                and OB22 = '37'
+                                and DAZS is null )
+                select BRANCH, NLS
                   from tab
                  union
-                select SubStr(branch, 1,15), nls
+                select SubStr(BRANCH,1,15), NLS
                   from tab
                  where branch like '/______/______/06____/' )
     loop
@@ -530,29 +525,29 @@ create or replace procedure make_int
 
     bars_audit.info( title || ' INIT_TAXNLS_LIST: exit with ' || to_char(g_taxnls_list.count) || ' accounts.');
 
-    for n in ( with tab as (select NLS, BRANCH
-                              from ACCOUNTS
-                             where nbs  = '3622'
-                               and kv   = 980
-                               and ob22 = '36'
-                               and dazs is null)
-                       select branch, nls
+    for n in ( with tab as ( select NLS, BRANCH
+                               from ACCOUNTS
+                              where KF   = p_kf
+                                and NBS  = '3622'
+                                and KV   = 980
+                                and OB22 = '36'
+                                and DAZS is null )
+                       select BRANCH, NLS
                          from tab
                         union
-                       select SubStr(branch, 1,15), nls
+                       select SubStr(BRANCH,1,15), NLS
                          from tab
                         where branch like '/______/______/06____/' )
     loop
       g_taxnls_list_military(n.branch) := n.nls;
     end loop;
 
-    bars_audit.trace('%s INIT_TAXNLS_LIST(MILITARY): exit with %s accounts.',
-                     title,
-                     to_char(g_taxnls_list_military.count));
+    bars_audit.trace( '%s INIT_TAXNLS_LIST(MILITARY): exit with %s accounts.',
+                      title, to_char(g_taxnls_list_military.count));
 
-    bars_audit.info(title || ' INIT_TAXNLS_LIST(MILITARY): exit with ' ||
-                    to_char(g_taxnls_list_military.count) || ' accounts.');
-  end init_taxnls_list;
+--  bars_audit.info( title || ' INIT_TAXNLS_LIST(MILITARY): exit with ' ||
+--                   to_char(g_taxnls_list_military.count) || ' accounts.');
+  end INIT_TAXNLS_LIST;
   
   --
   --
@@ -641,9 +636,9 @@ begin
                   to_char(p_dat2, 'dd.mm.yy') || ', режим ' ||
                   to_char(p_runmode) || ', запуск № ' || to_char(p_runid));
 
-  if ((p_runmode = 1) and (l_tax_method = 2 or l_tax_method = 3)) then
-    -- ініціалізація списку рахунків для сплати податку
-    init_taxnls_list;
+  if ((p_runmode = 1) and (l_tax_method = 2 or l_tax_method = 3))
+  then -- ініціалізація списку рахунків для сплати податку
+    INIT_TAXNLS_LIST( sys_context('bars_context','user_mfo') );
   end if;
 
   loop
@@ -767,17 +762,11 @@ begin
                   p_intid   => l_intlist(i).int_id,
                   p_amount  => l_intlist(i).acc_amount);
 
-        if (l_acrdat is null or l_stpdat is null) then
+        if (l_acrdat is null or l_stpdat is null)
+        then
           -- период %s - %s закрыт для счета %s/%s
-          bars_audit.trace('%s указанный период закрыт для начисления для %s/%s',
-                           title,
-                           l_intlist                                                                                (i)
-                           .acc_num,
-                           l_intlist                                                                                (i)
-                           .acc_iso);
-          bars_audit.info(title ||
-                          ' указанный период закрыт для начисления для ' || l_intlist(i)
-                          .acc_num || '/' || l_intlist(i).acc_iso);
+          bars_audit.trace( '%s указанный период закрыт для начисления для %s/%s'
+                          , title, l_intlist(i).acc_num, l_intlist(i).acc_iso );
           l_errmsg := null;
           raise expt_int;
         end if;
@@ -792,10 +781,8 @@ begin
         if (l_intlist(i).mod_code = 'DPT' and l_intlist(i).int_id = 3 and
             l_cardrow.stp_dat <= l_stpdat) then
           -- окончательная амортизация процентов по авансовому вкладу
-          bars_audit.trace('%s окончат.амортизация по аванс.вкладу...',
-                           title);
-          bars_audit.info(title ||
-                          ' окончат.амортизация по аванс.вкладу...');
+          bars_audit.trace( '%s окончат.амортизация по аванс.вкладу...', title );
+
           begin
             select ostb
               into p_intamount
@@ -803,9 +790,8 @@ begin
              where pap = 1
                and acc = l_cardrow.acra;
 
-            bars_audit.trace('%s остаток на счете амортизации - %s',
-                             title,
-                             to_char(p_intamount));
+            bars_audit.trace( '%s остаток на счете амортизации - %s', title, to_char(p_intamount) );
+
             if (p_intamount != 0) then
               insert into acr_intn
                 (acc, id, fdat, tdat, ir, br, osts, acrd, remi)
@@ -857,11 +843,7 @@ begin
               raise expt_int;
           end;
 
-          bars_audit.trace('%s сумма начисленных процентов - %s',
-                           title,
-                           to_char(p_intamount));
-          bars_audit.info(title || ' сумма начисленных процентов - ' ||
-                          to_char(p_intamount));
+          bars_audit.trace( '%s сумма начисленных процентов - %s', title, to_char(p_intamount) );
 
           -- сжатие ведомости начисленных процентов
           begin
@@ -884,8 +866,8 @@ begin
 
         -- прогнозный расчет суммы начисленных процентов выполнен.
         -- начинается формирование документов по начислению процентов
-        if (p_runmode = 1) then
-          -- чтение ведомости начисленных процентов по счету
+        if (p_runmode = 1) 
+        then -- чтение ведомости начисленных процентов по счету
           for acr_list in (select acc,
                                   id,
                                   fdat,
@@ -1035,29 +1017,22 @@ begin
                     join bars.customer c
                       on (c.rnk = a.rnk)
                    where a.acc = l_intlist(i).acc_id
-                     and ((a.nbs in ('2630', '2635')) or
-                         (a.nbs = '2620' and
-                         a.ob22 not in ('14', '17', '20', '21')) -- фо (ощадбанк)
-                         or (a.nbs in
-                         ('2600', '2610', '2615', '8610', '8615') and -- фоп
-                         c.sed = '91' and
-                         c.ise in ('14200', '14201', '14100', '14101')));
+                     and ( (a.nbs = '2630') or
+                           (a.nbs = '2620' and a.ob22 not in ('14', '17', '20', '21')) or -- ФО (ощадбанк)
+                           (a.nbs in ('2600','2610','8610') and c.sed = '91' and c.ise in ('14200','14201','14100', '14101')) -- ФОП
+                         );
                 exception
                   when no_data_found then
                     l_tax_required  := 0;
                     l_tax_socfactor := 0;
                 end;
 
-                bars_audit.trace('%s l_tax_required=' ||
-                                 to_char(l_tax_required) ||
-                                 ', l_intlist(i).acc_id=' ||
-                                 to_char(l_intlist(i).acc_id) ||
-                                 ', l_tax_socfactor=' ||
-                                 to_char(l_tax_socfactor),
-                                 title);
+                bars_audit.trace( '%s l_tax_required='     ||to_char(l_tax_required)         ||
+                                  ', l_intlist(i).acc_id=' ||to_char(l_intlist(i).acc_id)    ||
+                                  ', l_tax_socfactor='     ||to_char(l_tax_socfactor), title );
 
-                if (l_tax_required = 1) then
-                  -- расчет суммы для налогообложения по дфл (налогом облагаются начисленные проценты позднее 01/08/2014)
+                if (l_tax_required = 1) 
+                then -- расчет суммы для налогообложения по дфл (налогом облагаются начисленные проценты позднее 01/08/2014)
                   l_taxrow.tax_s      := 0;
                   l_taxrow.tax_sq     := 0;
                   l_tax_s             := 0;
@@ -1074,9 +1049,7 @@ begin
                   l_taxrow.int_date_begin := acr_list.fdat;
                   l_taxrow.int_date_end   := acr_list.tdat;
                   l_taxrow.int_s          := acr_list.acrd;
-                  l_taxrow.int_sq         := gl.p_icurval(l_taxrow.kv,
-                                                          acr_list.acrd,
-                                                          l_bdate);
+                  l_taxrow.int_sq         := GL.p_icurval( l_taxrow.kv, acr_list.acrd, l_bdate );
                   l_taxrow.tax_nls        := GET_TAXNLS( l_intlist(i).branch );
                   l_taxrow.tax_date_begin := acr_list.fdat;
                   l_taxrow.tax_date_end   := acr_list.tdat;
@@ -1091,9 +1064,7 @@ begin
                   l_taxrow_mil.int_date_begin := acr_list.fdat;
                   l_taxrow_mil.int_date_end   := acr_list.tdat;
                   l_taxrow_mil.int_s          := acr_list.acrd;
-                  l_taxrow_mil.int_sq         := gl.p_icurval(l_taxrow_mil.kv,
-                                                              acr_list.acrd,
-                                                              l_bdate);
+                  l_taxrow_mil.int_sq         := gl.p_icurval( l_taxrow_mil.kv, acr_list.acrd, l_bdate );
                   l_taxrow_mil.tax_nls        := GET_MILNLS( l_intlist(i).branch );
 
                   l_taxrow_mil.tax_date_begin := acr_list.fdat;
@@ -1117,20 +1088,11 @@ begin
                    where tax_type = l_taxrow_mil.tax_type -- 2 військовий збір
                      and (dat_end >= l_acrdat or dat_end is null);
 
-                  bars_audit.trace('%s Количество периодов налогообложения = ' ||
-                                   to_char(l_taxlist.count),
-                                   title);
+                  bars_audit.trace( '%s Количество периодов налогообложения = %s.', title, to_char(l_taxlist.count) );
 
                   for j in 1 .. l_taxlist.count loop
-                    bars_audit.trace('%s Считаем налог за период с ' ||
-                                     to_char(greatest(l_acrdat,
-                                                      l_taxlist(j)
-                                                      .tax_date_begin),
-                                             'dd/mm/yyyy') || ' по ' ||
-                                     to_char(nvl(l_taxlist(j).tax_date_end,
-                                                 l_stpdat),
-                                             'dd/mm/yyyy'),
-                                     title);
+                    bars_audit.trace( '%s Считаем налог за период с ' ||to_char(greatest(l_acrdat,l_taxlist(j).tax_date_begin),'dd/mm/yyyy')
+                                                            || ' по ' ||to_char(nvl(l_taxlist(j).tax_date_end,l_stpdat),'dd/mm/yyyy'), title );
 
                     begin
                       acrn.p_int(l_intlist(i).acc_id, -- внутр.номер основного счета
@@ -1156,17 +1118,10 @@ begin
                     end;
 
                     l_taxrow.tax_base_s  := round(l_taxrow.tax_base_s, 0); -- так как в проводку реально вставляется округленное, остаток ->> acr_docs.int_rest
-                    l_taxrow.tax_base_sq := gl.p_icurval(l_taxrow.kv,
-                                                         l_taxrow.tax_base_s,
-                                                         l_taxrow.bdate);
-                    l_taxrow.tax_s       := round(l_taxrow.tax_base_s * l_taxlist(j)
-                                                  .tax_int,
-                                                  0);
-                    l_taxrow.tax_sq      := gl.p_icurval(l_taxrow.kv,
-                                                         l_taxrow.tax_s,
-                                                         l_taxrow.bdate);
-                    l_taxrow.round_err   := l_taxrow.tax_base_s * l_taxlist(j)
-                                           .tax_int - l_taxrow.tax_s;
+                    l_taxrow.tax_base_sq := GL.p_icurval( l_taxrow.kv, l_taxrow.tax_base_s, l_taxrow.bdate );
+                    l_taxrow.tax_s       := round( l_taxrow.tax_base_s * l_taxlist(j).tax_int, 0 );
+                    l_taxrow.tax_sq      := GL.p_icurval( l_taxrow.kv, l_taxrow.tax_s, l_taxrow.bdate );
+                    l_taxrow.round_err   := l_taxrow.tax_base_s * l_taxlist(j).tax_int - l_taxrow.tax_s;
 
                     bars_audit.trace('%s сумма начисленных c ' ||
                                      to_char(greatest(acr_list.fdat,
@@ -1183,12 +1138,9 @@ begin
                                      title,
                                      '>>' || to_char(l_taxrow.tax_s));
 
-                    l_tax_s             := nvl(l_tax_s, 0) +
-                                           nvl(l_taxrow.tax_s, 0);
-                    l_tax_sq            := nvl(l_tax_sq, 0) +
-                                           nvl(l_taxrow.tax_sq, 0);
-                    l_taxrow_tax_base_s := nvl(l_taxrow_tax_base_s, 0) +
-                                           nvl(l_taxrow.tax_base_s, 0);
+                    l_tax_s             := nvl(l_tax_s, 0)             + nvl(l_taxrow.tax_s, 0);
+                    l_tax_sq            := nvl(l_tax_sq, 0)            + nvl(l_taxrow.tax_sq, 0);
+                    l_taxrow_tax_base_s := nvl(l_taxrow_tax_base_s, 0) + nvl(l_taxrow.tax_base_s, 0);
 
                     if l_tax_socfactor = 1 then
                       begin
@@ -1370,20 +1322,15 @@ begin
                         raise expt_int;
                     end;
 
-                    l_taxrow_mil.tax_base_s  := round(l_taxrow_mil.tax_base_s,
-                                                      0); -- так как в проводку реально вставляется округленное, остаток ->> acr_docs.int_rest
+                    l_taxrow_mil.tax_base_s  := round(l_taxrow_mil.tax_base_s,0); -- так как в проводку реально вставляется округленное, остаток ->> acr_docs.int_rest
                     l_taxrow_mil.tax_base_sq := gl.p_icurval(l_taxrow_mil.kv,
                                                              l_taxrow_mil.tax_base_s,
                                                              l_taxrow_mil.bdate);
-                    l_taxrow_mil.tax_s       := round(l_taxrow_mil.tax_base_s * l_taxlist_mil(z)
-                                                      .tax_int,
-                                                      0);
+                    l_taxrow_mil.tax_s       := round(l_taxrow_mil.tax_base_s * l_taxlist_mil(z).tax_int,0);
                     l_taxrow_mil.tax_sq      := gl.p_icurval(l_taxrow_mil.kv,
                                                              l_taxrow_mil.tax_s,
                                                              l_taxrow_mil.bdate);
-                    l_taxrow_mil.round_err   := l_taxrow_mil.tax_base_s * l_taxlist_mil(z)
-                                               .tax_int -
-                                                l_taxrow_mil.tax_s;
+                    l_taxrow_mil.round_err   := l_taxrow_mil.tax_base_s * l_taxlist_mil(z).tax_int -l_taxrow_mil.tax_s;
 
                     bars_audit.trace('%s сумма начисленных c ' ||
                                      to_char(greatest(acr_list.fdat,
@@ -1402,13 +1349,9 @@ begin
                                      title,
                                      '>>' || to_char(l_taxrow_mil.tax_s));
 
-                    l_tax_mil_s             := nvl(l_tax_mil_s, 0) +
-                                               nvl(l_taxrow_mil.tax_s, 0);
-                    l_tax_mil_sq            := nvl(l_tax_mil_sq, 0) +
-                                               nvl(l_taxrow_mil.tax_sq, 0);
-                    l_taxrow_mil_tax_base_s := nvl(l_taxrow_mil_tax_base_s,
-                                                   0) + nvl(l_taxrow_mil.tax_base_s,
-                                                            0);
+                    l_tax_mil_s             := nvl(l_tax_mil_s, 0)            + nvl(l_taxrow_mil.tax_s, 0);
+                    l_tax_mil_sq            := nvl(l_tax_mil_sq, 0)           + nvl(l_taxrow_mil.tax_sq, 0);
+                    l_taxrow_mil_tax_base_s := nvl(l_taxrow_mil_tax_base_s,0) + nvl(l_taxrow_mil.tax_base_s,0);
 
                     if l_tax_socfactor = 1 then
                       begin
@@ -1534,21 +1477,12 @@ begin
                                          ', l_tax_mil_sq_soc = ' ||
                                          to_char(l_tax_mil_sq_soc));
 
-                        l_taxrow_mil.tax_socinfo := substr(nvl(l_taxrow.tax_socinfo,
-                                                               '') ||
-                                                           to_char(l_soc_turns_data(si)
-                                                                   .soc_factor) || ' (' ||
-                                                           to_char(l_soc_turns_data(si)
-                                                                   .date_begin,
-                                                                   'dd/mm/yyyy') || '-' ||
-                                                           to_char(l_soc_turns_data(si)
-                                                                   .date_end,
-                                                                   'dd/mm/yyyy') ||
-                                                           ') base =' ||
-                                                           to_char(l_tax_base_soc) ||
-                                                           ', l_tmp_mil_s_soc=' ||
-                                                           to_char(l_tmp_mil_s_soc) || ';',
-                                                           2000);
+                        l_taxrow_mil.tax_socinfo := substr(l_taxrow.tax_socinfo ||
+                                                           to_char(l_soc_turns_data(si).soc_factor)              || ' ('      ||
+                                                           to_char(l_soc_turns_data(si).date_begin,'dd/mm/yyyy') || '-'       ||
+                                                           to_char(l_soc_turns_data(si).date_end,'dd/mm/yyyy')   ||') base =' ||
+                                                           to_char(l_tax_base_soc)  ||', l_tmp_mil_s_soc=' ||
+                                                           to_char(l_tmp_mil_s_soc) || ';',1,2000);
                       end loop;
                     else
                       l_tax_s_soc      := 0;
@@ -1559,16 +1493,14 @@ begin
                   end loop;
 
                   l_taxrow.tax_s := case
-                                      when (l_tax_s + l_tax_s_soc) >= 0 then
-                                       l_tax_s + l_tax_s_soc
-                                      else
-                                       0
+                                    when (l_tax_s + l_tax_s_soc) >= 0 
+                                    then l_tax_s + l_tax_s_soc
+                                    else 0
                                     end;
                   l_taxrow.tax_sq := case
-                                       when (l_tax_sq + l_tax_sq_soc) >= 0 then
-                                        l_tax_sq + l_tax_sq_soc
-                                       else
-                                        0
+                                     when (l_tax_sq + l_tax_sq_soc) >= 0 
+                                     then l_tax_sq + l_tax_sq_soc
+                                     else 0
                                      end;
                   l_taxrow_mil.tax_s := case
                                           when (l_tax_mil_s + l_tax_mil_s_soc) >= 0 then
@@ -1583,71 +1515,52 @@ begin
                                             0
                                          end;
 
-                  bars_audit.trace('%s l_taxrow.tax_sq = %s',
-                                   title,
-                                   to_char(l_taxrow.tax_sq));
-                  bars_audit.trace('%s l_taxrow_mil.tax_sq = %s',
-                                   title,
-                                   to_char(l_taxrow_mil.tax_sq));
+                  bars_audit.trace( '%s l_taxrow.tax_sq = %s', title, to_char(l_taxrow.tax_sq) );
+                  bars_audit.trace( '%s l_taxrow_mil.tax_sq = %s', title, to_char(l_taxrow_mil.tax_sq) );
 
                   -- убираю ошибки округления
                   if l_tax_base_soc_sq = l_taxrow.tax_base_s and
-                     (l_taxrow.tax_s = 1 or l_taxrow.tax_sq = 1) then
+                     (l_taxrow.tax_s = 1 or l_taxrow.tax_sq = 1)
+                  then
                     l_taxrow.tax_s  := 0;
                     l_taxrow.tax_sq := 0;
                   end if;
+
                   if l_tax_base_soc_sq = l_taxrow_mil.tax_base_s and
-                     (l_taxrow_mil.tax_s = 1 or l_taxrow_mil.tax_sq = 1) then
+                     (l_taxrow_mil.tax_s = 1 or l_taxrow_mil.tax_sq = 1)
+                  then
                     l_taxrow_mil.tax_s  := 0;
                     l_taxrow_mil.tax_sq := 0;
                   end if;
 
-                  l_taxrow.tax_socinfo     := substr(l_taxrow.tax_socinfo,
-                                                     1,
-                                                     1500);
-                  l_taxrow_mil.tax_socinfo := substr(l_taxrow_mil.tax_socinfo,
-                                                     1,
-                                                     1500);
+                  l_taxrow.tax_socinfo     := substr(l_taxrow.tax_socinfo,1,1500);
+                  l_taxrow_mil.tax_socinfo := substr(l_taxrow_mil.tax_socinfo,1,1500);
 
                   insert into bars.dpt_15log values l_taxrow;
 
                   insert into bars.dpt_15log values l_taxrow_mil;
 
-                  bars_audit.trace('%s TAX ПДФО (l_taxrow.tax_s) = %s, (l_taxrow.tax_sq)= %s',
-                                   title,
-                                   to_char(l_taxrow.tax_s),
-                                   to_char(l_taxrow.tax_sq));
-                  bars_audit.trace('%s TAX Военный сбор (l_taxrow_mil.tax_s) = %s,(l_taxrow_mil.tax_sq) = %s',
-                                   title,
-                                   to_char(l_taxrow_mil.tax_s),
-                                   to_char(l_taxrow_mil.tax_sq));
+                  bars_audit.trace( '%s TAX ПДФО (l_taxrow.tax_s) = %s, (l_taxrow.tax_sq)= %s',
+                                    title, to_char(l_taxrow.tax_s), to_char(l_taxrow.tax_sq) );
+                  bars_audit.trace( '%s TAX Военный сбор (l_taxrow_mil.tax_s) = %s,(l_taxrow_mil.tax_sq) = %s',
+                                    title, to_char(l_taxrow_mil.tax_s), to_char(l_taxrow_mil.tax_sq) );
 
                 end if;
 
                 -- оплата
                 begin
-                  if (l_intlist(i).mod_code = 'DPU') then
-                    l_docrec.nazn := substr(dpu.get_intdetails(l_intlist(i)
-                                                               .acc_num,
-                                                               l_intlist(i)
-                                                               .acc_cur) || ' ' ||
-                                            bars_msg.get_msg(modcode,
-                                                             'INT_DETAILS_FROM') || ' ' ||
-                                            to_char(acr_list.fdat,
-                                                    'dd.mm.yy') || ' ' ||
-                                            bars_msg.get_msg(modcode,
-                                                             'INT_DETAILS_TILL') || ' ' ||
-                                            to_char(acr_list.tdat,
-                                                    'dd.mm.yy') || ' ' ||
-                                            bars_msg.get_msg(modcode,
-                                                             'INT_DETAILS_INCLUDE'),
-                                            1,
-                                            160);
+                  if (l_intlist(i).mod_code = 'DPU')
+                  then
+                    l_docrec.nazn := substr( dpu.get_intdetails( l_intlist(i).acc_num, l_intlist(i).acc_cur) || ' ' ||
+                                             bars_msg.get_msg(modcode,'INT_DETAILS_FROM') || ' ' ||
+                                             to_char(acr_list.fdat,'dd.mm.yy')            || ' ' ||
+                                             bars_msg.get_msg(modcode,'INT_DETAILS_TILL') || ' ' ||
+                                             to_char(acr_list.tdat,'dd.mm.yy')            || ' ' ||
+                                             bars_msg.get_msg(modcode,'INT_DETAILS_INCLUDE'),1,160 );
 
                     -- процедура оплати внутрішніх операцій депозитного модуля юо
                     dpu.pay_doc_int(p_dpuid => l_intlist(i).deal_id,
-                                    p_tt    => nvl(l_intlist(i).int_tt,
-                                                   l_cardrow.tt),
+                                    p_tt    => nvl(l_intlist(i).int_tt,l_cardrow.tt),
                                     p_dk    => 0,
                                     p_bdat  => l_bdate,
                                     p_acc_a => l_cardrow.acra,
@@ -1655,8 +1568,7 @@ begin
                                     p_sum_a => l_docrec.s,
                                     p_nazn  => l_docrec.nazn,
                                     p_ref   => l_docrec.ref,
-                                    p_tax   => (nvl(l_taxrow.tax_s, 0) +
-                                               nvl(l_taxrow_mil.tax_s, 0)));
+                                    p_tax   => (nvl(l_taxrow.tax_s, 0) + nvl(l_taxrow_mil.tax_s, 0)));
 
                   else
                     -- інші, в т.ч. dpt
@@ -1670,11 +1582,9 @@ begin
 
                     l_docrec.ref := make_doc(l_docrec);
 
-                    if (l_intlist(i).deal_id is not null and l_intlist(i)
-                       .mod_code = 'DPT') then
-                      -- наполнение хранилища документов по депозитам фо
-                      dpt_web.fill_dpt_payments(l_intlist(i).deal_id,
-                                                l_docrec.ref);
+                    if (l_intlist(i).deal_id is not null and l_intlist(i).mod_code = 'DPT')
+                    then -- наполнение хранилища документов по депозитам фо
+                      dpt_web.fill_dpt_payments( l_intlist(i).deal_id, l_docrec.ref );
                     end if;
 
                   end if;
@@ -1732,14 +1642,11 @@ begin
                           raise;
                       end;
 
-                      bars_audit.trace(title ||
-                                       ' за період з %s по %s сума відсотків = %s сума податку = %s.',
-                                       to_char(l_taxrow.tax_date_begin,
-                                               'dd/mm/yyyy'),
-                                       to_char(l_taxrow.tax_date_end,
-                                               'dd/mm/yyyy'),
-                                       to_char(l_taxrow_tax_base_s),
-                                       to_char(l_taxrow.tax_s));
+                      bars_audit.trace( title ||' за період з %s по %s сума відсотків = %s сума податку = %s.',
+                                        to_char(l_taxrow.tax_date_begin,'dd/mm/yyyy'),
+                                        to_char(l_taxrow.tax_date_end,'dd/mm/yyyy'),
+                                        to_char(l_taxrow_tax_base_s),
+                                        to_char(l_taxrow.tax_s));
                     end if;
 
                     if (nvl(l_taxrow_mil.tax_sq, 0) > 0) then
@@ -1792,10 +1699,8 @@ begin
 
                       bars_audit.trace(title ||
                                        ' за період з %s по %s сума відсотків = %s сума податку (Військовий збір) = %s.',
-                                       to_char(l_taxrow_mil.tax_date_begin,
-                                               'dd/mm/yyyy'),
-                                       to_char(l_taxrow_mil.tax_date_end,
-                                               'dd/mm/yyyy'),
+                                       to_char(l_taxrow_mil.tax_date_begin,'dd/mm/yyyy'),
+                                       to_char(l_taxrow_mil.tax_date_end,'dd/mm/yyyy'),
                                        to_char(l_taxrow_mil_tax_base_s),
                                        to_char(l_taxrow_mil.tax_s));
                     end if;
@@ -1830,8 +1735,8 @@ begin
             end if; -- (l_docrec.s != 0)
 
             -- протоколирование автоматических операций
-            if (p_runid > 0 and l_intlist(i).deal_id > 0 and l_intlist(i)
-               .mod_code in ('DPT', 'DPU')) then
+            if (p_runid > 0 and l_intlist(i).deal_id > 0 and l_intlist(i).mod_code in ('DPT', 'DPU')) 
+            then
               fill_log(p_intrec => l_intlist(i),
                        p_runid  => p_runid,
                        p_ref    => l_docrec.ref,
@@ -1868,8 +1773,9 @@ begin
           rollback to sp_beforeintdoc;
 
           -- протоколирование автоматических операций
-          if (p_runmode = 1 and p_runid > 0 and l_intlist(i).deal_id > 0 and l_intlist(i)
-             .mod_code in ('DPT', 'DPU') and l_errmsg is not null) then
+          if ( p_runmode = 1 and p_runid > 0 and l_intlist(i).deal_id > 0 and
+               l_intlist(i).mod_code in ('DPT', 'DPU') and l_errmsg is not null )
+          then
             fill_log(p_intrec => l_intlist(i),
                      p_runid  => p_runid,
                      p_ref    => null,
@@ -1880,19 +1786,17 @@ begin
     end loop;
 
     forall i in 1 .. l_intlist.count
-      delete from int_queue where rowid = l_rwlist(i);
+    delete from int_queue where rowid = l_rwlist(i);
 
     l_rwlist.delete;
   end loop;
 
-  bars_audit.trace('%s финиш, начисление по %s, режим %s, запуск № %s',
-                   title,
-                   to_char(p_dat2, 'dd.mm.yy'),
-                   to_char(p_runmode),
-                   to_char(p_runid));
+  bars_audit.trace( '%s финиш, начисление по %s, режим %s, запуск № %s'
+                  , title, to_char(p_dat2, 'dd.mm.yy'), to_char(p_runmode), to_char(p_runid) );
 
-  bars_audit.info(title || ' финиш, начисление по ' ||
-                  to_char(p_dat2, 'dd.mm.yy') || ', режим ' ||
-                  to_char(p_runmode) || ', запуск № ' || to_char(p_runid));
-end make_int;
+end MAKE_INT;
 /
+
+show errors;
+
+grant EXECUTE on MAKE_INT to BARS_ACCESS_DEFROLE;

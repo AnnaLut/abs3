@@ -116,7 +116,7 @@ procedure ACC1   ( p_acc number, p_dat date  ) is  -- обработка одной строки (пт
       for k in (select * from accounts where rnk = aa.rnk and dazs is null )
       loop
          -- эти счета обходим.
-         If k.nbs not in ('2608', '2518', '2528', '2538', '2548', '2558', '2568', '2658', '3570', '3579')
+         If k.nbs not in ('2608', '2518', '2528', '2538', '2548', '2558', '2568', '2658', '3570', '3578')
                   and k.nls <> aa.nls         OR
             k.nbs in ('2605','2655')          OR
             k.nbs  = '2604' and k.ostc <> 0   OR

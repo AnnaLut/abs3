@@ -66,7 +66,7 @@ PROMPT *** Create  view V_CIG_CC_DEAL ***
           null operw_tag,
           null limit
      FROM ACC_FIN_OBS_KAT c, accounts a
-    WHERE     a.nbs IN ('9020')
+    WHERE     a.nbs IN decode (newnbs.get_state,1,'9000','9020')
           AND a.acc = c.acc
           AND NOT EXISTS
                  (SELECT 1

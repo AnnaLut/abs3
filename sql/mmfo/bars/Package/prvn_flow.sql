@@ -82,7 +82,7 @@ show errors
 
 create or replace package body PRVN_FLOW
 is
-  g_body_version  constant varchar2(64) := 'version 9.7  26.10.2017';
+  g_body_version  constant varchar2(64) := 'version 9.8  21.11.2017';
   
   individuals_shd signtype := 1; -- 1/0 - формувати графіки для ФО
   
@@ -638,7 +638,7 @@ begin
 
   PRVN_FLOW.SeND_MSG (p_txt => 'END:'||l_msg );
 
-end  D_SNA ;
+end D_SNA ;
 
 --------------------------------------------------
 procedure heir39 (p_dat01 date) is   --    наследование рез-МСФЗ от промлого месяца
@@ -908,14 +908,14 @@ begin -- OSA_V_PROV_RESULTS_OSH = PRVN_FV_REZ => PRVN_OSA= > PRVN_OSAq
                                        Div0( BVuq, sum(decode(substr(nls,1,1),'9',    0, BVuq )) over (partition by 1)),
                                        Div0( BVuq, sum(decode(substr(nls,1,1),'9', BVuq,    0 )) over (partition by 1))
                          from nbu23_rez where fdat = z_dat01 and BVuq >= 0  and nd =  x.ND and ( rezq39 = 0 or p_mode = 12)
-                          AND ( id like 'CCK%' or id like 'MBDK%' or id like '150%' or id like '9020%' or id like '9122%' or id like 'DEBF%' )
+                          AND ( id like 'CCK%' or id like 'MBDK%' or id like '150%' or id like '9000%' or id like '9122%' or id like 'DEBF%' )
                           and tipa = 3 ;
        ElsIf x.TIP = 3 and x.kv is not null THEN
              OPEN s1 FOR select ROWID, nls, BVuq, KV, BVu,
                                        Div0( BVuq, sum(decode(substr(nls,1,1),'9', 0   , BVuq )) over (partition by 1)),
                                        Div0( BVuq, sum(decode(substr(nls,1,1),'9', BVuq,    0 )) over (partition by 1))
                          from nbu23_rez where fdat = z_dat01 and BVuq >= 0  and nd =  x.ND and ( rezq39 = 0 or p_mode = 12)
-                          AND ( id like 'CCK%' or id like 'MBDK%' or id like '150%' or id like '9020%' or id like '9122%' or id like 'DEBF%' )
+                          AND ( id like 'CCK%' or id like 'MBDK%' or id like '150%' or id like '9000%' or id like '9122%' or id like 'DEBF%' )
                           and tipa = 3 and kv=x.kv ;
        ElsIf x.TIP = 9   then
              OPEN s1 FOR select ROWID, nls, BVuq, KV, BVu, Div0( BVuq , sum(BVuq) over (partition by 1)), 0
@@ -1632,8 +1632,8 @@ begin
                            WHEN a.tip = 'SLK'  THEN 'SK9'
                            WHEN a.tip = 'SPI'  THEN 'SDI'
                            WHEN a.nbs = '3600' THEN 'S36'
-                           WHEN a.tip = 'ODB' and a.NBS = '3579' THEN 'SK9' -- "ліва" фін.дебіторка (прострочений борг)
-                           WHEN a.tip = 'ODB'  THEN 'SK0'                   -- "ліва" фін.дебіторка (нормальний   борг)
+                           WHEN a.tip = 'OFR'  THEN 'SK9' -- "ліва" фін.дебіторка (прострочений борг)
+                           WHEN a.tip = 'ODB'  THEN 'SK0' -- "ліва" фін.дебіторка (нормальний   борг)
                            ELSE a.tip
                       END as TIP
                     , CASE WHEN a.mdate  > p_dat31 THEN a.mdate
@@ -1658,7 +1658,7 @@ begin
                    on ( n.ACC = a.ACC )
                 where ( a.nbs like '2%' and a.tip in ('SPN','SLN','SNO','SDI','SPI','SN ','SP ','SL ' ) and kv = NVL(x0.kv, a.kv)
                    OR   a.nbs like '9%' and a.tip in ('CR9') 
-                   OR   a.nbs like '3%' and a.tip in ('SK0','SK9','ODB') and l_rcvb = 0
+                   OR   a.nbs like '3%' and a.tip in ('SK0','SK9','ODB', 'OFR') and l_rcvb = 0
                    OR   a.nbs like '8%' and a.tip in ('SN8','SLK','SLK') 
                    OR   a.nbs = '3600' and ob22 = (CASE WHEN x0.vidd < 11  THEN '09' ELSE  '10' END ) -- для Корпор.Бизн 3600 с ОБ22 09, а для РБ - 3600 с ОБ22 10
                       )
@@ -2082,6 +2082,8 @@ end nos_del;
                            , ap.BRANCH       as BRANCH_SP
                            , an.NBS||an.OB22 as R020_OB22_SS
                            , ap.NBS||ap.OB22 as R020_OB22_SP
+                           , an.DAZS         as CLS_DT_SS
+                           , ap.DAZS         as CLS_DT_SP
                         from PRVN_FIN_DEB  fd
                         join ACCOUNTS an
                           on ( an.ACC = fd.ACC_SS )
@@ -2096,7 +2098,8 @@ end nos_del;
                join FIN_DEBT d
                  on ( d.NBS_N = t.R020_OB22_SS )
               where d.NBS_N Is Null
-                 or lnnvl ( d.NBS_P = t.R020_OB22_SP )
+                 or lnnvl ( d.NBS_P = t.R020_OB22_SP ) -- do not match the dictionary
+                 or ( t.CLS_DT_SS Is Not Null and t.CLS_DT_SP Is Not Null ) -- both accounts are closed
            )
     ;
     
@@ -2171,8 +2174,9 @@ end nos_del;
   ---
   -- ADD_FIN_DEB
   ---
-  procedure ADD_FIN_DEB( p_dat date)
-  is
+  procedure ADD_FIN_DEB
+  ( p_dat       in     date
+  ) is
     title   constant   varchar2(64) := $$PLSQL_UNIT||'.ADD_FIN_DEB';
     fd                 prvn_fin_deb%rowtype;
     l_eff_dt           date;
@@ -2218,7 +2222,7 @@ end nos_del;
            , KF
            , ND
         from ( select r.KF, r.ND
-                    , a.ACC, a.TIP
+                    , a.ACC, a.TIP, a.KV
                  from ND_ACC   r
                  join ACCOUNTS a
                    on ( r.KF = a.KF and r.ACC = a.ACC )
@@ -2276,10 +2280,10 @@ end nos_del;
                                       , SP_NBS
                                       , SP_OB22
                                    from NBSOB22
-                                  where NBS_P Is Not Null 
+                                  where NBS_P Is Not Null
                                ) t
                             on ( t.R020 = a.NBS and t.OB22 = a.OB22 )
-                         where a.TIP = 'ODB'
+                         where a.TIP not in ('SK0','SK9')
                            and a.NBS like '3%'
                            and a.DAOS <= p_dat
                            and lnnvl( a.DAZS <= p_dat )
@@ -2310,18 +2314,30 @@ end nos_del;
            , ACC_3579
            , KF
            , ND
-        from ( select ACC_3570, ACC_3579
-                    , sys_context('bars_context','user_mfo') as KF
-                    , ND
-                 from W4_ACC
-                where coalesce( ACC_3570, ACC_3579, 0 ) > 0
-                  and DAT_CLOSE Is Null
-                union all
-               select ACC_3570, ACC_3579, KF, ND
-                 from BPK_ACC
-                where coalesce( ACC_3570, ACC_3579, 0 ) > 0
-                  and DAT_CLOSE Is Null
+        from ( select w4.ACC_3570, w4.ACC_3579, w4.KF, w4.ND
+                 from ( select ACC_3570, ACC_3579, KF, ND
+
+                          from W4_ACC
+                         where coalesce( ACC_3570, ACC_3579, 0 ) > 0
+                           and DAT_CLOSE Is Null
+                         union all
+                        select ACC_3570, ACC_3579, KF, ND
+                          from BPK_ACC
+                         where coalesce( ACC_3570, ACC_3579, 0 ) > 0
+                           and DAT_CLOSE Is Null
+                      ) w4
+                 join ACCOUNTS an
+                   on ( an.KF = w4.KF and an.ACC = w4.ACC_3570 )
+                 left
+                 join ACCOUNTS ap
+                   on ( ap.KF = w4.KF and ap.ACC = w4.ACC_3579 )
+                 where an.DAZS is Null
+                    or ap.DAZS is Null
              )
+       minus
+      select ACC_SS, ACC_SP, KF, AGRM_ID
+        from PRVN_FIN_DEB
+       where AGRM_ID is not null
          log errors
         into PRVN_FIN_DEB_ERRLOG( 'BPK_'||l_err_tag )
       REJECT LIMIT UNLIMITED;
@@ -2344,7 +2360,7 @@ end nos_del;
         savepoint SP_ERRLOG;
         
         begin
-          
+
           -- 1) insert into PRVN_FIN_DEB_ARCH from PRVN_FIN_DEB
           insert
             into PRVN_FIN_DEB_ARCH
@@ -2352,7 +2368,7 @@ end nos_del;
           values
                ( S_PRVN_FIN_DEB_ARCH.NextVal, l_chg_dt, l_cls_dt
                 , fd.KF, fd.ACC_SS, fd.ACC_SP, fd.EFFECTDATE, fd.AGRM_ID );
-          
+
           -- 2) delete from PRVN_FIN_DEB
           delete
             from PRVN_FIN_DEB
@@ -2470,10 +2486,10 @@ end nos_del;
              and a.DAOS  <= k.DAOS
              and (a.dazs is null or a.dazs > p_dat)
              and not exists (select 1 from PRVN_FIN_DEB where ACC_SS = a.ACC)
-             and rownum = 1 ;
+             and rownum = 1;
         EXCEPTION
           WHEN NO_DATA_FOUND THEN
-            null;
+            fd.ACC_SS := k.ACC_SP;
         end;
       end if;
       

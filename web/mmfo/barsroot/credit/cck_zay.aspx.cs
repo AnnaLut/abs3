@@ -16,12 +16,20 @@ public partial class credit_cck_zay : Bars.BarsPage
     private String _ShowCustomerReferPattern = "ShowCustomerRefer({0}, '{1}', '{2}', '{3}'); return false;";
     private String _ShowBanksReferPattern = "ShowBanksRefer('{0}', '{1}'); return false;";
     private String _ShowDepositReferPattern = "ShowDepositRefer('{0}', '{1}', '{2}', '{3}', '{4}'); return false;";
+
+
+
     string[] _creditOrders = { "220263", "220353" };
+    string[] _creditOrdersNew = { "220377", "220353" };
     # endregion
 
     # region События
     protected void Page_Load(object sender, EventArgs e)
     {
+        Bars.WebServices.NewNbs ws = new Bars.WebServices.NewNbs();
+        bool useNew = ws.UseNewNbs();
+        _creditOrders = useNew ? _creditOrdersNew : _creditOrders;
+
         if (!IsPostBack)
         {
             // сохраняем страничку с которой перешли
@@ -31,31 +39,50 @@ public partial class credit_cck_zay : Bars.BarsPage
             cbPAWN_CheckedChanged(cbPAWN, e);
             cbPAWNP_CheckedChanged(cbPAWNP, e);
 
-            switch (Request.Params.Get("PROD"))
+            if (!useNew)
             {
-                case "220234":
-                case "220239":
-                case "220325":
-                case "220330":
-                    {
-                        lbDPT_ID.Visible = true;
-                        DPT_ID.Visible = true;
-                        btDepositReferDPT_ID.Visible = true;
-                        PAWN_DPTRNK.Visible = true;
-                        PAWN_DPTS.Visible = true;
-
-                        btCustomerReferPAWN_RNK.Visible = false;
-                        PAWN_RNK.Visible = false;
-                        PAWN_RNK.Enabled = false;
-                        PAWN_S.Visible = false;
-                    }
-                    break;
+                switch (Request.Params.Get("PROD"))
+                {
+                    case "220234":
+                    //220365
+                    case "220239":
+                    //--
+                    case "220325":
+                    case "220330":
+                        ConfigForm();
+                        break;
+                }
+            }
+            else
+            {
+                switch (Request.Params.Get("PROD"))
+                {
+                    case "220365":
+                    case "220325":
+                    case "220330":
+                        ConfigForm();
+                        break;
+                }
             }
             creditOrderTitle.Visible = creditOrder.Visible = _creditOrders.Contains(Request.Params.Get("PROD"));
         }
 
         btnNo.OnClientClick = String.Format("fnClickOK('{0}','{1}')", btnNo.UniqueID, "");
 
+    }
+
+    private void ConfigForm()
+    {
+        lbDPT_ID.Visible = true;
+        DPT_ID.Visible = true;
+        btDepositReferDPT_ID.Visible = true;
+        PAWN_DPTRNK.Visible = true;
+        PAWN_DPTS.Visible = true;
+
+        btCustomerReferPAWN_RNK.Visible = false;
+        PAWN_RNK.Visible = false;
+        PAWN_RNK.Enabled = false;
+        PAWN_S.Visible = false;
     }
 
     protected void RNK_ValueChanged(object sender, EventArgs e)

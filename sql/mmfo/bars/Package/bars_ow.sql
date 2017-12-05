@@ -1,7 +1,7 @@
 CREATE OR REPLACE PACKAGE BARS_OW
 is
 
-g_header_version  constant varchar2(64)  := 'version 4.285 23/11/2017';
+g_header_version  constant varchar2(64)  := 'version 4.286_nb 14/11/2017';
 g_header_defs     constant varchar2(512) := '';
 
 -- header_version - возвращает версию заголовка пакета
@@ -12,12 +12,6 @@ function body_version return varchar2;
 
 -- Конвертит blob в clob
 function blob_to_clob (blob_in in blob) return clob;
-
--------------------------------------------------------------------------------
--- ow_init
--- процедура инициализации параметров пакета
---
-procedure ow_init;
 
 -- процедура импорта файлов от Way4 - для вертушки
 procedure w4_import_files (
@@ -416,7 +410,9 @@ procedure set_cck_sob (
   p_acc           number,
   p_transfer_flag number,
   p_sucs_flag     boolean );
- 
+
+function get_new_nbs(p_nbs in varchar2) return varchar2;
+
 end;
 /
 CREATE OR REPLACE PACKAGE BODY BARS_OW
@@ -425,7 +421,7 @@ is
 --
 -- constants
 --
-g_body_version    constant varchar2(64)  := 'version 6.014 30/10/2017';
+g_body_version    constant varchar2(64)  := 'version 6.015_nb 14/11/2017';
 g_body_defs       constant varchar2(512) := '';
 
 g_modcode         constant varchar2(3)   := 'BPK';
@@ -543,6 +539,8 @@ type t_insurance is record(nd         w4_acc.nd%type,
                            ins_name   ins_partners.name%type
                            );
 
+type t_newnb is record(nbs varchar2(4),
+                      ob22 varchar2(2));
 -------------------------------------------------------------------------------
 -- header_version - возвращает версию заголовка пакета
 function header_version return varchar2 is
@@ -561,6 +559,39 @@ begin
       || g_body_defs;
 end body_version;
 
+function get_new_nbs_ob22(p_nbs in varchar2, p_ob22 in varchar2)
+  return t_newnb is
+  l_newnb t_newnb;
+begin
+  select t.r020_new, t.ob_new
+    into l_newnb
+    from transfer_2017 t
+   where t.r020_old = p_nbs
+     and t.ob_old = p_ob22;
+  return l_newnb;
+exception
+  when others then
+    l_newnb.nbs := p_nbs;
+    l_newnb.ob22 := p_ob22;
+    return l_newnb;
+end;
+
+function get_new_nbs(p_nbs in varchar2) return varchar2
+  is
+begin
+  return case substr(p_nbs, 1, 4)
+                when '2202' then
+                 '2203'
+                when '2207' then
+                 '2203'
+                when '2209' then
+                 '2208'
+                when '3579' then
+                 '3570'                                                                         
+                else
+                 substr(p_nbs, 1, 4)
+         end;   
+end;
 -------------------------------------------------------------------------------
 --процедура для проставления счетам 2924 признака пакетной оплаты
 procedure setoptfor2924w4 is
@@ -574,7 +605,7 @@ begin
     into l_tab_rowid
     from accounts a
    where a.nls in (select nls from v_w4_tr2924) and nvl(a.opt, 0) <> 1 and
-         a.dazs is null
+         a.dazs is null and a.pap = 3
      for update nowait;
   if l_tab_rowid.count > 0 then
     forall i in 1 .. l_tab_rowid.count
@@ -886,7 +917,7 @@ begin
   select rowid bulk collect
     into l_tab_rowid
     from accounts a
-   where a.nls = p_nls and a.dazs is null
+   where a.nls = p_nls and a.dazs is null and a.pap = 3
      for update nowait;
   if l_tab_rowid.count > 0 then
     forall i in 1 .. l_tab_rowid.count
@@ -1571,6 +1602,9 @@ is
   l_nd_kd nd_acc.nd%type;
   l_nlsb  oper.nlsb%type;
   l_txt   cc_sob.txt%type;
+  l_kv2   oper.kv2%type;
+  l_accounts_row accounts%rowtype;
+  
 begin
 
   select max(n.nd) into l_nd_kd
@@ -1581,20 +1615,31 @@ begin
 
   if l_nd_kd is not null then
 
-     select decode(dk,p_dk,nlsa,nlsb) into l_nlsb from oper where ref = p_ref;
-
-     l_txt := case when l_nlsb like '2__9%' then 'Погашення проср. %%'
-                   when l_nlsb like '3579%' then 'Погашення проср. комісії'
-                   when l_nlsb like '2__7%' then 'Погашення проср. тіла КД'
-                   when l_nlsb like '2__8%' then 'Погашення %%'
-                   when l_nlsb like '3578%' then 'Погашення комісії'
-                   when l_nlsb like '6___%' then 'Погашення пені'
-                   else 'Погашення тіла КД'
-              end;
-
+     select decode(dk,p_dk,nlsa,nlsb), decode(dk,p_dk,kv,kv2) into l_nlsb, l_kv2 from oper where ref = p_ref;
+     if newnbs.g_state = 1 then
+        l_accounts_row := account_utl.read_account(l_nlsb, l_kv2);
+       
+        l_txt := case when l_nlsb like '2__9%' and l_accounts_row.tip = 'SPN' then 'Погашення проср. %%'
+                      when l_nlsb like '3578%' and l_accounts_row.tip = 'SK9' then 'Погашення проср. комісії'
+                      when l_nlsb like '2__7%' and l_accounts_row.tip = 'SP ' then 'Погашення проср. тіла КД'
+                      when l_nlsb like '2__8%' then 'Погашення %%'
+                      when l_nlsb like '3578%' then 'Погашення комісії'
+                      when l_nlsb like '6___%' then 'Погашення пені'
+                      else 'Погашення тіла КД'
+                 end;
+     else
+        l_txt := case when l_nlsb like '2__9%' then 'Погашення проср. %%'
+                      when l_nlsb like '3579%' then 'Погашення проср. комісії'
+                      when l_nlsb like '2__7%' then 'Погашення проср. тіла КД'
+                      when l_nlsb like '2__8%' then 'Погашення %%'
+                      when l_nlsb like '3578%' then 'Погашення комісії'
+                      when l_nlsb like '6___%' then 'Погашення пені'
+                      else 'Погашення тіла КД'
+                  end;   
+     end if;
      l_txt := l_txt || ': Реф.' || p_ref || ' ' ||
               case when p_transfer_flag = 1 then 'відправлено до ПЦ'
-                   when p_transfer_flag = 2 then 'сквітовано'
+                   when p_transfer_flag = 2 then 'сквитовано'
                    else ''
               end;
 
@@ -1750,7 +1795,7 @@ begin
         l_rec(l_rec.last).doc_orn := convert_to_number(l_str);
 
         dbms_xslprocessor.valueof(l_analytic, 'DocInfo/AmountData/Extra/AddData/Parm[ParmCode="TRANS_INFO"]/Value/text()', l_str);
-        l_rec(l_rec.last).trans_info  := l_str;
+        l_rec(l_rec.last).trans_info  := trim(convert(dbms_xmlgen.convert(l_str,1), 'CL8MSWIN1251', 'UTF8'));
 
      else
 
@@ -3640,7 +3685,7 @@ begin
                from w4_sparam
               where grp_code = l_grpcode
                 and tip = l_pk_tip
-                and nbs = substr(p_mode,1,4)
+                and nbs =substr(p_mode, 1, 4)
                 and sp_id is not null
                 and value is not null )
   loop
@@ -3722,7 +3767,12 @@ begin
   end;
 
   -- определение БС
-  l_nbs := substr(p_mode,1,4);
+  
+  if newnbs.g_state = 1 then
+     l_nbs := get_new_nbs(substr(p_mode,1,4));     
+  else
+     l_nbs := substr(p_mode,1,4);
+  end if;
   l_nms := case when p_mode in ('2202', '2203', '2062', '2063') then
                      substr('Кред. ' || l_pk_nms, 1, 70)
                 when p_mode in ('2208', '2068') then
@@ -5470,6 +5520,7 @@ is
    --l_nls3800 ow_params.val%type := null;
    l_pk_nls  varchar2(30);
    l_pk_acc  number;
+   l_newnb t_newnb;
 begin
 
    -- 1. счет NLS_BBBB_2625
@@ -5529,8 +5580,12 @@ begin
             l_nls := g_nls9900;
       -- 2.3 определяем счет NLS_BBBBOO (BBBB - НБС, OO - ОБ22)
       else
-
-         l_nls := nbs_ob22_null(substr(p_nls,5,4), substr(p_nls,-2), l_branch);
+         if newnbs.g_state = 1 then
+            l_newnb := get_new_nbs_ob22(substr(p_nls,5,4), substr(p_nls,-2));
+            l_nls := nbs_ob22_null(l_newnb.nbs, l_newnb.ob22, l_branch);
+         else
+            l_nls := nbs_ob22_null(substr(p_nls,5,4), substr(p_nls,-2), l_branch);
+         end if;
 
       end if;
 
@@ -5556,6 +5611,7 @@ is
    l_branch varchar2(30) := null;
    l_nls    varchar2(30) := null;
    l_kv     number := null;
+   l_newnb t_newnb;
 begin
 
    p_nlsa := null;
@@ -5636,7 +5692,12 @@ begin
                   p_nlsa := get_nls_3801_cardpay(l_nls, p_dat, p_atrn.doc_drn, p_atrn.doc_orn, p_atrn.doc_currency, l_branch);
                -- счет NLS_BBBBOO (BBBB - НБС, OO - ОБ22)
                elsif l_nls like 'NLS%' then
-                  p_nlsa := nbs_ob22_null(substr(l_nls,5,4), substr(l_nls,-2), l_branch);
+                  if newnbs.g_state = 1 then
+                     l_newnb := get_new_nbs_ob22(substr(l_nls,5,4), substr(l_nls,-2));
+                     p_nlsa := nbs_ob22_null(l_newnb.nbs, l_newnb.ob22, l_branch);
+                  else
+                     p_nlsa := nbs_ob22_null(substr(l_nls,5,4), substr(l_nls,-2), l_branch);
+                  end if;                 
                -- нормальный счет - оставляем как есть
                end if;
             end if;
@@ -5648,7 +5709,12 @@ begin
                   p_nlsb := get_nls_3801_cardpay(l_nls, p_dat, p_atrn.doc_drn, p_atrn.doc_orn, p_atrn.doc_currency, l_branch);
                -- счет NLS_BBBBOO (BBBB - НБС, OO - ОБ22)
                elsif l_nls like 'NLS%' then
-                  p_nlsb := nbs_ob22_null(substr(l_nls,5,4), substr(l_nls,-2), l_branch);
+                  if newnbs.g_state = 1 then
+                     l_newnb := get_new_nbs_ob22(substr(l_nls,5,4), substr(l_nls,-2));
+                     p_nlsb := nbs_ob22_null(l_newnb.nbs, l_newnb.ob22, l_branch);
+                  else
+                     p_nlsb := nbs_ob22_null(substr(l_nls,5,4), substr(l_nls,-2), l_branch);
+                  end if;  
                -- нормальный счет - оставляем как есть
                end if;
             end if;
@@ -5678,6 +5744,7 @@ is
    l_pk_acc    number := null;
    l_pk_branch varchar2(30);
    l_nbs       varchar2(4);
+   l_newnb t_newnb;
 
    function get_nls_side2 (p_nls varchar2, p_kv number) return varchar2
    is
@@ -5722,12 +5789,17 @@ is
 
       -- счет NLS_BBBBOO (BBBB - НБС, OO - ОБ22)
       elsif p_nls like 'NLS%' then
+         if newnbs.g_state = 1 then
+            l_newnb := get_new_nbs_ob22(substr(p_nls,5,4), substr(p_nls,-2));
+            l_nls := nbs_ob22_null(l_newnb.nbs, l_newnb.ob22, l_pk_branch);
+         else
+            l_nls := nbs_ob22_null(substr(p_nls,5,4), substr(p_nls,-2), l_pk_branch);
+         end if;  
 
-         l_nls := nbs_ob22_null(substr(p_nls,5,4), substr(p_nls,-2), l_pk_branch);
          begin
            for i in (select *
                        from accounts t
-                      where t.nls = l_nls and nvl(t.opt, 0) <> 1 and t.dazs is null
+                      where t.nls = l_nls and nvl(t.opt, 0) <> 1 and t.dazs is null and pap = 3
                         for update nowait)
            loop
              update accounts t set t.opt = 1 where t.nls = l_nls;
@@ -5805,6 +5877,7 @@ procedure get_nls_multicurrency_cardpay (
 is
   --l_nls    varchar(14) := null;
   l_branch varchar2(30) := null;
+  l_newnb t_newnb;
 begin
 
    -- в счете-А указана маска счета
@@ -5835,7 +5908,12 @@ begin
             else
                -- определяем счет по формуле
                if l_branch is not null then
-                  p_nlsb := nbs_ob22_null(substr(p_nlsb,5,4), substr(p_nlsb,-2), l_branch);
+                  if newnbs.g_state = 1 then
+                     l_newnb := get_new_nbs_ob22(substr(p_nlsb,5,4), substr(p_nlsb,-2));
+                     p_nlsb := nbs_ob22_null(l_newnb.nbs, l_newnb.ob22, l_branch);
+                  else
+                     p_nlsb := nbs_ob22_null(substr(p_nlsb,5,4), substr(p_nlsb,-2), l_branch);
+                  end if;                   
                else
                   p_nlsb := get_nls_cardpay(p_dat, p_drn, p_orn, p_nlsb, p_kv2);
                end if;
@@ -5877,7 +5955,12 @@ begin
             p_nlsb := g_nls3800;
          else
             if l_branch is not null then
-               p_nlsb := nbs_ob22_null(substr(p_nlsb,5,4), substr(p_nlsb,-2), l_branch);
+               if newnbs.g_state = 1 then
+                  l_newnb := get_new_nbs_ob22(substr(p_nlsb,5,4), substr(p_nlsb,-2));
+                  p_nlsb := nbs_ob22_null(l_newnb.nbs, l_newnb.ob22, l_branch);
+               else
+                  p_nlsb := nbs_ob22_null(substr(p_nlsb,5,4), substr(p_nlsb,-2), l_branch);
+               end if;                
             else
                p_nlsb := get_nls_cardpay(p_dat, p_drn, p_orn, p_nlsb, p_kv2);
             end if;
@@ -5898,6 +5981,7 @@ procedure get_nls_onbranch_cardpay (
    p_kv     in     number,
    p_branch in     varchar2 )
 is
+  l_newnb t_newnb;
 begin
    -- счет А
    if p_nlsa like 'NLS%' then
@@ -5906,7 +5990,12 @@ begin
          p_nlsa := get_nls_on2625_cardpay(p_nlsa, p_kv);
       -- счет типа NLS_BBBBOO (BBBB - НБС, OO - ОБ22)
       elsif p_branch is not null then
-         p_nlsa := nbs_ob22_null(substr(p_nlsa,5,4), substr(p_nlsa,-2), p_branch);
+         if newnbs.g_state = 1 then
+            l_newnb := get_new_nbs_ob22(substr(p_nlsa,5,4), substr(p_nlsa,-2));
+            p_nlsa := nbs_ob22_null(l_newnb.nbs, l_newnb.ob22, p_branch);
+         else
+            p_nlsa := nbs_ob22_null(substr(p_nlsa,5,4), substr(p_nlsa,-2), p_branch);
+         end if;
       end if;
    end if;
    -- счет Б
@@ -5916,7 +6005,12 @@ begin
          p_nlsb := get_nls_on2625_cardpay(p_nlsb, p_kv);
       -- счет типа NLS_BBBBOO (BBBB - НБС, OO - ОБ22)
       elsif p_branch is not null then
-         p_nlsb := nbs_ob22_null(substr(p_nlsb,5,4), substr(p_nlsb,-2), p_branch);
+         if newnbs.g_state = 1 then
+            l_newnb := get_new_nbs_ob22(substr(p_nlsb,5,4), substr(p_nlsb,-2));
+            p_nlsb := nbs_ob22_null(l_newnb.nbs, l_newnb.ob22, p_branch);
+         else
+            p_nlsb := nbs_ob22_null(substr(p_nlsb,5,4), substr(p_nlsb,-2), p_branch);
+         end if;
       end if;
    end if;
 end get_nls_onbranch_cardpay;
@@ -6443,7 +6537,7 @@ is
    l_nls_trans    varchar2(15);
    l_ref_add      number;
    l_cur_bdate    date;
-
+   l_newnb        t_newnb;
 begin
 
    bars_audit.info(l || 'Start.');
@@ -6535,7 +6629,7 @@ begin
       end if;
 
       if bpay then
-         if substr(l_nlsa,1,4) in ('2909', '2900') then
+         if substr(l_nlsa,1,4) in ('2909', '2208', '2900') then
             begin
                if not check_available(l_nlsa, l_atrn(i).debit_currency, l_atrn(i).debit_amount) then
                   bPay   := false;
@@ -6554,7 +6648,7 @@ begin
       end if;
 
       if bpay then
-         if substr(l_nlsb,1,4) in('3570', '3579', '9129', '2202', '2203', '2207', '2208', '2209') then
+         if substr(l_nlsb,1,4) in('3570', '3579', '3578', '9129', '2202', '2203', '2207', '2208', '2209') then
             begin
               if not check_available(l_nlsb, l_atrn(i).credit_currency, l_atrn(i).credit_amount) then
                  bPay   := false;
@@ -6585,7 +6679,13 @@ begin
          if l_kv1 = l_kv2 then
             if l_atrn(i).debit_anlaccount = 'NLS_LOCPAY' then
                l_tt := 'OWR';
-               l_nlsa := nbs_ob22 ('2909','80');
+               if newnbs.g_state = 1 then
+                  l_newnb :=  get_new_nbs_ob22('2909', '80');
+                  l_nlsa := nbs_ob22 (l_newnb.nbs, l_newnb.ob22);
+               else
+                  l_nlsa := nbs_ob22 ('2909','80');
+               
+               end if;
             else
                l_tt := 'OW1';
             end if;
@@ -6634,7 +6734,7 @@ begin
          fill_operw_tbl(l_operw_tbl, l_ref, 'OW_SC', l_atrn(i).anl_synthcode);
          fill_operw_tbl(l_operw_tbl, l_ref, 'OWDRN', to_char(l_atrn(i).doc_drn));
          fill_operw_tbl(l_operw_tbl, l_ref, 'OWARN', l_atrn(i).anl_analyticrefn);
-fill_operw_tbl(l_operw_tbl, l_ref, 'OWTRI', substr(l_atrn(i).trans_info,1,220));
+         fill_operw_tbl(l_operw_tbl, l_ref, 'OWTRI', substr(l_atrn(i).trans_info,1,220));
 
 
          forall i in 1 .. l_operw_tbl.count
@@ -7072,7 +7172,7 @@ begin
          end if;
       end if;
       if bpay then
-         if substr(l_nlsa,1,4) in ('2909', '2900') then
+         if substr(l_nlsa,1,4) in ('2909', '2208', '2900') then
             begin
                if not check_available(l_nlsa, l_atrn(i).debit_currency, l_atrn(i).debit_amount) then
                   bPay   := false;
@@ -7091,7 +7191,7 @@ begin
       end if;
 
       if bpay then
-         if substr(l_nlsb,1,4) in('3570', '3579', '9129', '2202', '2203', '2207', '2208', '2209') then
+         if substr(l_nlsb,1,4) in('3570', '3579', '3578', '9129', '2202', '2203', '2207', '2208', '2209') then
             begin
               if not check_available(l_nlsb, l_atrn(i).credit_currency, l_atrn(i).credit_amount) then
                  bPay   := false;
@@ -7423,6 +7523,7 @@ is
   is
      l_branch  varchar2(30) := null;
      l_nls     varchar2(14) := null;
+     l_newnb t_newnb;
   begin
      -- счет по маске NLS_7110%, NLS_6110%
      if p_nls like 'NLS%' then
@@ -7431,7 +7532,12 @@ is
         exception when no_data_found then null;
         end;
         if l_branch is not null then
-           l_nls := nbs_ob22_null(substr(p_nls,5,4), substr(p_nls,-2), l_branch);
+           if newnbs.g_state = 1 then
+              l_newnb := get_new_nbs_ob22(substr(p_nls,5,4), substr(p_nls,-2));
+              l_nls := nbs_ob22_null(l_newnb.nbs, l_newnb.ob22, l_branch);
+           else
+              l_nls := nbs_ob22_null(substr(p_nls,5,4), substr(p_nls,-2), l_branch);
+           end if;
         end if;
      else
         l_nls := p_nls;
@@ -7771,6 +7877,7 @@ is
   l_erramsg varchar2(1000);
   l_mode number;
   l_acc    accounts.acc%type;
+  l_newnb t_newnb;
 begin
 
   bars_audit.info(h || 'Start.');
@@ -7893,7 +8000,13 @@ begin
             l_mode := 2;
             l_tt := 'OW7';
             l_nazn := substr('Відміна операції по причині: '||l_err, 1, 160);
-            l_nlsb := nbs_ob22 ('2909','80');
+            
+            if newnbs.g_state = 1 then
+               l_newnb :=  get_new_nbs_ob22('2909', '80');
+               l_nlsb := nbs_ob22 (l_newnb.nbs, l_newnb.ob22);
+            else
+               l_nlsb := nbs_ob22 ('2909','80');
+            end if;
             l_nam_b := l_doc(i).cnt_clientname;
             ipay_doc (l_tt, l_vob, 1, l_sk,
                l_nam_a, l_nlsa, null,   l_id_a,
@@ -8083,7 +8196,12 @@ begin
                    l_errumsg := 'Відхилено по технічній причині';
                 end if;
                 l_nazn := substr('Відміна операції по причині: '||l_errumsg, 1, 160);
-                l_nlsb := nbs_ob22 ('2909','80');
+                if newnbs.g_state = 1 then
+                   l_newnb :=  get_new_nbs_ob22('2909', '80');
+                   l_nlsb := nbs_ob22 (l_newnb.nbs, l_newnb.ob22);
+                else
+                   l_nlsb := nbs_ob22 ('2909','80');
+                end if;
                 ipay_doc (l_tt, l_vob, l_dk, l_sk,
                    l_nam_a, l_nlsa, null,   l_id_a,
                    l_nam_b, l_nlsb, null, l_id_b,
@@ -11120,16 +11238,6 @@ end add_deal;
 --
 procedure set_bpk_parameter(p_nd number, p_tag varchar2, p_value varchar2)
 is
-d_close w4_acc.dat_close%type;
-begin
-  begin
-	select  distinct dat_close into d_close from (
-	select a.dat_close  from  w4_acc a  where a.nd=p_nd
-    union
-    select a.dat_close from  bpk_acc a  where a.nd=p_nd);
-   end;
-
-   if (d_close is null) then
 begin
   if p_value is null then
      delete from bpk_parameters where nd = p_nd and tag = p_tag;
@@ -11143,10 +11251,6 @@ begin
          where nd = p_nd and tag = p_tag;
      end;
   end if;
-  end;
-  else
-  raise_application_error(-20000, 'По клієнту ' || to_char(p_nd) || ' неможливо додати доп.параметр, бо він закритий');
-   end if;
 end set_bpk_parameter;
 
 -------------------------------------------------------------------------------
@@ -14771,8 +14875,10 @@ is
   l_ovr_old_nls   accounts.nls%type;
   l_ovr_old_nms   accounts.nms%type;
   l_ovr_old_dazs  date;
+  l_ovr_old_ob22  accounts.ob22%type;
   l_ovr_new_nbs   accounts.nbs%type;
   l_ovr_new_acc   number;
+  l_ovr_new_ob22  accounts.ob22%type;  
   l_bpk_proect_id_new    number;
   l_name_new             bpk_proect.name%type;
   l_bpk_proect_id_old    number;
@@ -14823,13 +14929,6 @@ is
            l_s := abs(l_ost);
 
            gl.ref (l_ref);
-
-/*           insert into oper (ref, tt, vob, nd, dk, pdat, vdat, datd,
-              nam_a, nlsa, mfoa, id_a,
-              nam_b, nlsb, mfob, id_b, kv, s, kv2, s2, nazn, userid)
-           values (l_ref, l_tt, l_vob, l_ref, l_dk, sysdate, l_bdate, l_bdate,
-              l_newnms, l_newnls, l_mfo, l_okpo,
-              p_oldnms, p_oldnls, l_mfo, l_okpo, l_kv, l_s, l_kv, l_s, l_nazn, user_id);*/
 
            gl.in_doc3 (ref_    => l_ref,
                        tt_     => l_tt,
@@ -15005,23 +15104,47 @@ begin
         l_ovr_new_acc := l_acc_ovr;
         if l_old_tip <> l_new_tip and l_acc_ovr is not null then
            begin
-              select nbs, dazs, nls, substr(nms,1,38)
-                into l_ovr_old_nbs, l_ovr_old_dazs, l_ovr_old_nls, l_ovr_old_nms
+              select nbs, dazs, nls, substr(nms,1,38), ob22
+                into l_ovr_old_nbs, l_ovr_old_dazs, l_ovr_old_nls, l_ovr_old_nms, l_ovr_old_ob22
                 from accounts
                where acc = l_acc_ovr;
               -- кредитный счет закрыт, отвяжем его от договора
               if l_ovr_old_dazs is not null then
                  l_ovr_new_acc := null;
               else
-                 -- новый долгоср. 2203
-                 if l_new_tip = 'W4B' and l_ovr_old_nbs in ('2202', '2062') then
-                    l_ovr_new_nbs := case when l_ovr_old_nbs = '2202' then '2203' else '2063' end;
-                 -- новый краткоср. 2202
-                 elsif l_new_tip = 'W4C' and l_ovr_old_nbs in ('2203', '2063') then
-                    l_ovr_new_nbs := case when l_ovr_old_nbs = '2203' then '2202' else '2062' end;
-                 -- БС не меняется
+                 if newnbs.g_state = 1 then
+                    begin
+                      select t.ob_ovr
+                        into l_ovr_new_ob22
+                        from w4_nbs_ob22 t
+                       where t.nbs = l_new_nbs
+                         and t.ob22 = l_new_ob22
+                         and t.tip = l_new_tip;
+                     exception when no_data_found then
+                        l_ovr_new_ob22 := null;
+                     end;                       
+                    -- новый долгоср. 2203
+                    if l_old_tip = 'W4C' and l_ovr_new_ob22 <> l_ovr_old_ob22 then
+                       l_ovr_new_nbs := case when l_ovr_old_nbs = '2203' then '2203' else '2063' end;
+                    -- новый краткоср. 2203
+                    elsif l_new_tip = 'W4C'  and l_ovr_new_ob22 <> l_ovr_old_ob22 then
+                       l_ovr_new_nbs := case when l_ovr_old_nbs = '2203' then '2203' else '2063' end;
+                    -- БС не меняется
+                    else
+                       l_ovr_new_nbs := null;
+                    end if;                   
                  else
-                    l_ovr_new_nbs := null;
+                    -- новый долгоср. 2203
+                    if l_new_tip = 'W4B' and l_ovr_old_nbs in ('2202', '2062') then
+                       l_ovr_new_nbs := case when l_ovr_old_nbs = '2202' then '2203' else '2063' end;
+                    -- новый краткоср. 2202
+                    elsif l_new_tip = 'W4C' and l_ovr_old_nbs in ('2203', '2063') then
+                       l_ovr_new_nbs := case when l_ovr_old_nbs = '2203' then '2202' else '2062' end;
+                    -- БС не меняется
+                    else
+                       l_ovr_new_nbs := null;
+                    end if;
+                 
                  end if;
                  -- если БС меняется, открываем новый счет
                  if l_ovr_new_nbs is not null then
@@ -16432,6 +16555,7 @@ is
   l_nlsb accounts.nls%type;
   l_nazn varchar2(160);
   l_ref oper.ref%type;
+  l_newnb t_newnb;
 begin
  -- запоминаем реквизиты по старой операции
   select *
@@ -16444,8 +16568,12 @@ begin
   savepoint sp_op;
   p_back_dok(p_ref, 5, null, l_p1, l_p2);
             l_nazn := substr('Перевищено ліміт', 1, 160);
-            l_nlsb := nbs_ob22 ('2909','80');
-
+  if newnbs.g_state = 1 then
+     l_newnb :=  get_new_nbs_ob22('2909', '80');
+     l_nlsb := nbs_ob22 (l_newnb.nbs, l_newnb.ob22);
+  else
+     l_nlsb := nbs_ob22 ('2909','80');
+  end if;
   ipay_doc ('OW7', l_oper.vob, 1, l_oper.sk,
      l_oper.nam_a, l_oper.nlsa, null, l_oper.id_a,
      l_oper.nam_b, l_nlsb, null, l_oper.id_b,
@@ -16479,6 +16607,7 @@ procedure add_sep_rev_to_queue is
   l_nlsb          accounts.nls%type;
   l_nazn          varchar2(160);
   l_ref           oper.ref%type;
+  l_newnb         t_newnb;
   h               varchar2(100) := 'bars_ow.add_sep_rev_to_queue';
 begin
   bars_audit.info(h || 'Start.');
@@ -16501,7 +16630,12 @@ begin
       select * into l_oper from oper where ref = idx.ref;
       savepoint sp_op;
       l_nazn := substr('Сторно платежу', 1, 160);
-      l_nlsb := nbs_ob22('2909', '80');
+      if newnbs.g_state = 1 then
+         l_newnb :=  get_new_nbs_ob22('2909', '80');
+         l_nlsb := nbs_ob22 (l_newnb.nbs, l_newnb.ob22);
+      else
+         l_nlsb := nbs_ob22 ('2909','80');
+      end if;
 
       ipay_doc('OW7', l_oper.vob, 1, l_oper.sk, l_oper.nam_a, l_oper.nlsa,
                null, l_oper.id_a, l_oper.nam_b, l_nlsb, null, l_oper.id_b,

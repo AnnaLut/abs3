@@ -12,11 +12,10 @@
 .head 1 +  Design-time Settings
 .data VIEWINFO
 0000: 6F00000001000000 FFFF01000D004347 5458566965775374 6174650400010000
-0020: 0000000000500100 002C000000030000 0003000000010000 0061020000F8FFFF
-0040: FFE2FFFFFFFFFFFF FFFFFFFFFF1E0300 00C4010000010000 0000000000010000
-0060: 000F4170706C6963 6174696F6E497465 6D04000000075769 6E646F7773107462
-0080: 6C5F4163636F756E 74734C6973740946 756E6374696F6E73 0D47657455736572
-00A0: 4272616E6368
+0020: 0000000000390100 002C000000030000 0003000000010000 0061020000F8FFFF
+0040: FFE1FFFFFFFFFFFF FFFFFFFFFF1E0300 00C4010000010000 0001000000010000
+0060: 000F4170706C6963 6174696F6E497465 6D03000000075769 6E646F7773107462
+0080: 6C5F4163636F756E 74734C6973740743 6F6C756D6E73
 .enddata
 .data DT_MAKERUNDLG
 0000: 02000000001A513A 5C4241525339385C 42494E5C63757374 61636E742E657865
@@ -1949,6 +1948,7 @@
 .head 5 -  Date/Time: dtDateOff
 .head 5 -  Date/Time: dCurrDate
 .head 5 -  String: strCurrDate
+.head 5 -  String: sErrMsg
 .head 4 +  Actions
 .head 5 -  ! If MessageQuestion('Перерегистрировать Клиента банка: ' || strName || '?') = IDNO
 .head 5 +  If MessageQuestion(CurrentLangTable.GetAtomTitle('ResurectCustomer_cTQuestion') || ': '
@@ -1974,17 +1974,19 @@
      SalFmtFormatDateTime(dtDateOff, 'dd/MM/yyyy') || ')!',
      CurrentLangTable.GetAtomTitle('cTAt'), MB_IconStop | MB_Ok)
 .head 6 -  Return FALSE
-.head 5 +  If not SqlPrepareAndExecute(hSql(), T("
-   UPDATE customer
-   SET date_off=NULL
-   WHERE rnk=:nRNK"))
-.head 6 -  Return FALSE
 .head 5 -  ! If not SqlCommitEx(hSql(), 'Перерегистрирован клиент:' || Str(nRNK) || ':' ||
    strName)
-.head 5 +  If not SqlCommitEx(hSql(), CurrentLangTable.GetAtomTitle('ResurectCustomer_cTResurect')
-   || ':' || Str(nRNK) || ':' || strName)
+.head 5 +  If SqlPLSQLCommand( hSql(), "KL.RESURRECT_CUSTOMER( nRNK, sErrMsg )" )
+.head 6 +  If ( sErrMsg = STRING_Null )
+.head 7 -  Call SqlCommitEx(hSql(), CurrentLangTable.GetAtomTitle( 'ResurectCustomer_cTResurect') || ':' || Str(nRNK) || ':' || strName )
+.head 7 -  Return TRUE
+.head 6 +  Else
+.head 7 -  Call SqlRollbackEx(hSql(), sErrMsg )
+.head 7 -  Call SalMessageBox( sErrMsg, CurrentLangTable.GetAtomTitle( 'cTErr' ), MB_IconStop )
+.head 7 -  Return FALSE
+.head 5 +  Else
+.head 6 -  Call SqlRollback( hSql() )
 .head 6 -  Return FALSE
-.head 5 -  Return TRUE
 .head 3 +  Function: CheckMfoNls
 .head 4 -  Description: Проверка MFO & NLS
 .head 4 +  Returns
@@ -8818,6 +8820,7 @@ hWndCust.AbstractCustomer..getPassp(), hWndCust.AbstractCustomer..getSer(), hWnd
 .head 4 +  Local variables
 .head 5 -  Number: res
 .head 5 -  String: pmsg
+.head 5 -  Long String: sErrMsg
 .head 4 +  Actions
 .head 5 -  ! Выполнить регистрацию нового Клиента банка:
   Сохранить изменения в реквизитах Клиента банка: cCustomer.getNmk() ?
@@ -8884,55 +8887,60 @@ hWndCust.AbstractCustomer..getPassp(), hWndCust.AbstractCustomer..getSer(), hWnd
 .head 9 +  If res != 0
 .head 10 -  Break 
 .head 7 -  ! Регистрация нового Клиента банка: cCustomer.getNmk()
-.head 7 +  If NOT SqlCommitEx(hSql(), 
+.head 7 +  If SqlPLSQLCommand( hSql(), "P_BEFORE_SAVE_CLIENT( nCustomerRN, sErrMsg )" ) 
+AND ( sErrMsg = STRING_Null )
+.head 8 +  If NOT SqlCommitEx( hSql(), 
    CurrentLangTable.GetAtomTitle('Frm_Customer.cTMsgOpenOK') || ': ' ||
    Str(hWndCust.AbstractCustomer..getRnk()) || ' ' || hWndCust.AbstractCustomer..getNmk())
-.head 8 -  ! Call Debug('SqlCommitEx')
-.head 8 -  Break
-.head 7 -  ! Клиенту банка cCustomer.getNmk присвоен регистрационный номер: nCustomerRN
-.head 7 -  Call MessageInfo(CurrentLangTable.GetAtomTitle('Frm_Customer.cTMsgRNK1') || ' ' ||
+.head 9 -  ! Call Debug('SqlCommitEx')
+.head 9 -  Break
+.head 8 -  ! Клиенту банка cCustomer.getNmk присвоен регистрационный номер: nCustomerRN
+.head 8 -  Call MessageInfo(CurrentLangTable.GetAtomTitle('Frm_Customer.cTMsgRNK1') || ' ' ||
      hWndCust.AbstractCustomer..getNmk() || ' ' ||
      CurrentLangTable.GetAtomTitle('Frm_Customer.cTMsgRNK2') || ' ' ||
      NumberToStr(hWndCust.AbstractCustomer..getRnk()) ||
      IifS(bPAR_CUSTCLV=TRUE and not (nCtrlFlags & CVIEW_ApproveKK) and (nCType=3 and bPersonSPD=TRUE or nCType=2), PutCrLf() || 'Зміни набудуть чинності після підтвердження контролером.', ''))
-.head 7 -  Set nCustomerRN = hWndCust.AbstractCustomer..getRnk()
-.head 7 -  ! Инициализация закладок, доступных после регистрации клиента
-.head 7 -  ! Call Debug('before if bNN')
-.head 7 +  If bNN 
-.head 8 -  Call picTabs.AddPage(cTabCustNNCard.Name, cTabCustNNCard.DlgName, hWndNULL)
-.head 8 -  Call picTabs.Enable(cTabCustNNCard.TabNum, TRUE)
-.head 7 +  Else
-.head 8 -  Set cTabCustGeneral.hWnd.Dlg_CustGeneral.dfRnk = nCustomerRN
-.head 8 -  ! Info
-.head 8 +  If cTabCustInfo.EditMode != TAB_Hide
-.head 9 -  ! Для ПРАВЭКСа для физ.лиц-СПД читаем счета в других банках
-.head 9 +  If PAR_BANKTYPE = 'PRVX' and bPersonSPD
-.head 10 +  If NOT hWndCust.AbstractCustomer..initCorpAcc(nCustomerRN, bShowKK, bPAR_CUSTCLV)
-.head 11 -  Return FALSE
-.head 8 -  ! Rel
-.head 8 +  If cTabCustRel.EditMode != TAB_Hide
-.head 9 -  Call hWndCust.AbstractCustomer..initCustomerRel(nCustomerRN, bShowKK, bPAR_CUSTCLV)
-.head 9 -  Call linkTab(cTabCustRel)
-.head 9 -  Call picTabs.Enable(cTabCustRel.TabNum, TRUE)
-.head 7 -  ! Call Debug('before If nCtrlFlags & CVIEW_Accounts')
-.head 7 +  If nCtrlFlags & CVIEW_Accounts
-.head 8 -  Call SalEnableWindow(pbAccounts)
-.head 7 -  ! Call Debug('before SqlPLSQLCommand')
-.head 7 +  If not SqlPLSQLCommand(hSql(), "p_after_edit_client(nCustomerRN)")
-.head 8 -  Call SqlRollbackEx(hSql(), "РНК " || Str(nCustomerRN) || ": ошибка выполнения p_after_edit_client")
-.head 7 +  Else
-.head 8 -  Call SqlCommit(hSql())
-.head 8 -  Call SalPostMsg(hWndForm, UM_Populate, 6, 0)
-.head 7 +  ! If bPAR_CUSTCLV
-.head 8 -  Call hWndCust.AbstractCustomer..setShowKK(FALSE)
-.head 7 -  Call picTabs.InitializeFormPages( 
+.head 8 -  Set nCustomerRN = hWndCust.AbstractCustomer..getRnk()
+.head 8 -  ! Инициализация закладок, доступных после регистрации клиента
+.head 8 -  ! Call Debug('before if bNN')
+.head 8 +  If bNN 
+.head 9 -  Call picTabs.AddPage(cTabCustNNCard.Name, cTabCustNNCard.DlgName, hWndNULL)
+.head 9 -  Call picTabs.Enable(cTabCustNNCard.TabNum, TRUE)
+.head 8 +  Else
+.head 9 -  Set cTabCustGeneral.hWnd.Dlg_CustGeneral.dfRnk = nCustomerRN
+.head 9 -  ! Info
+.head 9 +  If cTabCustInfo.EditMode != TAB_Hide
+.head 10 -  ! Для ПРАВЭКСа для физ.лиц-СПД читаем счета в других банках
+.head 10 +  If PAR_BANKTYPE = 'PRVX' and bPersonSPD
+.head 11 +  If NOT hWndCust.AbstractCustomer..initCorpAcc(nCustomerRN, bShowKK, bPAR_CUSTCLV)
+.head 12 -  Return FALSE
+.head 9 -  ! Rel
+.head 9 +  If cTabCustRel.EditMode != TAB_Hide
+.head 10 -  Call hWndCust.AbstractCustomer..initCustomerRel(nCustomerRN, bShowKK, bPAR_CUSTCLV)
+.head 10 -  Call linkTab(cTabCustRel)
+.head 10 -  Call picTabs.Enable(cTabCustRel.TabNum, TRUE)
+.head 8 -  ! Call Debug('before If nCtrlFlags & CVIEW_Accounts')
+.head 8 +  If nCtrlFlags & CVIEW_Accounts
+.head 9 -  Call SalEnableWindow(pbAccounts)
+.head 8 -  ! Call Debug('before SqlPLSQLCommand')
+.head 8 +  If not SqlPLSQLCommand(hSql(), "p_after_edit_client(nCustomerRN)")
+.head 9 -  Call SqlRollbackEx(hSql(), "РНК " || Str(nCustomerRN) || ": ошибка выполнения p_after_edit_client")
+.head 8 +  Else
+.head 9 -  Call SqlCommit(hSql())
+.head 9 -  Call SalPostMsg(hWndForm, UM_Populate, 6, 0)
+.head 8 +  ! If bPAR_CUSTCLV
+.head 9 -  Call hWndCust.AbstractCustomer..setShowKK(FALSE)
+.head 8 -  Call picTabs.InitializeFormPages( 
      SalNumberToStrX(nCustomerRN,0)|| ';' ||
      SalNumberToStrX(nCType,0)     || ';' ||
      Str(SalWindowHandleToNumber(hWndForm)) || ';' || 
      Str(SalWindowHandleToNumber(hWndCust)))
-.head 7 -  Call picTabs.BringToTop(nActivTab,TRUE)
-.head 7 -  !
-.head 7 -  Return TRUE
+.head 8 -  Call picTabs.BringToTop(nActivTab,TRUE)
+.head 8 -  !
+.head 8 -  Return TRUE
+.head 7 +  Else
+.head 8 -  Call SqlRollbackEx(hSql(), "P_BEFORE_SAVE_CLIENT: РНК " || Str(nCustomerRN) || sErrMsg )
+.head 8 -  Call MessageError( sErrMsg )
 .head 5 +  Else
 .head 6 +  While TRUE
 .head 7 -  Set nActivTab = picTabs.GetTop()
@@ -9033,34 +9041,39 @@ or bPAR_CUSTCLV
 .head 9 +  If NOT hWndCust.AbstractCustomer..saveCustomerCategory()
 .head 10 -  ! Call Debug('saveCustomerCategory')
 .head 10 -  Break
-.head 7 -  ! Сохранение изменений в реквизитах Клиента банка: cCustomer.getNmk()
-.head 7 +  If not SqlCommitEx(hSql(), CurrentLangTable.GetAtomTitle('Frm_Customer.cTMsgSaveOK') || ': ' ||
+.head 7 +  If SqlPLSQLCommand( hSql(), "P_BEFORE_SAVE_CLIENT( nCustomerRN, sErrMsg )" ) 
+AND ( sErrMsg = STRING_Null )
+.head 8 -  ! Сохранение изменений в реквизитах Клиента банка: cCustomer.getNmk()
+.head 8 +  If not SqlCommitEx(hSql(), CurrentLangTable.GetAtomTitle('Frm_Customer.cTMsgSaveOK') || ': ' ||
    Str(hWndCust.AbstractCustomer..getRnk()) || ' ' || hWndCust.AbstractCustomer..getNmk())
-.head 8 -  ! Call Debug('getNmk')
-.head 8 -  Break
-.head 7 -  ! Сохранены реквизиты Клиента
-.head 7 -  ! Call MessageInfo(CurrentLangTable.GetAtomTitle('Frm_Customer.cTMsgRNK3') || ' ' || hWndCust.AbstractCustomer..getNmk() || '.' ||
+.head 9 -  ! Call Debug('getNmk')
+.head 9 -  Break
+.head 8 -  ! Сохранены реквизиты Клиента
+.head 8 -  ! Call MessageInfo(CurrentLangTable.GetAtomTitle('Frm_Customer.cTMsgRNK3') || ' ' || hWndCust.AbstractCustomer..getNmk() || '.' ||
      IifS(bPAR_CUSTCLV=TRUE and not (nCtrlFlags & CVIEW_ApproveKK) and not bVerifyClientParams and (nCType=3 and bPersonSPD=TRUE or nCType=2), 
      PutCrLf() || 'Зміни набудуть чинності після підтвердження контролером.', ''))
-.head 7 -  Call MessageInfo(CurrentLangTable.GetAtomTitle('Frm_Customer.cTMsgRNK3') || ' ' || hWndCust.AbstractCustomer..getNmk() || '.' ||
+.head 8 -  Call MessageInfo(CurrentLangTable.GetAtomTitle('Frm_Customer.cTMsgRNK3') || ' ' || hWndCust.AbstractCustomer..getNmk() || '.' ||
      IifS(bPAR_CUSTCLV=TRUE and not (nCtrlFlags & CVIEW_ApproveKK) and (nCType=3 and bPersonSPD=TRUE or nCType=2), 
      PutCrLf() || 'Зміни набудуть чинності після підтвердження контролером.', ''))
-.head 7 +  If not SqlPLSQLCommand(hSql(), "p_after_edit_client(nCustomerRN)")
-.head 8 -  Call SqlRollbackEx(hSql(), "РНК " || Str(nCustomerRN) || ": ошибка выполнения p_after_edit_client")
-.head 7 +  Else
-.head 8 -  Call SqlCommit(hSql())
-.head 8 -  Call SalPostMsg(hWndForm, UM_Populate, 6, 0)
-.head 7 +  ! If bPAR_CUSTCLV
-.head 8 -  Call hWndCust.AbstractCustomer..setShowKK(FALSE)
-.head 7 -  ! Инициализация после сохранения
-.head 7 -  Call picTabs.InitializeFormPages( 
+.head 8 +  If not SqlPLSQLCommand(hSql(), "p_after_edit_client(nCustomerRN)")
+.head 9 -  Call SqlRollbackEx(hSql(), "РНК " || Str(nCustomerRN) || ": ошибка выполнения p_after_edit_client")
+.head 8 +  Else
+.head 9 -  Call SqlCommit(hSql())
+.head 9 -  Call SalPostMsg(hWndForm, UM_Populate, 6, 0)
+.head 8 +  ! If bPAR_CUSTCLV
+.head 9 -  Call hWndCust.AbstractCustomer..setShowKK(FALSE)
+.head 8 -  ! Инициализация после сохранения
+.head 8 -  Call picTabs.InitializeFormPages( 
      SalNumberToStrX(nCustomerRN,0)|| ';' ||
      SalNumberToStrX(nCType,0)     || ';' ||
      Str(SalWindowHandleToNumber(hWndForm)) || ';' || 
      Str(SalWindowHandleToNumber(hWndCust)))
-.head 7 -  Call picTabs.BringToTop(nActivTab,TRUE)
-.head 7 -  !
-.head 7 -  Return TRUE
+.head 8 -  Call picTabs.BringToTop(nActivTab,TRUE)
+.head 8 -  !
+.head 8 -  Return TRUE
+.head 7 +  Else
+.head 8 -  Call SqlRollbackEx(hSql(), "P_BEFORE_SAVE_CLIENT: РНК " || Str(nCustomerRN) || sErrMsg )
+.head 8 -  Call MessageError( sErrMsg )
 .head 5 -  Call hWndCust.AbstractCustomer..setRnk(nCustomerRN)
 .head 5 -  Call SqlRollback(hSql())
 .head 5 -  ! Ошибка регистрации Клиента банка:
@@ -31438,6 +31451,39 @@ number
 .head 5 +  On SAM_AnyEdit
 .head 6 -  Set colNLS = sTmpNls
 .head 6 -  Call SalTblSetRowFlags(hWndForm, SalTblQueryContext(hWndForm), ROW_Edited, FALSE)
+.head 3 +  Column: colNLSALT
+.head 4 -  Class Child Ref Key: 0
+.head 4 -  Class ChildKey: 0
+.head 4 -  Class: cColumnLabeled
+.head 4 -  Property Template:
+.head 4 -  Class DLL Name:
+.head 4 -  Title: Alternative
+account
+number
+.head 4 -  Visible? Yes
+.head 4 -  Editable? No
+.head 4 -  Maximum Data Length: 9
+.head 4 -  Data Type: String
+.head 4 -  Justify: Left
+.head 4 -  Width:  1.7"
+.head 4 -  Width Editable? Yes
+.head 4 -  Format: Unformatted
+.head 4 -  Country: Default
+.head 4 -  Input Mask: Unformatted
+.head 4 -  Cell Options
+.head 5 -  Cell Type? Standard
+.head 5 -  Multiline Cell? No
+.head 5 -  Cell DropDownList
+.head 6 -  Sorted? Yes
+.head 6 -  Vertical Scroll? Yes
+.head 6 -  Auto Drop Down? No
+.head 6 -  Allow Text Editing? Yes
+.head 5 -  Cell CheckBox
+.head 6 -  Check Value:
+.head 6 -  Uncheck Value:
+.head 6 -  Ignore Case? Yes
+.head 4 -  List Values
+.head 4 -  Message Actions
 .head 3 +  Column: colKV
 .head 4 -  Class Child Ref Key: 0
 .head 4 -  Class ChildKey: 0
@@ -31562,39 +31608,6 @@ Name
 .head 6 -  Check Value:
 .head 6 -  Uncheck Value:
 .head 6 -  Ignore Case? Class Default
-.head 4 -  List Values
-.head 4 -  Message Actions
-.head 3 +  Column: colNLSALT
-.head 4 -  Class Child Ref Key: 0
-.head 4 -  Class ChildKey: 0
-.head 4 -  Class: cColumnLabeled
-.head 4 -  Property Template:
-.head 4 -  Class DLL Name:
-.head 4 -  Title: Alternative
-account
-number
-.head 4 -  Visible? No
-.head 4 -  Editable? No
-.head 4 -  Maximum Data Length: 9
-.head 4 -  Data Type: String
-.head 4 -  Justify: Left
-.head 4 -  Width:  1.7"
-.head 4 -  Width Editable? Yes
-.head 4 -  Format: Unformatted
-.head 4 -  Country: Default
-.head 4 -  Input Mask: Unformatted
-.head 4 -  Cell Options
-.head 5 -  Cell Type? Standard
-.head 5 -  Multiline Cell? No
-.head 5 -  Cell DropDownList
-.head 6 -  Sorted? Yes
-.head 6 -  Vertical Scroll? Yes
-.head 6 -  Auto Drop Down? No
-.head 6 -  Allow Text Editing? Yes
-.head 5 -  Cell CheckBox
-.head 6 -  Check Value:
-.head 6 -  Uncheck Value:
-.head 6 -  Ignore Case? Yes
 .head 4 -  List Values
 .head 4 -  Message Actions
 .head 3 -  ! финансовые показатели счета
@@ -34103,7 +34116,7 @@ account
 .head 4 -  Visible? Yes
 .head 4 -  Editable? Yes
 .head 4 -  Maximum Data Length: 1
-.head 4 -  Data Type: Number
+.head 4 -  Data Type: String
 .head 4 -  Justify: Right
 .head 4 -  Width:  0.6"
 .head 4 -  Width Editable? Yes
@@ -35502,7 +35515,7 @@ select BRANCH
 .head 4 -  Set DopFiltr = sDopFiltr
 .head 4 -  ! --- Костиль для Ощада (виключення доступу до рахунків "малого барсу" в ГОУ)
 .head 4 +  If ( GetBankMfo() = '300465' AND GetUserBranch() != '/300465/000041/' )
-.head 5 -  Set DopFiltr = DopFiltr || IifS( SalStrLength( DopFiltr )=0, "", " and " ) || "branch <> '/300465/000041/'" 
+.head 5 -  Set DopFiltr = DopFiltr || IifS( SalStrLength( DopFiltr )=0, "", " and " ) || "a.branch <> '/300465/000041/'" 
 .head 4 -  ! ---
 .head 4 -  Call XConnectGetParams(AccC)
 .head 4 +  If NOT AccC.Connect()
@@ -42386,7 +42399,10 @@ or cTabAccFinancial.EditMode = TAB_Edit
 .head 6 -  Call hWndParent.Frm_Account.IsEdited()
 .head 6 +  If SalIsNull(dfNbs)
 .head 7 -  Call hWndParent.Frm_Account.cAccount.setNbs(dfNbs)
-.head 7 -  Set dfNameNbs = ''
+.head 7 -  Set dfNameNbs = STRING_Null
+.head 7 -  Set dfOB22 = STRING_Null
+.head 7 -  Set dfNameOB22 = STRING_Null
+.head 7 -  Set dfNls = STRING_Null
 .head 7 +  If nAcc = 0
 .head 8 -  Set dfTip = 'ODB'
 .head 8 -  Call SalSendMsg(cmbTip, UM_ObjActivate, 0, 0)
@@ -42398,9 +42414,6 @@ or cTabAccFinancial.EditMode = TAB_Edit
 .head 7 -  Call SalSendMsg(hWndParent.Frm_Account.pbProf, SAM_User, 0, 0)
 .head 6 -  Return VALIDATE_Ok
 .head 5 +  On SAM_User
-.head 6 +  If nAcc = 0 and (dfTip = '' or dfTip = 'ODB')
-.head 7 -  Set dfTip = 'ODB'
-.head 7 -  Call SalSendMsg(cmbTip, UM_ObjActivate, 0, 0)
 .head 6 +  If not SalIsNull(dfNbs)
 .head 7 -  ! d_close > bankdate исправлено на d_close >= bankdate
 .head 7 -  ! для БС проставлена дата закрытия 24/01/2012,
@@ -42420,25 +42433,37 @@ or cTabAccFinancial.EditMode = TAB_Edit
 .head 9 -  Call SalSendMsg(dfXar, UM_Choose, 0, 0)
 .head 9 +  If dfTip != '' AND hWndParent.Frm_Account.nRnk != NUMBER_Null AND hWndParent.Frm_Account.nAcc = 0
 .head 10 -  Call SalEnableWindow(pbAccountMask)
+.head 10 -  ! Перевірка наявності ОБ22 в довіднику для вибраного R020
+.head 10 -  Call f_chk_ob22()
 .head 8 +  Else
 .head 9 -  ! dfNbs - Недопустимый балансовый счет для типа клиента
 .head 9 -  Call SalMessageBox(dfNbs || ' - '|| CurrentLangTable.GetAtomTitle('Dlg_AccGeneral.cTErrNbsK014'),
      CurrentLangTable.GetAtomTitle('cTErr'), MB_IconExclamation)
 .head 9 +  If nAcc = 0
-.head 10 -  Set dfNameNbs = STRING_Null
 .head 10 -  Set dfNbs = STRING_Null
+.head 10 -  Set dfNameNbs = STRING_Null
+.head 10 -  Set dfOB22 = STRING_Null
+.head 10 -  Set dfNameOB22 = STRING_Null
 .head 10 -  Set dfNls = STRING_Null
 .head 7 +  Else
 .head 8 -  ! dfNbs - Нет такого балансового счета или балансовый счет закрыт
 .head 8 -  Call SalMessageBox(dfNbs || ' - '|| CurrentLangTable.GetAtomTitle('Dlg_AccGeneral.cTErrNbs'),
      CurrentLangTable.GetAtomTitle('cTErr'), MB_IconExclamation)
 .head 8 +  If nAcc = 0
-.head 9 -  Set dfNameNbs = STRING_Null
 .head 9 -  Set dfNbs = STRING_Null
+.head 9 -  Set dfNameNbs = STRING_Null
+.head 9 -  Set dfOB22 = STRING_Null
+.head 9 -  Set dfNameOB22 = STRING_Null
+.head 9 -  Set dfNls = STRING_Null
 .head 9 +  If not GetGlobalOptionEx('NBS_NULL')
 .head 10 -  Set dfNls = STRING_Null
 .head 6 -  Call hWndParent.Frm_Account.cAccount.setNbs(dfNbs)
 .head 6 +  If SalIsNull(dfNbs)
+.head 7 -  Call SalSendMsg(cmbTip, UM_ObjActivate, 0, 0)
+.head 7 -  Set dfOB22 = STRING_Null
+.head 7 -  Set dfNls = STRING_Null
+.head 6 +  If nAcc = 0 and (dfTip = '' or dfTip = 'ODB')
+.head 7 -  Set dfTip = 'ODB'
 .head 7 -  Call SalSendMsg(cmbTip, UM_ObjActivate, 0, 0)
 .head 3 +  Data Field: dfNameNbs
 .head 4 -  Class Child Ref Key: 0
@@ -42457,6 +42482,122 @@ or cTabAccFinancial.EditMode = TAB_Edit
 .head 6 -  Width:  3.35"
 .head 6 -  Width Editable? Yes
 .head 6 -  Height: 0.25"
+.head 6 -  Height Editable? Yes
+.head 5 -  Visible? Yes
+.head 5 -  Border? Yes
+.head 5 -  Justify: Left
+.head 5 -  Format: Unformatted
+.head 5 -  Country: Default
+.head 5 -  Font Name: MS Sans Serif
+.head 5 -  Font Size: 8
+.head 5 -  Font Enhancement: Bold
+.head 5 -  Text Color: Default
+.head 5 -  Background Color: 3D Face Color
+.head 5 -  Input Mask: Unformatted
+.head 4 -  Message Actions
+.head 3 -  Background Text: Праметр (OB22):
+.head 4 -  Resource Id: 28972
+.head 4 -  Class Child Ref Key: 0
+.head 4 -  Class ChildKey: 0
+.head 4 -  Class:
+.head 4 -  Window Location and Size
+.head 5 -  Left:   0.2"
+.head 5 -  Top:    1.12"
+.head 5 -  Width:  3.0"
+.head 5 -  Width Editable? Yes
+.head 5 -  Height: 0.167"
+.head 5 -  Height Editable? Yes
+.head 4 -  Visible? Yes
+.head 4 -  Justify: Right
+.head 4 -  Font Name: MS Sans Serif
+.head 4 -  Font Size: 8
+.head 4 -  Font Enhancement: Bold
+.head 4 -  Text Color: Default
+.head 4 -  Background Color: Default
+.head 3 +  Data Field: dfOB22
+.head 4 -  Class Child Ref Key: 0
+.head 4 -  Class ChildKey: 0
+.head 4 -  Class:
+.head 4 -  Property Template:
+.head 4 -  Class DLL Name:
+.head 4 -  Data
+.head 5 -  Maximum Data Length: 2
+.head 5 -  Data Type: String
+.head 5 -  Editable? No
+.head 4 -  Display Settings
+.head 5 -  Window Location and Size
+.head 6 -  Left:   3.7"
+.head 6 -  Top:    1.04"
+.head 6 -  Width:  0.7"
+.head 6 -  Width Editable? Yes
+.head 6 -  Height: 0.26"
+.head 6 -  Height Editable? Yes
+.head 5 -  Visible? Yes
+.head 5 -  Border? Yes
+.head 5 -  Justify: Center
+.head 5 -  Format: Unformatted
+.head 5 -  Country: Default
+.head 5 -  Font Name: MS Sans Serif
+.head 5 -  Font Size: 8
+.head 5 -  Font Enhancement: Bold
+.head 5 -  Text Color: Default
+.head 5 -  Background Color: 3D Face Color
+.head 5 -  Input Mask: Unformatted
+.head 4 +  Message Actions
+.head 5 +  ! On UM_ObjActivate
+.head 6 +  If SalIsNull(dfOB22)
+.head 7 -  Set dfNameOB22 = ''
+.head 6 +  Else 
+.head 7 -  Call SalSendMsg(hWndItem, SAM_User, 0, 0)
+.head 5 +  On SAM_Validate
+.head 6 -  Call hWndParent.Frm_Account.IsEdited()
+.head 6 +  If SalIsNull(dfOB22)
+.head 7 -  Call hWndParent.Frm_Account.cAccount.setOB22(dfOB22)
+.head 7 -  Set dfNameOB22 = ''
+.head 7 -  Return VALIDATE_OkClearFlag
+.head 6 +  If SalStrLength(dfOB22) < 2
+.head 7 -  Return VALIDATE_Cancel
+.head 6 -  Call SalSendMsg(hWndItem, SAM_User, 0, 0)
+.head 6 +  If not SalIsNull(dfOB22) AND nAcc = 0
+.head 7 -  Call SalSendMsg(hWndParent.Frm_Account.pbProf, SAM_User, 0, 0)
+.head 6 -  Return VALIDATE_Ok
+.head 5 +  On SAM_User
+.head 6 +  If not SalIsNull(dfOB22)
+.head 7 -  Call SqlPrepareAndExecute(hSql(), 
+"select NAME
+   into :dfNameOB22
+   from V_SB_OB22 
+  where R020 = :dfNbs 
+    and OB22 = :dfOB22
+    and lnnvl( OPN_DT >  gl.bd() ) 
+    and lnnvl( CLS_DT <= gl.bd() )")
+.head 7 +  If Not SqlFetchNext(hSql(), nFetchRes)
+.head 8 -  ! dfOB22 - Нет такого OB22 или OB22 закрыт
+.head 8 -  Call SalMessageBox(dfOB22 || ' - '|| CurrentLangTable.GetAtomTitle('Dlg_AccGeneral.cTErrOB22'),
+     CurrentLangTable.GetAtomTitle('cTErr'), MB_IconExclamation)
+.head 8 +  If nAcc = 0
+.head 9 -  Set dfNameOB22 = STRING_Null
+.head 9 -  Set dfOB22 = STRING_Null
+.head 6 -  Call hWndParent.Frm_Account.cAccount.setOB22(dfOB22)
+.head 6 +  If SalIsNull(dfOB22)
+.head 7 -  Set dfNameOB22 = STRING_Null
+.head 3 +  Data Field: dfNameOB22
+.head 4 -  Class Child Ref Key: 0
+.head 4 -  Class ChildKey: 0
+.head 4 -  Class:
+.head 4 -  Property Template:
+.head 4 -  Class DLL Name:
+.head 4 -  Data
+.head 5 -  Maximum Data Length: 150
+.head 5 -  Data Type: String
+.head 5 -  Editable? No
+.head 4 -  Display Settings
+.head 5 -  Window Location and Size
+.head 6 -  Left:   4.4"
+.head 6 -  Top:    1.04"
+.head 6 -  Width:  3.65"
+.head 6 -  Width Editable? Yes
+.head 6 -  Height: 0.26"
 .head 6 -  Height Editable? Yes
 .head 5 -  Visible? Yes
 .head 5 -  Border? Yes
@@ -43592,157 +43733,6 @@ or cTabAccFinancial.EditMode = TAB_Edit
 .head 4 -  Border Color: Default
 .head 4 -  Background Color: 3D Face Color
 .head 4 -  Message Actions
-.head 3 -  Background Text: Праметр (OB22):
-.head 4 -  Resource Id: 28972
-.head 4 -  Class Child Ref Key: 0
-.head 4 -  Class ChildKey: 0
-.head 4 -  Class:
-.head 4 -  Window Location and Size
-.head 5 -  Left:   0.2"
-.head 5 -  Top:    1.12"
-.head 5 -  Width:  3.0"
-.head 5 -  Width Editable? Yes
-.head 5 -  Height: 0.167"
-.head 5 -  Height Editable? Yes
-.head 4 -  Visible? Yes
-.head 4 -  Justify: Right
-.head 4 -  Font Name: MS Sans Serif
-.head 4 -  Font Size: 8
-.head 4 -  Font Enhancement: Bold
-.head 4 -  Text Color: Default
-.head 4 -  Background Color: Default
-.head 3 +  Data Field: dfOB22
-.head 4 -  Class Child Ref Key: 0
-.head 4 -  Class ChildKey: 0
-.head 4 -  Class:
-.head 4 -  Property Template:
-.head 4 -  Class DLL Name:
-.head 4 -  Data
-.head 5 -  Maximum Data Length: 4
-.head 5 -  Data Type: String
-.head 5 -  Editable? No
-.head 4 -  Display Settings
-.head 5 -  Window Location and Size
-.head 6 -  Left:   3.7"
-.head 6 -  Top:    1.04"
-.head 6 -  Width:  0.7"
-.head 6 -  Width Editable? Yes
-.head 6 -  Height: 0.26"
-.head 6 -  Height Editable? Yes
-.head 5 -  Visible? Yes
-.head 5 -  Border? Yes
-.head 5 -  Justify: Center
-.head 5 -  Format: Unformatted
-.head 5 -  Country: Default
-.head 5 -  Font Name: MS Sans Serif
-.head 5 -  Font Size: 8
-.head 5 -  Font Enhancement: Bold
-.head 5 -  Text Color: Default
-.head 5 -  Background Color: 3D Face Color
-.head 5 -  Input Mask: Unformatted
-.head 4 +  Message Actions
-.head 5 +  On UM_ObjActivate
-.head 6 +  If SalIsNull(dfOB22)
-.head 7 -  Set dfNameOB22 = ''
-.head 6 +  Else
-.head 7 -  Call SalSendMsg(hWndItem, SAM_User, 0, 0)
-.head 5 +  On SAM_Validate
-.head 6 -  Call hWndParent.Frm_Account.IsEdited()
-.head 6 +  If SalIsNull(dfOB22)
-.head 7 -  Call hWndParent.Frm_Account.cAccount.setOB22(dfOB22)
-.head 7 -  Set dfNameOB22 = ''
-.head 7 -  Return VALIDATE_OkClearFlag
-.head 6 +  If SalStrLength(dfOB22) < 2
-.head 7 -  Return VALIDATE_Cancel
-.head 6 -  Call SalSendMsg(hWndItem, SAM_User, 0, 0)
-.head 6 +  If not SalIsNull(dfOB22) AND nAcc = 0
-.head 7 -  Call SalSendMsg(hWndParent.Frm_Account.pbProf, SAM_User, 0, 0)
-.head 6 -  Return VALIDATE_Ok
-.head 5 +  On SAM_User
-.head 6 +  If not SalIsNull(dfOB22)
-.head 7 -  Call SqlPrepareAndExecute(hSql(), 
-"select TXT
-   into :dfNameOB22
-   from SB_OB22 
-  where R020 = :dfNbs 
-    and OB22 = :dfOB22
-    and lnnvl( D_OPEN  >  gl.bd() ) 
-    and lnnvl( D_CLOSE <= gl.bd() )")
-.head 7 +  If SqlFetchNext(hSql(), nFetchRes)
-.head 8 +  If dfTip != '' AND hWndParent.Frm_Account.nRnk != NUMBER_Null AND hWndParent.Frm_Account.nAcc = 0
-.head 9 -  Call SalEnableWindow(pbAccountMask)
-.head 7 +  Else
-.head 8 -  ! dfNbs - Нет такого балансового счета или балансовый счет закрыт
-.head 8 -  Call SalMessageBox(dfOB22 || ' - '|| CurrentLangTable.GetAtomTitle('Dlg_AccGeneral.cTErrOB22'),
-     CurrentLangTable.GetAtomTitle('cTErr'), MB_IconExclamation)
-.head 8 +  If nAcc = 0
-.head 9 -  Set dfNameOB22 = STRING_Null
-.head 9 -  Set dfOB22 = STRING_Null
-.head 6 -  Call hWndParent.Frm_Account.cAccount.setOB22(dfOB22)
-.head 3 +  Data Field: dfNameOB22
-.head 4 -  Class Child Ref Key: 0
-.head 4 -  Class ChildKey: 0
-.head 4 -  Class:
-.head 4 -  Property Template:
-.head 4 -  Class DLL Name:
-.head 4 -  Data
-.head 5 -  Maximum Data Length: 150
-.head 5 -  Data Type: String
-.head 5 -  Editable? No
-.head 4 -  Display Settings
-.head 5 -  Window Location and Size
-.head 6 -  Left:   4.4"
-.head 6 -  Top:    1.04"
-.head 6 -  Width:  3.65"
-.head 6 -  Width Editable? Yes
-.head 6 -  Height: 0.26"
-.head 6 -  Height Editable? Yes
-.head 5 -  Visible? Yes
-.head 5 -  Border? Yes
-.head 5 -  Justify: Left
-.head 5 -  Format: Unformatted
-.head 5 -  Country: Default
-.head 5 -  Font Name: MS Sans Serif
-.head 5 -  Font Size: 8
-.head 5 -  Font Enhancement: Bold
-.head 5 -  Text Color: Default
-.head 5 -  Background Color: 3D Face Color
-.head 5 -  Input Mask: Unformatted
-.head 4 -  Message Actions
-.head 3 +  Picture: pbAccountOB22
-.head 4 -  Class Child Ref Key: 0
-.head 4 -  Class ChildKey: 0
-.head 4 -  Class:
-.head 4 -  Property Template:
-.head 4 -  Class DLL Name:
-.head 4 -  Window Location and Size
-.head 5 -  Left:   3.3"
-.head 5 -  Top:    1.05"
-.head 5 -  Width:  0.367"
-.head 5 -  Width Editable? Yes
-.head 5 -  Height: 0.25"
-.head 5 -  Height Editable? Yes
-.head 4 -  Visible? Yes
-.head 4 -  Editable? No
-.head 4 -  File Name: \BARS98\RESOURCE\BMP\HELP.BMP
-.head 4 -  Storage: Internal
-.head 4 -  Picture Transparent Color: Gray
-.head 4 -  Fit: Scale
-.head 4 -  Scaling
-.head 5 -  Width:  100
-.head 5 -  Height:  100
-.head 4 -  Corners: Square
-.head 4 -  Border Style: Raised-Shadow
-.head 4 -  Border Thickness: 1
-.head 4 -  Tile To Parent? No
-.head 4 -  Border Color: Default
-.head 4 -  Background Color: 3D Face Color
-.head 4 +  Message Actions
-.head 5 +  On SAM_Click
-.head 6 -  Call FunNSIGetFiltered( "SB_OB22", "OB22", 
-"lnnvl( D_OPEN > gl.bd() ) and lnnvl( D_CLOSE <= gl.bd() ) and R020 = "||dfNbs, sTmp, dfOB22 )
-.head 6 +  If SalSendMsg( dfOB22, SAM_Validate, 0, 0 )
-.head 7 -  Call SalSetFocus(dfNls)
 .head 3 +  Picture: pbAccountPlan
 .head 4 -  Class Child Ref Key: 0
 .head 4 -  Class ChildKey: 0
@@ -43775,20 +43765,42 @@ or cTabAccFinancial.EditMode = TAB_Edit
 .head 5 +  On SAM_Click
 .head 6 -  Set dfNbs = ShowRefPsEx(nK014)
 .head 6 +  If SalSendMsg(dfNbs, SAM_Validate, 0, 0)
-.head 7 -  Call SqlPrepareAndExecute( hSql(),
-"select OB22
-   from BARS.SB_OB22
-  where lnnvl( D_OPEN > gl.bd() )
-    and lnnvl( D_CLOSE <= gl.bd() )
-    and R020 = :dfNbs" )
-.head 7 +  If SqlFetchNext(hSql(), nFetchRes)
-.head 8 -  Call SalEnableWindow( pbAccountOB22 )
-.head 8 -  Call SalEnableWindow( dfOB22 )
-.head 8 -  Call SalSetFocus( dfOB22 )
-.head 7 +  Else
-.head 8 -  Call SalDisableWindow( pbAccountOB22 )
-.head 8 -  Call SalDisableWindow( dfOB22 )
-.head 8 -  Call SalSetFocus( dfNls )
+.head 7 -  Call f_chk_ob22()
+.head 3 +  Picture: pbAccountOB22
+.head 4 -  Class Child Ref Key: 0
+.head 4 -  Class ChildKey: 0
+.head 4 -  Class:
+.head 4 -  Property Template:
+.head 4 -  Class DLL Name:
+.head 4 -  Window Location and Size
+.head 5 -  Left:   3.3"
+.head 5 -  Top:    1.05"
+.head 5 -  Width:  0.367"
+.head 5 -  Width Editable? Yes
+.head 5 -  Height: 0.25"
+.head 5 -  Height Editable? Yes
+.head 4 -  Visible? Yes
+.head 4 -  Editable? No
+.head 4 -  File Name: \BARS98\RESOURCE\BMP\HELP.BMP
+.head 4 -  Storage: Internal
+.head 4 -  Picture Transparent Color: Gray
+.head 4 -  Fit: Scale
+.head 4 -  Scaling
+.head 5 -  Width:  100
+.head 5 -  Height:  100
+.head 4 -  Corners: Square
+.head 4 -  Border Style: Raised-Shadow
+.head 4 -  Border Thickness: 1
+.head 4 -  Tile To Parent? No
+.head 4 -  Border Color: Default
+.head 4 -  Background Color: 3D Face Color
+.head 4 +  Message Actions
+.head 5 +  On SAM_Click
+.head 6 +  If Not SalIsNull( dfNbs )
+.head 7 -  Call FunNSIGetFiltered( "V_SB_OB22", "OB22", 
+"lnnvl( OPN_DT > gl.bd() ) and lnnvl( CLS_DT <= gl.bd() ) and R020 = "||dfNbs||" ORDER BY OB22" , sTmp, dfOB22 )
+.head 7 +  If SalSendMsg( dfOB22, SAM_Validate, 0, 0 )
+.head 8 -  Call SalSetFocus(dfNls)
 .head 3 +  Picture: pbAccountMask
 .head 4 -  Class Child Ref Key: 0
 .head 4 -  Class ChildKey: 0
@@ -43820,9 +43832,11 @@ or cTabAccFinancial.EditMode = TAB_Edit
 .head 4 +  Message Actions
 .head 5 +  On SAM_Click
 .head 6 +  If SqlPrepareAndExecute(hSql(),
-"SELECT f_newnls2(null,:dfTip,:dfNbs,:nAccRnk,null),
-        substr(f_newnms (null,:dfTip,:dfNbs,:nAccRnk,null),1,70)
- INTO :sNlsTmp, :sNmsTmp FROM dual") AND SqlFetchNext(hSql(),nFetchRes)
+"SELECT substr(f_newnls2(null,:dfTip,:dfNbs,:nAccRnk,null),1,15)
+      , substr(f_newnms (null,:dfTip,:dfNbs,:nAccRnk,null),1,70)
+   INTO :sNlsTmp, :sNmsTmp
+   FROM dual
+") AND SqlFetchNext(hSql(),nFetchRes)
 .head 7 -  Set dfNls = IifS(sNlsTmp!='', sNlsTmp, dfNls)
 .head 7 -  Set dfNms = IifS(sNmsTmp!='', sNmsTmp, dfNms)
 .head 7 +  If SalSendMsg(dfNls, SAM_Validate, 0, 0)
@@ -44015,7 +44029,28 @@ or cTabAccFinancial.EditMode = TAB_Edit
 .head 6 -  Call hWndParent.Frm_Account.IsEdited()
 .head 6 -  Call SalSendClassMessage(SAM_Click, 0, 0)
 .head 6 -  Set dfTobo = cmbTobo.strCurrentId
-.head 2 -  Functions
+.head 2 +  Functions
+.head 3 +  Function: f_chk_ob22
+.head 4 -  Description:
+.head 4 -  Returns
+.head 4 -  Parameters
+.head 4 -  Static Variables
+.head 4 -  Local variables
+.head 4 +  Actions
+.head 5 -  Call SqlPrepareAndExecute( hSql(),
+"select OB22
+   from BARS.SB_OB22
+  where lnnvl( D_OPEN > gl.bd() )
+    and lnnvl( D_CLOSE <= gl.bd() )
+    and R020 = :dfNbs" )
+.head 5 +  If SqlFetchNext(hSql(), nFetchRes)
+.head 6 -  Call SalEnableWindow( pbAccountOB22 )
+.head 6 -  Call SalEnableWindow( dfOB22 )
+.head 6 -  Call SalSetFocus( dfOB22 )
+.head 5 +  Else
+.head 6 -  Call SalDisableWindow( pbAccountOB22 )
+.head 6 -  Call SalDisableWindow( dfOB22 )
+.head 6 -  Call SalSetFocus( dfNls )
 .head 2 -  Window Parameters
 .head 2 +  Window Variables
 .head 3 -  Number: nAcc
@@ -63722,7 +63757,7 @@ and SqlFetchNext(hSql(), nFetchRes)
 .head 8 -  ! наименование открываемоно счета
 .head 8 -  ! Нар.%% sNMS
 .head 8 -  Set sNmsN_ = IifS ( sNmsN=STRING_Null, CurrentLangTable.GetAtomTitle('frm_ProcAccounts.cTMess2')||" "||SalStrTrimX(sNMS),  SalStrTrimX(sNmsN) )
-.head 8 +  If Op_Reg(99,0,0,nGrp,nTmp,nR1,sNls,nKv, Subs(sNmsN_,1,38), 'ODB', nI1, nAccN) and
+.head 8 +  If Op_Reg( 99,0,0,nGrp,nTmp,nR1,sNls,nKv, Subs(sNmsN_,1,38), 'ODB', nI1, nAccN ) and
    SqlPLSQLCommand(hSql(), "p_setAccessByAccmask(nAccN, nAcc)") and
    SqlPrepareAndExecute(hSql(), "update accounts set tobo=:sBranch where acc=:nAccN")
 .head 9 -  Call SqlCommit(hSql())

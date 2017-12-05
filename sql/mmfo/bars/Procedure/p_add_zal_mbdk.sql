@@ -1,3 +1,11 @@
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_ADD_ZAL_MBDK.sql =========*** Run *** =
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  procedure P_ADD_ZAL_MBDK ***
+
+
 CREATE OR REPLACE PROCEDURE p_add_zal_mbdk
 (
   p_nd   NUMBER
@@ -79,8 +87,7 @@ end if;
         IF dd.vidd in (1211,1510,1511,1512,1515,1517,1521,1522,1523,1524,1526,1527) THEN  --(АКТИВ)
             l_tipD := 1 ; ----1=Розміщення (актив)
             SELECT a.acc  INTO acc8_  FROM accounts a, nd_acc n    WHERE n.nd = dd.nd      AND a.acc = n.acc
-            and(a.nls LIKE '1211%' or a.nls LIKE '1510%' or a.nls LIKE '1511%' or a.nls LIKE '1512%' or a.nls LIKE '1515%'or a.nls LIKE '1517%'
-            or a.nls LIKE '1521%' or a.nls LIKE '1522%' or a.nls LIKE '1523%' or a.nls LIKE '1524%' or a.nls LIKE '1526%' or a.nls LIKE '1527%');
+            and(a.nls LIKE '1513%' or a.nls LIKE '1524%');
         else
             select tipd   into l_tipD from cc_vidd where vidd = dd.vidd;  -- 1=Розміщення (актив),  2=Залучення (пасив)
         END IF;
@@ -153,7 +160,7 @@ end if;
     begin
     update accounts set  mdate=p_mdate, tobo=az.branch where acc=az.acc;
    begin
-   update pawn_acc set sv=p_SV*100,deposit_id=p_depid,pawn=l_pawn where acc=az.acc;
+		update pawn_acc set sv=p_SV*100,deposit_id=p_depid,cc_idz = p_cc_idz,pawn=l_pawn where acc=az.acc;
        end;
     end;
     end if;
@@ -264,3 +271,13 @@ end if;
 
 END p_add_zal_mbdk;
 /
+
+
+PROMPT *** Create  grants P_ADD_ZAL_MBDK ***
+grant EXECUTE on P_ADD_ZAL_MBDK to BARS_ACCESS_DEFROLE;
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_ADD_ZAL_MBDK.sql =========*** End *** =
+PROMPT ===================================================================================== 
+

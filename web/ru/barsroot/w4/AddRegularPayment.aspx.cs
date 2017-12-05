@@ -16,7 +16,7 @@ using BarsWeb.Areas.Kernel.Infrastructure.DI.Abstract;
 using BarsWeb.Areas.Kernel.Infrastructure.DI.Implementation;
 
 public partial class w4_AddRegularPayment : Page
-{    
+{
     private readonly IDbLogger _dbLogger;
     public w4_AddRegularPayment()
     {
@@ -167,7 +167,7 @@ public partial class w4_AddRegularPayment : Page
         cmd.CommandText = "select freq, name from freq where freq not in(2,12,999,30)";
 
         var reader = cmd.ExecuteReader();
-        
+
         while (reader.Read())
         {
             Period.Items.Add(new ListItem
@@ -198,7 +198,7 @@ public partial class w4_AddRegularPayment : Page
             {
                 var sumFee = tbFee.Value;
             }
-            
+
             Decimal pIdg = 11; // STO_GRP. 
             Decimal pIds = 0;
             DateTime pSdat = DateTime.Now.Date;
@@ -226,7 +226,7 @@ public partial class w4_AddRegularPayment : Page
             String nlsa = param.Get("NLS");
             String ob22 = param.Get("OB22");
             String branch = param.Get("BRANCH");
-            if (branch.Length > 15) {branch.Substring(0, 15);}            
+            if (branch.Length > 15) { branch.Substring(0, 15); }
             Decimal kva = Convert.ToDecimal(param.Get("KV"));
             String nlsb = param.Get("tbNlsB");
             String tt = tbTTs.Value;
@@ -279,7 +279,7 @@ public partial class w4_AddRegularPayment : Page
 
             String dr = String.Empty;
 
-            String fsum = String.Format("{0}", Convert.ToDecimal(param.Get("tbSum").Replace(",",".")) * 100);
+            String fsum = String.Format("{0}", Convert.ToDecimal(param.Get("tbSum").Replace(",", ".")) * 100);
 
             var cultute = new CultureInfo("uk-UA")
             {
@@ -378,18 +378,22 @@ public partial class w4_AddRegularPayment : Page
             }
 
             command.Parameters.Clear();
-            command.CommandText = @"select a.nls, 
+
+            Bars.WebServices.NewNbs ws = new Bars.WebServices.NewNbs();
+            string _nbs = ws.UseNewNbs() ? "6510" : "6110";
+
+            command.CommandText = string.Format(@"select a.nls, 
                                            a.nms, 
                                            a.kf, 
                                            user_id as userid
                                       from accounts a, 
                                            w4_nbs_ob22 wob 
-                                     where a.nbs = '6110' 
+                                     where a.nbs = '{0}' 
                                        and a.ob22 = wob.ob_6110 
                                        and wob.nbs = '2625' 
                                        and wob.ob22 = :p_ob22 
                                        and a.branch = :p_branch
-                                       and rownum = 1";
+                                       and rownum = 1", _nbs);
             command.Parameters.Add("p_ob22", OracleDbType.Varchar2, ob22, ParameterDirection.Input);
             command.Parameters.Add("p_branch", OracleDbType.Varchar2, branch, ParameterDirection.Input);
 
@@ -454,7 +458,7 @@ public partial class w4_AddRegularPayment : Page
                     }
                 }
             }
-        
+
             rdr.Close();
             rdr.Dispose();
         }

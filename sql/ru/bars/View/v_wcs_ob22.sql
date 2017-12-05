@@ -14,30 +14,30 @@ PROMPT *** Create  view V_WCS_OB22 ***
   FROM sb_ob22 sb, cck_ob22 cb
  WHERE sb.r020 = cb.nbs
    AND sb.ob22 = cb.ob22
-   AND sb.r020 || sb.ob22 IN ('220201'
-                             ,'220202'
-                             ,'220205'
-                             ,'220206'
-                             ,'220220'
-                             ,'220227'
-                             ,'220228'
-                             ,'220232'
-                             ,'220233'
-                             ,'220234'
-                             ,'220235'
-                             ,'220238'
-                             ,'220239'
-                             ,'220240'
-                             ,'220241'
-                             ,'220242'
-                             ,'220243'
-                             ,'220254'
-                             ,'220255'
-                             ,'220256'
-                             ,'220257'
-                             ,'220258'
-                             ,'220261'
-                             ,'220262'
+   AND sb.r020 || sb.ob22 IN (decode(NEWNBS.GET_STATE,0,'220201','220354')
+                             ,decode(NEWNBS.GET_STATE,0,'220202','220355')
+                             ,decode(NEWNBS.GET_STATE,0,'220205','220356')
+                             ,decode(NEWNBS.GET_STATE,0,'220206','220357')
+                             ,decode(NEWNBS.GET_STATE,0,'220220','220358')
+                             ,decode(NEWNBS.GET_STATE,0,'220227','220361')
+                             ,decode(NEWNBS.GET_STATE,0,'220228','220362')
+                             ,decode(NEWNBS.GET_STATE,0,'220232','220363')
+                             ,decode(NEWNBS.GET_STATE,0,'220233','220364')
+                             ,decode(NEWNBS.GET_STATE,0,'220234','220365')
+                             ,decode(NEWNBS.GET_STATE,0,'220235','220366')
+                             ,decode(NEWNBS.GET_STATE,0,'220238',null)
+                             ,decode(NEWNBS.GET_STATE,0,'220239',null)
+                             ,decode(NEWNBS.GET_STATE,0,'220240',null)
+                             ,decode(NEWNBS.GET_STATE,0,'220241','220367')
+                             ,decode(NEWNBS.GET_STATE,0,'220242','220368')
+                             ,decode(NEWNBS.GET_STATE,0,'220243','220369')
+                             ,decode(NEWNBS.GET_STATE,0,'220254','220378')
+                             ,decode(NEWNBS.GET_STATE,0,'220255',null)
+                             ,decode(NEWNBS.GET_STATE,0,'220256','220379')
+                             ,decode(NEWNBS.GET_STATE,0,'220257','220380')
+                             ,decode(NEWNBS.GET_STATE,0,'220258','220381')
+                             ,decode(NEWNBS.GET_STATE,0,'220261','220384')
+                             ,decode(NEWNBS.GET_STATE,0,'220262','220385')
                              ,'220301'
                              ,'220302'
                              ,'220304'

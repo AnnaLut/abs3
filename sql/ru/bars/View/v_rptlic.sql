@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view V_RPTLIC ***
 
-  CREATE OR REPLACE FORCE VIEW BARS.V_RPTLIC ("SRT", "DKSRT", "VOBSRT", "MFO", "NB", "FDAT", "TIP", "ACC", "NLS", "KV", "NMS", "OKPO", "NMK", "ISP", "DAPP", "OSTF", "OSTFQ", "REF", "S", "SQ", "DOSS", "KOSS", "DOSSQ", "KOSSQ", "NLS2", "MFO2", "NB2", "NMK2", "OKPO2", "DK", "ND", "TT", "NAZN", "DATD", "BIS", "BRANCH", "DOSR", "KOSR", "OSTFR", "GRPLIST") AS 
+  CREATE OR REPLACE FORCE VIEW BARS.V_RPTLIC ("SRT", "DKSRT", "VOBSRT", "MFO", "NB", "FDAT", "TIP", "ACC", "NLS", "NLSALT", "KV", "NMS", "OKPO", "NMK", "ISP", "DAPP", "OSTF", "OSTFQ", "REF", "S", "SQ", "DOSS", "KOSS", "DOSSQ", "KOSSQ", "NLS2", "MFO2", "NB2", "NMK2", "OKPO2", "DK", "ND", "TT", "NAZN", "DATD", "BIS", "BRANCH", "DOSR", "KOSR", "OSTFR", "GRPLIST") AS 
   select nvl(srt,'2')   srt,
        nvl(dksrt,'1') dksrt,
        decode (vob, 96, 2, 99, 2, 1 )  vobsrt,
@@ -17,6 +17,7 @@ PROMPT *** Create  view V_RPTLIC ***
        tip,
        o.acc,
        nls,
+       nlsalt,
        kv,
        nms,
        okpo,
@@ -59,7 +60,7 @@ PROMPT *** Create  view V_RPTLIC ***
              fdat,
              acc,
              ref,
-	     s/100             s,
+       s/100             s,
              sq/100            sq,
              decode(sign(s),  -1,  decode(bis, 0,  s/100, 1,  s/100,0), 0)   doss,
              decode(sign(s),   1,  decode(bis, 0,  s/100, 1,  s/100,0), 0)   koss,
@@ -86,14 +87,14 @@ PROMPT *** Create  view V_RPTLIC ***
        union all
        ----
        -- строка с параметрами счета, параметрами его контрагента
-       -- дл€ сбербанка: со вход€щим переоцененным осттаком, а также суммой переоцененных оборотов з отчетный период
+       -- для сбербанка: со входящим переоцененным осттаком, а также суммой переоцененных оборотов з отчетный период
        ----
       select '3' srt,
              0 dksrt,
              fdat,
              acc,
              (case when (dosr<>0 or kosr<>0) then 0 else null end)  ref,
-	     0       s,
+       0       s,
              0       sq,
              0       doss,
              0       koss,
@@ -121,11 +122,11 @@ PROMPT *** Create  view V_RPTLIC ***
              )
        where fdat = (select min(fdat) from tmp_licm)
     ) t,
-    (-- выт€гиваем вход€щий остаток, на первый день указанного отчетного периода
+    (-- вытягиваем входящий остаток, на первый день указанного отчетного периода
      select acc, tip,
             sys_context('bars_context','user_mfo') mfo,
             (select val from params where par = 'NAME') nb,
-            nls, kv, nms, okpo, nmk, isp, dapp, ostf, ostfq, grplist
+            nls, kv, nms, nlsalt, okpo, nmk, isp, dapp, ostf, ostfq, grplist
        from tmp_licm
       where (fdat, acc) in (select min(fdat), acc
                               from tmp_licm

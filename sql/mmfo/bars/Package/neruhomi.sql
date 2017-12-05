@@ -1,10 +1,8 @@
-
- 
  PROMPT ===================================================================================== 
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/neruhomi.sql =========*** Run *** ==
  PROMPT ===================================================================================== 
  
-  CREATE OR REPLACE PACKAGE BARS.NERUHOMI 
+CREATE OR REPLACE PACKAGE BARS.NERUHOMI
 IS
    g_header_version   CONSTANT VARCHAR2 (64) := 'version 1.1  13/02/2013';
    g_transfer_timeout constant number := 15;
@@ -94,13 +92,22 @@ PROCEDURE PAY_JOB;
 -------------------
 END NERUHOMI;
 /
+
+
 CREATE OR REPLACE PACKAGE BODY BARS.NERUHOMI IS
-  g_body_version CONSTANT VARCHAR2(64) := 'version 1.21  28/07/2014';
+  g_body_version CONSTANT VARCHAR2(64) := 'version 1.24mmfo  22/11/2017';
   g_is_error     boolean := false;
   g_cur_rep_id   number := -1;
   g_cur_block_id number := -1;
   G_XMLHEAD constant varchar2(100) := '<?xml version="1.0" encoding="utf-8"?>';
 
+  procedure stop_batch
+    is
+    pragma autonomous_transaction;
+    begin
+      update batch_immobile b set b.status='INPROGRESS' where b.status='NEW';
+      commit;
+      end stop_batch;
   -- Ф-ція отримання залишку %%
   FUNCTION get_percent(p_key number) RETURN NUMBER IS
     ern CONSTANT POSITIVE := 208;
@@ -729,27 +736,35 @@ CREATE OR REPLACE PACKAGE BODY BARS.NERUHOMI IS
     l_err      varchar2(4000);
     l_nd        number(20);
   BEGIN
+    --Останавливаем наполнение пачки и обрабатываем с статусом INPROGRESS and ERROR
+     stop_batch;
 
     for l_rec_asvo in(select a.bsd, a.ob22de ob22, c.batch_id,a.kv, a.branch, b.userid, sum(ost) ost
                        from crnv_que c, batch_immobile b, asvo_immobile a
               where a.key=c.key
               and c.batch_id=b.id
               and b.direction='INTERNAL'
-              and b.status in('NEW','ERROR')
+              and b.status in('INPROGRESS','ERROR')
               group by  a.bsd, a.ob22de,  c.batch_id,a.kv, a.branch, b.userid)
   loop
     ---
     -- Подбор счета Б (счет 6 класса)
     --
+          bars_audit.info('NERUHOMI pay_to_6 l_rec_asvo.bsd = '||l_rec_asvo.bsd||
+                       ' l_rec_asvo.ob22 = '||l_rec_asvo.ob22||
+                       ' l_rec_asvo.batch_id = '||l_rec_asvo.batch_id||
+                       ' l_rec_asvo.kv = '||l_rec_asvo.kv||
+                       ' l_rec_asvo.branch = '||l_rec_asvo.branch||
+                       ' l_rec_asvo.ost = '||l_rec_asvo.ost);
     begin
       select a.nls, substr(a.nms, 1, 38)
         into l_nls_b, l_nam_b
         from accounts a
-       where nls = nbs_ob22_null('6110', '28', l_rec_asvo.branch)
+       where nls = nbs_ob22_null('6510', '28', l_rec_asvo.branch)
          and kv = 980;
     exception
       when no_data_found then
-        l_err := 'Не удалось найти счет 6110/28 для бранча "' ||
+        l_err := 'Не удалось найти счет 6510/28 для бранча "' ||
                  l_rec_asvo.branch || '"';
         update batch_immobile b set b.status='ERROR', b.last_time_refresh=sysdate
         where b.id=l_rec_asvo.batch_id;
@@ -764,12 +779,12 @@ CREATE OR REPLACE PACKAGE BODY BARS.NERUHOMI IS
       select a.nls, substr(a.nms, 1, 38)
         into l_nls_a, l_nam_a
         from accounts a
-       where nls like l_rec_asvo.bsd||'_00'||case l_rec_asvo.bsd when '2620' then '30' when '2630' then '46' when '2635' then '38' end||substr(l_rec_asvo.branch,11,4)
+       where nls like case l_rec_asvo.bsd when '2635' then '2630' else l_rec_asvo.bsd end ||'_00'||case l_rec_asvo.bsd when '2620' then '30' when '2630' then '46' when '2635' then '38' end||substr(l_rec_asvo.branch,11,4)
          and kv = l_rec_asvo.kv;
     exception
       when no_data_found then
         l_err := 'Не удалось найти счет ' ||
-        l_rec_asvo.bsd||'_00'||case l_rec_asvo.bsd when '2620' then '30' when '2630' then '46' when '2635' then '38' end || substr(l_rec_asvo.branch,11,4);
+        case l_rec_asvo.bsd when '2635' then '2630' else l_rec_asvo.bsd end||'_00'||case l_rec_asvo.bsd when '2620' then '30' when '2630' then '46' when '2635' then '38' end || substr(l_rec_asvo.branch,11,4);
 
         update batch_immobile b set b.status='ERROR', b.last_time_refresh=sysdate
         where b.id=l_rec_asvo.batch_id;
@@ -868,7 +883,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.NERUHOMI IS
         update batch_immobile b set b.status='SUCCEEDED', b.last_time_refresh=sysdate
         where b.id=l_rec_asvo.batch_id;
 
-        update asvo_immobile set fl = 4, refout = l_ref, errmsg=null
+        update asvo_immobile set fl = 4, refout = l_ref, errmsg=null, batch_id=l_rec_asvo.batch_id
         where key in(select key from crnv_que where batch_id=l_rec_asvo.batch_id);
 
         delete from crnv_que where batch_id=l_rec_asvo.batch_id;
@@ -921,7 +936,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.NERUHOMI IS
     l_okpo_a                    oper.id_a%type := f_ourokpo;
     l_nam_b                     oper.nam_b%type := 'АТ "Ощадбанк"';
     l_nls_b                     oper.nlsb%type;
-    l_okpo_b                    oper.id_b%type := '00032129';
+    l_okpo_b                    oper.id_b%type := '0000032129';
     --l_okpo_b                    oper.id_b%type := '00032129';
     l_kv                        oper.kv%type;
     l_nazn                      oper.nazn%type;
@@ -950,17 +965,24 @@ CREATE OR REPLACE PACKAGE BODY BARS.NERUHOMI IS
       into l_rec_exchange_of_resources
       from exchange_of_resources e
      where mfo = l_mfo_a;
+     --Останавливаем наполнение пачки и обрабатываем с статусом INPROGRESS and ERROR
+     stop_batch;
 
     for l_rec_asvo in(select a.bsd, a.ob22de ob22, c.batch_id,a.kv, a.branch, b.userid, sum(ost) ost
       from crnv_que c, batch_immobile b, asvo_immobile a
               where a.key=c.key
               and c.batch_id=b.id
               and b.direction='EXTERNAL'
-              and b.status in('NEW','ERROR')
+              and b.status in('INPROGRESS','ERROR')
               group by  a.bsd, a.ob22de,  c.batch_id,a.kv, a.branch, b.userid)
 
   loop
-
+      bars_audit.info('NERUHOMI pay_to_crnv l_rec_asvo.bsd = '||l_rec_asvo.bsd||
+                       ' l_rec_asvo.ob22 = '||l_rec_asvo.ob22||
+                       ' l_rec_asvo.batch_id = '||l_rec_asvo.batch_id||
+                       ' l_rec_asvo.kv = '||l_rec_asvo.kv||
+                       ' l_rec_asvo.branch = '||l_rec_asvo.branch||
+                       ' l_rec_asvo.ost = '||l_rec_asvo.ost);
 
     ---
     -- Подбор котлового счета (Счет А)
@@ -969,12 +991,12 @@ CREATE OR REPLACE PACKAGE BODY BARS.NERUHOMI IS
       select a.nls
         into l_nls_a
         from accounts a
-       where nls like l_rec_asvo.bsd||'_00'||case l_rec_asvo.bsd when '2620' then '30' when '2630' then '46' when '2635' then '38' end||substr(l_rec_asvo.branch,11,4)
+       where nls like case l_rec_asvo.bsd when '2635' then '2630' else l_rec_asvo.bsd end||'_00'||case l_rec_asvo.bsd when '2620' then '30' when '2630' then '46' when '2635' then '38' end||substr(l_rec_asvo.branch,11,4)
          and kv = l_rec_asvo.kv;
-       -- bars_audit.info('NER l_nls_a = '||l_nls_a); 
+       -- bars_audit.info('NER l_nls_a = '||l_nls_a);
     exception
       when no_data_found then
-        l_err := 'Не удалось найти счет ' || l_rec_asvo.bsd||'_00'
+        l_err := 'Не удалось найти счет ' || case l_rec_asvo.bsd when '2635' then '2630' else l_rec_asvo.bsd end||'_00'
                                           ||case l_rec_asvo.bsd when '2620' then '30' when '2630' then '46' when '2635' then '38' end
                                           ||substr(l_rec_asvo.branch,11,4);
       when others then
@@ -1008,7 +1030,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.NERUHOMI IS
     case l_rec_asvo.bsd
         when '2620' then '2620_030'||l_mfo_a
         when '2630' then '2630_046'||l_mfo_a
-        when '2635' then '2635_038'||l_mfo_a
+        when '2635' then '2630_038'||l_mfo_a
     end
     );
 
@@ -1225,7 +1247,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.NERUHOMI IS
                  xmlelement("mark", a.mark),
                  xmlelement("kod_otd", a.kod_otd),
                  xmlelement("tvbv", a.tvbv),
-                 xmlelement("attr", a.attr)
+                 xmlelement("attr", a.attr),
+				 xmlelement("batch_id", c.batch_id)
                  ))).getclobval() into l_xml_body
                 from asvo_immobile a, crnv_que c, batch_immobile b
                where a.key = c.key
@@ -1237,7 +1260,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.NERUHOMI IS
             update batch_immobile b set b.status='SUCCEEDED', b.last_time_refresh=sysdate
             where b.id=l_rec_asvo.batch_id;
 
-            update asvo_immobile set fl = 3, refout = l_ref, errmsg=null
+            update asvo_immobile set fl = 3, refout = l_ref, errmsg=null, batch_id=l_rec_asvo.batch_id
             where key in(select key from crnv_que where batch_id=l_rec_asvo.batch_id);
 
             delete from crnv_que where batch_id=l_rec_asvo.batch_id;
@@ -1384,7 +1407,7 @@ PROCEDURE before_pay_to_6(p_key number) is
   --------------
 END NERUHOMI;
 /
- show err;
+show err;
  
 PROMPT *** Create  grants  NERUHOMI ***
 grant EXECUTE                                                                on NERUHOMI        to BARS_ACCESS_DEFROLE;

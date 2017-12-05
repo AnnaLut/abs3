@@ -655,6 +655,7 @@ namespace CustomerList
                 string sql = "DECODE(a.DAZS,NULL,1,2) MOD," +
                     "a.acc ACC," +
                     "a.nls NLS," +
+                    "a.nlsalt NLSALT," +
                     "a.lcv LCV," +
                     "a.rnk RNK," +
                     "a.nms NMS," +
@@ -927,7 +928,7 @@ namespace CustomerList
 
                 Session["SQL_CURRENCY"] = "select distinct t.acc, t.kv from (" + query + ") t";
 
-                obj = BindTableWithNewFilter(sql, table + " a ", where, data);
+                obj = BindTableWithNewFilter(sql, table + " a ", where, data, new LogParams { CallerName = "CustService.GetCustAcc" });
 
                 obj[2] = title;
                 return obj;
@@ -1103,6 +1104,7 @@ namespace CustomerList
         private string GetSqlTemplate(string[] data)
         {
             string sqlStr = " a.tobo \"Відділення\", a.OB22 \"ОБ22\", a.nls || '(' || a.kv || ')' \"Номер рахунку\" ," +
+			        "a.nlsalt \"Альт. номер рахунку\"," +
                     "a.lcv \"Валюта\"," +
                     "a.nms \"Найменування рах.\"," +
                     "a.daos \"Дата відкриття\"," +

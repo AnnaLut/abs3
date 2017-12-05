@@ -12,12 +12,13 @@ PROMPT *** Create  procedure P_F2D_NN ***
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирования #2D для КБ
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     : 11/03/2016 (04/11/2015, 03/03/2015)
+% VERSION     : 06/11/2017 (11/03/2016, 04/11/2015)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-11.03.2016 протокол формирования будет сохраняться в таблицу
+06.11.2017 удалил все блоки для закрытых банков (по коду МФО)
+11.03.2016 протокол формирования будет сохраняться в таблицу 
            OTCN_TRACE_70
 03.11.2015 значение показателя 64 будем определять также как и в файле #E2.
 30.09.2014 для банка Надра будут включаться проводки Дт 2650 Кт 1919
@@ -29,14 +30,14 @@ PROMPT *** Create  procedure P_F2D_NN ***
            - SWIFT_CODE (после изменеия перечня доп.реквизитов)
 03.06.2014 для доп.реквизита tag like '59%' выбираем первых 3 символа
            из поля VALUE
-09.04.2014 включались суммы док-тов >=1001$ а необходимо 1000.01$ и больше
-03.04.2014 будут отбираться суммы документов строго больше 1000$
-27.02.2014 для ОПЕРУ СБ не будем включать проводки вида
+09.04.2014 включались суммы док-тов >=1001$ а необходимо 1000.01$ и больше 
+03.04.2014 будут отбираться суммы документов строго больше 1000$ 
+27.02.2014 для ОПЕРУ СБ не будем включать проводки вида 
            Дт '37396506' Кт '1500%' и назначение "розрахунки за чеками"
 19.02.2014 для физлиц резидентов не имеющих ОКРО определяем серию и номер
            паспорта
 13.02.2014 будут включаться док-ты с суммой не менее 1000.00$
-08.01.2014 для ОПЕРУ СБ будем включать проводки вида
+08.01.2014 для ОПЕРУ СБ будем включать проводки вида 
            Дт '37396506' Кт '1500%' и назначение "розрахунки за чеками"
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
    kodf_      VARCHAR2 (2)   := '2D';
@@ -134,15 +135,15 @@ PROMPT *** Create  procedure P_F2D_NN ***
    --курсор по контрагентам
    CURSOR c_main
    IS
-      SELECT   t.ko, decode(substr(b.b040,9,1),'2',substr(b.b040,15,2),substr(b.b040,10,2)),
+      SELECT   t.ko, decode(substr(b.b040,9,1),'2',substr(b.b040,15,2),substr(b.b040,10,2)), 
                c.rnk, trim(c.okpo), c.nmk, TO_CHAR (c.country), c.adr,
                NVL (c.ved, '00000'), c.codcagent, NVL(SUM (t.s_eqv),0),
-               NVL(SUM (gl.p_icurval (t.kv, t.s_kom, dat_)),0)
-          FROM OTCN_PROV_TEMP t, customer c, tobo b
+               NVL(SUM (gl.p_icurval (t.kv, t.s_kom, dat_)),0)  
+          FROM OTCN_PROV_TEMP t, customer c, tobo b  
          WHERE t.rnk = c.rnk
-           and c.tobo = b.tobo
+           and c.tobo = b.tobo   
       GROUP BY t.ko,
-               decode(substr(b.b040,9,1),'2',substr(b.b040,15,2),substr(b.b040,10,2)),
+               decode(substr(b.b040,9,1),'2',substr(b.b040,15,2),substr(b.b040,10,2)), 
                c.rnk,
                c.okpo,
                c.nmk,
@@ -225,8 +226,8 @@ PROMPT *** Create  procedure P_F2D_NN ***
          select substr(trim(value),1,4)
             into kod_n_
          from operw
-         where ref=p_ref_
-           and tag='KOD_N';
+         where ref = p_ref_
+           and tag = 'KOD_N';
       EXCEPTION WHEN NO_DATA_FOUND THEN
          kod_n_ := null;
       END;
@@ -244,11 +245,11 @@ PROMPT *** Create  procedure P_F2D_NN ***
                                                '2909003101',
                                                '292460205',
                                                '292490204') then
-               --d1#E2_ := '31';  -- было до 26.07.2012
+               --d1#E2_ := '31';  -- было до 26.07.2012                              
                d1#E2_ := '37';    -- с 26.07.2012 согласно письма Рощиной от 11.07.2012
             end if;
             if nlsk_ like '1500%' and
-                nls_ in ('37394501547') --and  --,'37396506')
+                nls_ in ('37394501547') --and  --,'37396506') 
                --(instr(lower(nazn_),'розрахунки за чеками') > 0 or  instr(lower(nazn_),'розрахунки по чеках') > 0)
             then
                d1#E2_ := '31';  -- с 26.07.2012 согласно письма Рощиной от 11.07.2012
@@ -260,11 +261,11 @@ PROMPT *** Create  procedure P_F2D_NN ***
             if instr(lower(nazn_),'грош') > 0 then
                d1#E2_ := '38';  -- с 26.07.2012 согласно письма Рощиной от 11.07.2012
             end if;
-
+            
             if mfo_ <> 300120 and instr(lower(nazn_),'комерц') > 0 then
                d1#E2_ := '38';  -- с 26.07.2012 согласно письма Рощиной от 11.07.2012
             end if;
-
+            
             if instr(lower(nazn_),'соц_альний переказ') > 0 then
                d1#E2_ := '38';  -- с 26.07.2012 согласно письма Рощиной от 11.07.2012
             end if;
@@ -276,7 +277,7 @@ PROMPT *** Create  procedure P_F2D_NN ***
 
          if mfo_ = 353575 then
             p_value_ := NVL (SUBSTR (TRIM (p_value_), 1, 2), '00');
-         else
+         else 
             if TRIM (p_value_) is null and d1#E2_ is not null then
                p_value_ := NVL (SUBSTR (TRIM (d1#E2_), 1, 2), '00');
             else
@@ -454,29 +455,25 @@ PROMPT *** Create  procedure P_F2D_NN ***
          b010_ := null;
          p_kodp_ := '65';
 
-         if mfo_ = 353575 then
-            p_value_ := NVL (SUBSTR (TRIM (p_value_), 1, 10), 'код банку');
-         else
-            if TRIM (p_value_) is null and d7#E2_ is not null then
-               p_value_ := NVL (SUBSTR (TRIM (d7#E2_), 1, 10), 'код банку');
-            end if;
+         if TRIM (p_value_) is null and d7#E2_ is not null then
+            p_value_ := NVL (SUBSTR (TRIM (d7#E2_), 1, 10), 'код банку');
          end if;
 
-         if mfo_ != 353575 and TRIM (p_value_) is null and d7#E2_ is null then
+         if TRIM (p_value_) is null and d7#E2_ is null then
             BEGIN
                SELECT substr(trim(value), 1, 12)
                   INTO swift_k_
                FROM OPERW
-               WHERE REF=REF_
+               WHERE REF = REF_
                  AND TAG LIKE '58A%'
-                 AND ROWNUM=1;
+                 AND ROWNUM = 1;
 
                BEGIN
                   SELECT b010
                      INTO p_value_
                   FROM RC_BNK
                  WHERE SWIFT_CODE LIKE swift_k_||'%'
-                   AND ROWNUM=1;
+                   AND ROWNUM = 1;
                EXCEPTION WHEN NO_DATA_FOUND THEN
                   swift_k_ := substr(swift_k_,1,4)||' '||substr(swift_k_,5,2)||
                               ' '||substr(swift_k_,7,2);
@@ -485,7 +482,7 @@ PROMPT *** Create  procedure P_F2D_NN ***
                         INTO p_value_
                      FROM RC_BNK
                      WHERE SWIFT_CODE LIKE swift_k_||'%'
-                       AND ROWNUM=1;
+                       AND ROWNUM = 1;
                   EXCEPTION WHEN NO_DATA_FOUND THEN
                      null;
                   END;
@@ -495,16 +492,16 @@ PROMPT *** Create  procedure P_F2D_NN ***
                   SELECT substr(trim(value), 1, 12)
                      INTO swift_k_
                   FROM OPERW
-                  WHERE REF=REF_
+                  WHERE REF = REF_
                     AND TAG LIKE '57A%'
-                    AND ROWNUM=1;
+                    AND ROWNUM = 1;
 
                   BEGIN
                      SELECT b010
                         INTO p_value_
                      FROM RC_BNK
                      WHERE SWIFT_CODE LIKE swift_k_||'%'
-                       AND ROWNUM=1;
+                       AND ROWNUM = 1;
                   EXCEPTION WHEN NO_DATA_FOUND THEN
                      swift_k_ := substr(swift_k_,1,4)||' '||substr(swift_k_,5,2)||
                                  ' '||substr(swift_k_,7,2);
@@ -513,7 +510,7 @@ PROMPT *** Create  procedure P_F2D_NN ***
                            INTO p_value_
                         FROM RC_BNK
                         WHERE SWIFT_CODE LIKE swift_k_||'%'
-                          AND ROWNUM=1;
+                          AND ROWNUM = 1;
                      EXCEPTION WHEN NO_DATA_FOUND THEN
                         null;
                      END;
@@ -524,16 +521,16 @@ PROMPT *** Create  procedure P_F2D_NN ***
                      SELECT substr(trim(value), 1, 12)
                         INTO swift_k_
                      FROM OPERW
-                     WHERE REF=REF_
+                     WHERE REF = REF_
                        AND TAG LIKE '57D%'
-                       AND ROWNUM=1;
+                       AND ROWNUM = 1;
 
                      BEGIN
                         SELECT b010
                            INTO p_value_
                         FROM RC_BNK
                         WHERE SWIFT_CODE LIKE swift_k_||'%'
-                          AND ROWNUM=1;
+                          AND ROWNUM = 1;
                      EXCEPTION WHEN NO_DATA_FOUND THEN
                         swift_k_ := substr(swift_k_,1,4)||' '||substr(swift_k_,5,2)||
                                     ' '||substr(swift_k_,7,2);
@@ -542,7 +539,7 @@ PROMPT *** Create  procedure P_F2D_NN ***
                               INTO p_value_
                            FROM RC_BNK
                            WHERE SWIFT_CODE LIKE swift_k_||'%'
-                             AND ROWNUM=1;
+                             AND ROWNUM = 1;
                         EXCEPTION WHEN NO_DATA_FOUND THEN
                            null;
                         END;
@@ -552,17 +549,17 @@ PROMPT *** Create  procedure P_F2D_NN ***
                         SELECT substr(trim(value), 1, 12)
                            INTO swift_k_
                         FROM OPERW
-                        WHERE REF=REF_
-                          AND TAG='57'
-                          AND length(trim(value))>3
-                          AND ROWNUM=1;
+                        WHERE REF = REF_
+                          AND TAG = '57'
+                          AND length(trim(value)) > 3
+                          AND ROWNUM = 1;
 
                         BEGIN
                            SELECT b010
                               INTO p_value_
                            FROM RC_BNK
                            WHERE SWIFT_CODE LIKE swift_k_||'%'
-                             AND ROWNUM=1;
+                             AND ROWNUM = 1;
                         EXCEPTION WHEN NO_DATA_FOUND THEN
                            swift_k_ := substr(swift_k_,1,4)||' '||substr(swift_k_,5,2)||
                                        ' '||substr(swift_k_,7,2);
@@ -571,7 +568,7 @@ PROMPT *** Create  procedure P_F2D_NN ***
                                  INTO p_value_
                               FROM RC_BNK
                               WHERE SWIFT_CODE LIKE swift_k_||'%'
-                                AND ROWNUM=1;
+                                AND ROWNUM = 1;
                            EXCEPTION WHEN NO_DATA_FOUND THEN
                               null;
                            END;
@@ -581,9 +578,9 @@ PROMPT *** Create  procedure P_F2D_NN ***
                            SELECT substr(trim(value), 1, 12)
                               INTO swift_k_
                            FROM OPERW
-                           WHERE REF=REF_
-                             AND TAG='NOS_B'
-                             AND ROWNUM=1;
+                           WHERE REF = REF_
+                             AND TAG = 'NOS_B'
+                             AND ROWNUM = 1;
 
                            swift_k_ := substr(swift_k_,1,4)||' '||substr(swift_k_,5,2)||
                                        ' '||substr(swift_k_,7,2);
@@ -592,7 +589,7 @@ PROMPT *** Create  procedure P_F2D_NN ***
                                  INTO p_value_
                               FROM RC_BNK
                               WHERE SWIFT_CODE LIKE swift_k_||'%'
-                                AND ROWNUM=1;
+                                AND ROWNUM = 1;
                            EXCEPTION WHEN NO_DATA_FOUND THEN
                               null;
                            END;
@@ -607,14 +604,12 @@ PROMPT *** Create  procedure P_F2D_NN ***
             p_value_ := NVL (SUBSTR (TRIM (p_value_), 1, 10), 'код банку');
          end if;
 
-         if mfo_ != 353575 then
-            IF trim(p_value_) != 'код банку'
-            THEN
-               b010_:= SUBSTR (TRIM (p_value_), 1, 10);
-            ELSE
-               p_value_ := country_||'0000000';
-            END IF;
-         end if;
+         IF trim(p_value_) != 'код банку'
+         THEN
+            b010_:= SUBSTR (TRIM (p_value_), 1, 10);
+         ELSE
+            p_value_ := country_||'0000000';
+         END IF;
       ELSE
          p_kodp_ := 'NN';
       END IF;
@@ -660,17 +655,17 @@ BEGIN
      select decode(glb, 0, '0', lpad(to_char(glb), 3, '0'))
         into ourGLB_
      from rcukru
-     where mfo=mfo_
-       and rownum=1;
+     where mfo = mfo_
+       and rownum = 1;
    exception
      when no_data_found then
          ourGLB_ := null;
    END;
 
    sum_kom := gl.p_icurval(840, 100000, dat_);  -- сума комiсiї
-
+    
    kol_ref_ := 0;
-
+   
    IF mfou_=300465 and mfo_ != mfou_ and Dat_ > to_date('28072009','ddmmyyyy')
    THEN
       select count(*)
@@ -684,7 +679,7 @@ BEGIN
         and d_rec like '%D' || to_char(Dat_, 'yymmdd') || '%';
    END IF;
 
-   if ( (mfou_ = 300465 and mfou_ = mfo_) OR mfou_ <> 300465 ) and kol_ref_ = 0
+   if ( (mfou_ = 300465 and mfou_ = mfo_) OR mfou_ <> 300465 ) and kol_ref_ = 0 
    then
         -- отбор проводок, удовлетворяющих условию
         -- надходження вiд нерезидентiв
@@ -706,19 +701,7 @@ BEGIN
                         mfo_ in (333368, 380764, 315784) ) -- BAP
                    OR  (SUBSTR (o.nlsd, 1, 4) in ('2909') and
                         SUBSTR (o.nlsk, 1, 4) in ('1919','3739') and
-                        mfo_ in (333368, 380764) )
-                   OR  (o.nlsd LIKE '2809%' and
-                        o.nlsk LIKE '1500%' and
-                        mfo_=300120)
-                   OR  (o.nlsd LIKE '3800%' and           -- 24.02.2010 OAB
-                        o.nlsk LIKE '1500%' and
-                        mfo_ =353575)
-                   OR  (o.nlsd LIKE '3800%' and           -- 12.03.2010 OAB
-                        o.nlsk LIKE '1500%' and
-                        mfo_=300120)
-                   OR  (o.nlsd LIKE '3800%' and           -- 29.12.2010 OAB
-                        o.nlsk LIKE '1500%' and
-                        mfo_=380623)
+                        mfo_ in (333368) )
                    OR  (SUBSTR (o.nlsd, 1, 4) IN
                                                 ('1502',
                                                  '1511',
@@ -755,14 +738,8 @@ BEGIN
                           AND SUBSTR (LOWER (TRIM (o.nazn)), 1, 4) != 'конв')
                    OR (o.nlsd LIKE '1919%'     and
                        o.nlsk LIKE '1500%'     and
-                       mfo_ in (300465,300205,380764) and
+                       mfo_ in (300465) and
                        SUBSTR (LOWER (TRIM (o.nazn)), 1, 4) = 'конв')
-                   OR (o.nlsd LIKE '350009090%'     and
-                       o.nlsk like '1500543902%' and
-                       mfo_ in (300205) )
-                   OR (o.nlsd LIKE '361979119%'     and
-                       o.nlsk like '150072010%' and
-                       mfo_ in (300205) )
                    OR (o.nlsd LIKE '191992%'     and
                        (o.nlsk LIKE '1500%' or o.nlsk like '1600%') and
                        mfo_ in (300465) )
@@ -777,22 +754,18 @@ BEGIN
                        mfo_ in (300465) )
                    OR ((o.nlsd LIKE '292430003718%' or o.nlsd LIKE '292460003717%') and  -- 22/07/2013
                         o.nlsk LIKE '1500%'  and
-                       mfo_ in (300465) )
+                       mfo_ in (300465) )    
                    OR ( o.nlsd like '3800%'   -- 29/07/2012
                         AND SUBSTR (o.nlsk, 1, 4) in ('1500','1600')
                         AND mfo_ in (300465)
-                        AND ref in (select ref
-                                    from oper
-                                    where ( ((nlsa like '70%' or nlsa like '71%') and
+                        AND ref in (select ref 
+                                    from oper 
+                                    where ( ((nlsa like '70%' or nlsa like '71%') and 
                                              (nlsb like '1500%' or nlsb like '1600%')) or
-                                            ((nlsa like '1500%' or nlsa like '1600%') and
+                                            ((nlsa like '1500%' or nlsa like '1600%') and 
                                             (nlsb like '70%' or nlsb like '71%')) )
                                    )
-                        AND gl.p_icurval(o.kv, o.s*100, dat_) > sum_kom )
-                   OR (o.nlsd LIKE '3800%'     and
-                       o.nlsk LIKE '1500%'     and
-                       mfo_ in (353575) and
-                       SUBSTR (LOWER (TRIM (o.nazn)), 1, 4) = 'конв') )
+                        AND gl.p_icurval(o.kv, o.s*100, dat_) > sum_kom ))
                    AND o.accd = ca.acc);
 
         -- удаляем проводки пополнения коррсчета (в OPER Дт 1500 Кт 1500)
@@ -819,32 +792,11 @@ BEGIN
                           and a.mfoa != a.mfob);
         END IF;
 
-        -- для MFO=380764 удаляем проводки у которых назн.платежа "Списание средств согласно свифт"
-        IF mfo_ = 380764 THEN
-            delete from otcn_prov_temp
-            where nlsd like '1919%'
-              and nlsk like '1500%';  -- and LOWER (nazn) like '%списание средств согласно свифт%';
-        END IF;
-
         -- удаляем проводки Дт 1600 Кт 1500
         if mfo_ = 300465 then
             delete from otcn_prov_temp
             where nlsd like '1600%'
             and nlsk like '1500%';
-        end if;
-
-        -- удаляем проводки которые имеют код страны 804 Демарк
-        if mfo_ in (353575,380623) then
-            delete from otcn_f70_temp
-            where nlsd like '3800%'
-            and nlsk like '1500%'
-            and ref in (select a.ref
-                        from oper a, operw a1
-                        where a.ref in (select b.ref from otcn_f70_temp b)
-                          and a.nlsa like '7%' and a.nlsb like '1500%'
-                          and a.ref=a1.ref
-                          and a1.tag='D6#70'
-                          and trim(a1.value)='804');
         end if;
 
         -- удаляем проводки комиссии (Дт 7100 Кт 1500)
@@ -876,7 +828,7 @@ BEGIN
                                and nlsb like '2909%'
                                and nazn like '#E2;%'
                                and trim(d_rec) is not null
-                               and d_rec like '%D' || to_char(Dat_, 'yymmdd')|| '%') v
+                               and d_rec like '%D' || to_char(Dat_, 'yymmdd')|| '%') v 
             WHERE o.kv != 980
               and o.fdat between Dat_ - 10 and dat_
               and o.ref = v.ref
@@ -912,18 +864,18 @@ BEGIN
          END;
       end if;
 
-      -- для физлиц резидентов не имеющих OKPO
+      -- для физлиц резидентов не имеющих OKPO 
       --определяем серию и номер паспорта из PERSON
       if codc_ = 5 and trim(okpo_) in ('99999','999999999','00000','000000000','0000000000')
       then
          BEGIN
-            select ser, numdoc
+            select ser, numdoc 
                into ser_, numdoc_
             from person
             where rnk = rnk_
               and rownum=1;
-         okpo_ := trim(ser_) || ' ' || trim(numdoc_);
-         EXCEPTION WHEN NO_DATA_FOUND THEN
+         okpo_ := trim(ser_) || ' ' || trim(numdoc_);               
+         EXCEPTION WHEN NO_DATA_FOUND THEN 
             null;
          END;
       end if;
@@ -1038,7 +990,7 @@ BEGIN
                         SELECT '804'
                            INTO kod_g_
                         FROM OPERW
-                        WHERE REF = ref_
+                        WHERE REF = ref_ 
                           AND tag like '59%'
                           AND substr(trim(value),1,3)='/UA';
                      EXCEPTION WHEN NO_DATA_FOUND THEN
@@ -1046,7 +998,7 @@ BEGIN
                             SELECT '804'
                                INTO kod_g_
                             FROM OPERW
-                            WHERE REF = ref_
+                            WHERE REF = ref_ 
                               AND tag like '59%'
                               AND instr(UPPER(trim(value)),'UKRAINE') > 0;
                          EXCEPTION WHEN NO_DATA_FOUND THEN
@@ -1230,7 +1182,7 @@ BEGIN
                          d1#E2_ := null;
                      END;
 
-                     if d1#E2_ in ('01','02','03','04','05','06','07','08') and formOk_
+                     if d1#E2_ in ('01','02','03','04','05','06','07','08') and formOk_ 
                      then
                         nnnn_ := nnnn_ + 1;
                         -- код валюти
@@ -1333,7 +1285,7 @@ BEGIN
                                  end;
                               end if;
 
-                              if i=9 and val_ is null and D7#E2_ is null then
+                              if i = 9 and val_ is null and D7#E2_ is null then
                                  begin
                                     select trim(value)
                                        into kod_b_

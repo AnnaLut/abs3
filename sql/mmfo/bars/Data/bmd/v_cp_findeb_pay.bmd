@@ -123,7 +123,7 @@ begin
   bars_metabase.add_column(l_tabid, 2, 'FLAG_RUNN', 'B', 'Запуск~погашения~номинала', null, 22, 7, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 3, 'FLAG_RUNR', 'B', 'Запуск~погашения~купона', null, 22, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 4, 'ID', 'N', 'Идентификатор~ЦП', null, 22, 2, 1, 0, 0, 0, '', '', 1, 1, '', 1, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'INITIAL_REF', 'N', '', null, 22, 3, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'INITIAL_REF', 'N', 'Референс~початкової~угоди', null, 22, 3, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
   bars_metabase.add_column(l_tabid, 6, 'NLSFD', 'C', 'Консол.~счет ФД', null, 15, 0, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
   bars_metabase.add_column(l_tabid, 7, 'NLSN', 'C', 'Счет номинала', null, 15, 5, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 8, 'NLSR', 'C', 'Счет купона', null, 15, 8, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);

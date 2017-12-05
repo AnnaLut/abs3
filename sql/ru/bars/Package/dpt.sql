@@ -838,7 +838,7 @@ begin
   end;
 
   -- неформализуемое изменение классификатора KL_R013 c 02/02/2010
-  if l_r013 is null and p_depnbs in ('2630', '2635') then
+  if l_r013 is null and ((newnbs.g_state = 1 and p_depnbs = '2630') or (newnbs.g_state = 0 and p_depnbs in ('2630', '2635'))) then
      l_r013 := r013_actdep;
   end if;
   -- заплатка дл€ технических счетов
@@ -854,6 +854,7 @@ begin
   bars_audit.trace('%s (s180, s181, r011, r013, d020) = (%s, %s, %s, %s)',
                    l_title, l_s180, l_s181, l_r011, l_r013, l_d020);
 
+/* -- commented by Livshyts 29/11/17 for newnbs . Not Actual Check 
   -- контроль соответстви€ бал.счета срочности депозита только дл€ 2630,2635
   begin
     select s181
@@ -863,7 +864,7 @@ begin
        and prem    = ' Ѕ'
        and d_open <= l_bdate
        and nvl(d_close, l_bdate) >= l_bdate
-       and r020 in ('2630', '2635');
+       and ((r020 = '2630' and newnbs.g_state = 1) or (newnbs.g_state = 0 and r020 in ('2630', '2635')));
   exception
     when no_data_found then
       l_s181et := null;
@@ -872,7 +873,7 @@ begin
      -- заданный срок депозита не соответствует бал.счету %s (%s != %s)
      bars_error.raise_nerror (g_modcode, 'NBS181_MISMATCH', p_depnbs, l_s181, l_s181et);
   end if;
-
+*/
   -- заполнение спецпараметров дл€ депозитного счета
   update specparam
      set s180 = l_s180,

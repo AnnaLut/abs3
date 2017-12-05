@@ -3,28 +3,27 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" >
 <html>
 <head>
+    <base target="_self" />
     <title>Параметри депозитного договору</title>
-    <meta content="C#" name="CODE_LANGUAGE" />
-    <meta content="JavaScript" name="vs_defaultClientScript" />
-    <meta content="http://schemas.microsoft.com/intellisense/ie5" name="vs_targetSchema" />
+    
     <link href="Styles.css" type="text/css" rel="stylesheet" />
+
     <script type="text/javascript" language="jscript" src="/Common/WebEdit/NumericEdit.js"></script>
     <script type="text/javascript" language="jscript" src="/Common/Script/cross.js"></script>
-    <script type="text/javascript" language="JavaScript" src="Scripts/DptDealParams.js?v1.7.76"></script>
+    <script type="text/javascript" language="JavaScript" src="Scripts/DptDealParams.js?v1.7.77"></script>
     <script type="text/javascript" language="javascript" src="/Common/WebEdit/RadInput.js"></script>
     <script type="text/javascript" language="JavaScript" src="Scripts/Common.js?v1.1"></script>
-    <style type="text/css">
-        .auto-style1 {
-            height: 125px;
-        }
-    </style>
+    
+    <script type="text/javascript" src="/barsroot/Scripts/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="/barsroot/Scripts/bars/bars.ui.js"></script>
+
 </head>
 <body onkeydown="fnHotKey()">
     <form id="DptDealParamsForm" method="post" runat="server">
-    <table width="100%" align="left" border="0" id="mainTable" style="visibility: visible">
+    <table width="100%" align="left" border="0" id="mainTable" style="visibility: visible" >
         <tr>
             <td>
-                <div style="background-color: lightgrey">
+                <div style="background-color: lightgrey" >
                     <table id="T" cellspacing="0" cellpadding="0" border="2">
                         <tr>
                             <td>
@@ -46,15 +45,27 @@
                             <td>
                                 &nbsp;
                                 <img class="outset" id="btAccounts" title="Таблична форма рахунків депозиту" onclick="fnTabForm()"
-                                    src="/Common/Images/DETAILS.gif" height="16" alt="Рахунки" />
-                                <img class="outset" id="btPrint" title="Друк договору" onclick="fnPrint(false)" 
-                                    src="/Common/Images/PRINT.gif" width="16" alt="Друк" />
+                                    src="/Common/Images/DETAILS.gif" width="16" height="16" alt="Рахунки" />
+<%--                                <img class="outset" id="btPrint" title="Друк тексту депозитного договору" runat="server" 
+                                    onclick="if (isFrx == 1){ fnPrint(false); return false; } else {  return true; }" --%>
+                                <button id="btPrint" title="Друк тексту депозитного договору" type="button" runat="server" 
+                                    onclick="if (beforePrint())" onserverclick="btPrint_ServerClick" 
+                                    style="border: none; vertical-align: top;" >
+                                    <img class="outset" src="/Common/Images/default/16/print.png" alt="Друк" />
+                                </button>
                                 <img class="outset" id="imgWord" title="Друк договору в Word" onclick="fnPrint(true)"
-                                    src="/Common/Images/word_2005.gif" width="16" alt="Word" />
+                                    src="/Common/Images/word_2005.gif" width="16" height="16" alt="Word" />
+                                &nbsp;
                                 <img class="outset" id="btChilds" title="Відкрити дод. угоду" onclick="fnDopSogl()"
-                                    src="/Common/Images/CHILDS.gif" width="16" alt="Відкрити" />
+                                    src="/Common/Images/CHILDS.gif" width="16"  height="16" alt="Відкрити" />
                                 <img class="outset" id="btDubl" title="Пролонгація договору" onclick="fnPrepareProlongation()" 
-                                    src="/Common/Images/prolong.bmp" width="16" height="16" alt="Пролонгація"/>
+                                    src="/Common/Images/Prolong.gif" width="16"  height="16" alt="Пролонгація" />
+                                <img class="outset" id="btAddOption" title="Додаткові параметри" onclick="fnShowAddOption()" 
+                                    src="/Common/Images/AddOption.gif" width="16"  height="16" alt="Додаткові параметри договору"/>
+                                <img class="outset" id="btCrtAgreement" title="Додаткові угоди" onclick="fnShowCrtAgreement()" 
+                                    src="/Common/Images/Agreement.gif" width="16" height="16" alt="Заключення додаткової угоди до договору"/>
+                                <img class="outset" id="btSwiftDetails" title="SWIFT реквізити" onclick="fnShowSwiftDetails()" 
+                                    src="/Common/Images/SWIFT.gif" width="16" height="16" alt="SWIFT реквізити для виплат по договору"/>
                                 &nbsp;
                             </td>
                             <td>
@@ -104,7 +115,7 @@
                                             <span class="BarsLabel" id="lbRnk">Рег.№:</span>
                                         </td>
                                         <td>
-                                            <input class="BarsTextBoxRO" id="tbRnk" title="Рег.№ клієнта'" style="width: 60px"
+                                            <input class="BarsTextBoxRO" id="tbRnk" title="Рег.№ клієнта'" style="width: 80px"
                                                 readonly="readonly" type="text" size="2" onchange="fnGetCustomer()" />
                                         </td>
                                         <td nowrap="nowrap" align="right">
@@ -150,9 +161,13 @@
                                         <td nowrap="nowrap" align="right">
                                             <span class="BarsLabel" id="lbProduct">Продукт:</span>
                                         </td>
-                                        <td colspan="2">
+                                        <td>
+                                            <input class="BarsTextBoxRO" id="tbProduct" title="Депорзитний продукт" style="width: 50px; text-align: center"
+                                                readonly="readonly" type="text" size="1" name="tbProduct"/>
+                                        </td>
+                                        <td>
                                             <asp:DropDownList ID="ddProduct" DataTextField="TYPE_NAME" DataValueField="TYPE_ID"
-                                                runat="server" Width="354px">
+                                                onclick="getFilteredProduct(this)" runat="server" Width="300px">
                                             </asp:DropDownList>
                                         </td>
                                     </tr>
@@ -160,18 +175,20 @@
                                         <td align="right">
                                             <span class="BarsLabel" id="lbVal">Валюта:</span>
                                         </td>
-                                        <td>
+                                        <td nowrap="nowrap">
                                             <input class="BarsTextBoxRO" id="tbIso" title="Валюта договора" style="width: 50px; text-align: center"
                                                 readonly="readonly" type="text" size="1" name="tbIso"/>
+                                            <input id="tbCurrency" type="hidden" name="tbCurrency" />
                                         </td>
                                         <td>
-                                            <asp:DropDownList ID="ddKv" DataTextField="NAME" DataValueField="KV" runat="server" Width="300px">
+                                            <asp:DropDownList ID="ddKv" DataTextField="NAME" DataValueField="KV" 
+                                                onclick="getFilteredCurrency(this)" runat="server" Width="300px">
                                             </asp:DropDownList>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td nowrap="nowrap" align="right">
-                                            <span class="BarsLabel" id="lbVidDog">Вид договору:</span>
+                                            <span class="BarsLabel" id="lbVidDog">Вид:</span>
                                         </td>
                                         <td>
                                             <input class="BarsTextBoxRO" id="tbVidD" title="Код виду договору" style="width: 50px;
@@ -202,8 +219,8 @@
                                             <span class="BarsLabel" id="lbNDog">№ договору:</span>
                                         </td>
                                         <td>
-                                            <input class="BarsTextBox" id="tbND" title="№ договору" tabindex="1" type="text"
-                                                onchange="fnCheckNd()" style="width: 213px; text-align:center" name="tbND" />
+                                            <input class="BarsTextBox" id="tbND" name="tbND" title="№ договору" tabindex="1" type="text"
+                                                onchange="fnCheckNd()" style="width: 213px; text-align:center" maxlength="35" />
                                         </td>
                                     </tr>
                                     <tr>
@@ -211,8 +228,8 @@
                                             <span class="BarsLabel" id="lbSum">Сума:</span>
                                         </td>
                                         <td>
-                                            <input class="BarsTextBox" id="tbSum" tabindex="2" onchange="SetProcs()" title="Сума договору"
-                                                style="text-align: right; width: 213px" type="text" name="tbSum" />
+                                            <input class="BarsTextBox" id="tbSum" type="text" name="tbSum" title="Сума договору" maxlength="10"
+                                                onchange="fnCheckAmount(this)" tabindex="2" style="text-align: right; width: 150px" />
                                         </td>
                                     </tr>
                                     <tr>
@@ -220,32 +237,33 @@
                                             <span class="BarsLabel" id="lbMinSum">Незнижувальний залишок:</span>
                                         </td>
                                         <td>
-                                            <input class="BarsTextBox" id="tbMinSum" title="Незнижуваний залишок" style="width: 213px;
+                                            <input class="BarsTextBox" id="tbMinSum" title="Незнижуваний залишок" style="width: 150px;
                                                 text-align: right" type="text" tabindex="3" />
+                                            <input class="BarsTextBox" id="tbMaxSum" type="hidden" />
                                         </td>
                                     </tr>
                                     <tr>
                                         <td style="white-space: nowrap; text-align: right">
-                                            <span class="BarsLabel" id="Span3">Періодичність виплати %%:</span>
+                                            <span class="BarsLabel" id="lbFreqV">Періодичність виплати %%:</span>
                                         </td>
                                         <td style="white-space: nowrap" align="left">
                                             <input id="tbFreqV" type="text" title="Код періодичності виплати %%" name="tbFreqV" 
                                                 style="width: 35px; text-align: center" readonly="readonly" class="BarsTextBoxRO" />
                                             <asp:DropDownList ID="ddFreqV" onclick="cmb_dlg(this,document.all.tbFreqV)" runat="server"
-                                                Width="180px">
+                                                Width="180px" class="BarsTextBoxRO" >
                                                 <asp:ListItem></asp:ListItem>
                                             </asp:DropDownList>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td style="white-space: nowrap; text-align: right">
-                                            <span class="BarsLabel" id="Span2">Штраф при достр. розторг.:</span>
+                                            <span class="BarsLabel" id="lbStop">Штраф при достр. розторг.:</span>
                                         </td>
                                         <td>
                                             <input id="tbStop" type="text" title="Код штрафу за дострокове розсторгнення договору"
                                                 style="width: 35px; text-align: center" readonly="readonly" class="BarsTextBoxRO"  />
                                             <asp:DropDownList ID="ddStop" runat="server"
-                                                Width="180px">
+                                                Width="180px" class="BarsTextBoxRO" >
                                                 <asp:ListItem></asp:ListItem>
                                             </asp:DropDownList>
                                         </td>
@@ -262,7 +280,7 @@
                                         </td>
                                         <td>
                                             <input id="tbDatZ" type="hidden" /><input id="tbDatZ_Value" type="hidden" name="tbDatZ" /><input
-                                                id="tbDatZ_TextBox" title="Дата заключення договору" style="width: 110px; text-align: center"
+                                                id="tbDatZ_TextBox" title="Дата заключення договору" style="width: 90px; text-align: center"
                                                 type="text" maxlength="10" tabindex="9" class="BarsTextBox" />
                                         </td>
                                     </tr>
@@ -272,8 +290,8 @@
                                         </td>
                                         <td>
                                             <input id="tbDatN" type="hidden" /><input id="tbDatN_Value" type="hidden" name="tbDatN" /><input
-                                                id="tbDatN_TextBox" title="Дата початку договору" style="width: 110px; text-align: center"
-                                                type="text" maxlength="10" tabindex="10" />
+                                                id="tbDatN_TextBox" title="Дата початку договору" style="width: 90px; text-align: center"
+                                                type="text" maxlength="10" tabindex="10" class="BarsTextBox" />
                                         </td>
                                     </tr>
                                     <tr>
@@ -282,8 +300,8 @@
                                         </td>
                                         <td>
                                             <input id="tbDatO" type="hidden" /><input id="tbDatO_Value" type="hidden" name="tbDatO" /><input
-                                                id="tbDatO_TextBox" title="Дата завершення договору" style="width: 110px; text-align: center"
-                                                type="text" maxlength="10" tabindex="11" />
+                                                id="tbDatO_TextBox" title="Дата завершення договору" style="width: 90px; text-align: center"
+                                                type="text" maxlength="10" tabindex="11" class="BarsTextBox" />
                                         </td>
                                     </tr>
                                     <tr>
@@ -292,8 +310,8 @@
                                         </td>
                                         <td>
                                             <input id="tbDatV" type="hidden" /><input id="tbDatV_Value" type="hidden" name="tbDatV" /><input
-                                                id="tbDatV_TextBox" title="Дата повернення" style="width: 110px; text-align: center"
-                                                type="text" maxlength="10" tabindex="12" />
+                                                id="tbDatV_TextBox" title="Дата повернення" style="width: 90px; text-align: center"
+                                                type="text" maxlength="10" tabindex="12" class="BarsTextBox" />
                                         </td>
                                     </tr>
                                     <tr>
@@ -301,7 +319,7 @@
                                             <span class="BarsLabel" id="lbKtDay" style="color: Olive">К-cть днів:</span>
                                         </td>
                                         <td>
-                                            <input id="tbKtDay" title="Кількість днів" style="width: 110px; text-align: center"
+                                            <input id="tbKtDay" title="Кількість днів" style="width: 90px; text-align: center"
                                                 type="text" maxlength="10" readonly="readonly" class="BarsTextBoxRO" />
                                         </td>
                                     </tr>
@@ -312,40 +330,38 @@
                             <asp:Panel ID="pnAcrRate" runat="server" GroupingText="%% ставка">
                                 <table>
                                     <tr>
-                                        <td colspan="3">
+                                        <td colspan="4">
                                             <input id="cbCompProc" type="checkbox" onclick="fnCompProc()" />
                                             <label class="BarsLabel" for="cbCompProc">капіталізація відсотків</label>
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td colspan="3">
-                                            <input id="cbRatePerson" checked="checked" onclick="fnRatePerson(this)" type="checkbox" /><label
-                                                for="cbRatePerson">індивідуальна</label>
+                                        <td style="white-space: nowrap" class="auto-style2">
+                                            <input id="cbRatePerson" checked="checked" onclick="fnRatePerson(this)" 
+                                                type="checkbox" title="Індивідуальна відсоткова ставка" /><label
+                                                for="cbRatePerson">індив.</label>
                                         </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
+                                        <td class="auto-style2">
                                             <img id="btCalcRate" title="Розрахувати індивідуальну %% ставку" onclick="SetProcs()"
                                                 src="/Common/Images/A_PROC.gif" class="outset" align="top" alt="Розрахувати ставку" />
                                         </td>
-                                        <td style="white-space: nowrap">
-                                            <input class="BarsTextBox" id="tbIr" onblur="if (checkNumber(this)) CheckRate();" title="Індивидуальна % ставка"
-                                                style="width: 60px; text-align: right" type="text" name="tbIr" tabindex="20" />
+                                        <td style="white-space: nowrap" class="auto-style2">
+                                            <input class="BarsTextBox" id="tbIr" onblur="if (checkNumber(this)) fnCheckRate();" title="Індивидуальна % ставка"
+                                                style="width: 50px; text-align: right" type="text" name="tbIr" maxlength="6" tabindex="20" />
                                         </td>
-                                        <td align="left">
+                                        <td align="left" class="auto-style2">
                                             <input id="tbBrDat" type="hidden" /><input id="tbBrDat_Value" type="hidden" name="tbBrDat" /><input
-                                                id="tbBrDat_TextBox" class="BarsTextBox" title="Дата установки ставки" style="width: 100px;
+                                                id="tbBrDat_TextBox" class="BarsTextBox" title="Дата установки ставки" style="width: 90px;
                                                 text-align: center" type="text" maxlength="10" tabindex="21" />
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td colspan="2">
-                                            <input id="cbRateBase" onclick="fnRateBase(this)" type="checkbox" />
-                                            <label for="cbRateBase">базова</label>
+                                        <td style="white-space: nowrap; text-align: right">
+                                            <span id="lbOp" >опер.</span>
                                         </td>
-                                        <td align="left">
+                                        <td align="left" colspan="3">
                                             <asp:DropDownList ID="ddOp" runat="server" Enabled="False" CssClass="BarsTextBoxRO" 
-                                                Width="130px">
+                                                Width="90px">
                                                 <asp:ListItem Value="0" Text="" />
                                                 <asp:ListItem Value="1" Text="+" />
                                                 <asp:ListItem Value="2" Text="-" />
@@ -355,15 +371,31 @@
                                         </td>
                                     </tr>
                                     <tr>
+                                        <td style="white-space: nowrap">
+                                            <input id="cbRateBase" onclick="fnRateBase(this)" 
+                                                type="checkbox" title="Базова відсоткова ставка"/><label 
+                                                for="cbRateBase">базова</label>
+                                        </td>
                                         <td colspan="3">
                                             <asp:DropDownList ID="ddBaseRates" runat="server" Enabled="False" CssClass="BarsTextBoxRO" 
-                                                onclick="cmb_dlg(this)" Width="220px" >
+                                                onclick="cmb_dlg(this)" Width="170px" >
                                                 <asp:ListItem></asp:ListItem>
                                             </asp:DropDownList>
                                         </td>
                                     </tr>
                                 </table>
                             </asp:Panel>
+                            <table>
+                                <tr>
+                                    <td  style="white-space: nowrap">
+                                        <input id="tbBranch" type="text" title="Бранч договору" name="tbBranch" 
+                                                style="width: 220px; text-align: left" readonly="readonly" class="BarsTextBoxRO" />
+                                        <img id="btBranch" title="Вибір Бранчу Договору" alt="Вибір бранчу для договору"
+                                            height="16" width="16" class="outset"
+                                            onclick="fnSetBranch()" src="/Common/Images/BOOK.gif" />
+                                    </td>
+                                </tr>
+                            </table>
                         </td>
                     </tr>
                 </table>
@@ -460,9 +492,9 @@
                                             <input id="tbNmsD" class="BarsTextBox" name="tbNmsD" style="width: 390px" title="Отримувач депозиту"
                                                 type="text" />
                                         </td>
-                                        <td>
-                                            <button id="btClAcc" onclick="fnClientAccounst()" style="width: 40px" title="Поточні рахунки клієнта">
-                                                <img alt="Поточні рахунки клієнта" id="Img1" src="/Common/Images/BROWSE.gif" onclick="fnClientAccounst()" />
+                                        <td align="center">
+                                            <button id="btClAcc" onclick="fnClientAccounst()" style="width: 25px; height:25px;" title="Поточні рахунки клієнта">
+                                                <img id="Img1" src="/Common/Images/BROWSE.gif" onclick="fnClientAccounst()" alt="Поточні рахунки клієнта" />
                                             </button>
                                         </td>
                                     </tr>
@@ -475,22 +507,7 @@
         </tr>
         <tr>
             <td>
-                <table>
-                    <tr>
-                        <td>
-                            <asp:Panel ID="pnComments" runat="server" GroupingText="Коментар">
-                                <table>
-                                    <tr>
-                                        <td>
-                                            <asp:TextBox ID="tbComments" runat="server" Width="900px" ToolTip="Коментар" Rows="2"
-                                                TextMode="MultiLine" BackColor="Info" TabIndex="100" />
-                                        </td>
-                                    </tr>
-                                </table>
-                            </asp:Panel>
-                        </td>
-                    </tr>
-                </table>
+                <input id="tbTempalte" type="hidden" name="tbTempalte" runat="server" ClientIDMode="Static" />
             </td>
         </tr>
     </table>

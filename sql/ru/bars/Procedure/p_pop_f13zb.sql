@@ -4,13 +4,17 @@ CREATE OR REPLACE PROCEDURE BARS.P_POP_F13ZB(datb_ IN DATE, date_ IN DATE,
 % DESCRIPTION :    Процедура наполнения позабалансовых символов в табл.
 %             :    OTCN_F13_ZBSK для файла #13 (КБ)
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     :    12/07/2017 (10/07/2017, 07/07/2017)
+% VERSION     :    21/11/2017 (21/09/2017, 02/08/2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Datb_  - начальная дата
                Date_  - конечная дата
                nmode_ - вариант наполнения (0-с удалением, 1-добавление, 2 - просмотр)
                         в библиотеке - вызывается с nmode_ = 1
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+21.11.2017 добавлены изменения выполненные Вирко для оптимизации
+21.09.2017 поле SK_ZB (позабалансовый символ) не будет изменяться при повторном
+           наполнении чтобы не изменять откоректированные значения 
+02.08.2017 изменены некоторые условия для отбора документов из OPLDOK 
 11.07.2017 для формирования символа 97 добавил  p.NLSB like '2600%' из OPER 
 10.07.2017 для формирования символа 97 убрал условие nazn like '%ПТКС%' 
            а добавил  p.NLSB like '2650%' из OPER 
@@ -126,7 +130,7 @@ BEGIN
                        opldok o1,
                        accounts a1,
                        oper p
-                 WHERE     o.fdat BETWEEN datb_ AND date_
+                 WHERE     O.FDAT = any (select fdat from fdat where fdat BETWEEN datb_ AND date_)
                        AND o.tt NOT IN ('АСВ', 'KB8')
                        AND o.acc = a.acc
                        AND a.kv = 980
@@ -147,7 +151,7 @@ BEGIN
 
               acc_ := k.accd;
 
-              IF substr(k.nlsd,1,3) not in ('262','263') 
+              IF substr(k.nlsd,1,3) not in ('262','263') and k.nlsd not like '2909%' 
               THEN
                 acc_ := k.acck;
               END IF;
@@ -440,7 +444,7 @@ BEGIN
                      end if;
                  end if;
 
-                 update otcn_f13_zbsk o set o.sk_zb = sk_zb_
+                 update otcn_f13_zbsk o set o.ko = ko_ --o.sk_zb = sk_zb_
                  where o.ref = k.ref
                    and o.stmt = k.stmt;
 
@@ -454,20 +458,11 @@ BEGIN
                        k.nlsk, k.s, k.sq, k.nazn, isp_, sk_zb_, ko_, tobo_, k.kf, k.stmt);
                  END IF;
               else
-                 if kol_ > 0 and comm_ = '*' then
+                 if comm_ = '*' then
                      delete
                      from otcn_f13_zbsk
-                     where ko  = ko_
-                        and trim(tobo) = trim(tobo_)
-                        and fdat = k.fdat
-                        and ref = k.ref
-                        and stmt = k.stmt
-                        and tt  = k.tt
-                        and trim(nlsd) = trim(k.nlsd)
-                        and kv  = k.kv
-                        and trim(nlsk) = trim(k.nlsk)
-                        and s   = k.s
-                        and NVL(trim(nazn),'Z') = NVL(trim(k.nazn), 'Z');
+                     where  ref = k.ref
+                        and stmt = k.stmt;
                  END IF;
               end if;
            end if;
@@ -478,7 +473,8 @@ BEGIN
         insert into otcn_f13_zbsk
            (fdat, ref, tt, accd, nlsd, kv, acck, nlsk, s, sq, nazn, isp,
             sk_zb, ko, tobo, stmt )
-           SELECT o.fdat, 
+           SELECT /*+ leading(a) */
+                  o.fdat, 
                   o.ref, 
                   o.tt, 
                   (case when o.dk = 0 then o.acc else o1.acc end) accd, 
@@ -499,7 +495,7 @@ BEGIN
                   accounts a1,
                   oper p,
                   cust_ptkc c 
-            WHERE     o.fdat BETWEEN datb_ AND date_
+             WHERE    o.fdat = any (select fdat from fdat where fdat BETWEEN datb_ AND date_)
                   AND o.acc = a.acc
                   AND a.kv = 980
                   AND REGEXP_LIKE (a.NLS, '^(2909)')
@@ -513,13 +509,11 @@ BEGIN
                   and (p.nlsb like '2600%' OR p.nlsb like '2650%')
                   and p.vob not in (96, 99)
                   and p.sos = 5 
-                  --and p.nazn like '%ПТКС%'  
                   and a.rnk = c.rnk
                   and (o.ref, o.stmt) not in (select ref, stmt
                                               from otcn_f13_zbsk
                                               where sk_zb = 97 
                                                 and fdat BETWEEN datb_ AND date_);
-
 
         for k in (select fdat from fdat where fdat between dat1_ and date_)
         loop

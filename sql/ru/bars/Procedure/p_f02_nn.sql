@@ -12,7 +12,7 @@ PROMPT *** Create  procedure P_F02_NN ***
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :    Процедура формирование файла #02 для КБ
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     : 05/02/2016 (08/07/2015, 10/03/2015)
+% VERSION     :    14/11/2017 (05/02/2016)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
@@ -109,7 +109,6 @@ p_dat    Date;
 p_kodf   Varchar2(2):='02';
 k041_    Char(1);
 dk_      varchar2(2);
---nbu_     SMALLINT;
 prem_    Char(3);
 userid_  Number;
 nbuc1_   Varchar2(12);
@@ -117,8 +116,8 @@ nbuc_    Varchar2(12);
 b_       Varchar2(30);
 tips_    Varchar2(3);
 flag_    number;
-sql_acc_ varchar2(2000):='';
-sql_doda_ varchar2(200):='';
+sql_acc_ clob:='';
+sql_doda_ clob:='';
 ff_      number;
 ret_     number;
 pr_      NUMBER;
@@ -136,10 +135,44 @@ CURSOR Saldo IS
           s.dos99, s.dosq99, s.kos99, s.kosq99,
           s.doszg, s.koszg, s.dos96zg, s.kos96zg,
           a.tip, nvl(l.k041,'1')
-   FROM  otcn_saldo s, customer cc, kl_k040 l, otcn_acc a
+   FROM  otcn_saldo s, otcn_acc a, customer cc, kl_k040 l
    WHERE a.acc=s.acc    and
          a.rnk=cc.rnk   and
-         NVL(lpad(to_char(cc.country),3,'0'),'804')=l.k040(+) ;
+         NVL(lpad(to_char(cc.country),3,'0'),'804')=l.k040(+)  and
+         trunc(nvl(a.dat_alt, dat_ - 1), 'mm') <> trunc(dat_, 'mm')
+         union all
+   SELECT s.rnk, s.acc, a.nls, s.kv, s.fdat, substr(d.acc_num, 1, 4) nbs, 
+          (case when d.acc_type = 'OLD' then 0 else s.ost end) ost,
+          (case when d.acc_type = 'OLD' then 0 else s.ostq end) ostq,
+          (case when d.acc_type = 'OLD' then d.dos_repm  else s.dos - d.dos_repm end) dos,
+          (case when d.acc_type = 'OLD' then d.dosq_repm  else s.dosq - d.dosq_repm end) dosq,
+          (case when d.acc_type = 'OLD' then d.kos_repm  else s.kos - d.kos_repm end) kos,
+          (case when d.acc_type = 'OLD' then d.kosq_repm  else s.kosq - d.kosq_repm end) kosq,
+          (case when d.acc_type = 'OLD' then s.dos96p else 0 end) dos96p,
+          (case when d.acc_type = 'OLD' then s.dosq96p else 0 end) dosq96p,
+          (case when d.acc_type = 'OLD' then s.kos96p else 0 end) kos96p,
+          (case when d.acc_type = 'OLD' then s.kosq96p else 0 end) kosq96p,
+          (case when d.acc_type = 'OLD' then 0 else s.dos96 end) dos96,
+          (case when d.acc_type = 'OLD' then 0 else s.dosq96 end) dosq96,
+          (case when d.acc_type = 'OLD' then 0 else s.kos96 end) kos96,
+          (case when d.acc_type = 'OLD' then 0 else s.kosq96 end) kosq96,
+          (case when d.acc_type = 'OLD' then 0 else s.dos99 end) dos99,
+          (case when d.acc_type = 'OLD' then 0 else s.dosq99 end) dosq99,
+          (case when d.acc_type = 'OLD' then 0 else s.kos99 end) kos99,
+          (case when d.acc_type = 'OLD' then 0 else s.kosq99 end) kosq99,
+          (case when d.acc_type = 'OLD' then 0 else s.doszg end) doszg,
+          (case when d.acc_type = 'OLD' then 0 else s.koszg end) koszg,
+          (case when d.acc_type = 'OLD' then 0 else s.dos96zg end) dos96zg,
+          (case when d.acc_type = 'OLD' then 0 else s.kos96zg end) kos96zg,
+          a.tip, nvl(l.k041,'1')
+   FROM  otcn_saldo s, otcn_acc a, nbur_kor_balances d, customer cc, kl_k040 l
+   WHERE a.acc=s.acc    and
+         a.rnk=cc.rnk   and
+         NVL(lpad(to_char(cc.country),3,'0'),'804')=l.k040(+)  and
+         d.report_date between trunc(dat_, 'mm') and dat_ and 
+         s.acc = d.acc_id and
+         trunc(nvl(a.dat_alt, dat_ - 1), 'mm') = trunc(dat_, 'mm')  ;
+         
 ---------------------------------------------------------------------------
 procedure p_ins(p_dat_ date, p_tp_ varchar2, p_nls_ varchar2,p_nbs_ varchar2,
           p_kv_ smallint, p_k041_ varchar2, p_znap_ varchar2, p_acc_ number, p_nbuc_ varchar2) IS
@@ -202,7 +235,8 @@ p_proc_set(kodf_,sheme_,nbuc1_,typ_);
 --- все эти действия выполняются в функции F_POP_OTCN
 
 -- вместо классификатора KL_R020 будем использовать KOD_R020
-sql_acc_ := 'select r020 from kod_r020 where trim(prem)=''КБ'' and a010=''02'' ';
+sql_acc_ := 'select r020 from kod_r020 where trim(prem)=''КБ'' and a010=''02'' and '||
+            '(d_close is null or d_close > to_date('''||to_char(dat_, 'ddmmyyyy')||''',''ddmmyyyy'')) ';
 
 if to_char(Dat_,'MM') in ('01','02','03','04','05','06') then
    ret_ := f_pop_otcn(Dat_, 4, sql_acc_, null, 1);
@@ -309,13 +343,6 @@ OPEN Saldo;
    end if;
 
    --- обороты по перекрытию 6,7 классов на 5040,5041
-   --IF to_char(Dat_,'MM')='12' THEN
-   --   Dos_:=Dos_-Doszg_;
-   --   Kos_:=Kos_-Koszg_;
-   --   Ostn_:=Ostn_+Doszg_-Koszg_;
-   --END IF;
-
-   --- обороты по перекрытию 6,7 классов на 5040,5041
    IF to_char(Dat_,'MM')='12' and (nls_ like '6%' or nls_ like '7%' or nls_ like '504%') THEN
       SELECT NVL(SUM(decode(dk,0,1,0)*s),0),
              NVL(SUM(decode(dk,1,1,0)*s),0)
@@ -389,13 +416,7 @@ OPEN Saldo;
          sk_ := 0;
       END;
       Kosq99_ := Kosq99_ - sk_;
-      --Kosq96_ := Kosq96_ - sk_;
    END IF;
-
-   --Dos_ := Dos_ - iif_n(Dos96p_,0,0,Dos99_,Dos96p_);
-   --Dosq_ := Dosq_ - iif_n(Dosq96p_,0,0,Dosq99_,Dosq96p_);
-   --Kos_ := Kos_ - iif_n(Kos96p_,0,0,Kos99_,Kos96p_);
-   --Kosq_ := Kosq_ - iif_n(Kosq96p_,0,0,Kosq99_,Kosq96p_);
 
    Dos_  := Dos_ - Dos96p_ - Dos99_;
    Dosq_ := Dosq_ - Dosq96p_ - Dosq99_;
@@ -533,11 +554,6 @@ OPEN Saldo;
 
 END LOOP;
 CLOSE Saldo;
----------------------------------------------------------------------------
- -- Манипуляции с вешалками по Внебалансовым счетам
---if mfou_ in (300465, 380764) then
---   P_OTC_VE9 (P_DAT, P_KODF);
---end if;
 
 -- готовый отчет в таблицу.
 DELETE FROM TMP_NBU WHERE kodf=kodf_ AND datf= dat_;

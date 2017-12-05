@@ -1,5 +1,3 @@
-
- 
  PROMPT ===================================================================================== 
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/rez.sql =========*** Run *** =======
  PROMPT ===================================================================================== 
@@ -7,7 +5,6 @@
   CREATE OR REPLACE PACKAGE BARS.REZ 
 IS
 /*
-
 DESCRIPTION : Функции и процедуры для расчета резерва
 VERSION     : 12.11.2008
 СOMMENT     :
@@ -26,7 +23,7 @@ VERSION     : 12.11.2008
  'REZPAR4'  = 1 - не учитывать при расчете дисконт
  'REZPAR5'  = 1 - процент резервирования по 83 постанове (уст по умолч в пакете, нету в PARAMS !!!)
  'REZPAR6'  = 1 - расчет с учетом однородных кредитов (уст по умолч в пакете, нету в PARAMS !!!)
- 'REZPAR7'  = 1 - флаг - значение по умолчанию типа клиента для счетов 3579 (custtype=1) (АКБ Киев)
+ 'REZPAR7'  = 1 - флаг - значение по умолчанию типа клиента для счетов (SK9) (custtype=1) (АКБ Киев)
  'REZPAR8'  = 1 - при расчете резерва по счетам просроченных процентов используется "смешанный алгоритм"
                   т.е. если параметр R013 заполнен
                        = 2 - резервируем 100 % остатка на отчетную дату,
@@ -283,12 +280,12 @@ END rez;
 CREATE OR REPLACE PACKAGE BODY BARS.REZ 
 /*
 
-  VERSION : 09.01.2009
+  VERSION : 22.11.2017
 
 */
 IS
    -- версия пакета
-   version_        VARCHAR2 (30)   := '20.07.2009';
+   version_        VARCHAR2 (30)   := '22.11.2017';
   sss varchar2(1000);
    c_dt date := to_date('28122008','ddmmyyyy');
    curdate_        DATE; -- текущая отчетная дата
@@ -313,7 +310,7 @@ IS
       := '2236,2226,2216,2206,2116,2106,2086,2076,2066,2036,2026,1626,1526,1326,1316,';
    -- балансовые счета премии
    nbspremiy_      VARCHAR2 (2000)
-      := '2075,2065,2085,2105,2115,2125,2135,2205,2215,2235,2617,2637,2653,2707,';
+      := '';
    -- балансовые счета страхового фонда
    nbsfond_        VARCHAR2 (2000)
            := ',1492,1590,1591,1592,1593,1790,2400,2401,2490,3291,3599,3690,';
@@ -1157,9 +1154,9 @@ IS
          sk1_ := sk1_ + delq_ + discont_ + premiy_;
          to_log (acc_, 'sk1_ остаток по '||acc_||' +диск. и прем.', sk1_);
 
-         IF r013_ = '91299' OR r013_ = '90231' OR sk1_ > 0
+         IF r013_ = '91299' OR r013_ = '90031' OR sk1_ > 0
          THEN
-            to_log (acc_, 'спец обр 9129, 9023 sk1_=0', '');
+            to_log (acc_, 'спец обр 9129, 9003 sk1_=0', '');
             sk1_ := 0;
          END IF;
 
@@ -1249,7 +1246,7 @@ IS
             --    OR fl_use_as_first_zal_ = 0 and not prcrezal_.EXISTS (k.acc)
             -- THEN
                 --       to_log (acc_, '*** 1', '');
-            IF k1.s < 0 AND k1.r013 <> '91299' AND k1.r013 <> '90231'
+            IF k1.s < 0 AND k1.r013 <> '91299' AND k1.r013 <> '90031'
             THEN
 --            to_log (acc_, '*** 1', '');
                   -- 1. рассматриваем как кредиты все кроме однородных кредитов
@@ -1657,13 +1654,13 @@ IS
                   0)
         INTO sdqall_
         FROM accounts a, nd_acc n
-       WHERE a.acc = n.acc AND f_nbs_is_disc (a.nbs) = 1 AND n.nd = nd_;
+       WHERE a.acc = n.acc AND a.tip = 'SDI' AND n.nd = nd_;
 
       FOR k IN (SELECT a.acc,
                        gl.p_icurval (a.kv, rez.ostc96 (a.acc, dat_),
                                      dat_) sdq
                   FROM accounts a, nd_acc n
-                 WHERE a.acc = n.acc AND f_nbs_is_disc (a.nbs) = 1
+                 WHERE a.acc = n.acc AND a.tip = 'SDI'
                        AND n.nd = nd_)
       LOOP
          ndiscont1_ := ndiscont1_ + 1;
@@ -1836,7 +1833,7 @@ IS
                   0)
         INTO spqall_
         FROM accounts a, nd_acc n
-       WHERE a.acc = n.acc AND f_nbs_is_disc (a.nbs) = 1 AND n.nd = nd_;
+       WHERE a.acc = n.acc AND a.tip='SDI' AND n.nd = nd_;
 
       FOR k IN (SELECT a.acc,
                        gl.p_icurval (a.kv, rez.ostc96 (a.acc, dat_),
@@ -2143,10 +2140,8 @@ IS
                               FROM accounts a, specparam s, cust_acc ca
                              WHERE a.acc = s.acc
                                AND a.nbs IN
-                                      ('2202',
-                                       '2203',
+                                      ('2203',
                                        '2206',
-                                       '2207',
                                        '2290',
                                        '2620',
                                        '2625',
@@ -2208,19 +2203,7 @@ IS
                              WHERE s.acc = a.acc
                                AND a.acc = n.acc
                                AND a.acc = p.acc
-                               AND a.nbs IN
-                                      ('2207',
-                                       '2217',
-                                       '2227',
-                                       '2237',
-                                       '2290',
-                                       '2027',
-                                       '2037',
-                                       '2067',
-                                       '2077',
-                                       '2087',
-                                       '2097'
-                                      )
+                               AND a.tip in ('SP ')
                                AND a.acc = NVL (acc_, a.acc)
                                --AND p.s090 = '4'
                                AND s.fdat <= dat_
@@ -2648,7 +2631,7 @@ IS
 
          -- флаг - счет включен в портфель однородных кредитов
          IF     dodncre_.EXISTS (k.rnk)
-            AND k.nbs IN ('2202', '2203', '2207', '2290', '2620', '2625','2605')
+            AND k.nbs IN ('2203', '2290', '2620', '2625','2605')
             AND k.s090 = '4'
          THEN
             odncre_ := 'y';
@@ -3193,11 +3176,11 @@ IS
                szq2_ := 0;
                ostq_ := 0;
             --2. Авалі, що надані клієнтам за податковими векселями
-            ELSIF k.nbs = '9023' AND k.r013_2 = '1'
+            ELSIF k.nbs = '9003' AND k.r013_2 = '1'
             THEN
                to_log
                     (k.acc,
-                     'Специальная обработка: nbs = 9023 r013=1. Резерв = 0.',
+                     'Специальная обработка: nbs = 9003 r013=1. Резерв = 0.',
                      ''
                     );
                sz_ := 0;
@@ -3329,12 +3312,9 @@ IS
                              AND p.vdat = datpr_
                              AND p.nlsa NOT LIKE '3589%'
                              AND p.nlsb NOT LIKE '3589%'
-                             AND p.nlsa NOT LIKE '3579%'
-                             AND p.nlsb NOT LIKE '3579%'
                           OR     o.fdat BETWEEN dat_ + 1 AND dat_ + 15
                              AND p.vdat = dat_
                              AND (p.nlsa LIKE '3589%' OR p.nlsb LIKE '3589%'
-                                   or p.nlsa LIKE '3579%' OR p.nlsb LIKE '3579%'
                                  )
                          )
                 GROUP BY o.acc)
@@ -3353,84 +3333,49 @@ IS
 --4. категория риска одна - 9 в таблице CRISK
       FOR k IN
          (WITH cw AS
-               (SELECT DISTINCT rnk, tag,
-                                FIRST_VALUE (VALUE) OVER (PARTITION BY rnk ORDER BY rnk)
-                                                                         corp
-                           FROM customerw
-                          WHERE tag = 'CORP'
-                       ORDER BY rnk)
+               (SELECT DISTINCT rnk, tag, FIRST_VALUE (VALUE) OVER (PARTITION BY rnk ORDER BY rnk) corp
+                FROM customerw
+                WHERE tag = 'CORP'
+                ORDER BY rnk)
           --просроченные %
-          SELECT c.rnk, SUBSTR (c.nmk, 1, 35) nmk,
-                 --c.custtype,--T 23.03.2009
-                 DECODE (TRIM (c.sed),
-                         '91', DECODE (custtype, 3, 2, custtype),
-                         c.custtype
-                        ) custtype,  --T 02.12.2008
+          SELECT a.tip, c.rnk, SUBSTR (c.nmk, 1, 35) nmk, DECODE (TRIM (c.sed), '91', DECODE (custtype, 3, 2, custtype), c.custtype ) custtype,
                  a.tobo,
                  NVL (p.s080, '') s080,
                  NVL (p.r013, '') r013,
-                -- decode(NVL (p.r013, ''),'3','2',NVL (p.r013, '')) r013, --T 02.02.2008
                  a.acc, a.kv,
                  a.nls, a.isp, SUBSTR (a.nbs, 3, 2) priz, a.nbs, c.crisk fin,
                  NVL (c.country, acountry) country,
                  DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6', 2, 1) rz,
-                 cw.corp,
-                 a.daos,--T 23.01.2008
-                 p.s182 --T 23.01.2008
-                  ,p.s270 --T 19.03.2009
+                 cw.corp, a.daos, p.s182, p.s270 
             FROM accounts a, cust_acc cu, customer c, specparam p, cw
            WHERE cu.acc = a.acc
              AND cu.rnk = c.rnk
              AND a.acc = NVL (acckr_, a.acc)
              AND a.acc = p.acc(+)
              AND (a.dazs IS NULL OR a.dazs > dat_)
-             AND (   a.nbs IN (
-                        SELECT DISTINCT r020
-                                   FROM kl_r011
-                                  WHERE prem = 'КБ '
-                                    AND SUBSTR (r020, 4, 1) = '9'
-                                    AND r020r011 IS NOT NULL)
-                  OR a.nbs IN ('2480', '1780', '3589', '2239','2089')
-                 )
+             AND a.tip IN ( 'SPN') 
              AND c.rnk = cw.rnk(+)
              union all
            --начисленные
-           SELECT c.rnk, SUBSTR (c.nmk, 1, 35) nmk,
-                 --c.custtype,
-                 DECODE (TRIM (c.sed),
-                         '91', DECODE (custtype, 3, 2, custtype),
-                         c.custtype
-                        ) custtype,  --T 02.12.2008
+           SELECT a.tip, c.rnk, SUBSTR (c.nmk, 1, 35) nmk, DECODE (TRIM (c.sed),'91', DECODE (custtype, 3, 2, custtype),c.custtype) custtype, 
                  a.tobo,
                  NVL (p.s080, '') s080,
                  NVL (p.r013, '') r013,
-                -- decode(NVL (p.r013, ''),'3','2',NVL (p.r013, '')) r013, --T 02.02.2008
                  a.acc, a.kv,
                  a.nls, a.isp, SUBSTR (a.nbs, 3, 2) priz, a.nbs, c.crisk fin,
                  NVL (c.country, acountry) country,
                  DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6', 2, 1) rz,
-                 cw.corp,
-                 a.daos,--T 23.01.2008
-                 p.s182 --T 23.01.2008
-                 ,p.s270 --T 19.03.2009
+                 cw.corp, a.daos, p.s182, p.s270 
             FROM accounts a, cust_acc cu, customer c, specparam p, cw
            WHERE cu.acc = a.acc
              AND cu.rnk = c.rnk
              AND a.acc = NVL (acckr_, a.acc)
              AND a.acc = p.acc(+)
              AND (a.dazs IS NULL OR a.dazs > dat_)
-             AND (   a.nbs IN (
-                        SELECT DISTINCT r020
-                                   FROM kl_r011
-                                  WHERE prem = 'КБ '
-                                    AND SUBSTR (r020, 4, 1) = '8'
-                                    AND r020r011 IS NOT NULL)
-
-                 )
+             AND a.tip IN ( 'SN ')
              and p.s270 = '08'
              AND c.rnk = cw.rnk(+)
              and rezpar11_ = 1
-                                  -- and a.acc in (171287,198835)
          )
       LOOP
          curacc_ := k.acc;
@@ -3532,15 +3477,9 @@ IS
             szq_ := gl.p_icurval (k.kv, sz_, dat_);
             rezerv_ := sz_;
 
-            IF rezpar1_ = '1' AND k.custtype = '3'
-            THEN
-               custtype_ := '2';
-            ELSIF rezpar7_ = '1' AND k.custtype IN ('2', '3')
-                  AND k.nbs = '3579'
-            THEN
-               custtype_ := '1';
-            ELSE
-               custtype_ := k.custtype;
+            IF    rezpar1_ = '1' AND k.custtype = '3'                                      THEN custtype_ := '2';
+            ELSIF rezpar7_ = '1' AND k.custtype IN ('2', '3')  AND k.tip in ('SK9','OFR')  THEN custtype_ := '1';
+            ELSE                                                                                custtype_ := k.custtype;
             END IF;
 
             IF mode_ <> 2 AND calcdoppar_ = 1
@@ -6194,7 +6133,7 @@ BEGIN
          rezpar4_ := 0;
    END;
 
-   -- флаг - считать 3579 внутрибанковским счетом (custtype=1)
+   -- флаг - считать (SK9) внутрибанковским счетом (custtype=1)
    BEGIN
       SELECT TO_NUMBER (NVL (val, '0'))
         INTO rezpar7_

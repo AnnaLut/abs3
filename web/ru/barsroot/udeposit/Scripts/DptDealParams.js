@@ -1,5 +1,5 @@
 //------------------------------
-// 24.03.2014 
+// 07.11.2017
 //------------------------------
 window.onload = InitDptDealParams;
 
@@ -9,7 +9,6 @@ var dpu_id = null;
 var dpu_gen = null;
 var dpu_ad = null;
 var dpu_expired = null;
-var dpu_type = null;
 var vidd;
 var vidname;
 var type = null;
@@ -20,22 +19,28 @@ var branch = null;
 var branchName;
 var acc = null;
 var accN = "";
-//old values
+var termType = null;   // DPU_VIDD.TERM_TYPE - fixed (1) OR variable interval (2) term
+var periodType = null; // DPU_VIDD.DPU_TYPE  - long-term, short-term OR on-demand contract duration
+var comments = null;
+var dpu_bal = 0;
+// old values
 var datO_old = null;
 var br_old = null;
 var ir_old = null;
 var op_old = null;
-var bsd;
-var bsn;
+// var bsd;
+// var bsn;
 var srok = 10;
 var fl_extend;
 var switchMode = 0;
-var trustId = null; // Id доверенного лица
+var trustId = null;   // Id доверенного лица
 var sTypeDeal = null; // символьный код вида договора // SHRT, LONG, DMNP, COMB
-var nAcc2 = null; // код для нахождения новых счетов для комбинированных договоров
+var nAcc2 = null;     // код для нахождения новых счетов для комбинированных договоров
 var tempalteID = null;
 var cnt_dubl = 0;
 var segment = 0;
+var isFrx = null;
+var usr_lvl;          // user level 
 
 //**********************************************************************//
 function fnHotKey() {
@@ -79,12 +84,42 @@ function InitDptDealParams() {
         }
         else
         {
+            // Відкриття
             if (type == 1)
             {
-                if (dpu_gen) 
+                // COBUMMFO-2176
+                rnk = null;
+                document.all.tbRnk.value   = "";
+                document.all.tbOkpo.value  = "";
+                document.all.tbNmk.value   = "";
+                document.all.tbAdres.value = "";
+                document.all.tbK013.value = "";
+
+                document.all.tbProduct.value = "";
+                document.all.ddProduct.value = "";
+
+                document.all.tbIso.value = "";
+                document.all.ddKv.value = "";
+
+                document.all.tbVidD.value = "";
+                document.all.ddVidD.value = "";
+
+                document.all.tbNmsP.value  = "";
+                document.all.tbNmsD.value  = "";
+
+                // d.tbDatO_TextBox.readOnly = false;
+                // d.tbDatV_TextBox.readOnly = false;
+                document.all.tbDatO_TextBox.disabled = true;
+                document.all.tbDatV_TextBox.disabled = true;
+
+                document.all.tbBrDat_TextBox.readOnly = true;
+
+                if (dpu_gen) {
                     OpenDealAdd();
-                else 
+                }
+                else {
                     OpenDeal();
+                }
             }
         }
     }
@@ -96,6 +131,7 @@ function InitDptDealParams() {
     if (!isInit) {
         // Date
         gE("tbDatZ_TextBox").attachEvent("onblur", SetBrDate);
+        gE("tbDatN_TextBox").attachEvent("onblur", fnCheckDateBegin);
         gE("tbDatO_TextBox").attachEvent("onblur", fnCheckDataO);
         gE("tbDatV_TextBox").attachEvent("onblur", fnCheckDataV);
         IniDateTimeControl("tbDatZ");
@@ -104,10 +140,12 @@ function InitDptDealParams() {
         IniDateTimeControl("tbDatV");
         IniDateTimeControl("tbBrDat");
 
-        AddListeners("tbND,tbSum,tbDatN_TextBox,tbBrDat_TextBox,tbMinSum,tbDatO_TextBox,tbDatZ_TextBox,tbDatV_TextBox,tbMfoD,tbNlsD,tbMfoP,tbNlsP,tbIr,tbComments", 'onkeydown', TreatEnterAsTab);
+        AddListeners("tbND,tbSum,tbDatN_TextBox,tbBrDat_TextBox,tbMinSum,tbDatO_TextBox,tbDatZ_TextBox,tbDatV_TextBox,tbMfoD,tbNlsD,tbMfoP,tbNlsP,tbIr", 'onkeydown', TreatEnterAsTab);
 
         init_numedit("tbSum", 0, 2);
         init_numedit("tbMinSum", 0, 2);
+        init_numedit("tbMaxSum", 0, 2);
+        
     }
     isInit = true;
     dd_data["ddVidD"] = url_dlg_mod + 'DPU_VIDD&tail="flag=1"&title=' + escape("Вибір виду договору");
@@ -121,21 +159,68 @@ function InitDptDealParams() {
         dd_data["ddProduct"] = url_dlg_mod + 'dpu_types&tail=""';
 
 }
+
+function getFilteredProduct(prdList) {
+    var selectedIndex = prdList.selectedIndex;
+    if (selectedIndex > 0) {
+        var d = document.all;
+        if (prdList.value != d.tbProduct.value) {
+            // обнулення вибраного Виду Депозиту після зміни продукту
+            d.tbProduct.value = prdList.value;  // prdList.options[selectedIndex].value;
+            d.tbVidD.value = "";
+            if (d.ddVidD.options.length > 0) {
+                d.ddVidD.options[0].value = "";
+                d.ddVidD.options[0].text = "";
+            }
+        }
+    }
+}
+
+function getFilteredCurrency(curList) {
+    var selectedIndex = curList.selectedIndex;
+    if (selectedIndex > 0) {
+        var d = document.all;
+        if (curList.value != d.tbCurrency.value) {
+            // обнулення вибраного Виду Депозиту після зміни валюти
+            d.tbCurrency.value = curList.value;  // curList.options[selectedIndex].value;
+            d.tbVidD.value = "";
+            if (d.ddVidD.options.length > 0) {
+                d.ddVidD.options[0].value = "";
+                d.ddVidD.options[0].text = "";
+            }
+        }
+    }
+}
+
 function getFilteredVidd(ddlist) {
-    var tail = "flag=1";
+    var prodId = "";
     var val = "";
 
-    if (document.getElementById("ddProduct").value == "") {
+    if ((prodId = document.getElementById("ddProduct").value) == "") {
         alert("Вкажіть продукт !");
         return;
     }
 
-    tail += " and type_id=" + document.getElementById("ddProduct").value;
+    if ((val = document.getElementById("ddKv").value) == "")
+    {
+        alert("Вкажіть валюту !");
+        return;
+    }
 
-    if ((val = document.getElementById("ddKv").value) != "")
-        tail += " and kv=" + val;
-    tail += " and bsd in (select NBS_DEP from dpu_nbs4cust where k013=" + ((document.getElementById("tbK013").value) ? (document.getElementById("tbK013").value) : ("0")) + ")";
+    var tail = "FLAG = 1 and TYPE_ID = " + prodId + " and KV = " + val;
+
+    if (dpu_gen && dpu_ad > 0)
+    {
+        if(periodType != null)
+        {
+            tail += " and DPU_TYPE = " + periodType.toString();
+        }
+    }
+
+    tail += " and BSD in (select NBS_DEP from DPU_NBS4CUST where k013=" + ((document.getElementById("tbK013").value) ? (document.getElementById("tbK013").value) : ("0")) + ")";
+
     var result = window.showModalDialog(url_dlg_mod + 'DPU_VIDD&tail="' + tail + '"&title=' + escape("Вибір виду договору"), window, "dialogHeight:700px;dialogWidth:800px;center:yes;edge:sunken;help:no;status:no;");
+
     if (result != null) {
         if (ddlist.options.length == 0) {
             var oOption = document.createElement("OPTION");
@@ -169,18 +254,23 @@ function OpenDeal(add) {
     HideImg(d.btAccounts);
     HideImg(d.btChilds);
     HideImg(d.btDubl);
+    HideImg(d.btAddOption);
+    HideImg(d.btCrtAgreement);
+    HideImg(d.btSwiftDetails);
 
-    document.all.tbRnk.className = "BarsTextBox";
-    document.all.tbRnk.readOnly = false;
+    d.tbRnk.className = "BarsTextBox";
+    d.tbRnk.readOnly = false;
 
     var parwin = window.dialogArguments;
     gE("mainTable").style.visibility = "visible";
 
     //var parwin = window.opener;
-    if (window["tbDatZ"])
+    if (window["tbDatZ"]) {
         window["tbDatZ"].SetValue(parwin.bankdate);
-    else
+    }
+    else {
         d.tbDatZ_TextBox.value = parwin.bankdate;
+    }
 
     if (window["tbDatN"])
         window["tbDatN"].SetValue(parwin.bankdate);
@@ -195,18 +285,16 @@ function OpenDeal(add) {
     init_numedit("tbMinSum", 0, 2);
     init_numedit("tbSum", 0, 2);
 
-    d.tbMfoP.value = parwin.our_mfo;
-    d.tbMfoD.value = parwin.our_mfo;
-    d.tbNbP.value = parwin.our_nb;
-    d.tbNbD.value = parwin.our_nb;
     our_mfo = parwin.our_mfo;
     segment = parwin.segment;
+
     calcKtDay();
 
     if (!add) {
-        //d.tbDatO_TextBox.value = "";
-        //d.tbDatV_TextBox.value = "";
-        //alert(d.tbDatO_TextBox.value);
+        d.tbMfoP.value = parwin.our_mfo;
+        d.tbMfoD.value = parwin.our_mfo;
+        d.tbNbP.value = parwin.our_nb;
+        d.tbNbD.value = parwin.our_nb;
     }
 }
 //**********************************************************************//
@@ -237,10 +325,15 @@ function onGetDepositAddDealParams(result) {
     kv = data[10].text;
     d.tbIso.value = data[11].text;
     d.ddKv.value = kv;
+
     branch = data[13].text;
-    window["tbDatO"].SetValue(data[21].text);
-    if (data[22].text != "")
-        window["tbDatV"].SetValue(data[22].text);
+    d.tbBranch.value = data[13].text;
+
+    // window["tbDatO"].SetValue(data[21].text);
+    // if (data[22].text != "")
+    //     window["tbDatV"].SetValue(data[22].text);
+
+    d.tbProduct.value = data[23].text;
     d.ddProduct.value = data[23].text;
     d.tbK013.value = data[24].text;
     d.tbFreqV.value = data[25].text;
@@ -264,7 +357,6 @@ function onGetDepositAddDealParams(result) {
     d.tbIr.value = data[41].text;
     d.tbCntDubl.value = 0;
 
-
     d.tbDatN_TextBox.readOnly = false;
     d.tbDatO_TextBox.readOnly = false;
     d.tbDatV_TextBox.readOnly = true;
@@ -278,7 +370,10 @@ function onGetDepositAddDealParams(result) {
     d.ddKv.disabled = true;
     d.ddProduct.disabled = true;
     d.btClient.disabled = true;
-    d.tbIr.disabled = true;
+
+    d.tbMinSum.disabled = true;
+
+    // d.tbIr.disabled = true;
     d.cbRatePerson.disabled = true;
     d.cbRateBase.disabled = true;
     d.tbBrDat_TextBox.disabled = true;
@@ -292,6 +387,9 @@ function onGetDepositAddDealParams(result) {
     HideImg(d.btClientImg);
 
     OpenDeal(true);
+
+    SetVal();
+
 }
 function fnRatePerson(cb) {
     if (!cb.checked) {
@@ -380,9 +478,10 @@ function onGetDepositDealParams(result) {
     gE("mainTable").style.visibility = "visible";
     if (!getError(result)) return;
     var d = document.all;
+
     d.tbND.focus();
-    var nAdd;
-    var nGen;
+    var nAdd; // replace on global variable
+    var nGen; // replace on global variable
     var data = result.value;
     d.tbND.value = data[0].text;
 
@@ -417,7 +516,9 @@ function onGetDepositDealParams(result) {
     d.tbOkpoP.value = data[55].text;
     cnt_dubl = data[56].text;
     d.tbCntDubl.value = cnt_dubl;
-    d.tbComments.value = data[17].text;
+
+    comments = data[17].text;
+
     kv = data[18].text;
     d.tbIso.value = data[19].text;
     d.ddKv.value = kv;
@@ -450,17 +551,41 @@ function onGetDepositDealParams(result) {
     init_numedit("tbMinSum", data[39].text, 2);
     our_mfo = data[40].text;
     fl_extend = data[42].text;
+
     branch = data[43].text;
+    d.tbBranch.value = data[43].text;
+
     branchName = data[44].text;
+    d.tbBranch.title = data[44].text;
 
     sTypeDeal = data[45].text;
+
     // По доверенному лицу
     trustId = data[46].text;
 
+    // 
+    periodType = parseInt(data[47].text, 10);
+    termType = parseInt(data[48].text, 10);
+
+    // залишок на депозитному рахунку (OSTC)
+    dpu_bal = parseInt(data[49].text, 10);
+
+    //
     nAcc2 = data[50].text;
+
+    // tempalte
     tempalteID = data[51].text;
+    d.tbTempalte.value = data[51].text;
+    
     d.tbK013.value = data[52].text;
+    d.tbProduct.value = data[53].text;
     d.ddProduct.value = data[53].text;
+
+    // isFrx
+    isFrx = parseInt(data[57].text, 10);
+
+    // рівень користувача
+    usr_lvl = parseInt(data[58].text, 10);
 
     //
     d.btClient.disabled = true;
@@ -476,7 +601,30 @@ function onGetDepositDealParams(result) {
 
     d.tbDatZ_TextBox.disabled = true;
     d.tbDatN_TextBox.disabled = true;
-    d.tbDatO_TextBox.disabled = true;
+
+    if (termType == 2 && usr_lvl == 1 && dpu_expired == 1 )
+    {
+        d.tbND.disabled = false;
+        d.tbSum.disabled = false;
+        d.tbMinSum.disabled = false;
+        d.tbDatO_TextBox.disabled = false;
+        d.tbIr.disabled = false;
+        d.tbBrDat_TextBox.disabled = false;
+        UnHideImg(d.btBranch);
+        UnHideImg(d.btClAcc);
+    }
+    else
+    {
+        d.tbND.disabled = true;
+        d.tbSum.disabled = true;
+        d.tbMinSum.disabled = true;
+        d.tbDatO_TextBox.disabled = true;
+        d.tbIr.disabled = true;
+        d.tbBrDat_TextBox.disabled = true;
+        HideImg(d.btBranch);
+        HideImg(d.btClAcc);
+    }
+
     d.tbDatV_TextBox.disabled = true;
 
     //d.tbDatZ_TextBox.className = "BarsTextBoxRO";
@@ -485,31 +633,56 @@ function onGetDepositDealParams(result) {
     //d.tbDatV_TextBox.className = "BarsTextBoxRO";
 
     HideImg(d.btClientImg);
-    UnHideImg(d.btPrint);
-    UnHideImg(d.imgWord);
-    UnHideImg(d.btSos);
     UnHideImg(d.btPassport);
     UnHideImg(d.btAccounts);
+
+    if (dpu_expired == 1) {
+        UnHideImg(d.btPrint);
+        UnHideImg(d.imgWord);
+        UnHideImg(d.btAddOption);
+        UnHideImg(d.btCrtAgreement);
+    }
+    else {
+        HideImg(d.btPrint);
+        HideImg(d.imgWord);
+        HideImg(d.btAddOption);
+        HideImg(d.btCrtAgreement);
+    }
 
     datO_old = data[6].text;
     br_old = data[25].text;
     ir_old = data[28].text;
     op_old = data[27].text;
 
-    if (fl_extend == 2 && nAdd == "0" && nGen == "")
+    if (fl_extend == 2 && nAdd == "0" && nGen == ""){
         HideImg(d.btSos);
-    else
+        if (dpu_expired == 1) {
+            UnHideImg(d.btChilds);
+        }
+        else {
+            HideImg(d.btChilds);
+        }
+    }
+    else {
+        UnHideImg(d.btSos);
         HideImg(d.btChilds);
 
-    if (dpu_expired == 1)
-        HideImg(d.btDubl);
+        // dpu_expired gets from URL
+        if (dpu_expired == 1 || dpu_bal == 0) {
+            HideImg(d.btDubl);
+        }
+    }
 
+    if (kv == "980") {
+        HideImg(d.btSwiftDetails);
+    }
 
-    if (nGen != "")
+    if (nGen != "") {
         SetRO(d.tbND);
+    }
 
-
-    if (mode == 2) {
+    if (mode >= 2) {
+        // бухгалтер / лише перегляд
         HideImg(d.btSave);
         HideImg(d.btPassport);
         HideImg(d.btAccounts);
@@ -517,6 +690,7 @@ function onGetDepositDealParams(result) {
         HideImg(d.imgWord);
         HideImg(d.btChilds);
         HideImg(d.btRefresh);
+        HideImg(d.btDubl);
         d.tbND.disabled = true;
         d.tbSum.disabled = true;
         d.tbMinSum.disabled = true;
@@ -524,6 +698,7 @@ function onGetDepositDealParams(result) {
         d.tbDatN_TextBox.disabled = true;
         d.tbDatO_TextBox.disabled = true;
         d.tbDatV_TextBox.disabled = true;
+        d.tbBrDat_TextBox.disabled = true;
         d.ddStop.disabled = true;
         d.tbMfoP.disabled = true;
         d.tbNlsP.disabled = true;
@@ -532,11 +707,13 @@ function onGetDepositDealParams(result) {
         d.tbMfoD.disabled = true;
         d.tbNlsD.disabled = true;
         d.tbNmsD.disabled = true;
-        d.tbComments.disabled = true;
-        d.tbBrDat_TextBox.disabled = true;
     }
+    else {
+        UnHideImg(d.btRefresh);
+    }
+
     if (fl_extend == 2 && !nGen)
-        ShowHideControls("GEN_IR");
+        ShowHideControls("GENERAL");
 
     if (nGen == "") {
         d.lbTitleDeal.innerText = 'Депозитний договір № ' + d.tbND.value + ' #(' + dpu_id + ')';
@@ -547,11 +724,11 @@ function onGetDepositDealParams(result) {
     }
     if (sTypeDeal == "COMB" || (dpu_gen && dpu_ad > 0))
         SetSecAccounts();
-
 }
+
 //**********************************************************************//
 function SetRO(obj) {
-    obj.readonly = true;
+    obj.readOnly = true;
     obj.className = "BarsTextBoxRO";
 }
 //**********************************************************************//
@@ -574,7 +751,7 @@ function onCheckNd(result) {
 }
 //**********************************************************************//
 function fnClear() {
-    if (type == 0)
+    if (type == 0 || type == 1)
         InitDptDealParams();
 }
 //**********************************************************************//
@@ -630,19 +807,31 @@ function fnSave() {
     data[2] = GetValue("tbMinSum") * 100;
     data[3] = d.tbFreqV.value;
     data[4] = d.tbStop.value;
-    data[5] = d.tbDatN_TextBox.value;
-    if (fl_extend == '2') data[5] = d.tbDatZ_TextBox.value;
+
+    if (fl_extend == 2 && !dpu_gen) {
+        data[5] = d.tbDatZ_TextBox.value;
+    }
+    else {
+        data[5] = d.tbDatN_TextBox.value;
+    }
+
     data[6] = d.tbDatO_TextBox.value;
     data[7] = d.tbDatZ_TextBox.value;
-    data[8] = d.tbDatV_TextBox.value;
-    if (fl_extend == '2') data[8] = d.tbDatO_TextBox.value;
+
+    if (fl_extend == 2 && !dpu_gen) {
+        data[8] = d.tbDatO_TextBox.value;
+    }
+    else {
+        data[8] = d.tbDatV_TextBox.value;
+    }
+
     data[9] = d.tbMfoD.value;
     data[10] = d.tbNlsD.value;
     data[11] = d.tbNmsD.value;
     data[12] = d.tbMfoP.value;
     data[13] = d.tbNlsP.value;
     data[14] = d.tbNmsP.value;
-    data[15] = d.tbComments.value;
+    data[15] = comments;
     data[16] = dpu_id;
     data[17] = acc;
     data[18] = accN;
@@ -666,7 +855,7 @@ function fnSave() {
             data[25] = "";
         }
         data[26] = d.tbBrDat_TextBox.value;
-        data[27] = branch;
+        data[27] = d.tbBranch.value;
         data[28] = d.tbOkpoP.value;
 
         webService.DPU.callService(onUpdateDeal, "UpdateDeal", data);
@@ -691,7 +880,7 @@ function fnSave() {
         data[29] = 25;
         data[30] = window.dialogArguments.user_id;
         data[31] = dpu_gen;
-        data[32] = branch;
+        data[32] = d.tbBranch.value;
         webService.DPU.callService(onInsertDeal, "InsertDeal", data);
     }
 }
@@ -736,10 +925,29 @@ function fnShowState() {
 function fnTabForm() {
     var accs = acc;
     if (accN != "") accs += "," + accN;
-    window.dialogArguments.open("/barsroot/customerlist/custacc.aspx?type=4&rnk=" + rnk + "&acc=" + accs, "", "height=" + (window.screen.height - 200) + ",width=" + (window.screen.width - 10) + ",status=no,toolbar=no,menubar=no,location=no,left=0,top=0");
+    window.dialogArguments.open("/barsroot/customerlist/custacc.aspx?type=4&rnk=" + rnk + "&acc=" + accs, "", "height=" + (window.screen.height - 300) + ",width=" + (window.screen.width - 100) + ",status=no,toolbar=no,menubar=no,location=no,left=0,top=0");
 }
+
 //**********************************************************************//
+function beforePrint() {
+    // alert( 'isFrx=' + isFrx );
+    if ( confirm('Надрукувати депозитний договір') ) {
+        if (isFrx == 1) {
+            // bars.ui.loader($("body"), true);
+            return true;
+        }
+        else {
+            fnPrint(false);
+            return false;
+        }
+    }
+    else {
+        return false;
+    }
+}
+
 var inWord = false;
+
 function fnPrint(word) {
     inWord = word;
     if (!tempalteID) {
@@ -762,7 +970,39 @@ function onGenerateReport(result) {
 }
 //**********************************************************************//
 function fnDopSogl() {
-    window.showModalDialog("dptdealparAMS.aspx?mode=" + mode + "&dpu_id=0&type=1&dpu_gen=" + dpu_id + "&dpu_ad=1" + "&rnd=" + Math.random(), window.dialogArguments, "dialogWidth:1000px;dialogHeight:800px;center:yes;edge:sunken;help:no;status:no;");
+    window.showModalDialog("dptDealParams.aspx?mode=" + mode + "&dpu_id=0&type=1&dpu_gen=" + dpu_id + "&dpu_ad=1" + "&rnd=" + Math.random(), window.dialogArguments, "dialogWidth:1000px;dialogHeight:800px;center:yes;edge:sunken;help:no;status:no;");
+}
+
+//**********************************************************************//
+function fnShowAddOption() {
+    // window.dialogArguments.fnShowState();
+    // window.dialogArguments.open("/barsroot/clientregister/registration.aspx?readonly=1&rnk=" + rnk, "", "height=" + (window.screen.height - 200) + ",width=" + (window.screen.width - 10) + ",status=no,toolbar=no,menubar=no,location=no,left=0,top=0");
+    window.showModalDialog("DptAdditionalOptions.aspx?mode=" + mode + "&dpu_id=" + dpu_id + "&rnk=" + rnk + "&rnd=" + Math.random(), window, "dialogWidth:700px;dialogHeight:500px;center:yes;edge:sunken;help:no;status:no;scroll:no");
+}
+
+//**********************************************************************//
+function fnShowCrtAgreement() {
+    window.showModalDialog("DptCreateAgreement.aspx?mode=" + mode + "&dpu_id=" + dpu_id + "&rnd=" + Math.random(), window, "dialogWidth:600px;center:yes;edge:sunken;help:no;status:no;scroll:no");
+}
+
+//**********************************************************************//
+function fnShowSwiftDetails() {
+    // If ( "Y" = get_OneStringValue("SELECT decode(count(1),0,'N','Y') INTO :sResult from DPU_RU where KF = :dfMFOD") )
+    if ((document.all.tbMfoD.value != our_mfo) ||
+        (document.all.tbMfoD.value == our_mfo) &&
+        (confirm("Код банку одержувача належить Ощадбанку.\nВи впевненні що хочете вказати SWIFT реквізити для даного договору?")))
+    {
+        window.showModalDialog("DptSwiftDetails.aspx?mode=" + mode + "&dpu_id=" + dpu_id + "&rnd=" + Math.random(), window, "dialogWidth:550px;dialogHeight:450px;center:yes;edge:sunken;help:no;status:no;scroll:no");
+    }
+}
+
+//**********************************************************************//
+function fnSetBranch() {
+    var result = window.showModalDialog(url_dlg_mod + 'V_DPU_OUR_BRANCH&tail=""&title=' + escape("Вибір підрозділу"), window, "dialogHeight:700px;dialogWidth:800px;center:yes;edge:sunken;help:no;status:no;");
+    if (result) {
+        document.all.tbBranch.value = result[0];
+        document.all.tbBranch.title = result[1];
+    }
 }
 
 //** доступність елементів при пролонгації депозиту ********************//
@@ -789,7 +1029,6 @@ function fnDisableElements(disable) {
     document.getElementById('tbNbD').disabled = disable;
     document.getElementById('tbNlsD').disabled = disable;
     document.getElementById('tbNmsD').disabled = disable;
-    document.getElementById('tbComments').disabled = disable;
     // кнопки
     if (disable) {
         HideImg(gE("btRefresh"));
@@ -800,6 +1039,9 @@ function fnDisableElements(disable) {
         HideImg(gE("imgWord"));
         HideImg(gE("btChilds"));
         HideImg(gE("btDubl"));
+        HideImg(gE("btAddOption"));
+        HideImg(gE("btCrtAgreement"));
+        HideImg(gE("btSwiftDetails"));
         HideImg(gE("btClAcc"));
     }
     else {
@@ -811,36 +1053,54 @@ function fnDisableElements(disable) {
         UnHideImg(gE("imgWord"));
         UnHideImg(gE("btChilds"));
         UnHideImg(gE("btDubl"));
+        UnHideImg(gE("btAddOption"));
+        UnHideImg(gE("btCrtAgreement"));
+        UnHideImg(gE("btSwiftDetails"));
         UnHideImg(gE("btClAcc"));
     }
 }
 
 //** Підготовка форми для пролонгації договору *************************//
 function fnPrepareProlongation() {
-
-    document.getElementById('tbDatO_TextBox').disabled = false;
-    document.getElementById('tbDatV_TextBox').disabled = true;
-    sDatEnd = document.getElementById('tbDatV_TextBox').value;
+    var sDatEnd = document.getElementById('tbDatV_TextBox').value;
 
     window["tbBrDat"].SetValue(sDatEnd);
     window["tbDatN"].SetValue(sDatEnd);
 
-    // нова дата звершення договору
-    GetDateEnd(sDatEnd);
+    if (fl_extend == 2 && dpu_gen == dpu_id) {
+        // нова дата звершення ген. дог.
+        SetLineNewEndDate( sDatEnd );
 
-    // % ставка 
-    SetProcs();
+        // % ставка
+        document.getElementById('tbIr').disabled = true;
+        document.getElementById('tbIr').value = 0;
 
-    // к-ть днів
-    calcKtDay();
+        // доступність дати закінчення
+        if (periodType == 0) {
+            document.getElementById('tbDatO_TextBox').disabled = (termType == 1);
+        }
+        else {
+            document.getElementById('tbDatO_TextBox').disabled = true;
+        }
+    }
+    else {
+        // нова дата звершення договору
+        GetDateEnd(sDatEnd);
 
-    // 
+        // доступність дати закінчення
+        document.getElementById('tbDatO_TextBox').disabled = (termType == 1);
+
+        // % ставка
+        document.getElementById('tbIr').disabled = false;
+        //SetProcs();
+
+        // к-ть днів
+        calcKtDay();
+    }
+
     fnDisableElements(true);
 
-    //спеціально для ОБУ зроблено можливість редагувати поле 
-    document.getElementById('tbDatV_TextBox').disabled = false;
-
-    //
+    // change action
     document.getElementById('btSave').onclick = fnProlongationDeal;
 }
 
@@ -850,7 +1110,7 @@ function fnProlongationDeal() {
     if (Dialog("Пролонгувати депозитний договір!", "confirm") != 1) return;
     var d = document.all;
     var data = new Array();
-    data[0] = window.dialogArguments.bankdate;   // банківська дата (локальна)       
+    data[0] = window.dialogArguments.bankdate;   // банківська дата (локальна)
     data[1] = dpu_id;                            // id депозиту
     data[2] = d.tbDatO_TextBox.value;            // нова дата завершення договру
     data[3] = d.tbIr.value;                      // нова ставка по договору після пролонгації
@@ -886,6 +1146,29 @@ function fnClient() {
         webService.DPU.callService(onGetClientInfo, "getClientInfo", rnk);
     }
 }
+
+function lpad(strSrc, newLen, chr) {
+    var strTrg = "";
+
+    if (strSrc.length < newLen) {
+        var qty = (newLen - strSrc.length);
+        for (i = 0; i < qty; i++) {
+            strTrg += chr;
+        }
+        strTrg += strSrc;
+    }
+
+    if (strSrc.length > newLen) {
+        strTrg = strSrc.substr(0, newLen);
+    }
+
+    if (strSrc.length == newLen) {
+        strTrg = strSrc;
+    }
+
+    return strTrg;
+}
+
 function onGetClientInfo(result) {
     if (!getError(result)) return;
 
@@ -901,20 +1184,22 @@ function onGetClientInfo(result) {
         document.all.tbNmsD.value = result.value[2];
         document.all.tbAdres.value = result.value[3];
         document.all.tbK013.value = result.value[4];
+
+        // Deal Number
+        var crnDt = new Date();
+        
+        document.all.tbND.value = result.value[0] +
+            "-" +
+            crnDt.getFullYear().toString().substr(2, 2) +
+            lpad((crnDt.getMonth() + 1).toString(), 2, "0") +
+            lpad(crnDt.getDate().toString(), 2, "0") +
+            "-" +
+            lpad(crnDt.getHours().toString(), 2, "0") +
+            lpad(crnDt.getMinutes().toString(), 2, "0") +
+            lpad(crnDt.getSeconds().toString(), 2, "0");
     }
 }
-//**********************************************************************//
-function fnTrustee() {
-    var _tail = "";
-    if (rnk != null) _tail = "rnk = " + rnk;
-    var result = window.showModalDialog(url_dlg_mod + 'v_trustee_allow2sign&tail="' + _tail + '"', window, "dialogHeight:600px;dialogWidth:600px;center:yes;edge:sunken;help:no;status:no;");
-    if (result != null) {
-        trustId = result[0];
-        document.all.tbTasFio.value = result[1];
-        document.all.tbTasPos.value = result[2];
-        document.all.tbTasDoc.value = result[3];
-    }
-}
+
 //**********************************************************************//
 var mfo_idx = null;
 function fnGetMfo(tb) {
@@ -1011,39 +1296,69 @@ function ShowExtendOpt() {
 
 //
 function ShowHideControls(type) {
-    if (type == "GEN_IR") {
+    if (type == "GENERAL") {
         try {
-            document.all.lbDatN.style.visibility = "hidden";
-            document.all.tbDatN_TextBox.style.visibility = "hidden";
-            document.all.lbDatV.style.visibility = "hidden";
-            document.all.tbDatV_TextBox.style.visibility = "hidden";
-            document.all.lbKtDay.style.visibility = "hidden";
-            document.all.tbKtDay.style.visibility = "hidden";
-            document.all.lbCntDubl.style.visibility = "hidden";
-            document.all.tbCntDubl.style.visibility = "hidden";
-            document.all.lbSum.style.visibility = "hidden";
-            document.all.tbSum.style.visibility = "hidden";
-            document.all.lbMinSum.style.visibility = "hidden";
-            document.all.tbMinSum.style.visibility = "hidden";
-            document.all.cbCompProc.disabled = true;
-            document.all.tbIr.value = 0;
-            document.all.tbIr.disabled = true;
-            document.all.cbRatePerson.checked = true;
-            document.all.cbRatePerson.disabled = true;
-            document.all.cbRateBase.checked = false;
-            document.all.cbRateBase.disabled = true;
-            document.all.tbBrDat_TextBox.disabled = true;
-            document.all.ddOp.disabled = true;
-            document.all.ddBaseRates.disabled = true;
-            document.all.tbBrDat.disabled = true;
+            var d = document.all;
 
-            document.all.ddFreqV.disabled = true;
-            document.all.ddStop.disabled = true;
+            // d.lbDatN.style.visibility = "hidden";
+            // d.tbDatN_TextBox.style.visibility = "hidden";
+            d.lbDatV.style.visibility = "hidden";
+            d.tbDatV_TextBox.style.visibility = "hidden";
+            d.lbKtDay.style.visibility = "hidden";
+            d.tbKtDay.style.visibility = "hidden";
+            // d.lbCntDubl.style.visibility = "hidden";
+            // d.tbCntDubl.style.visibility = "hidden";
+            
+            d.lbSum.style.visibility = "hidden";
+            d.tbSum.style.visibility = "hidden";
+            d.lbMinSum.style.visibility = "hidden";
+            d.tbMinSum.style.visibility = "hidden";
+            d.lbFreqV.style.visibility = "hidden";
+            d.tbFreqV.style.visibility = "hidden";
+            d.ddFreqV.style.visibility = "hidden";
+            d.lbStop.style.visibility = "hidden";
+            d.tbStop.style.visibility = "hidden";
+            d.ddStop.style.visibility = "hidden";
+            
+            d.cbCompProc.disabled = true;
+            d.tbIr.value = 0;
+            d.tbIr.disabled = true;
+            d.cbRatePerson.checked = true;
+            d.cbRatePerson.disabled = true;
+            d.cbRateBase.checked = false;
+            d.cbRateBase.disabled = true;
+            d.tbBrDat_TextBox.disabled = true;
+            d.ddOp.disabled = true;
+            d.ddBaseRates.disabled = true;
+            d.tbBrDat.disabled = true;
+
+            // d.ddFreqV.disabled = true;
+            // d.ddStop.disabled = true;
         }
         catch (e) {
         }
     }
-    else if (type == "REFRESH_RATES") {
+    else if (type == "REGULAR") {
+        try {
+            var d = document.all;
+            
+            d.lbDatV.style.visibility = "visible";
+            d.tbDatV_TextBox.style.visibility = "visible";
+            d.lbKtDay.style.visibility = "visible";
+            d.tbKtDay.style.visibility = "visible";
+            d.lbSum.style.visibility = "visible";
+            d.tbSum.style.visibility = "visible";
+            d.lbMinSum.style.visibility = "visible";
+            d.tbMinSum.style.visibility = "visible";
+            d.lbFreqV.style.visibility = "visible";
+            d.tbFreqV.style.visibility = "visible";
+            d.ddFreqV.style.visibility = "visible";
+            d.lbStop.style.visibility = "visible";
+            d.tbStop.style.visibility = "visible";
+            d.ddStop.style.visibility = "visible";
+        }
+        catch (e) {
+        }
     }
 }
 
@@ -1070,62 +1385,73 @@ function onGetVal(result) {
     d.cbCompProc.checked = (result.value[8].text == "1") ? (true) : (false);
     fnCompProc();
 
-    //fl_extend
+    // fl_extend
     fl_extend = result.value[9].text;
-    if (fl_extend == 2 && !dpu_gen)
-        ShowHideControls("GEN_IR");
-    else {
-        ShowHideControls("REFRESH_RATES");
-        SetProcs();
-    }
 
     d.tbStop.value = result.value[10].text;
     d.ddStop.options[0].value = result.value[10].text;
     d.ddStop.options[0].text = result.value[11].text;
-    bsd = result.value[12].text;
-    bsn = result.value[13].text;
 
-    dpu_type = result.value[14].text
+    // 
+    periodType = result.value[14].text;
 
-    branch = result.value[15].text; ;
+    branch = result.value[15].text;
+    d.tbBranch.value = branch;
+
     branchName = result.value[16].text;
+    d.tbBranch.title = branchName;
 
     tempalteID = result.value[17].text;
 
-    window["tbDatO"].SetValue(result.value[18].text);
-    window["tbDatV"].SetValue(result.value[19].text);
+    d.tbMinSum.value = result.value[18].text;
+    d.tbMaxSum.value = result.value[19].text;
+    
+    if ( d.tbMinSum.value > 0) {
+        d.tbSum.value = d.tbMinSum.value;
+        d.tbMinSum.disabled = true;
+    }
+
+    // 1 - Фіксований термін / 2 - Діапазон
+    termType = result.value[20].text;
+
+    window["tbDatO"].SetValue(result.value[21].text);
+    window["tbDatV"].SetValue(result.value[22].text);
 
     window["tbBrDat"].SetValue(d.tbDatZ_TextBox.value);
-    
+
+    d.ddFreqV.disabled = true;
+    d.ddStop.disabled = true;
+
     d.tbDatZ_TextBox.disabled = true;
-    //d.tbDatN_TextBox.disabled = true;
-    d.tbDatV_TextBox.disabled = true;
-    d.tbBrDat_TextBox.disabled = true;
+
+    // доступність елементів форми 
+    if (fl_extend == 2 && !dpu_gen) {
+        ShowHideControls("GENERAL");
+        // дати закінчення
+        if ( periodType == 0 ) {
+            d.tbDatO_TextBox.disabled = (termType == 1);
+        }
+        else {
+            SetLineNewEndDate( d.tbDatZ_TextBox.value );
+            d.tbDatO_TextBox.disabled = true;
+        }
+    }
+    else {
+        ShowHideControls("REGULAR");
+        // дати закінчення
+        if ( !dpu_id || (dpu_id == 0) ) {
+            d.tbDatO_TextBox.disabled = (termType == 1);
+        }
+        SetProcs();
+    }
 
     if (srok != 0) {
-
         calcKtDay();
-
-        // якщо термін менше місяця
-        //if (srok < 1) {
-        //    d.tbDatO_TextBox.disabled = true;
-        //}
-        //else {
-        //    d.tbDatO_TextBox.disabled = false;
-        //}
     }
 }
 //**********************************************************************//
 function SetBrDate() {
     window["tbBrDat"].SetValue(document.all.tbDatZ_TextBox.value);
-}
-//**********************************************************************//
-function GetNd() {
-    webService.DPU.callService(onGetNd, "GetNd");
-}
-function onGetNd(result) {
-    if (!getError(result)) return;
-    document.all.tbND.value = result.value;
 }
 //**********************************************************************//
 function SetProcs() {
@@ -1145,8 +1471,9 @@ function onGetProcs(result) {
 //**********************************************************************//
 // Дата завершення дії договору
 // 
-function GetDateEnd(sDatEnd) {
-    webService.DPU.callService(onGetDateEnd, "GetDateEnd", sDatEnd, vidd);
+function GetDateEnd(sDatBegin) {
+    var sVidd = document.all.tbVidD.value;
+    webService.DPU.callService(onGetDateEnd, "GetDateEnd", sDatBegin, sVidd);
 }
 function onGetDateEnd(result) {
     if (!getError(result)) {
@@ -1182,7 +1509,77 @@ function fnShowMetaNlsP() {
         document.all.tbNlsP.value = result[0];
     }
 }
-//**********************************************************************//
+// *****************************
+// * Валідатори введених даних *
+// *****************************
+
+function fnCheckAmount(amount) {
+    var result = false;
+    var minAmnt = parseFloat(document.all.tbMinSum.value);
+    var maxAmnt = parseFloat(document.all.tbMaxSum.value);
+    var curAmnt = parseFloat(amount.value);
+    if ( curAmnt > 0 ) {
+        
+        if ( minAmnt > 0 ) {
+            if ( minAmnt > curAmnt ) {
+                Dialog( "Сума " + curAmnt.toFixed(2) + " менша від мінімально допустимої суми "
+                                + minAmnt.toFixed(2) + " для обраного виду депозиту!", "alert");
+                amount.value = minAmnt;
+                gE("tbSum").focus();
+                return false;
+            }
+        }
+        
+        if ( maxAmnt > 0 ) {
+            if ( maxAmnt < curAmnt ) {
+                Dialog( "Сума " + curAmnt.toFixed(2) + " більша від максимально допустимої суми "
+                                + maxAmnt.toFixed(2) + " для обраного виду депозиту!", "alert");
+                amount.value = maxAmnt;
+                gE("tbSum").focus();
+                return false;
+            }
+        }
+        
+        if (!dpu_id || (dpu_id == 0)) {
+            SetProcs();
+        }
+        return true;
+    }
+    else {
+        Dialog("Сума договору рівна НУЛЮ!", "alert");
+        if (minAmnt > 0) {
+            amount.value = minAmnt;
+            gE("tbSum").focus();
+        }
+        return false;
+    }
+}
+
+// 
+function fnCheckDateBegin() {
+    var dateN = new Date();
+    var sDatN = gE("tbDatN_TextBox").value;
+    dateN.setFullYear(sDatN.split('.')[2], sDatN.split('.')[1] - 1, sDatN.split('.')[0]);
+
+    var dateZ = new Date();
+    var sDatZ = gE("tbDatZ_TextBox").value;
+    dateZ.setFullYear(sDatZ.split('.')[2], sDatZ.split('.')[1] - 1, sDatZ.split('.')[0]);
+
+    if (dateN < dateZ) {
+        // alert("Дата початку менша від дати оформлення!");
+        Dialog("Дата початку менша від дати оформлення!", "alert");
+        window["tbDatN"].SetValue(sDatZ);
+        gE("tbDatN_TextBox").focus();
+        return false;
+    }
+    else {
+        GetDateEnd(sDatN);
+        SetProcs(); // % ставка 
+        return true;
+    }
+}
+
+//
 function fnCheckDataO() {
     var dateN = new Date();
     var sDatN = gE("tbDatN_TextBox").value;
@@ -1197,21 +1594,22 @@ function fnCheckDataO() {
     dateO.setFullYear(sDatO.split('.')[2], sDatO.split('.')[1] - 1, sDatO.split('.')[0]);
 
     if (dateO <= dateN || dateO <= dateZ) {
-        alert("Дата завершення менша допустимого значення.");
+        // alert("Дата завершення менша допустимого значення.");
+        Dialog("Дата завершення менша допустимого значення!", "alert");
         window["tbDatO"].SetValue(sDatN);
         gE("tbDatO_TextBox").focus();
         return false;
     }
     else
     {
-        if (fnDptDateValidate(document.all.ddVidD.options[0].value, sDatN, sDatO))
+        var errMsg = fnDptDateValidate(document.all.tbVidD.value, sDatN, sDatO);
+        if (errMsg == "")
         {
-            fnCorrectDate(document.getElementById("ddKv").value, sDatO);
+            fnCorrectDate(gE("ddKv").value, sDatO);
            // calcKtDay();
             if ( !dpu_id || (dpu_id == 0) ) {
                 SetProcs();
             }
-            
             gE("tbDatO_TextBox").style.backgroundColor = "";
 
             return true;
@@ -1219,7 +1617,8 @@ function fnCheckDataO() {
         else {
             gE("tbDatO_TextBox").style.backgroundColor = "LightPink";
 
-            alert("Дата завершення не відповідає умовам даного виду депозиту!");
+            // alert("Дата завершення не відповідає умовам даного виду депозиту!");
+            Dialog(errMsg, "alert");
 
             return false;
         }
@@ -1249,8 +1648,9 @@ function fnCheckDataV() {
         window["tbDatV"].SetValue(sDatO);
         gE("tbDatV_TextBox").focus();
     }
-    else
-    fnCorrectDate(document.getElementById("ddKv").value, sDatO);
+    else {
+        fnCorrectDate(document.getElementById("ddKv").value, sDatO);
+    }
 }
 
 //
@@ -1265,11 +1665,25 @@ function fnDptDateValidate(vidd, dateN, dateO) {
     callObj.params = input;
     var result = webService.DPU.callService(callObj);
     callObj.async = true;
-    if (!getError(result)) return false;
-    else return result.value == "1";
+    if (!getError(result)) {
+        return;
+    }
+    else {
+        return result.value;
+    }
 }
 
-//
+// Перевірка введеної ставки по договору
+function fnCheckRate() {
+    if (gE("tbIr").value > 0) {
+        // alert("Ставка вище допустимої для даного виду депозиту!");
+        Dialog("Ставка вище допустимої для даного виду депозиту!", "alert");
+        window["tbIr"].SetValue(0);
+        gE("tbIr").focus();
+    }
+}
+
+//**********************************************************************//
 function fnCorrectDate(kv, start_date) {
     webService.DPU.callService(onCorrectDate, "CorrectDate", kv, start_date, 1);
 }
@@ -1280,15 +1694,6 @@ function onCorrectDate(result) {
     else {
     window["tbDatV"].SetValue(result.value);
         calcKtDay();
-    }
-}
-
-// Перевірка введеної ставки по договору
-function CheckRate() {
-    if (gE("tbIr").value > 0) {
-        alert("Ставка вище допустимої для даного виду депозиту!");
-        window["tbIr"].SetValue(0);
-        gE("tbIr").focus();
     }
 }
 
@@ -1317,3 +1722,18 @@ function onGetSecAccounts(result) {
     }
 }
 //**********************************************************************//
+
+function SetLineNewEndDate( sDate ) {
+    var yearQty = 1;
+    if (periodType == 2) {
+        yearQty = 3;
+    }
+
+    var dateO = new Date();
+    dateO.setFullYear(parseInt(sDate.split('.')[2],10) + yearQty, parseInt(sDate.split('.')[1],10) - 1, parseInt(sDate.split('.')[0],10) - 1);
+
+    var sDatEnd = lpad(dateO.getDate().toString(), 2, "0") + "." + lpad((dateO.getMonth() + 1).toString(), 2, "0") + "." + dateO.getFullYear().toString();
+
+    window["tbDatO"].SetValue(sDatEnd);
+    window["tbDatV"].SetValue(sDatEnd);
+}

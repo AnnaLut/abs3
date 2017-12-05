@@ -1,13 +1,4 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_INV_CCK_FL.sql =========*** Run 
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure P_INV_CCK_FL ***
-
-  CREATE OR REPLACE PROCEDURE BARS.P_INV_CCK_FL (p_dat date, p_frm int, p_type int default 1) is
+CREATE OR REPLACE PROCEDURE BARS.P_INV_CCK_FL (p_dat date, p_frm int, p_type int default 1) is
 
 -- ============================================================================
 --                    Инвентаризационная ведомость
@@ -168,13 +159,15 @@ PROMPT *** Create  procedure P_INV_CCK_FL ***
   s3_       number;
   sr013_    number;
   sr013_60  number;
+  l_newnbs number;
 
   l_usedwh    char(1);        -- использование загрузки в ЦАС
   l_errmsg    varchar2(500);  -- сообщение
   l_errcode   number;          -- код выполнения
 
 begin
-
+    
+    l_newnbs := NEWNBS.GET_STATE;
    --
    -- проверка на возможность пересчета инв. ведомости
    -- Выполняется только для тех у кого работает загрузка в ЦАС
@@ -1605,7 +1598,7 @@ bars_audit.trace('%s TIME_3: l_time_start3=%s',l_title, l_time_start3);
             and t.id = l_rez_id2 and t.dat = l_rez_dat2 and fl_newacc<>'i' ) t3
   where ba.acc_ovr is not null
     and ba.acc_ovr = a.acc
-    and a.nbs in ('2202','2203') -- Херсон!
+    and a.nbs in (decode(l_newnbs,0,'2202','2203'),'2203') -- Херсон!
     and a.daos <= l_dat
     and a.branch   = b.branch
     and a.rnk      = c.rnk
@@ -1982,32 +1975,32 @@ if p_type = 1 then
     -- кред.счета, которые не попали в ведомость, но есть в снапах
        (select b.name G01, a.kf G02, a.branch G03,  substr('Iншi '||c.nmk,1,70) G04, a.kv G07,
                a.nbs G19, a.ob22 G20,
-               decode (a.nbs, '2202', decode(p_type,1,-SNP.fost(a.acc,di_,1,7),-SNP.fost(a.acc,di_,0,7)),
+               decode (a.nbs, decode(l_newnbs,0,'2202','2203'), decode(p_type,1,-SNP.fost(a.acc,di_,1,7),-SNP.fost(a.acc,di_,0,7)),
                               '2203', decode(p_type,1,-SNP.fost(a.acc,di_,1,7),-SNP.fost(a.acc,di_,0,7)),
-                      	      '2207', decode(p_type,1,-SNP.fost(a.acc,di_,1,7),-SNP.fost(a.acc,di_,0,7)),
+                      	      decode(l_newnbs,0,'2207','2203'), decode(p_type,1,-SNP.fost(a.acc,di_,1,7),-SNP.fost(a.acc,di_,0,7)),
                       	      '2232', decode(p_type,1,-SNP.fost(a.acc,di_,1,7),-SNP.fost(a.acc,di_,0,7)),
                       	      '2233', decode(p_type,1,-SNP.fost(a.acc,di_,1,7),-SNP.fost(a.acc,di_,0,7)),
-                      	      '2237', decode(p_type,1,-SNP.fost(a.acc,di_,1,7),-SNP.fost(a.acc,di_,0,7)),
+                      	      decode(l_newnbs,0,'2237','2233'), decode(p_type,1,-SNP.fost(a.acc,di_,1,7),-SNP.fost(a.acc,di_,0,7)),
         	      0 )/100 G21,
-               decode (a.nbs, '2202', decode(p_type,1,-SNP.fost(a.acc,di_,1,8),-SNP.fost(a.acc,di_,0,8)),
+               decode (a.nbs, decode(l_newnbs,0,'2202','2203'), decode(p_type,1,-SNP.fost(a.acc,di_,1,8),-SNP.fost(a.acc,di_,0,8)),
                       	      '2203', decode(p_type,1,-SNP.fost(a.acc,di_,1,8),-SNP.fost(a.acc,di_,0,8)),
-                      	      '2207', decode(p_type,1,-SNP.fost(a.acc,di_,1,8),-SNP.fost(a.acc,di_,0,8)),
+                      	      decode(l_newnbs,0,'2207','2203'), decode(p_type,1,-SNP.fost(a.acc,di_,1,8),-SNP.fost(a.acc,di_,0,8)),
                       	      '2232', decode(p_type,1,-SNP.fost(a.acc,di_,1,8),-SNP.fost(a.acc,di_,0,8)),
                       	      '2233', decode(p_type,1,-SNP.fost(a.acc,di_,1,8),-SNP.fost(a.acc,di_,0,8)),
-                      	      '2237', decode(p_type,1,-SNP.fost(a.acc,di_,1,8),-SNP.fost(a.acc,di_,0,8)),
+                      	      decode(l_newnbs,0,'2237','2233'), decode(p_type,1,-SNP.fost(a.acc,di_,1,8),-SNP.fost(a.acc,di_,0,8)),
                        0 )/100 G22,
               decode (a.nbs, '9129', decode(p_type,1,-SNP.fost(a.acc,di_,1,8),-SNP.fost(a.acc,di_,0,8)),
                        0 )/100 G25,
               decode (a.nbs, '2208', decode(p_type,1,-SNP.fost(a.acc,di_,1,8),-SNP.fost(a.acc,di_,0,8)),
                       '2238', decode(p_type,1,-SNP.fost(a.acc,di_,1,8),-SNP.fost(a.acc,di_,0,8)),
                        0 )/100 G28,
-              decode (a.nbs, '2209', decode(p_type,1,-SNP.fost(a.acc,di_,1,8),-SNP.fost(a.acc,di_,0,8)),
-                      '2239', decode(p_type,1,-SNP.fost(a.acc,di_,1,8),-SNP.fost(a.acc,di_,0,8)),
+              decode (a.nbs, decode(l_newnbs,0,'2209','2208'), decode(p_type,1,-SNP.fost(a.acc,di_,1,8),-SNP.fost(a.acc,di_,0,8)),
+                             decode(l_newnbs,0,'2239','2238'), decode(p_type,1,-SNP.fost(a.acc,di_,1,8),-SNP.fost(a.acc,di_,0,8)),
                        0 )/100 G30,
 	      a.acc acc, a.rnk rnk
           from ACCM_AGG_MONBALS bb, accounts a, customer c, branch b
          where bb.acc = a.acc
-           and (   a.nbs in ('2202','2203','2207','2208','2209','2232','2233','2237','2238','2239')
+           and (   a.nbs in (decode(l_newnbs,0,'2202','2203'),'2203',decode(l_newnbs,0,'2207','2203'),'2208',decode(l_newnbs,0,'2209','2208'),'2232','2233',decode(l_newnbs,0,'2237','2233'),'2238',decode(l_newnbs,0,'2239','2238'))
 	        or (a.nbs = '9129' and c.custtype = 3 and nvl(trim(c.sed),'00')<>'91') )
            and caldt_ID = di_
            -- смотрим, что счета нет среди INV_CCK_FL.ACC
@@ -2041,32 +2034,32 @@ else
     -- кред.счета, которые не попали в ведомость, но есть в снапах
        (select b.name G01, a.kf G02, a.branch G03,  substr('Iншi '||c.nmk,1,70) G04, a.kv G07,
                a.nbs G19, a.ob22 G20,
-               decode (a.nbs, '2202', decode(p_type,1,-SNP.fost(a.acc,di_,1,7),-SNP.fost(a.acc,di_,0,7)),
+               decode (a.nbs, decode(l_newnbs,0,'2202','2203'), decode(p_type,1,-SNP.fost(a.acc,di_,1,7),-SNP.fost(a.acc,di_,0,7)),
                               '2203', decode(p_type,1,-SNP.fost(a.acc,di_,1,7),-SNP.fost(a.acc,di_,0,7)),
-                      	      '2207', decode(p_type,1,-SNP.fost(a.acc,di_,1,7),-SNP.fost(a.acc,di_,0,7)),
+                      	      decode(l_newnbs,0,'2207','2203'), decode(p_type,1,-SNP.fost(a.acc,di_,1,7),-SNP.fost(a.acc,di_,0,7)),
                       	      '2232', decode(p_type,1,-SNP.fost(a.acc,di_,1,7),-SNP.fost(a.acc,di_,0,7)),
                       	      '2233', decode(p_type,1,-SNP.fost(a.acc,di_,1,7),-SNP.fost(a.acc,di_,0,7)),
-                      	      '2237', decode(p_type,1,-SNP.fost(a.acc,di_,1,7),-SNP.fost(a.acc,di_,0,7)),
+                      	      decode(l_newnbs,0,'2237','2233'), decode(p_type,1,-SNP.fost(a.acc,di_,1,7),-SNP.fost(a.acc,di_,0,7)),
         	      0 )/100 G21,
-               decode (a.nbs, '2202', decode(p_type,1,-SNP.fost(a.acc,di_,1,8),-SNP.fost(a.acc,di_,0,8)),
+               decode (a.nbs, decode(l_newnbs,0,'2202','2203'), decode(p_type,1,-SNP.fost(a.acc,di_,1,8),-SNP.fost(a.acc,di_,0,8)),
                       	      '2203', decode(p_type,1,-SNP.fost(a.acc,di_,1,8),-SNP.fost(a.acc,di_,0,8)),
-                      	      '2207', decode(p_type,1,-SNP.fost(a.acc,di_,1,8),-SNP.fost(a.acc,di_,0,8)),
+                      	      decode(l_newnbs,0,'2207','2203'), decode(p_type,1,-SNP.fost(a.acc,di_,1,8),-SNP.fost(a.acc,di_,0,8)),
                       	      '2232', decode(p_type,1,-SNP.fost(a.acc,di_,1,8),-SNP.fost(a.acc,di_,0,8)),
                       	      '2233', decode(p_type,1,-SNP.fost(a.acc,di_,1,8),-SNP.fost(a.acc,di_,0,8)),
-                      	      '2237', decode(p_type,1,-SNP.fost(a.acc,di_,1,8),-SNP.fost(a.acc,di_,0,8)),
+                      	      decode(l_newnbs,0,'2237','2233'), decode(p_type,1,-SNP.fost(a.acc,di_,1,8),-SNP.fost(a.acc,di_,0,8)),
                        0 )/100 G22,
               decode (a.nbs, '9129', decode(p_type,1,-SNP.fost(a.acc,di_,1,8),-SNP.fost(a.acc,di_,0,8)),
                        0 )/100 G25,
               decode (a.nbs, '2208', decode(p_type,1,-SNP.fost(a.acc,di_,1,8),-SNP.fost(a.acc,di_,0,8)),
                       '2238', decode(p_type,1,-SNP.fost(a.acc,di_,1,8),-SNP.fost(a.acc,di_,0,8)),
                        0 )/100 G28,
-              decode (a.nbs, '2209', decode(p_type,1,-SNP.fost(a.acc,di_,1,8),-SNP.fost(a.acc,di_,0,8)),
-                      '2239', decode(p_type,1,-SNP.fost(a.acc,di_,1,8),-SNP.fost(a.acc,di_,0,8)),
+              decode (a.nbs, decode(l_newnbs,0,'2209','2208'), decode(p_type,1,-SNP.fost(a.acc,di_,1,8),-SNP.fost(a.acc,di_,0,8)),
+                             decode(l_newnbs,0,'2239','2238'), decode(p_type,1,-SNP.fost(a.acc,di_,1,8),-SNP.fost(a.acc,di_,0,8)),
                        0 )/100 G30,
                a.acc acc, a.rnk rnk
           from ACCM_SNAP_BALANCES bb, accounts a, customer c, branch b
          where bb.acc = a.acc
-           and (   a.nbs in ('2202','2203','2207','2208','2209','2232','2233','2237','2238','2239')
+           and (   a.nbs in (decode(l_newnbs,0,'2202','2203'),'2203',decode(l_newnbs,0,'2207','2203'),'2208',decode(l_newnbs,0,'2209','2208'),'2232','2233',decode(l_newnbs,0,'2237','2233'),'2238',decode(l_newnbs,0,'2239','2238'))
 	        or (a.nbs = '9129' and c.custtype = 3 and nvl(trim(c.sed),'00')<>'91') )
            and caldt_ID = di_
            -- смотрим, что счета нет среди INV_CCK_FL.ACC
@@ -2126,16 +2119,3 @@ exception when others then
 
 end P_INV_CCK_FL ;
 /
-show err;
-
-PROMPT *** Create  grants  P_INV_CCK_FL ***
-grant EXECUTE                                                                on P_INV_CCK_FL    to BARSDWH_ACCESS_USER;
-grant EXECUTE                                                                on P_INV_CCK_FL    to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on P_INV_CCK_FL    to RCC_DEAL;
-grant EXECUTE                                                                on P_INV_CCK_FL    to WR_ALL_RIGHTS;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_INV_CCK_FL.sql =========*** End 
-PROMPT ===================================================================================== 

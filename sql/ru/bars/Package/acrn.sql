@@ -1,12 +1,7 @@
+create or replace package ACRN
+is
 
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/acrn.sql =========*** Run *** ======
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.ACRN IS
-
-G_HEADER_VERSION  CONSTANT VARCHAR2(64)  := 'версия 5.10 25/07/2008';
+G_HEADER_VERSION  CONSTANT VARCHAR2(64)  := 'версия 5.13 22/06/2017';
 G_AWK_HEADER_DEFS CONSTANT VARCHAR2(512) := ''
     ||'    DPT - используется модуль DPT'||chr(10)
     ||'    HO  - начисление по календарным дням '||chr(10)
@@ -42,15 +37,17 @@ PROCEDURE p0_acr( dt_ DATE, acc_ INTEGER DEFAULT NULL );
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
-
-PROCEDURE p_bns( rat_ OUT NUMBER, -- rate
-                amnt_ OUT NUMBER, -- SUM(amount*rate)
-                 dat_ DATE,       --  efective date
-                  nb_ SMALLINT,   -- base rate code
-                  kv_ SMALLINT,   --  currency code
-                ostf_ NUMBER,     -- account balance
-                  op_ SMALLINT DEFAULT NULL, -- rate amend op code
-                amnd_ NUMBER   DEFAULT NULL);-- rate amend value
+procedure P_BNS
+( rat_       out number                -- rate
+, amnt_      out number                -- SUM(amount*rate)
+, dat_    in     date                  -- efective date
+, nb_     in     smallint              -- base rate code
+, kv_     in     smallint              -- currency code
+, ostf_   in     number                -- account balance
+, op_     in     smallint default null -- rate amend op code
+, amnd_   in     number   default null -- rate amend value
+, kf_     in     varchar  default null -- 
+);
 
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -168,7 +165,7 @@ FUNCTION FPROCN(acc_ INTEGER, id_ INTEGER,
 %  	  1 history_flag,
 %  	  0 pay_flag
 %  	FROM ACCOUNTS
-%  	WHERE NBS = '2635';
+%  	WHERE NBS = '2630';
 %    acrN.MAKE_INT( cur, TRUE );
 %  END;
 %
@@ -227,44 +224,86 @@ procedure set_collect_salho(p_collected in number);
 -- Функция получения флага работы по накопительной таблице
 function get_collect_salho return number deterministic;
 
+  ---
+  -- Створення / редагування базової ставки
+  ---
+  procedure SET_BRATES
+  ( p_br_id        in out brates.br_id%type
+  , p_br_tp        in     brates.br_type%type default 1
+  , p_br_nm        in     brates.name%type
+  , p_br_frml      in     brates.formula%type default null
+  , p_actv         in     brates.inuse%type   default 1
+  , p_cmnt         in     brates.comm%type    default null
+  , p_err_msg         out varchar2
+  );
+
+  ---
+  -- Створення / редагування значення базової ставки
+  ---
+  procedure SET_BRATE_VAL
+  ( p_br_id        in     br_tier_edit.br_id%type
+  , p_ccy_id       in     br_tier_edit.kv%type
+  , p_eff_dt       in     br_tier_edit.bdate%type
+  , p_amnt         in     br_tier_edit.s%type
+  , p_rate         in     br_tier_edit.rate%type
+  , p_err_msg         out varchar2
+  );
+
+  ---
+  -- Видалення значення базової ставки
+  ---
+  procedure DEL_BRATE_VAL
+  ( p_br_id        in     br_tier_edit.br_id%type
+  , p_ccy_id       in     br_tier_edit.kv%type
+  , p_eff_dt       in     br_tier_edit.bdate%type
+  , p_amnt         in     br_tier_edit.s%type
+  , p_err_msg         out varchar2
+  );
+
 END acrN;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.ACRN 
+
+show errors
+
+----------------------------------------------------------------------------------------------------
+
+create or replace package body ACRN 
 IS
+  g_body_version constant varchar2(64) := 'версия 5.7 22/06/2017';
+  acc_FORM int := null;
 
-g_body_version  constant varchar2(64) := 'версия 5.31 18/12/2012';
-acc_FORM int := null;
-G_acc     NUMBER;   -- Текущий acc по котрому начисляют
+  g_acc       number; -- Текущий acc по котрому начисляют
 
-g_collected number; -- Признак использования накопительной таблицы
+  g_collected number; -- Признак использования накопительной таблицы
 
-
-G_AWK_BODY_DEFS CONSTANT VARCHAR2(512) := ''
-    ||'    DPT - используется модуль DPT'||chr(10)
-    ||'    HO  - начисление по календарным дням '||chr(10)
-    ||'ACR_DAT - с возможностью СТОРНО начисленных процентов'||chr(10)
+  G_AWK_BODY_DEFS CONSTANT VARCHAR2(512) := ''
+ ||' DPT - используется модуль DPT'||chr(10)
+ ||' HO - начисление по календарным дням '||chr(10)
+ ||'ACR_DAT - с возможностью СТОРНО начисленных процентов'||chr(10)
 ;
 
 function header_version return varchar2 is
 begin
-  return 'Заголовок пакета ACRN '||G_HEADER_VERSION||'.'||chr(13)||chr(10)
-	   ||'AWK definition: '||chr(10)
-	   ||G_AWK_HEADER_DEFS;
+  return 'Заголовок пакета BARS.ACRN '||G_HEADER_VERSION||'.'||chr(13)||chr(10)
+  ||'AWK definition: '||chr(10)
+  ||G_AWK_HEADER_DEFS;
 end header_version;
+
 function body_version return varchar2 is
 begin
   return 'Тело пакета ACRN '||G_BODY_VERSION||'.'||chr(13)||chr(10)
-	   ||'AWK definition: '||chr(10)
-	   ||G_AWK_BODY_DEFS;
+  ||'AWK definition: '||chr(10)
+  ||G_AWK_BODY_DEFS;
 end body_version;
+
 function ver return varchar2 is
 begin
   return 'Package header ACRN '||G_HEADER_VERSION||'.'||chr(10)
-	   ||'AWK definition: '||chr(10)
-	   ||G_AWK_HEADER_DEFS||chr(10)||chr(10)||
-         'Package  body ACRN '||G_BODY_VERSION||'.'||chr(10)
-	   ||'AWK definition: '||chr(10)
-	   ||G_AWK_BODY_DEFS;
+  ||'AWK definition: '||chr(10)
+  ||G_AWK_HEADER_DEFS||chr(10)||chr(10)||
+       'Package  body ACRN '||G_BODY_VERSION||'.'||chr(10)
+  ||'AWK definition: '||chr(10)
+  ||G_AWK_BODY_DEFS;
 end ver;
 
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -514,171 +553,219 @@ END p2_acr;
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
-PROCEDURE p_bns( rat_ OUT NUMBER, -- rate
-                amnt_ OUT NUMBER, -- SUM(amount*rate)
-                 dat_ DATE,       --  efective date
-                  nb_ SMALLINT,   -- base rate code
-                  kv_ SMALLINT,   --  currency code
-                ostf_ NUMBER,     -- account balance
-                  op_ SMALLINT DEFAULT NULL, -- rate amend op code
-                amnd_ NUMBER   DEFAULT NULL) -- rate amend value
-IS
-
-br_    NUMBER;
-ostp_  NUMBER;
-osts_  NUMBER;
-tmps_  NUMBER;
-
-rato_  NUMBER;
-ratb_  NUMBER;
-rats_  NUMBER;
-
-kvs_   SMALLINT;
-
-type_ int;
-FORM_ varchar2(25);
-
- CURSOR C0 IS
-   SELECT t.rate, t.s
-     FROM br_tier t
-    WHERE t.br_id=nb_ AND t.kv=kv_ AND
-          t.bdate=(SELECT MAX(bdate) FROM br_tier
-                    WHERE bdate<=dat_ AND br_id=nb_ AND kv=kv_)
-    ORDER BY s;
+procedure P_BNS
+( rat_       out number                -- rate
+, amnt_      out number                -- SUM(amount*rate)
+, dat_    in     date                  -- efective date
+, nb_     in     smallint              -- base rate code
+, kv_     in     smallint              -- currency code
+, ostf_   in     number                -- account balance
+, op_     in     smallint default null -- rate amend op code
+, amnd_   in     number   default null -- rate amend value
+, kf_     in     varchar  default null -- 
+) IS
+  br_    NUMBER;
+  ostp_  NUMBER;
+  osts_  NUMBER;
+  tmps_  NUMBER;
+  --
+  rato_  NUMBER;
+  ratb_  NUMBER;
+  rats_  NUMBER;
+  --
+  kvs_   SMALLINT;
+  --
+  type_  int;
+  FORM_  varchar2(25);
+  l_kf   varchar2(6);
+  --
+  CURSOR C0 IS
+  SELECT t.rate, t.s
+    FROM br_tier t
+   WHERE t.br_id=nb_ AND t.kv=kv_ AND
+         t.bdate=(SELECT MAX(bdate) FROM br_tier
+                   WHERE bdate<=dat_ AND br_id=nb_ AND kv=kv_)
+   ORDER BY s;
 
 BEGIN
-
+  
   br_  := 0;
   ostp_:= 0;
   osts_:= ostf_;
+  
+  if ( kf_ Is Null )
+  then l_kf := sys_context('bars_context','user_mfo');
+  else l_kf := kf_;
+  end if;
+  
+  if ( l_kf Is Null )
+  then
+    raise_application_error( -20666, 'Не вказано МФО для розрахунку значення базової ставки!' );
+  end if;
 
-  SELECT BR_TYPE ,FORMULA INTO type_,FORM_
-    FROM brates
-   WHERE br_id=nb_;
+  select BR_TYPE ,FORMULA 
+    into type_, form_
+    from BRATES
+   where br_id=nb_;
 
-  if type_ in (1,4) then
-     declare
-       c_CURSOR int; i_CURSOR int; dyn_SQL_ varchar2(250);
-     BEGIN
-       if type_ = 4 and FORM_ is not null then
-          --4 По внешней формуле (Этот блок добавила Сухова)
-          --открыть курсор
-          c_CURSOR:=DBMS_SQL.OPEN_CURSOR;
-          --приготовить дин.SQL с предполагаемыми параметрами ДАТА и АСС
-          dyn_SQL_:=
-          'SELECT '||FORM_||'(to_date('''||to_char(dat_)||'''),'||acc_FORM||','||to_char(nb_)||') from dual';
-          DBMS_SQL.PARSE(c_CURSOR, dyn_SQL_, DBMS_SQL.NATIVE);
-          --установить знач колонки в SELECT
-          DBMS_SQL.DEFINE_COLUMN(c_CURSOR, 1, br_ );
-          --выполнить приготовленный SQL
-          i_CURSOR:=DBMS_SQL.EXECUTE(c_CURSOR);
-          --прочитать
-          IF DBMS_SQL.FETCH_ROWS(c_CURSOR)>0 THEN
-             --снять результирующую переменную
-             DBMS_SQL.COLUMN_VALUE(c_CURSOR,1, br_ );
-          end if;
-       else
-          -- 1 Простая процентная ставка
-          --ищем явное значение БАЗ % ставки, действующее на нужную дату
-          SELECT rate INTO br_
-          FROM   br_normal
-          WHERE  br_id=nb_ AND kv=kv_ AND
-                 bdate=(SELECT MAX(bdate) FROM br_normal
-                        WHERE bdate<=dat_ AND br_id=nb_ AND kv=kv_);
+  if type_ in (1,4) 
+  then
+    declare
+      c_CURSOR int;
+      i_CURSOR int;
+      dyn_SQL_ varchar2(250);
+    begin
+      if type_ = 4 and FORM_ is not null 
+      then -- 4 - По внешней формуле (Этот блок добавила Сухова)
+        
+        c_CURSOR:=DBMS_SQL.OPEN_CURSOR;
+        --приготовить дин.SQL с предполагаемыми параметрами ДАТА и АСС
+        dyn_SQL_:=
+        'SELECT '||FORM_||'(to_date('''||to_char(dat_)||'''),'||acc_FORM||','||to_char(nb_)||') from dual';
+        DBMS_SQL.PARSE(c_CURSOR, dyn_SQL_, DBMS_SQL.NATIVE);
+        --установить знач колонки в SELECT
+        DBMS_SQL.DEFINE_COLUMN(c_CURSOR, 1, br_ );
+        --выполнить приготовленный SQL
+        i_CURSOR:=DBMS_SQL.EXECUTE(c_CURSOR);
+        --прочитать
+        IF DBMS_SQL.FETCH_ROWS(c_CURSOR)>0 THEN
+           --снять результирующую переменную
+           DBMS_SQL.COLUMN_VALUE(c_CURSOR,1, br_ );
+        end if;
+        
+      else -- 1 - Простая процентная ставка
+        
+        -- ищем явное значение БАЗ % ставки, действующее на нужную дату
+        select RATE
+          into br_
+          from BR_NORMAL_EDIT
+         where ( BR_ID, KV, BDATE ) in ( select BR_ID, KV, max(BDATE)
+                                           from BR_NORMAL_EDIT
+                                          where BR_ID = nb_
+                                            and KV    = kv_
+                                            and BDATE <=dat_
+                                          group by BR_ID, KV );
+         
        end if;
+       
        IF    op_ = 1 THEN  br_ := br_ + amnd_;
        ELSIF op_ = 2 THEN  br_ := br_ - amnd_;
        ELSIF op_ = 3 THEN  br_ := br_ * amnd_;
        ELSIF op_ = 4 THEN  br_ := br_ / amnd_;
        END IF;
-     exception when others then br_:=0;
+       
+     exception
+       when others then br_:=0;
      end;
 /**************************************************************************/
 /***      2-Ступ., 3-Ступ.,пропорциаонльная, 7-Ступ.,с формулой порога  ***/
 /**************************************************************************/
-  ELSIF type_ IN (2,3,7) THEN
-     tmps_ := 0;
-     FOR tie IN (SELECT t.rate,
-                   CASE WHEN t.s=0 AND type_=7 THEN get_dptamount(G_acc) ELSE t.s END s
-                   FROM br_tier t
-                  WHERE t.br_id=nb_ AND t.kv=kv_ AND
-                        t.bdate=(SELECT MAX(bdate) FROM br_tier
-                                  WHERE bdate<=dat_ AND br_id=nb_ AND kv=kv_)
-                  ORDER BY s)
-     LOOP
-        br_ := tie.rate;
-        IF    op_ = 1 THEN  br_ := br_ + amnd_;
-        ELSIF op_ = 2 THEN  br_ := br_ - amnd_;
-        ELSIF op_ = 3 THEN  br_ := br_ * amnd_;
-        ELSIF op_ = 4 THEN  br_ := br_ / amnd_;
+  elsif type_ in (2,3,7) 
+  then
+    
+    tmps_ := 0;
+    FOR tie IN ( select RATE
+                      , case 
+                        when t.S = 0 and type_=7
+                        then GET_DPTAMOUNT(G_acc)
+                        else t.S
+                        end as S
+                   from BR_TIER_EDIT t
+                  where ( BR_ID, KV, BDATE ) in ( select BR_ID, KV, max(BDATE)
+                                                    from BR_TIER_EDIT
+                                                   where BR_ID = nb_
+                                                     and KV    = kv_
+                                                     and BDATE <=dat_
+                                                   group by BR_ID, KV )
+                  order by S )
+    LOOP
+      br_ := tie.RATE;
+      IF    op_ = 1 THEN  br_ := br_ + amnd_;
+      ELSIF op_ = 2 THEN  br_ := br_ - amnd_;
+      ELSIF op_ = 3 THEN  br_ := br_ * amnd_;
+      ELSIF op_ = 4 THEN  br_ := br_ / amnd_;
+      END IF;
+      EXIT WHEN tie.s >= ostf_;
+      IF type_ IN (3,7) 
+      THEN
+        ostp_ := ostp_ + br_ * (tie.s - tmps_);
+        osts_ := osts_ - tie.s + tmps_;
+        IF deb.debug
+        THEN
+          deb.trace(1,TO_CHAR(tie.s-tmps_)||' at '||TO_CHAR(br_)||'%',nb_);
         END IF;
-        EXIT WHEN tie.s >= ostf_;
-        IF type_ IN (3,7) THEN
-           ostp_ := ostp_ + br_ * (tie.s - tmps_);
-           osts_ := osts_ - tie.s + tmps_;
-           IF deb.debug THEN
-              deb.trace(1,TO_CHAR(tie.s-tmps_)||' at '||TO_CHAR(br_)||'%',nb_);
-           END IF;
-           tmps_   := tie.s;
-        END IF;
+        tmps_   := tie.s;
+      END IF;
      END LOOP;
 
 /**************************************************************************/
 /***      5-Ступенчатая в другой валюте, 6-Ступенчатая, пропорциональная **/
 /**************************************************************************/
-  ELSIF type_ IN (5,6) THEN
+  ELSIF type_ IN (5,6) 
+  THEN
 
-     BEGIN
-        SELECT UNIQUE kv INTO kvs_ FROM br_tier WHERE br_id=nb_;
-     EXCEPTION
-        WHEN NO_DATA_FOUND THEN kvs_:=kv_;
-        WHEN TOO_MANY_ROWS THEN kvs_:=kv_;
-     END;
+    BEGIN
+      SELECT UNIQUE kv 
+        INTO kvs_
+        FROM br_tier
+       WHERE br_id=nb_;
+    EXCEPTION
+       WHEN NO_DATA_FOUND THEN kvs_:=kv_;
+       WHEN TOO_MANY_ROWS THEN kvs_:=kv_;
+    END;
 
-     tmps_ := 0;
+    tmps_ := 0;
 
-     FOR tie IN (SELECT t.rate, t.s  FROM br_tier t
-                  WHERE t.br_id=nb_ AND t.kv=kvs_ AND
-                        t.bdate=(SELECT MAX(bdate) FROM br_tier
+    FOR tie IN ( SELECT t.RATE
+                      , t.S
+                   FROM br_tier t
+                  WHERE t.br_id=nb_
+                    AND t.kv=kvs_
+                    AND t.bdate=(SELECT MAX(bdate) FROM br_tier
                                   WHERE bdate<=dat_ AND br_id=nb_ AND kv=kvs_)
                   ORDER BY s)
-     LOOP
-        br_ := tie.rate;
-        IF    op_ = 1 THEN  br_ := br_ + amnd_;
-        ELSIF op_ = 2 THEN  br_ := br_ - amnd_;
-        ELSIF op_ = 3 THEN  br_ := br_ * amnd_;
-        ELSIF op_ = 4 THEN  br_ := br_ / amnd_;
+    LOOP
+      br_ := tie.rate;
+      IF    op_ = 1 THEN  br_ := br_ + amnd_;
+      ELSIF op_ = 2 THEN  br_ := br_ - amnd_;
+      ELSIF op_ = 3 THEN  br_ := br_ * amnd_;
+      ELSIF op_ = 4 THEN  br_ := br_ / amnd_;
+      END IF;
+
+      gl.x_rat( rato_,ratb_,rats_,kvs_,kv_,dat_ );
+      
+      IF deb.debug 
+      THEN
+        deb.trace(1,'rat_o '||kvs_||','||kv_,rato_);
+        deb.trace(1,tie.rate||'%',tie.s);
+        deb.trace(1,br_||' % scale on '||kv_,tie.s*rato_);
+      END IF;
+
+      IF tie.s * rato_ >= ostf_ THEN EXIT; END IF;
+
+      IF type_=6 
+      THEN
+        ostp_ := ostp_ + br_ * (tie.s * rato_ - tmps_);
+        osts_ := osts_ - tie.s * rato_ + tmps_;
+        IF deb.debug
+        THEN
+          deb.trace(1,TO_CHAR(tie.s * rato_-tmps_)||' at '||TO_CHAR(br_)||'%',nb_);
         END IF;
-
-        gl.x_rat ( rato_,ratb_,rats_,kvs_,kv_,dat_ );
-        IF deb.debug THEN
-           deb.trace(1,'rat_o '||kvs_||','||kv_,rato_);
-           deb.trace(1,tie.rate||'%',tie.s);
-           deb.trace(1,br_||' % scale on '||kv_,tie.s*rato_);
-        END IF;
-
-        IF tie.s * rato_ >= ostf_ THEN EXIT; END IF;
-
-        IF type_=6 THEN
-           ostp_ := ostp_ + br_ * (tie.s * rato_ - tmps_);
-           osts_ := osts_ - tie.s * rato_ + tmps_;
-           IF deb.debug THEN
-              deb.trace(1,TO_CHAR(tie.s * rato_-tmps_)||' at '||TO_CHAR(br_)||'%',nb_);
-           END IF;
-           tmps_   := tie.s * rato_;
-        END IF;
-     END LOOP;
-
+        tmps_   := tie.s * rato_;
+      END IF;
+    END LOOP;
+     
   end if;
-
-  IF deb.debug THEN
-     deb.trace(1,TO_CHAR(osts_)||' at '||TO_CHAR(br_)||'%',nb_);
+  
+  IF deb.debug 
+  THEN
+    deb.trace(1,TO_CHAR(osts_)||' at '||TO_CHAR(br_)||'%',nb_);
   END IF;
 
   rat_  := br_;
   amnt_ := osts_ * br_ + ostp_;
 
-END p_bns;
+end P_BNS;
 
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -725,7 +812,7 @@ IS
 
 	acrd_  NUMBER;
 	acr_   NUMBER;
---	sess_  NUMBER;
+--sess_  NUMBER;
         dlta_  NUMBER;
         kv_    SMALLINT;
         op_    SMALLINT;
@@ -737,15 +824,17 @@ IS
         KOL_ int; -- кол-во ЦБ
         ACC_ALT_PK_ INT := CASE WHEN mode_ <= 1 THEN acc_ ELSE mode_ END;
 
-        --поиск % карточки - зависит от счета
-	CURSOR C_ACC IS
-             SELECT i.acc, i.basey, i.basem, nvl(i.io, 0) io, i.acr_dat + 1 dat,
-                    s.kv,  decode(i.metr, 96, 0, i.metr) metr, s.pap, i.s, i.stp_dat
-               FROM int_accn i,accounts s
-              WHERE s.acc = i.acc
-                AND i.acc = acc_alt_pk_
-                AND i.id  = id_
-                AND i.metr IN (0, 1, 2, 3, 4, 5, 96);
+  -- поиск % карточки - зависит от счета
+  CURSOR C_ACC
+  IS
+  SELECT i.ACC, i.basey, i.basem, nvl(i.io, 0) io, i.ACR_DAT + 1 dat,
+         a.KF, a.KV, decode(i.metr, 96, 0, i.metr) metr, a.PAP, i.S, i.STP_DAT
+    FROM int_accn i
+       , accounts a
+   WHERE a.acc = i.acc
+     AND i.acc = acc_alt_pk_
+     AND i.id  = id_
+     AND i.metr IN (0, 1, 2, 3, 4, 5, 96);
 
         --поиск % ставки индивидуальной  - зависит от счета
 	CURSOR C_RATI IS
@@ -1028,14 +1117,14 @@ BEGIN
  ELSIF acc.metr = 5 THEN
 
     -- Используется только в ПЕТРОКОМЕРЦ
-    --амортизация по методу эф.% ставки
+    -- амортизация по методу эф.% ставки
     -- Существует 2 проц.карточки по осн.счету номинала
-    -- id=0 - номинальная стака купона: acc 3114, acra 3118
-    -- id=2 - эф.стака  для амортизации:диск acc 3114, acra 3116
-    --                            или премии acc 3114, acra 3117
+    -- id=0 - номинальная стака купона:  acc 3114, acra 3118
+    -- id=2 - эф.стака амортизации диск: acc 3114, acra 3116
+    --                       или премии: acc 3114, acra 3116
     -- эф.ставка запоминается как дневной коеф.,
     -- т.е = ГОД эф.ставка/36500
-    --проверено и исправлено после проверки в ПЕРТОКОМЕРЦ
+    -- проверено и исправлено после проверки в ПЕРТОКОМЕРЦ
 
     declare
       N_    number; -- оттаток номинал
@@ -1375,7 +1464,7 @@ BEGIN
                   IF nb0_ > 0 THEN
 
                      ACC_FORM:=acc.ACC;
-                     p_bns(br_,ostp_,sdat_,nb0_,acc.kv,ABS(ostf_),op_,ir_);
+                     p_bns( br_, ostp_, sdat_, nb0_, acc.KV, ABS(ostf_), op_, ir_, acc.KF );
                      IF ostf_<0 THEN ostp_ := -ostp_; END IF;
                      ir_ := 0;
                   ELSE
@@ -1596,26 +1685,26 @@ END FPROC;
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
-FUNCTION FPROCN(acc_ INTEGER,
+function FPROCN(acc_ INTEGER,
                  id_ INTEGER,
                datp_ DATE DEFAULT NULL) RETURN NUMBER
-IS
-
-kv_     SMALLINT;
-i_      SMALLINT;
-apap_   SMALLINT;
-ppap_   SMALLINT;
-ostc_   NUMBER(24);
-ostp_   NUMBER(24);
-dat_    DATE;
-ir_     NUMBER;
-br_     NUMBER;
-op_     NUMBER(2);
-type_   NUMBER;
-rato_   NUMBER;
-ratb_   NUMBER;
-rats_   NUMBER;
-kvr_    NUMBER;  -- код валюты базовой ставки
+is
+  kf_     varchar2(6);
+  kv_     SMALLINT;
+  i_      SMALLINT;
+  apap_   SMALLINT;
+  ppap_   SMALLINT;
+  ostc_   NUMBER(24);
+  ostp_   NUMBER(24);
+  dat_    DATE;
+  ir_     NUMBER;
+  br_     NUMBER;
+  op_     NUMBER(2);
+  type_   NUMBER;
+  rato_   NUMBER;
+  ratb_   NUMBER;
+  rats_   NUMBER;
+  kvr_    NUMBER;  -- код валюты базовой ставки
 BEGIN
 
    IF datp_ IS NULL THEN
@@ -1628,12 +1717,15 @@ BEGIN
 
    BEGIN
       IF id_ IS NULL THEN
-         SELECT a.kv,s.ostf-s.dos+s.kos,p.pap,a.pap
-           INTO kv_, ostc_, ppap_, apap_
-           FROM accounts a,saldoa s,ps p
-          WHERE a.acc=s.acc AND a.nbs=p.nbs AND a.acc=acc_ AND
-         s.fdat =
-        (SELECT MAX(fdat) FROM saldoa WHERE acc=acc_ AND fdat<=dat_);
+         SELECT a.KF, a.KV, s.OSTF-s.DOS+s.KOS, p.PAP, a.PAP
+           INTO kf_, kv_, ostc_, ppap_, apap_
+           FROM accounts a
+              , saldoa s
+              , ps p
+          WHERE a.acc=s.acc
+            AND a.nbs=p.nbs
+            AND a.acc=acc_ 
+            AND s.fdat =( SELECT MAX(fdat) FROM saldoa WHERE acc=acc_ AND fdat<=dat_ );
 
          IF    ostc_<0 OR  ostc_=0 AND ppap_=1 OR
                ostc_=0 AND ppap_=3 AND apap_=1    THEN i_ := 0;
@@ -1650,34 +1742,43 @@ BEGIN
                 s.fdat =
                (SELECT MAX(fdat) FROM saldoa WHERE acc=acc_ AND fdat<=dat_); */
 
-         SELECT a.kv,NVL(s.ostf-s.dos+s.kos,0)
-           INTO kv_, ostc_
-           FROM accounts a,
-           (SELECT * FROM saldoa x
-             WHERE x.acc=acc_ AND x.fdat = ( SELECT MAX(fdat) FROM saldoa WHERE acc=acc_ AND fdat<=dat_ )) s
-          WHERE a.acc=s.acc(+) and a.acc=acc_;
-         i_:=id_;
+         SELECT a.KF, a.KV, nvl(s.OSTF-s.DOS+s.KOS,0)
+           INTO kf_, kv_, ostc_
+           FROM accounts a
+              , ( SELECT x.* 
+                    FROM saldoa x
+                   WHERE x.acc=acc_ 
+                     AND x.fdat = ( SELECT MAX(fdat) FROM saldoa WHERE acc=acc_ AND fdat<=dat_ )
+                ) s
+          WHERE a.acc = s.acc(+) 
+            and a.acc = acc_;
+         i_:= id_;
       END IF;
-   EXCEPTION WHEN NO_DATA_FOUND THEN RETURN 0;
+   EXCEPTION
+     WHEN NO_DATA_FOUND THEN RETURN 0;
    END;
 
    BEGIN
       SELECT ir, br, op
         INTO ir_,br_,op_
-        FROM int_ratn WHERE acc=acc_ AND id=i_ AND
-         bdat = (SELECT MAX(bdat) FROM int_ratn
-                  WHERE acc=acc_ AND id=i_ AND bdat<=dat_);
-   EXCEPTION WHEN NO_DATA_FOUND THEN RETURN 0;
+        FROM int_ratn 
+       WHERE acc=acc_ 
+         AND id=i_
+         AND bdat = ( SELECT MAX(bdat) FROM int_ratn
+                       WHERE acc=acc_ AND id=i_ AND bdat<=dat_);
+   EXCEPTION
+     WHEN NO_DATA_FOUND THEN RETURN 0;
    END;
 
---Учитываем шкалы процентных ставок
-   IF br_>0 THEN
-      p_bns(br_,ostp_,dat_,br_,kv_,ABS(ostc_),op_,ir_);
-      RETURN br_;
-   ELSE
-      RETURN ir_;
-   END IF;
-
+  -- Учитываем шкалы процентных ставок
+  IF br_>0 
+  THEN
+    P_BNS( br_, ostp_, dat_, br_, kv_, ABS(ostc_), op_, ir_, kf_ );
+    RETURN br_;
+  ELSE
+    RETURN ir_;
+  END IF;
+  
 END FPROCN;
 
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1772,7 +1873,7 @@ BEGIN
 
       insert into oper (ref,tt,vob,nd,pdat,vdat,kv,dk,s,datd,datp,
       nam_a,nlsa,mfoa,nam_b,nlsb,mfob,nazn,userid,id_a,id_b,s2,kv2,sos)
-      select l_ref, 'BAK', 6, l_ref, SYSDATE, gl.bDATE, kv, 1-dk, s, gl.bDATE, gl.bDATE,
+      select l_ref, 'BAK', 6, substr(l_ref,-10), SYSDATE, gl.bDATE, kv, 1-dk, s, gl.bDATE, gl.bDATE,
              nam_a, nlsa, mfoa, nam_b, nlsb, mfob,
              'СТОРНО помилково нарахованих %% по док. '||TRIM(nd)||' за '||datd,
              gl.aUID, id_a, id_b, s2, kv2, sos
@@ -1834,34 +1935,396 @@ begin
     return nvl(g_collected, 0);
 end get_collect_salho;
 
+----------------------------------------------------------------------------------------------------
+
+  ---
+  -- SET_BRATES
+  ---
+  procedure SET_BRATES
+  ( p_br_id        in out brates.br_id%type
+  , p_br_tp        in     brates.br_type%type default 1
+  , p_br_nm        in     brates.name%type
+  , p_br_frml      in     brates.formula%type default null
+  , p_actv         in     brates.inuse%type   default 1
+  , p_cmnt         in     brates.comm%type    default null
+  , p_err_msg         out varchar2
+  ) is
+  /**
+  <b>SET_BRATES</b> - Створення / редагування параметрів базової ставки
+  %param p_br_id   - Ід базової ставки
+  %param p_br_tp   - Тип базової ставки
+  %param p_br_nm   - Назва базової ставки
+  %param p_br_frml - SQL-формула для ставки з типом = 4
+  %param p_actv    - Ознака активності (1 - діюча, 0 - недіюча)
+  %param p_cmnt    - Коментар
+  %param p_err_msg - Текст помилки
+
+  %version 1.0 (21.12.2016)
+  %usage   Створення / редагування базової ставки
+  */
+    title    constant     varchar2(60) := $$PLSQL_UNIT||'.SET_BRATES';
+    type r_brates_type is record ( br_type   brates.br_type%type
+                                 , name      brates.name%type
+                                 , formula   brates.formula%type
+                                 , inuse     brates.inuse%type
+                                 , comm      brates.comm%type
+                                 );
+    r_brates              r_brates_type;
+    e_brates              exception;
+  begin
+
+    bars_audit.trace( '%s: Entry with ( p_br_id=%s, p_br_tp=%s, p_br_nm=%s, p_br_frml=%s, p_actv=%s, p_cmnt ).'
+                    , title, to_char(p_br_id), to_char(p_br_tp), p_br_nm, p_br_frml, to_char(p_actv), p_cmnt );
+
+    begin
+
+      if ( p_br_id > 0 )
+      then
+
+        begin
+          select BR_TYPE, NAME, FORMULA, INUSE, COMM
+            into r_brates
+            from BARS.BRATES
+           where BR_ID = p_br_id;
+        exception
+          when NO_DATA_FOUND then
+--          raise_application_error( -20666, 'Not found record with id='||to_char(p_br_id), true );
+            p_err_msg := 'Not found record with id='||to_char(p_br_id);
+            raise e_brates;
+        end;
+
+        case
+          when ( p_br_tp Is Not Null and r_brates.br_type != p_br_tp )
+          then -- зміна типу базової ставки
+--          raise_application_error( -20666, 'Зміна типу базової ставки заборонена', true );
+            p_err_msg := 'Changing type of base rate is not allowed';
+            raise e_brates;
+          when ( p_br_frml Is Not Null and r_brates.br_type != 4 )
+          then -- первіка на допустипу комбінацію параметрів
+--          raise_application_error( -20666, 'Формула допустима лише для базової ставки з типом = 4', true );
+            p_err_msg := 'Value for parameter [p_br_frml] permitted only for base rate with type = 4';
+            raise e_brates;
+          else
+            null;
+        end case;
+
+        update BARS.BRATES
+           set NAME    = nvl(p_br_nm,  r_brates.name   )
+             , FORMULA = nvl(p_br_frml,r_brates.formula)
+             , INUSE   = nvl(p_actv,   r_brates.inuse  )
+             , COMM    = nvl(p_cmnt,   r_brates.comm   )
+         where BR_ID   = p_br_id;
+
+      else
+
+        if ( p_br_nm Is Null )
+        then
+--        raise_application_error( -20666, 'Value fo parameter [p_br_nm] must be specified', true );
+          p_err_msg := 'Value fo parameter [p_br_nm] must be specified';
+          raise e_brates;
+        end if;
+
+        r_brates.br_type := nvl(p_br_tp,1);
+        r_brates.name    := p_br_nm;
+        r_brates.formula := case when p_br_tp = 4 then p_br_frml else null end;
+        r_brates.inuse   := nvl(p_actv,1);
+        r_brates.comm    := p_cmnt;
+
+        insert
+          into BARS.BRATES
+             ( BR_TYPE, NAME, FORMULA, INUSE, COMM )
+        values
+             ( r_brates.BR_TYPE, r_brates.NAME, r_brates.FORMULA, r_brates.INUSE, r_brates.COMM )
+        returning BR_ID into p_br_id;
+
+      end if;
+
+    exception
+      when e_brates then
+        null;
+      when OTHERS then
+        p_err_msg := dbms_utility.format_error_stack();
+        bars_audit.error( title ||': '|| p_err_msg || CHR(10) || dbms_utility.format_error_backtrace() );
+    end;
+
+    bars_audit.trace( '%s: Exit with ( p_br_id=%s, p_err_msg=%s ).'
+                    , title, to_char(p_br_id), p_err_msg );
+
+  end SET_BRATES;
+
+  ---
+  -- SET_BRATE_VAL
+  ---
+  procedure SET_BRATE_VAL
+  ( p_br_id        in     br_tier_edit.br_id%type
+  , p_ccy_id       in     br_tier_edit.kv%type
+  , p_eff_dt       in     br_tier_edit.bdate%type
+  , p_amnt         in     br_tier_edit.s%type
+  , p_rate         in     br_tier_edit.rate%type
+  , p_err_msg         out varchar2
+  ) is
+  /**
+  <b>SET_BRATE_VAL</b> - Створення / редагування значення базової ставки
+  %param p_br_id   - Ід базової ставки
+  %param p_ccy_id  - Код валюти
+  %param p_eff_dt  - Дата початку дії ставки
+  %param p_rate    - Значення ставки
+  %param p_amnt    - Сума ( для br_type >= 2 )
+  %param p_err_msg - Текст помилки
+
+  %version 1.1 (13.03.2017)
+  %usage   Створення / редагування значення базової ставки
+  */
+    title    constant     varchar2(60) := $$PLSQL_UNIT||'.SET_BRATE_VAL';
+    l_br_tp               br_types.br_type%type;
+  begin
+
+    bars_audit.trace( '%s: Entry with ( p_br_id=%s, p_ccy_id=%s, p_eff_dt=%s, p_rate=%s ).'
+                    , title, to_char(p_br_id), to_char(p_ccy_id), to_char(p_eff_dt,'dd.mm.yyyy'), to_char(p_rate) );
+
+    begin
+
+      -- checks
+      case
+        when ( p_br_id Is Null )
+        then p_err_msg := 'Value fo parameter [p_br_id] must be specified';
+        when ( p_ccy_id Is Null )
+        then p_err_msg := 'Value fo parameter [p_ccy_id] must be specified';
+        when ( p_eff_dt Is Null )
+        then p_err_msg := 'Value fo parameter [p_eff_dt] must be specified';
+        when ( p_rate Is Null or p_rate < 0 )
+        then p_err_msg := 'Value fo parameter [p_rate] must be greater than or equal to 0';
+        else
+          begin
+
+            select BR_TYPE
+              into l_br_tp
+              from BRATES
+             where BR_ID = p_br_id;
+
+            bars_audit.trace( '%s: l_br_tp=%s.', title, to_char(l_br_tp) );
+
+            if ( l_br_tp > 1 and p_amnt Is Null )
+            then
+              p_err_msg := 'Value fo parameter [p_amnt] must be specified for base rate with type = '||to_char(l_br_tp);
+            end if;
+
+          exception
+            when NO_DATA_FOUND then
+              p_err_msg := 'Not found base rate with id='||to_char(p_br_id);
+          end;
+
+      end case;
+
+      if ( p_err_msg Is Null )
+      then
+
+        if ( sys_context('bars_context','policy_group') = 'CENTER' )
+        then -- для всіх РУ (тіль вставка - існуючі значення не перетираємо)
+
+          bars_audit.trace( '%s: policy_group="CENTER" (run by all KF).', title, to_char(l_br_tp) );
+
+--        for c in ( select KF
+--                     from MV_KF )
+--        loop
+--
+--          begin
+--
+--            if ( l_br_tp = 1 )
+--            then
+--
+--              insert
+--                into BR_NORMAL_EDIT
+--                   ( KF, BR_ID, BDATE, KV, RATE )
+--              values
+--                   ( c.KF, p_br_id, p_eff_dt, p_ccy_id, p_rate );
+--
+--            else
+--
+--              insert
+--                into BR_TIER_EDIT
+--                   ( KF, BR_ID, BDATE, KV, S, RATE )
+--              values
+--                   ( c.KF, p_br_id, p_eff_dt, p_ccy_id, p_amnt, p_rate );
+--
+--            end if;
+--
+--          exception
+--            when DUP_VAL_ON_INDEX then
+--              null;
+--          end;
+--
+--        end loop;
+
+        else -- для поточного РУ користувача
+
+          begin
+
+            if ( l_br_tp = 1 )
+            then
+
+              update BR_NORMAL_EDIT
+                 set RATE  = p_rate
+               where BR_ID = p_br_id
+                 and KV    = p_ccy_id
+                 and BDATE = p_eff_dt;
+
+              if ( sql%rowcount = 0 )
+              then
+
+                insert
+                  into BARS.BR_NORMAL_EDIT
+                     ( BR_ID, BDATE, KV, RATE )
+                values
+                     ( p_br_id, p_eff_dt, p_ccy_id, p_rate );
+
+              end if;
+
+            else
+
+              update BR_TIER_EDIT
+                 set RATE  = p_rate
+               where BR_ID = p_br_id
+                 and KV    = p_ccy_id
+                 and BDATE = p_eff_dt
+                 and S     = p_amnt;
+
+              if ( sql%rowcount = 0 )
+              then
+
+                if ( l_br_tp = 5 or l_br_tp = 6 )
+                then -- логіка тригера TIU_TIER
+                  
+                  select case
+                         when exists ( select 1 from BR_TIER_EDIT where BR_ID = p_br_id and KV <> p_ccy_id )
+                         then 'No more then one currency for the scale alowed'
+                         else Null
+                         end
+                    into p_err_msg
+                    from dual;
+                  
+                end if;
+                
+                if ( p_err_msg Is Null )
+                then
+                  insert 
+                    into BR_TIER_EDIT
+                       ( BR_ID, BDATE, KV, S, RATE )
+                  values
+                       ( p_br_id, p_eff_dt, p_ccy_id, p_amnt, p_rate );
+                end if;
+
+              end if;
+
+            end if;
+
+          end;
+
+        end if;
+
+      end if;
+
+    exception
+      when OTHERS then
+        p_err_msg := dbms_utility.format_error_stack();
+        bars_audit.error( title ||': '|| p_err_msg || CHR(10) || dbms_utility.format_error_backtrace() );
+    end;
+
+    bars_audit.trace( '%s: Exit with ( p_err_msg=%s )', title, p_err_msg );
+
+  end SET_BRATE_VAL;
+
+  ---
+  -- DEL_BRATE_VAL
+  ---
+  procedure DEL_BRATE_VAL
+  ( p_br_id        in     br_tier_edit.br_id%type
+  , p_ccy_id       in     br_tier_edit.kv%type
+  , p_eff_dt       in     br_tier_edit.bdate%type
+  , p_amnt         in     br_tier_edit.s%type
+  , p_err_msg         out varchar2
+  ) is
+  /**
+  <b>DEL_BRATE_VAL</b> - Видалення значення базової ставки
+  %param p_br_id   - Ід базової ставки
+  %param p_ccy_id  - Код валюти
+  %param p_eff_dt  - Дата початку дії ставки
+  %param p_amnt    - Сума ( для br_type >= 2 )
+  %param p_err_msg - Текст помилки
+
+  %version 1.0 (22.12.2016)
+  %usage   Видалення значення базової ставки
+  */
+    title    constant     varchar2(60) := $$PLSQL_UNIT||'.DEL_BRATE_VAL';
+    l_br_tp               br_types.br_type%type;
+  begin
+
+    bars_audit.trace( '%s: Entry with ( p_br_id=%s, p_ccy_id=%s, p_eff_dt=%s, p_amnt=%s ).'
+                    , title, to_char(p_br_id), to_char(p_ccy_id), to_char(p_eff_dt,'dd.mm.yyyy'), to_char(p_amnt) );
+
+    begin
+
+      begin
+
+        select BR_TYPE
+          into l_br_tp
+          from BRATES
+         where BR_ID = p_br_id;
+
+        if ( l_br_tp = 1 )
+        then
+          delete BR_NORMAL_EDIT
+           where BR_ID = p_br_id
+             and KV    = p_ccy_id
+             and BDATE = p_eff_dt;
+        else
+          if ( p_amnt Is Null )
+          then
+             p_err_msg := 'Value fo parameter [p_amnt] must be specified for base rate with type = '||to_char(l_br_tp);
+          else
+            delete BR_TIER_EDIT
+             where BR_ID = p_br_id
+               and KV    = p_ccy_id
+               and BDATE = p_eff_dt
+               and S     = p_amnt;
+          end if;
+        end if;
+
+        if ( sql%rowcount > 0 )
+        then
+          bars_audit.trace( '%s: base rate #%s deleted.', title, to_char(p_br_id) );
+        end if;
+
+      exception
+        when NO_DATA_FOUND then
+          p_err_msg := 'Not found base rate with id='||to_char(p_br_id);
+      end;
+
+    exception
+      when OTHERS then
+        p_err_msg := dbms_utility.format_error_stack();
+        bars_audit.error( title ||': '|| p_err_msg || CHR(10) || dbms_utility.format_error_backtrace() );
+    end;
+
+    bars_audit.trace( '%s: Exit with ( p_err_msg=%s )', title, p_err_msg );
+
+  end DEL_BRATE_VAL;
 
 
 
-
+begin
+  null;
 END acrN;
 /
- show err;
- 
-PROMPT *** Create  grants  ACRN ***
-grant EXECUTE                                                                on ACRN            to BARS009;
-grant EXECUTE                                                                on ACRN            to BARS010;
-grant EXECUTE                                                                on ACRN            to BARSDWH_ACCESS_USER;
-grant EXECUTE                                                                on ACRN            to BARSUPL;
-grant EXECUTE                                                                on ACRN            to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on ACRN            to BARS_DM;
-grant EXECUTE                                                                on ACRN            to BARS_SUP;
-grant EXECUTE                                                                on ACRN            to CC_DOC;
-grant EXECUTE                                                                on ACRN            to DPT_ROLE;
-grant EXECUTE                                                                on ACRN            to FOREX;
-grant EXECUTE                                                                on ACRN            to RCC_DEAL;
-grant EXECUTE                                                                on ACRN            to START1;
-grant EXECUTE                                                                on ACRN            to WR_ACRINT;
-grant EXECUTE                                                                on ACRN            to WR_ALL_RIGHTS;
-grant EXECUTE                                                                on ACRN            to WR_DEPOSIT_U;
 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/acrn.sql =========*** End *** ======
- PROMPT ===================================================================================== 
- 
+show errors;
+
+grant EXECUTE on ACRN to BARS_ACCESS_DEFROLE; 
+grant EXECUTE on ACRN to BARSUPL;
+grant EXECUTE on ACRN to BARS_DM;
+grant EXECUTE on ACRN to DPT_ROLE;
+grant EXECUTE on ACRN to FOREX;
+grant EXECUTE on ACRN to RCC_DEAL;
+grant EXECUTE on ACRN to START1;
+grant EXECUTE on ACRN to WR_ACRINT;
+grant EXECUTE on ACRN to WR_ALL_RIGHTS;

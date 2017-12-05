@@ -3,10 +3,9 @@ Application Description: ! Факторинг + Фючерс
 	Design-time Settings
 .data VIEWINFO
 0000: 6F00000001000000 FFFF01000D004347 5458566965775374 6174650400010000
-0020: 0000000000B30000 002C000000020000 0003000000FFFFFF FFFFFFFFFFFCFFFF
-0040: FFE9FFFFFFFFFFFF FF000000007C0200 004D010000010000 0000000000010000
-0060: 000F4170706C6963 6174696F6E497465 6D04000000075769 6E646F777303584C
-0080: 310D4368696C6420 57696E646F777304 74626C32
+0020: 0000000000B30000 002C000000020000 0003000000FFFFFF FFFFFFFFFFF8FFFF
+0040: FFE1FFFFFFFFFFFF FF000000007C0200 004D010000010000 0001000000010000
+0060: 000F4170706C6963 6174696F6E497465 6D00000000
 .enddata
 .data DT_MAKERUNDLG
 0000: 020000000019453A 5C4261727339385C 62696E5C42415253 3032302E65786519
@@ -321,11 +320,11 @@ Application Description: ! Факторинг + Фючерс
 					Else
 						If NBS_SP = STRING_Null
 							If SqlPrepareAndExecute( hSql(),
-									"select '2037' into :NBS_SP from fak_param where par='NBS_SP' and val='1'" ) 
+									"select '2030' into :NBS_SP from fak_param where par='NBS_SP' and val='1'" ) 
 									and SqlFetchNext(hSql(), nFetchRes) 
 								Set NBS_SPN = '2039'
 							Else
-								Set NBS_SP = '2062'
+								Set NBS_SP  = '2063' !!2062
 								Set NBS_SPN = '2068'
 						If KOM_AVA2 = STRING_Null
 							If SqlPrepareAndExecute( hSql(),
@@ -374,11 +373,11 @@ Application Description: ! Факторинг + Фючерс
 									Call SalBringWindowToTop ( h_FA5 )
 								Break
 							! Case 201 ! ФАКТОРИНГ.НЕраспознанные поступления (только привязка)
-								                                                                                                                                 If not IsWindow(h_FA6)
-									                                                                                                                                 Set h_FA6 = SalCreateWindow( FA6, hWndMDI, nMode, nPar , strPar01, strPar02 )
-								                                                                                                                                 Else 
-									                                                                                                                                 Call SalBringWindowToTop ( h_FA6 )
-								                                                                                                                                 Break 
+								                                                                                                                                  If not IsWindow(h_FA6)
+									                                                                                                                                  Set h_FA6 = SalCreateWindow( FA6, hWndMDI, nMode, nPar , strPar01, strPar02 )
+								                                                                                                                                  Else 
+									                                                                                                                                  Call SalBringWindowToTop ( h_FA6 )
+								                                                                                                                                  Break 
 							Case 201 ! ФАКТОРИНГ.НЕраспознанные поступления привязка с указанием сумм
 								If not IsWindow(h_FA7)
 									Set h_FA7 = SalCreateWindow( FA7, hWndMDI, nMode, nPar , strPar01, strPar02 )
@@ -410,11 +409,11 @@ Application Description: ! Факторинг + Фючерс
 									Call SalBringWindowToTop ( h_FA4 )
 								Break
 							! Case 208! Особая комиссия по шкале отсрочки (кол дней)
-								                                                               If not IsWindow(h_FA8)
-									                                                               Set h_FA8 = SalCreateWindow( FA8, hWndMDI, nMode, nPar , strPar01, strPar02 )
-								                                                               Else 
-									                                                               Call SalBringWindowToTop ( h_FA8 )
-								                                                               Break 
+								                                                                If not IsWindow(h_FA8)
+									                                                                Set h_FA8 = SalCreateWindow( FA8, hWndMDI, nMode, nPar , strPar01, strPar02 )
+								                                                                Else 
+									                                                                Call SalBringWindowToTop ( h_FA8 )
+								                                                                Break 
 							Case 210 ! Архив погашений инвойсов
 								If not IsWindow(h_FA0)
 									Set h_FA0= SalCreateWindow( FA0, hWndMDI, nMode, nPar , strPar01, strPar02 )
@@ -589,7 +588,7 @@ Application Description: ! Факторинг + Фючерс
 									Return TRUE
 								! If SqlPrepareAndExecute( hSql(),"UPDATE FAK_Invoice set SAVA=:nSA,SOS=2,dAVA=:bDat where ni=:NI") 
 										and SqlPLSQLCommand( hSql(),"FAKTOR.MDATE_2030(ACCD,NI)" )
-									                                                              Return TRUE
+									                                                               Return TRUE
 					Return FALSE
 		Named Menus
 		Class Definitions
@@ -1171,7 +1170,7 @@ Application Description: ! Факторинг + Фючерс
 						Input Mask: Unformatted
 					Message Actions
 						! On SAM_TooltipSetText
-							                                          Return XSalTooltipSetText( lParam, 'Общее количество Договоров факторинга')
+							                                           Return XSalTooltipSetText( lParam, 'Общее количество Договоров факторинга')
 						On SAM_TooltipSetText
 							Return XSalTooltipSetText( lParam, '"Котловой" Счет гашения')
 						On SAM_SetFocus
@@ -2046,7 +2045,7 @@ Application Description: ! Факторинг + Фючерс
 					On SAM_SetFocus
 						If NLS_3579 = STRING_Null and RNK > 0 and ND > 0
 							If SqlPrepareAndExecute( hSql(),
-									"SELECT substr(f_newnls2(null,:pXCP,'3579',:RNK,NULL,:KV),1,14)
+									"SELECT substr(f_newnls2(null,:pXCP,'3578',:RNK,NULL,:KV),1,14)
 									 INTO :NLS_3579 from dual") 
 									and SqlFetchNext(hSql(), nFetchRes) 
 									and NLS_3579 != STRING_Null
@@ -4454,7 +4453,7 @@ Application Description: ! Факторинг + Фючерс
 				List Initialization
 				Message Actions
 					! On SAM_Create
-						                                                                                                                                                                                                       Call SalListPopulate( lbAdd, hSql(), "
+						                                                                                                                                                                                                        Call SalListPopulate( lbAdd, hSql(), "
 								SELECT
 								adds
 								FROM
@@ -4604,9 +4603,9 @@ Application Description: ! Факторинг + Фючерс
 										Call SqlCommitEx(hSql(), 'Текст договора № ' || SalNumberToStrX(nND,0) || ', дополнительное соглашение:' || SalNumberToStrX(lbAdd.GetCurrentKey(),0) || ' сохранен в БД!')
 									! If SqlPrepare( hSql(), 'INSERT INTO CC_DOCS (id,nd,text,adds)
 											 VALUES (:tblTemplates.colId,:nND,:sDoc,0)' )
-										                                                                                                         If SqlSetLongBindDatatype( 3, 23 )
-											                                                                                                         If SqlExecute( hSql() )
-												                                                                                                         Call SqlCommitEx( hSql(), 'Текст договора № ' || SalNumberToStrX(nND,0) || ', дополнительное соглашение:'||SalNumberToStrX( lbAdd.GetCurrentKey(),0)|| ' сохранен в БД!' )
+										                                                                                                          If SqlSetLongBindDatatype( 3, 23 )
+											                                                                                                          If SqlExecute( hSql() )
+												                                                                                                          Call SqlCommitEx( hSql(), 'Текст договора № ' || SalNumberToStrX(nND,0) || ', дополнительное соглашение:'||SalNumberToStrX( lbAdd.GetCurrentKey(),0)|| ' сохранен в БД!' )
 												! Return 1
 							Call cCnc.Disconnect()
 							Call cCnc2.Disconnect()
@@ -4747,7 +4746,7 @@ Application Description: ! Факторинг + Фючерс
 				Border Color: Default
 				Background Color: Default
 			! cFieldLabel: tbgSave	!Сохранить сделку с назначением
-				                                                                                                                                                               Message Actions
+				                                                                                                                                                                Message Actions
 			Multiline Field: mlTxt
 				Class Child Ref Key: 0
 				Class ChildKey: 0
@@ -7797,7 +7796,7 @@ Application Description: ! Факторинг + Фючерс
 				If SOS = 9 !! Погашен частично Деб   СЛАБО-СЕРЫЙ
 					Call XSalTblSetRowBackColor( hWndForm, lParam, SalColorFromRGB( 239,247,247) )
 				! Else If SOS = 10 !! Погашен Дебитором СЕРЫЙ
-					                                                                                 Call XSalTblSetRowBackColor( hWndForm, lParam, COLOR_LightGray )
+					                                                                                  Call XSalTblSetRowBackColor( hWndForm, lParam, COLOR_LightGray )
 				Else If SOS = 11 !! Выставлен регресс Кл СЛАБО-КРАСНЫЙ
 					Call XSalTblSetRowBackColor( hWndForm, lParam, SalColorFromRGB( 255,210,210 ))
 				!
@@ -9521,8 +9520,8 @@ Application Description: ! Факторинг + Фючерс
 						Uncheck Value:
 						Ignore Case? Yes
 .end
-				                                                                                                       List Values 
-				                                                                                                       Message Actions 
+				                                                                                                        List Values 
+				                                                                                                        Message Actions 
 		Functions
 			Function: F_Opl_1 ! Лимит на клиента (с комиссией)
 				Description:
@@ -9741,7 +9740,7 @@ Application Description: ! Факторинг + Фючерс
 				Call SalModalDialog( dlg_CreateDoc, hWndForm, FA1.ND, 203 )
 			On SAM_TblDoDetails
 				! If IsWindow( h_FA8 )
-					                                                               Call SalDestroyWindow(h_FA8 )
+					                                                                Call SalDestroyWindow(h_FA8 )
 				If IsWindow( h_FA4 )
 					Call SalDestroyWindow(h_FA4 )
 				If IsWindow( h_FA3 )
@@ -12345,18 +12344,18 @@ Application Description: ! Факторинг + Фючерс
 				List Values
 				Message Actions
 					! On SAM_SetFocus
-						                                                                             If DDOC = DATETIME_Null and NI = NUMBER_Null
-							                                                                             Set DDOC = bDat
+						                                                                              If DDOC = DATETIME_Null and NI = NUMBER_Null
+							                                                                              Set DDOC = bDat
 					! On SAM_Validate
-						                                                                             If NI = NUMBER_Null
-							                                                                             If DDOC+SROK <=bDat 
-								                                                                             Call SalMessageBox("Дата инвойса - "||Str(SROK) ||" меньше банковской даты ",
+						                                                                              If NI = NUMBER_Null
+							                                                                              If DDOC+SROK <=bDat 
+								                                                                              Call SalMessageBox("Дата инвойса - "||Str(SROK) ||" меньше банковской даты ",
 										"Ошибка ! ", MB_IconStop)
-								                                                                             Set DDOC = bDat
-							                                                                             If DDOC < DATK 
-								                                                                             Call SalMessageBox("Дата инвойса меньше даты контракта ",
+								                                                                              Set DDOC = bDat
+							                                                                              If DDOC < DATK 
+								                                                                              Call SalMessageBox("Дата инвойса меньше даты контракта ",
 										"Ошибка ! ", MB_IconStop)
-								                                                                             Set DDOC = bDat
+								                                                                              Set DDOC = bDat
 			Column: DAT_END
 				Class Child Ref Key: 0
 				Class ChildKey: 0
@@ -12391,18 +12390,18 @@ Application Description: ! Факторинг + Фючерс
 				List Values
 				Message Actions
 					! On SAM_SetFocus
-						                                                                             If DDOC = DATETIME_Null and NI = NUMBER_Null
-							                                                                             Set DDOC = bDat
+						                                                                              If DDOC = DATETIME_Null and NI = NUMBER_Null
+							                                                                              Set DDOC = bDat
 					! On SAM_Validate
-						                                                                             If NI = NUMBER_Null
-							                                                                             If DDOC+SROK <=bDat 
-								                                                                             Call SalMessageBox("Дата инвойса - "||Str(SROK) ||" меньше банковской даты ",
+						                                                                              If NI = NUMBER_Null
+							                                                                              If DDOC+SROK <=bDat 
+								                                                                              Call SalMessageBox("Дата инвойса - "||Str(SROK) ||" меньше банковской даты ",
 										"Ошибка ! ", MB_IconStop)
-								                                                                             Set DDOC = bDat
-							                                                                             If DDOC < DATK 
-								                                                                             Call SalMessageBox("Дата инвойса меньше даты контракта ",
+								                                                                              Set DDOC = bDat
+							                                                                              If DDOC < DATK 
+								                                                                              Call SalMessageBox("Дата инвойса меньше даты контракта ",
 										"Ошибка ! ", MB_IconStop)
-								                                                                             Set DDOC = bDat
+								                                                                              Set DDOC = bDat
 			Column: SDATE
 				Class Child Ref Key: 0
 				Class ChildKey: 0
@@ -12437,18 +12436,18 @@ Application Description: ! Факторинг + Фючерс
 				List Values
 				Message Actions
 					! On SAM_SetFocus
-						                                                                             If DDOC = DATETIME_Null and NI = NUMBER_Null
-							                                                                             Set DDOC = bDat
+						                                                                              If DDOC = DATETIME_Null and NI = NUMBER_Null
+							                                                                              Set DDOC = bDat
 					! On SAM_Validate
-						                                                                             If NI = NUMBER_Null and NK != NUMBER_Null
-							                                                                             If DDOC+SROK <=bDat 
-								                                                                             Call SalMessageBox("Дата инвойса - "||Str(SROK) ||" меньше банковской даты ",
+						                                                                              If NI = NUMBER_Null and NK != NUMBER_Null
+							                                                                              If DDOC+SROK <=bDat 
+								                                                                              Call SalMessageBox("Дата инвойса - "||Str(SROK) ||" меньше банковской даты ",
 										"Ошибка ! ", MB_IconStop)
-								                                                                             Set DDOC = bDat
-							                                                                             If DDOC < DATK 
-								                                                                             Call SalMessageBox("Дата инвойса меньше даты контракта ",
+								                                                                              Set DDOC = bDat
+							                                                                              If DDOC < DATK 
+								                                                                              Call SalMessageBox("Дата инвойса меньше даты контракта ",
 										"Ошибка ! ", MB_IconStop)
-								                                                                             Set DDOC = bDat
+								                                                                              Set DDOC = bDat
 			Column: WDATE
 				Class Child Ref Key: 0
 				Class ChildKey: 0
@@ -12481,18 +12480,18 @@ Application Description: ! Факторинг + Фючерс
 				List Values
 				Message Actions
 					! On SAM_SetFocus
-						                                                                             If DDOC = DATETIME_Null and NI = NUMBER_Null
-							                                                                             Set DDOC = bDat
+						                                                                              If DDOC = DATETIME_Null and NI = NUMBER_Null
+							                                                                              Set DDOC = bDat
 					! On SAM_Validate
-						                                                                             If NI = NUMBER_Null and NK != NUMBER_Null
-							                                                                             If DDOC+SROK <=bDat 
-								                                                                             Call SalMessageBox("Дата инвойса - "||Str(SROK) ||" меньше банковской даты ",
+						                                                                              If NI = NUMBER_Null and NK != NUMBER_Null
+							                                                                              If DDOC+SROK <=bDat 
+								                                                                              Call SalMessageBox("Дата инвойса - "||Str(SROK) ||" меньше банковской даты ",
 										"Ошибка ! ", MB_IconStop)
-								                                                                             Set DDOC = bDat
-							                                                                             If DDOC < DATK 
-								                                                                             Call SalMessageBox("Дата инвойса меньше даты контракта ",
+								                                                                              Set DDOC = bDat
+							                                                                              If DDOC < DATK 
+								                                                                              Call SalMessageBox("Дата инвойса меньше даты контракта ",
 										"Ошибка ! ", MB_IconStop)
-								                                                                             Set DDOC = bDat
+								                                                                              Set DDOC = bDat
 			Column: DAT4L
 				Class Child Ref Key: 0
 				Class ChildKey: 0
@@ -12525,18 +12524,18 @@ Application Description: ! Факторинг + Фючерс
 				List Values
 				Message Actions
 					! On SAM_SetFocus
-						                                                                             If DDOC = DATETIME_Null and NI = NUMBER_Null
-							                                                                             Set DDOC = bDat
+						                                                                              If DDOC = DATETIME_Null and NI = NUMBER_Null
+							                                                                              Set DDOC = bDat
 					! On SAM_Validate
-						                                                                             If NI = NUMBER_Null and NK != NUMBER_Null
-							                                                                             If DDOC+SROK <=bDat 
-								                                                                             Call SalMessageBox("Дата инвойса - "||Str(SROK) ||" меньше банковской даты ",
+						                                                                              If NI = NUMBER_Null and NK != NUMBER_Null
+							                                                                              If DDOC+SROK <=bDat 
+								                                                                              Call SalMessageBox("Дата инвойса - "||Str(SROK) ||" меньше банковской даты ",
 										"Ошибка ! ", MB_IconStop)
-								                                                                             Set DDOC = bDat
-							                                                                             If DDOC < DATK 
-								                                                                             Call SalMessageBox("Дата инвойса меньше даты контракта ",
+								                                                                              Set DDOC = bDat
+							                                                                              If DDOC < DATK 
+								                                                                              Call SalMessageBox("Дата инвойса меньше даты контракта ",
 										"Ошибка ! ", MB_IconStop)
-								                                                                             Set DDOC = bDat
+								                                                                              Set DDOC = bDat
 			Column: MDATE
 				Class Child Ref Key: 0
 				Class ChildKey: 0
@@ -12569,18 +12568,18 @@ Application Description: ! Факторинг + Фючерс
 				List Values
 				Message Actions
 					! On SAM_SetFocus
-						                                                                             If DDOC = DATETIME_Null and NI = NUMBER_Null
-							                                                                             Set DDOC = bDat
+						                                                                              If DDOC = DATETIME_Null and NI = NUMBER_Null
+							                                                                              Set DDOC = bDat
 					! On SAM_Validate
-						                                                                             If NI = NUMBER_Null and NK != NUMBER_Null
-							                                                                             If DDOC+SROK <=bDat 
-								                                                                             Call SalMessageBox("Дата инвойса - "||Str(SROK) ||" меньше банковской даты ",
+						                                                                              If NI = NUMBER_Null and NK != NUMBER_Null
+							                                                                              If DDOC+SROK <=bDat 
+								                                                                              Call SalMessageBox("Дата инвойса - "||Str(SROK) ||" меньше банковской даты ",
 										"Ошибка ! ", MB_IconStop)
-								                                                                             Set DDOC = bDat
-							                                                                             If DDOC < DATK 
-								                                                                             Call SalMessageBox("Дата инвойса меньше даты контракта ",
+								                                                                              Set DDOC = bDat
+							                                                                              If DDOC < DATK 
+								                                                                              Call SalMessageBox("Дата инвойса меньше даты контракта ",
 										"Ошибка ! ", MB_IconStop)
-								                                                                             Set DDOC = bDat
+								                                                                              Set DDOC = bDat
 			Column: LIMIT
 				Class Child Ref Key: 0
 				Class ChildKey: 0
@@ -12855,70 +12854,6 @@ Application Description: ! Факторинг + Фючерс
 								Set FA5.SOS_NAME = FA5.SOS_NAME || ' ош.CC_ID'
 					Call SalWaitCursor(FALSE)
 			! Function: F_Import_A
-				                                                                                                     Description: 
-				                                                                                                     Returns 
-				                                                                                                     Parameters 
-				                                                                                                     Static Variables 
-				                                                                                                     Local variables 
-					                                                                                                     String: CC_ID_
-					                                                                                                     String: OKPOK_
-					                                                                                                     String: OKPOD_
-					                                                                                                     String: IDK_
-					                                                                                                     String: NDOC_
-					                                                                                                     Date/Time: DDOC_
-					                                                                                                     Number: SDOC_
-					                                                                                                     Number: PR_
-					                                                                                                     Number: REF_DOC_
-				                                                                                                     Actions 
-					                                                                                                     If SqlPrepareAndExecute( hSql(),
-							"select CC_ID , OKPOD,  IDK,  NDOC,  DDOC , SDOC/100, ref_doc
-							 into  :CC_ID_,:OKPOD_,:IDK_,:NDOC_,:DDOC_,:SDOC_,:REF_DOC_
-							 from bars_f_invoice 
-							 where ref_doc not in (select ref_doc from DF_BARS_INVOICE)
-							 order by DDOC " )
-						                                                                                                     While SqlFetchNext( hSql(), nFetchRes)
-							                                                                                                     Set nRow = SalTblInsertRow(hWndForm, TBL_MaxRow)
-							                                                                                                     Call SalTblSetContext(hWndForm, nRow )
-							                                                                                                     Call SalTblSetRowFlags( hWndForm, nRow, ROW_New, FALSE  )
-							                                                                                                     Set FA5.NDOC = NDOC_
-							                                                                                                     Set FA5.DDOC = DDOC_
-							                                                                                                     Set FA5.SDOC = SDOC_
-							                                                                                                     Set FA5.CC_ID= CC_ID_
-							                                                                                                     Set FA5.IDK  = IDK_
-							! Set FA5.OKPO_K=OKPOK_
-							                                                                                                     Set FA5.OKPO_D=OKPOD_
-							                                                                                                     Set FA5.SOS_NAME='ДФ'
-							                                                                                                     If CC_ID_ != STRING_Null 
-									and SqlPrepareAndExecute( hSqlAux2(),
-									  "SELECT E.nd, E.rnk, E.SDATE, E.WDATE, E.LIMIT, K.nmk, k.OKPO   
-									   into :FA5.ND,:FA5.RNK_K,:FA5.SDATE,:FA5.WDATE,:FA5.LIMIT,:FA5.NMK_K,:FA5.OKPO_K
-									   from cc_deal E, customer K
-									   where E.sos<15 and E.vidd=203 and E.rnk=K.rnk and E.cc_id=:CC_ID_ " )
-									and SqlFetchNext( hSqlAux2(), nFetchRes)
-								                                                                                                     If IDK_ != STRING_Null and OKPOD_ != STRING_Null 
-										and SqlPrepareAndExecute( hSqlAux2(),
-										  "SELECT T.nk, T.RNKD, D.nmk, T.SROK, AD.nls,
-										          T.SK, T.DATK, To_NUMBER(AD.nlsalt)/100
-										   into :FA5.NK, :FA5.RNK_D,:FA5.NMK_D, :FA5.SROK, :FA5.NLS_D,
-										        :FA5.SK, :FA5.DATK, :FA5.AVA
-										   from FAK_KONTR T, customer D, accounts AD, nd_acc N, cust_acc U 
-										   where T.rnkd=D.rnk and D.okpo=:OKPOD_ and T.ND=:FA5.ND and T.idk=:IDK_ 
-										     and N.nd=T.ND and N.acc=AD.acc 
-										     and U.acc=AD.acc and U.rnk=D.rnk and AD.nbs='2030' ") 
-										and SqlFetchNext( hSqlAux2(), nFetchRes) 
-									                                                                                                     Set FA5.DOPL = DDOC_ + FA5.SROK
-									                                                                                                     Set FA5.REF_DOC = REF_DOC_ 
-									                                                                                                     If NDOC_= STRING_Null or DDOC_= DATETIME_Null and SDOC_<= 0
-										                                                                                                     Set FA5.SOS_NAME = FA5.SOS_NAME || ' ош.NDOC/DDOC/SDOC'
-									                                                                                                     Else 
-										                                                                                                     Call SalTblSetRowFlags( hWndForm, nRow, ROW_New, TRUE  )
-										                                                                                                     Call F_STROKA()
-								                                                                                                     Else 
-									                                                                                                     Set FA5.SOS_NAME = FA5.SOS_NAME || ' ош.OKPOD/IDK'
-							                                                                                                     Else 
-								                                                                                                     Set FA5.SOS_NAME = FA5.SOS_NAME || ' ош.CC_ID'
-					                                                                                                     Call SalWaitCursor(FALSE)
-			! Function: F_Import
 				                                                                                                      Description: 
 				                                                                                                      Returns 
 				                                                                                                      Parameters 
@@ -12932,15 +12867,13 @@ Application Description: ! Факторинг + Фючерс
 					                                                                                                      Date/Time: DDOC_
 					                                                                                                      Number: SDOC_
 					                                                                                                      Number: PR_
+					                                                                                                      Number: REF_DOC_
 				                                                                                                      Actions 
-					                                                                                                      Set KOL = 0
-					                                                                                                      Call SalTblReset( hWndForm )
 					                                                                                                      If SqlPrepareAndExecute( hSql(),
-							"select CC_ID , OKPOK , OKPOD,  IDK,  NDOC,  DDOC , SDOC,  0 
-							 into  :CC_ID_,:OKPOK_,:OKPOD_,:IDK_,:NDOC_,:DDOC_,:SDOC_,:PR_ 
-							 from bars_invoice 
-							 where (OKPOK,CC_ID,OKPOD,IDK,NDOC,DDOC,SDOC) not in 
-							(select  OKPOK, CC_ID,OKPOD,IDK,NDOC,DDOC,SDOC from DF_BARS_INVOICE)
+							"select CC_ID , OKPOD,  IDK,  NDOC,  DDOC , SDOC/100, ref_doc
+							 into  :CC_ID_,:OKPOD_,:IDK_,:NDOC_,:DDOC_,:SDOC_,:REF_DOC_
+							 from bars_f_invoice 
+							 where ref_doc not in (select ref_doc from DF_BARS_INVOICE)
 							 order by DDOC " )
 						                                                                                                      While SqlFetchNext( hSql(), nFetchRes)
 							                                                                                                      Set nRow = SalTblInsertRow(hWndForm, TBL_MaxRow)
@@ -12951,16 +12884,15 @@ Application Description: ! Факторинг + Фючерс
 							                                                                                                      Set FA5.SDOC = SDOC_
 							                                                                                                      Set FA5.CC_ID= CC_ID_
 							                                                                                                      Set FA5.IDK  = IDK_
-							                                                                                                      Set FA5.OKPO_K=OKPOK_
+							! Set FA5.OKPO_K=OKPOK_
 							                                                                                                      Set FA5.OKPO_D=OKPOD_
 							                                                                                                      Set FA5.SOS_NAME='ДФ'
-							                                                                                                      If CC_ID_ != STRING_Null and OKPOK_ != STRING_Null 
+							                                                                                                      If CC_ID_ != STRING_Null 
 									and SqlPrepareAndExecute( hSqlAux2(),
-									  "SELECT E.nd, E.rnk, E.SDATE, E.WDATE, E.LIMIT, K.nmk, 
-									    Substr(FAKTOR.NLS(E.ND,E.RNK,'2600'),1,15)   
-									   into :FA5.ND, :FA5.RNK_K, :FA5.SDATE, :FA5.WDATE, :FA5.LIMIT, :FA5.NMK_K,:FA5.NLS_K, 
+									  "SELECT E.nd, E.rnk, E.SDATE, E.WDATE, E.LIMIT, K.nmk, k.OKPO   
+									   into :FA5.ND,:FA5.RNK_K,:FA5.SDATE,:FA5.WDATE,:FA5.LIMIT,:FA5.NMK_K,:FA5.OKPO_K
 									   from cc_deal E, customer K
-									   where E.sos<15 and E.vidd=203 and E.rnk=K.rnk and E.cc_id=:CC_ID_ and K.okpo=:OKPOK_ " )
+									   where E.sos<15 and E.vidd=203 and E.rnk=K.rnk and E.cc_id=:CC_ID_ " )
 									and SqlFetchNext( hSqlAux2(), nFetchRes)
 								                                                                                                      If IDK_ != STRING_Null and OKPOD_ != STRING_Null 
 										and SqlPrepareAndExecute( hSqlAux2(),
@@ -12974,6 +12906,7 @@ Application Description: ! Факторинг + Фючерс
 										     and U.acc=AD.acc and U.rnk=D.rnk and AD.nbs='2030' ") 
 										and SqlFetchNext( hSqlAux2(), nFetchRes) 
 									                                                                                                      Set FA5.DOPL = DDOC_ + FA5.SROK
+									                                                                                                      Set FA5.REF_DOC = REF_DOC_ 
 									                                                                                                      If NDOC_= STRING_Null or DDOC_= DATETIME_Null and SDOC_<= 0
 										                                                                                                      Set FA5.SOS_NAME = FA5.SOS_NAME || ' ош.NDOC/DDOC/SDOC'
 									                                                                                                      Else 
@@ -12982,8 +12915,74 @@ Application Description: ! Факторинг + Фючерс
 								                                                                                                      Else 
 									                                                                                                      Set FA5.SOS_NAME = FA5.SOS_NAME || ' ош.OKPOD/IDK'
 							                                                                                                      Else 
-								                                                                                                      Set FA5.SOS_NAME = FA5.SOS_NAME || ' ош.OKPOK/CC_ID'
+								                                                                                                      Set FA5.SOS_NAME = FA5.SOS_NAME || ' ош.CC_ID'
 					                                                                                                      Call SalWaitCursor(FALSE)
+			! Function: F_Import
+				                                                                                                       Description: 
+				                                                                                                       Returns 
+				                                                                                                       Parameters 
+				                                                                                                       Static Variables 
+				                                                                                                       Local variables 
+					                                                                                                       String: CC_ID_
+					                                                                                                       String: OKPOK_
+					                                                                                                       String: OKPOD_
+					                                                                                                       String: IDK_
+					                                                                                                       String: NDOC_
+					                                                                                                       Date/Time: DDOC_
+					                                                                                                       Number: SDOC_
+					                                                                                                       Number: PR_
+				                                                                                                       Actions 
+					                                                                                                       Set KOL = 0
+					                                                                                                       Call SalTblReset( hWndForm )
+					                                                                                                       If SqlPrepareAndExecute( hSql(),
+							"select CC_ID , OKPOK , OKPOD,  IDK,  NDOC,  DDOC , SDOC,  0 
+							 into  :CC_ID_,:OKPOK_,:OKPOD_,:IDK_,:NDOC_,:DDOC_,:SDOC_,:PR_ 
+							 from bars_invoice 
+							 where (OKPOK,CC_ID,OKPOD,IDK,NDOC,DDOC,SDOC) not in 
+							(select  OKPOK, CC_ID,OKPOD,IDK,NDOC,DDOC,SDOC from DF_BARS_INVOICE)
+							 order by DDOC " )
+						                                                                                                       While SqlFetchNext( hSql(), nFetchRes)
+							                                                                                                       Set nRow = SalTblInsertRow(hWndForm, TBL_MaxRow)
+							                                                                                                       Call SalTblSetContext(hWndForm, nRow )
+							                                                                                                       Call SalTblSetRowFlags( hWndForm, nRow, ROW_New, FALSE  )
+							                                                                                                       Set FA5.NDOC = NDOC_
+							                                                                                                       Set FA5.DDOC = DDOC_
+							                                                                                                       Set FA5.SDOC = SDOC_
+							                                                                                                       Set FA5.CC_ID= CC_ID_
+							                                                                                                       Set FA5.IDK  = IDK_
+							                                                                                                       Set FA5.OKPO_K=OKPOK_
+							                                                                                                       Set FA5.OKPO_D=OKPOD_
+							                                                                                                       Set FA5.SOS_NAME='ДФ'
+							                                                                                                       If CC_ID_ != STRING_Null and OKPOK_ != STRING_Null 
+									and SqlPrepareAndExecute( hSqlAux2(),
+									  "SELECT E.nd, E.rnk, E.SDATE, E.WDATE, E.LIMIT, K.nmk, 
+									    Substr(FAKTOR.NLS(E.ND,E.RNK,'2600'),1,15)   
+									   into :FA5.ND, :FA5.RNK_K, :FA5.SDATE, :FA5.WDATE, :FA5.LIMIT, :FA5.NMK_K,:FA5.NLS_K, 
+									   from cc_deal E, customer K
+									   where E.sos<15 and E.vidd=203 and E.rnk=K.rnk and E.cc_id=:CC_ID_ and K.okpo=:OKPOK_ " )
+									and SqlFetchNext( hSqlAux2(), nFetchRes)
+								                                                                                                       If IDK_ != STRING_Null and OKPOD_ != STRING_Null 
+										and SqlPrepareAndExecute( hSqlAux2(),
+										  "SELECT T.nk, T.RNKD, D.nmk, T.SROK, AD.nls,
+										          T.SK, T.DATK, To_NUMBER(AD.nlsalt)/100
+										   into :FA5.NK, :FA5.RNK_D,:FA5.NMK_D, :FA5.SROK, :FA5.NLS_D,
+										        :FA5.SK, :FA5.DATK, :FA5.AVA
+										   from FAK_KONTR T, customer D, accounts AD, nd_acc N, cust_acc U 
+										   where T.rnkd=D.rnk and D.okpo=:OKPOD_ and T.ND=:FA5.ND and T.idk=:IDK_ 
+										     and N.nd=T.ND and N.acc=AD.acc 
+										     and U.acc=AD.acc and U.rnk=D.rnk and AD.nbs='2030' ") 
+										and SqlFetchNext( hSqlAux2(), nFetchRes) 
+									                                                                                                       Set FA5.DOPL = DDOC_ + FA5.SROK
+									                                                                                                       If NDOC_= STRING_Null or DDOC_= DATETIME_Null and SDOC_<= 0
+										                                                                                                       Set FA5.SOS_NAME = FA5.SOS_NAME || ' ош.NDOC/DDOC/SDOC'
+									                                                                                                       Else 
+										                                                                                                       Call SalTblSetRowFlags( hWndForm, nRow, ROW_New, TRUE  )
+										                                                                                                       Call F_STROKA()
+								                                                                                                       Else 
+									                                                                                                       Set FA5.SOS_NAME = FA5.SOS_NAME || ' ош.OKPOD/IDK'
+							                                                                                                       Else 
+								                                                                                                       Set FA5.SOS_NAME = FA5.SOS_NAME || ' ош.OKPOK/CC_ID'
+					                                                                                                       Call SalWaitCursor(FALSE)
 		Window Parameters
 			Number: nPar1
 			Number: nPar2
@@ -13060,7 +13059,7 @@ Application Description: ! Факторинг + Фючерс
 			! On SAM_CreateComplete
 				! Call SalSendMsg(hWndForm, UM_Populate, 0, 0)
 				! Set FA5.fFilterAtStart = 1
-				                                                                                           Call SalWaitCursor(FALSE)
+				                                                                                            Call SalWaitCursor(FALSE)
 			On UM_Populate
 				If FA5.fFilterAtStart
 					Set FA5.fFilterAtStart = NOT FA5.fFilterAtStart
@@ -13134,30 +13133,30 @@ Application Description: ! Факторинг + Фючерс
 								and SqlFetchNext(hSql(), nFetchRes)
 						Call F_ZAG()
 			! On UM_Update
-				                                                                      Set nRow = TBL_MinRow
-				                                                                      While SalTblFindNextRow(hWndForm, nRow,  ROW_New | ROW_MarkDeleted, 0) 
+				                                                                       Set nRow = TBL_MinRow
+				                                                                       While SalTblFindNextRow(hWndForm, nRow,  ROW_New | ROW_MarkDeleted, 0) 
 						  and SDOC > 0 and DDOC != DATETIME_Null and NDOC !=STRING_Null 
-					                                                                      Call SalTblSetContext(hWndForm, nRow)
-					                                                                      If SalTblQueryRowFlags( hWndForm, nRow, ROW_New ) 
+					                                                                       Call SalTblSetContext(hWndForm, nRow)
+					                                                                       If SalTblQueryRowFlags( hWndForm, nRow, ROW_New ) 
 							and NK !=NUMBER_Null and NI=NUMBER_Null
-						                                                                      If SqlPLSQLCommand( hSql(), "FAKTOR.OPEN_INV( NK, NDOC, DDOC, SDOC, NI_ )" )
-							                                                                      Set NI = NI_ 
-							                                                                      If FA5.SOS_NAME='ДФ' and SqlPrepareAndExecute( hSql(),
+						                                                                       If SqlPLSQLCommand( hSql(), "FAKTOR.OPEN_INV( NK, NDOC, DDOC, SDOC, NI_ )" )
+							                                                                       Set NI = NI_ 
+							                                                                       If FA5.SOS_NAME='ДФ' and SqlPrepareAndExecute( hSql(),
 									"insert into DF_BARS_INVOICE ( REF_DOC, REF_BARS )
 									Values (:REF_DOC, :NI_ )") 
-							                                                                      Call SqlCommitEx( hSql(), " Введен Инвойс "||NDOC )
-					                                                                      Else If SalTblQueryRowFlags( hWndForm, nRow, ROW_MarkDeleted ) 
+							                                                                       Call SqlCommitEx( hSql(), " Введен Инвойс "||NDOC )
+					                                                                       Else If SalTblQueryRowFlags( hWndForm, nRow, ROW_MarkDeleted ) 
 							and  NI != NUMBER_Null
-						                                                                      Set nTmp = 0 
-						                                                                      If SqlPrepareAndExecute( hSql(),
+						                                                                       Set nTmp = 0 
+						                                                                       If SqlPrepareAndExecute( hSql(),
 								  "SELECT NVL(sum(SN),0)/100 INTO :nTmp from FAK_POG where ni=:NI " )
 								and SqlFetchNext( hSql(), nFetchRes) 
-						                                                                      If nTmp < SDOC
-							                                                                      Call MessageError('Невозможно закрыть непогашенный инвойс №'||Str(NI))
-						                                                                      Else 
-							                                                                      If SqlPLSQLCommand( hSql(), "FAKTOR.INV_9800(NI,1)" )
+						                                                                       If nTmp < SDOC
+							                                                                       Call MessageError('Невозможно закрыть непогашенный инвойс №'||Str(NI))
+						                                                                       Else 
+							                                                                       If SqlPLSQLCommand( hSql(), "FAKTOR.INV_9800(NI,1)" )
 									and SqlCommitEx( hSql(), " Закрыт Инвойс "||NDOC )
-				                                                                      Call SalSendMsg(hWndForm, UM_Populate, 0, 0)
+				                                                                       Call SalSendMsg(hWndForm, UM_Populate, 0, 0)
 			On UM_Update
 				Set nRow = TBL_MinRow
 				While SalTblFindNextRow(hWndForm, nRow,  ROW_New | ROW_MarkDeleted | ROW_Edited, 0) 
@@ -14743,7 +14742,7 @@ Application Description: ! Факторинг + Фючерс
 					Call Sel020( hWndForm, 205, ND, strPar01,Str(RNKD) )
 			On SAM_TblDoDetails
 				! If IsWindow( h_FA8 )
-					                                                               Call SalDestroyWindow(h_FA8 )
+					                                                                Call SalDestroyWindow(h_FA8 )
 				If IsWindow( h_FA4 )
 					Call SalDestroyWindow(h_FA4 )
 				If IsWindow( h_FA3 )
@@ -16385,7 +16384,7 @@ Application Description: ! Факторинг + Фючерс
 				! Call SalSendClassMessage(UM_Populate, 0, 0)
 			On SAM_TblDoDetails
 				! If IsWindow( h_FA8 )
-					                                                               Call SalDestroyWindow(h_FA8 )
+					                                                                Call SalDestroyWindow(h_FA8 )
 				If IsWindow( h_FA4 )
 					Call SalDestroyWindow(h_FA4 )
 				If DAT_END < bDat 
@@ -18463,25 +18462,25 @@ Application Description: ! Факторинг + Фючерс
 				Call SqlCommit( hSql() )
 				Call SalSendMsg(hWndForm, UM_Populate, 0, 0)
 			! On UM_Update
-				                                                                      Set nRow = TBL_MinRow
-				                                                                      While SalTblFindNextRow(hWndForm, nRow,  ROW_New | ROW_MarkDeleted, 0) 
+				                                                                       Set nRow = TBL_MinRow
+				                                                                       While SalTblFindNextRow(hWndForm, nRow,  ROW_New | ROW_MarkDeleted, 0) 
 						  and SDOC > 0 and DDOC != DATETIME_Null and NDOC !=STRING_Null 
-					                                                                      Call SalTblSetContext(hWndForm, nRow)
-					                                                                      If SalTblQueryRowFlags( hWndForm, nRow, ROW_New )
-						                                                                      If SqlPLSQLCommand( hSql(), "FAKTOR.OPEN_INV( NK, NDOC, DDOC, SDOC, NI_ )" )
+					                                                                       Call SalTblSetContext(hWndForm, nRow)
+					                                                                       If SalTblQueryRowFlags( hWndForm, nRow, ROW_New )
+						                                                                       If SqlPLSQLCommand( hSql(), "FAKTOR.OPEN_INV( NK, NDOC, DDOC, SDOC, NI_ )" )
 								and SqlCommitEx( hSql(), " Введен Инвойс "||NDOC )
-						                                                                      Set NI = NI_
-					                                                                      Else 
-						                                                                      Set nTmp = 0 
-						                                                                      If SqlPrepareAndExecute( hSql(),
+						                                                                       Set NI = NI_
+					                                                                       Else 
+						                                                                       Set nTmp = 0 
+						                                                                       If SqlPrepareAndExecute( hSql(),
 								  "SELECT NVL(sum(SN),0)/100 INTO :nTmp from FAK_POG where ni=:NI " )
 								and SqlFetchNext( hSql(), nFetchRes) 
-						                                                                      If nTmp < SDOC
-							                                                                      Call MessageError('Невозможно закрыть непогашенный инвойс №'||Str(NI))
-						                                                                      Else 
-							                                                                      If SqlPLSQLCommand( hSql(), "FAKTOR.INV_9800(NI,1)" )
+						                                                                       If nTmp < SDOC
+							                                                                       Call MessageError('Невозможно закрыть непогашенный инвойс №'||Str(NI))
+						                                                                       Else 
+							                                                                       If SqlPLSQLCommand( hSql(), "FAKTOR.INV_9800(NI,1)" )
 									and SqlCommitEx( hSql(), " Закрыт Инвойс "||NDOC )
-				                                                                      Call SalSendMsg(hWndForm, UM_Populate, 0, 0)
+				                                                                       Call SalSendMsg(hWndForm, UM_Populate, 0, 0)
 	Table Window: FA4
 		Class: cGenericTable
 		Property Template:
@@ -19924,12 +19923,12 @@ Application Description: ! Факторинг + Фючерс
 						On SAM_Click
 							! If SqlPrepareAndExecute( hSql(),"DELETE from INVOICE " )
 								! Call Imp_Dbf_New(hWndForm, NUMBER_Null, 0, 'INVOICE', '' )
-								                                                         Call Imp_KL_NBU(hWndMDI)
-								                                                         If SqlPrepareAndExecute( hSql(),
+								                                                          Call Imp_KL_NBU(hWndMDI)
+								                                                          If SqlPrepareAndExecute( hSql(),
 										"insert into fak_invoice(NK, NDOC, DDOC, SDOC, SOS) select            
 										 :NK, NDOC, DDOC, SDOC*100, -1 from INVOICE " )
 										and SqlCommit( hSql())
-								                                                         Call SalSendMsg( pbRefresh, SAM_Click, 0, 0 )
+								                                                          Call SalSendMsg( pbRefresh, SAM_Click, 0, 0 )
 							! Call Imp_Dbf_New(hWndForm, NUMBER_Null, 0, 'INVOICE', '' )
 							Call Imp_KL_NBU(hWndMDI)
 							If SqlPrepareAndExecute( hSql(),
@@ -20631,25 +20630,25 @@ Application Description: ! Факторинг + Фючерс
 				Call SqlCommit( hSql() )
 				Call SalSendMsg(hWndForm, UM_Populate, 0, 0)
 			! On UM_Update
-				                                                                      Set nRow = TBL_MinRow
-				                                                                      While SalTblFindNextRow(hWndForm, nRow,  ROW_New | ROW_MarkDeleted, 0) 
+				                                                                       Set nRow = TBL_MinRow
+				                                                                       While SalTblFindNextRow(hWndForm, nRow,  ROW_New | ROW_MarkDeleted, 0) 
 						  and SDOC > 0 and DDOC != DATETIME_Null and NDOC !=STRING_Null 
-					                                                                      Call SalTblSetContext(hWndForm, nRow)
-					                                                                      If SalTblQueryRowFlags( hWndForm, nRow, ROW_New )
-						                                                                      If SqlPLSQLCommand( hSql(), "FAKTOR.OPEN_INV( NK, NDOC, DDOC, SDOC, NI_ )" )
+					                                                                       Call SalTblSetContext(hWndForm, nRow)
+					                                                                       If SalTblQueryRowFlags( hWndForm, nRow, ROW_New )
+						                                                                       If SqlPLSQLCommand( hSql(), "FAKTOR.OPEN_INV( NK, NDOC, DDOC, SDOC, NI_ )" )
 								and SqlCommitEx( hSql(), " Введен Инвойс "||NDOC )
-						                                                                      Set NI = NI_
-					                                                                      Else 
-						                                                                      Set nTmp = 0 
-						                                                                      If SqlPrepareAndExecute( hSql(),
+						                                                                       Set NI = NI_
+					                                                                       Else 
+						                                                                       Set nTmp = 0 
+						                                                                       If SqlPrepareAndExecute( hSql(),
 								  "SELECT NVL(sum(SN),0)/100 INTO :nTmp from FAK_POG where ni=:NI " )
 								and SqlFetchNext( hSql(), nFetchRes) 
-						                                                                      If nTmp < SDOC
-							                                                                      Call MessageError('Невозможно закрыть непогашенный инвойс №'||Str(NI))
-						                                                                      Else 
-							                                                                      If SqlPLSQLCommand( hSql(), "FAKTOR.INV_9800(NI,1)" )
+						                                                                       If nTmp < SDOC
+							                                                                       Call MessageError('Невозможно закрыть непогашенный инвойс №'||Str(NI))
+						                                                                       Else 
+							                                                                       If SqlPLSQLCommand( hSql(), "FAKTOR.INV_9800(NI,1)" )
 									and SqlCommitEx( hSql(), " Закрыт Инвойс "||NDOC )
-				                                                                      Call SalSendMsg(hWndForm, UM_Populate, 0, 0)
+				                                                                       Call SalSendMsg(hWndForm, UM_Populate, 0, 0)
 	! cGenericTableSpl: XL1
 .data CLASSPROPS
 0000: 56543A53706C6974 746572002B000100 00000000000090B0 A800C8D8D8005880
@@ -20692,161 +20691,161 @@ Application Description: ! Факторинг + Фючерс
 			Text Color: Default
 			Background Color: Default
 .end
-		                                                Description: 
-		                                                Named Menus 
-		                                                Menu 
-		                                                Tool Bar 
-			                                                Contents 
-				                                                Frame 
-				                                                Pushbutton: pbIns
-					                                                Message Actions 
-						                                                On SAM_Create
-							                                                Set strTip = 'Открыть овердрафт выбранному Холдингу'
-						                                                On SAM_Click
-							                                                If SalTblAnyRows( tbl, ROW_Selected, 0 ) and tbl.ACC8 = NUMBER_Null 
-								                                                Call tbl.OP_1()
-				                                                Pushbutton: pbUpdate
-					                                                Message Actions 
-						                                                On SAM_Create
-							                                                Set strTip = 'Сохранить установки по дочерним счетам'
-						                                                On SAM_Click
-							                                                If SalTblAnyRows( tbl, ROW_Selected, 0 ) and tbl.ACC8 != NUMBER_Null 
-								                                                Call tbl2.OP_2()
-				                                                Pushbutton: pbAccHistory2
-					                                                Message Actions 
-						                                                On SAM_Create
-							                                                Set strTip = 'История выбранного доч.счета'
-						                                                On SAM_Click
-							                                                If SalTblAnyRows( tbl2, ROW_Selected, 0 ) and tbl2.ACC > 0
-								                                                Call Show_Sal_Day_P (tbl2.ACC, tbl2.NLS, tbl2.KV, DAT1, DAT2)
-				                                                Pushbutton: pb_PR
-					                                                Message Actions 
-						                                                On SAM_Create
-							                                                Set strTip = 'Процентная карточка выбранного доч.счета'
-						                                                On SAM_Click
-							                                                If SalTblAnyRows( tbl2, ROW_Selected, 0 ) and tbl2.ACC > 0
-								                                                Call SetProcParN(tbl2.ACC, tbl2.KV, "", "" )
+		                                                 Description: 
+		                                                 Named Menus 
+		                                                 Menu 
+		                                                 Tool Bar 
+			                                                 Contents 
+				                                                 Frame 
+				                                                 Pushbutton: pbIns
+					                                                 Message Actions 
+						                                                 On SAM_Create
+							                                                 Set strTip = 'Открыть овердрафт выбранному Холдингу'
+						                                                 On SAM_Click
+							                                                 If SalTblAnyRows( tbl, ROW_Selected, 0 ) and tbl.ACC8 = NUMBER_Null 
+								                                                 Call tbl.OP_1()
+				                                                 Pushbutton: pbUpdate
+					                                                 Message Actions 
+						                                                 On SAM_Create
+							                                                 Set strTip = 'Сохранить установки по дочерним счетам'
+						                                                 On SAM_Click
+							                                                 If SalTblAnyRows( tbl, ROW_Selected, 0 ) and tbl.ACC8 != NUMBER_Null 
+								                                                 Call tbl2.OP_2()
+				                                                 Pushbutton: pbAccHistory2
+					                                                 Message Actions 
+						                                                 On SAM_Create
+							                                                 Set strTip = 'История выбранного доч.счета'
+						                                                 On SAM_Click
+							                                                 If SalTblAnyRows( tbl2, ROW_Selected, 0 ) and tbl2.ACC > 0
+								                                                 Call Show_Sal_Day_P (tbl2.ACC, tbl2.NLS, tbl2.KV, DAT1, DAT2)
+				                                                 Pushbutton: pb_PR
+					                                                 Message Actions 
+						                                                 On SAM_Create
+							                                                 Set strTip = 'Процентная карточка выбранного доч.счета'
+						                                                 On SAM_Click
+							                                                 If SalTblAnyRows( tbl2, ROW_Selected, 0 ) and tbl2.ACC > 0
+								                                                 Call SetProcParN(tbl2.ACC, tbl2.KV, "", "" )
 				!
-				                                                Pushbutton: pb_Sum
-					                                                Message Actions 
-						                                                On SAM_Create
-							                                                Set strTip = 'Установить суммарный остаток на консолидированном счете'
-						                                                On SAM_Click
-							                                                If SalTblAnyRows( tbl, ROW_Selected, 0 ) and tbl.ACC8 != NUMBER_Null 
-								                                                Call tbl.OST_1()
-				                                                Data Field: DAT1
-					                                                Message Actions 
-						                                                On SAM_TooltipSetText
-							                                                Return XSalTooltipSetText( lParam, 'Дата "С" ')
-				                                                Data Field: DAT2
-					                                                Message Actions 
-						                                                On SAM_TooltipSetText
-							                                                Return XSalTooltipSetText( lParam, 'Дата "По" ')
-				                                                Check Box: cb2
-					                                                Message Actions 
-						                                                On SAM_TooltipSetText
-							                                                Return XSalTooltipSetText( lParam, 'Только вкл.счета / Все счета')
-				                                                Pushbutton: pb_PR_ALL
-					                                                Message Actions 
-						                                                On SAM_Create
-							                                                Set strTip = 'Расчетные Проценты за период'
-						                                                On SAM_Click
-							                                                If SalTblAnyRows( tbl, ROW_Selected, 0 )
-								                                                Call tbl2.PR_2 ()
-				                                                Data Field: PR_A
-					                                                Message Actions 
-						                                                On SAM_TooltipSetText
-							                                                Return XSalTooltipSetText( lParam, 'Расчетные % по АКТ в нац.вал')
-				                                                Data Field: PR_P
-					                                                Message Actions 
-						                                                On SAM_TooltipSetText
-							                                                Return XSalTooltipSetText( lParam, 'Расчетные % по ПАС в нац.вал')
+				                                                 Pushbutton: pb_Sum
+					                                                 Message Actions 
+						                                                 On SAM_Create
+							                                                 Set strTip = 'Установить суммарный остаток на консолидированном счете'
+						                                                 On SAM_Click
+							                                                 If SalTblAnyRows( tbl, ROW_Selected, 0 ) and tbl.ACC8 != NUMBER_Null 
+								                                                 Call tbl.OST_1()
+				                                                 Data Field: DAT1
+					                                                 Message Actions 
+						                                                 On SAM_TooltipSetText
+							                                                 Return XSalTooltipSetText( lParam, 'Дата "С" ')
+				                                                 Data Field: DAT2
+					                                                 Message Actions 
+						                                                 On SAM_TooltipSetText
+							                                                 Return XSalTooltipSetText( lParam, 'Дата "По" ')
+				                                                 Check Box: cb2
+					                                                 Message Actions 
+						                                                 On SAM_TooltipSetText
+							                                                 Return XSalTooltipSetText( lParam, 'Только вкл.счета / Все счета')
+				                                                 Pushbutton: pb_PR_ALL
+					                                                 Message Actions 
+						                                                 On SAM_Create
+							                                                 Set strTip = 'Расчетные Проценты за период'
+						                                                 On SAM_Click
+							                                                 If SalTblAnyRows( tbl, ROW_Selected, 0 )
+								                                                 Call tbl2.PR_2 ()
+				                                                 Data Field: PR_A
+					                                                 Message Actions 
+						                                                 On SAM_TooltipSetText
+							                                                 Return XSalTooltipSetText( lParam, 'Расчетные % по АКТ в нац.вал')
+				                                                 Data Field: PR_P
+					                                                 Message Actions 
+						                                                 On SAM_TooltipSetText
+							                                                 Return XSalTooltipSetText( lParam, 'Расчетные % по ПАС в нац.вал')
 				!
-				                                                Pushbutton: pbDel
-					                                                Message Actions 
-						                                                On SAM_Create
-							                                                Set strTip = 'Изъять Документ из картотеки'
-				                                                Pushbutton: pbDetails
-					                                                Message Actions 
-						                                                On SAM_Create
-							                                                Set strTip = 'Счета, входящие в Холдинг'
-						                                                On SAM_Click
-							                                                If SalTblAnyRows( tbl, ROW_Selected, 0 ) 
-								                                                Call tbl2.NAS_2()
-				                                                Pushbutton: pbRefresh
-					                                                Message Actions 
-						                                                On SAM_Create
-							                                                Set strTip = 'Перечитать нераспределенные документы-поступления'
-						                                                On SAM_Click
-							                                                Call tbl.NAS_1( )
-				                                                Line 
-				                                                Pushbutton: pbSearch
-					                                                Message Actions 
-				                                                Pushbutton: pbFilter
-					                                                Message Actions 
-						                                                On SAM_Create
-							                                                Set strTip = 'Установить фильтр на документы (верхняя таблица)'
-						                                                On SAM_Click
-							                                                Set sFilter = ""
-							                                                If NOT SetQueryFilter( cF )
-								                                                Call SalDestroyWindow( hWndForm )
-							                                                Set sFilter = cF.GetFilterWhereClause( FALSE )
-							                                                Call Debug(sFilter)
-				                                                Pushbutton: pbPrint
-					                                                Message Actions 
-				                                                Line 
-				                                                Pushbutton: pbExit
-					                                                Message Actions 
-				                                                Line 
+				                                                 Pushbutton: pbDel
+					                                                 Message Actions 
+						                                                 On SAM_Create
+							                                                 Set strTip = 'Изъять Документ из картотеки'
+				                                                 Pushbutton: pbDetails
+					                                                 Message Actions 
+						                                                 On SAM_Create
+							                                                 Set strTip = 'Счета, входящие в Холдинг'
+						                                                 On SAM_Click
+							                                                 If SalTblAnyRows( tbl, ROW_Selected, 0 ) 
+								                                                 Call tbl2.NAS_2()
+				                                                 Pushbutton: pbRefresh
+					                                                 Message Actions 
+						                                                 On SAM_Create
+							                                                 Set strTip = 'Перечитать нераспределенные документы-поступления'
+						                                                 On SAM_Click
+							                                                 Call tbl.NAS_1( )
+				                                                 Line 
+				                                                 Pushbutton: pbSearch
+					                                                 Message Actions 
+				                                                 Pushbutton: pbFilter
+					                                                 Message Actions 
+						                                                 On SAM_Create
+							                                                 Set strTip = 'Установить фильтр на документы (верхняя таблица)'
+						                                                 On SAM_Click
+							                                                 Set sFilter = ""
+							                                                 If NOT SetQueryFilter( cF )
+								                                                 Call SalDestroyWindow( hWndForm )
+							                                                 Set sFilter = cF.GetFilterWhereClause( FALSE )
+							                                                 Call Debug(sFilter)
+				                                                 Pushbutton: pbPrint
+					                                                 Message Actions 
+				                                                 Line 
+				                                                 Pushbutton: pbExit
+					                                                 Message Actions 
+				                                                 Line 
 				!
-		                                                Contents 
-			                                                Custom Control: ccSplitter
-				                                                Message Actions 
-			                                                Child Table: tbl ! Холдинги
-				                                                Contents 
+		                                                 Contents 
+			                                                 Custom Control: ccSplitter
+				                                                 Message Actions 
+			                                                 Child Table: tbl ! Холдинги
+				                                                 Contents 
 					!
-					                                                Column: RNKP
-						                                                List Values 
-						                                                Message Actions 
-					                                                Column: NMKP 
-						                                                List Values 
-						                                                Message Actions 
-					                                                Column: KOLK
-						                                                List Values 
-						                                                Message Actions 
+					                                                 Column: RNKP
+						                                                 List Values 
+						                                                 Message Actions 
+					                                                 Column: NMKP 
+						                                                 List Values 
+						                                                 Message Actions 
+					                                                 Column: KOLK
+						                                                 List Values 
+						                                                 Message Actions 
 					!
-					                                                Column: NLSP 
-						                                                List Values 
-						                                                Message Actions 
-					                                                Column: KOL
-						                                                List Values 
-						                                                Message Actions 
-					                                                Column: DOS
-						                                                List Values 
-						                                                Message Actions 
-					                                                Column: KOS
-						                                                List Values 
-						                                                Message Actions 
-					                                                Column: OSTC
-						                                                List Values 
-						                                                Message Actions 
-					                                                Column: OSTB
-						                                                List Values 
-						                                                Message Actions 
-					                                                Column: ACC8
-						                                                List Values 
-						                                                Message Actions 
-				                                                Functions 
-					                                                Function: NAS_1
-						                                                Description: 
-						                                                Returns 
-						                                                Parameters 
-						                                                Static Variables 
-						                                                Local variables 
-						                                                Actions 
-							                                                Call SalTblSetTableFlags ( tbl, TBL_Flag_SingleSelection, TRUE )
-							                                                Call SalTblSetLockedColumns( tbl, 3 )
-							                                                Set sSql1 =
+					                                                 Column: NLSP 
+						                                                 List Values 
+						                                                 Message Actions 
+					                                                 Column: KOL
+						                                                 List Values 
+						                                                 Message Actions 
+					                                                 Column: DOS
+						                                                 List Values 
+						                                                 Message Actions 
+					                                                 Column: KOS
+						                                                 List Values 
+						                                                 Message Actions 
+					                                                 Column: OSTC
+						                                                 List Values 
+						                                                 Message Actions 
+					                                                 Column: OSTB
+						                                                 List Values 
+						                                                 Message Actions 
+					                                                 Column: ACC8
+						                                                 List Values 
+						                                                 Message Actions 
+				                                                 Functions 
+					                                                 Function: NAS_1
+						                                                 Description: 
+						                                                 Returns 
+						                                                 Parameters 
+						                                                 Static Variables 
+						                                                 Local variables 
+						                                                 Actions 
+							                                                 Call SalTblSetTableFlags ( tbl, TBL_Flag_SingleSelection, TRUE )
+							                                                 Call SalTblSetLockedColumns( tbl, 3 )
+							                                                 Set sSql1 =
 									"SELECT k.RNKP, c.NMK,  k.KOLK, a.acc, a.nls, a.ostc, a.ostb
 									INTO :tbl.RNKP,:tbl.NMKP,:tbl.KOLK, :tbl.ACC8,:tbl.NLSP, :tbl.OSTC, :tbl.OSTB
 									  FROM customer c, 
@@ -20855,153 +20854,153 @@ Application Description: ! Факторинг + Фючерс
 									   from  accounts a, cust_acc u where u.acc=a.acc and a.nls  like '8026_'||u.rnk and a.kv =:n980 ) a
 									  WHERE c.rnk=k.rnkp  and c.rnk=a.rnk (+) " ||
 									 IifS (sFilter = "", ""," and "|| sFilter ) || " ORDER BY c.rnk"
-							                                                Call SalTblPopulate( tbl, hSql(), sSql1, TBL_FillAll )
-							                                                Call SalTblReset( tbl2 )
-					                                                Function: OP_1
-						                                                Description: 
-						                                                Returns 
-						                                                Parameters 
-						                                                Static Variables 
-						                                                Local variables 
-							                                                Number: nRet
-							                                                String: sNls
-						                                                Actions 
-							                                                Set sNls = KeyAccount( sBankMfo, '80260'||Str(tbl.RNKP) )
-							                                                If Op_Reg(99,0,0,0,nRet, tbl.RNKP, sNls, n980, tbl.NMKP, 'ODB', nId, tbl.ACC8 )
-								                                                Set tbl.NLSP = sNls
-								                                                Call SqlCommitEx( hSql(),"Открыт "||sNls )
-								                                                Call OPEN_1()
-								                                                Call SalShowWindow( tbl2.OP )
-								                                                Call SalShowWindow( tbl2.LIM)
-								                                                Call XSalTblSetCellBackColor( RNKP, nCol1 ) 
-								                                                Call XSalTblSetCellBackColor( NMKP, nCol1 )
-								                                                Call XSalTblSetCellBackColor( KOLK, nCol1 )
-								                                                Call XSalTblSetCellBackColor( NLSP, nCol1 )
-							                                                Else 
-								                                                Call SqlRollback( hSql() )
-					                                                Function: OST_1
-						                                                Description: 
-						                                                Returns 
-						                                                Parameters 
-						                                                Static Variables 
-						                                                Local variables 
+							                                                 Call SalTblPopulate( tbl, hSql(), sSql1, TBL_FillAll )
+							                                                 Call SalTblReset( tbl2 )
+					                                                 Function: OP_1
+						                                                 Description: 
+						                                                 Returns 
+						                                                 Parameters 
+						                                                 Static Variables 
+						                                                 Local variables 
+							                                                 Number: nRet
+							                                                 String: sNls
+						                                                 Actions 
+							                                                 Set sNls = KeyAccount( sBankMfo, '80260'||Str(tbl.RNKP) )
+							                                                 If Op_Reg(99,0,0,0,nRet, tbl.RNKP, sNls, n980, tbl.NMKP, 'ODB', nId, tbl.ACC8 )
+								                                                 Set tbl.NLSP = sNls
+								                                                 Call SqlCommitEx( hSql(),"Открыт "||sNls )
+								                                                 Call OPEN_1()
+								                                                 Call SalShowWindow( tbl2.OP )
+								                                                 Call SalShowWindow( tbl2.LIM)
+								                                                 Call XSalTblSetCellBackColor( RNKP, nCol1 ) 
+								                                                 Call XSalTblSetCellBackColor( NMKP, nCol1 )
+								                                                 Call XSalTblSetCellBackColor( KOLK, nCol1 )
+								                                                 Call XSalTblSetCellBackColor( NLSP, nCol1 )
+							                                                 Else 
+								                                                 Call SqlRollback( hSql() )
+					                                                 Function: OST_1
+						                                                 Description: 
+						                                                 Returns 
+						                                                 Parameters 
+						                                                 Static Variables 
+						                                                 Local variables 
 							! Number: nRet
 							! String: sNls
-						                                                Actions 
-							                                                If SqlPrepareAndExecute( hSql(), 
+						                                                 Actions 
+							                                                 If SqlPrepareAndExecute( hSql(), 
 									"UPDATE accounts set 
 									  ostC = (select NVL(sum(gl.p_Icurval(kv,ostC,:bDat)),0) from accounts where accc=:ACC8),
 									  ostB = (select NVL(sum(gl.p_Icurval(kv,ostB,:bDat)),0) from accounts where accc=:ACC8)
 									 WHERE acc=:ACC8 " )
-								                                                Call SqlCommitEx( hSql(),"Уст.остатки на "|| NLSP )
-								                                                Call tbl2.NAS_2()
-							                                                Else 
-								                                                Call SqlRollback( hSql() )
-					                                                Function: OPEN_1
-						                                                Description: 
-						                                                Returns 
-						                                                Parameters 
-						                                                Static Variables 
-						                                                Local variables 
-						                                                Actions 
-							                                                If tbl.ACC8 = NUMBER_Null 
-								                                                Call SalEnableWindow( pbIns )
-								                                                Call SalDisableWindow( pbUpdate )
-								                                                Call SalDisableWindow( pb_Sum )
-								                                                Call SalHideWindow( tbl2.OP )
-								                                                Call SalHideWindow( tbl2.LIM )
-							                                                Else 
-								                                                Call SalDisableWindow( pbIns )
-								                                                Call SalEnableWindow( pbUpdate )
-								                                                Call SalEnableWindow( pb_Sum )
-								                                                Call SalShowWindow( tbl2.OP )
-								                                                Call SalShowWindow( tbl2.LIM)
-				                                                Window Variables 
-				                                                Message Actions 
-					                                                On SAM_DoubleClick
-						                                                Call tbl2.NAS_2()
-					                                                On SAM_TblDoDetails
-						                                                Call SalTblReset( tbl2 )
-						                                                Set tbl.KOL = 0
-						                                                Set PR_A = NUMBER_Null
-						                                                Set PR_P = NUMBER_Null
+								                                                 Call SqlCommitEx( hSql(),"Уст.остатки на "|| NLSP )
+								                                                 Call tbl2.NAS_2()
+							                                                 Else 
+								                                                 Call SqlRollback( hSql() )
+					                                                 Function: OPEN_1
+						                                                 Description: 
+						                                                 Returns 
+						                                                 Parameters 
+						                                                 Static Variables 
+						                                                 Local variables 
+						                                                 Actions 
+							                                                 If tbl.ACC8 = NUMBER_Null 
+								                                                 Call SalEnableWindow( pbIns )
+								                                                 Call SalDisableWindow( pbUpdate )
+								                                                 Call SalDisableWindow( pb_Sum )
+								                                                 Call SalHideWindow( tbl2.OP )
+								                                                 Call SalHideWindow( tbl2.LIM )
+							                                                 Else 
+								                                                 Call SalDisableWindow( pbIns )
+								                                                 Call SalEnableWindow( pbUpdate )
+								                                                 Call SalEnableWindow( pb_Sum )
+								                                                 Call SalShowWindow( tbl2.OP )
+								                                                 Call SalShowWindow( tbl2.LIM)
+				                                                 Window Variables 
+				                                                 Message Actions 
+					                                                 On SAM_DoubleClick
+						                                                 Call tbl2.NAS_2()
+					                                                 On SAM_TblDoDetails
+						                                                 Call SalTblReset( tbl2 )
+						                                                 Set tbl.KOL = 0
+						                                                 Set PR_A = NUMBER_Null
+						                                                 Set PR_P = NUMBER_Null
 						!
-						                                                Call OPEN_1()
-					                                                On SAM_FetchRowDone
-						                                                If NLSP != STRING_Null
-							                                                Call XSalTblSetCellBackColor( RNKP, nCol1 ) 
-							                                                Call XSalTblSetCellBackColor( NMKP, nCol1 )
-							                                                Call XSalTblSetCellBackColor( KOLK, nCol1 )
-							                                                Call XSalTblSetCellBackColor( NLSP, nCol1 )
+						                                                 Call OPEN_1()
+					                                                 On SAM_FetchRowDone
+						                                                 If NLSP != STRING_Null
+							                                                 Call XSalTblSetCellBackColor( RNKP, nCol1 ) 
+							                                                 Call XSalTblSetCellBackColor( NMKP, nCol1 )
+							                                                 Call XSalTblSetCellBackColor( KOLK, nCol1 )
+							                                                 Call XSalTblSetCellBackColor( NLSP, nCol1 )
 						!
-			                                                Child Table: tbl2 ! Дочерние предприятия
-				                                                Contents 
+			                                                 Child Table: tbl2 ! Дочерние предприятия
+				                                                 Contents 
 					!
-					                                                Column: RNK
-						                                                List Values 
-						                                                Message Actions 
-					                                                Column: NMK
-						                                                List Values 
-						                                                Message Actions 
+					                                                 Column: RNK
+						                                                 List Values 
+						                                                 Message Actions 
+					                                                 Column: NMK
+						                                                 List Values 
+						                                                 Message Actions 
 					!
-					                                                Column: KV
-						                                                List Values 
-						                                                Message Actions 
-					                                                Column: NLS
-						                                                List Values 
-						                                                Message Actions 
-							                                                On SAM_SetFocus
-								                                                Set NLS2 = NLS
-							                                                On SAM_KillFocus
-								                                                Set NLS = NLS2
-					                                                Column: LIM
-						                                                List Values 
-						                                                Message Actions 
-					                                                Column: OP
-						                                                List Values 
-						                                                Message Actions 
+					                                                 Column: KV
+						                                                 List Values 
+						                                                 Message Actions 
+					                                                 Column: NLS
+						                                                 List Values 
+						                                                 Message Actions 
+							                                                 On SAM_SetFocus
+								                                                 Set NLS2 = NLS
+							                                                 On SAM_KillFocus
+								                                                 Set NLS = NLS2
+					                                                 Column: LIM
+						                                                 List Values 
+						                                                 Message Actions 
+					                                                 Column: OP
+						                                                 List Values 
+						                                                 Message Actions 
 							! On SAM_AnyEdit
-								                                                                                                                      Call OP_2()
-					                                                Column: DOS2
-						                                                List Values 
-						                                                Message Actions 
-					                                                Column: KOS2
-						                                                List Values 
-						                                                Message Actions 
-					                                                Column: OSTC2
-						                                                List Values 
-						                                                Message Actions 
-					                                                Column: OSTB2
-						                                                List Values 
-						                                                Message Actions 
-					                                                Column: IR_A
-						                                                List Values 
-						                                                Message Actions 
-					                                                Column: IR_P
-						                                                List Values 
-						                                                Message Actions 
-					                                                Column: NP_A
-						                                                List Values 
-						                                                Message Actions 
-					                                                Column: NP_P
-						                                                List Values 
-						                                                Message Actions 
-					                                                Column: ACCC
-						                                                List Values 
-						                                                Message Actions 
-					                                                Column: ACC
-						                                                List Values 
-						                                                Message Actions 
-				                                                Functions 
-					                                                Function: NAS_2
-						                                                Description: 
-						                                                Returns 
-						                                                Parameters 
-						                                                Static Variables 
-						                                                Local variables 
-						                                                Actions 
-							                                                Call SalTblSetTableFlags ( tbl2, TBL_Flag_SingleSelection, TRUE )
-							                                                Set sSql2=
+								                                                                                                                       Call OP_2()
+					                                                 Column: DOS2
+						                                                 List Values 
+						                                                 Message Actions 
+					                                                 Column: KOS2
+						                                                 List Values 
+						                                                 Message Actions 
+					                                                 Column: OSTC2
+						                                                 List Values 
+						                                                 Message Actions 
+					                                                 Column: OSTB2
+						                                                 List Values 
+						                                                 Message Actions 
+					                                                 Column: IR_A
+						                                                 List Values 
+						                                                 Message Actions 
+					                                                 Column: IR_P
+						                                                 List Values 
+						                                                 Message Actions 
+					                                                 Column: NP_A
+						                                                 List Values 
+						                                                 Message Actions 
+					                                                 Column: NP_P
+						                                                 List Values 
+						                                                 Message Actions 
+					                                                 Column: ACCC
+						                                                 List Values 
+						                                                 Message Actions 
+					                                                 Column: ACC
+						                                                 List Values 
+						                                                 Message Actions 
+				                                                 Functions 
+					                                                 Function: NAS_2
+						                                                 Description: 
+						                                                 Returns 
+						                                                 Parameters 
+						                                                 Static Variables 
+						                                                 Local variables 
+						                                                 Actions 
+							                                                 Call SalTblSetTableFlags ( tbl2, TBL_Flag_SingleSelection, TRUE )
+							                                                 Set sSql2=
 									"SELECT c.RNK, c.NMK, a.acc, a.accc, a.kv, a.nls, a.lim/100, a.ostC/100, a.ostB/100,
 									  decode(a.dapp, BANKDATE_G, a.dos,0)/100, decode(a.dapp, BANKDATE_G, a.kos,0)/100,
 									  acrn.FPROCN(a.acc,0,:bDat), acrn.FPROCN(a.acc,1,:bDat)
@@ -21014,138 +21013,138 @@ Application Description: ! Факторинг + Фючерс
 									     and a.nls like '2600%'||u.rnk and a.dazs is null 
 									     and a.acc not in (select acc from ACC_OVER )   
 									 ORDER BY c.rnk"
-							                                                Set tbl.KOL  = 0
-							                                                Set tbl.DOS  = 0
-							                                                Set tbl.KOS  = 0
-							                                                Set tbl.OSTC = 0
-							                                                Set tbl.OSTB = 0
-							                                                Call SalTblPopulate( tbl2, hSql(), sSql2 , TBL_FillAll )
-							                                                Call SalTblSetLockedColumns( tbl2, 2 )
-					                                                Function: OP_2
-						                                                Description: 
-						                                                Returns 
-						                                                Parameters 
-						                                                Static Variables 
-						                                                Local variables 
-							                                                String: sTmp
-							                                                String: sSql
-							                                                Number: nLim
-						                                                Actions 
-							                                                Set nRow = TBL_MinRow
-							                                                While SalTblFindNextRow( tbl2, nRow, ROW_Edited, 0)
-								                                                Call SalTblSetContext( tbl2, nRow)
-								                                                Set nLim = LIM * 100
-								                                                If OP = 1 and ( ACCC = NUMBER_Null  or ACCC = tbl.ACC8)
-									                                                Set sSql ="Update accounts set lim=:nLim, accc=:tbl.ACC8  where acc=:ACC"
-								                                                Else If OP = 0 and ACCC = tbl.ACC8 
-									                                                Set sSql ="Update accounts set lim=0, accc=null where acc=:ACC"
-								                                                Set sTmp = IifS (OP = 1, "Включить", "Исключить") ||" счет "||Str(KV)||'/'||NLS 
-								                                                If SqlPrepareAndExecute( hSql(), sSql )
-									                                                Call SqlCommitEx( hSql(),sTmp  )
-									                                                Set ACCC = IifN ( OP = 1, tbl.ACC8, NUMBER_Null)
-								                                                Else 
-									                                                Call SqlRollback( hSql() )
-							                                                Call NAS_2()
-					                                                Function: PR_2
-						                                                Description: 
-						                                                Returns 
-						                                                Parameters 
-						                                                Static Variables 
-						                                                Local variables 
-							                                                Number: nTmp_0
-							                                                Number: nTmp_1
-						                                                Actions 
-							                                                Set PR_A = 0
-							                                                Set PR_P = 0
-							                                                Set nRow = TBL_MinRow
-							                                                While SalTblFindNextRow( tbl2, nRow,  0, 0 )
-								                                                Call SalTblSetContext( tbl2, nRow)
-								                                                If (cb2 and OP = 1 and ACCC = tbl.ACC8)  or (not cb2)
-									                                                Set NP_A = - p_intN( ACC, 0, DAT1, DAT2, NUMBER_Null, 0)
-									                                                Set NP_P = p_intN( ACC, 1, DAT1, DAT2, NUMBER_Null, 0)
-									                                                If KV = n980
-										                                                Set nTmp_0 = NP_A
-										                                                Set nTmp_1 = NP_P
-									                                                Else 
-										                                                If SqlPrepareAndExecute( hSql(),
+							                                                 Set tbl.KOL  = 0
+							                                                 Set tbl.DOS  = 0
+							                                                 Set tbl.KOS  = 0
+							                                                 Set tbl.OSTC = 0
+							                                                 Set tbl.OSTB = 0
+							                                                 Call SalTblPopulate( tbl2, hSql(), sSql2 , TBL_FillAll )
+							                                                 Call SalTblSetLockedColumns( tbl2, 2 )
+					                                                 Function: OP_2
+						                                                 Description: 
+						                                                 Returns 
+						                                                 Parameters 
+						                                                 Static Variables 
+						                                                 Local variables 
+							                                                 String: sTmp
+							                                                 String: sSql
+							                                                 Number: nLim
+						                                                 Actions 
+							                                                 Set nRow = TBL_MinRow
+							                                                 While SalTblFindNextRow( tbl2, nRow, ROW_Edited, 0)
+								                                                 Call SalTblSetContext( tbl2, nRow)
+								                                                 Set nLim = LIM * 100
+								                                                 If OP = 1 and ( ACCC = NUMBER_Null  or ACCC = tbl.ACC8)
+									                                                 Set sSql ="Update accounts set lim=:nLim, accc=:tbl.ACC8  where acc=:ACC"
+								                                                 Else If OP = 0 and ACCC = tbl.ACC8 
+									                                                 Set sSql ="Update accounts set lim=0, accc=null where acc=:ACC"
+								                                                 Set sTmp = IifS (OP = 1, "Включить", "Исключить") ||" счет "||Str(KV)||'/'||NLS 
+								                                                 If SqlPrepareAndExecute( hSql(), sSql )
+									                                                 Call SqlCommitEx( hSql(),sTmp  )
+									                                                 Set ACCC = IifN ( OP = 1, tbl.ACC8, NUMBER_Null)
+								                                                 Else 
+									                                                 Call SqlRollback( hSql() )
+							                                                 Call NAS_2()
+					                                                 Function: PR_2
+						                                                 Description: 
+						                                                 Returns 
+						                                                 Parameters 
+						                                                 Static Variables 
+						                                                 Local variables 
+							                                                 Number: nTmp_0
+							                                                 Number: nTmp_1
+						                                                 Actions 
+							                                                 Set PR_A = 0
+							                                                 Set PR_P = 0
+							                                                 Set nRow = TBL_MinRow
+							                                                 While SalTblFindNextRow( tbl2, nRow,  0, 0 )
+								                                                 Call SalTblSetContext( tbl2, nRow)
+								                                                 If (cb2 and OP = 1 and ACCC = tbl.ACC8)  or (not cb2)
+									                                                 Set NP_A = - p_intN( ACC, 0, DAT1, DAT2, NUMBER_Null, 0)
+									                                                 Set NP_P = p_intN( ACC, 1, DAT1, DAT2, NUMBER_Null, 0)
+									                                                 If KV = n980
+										                                                 Set nTmp_0 = NP_A
+										                                                 Set nTmp_1 = NP_P
+									                                                 Else 
+										                                                 If SqlPrepareAndExecute( hSql(),
 												"select gl.p_Icurval(:KV,:NP_A,:bDat), gl.p_Icurval(:KV,:NP_P,:bDat) 
 												 into :nTmp_0, :nTmp_1 from dual" )
 												and SqlFetchNext(hSql(), nFetchRes)
-									                                                If nTmp_0 != 0
-										                                                Set PR_A = PR_A + nTmp_0 /100
-										                                                Set NP_A = NP_A /100
-										                                                Call SalTblSetCellTextColor(NP_A, COLOR_Red,FALSE )
-									                                                Else 
-										                                                Set NP_A = NUMBER_Null
-									                                                If nTmp_1 != 0
-										                                                Set PR_P = PR_P + nTmp_1 /100
-										                                                Set NP_P = NP_P /100
-										                                                Call SalTblSetCellTextColor(NP_P, COLOR_DarkBlue,FALSE )
-									                                                Else 
-										                                                Set NP_P = NUMBER_Null
+									                                                 If nTmp_0 != 0
+										                                                 Set PR_A = PR_A + nTmp_0 /100
+										                                                 Set NP_A = NP_A /100
+										                                                 Call SalTblSetCellTextColor(NP_A, COLOR_Red,FALSE )
+									                                                 Else 
+										                                                 Set NP_A = NUMBER_Null
+									                                                 If nTmp_1 != 0
+										                                                 Set PR_P = PR_P + nTmp_1 /100
+										                                                 Set NP_P = NP_P /100
+										                                                 Call SalTblSetCellTextColor(NP_P, COLOR_DarkBlue,FALSE )
+									                                                 Else 
+										                                                 Set NP_P = NUMBER_Null
 									!
-				                                                Window Variables 
-					                                                String: NLS2
+				                                                 Window Variables 
+					                                                 String: NLS2
 					! String: sProcText
-				                                                Message Actions 
-					                                                On SAM_FetchRowDone
-						                                                If tbl.ACC8 != NUMBER_Null and ACCC !=NUMBER_Null and ACCC = tbl.ACC8  
-							                                                Call XSalTblSetCellBackColor( KV,  nCol2 )
-							                                                Call XSalTblSetCellBackColor( NLS, nCol2 ) 
-							                                                Set tbl.KOL = tbl.KOL + 1
-							                                                Set tbl.DOS = tbl.DOS + DOS2
-							                                                Set tbl.DOS = tbl.DOS + KOS2
-							                                                Set tbl.OSTC = tbl.OSTC + OSTC2
-							                                                Set tbl.OSTB = tbl.OSTB + OSTB2
+				                                                 Message Actions 
+					                                                 On SAM_FetchRowDone
+						                                                 If tbl.ACC8 != NUMBER_Null and ACCC !=NUMBER_Null and ACCC = tbl.ACC8  
+							                                                 Call XSalTblSetCellBackColor( KV,  nCol2 )
+							                                                 Call XSalTblSetCellBackColor( NLS, nCol2 ) 
+							                                                 Set tbl.KOL = tbl.KOL + 1
+							                                                 Set tbl.DOS = tbl.DOS + DOS2
+							                                                 Set tbl.DOS = tbl.DOS + KOS2
+							                                                 Set tbl.OSTC = tbl.OSTC + OSTC2
+							                                                 Set tbl.OSTB = tbl.OSTB + OSTB2
 							! Call XSalTblSetCellBackColor( DOS, nCol2 )
 							! Call XSalTblSetCellBackColor( KOS, nCol2 )
 							! Call XSalTblSetCellBackColor( OSTC,nCol2 ) 
 							! Call XSalTblSetCellBackColor( OSTB,nCol2 )
-							                                                Set OP= 1
-						                                                Else 
-							                                                Set OP= 0
-					                                                On SAM_DoubleClick
-						                                                Call SetProcParN(tbl2.ACC, tbl2.KV, "", "" )
-		                                                Functions 
-		                                                Window Parameters 
-			                                                Number: nPar1
-			                                                Number: nPar2
-			                                                String: strPar01
-			                                                String: strPar02
-		                                                Window Variables 
-			                                                Number: nId
-			                                                Number: nCol1
-			                                                Number: nCol2
-			                                                Number: n980
-			                                                Date/Time: bDat
+							                                                 Set OP= 1
+						                                                 Else 
+							                                                 Set OP= 0
+					                                                 On SAM_DoubleClick
+						                                                 Call SetProcParN(tbl2.ACC, tbl2.KV, "", "" )
+		                                                 Functions 
+		                                                 Window Parameters 
+			                                                 Number: nPar1
+			                                                 Number: nPar2
+			                                                 String: strPar01
+			                                                 String: strPar02
+		                                                 Window Variables 
+			                                                 Number: nId
+			                                                 Number: nCol1
+			                                                 Number: nCol2
+			                                                 Number: n980
+			                                                 Date/Time: bDat
 			! Number: nMax
-			                                                Number: nRow
-			                                                String: NLS_B1
-			                                                String: sSql1
-			                                                String: sSql2 
-			                                                String: sBankMfo 
-			                                                String: sFilter
-			                                                : cF
-		                                                Message Actions 
-			                                                On SAM_Create
+			                                                 Number: nRow
+			                                                 String: NLS_B1
+			                                                 String: sSql1
+			                                                 String: sSql2 
+			                                                 String: sBankMfo 
+			                                                 String: sFilter
+			                                                 : cF
+		                                                 Message Actions 
+			                                                 On SAM_Create
 				!
-				                                                Set XL1.nTabInstance1 = 1
-				                                                Set XL1.nTabInstance2 = 1
-				                                                Set XL1.strFilterTblName = 'CUSTOMER'
+				                                                 Set XL1.nTabInstance1 = 1
+				                                                 Set XL1.nTabInstance2 = 1
+				                                                 Set XL1.strFilterTblName = 'CUSTOMER'
 				! Set XL1.fFilterAtStart = FALSE
-				                                                Set n980 = GetBaseVal()
-				                                                Set bDat = GetBankDate()
-				                                                Set sBankMfo = GetBankMfo()
-				                                                Set nId = GetUserId()
-				                                                Set DAT2 = bDat
-				                                                Set DAT1 = AddMonths( DAT2, -1 )
+				                                                 Set n980 = GetBaseVal()
+				                                                 Set bDat = GetBankDate()
+				                                                 Set sBankMfo = GetBankMfo()
+				                                                 Set nId = GetUserId()
+				                                                 Set DAT2 = bDat
+				                                                 Set DAT1 = AddMonths( DAT2, -1 )
 				! Set nMax = 100000000000
-				                                                Set nCol1= SalColorFromRGB( 220,255,255 )
-				                                                Set nCol2= SalColorFromRGB( 230,255,230 )
-				                                                Call PrepareWindowEx( hWndForm )
-				                                                Call SetWindowFullSize( hWndForm )
-				                                                Call SalSendClassMessage( SAM_Create, 0, 0 )
-				                                                Call tbl.NAS_1( )
+				                                                 Set nCol1= SalColorFromRGB( 220,255,255 )
+				                                                 Set nCol2= SalColorFromRGB( 230,255,230 )
+				                                                 Call PrepareWindowEx( hWndForm )
+				                                                 Call SetWindowFullSize( hWndForm )
+				                                                 Call SalSendClassMessage( SAM_Create, 0, 0 )
+				                                                 Call tbl.NAS_1( )
 	Form Window: FA7
 .data CLASSPROPS
 0000: 56543A53706C6974 746572002B000100 00000000000090B0 A800C8D8D8005880
@@ -21527,20 +21526,20 @@ Application Description: ! Факторинг + Фючерс
 					Text Color: Default
 					Background Color: Light Green
 .end
-					                                                                   Message Actions 
-						                                                                   On SAM_Create
-							                                                                   Set strTip = 'Погасить все привязанные платежи '
-							                                                                   Call SalDisableWindow( pb_SG )
-						                                                                   On SAM_Click
-							                                                                   Call SalWaitCursor(TRUE)
-							                                                                   If SqlPLSQLCommand( hSql(), "FAKTOR.ASG_K(0)" )
-								                                                                   Call SqlCommit( hSql())
-								                                                                   Call SalWaitCursor(FALSE)
-								                                                                   Call MessageNoWait('Погашены связанные инвойсы','Сообщение',3,0)
-							                                                                   Else 
-								                                                                   Call SqlRollback(hSql())
-								                                                                   Call SalWaitCursor(FALSE)
-								                                                                   Call MessageNoWait('Неуспешный Разбор', 'Ошибка', 0, 1)
+					                                                                    Message Actions 
+						                                                                    On SAM_Create
+							                                                                    Set strTip = 'Погасить все привязанные платежи '
+							                                                                    Call SalDisableWindow( pb_SG )
+						                                                                    On SAM_Click
+							                                                                    Call SalWaitCursor(TRUE)
+							                                                                    If SqlPLSQLCommand( hSql(), "FAKTOR.ASG_K(0)" )
+								                                                                    Call SqlCommit( hSql())
+								                                                                    Call SalWaitCursor(FALSE)
+								                                                                    Call MessageNoWait('Погашены связанные инвойсы','Сообщение',3,0)
+							                                                                    Else 
+								                                                                    Call SqlRollback(hSql())
+								                                                                    Call SalWaitCursor(FALSE)
+								                                                                    Call MessageNoWait('Неуспешный Разбор', 'Ошибка', 0, 1)
 				! ctb_pbGetValue: pb_REGR
 .winattr class Pushbutton:
 					Class Child Ref Key: 0
@@ -21567,20 +21566,20 @@ Application Description: ! Факторинг + Фючерс
 					Text Color: Default
 					Background Color: Light Green
 .end
-					                                                                   Message Actions 
-						                                                                   On SAM_Create
-							                                                                   Set strTip = 'Выставить регресы по просроченным инвойсам'
-							                                                                   Call SalDisableWindow( pb_REGR )
-						                                                                   On SAM_Click
-							                                                                   Call SalWaitCursor(TRUE)
-							                                                                   If SqlPLSQLCommand( hSql(), "FAKTOR.REGR_K(0)" )
-								                                                                   Call SqlCommit( hSql())
-								                                                                   Call SalWaitCursor(FALSE)
-								                                                                   Call MessageNoWait('Регрессы выставлены','Сообщение',3,0)
-							                                                                   Else 
-								                                                                   Call SqlRollback(hSql())
-								                                                                   Call SalWaitCursor(FALSE)
-								                                                                   Call MessageNoWait('Неуспешное выставление регресса', 'Ошибка', 0, 1)
+					                                                                    Message Actions 
+						                                                                    On SAM_Create
+							                                                                    Set strTip = 'Выставить регресы по просроченным инвойсам'
+							                                                                    Call SalDisableWindow( pb_REGR )
+						                                                                    On SAM_Click
+							                                                                    Call SalWaitCursor(TRUE)
+							                                                                    If SqlPLSQLCommand( hSql(), "FAKTOR.REGR_K(0)" )
+								                                                                    Call SqlCommit( hSql())
+								                                                                    Call SalWaitCursor(FALSE)
+								                                                                    Call MessageNoWait('Регрессы выставлены','Сообщение',3,0)
+							                                                                    Else 
+								                                                                    Call SqlRollback(hSql())
+								                                                                    Call SalWaitCursor(FALSE)
+								                                                                    Call MessageNoWait('Неуспешное выставление регресса', 'Ошибка', 0, 1)
 				!
 				Pushbutton: pb_F1
 					Class Child Ref Key: 0
@@ -22528,9 +22527,9 @@ Application Description: ! Факторинг + Фючерс
 						Call NAS_2( 1 )
 					On SAM_FetchRowDone
 						! If NMK_D = STRING_Null
-							                                                                                         Call XSalTblSetCellBackColor( ID_A, SalColorFromRGB(255,210,250 ) )
-							                                                                                         Call XSalTblSetCellBackColor( NMK_D, SalColorFromRGB(255,210,250 ) )
-							                                                                                         Call XSalTblSetCellBackColor( NAM_A, SalColorFromRGB(255,210,250 ) )
+							                                                                                          Call XSalTblSetCellBackColor( ID_A, SalColorFromRGB(255,210,250 ) )
+							                                                                                          Call XSalTblSetCellBackColor( NMK_D, SalColorFromRGB(255,210,250 ) )
+							                                                                                          Call XSalTblSetCellBackColor( NAM_A, SalColorFromRGB(255,210,250 ) )
 						Call XSalTblSetCellBackColor( S, SalColorFromRGB( 230,255,230 ) )
 						!
 			Child Table: tbl2 ! Инвойсы, пожходящие под поступления
@@ -22775,8 +22774,8 @@ Application Description: ! Факторинг + Фючерс
 											Принять к ОПЛАТЕ ?' , 
 											'Внимание! ',
 											MB_IconQuestion | MB_YesNo) != IDYES
-										                                                                Set tbl2.SR = SR2
-										                                                                Return VALIDATE_Cancel
+										                                                                 Set tbl2.SR = SR2
+										                                                                 Return VALIDATE_Cancel
 									Call SalMessageBox
 											('Введенная сумма к ОПЛАТЕ ('|| SalNumberToStrX(tbl2.SR,2)||' )
 											БОЛЬШЕ непогашенной суммы НОМИНАЛА ('||SalNumberToStrX(tbl2.NNOM ,2) ||') ! ',
@@ -23198,11 +23197,11 @@ Application Description: ! Факторинг + Фючерс
 						! Call XSalTblSetCellBackColor( SR, SalColorFromRGB( 230,255,230 ) )
 						Call XSalTblSetCellBackColor( SR, COLOR_LightGreen )
 						! If tbl.NI = tbl2.NI 
-							                                                                                                Set tbl2.SR =tbl.S
-							                                                                                                Call SalTblSetRowFlags( tbl2, SalTblQueryContext(tbl2), ROW_Edited,  TRUE )
+							                                                                                                 Set tbl2.SR =tbl.S
+							                                                                                                 Call SalTblSetRowFlags( tbl2, SalTblQueryContext(tbl2), ROW_Edited,  TRUE )
 						! If tbl.RNK_D>0
-							                                                                                                                               Set tbl2.OKPO_D = tbl.ID_A
-							                                                                                                                               Set tbl2.NMK_D = tbl.NMK_D
+							                                                                                                                                Set tbl2.OKPO_D = tbl.ID_A
+							                                                                                                                                Set tbl2.NMK_D = tbl.NMK_D
 						If tbl2.OKPO_D != tbl.ID_A
 							Call XSalTblSetCellBackColor( OKPO_D, SalColorFromRGB(255,210,250 ) )
 							Call XSalTblSetCellBackColor( NMK_D, SalColorFromRGB(255,210,250 ) )
@@ -23226,8 +23225,8 @@ Application Description: ! Факторинг + Фючерс
 							   where ref1=:tbl.REF  AND ref2 IS NULL 
 							   FOR UPDATE OF ref2 NOWAIT ") 
 							and NOT SqlFetchNext( hSql(), nFetchRes) 
-						                                                         Call SqlRollback(  hSql() )
-						                                                         Return FALSE
+						                                                          Call SqlRollback(  hSql() )
+						                                                          Return FALSE
 					!
 					Call SalTblSetTableFlags ( tbl2, TBL_Flag_SingleSelection, TRUE )
 					Set tbl.KOL=0
@@ -23264,9 +23263,9 @@ Application Description: ! Факторинг + Фючерс
 								MB_IconStop)
 						Return FALSE
 					! If SalTblColumnSum( tbl2, nT2 , ROW_Edited, 0 ) > tbl.S
-						                                                   Call SalMessageBox("ПРЕВЫШЕНИЕ частных сумм  СВОБОДНОЙ суммы документа ! ",
+						                                                    Call SalMessageBox("ПРЕВЫШЕНИЕ частных сумм  СВОБОДНОЙ суммы документа ! ",
 								"Ошибка ! ", MB_IconStop)
-						                                                   Return FALSE
+						                                                    Return FALSE
 					!
 					Set nRow = TBL_MinRow
 					Set nS = 0 
@@ -23280,13 +23279,13 @@ Application Description: ! Факторинг + Фючерс
 								Return FALSE
 							Set nKolI = nKolI + 1 
 							! If SqlPLSQLCommand( hSql(),"FAKTOR.REF_NI( tbl.REF, tbl2.NI, nSR2, tbl.ACC )" )
-								                                                                                         Set nS = nS + nSR2
+								                                                                                          Set nS = nS + nSR2
 								!
-								                                                                                         If NOT ASG_K ( )
-									                                                                                         Return FALSE
-								                                                                                         Set nKolI = nKolI + 1 
+								                                                                                          If NOT ASG_K ( )
+									                                                                                          Return FALSE
+								                                                                                          Set nKolI = nKolI + 1 
 							! Else
-								                                                                                         Return FALSE
+								                                                                                          Return FALSE
 					If nKolI > 0
 						Call SalTblDeleteRow( tbl, SalTblQueryContext(tbl), TBL_Adjust )
 						Call SalTblReset( tbl2 )
@@ -25727,10 +25726,10 @@ Application Description: ! Факторинг + Фючерс
 										and SqlFetchNext( hSql(), nFetchRes )
 										and SqlPrepareAndExecute( hSql(), "SELECT nls INTO :T0.NLS26 FROM accounts WHERE acc=:T0.ACC_26 " )
 										and SqlFetchNext( hSql(), nFetchRes )
-									                                                                                                                                                                                                             Set DEB_26 = 'Y'
-									                                                                                                                                                                                                             Set T0.DAT1 = T0.bDat
-									                                                                                                                                                                                                             Set T0.DAT4 = T0.DATP_
-									                                                                                                                                                                                                             If SqlPrepareAndExecute( hSql(),
+									                                                                                                                                                                                                              Set DEB_26 = 'Y'
+									                                                                                                                                                                                                              Set T0.DAT1 = T0.bDat
+									                                                                                                                                                                                                              Set T0.DAT4 = T0.DATP_
+									                                                                                                                                                                                                              If SqlPrepareAndExecute( hSql(),
 											  "SELECT min(a.nls) INTO :T0.NLS36 FROM accounts a, cust_acc u
 											   WHERE u.rnk=:T0.RNK and u.acc=a.acc(+) and
 											         a.kv=:T0.n980 and a.nbs=3600 and a.dazs is null " )
@@ -25784,10 +25783,10 @@ Application Description: ! Факторинг + Фючерс
 										and SqlFetchNext( hSql(), nFetchRes )
 										and SqlPrepareAndExecute( hSql(), "SELECT nls INTO :T0.NLS26 FROM accounts WHERE acc=:T0.ACC_26 " )
 										and SqlFetchNext( hSql(), nFetchRes )
-									                                                                                                                                                                                                             Set DEB_26 = 'Y'
-									                                                                                                                                                                                                             Set T0.DAT1 = T0.bDat
-									                                                                                                                                                                                                             Set T0.DAT4 = T0.DATP_
-									                                                                                                                                                                                                             If SqlPrepareAndExecute( hSql(),
+									                                                                                                                                                                                                              Set DEB_26 = 'Y'
+									                                                                                                                                                                                                              Set T0.DAT1 = T0.bDat
+									                                                                                                                                                                                                              Set T0.DAT4 = T0.DATP_
+									                                                                                                                                                                                                              If SqlPrepareAndExecute( hSql(),
 											  "SELECT min(a.nls) INTO :T0.NLS36 FROM accounts a, cust_acc u
 											   WHERE u.rnk=:T0.RNK and u.acc=a.acc(+) and
 											         a.kv=:T0.n980 and a.nbs=3600 and a.dazs is null " )
@@ -26132,11 +26131,11 @@ Application Description: ! Факторинг + Фючерс
 									and SqlPrepareAndExecute( hSql(),"UPDATE FK_deal set NLS_FCH =:T0.NLS_FCH where nd=:T0.ND")
 								Call SqlCommit(hSql())
 							! If Op_Reg(99, 0, 0, nGr, nRet, T0.RNK, Str(T0.NLS_FCH), T0.n980, sNms, 'FCH', nIsp, nAcc)
-								                                                                                                                                                                                                     Call SqlCommit(hSql())
-								                                                                                                                                                                                                     Call Debug('nAcc='||Str(nAcc) )
+								                                                                                                                                                                                                      Call SqlCommit(hSql())
+								                                                                                                                                                                                                      Call Debug('nAcc='||Str(nAcc) )
 							! If SqlPrepareAndExecute( hSql(),"UPDATE FK_deal set NLS_FCH =:T0.NLS_FCH where nd=:T0.ND")
-								                                                                                                                                                                                                     Call SqlCommit(hSql())
-								                                                                                                                                                                                                     Call Debug('T0.ND='||Str(T0.ND) )
+								                                                                                                                                                                                                      Call SqlCommit(hSql())
+								                                                                                                                                                                                                      Call Debug('T0.ND='||Str(T0.ND) )
 							Else
 								Call SqlRollback(hSql())
 								Call SalMessageBox('Невозможно откыть счет ' || Str(T0.NLS_FCH), 'Ошибка', MB_IconExclamation)
@@ -28665,8 +28664,8 @@ Application Description: ! Факторинг + Фючерс
 						Uncheck Value:
 						Ignore Case? Yes
 .end
-				                                                                                                     List Values 
-				                                                                                                     Message Actions 
+				                                                                                                      List Values 
+				                                                                                                      Message Actions 
 			!
 			Column: REF_DOC
 				Class Child Ref Key: 0
@@ -29520,7 +29519,7 @@ Application Description: ! Факторинг + Фючерс
 				List Values
 				Message Actions
 					! On SAM_AnyEdit
-						                                                                               Set LIM = - OSTX * 100 
+						                                                                                Set LIM = - OSTX * 100 
 					On SAM_Validate
 						Set LIM = - OSTX * 100 
 					On SAM_KillFocus
@@ -31038,12 +31037,12 @@ Application Description: ! Факторинг + Фючерс
 					Text Color: Default
 					Background Color: Sky
 .end
-					                                                Message Actions 
-						                                                On SAM_Create
-							                                                Set strTip = 'Установить суммарный остаток на консолидированном счете'
-						                                                On SAM_Click
-							                                                If SalTblAnyRows( tbl, ROW_Selected, 0 ) and tbl.ACC8 != NUMBER_Null 
-								                                                Call tbl.OST_1()
+					                                                 Message Actions 
+						                                                 On SAM_Create
+							                                                 Set strTip = 'Установить суммарный остаток на консолидированном счете'
+						                                                 On SAM_Click
+							                                                 If SalTblAnyRows( tbl, ROW_Selected, 0 ) and tbl.ACC8 != NUMBER_Null 
+								                                                 Call tbl.OST_1()
 				Data Field: DAT1
 					Class Child Ref Key: 0
 					Class ChildKey: 0
@@ -31913,15 +31912,15 @@ Application Description: ! Факторинг + Фючерс
 							Else
 								Call SqlRollback( hSql() )
 					! Function: OPEN_1
-						                                                Description: 
-						                                                Returns 
-						                                                Parameters 
-						                                                Static Variables 
-						                                                Local variables 
-						                                                Actions 
-							                                                Call SalEnableWindow( pbUpdate )
-							                                                Call SalShowWindow( tbl2.OP )
-							                                                Call SalShowWindow( tbl2.LIM)
+						                                                 Description: 
+						                                                 Returns 
+						                                                 Parameters 
+						                                                 Static Variables 
+						                                                 Local variables 
+						                                                 Actions 
+							                                                 Call SalEnableWindow( pbUpdate )
+							                                                 Call SalShowWindow( tbl2.OP )
+							                                                 Call SalShowWindow( tbl2.LIM)
 					Function: F_New
 						Description:
 						Returns
@@ -31962,11 +31961,11 @@ Application Description: ! Факторинг + Фючерс
 						!
 						! Call OPEN_1()
 					! On SAM_FetchRowDone
-						                                                If NLSP != STRING_Null
-							                                                Call XSalTblSetCellBackColor( RNKP, nCol1 ) 
-							                                                Call XSalTblSetCellBackColor( NMKP, nCol1 )
-							                                                Call XSalTblSetCellBackColor( KOLK, nCol1 )
-							                                                Call XSalTblSetCellBackColor( NLSP, nCol1 )
+						                                                 If NLSP != STRING_Null
+							                                                 Call XSalTblSetCellBackColor( RNKP, nCol1 ) 
+							                                                 Call XSalTblSetCellBackColor( NMKP, nCol1 )
+							                                                 Call XSalTblSetCellBackColor( KOLK, nCol1 )
+							                                                 Call XSalTblSetCellBackColor( NLSP, nCol1 )
 						!
 			Child Table: tbl2 ! Дочерние предприятия
 				Class Child Ref Key: 27
@@ -32190,7 +32189,7 @@ Application Description: ! Факторинг + Фючерс
 						List Values
 						Message Actions
 							! On SAM_AnyEdit
-								                                                                                                                      Call OP_2()
+								                                                                                                                       Call OP_2()
 					Column: DOS2
 						Class Child Ref Key: 0
 						Class ChildKey: 0
@@ -34011,7 +34010,7 @@ Application Description: ! Факторинг + Фючерс
 					Text Color: Default
 					Background Color: Default
 .end
-					                     Message Actions 
+					                      Message Actions 
 				Check Box: cb_Arc
 					Class Child Ref Key: 0
 					Class ChildKey: 0

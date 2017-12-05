@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure NBUR_P_F39 ***
 
-  CREATE OR REPLACE PROCEDURE BARS.NBUR_P_F39 (p_kod_filii        varchar2,
+CREATE OR REPLACE PROCEDURE BARS.NBUR_P_F39 (p_kod_filii        varchar2,
                                              p_report_date      date,
                                              p_form_id          number,
                                              p_scheme           varchar2 default 'C',
@@ -18,9 +18,9 @@ is
 % DESCRIPTION : Процедура формирования #39 для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.16.004  06.04.2017
+% VERSION     :  v.16.007  28.05.2017
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_          char(30)  := 'v.16.004  06.04.2017';
+  ver_          char(30)  := 'v.16.007  28.05.2017';
 /*
    Структура показника  L DDD VVV
 
@@ -73,7 +73,7 @@ BEGIN
                         then trim(to_char(d.value, l_fmt))
                      else to_char(d.value)
                 end) field_value,
-               NULL description,
+               comm description,
                d.acc_id,
                d.acc_num,
                d.kv,
@@ -87,21 +87,29 @@ BEGIN
                       kv, type_op ,
                       bal s1,
                       bal * round(kurs * div, 4) / dig s3,
-                      kurs * div s4
+                      kurs * div s4,
+                      comm || trim(to_char(kurs, l_fmt)) comm
                 from (
                     select s.report_date, s.kf, s.ref, s.tt, s.cust_id, s.acc_id, s.acc_num,
                         s.cust_id2, s.acc_id2, s.acc_num2, s.kv, s.bal, s.bal_uah,
                         (case when s.kurs is not null
                               then (case when is_number(s.kurs) = 1 then to_number(s.kurs) else null end)
-                              else (case when nvl(s.bal, 0) <> 0 and nvl(s.bal_uah_cent, 0) <> 0
+                              else (case when s.kf = '300465' and nvl(s.bal, 0) <> 0 and nvl(s.bal_uah_cent, 0) <> 0
                                          then s.bal_uah_cent / s.bal
-                                         else null
+                                         else f_ret_rate(s.kv, s.report_date, decode(s.dk, 0, 'B', 'S'))
                                     end)
                         end) kurs,
                         decode(s.dk, 0, '210', '220') type_op,
                         F_NBUR_Ret_Dig(s.kv, s.report_date) dig,
                         F_NBUR_Ret_DiV(s.kv, s.report_date) div,
-                        a.branch, a.nbuc
+                        a.branch, a.nbuc,
+                        (case when s.kurs is not null
+                              then (case when is_number(s.kurs) = 1 then ' курс введений в док-тi ' else null end)
+                              else (case when s.kf = '300465' and nvl(s.bal, 0) <> 0 and nvl(s.bal_uah_cent, 0) <> 0
+                                         then ' курс розрахований ' 
+                                         else ' курс вибраний iз таблицi курсiв '
+                                    end)
+                        end) comm                        
                     from
                        (select t.report_date, t.kf, t.ref, t.tt,
                                (case when t.acc_num_db like '100%' then t.cust_id_db else t.cust_id_cr end) cust_id,
@@ -129,8 +137,8 @@ BEGIN
                             t.kf = p_kod_filii and
                             t.tt not in ('BAK') and
                             t.kv not in (959,961,962,964) and
-                            (t.acc_id_db = v.acc3800 and t.acc_num_cr like '100%' or
-                             t.acc_id_cr = v.acc3800 and t.acc_num_db like '100%') and
+                            (t.acc_id_db = v.acc3800 and t.ob22_db in ('10','11','12') and t.acc_num_cr like '100%' or
+                             t.acc_id_cr = v.acc3800 and t.ob22_cr in ('10','11','12') and t.acc_num_db like '100%') and
                             t.ref = p.ref and
                             p.sos = 5 and
                             p.nlsa not like '390%' and p.nlsb not like '390%' and
@@ -185,7 +193,7 @@ BEGIN
               nbuc,
               field_code,
               to_char(field_value)
-         FROM (  SELECT report_date,
+         FROM (SELECT report_date,
                         kf,
                         report_code,
                         nbuc,
@@ -201,40 +209,43 @@ BEGIN
                         report_code,
                         nbuc,
                         field_code)
-            UNION
-         SELECT a.report_date,
-              a.kf,
-              a.report_code,
-              a.nbuc,
-              '4'||a.field_code,
-              trim(to_char(a.field_value/b.field_value, '999990D0000')) field_value
-         FROM (  SELECT report_date,
-                        kf,
-                        report_code,
-                        nbuc,
-                        substr(field_code, 2) field_code,
-                        SUM (field_value) field_value
-                   FROM nbur_detail_protocols
-                  WHERE     report_date = p_report_date
-                        AND report_code = p_file_code
-                        AND kf = p_kod_filii
-                        and field_code like '3%'
-               GROUP BY report_date,
-                        kf,
-                        report_code,
-                        nbuc,
-                        substr(field_code, 2)) a
-         join
-         (  SELECT substr(field_code, 2) field_code,
-                   SUM (field_value) field_value
-            FROM nbur_detail_protocols
-                  WHERE     report_date = p_report_date
-                        AND report_code = p_file_code
-                        AND kf = p_kod_filii
-                        and field_code like '1%'
-               GROUP BY substr(field_code, 2)) b
-          on (a.field_code = b.field_code);
-
+                    UNION
+               SELECT a.report_date,
+                      a.kf,
+                      a.report_code,
+                      a.nbuc,
+                      '4'||a.field_code,
+                      trim(to_char(a.field_value/b.field_value, '999990D0000')) field_value
+                 FROM (  SELECT report_date,
+                                kf,
+                                report_code,
+                                nbuc,
+                                substr(field_code, 2) field_code,
+                                SUM (field_value) field_value
+                           FROM nbur_detail_protocols
+                          WHERE     report_date = p_report_date
+                                AND report_code = p_file_code
+                                AND kf = p_kod_filii
+                                and field_code like '3%'
+                       GROUP BY report_date,
+                                kf,
+                                report_code,
+                                nbuc,
+                                substr(field_code, 2)) a
+                 join
+                 (  SELECT kf,
+                           nbuc,
+                           substr(field_code, 2) field_code,
+                           SUM (field_value) field_value
+                    FROM nbur_detail_protocols
+                          WHERE     report_date = p_report_date
+                                AND report_code = p_file_code
+                                AND kf = p_kod_filii
+                                and field_code like '1%'
+                       GROUP BY kf, nbuc, substr(field_code, 2)) b
+                  on (a.kf = b.kf and
+                      a.nbuc = b.nbuc and
+                      a.field_code = b.field_code);
 
     DELETE FROM OTCN_TRACE_39
     WHERE datf = p_report_date;

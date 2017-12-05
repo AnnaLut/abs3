@@ -68,26 +68,24 @@ IS
    --  Package bars_sms_clearance - пакет процедур для подготовки дебиторской задолженности за  SMS-сообщения
    --
 
-   g_body_version      CONSTANT VARCHAR2 (64) := 'version 1.06 17/06/2016';
+   g_body_version      CONSTANT VARCHAR2 (64) := 'version 1.04 20/11/2017';
 
    g_awk_body_defs     CONSTANT VARCHAR2 (512) := '';
 
-   -- маска формата для преобразования char <--> number
-   g_number_format     CONSTANT VARCHAR2 (128) := 'FM999999999999999999990D00';
-   -- параметры преобразования char <--> number
-   g_number_nlsparam   CONSTANT VARCHAR2 (30)
-                                   := 'NLS_NUMERIC_CHARACTERS = ''. ''' ;
-   -- маска формата для преобразования char <--> date
-   g_date_format       CONSTANT VARCHAR2 (30) := 'YYYY.MM.DD HH24:MI:SS';
-
    --глобальний параметрт ОВ22 для рахунків 3570
-   g_ob22              CONSTANT VARCHAR2 (2) := '33';
+   g_ob22              CONSTANT VARCHAR2 (2) := case when newnbs.g_state = 1 then '52' else '33' end; -- за новим планом рахунків замість 3570/33 відкриваються рахунки 3570/52
 
    --глобальний параметрт ОВ22 для рахунків 3579
-   g_ob22_exp          CONSTANT VARCHAR2 (2) := '88';
+   g_ob22_exp          CONSTANT VARCHAR2 (2) := case when newnbs.g_state = 1 then '47' else '88' end; -- за новим планом рахунків замість 3579/88 відкриваються рахунки 3570/47
 
-   --глобальний параметрт ОВ22 для рахунків 6110
-   g_ob22_6110          CONSTANT VARCHAR2 (2) := 'E8';
+   --глобальний параметрт NBS для рахунків 3579
+   g_nbs_3579          CONSTANT VARCHAR2 (2) := case when newnbs.g_state = 1 then '3570' else '3579' end; -- за новим планом рахунків замість 3579 відкриваються рахунки 3570
+
+   --глобальний параметрт ОВ22 для рахунків 6110 (за новим планом рахунків 6510, ОБ22 залишається той самий)
+   g_ob22_6110         CONSTANT VARCHAR2 (2) := 'E8';
+
+   --глобальний параметрт NBS для рахунків 6110
+   g_nbs_6110          CONSTANT VARCHAR2 (2) := case when newnbs.g_state = 1 then '6510' else '6110' end; -- за новим планом рахунків замість 6110 відкриваються рахунки 6510
 
    --глобальний параметрт код валюти
    g_kv                 CONSTANT NUMBER(3) := 980;
@@ -202,7 +200,7 @@ IS
       BEGIN
          logger.debug ('gl.aMFO=' || gl.aMFO || ' nls_ = ' || nls_);
          nls_3579 :=
-            VKRZN (SUBSTR (gl.aMFO, 1, 5), '3579' || SUBSTR (nls_, 5));
+            VKRZN (SUBSTR (gl.aMFO, 1, 5), g_nbs_3579 || SUBSTR (nls_, 5));
 
          SELECT NLS
            INTO tmp_3579
@@ -224,7 +222,7 @@ IS
             nls_3579 :=
                vkrzn (
                   SUBSTR (gl.aMFO, 1, 5),
-                     '3579'
+                     g_nbs_3579
                   || '0'
                   || SUBSTR (nls_, 6, 1)
                   || LPAD (TO_CHAR (i), 2, '0')
@@ -278,7 +276,7 @@ IS
       ----  Добавление Доступа по GROUPS_NBS:
       FOR n IN (SELECT ID
                   FROM GROUPS_NBS
-                 WHERE NBS = '3579')
+                 WHERE NBS = g_nbs_3579)
       LOOP
          sec.addAgrp (acc1_, n.ID);
       END LOOP;
@@ -709,7 +707,7 @@ IS
 
       --шукаємо рахунок оплати 6110
       BEGIN
-         l_nlsb := NBS_OB22_NULL ('6110', g_ob22_6110, l_toboa);
+         l_nlsb := NBS_OB22_NULL (g_nbs_6110, g_ob22_6110, l_toboa);
 
          SELECT SUBSTR (t4.NMS, 1, 38), T5.OKPO, T4.TOBO
            INTO l_nmsb, l_okpob, l_tobob
@@ -720,7 +718,7 @@ IS
          THEN
             g_err_num := -20003;
             g_erm :=
-               g_erm || ' - Не найден счет оплаты 6110!';
+               g_erm || ' - Не найден счет оплаты ' || g_nbs_6110 || '!';
             raise_application_error (g_err_num, g_erm);
       END;
 
@@ -805,7 +803,7 @@ IS
          WHEN OTHERS
          THEN
             g_err_num := -20004;
-            g_erm := g_erm || ' - Ошибка при оплате СМC!';
+            g_erm :=nvl(g_erm, DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE()) || ' - Ошибка при оплате СМC!';
             --RAISE;
             raise_application_error (g_err_num, g_erm);
       END;
@@ -1081,7 +1079,7 @@ IS
     into l_nazn from dual;
 
 
-    --оплачиваем
+      --оплачиваем
       BEGIN
          gl.REF (l_ref);
          logger.info ('l_ref=' || l_ref);

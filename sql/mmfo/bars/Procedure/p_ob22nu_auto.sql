@@ -1,4 +1,10 @@
-CREATE OR REPLACE PROCEDURE BARS.P_OB22NU_AUTO (p_dat1 date,  p_dat2 date ) is
+
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/procedure/p_ob22nu_auto.sql =========*** Run
+ PROMPT ===================================================================================== 
+ 
+  CREATE OR REPLACE PROCEDURE BARS.P_OB22NU_AUTO (p_dat1 date,  p_dat2 date ) is
  l_prizn char(1) ;
  l_dat1 date;
  dat_tek DATE;
@@ -12,7 +18,7 @@ CREATE OR REPLACE PROCEDURE BARS.P_OB22NU_AUTO (p_dat1 date,  p_dat2 date ) is
 
 01-07-2014   nvv  ƒобавив обработку ј/ѕ (6204)
                     + v_ob22nu.vie  01/07/2014
-					
+
 27-02-2014   qwa добавили к vob=96 также vob=99 (годовые)
 
 14-07-2011   qwa обработаем также документы за предыдущий банк день,
@@ -148,9 +154,9 @@ for k in ( select /*+ INDEX(o) INDEX(ob) INDEX(t1) INDEX(t2)*/ o.ref,      a.acc
            and o.tt<>'PO3' --and p.vob<>96   ---- потом убрать, нужно дл€ просчета начала апрел€
            and not exists (select   /*+ INDEX(tmp_ob22_funu_auto)*/
                      1 from tmp_ob22_funu_auto where ref=o.ref and stmt =o.stmt)
-           and  a.nbs not in ('2065','2075','2085','2105',
-                                    '2115','2125','2135','2205',
-                                    '2235','2636')-- пока нет формального признака только дебетовые обороты - оставим в коде
+           and  a.nbs not in ('2066','2076','2086','2106',
+                                    '2116','2126','2136','2206',
+                                    '2236','2636')-- пока нет формального признака только дебетовые обороты - оставим в коде
 --           and a.nbs  not in ('3400','3410','3500','3600','4500')    -- вс€ друга€ экзотика не 6 и 7 класс
 --           and ab.nbs not in ('3400','3410','3500','3600','4500')    -- вс€ друга€ экзотика не 6 и 7 класс
            )
@@ -244,3 +250,15 @@ end loop;
 GL.bdate:=dat_tek;
 end  P_OB22NU_AUTO ;
 /
+ show err;
+ 
+PROMPT *** Create  grants  P_OB22NU_AUTO ***
+grant EXECUTE                                                                on P_OB22NU_AUTO   to BARS_ACCESS_DEFROLE;
+grant EXECUTE                                                                on P_OB22NU_AUTO   to START1;
+
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/procedure/p_ob22nu_auto.sql =========*** End
+ PROMPT ===================================================================================== 
+ 

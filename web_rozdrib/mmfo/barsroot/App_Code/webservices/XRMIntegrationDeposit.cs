@@ -1096,7 +1096,7 @@ namespace Bars.WebServices
                                 }
                             }
                         }
-                            
+
                         XRMEarlyCloseRes.PenaltySum = p_intrest - p_penalty;
                         XRMEarlyCloseRes.PenaltyPercentSum = p_intrest;
                         XRMEarlyCloseRes.AllPercentSum = p_penalty;
@@ -1207,7 +1207,19 @@ namespace Bars.WebServices
 
                 using (OracleCommand cmdRests = con.CreateCommand())
                 {
-                    cmdRests.CommandText = "select sum(case when nbs in ('2620','2630','2635') then ostb else 0 end)/100 dptrest, sum(case when nbs in ('2628','2638') then ostb else 0 end)/100 percentrest from accounts where acc in (select accid FROM DPT_ACCOUNTS WHERE DPTID = :dpt_id)";
+
+                    Bars.WebServices.NewNbs ws = new Bars.WebServices.NewNbs();
+                    string a = "";
+                    if (ws.UseNewNbs())
+                    {
+                        a = "('2620','2630')";
+                    }
+                    else
+                    {
+                        a = "('2620','2630','2635')";
+                    }
+
+                    cmdRests.CommandText = "select sum(case when nbs in " + a + " then ostb else 0 end)/100 dptrest, sum(case when nbs in ('2628','2638') then ostb else 0 end)/100 percentrest from accounts where acc in (select accid FROM DPT_ACCOUNTS WHERE DPTID = :dpt_id)";
                     cmdRests.Parameters.Add("dpt_id", OracleDbType.Decimal, XRMEarlyCloseReq.DPT_ID, ParameterDirection.Input);
 
                     using (OracleDataReader rdr = cmdRests.ExecuteReader())
@@ -1549,7 +1561,7 @@ namespace Bars.WebServices
                     {
                         Int32 resultCode = -1;
                         String resultMessage = ex.Message;
-                        resList.Add(new XRMDeposits.XRMOpenDeposit.XRMOpenDepositResult { ResultCode = resultCode,ResultMessage = resultMessage});
+                        resList.Add(new XRMDeposits.XRMOpenDeposit.XRMOpenDepositResult { ResultCode = resultCode, ResultMessage = resultMessage });
                         return resList;
                     }
                 }
@@ -1558,7 +1570,7 @@ namespace Bars.WebServices
                     String resultMessage = String.Format("Помилка авторизації: {0}", ex.Message);
                     Int32 resultCode = -1;
                     decimal? dptId = -1;
-                    resList.Add(new XRMDeposits.XRMOpenDeposit.XRMOpenDepositResult { ResultMessage = resultMessage, ResultCode = resultCode, DptId = dptId});
+                    resList.Add(new XRMDeposits.XRMOpenDeposit.XRMOpenDepositResult { ResultMessage = resultMessage, ResultCode = resultCode, DptId = dptId });
                     return resList;
                 }
                 finally { DisposeOraConnection(); }

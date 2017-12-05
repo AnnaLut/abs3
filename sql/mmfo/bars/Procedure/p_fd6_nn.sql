@@ -13,7 +13,7 @@ PROMPT *** Create  procedure P_FD6_NN ***
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :    #D6 for KB
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     : 28/01/2016 (09/07/2015)
+% VERSION     :    21/11/2017 (16/08/2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 08/04/2014 - для МФО=300465 и бал.счета 2602 и S180_='1' будем формировать
 %              S180_ := '6'
@@ -351,10 +351,10 @@ BEGIN
    end if;
 --------------------------------------------------------------------------
 --   телеграмма НБУ от 23.03.2007 №62-212/324 - 3062
-   IF nbs2_ in ('1600','1602','1608','2603','2604',        -- убрал 2601,2602 ОАВ 08.02.2011
-               '2606','2622','2625','2640',                      -- убрал 2608
-               '2641','2642','2643','2655','3650','3651','3652',
-               '3659') THEN
+   IF nbs2_ in ('1600','1602','1608','2603','2604',        
+                '2606','2622','2625','2640',                      
+                '2641','2642','2643','2655',
+                '3650','3651','3652','3659') THEN
       s180_:='1';
    END IF;
 
@@ -394,11 +394,13 @@ BEGIN
    END ;
 
 --------------------------------------------------------------------------
---   телеграмма НБУ от 23.03.2007 №62-212/324 - 3062
-   IF nbs2_ in ('1610','1612','2610','2630','2651') THEN
-      s183_:='B';
-   END IF;
-
+   if newnbs.g_state = 0 then
+       --   телеграмма НБУ от 23.03.2007 №62-212/324 - 3062
+       IF nbs2_ in ('1610','1612','2610','2630','2651') THEN
+          s183_:='B';
+       END IF;
+   end if;
+   
    comm_ := comm_ || ' s180=' || s180_ || ' s183=' || s183_;
 -------------------------------------------------------------------------
 
@@ -1050,7 +1052,7 @@ BEGIN
     dat_kl_ := add_months(trunc(dat_, 'mm'), 1);
 
     if prnk_ is null then
-        sql_acc_ := ' SELECT  /*+ parallel(a) */ * FROM ACCOUNTS a where nvl(a.nbs, SUBSTR (a.nls, 1, 4)) in (';
+        sql_acc_ := ' SELECT  /*+ parallel(a, 8) */ * FROM ACCOUNTS a where nvl(a.nbs, SUBSTR (a.nls, 1, 4)) in (';
         sql_acc_ := sql_acc_ || 'select r020 from kod_r020 where trim(prem)=''КБ'' and a010=''D6'' and r020 not like ''7%'' ';
         sql_acc_ := sql_acc_ || 'and d_open<=to_date('''||to_char(dat_kl_, 'ddmmyyyy')||''',''ddmmyyyy'') ';
         sql_acc_ := sql_acc_ || 'and (d_close is null or d_close>to_date('''||to_char(dat_kl_, 'ddmmyyyy')||''',''ddmmyyyy''))) ';
@@ -1058,7 +1060,7 @@ BEGIN
         if FL_D8_ = '8' then
            sql_acc_ := sql_acc_ || ' and a.acc not in (SELECT GEN_ACC FROM V_DPU_REL_ACC_ALL) '; 
            sql_acc_ := sql_acc_ || ' UNION ALL '; 
-           sql_acc_ := sql_acc_ || ' SELECT  /*+ parallel(v) */ s.ACC, s.KF, s.NLS, s.KV, s.BRANCH, s.NLSALT, '||
+           sql_acc_ := sql_acc_ || ' SELECT  /*+ parallel(v, 8) */ s.ACC, s.KF, s.NLS, s.KV, s.BRANCH, s.NLSALT, '||
                             'substr(s.NLSALT,1,4) NBS, s.NBS2, s.DAOS, s.DAPP, s.ISP, s.NMS,
                              s.LIM, s.OSTB, s.OSTC, s.OSTF, s.OSTQ, s.DOS, s.KOS, s.DOSQ, s.KOSQ, s.PAP, s.TIP, s.VID, s.TRCN, 
                              s.MDATE, s.DAZS, s.SEC, s.ACCC, s.BLKD, s.BLKK, s.POS, s.SECI, s.SECO, s.GRP, s.OSTX, s.RNK, 
@@ -1112,7 +1114,7 @@ BEGIN
                         nvl(trim(p.k072), ''0'') k072p, p.acc acc1, NVL(Trim(p.r011),''0'') r011,
                         NVL(Trim(p.r013),''0'') r013, Trim(p.s180) s180, null acc2
                     from (
-                       SELECT  /*+ PARALLEL(a) */
+                       SELECT  /*+ ordered */
                                a.rnk, a.acc, a.nls, a.kv, a.fdat, a.nbs, a.ost, a.ostq,
                                a.dos96, a.kos96, a.dosq96, a.kosq96, s.isp, NVL(s.lim,0) lim,
                                NVL(s.blkd,0) blkd, NVL(s.blkk,0) blkk, NVL(s.ob22,''00'') ob22, s.tobo, s.nms,
@@ -1194,7 +1196,7 @@ BEGIN
            comm_ := '';
 
            if dat_ <= dat_izm2 then
-              spcnt_ := Acrn.fproc (acc_, dat_);
+              spcnt_ := acrn_otc.fproc (acc_, dat_);
            end if;
 
            IF kv_ <> 980 THEN
@@ -1277,7 +1279,7 @@ BEGIN
                 sum(z.sumh) over (partition by z.acc) sh
            from (
                select acc, nls, kv, rnk, isp, accc, tip, 0, iacc, 0 sumh
-               from (select /*+ PARALLEL(a) */
+               from (select /*+ PARALLEL(a, 8) */
                         a.acc, a.nls, a.kv, a.rnk, a.isp, a.accc, a.tip, i.acc iacc
                      from accounts a, int_accn i
                      where a.nbs in ('1608','1618','2518','2528','2538','2548','2558','2568','2618','2608','2628','2638','2658') and
@@ -1320,7 +1322,7 @@ BEGIN
                                          s.kos <> 0))) z;
 
            insert into OTCN_FD5_DOCS (ACC, NBS, REF, FDAT, S, NAZN)
-           select /*+PARALLEL(o)*/
+           select /*+ ordered */
             o.acc, decode(r.dk, 1, substr(r.nlsa,1,4), substr(r.nlsb,1,4)) nbs,
             o.REF, o.fdat, nvl(o.s, 0) s, r.NAZN
            from saldoa s, opldok o, opldok p, accounts a, oper r
@@ -1342,7 +1344,8 @@ BEGIN
                 r.vob = 96 and  o.fdat > dat2_);
 
            insert into OTCN_FD5_DOCS (ACC, NBS, REF, FDAT, S, NAZN)
-           select o.acc, decode(r.dk, 1, substr(r.nlsa,1,4), substr(r.nlsb,1,4)) nbs, o.REF, o.fdat,
+           select /*+ ordered*/ 
+                o.acc, decode(r.dk, 1, substr(r.nlsa,1,4), substr(r.nlsb,1,4)) nbs, o.REF, o.fdat,
                 decode(r.kv, 980, r.s, r.s2), r.NAZN
            from saldoa s, opldok o, opldok p, accounts a, oper r
            where s.fdat between datr1_ and dat_kor_ and
@@ -1374,7 +1377,7 @@ BEGIN
            
            -- вибираэмо рахунки, де один процентний рахунок выдповыдаэ рахунку активу
            for k in (select *
-                     from (select /*+parallel(b) */
+                     from (select /*+parallel(b, 8) */
                                 distinct b.ACC, b.NLS, b.KV, b.RNK, b.ISP, b.ACCC, b.TIP, b.DOS, b.IACC, b.ND,
                                 ot_sumh (b.iacc, datr1_, datr2_, 1, dat_, b.kv) SUMH,
                                 a.acc acca, a.nls nlsa, a.kv kva, a.isp ispa, a.rnk rnka, a.tip tipa, a.accc accca,

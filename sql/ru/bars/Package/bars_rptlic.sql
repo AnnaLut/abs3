@@ -1,7 +1,7 @@
 
  
  PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bars_rptlic.sql =========*** Run ***
+ PROMPT *** Run *** ========== Scripts \Sql\BARS\package\bars_rptlic.sql =========*** Run ***
  PROMPT ===================================================================================== 
  
   CREATE OR REPLACE PACKAGE BARS.BARS_RPTLIC 
@@ -279,6 +279,7 @@ is
 
     type t_acc     is record( acc     number           ,
                               nls     accounts.nls%type,
+							  nlsalt  accounts.nlsalt%type,
                               kv      number           ,
                               tip     accounts.tip%type,
                               fdat    date             ,
@@ -386,7 +387,7 @@ is
     --   p_date1   -  дата с
     --   p_date2   -  дата по
     --
-    --   Строка с информационными запросами/ответами/сообщениями в поле временной таблицы tmp_licm.DK содержит такие значения
+    --   Строка с информационными запросами\ответами\сообщениями в поле временной таблицы tmp_licm.DK содержит такие значения
     --       21 - мы посылаем запрос на уточнение реквизитов
     --       23 - мы отдаем ответ по запросу
     --       25 - мы просим вернуть деньги
@@ -795,7 +796,7 @@ is
        -- Платежи идут от наших подчиненных МФО трензитом через нас
        -- на ГРЦ или на другое наше МФО или на межбанк,
        -- R00 - операция списания с коррсчета подчиненного МФО и зачисления на наш транзит
-       -- Дб/L00 -> Kр/T00
+       -- Дб\L00 -> Kр\T00
        --
        -- mfoa - наше подчиненное, fn_a - имя файла от нашего подчиненного
        -- fn_b - это файл в котором мы отправили это платеж дальше
@@ -858,7 +859,7 @@ is
        -- Платежи идут от НБУ, от нас, от других наших МФО на наши подчиненные МФО.
        -- Данная опреация для кредитовой суммы файла. Операция выполняется по квитовке файла $B,
        -- который идет на подчиненные МФО
-       -- Дб/TUR -> Кр/L00
+       -- Дб\TUR -> Кр\L00
        --
        if p_trs.rt0 = 1 then  --p_tt = 'RT0'
           for c in (select * from tmp_licm  where tt in ('RT0') ) loop
@@ -977,7 +978,7 @@ is
        -- Платежи идут от НБУ, от нас, от других наших МФО на наши подчиненные МФО.
        -- Данная опреация для дебетовой суммы файла. Операция выполняется по квитовке файла $B,
        -- который идет на подчиненные МФО
-       -- Дб/L00 -> Кр/TUD
+       -- Дб\L00 -> Кр\TUD
        --
         if p_trs.dt0 = 1  then  --p_tt = 'DT0'
 
@@ -1086,7 +1087,7 @@ is
        l_value    varchar2(220);
     begin
 
-       bars_audit.trace(l_trace||' находим документы по счету: acc='||p_acc.acc||' '||p_acc.nls||'('||p_acc.kv||') за '||to_char(p_fdat, 'dd/mm/yyyy'));
+       bars_audit.trace(l_trace||' находим документы по счету: acc='||p_acc.acc||' '||p_acc.nls||'('||p_acc.kv||') за '||to_char(p_fdat, 'dd\mm\yyyy'));
 
        -- по какому счету искать - дочернему или главному
        l_acc := case when p_refacc is null then p_acc.acc else p_refacc end;
@@ -1103,7 +1104,7 @@ is
                           -- Тут ми пошаманили
                           --case when o1.sq is not null then o1.sq else gl.p_icurval( p_acc.kv, o1.s, fdat) end *decode(o1.dk,0,-1,1) sq,
 						  gl.p_icurval( p_acc.kv, o1.s, fdat)*decode(o1.dk,0,-1,1) sq,
-                          dk, txt, o1.kf
+                          dk, txt, o1.kf 
                      from opldok o1
                     where o1.acc = l_acc and o1.fdat = p_fdat and o1.sos=5 )
        loop
@@ -1452,8 +1453,8 @@ is
       l_trace    varchar2(1000) := G_TRACE||'lic_global:';
    begin
 
-      bars_audit.trace(l_trace||'Выписка за даты с:'||to_char(p_date1,'dd/mm/yyyy')||' по '||to_char(p_date2,'dd/mm/yyyy'));
-      bars_audit.trace(l_trace||'Включать информационные(1-да/0-нет):'||p_inform);
+      bars_audit.trace(l_trace||'Выписка за даты с:'||to_char(p_date1,'dd\mm\yyyy')||' по '||to_char(p_date2,'dd\mm\yyyy'));
+      bars_audit.trace(l_trace||'Включать информационные(1-да\0-нет):'||p_inform);
       execute immediate 'delete from tmp_licm';
 
       select max(fdat) into l_prevbd
@@ -1472,7 +1473,7 @@ is
          l_trs.rt1 := 0;
 
          l_ostfq := 0;
-         bars_audit.trace(l_trace||'fdat = '||to_char(l_acc.fdat,'dd/mm/yyyy')||' acc = '||l_acc.acc|| ' nls = '||l_acc.nls||'('||l_acc.kv||')');
+         bars_audit.trace(l_trace||'fdat = '||to_char(l_acc.fdat,'dd\mm\yyyy')||' acc = '||l_acc.acc|| ' nls = '||l_acc.nls||'('||l_acc.kv||')');
 
 
 		  select max(fdat) into l_prevbd
@@ -1490,11 +1491,11 @@ is
           bars_audit.trace(l_trace||'производим вставку в tmp_licm счета' );
           insert into tmp_licm(
                    fdat,    tip,     acc,     nls,     kv,     nms,
-                   okpo,    nmk,     isp,     dapp,
+                   okpo,    nmk,     isp,     dapp,    nlsalt,
                    ostf,    ostfq,
                    rowtype)
           values( l_acc.fdat, l_acc.tip,  l_acc.acc,  l_acc.nls,  l_acc.kv,  l_acc.nms,
-                  l_acc.okpo, l_acc.nmk,  l_acc.isp,  l_acc.dapp,
+                  l_acc.okpo, l_acc.nmk,  l_acc.isp,  l_acc.dapp, l_acc.nlsalt,
                   l_acc.ostf, l_ostfq,
                   G_ROWTYPE_ACC);
 
@@ -1532,11 +1533,11 @@ is
               insert into tmp_licm(
                       fdat,      tip,     acc,    nls,      kv,        nms,
                       okpo,      nmk,     isp,
-                      ostfr,     dosr,    kosr,
+                      ostfr,     dosr,    kosr, nlsalt,
                       rowtype)
               values( l_acc.fdat, l_acc.tip,  l_acc.acc,  l_acc.nls,  l_acc.kv,     l_acc.nms,
                       l_acc.okpo, l_acc.nmk,  l_acc.isp,
-                      l_ostfr, l_dosr,  l_kosr,
+                      l_ostfr, l_dosr,  l_kosr, l_acc.nlsalt,
                       G_ROWTYPE_REV);
           end if;
 
@@ -1654,7 +1655,7 @@ is
       l_nbsmask  := get_nbs(p_mask);
 
 	  --сформировать строку запроса для выбора счетов
-      l_sql := 'select a.acc,  a.nls, a.kv, a.tip, s.fdat, s.dos, s.kos,                '||
+      l_sql := 'select a.acc,  a.nls, a.nlsalt, a.kv, a.tip, s.fdat, s.dos, s.kos,                '||
                '       s.ostf, s.dapp, a.isp, a.nms,  cus.nmk, cus.okpo                 '||
                '  from                                                                  '||
 			   '       customer cus, saldo so,                                          '||
@@ -1679,7 +1680,7 @@ is
 
 
       open l_c0 for l_sql  using p_date1, p_date2,   p_date1, p_branch;
-      bars_audit.trace(l_trace||'params: :=1'||to_char(p_date1, 'dd/mm/yyyy')||' :2='||to_char(p_date2,'dd/mm/yyyy')||' :3='||to_char(p_date2,'dd/mm/yyyy')||' :4='||p_branch);
+      bars_audit.trace(l_trace||'params: :=1'||to_char(p_date1, 'dd\mm\yyyy')||' :2='||to_char(p_date2,'dd\mm\yyyy')||' :3='||to_char(p_date2,'dd\mm\yyyy')||' :4='||p_branch);
 
           lic_global(
                   p_date1   =>  p_date1,
@@ -1765,7 +1766,7 @@ is
 
 
       open l_c0 for l_sql  using p_date1, p_date2,   p_date1, p_branch;
-      bars_audit.trace(l_trace||'params: :=1'||to_char(p_date1, 'dd/mm/yyyy')||' :2='||to_char(p_date2,'dd/mm/yyyy')||' :3='||to_char(p_date2,'dd/mm/yyyy')||' :4='||p_branch);
+      bars_audit.trace(l_trace||'params: :=1'||to_char(p_date1, 'dd\mm\yyyy')||' :2='||to_char(p_date2,'dd\mm\yyyy')||' :3='||to_char(p_date2,'dd\mm\yyyy')||' :4='||p_branch);
 
           lic_global(
                   p_date1   =>  p_date1,
@@ -2141,6 +2142,6 @@ grant EXECUTE                                                                on 
  
  
  PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/bars_rptlic.sql =========*** End ***
+ PROMPT *** End *** ========== Scripts \Sql\BARS\package\bars_rptlic.sql =========*** End ***
  PROMPT ===================================================================================== 
    

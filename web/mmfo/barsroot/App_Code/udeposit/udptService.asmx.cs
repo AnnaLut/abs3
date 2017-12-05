@@ -222,11 +222,11 @@ namespace barsroot.udeposit
                                               ", OKPO" + //22
                                               ", ADR" + //23
                                               ", to_char(BDAT,'dd.mm.yyyy')" + //24
-                                              ", BR"          + // 25
-                                              ", BR_NAME"     + // 26
-                                              ", OP"          + // 27
-                                              ", IR"          + // 28
-                                              ", FREQV"       + // 29
+                                              ", BR" + //25
+                                              ", BR_NAME" +//26
+                                              ", OP" +//27
+                                              ", IR" +//28
+                                              ", FREQV" +//29
                                               ", FREQV_NAME"  + // 30
                                               ", ACC"         + // 31
                                               ", NLS"         + // 32
@@ -255,7 +255,7 @@ namespace barsroot.udeposit
                                               ", OKPO_P"      + // 55
                                               ", CNT_DUBL"    + // 56
                                               ", ( select nvl(min(FR),-1) from DOC_SCHEME where ID = TEMPLATE_ID ) as TPL_TP"  + // 57
-                                              ", (length(sys_context('bars_context','user_branch'))-1)/7 as USR_LVL" + // 58
+                                              ", ( select (greatest(length(BRANCH),length(sys_context('bars_context','user_branch')))-1)/7 from STAFF$BASE where ID = USER_ID ) as USR_LVL" + // 58
                                               " from V_DPU_DEAL_WEB WHERE DPU_ID=:DPU_ID");
 
                 DBLogger.Info("Пользователь просматривает параметры депозитного договора № " + dpu_id, "BarsWeb.DepositU");
@@ -1176,7 +1176,7 @@ namespace barsroot.udeposit
                 SetRole(base_role);
                 SetParameters("ID", DB_TYPE.Decimal, id, DIRECTION.Input);
                 ArrayList reader = SQL_reader("select d.TERM_MAX, d.KV, t.lcv, t.name, d.freq_v, f.name, d.br_id, b.name, NVL(d.comproc,0), NVL(d.fl_extend,0)" + 
-                                              "     , d.id_stop, s.name, d.bsd, d.bsn, d.DPU_TYPE, br.branch, br.name, d.SHABLON" +
+                                              "     , d.id_stop, s.name, d.bsd, d.bsn, d.IRVK, br.branch, br.name, d.SHABLON" +
                                               "     , nvl(d.MIN_SUMM,0)/100, nvl(d.MAX_SUMM,0)/100, nvl(d.TERM_TYPE,2)" +
                                               "  from TABVAL t, DPU_VIDD d, FREQ f, BRATES b, DPT_STOP s, BRANCH br " + 
                                               " where br.BRANCH = sys_context('bars_context', 'user_branch') and d.kv=t.kv(+) and d.freq_v=f.freq(+) " +

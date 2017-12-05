@@ -46,7 +46,14 @@ PROMPT *** Create  view OPER_CP_V ***
                       '6393',
                       '7703',
                       '7704',
-                      '7720')
+                      '7720',
+                      decode(NEWNBS.GET_STATE,0,'6050','6121'),
+                      decode(NEWNBS.GET_STATE,0,'6051','6122'),
+                      decode(NEWNBS.GET_STATE,0,'6052','6124'),
+                      decode(NEWNBS.GET_STATE,0,'6053','6125'),
+                      decode(NEWNBS.GET_STATE,0,'6057','6126'),
+                      decode(NEWNBS.GET_STATE,0,'7720','7707')
+                      )
                OR SUBSTR (o1.nlsb, 1, 4) IN
                      ('6050',
                       '6051',
@@ -57,7 +64,14 @@ PROMPT *** Create  view OPER_CP_V ***
                       '6393',
                       '7703',
                       '7704',
-                      '7720'));
+                      '7720',
+                      decode(NEWNBS.GET_STATE,0,'6050','6121'),
+                      decode(NEWNBS.GET_STATE,0,'6051','6122'),
+                      decode(NEWNBS.GET_STATE,0,'6052','6124'),
+                      decode(NEWNBS.GET_STATE,0,'6053','6125'),
+                      decode(NEWNBS.GET_STATE,0,'6057','6126'),
+                      decode(NEWNBS.GET_STATE,0,'7720','7707')                      
+                      ));
 
 PROMPT *** Create  grants  OPER_CP_V ***
 grant SELECT                                                                 on OPER_CP_V       to BARS_ACCESS_DEFROLE;

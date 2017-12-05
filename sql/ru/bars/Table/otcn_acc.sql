@@ -19,35 +19,47 @@ BEGIN
 END; 
 /
 
+begin 
+  execute immediate '
+    DROP TABLE BARS.OTCN_ACC';
+exception when others then       
+  if sqlcode=-942 then null; else raise; end if; 
+end;
+/
+    
 PROMPT *** Create  table OTCN_ACC ***
 begin 
   execute immediate '
-  CREATE GLOBAL TEMPORARY TABLE BARS.OTCN_ACC 
-   (	ACC NUMBER, 
-	NLS VARCHAR2(15), 
-	KV NUMBER(*,0), 
-	NBS VARCHAR2(4), 
-	RNK NUMBER, 
-	DAOS DATE, 
-	DAPP DATE, 
-	ISP NUMBER, 
-	NMS VARCHAR2(70), 
-	LIM NUMBER(24,0), 
-	PAP NUMBER(*,0), 
-	TIP CHAR(3), 
-	VID NUMBER(38,0), 
-	MDATE DATE, 
-	DAZS DATE, 
-	ACCC NUMBER(*,0), 
-	TOBO VARCHAR2(30)
-   ) ON COMMIT PRESERVE ROWS ';
+    CREATE GLOBAL TEMPORARY TABLE BARS.OTCN_ACC
+    (
+      ACC    NUMBER                                 NOT NULL,
+      NLS    VARCHAR2(15 BYTE),
+      KV     NUMBER(38),
+      NBS    VARCHAR2(4 BYTE),
+      OB22   VARCHAR2(2 BYTE),
+      RNK    NUMBER,
+      DAOS   DATE,
+      DAPP   DATE,
+      ISP    NUMBER,
+      NMS    VARCHAR2(70 BYTE),
+      LIM    NUMBER(24),
+      PAP    NUMBER(38),
+      TIP    CHAR(3 BYTE),
+      VID    INTEGER,
+      MDATE  DATE,
+      DAZS   DATE,
+      ACCC   NUMBER(38),
+      TOBO   VARCHAR2(30 BYTE),
+      NLS_ALT   VARCHAR2(15 BYTE),
+      OB22_ALT  VARCHAR2(2 BYTE),
+      DAT_ALT   DATE
+    ) 
+    
+    ON COMMIT PRESERVE ROWS ';
 exception when others then       
   if sqlcode=-955 then null; else raise; end if; 
 end; 
 /
-
-
-
 
 PROMPT *** ALTER_POLICIES to OTCN_ACC ***
  exec bpa.alter_policies('OTCN_ACC');

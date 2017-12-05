@@ -364,7 +364,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.BARS_XMLKLB_IMP is
           ||'    - Сбербанк'    || chr(10)
 ;
 
-   G_BODY_VERSION    constant varchar2(64) := 'version 13.12 03.08.2016';
+   G_BODY_VERSION    constant varchar2(64) := 'version 13.13 28.11.2017';
 
    G_MODULE          constant char(3)      := 'KLB';    -- код модуля
    G_TRACE           constant varchar2(50) := 'xmlklb_imp.';
@@ -818,8 +818,18 @@ CREATE OR REPLACE PACKAGE BODY BARS.BARS_XMLKLB_IMP is
 
 
          exception when no_data_found then
-            bars_error.raise_error(G_MODULE, 168, p_impdoc.nlsa||'('||p_impdoc.kv||')' );
-         end;
+            begin -- Для перехода на новый план счетов пытаемся найти по nlsalt новый счет если пришол старый
+                 select nls, dazs
+                  into p_impdoc.nlsa, l_dazs
+                 from accounts where nlsalt = p_impdoc.nlsa and kv = p_impdoc.kv AND dat_alt IS NOT NULL;
+                 
+                        if l_dazs is not null then
+                           bars_error.raise_nerror(G_MODULE, 'CLOSE_PAYER_ACCOUNT', p_impdoc.nlsa, to_char(p_impdoc.kv));
+                        end if;
+            exception when no_data_found then
+              bars_error.raise_error(G_MODULE, 168, p_impdoc.nlsa||'('||p_impdoc.kv||')' );
+            end;
+        end;
       else
          if p_impdoc.nlsa <> vkrzn(substr(p_impdoc.mfoa,1,5), p_impdoc.nlsa) then
             bars_error.raise_error(G_MODULE, 85, p_impdoc.nlsa);
@@ -900,7 +910,16 @@ CREATE OR REPLACE PACKAGE BODY BARS.BARS_XMLKLB_IMP is
 
 
          exception when no_data_found then
-            bars_error.raise_error(G_MODULE, 169, p_impdoc.nlsb||'('||p_impdoc.kv2||')' );
+            begin   -- Для перехода на новый план счетов пытаемся найти по nlsalt новый счет если пришол старый
+                    select nls, dazs into p_impdoc.nlsb, l_dazs
+                    from accounts where nlsalt = p_impdoc.nlsb and kv = p_impdoc.kv2 AND dat_alt IS NOT NULL;
+                 
+                        if l_dazs is not null then
+                           bars_error.raise_nerror(G_MODULE, 'CLOSE_PAYER_ACCOUNT', p_impdoc.nlsb, to_char(p_impdoc.kv));
+                        end if;
+            exception when no_data_found then 
+               bars_error.raise_error(G_MODULE, 169, p_impdoc.nlsb||'('||p_impdoc.kv2||')' );
+            end;
          end;
       else
         if p_impdoc.nlsb <> vkrzn(substr(p_impdoc.mfob,1,5), p_impdoc.nlsb) then

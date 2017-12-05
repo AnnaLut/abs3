@@ -7,7 +7,7 @@ IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :   Процедура формирования #70 для КБ (универсальная)
 % COPYRIGHT   :   Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     :   09/08/2017 (18/07/2017, 10/07/2017)
+% VERSION     :   20/11/2017 (06/11/2017, 24/10/2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
       sheme_ - схема формирования
@@ -15,6 +15,12 @@ IS
                                  2 - надходження вiд нерезидентiв
                                  3 - всi операцii
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+20/11/2017 для изменений от 26.04.2017 убрал условие MFO_ = 353553
+           (Черниговское РУ) 
+06/11/2017 удалил блоки для закрытых МФО
+24/10/2017 показатель 71NNNN всегда будет '01' при пустом доп.реквизите 
+25/09/2017 не будут включаться суммы док-тов которые после операции 
+           округления < 100 (1 USD) 
 09/08/2017 для проводок Дт 2625 Кт 3800 с доп.реквизитом "OW_AM" и если 
             значение содержит текст "/980" добавил d1#D3_ = '16'
 26/07/2017 при формировании #70 дополнительно будем вибирать проводки
@@ -709,11 +715,7 @@ IS
          THEN
             p_kodp_ := '71';
             p_value_ :=
-                  NVL (SUBSTR (TRIM (p_value_), 1, 70), 'код валютної операції');
-
-            if mfo_ = 300120 then
-               p_value_ := '01';
-            end if;
+                  NVL (SUBSTR (TRIM (p_value_), 1, 70), '01');
          END IF;
          -- файл #D3
          IF dat_ >= dat_Izm2_ and pr_op_ = 3     
@@ -947,10 +949,6 @@ BEGIN
                         OR (    SUBSTR (o.nlsk, 1, 4) = '2900'  -- 14.12.2012 было сделано только для Сбербанка
                             AND SUBSTR (o.nlsd, 1, 4) = '2909'  -- 28.12.2012 для Всех (убрал МФО)
                            )
-                        --OR (    SUBSTR (o.nlsd, 1, 4) in ('2625', '3570')  
-                        --    AND SUBSTR (o.nlsk, 1, 4) = '2900'  
-                        --    AND mfo_ <> 300465 
-                        --   )
                         OR (    SUBSTR (o.nlsd, 1, 4) = '2900'
                             AND SUBSTR (o.nlsk, 1, 4) = '2900'
                             AND mfou_ = 300465 AND mfou_ <> mfo_ 
@@ -994,7 +992,7 @@ BEGIN
    end if;
    
    -- удаляем проводки вида Дт 2900 Кт 2900 для продажи если это не ЦБ
-   if mfou_ <> 380764 and mfo_ <> 300465 
+   if mfo_ <> 300465 
    then 
       DELETE FROM otcn_prov_temp a
       WHERE a.nlsd like '2900%' 
@@ -1010,31 +1008,6 @@ BEGIN
                             and tag ='D#39'
                             and trim(value) is not null
                             and trim(value) not in ('110','120','131','132'));
-   end if;
-
-   -- удаляем проводки вида Дт 2900 Кт 2900 для продажи если это назн.плат. не "вiльний продаж валютних коштiв"
-   if mfou_ = 380764 
-   then
-      DELETE FROM otcn_prov_temp a
-      WHERE a.nlsd like '2900%' 
-        and a.nlsk like '2900%' 
-        and a.ko = 2 
-        and LOWER (a.nazn) not like '%в_льний продаж валютних кошт_в%'; 
-   end if;
-
-   -- 10.12.2012
-   -- удаляем проводки вида Дт 2603 Кт 2900 внутрибанковские операции
-   if mfou_=300120 
-   then
-      DELETE FROM otcn_prov_temp a
-      WHERE a.nlsd like '2603%' 
-        and a.nlsk like '2900%' 
-        and a.ko = 2 
-        and a.ref in (SELECT ref 
-                      FROM operw 
-                      WHERE ref=a.ref
-                        and tag like 'D#27%'
-                        and trim(value) <> '01');
    end if;
 
    -- удаляем все проводки Дт 2909 Кт 2900 кроме Дт 2909 (OB22=56) Кт 2900 (OB22=01) Cбербанк
@@ -1215,7 +1188,7 @@ BEGIN
                   d1#D3_ := NULL;
                end if;
 
-               if mfo_ = 353553 and ko_ = 2 and 
+               if ko_ = 2 and   -- mfo_ in (353553, 313957) and 
                   nls_ like '2600%' and nlsk_ like '2900%' and 
                   d1#D3_ is null
                then
@@ -1283,7 +1256,8 @@ BEGIN
                   d6#70_ := NULL;
                end if;
 
-               if (d6#70_ is null or d6#70_<>'804') then  --and ROUND (sum0_ / dig_, 0) >= 1
+               if (d6#70_ is null or d6#70_ <> '804') and ROUND (sum0_/dig_, 0) >= 1
+               then
                   -- код валюти
                   p_ins (nnnn_, '10', LPAD (kv_, 3, '0'));
 

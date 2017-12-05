@@ -3,7 +3,7 @@ IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  % DESCRIPTION : процедура #6B
  %
- % VERSION     :   v.17.005      28.07.2017
+ % VERSION     :   v.17.010      15.11.2017
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 /*
    Структура показателя    GGG CC N H I OO R VVV
@@ -19,6 +19,12 @@ IS
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+15.11.2017  переход на новый план счетов
+27.10.2017  сегмент N равен 5 при установленном доп.параметре клиента "юр.лицо SPE"
+10.10.2017  код контрагента дополнительно определяется по customer.CUSTTYPE
+11.09.2017  сегмент H равен 1 для ggg=161
+09.08.2017  уточнения по отображению рисковых/безрисковых ЦБ (счета 3-го класса)
+              по видам задолженности GGG =130,133,135,138
 28.07.2017  -изменение справочника соответствия GGG балансовым счетам
             -расширение списка нерисковых активов по условию pd_0 =1
 11.04.2017  ggg=133 и счета 3-го класса не переносятся в ggg=130,
@@ -57,6 +63,7 @@ nbuc1_      varchar2(30);
 nbuc_       varchar2(30);
 
 is_budg_       number;         --при поиске счетов бюджета, раздел 25
+is_spe_        varchar2(1);    --при проверке юр.лиц на принадлежность SPE
 
    CURSOR basel
    IS
@@ -181,18 +188,34 @@ BEGIN
        comm_ := 'ID='||k.id||' RNK='||k.rnk||' ND='||k.nd||' DDD='||k.ddd;
 
        CC_ := '11';
-       if k.codcagent in (1, 2)
-       then
-          N_ := '3';                          --банки
-       elsif k.codcagent in (3, 4)
-       then
--- поиск счетов раздела 25 -бюджетные организации
---                 select count( * )  into is_budg_
---                   from accounts
---                  where rnk = k.rnk
---                    and ( nls like '21%' or nls like '25%' );
 
-             if k.nls like '21%'  then
+       if k.codcagent in (1, 2)               -- банки
+       then
+          N_ := '3';                          
+       elsif k.codcagent in (3, 4)            -- юр.лица
+       then
+
+--   проверка наличия доп.параметра ISSPE
+          begin
+            select nvl(trim(value),'0')   into is_spe_
+              from customerw
+             where rnk =k.rnk
+               and tag ='ISSPE';
+          exception
+            when others
+               then is_spe_ :='0';
+          end;
+
+          if is_spe_ ='1'  then
+
+             N_ := '5';
+          else
+
+             if k.nls like '21%'    or
+                k.nls like '236%'   or
+                k.nls like '237%'   or
+                k.nls like '238%'   
+             then
                      is_budg_ := 1;
              else    is_budg_ := 0;
              end if;
@@ -200,7 +223,7 @@ BEGIN
              -- временно на 01.02.2017
              -- для контрагента Министерство финансов ........
              if    is_budg_ !=0  or
-                   ( mfo_ = 300465 and k.rnk in (90092301, 943128) ) then
+                   ( mfo_ = 300465 and k.rnk in (90092301, 94312801) ) then
 
                   N_ := '4';                  --бюджет
              elsif k.sed = '56'  then
@@ -209,6 +232,8 @@ BEGIN
                   N_ := '2';                  --юр.лицо
              end if;
 
+          end if;
+
        elsif k.codcagent in (5,6) and k.sed <> '91'
        then
           N_ := '1';                          --физ.лицо
@@ -216,17 +241,24 @@ BEGIN
        then
           N_ := '1';                    --физ.лицо предприниматель (ранее =2)
        else
-          N_ := 'X';
+
+          if    k.custtype ='1'  then   N_ := '3';
+          elsif k.custtype ='2'  then   N_ := '2';
+          elsif k.custtype ='3'  then   N_ := '1';
+          else
+               N_ := 'X';
+          end if;
+
        end if;
 
        OO_ := '00';
 
        -- балансова вартiсть нарахованих вiдсоткiв в тому числi
        if k.BV <> 0
-          and ( (k.nbs like '___8%' or k.nbs like '___9%' or k.nbs in ('1607','2607','2627','2657','8026') )
+          and ( (k.nbs like '___8%' or  k.nbs in ('1607','2607','2627','2657','8026') )
                 and k.nbs not like '9%'
                 and ddd_ not like '15%'
-          or  ddd_ like '15%' and k.nbs in ('3570','3578','3579') )
+          or  ddd_ like '15%' and k.nbs in ('3570','3578') )
        then
           CC_ := '12';
        end if;
@@ -241,7 +273,7 @@ BEGIN
           H_ := '0';
        end if;
 
-       if  ddd_ ='133' and k.nbs like '3%'   then
+       if ddd_ ='161'  then
           H_ := '1';
        end if;
 
@@ -270,31 +302,45 @@ BEGIN
           I_ := 'A';
        end if;
 
-       if dat_ =to_date('20170131','yyyymmdd') and N_ ='6' and H_ ='1'  then
-          N_ := '2';
-       end if;
-
        if N_ ='X'  and ddd_ between '152' and '153'  then
           N_ :='3';
        end if;
 
        -- для контрагента Министерство финансов ........
-       if mfo_ = 300465 and k.rnk in (90092301, 943128)
+       if mfo_ = 300465 and k.rnk in (90092301, 94312801)
        then
           I_ := 'M';
        end if;
 
        if    k.pd_0 =1  and
              k.nbs in ('1400','1401','1402','1405','1408', 
-                       '1410','1411','1412','1415','1418','1419',
-                       '1420','1421','1422','1428','1429',
-                       '3002', '3007', '3008',
-                       '3015', '3018',         
-                       '3102', '3107', '3108',
-                       '3115', '3118', '3119', 
-                       '3218', '3219')
+                       '1410','1411','1412','1415','1418',
+                       '1420','1421','1422','1428',
+                       '3002','3007','3008','3102','3107','3108')
        then  
            ddd_ :='130';   
+           H_ := '0';
+
+       end if;
+
+-- отдельная обработка  счетов 3-го класса -могут быть в ggg=130
+ 
+       if  ddd_ in('133','135','138') and k.nbs like '3%'   then
+                 
+          select count(*)  into pr_
+            from nbu23_rez
+           where fdat = z.fdat1
+             and nd = k.nd
+             and nbs = substr(k.nbs,1,3)||'0';
+
+          if pr_ !=0  then
+
+              ddd_ :='130';   
+              H_ := '0';
+          else
+
+              H_ := '1';
+          end if;
        end if;
 
        -- вся балансова вартiсть
@@ -525,5 +571,5 @@ BEGIN
   logger.info ('P_F6B_NN: End for datf = '||to_char(dat_, 'dd/mm/yyyy'));
 END p_f6b_nn;
 /
---show err;
+
 

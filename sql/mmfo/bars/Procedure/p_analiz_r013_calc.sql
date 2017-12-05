@@ -9,7 +9,7 @@ PROMPT *** Create  procedure P_ANALIZ_R013_CALC ***
 
   CREATE OR REPLACE PROCEDURE BARS.P_ANALIZ_R013_CALC (
 -------------------------------------------------------------------------------
--- VERSION: 25.10.2016   ( 28.07.2016, 09.12.2015)
+-- VERSION: 22/11/2017 (25.10.2016)
 -------------------------------------------------------------------------------
 -- 25.10.2016 для SN обороты ДТ со счетов SNO сопоставляются оборотам КТ в более
 --             поздние даты для расчета R013 >30дн
@@ -332,100 +332,94 @@ BEGIN
    comm_ := comm_ || ' freq=' || TO_CHAR (freq_);
 
 ----------------------------------------------------------------------------¬
-      l_se_ :=se_;         --включено для возможности корректировки остатка
-      dose_sn_ :=0;
-      dos_sn_ :=0;
-      kos_sn_ :=0;
+   l_se_ :=se_;         --включено для возможности корректировки остатка
+   dose_sn_ :=0;
+   dos_sn_ :=0;
+   kos_sn_ :=0;
 
--- для счетов SN дополнительно определяются ДТ обороты в корреспонденции
--- со счетами SNO для отображения в разрезе R013 >30дн
-      if type_calc =1 and tip_ ='SN'  then
+   -- для счетов SN дополнительно определяются ДТ обороты в корреспонденции
+   -- со счетами SNO для отображения в разрезе R013 >30дн
+   if type_calc =1 and trim(tip_) ='SN'  then
+      begin
+          select nvl(sum(od.s),0),
+                 min(od.fdat)     
+          into dos_sn_, dos_dat_
+          from opldok od, opldok ok, accounts ak
+          where od.fdat  between dat_ -29 and dat_
+            and od.acc = acc_
+            and od.dk = 0
+            and od.sos = 5
+            and od.ref = ok.ref
+            and od.fdat = ok.fdat
+            and od.stmt = ok.stmt
+            and ok.fdat  between dat_ -29 and dat_
+            and ok.dk = 1
+            and ok.sos = 5
+            and ok.acc = ak.acc
+            and ak.tip = 'SNO';
+      exception
+         when others  then  dos_sn_ :=0;
+                            dos_dat_ :=NULL;
+      end;
 
-          begin
-             select nvl(sum(od.s),0),
-                    min(od.fdat)     into dos_sn_, dos_dat_
-               from opldok od, opldok ok, accounts ak
-              where od.fdat  between dat_ -29 and dat_
-                and od.acc = acc_
-                and od.dk = 0
-                and od.sos = 5
-                and od.ref = ok.ref
-                and od.fdat = ok.fdat
-                and od.stmt = ok.stmt
-                and ok.fdat  between dat_ -29 and dat_
+      if dos_sn_ != 0 and dos_dat_ is not null  then
+           begin
+              select sum(ok.s)   
+              into kos_sn_
+              from opldok ok
+              where ok.fdat  between dos_dat_  and dat_
+                and ok.acc = acc_
                 and ok.dk = 1
                 and ok.sos = 5
-                and ok.acc = ak.acc
-                and ak.tip = 'SNO';
+              group by ok.acc;
+           exception
+              when others  then  kos_sn_ :=0;
+           end;
 
-          exception
-             when others  then  dos_sn_ :=0;
-                                dos_dat_ :=NULL;
-          end;
+           if dos_sn_ > kos_sn_  then
+              dos_sn_ := (-1)* (dos_sn_-kos_sn_);
 
-          if dos_sn_ != 0 and dos_dat_ is not null  then
-
-               begin
-                 select sum(ok.s)   into kos_sn_
-                   from opldok ok
-                  where ok.fdat  between dos_dat_  and dat_
-                    and ok.acc = acc_
-                    and ok.dk = 1
-                    and ok.sos = 5
-                  group by ok.acc;
-               exception
-                  when others  then  kos_sn_ :=0;
-               end;
-
-               if dos_sn_ > kos_sn_  then
-                  dos_sn_ := (-1)* (dos_sn_-kos_sn_);
-
-                  if kv_ !=980  then
-                      dose_sn_ := gl.p_icurval(kv_, dos_sn_, dat_);
-                  else
-                      dose_sn_ := dos_sn_;
-                  end if;
-            
-               else
-                  dos_sn_ := 0;
-                  dose_sn_ := 0;
-               end if;
-          end if;
+              if kv_ !=980  then
+                  dose_sn_ := gl.p_icurval(kv_, dos_sn_, dat_);
+              else
+                  dose_sn_ := dos_sn_;
+              end if;
+                
+           else
+              dos_sn_ := 0;
+              dose_sn_ := 0;
+           end if;
       end if;
---
+   end if;
+
    IF NVL(freq_, 400) = 5 and
       not (300465 IN (mfo_, mfou_) and tip_ = 'SNO')
    THEN                                             -- погашение % ежемесячное
-
------------------------------------------------------------------------------
---   корректировка остатка с учетом наличия оборотов ДТ с SNO
-      if type_calc =1 and tip_ ='SN' and dose_sn_ !=0  then
-
-            if abs(dose_sn_) >= abs(l_se_)  then
-
-                 dose_sn_ := l_se_ ;
-                 l_se_ := 0;
-            else
-                 l_se_ := l_se_ -dose_sn_;
-            end if;
+      ----------------------------------------------------------------------------- 
+      --   корректировка остатка с учетом наличия оборотов ДТ с SNO
+      if type_calc =1 and trim(tip_) ='SN' and dose_sn_ !=0  then
+         if abs(dose_sn_) >= abs(l_se_)  then
+            dose_sn_ := l_se_ ;
+            l_se_ := 0;
+         else
+            l_se_ := l_se_ -dose_sn_;
+         end if;
+         
 --    свыше 30 дней  -создать o_r013_2, заполнив  o_se_2  значением  dose_sn
-
-            o_r013_2 := f_ret_r013 (nbs_, kv_, r013_, 2);
-            o_comm_2 := comm_ || ' оборот з SNO';
-            o_se_2 := dose_sn_;
+         o_r013_2 := f_ret_r013 (nbs_, kv_, r013_, 2);
+         o_comm_2 := comm_ || ' оборот з SNO';
+         o_se_2 := dose_sn_;
+         
 --    до 30 дней
-            o_r013_1 := NULL;
-            o_comm_1 := NULL;
-            o_se_1 := 0;
+         o_r013_1 := NULL;
+         o_comm_1 := NULL;
+         o_se_1 := 0;
 
-            if l_se_ !=0  then
-
-              o_r013_1 := f_ret_r013 (nbs_, kv_, r013_, 1);
-              o_comm_1 := comm_ || ' без обороту(погашений) SNO';
-              o_se_1 := l_se_;
-
-            end if;
-
+         if l_se_ !=0  then
+            o_r013_1 := f_ret_r013 (nbs_, kv_, r013_, 1);
+            o_comm_1 := comm_ || ' без обороту(погашений) SNO';
+            o_se_1 := l_se_;
+         end if;
 -----------------------------------------------------------------------------
       else
          o_r013_1 := f_ret_r013 (nbs_, kv_, r013_, 1);
@@ -437,9 +431,7 @@ BEGIN
       
          o_se_1 := se_;
       end if;
-
    elsif 300465 IN (mfo_, mfou_) and tip_ = 'SNO' then
-
       -- Долинченко и Сухова: относить с таким типом к R013 = 4
       if r013_ = '3' then
          o_r013_1 := r013_;
@@ -467,8 +459,11 @@ BEGIN
             o_r013_2 := null;
          end if;
       end if;
+   elsif newnbs.g_state = 1 and tip_ = 'SPN' then -- після переходу на новий ПР відносимо простроченівідсотки  до > 30 днів
+         o_r013_2 := f_ret_r013 (nbs_, kv_, r013_, 2);
+         o_comm_2 := comm_ || ' (SPN, тобто > 30 днів) міняємо R013='||r013_||' на '||o_r013_2;
+         o_se_2 := se_;
    ELSE                                          -- погашение % НЕ ежемесячное
-
       -- ищем обороты по начислению % на протяжении 30 дней
       SELECT (-1) * NVL (SUM (dos), 0)
         INTO dos_
@@ -502,18 +497,15 @@ BEGIN
 
 -----------------------------------------------------------------------------
 --   корректировка остатка/оборота с учетом наличия оборотов ДТ с SNO
-      if type_calc =1 and tip_ ='SN' and dose_sn_ !=0  then
-
-            if abs(dose_sn_) >= abs(l_se_)  then
-
-                 dose_sn_ := l_se_ ;
-                 l_se_ := 0;
-                 dose_ := 0;
-            else
-
-                 l_se_ := l_se_ -dose_sn_;
-                 dose_ := dose_ -dose_sn_;
-            end if;
+      if type_calc =1 and trim(tip_) ='SN' and dose_sn_ !=0  then
+         if abs(dose_sn_) >= abs(l_se_)  then
+            dose_sn_ := l_se_ ;
+            l_se_ := 0;
+            dose_ := 0;
+         else
+            l_se_ := l_se_ -dose_sn_;
+            dose_ := dose_ -dose_sn_;
+         end if;
       end if;
 -----------------------------------------------------------------------------
       -- если не начислялись % на протяжении 30 дней,
@@ -542,6 +534,7 @@ BEGIN
          o_r013_1 := f_ret_r013 (nbs_, kv_, r013_, 1);
          o_comm_1 := comm_ || ' розбивка залишку';
          o_se_1 := dose_;
+         
          -- остальная часть остатка
          o_r013_2 := f_ret_r013 (nbs_, kv_, r013_, 2);
          o_comm_2 := comm_ || ' розбивка залишку';
@@ -557,7 +550,6 @@ BEGIN
          END IF;
 
          o_se_1 := l_se_;
-
       END IF;
 ----------------------------------------------------------------------------¬
 --   создать/дополнить o_r013_2,o_se_2 ненулевой суммой dose_sn (оборотоы ДТ с SNO

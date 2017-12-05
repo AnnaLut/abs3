@@ -103,13 +103,10 @@ CREATE OR REPLACE PACKAGE BODY BARS.LORO IS
 -- Раскоментарить  DATE_PAY
 ----!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
- G_BODY_VERSION  CONSTANT VARCHAR2(64)  :=   'ver.2 05.09.2016';
+ G_BODY_VERSION  CONSTANT VARCHAR2(64)  :=   'ver.3 от 23.11.2017 ';
 
---Олексій Климентьєв Tel.:+38 044 247-8403 klimentevov@oschadbank.ua
---        | Хихлуха Дима + Макаренко Игорь|       247-85-78
-
----================================================================
 /*
+23.11.2017 Сухова  Трансфер-2017
 
 19.01.2017 Щебнєв О.
            В SWT_SWT введеня доп.реквізивіт переведено на SET_OPERW, для уникнення помилки на OPERW_PK,
@@ -392,7 +389,11 @@ procedure SWT_SEP   -- L-1
   bb custbank%rowtype ;
   sTmp_  SW_OPERW.value%type;  nTmp_  number;  i1_ int; i2_ int; i3_ int ;
   flg37_ char(1)      ;  nlchr  char(2)     := chr(13)||chr(10);
+
+  nls_6100 accounts.NLS%type ;
+
 begin
+  If NVL(newnbs.g_state,0)  = 1 then  nls_6100 :='6500010201515' ;  Else nls_6100 := '6100410201515' ;  end if ; -- -- Трансфер-2017
 
   If not ( p_Mfob <> gl.aMfo OR p_NLSB like '1600%' )  then RETURN; end if;
 
@@ -443,7 +444,7 @@ begin
              sb_   => oo.s    , sq_   => null   , nom_  => null  ) ;
    If p_Mfob <> gl.aMfo then
       oo.s := f_tarif ( 198 , oo.kv, ll.nlsa, oo.s, 0);
-      gl.PAYv ( 0, oo.ref, gl.bdate, 'D06', 1, oo.kv, ll.nlsa, oo.s, gl.baseval, '6100410201515', oo.s );
+      gl.PAYv ( 0, oo.ref, gl.bdate, 'D06', 1, oo.kv, ll.nlsa, oo.s, gl.baseval, nls_6100, oo.s ); 
    end if;
 
    INSERT INTO sw_oper (ref, swref )    values (oo.ref , p_swref              ) ;

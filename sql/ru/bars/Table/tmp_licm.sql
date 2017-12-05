@@ -63,7 +63,8 @@ begin
 	ROWTYPE NUMBER, 
 	GRPLIST VARCHAR2(70), 
 	D_REC VARCHAR2(60), 
-	REFNLS VARCHAR2(14)
+	REFNLS VARCHAR2(14),
+    NLSALT  VARCHAR2(15)
    ) ON COMMIT PRESERVE ROWS ';
 exception when others then       
   if sqlcode=-955 then null; else raise; end if; 
@@ -78,6 +79,22 @@ PROMPT *** ALTER_POLICIES to TMP_LICM ***
 
 
 COMMENT ON TABLE BARS.TMP_LICM IS 'Временная таблица для отчетности по выпискам';
+COMMENT ON COLUMN BARS.TMP_LICM.FDAT IS 'Дата движения по счету';
+COMMENT ON COLUMN BARS.TMP_LICM.TIP IS 'тип  счета';
+COMMENT ON COLUMN BARS.TMP_LICM.ACC IS 'acc счета';
+COMMENT ON COLUMN BARS.TMP_LICM.NLS IS 'Лицевой счет выписки';
+COMMENT ON COLUMN BARS.TMP_LICM.KV IS 'Валюта счета выписки';
+COMMENT ON COLUMN BARS.TMP_LICM.NMS IS 'Наименование счет выписки';
+COMMENT ON COLUMN BARS.TMP_LICM.OKPO IS 'ОКПО клиента счета';
+COMMENT ON COLUMN BARS.TMP_LICM.NMK IS 'Наименовнаие клиента счета';
+COMMENT ON COLUMN BARS.TMP_LICM.DAPP IS 'Датат пред. движения по счету выписки';
+COMMENT ON COLUMN BARS.TMP_LICM.ISP IS 'Исполнитель счета';
+COMMENT ON COLUMN BARS.TMP_LICM.OSTF IS 'Входящий остаток на дату движения';
+COMMENT ON COLUMN BARS.TMP_LICM.OSTFQ IS 'Входящий остаток(эквив) на дату движения';
+COMMENT ON COLUMN BARS.TMP_LICM.OSTFR IS 'Входящий остаток(с переоценкой) на дату движения';
+COMMENT ON COLUMN BARS.TMP_LICM.DOS IS 'Обороты дебет';
+COMMENT ON COLUMN BARS.TMP_LICM.KOS IS 'Обороты кредит';
+COMMENT ON COLUMN BARS.TMP_LICM.DOSQ IS 'Обороты дебет (эквив)';
 COMMENT ON COLUMN BARS.TMP_LICM.KOSQ IS 'Обороты кредит (эквив)';
 COMMENT ON COLUMN BARS.TMP_LICM.DOSR IS 'Обороты дебет (с переоценкой)';
 COMMENT ON COLUMN BARS.TMP_LICM.KOSR IS 'Обороты кредит (с переоценкой)';
@@ -105,23 +122,7 @@ COMMENT ON COLUMN BARS.TMP_LICM.ROWTYPE IS '';
 COMMENT ON COLUMN BARS.TMP_LICM.GRPLIST IS 'Список отчетных групп в кот. входит счет';
 COMMENT ON COLUMN BARS.TMP_LICM.D_REC IS '';
 COMMENT ON COLUMN BARS.TMP_LICM.REFNLS IS 'Лицевой счет по которому был выполнен платеж(если выписка делается по родительскому счету - не дочернему)';
-COMMENT ON COLUMN BARS.TMP_LICM.FDAT IS 'Дата движения по счету';
-COMMENT ON COLUMN BARS.TMP_LICM.TIP IS 'тип  счета';
-COMMENT ON COLUMN BARS.TMP_LICM.ACC IS 'acc счета';
-COMMENT ON COLUMN BARS.TMP_LICM.NLS IS 'Лицевой счет выписки';
-COMMENT ON COLUMN BARS.TMP_LICM.KV IS 'Валюта счета выписки';
-COMMENT ON COLUMN BARS.TMP_LICM.NMS IS 'Наименование счет выписки';
-COMMENT ON COLUMN BARS.TMP_LICM.OKPO IS 'ОКПО клиента счета';
-COMMENT ON COLUMN BARS.TMP_LICM.NMK IS 'Наименовнаие клиента счета';
-COMMENT ON COLUMN BARS.TMP_LICM.DAPP IS 'Датат пред. движения по счету выписки';
-COMMENT ON COLUMN BARS.TMP_LICM.ISP IS 'Исполнитель счета';
-COMMENT ON COLUMN BARS.TMP_LICM.OSTF IS 'Входящий остаток на дату движения';
-COMMENT ON COLUMN BARS.TMP_LICM.OSTFQ IS 'Входящий остаток(эквив) на дату движения';
-COMMENT ON COLUMN BARS.TMP_LICM.OSTFR IS 'Входящий остаток(с переоценкой) на дату движения';
-COMMENT ON COLUMN BARS.TMP_LICM.DOS IS 'Обороты дебет';
-COMMENT ON COLUMN BARS.TMP_LICM.KOS IS 'Обороты кредит';
-COMMENT ON COLUMN BARS.TMP_LICM.DOSQ IS 'Обороты дебет (эквив)';
-
+COMMENT ON COLUMN BARS.TMP_LICM.NLSALT IS 'Альтернативный номер счета';
 
 
 PROMPT *** Create  grants  TMP_LICM ***

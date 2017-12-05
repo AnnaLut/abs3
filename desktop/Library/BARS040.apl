@@ -4,7 +4,7 @@ Application Description: ОБ ЭНЕРГОРЫНОК
 .data VIEWINFO
 0000: 6F00000001000000 FFFF01000D004347 5458566965775374 6174650400010000
 0020: 00000000001D0100 002C000000020000 0003000000000000 001C020000F8FFFF
-0040: FFE2FFFFFFFFFFFF FF000000007C0200 004D010000010000 0000000000010000
+0040: FFE1FFFFFFFFFFFF FF000000007C0200 004D010000010000 0001000000010000
 0060: 000F4170706C6963 6174696F6E497465 6D00000000
 .enddata
 .data DT_MAKERUNDLG
@@ -326,11 +326,11 @@ Application Description: ОБ ЭНЕРГОРЫНОК
 							Break
 						!
 						! Case 30
-							                                                 Call SalCreateWindow(tblView, hWndParent, nPar, strPar01, strPar02)
-							                                                 Break 
+							                                                  Call SalCreateWindow(tblView, hWndParent, nPar, strPar01, strPar02)
+							                                                  Break 
 						! Case 31
-							                                                Call SalCreateWindow(tblView2, hWndParent, nPar, strPar01, strPar02)
-							                                                Break 
+							                                                 Call SalCreateWindow(tblView2, hWndParent, nPar, strPar01, strPar02)
+							                                                 Break 
 						Case 31
 							Call SalCreateWindow(frmView4, hWndParent, nPar, strPar01, strPar02)
 							Break
@@ -3403,10 +3403,10 @@ Application Description: ОБ ЭНЕРГОРЫНОК
 						On SAM_Create
 							Set strTip = 'Учасники вибранного Протоколу '
 						! On SAM_Create
-							                                                                                                         If nMode = 0 
-								                                                                                                         Set strTip = 'Генерація платежів по взвєморозрахунку вибраного Протоколу '
-							                                                                                                         Else 
-								                                                                                                         Set strTip = 'Учасники вибранного Протоколу '
+							                                                                                                          If nMode = 0 
+								                                                                                                          Set strTip = 'Генерація платежів по взвєморозрахунку вибраного Протоколу '
+							                                                                                                          Else 
+								                                                                                                          Set strTip = 'Учасники вибранного Протоколу '
 				Pushbutton: pbPrint
 					Class Child Ref Key: 40
 					Class ChildKey: 0
@@ -5924,23 +5924,23 @@ Application Description: ОБ ЭНЕРГОРЫНОК
 							! Call SalTblSetRowFlags( hWndForm, SalTblQueryContext(  hWndForm  ),
 									IifN( ID = NUMBER_Null, ROW_New, ROW_Edited ),  TRUE )
 							! ! Function: FunNSIGetFiltered
-								                                                                                                      Description: Выбрать значение из фильтрованого справочника
-								                                                                                                      Returns
-									                                                                                                      Number: nRet
-								                                                                                                      Parameters
-									                                                                                                      String: strNSITblName
-									                                                                                                      String: strSKColumn
-									                                                                                                      String: strFilter
-									                                                                                                      Receive String: strFKReturn
-									                                                                                                      Receive String: strSKReturn
-								                                                                                                      Static Variables
-								                                                                                                      Local variables
-									                                                                                                      Number: fReturnResult
-									                                                                                                      String: strFKey
-									                                                                                                      String: strSKey
-								                                                                                                      Actions
-									                                                                                                      Call IniNsiApi()
-									                                                                                                      Set fReturnResult =  SalModalDialog( dlg_universal_nsi_get, hWndForm,
+								                                                                                                       Description: Выбрать значение из фильтрованого справочника
+								                                                                                                       Returns
+									                                                                                                       Number: nRet
+								                                                                                                       Parameters
+									                                                                                                       String: strNSITblName
+									                                                                                                       String: strSKColumn
+									                                                                                                       String: strFilter
+									                                                                                                       Receive String: strFKReturn
+									                                                                                                       Receive String: strSKReturn
+								                                                                                                       Static Variables
+								                                                                                                       Local variables
+									                                                                                                       Number: fReturnResult
+									                                                                                                       String: strFKey
+									                                                                                                       String: strSKey
+								                                                                                                       Actions
+									                                                                                                       Call IniNsiApi()
+									                                                                                                       Set fReturnResult =  SalModalDialog( dlg_universal_nsi_get, hWndForm,
 											    SalStrUpperX( SalStrTrimX( strNSITblName )),
 											    '',
 											    SalStrUpperX( SalStrTrimX( strSKColumn )),
@@ -5948,10 +5948,10 @@ Application Description: ОБ ЭНЕРГОРЫНОК
 											    strFKey,
 											    strSKey,
 											    TRUE )
-									                                                                                                      If fReturnResult
-										                                                                                                      Set strFKReturn = strFKey
-										                                                                                                      Set strSKReturn = strSKey
-									                                                                                                      Return fReturnResult
+									                                                                                                       If fReturnResult
+										                                                                                                       Set strFKReturn = strFKey
+										                                                                                                       Set strSKReturn = strSKey
+									                                                                                                       Return fReturnResult
 			Function: F_Close
 				Description:
 				Returns
@@ -9660,10 +9660,10 @@ Application Description: ОБ ЭНЕРГОРЫНОК
 							Else
 								Call SalBringWindowToTop ( hKOB3 )
 				! ctb_pbExecute: pb_Nsi
-					                                                                             Message Actions
-						                                                                             On SAM_Create
-							                                                                             Set strTip = 'Генерація документів на сплату комісії'
-						                                                                             On SAM_Click
+					                                                                              Message Actions
+						                                                                              On SAM_Create
+							                                                                              Set strTip = 'Генерація документів на сплату комісії'
+						                                                                              On SAM_Click
 		Contents
 			Column: RNK
 				Class Child Ref Key: 0
@@ -9731,11 +9731,11 @@ Application Description: ОБ ЭНЕРГОРЫНОК
 				List Values
 				Message Actions
 					! On SAM_SetFocus
-						                                                                            Set sTmpE = NMS26
+						                                                                             Set sTmpE = NMS26
 					! On SAM_AnyEdit
-						                                                                            Set NMS26 = sTmpE
-						                                                                            If ACC26 >0
-							                                                                            Call SalTblSetRowFlags( hWndForm, lParam, ROW_Edited, FALSE )
+						                                                                             Set NMS26 = sTmpE
+						                                                                             If ACC26 >0
+							                                                                             Call SalTblSetRowFlags( hWndForm, lParam, ROW_Edited, FALSE )
 			Column: DATND
 				Class Child Ref Key: 0
 				Class ChildKey: 0
@@ -9832,11 +9832,11 @@ Application Description: ОБ ЭНЕРГОРЫНОК
 				List Values
 				Message Actions
 					! On SAM_SetFocus
-						                                                                            Set sTmpE = NMS26
+						                                                                             Set sTmpE = NMS26
 					! On SAM_AnyEdit
-						                                                                            Set NMS26 = sTmpE
-						                                                                            If ACC26 >0
-							                                                                            Call SalTblSetRowFlags( hWndForm, lParam, ROW_Edited, FALSE )
+						                                                                             Set NMS26 = sTmpE
+						                                                                             If ACC26 >0
+							                                                                             Call SalTblSetRowFlags( hWndForm, lParam, ROW_Edited, FALSE )
 			Column: NLS26
 				Class Child Ref Key: 0
 				Class ChildKey: 0
@@ -9984,7 +9984,7 @@ Application Description: ОБ ЭНЕРГОРЫНОК
 										" and ACCOUNTS.DAZS is null and ACCOUNTS.NBS ='3570' ",
 										sTmp,NLS35)
 							! Else If Subs(NLS26,1,2) ='29' 
-								         Call FunNSIGetFiltered
+								          Call FunNSIGetFiltered
 										("ACCOUNTS","NLS",
 										" ACCOUNTS.RNK="||Str(RNK)||
 										" and ACCOUNTS.KV="||Str(KV)||
@@ -10112,10 +10112,10 @@ Application Description: ОБ ЭНЕРГОРЫНОК
 							Call FunNSIGetFiltered
 									("ACCOUNTS","NLS",
 									" ACCOUNTS.KV="||Str(n980)||
-									" and ACCOUNTS.DAZS is null and ACCOUNTS.NBS ='6110' ",
+									" and ACCOUNTS.DAZS is null and ACCOUNTS.NBS ='6510' ",
 									sTmp,NLS6)
 						! Else If Subs(NLS26,1,2) ='29' 
-							         Call FunNSIGetFiltered
+							          Call FunNSIGetFiltered
 									("ACCOUNTS","NLS",
 									" ACCOUNTS.KV="||Str(n980)||
 									" and ACCOUNTS.DAZS is null "|| 
@@ -14740,14 +14740,14 @@ Application Description: ОБ ЭНЕРГОРЫНОК
 							Call SalTblSetRowFlags( hWndForm, lParam, ROW_Edited, FALSE )
 							Call SalTblSetRowFlags( hWndForm, lParam, ROW_New, FALSE )
 						! If S67 = 0 
-							            If sTmp != STRING_Null
-								            Set OB_NEW= sTmp
-								            Call SalTblSetRowFlags( hWndForm, SalTblQueryContext(hWndForm),
+							             If sTmp != STRING_Null
+								             Set OB_NEW= sTmp
+								             Call SalTblSetRowFlags( hWndForm, SalTblQueryContext(hWndForm),
 										IifN( ERR='NOT', ROW_New, ROW_Edited ),  TRUE )
-								            Set ERR = sTmp1
-							            Else 
-								            Call SalTblSetRowFlags( hWndForm, lParam, ROW_Edited, FALSE )
-								            Call SalTblSetRowFlags( hWndForm, lParam, ROW_New, FALSE )
+								             Set ERR = sTmp1
+							             Else 
+								             Call SalTblSetRowFlags( hWndForm, lParam, ROW_Edited, FALSE )
+								             Call SalTblSetRowFlags( hWndForm, lParam, ROW_New, FALSE )
 			Column: NM_NEW
 				Class Child Ref Key: 0
 				Class ChildKey: 0
@@ -15423,7 +15423,7 @@ Application Description: ОБ ЭНЕРГОРЫНОК
 							Return XSalTooltipSetText( lParam, 'Графічно "До сплати"' )
 						On SAM_Click
 							! If hTK = hWndNULL
-								                                                             Set hTK = SalCreateWindow( GRA, hWndForm, hWndForm.RES.nMode )
+								                                                              Set hTK = SalCreateWindow( GRA, hWndForm, hWndForm.RES.nMode )
 							If NOT IsWindow( hTK ) 
 								Set hTK = SalCreateWindow( GRA, hWndForm, hWndForm, hWndForm.RES.nMode )
 							! Call SalCreateWindow( GRA, hWndForm, hWndForm.RES.nMode )
@@ -15900,9 +15900,9 @@ Application Description: ОБ ЭНЕРГОРЫНОК
 						Set hWndForm.RES.sTtitl = hWndForm.RES.sTtitl || " Розріз: РУ "
 					!
 					! If hWndForm.RES.rb0 OR hWndForm.RES.nMode = 23 and hWndForm.RES.rb1
-						                                                                  Call SalShowWindow( hWndForm.RES.pbGRA )
+						                                                                   Call SalShowWindow( hWndForm.RES.pbGRA )
 					! Else
-						                                                                  Call SalHideWindow( hWndForm.RES.pbGRA )
+						                                                                   Call SalHideWindow( hWndForm.RES.pbGRA )
 					If hWndForm.RES.rb1 OR hWndForm.RES.rb0 
 						Call SalHideWindow( hWndForm.RES.KOD )
 						Call SalHideWindow( hWndForm.RES.NAME )
@@ -16129,8 +16129,8 @@ Application Description: ОБ ЭНЕРГОРЫНОК
 				Call hWndForm.RES.IG()
 				! Call XSalTblSetRowBackColor( hWndForm, lParam, hWndForm.RES.mCol[hWndForm.RES.nCol] )
 				! If hWndForm.RES.sKod != hWndForm.RES.KOD
-					                                                                  Set hWndForm.RES.sKod = hWndForm.RES.KOD
-					                                                                  Set hWndForm.RES.nCol = NOT hWndForm.RES.nCol
+					                                                                   Set hWndForm.RES.sKod = hWndForm.RES.KOD
+					                                                                   Set hWndForm.RES.nCol = NOT hWndForm.RES.nCol
 			On SAM_DoubleClick
 				If hWndForm.RES.rb0
 					Call SalCreateWindow( RES, hWndMDI, hWndForm.RES.nMode, 
@@ -17436,13 +17436,13 @@ Application Description: ОБ ЭНЕРГОРЫНОК
 					Set OSTC = nOSTC
 					Set OSTB = nOSTB
 					! If I01 > 0
-						                                                                Set P01 = 100
+						                                                                 Set P01 = 100
 					! If I02 > 0
-						                                                                Set P02 = 100
+						                                                                 Set P02 = 100
 					! If I03 > 0
-						                                                                Set P03 = 100
+						                                                                 Set P03 = 100
 					! If I04 > 0
-						                                                                Set P04 = 100
+						                                                                 Set P04 = 100
 			Function: F_Opl
 				Description:
 				Returns
@@ -18575,30 +18575,30 @@ Application Description: ОБ ЭНЕРГОРЫНОК
 						Return FALSE
 					Return TRUE
 			! Function: SetParam
-				                                                     Description: 
-				                                                     Returns 
-				                                                     Parameters 
-					                                                     String: sView
-				                                                     Static Variables 
-				                                                     Local variables 
-					                                                     String: sSemantic
-				                                                     Actions 
-					                                                     Call SalTblReset(tblNSI)
-					                                                     Call SqlPrepareAndExecute(hSql(), "SELECT semantic INTO :sSemantic FROM meta_tables WHERE tabname=:sView")
-					                                                     Call SqlFetchNext(hSql(), nFetchRes)
-					                                                     Call SalSetWindowText(hWndForm, sSemantic)
+				                                                      Description: 
+				                                                      Returns 
+				                                                      Parameters 
+					                                                      String: sView
+				                                                      Static Variables 
+				                                                      Local variables 
+					                                                      String: sSemantic
+				                                                      Actions 
+					                                                      Call SalTblReset(tblNSI)
+					                                                      Call SqlPrepareAndExecute(hSql(), "SELECT semantic INTO :sSemantic FROM meta_tables WHERE tabname=:sView")
+					                                                      Call SqlFetchNext(hSql(), nFetchRes)
+					                                                      Call SalSetWindowText(hWndForm, sSemantic)
 					! Параметры окна
 					! strPrintFileName
-					                                                     Set hWndForm.tblView.strPrintFileName = SalStrLeftX(sView, 8) || '.ref'
+					                                                      Set hWndForm.tblView.strPrintFileName = SalStrLeftX(sView, 8) || '.ref'
 					! nFlags
-					                                                     Set hWndForm.tblView.nFlags = GT_ReadOnly
+					                                                      Set hWndForm.tblView.nFlags = GT_ReadOnly
 					! Параметры таблицы
-					                                                     Set hWndForm.tblView.tblNSI.strNSITableName = sView
-					                                                     Set hWndForm.tblView.tblNSI.nNSIMode = 1
-					                                                     Set hWndForm.tblView.tblNSI.nNSIModeEdit = 1
+					                                                      Set hWndForm.tblView.tblNSI.strNSITableName = sView
+					                                                      Set hWndForm.tblView.tblNSI.nNSIMode = 1
+					                                                      Set hWndForm.tblView.tblNSI.nNSIModeEdit = 1
 					!
-					                                                     Call SalSendClassMessage(SAM_Create, 0, 0)
-					                                                     Call SalWaitCursor(FALSE)
+					                                                      Call SalSendClassMessage(SAM_Create, 0, 0)
+					                                                      Call SalWaitCursor(FALSE)
 		Window Parameters
 			Number: nPar
 			String: sPar1
@@ -18654,11 +18654,11 @@ Application Description: ОБ ЭНЕРГОРЫНОК
 				If SalMessageBox('Вы действительно хотите выполнить накопление данных?' || PutCrLf() || 
 						   'Это займет некоторое время.', 'Вопрос', MB_IconQuestion | MB_YesNo) = IDYES
 					! If SalIsNull(dfDat1)
-						                                                   Call SalMessageBox('Не указана начальная дата регистрации компенс.вклада !', 'Внимание!', MB_IconExclamation)
-						                                                   Call SalSetFocus(dfDat1)
+						                                                    Call SalMessageBox('Не указана начальная дата регистрации компенс.вклада !', 'Внимание!', MB_IconExclamation)
+						                                                    Call SalSetFocus(dfDat1)
 					! Else If SalIsNull(dfDat2)
-						                                                   Call SalMessageBox('Не указана конечная дата регистрации компенс.вклада !', 'Внимание!', MB_IconExclamation)
-						                                                   Call SalSetFocus(dfDat2)
+						                                                    Call SalMessageBox('Не указана конечная дата регистрации компенс.вклада !', 'Внимание!', MB_IconExclamation)
+						                                                    Call SalSetFocus(dfDat2)
 					If fCheck()
 						Set sFilter =  
 								    IifS(rbMfo=TRUE, 
@@ -18687,7 +18687,7 @@ Application Description: ОБ ЭНЕРГОРЫНОК
 						Set colCnt = nCnt
 						Set colOst = nOst
 						! If smWColumnsS[0] != '' and ( SalGetDataType(hmWColumnsS[0]) = DT_String or SalGetDataType(hmWColumnsS[0]) = DT_LongString )
-							                                                     Call SalTblSetColumnText(hWndForm, SalTblQueryColumnID(hmWColumnsS[0]), 'Итого')
+							                                                      Call SalTblSetColumnText(hWndForm, SalTblQueryColumnID(hmWColumnsS[0]), 'Итого')
 						! Call SalTblSetColumnText(hWndForm, nIDCnt, Str(nCnt))
 						! Call SalTblSetColumnText(hWndForm, nIDOst, Str(nOst))
 			On SAM_FetchRowDone
@@ -20197,13 +20197,13 @@ Application Description: ОБ ЭНЕРГОРЫНОК
 				Call setColumns(TRUE)
 				Call SalSendClassMessage(SAM_Create, 0, 0)
 			! On SAM_CreateComplete
-				                                                 If strSqlPopulate != ''
-					                                                 If SetQueryFilter(cF) and cF.GetFilterWhereClause(TRUE)
-						                                                 Set fFilterAtStart = NOT fFilterAtStart
-						                                                 Call SalSendClassMessage(SAM_CreateComplete, 0, 0)
-					                                                 Else 
-						                                                 Call MessageNoWait("Не установлен фильтр !!!", "Информация", 2, 0)
-						                                                 Call SalDestroyWindow(hWndForm)
+				                                                  If strSqlPopulate != ''
+					                                                  If SetQueryFilter(cF) and cF.GetFilterWhereClause(TRUE)
+						                                                  Set fFilterAtStart = NOT fFilterAtStart
+						                                                  Call SalSendClassMessage(SAM_CreateComplete, 0, 0)
+					                                                  Else 
+						                                                  Call MessageNoWait("Не установлен фильтр !!!", "Информация", 2, 0)
+						                                                  Call SalDestroyWindow(hWndForm)
 			On UM_Populate
 				If not cbFile
 					If cF.GetFilterWhereClause(TRUE)
@@ -23301,29 +23301,29 @@ Application Description: ОБ ЭНЕРГОРЫНОК
 						Set sFiltr_ACC = 
 								" a.branch='" ||tbl.BRANCH || "' and a.nbs='" || tbl2.NBS || "' #1112111"
 					! On SAM_FetchRowDone
-						                                    Set strPopulate21 = 
+						                                     Set strPopulate21 = 
 								"select a.acc,a.kv,a.nls,a.nms,a.daos,a.dazs,a.rnk  
 								 into :BTI.tbl2.ACC, :BTI.tbl2.KV,  :BTI.tbl2.NLS, :BTI.tbl2.NMS, 
 								      :BTI.tbl2.DAOS,:BTI.tbl2.DAZS,:BTI.tbl2.RNK 
 								 from accounts a "
-						                                    If BTI.tbl2.NBS = '3800'
-							                                    Set nKv= 840
-						                                    Else 
-							                                    Set nKv= n980
-						                                    Set strWhere21 = 
+						                                     If BTI.tbl2.NBS = '3800'
+							                                     Set nKv= 840
+						                                     Else 
+							                                     Set nKv= n980
+						                                     Set strWhere21 = 
 								"where a.branch=:BTI.tbl.BRANCH and a.nbs=:BTI.tbl2.NBS and a.kv=:nKv " 
-						                                    If BTI.tbl2.OB22 = STRING_Null
-							                                    Set strPopulate21 = strPopulate21 || strWhere21
-						                                    Else 
-							 Set strPopulate21 = strPopulate21 || strWhere21 || 
+						                                     If BTI.tbl2.OB22 = STRING_Null
+							                                     Set strPopulate21 = strPopulate21 || strWhere21
+						                                     Else 
+							  Set strPopulate21 = strPopulate21 || strWhere21 || 
 									" and a.ob22=:BTI.tbl2.OB22"
-						                                    If SqlPrepareAndExecute( hSqlAux2(), strPopulate21 ||
+						                                     If SqlPrepareAndExecute( hSqlAux2(), strPopulate21 ||
 								 " order by nvl(a.dazs, :bDat ) desc " ) 
 								and SqlFetchNext( hSqlAux2(), nFetchRes )
-							                                    If BTI.tbl2.DAZS != DATETIME_Null
-								                                    Call XSalTblSetRowBackColor( hWndForm, lParam,  COLOR_Gray )
-						                                    Else 
-							                                    Call XSalTblSetRowBackColor( hWndForm, lParam, SalColorFromRGB( 255,210,250 ) )
+							                                     If BTI.tbl2.DAZS != DATETIME_Null
+								                                     Call XSalTblSetRowBackColor( hWndForm, lParam,  COLOR_Gray )
+						                                     Else 
+							                                     Call XSalTblSetRowBackColor( hWndForm, lParam, SalColorFromRGB( 255,210,250 ) )
 					On SAM_FetchRowDone
 						Set strPopulate21 = 
 								"select a.acc,a.kv,a.nls,a.nms,a.daos,a.dazs,a.rnk  
@@ -23629,7 +23629,7 @@ Application Description: ОБ ЭНЕРГОРЫНОК
 						On SAM_Create
 							Set strTip = 'Відкрити вибрану дату'
 						! On SAM_Click
-							                   Call NASELENIE(  )
+							                    Call NASELENIE(  )
 				Pushbutton: pbIns
 					Class Child Ref Key: 33
 					Class ChildKey: 0
@@ -23998,7 +23998,7 @@ Application Description: ОБ ЭНЕРГОРЫНОК
 						Background Color: Default
 						DLL Settings
 .end
-					                 Message Actions 
+					                  Message Actions 
 		Contents
 			Column: KOL
 				Class Child Ref Key: 0
@@ -24498,7 +24498,7 @@ Application Description: ОБ ЭНЕРГОРЫНОК
 				!
 				Call SalSendClassMessage(SAM_Create, 0, 0)
 			! On SAM_CreateComplete
-				                   Call NASELENIE()
+				                    Call NASELENIE()
 			On UM_Populate
 				Call NASELENIE()
 				If NOT_AUTO

@@ -1,59 +1,46 @@
-
-
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/REZ_PAY_OB22.sql =========*** Run 
 PROMPT ===================================================================================== 
 
-
 PROMPT *** Create  procedure REZ_PAY_OB22 ***
 
-  CREATE OR REPLACE PROCEDURE BARS.REZ_PAY_OB22 (dat_ DATE, mode_ NUMBER DEFAULT 0, p_user number default null,nal_ number)  IS
+  CREATE OR REPLACE PROCEDURE BARS.REZ_PAY_OB22 (dat_ DATE, mode_ NUMBER DEFAULT 0, p_user number default null)  IS
 
+/* Версія   1.0   13-11-2017
+   13-11-2017(1.0) - Убран rez.p_unload_data; 
+*/
 
-  doform_nazn      varchar2(100) := 'Формування резерву під ';
+  doform_nazn varchar2(100) := 'Формування резерву під ';
   doform_nazn_korr varchar2(100) := 'Кор. проводка по формуванню резерву під ';
 
-  rasform_nazn      varchar2(100) := 'Зменшення резерву під ';
+  rasform_nazn varchar2(100) := 'Зменшення резерву під ';
   rasform_nazn_korr varchar2(100) := 'Кор. проводка по зменшенню резерву під ';
 
 
   r7702_acc number;
-  REZPROV_  NUMBER          DEFAULT 0;
-  r7702_    varchar2(20);
-  vob_      number;
-  nazn_     varchar2(500);
-  otvisp_   number;
-  fl        number(1);
-  tt_       varchar2(3);
-  s_old_    number;
-  s_old_q   number;
-  s_new_    number;
-  vv_       int;
-  s_val_    number;
-  nam_a_    varchar2(50);
-  nam_b_    varchar2(50);
+  r7702_ varchar2(20);
+  vob_ number;
+  nazn_ varchar2(500);
+  otvisp_ number;
+  fl number(1);
+  tt_ varchar2(3);
+  s_old_ number;
+  s_old_q number;
+  s_new_ number;
+  nam_a_ varchar2(50);
+  nam_b_ varchar2(50);
   r7702_bal varchar2(50);
-  ref_      number;
-  kurs_     varchar2(500);
-  b_date    date;
-  okpoa_    varchar2(500);
-  userid_   number;
-  diff_     number;
-  error_str varchar2(1000);
-  GRP_      accounts.grp%type:= 21;
-  rnk_b     accounts.rnk%type;
-  acc_      accounts.acc%type;
-  nls_      accounts.nls%type;
-  isp_      accounts.isp%type;
-  nms_      accounts.nms%type;
-  l_acc     accounts.acc%type;
-  s080_     specparam.s080%type;
-  p4_       int;
+  ref_ number;
+  kurs_ varchar2(500);
+  b_date date;
+  okpoa_ varchar2(500);
+  userid_ number;
+  diff_ number;
   e_nofound_7form exception;
   e_nofound_7rasform exception;
+  error_str varchar2(1000);
 
 
-  ---------------------------------------
   procedure p_error( p_error_type  NUMBER,
                      p_nbs         VARCHAR2,
                      p_s080        VARCHAR2,
@@ -73,10 +60,11 @@ PROMPT *** Create  procedure REZ_PAY_OB22 ***
      ( dat,userid, error_type, nbs, s080, custtype, kv, branch,
       nbs_rez,nbs_7f,  nbs_7r, sz, error_txt, desrc)
      values (dat_, userid_, p_error_type, p_nbs, p_s080, p_custtype, p_kv, p_branch,
-            p_nbs_rez, p_nbs_7f, p_nbs_7r, p_sz, substr(p_error_txt,1,999), p_desrc) ;
+            p_nbs_rez, p_nbs_7f, p_nbs_7r, p_sz, p_error_txt, p_desrc) ;
      COMMIT;
   end;
-  ---------------------------------------
+
+
 
 BEGIN
 
@@ -103,7 +91,6 @@ BEGIN
     --проверка, есть ли за текущую дату расчета непроведенные проводки по резервам
     s_new_ := 0;
 
-    if nal_=0 THEN
     --выбираем не оплаченные документы
     SELECT count(*)
         INTO s_new_
@@ -116,10 +103,8 @@ BEGIN
     if s_new_ > 0 then
         bars_error.raise_error('REZ',4);
     end if;
-    end if;
-    if nal_=0 THEN
-       delete from srezerv_errors s where s.userid = userid_;
-    end if;
+
+    delete from srezerv_errors s where s.userid = userid_;
 
 --dbms_output.put_line(' mode_ = '|| mode_);
 
@@ -130,10 +115,11 @@ BEGIN
            ac.nbs||'/'||s.ob22, null,null ,r.kv,
            rtrim(substr(r.tobo||'/',1,instr(r.tobo||'/','/',1,3)-1),'/')||'/' branch,
            sum(nvl(r.sz1, sz)) sz
-           ,substr('S080 = '||r.s080||', Тип клієнта - '||decode(r.custtype,2, 'Юр.ос.',3, 'Фіз.ос.','')||'. Рахунки - '
-           ||ConcatStr(r.nls),1,999),r.kv
+           ,'S080 = '||r.s080||', Тип клієнта - '||decode(r.custtype,2, 'Юр.ос.',3, 'Фіз.ос.','')||'. Рахунки - '
+           ||ConcatStr(r.nls)
+           ,r.kv
     from tmp_rez_risk r,
-         v_gl ac,
+         accounts ac,
          specparam_int s
     where id = nvl(p_user, user_id) and dat = dat_
           and r.acc = ac.acc
@@ -155,24 +141,16 @@ BEGIN
 
     commit;
 --dbms_output.put_line(' mode_ = '|| mode_);
-    IF nal_ = 0 THEN
-       DELETE FROM rez_doc_maket s where s.userid = userid_;
+    --IF mode_ = 1
+   -- THEN
+     DELETE FROM rez_doc_maket s where s.userid = userid_;
   --COMMIT;
-    END IF;
+   -- END IF;
 
     b_date := bankdate;
 
    otvisp_ := nvl(GetGlobalOption('REZ_ISP'),userid_);
 
-
-   BEGIN
-     SELECT TO_NUMBER (NVL (val, '0'))
-     INTO REZPROV_
-     FROM params
-     WHERE par = 'REZPROV';
-   EXCEPTION WHEN NO_DATA_FOUND THEN
-     rezprov_ := 0;
-   END;
 
 --dbms_output.put_line(' mode_ = '|| mode_);
    BEGIN
@@ -189,8 +167,8 @@ BEGIN
     --dat_form :=
     --выборка данных для проводок
   for k in
-    (select t.NBS_REZ, t.OB22_REZ, t.NBS_7f,t.OB22_7f,t.NBS_7r,t.OB22_7r,
-            t.kv, t.branch, t.sz,t.szn,t.s080,t.pr,t.r_s080,
+    (select t.NBS_REZ, t.OB22_REZ, t.NBS_7f, t.OB22_7f, t.NBS_7r,  t.OB22_7r,t.kv, t.branch, t.sz,t.s080,t.pr,
+           t.r_s080,
            ConcatStr(ar.acc) r_acc,    ConcatStr(ar.nls) r_nls,    --ConcatStr(t.OB22_REZ) r_ob22,
            ConcatStr(a7_f.acc) f7_acc, ConcatStr(a7_f.nls) f7_nls, --ConcatStr(t.OB22_7f) f7_ob22,
            ConcatStr(a7_r.acc) r7_acc, ConcatStr(a7_r.nls) r7_nls, --ConcatStr(t.OB22_7r) r7_ob22,
@@ -200,20 +178,20 @@ BEGIN
         select  --выборка сумм резерва в разрезе счетов резервного фонда каждого бранча (по справочнику)
                o.NBS_REZ, o.OB22_REZ, o.NBS_7f, o.OB22_7f, o.NBS_7r,  o.OB22_7r,o.pr,
                r.KV, rtrim(substr(r.tobo||'/',1,instr(r.tobo||'/','/',1,3)-1),'/')||'/' branch,
-               sum(nvl(r.sz1, sz)) sz,sum(nvl(szn,0)) szn
+               sum(nvl(r.sz1, sz)) sz
                --,decode(r.s080,1,1,9,1,2) s080
                ,decode(r.s080,1,1,9,9,2) s080
                ,decode(r.s080,1,0,9,0,r.s080) r_s080
         from tmp_rez_risk r
-             join v_gl ac on r.acc = ac.acc
+             join accounts ac on r.acc = ac.acc
              join specparam_int s on r.acc = s.acc
-             join srezerv_ob22 o on (ac.nbs = o.nbs and o.nal=nal_ AND r.arjk=decode(o.nal,2,1,0) AND
+             join srezerv_ob22 o on (ac.nbs = o.nbs and
                                      s.ob22 = decode(o.ob22,'0',s.ob22,o.ob22) and
                                      decode(r.s080,1,1,2) = decode(o.s080,'0',decode(r.s080,1,1,2),o.s080) and
                                      r.custtype = decode(o.custtype,'0',r.custtype,o.custtype) and
                                      r.kv = decode(o.kv,'0',r.kv,o.kv) )
         where id = nvl(p_user, user_id) and dat = dat_
-              and nvl(decode(nal_,0,szn,2,szn,sz),0) <> 0
+              and nvl(r.sz1, sz) <> 0
           --    and o.NBS_REZ = '2400' and o.OB22_REZ = '03'  and ac.kv = 980
         group by o.NBS_REZ, o.OB22_REZ, o.NBS_7f, o.OB22_7f, o.NBS_7r,  o.OB22_7r,o.pr,
                 r.KV, rtrim(substr(r.tobo||'/',1,instr(r.tobo||'/','/',1,3)-1),'/')||'/'
@@ -222,7 +200,7 @@ BEGIN
                 ,decode(r.s080,1,0,9,0,r.s080)
     ) t
      --счет резерва
-     left join v_gl ar on (t.NBS_REZ = ar.nbs and
+     left join accounts ar on (t.NBS_REZ = ar.nbs and
                                t.OB22_REZ = (select ob22 from specparam_int s where s.acc = ar.acc)  and
                                t.KV = ar.kv and
                                t.branch = ar.BRANCH
@@ -231,7 +209,7 @@ BEGIN
                                and t.r_s080 = decode(t.r_s080,0,t.r_s080, (select s080 from specparam s where s.acc = ar.acc))
                                )
      --счет 7 класса формирования
-     left join v_gl a7_f on (t.NBS_7f = a7_f.nbs and
+     left join accounts a7_f on (t.NBS_7f = a7_f.nbs and
                                t.OB22_7f = (select ob22 from specparam_int s where s.acc = a7_f.acc)  and
                                '980' = a7_f.kv and
                                t.branch = a7_f.BRANCH
@@ -239,14 +217,14 @@ BEGIN
                                and a7_f.dazs is null
                                )
      --счет 7 класса уменьшения
-     left join v_gl a7_r on (t.NBS_7r = a7_r.nbs and
+     left join accounts a7_r on (t.NBS_7r = a7_r.nbs and
                                  t.OB22_7r = (select ob22 from specparam_int s where s.acc = a7_r.acc)  and
                                  '980' = a7_r.kv and
                                  t.branch = a7_r.BRANCH
                                 -- and nvl(a7_r.dazs, to_date('01014999','ddmmyyyy')) > dat_
                                  and a7_r.dazs is null
                                  )
-    group by t.NBS_REZ, t.OB22_REZ, t.NBS_7f, t.OB22_7f, t.NBS_7r,  t.OB22_7r,t.kv, t.branch, t.sz,t.szn,t.s080,t.pr
+    group by t.NBS_REZ, t.OB22_REZ, t.NBS_7f, t.OB22_7f, t.NBS_7r,  t.OB22_7r,t.kv, t.branch, t.sz,t.s080,t.pr
              ,t.r_s080
   )
   loop
@@ -281,124 +259,28 @@ BEGIN
           end if;
        end if;
 
-       begin
-          select val into rnk_b
-          from BRANCH_PARAMETERS
-          where length(branch)=15 and tag='RNK' and branch =k.branch;
-       EXCEPTION  WHEN NO_DATA_FOUND THEN
-          select trim(val) into rnk_b from params$base where par='OUR_RNK';
-       end;
-
        --проверка открыты ли необходимые счета в базе
        if k.r_acc is null then
-          if REZPROV_ = 1 then
-             -- Счет не открыт - открываем нужный счет
-             acc_:=null;
-             if k.r_s080='0' then
-                s080_:=k.s080;
-             else
-                s080_:=k.r_s080;
-             end if;
-
-             nls_ := k.NBS_REZ || '0' || s080_ || substr(k.branch,9,6) || k.OB22_REZ ;
-             nls_ := vkrzn( substr(gl.aMfo,1,5), NLS_);
-             nms_ := 'Рез.фонд S080='||nvl(s080_,'0')||
-                     ',об22='||k.OB22_REZ || ',бранч=' || k.branch;
-
-             begin
-                 select isp into isp_  from v_gl
-                 where kv=k.kv and branch = k.branch
-                       and nbs =k.NBS_REZ and dazs is null and isp<>20094 and rownum=1;
-                 EXCEPTION WHEN NO_DATA_FOUND THEN isp_ := 20094;
-             end;
-
-             begin
-                 select acc into l_acc
-                 from v_gl where nls=nls_ and kv=k.kv and dazs is not null;
-                 update accounts set dazs=null where acc=l_acc;
-
-             EXCEPTION WHEN NO_DATA_FOUND THEN null;
-             END;
-             op_reg(99,0,0,GRP_,p4_,rnk_b,nls_,k.kv,nms_,'ODB',isp_,acc_);
-
-             k.r_acc:=acc_;
-             update accounts set tobo = k.branch where acc= acc_;
-             update specparam_int set ob22=k.OB22_REZ where acc=acc_;
-             if sql%rowcount=0 then
-                insert into specparam_int(acc,ob22) values(acc_, k.OB22_REZ);
-             end if;
-
-             update specparam set s080=s080_ where acc=acc_;
-             if sql%rowcount=0 then
-                insert into specparam (acc,s080) values(acc_, s080_);
-             end if;
-          else
-             p_error( 3, k.NBS_REZ||'/'||k.OB22_REZ,k.r_s080, null, k.kv, k.branch,k.NBS_REZ||'/'||k.OB22_REZ,
+          p_error( 3, k.NBS_REZ||'/'||k.OB22_REZ,k.r_s080, null, k.kv, k.branch,k.NBS_REZ||'/'||k.OB22_REZ,
                       k.kv, null, k.sz,
-                      k.NBS_REZ||'/'||k.OB22_REZ||(case k.r_s080 when 0 then '' else ' s080='||k.r_s080 end),
+                     k.NBS_REZ||'/'||k.OB22_REZ||(case k.r_s080 when 0 then '' else ' s080='||k.r_s080 end),
                      null);
-             fl := 4;
-          end if;
+          fl := 4;
+
        end if;
 
        --проверка открыт ли нужный счет 7 класса
        if k.f7_acc is null then
-          if REZPROV_ = 1 then
-             acc_:=null;
-             nls_ := k.NBS_7F || '0' || substr(k.branch,9,6) || k.OB22_7F ||'0';
-             nls_ := vkrzn( substr(gl.aMfo,1,5), NLS_);
-             nms_ := 'Формир.рез. '||
-                     ',об22='||k.OB22_7F || ',бранч=' || k.branch;
-             begin
-                 select isp into isp_  from v_gl
-                 where kv=980 and branch = k.branch
-                       and nbs =k.NBS_7F and dazs is null and isp<>20094 and rownum=1;
-                 EXCEPTION WHEN NO_DATA_FOUND THEN isp_ := 20094;
-             end;
-
-             bars_audit.error('111 счет='|| nls_);
-             op_reg(99,0,0,GRP_,p4_,rnk_b,nls_,980,nms_,'ODB',isp_,acc_);
-             k.f7_acc:=acc_;
-             update accounts set tobo = k.branch where acc= acc_;
-             update specparam_int set ob22=k.OB22_7F where acc=acc_;
-             if sql%rowcount=0 then
-                insert into specparam_int(acc,ob22) values(acc_, k.OB22_7F);
-             end if;
-          Else
             p_error( 3, k.NBS_7f||'/'|| k.OB22_7f,null, null, 980, k.branch, k.NBS_REZ||'/'||k.OB22_REZ,
                      k.kv, null, k.sz, k.NBS_7f||'/'|| k.OB22_7f,  'Рахунок резерву - '||k.r_nls);
             fl := 4;
-          end if;
        end if;
 
         --проверка открыт ли нужный счет 7 класса
         if k.r7_acc is null then
-          if REZPROV_ = 1 then
-             acc_:=null;
-             nls_ := k.NBS_7R || '0' || substr(k.branch,9,6) || k.OB22_7R ||'0';
-             nls_ := vkrzn( substr(gl.aMfo,1,5), NLS_);
-             nms_ := 'Формир.рез. '||
-                     ',об22='||k.OB22_7R || ',бранч=' || k.branch;
-             begin
-                 select isp into isp_  from v_gl
-                 where kv=980 and branch = k.branch
-                       and nbs =k.NBS_7R and dazs is null and isp<>20094 and rownum=1;
-                 EXCEPTION WHEN NO_DATA_FOUND THEN isp_ := 20094;
-             end;
-             bars_audit.error('222 счет='|| nls_);
-
-             op_reg(99,0,0,GRP_,p4_,rnk_b,nls_,980,nms_,'ODB',isp_,acc_);
-             k.r7_acc:=acc_;
-             update accounts set tobo = k.branch where acc= acc_;
-             update specparam_int set ob22=k.OB22_7R where acc=acc_;
-             if sql%rowcount=0 then
-                insert into specparam_int(acc,ob22) values(acc_, k.OB22_7R);
-             end if;
-          else
             p_error( 3, k.NBS_7r||'/'|| k.OB22_7r,null, null, 980, k.branch,  k.NBS_REZ||'/'||k.OB22_REZ,
                      k.kv, null,  k.sz, k.NBS_7r||'/'|| k.OB22_7r,  'Рахунок резерву - '||k.r_nls);
              fl := 4;
-          end if;
         end if;
 
     --   if fl <> 0 then
@@ -457,40 +339,8 @@ BEGIN
            from dual;
             dbms_output.put_line('s_old = '||to_char(s_old_));
 
---         Выбираем по физ.лицам счета за рах. вал. витрат
---           if k.nbs_rez='2400' and k.ob22_rez='03' and k.r_s080=5   then
---              begin
---                 select NVL (SUM (rez.ostc96 (acc, dat_)), 0)
---                   INTO s_val_
---                   from v_gl
---                  where nbs='2400' and ob22='06' and kv=k.kv and
---                        branch=k.branch;
---                 s_old_:=s_old_+s_val_;
---              EXCEPTION WHEN NO_DATA_FOUND THEN null;
---              end;
---           end if;
-
---         Выбираем по юр.лицам счета за рах. вал. витрат
---           if k.nbs_rez='2400' and k.ob22_rez='04' and k.r_s080=5   then
---              begin
---                 select NVL (SUM (rez.ostc96 (acc, dat_)), 0)
---                   INTO s_val_
---                   from v_gl
---                  where nbs='2400' and ob22='07' and kv=k.kv and
---                        branch=k.branch;
---                 s_old_:=s_old_+s_val_;
---             EXCEPTION WHEN NO_DATA_FOUND THEN null;
---              end;
---           end if;
-
-
            --новая сумма резерва
-           if nal_=0 or nal_=2 THEN
-              s_new_:=k.szn;
-           else
-              s_new_ := k.sz-k.szn;
-           end if;
-
+           s_new_ := k.sz;
             dbms_output.put_line('s_new_ = '||to_char(s_new_));
 
            error_str := error_str||'1';
@@ -515,7 +365,7 @@ BEGIN
               -- узнать название нужных счетов для вставки в OPER
               SELECT SUBSTR (a.nms, 1, 38), SUBSTR (b.nms, 1, 38)
                   INTO nam_a_, nam_b_
-                  FROM v_gl a, v_gl b
+                  FROM accounts a, accounts b
               WHERE a.acc = k.r_acc and
                     b.acc = r7702_acc;
 
@@ -717,6 +567,7 @@ BEGIN
         end if; --if fl = 0
 
     exception
+
     when others then
       rollback to sp;
       p_error( 5, null,null, null, k.kv, k.branch,k.NBS_REZ||'/'||k.OB22_REZ,
@@ -736,26 +587,24 @@ BEGIN
 --РАСФОРМИРОВАНИЕ ДЛЯ ТЕХ СЧЕТОВ ПО КОТОРЫМ ТЕКУЩИЙ РЕЗЕРВ НЕ ФОРМИРОВАЛСЯ (т.е. = 0)
 --(НЕТ В TMP_REZ_RISK)
  for k in
-  ( select --+  index(a7 I2_ACCOUNTS)
-           a.acc r_acc, s.ob22 OB22_REZ, a.nbs NBS_REZ,
+  ( select a.acc r_acc, s.ob22 OB22_REZ, a.nbs NBS_REZ,
            rtrim(substr(a.branch||'/',1,instr(a.branch||'/','/',1,3)-1),'/')||'/' branch,
            a.nls r_nls, a.kv,
            rez.ostc96(to_number(a.acc), dat_) sz,
            o.NBS_7R, o.OB22_7R
            ,ConcatStr(a7.acc) r7_acc, ConcatStr(a7.nls) r7_nls
            ,o.pr
-    from v_gl a
+    from accounts a
          left join specparam_int s on a.acc = s.acc
-         left join srezerv_ob22 o on a.nbs = o.nbs_rez and s.ob22 = o.ob22_rez --and o.nal=nal_
-         left join v_gl a7 on (o.NBS_7R = a7.nbs and
-                                   a7.nbs like '77%'  and
+         left join srezerv_ob22 o on a.nbs = o.nbs_rez and s.ob22 = o.ob22_rez
+         left join accounts a7 on (o.NBS_7R = a7.nbs and
                                    o.OB22_7R = (select ob22 from specparam_int s where s.acc = a7.acc)  and
                                     '980' = a7.kv and
                                     rtrim(substr(a.branch||'/',1,instr(a.branch||'/','/',1,3)-1),'/')||'/' = a7.BRANCH
                                     --and nvl(a7.dazs, to_date('01014999','ddmmyyyy')) > dat_
                                     and a7.dazs is null
                                     )
-    where a.nbs in ('2400','2401','3690','3599') and o.nal=nal_
+    where a.nbs in ('2400','2401','3690','3599')
          -- and dat_ between a.daos and nvl(a.dazs, to_date('01014999','ddmmyyyy'))
          --and nvl(a.dazs, to_date('01014999','ddmmyyyy')) > dat_
          and a.dazs is null
@@ -825,7 +674,7 @@ dbms_output.put_line(k.branch||'   '||k.r_nls||' '|| k.kv||' === '||k.sz);
        )
        loop
           if (k.pr = 9 and rr.r013 <> 3) or (k.pr <> 9 and rr.r013 = 3) then
-            p_error( 4, k.NBS_REZ||'/'||k.OB22_REZ, null, null, k.kv, k.branch, k.NBS_REZ||'/'||k.OB22_REZ,
+            p_error( 7, k.NBS_REZ||'/'||k.OB22_REZ, null, null, k.kv, k.branch, k.NBS_REZ||'/'||k.OB22_REZ,
                         k.kv, null, k.sz,
                        k.r_nls||' (R013='||rr.r013||', OB22='||k.OB22_REZ||')',
                        null);
@@ -882,7 +731,7 @@ dbms_output.put_line(k.branch||'   '||k.r_nls||' '|| k.kv||' === '||k.sz);
            -- узнать название нужных счетов для вставки в OPER
            SELECT SUBSTR (a.nms, 1, 38), SUBSTR (b.nms, 1, 38)
               INTO nam_a_, nam_b_
-              FROM v_gl a, v_gl b
+              FROM accounts a, accounts b
            WHERE a.acc = k.r_acc and
                  b.acc = r7702_acc;
 
@@ -1017,9 +866,10 @@ dbms_output.put_line(k.branch||'   '||k.r_nls||' '|| k.kv||' === '||k.sz);
          END IF;
   END IF;
 
-  rez.p_unload_data;
+  --rez.p_unload_data;
 
 END REZ_PAY_OB22  ;
+ 
 /
 show err;
 

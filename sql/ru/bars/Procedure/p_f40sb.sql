@@ -1,21 +1,14 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_F40SB.sql =========*** Run *** =
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure P_F40SB ***
-
-  CREATE OR REPLACE PROCEDURE BARS.P_F40SB (Dat_ DATE, sheme_ VARCHAR2 DEFAULT 'C')  IS
+CREATE OR REPLACE PROCEDURE BARS.p_f40SB (Dat_ DATE, sheme_ VARCHAR2 DEFAULT 'C')  IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :	Процедура формирование файла @40 для Ощадного Банку
 % COPYRIGHT   :	Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     : 30/03/2017 (11/02/2016, 03/06/2015)
+% VERSION     : 16/11/2017 (30/03/2017, 11/02/2016)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_ - отчетная дата
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% 30.03.2017 - для остатков и оборотов добалены годовые корректирующие
+% 16.11.2017 - удалил ненужные строки и изменил некоторые блоки формирования 
+%              изменил курсор OPL_DOK
+% 30.03.2017 - для остатков и оборотов добалены годовые корректирующие 
 %              проводки
 % 11.02.2016 - объеденены все изменения выполненные ранее
 % 03.06.2015 - изменен курсор OPL_DOK
@@ -105,7 +98,7 @@ ret_	 number;
 tobo_    accounts.tobo%TYPE;
 nms_     accounts.nms%TYPE;
 comm_    rnbu_trace.comm%TYPE;  -- Varchar2(200);
-typ_     Number;
+typ_     Number; 
 nbuc1_   VARCHAR2(12);
 nbuc_    VARCHAR2(12);
 
@@ -117,27 +110,54 @@ CURSOR Saldo IS
           s.dos96, s.dosq96, s.kos96, s.kosq96,
           s.dos99, s.dosq99, s.kos99, s.kosq99,
           s.doszg, s.koszg, s.dos96zg, s.kos96zg,
-          a.tobo, a.nms, NVL(trim(sp.ob22),'00')
+          a.tobo, a.nms, NVL(trim(sp.ob22),'00')  
     FROM  otcn_saldo s, otcn_acc a, specparam_int sp
     WHERE s.acc=a.acc
       and s.acc=sp.acc(+);
 -----------------------------------------------------------------------
 CURSOR OPL_DOK IS
-   SELECT distinct * FROM (
-   SELECT o.ref, o.accd, o.nlsd, o.kv, o.fdat,
-          o.s*100, o.acck, o.nlsk, o.nbsd r020, o.nazn
-   FROM  provodki_otc o
-   WHERE o.nbsd in (select r020 from sb_r020 where f_40='1')
-     and o.vob not in (96,99)
-     and o.fdat between Dat1_ and Dat_
-UNION ALL
-   SELECT o.ref, o.accd, o.nlsd, o.kv, o.fdat,
-          o.s*100, o.acck, o.nlsk, nbsk r020, o.nazn
-   FROM  provodki_otc o
-   WHERE o.nbsk in (select r020 from sb_r020 where f_40='1')
-     and o.vob not in (96,99)
-     and o.fdat between Dat1_ and Dat_
-) ;
+ select distinct REF, ACCD, NLSD, KV, FDAT, S*100, ACCK, NLSK, R020, NAZN
+ from (
+     with sel as
+          ( select /*+ LEADING(a) */  --/*+ parallel(4) */
+               a.acc, a.nls, a.kv, a.nbs,
+               o.nazn,
+               o.userid isp, o.vob,  
+               p.ref, p.stmt, p.dk, p.tt,
+               p.fdat, p.s/100 s, p.sq/100 sq
+           FROM opldok p, accounts a, oper o
+           WHERE p.fdat between Dat1_ and Dat_ and 
+                 p.acc = a.acc and
+                 a.nbs in (select r020
+                           from sb_r020
+                           where f_40 = '1') and  
+                 p.sos >= 4 and
+                 p.ref = o.ref and
+                 o.sos = 5 and 
+                 o.vob not in (96,99))
+      select a.ref REF, a.acc ACCD, a.nls NLSD, a.kv KV, a.FDAT, a.s, 
+         b.acc ACCK, b.nls NLSK, substr(a.nls,1,4) R020, a.NAZN
+      from sel a, opl b
+      where a.fdat between dat1_ and Dat_ and 
+         a.dk = 0 and
+         a.ref = b.ref and
+         b.fdat between dat1_ and Dat_ and
+         a.stmt = b.stmt and
+         a.s = b.s/100 and
+         a.sq = b.sq/100 and
+         b.dk = 1
+      union all
+      select a.ref REF, b.acc ACCD, b.nls NLSD, a.kv KV, a.FDAT, a.s, 
+         a.acc ACCK, a.nls NLSK, substr(a.nls,1,4) R020, a.NAZN
+      from sel a, opl b
+      where a.fdat between dat1_ and Dat_ and 
+         a.dk = 1 and
+         a.ref = b.ref and
+         b.fdat between dat1_ and Dat_ and
+         a.stmt = b.stmt and
+         a.s = b.s/100 and
+         a.sq = b.sq/100 and
+         b.dk = 0);
 ----------------------------------------------------------------------
 --- коррект. проводки для кодов '5' и '6'
 CURSOR KOR_PROVODKI IS
@@ -145,9 +165,9 @@ CURSOR KOR_PROVODKI IS
            DECODE(a.dk, 0, GL.P_ICURVAL(s.kv, a.s, Dat_), 0),
            DECODE(a.dk, 1, GL.P_ICURVAL(s.kv, a.s, Dat_), 0)
     FROM  kor_prov a, accounts s, sb_r020 k
-    WHERE a.acc=s.acc
-      and s.nbs=k.r020
-      and k.f_40='1'
+    WHERE a.acc=s.acc                               
+      and s.nbs=k.r020                              
+      and k.f_40='1'                                
       and a.fdat between Dat_+1 and Dat2_;
 
 --- річні корегуючі проводки для кодів '5' и '6'
@@ -156,38 +176,32 @@ CURSOR KOR_PROV_99 IS
            DECODE(a.dk, 0, GL.P_ICURVAL(s.kv, a.s, Dat_), 0),
            DECODE(a.dk, 1, GL.P_ICURVAL(s.kv, a.s, Dat_), 0)
     FROM  kor_prov a, accounts s, sb_r020 k
-    WHERE a.acc=s.acc
-      and s.nbs=k.r020
-      and k.f_40='1'
-      and a.vob = 99
+    WHERE a.acc=s.acc                               
+      and s.nbs=k.r020                              
+      and k.f_40='1' 
+      and a.vob = 99                                
       and a.fdat between Dat_ + 1 and Dat99_;
 ----------------------------------------------------------------------
-CURSOR BaseL IS
-    SELECT kodp, nbuc, SUM (znap)
-    FROM rnbu_trace
-    WHERE userid=userid_
-    GROUP BY kodp, nbuc;
-
 BEGIN
 -------------------------------------------------------------------
-userid_ := user_id;
-EXECUTE IMMEDIATE 'TRUNCATE TABLE RNBU_TRACE';
+   userid_ := user_id;
+   EXECUTE IMMEDIATE 'TRUNCATE TABLE RNBU_TRACE';
 -------------------------------------------------------------------
-Dat1_ := TRUNC(Dat_, 'MM');
-Dat2_ := TRUNC(Dat_ + 28);
-Dat99_ := glb_bankdate();
+   Dat1_ := TRUNC(Dat_, 'MM');
+   Dat2_ := TRUNC(Dat_ + 28);
+   Dat99_ := glb_bankdate();
+ 
+   -- определение начальных параметров
+   P_Proc_Set_Int(kodf_,sheme_,nbuc1_,typ_);
 
--- определение начальных параметров
-P_Proc_Set_Int(kodf_,sheme_,nbuc1_,typ_);
+   -- используем классификатор SB_R020 
+   sql_acc_ := 'select r020 from sb_r020 where f_40=''1'' ';
 
--- используем классификатор SB_R020
-sql_acc_ := 'select r020 from sb_r020 where f_40=''1'' ';
-
-if to_char(Dat_,'MM') = '12' then
-   ret_ := f_pop_otcn(Dat_, 4, sql_acc_, null, 1);
-else
-   ret_ := f_pop_otcn(Dat_, 3, sql_acc_, null, 1);
-end if;
+   if to_char(Dat_,'MM') = '12' then
+      ret_ := f_pop_otcn(Dat_, 4, sql_acc_, null, 1);
+   else
+      ret_ := f_pop_otcn(Dat_, 3, sql_acc_, null, 1);
+   end if;
 
 -- Остатки (грн. + валюта эквиваленты) --
 OPEN Saldo;
@@ -197,34 +211,37 @@ OPEN Saldo;
                     Dos96p_, Dosq96p_, Kos96p_, Kosq96p_,
                     Dos96_, Dosq96_, Kos96_, Kosq96_,
                     Dos99_, Dosq99_, Kos99_, Kosq99_,
-                    Doszg_, Koszg_, Dos96zg_, Kos96zg_,
+                    Doszg_, Koszg_, Dos96zg_, Kos96zg_, 
                     tobo_, nms_, zz_;
    EXIT WHEN Saldo%NOTFOUND;
 
    comm_ := '';
 
-   IF typ_>0 THEN
+   IF typ_ > 0 
+   THEN
       nbuc_ := NVL(F_Codobl_Tobo(acc_,typ_),nbuc1_);
    ELSE
       nbuc_ := nbuc1_;
    END IF;
 
-   se_:=0;
+   se_ := 0;
 
-   if kv_ = 980 then
-      se_:=Ostn_- Dos96_ + Kos96_ - Dos99_ + Kos99_;
+   if kv_ = 980 
+   then
+      se_ := Ostn_- Dos96_ + Kos96_ - Dos99_ + Kos99_;
    else
-      se_:=Ostq_-Dosq96_ + Kosq96_ - Dosq99_ + Kosq99_;
+      se_ := Ostq_-Dosq96_ + Kosq96_ - Dosq99_ + Kosq99_;
    end if;
 
    comm_ := substr(comm_ || tobo_ || '  ' || nms_, 1, 200);
 
    -- Остатки в номинале грн + экв.валюты
-   IF se_ <> 0 THEN
-      dk_:=IIF_N(se_,0,'1','2','2') ;
-      kodp_:= dk_ || nbs_ || zz_ || '00' ;
-      znap_:= TO_CHAR(ABS(se_)) ;
-      INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, acc, comm, tobo, nbuc) VALUES
+   IF se_ <> 0 
+   THEN 
+      dk_ := IIF_N(se_,0,'1','2','2') ;
+      kodp_ := dk_ || nbs_ || zz_ || '00' ;
+      znap_ := TO_CHAR(ABS(se_)) ;
+      INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, acc, comm, tobo, nbuc) VALUES  
                              (nls_, kv_, data_, kodp_,znap_, acc_, comm_, tobo_, nbuc_) ;
    END IF;
 
@@ -234,23 +251,23 @@ CLOSE Saldo;
 OPEN OPL_DOK;
 LOOP
    FETCH OPL_DOK INTO ref_, accd_, nls_, kv_, data_, sn_, acck_,
-                      nlsk_, nbs_, nazn_ ; --kk_
+                      nlsk_, nbs_, nazn_ ; 
    EXIT WHEN OPL_DOK%NOTFOUND;
 
    BEGIN
-      SELECT NVL(SUBSTR(value,1,2),'00')
-         INTO kk_d
+      SELECT NVL(SUBSTR(value,1,2),'00') INTO kk_d
       FROM operw
-      WHERE ref=ref_ and tag ='OB40' ;
+      WHERE ref = ref_ 
+        and tag = 'OB40' ;
    EXCEPTION WHEN NO_DATA_FOUND THEN
       kk_d := '00';
    END;
 
    BEGIN
-      SELECT NVL(SUBSTR(value,1,2),'00')
-         INTO kk_k
+      SELECT NVL(SUBSTR(value,1,2),'00') INTO kk_k
       FROM operw
-      WHERE ref=ref_ and tag ='OB40D' ;
+      WHERE ref = ref_ 
+        and tag = 'OB40D' ;
    EXCEPTION WHEN NO_DATA_FOUND THEN
       kk_k := '00';
    END;
@@ -258,64 +275,69 @@ LOOP
    comm_ := '';
    comm_ := substr(comm_||'Дт '||nls_||'  '||' Кт '||nlsk_||'  '||nazn_,1,200);
 
-   IF sn_>0 and substr(nls_,1,4)=nbs_ THEN
-
-      IF typ_>0 THEN
+   IF sn_ > 0 and substr(nls_,1,4) = nbs_ 
+   THEN
+ 
+      IF typ_ > 0 
+      THEN
          nbuc_ := NVL(F_Codobl_Tobo(accd_,typ_),nbuc1_);
       ELSE
          nbuc_ := nbuc1_;
       END IF;
 
       BEGIN
-         SELECT NVL(ob22,'00')
-            into zz_
+         SELECT NVL(ob22,'00') into zz_
          FROM specparam_int
-         WHERE acc=accd_ ;
+         WHERE acc = accd_ ;
       EXCEPTION WHEN NO_DATA_FOUND THEN
-         zz_:='00';
+         zz_ := '00';
       END ;
 
       kk_ := '00';
 
-      if kk_d != '00' then
+      if kk_d != '00' 
+      then
          kk_ := kk_d;
       end if;
       if kk_d = '00' and kk_k != '00' then
          kk_ := kk_k;
       end if;
-      kodp_:= '5' || SUBSTR(nls_,1,4) || zz_ || kk_ ;
-      znap_:= TO_CHAR(SN_) ;
+      kodp_ := '5' || SUBSTR(nls_,1,4) || zz_ || kk_ ;
+      znap_ := TO_CHAR(SN_) ;
       INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, ref, comm, nbuc) VALUES
                              (nls_, kv_, data_, kodp_,znap_, ref_, comm_, nbuc_);
    END IF;
 
-   IF sn_>0 and substr(nlsk_,1,4)=nbs_ THEN
+   IF sn_ > 0 and substr(nlsk_,1,4) = nbs_ 
+   THEN
 
-      IF typ_>0 THEN
+      IF typ_ > 0 
+      THEN
          nbuc_ := NVL(F_Codobl_Tobo(acck_,typ_),nbuc1_);
       ELSE
          nbuc_ := nbuc1_;
       END IF;
 
       BEGIN
-         SELECT NVL(ob22,'00')
-            into zz_
+         SELECT NVL(ob22,'00') into zz_
          FROM specparam_int
-         WHERE acc=acck_ ;
+         WHERE acc = acck_ ;
          EXCEPTION WHEN NO_DATA_FOUND THEN
          zz_:='00';
       END ;
 
       kk_ := '00';
 
-      if kk_k != '00' then
+      if kk_k != '00' 
+      then
          kk_ := kk_k;
       end if;
-      if kk_k = '00' and kk_d != '00' then
+      if kk_k = '00' and kk_d != '00' 
+      then
          kk_ := kk_d;
       end if;
-      kodp_:= '6' || SUBSTR(nlsk_,1,4) || zz_ || kk_ ;
-      znap_:= TO_CHAR(SN_) ;
+      kodp_ := '6' || SUBSTR(nlsk_,1,4) || zz_ || kk_ ;
+      znap_ := TO_CHAR(SN_) ;
       INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, ref, comm, nbuc) VALUES
                              (nlsk_, kv_, data_, kodp_,znap_, ref_, comm_, nbuc_);
    END IF;
@@ -333,7 +355,8 @@ LOOP
    BEGIN
       SELECT NVL(SUBSTR(value,1,2),'00') INTO kk_d
       FROM operw
-      WHERE ref=ref_ and tag ='OB40' ;
+      WHERE ref = ref_ 
+        and tag  = 'OB40' ;
    EXCEPTION WHEN NO_DATA_FOUND THEN
       kk_d := '00';
    END;
@@ -341,7 +364,8 @@ LOOP
    BEGIN
       SELECT NVL(SUBSTR(value,1,2),'00') INTO kk_k
       FROM operw
-      WHERE ref=ref_ and tag ='OB40D' ;
+      WHERE ref = ref_ 
+        and tag = 'OB40D' ;
    EXCEPTION WHEN NO_DATA_FOUND THEN
       kk_k := '00';
    END;
@@ -349,58 +373,68 @@ LOOP
    begin
       select nlsd, nlsk, nazn
          into nlsd_, nlsk_, nazn_
-      from provodki_otc
-      where fdat = data_
-        and ref = ref_;
+      from provodki_otc o, opldok z
+      where o.fdat = data_ 
+        and o.ref = ref_
+        and o.ref = z.ref 
+        and o.stmt = z.stmt
+        and z.acc = acc_;
 
       comm_ := '';
       comm_ := substr(comm_||'Дт '||nlsd_||'  '||' Кт '||nlsk_||'  '||nazn_,1,200);
-   exception when no_data_found then
+   exception when no_data_found then     
       comm_ := '';
-   end;
+   end;            
 
-   IF typ_>0 THEN
+   IF typ_ > 0 
+   THEN
       nbuc_ := NVL(F_Codobl_Tobo(acc_,typ_),nbuc1_);
    ELSE
       nbuc_ := nbuc1_;
    END IF;
 
-   IF Dosn_>0 THEN
+   IF Dosn_ > 0 
+   THEN
       BEGIN
          SELECT NVL(ob22,'00') into zz_
          FROM specparam_int
-         WHERE acc=acc_ ;
+         WHERE acc = acc_ ;
          EXCEPTION WHEN NO_DATA_FOUND THEN
-         zz_:='00';
+         zz_ := '00';
       END ;
-      if kk_d != '00' then
+      if kk_d != '00' 
+      then
          kk_ := kk_d;
       end if;
-      if kk_d = '00' and kk_k != '00' then
+      if kk_d = '00' and kk_k != '00' 
+      then
          kk_ := kk_k;
       end if;
-      kodp_:= '5' || SUBSTR(nls_,1,4) || zz_ || kk_ ;
-      znap_:= TO_CHAR(Dosn_) ;
+      kodp_ := '5' || SUBSTR(nls_,1,4) || zz_ || kk_ ;
+      znap_ := TO_CHAR(Dosn_) ;
       INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, ref, comm, nbuc) VALUES
                              (nls_, kv_, data_, kodp_,znap_, ref_, comm_, nbuc_);
    END IF;
 
-   IF Kosn_>0 THEN
+   IF Kosn_ > 0 
+   THEN
       BEGIN
          SELECT NVL(ob22,'00') into zz_
          FROM specparam_int
-         WHERE acc=acc_ ;
+         WHERE acc = acc_ ;
          EXCEPTION WHEN NO_DATA_FOUND THEN
-         zz_:='00';
+         zz_ := '00';
       END ;
-      if kk_k != '00' then
+      if kk_k != '00' 
+      then
          kk_ := kk_k;
       end if;
-      if kk_k = '00' and kk_d != '00' then
+      if kk_k = '00' and kk_d != '00' 
+      then
          kk_ := kk_d;
       end if;
-      kodp_:= '6' || SUBSTR(nls_,1,4) || zz_ || kk_ ;
-      znap_:= TO_CHAR(Kosn_) ;
+      kodp_ := '6' || SUBSTR(nls_,1,4) || zz_ || kk_ ;
+      znap_ := TO_CHAR(Kosn_) ;
       INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, ref, comm, nbuc) VALUES
                              (nls_, kv_, data_, kodp_,znap_, ref_, comm_, nbuc_);
    END IF;
@@ -418,7 +452,8 @@ LOOP
    BEGIN
       SELECT NVL(SUBSTR(value,1,2),'00') INTO kk_d
       FROM operw
-      WHERE ref=ref_ and tag ='OB40' ;
+      WHERE ref = ref_ 
+        and tag = 'OB40' ;
    EXCEPTION WHEN NO_DATA_FOUND THEN
       kk_d := '00';
    END;
@@ -426,7 +461,8 @@ LOOP
    BEGIN
       SELECT NVL(SUBSTR(value,1,2),'00') INTO kk_k
       FROM operw
-      WHERE ref=ref_ and tag ='OB40D' ;
+      WHERE ref = ref_ 
+        and tag = 'OB40D' ;
    EXCEPTION WHEN NO_DATA_FOUND THEN
       kk_k := '00';
    END;
@@ -434,58 +470,68 @@ LOOP
    begin
       select nlsd, nlsk, nazn
          into nlsd_, nlsk_, nazn_
-      from provodki_otc
-      where fdat = data_
-        and ref = ref_;
-
+      from provodki_otc o, opldok z
+      where o.fdat = data_ 
+        and o.ref = ref_
+        and o.ref = z.ref 
+        and o.stmt = z.stmt
+        and z.acc = acc_;
+        
       comm_ := '';
       comm_ := substr(comm_||'Дт '||nlsd_||'  '||' Кт '||nlsk_||'  '||nazn_,1,200);
-   exception when no_data_found then
+   exception when no_data_found then     
       comm_ := '';
-   end;
+   end;            
 
-   IF typ_>0 THEN
+   IF typ_ > 0 
+   THEN
       nbuc_ := NVL(F_Codobl_Tobo(acc_,typ_),nbuc1_);
    ELSE
       nbuc_ := nbuc1_;
    END IF;
 
-   IF Dosn_>0 THEN
+   IF Dosn_ > 0 
+   THEN
       BEGIN
          SELECT NVL(ob22,'00') into zz_
          FROM specparam_int
-         WHERE acc=acc_ ;
+         WHERE acc = acc_ ;
          EXCEPTION WHEN NO_DATA_FOUND THEN
-         zz_:='00';
+         zz_ := '00';
       END ;
-      if kk_d != '00' then
+      if kk_d != '00' 
+      then
          kk_ := kk_d;
       end if;
-      if kk_d = '00' and kk_k != '00' then
+      if kk_d = '00' and kk_k != '00' 
+      then
          kk_ := kk_k;
       end if;
-      kodp_:= '5' || SUBSTR(nls_,1,4) || zz_ || kk_ ;
-      znap_:= TO_CHAR(Dosn_) ;
+      kodp_ := '5' || SUBSTR(nls_,1,4) || zz_ || kk_ ;
+      znap_ := TO_CHAR(Dosn_) ;
       INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, ref, comm, nbuc) VALUES
                              (nls_, kv_, data_, kodp_,znap_, ref_, comm_, nbuc_);
    END IF;
 
-   IF Kosn_>0 THEN
+   IF Kosn_ > 0 
+   THEN
       BEGIN
          SELECT NVL(ob22,'00') into zz_
          FROM specparam_int
-         WHERE acc=acc_ ;
+         WHERE acc = acc_ ;
          EXCEPTION WHEN NO_DATA_FOUND THEN
-         zz_:='00';
+         zz_ := '00';
       END ;
-      if kk_k != '00' then
+      if kk_k != '00' 
+      then
          kk_ := kk_k;
       end if;
-      if kk_k = '00' and kk_d != '00' then
+      if kk_k = '00' and kk_d != '00' 
+      then
          kk_ := kk_d;
       end if;
-      kodp_:= '6' || SUBSTR(nls_,1,4) || zz_ || kk_ ;
-      znap_:= TO_CHAR(Kosn_) ;
+      kodp_ := '6' || SUBSTR(nls_,1,4) || zz_ || kk_ ;
+      znap_ := TO_CHAR(Kosn_) ;
       INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, ref, comm, nbuc) VALUES
                              (nls_, kv_, data_, kodp_,znap_, ref_, comm_, nbuc_);
    END IF;
@@ -494,31 +540,13 @@ CLOSE KOR_PROV_99;
 ---------------------------------------------------
 DELETE FROM tmp_irep where kodf='40' and datf= dat_;
 ---------------------------------------------------
-OPEN BaseL;
-LOOP
-   FETCH BaseL INTO  kodp_, nbuc_, znap_;
-   EXIT WHEN BaseL%NOTFOUND;
-   INSERT INTO tmp_irep
-        (kodf, datf, kodp, znap, nbuc)
-   VALUES
-        ('40', Dat_, kodp_, znap_, nbuc_);
-END LOOP;
-CLOSE BaseL;
+INSERT INTO tmp_irep (kodf, datf, kodp, znap, nbuc)
+select '40', Dat_, kodp, SUM (znap), nbuc
+FROM rnbu_trace
+GROUP BY kodp, nbuc;
 ------------------------------------------------------------------
 -- перевiрка показник?в з файлом 02
 p_ch_file40('40',dat_,userid_);
 ------------------------------------------------------------------
 END p_f40sb;
 /
-show err;
-
-PROMPT *** Create  grants  P_F40SB ***
-grant EXECUTE                                                                on P_F40SB         to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on P_F40SB         to RPBN002;
-grant EXECUTE                                                                on P_F40SB         to WR_ALL_RIGHTS;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_F40SB.sql =========*** End *** =
-PROMPT ===================================================================================== 

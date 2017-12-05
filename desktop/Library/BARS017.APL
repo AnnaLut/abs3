@@ -5,9 +5,9 @@ Application Description: Кредиты - 17-08-2007
 .data VIEWINFO
 0000: 6F00000001000000 FFFF01000D004347 5458566965775374 6174650400010000
 0020: 0000000000AA0000 002C000000020000 0003000000000000 00EF010000F8FFFF
-0040: FFE1FFFFFFFFFFFF FF000000007C0200 004D010000010000 0001000000010000
-0060: 000F4170706C6963 6174696F6E497465 6D02000000075769 6E646F7773034953
-0080: 47
+0040: FFE1FFFFFFFFFFFF FF000000007C0200 004D010000010000 0000000000010000
+0060: 000F4170706C6963 6174696F6E497465 6D02000000075769 6E646F7773074B72
+0080: 6564416363
 .enddata
 .data DT_MAKERUNDLG
 0000: 02000000001D513A 5C4241525339385C 4C4942524152595C 424152533031352E
@@ -301,9 +301,9 @@ Application Description: Кредиты - 17-08-2007
 							Break
 						Case 0 !! Счета и % ставки по договору
 							! If not IsWindow(hWin0)
-								                                                                                                                                                                                                                                             Set hWin0 = SalCreateWindow(frmOpKredAcc, hWndMDI, nTip_Ur, nPar, strPar01,strPar02)
+								                                                                                                                                                                                                                                              Set hWin0 = SalCreateWindow(frmOpKredAcc, hWndMDI, nTip_Ur, nPar, strPar01,strPar02)
 							! Else
-								                                                                                                                                                                                                                                             Call SalBringWindowToTop ( frmOpKredAcc )
+								                                                                                                                                                                                                                                              Call SalBringWindowToTop ( frmOpKredAcc )
 							Call SalCreateWindow(KredAcc, hWndMDI, nTip_Ur, nPar, strPar01,strPar02)
 							Break
 						Case 26 !! Расчет Эф.% ставки по 1 КД
@@ -327,11 +327,11 @@ Application Description: Кредиты - 17-08-2007
 							Break
 							! Call Sel017( hWndMDI, NUMBER_Null, nMode, nPar, strPar01, strPar02, NUMBER_Null )
 						! Case 299 ! Тест-Аккета(OLD)
-							                                                                                                                                                                                             If not IsWindow(hWin_TA)
-								                                                                                                                                                                                             Set hWin_TA = SalCreateWindow( TA, hWndParent, nMode, nPar, strPar01, strPar02 )
-							                                                                                                                                                                                             Else 
-								                                                                                                                                                                                             Call SalBringWindowToTop ( hWin_TA )
-							                                                                                                                                                                                             Break 
+							                                                                                                                                                                                              If not IsWindow(hWin_TA)
+								                                                                                                                                                                                              Set hWin_TA = SalCreateWindow( TA, hWndParent, nMode, nPar, strPar01, strPar02 )
+							                                                                                                                                                                                              Else 
+								                                                                                                                                                                                              Call SalBringWindowToTop ( hWin_TA )
+							                                                                                                                                                                                              Break 
 						Case 298 ! Тест-Аккета (NEW)
 							If not IsWindow(hWin_NAT)
 								Set hWin_NAT = SalCreateWindow( NAT, hWndParent, nMode, nPar, strPar01, strPar02 )
@@ -435,11 +435,11 @@ Application Description: Кредиты - 17-08-2007
 					! Call Ini017()
 					! Call Initcc()
 					! If not IsWindow(hDocWdog)
-						                                                                                             Set hDocWdog = SalCreateWindow(cDocWdog, hW,
+						                                                                                              Set hDocWdog = SalCreateWindow(cDocWdog, hW,
 								 nOper, nSumDog, nKvDog, nRnk, sAccA, sAccB, sMfoB,
 								 nNdog, sNazn  , sPolu , sNd , dWida, sKV1 , sKV2 , sKV3, '', pbDisable, pbRefreshG )
 					! Else
-						                                                                                             Call SalBringWindowToTop ( cDocWdog )
+						                                                                                              Call SalBringWindowToTop ( cDocWdog )
 			Function: Sel017oEx
 				Description:
 				Returns
@@ -5705,11 +5705,14 @@ Application Description: Кредиты - 17-08-2007
 							Set NBS6 = Subs( sNbs, 1,3)||'5'
 						Set NBS5 = Subs( sNbs, 1,3)||'6'
 					Else
-						Set NBS5 = Subs( sNbs, 1,3)||'5'
+						! Set NBS5 = Subs( sNbs, 1,3)||'5'
+						Set NBS5 = Subs( sNbs, 1,3)||'6'
 						Set NBS6 = Subs( sNbs, 1,3)||'6'
-					Set NBS7 = Subs( sNbs, 1,3)||'7'
+					! Set NBS7 = Subs( sNbs, 1,3)||'7'
+					Set NBS7 = Subs( sNbs, 1,3)||'3'
 					Set NBS8 = Subs( sNbs, 1,3)||'8'
-					Set NBS9 = Subs( sNbs, 1,3)||'9'
+					! Set NBS9 = Subs( sNbs, 1,3)||'9'
+					Set NBS9 = Subs( sNbs, 1,3)||'8'
 					Set NBS0 = Subs( sNbs, 1,2)||'9'|| Subs( sNbs, 3,1)
 				!
 				If TIP = 'SD '
@@ -5854,7 +5857,7 @@ Application Description: Кредиты - 17-08-2007
 				Border Color: Default
 				Background Color: Default
 			! cFieldLabel: tbgSave	!Сохранить сделку с назначением
-				                                                                                                                                                                                                                                     Message Actions
+				                                                                                                                                                                                                                                      Message Actions
 			Multiline Field: mlTxt
 				Class Child Ref Key: 0
 				Class ChildKey: 0
@@ -6778,9 +6781,9 @@ Application Description: Кредиты - 17-08-2007
 					Background Color: White
 					Input Mask: Unformatted
 .end
-				                                                                                                                                                                                                                          Message Actions 
-					                                                                                                                                                                                                                          On SAM_TooltipSetText
-						                                                                                                                                                                                                                          Return XSalTooltipSetText( lParam, 'Реф.КД')
+				                                                                                                                                                                                                                           Message Actions 
+					                                                                                                                                                                                                                           On SAM_TooltipSetText
+						                                                                                                                                                                                                                           Return XSalTooltipSetText( lParam, 'Реф.КД')
 			Data Field: REF
 				Class Child Ref Key: 0
 				Class ChildKey: 0
@@ -6908,9 +6911,9 @@ Application Description: Кредиты - 17-08-2007
 					Background Color: Default
 					Input Mask: Unformatted
 .end
-				                                                                                                                                                                                                                     Message Actions 
-					                                                                                                                                                                                                                     On SAM_TooltipSetText
-						                                                                                                                                                                                                                     Return XSalTooltipSetText( lParam, 'Рахунок погашення')
+				                                                                                                                                                                                                                      Message Actions 
+					                                                                                                                                                                                                                      On SAM_TooltipSetText
+						                                                                                                                                                                                                                      Return XSalTooltipSetText( lParam, 'Рахунок погашення')
 			Data Field: REF8
 				Class Child Ref Key: 0
 				Class ChildKey: 0
@@ -7900,15 +7903,15 @@ Application Description: Кредиты - 17-08-2007
 				Text Color: Default
 				Background Color: Cyan
 .end
-				                                                                                                                                                                                                                                               Message Actions 
-					                                                                                                                                                                                                                                               On SAM_Create
-						                                                                                                                                                                                                                                               Set strTip = 'Нарахувати з проводками ПРОЦЕНТНІ та КОМІСІЙНІ доходи'
-					                                                                                                                                                                                                                                               On SAM_Click
+				                                                                                                                                                                                                                                                Message Actions 
+					                                                                                                                                                                                                                                                On SAM_Create
+						                                                                                                                                                                                                                                                Set strTip = 'Нарахувати з проводками ПРОЦЕНТНІ та КОМІСІЙНІ доходи'
+					                                                                                                                                                                                                                                                On SAM_Click
 						! Call Sel010(hWndMDI,0, 0,
 								" and s.TIP in ('SS ','SP ','SL ')
 								  and s.ACC in (select acc from nd_acc where nd="||Str(ND)||")" ,
 								" "   )
-						                                                                                                                                                                                                                                               Call Sel010(hWndMDI,0, 0,
+						                                                                                                                                                                                                                                                Call Sel010(hWndMDI,0, 0,
 								"  and
 								(i.id=2 and s.acc=" ||Str(ACC8)|| " OR
 								 s.TIP in ('SS ','SP ','SL ') and s.ACC in (select acc from nd_acc where nd="||Str(ND)||")
@@ -8400,13 +8403,13 @@ Application Description: Кредиты - 17-08-2007
 							and SqlFetchNext( hSql(), nFetchRes )
 					!
 				! If nPar >0
-					                                                                                                                                                                      Set ND = nPar
-					                                                                                                                                                                      Call SalDisableWindow( CC_ID )
-					                                                                                                                                                                      Call SalDisableWindow( DAT1 )
-					                                                                                                                                                                      Call SalDisableWindow( pb_F1 )
+					                                                                                                                                                                       Set ND = nPar
+					                                                                                                                                                                       Call SalDisableWindow( CC_ID )
+					                                                                                                                                                                       Call SalDisableWindow( DAT1 )
+					                                                                                                                                                                       Call SalDisableWindow( pb_F1 )
 					! и задан индив 2902
-					                                                                                                                                                                      If strPar02 !=STRING_Null
-						                                                                                                                                                                      Set NLS_2902 = SalStrTrimX( strPar02 )
+					                                                                                                                                                                       If strPar02 !=STRING_Null
+						                                                                                                                                                                       Set NLS_2902 = SalStrTrimX( strPar02 )
 				If SqlPrepareAndExecute( hSql(),
 						"SELECT nls, nms INTO :NLS_1002,:NMS_1002 from accounts where kv=:n980 and nls = Substr(" || Sql_1002 || ",1,14) ")
 						and NOT SqlFetchNext( hSql(), nFetchRes )
@@ -8433,11 +8436,11 @@ Application Description: Кредиты - 17-08-2007
 						and SqlFetchNext(hSql(), nFetchRes)
 				Call F_NULL()
 				! If nPar >0
-					                                                                                                                                                                                                                          Call SalSendMsg( pb_F1, SAM_Click, 0, 0 )
-					                                                                                                                                                                                                                          Set ND = nPar
-					                                                                                                                                                                                                                          Call SalDisableWindow( CC_ID )
-					                                                                                                                                                                                                                          Call SalDisableWindow( DAT1 )
-					                                                                                                                                                                                                                          Call SalDisableWindow( pb_F1 )
+					                                                                                                                                                                                                                           Call SalSendMsg( pb_F1, SAM_Click, 0, 0 )
+					                                                                                                                                                                                                                           Set ND = nPar
+					                                                                                                                                                                                                                           Call SalDisableWindow( CC_ID )
+					                                                                                                                                                                                                                           Call SalDisableWindow( DAT1 )
+					                                                                                                                                                                                                                           Call SalDisableWindow( pb_F1 )
 				Call SalMapEnterToTab( TRUE )
 				Call SalSetWindowText(hWndForm, 'Погашення кредиту готівкою ' )
 				Call ShowApdVersion('06')
@@ -8477,502 +8480,502 @@ Application Description: Кредиты - 17-08-2007
 			Text Color: Default
 			Background Color: Default
 .end
-		                                                                                                                                                                      Description: 
-		                                                                                                                                                                      Named Menus 
-		                                                                                                                                                                      Menu 
-		                                                                                                                                                                      Tool Bar 
-			                                                                                                                                                                      Contents 
-		                                                                                                                                                                      Contents 
-			                                                                                                                                                                      Background Text: Сплата боргу за користування позикою згідно кредитної угоди
-			                                                                                                                                                                      Data Field: TXT_END
-				                                                                                                                                                                      Message Actions 
-			                                                                                                                                                                      Pushbutton: pb_F6
-				                                                                                                                                                                      Message Actions 
-					                                                                                                                                                                      On SAM_Create
-						                                                                                                                                                                      Set strTip = 'F6. Новий '
-					                                                                                                                                                                      On SAM_Click
-						                                                                                                                                                                      Call F_NULL()
-			                                                                                                                                                                      Pushbutton: pb_Exit
-				                                                                                                                                                                      Message Actions 
-					                                                                                                                                                                      On SAM_Create
-						                                                                                                                                                                      Set strTip = 'ESC. Завершити  '
-					                                                                                                                                                                      On SAM_Click
-						                                                                                                                                                                      Call SalDestroyWindow(hWndForm)
+		                                                                                                                                                                       Description: 
+		                                                                                                                                                                       Named Menus 
+		                                                                                                                                                                       Menu 
+		                                                                                                                                                                       Tool Bar 
+			                                                                                                                                                                       Contents 
+		                                                                                                                                                                       Contents 
+			                                                                                                                                                                       Background Text: Сплата боргу за користування позикою згідно кредитної угоди
+			                                                                                                                                                                       Data Field: TXT_END
+				                                                                                                                                                                       Message Actions 
+			                                                                                                                                                                       Pushbutton: pb_F6
+				                                                                                                                                                                       Message Actions 
+					                                                                                                                                                                       On SAM_Create
+						                                                                                                                                                                       Set strTip = 'F6. Новий '
+					                                                                                                                                                                       On SAM_Click
+						                                                                                                                                                                       Call F_NULL()
+			                                                                                                                                                                       Pushbutton: pb_Exit
+				                                                                                                                                                                       Message Actions 
+					                                                                                                                                                                       On SAM_Create
+						                                                                                                                                                                       Set strTip = 'ESC. Завершити  '
+					                                                                                                                                                                       On SAM_Click
+						                                                                                                                                                                       Call SalDestroyWindow(hWndForm)
 			!
-			                                                                                                                                                                      Background Text: № Угоди
-			                                                                                                                                                                      Data Field: CC_ID
-				                                                                                                                                                                      Message Actions 
-					                                                                                                                                                                      On SAM_TooltipSetText
-						                                                                                                                                                                      Return XSalTooltipSetText( lParam, '№ Угоди')
-					                                                                                                                                                                      On SAM_Validate
-						                                                                                                                                                                      Set CC_ID = SalStrTrimX( CC_ID )
-					                                                                                                                                                                      On SAM_SetFocus
-						                                                                                                                                                                      Call SalMapEnterToTab( TRUE )
-			                                                                                                                                                                      Background Text: Дата Угоди
-			                                                                                                                                                                      Data Field: DAT1
-				                                                                                                                                                                      Message Actions 
-					                                                                                                                                                                      On SAM_TooltipSetText
-						                                                                                                                                                                      Return XSalTooltipSetText( lParam, 'Дата Угоди')
-					                                                                                                                                                                      On SAM_Validate
-						                                                                                                                                                                      If DAT1 != DATETIME_Null and DAT1 >= GetBankDate()
-							                                                                                                                                                                      Call SalMessageBox("Дата начала КД должна быть МЕНЬШЕ текущей банковской",
+			                                                                                                                                                                       Background Text: № Угоди
+			                                                                                                                                                                       Data Field: CC_ID
+				                                                                                                                                                                       Message Actions 
+					                                                                                                                                                                       On SAM_TooltipSetText
+						                                                                                                                                                                       Return XSalTooltipSetText( lParam, '№ Угоди')
+					                                                                                                                                                                       On SAM_Validate
+						                                                                                                                                                                       Set CC_ID = SalStrTrimX( CC_ID )
+					                                                                                                                                                                       On SAM_SetFocus
+						                                                                                                                                                                       Call SalMapEnterToTab( TRUE )
+			                                                                                                                                                                       Background Text: Дата Угоди
+			                                                                                                                                                                       Data Field: DAT1
+				                                                                                                                                                                       Message Actions 
+					                                                                                                                                                                       On SAM_TooltipSetText
+						                                                                                                                                                                       Return XSalTooltipSetText( lParam, 'Дата Угоди')
+					                                                                                                                                                                       On SAM_Validate
+						                                                                                                                                                                       If DAT1 != DATETIME_Null and DAT1 >= GetBankDate()
+							                                                                                                                                                                       Call SalMessageBox("Дата начала КД должна быть МЕНЬШЕ текущей банковской",
 									"Ошибка ! ", MB_IconStop)
-							                                                                                                                                                                      Set DAT1 = DATETIME_Null
-						                                                                                                                                                                      Return VALIDATE_Ok
-					                                                                                                                                                                      On SAM_SetFocus
-						                                                                                                                                                                      Call SalMapEnterToTab( TRUE )
-			                                                                                                                                                                      Pushbutton: pb_F1
-				                                                                                                                                                                      Message Actions 
-					                                                                                                                                                                      On SAM_Create
-						                                                                                                                                                                      Set strTip = 'F1. Пошук угоди в БД '
-					                                                                                                                                                                      On SAM_Click
-						                                                                                                                                                                      Set sSql = STRING_Null
-						                                                                                                                                                                      Call F_DISA ()
-						                                                                                                                                                                      If CC_ID != STRING_Null and DAT1 != DATETIME_Null
-							                                                                                                                                                                      Set sSql = sSql1
-						                                                                                                                                                                      Else If ND != NUMBER_Null
-							                                                                                                                                                                      Set sSql = sSql2
-						                                                                                                                                                                      If sSql != STRING_Null
-							                                                                                                                                                                      If SqlPrepareAndExecute( hSql(), sSql ) and SqlFetchNext( hSql(), nFetchRes )
-								                                                                                                                                                                      Call NASELENIE()
-							                                                                                                                                                                      Else 
-								                                                                                                                                                                      Call SalMessageBox(
+							                                                                                                                                                                       Set DAT1 = DATETIME_Null
+						                                                                                                                                                                       Return VALIDATE_Ok
+					                                                                                                                                                                       On SAM_SetFocus
+						                                                                                                                                                                       Call SalMapEnterToTab( TRUE )
+			                                                                                                                                                                       Pushbutton: pb_F1
+				                                                                                                                                                                       Message Actions 
+					                                                                                                                                                                       On SAM_Create
+						                                                                                                                                                                       Set strTip = 'F1. Пошук угоди в БД '
+					                                                                                                                                                                       On SAM_Click
+						                                                                                                                                                                       Set sSql = STRING_Null
+						                                                                                                                                                                       Call F_DISA ()
+						                                                                                                                                                                       If CC_ID != STRING_Null and DAT1 != DATETIME_Null
+							                                                                                                                                                                       Set sSql = sSql1
+						                                                                                                                                                                       Else If ND != NUMBER_Null
+							                                                                                                                                                                       Set sSql = sSql2
+						                                                                                                                                                                       If sSql != STRING_Null
+							                                                                                                                                                                       If SqlPrepareAndExecute( hSql(), sSql ) and SqlFetchNext( hSql(), nFetchRes )
+								                                                                                                                                                                       Call NASELENIE()
+							                                                                                                                                                                       Else 
+								                                                                                                                                                                       Call SalMessageBox(
 										'Угоду № '|| CC_ID ||
 										' з датою заключення ' ||
 										SalFmtFormatDateTime( DAT1, 'dd/MM/yyyy' ) ||
 										' не знайдено серед діючих ',
 										"Помилки в заданих параметрах пошуку ! ", MB_IconStop)
 								! Call SalMessageBeep( MB_IconAsterisk )
-								                                                                                                                                                                      Call SalSetFocus( CC_ID )
-			                                                                                                                                                                      Data Field: nSKP
-				                                                                                                                                                                      Message Actions 
-					                                                                                                                                                                      On SAM_TooltipSetText
-						                                                                                                                                                                      Return XSalTooltipSetText( lParam, 'Символ Кас.Плана')
-					                                                                                                                                                                      On SAM_Validate
-						                                                                                                                                                                      If nSKP > 39
-							                                                                                                                                                                      Return VALIDATE_Cancel
-						                                                                                                                                                                      Return VALIDATE_Ok
-			                                                                                                                                                                      Pushbutton: pb_F10
-				                                                                                                                                                                      Message Actions 
-					                                                                                                                                                                      On SAM_Create
-						                                                                                                                                                                      Set strTip = 'F10. Ввести '
-					                                                                                                                                                                      On SAM_Click
-						                                                                                                                                                                      If SalMessageBox(
+								                                                                                                                                                                       Call SalSetFocus( CC_ID )
+			                                                                                                                                                                       Data Field: nSKP
+				                                                                                                                                                                       Message Actions 
+					                                                                                                                                                                       On SAM_TooltipSetText
+						                                                                                                                                                                       Return XSalTooltipSetText( lParam, 'Символ Кас.Плана')
+					                                                                                                                                                                       On SAM_Validate
+						                                                                                                                                                                       If nSKP > 39
+							                                                                                                                                                                       Return VALIDATE_Cancel
+						                                                                                                                                                                       Return VALIDATE_Ok
+			                                                                                                                                                                       Pushbutton: pb_F10
+				                                                                                                                                                                       Message Actions 
+					                                                                                                                                                                       On SAM_Create
+						                                                                                                                                                                       Set strTip = 'F10. Ввести '
+					                                                                                                                                                                       On SAM_Click
+						                                                                                                                                                                       If SalMessageBox(
 								'Виконати
 								'|| IifS (rb1, 'О С Т А Т О Ч Н И Й ','П О Т О Ч Н И Й ') || '
 								разрахунок ? ',
 								 'УВАГА !',
 								MB_IconQuestion | MB_YesNo) = IDYES
-							                                                                                                                                                                      If f_Opl()
-								                                                                                                                                                                      Call SqlCommit(hSql())
-								                                                                                                                                                                      If nSP > 0
+							                                                                                                                                                                       If f_Opl()
+								                                                                                                                                                                       Call SqlCommit(hSql())
+								                                                                                                                                                                       If nSP > 0
 										AND cb_SN8 = 1
 										AND SalMessageBox(
 										'Сплатити штраф-пеню в розмірі '|| SalNumberToStrX( nSP, 2 )||' ?',
 										 'УВАГА !',
 										MB_IconQuestion | MB_YesNo) = IDYES
-									                                                                                                                                                                      If f_Opl_SN8()
-										                                                                                                                                                                      Call SqlCommit(hSql())
-								                                                                                                                                                                      Call F_DISA1()
-								                                                                                                                                                                      Call SalSendMsg( pb_F5, SAM_Click, 0, 0 )
-							                                                                                                                                                                      Else 
-								                                                                                                                                                                      Call SqlRollback(hSql())
-			                                                                                                                                                                      Pushbutton: pb_F5
-				                                                                                                                                                                      Message Actions 
-					                                                                                                                                                                      On SAM_Create
-						                                                                                                                                                                      Set strTip = 'F5. Надрукувати '
-					                                                                                                                                                                      On SAM_Click
-						                                                                                                                                                                      Set cDoc.m_nRef = REF
-						                                                                                                                                                                      Call cDoc.pDoc()
-						                                                                                                                                                                      If REF8 > 0
-							                                                                                                                                                                      Set cDoc.m_nRef = REF8
-							                                                                                                                                                                      Call cDoc.pDoc()
-						                                                                                                                                                                      Call SalWaitCursor(FALSE)
+									                                                                                                                                                                       If f_Opl_SN8()
+										                                                                                                                                                                       Call SqlCommit(hSql())
+								                                                                                                                                                                       Call F_DISA1()
+								                                                                                                                                                                       Call SalSendMsg( pb_F5, SAM_Click, 0, 0 )
+							                                                                                                                                                                       Else 
+								                                                                                                                                                                       Call SqlRollback(hSql())
+			                                                                                                                                                                       Pushbutton: pb_F5
+				                                                                                                                                                                       Message Actions 
+					                                                                                                                                                                       On SAM_Create
+						                                                                                                                                                                       Set strTip = 'F5. Надрукувати '
+					                                                                                                                                                                       On SAM_Click
+						                                                                                                                                                                       Set cDoc.m_nRef = REF
+						                                                                                                                                                                       Call cDoc.pDoc()
+						                                                                                                                                                                       If REF8 > 0
+							                                                                                                                                                                       Set cDoc.m_nRef = REF8
+							                                                                                                                                                                       Call cDoc.pDoc()
+						                                                                                                                                                                       Call SalWaitCursor(FALSE)
 			!
-			                                                                                                                                                                      Background Text: Сума платежу
-			                                                                                                                                                                      Radio Button: rb
-				                                                                                                                                                                      Message Actions 
-					                                                                                                                                                                      On SAM_Click
-						                                                                                                                                                                      If rb
-							                                                                                                                                                                      Call SalSetFocus( nS )
-			                                                                                                                                                                      Radio Button: rb1
-				                                                                                                                                                                      Message Actions 
-					                                                                                                                                                                      On SAM_Click
-						                                                                                                                                                                      If rb1
-							                                                                                                                                                                      Call SalSetFocus( nS1 )
-			                                                                                                                                                                      Data Field: nS
-				                                                                                                                                                                      Message Actions 
-					                                                                                                                                                                      On SAM_TooltipSetText
-						                                                                                                                                                                      Return XSalTooltipSetText( lParam, 'Сума платежу')
-					                                                                                                                                                                      On SAM_SetFocus
-						                                                                                                                                                                      Set rb = TRUE
-						                                                                                                                                                                      Set nS_OLD = nS
-						                                                                                                                                                                      Call F_SumPr(nS)
+			                                                                                                                                                                       Background Text: Сума платежу
+			                                                                                                                                                                       Radio Button: rb
+				                                                                                                                                                                       Message Actions 
+					                                                                                                                                                                       On SAM_Click
+						                                                                                                                                                                       If rb
+							                                                                                                                                                                       Call SalSetFocus( nS )
+			                                                                                                                                                                       Radio Button: rb1
+				                                                                                                                                                                       Message Actions 
+					                                                                                                                                                                       On SAM_Click
+						                                                                                                                                                                       If rb1
+							                                                                                                                                                                       Call SalSetFocus( nS1 )
+			                                                                                                                                                                       Data Field: nS
+				                                                                                                                                                                       Message Actions 
+					                                                                                                                                                                       On SAM_TooltipSetText
+						                                                                                                                                                                       Return XSalTooltipSetText( lParam, 'Сума платежу')
+					                                                                                                                                                                       On SAM_SetFocus
+						                                                                                                                                                                       Set rb = TRUE
+						                                                                                                                                                                       Set nS_OLD = nS
+						                                                                                                                                                                       Call F_SumPr(nS)
 						! Call SalMapEnterToTab( TRUE )
-					                                                                                                                                                                      On SAM_Validate
-						                                                                                                                                                                      Call f_Tochka (hWndItem)
-						                                                                                                                                                                      Call F_SumPr(nS)
-						                                                                                                                                                                      If nS > nS1
-							                                                                                                                                                                      If SalMessageBox(
+					                                                                                                                                                                       On SAM_Validate
+						                                                                                                                                                                       Call f_Tochka (hWndItem)
+						                                                                                                                                                                       Call F_SumPr(nS)
+						                                                                                                                                                                       If nS > nS1
+							                                                                                                                                                                       If SalMessageBox(
 									'Введена Сума платежу перевищує ЗАГАЛЬНИЙ кінцевий борг !
 									 Відмовитись від цієї суми = '|| SalNumberToStrX( nS, 2 ) || ' ? ',
 									 'Можлива переплата  !',
 									MB_IconQuestion | MB_YesNo) = IDYES
-								                                                                                                                                                                      Set nS = nS_OLD
-								                                                                                                                                                                      Call SalSetFocus( nS )
-								                                                                                                                                                                      Return VALIDATE_Cancel
-						                                                                                                                                                                      Return VALIDATE_Ok
-					                                                                                                                                                                      On SAM_KillFocus
-						                                                                                                                                                                      Call f_Tochka (hWndItem)
-						                                                                                                                                                                      Call F_SumPr(nS)
-						                                                                                                                                                                      If nS > nS1
-							                                                                                                                                                                      If SalMessageBox(
+								                                                                                                                                                                       Set nS = nS_OLD
+								                                                                                                                                                                       Call SalSetFocus( nS )
+								                                                                                                                                                                       Return VALIDATE_Cancel
+						                                                                                                                                                                       Return VALIDATE_Ok
+					                                                                                                                                                                       On SAM_KillFocus
+						                                                                                                                                                                       Call f_Tochka (hWndItem)
+						                                                                                                                                                                       Call F_SumPr(nS)
+						                                                                                                                                                                       If nS > nS1
+							                                                                                                                                                                       If SalMessageBox(
 									'Введена Сума платежу перевищує ЗАГАЛЬНИЙ кінцевий борг !
 									 Відмовитись від цієї суми = '|| SalNumberToStrX( nS, 2 ) || ' ? ',
 									 'Можлива переплата  !',
 									MB_IconQuestion | MB_YesNo) = IDYES
-								                                                                                                                                                                      Set nS = nS_OLD
-								                                                                                                                                                                      Call SalSetFocus( nS )
-								                                                                                                                                                                      Return FALSE
-						                                                                                                                                                                      Return TRUE
-			                                                                                                                                                                      Data Field: nS1
-				                                                                                                                                                                      Message Actions 
-					                                                                                                                                                                      On SAM_TooltipSetText
-						                                                                                                                                                                      Return XSalTooltipSetText( lParam, 'Сума платежу')
-					                                                                                                                                                                      On SAM_SetFocus
-						                                                                                                                                                                      Set rb1 = TRUE
-						                                                                                                                                                                      Set nS_OLD = nS1
-						                                                                                                                                                                      Call F_SumPr(nS1)
-						                                                                                                                                                                      Call SalMapEnterToTab( TRUE )
-					                                                                                                                                                                      On SAM_Validate
-						                                                                                                                                                                      Call f_Tochka (hWndItem)
-						                                                                                                                                                                      Call F_SumPr(nS1)
-						                                                                                                                                                                      If nS1 > nS_OLD
-							                                                                                                                                                                      If SalMessageBox(
+								                                                                                                                                                                       Set nS = nS_OLD
+								                                                                                                                                                                       Call SalSetFocus( nS )
+								                                                                                                                                                                       Return FALSE
+						                                                                                                                                                                       Return TRUE
+			                                                                                                                                                                       Data Field: nS1
+				                                                                                                                                                                       Message Actions 
+					                                                                                                                                                                       On SAM_TooltipSetText
+						                                                                                                                                                                       Return XSalTooltipSetText( lParam, 'Сума платежу')
+					                                                                                                                                                                       On SAM_SetFocus
+						                                                                                                                                                                       Set rb1 = TRUE
+						                                                                                                                                                                       Set nS_OLD = nS1
+						                                                                                                                                                                       Call F_SumPr(nS1)
+						                                                                                                                                                                       Call SalMapEnterToTab( TRUE )
+					                                                                                                                                                                       On SAM_Validate
+						                                                                                                                                                                       Call f_Tochka (hWndItem)
+						                                                                                                                                                                       Call F_SumPr(nS1)
+						                                                                                                                                                                       If nS1 > nS_OLD
+							                                                                                                                                                                       If SalMessageBox(
 									'Введена Сума платежу перевищує ЗАГАЛЬНИЙ кінцевий борг !
 									 Відмовитись від цієї суми = '|| SalNumberToStrX( nS1, 2 ) || ' ? ',
 									 'Можлива переплата  !',
 									MB_IconQuestion | MB_YesNo) = IDYES
-								                                                                                                                                                                      Set nS1 = nS_OLD
-								                                                                                                                                                                      Call SalSetFocus( nS1 )
-								                                                                                                                                                                      Return VALIDATE_Cancel
-						                                                                                                                                                                      Return VALIDATE_Ok
-					                                                                                                                                                                      On SAM_KillFocus
-						                                                                                                                                                                      Call f_Tochka (hWndItem)
-						                                                                                                                                                                      Call F_SumPr(nS1)
-						                                                                                                                                                                      If nS1 > nS_OLD
-							                                                                                                                                                                      If SalMessageBox(
+								                                                                                                                                                                       Set nS1 = nS_OLD
+								                                                                                                                                                                       Call SalSetFocus( nS1 )
+								                                                                                                                                                                       Return VALIDATE_Cancel
+						                                                                                                                                                                       Return VALIDATE_Ok
+					                                                                                                                                                                       On SAM_KillFocus
+						                                                                                                                                                                       Call f_Tochka (hWndItem)
+						                                                                                                                                                                       Call F_SumPr(nS1)
+						                                                                                                                                                                       If nS1 > nS_OLD
+							                                                                                                                                                                       If SalMessageBox(
 									'Введена Сума платежу перевищує ЗАГАЛЬНИЙ кінцевий борг !
 									 Відмовитись від цієї суми = '|| SalNumberToStrX( nS1, 2 ) || ' ? ',
 									 'Можлива переплата  !',
 									MB_IconQuestion | MB_YesNo) = IDYES
-								                                                                                                                                                                      Set nS1 = nS_OLD
-								                                                                                                                                                                      Call SalSetFocus( nS1 )
-								                                                                                                                                                                      Return FALSE
-						                                                                                                                                                                      Return TRUE
+								                                                                                                                                                                       Set nS1 = nS_OLD
+								                                                                                                                                                                       Call SalSetFocus( nS1 )
+								                                                                                                                                                                       Return FALSE
+						                                                                                                                                                                       Return TRUE
 			!
-			                                                                                                                                                                      Data Field: NMK
-				                                                                                                                                                                      Message Actions 
-					                                                                                                                                                                      On SAM_TooltipSetText
-						                                                                                                                                                                      Return XSalTooltipSetText( lParam, 'Позичальник')
-			                                                                                                                                                                      Data Field: OKPO
-				                                                                                                                                                                      Message Actions 
-					                                                                                                                                                                      On SAM_TooltipSetText
-						                                                                                                                                                                      Return XSalTooltipSetText( lParam, 'Ідентиф.код')
+			                                                                                                                                                                       Data Field: NMK
+				                                                                                                                                                                       Message Actions 
+					                                                                                                                                                                       On SAM_TooltipSetText
+						                                                                                                                                                                       Return XSalTooltipSetText( lParam, 'Позичальник')
+			                                                                                                                                                                       Data Field: OKPO
+				                                                                                                                                                                       Message Actions 
+					                                                                                                                                                                       On SAM_TooltipSetText
+						                                                                                                                                                                       Return XSalTooltipSetText( lParam, 'Ідентиф.код')
 			!
-			                                                                                                                                                                      Data Field: ND
-				                                                                                                                                                                      Message Actions 
-					                                                                                                                                                                      On SAM_TooltipSetText
-						                                                                                                                                                                      Return XSalTooltipSetText( lParam, 'Реф.КД')
-			                                                                                                                                                                      Data Field: REF
-				                                                                                                                                                                      Message Actions 
-					                                                                                                                                                                      On SAM_TooltipSetText
-						                                                                                                                                                                      Return XSalTooltipSetText( lParam, 'Реф.Платежу')
-			                                                                                                                                                                      Data Field: NLS_1002
-				                                                                                                                                                                      Message Actions 
-					                                                                                                                                                                      On SAM_TooltipSetText
-						                                                                                                                                                                      Return XSalTooltipSetText( lParam, 'Рахунок каси')
-			                                                                                                                                                                      Data Field: NLS_2902
-				                                                                                                                                                                      Message Actions 
-					                                                                                                                                                                      On SAM_TooltipSetText
-						                                                                                                                                                                      Return XSalTooltipSetText( lParam, 'Рахунок погашення')
-			                                                                                                                                                                      Data Field: REF8
-				                                                                                                                                                                      Message Actions 
-					                                                                                                                                                                      On SAM_TooltipSetText
-						                                                                                                                                                                      Return XSalTooltipSetText( lParam, 'Реф.Платежу по пені')
-			                                                                                                                                                                      Data Field: NLS_6397
-				                                                                                                                                                                      Message Actions 
-					                                                                                                                                                                      On SAM_TooltipSetText
-						                                                                                                                                                                      Return XSalTooltipSetText( lParam, 'Рахунок погашення Пені')
+			                                                                                                                                                                       Data Field: ND
+				                                                                                                                                                                       Message Actions 
+					                                                                                                                                                                       On SAM_TooltipSetText
+						                                                                                                                                                                       Return XSalTooltipSetText( lParam, 'Реф.КД')
+			                                                                                                                                                                       Data Field: REF
+				                                                                                                                                                                       Message Actions 
+					                                                                                                                                                                       On SAM_TooltipSetText
+						                                                                                                                                                                       Return XSalTooltipSetText( lParam, 'Реф.Платежу')
+			                                                                                                                                                                       Data Field: NLS_1002
+				                                                                                                                                                                       Message Actions 
+					                                                                                                                                                                       On SAM_TooltipSetText
+						                                                                                                                                                                       Return XSalTooltipSetText( lParam, 'Рахунок каси')
+			                                                                                                                                                                       Data Field: NLS_2902
+				                                                                                                                                                                       Message Actions 
+					                                                                                                                                                                       On SAM_TooltipSetText
+						                                                                                                                                                                       Return XSalTooltipSetText( lParam, 'Рахунок погашення')
+			                                                                                                                                                                       Data Field: REF8
+				                                                                                                                                                                       Message Actions 
+					                                                                                                                                                                       On SAM_TooltipSetText
+						                                                                                                                                                                       Return XSalTooltipSetText( lParam, 'Реф.Платежу по пені')
+			                                                                                                                                                                       Data Field: NLS_6397
+				                                                                                                                                                                       Message Actions 
+					                                                                                                                                                                       On SAM_TooltipSetText
+						                                                                                                                                                                       Return XSalTooltipSetText( lParam, 'Рахунок погашення Пені')
 			!
-			                                                                                                                                                                      Background Text: Кредит
-			                                                                                                                                                                      Data Field: dSS
-				                                                                                                                                                                      Message Actions 
-					                                                                                                                                                                      On SAM_TooltipSetText
-						                                                                                                                                                                      Return XSalTooltipSetText( lParam, ' Дата ОСНОВНОГО поточного боргу ')
-			                                                                                                                                                                      Data Field: nSS
-				                                                                                                                                                                      Message Actions 
-					                                                                                                                                                                      On SAM_TooltipSetText
-						                                                                                                                                                                      Return XSalTooltipSetText( lParam, ' Сума ОСНОВНОГО поточного боргу ')
-			                                                                                                                                                                      Data Field: dSS1
-				                                                                                                                                                                      Message Actions 
-					                                                                                                                                                                      On SAM_TooltipSetText
-						                                                                                                                                                                      Return XSalTooltipSetText( lParam, ' Дата ОСНОВНОГО кінцевого боргу ')
-			                                                                                                                                                                      Data Field: nSS1
-				                                                                                                                                                                      Message Actions 
-					                                                                                                                                                                      On SAM_TooltipSetText
-						                                                                                                                                                                      Return XSalTooltipSetText( lParam, ' Сума ОСНОВНОГО кінцевого боргу ')
+			                                                                                                                                                                       Background Text: Кредит
+			                                                                                                                                                                       Data Field: dSS
+				                                                                                                                                                                       Message Actions 
+					                                                                                                                                                                       On SAM_TooltipSetText
+						                                                                                                                                                                       Return XSalTooltipSetText( lParam, ' Дата ОСНОВНОГО поточного боргу ')
+			                                                                                                                                                                       Data Field: nSS
+				                                                                                                                                                                       Message Actions 
+					                                                                                                                                                                       On SAM_TooltipSetText
+						                                                                                                                                                                       Return XSalTooltipSetText( lParam, ' Сума ОСНОВНОГО поточного боргу ')
+			                                                                                                                                                                       Data Field: dSS1
+				                                                                                                                                                                       Message Actions 
+					                                                                                                                                                                       On SAM_TooltipSetText
+						                                                                                                                                                                       Return XSalTooltipSetText( lParam, ' Дата ОСНОВНОГО кінцевого боргу ')
+			                                                                                                                                                                       Data Field: nSS1
+				                                                                                                                                                                       Message Actions 
+					                                                                                                                                                                       On SAM_TooltipSetText
+						                                                                                                                                                                       Return XSalTooltipSetText( lParam, ' Сума ОСНОВНОГО кінцевого боргу ')
 			!
-			                                                                                                                                                                      Background Text: Проценти
-			                                                                                                                                                                      Data Field: dSN
-				                                                                                                                                                                      Message Actions 
-					                                                                                                                                                                      On SAM_TooltipSetText
-						                                                                                                                                                                      Return XSalTooltipSetText( lParam, ' Дата ПРОЦЕНТНОГО поточного боргу ')
-			                                                                                                                                                                      Data Field: nSN
-				                                                                                                                                                                      Message Actions 
-					                                                                                                                                                                      On SAM_TooltipSetText
-						                                                                                                                                                                      Return XSalTooltipSetText( lParam, ' Сума ПРОЦЕНТНОГО поточного боргу ')
-			                                                                                                                                                                      Data Field: dSN1
-				                                                                                                                                                                      Message Actions 
-					                                                                                                                                                                      On SAM_TooltipSetText
-						                                                                                                                                                                      Return XSalTooltipSetText( lParam, ' Дата ПРОЦЕНТНОГО кінцевого боргу ')
-			                                                                                                                                                                      Data Field: nSN1
-				                                                                                                                                                                      Message Actions 
-					                                                                                                                                                                      On SAM_TooltipSetText
-						                                                                                                                                                                      Return XSalTooltipSetText( lParam, ' Сума ПРОЦЕНТНОГО кінцевого боргу ')
+			                                                                                                                                                                       Background Text: Проценти
+			                                                                                                                                                                       Data Field: dSN
+				                                                                                                                                                                       Message Actions 
+					                                                                                                                                                                       On SAM_TooltipSetText
+						                                                                                                                                                                       Return XSalTooltipSetText( lParam, ' Дата ПРОЦЕНТНОГО поточного боргу ')
+			                                                                                                                                                                       Data Field: nSN
+				                                                                                                                                                                       Message Actions 
+					                                                                                                                                                                       On SAM_TooltipSetText
+						                                                                                                                                                                       Return XSalTooltipSetText( lParam, ' Сума ПРОЦЕНТНОГО поточного боргу ')
+			                                                                                                                                                                       Data Field: dSN1
+				                                                                                                                                                                       Message Actions 
+					                                                                                                                                                                       On SAM_TooltipSetText
+						                                                                                                                                                                       Return XSalTooltipSetText( lParam, ' Дата ПРОЦЕНТНОГО кінцевого боргу ')
+			                                                                                                                                                                       Data Field: nSN1
+				                                                                                                                                                                       Message Actions 
+					                                                                                                                                                                       On SAM_TooltipSetText
+						                                                                                                                                                                       Return XSalTooltipSetText( lParam, ' Сума ПРОЦЕНТНОГО кінцевого боргу ')
 			!
-			                                                                                                                                                                      Background Text: Комісія
-			                                                                                                                                                                      Data Field: dSK
-				                                                                                                                                                                      Message Actions 
-					                                                                                                                                                                      On SAM_TooltipSetText
-						                                                                                                                                                                      Return XSalTooltipSetText( lParam, ' Дата КОМІСІЙНОГО поточного боргу ')
-			                                                                                                                                                                      Data Field: nSK
-				                                                                                                                                                                      Message Actions 
-					                                                                                                                                                                      On SAM_TooltipSetText
-						                                                                                                                                                                      Return XSalTooltipSetText( lParam, ' Сума КОМІСІЙНОГО поточного боргу ')
-			                                                                                                                                                                      Data Field: dSK1
-				                                                                                                                                                                      Message Actions 
-					                                                                                                                                                                      On SAM_TooltipSetText
-						                                                                                                                                                                      Return XSalTooltipSetText( lParam, ' Дата КОМІСІЙНОГО кінцевого боргу ')
-			                                                                                                                                                                      Data Field: nSK1
-				                                                                                                                                                                      Message Actions 
-					                                                                                                                                                                      On SAM_TooltipSetText
-						                                                                                                                                                                      Return XSalTooltipSetText( lParam, ' Сума КОМІСІЙНОГО кінцевого боргу ')
+			                                                                                                                                                                       Background Text: Комісія
+			                                                                                                                                                                       Data Field: dSK
+				                                                                                                                                                                       Message Actions 
+					                                                                                                                                                                       On SAM_TooltipSetText
+						                                                                                                                                                                       Return XSalTooltipSetText( lParam, ' Дата КОМІСІЙНОГО поточного боргу ')
+			                                                                                                                                                                       Data Field: nSK
+				                                                                                                                                                                       Message Actions 
+					                                                                                                                                                                       On SAM_TooltipSetText
+						                                                                                                                                                                       Return XSalTooltipSetText( lParam, ' Сума КОМІСІЙНОГО поточного боргу ')
+			                                                                                                                                                                       Data Field: dSK1
+				                                                                                                                                                                       Message Actions 
+					                                                                                                                                                                       On SAM_TooltipSetText
+						                                                                                                                                                                       Return XSalTooltipSetText( lParam, ' Дата КОМІСІЙНОГО кінцевого боргу ')
+			                                                                                                                                                                       Data Field: nSK1
+				                                                                                                                                                                       Message Actions 
+					                                                                                                                                                                       On SAM_TooltipSetText
+						                                                                                                                                                                       Return XSalTooltipSetText( lParam, ' Сума КОМІСІЙНОГО кінцевого боргу ')
 			!
-			                                                                                                                                                                      Background Text: Пеня
-			                                                                                                                                                                      Data Field: dSP
-				                                                                                                                                                                      Message Actions 
-					                                                                                                                                                                      On SAM_TooltipSetText
-						                                                                                                                                                                      Return XSalTooltipSetText( lParam, ' Дата ШТРАФНОГО поточного боргу ')
-			                                                                                                                                                                      Data Field: nSP
-				                                                                                                                                                                      Message Actions 
-					                                                                                                                                                                      On SAM_TooltipSetText
-						                                                                                                                                                                      Return XSalTooltipSetText( lParam, ' Сума ШТРАФНОГО поточного боргу ')
-					                                                                                                                                                                      On SAM_SetFocus
-						                                                                                                                                                                      Set SN8_OST = nSP
-					                                                                                                                                                                      On SAM_KillFocus
-						                                                                                                                                                                      If nSP > SN8_OST
-							                                                                                                                                                                      Set nSP = SN8_OST
-			                                                                                                                                                                      Data Field: dSP1
-				                                                                                                                                                                      Message Actions 
-					                                                                                                                                                                      On SAM_TooltipSetText
-						                                                                                                                                                                      Return XSalTooltipSetText( lParam, ' Дата ШТРАФНОГО кінцевого боргу ')
-			                                                                                                                                                                      Data Field: nSP1
-				                                                                                                                                                                      Message Actions 
-					                                                                                                                                                                      On SAM_TooltipSetText
-						                                                                                                                                                                      Return XSalTooltipSetText( lParam, ' Сума ШТРАФНОГО кінцевого боргу ')
-			                                                                                                                                                                      Check Box: cb_SN8
-				                                                                                                                                                                      Message Actions 
+			                                                                                                                                                                       Background Text: Пеня
+			                                                                                                                                                                       Data Field: dSP
+				                                                                                                                                                                       Message Actions 
+					                                                                                                                                                                       On SAM_TooltipSetText
+						                                                                                                                                                                       Return XSalTooltipSetText( lParam, ' Дата ШТРАФНОГО поточного боргу ')
+			                                                                                                                                                                       Data Field: nSP
+				                                                                                                                                                                       Message Actions 
+					                                                                                                                                                                       On SAM_TooltipSetText
+						                                                                                                                                                                       Return XSalTooltipSetText( lParam, ' Сума ШТРАФНОГО поточного боргу ')
+					                                                                                                                                                                       On SAM_SetFocus
+						                                                                                                                                                                       Set SN8_OST = nSP
+					                                                                                                                                                                       On SAM_KillFocus
+						                                                                                                                                                                       If nSP > SN8_OST
+							                                                                                                                                                                       Set nSP = SN8_OST
+			                                                                                                                                                                       Data Field: dSP1
+				                                                                                                                                                                       Message Actions 
+					                                                                                                                                                                       On SAM_TooltipSetText
+						                                                                                                                                                                       Return XSalTooltipSetText( lParam, ' Дата ШТРАФНОГО кінцевого боргу ')
+			                                                                                                                                                                       Data Field: nSP1
+				                                                                                                                                                                       Message Actions 
+					                                                                                                                                                                       On SAM_TooltipSetText
+						                                                                                                                                                                       Return XSalTooltipSetText( lParam, ' Сума ШТРАФНОГО кінцевого боргу ')
+			                                                                                                                                                                       Check Box: cb_SN8
+				                                                                                                                                                                       Message Actions 
 			!
-			                                                                                                                                                                      Data Field: TXT_KOM
-				                                                                                                                                                                      Message Actions 
+			                                                                                                                                                                       Data Field: TXT_KOM
+				                                                                                                                                                                       Message Actions 
 			!
-			                                                                                                                                                                      Multiline Field: ml1
-				                                                                                                                                                                      Message Actions 
-					                                                                                                                                                                      On SAM_TooltipSetText
-						                                                                                                                                                                      Return XSalTooltipSetText( lParam, 'Залальна Сума літерами')
-			                                                                                                                                                                      Data Field: KV
-				                                                                                                                                                                      Message Actions 
-					                                                                                                                                                                      On SAM_TooltipSetText
-						                                                                                                                                                                      Return XSalTooltipSetText( lParam, 'Числовий код валюти')
-			                                                                                                                                                                      Data Field: LCV
-				                                                                                                                                                                      Message Actions 
-					                                                                                                                                                                      On SAM_TooltipSetText
-						                                                                                                                                                                      Return XSalTooltipSetText( lParam, 'ISO код валюти')
-			                                                                                                                                                                      Data Field: KURS
-				                                                                                                                                                                      Message Actions 
-					                                                                                                                                                                      On SAM_TooltipSetText
-						                                                                                                                                                                      Return XSalTooltipSetText( lParam, 'Курс валюти')
-			                                                                                                                                                                      Data Field: UVAGA
-				                                                                                                                                                                      Message Actions 
-			                                                                                                                                                                      Data Field: NAMEV
-				                                                                                                                                                                      Message Actions 
-					                                                                                                                                                                      On SAM_TooltipSetText
-						                                                                                                                                                                      Return XSalTooltipSetText( lParam, 'Найменування валюти')
-			                                                                                                                                                                      Multiline Field: ml1V
-				                                                                                                                                                                      Message Actions 
-					                                                                                                                                                                      On SAM_TooltipSetText
-						                                                                                                                                                                      Return XSalTooltipSetText( lParam, 'Сума літерами в цілих одиницях валюти')
-			                                                                                                                                                                      Multiline Field: ml1G
-				                                                                                                                                                                      Message Actions 
-					                                                                                                                                                                      On SAM_TooltipSetText
-						                                                                                                                                                                      Return XSalTooltipSetText( lParam, 'Сума літерами в нац.валюті по викупу нерозмінної монети')
+			                                                                                                                                                                       Multiline Field: ml1
+				                                                                                                                                                                       Message Actions 
+					                                                                                                                                                                       On SAM_TooltipSetText
+						                                                                                                                                                                       Return XSalTooltipSetText( lParam, 'Залальна Сума літерами')
+			                                                                                                                                                                       Data Field: KV
+				                                                                                                                                                                       Message Actions 
+					                                                                                                                                                                       On SAM_TooltipSetText
+						                                                                                                                                                                       Return XSalTooltipSetText( lParam, 'Числовий код валюти')
+			                                                                                                                                                                       Data Field: LCV
+				                                                                                                                                                                       Message Actions 
+					                                                                                                                                                                       On SAM_TooltipSetText
+						                                                                                                                                                                       Return XSalTooltipSetText( lParam, 'ISO код валюти')
+			                                                                                                                                                                       Data Field: KURS
+				                                                                                                                                                                       Message Actions 
+					                                                                                                                                                                       On SAM_TooltipSetText
+						                                                                                                                                                                       Return XSalTooltipSetText( lParam, 'Курс валюти')
+			                                                                                                                                                                       Data Field: UVAGA
+				                                                                                                                                                                       Message Actions 
+			                                                                                                                                                                       Data Field: NAMEV
+				                                                                                                                                                                       Message Actions 
+					                                                                                                                                                                       On SAM_TooltipSetText
+						                                                                                                                                                                       Return XSalTooltipSetText( lParam, 'Найменування валюти')
+			                                                                                                                                                                       Multiline Field: ml1V
+				                                                                                                                                                                       Message Actions 
+					                                                                                                                                                                       On SAM_TooltipSetText
+						                                                                                                                                                                       Return XSalTooltipSetText( lParam, 'Сума літерами в цілих одиницях валюти')
+			                                                                                                                                                                       Multiline Field: ml1G
+				                                                                                                                                                                       Message Actions 
+					                                                                                                                                                                       On SAM_TooltipSetText
+						                                                                                                                                                                       Return XSalTooltipSetText( lParam, 'Сума літерами в нац.валюті по викупу нерозмінної монети')
 			!
 			! ctb_pbGetValue: pb_SN1F
-				                                                                                                                                                                                     Message Actions
-					                                                                                                                                                                                     On SAM_Create
-						                                                                                                                                                                                     Set strTip = 'Нарахувати з проводками ПРОЦЕНТНІ та КОМІСІЙНІ доходи'
-					                                                                                                                                                                                     On SAM_Click
+				                                                                                                                                                                                      Message Actions
+					                                                                                                                                                                                      On SAM_Create
+						                                                                                                                                                                                      Set strTip = 'Нарахувати з проводками ПРОЦЕНТНІ та КОМІСІЙНІ доходи'
+					                                                                                                                                                                                      On SAM_Click
 						! Call Sel010(hWndMDI,0, 0,
 								" and s.TIP in ('SS ','SP ','SL ')
 								  and s.ACC in (select acc from nd_acc where nd="||Str(ND)||")" ,
 								" "   )
-						                                                                                                                                                                                     Call Sel010(hWndMDI,0, 0,
+						                                                                                                                                                                                      Call Sel010(hWndMDI,0, 0,
 								"  and
 								(i.id=2 and s.acc=" ||Str(ACC8)|| " OR
 								 s.TIP in ('SS ','SP ','SL ') and s.ACC in (select acc from nd_acc where nd="||Str(ND)||")
 								 )" ,
 								" "   )
-		                                                                                                                                                                      Functions 
-			                                                                                                                                                                      Function: F_NULL
-				                                                                                                                                                                      Description: 
-				                                                                                                                                                                      Returns 
-				                                                                                                                                                                      Parameters 
-				                                                                                                                                                                      Static Variables 
-				                                                                                                                                                                      Local variables 
-				                                                                                                                                                                      Actions 
-					                                                                                                                                                                      Set dSS = GetBankDate()
-					                                                                                                                                                                      Set nSS = NUMBER_Null
-					                                                                                                                                                                      Set dSS1 = DATETIME_Null
-					                                                                                                                                                                      Set nSS1 = NUMBER_Null
+		                                                                                                                                                                       Functions 
+			                                                                                                                                                                       Function: F_NULL
+				                                                                                                                                                                       Description: 
+				                                                                                                                                                                       Returns 
+				                                                                                                                                                                       Parameters 
+				                                                                                                                                                                       Static Variables 
+				                                                                                                                                                                       Local variables 
+				                                                                                                                                                                       Actions 
+					                                                                                                                                                                       Set dSS = GetBankDate()
+					                                                                                                                                                                       Set nSS = NUMBER_Null
+					                                                                                                                                                                       Set dSS1 = DATETIME_Null
+					                                                                                                                                                                       Set nSS1 = NUMBER_Null
 					!
-					                                                                                                                                                                      Set dSN = DATETIME_Null
-					                                                                                                                                                                      Set nSN = NUMBER_Null
-					                                                                                                                                                                      Set dSN1 = GetBankDate() - 1
-					                                                                                                                                                                      Set nSN1= NUMBER_Null
+					                                                                                                                                                                       Set dSN = DATETIME_Null
+					                                                                                                                                                                       Set nSN = NUMBER_Null
+					                                                                                                                                                                       Set dSN1 = GetBankDate() - 1
+					                                                                                                                                                                       Set nSN1= NUMBER_Null
 					!
-					                                                                                                                                                                      Set dSK = DATETIME_Null
-					                                                                                                                                                                      Set nSK = NUMBER_Null
-					                                                                                                                                                                      Set dSK1 = GetBankDate() - 1
-					                                                                                                                                                                      Set nSK1= NUMBER_Null
+					                                                                                                                                                                       Set dSK = DATETIME_Null
+					                                                                                                                                                                       Set nSK = NUMBER_Null
+					                                                                                                                                                                       Set dSK1 = GetBankDate() - 1
+					                                                                                                                                                                       Set nSK1= NUMBER_Null
 					!
-					                                                                                                                                                                      Set CC_ID = STRING_Null
-					                                                                                                                                                                      Set DAT1 = DATETIME_Null
-					                                                                                                                                                                      Set NMK = STRING_Null
-					                                                                                                                                                                      Set OKPO = STRING_Null
-					                                                                                                                                                                      Set nS = NUMBER_Null
-					                                                                                                                                                                      Set nS1 = NUMBER_Null
-					                                                                                                                                                                      Call SalHideWindow( TXT_KOM )
-					                                                                                                                                                                      Call SalHideWindow( TXT_END )
-					                                                                                                                                                                      Set ND = NUMBER_Null
-					                                                                                                                                                                      Set REF = NUMBER_Null
-					                                                                                                                                                                      Set REF8 = NUMBER_Null
+					                                                                                                                                                                       Set CC_ID = STRING_Null
+					                                                                                                                                                                       Set DAT1 = DATETIME_Null
+					                                                                                                                                                                       Set NMK = STRING_Null
+					                                                                                                                                                                       Set OKPO = STRING_Null
+					                                                                                                                                                                       Set nS = NUMBER_Null
+					                                                                                                                                                                       Set nS1 = NUMBER_Null
+					                                                                                                                                                                       Call SalHideWindow( TXT_KOM )
+					                                                                                                                                                                       Call SalHideWindow( TXT_END )
+					                                                                                                                                                                       Set ND = NUMBER_Null
+					                                                                                                                                                                       Set REF = NUMBER_Null
+					                                                                                                                                                                       Set REF8 = NUMBER_Null
 					!
-					                                                                                                                                                                      Set ml1 = STRING_Null
-					                                                                                                                                                                      Set KV = NUMBER_Null
-					                                                                                                                                                                      Set LCV = STRING_Null
-					                                                                                                                                                                      Set NAMEV = STRING_Null
-					                                                                                                                                                                      Set ml1V = STRING_Null
-					                                                                                                                                                                      Set ml1G = STRING_Null
-					                                                                                                                                                                      Set KURS = NUMBER_Null
-					                                                                                                                                                                      Call SalEnableWindow( rb )
-					                                                                                                                                                                      Call SalEnableWindow( rb1 )
-					                                                                                                                                                                      Call SalEnableWindow( CC_ID )
-					                                                                                                                                                                      Call SalEnableWindow( DAT1 )
-					                                                                                                                                                                      Call SalEnableWindow( ND )
-					                                                                                                                                                                      Call SalEnableWindow( nS )
-					                                                                                                                                                                      Call F_VALUTA( n980 )
-					                                                                                                                                                                      Call F_DISA ()
-					                                                                                                                                                                      Call SalSetFocus( CC_ID )
-			                                                                                                                                                                      Function: F_DISA
-				                                                                                                                                                                      Description: 
-				                                                                                                                                                                      Returns 
-				                                                                                                                                                                      Parameters 
-				                                                                                                                                                                      Static Variables 
-				                                                                                                                                                                      Local variables 
-				                                                                                                                                                                      Actions 
-					                                                                                                                                                                      Call SalDisableWindow( pb_F10 )
-					                                                                                                                                                                      Call SalDisableWindow( pb_F5 )
-			                                                                                                                                                                      Function: F_VALUTA
-				                                                                                                                                                                      Description: 
-				                                                                                                                                                                      Returns 
-				                                                                                                                                                                      Parameters 
-					                                                                                                                                                                      Number: nKV
-				                                                                                                                                                                      Static Variables 
-				                                                                                                                                                                      Local variables 
-				                                                                                                                                                                      Actions 
-					                                                                                                                                                                      If nKV = n980
-						                                                                                                                                                                      Call SalHideWindow( UVAGA )
-						                                                                                                                                                                      Call SalHideWindow( ml1V )
-						                                                                                                                                                                      Call SalHideWindow( ml1G )
-						                                                                                                                                                                      Set KURS = NUMBER_Null
-					                                                                                                                                                                      Else 
-						                                                                                                                                                                      Call SalShowWindow( UVAGA )
-						                                                                                                                                                                      If SqlPrepareAndExecute( hSql(),
+					                                                                                                                                                                       Set ml1 = STRING_Null
+					                                                                                                                                                                       Set KV = NUMBER_Null
+					                                                                                                                                                                       Set LCV = STRING_Null
+					                                                                                                                                                                       Set NAMEV = STRING_Null
+					                                                                                                                                                                       Set ml1V = STRING_Null
+					                                                                                                                                                                       Set ml1G = STRING_Null
+					                                                                                                                                                                       Set KURS = NUMBER_Null
+					                                                                                                                                                                       Call SalEnableWindow( rb )
+					                                                                                                                                                                       Call SalEnableWindow( rb1 )
+					                                                                                                                                                                       Call SalEnableWindow( CC_ID )
+					                                                                                                                                                                       Call SalEnableWindow( DAT1 )
+					                                                                                                                                                                       Call SalEnableWindow( ND )
+					                                                                                                                                                                       Call SalEnableWindow( nS )
+					                                                                                                                                                                       Call F_VALUTA( n980 )
+					                                                                                                                                                                       Call F_DISA ()
+					                                                                                                                                                                       Call SalSetFocus( CC_ID )
+			                                                                                                                                                                       Function: F_DISA
+				                                                                                                                                                                       Description: 
+				                                                                                                                                                                       Returns 
+				                                                                                                                                                                       Parameters 
+				                                                                                                                                                                       Static Variables 
+				                                                                                                                                                                       Local variables 
+				                                                                                                                                                                       Actions 
+					                                                                                                                                                                       Call SalDisableWindow( pb_F10 )
+					                                                                                                                                                                       Call SalDisableWindow( pb_F5 )
+			                                                                                                                                                                       Function: F_VALUTA
+				                                                                                                                                                                       Description: 
+				                                                                                                                                                                       Returns 
+				                                                                                                                                                                       Parameters 
+					                                                                                                                                                                       Number: nKV
+				                                                                                                                                                                       Static Variables 
+				                                                                                                                                                                       Local variables 
+				                                                                                                                                                                       Actions 
+					                                                                                                                                                                       If nKV = n980
+						                                                                                                                                                                       Call SalHideWindow( UVAGA )
+						                                                                                                                                                                       Call SalHideWindow( ml1V )
+						                                                                                                                                                                       Call SalHideWindow( ml1G )
+						                                                                                                                                                                       Set KURS = NUMBER_Null
+					                                                                                                                                                                       Else 
+						                                                                                                                                                                       Call SalShowWindow( UVAGA )
+						                                                                                                                                                                       If SqlPrepareAndExecute( hSql(),
 								  "SELECT r.RATE_O/r.BSUM into :KURS from cur_rates r
 								   WHERE r.kv=:KV and (r.kv,r.vdate)=
 								    (select kv,max(vdate) from cur_rates
 								     where kv=:KV and vdate<=:BankDate group by kv) ")
 								and SqlFetchNext( hSql(), nFetchRes )
-					                                                                                                                                                                      Call SalHideWindow( ml1V )
-					                                                                                                                                                                      Call SalHideWindow( ml1G )
+					                                                                                                                                                                       Call SalHideWindow( ml1V )
+					                                                                                                                                                                       Call SalHideWindow( ml1G )
 			!
-			                                                                                                                                                                      Function: NASELENIE
-				                                                                                                                                                                      Description: 
-				                                                                                                                                                                      Returns 
-				                                                                                                                                                                      Parameters 
-				                                                                                                                                                                      Static Variables 
-				                                                                                                                                                                      Local variables 
-					                                                                                                                                                                      Number: nLIM
-				                                                                                                                                                                      Actions 
-					                                                                                                                                                                      Call F_VALUTA( KV )
-					                                                                                                                                                                      Set KV_KOM = KV
+			                                                                                                                                                                       Function: NASELENIE
+				                                                                                                                                                                       Description: 
+				                                                                                                                                                                       Returns 
+				                                                                                                                                                                       Parameters 
+				                                                                                                                                                                       Static Variables 
+				                                                                                                                                                                       Local variables 
+					                                                                                                                                                                       Number: nLIM
+				                                                                                                                                                                       Actions 
+					                                                                                                                                                                       Call F_VALUTA( KV )
+					                                                                                                                                                                       Set KV_KOM = KV
 					! По какую дату нач % ?
-					                                                                                                                                                                      If SqlPrepareAndExecute( hSql(),
+					                                                                                                                                                                       If SqlPrepareAndExecute( hSql(),
 							  "SELECT max(i.acr_dat) into :dSN
 							   FROM accounts a, nd_acc n, int_accn i
 							   WHERE n.nd=:ND and n.acc=a.acc and a.tip in ('SS ','SP ','SL ')
 							     and i.id=0 and a.acc=i.acc and i.acr_dat is not null")
 							and SqlFetchNext( hSql(), nFetchRes )
 					! По какую дату нач ком ?
-					                                                                                                                                                                      Set nSK = 0
-					                                                                                                                                                                      If SqlPrepareAndExecute( hSql(),
+					                                                                                                                                                                       Set nSK = 0
+					                                                                                                                                                                       If SqlPrepareAndExecute( hSql(),
 							  "SELECT acr_dat into :dSK FROM int_accn WHERE acc=:ACC8 and id=2 ")
 							and SqlFetchNext( hSql(), nFetchRes )
 						! Вал и сумма уже начисленной комиссии
-						                                                                                                                                                                      If SqlPrepareAndExecute( hSql(),
+						                                                                                                                                                                       If SqlPrepareAndExecute( hSql(),
 								  "SELECT min(a.kv),Nvl(-SUM(a.ostb+a.ostf),0)/100
 								   INTO :KV_KOM, :nSK
 								   FROM accounts a, nd_acc n
 								   WHERE n.nd=:ND and n.acc=a.acc and a.tip in ('SK0','SK9') ")
 								and SqlFetchNext( hSql(), nFetchRes )
 					! По какую дату нач пеня ?
-					                                                                                                                                                                      Set nSP = 0
-					                                                                                                                                                                      Call SalDisableWindow( nSP )
-					                                                                                                                                                                      Call SalHideWindow( cb_SN8 )
-					                                                                                                                                                                      Set cb_SN8 = 0
-					                                                                                                                                                                      If SqlPrepareAndExecute( hSql(),
+					                                                                                                                                                                       Set nSP = 0
+					                                                                                                                                                                       Call SalDisableWindow( nSP )
+					                                                                                                                                                                       Call SalHideWindow( cb_SN8 )
+					                                                                                                                                                                       Set cb_SN8 = 0
+					                                                                                                                                                                       If SqlPrepareAndExecute( hSql(),
 							  "SELECT Nvl(i.acr_dat,a.daos-1),a8.NLS,a6.NLS,-(a8.ostb+a.ostf)/100
 							   INTO :dSP, :SN8_NLS, :SD8_NLS , :nSP
 							   FROM accounts a, nd_acc n, int_accn i, accounts a8, accounts a6
 							   WHERE n.nd=:ND and n.acc=a.acc and a.tip='SPN'
 							    and i.id=2 and a.acc=i.acc and i.acrA=a8.acc and i.acrB=a6.acc")
 							and SqlFetchNext( hSql(), nFetchRes )
-					                                                                                                                                                                      If nSP > 0
-						                                                                                                                                                                      Call SalEnableWindow( nSP )
-						                                                                                                                                                                      Call SalShowWindow( cb_SN8 )
-						                                                                                                                                                                      Set cb_SN8 = 1
-					                                                                                                                                                                      If SqlPrepareAndExecute( hSql(),
+					                                                                                                                                                                       If nSP > 0
+						                                                                                                                                                                       Call SalEnableWindow( nSP )
+						                                                                                                                                                                       Call SalShowWindow( cb_SN8 )
+						                                                                                                                                                                       Set cb_SN8 = 1
+					                                                                                                                                                                       If SqlPrepareAndExecute( hSql(),
 							  "SELECT acr_dat into :dSP FROM int_accn WHERE acc=:ACC8 and id=2 ")
 							and SqlFetchNext( hSql(), nFetchRes )
 						! Вал и сумма уже начисленной комиссии
-						                                                                                                                                                                      If SqlPrepareAndExecute( hSql(),
+						                                                                                                                                                                       If SqlPrepareAndExecute( hSql(),
 								  "SELECT min(a.kv),Nvl(-SUM(a.ostb+a.ostf),0)/100
 								   INTO :KV_KOM, :nSK
 								   FROM accounts a, nd_acc n
 								   WHERE n.nd=:ND and n.acc=a.acc and a.tip in ('SK0','SK9') ")
 								and SqlFetchNext( hSql(), nFetchRes )
-					                                                                                                                                                                      If SqlPrepareAndExecute( hSql(),
+					                                                                                                                                                                       If SqlPrepareAndExecute( hSql(),
 							    "SELECT -SUM(decode(a.tip,'LIM',ostb+ostf,0))/100,
 							            -SUM(decode(a.tip,'LIM',0, ostb+ostf))/100,
 							            -SUM(decode(a.tip,'LIM',ostx,0))/100
@@ -8981,76 +8984,76 @@ Application Description: Кредиты - 17-08-2007
 							     WHERE n.nd=:ND and n.acc=a.acc and a.tip in ('SN ','SPN','SLN','LIM') ")
 							and SqlFetchNext( hSql(), nFetchRes )
 							and (nSS1 >0 or nSN1 > 0 )
-						                                                                                                                                                                      Set nSS = SalNumberMax(  nSS1 - nLIM, 0)
-						                                                                                                                                                                      If KV=KV_KOM
-							                                                                                                                                                                      Call SalHideWindow( TXT_KOM )
-						                                                                                                                                                                      Else 
-							                                                                                                                                                                      Call SalShowWindow( TXT_KOM )
+						                                                                                                                                                                       Set nSS = SalNumberMax(  nSS1 - nLIM, 0)
+						                                                                                                                                                                       If KV=KV_KOM
+							                                                                                                                                                                       Call SalHideWindow( TXT_KOM )
+						                                                                                                                                                                       Else 
+							                                                                                                                                                                       Call SalShowWindow( TXT_KOM )
 						! Поточний платіж
-						                                                                                                                                                                      Set nS = nSS + nSN + IifN( KV=KV_KOM, nSK, 0)
+						                                                                                                                                                                       Set nS = nSS + nSN + IifN( KV=KV_KOM, nSK, 0)
 						! Кінцевий платіж
-						                                                                                                                                                                      If dSN = DATETIME_Null or dSN < dSN1
-							                                                                                                                                                                      Set nSN1 = F_Proc()
-						                                                                                                                                                                      Else 
-							                                                                                                                                                                      Set nSN1 = 0
-							                                                                                                                                                                      Set nSK1 = 0
-						                                                                                                                                                                      Set nSN1 = nSN + nSN1
-						                                                                                                                                                                      Set nSK1 = nSK + nSK1
-						                                                                                                                                                                      Set nS1 = nSS1 + nSN1 +  IifN( KV=KV_KOM, nSK1, 0)
+						                                                                                                                                                                       If dSN = DATETIME_Null or dSN < dSN1
+							                                                                                                                                                                       Set nSN1 = F_Proc()
+						                                                                                                                                                                       Else 
+							                                                                                                                                                                       Set nSN1 = 0
+							                                                                                                                                                                       Set nSK1 = 0
+						                                                                                                                                                                       Set nSN1 = nSN + nSN1
+						                                                                                                                                                                       Set nSK1 = nSK + nSK1
+						                                                                                                                                                                       Set nS1 = nSS1 + nSN1 +  IifN( KV=KV_KOM, nSK1, 0)
 						! Договор истек
-						                                                                                                                                                                      If dSS1 <= dSS
-							                                                                                                                                                                      Call SalShowWindow( TXT_END )
-							                                                                                                                                                                      Set nSS=nSS1
-							                                                                                                                                                                      Set nSN=nSN1
-							                                                                                                                                                                      Set nSK=nSK1
-							                                                                                                                                                                      Set nS = nS1
-						                                                                                                                                                                      Else 
-							                                                                                                                                                                      Call SalHideWindow( TXT_END )
+						                                                                                                                                                                       If dSS1 <= dSS
+							                                                                                                                                                                       Call SalShowWindow( TXT_END )
+							                                                                                                                                                                       Set nSS=nSS1
+							                                                                                                                                                                       Set nSN=nSN1
+							                                                                                                                                                                       Set nSK=nSK1
+							                                                                                                                                                                       Set nS = nS1
+						                                                                                                                                                                       Else 
+							                                                                                                                                                                       Call SalHideWindow( TXT_END )
 						!
-						                                                                                                                                                                      Call SalSetFocus( nS )
-						                                                                                                                                                                      Call SalEnableWindow( pb_F10 )
+						                                                                                                                                                                       Call SalSetFocus( nS )
+						                                                                                                                                                                       Call SalEnableWindow( pb_F10 )
 						!
 			!
-			                                                                                                                                                                      Function: f_Opl
-				                                                                                                                                                                      Description: 
-				                                                                                                                                                                      Returns 
-					                                                                                                                                                                      Boolean: 
-				                                                                                                                                                                      Parameters 
-				                                                                                                                                                                      Static Variables 
-				                                                                                                                                                                      Local variables 
-					                                                                                                                                                                      Number: nSk
-					                                                                                                                                                                      Number: S_
-					                                                                                                                                                                      Number: nSum
-					                                                                                                                                                                      String: sNazn     !! Назначение пл
+			                                                                                                                                                                       Function: f_Opl
+				                                                                                                                                                                       Description: 
+				                                                                                                                                                                       Returns 
+					                                                                                                                                                                       Boolean: 
+				                                                                                                                                                                       Parameters 
+				                                                                                                                                                                       Static Variables 
+				                                                                                                                                                                       Local variables 
+					                                                                                                                                                                       Number: nSk
+					                                                                                                                                                                       Number: S_
+					                                                                                                                                                                       Number: nSum
+					                                                                                                                                                                       String: sNazn     !! Назначение пл
 					!
-					                                                                                                                                                                      String: sPASP
-					                                                                                                                                                                      String: sPASPN
-					                                                                                                                                                                      String: sATRT
-					                                                                                                                                                                      String: sDT_R
-				                                                                                                                                                                      Actions 
-					                                                                                                                                                                      Set S_ = IifN(rb, nS, nS1)
-					                                                                                                                                                                      If S_ != NUMBER_Null and S_ > 0
-						                                                                                                                                                                      Set nSum = S_ * 100
-						                                                                                                                                                                      Set sNazn = 'Сплата боргу за кредит згідно договору №'||CC_ID||
+					                                                                                                                                                                       String: sPASP
+					                                                                                                                                                                       String: sPASPN
+					                                                                                                                                                                       String: sATRT
+					                                                                                                                                                                       String: sDT_R
+				                                                                                                                                                                       Actions 
+					                                                                                                                                                                       Set S_ = IifN(rb, nS, nS1)
+					                                                                                                                                                                       If S_ != NUMBER_Null and S_ > 0
+						                                                                                                                                                                       Set nSum = S_ * 100
+						                                                                                                                                                                       Set sNazn = 'Сплата боргу за кредит згідно договору №'||CC_ID||
 								            ' від '|| SalFmtFormatDateTime( DAT1, 'dd/MM/yyyy' )
-						                                                                                                                                                                      If KV = n980
-							                                                                                                                                                                      Set nSk = nSKP
-						                                                                                                                                                                      Else 
-							                                                                                                                                                                      Set nSk = NUMBER_Null
-						                                                                                                                                                                      Call cDoc.SetDoc( REF, sTT, 0, nVOB[nORD], Subs(CC_ID,1,10),
+						                                                                                                                                                                       If KV = n980
+							                                                                                                                                                                       Set nSk = nSKP
+						                                                                                                                                                                       Else 
+							                                                                                                                                                                       Set nSk = NUMBER_Null
+						                                                                                                                                                                       Call cDoc.SetDoc( REF, sTT, 0, nVOB[nORD], Subs(CC_ID,1,10),
 								     SalDateCurrent( ),  SalDateCurrent( ), BankDate, BankDate,
 								     NLS_2902, NMS_2902, BankMfo, '', KV, nSum, OKPO,
 								     NLS_1002, NMS_1002, BankMfo, '', KV, nSum, OKPO, sNazn, '',GetIdOper(),'', nSk ,0)
-						                                                                                                                                                                      If NOT cDoc.oDoc()
-							                                                                                                                                                                      Return FALSE
-						                                                                                                                                                                      Set REF = cDoc.m_nRef
+						                                                                                                                                                                       If NOT cDoc.oDoc()
+							                                                                                                                                                                       Return FALSE
+						                                                                                                                                                                       Set REF = cDoc.m_nRef
 						! Доп рекв ФИО
-						                                                                                                                                                                      If NOT SqlPrepareAndExecute( hSql(),"INSERT INTO operw (ref,tag,value) VALUES (:REF,'FIO',:NMK )" )
-							                                                                                                                                                                      Return FALSE
-						                                                                                                                                                                      Set nQ = nSum
-						                                                                                                                                                                      If KV != n980
+						                                                                                                                                                                       If NOT SqlPrepareAndExecute( hSql(),"INSERT INTO operw (ref,tag,value) VALUES (:REF,'FIO',:NMK )" )
+							                                                                                                                                                                       Return FALSE
+						                                                                                                                                                                       Set nQ = nSum
+						                                                                                                                                                                       If KV != n980
 							! Доп рекв для 1-ПБ и #073
-							                                                                                                                                                                      If NOT
+							                                                                                                                                                                       If NOT
 									(   SqlPrepareAndExecute( hSql(),"select gl.p_Icurval(:KV,:nSum,:BankDate) into :nQ from dual")
 									and SqlFetchNext( hSql(), nFetchRes )
 									and SqlPrepareAndExecute( hSql(),"INSERT INTO operw (ref,tag,value) VALUES (:REF,'KOD_B',:sKOD_B )" )
@@ -9058,10 +9061,10 @@ Application Description: Кредиты - 17-08-2007
 									and SqlPrepareAndExecute( hSql(),"INSERT INTO operw (ref,tag,value) VALUES (:REF,'KOD_N','8446'  )" )
 									and SqlPrepareAndExecute( hSql(),"INSERT INTO operw (ref,tag,value) VALUES (:REF,'D#73' , '246'   )" )
 									)
-								                                                                                                                                                                      Return FALSE
+								                                                                                                                                                                       Return FALSE
 						! Доп рекв для больших сумм
-						                                                                                                                                                                      If nQ >=5000000
-							                                                                                                                                                                      If NOT
+						                                                                                                                                                                       If nQ >=5000000
+							                                                                                                                                                                       If NOT
 									 (  SqlPrepareAndExecute( hSql(),
 									     "SELECT k.name, p.SER||' '||p.NUMDOC, p.ORGAN, to_char(p.BDAY,'dd/mm/yyyy')
 									      INTO :sPASP, :sPASPN, :sATRT ,:sDT_R
@@ -9073,60 +9076,60 @@ Application Description: Кредиты - 17-08-2007
 									and SqlPrepareAndExecute( hSql(),"INSERT INTO operw (ref,tag,value) VALUES (:REF,'DT_R', :sDT_R  )" )
 									and SqlPrepareAndExecute( hSql(),"INSERT INTO operw (ref,tag,value) VALUES (:REF,'ADRES',:sADRES )" )
 									  )
-								                                                                                                                                                                      Return FALSE
-						                                                                                                                                                                      Return TRUE
-			                                                                                                                                                                      Function: f_Opl_SN8
-				                                                                                                                                                                      Description: 
-				                                                                                                                                                                      Returns 
-					                                                                                                                                                                      Boolean: 
-				                                                                                                                                                                      Parameters 
-				                                                                                                                                                                      Static Variables 
-				                                                                                                                                                                      Local variables 
-					                                                                                                                                                                      Number: nSk
-					                                                                                                                                                                      Number: S_
-					                                                                                                                                                                      Number: nSum
-					                                                                                                                                                                      String: sNazn     !! Назначение пл
+								                                                                                                                                                                       Return FALSE
+						                                                                                                                                                                       Return TRUE
+			                                                                                                                                                                       Function: f_Opl_SN8
+				                                                                                                                                                                       Description: 
+				                                                                                                                                                                       Returns 
+					                                                                                                                                                                       Boolean: 
+				                                                                                                                                                                       Parameters 
+				                                                                                                                                                                       Static Variables 
+				                                                                                                                                                                       Local variables 
+					                                                                                                                                                                       Number: nSk
+					                                                                                                                                                                       Number: S_
+					                                                                                                                                                                       Number: nSum
+					                                                                                                                                                                       String: sNazn     !! Назначение пл
 					!
-					                                                                                                                                                                      String: sPASP
-					                                                                                                                                                                      String: sPASPN
-					                                                                                                                                                                      String: sATRT
-					                                                                                                                                                                      String: sDT_R
-				                                                                                                                                                                      Actions 
-					                                                                                                                                                                      Set nSum = nSP * 100
-					                                                                                                                                                                      Set sNazn = 'Сплата пені за просрочені проценти згідно договору №'||CC_ID||
+					                                                                                                                                                                       String: sPASP
+					                                                                                                                                                                       String: sPASPN
+					                                                                                                                                                                       String: sATRT
+					                                                                                                                                                                       String: sDT_R
+				                                                                                                                                                                       Actions 
+					                                                                                                                                                                       Set nSum = nSP * 100
+					                                                                                                                                                                       Set sNazn = 'Сплата пені за просрочені проценти згідно договору №'||CC_ID||
 							            ' від '|| SalFmtFormatDateTime( DAT1, 'dd/MM/yyyy' )
-					                                                                                                                                                                      Set nSk = nSKP
-					                                                                                                                                                                      Set REF8 = NUMBER_Null
-					                                                                                                                                                                      Call cDoc.SetDoc( REF8, sTT, 0, nVOB[1], Subs(CC_ID,1,10),
+					                                                                                                                                                                       Set nSk = nSKP
+					                                                                                                                                                                       Set REF8 = NUMBER_Null
+					                                                                                                                                                                       Call cDoc.SetDoc( REF8, sTT, 0, nVOB[1], Subs(CC_ID,1,10),
 							     SalDateCurrent( ),  SalDateCurrent( ), BankDate, BankDate,
 							     NLS_6397, NMS_6397, BankMfo,'',n980,nSum,GetBankOkpoS(),
 							     NLS_1002, NMS_1002, BankMfo,'',n980,nSum,OKPO,sNazn, '',GetIdOper(),'', nSk ,0)
-					                                                                                                                                                                      If NOT cDoc.oDoc()
-						                                                                                                                                                                      Return FALSE
-					                                                                                                                                                                      Set REF8 = cDoc.m_nRef
-					                                                                                                                                                                      If NOT cDoc.PayTT (0,REF8,BankDate,sTT,1,n980,SD8_NLS,nSum,n980,SN8_NLS,nSum)
+					                                                                                                                                                                       If NOT cDoc.oDoc()
+						                                                                                                                                                                       Return FALSE
+					                                                                                                                                                                       Set REF8 = cDoc.m_nRef
+					                                                                                                                                                                       If NOT cDoc.PayTT (0,REF8,BankDate,sTT,1,n980,SD8_NLS,nSum,n980,SN8_NLS,nSum)
 							OR NOT SqlPrepareAndExecute( hSql(),
 							      "INSERT INTO operw (ref,tag,value) VALUES (:REF8,'FIO',:NMK )" )
 							OR NOT SqlPrepareAndExecute( hSql(),"DELETE From nlk_ref where ref1=:REF8 " )
-						                                                                                                                                                                      Return FALSE
-					                                                                                                                                                                      Return TRUE
-			                                                                                                                                                                      Function: F_Proc
-				                                                                                                                                                                      Description: 
-				                                                                                                                                                                      Returns 
-					                                                                                                                                                                      Number: 
-				                                                                                                                                                                      Parameters 
-				                                                                                                                                                                      Static Variables 
-				                                                                                                                                                                      Local variables 
-					                                                                                                                                                                      Number: nKom
-					                                                                                                                                                                      Number: nMetr
-					                                                                                                                                                                      Number: nAcc
-					                                                                                                                                                                      Number: nS
-					                                                                                                                                                                      String: sTip
-					                                                                                                                                                                      Date/Time: Dat1_
-				                                                                                                                                                                      Actions 
-					                                                                                                                                                                      Set nS = 0
-					                                                                                                                                                                      Set nKom = 0
-					                                                                                                                                                                      If SqlPrepareAndExecute( hSqlAux2(), "delete from ACR_INTN ")
+						                                                                                                                                                                       Return FALSE
+					                                                                                                                                                                       Return TRUE
+			                                                                                                                                                                       Function: F_Proc
+				                                                                                                                                                                       Description: 
+				                                                                                                                                                                       Returns 
+					                                                                                                                                                                       Number: 
+				                                                                                                                                                                       Parameters 
+				                                                                                                                                                                       Static Variables 
+				                                                                                                                                                                       Local variables 
+					                                                                                                                                                                       Number: nKom
+					                                                                                                                                                                       Number: nMetr
+					                                                                                                                                                                       Number: nAcc
+					                                                                                                                                                                       Number: nS
+					                                                                                                                                                                       String: sTip
+					                                                                                                                                                                       Date/Time: Dat1_
+				                                                                                                                                                                       Actions 
+					                                                                                                                                                                       Set nS = 0
+					                                                                                                                                                                       Set nKom = 0
+					                                                                                                                                                                       If SqlPrepareAndExecute( hSqlAux2(), "delete from ACR_INTN ")
 							and SqlPrepareAndExecute( hSqlAux2(),
 							  "SELECT a.acc, a.tip, i.metr, NVL(i.acr_dat, a.daos-1) + 1
 							   INTO :nAcc, :sTip, :nMetr, :Dat1_
@@ -9134,140 +9137,140 @@ Application Description: Кредиты - 17-08-2007
 							   WHERE n.nd=:ND and n.acc=a.acc and a.dazs is null
 							     and a.acc=i.acc and
 							(i.id=0 and a.tip in ('SS ','SP ','SL ') OR i.id=2 and a.tip='LIM' and i.metr >90 )" )
-						                                                                                                                                                                      While SqlFetchNext( hSqlAux2(), nFetchRes )
-							                                                                                                                                                                      If sTip = 'LIM' and nMetr > 90
+						                                                                                                                                                                       While SqlFetchNext( hSqlAux2(), nFetchRes )
+							                                                                                                                                                                       If sTip = 'LIM' and nMetr > 90
 								! ! Начисление комиссий по КD по разным METR > 90
-								                                                                                                                                                                      If SqlPLSQLCommand(hSql(),
+								                                                                                                                                                                       If SqlPLSQLCommand(hSql(),
 										   "CC_KOMISSIA (nMetr, nAcc, 2, Dat1_, dSK1, nKom, NUMBER_Null, 1)")
-									                                                                                                                                                                      Set nSK1 = -nKom/100
-							                                                                                                                                                                      Else 
-								                                                                                                                                                                      Call p_intN (nAcc,0,Dat1_,dSN1,NUMBER_Null,1)
-						                                                                                                                                                                      If SqlPrepareAndExecute( hSqlAux2(),
+									                                                                                                                                                                       Set nSK1 = -nKom/100
+							                                                                                                                                                                       Else 
+								                                                                                                                                                                       Call p_intN (nAcc,0,Dat1_,dSN1,NUMBER_Null,1)
+						                                                                                                                                                                       If SqlPrepareAndExecute( hSqlAux2(),
 								  "SELECT - sum(round(ACRD+ REMI,0)) into :nS from ACR_INTN " )
 								and SqlFetchNext( hSqlAux2(), nFetchRes )
-						                                                                                                                                                                      Return (nS) / 100
-			                                                                                                                                                                      Function: F_DISA1
-				                                                                                                                                                                      Description: 
-				                                                                                                                                                                      Returns 
-				                                                                                                                                                                      Parameters 
-				                                                                                                                                                                      Static Variables 
-				                                                                                                                                                                      Local variables 
-				                                                                                                                                                                      Actions 
-					                                                                                                                                                                      Call SalDisableWindow( pb_F10 )
-					                                                                                                                                                                      Call SalEnableWindow( pb_F5 )
+						                                                                                                                                                                       Return (nS) / 100
+			                                                                                                                                                                       Function: F_DISA1
+				                                                                                                                                                                       Description: 
+				                                                                                                                                                                       Returns 
+				                                                                                                                                                                       Parameters 
+				                                                                                                                                                                       Static Variables 
+				                                                                                                                                                                       Local variables 
+				                                                                                                                                                                       Actions 
+					                                                                                                                                                                       Call SalDisableWindow( pb_F10 )
+					                                                                                                                                                                       Call SalEnableWindow( pb_F5 )
 					!
-					                                                                                                                                                                      Call SalDisableWindow( CC_ID )
-					                                                                                                                                                                      Call SalDisableWindow( DAT1 )
-					                                                                                                                                                                      Call SalDisableWindow( ND )
-					                                                                                                                                                                      Call SalDisableWindow( nS )
-					                                                                                                                                                                      Call SalDisableWindow( rb )
-					                                                                                                                                                                      Call SalDisableWindow( rb1 )
-			                                                                                                                                                                      Function: F_SumPr
-				                                                                                                                                                                      Description: 
-				                                                                                                                                                                      Returns 
-					                                                                                                                                                                      Boolean: 
-				                                                                                                                                                                      Parameters 
-					                                                                                                                                                                      Number: S_
-				                                                                                                                                                                      Static Variables 
-				                                                                                                                                                                      Local variables 
-					                                                                                                                                                                      Number: nKop
-					                                                                                                                                                                      Number: nS_980
-				                                                                                                                                                                      Actions 
+					                                                                                                                                                                       Call SalDisableWindow( CC_ID )
+					                                                                                                                                                                       Call SalDisableWindow( DAT1 )
+					                                                                                                                                                                       Call SalDisableWindow( ND )
+					                                                                                                                                                                       Call SalDisableWindow( nS )
+					                                                                                                                                                                       Call SalDisableWindow( rb )
+					                                                                                                                                                                       Call SalDisableWindow( rb1 )
+			                                                                                                                                                                       Function: F_SumPr
+				                                                                                                                                                                       Description: 
+				                                                                                                                                                                       Returns 
+					                                                                                                                                                                       Boolean: 
+				                                                                                                                                                                       Parameters 
+					                                                                                                                                                                       Number: S_
+				                                                                                                                                                                       Static Variables 
+				                                                                                                                                                                       Local variables 
+					                                                                                                                                                                       Number: nKop
+					                                                                                                                                                                       Number: nS_980
+				                                                                                                                                                                       Actions 
 					!
-					                                                                                                                                                                      Set ml1 = SumPr( S_ *100, sGENDER, LCV, sUNIT )
-					                                                                                                                                                                      Call SalHideWindow( ml1V )
-					                                                                                                                                                                      Call SalHideWindow( ml1G )
-					                                                                                                                                                                      Set ml1V = STRING_Null
-					                                                                                                                                                                      Set ml1G = STRING_Null
-					                                                                                                                                                                      Set nORD = 1
-					                                                                                                                                                                      If KV != 980
-						                                                                                                                                                                      Set nKop = SalNumberMod( S_, IifN ( KV=978,5,1 ) )
-						                                                                                                                                                                      Set nORD = 2
-						                                                                                                                                                                      If nKop > 0
-							                                                                                                                                                                      Set ml1V = SumPr( (S_ - nKop)*100, sGENDER, LCV, sUNIT )
-							                                                                                                                                                                      Set nS_980 = SalNumberRound( nKop*100 * KURS )
-							                                                                                                                                                                      Set ml1G = SumPr( nS_980, 'F', "грн.", "коп." )
-							                                                                                                                                                                      Call SalShowWindow( ml1V )
-							                                                                                                                                                                      Call SalShowWindow( ml1G )
-							                                                                                                                                                                      Set nORD = 3
+					                                                                                                                                                                       Set ml1 = SumPr( S_ *100, sGENDER, LCV, sUNIT )
+					                                                                                                                                                                       Call SalHideWindow( ml1V )
+					                                                                                                                                                                       Call SalHideWindow( ml1G )
+					                                                                                                                                                                       Set ml1V = STRING_Null
+					                                                                                                                                                                       Set ml1G = STRING_Null
+					                                                                                                                                                                       Set nORD = 1
+					                                                                                                                                                                       If KV != 980
+						                                                                                                                                                                       Set nKop = SalNumberMod( S_, IifN ( KV=978,5,1 ) )
+						                                                                                                                                                                       Set nORD = 2
+						                                                                                                                                                                       If nKop > 0
+							                                                                                                                                                                       Set ml1V = SumPr( (S_ - nKop)*100, sGENDER, LCV, sUNIT )
+							                                                                                                                                                                       Set nS_980 = SalNumberRound( nKop*100 * KURS )
+							                                                                                                                                                                       Set ml1G = SumPr( nS_980, 'F', "грн.", "коп." )
+							                                                                                                                                                                       Call SalShowWindow( ml1V )
+							                                                                                                                                                                       Call SalShowWindow( ml1G )
+							                                                                                                                                                                       Set nORD = 3
 						!
-						                                                                                                                                                                      If nVOB[nORD] = NUMBER_Null
-							                                                                                                                                                                      If SqlPrepareAndExecute( hSql(),
+						                                                                                                                                                                       If nVOB[nORD] = NUMBER_Null
+							                                                                                                                                                                       If SqlPrepareAndExecute( hSql(),
 									   "SELECT vob INTO :nVOB["||Str(nORD)||"] FROM tts_vob WHERE tt=:sTT and ORD=:nORD " )
 									and SqlFetchNext( hSql(), nFetchRes )
-							                                                                                                                                                                      Else 
-								                                                                                                                                                                      Set nVOB[nORD] = nVOB[1]
-					                                                                                                                                                                      Return TRUE
-			                                                                                                                                                                      Function: f_Tochka
-				                                                                                                                                                                      Description: 
-				                                                                                                                                                                      Returns 
-				                                                                                                                                                                      Parameters 
-					                                                                                                                                                                      Window Handle: hWnd
-				                                                                                                                                                                      Static Variables 
-					                                                                                                                                                                      String: sTmp
-				                                                                                                                                                                      Local variables 
-				                                                                                                                                                                      Actions 
-					                                                                                                                                                                      Set sTmp=SalStrRepeatX( ' ', 20 )
-					                                                                                                                                                                      Call SalGetWindowText ( hWnd, sTmp, 20 )
-					                                                                                                                                                                      While SalStrScan(sTmp, sDecimal2) > 0
-						                                                                                                                                                                      Set sTmp = SalStrReplaceX(sTmp,SalStrScan(sTmp,sDecimal2),1,sDecimal)
-					                                                                                                                                                                      Call SalFmtStrToField ( hWnd, sTmp, TRUE)
-		                                                                                                                                                                      Window Parameters 
-			                                                                                                                                                                      Number: nMode ! 297
-			                                                                                                                                                                      Number: nPar  ! 0 (NUMBER_Null) или реф КД
-			                                                                                                                                                                      String: strPar01 ! Операция CCK
-			                                                                                                                                                                      String: strPar02 ! Счет 2902 для инд догов
-		                                                                                                                                                                      Window Variables 
-			                                                                                                                                                                      String: SD8_NLS
-			                                                                                                                                                                      String: SN8_NLS
-			                                                                                                                                                                      Number: SN8_OST
+							                                                                                                                                                                       Else 
+								                                                                                                                                                                       Set nVOB[nORD] = nVOB[1]
+					                                                                                                                                                                       Return TRUE
+			                                                                                                                                                                       Function: f_Tochka
+				                                                                                                                                                                       Description: 
+				                                                                                                                                                                       Returns 
+				                                                                                                                                                                       Parameters 
+					                                                                                                                                                                       Window Handle: hWnd
+				                                                                                                                                                                       Static Variables 
+					                                                                                                                                                                       String: sTmp
+				                                                                                                                                                                       Local variables 
+				                                                                                                                                                                       Actions 
+					                                                                                                                                                                       Set sTmp=SalStrRepeatX( ' ', 20 )
+					                                                                                                                                                                       Call SalGetWindowText ( hWnd, sTmp, 20 )
+					                                                                                                                                                                       While SalStrScan(sTmp, sDecimal2) > 0
+						                                                                                                                                                                       Set sTmp = SalStrReplaceX(sTmp,SalStrScan(sTmp,sDecimal2),1,sDecimal)
+					                                                                                                                                                                       Call SalFmtStrToField ( hWnd, sTmp, TRUE)
+		                                                                                                                                                                       Window Parameters 
+			                                                                                                                                                                       Number: nMode ! 297
+			                                                                                                                                                                       Number: nPar  ! 0 (NUMBER_Null) или реф КД
+			                                                                                                                                                                       String: strPar01 ! Операция CCK
+			                                                                                                                                                                       String: strPar02 ! Счет 2902 для инд догов
+		                                                                                                                                                                       Window Variables 
+			                                                                                                                                                                       String: SD8_NLS
+			                                                                                                                                                                       String: SN8_NLS
+			                                                                                                                                                                       Number: SN8_OST
 			! String: NLS_6397
-			                                                                                                                                                                      String: NMS_6397
-			                                                                                                                                                                      Number: nRnk
-			                                                                                                                                                                      Number: ACC8
-			                                                                                                                                                                      String: sADRES
+			                                                                                                                                                                       String: NMS_6397
+			                                                                                                                                                                       Number: nRnk
+			                                                                                                                                                                       Number: ACC8
+			                                                                                                                                                                       String: sADRES
 			!
-			                                                                                                                                                                      Number: nS_OLD
-			                                                                                                                                                                      Number: nORD
-			                                                                                                                                                                      String: sSEL
-			                                                                                                                                                                      String: CC_FL_PR !! Флаг начисления % проводками в ТОБО
-			                                                                                                                                                                      String: sUNIT
-			                                                                                                                                                                      String: sGENDER
-			                                                                                                                                                                      String: sSqlK
-			                                                                                                                                                                      String: sSql2
-			                                                                                                                                                                      String: sSql1
-			                                                                                                                                                                      String: sSql
-			                                                                                                                                                                      String: NMS_1002
-			                                                                                                                                                                      String: NMS_2902
-			                                                                                                                                                                      String: sTT
-			                                                                                                                                                                      Number: n980
-			                                                                                                                                                                      Number: nQ
-			                                                                                                                                                                      String: BankMfo
-			                                                                                                                                                                      String: sKOD_B
-			                                                                                                                                                                      Date/Time: BankDate
-			                                                                                                                                                                      Number: nVOB[*]
-			                                                                                                                                                                      String: sDecimal2  ! симв десятичной точки alt
-			                                                                                                                                                                      String: sDecimal   ! симв десятичной точки
-			                                                                                                                                                                      : cDoc
-			                                                                                                                                                                      Number: KV_KOM
-			                                                                                                                                                                      String: TOBO
-			                                                                                                                                                                      String: s6397
+			                                                                                                                                                                       Number: nS_OLD
+			                                                                                                                                                                       Number: nORD
+			                                                                                                                                                                       String: sSEL
+			                                                                                                                                                                       String: CC_FL_PR !! Флаг начисления % проводками в ТОБО
+			                                                                                                                                                                       String: sUNIT
+			                                                                                                                                                                       String: sGENDER
+			                                                                                                                                                                       String: sSqlK
+			                                                                                                                                                                       String: sSql2
+			                                                                                                                                                                       String: sSql1
+			                                                                                                                                                                       String: sSql
+			                                                                                                                                                                       String: NMS_1002
+			                                                                                                                                                                       String: NMS_2902
+			                                                                                                                                                                       String: sTT
+			                                                                                                                                                                       Number: n980
+			                                                                                                                                                                       Number: nQ
+			                                                                                                                                                                       String: BankMfo
+			                                                                                                                                                                       String: sKOD_B
+			                                                                                                                                                                       Date/Time: BankDate
+			                                                                                                                                                                       Number: nVOB[*]
+			                                                                                                                                                                       String: sDecimal2  ! симв десятичной точки alt
+			                                                                                                                                                                       String: sDecimal   ! симв десятичной точки
+			                                                                                                                                                                       : cDoc
+			                                                                                                                                                                       Number: KV_KOM
+			                                                                                                                                                                       String: TOBO
+			                                                                                                                                                                       String: s6397
 			! Boolean: FL_SN1_Add
-		                                                                                                                                                                      Message Actions 
-			                                                                                                                                                                      On SAM_Create
-				                                                                                                                                                                      Set nVOB[1] = NUMBER_Null
-				                                                                                                                                                                      Set nVOB[2] = NUMBER_Null
-				                                                                                                                                                                      Set nVOB[3] = NUMBER_Null
-				                                                                                                                                                                      Set n980 = GetBaseVal()
-				                                                                                                                                                                      Set nORD = 1
-				                                                                                                                                                                      Set TXT_KOM ='Комісія до суми платежу НЕ додається !'
-				                                                                                                                                                                      Set TXT_END = "Термін дії угоди завершено !"
-				                                                                                                                                                                      Call SalHideWindow( TXT_KOM )
-				                                                                                                                                                                      Set UVAGA = 'У В А Г А,  В А Л Ю Т А ! '
-				                                                                                                                                                                      Call F_VALUTA( n980 )
-				                                                                                                                                                                      Set sDecimal =SalStrMidX(SalNumberToStrX(1.1,1),1,1)
-				                                                                                                                                                                      Set sDecimal2 = IifS ( sDecimal = '.', ',', '.' )
-				                                                                                                                                                                      Set sSEL =
+		                                                                                                                                                                       Message Actions 
+			                                                                                                                                                                       On SAM_Create
+				                                                                                                                                                                       Set nVOB[1] = NUMBER_Null
+				                                                                                                                                                                       Set nVOB[2] = NUMBER_Null
+				                                                                                                                                                                       Set nVOB[3] = NUMBER_Null
+				                                                                                                                                                                       Set n980 = GetBaseVal()
+				                                                                                                                                                                       Set nORD = 1
+				                                                                                                                                                                       Set TXT_KOM ='Комісія до суми платежу НЕ додається !'
+				                                                                                                                                                                       Set TXT_END = "Термін дії угоди завершено !"
+				                                                                                                                                                                       Call SalHideWindow( TXT_KOM )
+				                                                                                                                                                                       Set UVAGA = 'У В А Г А,  В А Л Ю Т А ! '
+				                                                                                                                                                                       Call F_VALUTA( n980 )
+				                                                                                                                                                                       Set sDecimal =SalStrMidX(SalNumberToStrX(1.1,1),1,1)
+				                                                                                                                                                                       Set sDecimal2 = IifS ( sDecimal = '.', ',', '.' )
+				                                                                                                                                                                       Set sSEL =
 						"SELECT d.nd,d.cc_id,d.sdate,d.wdate,c.NMK,c.okpo,c.rnk,c.ADR,
 						      ad.KV, t.LCV, t.NAME, t.UNIT, t.GENDER, a.acc
 						 INTO :ND,:CC_ID,:DAT1,:dSS1,:NMK,:OKPO,:nRnk,:sADRES,
@@ -9275,89 +9278,89 @@ Application Description: Кредиты - 17-08-2007
 						 FROM cc_deal d, customer c, cc_add ad, tabval t, accounts a
 						 WHERE d.ND=ad.ND and ad.KV=t.KV and d.sos>9 and d.sos<15 and d.rnk=c.rnk
 						   and a.nls like '8999_'||d.nd and a.kv=ad.kv and "
-				                                                                                                                                                                      Set sSql1 = sSEL || " d.cc_id=:CC_ID and d.SDATE = :DAT1 "
-				                                                                                                                                                                      Set sSql2 = sSEL || " d.nd=:ND "
-				                                                                                                                                                                      Call F_DISA ()
-				                                                                                                                                                                      Set BankMfo =  GetBankMfo()
-				                                                                                                                                                                      Set BankDate = GetBankDate()
-				                                                                                                                                                                      Set sKOD_B =  GetGlobalOption('1_PB')
-				                                                                                                                                                                      Set sTT = strPar01
+				                                                                                                                                                                       Set sSql1 = sSEL || " d.cc_id=:CC_ID and d.SDATE = :DAT1 "
+				                                                                                                                                                                       Set sSql2 = sSEL || " d.nd=:ND "
+				                                                                                                                                                                       Call F_DISA ()
+				                                                                                                                                                                       Set BankMfo =  GetBankMfo()
+				                                                                                                                                                                       Set BankDate = GetBankDate()
+				                                                                                                                                                                       Set sKOD_B =  GetGlobalOption('1_PB')
+				                                                                                                                                                                       Set sTT = strPar01
 				! ---1 счет кассы
 				! Взять счет кассы и его наименование сначала из карточки операции CCK
-				                                                                                                                                                                      If SqlPrepareAndExecute( hSql(),
+				                                                                                                                                                                       If SqlPrepareAndExecute( hSql(),
 						  "SELECT t.nlsb,a.nms INTO :NLS_1002,:NMS_1002
 						   from tts t,accounts a where t.tt=:sTT and a.kv=:n980 and t.nlsb=a.nls")
 						and SqlFetchNext( hSql(), nFetchRes )
 				! если нет , то из из INI-файла
-				                                                                                                                                                                      Else 
+				                                                                                                                                                                       Else 
 					! Взять счет кассы и его наименование из INI-файла
-					                                                                                                                                                                      If SqlPrepareAndExecute( hSql(),
+					                                                                                                                                                                       If SqlPrepareAndExecute( hSql(),
 							  "SELECT substr(pul.Get_Mas_Ini_Val('CASH'),1,14) into :NLS_1002 from dual" )
 							and SqlFetchNext( hSql(), nFetchRes )
 							and SqlPrepareAndExecute( hSql(),"SELECT nms INTO :NMS_1002 from accounts where kv=:n980 and nls=:NLS_1002")
 							and SqlFetchNext( hSql(), nFetchRes )
-					                                                                                                                                                                      Else 
-						                                                                                                                                                                      Call SalMessageBox('Не определен счет кассы, операция '||sTT, "Ошибки в настройках ! ", MB_IconStop)
-						                                                                                                                                                                      Call SalDestroyWindow(hWndForm)
+					                                                                                                                                                                       Else 
+						                                                                                                                                                                       Call SalMessageBox('Не определен счет кассы, операция '||sTT, "Ошибки в настройках ! ", MB_IconStop)
+						                                                                                                                                                                       Call SalDestroyWindow(hWndForm)
 				! ---2 счет 2902 индив или общий
-				                                                                                                                                                                      Set NLS_2902 = STRING_Null
+				                                                                                                                                                                       Set NLS_2902 = STRING_Null
 				! Ecли по одному дог
-				                                                                                                                                                                      If nPar >0
-					                                                                                                                                                                      Set ND = nPar
-					                                                                                                                                                                      Call SalDisableWindow( CC_ID )
-					                                                                                                                                                                      Call SalDisableWindow( DAT1 )
-					                                                                                                                                                                      Call SalDisableWindow( pb_F1 )
+				                                                                                                                                                                       If nPar >0
+					                                                                                                                                                                       Set ND = nPar
+					                                                                                                                                                                       Call SalDisableWindow( CC_ID )
+					                                                                                                                                                                       Call SalDisableWindow( DAT1 )
+					                                                                                                                                                                       Call SalDisableWindow( pb_F1 )
 					! и задан индив 2902
-					                                                                                                                                                                      If strPar02 !=STRING_Null
-						                                                                                                                                                                      Set NLS_2902 = SalStrTrimX( strPar02 )
-				                                                                                                                                                                      If NLS_2902 = STRING_Null
-					                                                                                                                                                                      Set sSqlK =
+					                                                                                                                                                                       If strPar02 !=STRING_Null
+						                                                                                                                                                                       Set NLS_2902 = SalStrTrimX( strPar02 )
+				                                                                                                                                                                       If NLS_2902 = STRING_Null
+					                                                                                                                                                                       Set sSqlK =
 							"SELECT  Nvl(t.SK,32), v.vob, t.nlsa, Substr(a.nms,1,38 )
 							    into  :nSKP,  :nVOB[1], :NLS_2902, :NMS_2902
 							    from tts t, tts_vob v, accounts a
 							    where a.kv=:n980 and a.nls=t.NLSa and v.tt=t.tt and t.tt=:sTT and v.ORD=1 "
-				                                                                                                                                                                      Else 
-					                                                                                                                                                                      Set sSqlK =
+				                                                                                                                                                                       Else 
+					                                                                                                                                                                       Set sSqlK =
 							"SELECT  Nvl(t.SK,32), v.vob, Substr(a.nms,1,38 )
 							    into  :nSKP,  :nVOB[1], :NMS_2902
 							    from tts t, tts_vob v, accounts a
 							    where a.kv=:n980 and a.nls=:NLS_2902 and v.tt=t.tt and t.tt=:sTT and v.ORD=1 "
-				                                                                                                                                                                      If SqlPrepareAndExecute( hSql(),sSqlK) and not SqlFetchNext( hSql(), nFetchRes )
-					                                                                                                                                                                      Call SalMessageBox('Не определен Счет гашения, операция '||sTT, "Ошибки в настройках ! ", MB_IconStop)
-					                                                                                                                                                                      Call SalDestroyWindow(hWndForm)
+				                                                                                                                                                                       If SqlPrepareAndExecute( hSql(),sSqlK) and not SqlFetchNext( hSql(), nFetchRes )
+					                                                                                                                                                                       Call SalMessageBox('Не определен Счет гашения, операция '||sTT, "Ошибки в настройках ! ", MB_IconStop)
+					                                                                                                                                                                       Call SalDestroyWindow(hWndForm)
 				! !!! Флаг начисления % проводками
-				                                                                                                                                                                      Set CC_FL_PR = '0'
+				                                                                                                                                                                       Set CC_FL_PR = '0'
 				! Call SalHideWindow( pb_SN1F )
 				! в ТОБО из ini-файла
-				                                                                                                                                                                      If SqlPrepareAndExecute(hSql(),
+				                                                                                                                                                                       If SqlPrepareAndExecute(hSql(),
 						"SELECT substr(pul.Get_Mas_Ini_Val('KOD_TOBO'),1,12),
 						        substr(pul.Get_Mas_Ini_Val('CC_FL_PR'),1,1)
 						 INTO :TOBO, :CC_FL_PR from dual ")
 						and SqlFetchNext(hSql(), nFetchRes)
-				                                                                                                                                                                      If CC_FL_PR != '1'
-					                                                                                                                                                                      Set CC_FL_PR = GetGlobalOption('CC_FL_PR')
+				                                                                                                                                                                       If CC_FL_PR != '1'
+					                                                                                                                                                                       Set CC_FL_PR = GetGlobalOption('CC_FL_PR')
 				! общий 6397 NLX
 				! NLS_GB_TOBO
-				                                                                                                                                                                      If SqlPrepareAndExecute( hSql(),
+				                                                                                                                                                                       If SqlPrepareAndExecute( hSql(),
 						  "Select a.nls,substr(a.nms,1,380)
 						   into :NLS_6397,:NMS_6397
 						   from accounts a, params p
 						   where a.kv= :n980 and a.dazs is null and a.nls=p.val and p.par='CC_NLX_G' ")
 						and not SqlFetchNext( hSql(), nFetchRes )
-					                                                                                                                                                                      Call SalMessageBox('Не определен Счет доходов по ПЕНЕ !', "Ошибки в настройках ! ", MB_IconStop)
-					                                                                                                                                                                      Call SalDestroyWindow(hWndForm)
-				                                                                                                                                                                      Set s6397 = NLS_6397
-				                                                                                                                                                                      If SqlPrepareAndExecute( hSql(),
+					                                                                                                                                                                       Call SalMessageBox('Не определен Счет доходов по ПЕНЕ !', "Ошибки в настройках ! ", MB_IconStop)
+					                                                                                                                                                                       Call SalDestroyWindow(hWndForm)
+				                                                                                                                                                                       Set s6397 = NLS_6397
+				                                                                                                                                                                       If SqlPrepareAndExecute( hSql(),
 						  "SELECT a.nls,substr(a.nms,1,380) into :NLS_6397,:NMS_6397
 						   from accounts a, NLS_GB_TOBO p
 						   where a.kv= :n980 and a.dazs is null and a.nls=p.nlst and p.nlsg=:s6397 and p.tobo=:TOBO ")
 						and SqlFetchNext( hSql(), nFetchRes )
 				! If CC_FL_PR = '1'
-					                                                                                                                                                                                     Call SalShowWindow( pb_SN1F )
-				                                                                                                                                                                      Call F_NULL()
-				                                                                                                                                                                      If nPar >0
-					                                                                                                                                                                      Call SalSendMsg( pb_F1, SAM_Click, 0, 0 )
-				                                                                                                                                                                      Call SalMapEnterToTab( TRUE )
+					                                                                                                                                                                                      Call SalShowWindow( pb_SN1F )
+				                                                                                                                                                                       Call F_NULL()
+				                                                                                                                                                                       If nPar >0
+					                                                                                                                                                                       Call SalSendMsg( pb_F1, SAM_Click, 0, 0 )
+				                                                                                                                                                                       Call SalMapEnterToTab( TRUE )
 	! !!!!
 	Table Window: frmOpZalAcc
 		Class: cGenericTable
@@ -11385,7 +11388,7 @@ Application Description: Кредиты - 17-08-2007
 				Set frmOpZalAcc.strPrintFileName = 'DZal'
 				! If SqlPrepareAndExecute( hSql(),"SELECT val from params where par='ZAL_DPT' and val='1' " )
 						and not SqlFetchNext(hSql(), nFetchRes)
-					                            Call SalHideWindow ( colDep )
+					                             Call SalHideWindow ( colDep )
 				If nTip_Ur >= 80
 					Call SalDisableWindow( pbIns )
 					! Call SalDisableWindow( pbDel )
@@ -11930,184 +11933,184 @@ Application Description: Кредиты - 17-08-2007
 			Text Color: Default
 			Background Color: Default
 .end
-		                                                                                                                                                Description: 
-		                                                                                                                                                Named Menus 
-		                                                                                                                                                Menu 
-		                                                                                                                                                Tool Bar 
-			                                                                                                                                                Contents 
-				                                                                                                                                                Pushbutton: pbPayDoc
-					                                                                                                                                                Message Actions 
+		                                                                                                                                                 Description: 
+		                                                                                                                                                 Named Menus 
+		                                                                                                                                                 Menu 
+		                                                                                                                                                 Tool Bar 
+			                                                                                                                                                 Contents 
+				                                                                                                                                                 Pushbutton: pbPayDoc
+					                                                                                                                                                 Message Actions 
 						! On SAM_Click
-							                                                                                                                                                                                                                                                                                                                                                         Set cDocWdog.nFli = IifN(dfBankB=GetBankMfo(), 0, 1)
-							                                                                                                                                                                                                                                                                                                                                                         Set cDocWdog.sTT = IifS(dfBankB=GetBankMfo(), sKV1,    sKV2)
-							                                                                                                                                                                                                                                                                                                                                                         Set cDocWdog.sTT = IifS(Subs(dfNlsB,1,2)='10', sKV3, cDocWdog.sTT )
-							                                                                                                                                                                                                                                                                                                                                                         Call SalSendMsg( hWndForm, UM_Insert, 0, 0 )
-				                                                                                                                                                Pushbutton: pbExit
-					                                                                                                                                                Message Actions 
-				                                                                                                                                                Pushbutton: pbPrtDoc
-					                                                                                                                                                Message Actions 
-				                                                                                                                                                Line 
-				                                                                                                                                                Line 
-				                                                                                                                                                Line 
-				                                                                                                                                                Data Field: dfZn
-					                                                                                                                                                Message Actions 
-				                                                                                                                                                Data Field: dfOst
-					                                                                                                                                                Message Actions 
-				                                                                                                                                                Pushbutton: pbNewDoc
-					                                                                                                                                                Message Actions 
-				                                                                                                                                                Pushbutton: pbNewTTs
-					                                                                                                                                                Message Actions 
-						                                                                                                                                                On SAM_Create
-							                                                                                                                                                Set strTip = 'Перейти к следующему документу выдачи'
-				                                                                                                                                                Pushbutton: pbHelp
-					                                                                                                                                                Message Actions 
-				                                                                                                                                                Pushbutton: pbSaveKor
-					                                                                                                                                                Message Actions 
-				                                                                                                                                                Background Text: Остаток:
-				                                                                                                                                                Pushbutton: pbDocBal
-					                                                                                                                                                Message Actions 
-				                                                                                                                                                Line 
-				                                                                                                                                                Pushbutton: pbHotVytyag
-					                                                                                                                                                Message Actions 
-				                                                                                                                                                Pushbutton: pbHotName
-					                                                                                                                                                Message Actions 
-				                                                                                                                                                Pushbutton: pbHotFio
-					                                                                                                                                                Message Actions 
+							                                                                                                                                                                                                                                                                                                                                                          Set cDocWdog.nFli = IifN(dfBankB=GetBankMfo(), 0, 1)
+							                                                                                                                                                                                                                                                                                                                                                          Set cDocWdog.sTT = IifS(dfBankB=GetBankMfo(), sKV1,    sKV2)
+							                                                                                                                                                                                                                                                                                                                                                          Set cDocWdog.sTT = IifS(Subs(dfNlsB,1,2)='10', sKV3, cDocWdog.sTT )
+							                                                                                                                                                                                                                                                                                                                                                          Call SalSendMsg( hWndForm, UM_Insert, 0, 0 )
+				                                                                                                                                                 Pushbutton: pbExit
+					                                                                                                                                                 Message Actions 
+				                                                                                                                                                 Pushbutton: pbPrtDoc
+					                                                                                                                                                 Message Actions 
+				                                                                                                                                                 Line 
+				                                                                                                                                                 Line 
+				                                                                                                                                                 Line 
+				                                                                                                                                                 Data Field: dfZn
+					                                                                                                                                                 Message Actions 
+				                                                                                                                                                 Data Field: dfOst
+					                                                                                                                                                 Message Actions 
+				                                                                                                                                                 Pushbutton: pbNewDoc
+					                                                                                                                                                 Message Actions 
+				                                                                                                                                                 Pushbutton: pbNewTTs
+					                                                                                                                                                 Message Actions 
+						                                                                                                                                                 On SAM_Create
+							                                                                                                                                                 Set strTip = 'Перейти к следующему документу выдачи'
+				                                                                                                                                                 Pushbutton: pbHelp
+					                                                                                                                                                 Message Actions 
+				                                                                                                                                                 Pushbutton: pbSaveKor
+					                                                                                                                                                 Message Actions 
+				                                                                                                                                                 Background Text: Остаток:
+				                                                                                                                                                 Pushbutton: pbDocBal
+					                                                                                                                                                 Message Actions 
+				                                                                                                                                                 Line 
+				                                                                                                                                                 Pushbutton: pbHotVytyag
+					                                                                                                                                                 Message Actions 
+				                                                                                                                                                 Pushbutton: pbHotName
+					                                                                                                                                                 Message Actions 
+				                                                                                                                                                 Pushbutton: pbHotFio
+					                                                                                                                                                 Message Actions 
 				!
-				                                                                                                                                                Pushbutton: pbLocalD
-					                                                                                                                                                Message Actions 
-				                                                                                                                                                Pushbutton: pbHotOstat
-					                                                                                                                                                Message Actions 
-		                                                                                                                                                Contents 
-			                                                                                                                                                Combo Box: cmbVob
-				                                                                                                                                                List Initialization 
-				                                                                                                                                                Message Actions 
-			                                                                                                                                                Background Text: №
-			                                                                                                                                                Data Field: dfNd
-				                                                                                                                                                Message Actions 
-					                                                                                                                                                On SAM_Create
-						                                                                                                                                                Call cDocWdog.UnHideIt(hWndItem)
-						                                                                                                                                                If cDocWdog.sNd
-							                                                                                                                                                Set dfNd = cDocWdog.sNd
-			                                                                                                                                                Data Field: dfDocD
-				                                                                                                                                                Message Actions 
-			                                                                                                                                                Data Field: dfBankA
-				                                                                                                                                                Message Actions 
-			                                                                                                                                                Data Field: dfKvA
-				                                                                                                                                                Message Actions 
-					                                                                                                                                                On SAM_Create
-						                                                                                                                                                Call SalSendClassMessage(SAM_Create, 0, 0)
-			                                                                                                                                                Data Field: dfNlsA
-				                                                                                                                                                Message Actions 
-			                                                                                                                                                Data Field: dfPlat
-				                                                                                                                                                Message Actions 
-			                                                                                                                                                Data Field: dfNamA
-				                                                                                                                                                Message Actions 
-					                                                                                                                                                On SAM_Create
-						                                                                                                                                                Call cDocWdog.UnHideIt( hWndItem )
+				                                                                                                                                                 Pushbutton: pbLocalD
+					                                                                                                                                                 Message Actions 
+				                                                                                                                                                 Pushbutton: pbHotOstat
+					                                                                                                                                                 Message Actions 
+		                                                                                                                                                 Contents 
+			                                                                                                                                                 Combo Box: cmbVob
+				                                                                                                                                                 List Initialization 
+				                                                                                                                                                 Message Actions 
+			                                                                                                                                                 Background Text: №
+			                                                                                                                                                 Data Field: dfNd
+				                                                                                                                                                 Message Actions 
+					                                                                                                                                                 On SAM_Create
+						                                                                                                                                                 Call cDocWdog.UnHideIt(hWndItem)
+						                                                                                                                                                 If cDocWdog.sNd
+							                                                                                                                                                 Set dfNd = cDocWdog.sNd
+			                                                                                                                                                 Data Field: dfDocD
+				                                                                                                                                                 Message Actions 
+			                                                                                                                                                 Data Field: dfBankA
+				                                                                                                                                                 Message Actions 
+			                                                                                                                                                 Data Field: dfKvA
+				                                                                                                                                                 Message Actions 
+					                                                                                                                                                 On SAM_Create
+						                                                                                                                                                 Call SalSendClassMessage(SAM_Create, 0, 0)
+			                                                                                                                                                 Data Field: dfNlsA
+				                                                                                                                                                 Message Actions 
+			                                                                                                                                                 Data Field: dfPlat
+				                                                                                                                                                 Message Actions 
+			                                                                                                                                                 Data Field: dfNamA
+				                                                                                                                                                 Message Actions 
+					                                                                                                                                                 On SAM_Create
+						                                                                                                                                                 Call cDocWdog.UnHideIt( hWndItem )
 						! If SalStrLength(dfNamA )>=3 and not (bFixNlsA or bFixAll)
-							                                                                                                                                                                                                                                                                                                                                                         Call HideIt( hWndItem )
-			                                                                                                                                                Data Field: dfPlatB
-				                                                                                                                                                Message Actions 
-			                                                                                                                                                Data Field: dfNbA
-				                                                                                                                                                Message Actions 
-			                                                                                                                                                Data Field: dfBankB
-				                                                                                                                                                Message Actions 
-					                                                                                                                                                On SAM_Create
-						                                                                                                                                                Call cDocWdog.UnHideIt(hWndItem)
-						                                                                                                                                                If cDocWdog.sBankB
-							                                                                                                                                                Set dfBankB = cDocWdog.sBankB
-							                                                                                                                                                Call SalSendMsg(hWndItem, SAM_Validate, 0, 0)
-					                                                                                                                                                On SAM_Validate
-						                                                                                                                                                Set cDocWdog.dfBankB = SalStrTrimX(cDocWdog.dfBankB)
-						                                                                                                                                                If SalIsNull (cDocWdog.dfBankB) and not  cDocWdog.bTotVal
-							                                                                                                                                                Return VALIDATE_Ok
-						                                                                                                                                                If not SalIsValidInteger(cDocWdog.dfBankB)
-							                                                                                                                                                Call SalMessageBox("Нецифра в коде банка Б",     "Ошибка", MB_IconExclamation)
-							                                                                                                                                                Return VALIDATE_Cancel
-						                                                                                                                                                If not IsValidMFO(cDocWdog.dfBankB)
-							                                                                                                                                                Call SalMessageBox( "Ош контрольный разряд кода банка Б", "Ошибка", MB_IconExclamation)
-							                                                                                                                                                Return VALIDATE_Cancel
+							                                                                                                                                                                                                                                                                                                                                                          Call HideIt( hWndItem )
+			                                                                                                                                                 Data Field: dfPlatB
+				                                                                                                                                                 Message Actions 
+			                                                                                                                                                 Data Field: dfNbA
+				                                                                                                                                                 Message Actions 
+			                                                                                                                                                 Data Field: dfBankB
+				                                                                                                                                                 Message Actions 
+					                                                                                                                                                 On SAM_Create
+						                                                                                                                                                 Call cDocWdog.UnHideIt(hWndItem)
+						                                                                                                                                                 If cDocWdog.sBankB
+							                                                                                                                                                 Set dfBankB = cDocWdog.sBankB
+							                                                                                                                                                 Call SalSendMsg(hWndItem, SAM_Validate, 0, 0)
+					                                                                                                                                                 On SAM_Validate
+						                                                                                                                                                 Set cDocWdog.dfBankB = SalStrTrimX(cDocWdog.dfBankB)
+						                                                                                                                                                 If SalIsNull (cDocWdog.dfBankB) and not  cDocWdog.bTotVal
+							                                                                                                                                                 Return VALIDATE_Ok
+						                                                                                                                                                 If not SalIsValidInteger(cDocWdog.dfBankB)
+							                                                                                                                                                 Call SalMessageBox("Нецифра в коде банка Б",     "Ошибка", MB_IconExclamation)
+							                                                                                                                                                 Return VALIDATE_Cancel
+						                                                                                                                                                 If not IsValidMFO(cDocWdog.dfBankB)
+							                                                                                                                                                 Call SalMessageBox( "Ош контрольный разряд кода банка Б", "Ошибка", MB_IconExclamation)
+							                                                                                                                                                 Return VALIDATE_Cancel
 						!
-						                                                                                                                                                If SqlPrepareAndExecute(hSql(), 
+						                                                                                                                                                 If SqlPrepareAndExecute(hSql(), 
 								  "SELECT nb INTO :cDocWdog.dfNbB FROM banks 
 								   WHERE mfo=:cDocWdog.dfBankB and nvl(blk,0)<>4")
 								and not SqlFetchNext(hSql(),nFetchRes)
-							                                                                                                                                                Call SalMessageBox("Не найден банк " || dfBankB, "Ошибка", MB_IconExclamation)
-							                                                                                                                                                Return VALIDATE_Cancel
+							                                                                                                                                                 Call SalMessageBox("Не найден банк " || dfBankB, "Ошибка", MB_IconExclamation)
+							                                                                                                                                                 Return VALIDATE_Cancel
 						!
-						                                                                                                                                                Call F_TT()
-						                                                                                                                                                Return VALIDATE_Ok
-			                                                                                                                                                Data Field: dfPoluB
-				                                                                                                                                                Message Actions 
-			                                                                                                                                                Data Field: dfNbB
-				                                                                                                                                                Message Actions 
-			                                                                                                                                                Data Field: dfKvB
-				                                                                                                                                                Message Actions 
-			                                                                                                                                                Data Field: dfNlsB
-				                                                                                                                                                Message Actions 
-					                                                                                                                                                On SAM_Create
-						                                                                                                                                                Call cDocWdog.UnHideIt(hWndItem)
-						                                                                                                                                                If cDocWdog.sNlsB
-							                                                                                                                                                Set dfNlsB = cDocWdog.sNlsB
-							                                                                                                                                                Call SalSendMsg(hWndItem, SAM_Validate, 0, 0)
-					                                                                                                                                                On SAM_Validate
-						                                                                                                                                                Call F_TT()
-						                                                                                                                                                Return SalSendClassMessage(SAM_Validate, 0, 0)
-			                                                                                                                                                Data Field: dfPolu
-				                                                                                                                                                Message Actions 
-			                                                                                                                                                Data Field: dfNamB
-				                                                                                                                                                Message Actions 
-					                                                                                                                                                On SAM_Create
-						                                                                                                                                                Call cDocWdog.UnHideIt(hWndItem)
-			                                                                                                                                                Data Field: dfSumA
-				                                                                                                                                                Message Actions 
-			                                                                                                                                                Data Field: dfSumB
-				                                                                                                                                                Message Actions 
-			                                                                                                                                                Data Field: dfRat
-				                                                                                                                                                Message Actions 
-			                                                                                                                                                Data Field: dfSumC
-				                                                                                                                                                Message Actions 
-					                                                                                                                                                On SAM_Create
-						                                                                                                                                                Call cDocWdog.UnHideIt( hWndItem )
-						                                                                                                                                                Set cDocWdog.dfSumC= SalNumberAbs( cDocWdog.nSumDog)
-						                                                                                                                                                Set cDocWdog.nS    = cDocWdog.dfSumC 
-						                                                                                                                                                Set cDocWdog.dfSumA= cDocWdog.dfSumC
-						                                                                                                                                                Set cDocWdog.dfSumB= cDocWdog.dfSumC
-						                                                                                                                                                Call SalSendClassMessage(SAM_Create, wParam, lParam)
-					                                                                                                                                                On SAM_Validate
-						                                                                                                                                                Call cDocWdog.DecPoint(hWndItem)
-						                                                                                                                                                If not SalIsValidDecimal( hWndItem, 15, cDocWdog.nDigA )
-							                                                                                                                                                Call SalMessageBox( CurrentLangTable.GetAtomTitle('DocWMesErrSumFormat'),
+						                                                                                                                                                 Call F_TT()
+						                                                                                                                                                 Return VALIDATE_Ok
+			                                                                                                                                                 Data Field: dfPoluB
+				                                                                                                                                                 Message Actions 
+			                                                                                                                                                 Data Field: dfNbB
+				                                                                                                                                                 Message Actions 
+			                                                                                                                                                 Data Field: dfKvB
+				                                                                                                                                                 Message Actions 
+			                                                                                                                                                 Data Field: dfNlsB
+				                                                                                                                                                 Message Actions 
+					                                                                                                                                                 On SAM_Create
+						                                                                                                                                                 Call cDocWdog.UnHideIt(hWndItem)
+						                                                                                                                                                 If cDocWdog.sNlsB
+							                                                                                                                                                 Set dfNlsB = cDocWdog.sNlsB
+							                                                                                                                                                 Call SalSendMsg(hWndItem, SAM_Validate, 0, 0)
+					                                                                                                                                                 On SAM_Validate
+						                                                                                                                                                 Call F_TT()
+						                                                                                                                                                 Return SalSendClassMessage(SAM_Validate, 0, 0)
+			                                                                                                                                                 Data Field: dfPolu
+				                                                                                                                                                 Message Actions 
+			                                                                                                                                                 Data Field: dfNamB
+				                                                                                                                                                 Message Actions 
+					                                                                                                                                                 On SAM_Create
+						                                                                                                                                                 Call cDocWdog.UnHideIt(hWndItem)
+			                                                                                                                                                 Data Field: dfSumA
+				                                                                                                                                                 Message Actions 
+			                                                                                                                                                 Data Field: dfSumB
+				                                                                                                                                                 Message Actions 
+			                                                                                                                                                 Data Field: dfRat
+				                                                                                                                                                 Message Actions 
+			                                                                                                                                                 Data Field: dfSumC
+				                                                                                                                                                 Message Actions 
+					                                                                                                                                                 On SAM_Create
+						                                                                                                                                                 Call cDocWdog.UnHideIt( hWndItem )
+						                                                                                                                                                 Set cDocWdog.dfSumC= SalNumberAbs( cDocWdog.nSumDog)
+						                                                                                                                                                 Set cDocWdog.nS    = cDocWdog.dfSumC 
+						                                                                                                                                                 Set cDocWdog.dfSumA= cDocWdog.dfSumC
+						                                                                                                                                                 Set cDocWdog.dfSumB= cDocWdog.dfSumC
+						                                                                                                                                                 Call SalSendClassMessage(SAM_Create, wParam, lParam)
+					                                                                                                                                                 On SAM_Validate
+						                                                                                                                                                 Call cDocWdog.DecPoint(hWndItem)
+						                                                                                                                                                 If not SalIsValidDecimal( hWndItem, 15, cDocWdog.nDigA )
+							                                                                                                                                                 Call SalMessageBox( CurrentLangTable.GetAtomTitle('DocWMesErrSumFormat'),
 									                    CurrentLangTable.GetAtomTitle('DlgMSG_Error'), MB_IconExclamation )
-							                                                                                                                                                Return VALIDATE_Cancel
-						                                                                                                                                                Set cDocWdog.dfSumC=SalNumberAbs(cDocWdog.dfSumC)
+							                                                                                                                                                 Return VALIDATE_Cancel
+						                                                                                                                                                 Set cDocWdog.dfSumC=SalNumberAbs(cDocWdog.dfSumC)
 						!
-						                                                                                                                                                If SalIsNull( hWndItem ) or (cDocWdog.dfSumC=0 and not cDocWdog.aFlg[14]) ! nFeq
-							                                                                                                                                                Call SalMessageBox( CurrentLangTable.GetAtomTitle('DocWMesErrSumBlank'),
+						                                                                                                                                                 If SalIsNull( hWndItem ) or (cDocWdog.dfSumC=0 and not cDocWdog.aFlg[14]) ! nFeq
+							                                                                                                                                                 Call SalMessageBox( CurrentLangTable.GetAtomTitle('DocWMesErrSumBlank'),
 									                    CurrentLangTable.GetAtomTitle('DlgMSG_Error'), MB_IconExclamation )
-							                                                                                                                                                Return VALIDATE_Cancel
+							                                                                                                                                                 Return VALIDATE_Cancel
 						!
 						! Call Debug('cDocWdog.dfSumC = '|| Str(cDocWdog.dfSumC)||' , cDocWdog.nSumDog='||Str(cDocWdog.nSumDog) )
-						                                                                                                                                                If cDocWdog.dfSumC > SalNumberAbs( cDocWdog.nSumDog) and nOper=2 
-							                                                                                                                                                Call SalMessageBox(
+						                                                                                                                                                 If cDocWdog.dfSumC > SalNumberAbs( cDocWdog.nSumDog) and nOper=2 
+							                                                                                                                                                 Call SalMessageBox(
 									"Сумма взыскания больше суммы общей задолженности по счету ",
 									"Взыскание невозможно ! ",
 									MB_IconStop)
-							                                                                                                                                                Set dfSumC = SalNumberAbs( cDocWdog.nSumDog)
-							                                                                                                                                                Return VALIDATE_Cancel
+							                                                                                                                                                 Set dfSumC = SalNumberAbs( cDocWdog.nSumDog)
+							                                                                                                                                                 Return VALIDATE_Cancel
 						!
-						                                                                                                                                                Set cDocWdog.dfSumA=cDocWdog.dfSumC
-						                                                                                                                                                Set cDocWdog.dfSumB=cDocWdog.dfSumC
-						                                                                                                                                                Return VALIDATE_Ok
-			                                                                                                                                                List Box: lb1
-				                                                                                                                                                List Initialization 
-				                                                                                                                                                Message Actions 
-					                                                                                                                                                On SAM_Create
-						                                                                                                                                                Call SalSendClassMessage( SAM_Create, 0, 0 )
-						                                                                                                                                                Set cDocWdog.i=0
-						                                                                                                                                                Call SalArrayGetUpperBound( cDocWdog.aTag, 1, cDocWdog.nTmp  )
-						                                                                                                                                                If SqlPrepareAndExecute( hSql(),
+						                                                                                                                                                 Set cDocWdog.dfSumA=cDocWdog.dfSumC
+						                                                                                                                                                 Set cDocWdog.dfSumB=cDocWdog.dfSumC
+						                                                                                                                                                 Return VALIDATE_Ok
+			                                                                                                                                                 List Box: lb1
+				                                                                                                                                                 List Initialization 
+				                                                                                                                                                 Message Actions 
+					                                                                                                                                                 On SAM_Create
+						                                                                                                                                                 Call SalSendClassMessage( SAM_Create, 0, 0 )
+						                                                                                                                                                 Set cDocWdog.i=0
+						                                                                                                                                                 Call SalArrayGetUpperBound( cDocWdog.aTag, 1, cDocWdog.nTmp  )
+						                                                                                                                                                 If SqlPrepareAndExecute( hSql(),
 								"SELECT c.nmk, d.name,  p.SER||' '||p.NUMDOC, 
 								        p.organ||' '||to_char(PDATE,'dd/mm/yyyy'), c.ADR, to_char(p.BDAY,'dd/mm/yyyy')
 								 INTO :cDocWdog.aVal[1], :cDocWdog.aVal[2], :cDocWdog.aVal[3], 
@@ -12115,221 +12118,221 @@ Application Description: Кредиты - 17-08-2007
 								 FROM customer c, person p, PASSP d
 								 WHERE c.rnk=p.rnk and c.rnk=:nRnk and nvl(p.PASSP,1) =d.PASSP ")
 								and SqlFetchNext(hSql(), nFetchRes)
-						                                                                                                                                                Call SalListSetSelect( lb1, 0 )
-						                                                                                                                                                Call SalSendMsg( hWndItem, SAM_Click, 0, 0 )
-			                                                                                                                                                Multiline Field: dfNazn
-				                                                                                                                                                Message Actions 
-					                                                                                                                                                On SAM_Create
-						                                                                                                                                                Call cDocWdog.UnHideIt(hWndItem)
-						                                                                                                                                                If cDocWdog.sNazn
-							                                                                                                                                                Set dfNazn = cDocWdog.sNazn
-							                                                                                                                                                Call SalSendMsg(hWndItem, SAM_Validate, 0, 0)
-			                                                                                                                                                Data Field: dfSk
-				                                                                                                                                                Message Actions 
-			                                                                                                                                                Data Field: dfValD1
-				                                                                                                                                                Message Actions 
-					                                                                                                                                                On SAM_Create
-						                                                                                                                                                Call SalSendClassMessage(SAM_Create, 0, 0)
-						                                                                                                                                                Set dfValD1 = IifD(dWida<cDocWdog.dDat, cDocWdog.dDat, dWida)
-			                                                                                                                                                Data Field: dfValD2
-				                                                                                                                                                Message Actions 
-			                                                                                                                                                Data Field: dfSumNA
-				                                                                                                                                                Message Actions 
-			                                                                                                                                                Data Field: dfSumNB
-				                                                                                                                                                Message Actions 
-			                                                                                                                                                Data Field: dfRatNomN
-				                                                                                                                                                Message Actions 
-			                                                                                                                                                Data Field: dfSumNC
-				                                                                                                                                                Message Actions 
-			                                                                                                                                                Data Field: dfSkN
-				                                                                                                                                                Message Actions 
-			                                                                                                                                                Data Field: dfValD2N
-				                                                                                                                                                Message Actions 
-			                                                                                                                                                Data Field: dfD
-				                                                                                                                                                Message Actions 
-			                                                                                                                                                Data Field: dfK
-				                                                                                                                                                Message Actions 
-			                                                                                                                                                Check Box: cbUgrnt
-				                                                                                                                                                Message Actions 
-			                                                                                                                                                Data Field: dfOkpoA
-				                                                                                                                                                Message Actions 
-					                                                                                                                                                On SAM_Create
-						                                                                                                                                                Call cDocWdog.UnHideIt( hWndItem )
-			                                                                                                                                                Data Field: dfOkpoB
-				                                                                                                                                                Message Actions 
-			                                                                                                                                                Data Field: dfVytyagN
-				                                                                                                                                                Message Actions 
-			                                                                                                                                                Data Field: dfEquivN
-				                                                                                                                                                Message Actions 
-			                                                                                                                                                Data Field: dfEquiv
-				                                                                                                                                                Message Actions 
-			                                                                                                                                                Data Field: dfLocDat
-				                                                                                                                                                Message Actions 
-			                                                                                                                                                Data Field: dfDateFrom
-				                                                                                                                                                Message Actions 
-			                                                                                                                                                Data Field: dfNssA
-				                                                                                                                                                Message Actions 
-			                                                                                                                                                Data Field: dfSlashD
-				                                                                                                                                                Message Actions 
-			                                                                                                                                                Data Field: dfNssB
-				                                                                                                                                                Message Actions 
-			                                                                                                                                                Data Field: dfSlashK
-				                                                                                                                                                Message Actions 
-			                                                                                                                                                Data Field: dfValD1N
-				                                                                                                                                                Message Actions 
-			                                                                                                                                                Picture: pic1f
-				                                                                                                                                                Message Actions 
-			                                                                                                                                                Picture: pic2f
-				                                                                                                                                                Message Actions 
-			                                                                                                                                                Picture: pic3f
-				                                                                                                                                                Message Actions 
-		                                                                                                                                                Functions 
-			                                                                                                                                                Function: oDoc
-				                                                                                                                                                Description: Оплатить  документ с прибамбасами
-				                                                                                                                                                Returns 
-					                                                                                                                                                Boolean: 
-				                                                                                                                                                Parameters 
-				                                                                                                                                                Static Variables 
-				                                                                                                                                                Local variables 
-					                                                                                                                                                String: sFio
-					                                                                                                                                                String: sPasp
-					                                                                                                                                                String: sAtrt
-					                                                                                                                                                String: sAdr
-					                                                                                                                                                String: sDobr
-				                                                                                                                                                Actions 
-					                                                                                                                                                If cDocWdog.sTT = sKV3 and cDocWdog.nKvA=GetBaseVal()
-						                                                                                                                                                Set cDocWdog.m_nSk=cDocWdog.dfSk
+						                                                                                                                                                 Call SalListSetSelect( lb1, 0 )
+						                                                                                                                                                 Call SalSendMsg( hWndItem, SAM_Click, 0, 0 )
+			                                                                                                                                                 Multiline Field: dfNazn
+				                                                                                                                                                 Message Actions 
+					                                                                                                                                                 On SAM_Create
+						                                                                                                                                                 Call cDocWdog.UnHideIt(hWndItem)
+						                                                                                                                                                 If cDocWdog.sNazn
+							                                                                                                                                                 Set dfNazn = cDocWdog.sNazn
+							                                                                                                                                                 Call SalSendMsg(hWndItem, SAM_Validate, 0, 0)
+			                                                                                                                                                 Data Field: dfSk
+				                                                                                                                                                 Message Actions 
+			                                                                                                                                                 Data Field: dfValD1
+				                                                                                                                                                 Message Actions 
+					                                                                                                                                                 On SAM_Create
+						                                                                                                                                                 Call SalSendClassMessage(SAM_Create, 0, 0)
+						                                                                                                                                                 Set dfValD1 = IifD(dWida<cDocWdog.dDat, cDocWdog.dDat, dWida)
+			                                                                                                                                                 Data Field: dfValD2
+				                                                                                                                                                 Message Actions 
+			                                                                                                                                                 Data Field: dfSumNA
+				                                                                                                                                                 Message Actions 
+			                                                                                                                                                 Data Field: dfSumNB
+				                                                                                                                                                 Message Actions 
+			                                                                                                                                                 Data Field: dfRatNomN
+				                                                                                                                                                 Message Actions 
+			                                                                                                                                                 Data Field: dfSumNC
+				                                                                                                                                                 Message Actions 
+			                                                                                                                                                 Data Field: dfSkN
+				                                                                                                                                                 Message Actions 
+			                                                                                                                                                 Data Field: dfValD2N
+				                                                                                                                                                 Message Actions 
+			                                                                                                                                                 Data Field: dfD
+				                                                                                                                                                 Message Actions 
+			                                                                                                                                                 Data Field: dfK
+				                                                                                                                                                 Message Actions 
+			                                                                                                                                                 Check Box: cbUgrnt
+				                                                                                                                                                 Message Actions 
+			                                                                                                                                                 Data Field: dfOkpoA
+				                                                                                                                                                 Message Actions 
+					                                                                                                                                                 On SAM_Create
+						                                                                                                                                                 Call cDocWdog.UnHideIt( hWndItem )
+			                                                                                                                                                 Data Field: dfOkpoB
+				                                                                                                                                                 Message Actions 
+			                                                                                                                                                 Data Field: dfVytyagN
+				                                                                                                                                                 Message Actions 
+			                                                                                                                                                 Data Field: dfEquivN
+				                                                                                                                                                 Message Actions 
+			                                                                                                                                                 Data Field: dfEquiv
+				                                                                                                                                                 Message Actions 
+			                                                                                                                                                 Data Field: dfLocDat
+				                                                                                                                                                 Message Actions 
+			                                                                                                                                                 Data Field: dfDateFrom
+				                                                                                                                                                 Message Actions 
+			                                                                                                                                                 Data Field: dfNssA
+				                                                                                                                                                 Message Actions 
+			                                                                                                                                                 Data Field: dfSlashD
+				                                                                                                                                                 Message Actions 
+			                                                                                                                                                 Data Field: dfNssB
+				                                                                                                                                                 Message Actions 
+			                                                                                                                                                 Data Field: dfSlashK
+				                                                                                                                                                 Message Actions 
+			                                                                                                                                                 Data Field: dfValD1N
+				                                                                                                                                                 Message Actions 
+			                                                                                                                                                 Picture: pic1f
+				                                                                                                                                                 Message Actions 
+			                                                                                                                                                 Picture: pic2f
+				                                                                                                                                                 Message Actions 
+			                                                                                                                                                 Picture: pic3f
+				                                                                                                                                                 Message Actions 
+		                                                                                                                                                 Functions 
+			                                                                                                                                                 Function: oDoc
+				                                                                                                                                                 Description: Оплатить  документ с прибамбасами
+				                                                                                                                                                 Returns 
+					                                                                                                                                                 Boolean: 
+				                                                                                                                                                 Parameters 
+				                                                                                                                                                 Static Variables 
+				                                                                                                                                                 Local variables 
+					                                                                                                                                                 String: sFio
+					                                                                                                                                                 String: sPasp
+					                                                                                                                                                 String: sAtrt
+					                                                                                                                                                 String: sAdr
+					                                                                                                                                                 String: sDobr
+				                                                                                                                                                 Actions 
+					                                                                                                                                                 If cDocWdog.sTT = sKV3 and cDocWdog.nKvA=GetBaseVal()
+						                                                                                                                                                 Set cDocWdog.m_nSk=cDocWdog.dfSk
 					! !!!!!!!!!!!!!!!!
-					                                                                                                                                                If cDocW.oDoc()
+					                                                                                                                                                 If cDocW.oDoc()
 						! Перенос на просрочку 
-						                                                                                                                                                If nOper=1
-							                                                                                                                                                If SqlPrepareAndExecute( hSql(),"UPDATE cc_deal SET sos=13 WHERE nd=:N_ND ")
+						                                                                                                                                                 If nOper=1
+							                                                                                                                                                 If SqlPrepareAndExecute( hSql(),"UPDATE cc_deal SET sos=13 WHERE nd=:N_ND ")
 									   and SqlCommit( hSql() )
-							                                                                                                                                                Return TRUE
-						                                                                                                                                                Return TRUE
-					                                                                                                                                                Else 
-						                                                                                                                                                Call SqlRollback( hSql() )
-						                                                                                                                                                Return FALSE
+							                                                                                                                                                 Return TRUE
+						                                                                                                                                                 Return TRUE
+					                                                                                                                                                 Else 
+						                                                                                                                                                 Call SqlRollback( hSql() )
+						                                                                                                                                                 Return FALSE
 					! Return cDocW.oDoc()
 					! If cDocW.oDoc()
 						! While TRUE
-							                                                                                                                                                                                                                                                                                                                                                         If not SqlPrepareAndExecute(hSql(),
+							                                                                                                                                                                                                                                                                                                                                                          If not SqlPrepareAndExecute(hSql(),
 									 "INSERT INTO cc_refv (nd,ref) VALUES (:cDocWdog.nNdog,:cDocWdog.m_nRef)")
-								                                                                                                                                                                                                                                                                                                                                                         Break
+								                                                                                                                                                                                                                                                                                                                                                          Break
 							! проверка суммы
 							! !!!!!!!!!!!!!!!!!!
-							                                                                                                                                                                                                                                                                                                                                                         Set nU = nU - cDocWdog.A.S
-							                                                                                                                                                                                                                                                                                                                                                         If nU = 0
-								                                                                                                                                                                                                                                                                                                                                                         If SqlPrepareAndExecute(hSql(),
+							                                                                                                                                                                                                                                                                                                                                                          Set nU = nU - cDocWdog.A.S
+							                                                                                                                                                                                                                                                                                                                                                          If nU = 0
+								                                                                                                                                                                                                                                                                                                                                                          If SqlPrepareAndExecute(hSql(),
 										"UPDATE cc_add SET refv=:cDocWdog.m_nRef WHERE nd=:cDocWdog.nNdog and adds=0")
-									                                                                                                                                                                                                                                                                                                                                                         Call SqlCommit(hSql())
-								                                                                                                                                                                                                                                                                                                                                                         Else
-									                                                                                                                                                                                                                                                                                                                                                         Break
-							                                                                                                                                                                                                                                                                                                                                                         Return TRUE
+									                                                                                                                                                                                                                                                                                                                                                          Call SqlCommit(hSql())
+								                                                                                                                                                                                                                                                                                                                                                          Else
+									                                                                                                                                                                                                                                                                                                                                                          Break
+							                                                                                                                                                                                                                                                                                                                                                          Return TRUE
 					! !!!!!!!!!!!!!!!!
-			                                                                                                                                                Function: F_TT
-				                                                                                                                                                Description: 
-				                                                                                                                                                Returns 
-				                                                                                                                                                Parameters 
-				                                                                                                                                                Static Variables 
-				                                                                                                                                                Local variables 
-				                                                                                                                                                Actions 
-					                                                                                                                                                If cDocWdog.dfBankB=GetBankMfo()
-						                                                                                                                                                Set cDocWdog.nFli =  0
-						                                                                                                                                                If Subs(cDocWdog.dfNlsB,1,2)='10'
-							                                                                                                                                                Set cDocWdog.sTT = sKV3
-							                                                                                                                                                If SqlPrepareAndExecute(hSql(),"
+			                                                                                                                                                 Function: F_TT
+				                                                                                                                                                 Description: 
+				                                                                                                                                                 Returns 
+				                                                                                                                                                 Parameters 
+				                                                                                                                                                 Static Variables 
+				                                                                                                                                                 Local variables 
+				                                                                                                                                                 Actions 
+					                                                                                                                                                 If cDocWdog.dfBankB=GetBankMfo()
+						                                                                                                                                                 Set cDocWdog.nFli =  0
+						                                                                                                                                                 If Subs(cDocWdog.dfNlsB,1,2)='10'
+							                                                                                                                                                 Set cDocWdog.sTT = sKV3
+							                                                                                                                                                 If SqlPrepareAndExecute(hSql(),"
 									     SELECT sk INTO :cDocWdog.dfSk FROM tts WHERE tt=:cDocWdog.sTT ")
 									and SqlFetchNext(hSql(), nFetchRes)
-							                                                                                                                                                If cDocWdog.nKvA=GetBaseVal()
-								                                                                                                                                                Set cDocWdog.nVob =KK3_NV
-							                                                                                                                                                Else 
-								                                                                                                                                                Set cDocWdog.nVob =KK3_IV
-						                                                                                                                                                Else 
-							                                                                                                                                                Set cDocWdog.sTT = sKV1
+							                                                                                                                                                 If cDocWdog.nKvA=GetBaseVal()
+								                                                                                                                                                 Set cDocWdog.nVob =KK3_NV
+							                                                                                                                                                 Else 
+								                                                                                                                                                 Set cDocWdog.nVob =KK3_IV
+						                                                                                                                                                 Else 
+							                                                                                                                                                 Set cDocWdog.sTT = sKV1
 							! Set cDocWdog.nVob = 6
-					                                                                                                                                                Else 
-						                                                                                                                                                Set cDocWdog.nFli =  1
-						                                                                                                                                                Set cDocWdog.sTT = sKV2
+					                                                                                                                                                 Else 
+						                                                                                                                                                 Set cDocWdog.nFli =  1
+						                                                                                                                                                 Set cDocWdog.sTT = sKV2
 						! If SqlPrepareAndExecute(hSql(),
 								  "SELECT vob INTO :cDocWdog.nVob FROM tts_vob WHERE tt=:cDocWdog.sTT ")
 								and not SqlFetchNext(hSql(), nFetchRes)
-							                                                                                                                                                                                                                                                                                                                       Set cDocWdog.nVob = 1
-		                                                                                                                                                Window Parameters 
-			                                                                                                                                                Number: nOper !! 0-выдача, 1-пролонгация 2-погаш
-			                                                                                                                                                Number: nSumDog !! не исп
-			                                                                                                                                                Number: nKvDog
-			                                                                                                                                                Number: nRnk
-			                                                                                                                                                String: sAccA
-			                                                                                                                                                String: sAccB
-			                                                                                                                                                String: sMfoB
-			                                                                                                                                                Number: nNdog
-			                                                                                                                                                String: sNazn
-			                                                                                                                                                String: sPolu
-			                                                                                                                                                String: sNd
-			                                                                                                                                                Date/Time: dWida
-			                                                                                                                                                String: sKV1
-			                                                                                                                                                String: sKV2
-			                                                                                                                                                String: sKV3
-			                                                                                                                                                Window Handle: pbDisable
-			                                                                                                                                                Window Handle: pbRefreshG
-		                                                                                                                                                Window Variables 
-			                                                                                                                                                String: sNamB
-			                                                                                                                                                Number: nU
-			                                                                                                                                                Number: nSupro
-			                                                                                                                                                Number: KK3_NV
-			                                                                                                                                                Number: KK3_IV
-			                                                                                                                                                Number: nVx
-		                                                                                                                                                Message Actions 
-			                                                                                                                                                On SAM_Create
-				                                                                                                                                                Call SalDisableWindow( pbDisable )
-				                                                                                                                                                If SqlPrepareAndExecute(hSql(),
+							                                                                                                                                                                                                                                                                                                                        Set cDocWdog.nVob = 1
+		                                                                                                                                                 Window Parameters 
+			                                                                                                                                                 Number: nOper !! 0-выдача, 1-пролонгация 2-погаш
+			                                                                                                                                                 Number: nSumDog !! не исп
+			                                                                                                                                                 Number: nKvDog
+			                                                                                                                                                 Number: nRnk
+			                                                                                                                                                 String: sAccA
+			                                                                                                                                                 String: sAccB
+			                                                                                                                                                 String: sMfoB
+			                                                                                                                                                 Number: nNdog
+			                                                                                                                                                 String: sNazn
+			                                                                                                                                                 String: sPolu
+			                                                                                                                                                 String: sNd
+			                                                                                                                                                 Date/Time: dWida
+			                                                                                                                                                 String: sKV1
+			                                                                                                                                                 String: sKV2
+			                                                                                                                                                 String: sKV3
+			                                                                                                                                                 Window Handle: pbDisable
+			                                                                                                                                                 Window Handle: pbRefreshG
+		                                                                                                                                                 Window Variables 
+			                                                                                                                                                 String: sNamB
+			                                                                                                                                                 Number: nU
+			                                                                                                                                                 Number: nSupro
+			                                                                                                                                                 Number: KK3_NV
+			                                                                                                                                                 Number: KK3_IV
+			                                                                                                                                                 Number: nVx
+		                                                                                                                                                 Message Actions 
+			                                                                                                                                                 On SAM_Create
+				                                                                                                                                                 Call SalDisableWindow( pbDisable )
+				                                                                                                                                                 If SqlPrepareAndExecute(hSql(),
 						  "SELECT to_number(val) INTO :KK3_NV FROM params WHERE par='KK3_NV'")
 						and not SqlFetchNext(hSql(), nFetchRes)
-					                                                                                                                                                Set KK3_NV=22
-				                                                                                                                                                If SqlPrepareAndExecute(hSql(),
+					                                                                                                                                                 Set KK3_NV=22
+				                                                                                                                                                 If SqlPrepareAndExecute(hSql(),
 						  "SELECT to_number(val) INTO :KK3_IV FROM params WHERE par='KK3_IV'")
 						and not SqlFetchNext(hSql(), nFetchRes)
-					                                                                                                                                                Set KK3_IV=42
-				                                                                                                                                                Call SalSendClassMessage(SAM_Create, 0, 0)
-			                                                                                                                                                On UM_Choose
-				                                                                                                                                                Set sNlsA_TT = sAccA
-				                                                                                                                                                Set sNlsB_TT = sAccB
-				                                                                                                                                                Set nKvA_TT = nKvDog
-				                                                                                                                                                Set dfNazn = sNazn
-				                                                                                                                                                Set sBankB_TT = sMfoB
-				                                                                                                                                                Set dfNd = sNd
-				                                                                                                                                                Set bDocStart = TRUE
-				                                                                                                                                                Set sTT = sKV1
-				                                                                                                                                                If not SqlPrepareAndExecute(hSql(),
+					                                                                                                                                                 Set KK3_IV=42
+				                                                                                                                                                 Call SalSendClassMessage(SAM_Create, 0, 0)
+			                                                                                                                                                 On UM_Choose
+				                                                                                                                                                 Set sNlsA_TT = sAccA
+				                                                                                                                                                 Set sNlsB_TT = sAccB
+				                                                                                                                                                 Set nKvA_TT = nKvDog
+				                                                                                                                                                 Set dfNazn = sNazn
+				                                                                                                                                                 Set sBankB_TT = sMfoB
+				                                                                                                                                                 Set dfNd = sNd
+				                                                                                                                                                 Set bDocStart = TRUE
+				                                                                                                                                                 Set sTT = sKV1
+				                                                                                                                                                 If not SqlPrepareAndExecute(hSql(),
 						"SELECT name, fli, flv, decode(:nOper,2,0,dk), flags 
 						 INTO :sTTN, :nFli,:nFlv, :nDk, :sFlags         
 						 FROM tts  WHERE tt=:sTT ") 
 						or not SqlFetchNext(hSql(), nFetchRes)
-					                                                                                                                                                Call SalMessageBox("Нет описана операция " || sTT,   "Ошибка", MB_IconExclamation)
-					                                                                                                                                                Call SalDestroyWindow(hWndForm)
-				                                                                                                                                                Call Flgs2aFlg(sFlags)
-				                                                                                                                                                Call SalSetWindowText(hWndForm, 'Ввод документа - [ ' ||  sTTN || ' ]')
-				                                                                                                                                                If not aFlg[9]
-					                                                                                                                                                Set nSk_TT = NUMBER_Null
-				                                                                                                                                                Call SalSendClassMessage(UM_Clear, 0, 0)
-			                                                                                                                                                On SAM_Destroy
-				                                                                                                                                                Call SalEnableWindow( pbDisable )
-				                                                                                                                                                Call SalSendMsg( pbRefreshG, SAM_Click, 0, 0 )
-			                                                                                                                                                On SAM_CreateComplete
-				                                                                                                                                                Call SalSendClassMessage(SAM_CreateComplete, 0, 0)
-				                                                                                                                                                Set nVx = 0
-				                                                                                                                                                If nOper = 2
-					                                                                                                                                                Call SalDisableWindow( dfBankA )  
-					                                                                                                                                                Call SalDisableWindow( dfBankB )  
-					                                                                                                                                                Call SalDisableWindow( dfOkpoA ) 
-					                                                                                                                                                Call SalDisableWindow( dfOkpoB ) 
-					                                                                                                                                                Call SalDisableWindow( dfNamA ) 
-					                                                                                                                                                Call SalDisableWindow( dfNamB )  
-					                                                                                                                                                Call SalDisableWindow( dfKvA ) 
-					                                                                                                                                                Call SalDisableWindow( dfKvB ) 
-					                                                                                                                                                Call SalDisableWindow( dfNlsA ) 
-					                                                                                                                                                Call SalDisableWindow( dfNlsB ) 
+					                                                                                                                                                 Call SalMessageBox("Нет описана операция " || sTT,   "Ошибка", MB_IconExclamation)
+					                                                                                                                                                 Call SalDestroyWindow(hWndForm)
+				                                                                                                                                                 Call Flgs2aFlg(sFlags)
+				                                                                                                                                                 Call SalSetWindowText(hWndForm, 'Ввод документа - [ ' ||  sTTN || ' ]')
+				                                                                                                                                                 If not aFlg[9]
+					                                                                                                                                                 Set nSk_TT = NUMBER_Null
+				                                                                                                                                                 Call SalSendClassMessage(UM_Clear, 0, 0)
+			                                                                                                                                                 On SAM_Destroy
+				                                                                                                                                                 Call SalEnableWindow( pbDisable )
+				                                                                                                                                                 Call SalSendMsg( pbRefreshG, SAM_Click, 0, 0 )
+			                                                                                                                                                 On SAM_CreateComplete
+				                                                                                                                                                 Call SalSendClassMessage(SAM_CreateComplete, 0, 0)
+				                                                                                                                                                 Set nVx = 0
+				                                                                                                                                                 If nOper = 2
+					                                                                                                                                                 Call SalDisableWindow( dfBankA )  
+					                                                                                                                                                 Call SalDisableWindow( dfBankB )  
+					                                                                                                                                                 Call SalDisableWindow( dfOkpoA ) 
+					                                                                                                                                                 Call SalDisableWindow( dfOkpoB ) 
+					                                                                                                                                                 Call SalDisableWindow( dfNamA ) 
+					                                                                                                                                                 Call SalDisableWindow( dfNamB )  
+					                                                                                                                                                 Call SalDisableWindow( dfKvA ) 
+					                                                                                                                                                 Call SalDisableWindow( dfKvB ) 
+					                                                                                                                                                 Call SalDisableWindow( dfNlsA ) 
+					                                                                                                                                                 Call SalDisableWindow( dfNlsB ) 
 	Form Window: cDocWdog
 		Class: cDocW
 		Property Template:
@@ -14441,19 +14444,19 @@ Application Description: Кредиты - 17-08-2007
 					! Return cDocW.oDoc()
 					! If cDocW.oDoc()
 						! While TRUE
-							                                                                                                                                                                                                                                                                                                                                                         If not SqlPrepareAndExecute(hSql(),
+							                                                                                                                                                                                                                                                                                                                                                          If not SqlPrepareAndExecute(hSql(),
 									 "INSERT INTO cc_refv (nd,ref) VALUES (:cDocWdog.nNdog,:cDocWdog.m_nRef)")
-								                                                                                                                                                                                                                                                                                                                                                         Break
+								                                                                                                                                                                                                                                                                                                                                                          Break
 							! проверка суммы
 							! !!!!!!!!!!!!!!!!!!
-							                                                                                                                                                                                                                                                                                                                                                         Set nU = nU - cDocWdog.A.S
-							                                                                                                                                                                                                                                                                                                                                                         If nU = 0
-								                                                                                                                                                                                                                                                                                                                                                         If SqlPrepareAndExecute(hSql(),
+							                                                                                                                                                                                                                                                                                                                                                          Set nU = nU - cDocWdog.A.S
+							                                                                                                                                                                                                                                                                                                                                                          If nU = 0
+								                                                                                                                                                                                                                                                                                                                                                          If SqlPrepareAndExecute(hSql(),
 										"UPDATE cc_add SET refv=:cDocWdog.m_nRef WHERE nd=:cDocWdog.nNdog and adds=0")
-									                                                                                                                                                                                                                                                                                                                                                         Call SqlCommit(hSql())
-								                                                                                                                                                                                                                                                                                                                                                         Else
-									                                                                                                                                                                                                                                                                                                                                                         Break
-							                                                                                                                                                                                                                                                                                                                                                         Return TRUE
+									                                                                                                                                                                                                                                                                                                                                                          Call SqlCommit(hSql())
+								                                                                                                                                                                                                                                                                                                                                                          Else
+									                                                                                                                                                                                                                                                                                                                                                          Break
+							                                                                                                                                                                                                                                                                                                                                                          Return TRUE
 					! !!!!!!!!!!!!!!!!
 			Function: F_TT
 				Description:
@@ -14482,7 +14485,7 @@ Application Description: Кредиты - 17-08-2007
 						! If SqlPrepareAndExecute(hSql(),
 								  "SELECT vob INTO :cDocWdog.nVob FROM tts_vob WHERE tt=:cDocWdog.sTT ")
 								and not SqlFetchNext(hSql(), nFetchRes)
-							                                                                                                                                                                                                                                                                                                                       Set cDocWdog.nVob = 1
+							                                                                                                                                                                                                                                                                                                                        Set cDocWdog.nVob = 1
 			Function: iDop
 				Description: Вставить доп реквизиты
 				Returns
@@ -15039,13 +15042,13 @@ Application Description: Кредиты - 17-08-2007
 											"SELECT nd into :lNd from acc_over d where d.nd=:nNd and rownum=1") and SqlFetchNext( hSql(), nFetchRes )
 										! Set bTmp = SqlPrepareAndExecute(hSql(),"INSERT into PAWN_ACC(ACC) SELECT :NDZ.ACCZ FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM PAWN_ACC WHERE ACC= :NDZ.ACCZ)")
 										! If bTmp
-											                                 Call Debug('OVER')
-											                                 Call DebugN(NDZ.tbl.ACCZ)
-											                                 Call DebugN(lAcc_over)
-											                                 Call DebugN(dNd)
-											                                 Set bTmp = SqlPrepareAndExecute( hSql(),"INSERT into CC_ACCP(ACC,ACCS,pr_12,nd) values (:NDZ.tbl.ACCZ,:lAcc_over,2,:dNd)" )
-											                                 Set bTmp = SqlPLSQLCommand(hSql(), "cck.CC_M_ACCP( 1, dNd, NDZ.tbl.ACCZ ) " )
-											                                 Return 1
+											                                  Call Debug('OVER')
+											                                  Call DebugN(NDZ.tbl.ACCZ)
+											                                  Call DebugN(lAcc_over)
+											                                  Call DebugN(dNd)
+											                                  Set bTmp = SqlPrepareAndExecute( hSql(),"INSERT into CC_ACCP(ACC,ACCS,pr_12,nd) values (:NDZ.tbl.ACCZ,:lAcc_over,2,:dNd)" )
+											                                  Set bTmp = SqlPLSQLCommand(hSql(), "cck.CC_M_ACCP( 1, dNd, NDZ.tbl.ACCZ ) " )
+											                                  Return 1
 									Else
 										Call Debug('Договор не открыт!!!')
 										Return 1
@@ -18421,11 +18424,11 @@ Application Description: Кредиты - 17-08-2007
 					On SAM_SetFocus
 						Call SalMapEnterToTab( TRUE )
 					! On SAM_Validate
-						                                                                                                                                                                              If DOX_ <=0
-							                                                                                                                                                                              Call SalMessageBox(" Чистий дохід <= 0",
+						                                                                                                                                                                               If DOX_ <=0
+							                                                                                                                                                                               Call SalMessageBox(" Чистий дохід <= 0",
 									"Помилка ! ", MB_IconStop)
-							                                                                                                                                                                              Set DOX_ = NUMBER_Null
-						                                                                                                                                                                              Return VALIDATE_Ok
+							                                                                                                                                                                               Set DOX_ = NUMBER_Null
+						                                                                                                                                                                               Return VALIDATE_Ok
 			Data Field: KRDN
 .data CLASSPROPSSIZE
 0000: 1900
@@ -20481,10 +20484,10 @@ Application Description: Кредиты - 17-08-2007
 					Background Color: Class Default
 					Message Actions
 						! On SAM_Create
-							                                                                                                                          Set strTip = 'Карточка Счета'
+							                                                                                                                           Set strTip = 'Карточка Счета'
 						On SAM_Click
 							! If colAcc != NUMBER_Null
-								                                                                                                                          Call OperWithAccount(ALL_ACCOUNTS, colAcc, 0, 
+								                                                                                                                           Call OperWithAccount(ALL_ACCOUNTS, colAcc, 0, 
 										 IifN(nTip_Ur=90, ACCESS_READONLY, ACCESS_FULL))
 							Set sTmp='CC_KOL_ALL.ND='||Str(nNd)
 							Call FunNSIEditFFiltered('CC_KOL_ALL',1,sTmp)
@@ -20891,10 +20894,10 @@ Application Description: Кредиты - 17-08-2007
 					Background Color: Default
 					Message Actions
 						! On SAM_Create
-							                                                                                                                          Set strTip = 'Карточка Счета'
+							                                                                                                                           Set strTip = 'Карточка Счета'
 						On SAM_Click
 							! If colAcc != NUMBER_Null1
-								                                                                                                                          Call OperWithAccount(ALL_ACCOUNTS, colAcc, 0, 
+								                                                                                                                           Call OperWithAccount(ALL_ACCOUNTS, colAcc, 0, 
 										 IifN(nTip_Ur=90, ACCESS_READONLY, ACCESS_FULL))
 							Set sTmp='CC_KOL_ALL.ND='||Str(nNd)||' AND CC_KOL_ALL.CRDND='||Str(CRD.CRDND)
 							Call FunNSIEditFFiltered('CC_KOL_ALL',1,sTmp)
@@ -21217,7 +21220,7 @@ Application Description: Кредиты - 17-08-2007
 				List Values
 				Message Actions
 					! On SAM_KillFocus
-						                                                                                                                  If SqlPrepareAndExecute( hSql(), "SELECT NMS into :NAME_NLS from accounts  WHERE kv=:n980 and nls=:NLS" )
+						                                                                                                                   If SqlPrepareAndExecute( hSql(), "SELECT NMS into :NAME_NLS from accounts  WHERE kv=:n980 and nls=:NLS" )
 								and SqlFetchNext( hSql(), nFetchRes )
 					On SAM_AnyEdit
 						If SqlPrepareAndExecute( hSql(), "SELECT NMS into :NAME_NLS from accounts  WHERE kv=:n980 and nls=:NLS" )
@@ -22241,7 +22244,7 @@ Application Description: Кредиты - 17-08-2007
 						On SAM_TooltipSetText
 							Return XSalTooltipSetText( lParam, 'Дата для расч.эф.ставки по бал.стоимости' )
 						! On SAM_CreateComplete
-							                            Set R_DAT = GetBankDate()
+							                             Set R_DAT = GetBankDate()
 				! !=========================
 				Pushbutton: pbUpdate
 					Class Child Ref Key: 36

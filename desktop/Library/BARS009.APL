@@ -7,7 +7,7 @@
 .data VIEWINFO
 0000: 6F00000001000000 FFFF01000D004347 5458566965775374 6174650400010000
 0020: 0000000000B20000 002C000000030000 0003000000000000 00C1020000F8FFFF
-0040: FFE2FFFFFF000000 0000000000230300 00E3010000010000 0000000000010000
+0040: FFE1FFFFFF000000 0000000000230300 00E3010000010000 0000000000010000
 0060: 000F4170706C6963 6174696F6E497465 6D02000000075769 6E646F777302544F
 .enddata
 .data DT_MAKERUNDLG
@@ -1514,21 +1514,20 @@ where o.acc=:TO.Acc_2600 and o.acc_2067=i.acc and a1.acc=i.acc and
 .head 7 -  Set strTip = 'Счета по ОДНОМУ договору'
 .head 6 +  On SAM_Click
 .head 7 +  If SalTblAnyRows(hWndForm, ROW_Selected, 0)
-.head 8 -  Set sTmp = "
- a.ACC in 
+.head 8 -  Set sTmp = " a.ACC in 
 (          Select a.acc    from accounts a, acc_over o where o.acc=" || Str(Acc_2600) || " and
                                                              a.acc in (o.acco,o.acc_9129,o.acc_8000)
  union all select i.acra   from int_accn i, acc_over o where i.acra is not null and (i.id=0 or i.id=2) and
                                                              o.acc=" || Str(Acc_2600) || " and
                                                              i.acc in (o.acco,o.acc_9129,o.acc_8000)
- union all select a.acc    from accounts a where nbs='3579' and
-                                                 a.rnk in (select rnk from accounts
-                                                           where acc=" || Str(Acc_2600) || ")
+ union all select a.acc    from accounts a where a.nbs='3578'
+                                             and a.rnk in (select rnk from accounts
+                                                            where acc=" || Str(Acc_2600) || ")
  union all select acc      from cc_accp where accs=" || Str(Acc_2600) || "
  union all select acc_2096 from acc_over where acc_2096 is not null and acc=" || Str(Acc_2600) || "
  union all select i.acra   from acc_over a, int_accn i where i.acra is not null and i.acc=a.acc_2096 and
                                                              i.id=0 and a.acc=" || Str(Acc_2600) || "
- union all select n.acc    from nd_acc n, accounts a where a.acc=n.acc and a.nls like '3579%' and
+ union all select n.acc    from nd_acc n, accounts a where a.acc=n.acc and a.nls like '3578%' and
                                                            n.nd=" || Str(ND) || "
  union all select n.acc    from nd_acc n, accounts a where a.acc=n.acc and a.nls like '8008%' and
                                                            n.nd=" || Str(ND) || "
@@ -7803,8 +7802,8 @@ SqlCommitEx(hSql(), Txt || ' acc=' || Str(nAcc))
 .head 6 -  Set NBS2600 = '2600'
 .head 6 -  Set NBS2000 = '2000'
 .head 6 -  Set NBS2607 = '2607'
-.head 6 -  Set NBS2067 = '2067'
-.head 6 -  Set NBS2069 = '2069'
+.head 6 -  Set NBS2067 = '2063' !!2067
+.head 6 -  Set NBS2069 = '2068' !!2069
 .head 6 -  Set NBS2096 = '2096'
 .head 6 -  Set NBS2480 = '2480'
 .head 6 -  Set NBS9129 = '9129'

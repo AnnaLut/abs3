@@ -1,3 +1,4 @@
+set define       off
 set serveroutput on
 
 declare
@@ -126,15 +127,14 @@ begin
   bars_metabase.add_column(l_tabid, 5, 'BR_NM', 'C', 'Назва~базової~ставки', 3, 35, 29, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 6, 'R020_DEP', 'C', 'Бал.~рах.~договору', 1, 4, 7, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 7, 'CCY_ID', 'N', 'Код~валюти', 1, 3, 6, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'COMPROC', 'N', 'Ознака~капитализации %%', .7, 1, 23, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'COMPROC', 'B', 'Ознака~капиталізації %%', .7, 1, 23, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 10, 'DEAL_QTY', 'N', 'К-ть діючих депозитних договорів', 1, 5, 30, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'DPU_TYPE', 'N', 'Код~строку~(S181)', null, 1, 9, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 12, 'FREQ_ID', 'N', 'Код~періодичності~виплати %%', .5, 3, 19, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 13, 'FREQ_NM', 'C', 'Назва~періодичності~ виплати %%', 2, 35, 20, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'IRREVOCABLE', 'N', 'Ознака~безвідкличності', .7, 1, 27, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'IS_ACTIVE', 'N', 'Ознака~активності', 1, 1, 1, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'IS_LINE', 'N', 'Ознака~деп.лінії', .7, 1, 24, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'PROLONGABLE', 'N', 'Ознака~автопереоформления', .7, 1, 26, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'IRREVOCABLE', 'B', 'Ознака~безвідкличності', .7, 1, 27, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'IS_ACTIVE', 'B', 'Ознака~активності', 1, 1, 1, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'IS_LINE', 'B', 'Ознака~деп.лінії', .7, 1, 24, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'PROLONGABLE', 'B', 'Ознака~автопереоформления', .7, 1, 26, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 20, 'REPLENISHABLE', 'N', 'Ознака~поповнення', .7, 1, 17, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 23, 'STOP_ID', 'N', 'Код~штрафу', .7, 5, 21, 0, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 24, 'STOP_NM', 'C', 'Назва~штрафу', 2, 50, 22, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
@@ -154,17 +154,23 @@ begin
   -- добавляем описание сортировки
   bars_metabase.add_sortorder(l_tabid, 2, 1, 'DESC');
 
+  -- добавляем описание процедур
+  bars_metabase.add_actiontbl(l_tabid, 'UPDATE', 'DPU_UTILS.SUBTYPE_CHG_STE(:VIDD_ID,:IS_ACTIVE)');
+
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 1, 'Додати новий вид депозиту', '', '', 'ONCE', 'Створити новий вид депозиту?', '', '', '', '/barsroot/udeposit_admin/dpuvidddetails.aspx?mode=1', null);
+  bars_metabase.add_nsifunction(l_tabid, 1, 'Додати новий вид депозиту', '', '', 'ONCE', 'Створити новий вид депозиту?', '', '', '', '/barsroot/udeposit_admin/dpuvidddetails.aspx?mode=1', 4 );
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 2, 'Перегляд/Редагування видуу депозиту', '', '', 'ONCE', '', '', '', '', '/barsroot/udeposit_admin/dpuvidddetails.aspx?mode=1'||chr(38)||'vidd=:VIDD_ID', null);
+  bars_metabase.add_nsifunction(l_tabid, 2, 'Перегляд/Редагування видуу депозиту', '', '', 'ONCE', '', '', '', '', '/barsroot/udeposit_admin/dpuvidddetails.aspx?mode=1&vidd=:VIDD_ID', 8 );
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 3, 'Видалити вид депозиту', 'DPU_UTILS.DEL_SUBTYPE(:VIDD_ID)', '', 'EACH', 'Видалити типу депозиту?', '', '', '', '', null);
+  bars_metabase.add_nsifunction(l_tabid, 3, 'Видалити вид депозиту', 'DPU_UTILS.DEL_SUBTYPE(:VIDD_ID)', '', 'EACH', 'Видалити вид депозиту?', '', '', '', '', 5 );
+
+  -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 4, 'Експорт вид депозиту в SQL-сценарій', '', '', '', 'Експортувати вид депозиту в SQL-сценарій?', 'Done!', '', '', 'sPar=[EXEC=>SELECTED_ONE][PROC=>DPU_UTILS.EXPRT_SUBTYPE( :VIDD_ID, :p_script, :p_file_nm )][OUT_PARAMS=>:p_script(SEM=ФАЙЛ,TYPE=CLOB),:p_file_nm(SEM=Назва файлу,TYPE=fileName)]', 156 );
 
   -- восстанавливаем ссылки сложных полей других таблиц
   for i in 1..l_extrnval.count loop

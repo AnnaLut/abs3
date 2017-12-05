@@ -43,13 +43,13 @@ begin
        SELECT a.*
          INTO ab
          FROM accounts a
-        WHERE a.NLS = nbs_ob22_null ('6110', 'F4') AND a.dazs IS NULL;
+        WHERE a.NLS = nbs_ob22_null (case when newnbs.g_state= 1 then '6510' else'6110' end, 'F4') AND a.dazs IS NULL;
     EXCEPTION
        WHEN NO_DATA_FOUND
        THEN
           raise_application_error (
              -20203,
-             'Не знайдено рахунок доходів NBS = 6110 OB22 = F4');
+             'Не знайдено рахунок доходів NBS = '||case when newnbs.g_state= 1 then '6510' else'6110' end||' OB22 = F4');
     END;
    -- Создание документа по 2924
    begin

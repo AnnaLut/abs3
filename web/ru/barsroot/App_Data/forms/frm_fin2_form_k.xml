@@ -137,8 +137,8 @@
           select '1' as n, 'Валовий (прибуток\збиток)' as txt, '2090' as rr,  NVL(SUM(decode(KOD,'2090',S,0)),0) SL, '2000+2010-2050-2070+2095' as rr2,  NVL(SUM(decode(KOD,'2090',0,decode(KOD,'2050',-1,'2070',-1,1)*S)),0) SR
           from fin_rnk    where OKPO=:OKPO and FDAT=:DAT and idf=:nForm   and  kod in ('2090','2095','2000','2010','2050','2070')
           UNION ALL
-          select '2' as n, 'Фінансовий результат від операційної діяльності (прибуток\збиток)' as txt, '2190' as rr,  NVL(SUM(decode(KOD,'2190',S,0)),0) SL, '2090-2095+2105+2110+2120-2130-2150-2180+2195' as rr2,  NVL(SUM(decode(KOD,'2190',0,decode(KOD,'2095',-1,'2130',-1,'2150',-1,'2180',-1,'2195',1,1)*S)),0) SR
-          from fin_rnk   where OKPO=:OKPO and FDAT=:DAT and idf=:nForm  and  kod in ('2190','2090','2095','2105','2110','2120','2130','2150','2180','2195')
+          select '2' as n, 'Фінансовий результат від операційної діяльності (прибуток\збиток)' as txt, '2190' as rr,  NVL(SUM(decode(KOD,'2190',S,0)),0) SL, case when bars.newnbs.get_state () = 1 then '2090-2095+2106+2110+2120-2130-2150-2180+2195' else '2090-2095+2105+2110+2120-2130-2150-2180+2195' end as rr2,  NVL(SUM(decode(KOD,'2190',0,decode(KOD,'2095',-1,'2130',-1,'2150',-1,'2180',-1,'2195',1,1)*S)),0) SR
+          from fin_rnk   where OKPO=:OKPO and FDAT=:DAT and idf=:nForm  and  kod in ('2190','2090','2095',case when bars.newnbs.get_state () = 1 then '2106' else '2105' end ,'2110','2120','2130','2150','2180','2195')
           UNION ALL
           select '3' as n, 'Фінансовий результат до оподаткування (прибуток\збиток)' as txt, '2290' as rr,  NVL(SUM(decode(KOD,'2290',S,0)),0) SL, '2190-2195+2200+2220+2240-2250-2255-2270+2275+2295' as rr2,  NVL(SUM(decode(KOD,'2290',0,decode(KOD,'2195',-1,'2250',-1,'2255',-1,'2270',-1,'2295',1,1)*S)),0) SR
           from fin_rnk   where OKPO=:OKPO and FDAT=:DAT and idf=:nForm and  kod in ('2290','2190','2195','2200','2220','2240','2250','2255','2270','2275','2295')
@@ -265,16 +265,16 @@
         </sql>
         <parameters>
           <parameter name="OKPO"  type="QueryString" datatype="Int64" >
-        </parameter>
+          </parameter>
           <parameter name="DAT"  type="QueryString" datatype="DateTime">
-        </parameter>
+          </parameter>
           <parameter name="nForm" type="QueryString" datatype="Int64">
-        </parameter>
+          </parameter>
         </parameters>
       </datasource>
 
-     <!--Опис колонок-->
-      
+      <!--Опис колонок-->
+
       <fields>
         <field name="TXT" datatype="String" key="false" >
           <column caption="Стаття"  show="true" width="170" />
@@ -284,28 +284,28 @@
           <column caption="Код рядка, що порівнюэться"  show="true" width="80" />
         </field>
 
-          <field name="S" datatype="Decimal"  key="false" >
-            <column caption="та його значення"  show="true" width="80" />
-          </field>
+        <field name="S" datatype="Decimal"  key="false" >
+          <column caption="та його значення"  show="true" width="80" />
+        </field>
 
-            <field name="RR2" datatype="String"  key="false" >
-              <column caption="Коди рядків, з якими порівнюються"  show="true" />
-            </field>
+        <field name="RR2" datatype="String"  key="false" >
+          <column caption="Коди рядків, з якими порівнюються"  show="true" />
+        </field>
 
-              <field name="S2" datatype="Decimal"  key="false" >
-                <column caption="та їх сумарне значення"  show="true" width="80" />
-              </field>
-        
+        <field name="S2" datatype="Decimal"  key="false" >
+          <column caption="та їх сумарне значення"  show="true" width="80" />
+        </field>
 
-          <field name="RIZ" datatype="Decimal"  key="false" >
-            <column caption="Відхилення"  show="true" width="80" />
-            <!--<layout>
+
+        <field name="RIZ" datatype="Decimal"  key="false" >
+          <column caption="Відхилення"  show="true" width="80" />
+          <!--<layout>
               <colors scope="Column">
                 <color color="clRed" operation="Equal" value="0.00"/>
                 <color color="clBlue" operation="Great" value="0.00"/>
               </colors>
             </layout>-->
-          </field>
+        </field>
 
         <field name="COL" datatype="Int64" key="false" >
           <column caption="COL"  show="false" />
@@ -317,9 +317,9 @@
         </field>
 
       </fields>
-      
-      
+
+
     </grid>
-    
+
   </grids>
 </xmlform>

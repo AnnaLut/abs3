@@ -9,11 +9,13 @@ PROMPT *** Create  procedure P_F32SB ***
 
   CREATE OR REPLACE PROCEDURE BARS.P_F32SB (Dat_ DATE, sheme_ VARCHAR2 DEFAULT 'C' )  IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% FILE NAME   :	otcn.sql
-% DESCRIPTION :	ќтчетность —берЅанка: формирование файлов
-% COPYRIGHT   :	Copyright UNITY-BARS Limited, 2001.  All Rights Reserved.
-% VERSION     : 13/01/2016 (13/01/2014, 13.05.2011)
+% FILE NAME   :    otcn.sql
+% DESCRIPTION :    ќтчетность —берЅанка: формирование файлов
+% COPYRIGHT   :    Copyright UNITY-BARS Limited, 2001.  All Rights Reserved.
+% VERSION     :    13/05/2017 (08/02/2016)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 08,02.2016 - вместо пол€ MFO из SPECPARAM_INT будем использовать поле
+%              MFO из таблицы CUSTBANK
 % 13.01.2016 - убрал мусор
 % 13.01.2014 - исключаем проводки перекрыти€ корректирующих за декабрь
 % 13.05.2011 - дл€ ƒонецка(335106) будем формировать показатели если код
@@ -72,7 +74,7 @@ f33_     SMALLINT;
 userid_  Number;
 sql_acc_ varchar2(2000):='';
 sql_doda_ varchar2(200):='';
-ret_	 number;
+ret_     number;
 tobo_    accounts.tobo%TYPE;
 nms_     accounts.nms%TYPE;
 comm_    rnbu_trace.comm%TYPE;
@@ -91,16 +93,12 @@ CURSOR Saldo IS
           s.dos96, s.dosq96, s.kos96, s.kosq96,
           s.dos99, s.dosq99, s.kos99, s.kosq99,
           s.doszg, s.koszg, s.dos96zg, s.kos96zg,
-          a.tobo, a.nms, NVL(trim(sp.ob22),'00'), nvl(trim(sp.mfo),'000000')
-    FROM  otcn_saldo s, otcn_acc a, specparam_int sp
-    WHERE s.acc=a.acc
-      and s.acc=sp.acc(+);
------------------------------------------------------------------------
-CURSOR BaseL IS
-    SELECT kodp, nbuc, SUM (znap)
-    FROM rnbu_trace
-	WHERE userid=userid_
-    GROUP BY kodp, nbuc;
+          a.tobo, a.nms, NVL(trim(a.ob22),'00'),
+          nvl(trim(cb.mfo), nvl(trim(sp.mfo),'000000'))
+    FROM  otcn_saldo s, accounts a, specparam_int sp, custbank cb
+    WHERE s.acc = a.acc
+      and a.rnk = cb.rnk(+)
+      and s.acc = sp.acc(+);
 
 BEGIN
 -------------------------------------------------------------------
@@ -208,18 +206,22 @@ OPEN Saldo;
 
    IF pr_ = 0 and se_ <> 0 THEN
       dk_ := IIF_N(se_,0,'1','2','2');
+      
       kodp_ := dk_ || '0' || nbs_ || zz_ || mfo_fa_ || lpad(kv_,3,'0');
       znap_ := TO_CHAR(ABS(se_)) ;
-      INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, acc, comm, tobo, nbuc) VALUES
-                             (nls_, kv_, data_, kodp_,znap_, acc_, comm_, tobo_, nbuc_) ;
+      
+      INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, acc, comm, tobo, nbuc, rnk) VALUES
+                             (nls_, kv_, data_, kodp_,znap_, acc_, comm_, tobo_, nbuc_, rnk_) ;
    END IF ;
 
    IF pr_ = 0 and sn_ <> 0 THEN
       dk_ := IIF_N(sn_,0,'1','2','2');
+      
       kodp_ := dk_ || '1' || nbs_ || zz_ || mfo_fa_ || lpad(kv_,3,'0');
       znap_ := TO_CHAR(ABS(sn_)) ;
-      INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, acc, comm, tobo, nbuc) VALUES
-                             (nls_, kv_, data_, kodp_,znap_, acc_, comm_, tobo_, nbuc_) ;
+      
+      INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, acc, comm, tobo, nbuc, rnk) VALUES
+                             (nls_, kv_, data_, kodp_,znap_, acc_, comm_, tobo_, nbuc_, rnk_) ;
    END IF ;
 
 END LOOP;
@@ -227,16 +229,10 @@ CLOSE SALDO;
 ---------------------------------------------------
 DELETE FROM tmp_irep WHERE kodf = '32' AND datf = Dat_;
 ---------------------------------------------------
-OPEN BaseL;
-LOOP
-   FETCH BaseL INTO  kodp_, nbuc_, znap_;
-   EXIT WHEN BaseL%NOTFOUND;
-   INSERT INTO tmp_irep
-        (kodf, datf, kodp, znap, nbuc)
-   VALUES
-        ('32', Dat_, kodp_, znap_, nbuc_);
-END LOOP;
-CLOSE BaseL;
+INSERT INTO tmp_irep (kodf, datf, kodp, znap, nbuc)
+select '32', Dat_, kodp, SUM (znap), nbuc
+FROM rnbu_trace
+GROUP BY kodp, nbuc;
 ------------------------------------------------------------------
 END p_f32sb;
 /

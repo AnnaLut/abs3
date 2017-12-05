@@ -2658,14 +2658,21 @@ BEGIN
 				ELSE l_ob22 := '29';
         END IF;
 
-    begin
+     begin
+     if newnbs.g_state = 0 then 
      select nls,      substr(nms,1,38)
        into opr.nlsb, opr.nam_b
        from accounts
       where   nls =  NBS_OB22_NULL('6110', l_ob22);
-    exception when no_data_found then bars_audit.info('Податок неможливо зняти 3622/51 не знайдено');
-    end;
-
+     else
+     select nls,      substr(nms,1,38)
+       into opr.nlsb, opr.nam_b
+       from accounts
+      where   nls =  NBS_OB22_NULL('6510', l_ob22);
+     end if;
+     exception when no_data_found then bars_audit.info('Податок неможливо зняти 3622/51 не знайдено');
+     end;
+     
      -- vob3_  прописали код тарифа
 
 

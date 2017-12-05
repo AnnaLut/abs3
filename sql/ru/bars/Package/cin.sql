@@ -1,3 +1,57 @@
+CREATE OR REPLACE PACKAGE BARS.CIN IS
+
+/*
+26-09-2016 Коррекция вюшки 
+17.12.2014 Процедура предварительной подготовки даннях для расчета за прошлый кал.месяц
+ 11.03.2013
+ Заявка № 719. Возможность расчетов комиссии (прогноз+финиш) по одному или всем  клиентам
+ Заявка № 721. Расчет абонплаты
+ Заявка № 722. Расширить  тариф Б1.
+*/
+
+ cRnk    number;
+ DAT_BEG date  ;
+ DAT_END date  ;
+
+ FUNCTION B return date   ;
+ FUNCTION E return date   ;
+ FUNCTION R return number ;
+
+ --- корректировка сумм комисии по протоколу 
+ procedure UPD1 ( p_RI varchar2, p_kc0 number,  p_ka1 number,  p_ka2 number,  p_kb1 number, p_kb2 number, p_kb3 number); 
+--------------------------------------------------------------------
+-- SK_A1 : Pасчет суммы (или комиссии)  по одному доп реквизиту
+--------------------------------------------------------------------
+ FUNCTION SK_A1
+ ( p_REF   IN operw.ref%type,
+   p_TAG   IN operw.TAG%type,
+   p_mode  in int
+ ) return  number;
+
+
+--------------------------------------------------------------------
+-- K_A2 : Pасчет комиссии за доставку
+--------------------------------------------------------------------
+ FUNCTION K_A2  (p_REF IN oper.ref%type ) return number;
+
+-------------------------------------
+ PROCEDURE PREV_DOK ( p_dat1 date, p_dat2 date ) ; -- процедура предварительного среза информации из таблиц OPER +ARC_RRP за прошлый календарный мес
+-------------------------------------
+
+ PROCEDURE KOM_ALL
+( p_mode int,
+  s_Dat1 varchar2,
+  s_Dat2 varchar2,
+  p_RNK cin_cust.rnk%type
+) ;
+--------------
+ PROCEDURE  KOM_GOU( p_mode int);
+
+END CIN;
+
+GRANT execute ON BARS.CIN TO BARS_ACCESS_DEFROLE;
+
+/
 CREATE OR REPLACE PACKAGE BODY BARS.CIN IS
   k_branch  varchar2(30);
 
@@ -8,9 +62,12 @@ CREATE OR REPLACE PACKAGE BODY BARS.CIN IS
 --В0 : Абонплата
 
 /*
- 29-04-2016 Sta Корр разрешениі только 1 раб день
+ 15.11.2017 Пееход на нов.план счетов
+r020 = '6119'; ob22 = '16'  ;  TRANSFER_2017 : 6119 =>6519 , об22 не изм в новом
 
- 02-03-2016 Sta Убрала корр проводки в связи с Т0
+
+
+ 20.09.2016 Переменные пакеджа - в пул гл.переменных. т.к. в ВЕБ обрывается сессия.
  20.01.2015 Расчет комис Б3 за холостой выезд - c Выводом в конечную таблицу CIN_TKR
  12.01.2015 Перекриття 3739 та 3578
  25.12.2014 Штрафы. Предвар Оброр док через таблицу
@@ -38,9 +95,14 @@ CREATE OR REPLACE PACKAGE BODY BARS.CIN IS
 
 */
 
- FUNCTION B return date   is begin   return cin.DAT_BEG; end B;
- FUNCTION E return date   is begin   return cin.DAT_END; end E;
- FUNCTION R return number is begin   return cin.cRNK;    end R;
+ FUNCTION B return date   is begin   return to_date   (pul.Get_Mas_Ini_Val('sFdat1'), 'dd.mm.yyyy'); end B;
+ FUNCTION E return date   is begin   return to_date   (pul.Get_Mas_Ini_Val('sFdat2'), 'dd.mm.yyyy'); end E;
+ FUNCTION R return number is begin   return to_number (pul.Get_Mas_Ini_Val('RNK'   )              ); end R;
+
+ --- корректировка сумм комисии по протоколу 
+ procedure UPD1 ( p_RI varchar2, p_kc0 number,  p_ka1 number,  p_ka2 number,  p_kb1 number, p_kb2 number, p_kb3 number) is
+begin   update CIN_TKR set  kc0 = p_kc0 , ka1 = p_ka1 , ka2 = p_ka2 , kb1=p_kb1 , kb2 = p_kb2 , kb3 = p_kb3 where rowid = p_RI;
+end UPD1;
 
 --------------------------------------------------------------------
 -- SK_A1 : Pасчет суммы (или комиссии)  по одному доп реквизиту
@@ -92,6 +154,8 @@ begin
  end if;
 
  l_dat11 := l_dat2 + 1;
+
+ bc.GO ('300465');
 
  logger.info ('CIN.PREV_DOK/1-начало: dat1='|| to_char(l_dat1, 'dd.mm.yyyy') || ' , dat2= ' || to_char(l_dat2, 'dd.mm.yyyy') );
 
@@ -152,6 +216,11 @@ begin
   cin.cRNK    := l_rnk   ;
   cin.DAT_BEG := p_Dat1  ;
   cin.DAT_END := p_Dat2  ;
+
+  PUL.Set_Mas_Ini( 'RNK'   , to_char(l_RNK), 'RNK' );
+  PUL.Set_Mas_Ini( 'sFdat1', s_Dat1,  'sFdat1' );
+  PUL.Set_Mas_Ini( 'sFdat2', s_Dat2,  'sFdat1' );
+
   ---------------------------------------------------------------
   If p_mode = 3 then RETURN; end if;  --Холостой вход в процедуру. Использовать для отложенной корректировки протокола
   ----------------------------------------------------------------
@@ -272,7 +341,7 @@ If p_mode = 1 then
    --архив расчетов
    insert into cin_tkr
          (RNK,NMK,NLS_2909,ID,NAME,MFO,NLS,REF,S,KA2,KA1,KB2,KB1,DAT1,DAT2,VDAT,KC0,A2,B1, SB1_MIN, B2,C0,NLSR,REC,SR,BRANCH,  b3,kb3,s3 )
-   select RNK,NMK,NLS_2909,ID,NAME,MFO,NLS,REF,S,KA2,KA1,KB2,KB1,DAT1,DAT2,VDAT,KC0,A2,B1, SB1_MIN, B2,C0,NLSR,REC,SR,BRANCH,  b3,kb3,s3
+   select RNK,NMK,NLS_2909,ID,NAME,MFO,NLS,REF,S,KA2,KA1,KB2,KB1,DAT1,DAT2,VDAT,KC0,A2,B1, SB1_MIN, B2,C0,NLSR,REC,SR,BRANCH,  b3,kb3,s3 
    from cin_kom1 u   where l_RNK in (0, u.rnk);
 
 end if;
@@ -293,12 +362,12 @@ PROCEDURE  KOM_GOU( p_mode int) is
   l_tt2  oper.tt%type       := 'CS2';
   aa61   accounts%rowtype   ;
   ----------------------------
-  l_ob22 specparam_int.ob22%type :='16';
+  SBO sb_ob22%Rowtype       ; --   r020 = '6119'; ob22 = '16'  ;  TRANSFER_2017 : 6119 =>6519 , об22 не изм в новом
+  ---------------------------
   l_rec  arc_rrp.REC%type   ;
   l_sos  oper.sos%type      ;
   n_Tmp  int                ;
   l_id_o oper.id_o%type     := '******';
-  l_fdat1 date ; 
   ---------------------------
 begin
 
@@ -318,7 +387,7 @@ begin
                    sk_  => null      , data_ => gl.BDATE, datp_=> gl.bdate, nam_a_=> k.nam_A  , nlsa_ => k.nlsA ,
                   mfoa_ => gl.aMfo   , nam_b_=> k.nam_B , nlsb_=> k.nlsB  , mfob_ => gl.aMfo  , nazn_ => r_oper.nazn,
                   d_rec_=> null      ,                    id_a_=> k.OKPO  , id_b_ => gl.aOKPO , id_o_ => null   ,
-                  sign_ => null      , sos_  => 1       , prty_=> null    , uid_  => null  )  ;
+                  sign_ => null      , sos_  => 1       , prty_=> null    , uid_  => null     )  ;
        gl.payv(0, r_oper.REF, gl.bDATE , l_TT1, 1 , 980 , k.nlsA, k.s, 980, k.nlsB , k.S   )  ;
     ---gl.pay (2, r_oper.REF, gl.bDATE ) ;
      end loop;
@@ -329,16 +398,23 @@ begin
   select max(dat2) into p_Dat2 from cin_tkr where ref_kom is null;
   If p_dat2 is null then      raise_application_error(-20100, 'Не выполнен финальный расчет' ) ;  end if;
 
-  r_oper.vdat := gl.bdate ;
-  r_oper.vob :=  6 ;
+  If to_number ( to_char( gl.bdate, 'DD') ) < 10 and to_char (p_dat2, 'yyyymm') < to_char ( gl.bdate, 'yyyymm') then
+     select max(fdat) into  r_oper.vdat from fdat where fdat <= p_dat2;  r_oper.vob := 96 ;
+  else                      r_oper.vdat := gl.bdate ;                    r_oper.vob :=  6 ;
+  end if;
 
-  select max(fdat) into l_fdat1 from fdat where fdat < gl.bdate;
-  If to_char(l_fdat1,'yyyymm') < to_char(gl.bdate,'yyyymm') then r_oper.vdat := l_fdat1; r_oper.vob :=  96 ;  end if;
-  -------------------
-  begin
-      select * into aa61 from accounts where kv=980 and nbs= '6119' and dazs is null and ob22 = l_ob22 and rownum = 1;
+
+  ------------------------------- TRANSFER_2017 : 6119 =>6519 , об22 не изм в новом
+  begin select * into SBO from sb_ob22 where r020 = '6519' and ob22 ='16' and d_close is null;  
+  EXCEPTION WHEN NO_DATA_FOUND THEN 
+        begin select * into SBO from sb_ob22 where r020 = '6119' and ob22 ='16' and d_close is null;
+        EXCEPTION WHEN NO_DATA_FOUND then raise_application_error(-20100, 'Не знайдено аналітики в SB_Ob22 рах R020=6519(6119), Ob22=16 ' ) ;
+        end;
+  end ;
+
+  begin select * into aa61 from accounts where kv=980 and nbs = SBO.r020 and dazs is null and ob22 = SBO.ob22 and rownum = 1;
       aa61.nms := substr(aa61.nms,1,38);
-  EXCEPTION WHEN NO_DATA_FOUND THEN  raise_application_error(-20100, 'Не найден счет 6119/'||l_ob22|| ' в ГОУ ' ) ;
+  EXCEPTION WHEN NO_DATA_FOUND       THEN raise_application_error(-20100, 'Не знайдено особового рах. "За послуги служби інкасації" '|| SBO.R020 || '.'|| SBO.OB22 || '  в ГОУ ' ) ;
   end;
 
   r_cust.rnk  := -1  ;
@@ -388,11 +464,9 @@ begin
 
        r_oper.nam_b := substr(r_br.name,1,38);
 
---- OLD:  Структура рахунку має бути така:        ААААК00НН00FFF
----    r_oper.nlsb  := vkrzn( substr(k.MFO,1,5), '6119000'|| l_ob22 ||'00'||substr (k.branch,12,3)  );
-
---- 20.03.15  Теперь все доходы должны поступать на один счет:  6119К001600000
-       r_oper.nlsb  := vkrzn( substr(k.MFO,1,5), '6119000'|| l_ob22 ||'00000' );
+--- OLD:  Структура рахунку має бути така:        ААААК00НН00FFF-    r_oper.nlsb  := vkrzn( substr(k.MFO,1,5), '6119000'|| l_ob22 ||'00'||substr (k.branch,12,3)  );
+--- 10.11.2017  Теперь все доходы должны поступать на один счет:  6519К001600000 ( 6119*001600000 )
+       r_oper.nlsb  := vkrzn( substr(k.MFO,1,5), SBO.R020 ||'000'|| SBO.ob22 ||'00000' );
 
     end if;
     s_GOU := round( k.KC0 * r_cust.PC0
@@ -425,7 +499,7 @@ begin
                     sk_ => null        , data_ => gl.BDATE    , datp_ => gl.bdate   , nam_a_=> r_oper.nam_a, nlsa_ => r_cust.nls_3739,
                    mfoa_=> gl.aMfo     , nam_b_=> r_oper.nam_b, nlsb_ => r_oper.nlsb, mfob_ => k.mfo       , nazn_ => r_oper.nazn    ,
                   d_rec_=> r_oper.d_rec, id_a_=> gl.aOKPO     , id_b_ => r_oper.id_b, id_o_ => l_id_o      ,
-                  sign_ => null        , sos_  =>  1          , prty_ => null       , uid_  => NULL )      ;
+                  sign_ => null        , sos_  =>  1          , prty_ => null       , uid_  => NULL        )      ;
 
         paytt(0, r_oper.REF, gl.bDATE, l_TT2, 1, 980, r_cust.nls_3739, s_RU , 980, r_oper.nlsb   , S_ru) ;
 
@@ -435,7 +509,7 @@ begin
                    sk_  => null       , data_ => gl.BDATE    ,  datp_=> gl.bdate  , nam_a_=> r_oper.nam_a, nlsa_ => r_cust.nls_3739 ,
                   mfoa_ => gl.aMfo    , nam_b_=> aa61.nms    ,  nlsb_=> aa61.nls  , mfob_ => gl.aMfo     , nazn_ => r_oper.nazn,
                   d_rec_=> null       ,                         id_a_=> gl.aOKPO  , id_b_ => gl.aOKPO    , id_o_ => null   ,
-                  sign_ => null       , sos_  => 1           ,  prty_=> null      , uid_  => null  )     ;
+                  sign_ => null       , sos_  => 1           ,  prty_=> null      , uid_  => null        )     ;
 
        If s_RU >0 then  gl.payv(0, r_oper.REF, gl.bDATE, l_TT1, 1, 980, r_cust.nls_3739, s_RU, 980, aa61.nls  , S_RU );
           update opldok set txt ='Комiciя служби iнкасацiї площадки ОБ' where ref = gl.aRef and stmt= gl.astmt;
@@ -456,4 +530,3 @@ end KOM_GOU;
 
 END CIN;
 /
-

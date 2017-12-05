@@ -345,9 +345,21 @@ namespace CustomerList
                 string table = string.Empty;
                 string where = string.Empty;
 
+                Bars.WebServices.NewNbs ws = new Bars.WebServices.NewNbs();
+                string a = "";
+                if (ws.UseNewNbs())
+                {
+                    a = "('2620','2630')";
+                }
+                else
+                {
+                    a = "('2620','2630','2635')";
+                }
+
                 string sql = "DECODE(a.DAZS,NULL,1,2) MOD," +
                     "a.acc ACC," +
                     "a.nls NLS," +
+                    "a.nlsalt NLSALT," +
                     "a.lcv LCV," +
                     "a.rnk RNK," +
                     "a.nms NMS," +
@@ -366,7 +378,7 @@ namespace CustomerList
                     "a.blkk as BLKK," +
                     "a.ostb OSTB," +
                     "a.ob22 OB22," +
-                    "a.VID VID,"+
+                    "a.VID VID," +
                     "a.daos as DAOS_SORT," +
                     "a.dapp as DAPP_SORT," +
                     "a.dazs as DAZS_SORT," +
@@ -380,11 +392,12 @@ namespace CustomerList
                                 ELSE
                                     0
                             END
-                        FROM DUAL) AS IS_DEAD," + 
-                    "case when a.nbs in ('2620','2630','2635') then acrn.fproc(a.acc) else null end PERCENT";
+                        FROM DUAL) AS IS_DEAD," +
+                    "case when a.nbs in " + a + " then acrn.fproc(a.acc) else null end PERCENT";
 
                 // eq
-                if (data[18] == "1") {
+                if (data[18] == "1")
+                {
                     sql += ", gl.p_icurval(a.kv, (a.ostc + decode(greatest(a.dapp, nvl(a.dapp, a.dappq)),bankdate, a.dos, 0) - decode(greatest(a.dapp, nvl(a.dapp, a.dappq)),bankdate, a.kos, 0)), bankdate) OSTEQ, " +
                            "  gl.p_icurval(a.kv, decode(greatest(a.dapp, nvl(a.dapp, a.dappq)), bankdate, a.dos, 0), bankdate) DOSEQ," +
                            "  gl.p_icurval(a.kv, decode(greatest(a.dapp, nvl(a.dapp, a.dappq)), bankdate, a.kos, 0), bankdate) KOSEQ, " +
@@ -445,22 +458,22 @@ namespace CustomerList
 
                     table = "V_ACCOUNTS";
                 }
-                else if(type=="6")
+                else if (type == "6")
                 {
-                   SetRole(base_role);
-                   SetParameters("nls", DB_TYPE.Varchar2, nls, DIRECTION.Input);
-                   SetParameters("lcv", DB_TYPE.Varchar2, lcv, DIRECTION.Input);
-                   table = "V_ACCOUNTS";
-                   where = @"a.accc  in(select acc from accounts where nls=:nls
+                    SetRole(base_role);
+                    SetParameters("nls", DB_TYPE.Varchar2, nls, DIRECTION.Input);
+                    SetParameters("lcv", DB_TYPE.Varchar2, lcv, DIRECTION.Input);
+                    table = "V_ACCOUNTS";
+                    where = @"a.accc  in(select acc from accounts where nls=:nls
                             and kv = (select kv from tabval where lcv = :lcv))";
 
                 }
-                else if(type=="7")
+                else if (type == "7")
                 {
                     string stmt = Convert.ToString(SQL_SELECT_scalar("select pul.Get_Mas_Ini_Val ('WACC') stmt from dual "));
                     SetRole(base_role);
                     table = "V_ACCOUNTS";
-                    if(String.IsNullOrEmpty(stmt)|| stmt==null)
+                    if (String.IsNullOrEmpty(stmt) || stmt == null)
                     {
                         where = "1=0";
                     }
@@ -470,7 +483,7 @@ namespace CustomerList
                     }
 
                 }
-                else if(type=="8")
+                else if (type == "8")
                 {
                     SetRole("WR_TOBO_ACCOUNTS_LIST");
                     if (localBD == "1")
@@ -522,7 +535,7 @@ namespace CustomerList
                     "a.dazs as DAZS_SORT";
                     if (Session["prev_acc_data"] != null)
                     {
-                        var dataPrev = (string[]) Session["prev_acc_data"];
+                        var dataPrev = (string[])Session["prev_acc_data"];
                         if (string.IsNullOrEmpty(data[0]))
                             data[0] = dataPrev[0];
                         data[1] = dataPrev[1];
@@ -566,7 +579,7 @@ namespace CustomerList
             }
         }
 
-        [WebMethod(EnableSession =true)]
+        [WebMethod(EnableSession = true)]
         public string total_currency()
         {
 

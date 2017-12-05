@@ -6,9 +6,8 @@ Application Description: Для аналитических функций
 .data VIEWINFO
 0000: 6F00000001000000 FFFF01000D004347 5458566965775374 6174650400010000
 0020: 0000000000CE0000 002C000000020000 0003000000000000 0002020000F8FFFF
-0040: FFE2FFFFFFFFFFFF FF000000007C0200 004D010000010000 0001000000010000
-0060: 000F4170706C6963 6174696F6E497465 6D02000000075769 6E646F7773034241
-0080: 4C
+0040: FFE1FFFFFFFFFFFF FF000000007C0200 004D010000010000 0001000000010000
+0060: 000F4170706C6963 6174696F6E497465 6D00000000
 .enddata
 .data DT_MAKERUNDLG
 0000: 0200000000001D51 3A5C424152533938 5C4C494252415259 5C42415253303135
@@ -287,21 +286,21 @@ Application Description: Для аналитических функций
 						! nMode = -1 Разрывы: RNBU_TRACE_2
 								 ANI-1. Анализ вiдповiдностi АКТ-ПАС +   ANI-10. Анализ вiдповiдностi Проц.АКТ-ПАС 
 						! Case 99 
-							                                                                         If SalStrTrimX( strPar01 ) = ''
-								                                                                         Set RNBU_TRACEX = 'RNBU_TRACE1'
-							                                                                         Else 
-								                                                                         Set RNBU_TRACEX = SalStrTrimX( strPar01 )
-							                                                                         Call SalCreateWindow( GAP, hWndMDI, nPar,NUMBER_Null, "",0,"",
+							                                                                          If SalStrTrimX( strPar01 ) = ''
+								                                                                          Set RNBU_TRACEX = 'RNBU_TRACE1'
+							                                                                          Else 
+								                                                                          Set RNBU_TRACEX = SalStrTrimX( strPar01 )
+							                                                                          Call SalCreateWindow( GAP, hWndMDI, nPar,NUMBER_Null, "",0,"",
 									FALSE,TRUE,FALSE,FALSE,FALSE,0,"",1,"", DATETIME_Null)
-							                                                                         Break 
+							                                                                          Break 
 						! !!!!!!!!!!!!!!!
 						Case 2 ! ANI-2.Платежный календарь по КС
 							Call Sel00V(hWndMDI,4,0,"","")
 							Break
 						! Case 3 ! Трансф.цены Устарелая версия
 								         ANI-3. Реальнi та трансфернi цiни АКТ-ПАС
-							                                                                                    Call SalCreateWindow( TRA, hWndMDI, nPar,NUMBER_Null, "",0,"",TRUE,FALSE,FALSE,FALSE,FALSE,"",1,"")
-							                                                                                    Break 
+							                                                                                     Call SalCreateWindow( TRA, hWndMDI, nPar,NUMBER_Null, "",0,"",TRUE,FALSE,FALSE,FALSE,FALSE,"",1,"")
+							                                                                                     Break 
 						Case 31 ! ANI-31. Установка трансферних цiн на проц.АКТ-ПАС
 							Call SalCreateWindow( TRC, hWndMDI, nMode, nPar, strPar01, strPar02 )
 							Break
@@ -323,15 +322,15 @@ Application Description: Для аналитических функций
 								Call SalCreateWindow( BAL, hWndParent, nMode, nPar, strPar01, strPar02)
 							Break
 						! Case 12 ! Архив-Баланс в структурі показників ОБ
-							                                                                                        If nHaveTOBO = 2
-								                                                                                        If IsWindow( hAR )
-									                                                                                        Call SalDestroyWindow( hAR )
-								                                                                                        Set hAR = SalCreateWindow( BAX, hWndParent, nMode, nPar, strPar01, strPar02)
-							                                                                                        Break 
+							                                                                                         If nHaveTOBO = 2
+								                                                                                         If IsWindow( hAR )
+									                                                                                         Call SalDestroyWindow( hAR )
+								                                                                                         Set hAR = SalCreateWindow( BAX, hWndParent, nMode, nPar, strPar01, strPar02)
+							                                                                                         Break 
 						! Case 13 ! TECT Sql - формул
 							! If nHaveTOBO = 2
-							                                                                                                    Call SalCreateWindow( FRM, hWndParent, nMode, nPar, strPar01, strPar02)
-							                                                                                                    Break 
+							                                                                                                     Call SalCreateWindow( FRM, hWndParent, nMode, nPar, strPar01, strPar02)
+							                                                                                                     Break 
 						Case 22 ! для ОБ + Гляд "на дату"  в анал.форме "Аналiз балансу за перiод" (SNP)
 							If nHaveTOBO = 2
 								Call SalCreateWindow( OB2, hWndMDI, nMode, nPar, strPar01, strPar02)
@@ -506,210 +505,210 @@ Application Description: Для аналитических функций
 			Text Color: Default
 			Background Color: Default
 .end
-		                                                                               Description: 
-		                                                                               Named Menus 
-		                                                                               Menu 
-		                                                                               Tool Bar 
-			                                                                               Contents 
-				                                                                               Pushbutton: pbIns
-					                                                                               Message Actions 
-						                                                                               On SAM_Create
-							                                                                               Set strTip = 'Добавить новую запись'
-						                                                                               On SAM_Click
-							                                                                               Call SalSendMsg( hWndLost, UM_Insert, 0, 0 )
-				                                                                               Pushbutton: pbDel
-					                                                                               Message Actions 
-						                                                                               On SAM_Create
-							                                                                               Set strTip = 'Пометить/Снять пометку на удаление'
-						                                                                               On SAM_Click
-							                                                                               Call SalSendMsg( hWndLost, UM_Delete, 0, 0 )
-				                                                                               Pushbutton: pbRefresh
-					                                                                               Message Actions 
-				                                                                               Pushbutton: pbUpdate
-					                                                                               Message Actions 
-						                                                                               On SAM_Create
-							                                                                               Set strTip = 'Внести изменения в Базу Данных'
-						                                                                               On SAM_Click
+		                                                                                Description: 
+		                                                                                Named Menus 
+		                                                                                Menu 
+		                                                                                Tool Bar 
+			                                                                                Contents 
+				                                                                                Pushbutton: pbIns
+					                                                                                Message Actions 
+						                                                                                On SAM_Create
+							                                                                                Set strTip = 'Добавить новую запись'
+						                                                                                On SAM_Click
+							                                                                                Call SalSendMsg( hWndLost, UM_Insert, 0, 0 )
+				                                                                                Pushbutton: pbDel
+					                                                                                Message Actions 
+						                                                                                On SAM_Create
+							                                                                                Set strTip = 'Пометить/Снять пометку на удаление'
+						                                                                                On SAM_Click
+							                                                                                Call SalSendMsg( hWndLost, UM_Delete, 0, 0 )
+				                                                                                Pushbutton: pbRefresh
+					                                                                                Message Actions 
+				                                                                                Pushbutton: pbUpdate
+					                                                                                Message Actions 
+						                                                                                On SAM_Create
+							                                                                                Set strTip = 'Внести изменения в Базу Данных'
+						                                                                                On SAM_Click
 							! Call SalSendMsg(hWndForm, UM_Update, 0, 0)
-							                                                                               Call SalSendMsg( hWndLost, UM_Update, 0, 0 )
-				                                                                               Line 
-				                                                                               Pushbutton: pbSearch
-					                                                                               Message Actions 
-				                                                                               Pushbutton: pbFilter
-					                                                                               Message Actions 
-						                                                                               On SAM_Create
-							                                                                               Set strTip = 'Перечитать записи в таблице (с фильтром)'
-							                                                                               Call SalEnableWindow(hWndItem)
-						                                                                               On SAM_Click
-							                                                                               Call SalTblDefineSplitWindow(tbl, 0, FALSE)
-							                                                                               If SetQueryFilter( cF )
-								                                                                               Set sf = cF.GetFilterWhereClause( FALSE )
-								                                                                               Set sfrom = cF.GetFilterFromClause( FALSE )
-							                                                                               Call SalSendMsg(tbl, UM_Populate, 0, 0)
-				                                                                               Pushbutton: pbDetails
-					                                                                               Message Actions 
+							                                                                                Call SalSendMsg( hWndLost, UM_Update, 0, 0 )
+				                                                                                Line 
+				                                                                                Pushbutton: pbSearch
+					                                                                                Message Actions 
+				                                                                                Pushbutton: pbFilter
+					                                                                                Message Actions 
+						                                                                                On SAM_Create
+							                                                                                Set strTip = 'Перечитать записи в таблице (с фильтром)'
+							                                                                                Call SalEnableWindow(hWndItem)
+						                                                                                On SAM_Click
+							                                                                                Call SalTblDefineSplitWindow(tbl, 0, FALSE)
+							                                                                                If SetQueryFilter( cF )
+								                                                                                Set sf = cF.GetFilterWhereClause( FALSE )
+								                                                                                Set sfrom = cF.GetFilterFromClause( FALSE )
+							                                                                                Call SalSendMsg(tbl, UM_Populate, 0, 0)
+				                                                                                Pushbutton: pbDetails
+					                                                                                Message Actions 
 						! On SAM_Create
-							                                                                                                                                                                                                                   Set strTip = 'Поповнити можливими значеннями'
+							                                                                                                                                                                                                                    Set strTip = 'Поповнити можливими значеннями'
 						! On SAM_Click
-				                                                                               Pushbutton: pbPrint
-					                                                                               Message Actions 
-				                                                                               Line 
-				                                                                               Pushbutton: pbExit
-					                                                                               Message Actions 
-				                                                                               Line 
+				                                                                                Pushbutton: pbPrint
+					                                                                                Message Actions 
+				                                                                                Line 
+				                                                                                Pushbutton: pbExit
+					                                                                                Message Actions 
+				                                                                                Line 
 				! cGenComboBox_NumId: cmbGroups
-					                                                                                                                                                                                                                   List Initialization 
-					                                                                                                                                                                                                                   Message Actions 
-						                                                                                                                                                                                                                   On SAM_Create
-							                                                                                                                                                                                                                   If cmbGroups.Init( hWndItem )
-								                                                                                                                                                                                                                   If pGRP = NUMBER_Null or pGRP=0
-									                                                                                                                                                                                                                   Call cmbGroups.Populate( hSql(),
+					                                                                                                                                                                                                                    List Initialization 
+					                                                                                                                                                                                                                    Message Actions 
+						                                                                                                                                                                                                                    On SAM_Create
+							                                                                                                                                                                                                                    If cmbGroups.Init( hWndItem )
+								                                                                                                                                                                                                                    If pGRP = NUMBER_Null or pGRP=0
+									                                                                                                                                                                                                                    Call cmbGroups.Populate( hSql(),
 											"idg", "idg||'.'||name", "sto_grp", "order by name" )
-								                                                                                                                                                                                                                   Else 
-									                                                                                                                                                                                                                   Call cmbGroups.Populate( hSql(),
+								                                                                                                                                                                                                                    Else 
+									                                                                                                                                                                                                                    Call cmbGroups.Populate( hSql(),
 											"idg", "idg||'.'||name", "sto_grp", "where IDG="||Str(pGRP) )
-									                                                                                                                                                                                                                   Set nGrp=pGRP
-									                                                                                                                                                                                                                   Call SalDisableWindow( cmbGroups )
-									                                                                                                                                                                                                                   Call SalSendMsg( tbl, UM_Populate, 0, 0 )
-								                                                                                                                                                                                                                   Call cmbGroups.SetSelectById( nGrp )
-						                                                                                                                                                                                                                   On SAM_Click
-							                                                                                                                                                                                                                   Call SalSendClassMessage( SAM_Click, 0, 0 )
-							                                                                                                                                                                                                                   Set nGrp=cmbGroups.nCurrentId
-							                                                                                                                                                                                                                   Call SalSendMsg( tbl, UM_Populate, 0, 0 )
-				                                                                               Data Field: BR_NAME
-					                                                                               Message Actions 
-		                                                                               Contents 
-			                                                                               Custom Control: ccSplitter
-				                                                                               Message Actions 
-			                                                                               Child Table: tbl
-				                                                                               Contents 
+									                                                                                                                                                                                                                    Set nGrp=pGRP
+									                                                                                                                                                                                                                    Call SalDisableWindow( cmbGroups )
+									                                                                                                                                                                                                                    Call SalSendMsg( tbl, UM_Populate, 0, 0 )
+								                                                                                                                                                                                                                    Call cmbGroups.SetSelectById( nGrp )
+						                                                                                                                                                                                                                    On SAM_Click
+							                                                                                                                                                                                                                    Call SalSendClassMessage( SAM_Click, 0, 0 )
+							                                                                                                                                                                                                                    Set nGrp=cmbGroups.nCurrentId
+							                                                                                                                                                                                                                    Call SalSendMsg( tbl, UM_Populate, 0, 0 )
+				                                                                                Data Field: BR_NAME
+					                                                                                Message Actions 
+		                                                                                Contents 
+			                                                                                Custom Control: ccSplitter
+				                                                                                Message Actions 
+			                                                                                Child Table: tbl
+				                                                                                Contents 
 					!
-					                                                                               Column: cBR_NAME
-						                                                                               List Values 
-						                                                                               Message Actions 
-				                                                                               Functions 
-				                                                                               Window Variables 
-				                                                                               Message Actions 
+					                                                                                Column: cBR_NAME
+						                                                                                List Values 
+						                                                                                Message Actions 
+				                                                                                Functions 
+				                                                                                Window Variables 
+				                                                                                Message Actions 
 					!
-			                                                                               Child Table: tbl2
-				                                                                               Contents 
-					                                                                               Column: KV
-						                                                                               List Values 
-						                                                                               Message Actions 
+			                                                                                Child Table: tbl2
+				                                                                                Contents 
+					                                                                                Column: KV
+						                                                                                List Values 
+						                                                                                Message Actions 
 							! On SAM_SetFocus
-								                                                                                                                                                                                                                   If colKvA = NUMBER_Null
-									                                                                                                                                                                                                                   Set colKvA = GetBaseVal()
-							                                                                               On SAM_Validate
-								                                                                               If SqlPrepareAndExecute( hSql(), 
+								                                                                                                                                                                                                                    If colKvA = NUMBER_Null
+									                                                                                                                                                                                                                    Set colKvA = GetBaseVal()
+							                                                                                On SAM_Validate
+								                                                                                If SqlPrepareAndExecute( hSql(), 
 										"select lcv, name into :tbl2.LCV, :tbl2.KV_NAME 
 										from tabval where kv=:tbl2.KV and d_close is null" )
 										and NOT SqlFetchNext( hSql(), nFetchRes )
-									                                                                               Call SalMessageBox('Недопустиме значення коду валюти',
+									                                                                                Call SalMessageBox('Недопустиме значення коду валюти',
 											'Помилка ! ', MB_IconStop)
-									                                                                               Set KV = NUMBER_Null
-									                                                                               Set KV_NAME = STRING_Null
-					                                                                               Column: LCV
-						                                                                               List Values 
-						                                                                               Message Actions 
-					                                                                               Column: KV_NAME
-						                                                                               List Values 
-						                                                                               Message Actions 
-					                                                                               Column: BDATE
-						                                                                               List Values 
-						                                                                               Message Actions 
-							                                                                               On SAM_SetFocus
-								                                                                               If BDATE = DATETIME_Null
-									                                                                               Set BDATE = GetBankDate()
-					                                                                               Column: RATE
-						                                                                               List Values 
-						                                                                               Message Actions 
-				                                                                               Functions 
-					                                                                               Function: GetFirstEditableColumn
-						                                                                               Description: Получить первую редактируюмую колонку
-						                                                                               Returns 
-							                                                                               Window Handle: 
-						                                                                               Parameters 
-							                                                                               Window Handle: hWndTbl
-						                                                                               Static Variables 
-						                                                                               Local variables 
-							                                                                               Number: nCol
-							                                                                               Window Handle: hWndCol
-						                                                                               Actions 
-							                                                                               Set nCol=1
-							                                                                               Loop 
-								                                                                               Set hWndCol = SalTblGetColumnWindow(hWndTbl, nCol,
+									                                                                                Set KV = NUMBER_Null
+									                                                                                Set KV_NAME = STRING_Null
+					                                                                                Column: LCV
+						                                                                                List Values 
+						                                                                                Message Actions 
+					                                                                                Column: KV_NAME
+						                                                                                List Values 
+						                                                                                Message Actions 
+					                                                                                Column: BDATE
+						                                                                                List Values 
+						                                                                                Message Actions 
+							                                                                                On SAM_SetFocus
+								                                                                                If BDATE = DATETIME_Null
+									                                                                                Set BDATE = GetBankDate()
+					                                                                                Column: RATE
+						                                                                                List Values 
+						                                                                                Message Actions 
+				                                                                                Functions 
+					                                                                                Function: GetFirstEditableColumn
+						                                                                                Description: Получить первую редактируюмую колонку
+						                                                                                Returns 
+							                                                                                Window Handle: 
+						                                                                                Parameters 
+							                                                                                Window Handle: hWndTbl
+						                                                                                Static Variables 
+						                                                                                Local variables 
+							                                                                                Number: nCol
+							                                                                                Window Handle: hWndCol
+						                                                                                Actions 
+							                                                                                Set nCol=1
+							                                                                                Loop 
+								                                                                                Set hWndCol = SalTblGetColumnWindow(hWndTbl, nCol,
 										    COL_GetPos)
-								                                                                               If hWndCol = hWndNULL
-									                                                                               Break 
-								                                                                               If SalTblQueryColumnFlags(hWndCol, COL_Editable) and
+								                                                                                If hWndCol = hWndNULL
+									                                                                                Break 
+								                                                                                If SalTblQueryColumnFlags(hWndCol, COL_Editable) and
 										   SalIsWindowVisible(hWndCol)
-									                                                                               Break 
-								                                                                               Set nCol = nCol + 1
-							                                                                               Return hWndCol
+									                                                                                Break 
+								                                                                                Set nCol = nCol + 1
+							                                                                                Return hWndCol
 					! Function: F_NLS
-						                                                                                                                                                                                                                   Description: 
-						                                                                                                                                                                                                                   Returns 
-						                                                                                                                                                                                                                   Parameters 
-							                                                                                                                                                                                                                   Number: nKv
-							                                                                                                                                                                                                                   String: sMfo
-							                                                                                                                                                                                                                   String: sNls
-						                                                                                                                                                                                                                   Static Variables 
-						                                                                                                                                                                                                                   Local variables 
-							                                                                                                                                                                                                                   String: sTmp
-						                                                                                                                                                                                                                   Actions 
-							                                                                                                                                                                                                                   If nKv != GetBaseVal() and
+						                                                                                                                                                                                                                    Description: 
+						                                                                                                                                                                                                                    Returns 
+						                                                                                                                                                                                                                    Parameters 
+							                                                                                                                                                                                                                    Number: nKv
+							                                                                                                                                                                                                                    String: sMfo
+							                                                                                                                                                                                                                    String: sNls
+						                                                                                                                                                                                                                    Static Variables 
+						                                                                                                                                                                                                                    Local variables 
+							                                                                                                                                                                                                                    String: sTmp
+						                                                                                                                                                                                                                    Actions 
+							                                                                                                                                                                                                                    If nKv != GetBaseVal() and
 									SqlPrepareAndExecute( hSql(),"SELECT name into :sTmp from tabval where kv=:nKv " )
 									and NOT SqlFetchNext(  hSql(), nFetchRes )
-								                                                                                                                                                                                                                   Call SalMessageBox("Код вал","Ошибка ! ", MB_IconStop)
-								                                                                                                                                                                                                                   Return FALSE
+								                                                                                                                                                                                                                    Call SalMessageBox("Код вал","Ошибка ! ", MB_IconStop)
+								                                                                                                                                                                                                                    Return FALSE
 							!
-							                                                                                                                                                                                                                   If sMfo != STRING_Null and sMfo != GetBankMfo() and
+							                                                                                                                                                                                                                    If sMfo != STRING_Null and sMfo != GetBankMfo() and
 									SqlPrepareAndExecute( hSql(),"SELECT nb into :sTmp from banks where mfo=:sMfo " )
 									and NOT SqlFetchNext(  hSql(), nFetchRes )
-								                                                                                                                                                                                                                   Call SalMessageBox("Код Банка","Ошибка ! ", MB_IconStop)
-								                                                                                                                                                                                                                   Return FALSE
+								                                                                                                                                                                                                                    Call SalMessageBox("Код Банка","Ошибка ! ", MB_IconStop)
+								                                                                                                                                                                                                                    Return FALSE
 							!
-							                                                                                                                                                                                                                   If sNls != STRING_Null and  nKv != NUMBER_Null and sMfo !=STRING_Null
-								                                                                                                                                                                                                                   If sMfo = GetBankMfo() and
+							                                                                                                                                                                                                                    If sNls != STRING_Null and  nKv != NUMBER_Null and sMfo !=STRING_Null
+								                                                                                                                                                                                                                    If sMfo = GetBankMfo() and
 										SqlPrepareAndExecute( hSql(),"SELECT nms into :sTmp from accounts where kv=:nKv and nls=:sNls " )
 										and NOT SqlFetchNext(  hSql(), nFetchRes )
-									                                                                                                                                                                                                                   Call SalMessageBox("Отсутствует счет в нашем банке","Ошибка ! ", MB_IconStop)
-									                                                                                                                                                                                                                   Return FALSE
-								                                                                                                                                                                                                                   Else If sNls != KeyAccount(sMfo, sNls)
-									                                                                                                                                                                                                                   Call SalMessageBox("Контрольный разряд счета","Ошибка ! ", MB_IconStop)
-									                                                                                                                                                                                                                   Return FALSE
+									                                                                                                                                                                                                                    Call SalMessageBox("Отсутствует счет в нашем банке","Ошибка ! ", MB_IconStop)
+									                                                                                                                                                                                                                    Return FALSE
+								                                                                                                                                                                                                                    Else If sNls != KeyAccount(sMfo, sNls)
+									                                                                                                                                                                                                                    Call SalMessageBox("Контрольный разряд счета","Ошибка ! ", MB_IconStop)
+									                                                                                                                                                                                                                    Return FALSE
 							!
-							                                                                                                                                                                                                                   Return TRUE
-				                                                                               Window Variables 
-					                                                                               String: strSqlPopulate	! Строка SQL SELECT
-					                                                                               String: strSqlInsert	! Строка SQL INSERT
-					                                                                               String: strSqlDelete	! Строка SQL DELETE
-					                                                                               String: strSqlUpdate	! Строка SQL UPDATE
-					                                                                               String: strTitleAux
-					                                                                               String: sTmp
-				                                                                               Message Actions 
-					                                                                               On UM_Delete
-						                                                                               Set nRow = TBL_MinRow
-						                                                                               While SalTblFindNextRow(hWndForm, nRow, ROW_Selected, 0)
-							                                                                               If NOT SalTblQueryRowFlags(hWndForm, nRow, ROW_New)
-								                                                                               Call SalTblSetRowFlags(hWndForm, nRow, ROW_MarkDeleted,
+							                                                                                                                                                                                                                    Return TRUE
+				                                                                                Window Variables 
+					                                                                                String: strSqlPopulate	! Строка SQL SELECT
+					                                                                                String: strSqlInsert	! Строка SQL INSERT
+					                                                                                String: strSqlDelete	! Строка SQL DELETE
+					                                                                                String: strSqlUpdate	! Строка SQL UPDATE
+					                                                                                String: strTitleAux
+					                                                                                String: sTmp
+				                                                                                Message Actions 
+					                                                                                On UM_Delete
+						                                                                                Set nRow = TBL_MinRow
+						                                                                                While SalTblFindNextRow(hWndForm, nRow, ROW_Selected, 0)
+							                                                                                If NOT SalTblQueryRowFlags(hWndForm, nRow, ROW_New)
+								                                                                                Call SalTblSetRowFlags(hWndForm, nRow, ROW_MarkDeleted,
 										     not SalTblQueryRowFlags(hWndForm, nRow, ROW_MarkDeleted))
-							                                                                               Else 
-								                                                                               Call SalTblDeleteRow(hWndForm, nRow, TBL_NoAdjust)
-		                                                                               Functions 
-		                                                                               Window Parameters 
-		                                                                               Window Variables 
+							                                                                                Else 
+								                                                                                Call SalTblDeleteRow(hWndForm, nRow, TBL_NoAdjust)
+		                                                                                Functions 
+		                                                                                Window Parameters 
+		                                                                                Window Variables 
 			!
-			                                                                               Number: nId
-			                                                                               String: sf
-			                                                                               String: sfrom
-			                                                                               : cF
-			                                                                               Number: nRow
-			                                                                               Number: BR_ID
-			                                                                               String: sBR_ID
-			                                                                               Window Handle: hWndLost
+			                                                                                Number: nId
+			                                                                                String: sf
+			                                                                                String: sfrom
+			                                                                                : cF
+			                                                                                Number: nRow
+			                                                                                Number: BR_ID
+			                                                                                String: sBR_ID
+			                                                                                Window Handle: hWndLost
 			!
-		                                                                               Message Actions 
+		                                                                                Message Actions 
 	!
 	Table Window: TRC
 		Class: cGenericTable
@@ -1065,7 +1064,7 @@ Application Description: Для аналитических функций
 						Background Color: Default
 						Input Mask: Unformatted
 .end
-					                                                                                Message Actions 
+					                                                                                 Message Actions 
 		Contents
 			Column: ID
 				Class Child Ref Key: 0
@@ -5682,48 +5681,48 @@ Application Description: Для аналитических функций
 				Message Actions
 		Functions
 			! Function: FunNSIEditF			!__exported
-				                                                Description: Универсальная функция вызова редактирования таблиц с
+				                                                 Description: Универсальная функция вызова редактирования таблиц с
 						вариативными вкл/выкл фильтров, режимов редактирования
 						и т.д.
-				                                                Returns 
-					                                                Number: nRet
-				                                                Parameters 
-					                                                String: strNSITblName
-					                                                Number: nMode
-				                                                Static Variables 
-				                                                Local variables 
-					                                                Number: fReturnResult
-					                                                Boolean: fFilterAtStart
-				                                                Actions 
+				                                                 Returns 
+					                                                 Number: nRet
+				                                                 Parameters 
+					                                                 String: strNSITblName
+					                                                 Number: nMode
+				                                                 Static Variables 
+				                                                 Local variables 
+					                                                 Number: fReturnResult
+					                                                 Boolean: fFilterAtStart
+				                                                 Actions 
 					! /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-					                                                Call IniNsiApi()
+					                                                 Call IniNsiApi()
 					!
-					                                                Set fReturnResult = TRUE
+					                                                 Set fReturnResult = TRUE
 					!
 					! Реанимация записей (ПРАВЭКС)
-					                                                If strNSITblName = STRING_Null and nMode = 20
-						                                                If not IsWindow(hWin20)
-							                                                Set hWin20 = SalCreateWindow(frmRestoreRecord, hWndMDI)
-						                                                Else 
-							                                                Call SalBringWindowToTop(hWin20)
+					                                                 If strNSITblName = STRING_Null and nMode = 20
+						                                                 If not IsWindow(hWin20)
+							                                                 Set hWin20 = SalCreateWindow(frmRestoreRecord, hWndMDI)
+						                                                 Else 
+							                                                 Call SalBringWindowToTop(hWin20)
 					! Обычное редактирование справочников
-					                                                Else 
+					                                                 Else 
 						! 0x0010 - принудительный фильтр на старте
-						                                                If nMode & 0x0010
-							                                                Set fFilterAtStart = TRUE
-							                                                Set nMode = nMode - 0x0010
-						                                                Else 
-							                                                Set fFilterAtStart = FALSE
+						                                                 If nMode & 0x0010
+							                                                 Set fFilterAtStart = TRUE
+							                                                 Set nMode = nMode - 0x0010
+						                                                 Else 
+							                                                 Set fFilterAtStart = FALSE
 						!
-						                                                If nMode < 0 OR nMode > 7
-							                                                Set nMode = NSIMode_Normal
+						                                                 If nMode < 0 OR nMode > 7
+							                                                 Set nMode = NSIMode_Normal
 						!
-						                                                If ChekNsiTable(strNSITblName)
-							                                                Call SalCreateWindow(frm_universal_nsi_edit, hWndMDI, SalStrTrimX(strNSITblName), hWndNULL, 0, '', nMode, fFilterAtStart)
-						                                                Else 
-							                                                Set fReturnResult = FALSE
+						                                                 If ChekNsiTable(strNSITblName)
+							                                                 Call SalCreateWindow(frm_universal_nsi_edit, hWndMDI, SalStrTrimX(strNSITblName), hWndNULL, 0, '', nMode, fFilterAtStart)
+						                                                 Else 
+							                                                 Set fReturnResult = FALSE
 					!
-					                                                Return fReturnResult
+					                                                 Return fReturnResult
 					!
 					! /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			Function: I0 ! Обнуление итогов
@@ -6287,7 +6286,7 @@ Application Description: Для аналитических функций
 				Call SalSendClassMessage(SAM_Create, 0, 0)
 			On SAM_CreateComplete
 			! On UM_Populate
-				                                                   Call NASELENIE ()
+				                                                    Call NASELENIE ()
 			On SAM_FetchRowDone
 				! Расчет средних % ставок
 				Call STROKA()
@@ -6670,7 +6669,7 @@ Application Description: Для аналитических функций
 						Background Color: Default
 						Input Mask: Unformatted
 .end
-					                                                                                                                                                                                                                                 Message Actions
+					                                                                                                                                                                                                                                  Message Actions
 				Check Box: cb_A7
 					Class Child Ref Key: 0
 					Class ChildKey: 0
@@ -8456,8 +8455,8 @@ Application Description: Для аналитических функций
 				List Values
 				Message Actions
 			! cColumnLabeled: nPAP
-				                                                                                                                                                                                                                                 List Values
-				                                                                                                                                                                                                                                 Message Actions
+				                                                                                                                                                                                                                                  List Values
+				                                                                                                                                                                                                                                  Message Actions
 		Functions
 			Function: FDAT
 				Description:
@@ -9595,66 +9594,66 @@ Application Description: Для аналитических функций
 			Maximum Rows in Memory: 10000
 			Discardable? No
 .end
-		                                                                                    Description: 
-		                                                                                    Named Menus 
-		                                                                                    Menu 
-		                                                                                    Tool Bar 
-			                                                                                    Contents 
-				                                                                                    Pushbutton: pbIns
-					                                                                                    Message Actions 
-				                                                                                    Pushbutton: pbDel
-					                                                                                    Message Actions 
-				                                                                                    Pushbutton: pbRefresh
-					                                                                                    Message Actions 
-				                                                                                    Pushbutton: pbUpdate
-					                                                                                    Message Actions 
-				                                                                                    Line 
-				                                                                                    Pushbutton: pbSearch
-					                                                                                    Message Actions 
-				                                                                                    Pushbutton: pbFilter
-					                                                                                    Message Actions 
-				                                                                                    Pushbutton: pbDetails
-					                                                                                    Message Actions 
-				                                                                                    Pushbutton: pbPrint
-					                                                                                    Message Actions 
-				                                                                                    Line 
-				                                                                                    Pushbutton: pbExit
-					                                                                                    Message Actions 
-				                                                                                    Line 
+		                                                                                     Description: 
+		                                                                                     Named Menus 
+		                                                                                     Menu 
+		                                                                                     Tool Bar 
+			                                                                                     Contents 
+				                                                                                     Pushbutton: pbIns
+					                                                                                     Message Actions 
+				                                                                                     Pushbutton: pbDel
+					                                                                                     Message Actions 
+				                                                                                     Pushbutton: pbRefresh
+					                                                                                     Message Actions 
+				                                                                                     Pushbutton: pbUpdate
+					                                                                                     Message Actions 
+				                                                                                     Line 
+				                                                                                     Pushbutton: pbSearch
+					                                                                                     Message Actions 
+				                                                                                     Pushbutton: pbFilter
+					                                                                                     Message Actions 
+				                                                                                     Pushbutton: pbDetails
+					                                                                                     Message Actions 
+				                                                                                     Pushbutton: pbPrint
+					                                                                                     Message Actions 
+				                                                                                     Line 
+				                                                                                     Pushbutton: pbExit
+					                                                                                     Message Actions 
+				                                                                                     Line 
 				!
-				                                                                                    Data Field: DAT1
-					                                                                                    Message Actions 
-						                                                                                    On SAM_TooltipSetText
-							                                                                                    Return XSalTooltipSetText( lParam, 'Дата початку періоду розрахунку')
-						                                                                                    On SAM_Validate
-							                                                                                    Call F_DAT()
-				                                                                                    Data Field: DAT2
-					                                                                                    Message Actions 
-						                                                                                    On SAM_TooltipSetText
-							                                                                                    Return XSalTooltipSetText( lParam, 'Дата завершення періоду розрахунку')
-						                                                                                    On SAM_Validate
-							                                                                                    Call F_DAT()
-				                                                                                    Radio Button: rb0
-					                                                                                    Message Actions 
-						                                                                                    On SAM_Click
-							                                                                                    Call SalSendMsg( pbRefresh, SAM_Click, 0, 0 )
-				                                                                                    Radio Button: rb1
-					                                                                                    Message Actions 
-						                                                                                    On SAM_Click
-							                                                                                    Call SalSendMsg( pbRefresh, SAM_Click, 0, 0 )
-				                                                                                    Radio Button: rb2
-					                                                                                    Message Actions 
-						                                                                                    On SAM_Click
-							                                                                                    Call SalSendMsg( pbRefresh, SAM_Click, 0, 0 )
-				                                                                                    Radio Button: rb3
-					                                                                                    Message Actions 
-						                                                                                    On SAM_Click
-							                                                                                    Call SalSendMsg( pbRefresh, SAM_Click, 0, 0 )
-				                                                                                    Radio Button: rb4
-					                                                                                    Message Actions 
-						                                                                                    On SAM_Click
-							                                                                                    Call SalSendMsg( pbRefresh, SAM_Click, 0, 0 )
-				                                                                                    Combo Box: cmb_KV
+				                                                                                     Data Field: DAT1
+					                                                                                     Message Actions 
+						                                                                                     On SAM_TooltipSetText
+							                                                                                     Return XSalTooltipSetText( lParam, 'Дата початку періоду розрахунку')
+						                                                                                     On SAM_Validate
+							                                                                                     Call F_DAT()
+				                                                                                     Data Field: DAT2
+					                                                                                     Message Actions 
+						                                                                                     On SAM_TooltipSetText
+							                                                                                     Return XSalTooltipSetText( lParam, 'Дата завершення періоду розрахунку')
+						                                                                                     On SAM_Validate
+							                                                                                     Call F_DAT()
+				                                                                                     Radio Button: rb0
+					                                                                                     Message Actions 
+						                                                                                     On SAM_Click
+							                                                                                     Call SalSendMsg( pbRefresh, SAM_Click, 0, 0 )
+				                                                                                     Radio Button: rb1
+					                                                                                     Message Actions 
+						                                                                                     On SAM_Click
+							                                                                                     Call SalSendMsg( pbRefresh, SAM_Click, 0, 0 )
+				                                                                                     Radio Button: rb2
+					                                                                                     Message Actions 
+						                                                                                     On SAM_Click
+							                                                                                     Call SalSendMsg( pbRefresh, SAM_Click, 0, 0 )
+				                                                                                     Radio Button: rb3
+					                                                                                     Message Actions 
+						                                                                                     On SAM_Click
+							                                                                                     Call SalSendMsg( pbRefresh, SAM_Click, 0, 0 )
+				                                                                                     Radio Button: rb4
+					                                                                                     Message Actions 
+						                                                                                     On SAM_Click
+							                                                                                     Call SalSendMsg( pbRefresh, SAM_Click, 0, 0 )
+				                                                                                     Combo Box: cmb_KV
 .data INHERITPROPS
 0000: 0100
 .enddata
@@ -9664,35 +9663,35 @@ Application Description: Для аналитических функций
 .data CLASSPROPSSIZE
 0000: 1700
 .enddata
-					                                                                                    List Initialization 
-					                                                                                    Message Actions 
-						                                                                                    On SAM_Create
-							                                                                                    If nPar=701
-								                                                                                    Call SalDisableWindow( cmb_KV )
-								                                                                                    Set cmb_KV = pcmb_KV
-								                                                                                    Set nKurs = pKurs
-							                                                                                    Else 
-								                                                                                    Set nKv = 0
-								                                                                                    Call cmb_KV.Init(hWndItem)
-								                                                                                    Call cmb_KV.Populate(hSql(),
+					                                                                                     List Initialization 
+					                                                                                     Message Actions 
+						                                                                                     On SAM_Create
+							                                                                                     If nPar=701
+								                                                                                     Call SalDisableWindow( cmb_KV )
+								                                                                                     Set cmb_KV = pcmb_KV
+								                                                                                     Set nKurs = pKurs
+							                                                                                     Else 
+								                                                                                     Set nKv = 0
+								                                                                                     Call cmb_KV.Init(hWndItem)
+								                                                                                     Call cmb_KV.Populate(hSql(),
 										"KV","substr('   '||SKV,-3)||'.'||LCV||'/'||NAME","TABVAL",
 										" where  D_CLOSE is null union all select  0 , '  */Консолідовано по вал' from dual
 										 ORDER BY 2 ")
-								                                                                                    Call SalListSetSelect(cmb_KV,0)
-						                                                                                    On SAM_Click
-							                                                                                    Set nKv =cmb_KV.GetKey(SalListQuerySelection(hWndItem))
-							                                                                                    If nKv = 0 or nKv=n980
-								                                                                                    Set nKurs = 1
-							                                                                                    Else 
-								                                                                                    If SqlPrepareAndExecute( hSql(),
+								                                                                                     Call SalListSetSelect(cmb_KV,0)
+						                                                                                     On SAM_Click
+							                                                                                     Set nKv =cmb_KV.GetKey(SalListQuerySelection(hWndItem))
+							                                                                                     If nKv = 0 or nKv=n980
+								                                                                                     Set nKurs = 1
+							                                                                                     Else 
+								                                                                                     If SqlPrepareAndExecute( hSql(),
 										"SELECT RATE_O/BSUM into :hWndForm.TRA.nKurs from cur_rates c
 										 where c.KV=:hWndForm.TRA.nKv and (c.kv,c.vdate) =
 										(select kv,max(vdate) from cur_rates
 										 where kv=c.KV and vdate<=:hWndForm.TRA.DAT2 group by kv) " )
 										 and SqlFetchNext( hSql(), nFetchRes )
-				                                                                                    Data Field: nKurs
-					                                                                                    Message Actions 
-				                                                                                    Combo Box: cmb_TOBO
+				                                                                                     Data Field: nKurs
+					                                                                                     Message Actions 
+				                                                                                     Combo Box: cmb_TOBO
 .data INHERITPROPS
 0000: 0100
 .enddata
@@ -9702,264 +9701,264 @@ Application Description: Для аналитических функций
 .data CLASSPROPSSIZE
 0000: 1700
 .enddata
-					                                                                                    List Initialization 
-					                                                                                    Message Actions 
-						                                                                                    On SAM_Create
-							                                                                                    If nPar=701
-								                                                                                    Call SalDisableWindow( cmb_TOBO )
-								                                                                                    Set cmb_TOBO = pcmb_TOBO
-							                                                                                    Else 
-								                                                                                    Set sTobo = '*'
-								                                                                                    Call cmb_TOBO.Init(hWndItem)
-								                                                                                    Call cmb_TOBO.Populate(hSql(),
+					                                                                                     List Initialization 
+					                                                                                     Message Actions 
+						                                                                                     On SAM_Create
+							                                                                                     If nPar=701
+								                                                                                     Call SalDisableWindow( cmb_TOBO )
+								                                                                                     Set cmb_TOBO = pcmb_TOBO
+							                                                                                     Else 
+								                                                                                     Set sTobo = '*'
+								                                                                                     Call cmb_TOBO.Init(hWndItem)
+								                                                                                     Call cmb_TOBO.Populate(hSql(),
 										"TOBO","TOBO||'/'||NAME","TOBO",
 										" where nvl(tobo,'0') >='0' union all select '*' , '*/Консолідовано по ТОБО' from dual
 										 ORDER BY 1")
-								                                                                                    Call SalListSetSelect(cmb_TOBO,0)
-						                                                                                    On SAM_Click
-							                                                                                    Set sTobo =cmb_TOBO.GetKey(SalListQuerySelection(hWndItem))
-				                                                                                    Data Field: dWait
-					                                                                                    Message Actions 
-				                                                                                    Pushbutton: pbExecute
-					                                                                                    Message Actions 
-						                                                                                    On SAM_Create
-							                                                                                    Set strTip = 'Виконати Розрахунок (м.б. довго)'
-						                                                                                    On SAM_Click
-							                                                                                    Call SalWaitCursor(TRUE)
-							                                                                                    Call SalShowWindow( hWndForm.TRA.dWait )
-							                                                                                    Set dWait = "Зачекайте, Виконується розрахунок по реальним і трансф.цінам "
-							                                                                                    If SqlPLSQLCommand( hSql(), "Bars.ANI( 3, DAT1, DAT2 )" )
-							                                                                                    Set dWait = ""
-							                                                                                    Call SalHideWindow( hWndForm.TRA.dWait )
-							                                                                                    Call SalWaitCursor(FALSE)
-							                                                                                    Call SalSendMsg( pbRefresh, SAM_Click, 0, 0 )
-		                                                                                    Contents 
-			                                                                                    Column: PAP
-				                                                                                    List Values 
-				                                                                                    Message Actions 
-			                                                                                    Column: NBS
-				                                                                                    List Values 
-				                                                                                    Message Actions 
-					                                                                                    On SAM_SetFocus
-						                                                                                    Set sTmpE = NBS
-					                                                                                    On SAM_AnyEdit
-						                                                                                    Set NBS = sTmpE
-						                                                                                    Call SalTblSetRowFlags( hWndForm, lParam, ROW_Edited, FALSE )
-			                                                                                    Column: NAME
-				                                                                                    List Values 
-				                                                                                    Message Actions 
-			                                                                                    Column: RE
-				                                                                                    List Values 
-				                                                                                    Message Actions 
+								                                                                                     Call SalListSetSelect(cmb_TOBO,0)
+						                                                                                     On SAM_Click
+							                                                                                     Set sTobo =cmb_TOBO.GetKey(SalListQuerySelection(hWndItem))
+				                                                                                     Data Field: dWait
+					                                                                                     Message Actions 
+				                                                                                     Pushbutton: pbExecute
+					                                                                                     Message Actions 
+						                                                                                     On SAM_Create
+							                                                                                     Set strTip = 'Виконати Розрахунок (м.б. довго)'
+						                                                                                     On SAM_Click
+							                                                                                     Call SalWaitCursor(TRUE)
+							                                                                                     Call SalShowWindow( hWndForm.TRA.dWait )
+							                                                                                     Set dWait = "Зачекайте, Виконується розрахунок по реальним і трансф.цінам "
+							                                                                                     If SqlPLSQLCommand( hSql(), "Bars.ANI( 3, DAT1, DAT2 )" )
+							                                                                                     Set dWait = ""
+							                                                                                     Call SalHideWindow( hWndForm.TRA.dWait )
+							                                                                                     Call SalWaitCursor(FALSE)
+							                                                                                     Call SalSendMsg( pbRefresh, SAM_Click, 0, 0 )
+		                                                                                     Contents 
+			                                                                                     Column: PAP
+				                                                                                     List Values 
+				                                                                                     Message Actions 
+			                                                                                     Column: NBS
+				                                                                                     List Values 
+				                                                                                     Message Actions 
+					                                                                                     On SAM_SetFocus
+						                                                                                     Set sTmpE = NBS
+					                                                                                     On SAM_AnyEdit
+						                                                                                     Set NBS = sTmpE
+						                                                                                     Call SalTblSetRowFlags( hWndForm, lParam, ROW_Edited, FALSE )
+			                                                                                     Column: NAME
+				                                                                                     List Values 
+				                                                                                     Message Actions 
+			                                                                                     Column: RE
+				                                                                                     List Values 
+				                                                                                     Message Actions 
 			!
-			                                                                                    Column: SR
-				                                                                                    List Values 
-				                                                                                    Message Actions 
-			                                                                                    Column: ST
-				                                                                                    List Values 
-				                                                                                    Message Actions 
-			                                                                                    Column: RT
-				                                                                                    List Values 
-				                                                                                    Message Actions 
+			                                                                                     Column: SR
+				                                                                                     List Values 
+				                                                                                     Message Actions 
+			                                                                                     Column: ST
+				                                                                                     List Values 
+				                                                                                     Message Actions 
+			                                                                                     Column: RT
+				                                                                                     List Values 
+				                                                                                     Message Actions 
 			!
 			! cColumnLabeled: IR
-				                                                                                                                                                                                                                                                      List Values
-				                                                                                                                                                                                                                                                      Message Actions
+				                                                                                                                                                                                                                                                       List Values
+				                                                                                                                                                                                                                                                       Message Actions
 			! cColumnLabeled: IT
-				                                                                                                                                                                                                                                                      List Values
-				                                                                                                                                                                                                                                                      Message Actions
+				                                                                                                                                                                                                                                                       List Values
+				                                                                                                                                                                                                                                                       Message Actions
 			! cColumnLabeled: IT
-				                                                                                                                                                                                                                                                      List Values
-				                                                                                                                                                                                                                                                      Message Actions
-		                                                                                    Functions 
-			                                                                                    Function: F_Col
-				                                                                                    Description: 
-				                                                                                    Returns 
-				                                                                                    Parameters 
-					                                                                                    Window Handle: hW
-					                                                                                    Number: nW
-				                                                                                    Static Variables 
-				                                                                                    Local variables 
-				                                                                                    Actions 
-					                                                                                    If nW >0
-						                                                                                    Call XSalTblSetCellBackColor( hW, nCol[2] )
-					                                                                                    Else If nW <0
-						                                                                                    Call XSalTblSetCellBackColor( hW, nCol[1] )
-			                                                                                    Function: I0
-				                                                                                    Description: 
-				                                                                                    Returns 
-				                                                                                    Parameters 
-				                                                                                    Static Variables 
-				                                                                                    Local variables 
-				                                                                                    Actions 
-					                                                                                    Set I01[1] = 0
-					                                                                                    Set I02[1] = 0
-					                                                                                    Set I03[1] = 0
-					                                                                                    Set I04[1] = 0
-					                                                                                    Set I01[2] = 0
-					                                                                                    Set I02[2] = 0
-					                                                                                    Set I03[2] = 0
-					                                                                                    Set I04[2] = 0
-			                                                                                    Function: IG
-				                                                                                    Description: 
-				                                                                                    Returns 
-				                                                                                    Parameters 
-				                                                                                    Static Variables 
-				                                                                                    Local variables 
-				                                                                                    Actions 
-					                                                                                    Set I01[PAP] = I01[PAP] + RE
-					                                                                                    Set I02[PAP] = I02[PAP] + SR
-					                                                                                    Set I03[PAP] = I03[PAP] + ST
-					                                                                                    Set I04[PAP] = I04[PAP] + RT
-			                                                                                    Function: IR
-				                                                                                    Description: 
-				                                                                                    Returns 
-				                                                                                    Parameters 
-				                                                                                    Static Variables 
-				                                                                                    Local variables 
-				                                                                                    Actions 
-					                                                                                    Set nRow = SalTblInsertRow(hWndForm,TBL_MinSplitRow)
-					                                                                                    Call SalTblFetchRow(hWndForm, nRow )
-					                                                                                    Call SalTblSetFlagsAnyRows(hWndForm, ROW_New, FALSE, 0, 0)
-					                                                                                    Set PAP = NUMBER_Null
-					                                                                                    Set NAME='Різниця'
-					                                                                                    Call XSalTblSetRowBackColor( hWndForm, nRow, nCol[3] )
-					                                                                                    Set RE = I01[2] - I01[1]
-					                                                                                    Set SR = I02[2] - I02[1]
-					                                                                                    Set ST = I03[2] - I03[1]
-					                                                                                    Set RT = I04[2] - I04[1]
-					                                                                                    Call F_Col(RE,RE)
-					                                                                                    Call F_Col(SR,SR)
-					                                                                                    Call F_Col(ST,ST)
-					                                                                                    Call F_Col(RT,RT)
-			                                                                                    Function: IP
-				                                                                                    Description: 
-				                                                                                    Returns 
-				                                                                                    Parameters 
-				                                                                                    Static Variables 
-				                                                                                    Local variables 
-				                                                                                    Actions 
-					                                                                                    Set nRow = SalTblInsertRow(hWndForm,TBL_MinSplitRow)
-					                                                                                    Call SalTblFetchRow(hWndForm, nRow )
-					                                                                                    Call SalTblSetFlagsAnyRows(hWndForm, ROW_New, FALSE, 0, 0)
-					                                                                                    Call XSalTblSetRowBackColor( hWndForm, nRow, nCol[2])
-					                                                                                    Set PAP=2
-					                                                                                    Set NAME='Пасиви'
-					                                                                                    Set RE = I01[2]
-					                                                                                    Set SR = I02[2]
-					                                                                                    Set ST = I03[2]
-					                                                                                    Set RT = I04[2]
-			                                                                                    Function: IA
-				                                                                                    Description: 
-				                                                                                    Returns 
-				                                                                                    Parameters 
-				                                                                                    Static Variables 
-				                                                                                    Local variables 
-				                                                                                    Actions 
-					                                                                                    Set nRow = SalTblInsertRow(hWndForm,TBL_MinSplitRow)
-					                                                                                    Call SalTblFetchRow(hWndForm, nRow )
-					                                                                                    Call SalTblSetFlagsAnyRows(hWndForm, ROW_New, FALSE, 0, 0)
-					                                                                                    Call XSalTblSetRowBackColor( hWndForm, nRow, nCol[1])
-					                                                                                    Set PAP=1
-					                                                                                    Set NAME='Активи'
-					                                                                                    Set RE = I01[1]
-					                                                                                    Set SR = I02[1]
-					                                                                                    Set ST = I03[1]
-					                                                                                    Set RT = I04[1]
-			                                                                                    Function: F_DAT
-				                                                                                    Description: 
-				                                                                                    Returns 
-				                                                                                    Parameters 
-				                                                                                    Static Variables 
-				                                                                                    Local variables 
-				                                                                                    Actions 
-					                                                                                    If DAT1 > DAT2
-						                                                                                    Call SalMessageBox(
+				                                                                                                                                                                                                                                                       List Values
+				                                                                                                                                                                                                                                                       Message Actions
+		                                                                                     Functions 
+			                                                                                     Function: F_Col
+				                                                                                     Description: 
+				                                                                                     Returns 
+				                                                                                     Parameters 
+					                                                                                     Window Handle: hW
+					                                                                                     Number: nW
+				                                                                                     Static Variables 
+				                                                                                     Local variables 
+				                                                                                     Actions 
+					                                                                                     If nW >0
+						                                                                                     Call XSalTblSetCellBackColor( hW, nCol[2] )
+					                                                                                     Else If nW <0
+						                                                                                     Call XSalTblSetCellBackColor( hW, nCol[1] )
+			                                                                                     Function: I0
+				                                                                                     Description: 
+				                                                                                     Returns 
+				                                                                                     Parameters 
+				                                                                                     Static Variables 
+				                                                                                     Local variables 
+				                                                                                     Actions 
+					                                                                                     Set I01[1] = 0
+					                                                                                     Set I02[1] = 0
+					                                                                                     Set I03[1] = 0
+					                                                                                     Set I04[1] = 0
+					                                                                                     Set I01[2] = 0
+					                                                                                     Set I02[2] = 0
+					                                                                                     Set I03[2] = 0
+					                                                                                     Set I04[2] = 0
+			                                                                                     Function: IG
+				                                                                                     Description: 
+				                                                                                     Returns 
+				                                                                                     Parameters 
+				                                                                                     Static Variables 
+				                                                                                     Local variables 
+				                                                                                     Actions 
+					                                                                                     Set I01[PAP] = I01[PAP] + RE
+					                                                                                     Set I02[PAP] = I02[PAP] + SR
+					                                                                                     Set I03[PAP] = I03[PAP] + ST
+					                                                                                     Set I04[PAP] = I04[PAP] + RT
+			                                                                                     Function: IR
+				                                                                                     Description: 
+				                                                                                     Returns 
+				                                                                                     Parameters 
+				                                                                                     Static Variables 
+				                                                                                     Local variables 
+				                                                                                     Actions 
+					                                                                                     Set nRow = SalTblInsertRow(hWndForm,TBL_MinSplitRow)
+					                                                                                     Call SalTblFetchRow(hWndForm, nRow )
+					                                                                                     Call SalTblSetFlagsAnyRows(hWndForm, ROW_New, FALSE, 0, 0)
+					                                                                                     Set PAP = NUMBER_Null
+					                                                                                     Set NAME='Різниця'
+					                                                                                     Call XSalTblSetRowBackColor( hWndForm, nRow, nCol[3] )
+					                                                                                     Set RE = I01[2] - I01[1]
+					                                                                                     Set SR = I02[2] - I02[1]
+					                                                                                     Set ST = I03[2] - I03[1]
+					                                                                                     Set RT = I04[2] - I04[1]
+					                                                                                     Call F_Col(RE,RE)
+					                                                                                     Call F_Col(SR,SR)
+					                                                                                     Call F_Col(ST,ST)
+					                                                                                     Call F_Col(RT,RT)
+			                                                                                     Function: IP
+				                                                                                     Description: 
+				                                                                                     Returns 
+				                                                                                     Parameters 
+				                                                                                     Static Variables 
+				                                                                                     Local variables 
+				                                                                                     Actions 
+					                                                                                     Set nRow = SalTblInsertRow(hWndForm,TBL_MinSplitRow)
+					                                                                                     Call SalTblFetchRow(hWndForm, nRow )
+					                                                                                     Call SalTblSetFlagsAnyRows(hWndForm, ROW_New, FALSE, 0, 0)
+					                                                                                     Call XSalTblSetRowBackColor( hWndForm, nRow, nCol[2])
+					                                                                                     Set PAP=2
+					                                                                                     Set NAME='Пасиви'
+					                                                                                     Set RE = I01[2]
+					                                                                                     Set SR = I02[2]
+					                                                                                     Set ST = I03[2]
+					                                                                                     Set RT = I04[2]
+			                                                                                     Function: IA
+				                                                                                     Description: 
+				                                                                                     Returns 
+				                                                                                     Parameters 
+				                                                                                     Static Variables 
+				                                                                                     Local variables 
+				                                                                                     Actions 
+					                                                                                     Set nRow = SalTblInsertRow(hWndForm,TBL_MinSplitRow)
+					                                                                                     Call SalTblFetchRow(hWndForm, nRow )
+					                                                                                     Call SalTblSetFlagsAnyRows(hWndForm, ROW_New, FALSE, 0, 0)
+					                                                                                     Call XSalTblSetRowBackColor( hWndForm, nRow, nCol[1])
+					                                                                                     Set PAP=1
+					                                                                                     Set NAME='Активи'
+					                                                                                     Set RE = I01[1]
+					                                                                                     Set SR = I02[1]
+					                                                                                     Set ST = I03[1]
+					                                                                                     Set RT = I04[1]
+			                                                                                     Function: F_DAT
+				                                                                                     Description: 
+				                                                                                     Returns 
+				                                                                                     Parameters 
+				                                                                                     Static Variables 
+				                                                                                     Local variables 
+				                                                                                     Actions 
+					                                                                                     If DAT1 > DAT2
+						                                                                                     Call SalMessageBox(
 								"Дата Початку НЕ може бути більшою Дати завершення !",
 								"Увага, помилка !", MB_IconStop)
-						                                                                                    Set hWndForm.TRA.DAT2 = GetBankDate() - 1
-						                                                                                    Set hWndForm.TRA.DAT1 = AddMonths( hWndForm.TRA.DAT2, -1 ) + 1
-		                                                                                    Window Parameters 
-			                                                                                    Number: nPar
-			                                                                                    Number: pPAP
-			                                                                                    String: sNBS
-			                                                                                    Number: pKV
-			                                                                                    String: pTOBO
-			                                                                                    Boolean: b0
-			                                                                                    Boolean: b1
-			                                                                                    Boolean: b2
-			                                                                                    Boolean: b3
-			                                                                                    Boolean: b4
-			                                                                                    String: pcmb_KV
-			                                                                                    Number: pKurs
-			                                                                                    String: pcmb_TOBO
-		                                                                                    Window Variables 
-			                                                                                    Number: nKv
+						                                                                                     Set hWndForm.TRA.DAT2 = GetBankDate() - 1
+						                                                                                     Set hWndForm.TRA.DAT1 = AddMonths( hWndForm.TRA.DAT2, -1 ) + 1
+		                                                                                     Window Parameters 
+			                                                                                     Number: nPar
+			                                                                                     Number: pPAP
+			                                                                                     String: sNBS
+			                                                                                     Number: pKV
+			                                                                                     String: pTOBO
+			                                                                                     Boolean: b0
+			                                                                                     Boolean: b1
+			                                                                                     Boolean: b2
+			                                                                                     Boolean: b3
+			                                                                                     Boolean: b4
+			                                                                                     String: pcmb_KV
+			                                                                                     Number: pKurs
+			                                                                                     String: pcmb_TOBO
+		                                                                                     Window Variables 
+			                                                                                     Number: nKv
 			! Number: nKurs
-			                                                                                    Date/Time: dTmp
-			                                                                                    Number: n980
-			                                                                                    String: sTobo
-			                                                                                    String: sTmpE
-			                                                                                    String: sTmp
+			                                                                                     Date/Time: dTmp
+			                                                                                     Number: n980
+			                                                                                     String: sTobo
+			                                                                                     String: sTmpE
+			                                                                                     String: sTmp
 			! Number: nFl
-			                                                                                    Number: nRow
-			                                                                                    String: sNbs
-			                                                                                    String: sNls
+			                                                                                     Number: nRow
+			                                                                                     String: sNbs
+			                                                                                     String: sNls
 			!
-			                                                                                    Number: nCol[*]
-			                                                                                    Number: I01[*]
-			                                                                                    Number: I02[*]
-			                                                                                    Number: I03[*]
-			                                                                                    Number: I04[*]
+			                                                                                     Number: nCol[*]
+			                                                                                     Number: I01[*]
+			                                                                                     Number: I02[*]
+			                                                                                     Number: I03[*]
+			                                                                                     Number: I04[*]
 			!
-			                                                                                    String: sINTO
-			                                                                                    String: sSUM
-			                                                                                    String: sDECO
-			                                                                                    String: sSql
-		                                                                                    Message Actions 
-			                                                                                    On SAM_Create
-				                                                                                    Set hWndForm.TRA.nTabInstance = 1
-				                                                                                    Set hWndForm.TRA.rb0 = hWndForm.TRA.b0
-				                                                                                    Set hWndForm.TRA.rb1 = hWndForm.TRA.b1
-				                                                                                    Set hWndForm.TRA.rb2 = hWndForm.TRA.b2
-				                                                                                    Set hWndForm.TRA.rb3 = hWndForm.TRA.b3
-				                                                                                    Set hWndForm.TRA.rb4 = hWndForm.TRA.b4
-				                                                                                    Set hWndForm.TRA.n980 = GetBaseVal()
-				                                                                                    Set hWndForm.TRA.nCol[1] = SalColorFromRGB( 255,240,255 )
-				                                                                                    Set hWndForm.TRA.nCol[2] = SalColorFromRGB( 220,255,255 )
-				                                                                                    Set hWndForm.TRA.nCol[3] = SalColorFromRGB( 230,255,230 )
-				                                                                                    Set TRA.strPrintFileName = 'TRA_'||Str(hWndForm.TRA.nPar)
-				                                                                                    Call SalTblSetLockedColumns(hWndForm, 4)
-				                                                                                    Call SalHideWindow( hWndForm.TRA.dWait )
-				                                                                                    If hWndForm.TRA.nPar=711
-					                                                                                    Call SalHideWindow( hWndForm.TRA.pbExecute )
-					                                                                                    Call SalDisableWindow( hWndForm.TRA.rb1 )
-					                                                                                    Call SalDisableWindow( hWndForm.TRA.rb2 )
-					                                                                                    Call SalDisableWindow( hWndForm.TRA.rb3 )
-					                                                                                    Call SalDisableWindow( hWndForm.TRA.rb4 )
-					                                                                                    Call SalDisableWindow( hWndForm.TRA.DAT1 )
-					                                                                                    Call SalDisableWindow( hWndForm.TRA.DAT2 )
-				                                                                                    Else 
-					                                                                                    Set hWndForm.TRA.DAT2 = GetBankDate() - 1
-					                                                                                    Set hWndForm.TRA.DAT1 = AddMonths( hWndForm.TRA.DAT2, -1 ) + 1
-				                                                                                    Set sINTO = " s.PAP, s.RE,s.SR,s.ST INTO
+			                                                                                     String: sINTO
+			                                                                                     String: sSUM
+			                                                                                     String: sDECO
+			                                                                                     String: sSql
+		                                                                                     Message Actions 
+			                                                                                     On SAM_Create
+				                                                                                     Set hWndForm.TRA.nTabInstance = 1
+				                                                                                     Set hWndForm.TRA.rb0 = hWndForm.TRA.b0
+				                                                                                     Set hWndForm.TRA.rb1 = hWndForm.TRA.b1
+				                                                                                     Set hWndForm.TRA.rb2 = hWndForm.TRA.b2
+				                                                                                     Set hWndForm.TRA.rb3 = hWndForm.TRA.b3
+				                                                                                     Set hWndForm.TRA.rb4 = hWndForm.TRA.b4
+				                                                                                     Set hWndForm.TRA.n980 = GetBaseVal()
+				                                                                                     Set hWndForm.TRA.nCol[1] = SalColorFromRGB( 255,240,255 )
+				                                                                                     Set hWndForm.TRA.nCol[2] = SalColorFromRGB( 220,255,255 )
+				                                                                                     Set hWndForm.TRA.nCol[3] = SalColorFromRGB( 230,255,230 )
+				                                                                                     Set TRA.strPrintFileName = 'TRA_'||Str(hWndForm.TRA.nPar)
+				                                                                                     Call SalTblSetLockedColumns(hWndForm, 4)
+				                                                                                     Call SalHideWindow( hWndForm.TRA.dWait )
+				                                                                                     If hWndForm.TRA.nPar=711
+					                                                                                     Call SalHideWindow( hWndForm.TRA.pbExecute )
+					                                                                                     Call SalDisableWindow( hWndForm.TRA.rb1 )
+					                                                                                     Call SalDisableWindow( hWndForm.TRA.rb2 )
+					                                                                                     Call SalDisableWindow( hWndForm.TRA.rb3 )
+					                                                                                     Call SalDisableWindow( hWndForm.TRA.rb4 )
+					                                                                                     Call SalDisableWindow( hWndForm.TRA.DAT1 )
+					                                                                                     Call SalDisableWindow( hWndForm.TRA.DAT2 )
+				                                                                                     Else 
+					                                                                                     Set hWndForm.TRA.DAT2 = GetBankDate() - 1
+					                                                                                     Set hWndForm.TRA.DAT1 = AddMonths( hWndForm.TRA.DAT2, -1 ) + 1
+				                                                                                     Set sINTO = " s.PAP, s.RE,s.SR,s.ST INTO
 						 :hWndForm.TRA.NBS,:hWndForm.TRA.NAME,:hWndForm.TRA.PAP,:hWndForm.TRA.RE,
 						 :hWndForm.TRA.SR,:hWndForm.TRA.ST"
-				                                                                                    Set sSUM = " Sum(RE)/100 RE, Sum(SR)/100 SR, Sum(ST)/100 ST "
-				                                                                                    Set sDECO= " decode(Substr(kodp,2,1),'1',ref,0) RE,
+				                                                                                     Set sSUM = " Sum(RE)/100 RE, Sum(SR)/100 SR, Sum(ST)/100 ST "
+				                                                                                     Set sDECO= " decode(Substr(kodp,2,1),'1',ref,0) RE,
 						 decode(Substr(kodp,2,1),'0',znap,0) SR, decode(Substr(kodp,2,1),'1',znap,0) ST "
-				                                                                                    Call SalSendClassMessage(SAM_Create, 0, 0)
-			                                                                                    On SAM_CreateComplete
-				                                                                                    Call SalSendMsg(hWndForm, UM_Populate, 0, 0)
-			                                                                                    On UM_Populate
-				                                                                                    Call SalWaitCursor(TRUE)
-				                                                                                    If nPar =710
-					                                                                                    Call I0()
-					                                                                                    Call SalSetWindowText( hWndForm,
+				                                                                                     Call SalSendClassMessage(SAM_Create, 0, 0)
+			                                                                                     On SAM_CreateComplete
+				                                                                                     Call SalSendMsg(hWndForm, UM_Populate, 0, 0)
+			                                                                                     On UM_Populate
+				                                                                                     Call SalWaitCursor(TRUE)
+				                                                                                     If nPar =710
+					                                                                                     Call I0()
+					                                                                                     Call SalSetWindowText( hWndForm,
 							"Реальнi та трансфернi цiни на проц.АКТ-ПАС "|| cmb_KV ||" "||cmb_TOBO )
 					!
-					                                                                                    If rb0
-						                                                                                    Set sSql =
+					                                                                                     If rb0
+						                                                                                     Set sSql =
 								"SELECT bs1.id, bs1.name," || sINTO || " FROM bs1 ,
 								 (select r.pap, bs2.id," || sSUM || "
 								  from (select Substr(kodp,1,1) PAP, substr(kodp,3,4) NBS, KV, NBUC," || sDECO || "
@@ -9971,16 +9970,16 @@ Application Description: Для аналитических функций
 								  Group by r.pap, bs2.id ) s
 								 WHERE bs1.id = s.id
 								 Order by s.pap, s.id"
-					                                                                                    Else 
-						                                                                                    If rb1
-							                                                                                    Set sNbs = " Substr(kodp,3,1)||'   ' "
-						                                                                                    Else If rb2
-							                                                                                    Set sNbs = " Substr(kodp,3,2)||'  ' "
-						                                                                                    Else If rb3
-							                                                                                    Set sNbs = " Substr(kodp,3,3)|| ' ' "
-						                                                                                    Else If rb4
-							                                                                                    Set sNbs = " Substr(kodp,3,4) "
-						                                                                                    Set sSql =
+					                                                                                     Else 
+						                                                                                     If rb1
+							                                                                                     Set sNbs = " Substr(kodp,3,1)||'   ' "
+						                                                                                     Else If rb2
+							                                                                                     Set sNbs = " Substr(kodp,3,2)||'  ' "
+						                                                                                     Else If rb3
+							                                                                                     Set sNbs = " Substr(kodp,3,3)|| ' ' "
+						                                                                                     Else If rb4
+							                                                                                     Set sNbs = " Substr(kodp,3,4) "
+						                                                                                     Set sSql =
 								"SELECT p.NBS,p.name," || sINTO || " FROM ps p,
 								 (select pap, "|| sNbs || " NBS," || sSUM || "
 								  from (select Substr(kodp,1,1) PAP, kodp, KV, NBUC," || sDECO || " FROM RNBU_TRACE
@@ -9988,17 +9987,17 @@ Application Description: Для аналитических функций
 								         IifS(nKv=0,""," and KV=:nKv ")||IifS(sTobo='*',""," and Nvl(nbuc,'0')=:sTobo ")||" )
 								  Group by pap,"|| sNbs ||" ) s
 								 WHERE p.nbs = s.nbs  Order by s.pap, s.nbs"
-					                                                                                    If SalTblPopulate(hWndForm, hSql(), sSql,TBL_FillAll  )
-						                                                                                    Call SalTblDefineSplitWindow(hWndForm, 3, TBL_Split_Adjustable)
-						                                                                                    Call IR()
-						                                                                                    Call IP()
-						                                                                                    Call IA()
-				                                                                                    Else If nPar =711
-					                                                                                    Set sNls = hWndForm.TRA.sNBS || '%'
-					                                                                                    Call SalSetWindowText( hWndForm,
+					                                                                                     If SalTblPopulate(hWndForm, hSql(), sSql,TBL_FillAll  )
+						                                                                                     Call SalTblDefineSplitWindow(hWndForm, 3, TBL_Split_Adjustable)
+						                                                                                     Call IR()
+						                                                                                     Call IP()
+						                                                                                     Call IA()
+				                                                                                     Else If nPar =711
+					                                                                                     Set sNls = hWndForm.TRA.sNBS || '%'
+					                                                                                     Call SalSetWindowText( hWndForm,
 							"Реальнi та трансфернi цiни на проц.АКТ-ПАС рах."|| hWndForm.TRA.sNls ||" "|| cmb_KV ||" "||cmb_TOBO )
-					                                                                                    If rb0
-						                                                                                    Set sSql =
+					                                                                                     If rb0
+						                                                                                     Set sSql =
 								"SELECT :hWndForm.TRA.sNBS,s.NLS," || sINTO || " FROM
 								 (select pap, NLS, " || sSUM || "
 								  from (select Substr(kodp,1,1) PAP, NLS, KV, NBUC," || sDECO || " FROM RNBU_TRACE
@@ -10008,8 +10007,8 @@ Application Description: Для аналитических функций
 								         IifS(hWndForm.TRA.pKV=0,    ""," and KV=:hWndForm.TRA.pKV ") ||
 								         IifS(hWndForm.TRA.pTOBO='*',""," and Nvl(nbuc,'0')=:hWndForm.TRA.pTOBO ")||" )
 								  Group by pap,NLS ) s  Order by s.pap,s.nls"
-					                                                                                    Else 
-						                                                                                    Set sSql =
+					                                                                                     Else 
+						                                                                                     Set sSql =
 								"SELECT :hWndForm.TRA.sNBS,s.NLS," || sINTO || " FROM
 								 (select pap, NLS, " || sSUM || "
 								  from (select Substr(kodp,1,1) PAP, NLS, KV, NBUC," || sDECO || " FROM RNBU_TRACE
@@ -10019,28 +10018,28 @@ Application Description: Для аналитических функций
 								         IifS(hWndForm.TRA.pKV=0,    ""," and KV=:hWndForm.TRA.pKV ") ||
 								         IifS(hWndForm.TRA.pTOBO='*',""," and Nvl(nbuc,'0')=:hWndForm.TRA.pTOBO ")||" )
 								  Group by pap,NLS ) s  Order by s.pap,s.nls"
-					                                                                                    If SalTblPopulate(hWndForm, hSql(), sSql, TBL_FillAll  )
-				                                                                                    Call SalWaitCursor(FALSE)
-			                                                                                    On SAM_FetchRowDone
-				                                                                                    Set RT = SR - ST
-				                                                                                    If nKv != 0 and nKv != n980
-					                                                                                    Set RE = RE / nKurs
-					                                                                                    Set SR = SR / nKurs
-					                                                                                    Set ST = ST / nKurs
-					                                                                                    Set RT = RT / nKurs
-				                                                                                    If nPar =710
-					                                                                                    Call IG()
-				                                                                                    Else If nPar =711
-					                                                                                    Set hWndForm.TRA.NBS = hWndForm.TRA.sNBS
-				                                                                                    Call XSalTblSetRowBackColor( hWndForm, lParam, nCol[PAP])
-			                                                                                    On SAM_DoubleClick
-				                                                                                    If nPar = 710 and NBS != '5   '
-					                                                                                    Call SalCreateWindow
+					                                                                                     If SalTblPopulate(hWndForm, hSql(), sSql, TBL_FillAll  )
+				                                                                                     Call SalWaitCursor(FALSE)
+			                                                                                     On SAM_FetchRowDone
+				                                                                                     Set RT = SR - ST
+				                                                                                     If nKv != 0 and nKv != n980
+					                                                                                     Set RE = RE / nKurs
+					                                                                                     Set SR = SR / nKurs
+					                                                                                     Set ST = ST / nKurs
+					                                                                                     Set RT = RT / nKurs
+				                                                                                     If nPar =710
+					                                                                                     Call IG()
+				                                                                                     Else If nPar =711
+					                                                                                     Set hWndForm.TRA.NBS = hWndForm.TRA.sNBS
+				                                                                                     Call XSalTblSetRowBackColor( hWndForm, lParam, nCol[PAP])
+			                                                                                     On SAM_DoubleClick
+				                                                                                     If nPar = 710 and NBS != '5   '
+					                                                                                     Call SalCreateWindow
 							( TRA, hWndMDI, 711, PAP,
 							SalStrTrimX( NBS),nKv, sTobo, rb0,rb1,rb2,rb3,rb4, cmb_KV, nKurs, cmb_TOBO )
-				                                                                                    If nPar = 711
-					                                                                                    Set sTmp = " a.nls like '" || hWndForm.TRA.NBS ||"%'"
-					                                                                                    Call ShowAccList ( NUMBER_Null, AVIEW_ALL, AVIEW_ReadOnly | AVIEW_AllOptions, sTmp )
+				                                                                                     If nPar = 711
+					                                                                                     Set sTmp = " a.nls like '" || hWndForm.TRA.NBS ||"%'"
+					                                                                                     Call ShowAccList ( NUMBER_Null, AVIEW_ALL, AVIEW_ReadOnly | AVIEW_AllOptions, sTmp )
 	Table Window: FS !! FSC-1_C Реєстр проводок 
 		Class: cGenericTable
 		Property Template:
@@ -12091,8 +12090,8 @@ Application Description: Для аналитических функций
 						Uncheck Value:
 						Ignore Case? Yes
 .end
-				                                                                                                                                                             List Values 
-				                                                                                                                                                             Message Actions 
+				                                                                                                                                                              List Values 
+				                                                                                                                                                              Message Actions 
 		Functions
 			Function: F_DAT
 				Description:
@@ -12823,7 +12822,7 @@ Application Description: Для аналитических функций
 						On SAM_TooltipSetText
 							Return XSalTooltipSetText( lParam, 'Кількість днів+ просрочки')
 						! On SAM_Validate
-							                                                                                                                                                                                      Call F_DAT()
+							                                                                                                                                                                                       Call F_DAT()
 						On SAM_Create
 							Set KODP = 7
 				Pushbutton: pb_Run
@@ -13428,16 +13427,16 @@ Application Description: Для аналитических функций
 					! Set Sh = 'YYYY-MM'
 					! Set mKol = 1
 					! If nPar=2
-						                                                                                                     Set MESX = SalNumberRound( MESX/3 +0.5)
-						                                                                                                     Set Sh   = 'YYYY-Q'
-						                                                                                                     Set mKol = 3
-						                                                                                                     Call SalTblSetColumnTitle( colMonth, 'Через
+						                                                                                                      Set MESX = SalNumberRound( MESX/3 +0.5)
+						                                                                                                      Set Sh   = 'YYYY-Q'
+						                                                                                                      Set mKol = 3
+						                                                                                                      Call SalTblSetColumnTitle( colMonth, 'Через
 								кварт' )
 					! Else If nPar=3 
-						                                                                                                     Set MESX = SalNumberRound( MESX/12 +0.5)
-						                                                                                                     Set Sh   = 'YYYY'
-						                                                                                                     Set mKol = 12
-						                                                                                                     Call SalTblSetColumnTitle( colMonth, 'Через
+						                                                                                                      Set MESX = SalNumberRound( MESX/12 +0.5)
+						                                                                                                      Set Sh   = 'YYYY'
+						                                                                                                      Set mKol = 12
+						                                                                                                      Call SalTblSetColumnTitle( colMonth, 'Через
 								років' )
 					! Set MESY  = MESX -1 
 					! == Колонки
@@ -13685,13 +13684,13 @@ Application Description: Для аналитических функций
 			On UM_Populate
 				Call F_SQL()
 			! On SAM_FetchRowDone
-				                                                                                                                                                                                      If BRAN = '/'
-					                                                                                                                                                                                      If NPP < 5
-						                                                                                                                                                                                      Call XSalTblSetRowBackColor( hWndForm, lParam, COLOR_Maize)
-					                                                                                                                                                                                      Else If NPP < 9
-						                                                                                                                                                                                      Call XSalTblSetRowBackColor( hWndForm, lParam, COLOR_LightPeriwinkle)
-					                                                                                                                                                                                      Else 
-						                                                                                                                                                                                      Call XSalTblSetRowBackColor( hWndForm, lParam, COLOR_Orchid)
+				                                                                                                                                                                                       If BRAN = '/'
+					                                                                                                                                                                                       If NPP < 5
+						                                                                                                                                                                                       Call XSalTblSetRowBackColor( hWndForm, lParam, COLOR_Maize)
+					                                                                                                                                                                                       Else If NPP < 9
+						                                                                                                                                                                                       Call XSalTblSetRowBackColor( hWndForm, lParam, COLOR_LightPeriwinkle)
+					                                                                                                                                                                                       Else 
+						                                                                                                                                                                                       Call XSalTblSetRowBackColor( hWndForm, lParam, COLOR_Orchid)
 	Table Window: F2 !! FSC-2 КП ФО у розрізі точок продажу 
 		Class: cGenericTable
 		Property Template:
@@ -13936,11 +13935,11 @@ Application Description: Для аналитических функций
 						On SAM_Create
 							Set strTip = 'Вибрати дереро БРАНЧІВ'
 							! If nPar = 61 
-								                                                                                                                                                                  Call SalDisableWindow( pb_Branch )
+								                                                                                                                                                                   Call SalDisableWindow( pb_Branch )
 						On SAM_Click
 							Set sTmp = STRING_Null
 							! If nPar = 0
-								                                                                                                                                                                  Call FunNSIGetFiltered("BRANCH", "NAME",
+								                                                                                                                                                                   Call FunNSIGetFiltered("BRANCH", "NAME",
 										  "DELETED is null AND BRANCH LIKE SYS_CONTEXT('bars_context','user_branch_mask') " ||
 										  "ORDER BY NAME ",
 										  sTmp, sTmp1)
@@ -14792,19 +14791,19 @@ Application Description: Для аналитических функций
 				Message Actions
 		Functions
 			! Function: F_DAT
-				                                                                                                                             Description: 
-				                                                                                                                             Returns 
-				                                                                                                                             Parameters 
-				                                                                                                                             Static Variables 
-				                                                                                                                             Local variables 
-				                                                                                                                             Actions 
-					                                                                                                                             Call SalTblSetColumnTitle( N0, SalFmtFormatDateTime( DAT, 'dd/MM/yyyy' ) )
-					                                                                                                                             Call SalTblSetColumnTitle( N1, SalFmtFormatDateTime( AddMonths( DAT,-1), 'dd/MM/yyyy' ) )
-					                                                                                                                             Call SalTblSetColumnTitle( N2, SalFmtFormatDateTime( AddMonths( DAT,-2), 'dd/MM/yyyy' ) )
-					                                                                                                                             Call SalTblSetColumnTitle( N3, SalFmtFormatDateTime( AddMonths( DAT,-3), 'dd/MM/yyyy' ) )
-					                                                                                                                             Call SalTblSetColumnTitle( N4, SalFmtFormatDateTime( AddMonths( DAT,-4), 'dd/MM/yyyy' ) )
-					                                                                                                                             Call SalTblSetColumnTitle( N5, SalFmtFormatDateTime( AddMonths( DAT,-5), 'dd/MM/yyyy' ) )
-					                                                                                                                             Call SalTblSetColumnTitle( N6, SalFmtFormatDateTime( AddMonths( DAT,-6), 'dd/MM/yyyy' ) )
+				                                                                                                                              Description: 
+				                                                                                                                              Returns 
+				                                                                                                                              Parameters 
+				                                                                                                                              Static Variables 
+				                                                                                                                              Local variables 
+				                                                                                                                              Actions 
+					                                                                                                                              Call SalTblSetColumnTitle( N0, SalFmtFormatDateTime( DAT, 'dd/MM/yyyy' ) )
+					                                                                                                                              Call SalTblSetColumnTitle( N1, SalFmtFormatDateTime( AddMonths( DAT,-1), 'dd/MM/yyyy' ) )
+					                                                                                                                              Call SalTblSetColumnTitle( N2, SalFmtFormatDateTime( AddMonths( DAT,-2), 'dd/MM/yyyy' ) )
+					                                                                                                                              Call SalTblSetColumnTitle( N3, SalFmtFormatDateTime( AddMonths( DAT,-3), 'dd/MM/yyyy' ) )
+					                                                                                                                              Call SalTblSetColumnTitle( N4, SalFmtFormatDateTime( AddMonths( DAT,-4), 'dd/MM/yyyy' ) )
+					                                                                                                                              Call SalTblSetColumnTitle( N5, SalFmtFormatDateTime( AddMonths( DAT,-5), 'dd/MM/yyyy' ) )
+					                                                                                                                              Call SalTblSetColumnTitle( N6, SalFmtFormatDateTime( AddMonths( DAT,-6), 'dd/MM/yyyy' ) )
 			Function: F_DAT
 				Description:
 				Returns
@@ -16565,7 +16564,7 @@ Application Description: Для аналитических функций
 									Call SalListAdd(BAX.YYYY, BAX.sTmp)
 								Call SalListSetSelect(BAX.YYYY, 0)
 						! On SAM_SetFocus
-							                                                                                        Call SalStatusSetText(hWndForm, 'Виберіть звітний рік')
+							                                                                                         Call SalStatusSetText(hWndForm, 'Виберіть звітний рік')
 				Pushbutton: pbExit
 					Class Child Ref Key: 42
 					Class ChildKey: 0
@@ -18199,7 +18198,7 @@ Application Description: Для аналитических функций
 									Call SalListAdd(YYYYMM, sTmp)
 								Call SalListSetSelect(hWndItem, 0)
 						! On SAM_Click
-							                                                                                                                        Call NASELENIE()
+							                                                                                                                         Call NASELENIE()
 						On SAM_SetFocus
 							Call SalStatusSetText(hWndForm, 'Виберіть звітний місяць')
 				Background Text: >
@@ -18417,9 +18416,9 @@ Application Description: Для аналитических функций
 						On SAM_TooltipSetText
 							Return XSalTooltipSetText( lParam, 'Середньозважений Баланс за 1 день(з початку Року).')
 				! !!!!!
-					                                                                                                                                      Message Actions 
-						                                                                                                                                      On SAM_Click
-							                                                                                                                                      Call SalSendMsg( pbRefresh, SAM_Click, 0, 0 )
+					                                                                                                                                       Message Actions 
+						                                                                                                                                       On SAM_Click
+							                                                                                                                                       Call SalSendMsg( pbRefresh, SAM_Click, 0, 0 )
 				Group Box: Розріз по установам :
 					Resource Id: 8190
 					Class Child Ref Key: 0
@@ -19146,8 +19145,8 @@ Application Description: Для аналитических функций
 				List Values
 				Message Actions
 			!
-				                                         List Values 
-				                                         Message Actions 
+				                                          List Values 
+				                                          Message Actions 
 			Column: S01
 				Class Child Ref Key: 0
 				Class ChildKey: 0
@@ -21663,8 +21662,8 @@ Application Description: Для аналитических функций
 						Uncheck Value:
 						Ignore Case? Yes
 .end
-				                                       List Values 
-				                                       Message Actions 
+				                                        List Values 
+				                                        Message Actions 
 			! cColumnLabeled: S42
 .winattr class Column:
 				Class Child Ref Key: 0
@@ -21696,8 +21695,8 @@ Application Description: Для аналитических функций
 						Uncheck Value:
 						Ignore Case? Yes
 .end
-				                                       List Values 
-				                                       Message Actions 
+				                                        List Values 
+				                                        Message Actions 
 			! cColumnLabeled: S43
 .winattr class Column:
 				Class Child Ref Key: 0
@@ -21729,8 +21728,8 @@ Application Description: Для аналитических функций
 						Uncheck Value:
 						Ignore Case? Yes
 .end
-				                                       List Values 
-				                                       Message Actions 
+				                                        List Values 
+				                                        Message Actions 
 			! cColumnLabeled: S44
 .winattr class Column:
 				Class Child Ref Key: 0
@@ -21762,8 +21761,8 @@ Application Description: Для аналитических функций
 						Uncheck Value:
 						Ignore Case? Yes
 .end
-				                                       List Values 
-				                                       Message Actions 
+				                                        List Values 
+				                                        Message Actions 
 			! cColumnLabeled: S45
 .winattr class Column:
 				Class Child Ref Key: 0
@@ -21795,8 +21794,8 @@ Application Description: Для аналитических функций
 						Uncheck Value:
 						Ignore Case? Yes
 .end
-				                                       List Values 
-				                                       Message Actions 
+				                                        List Values 
+				                                        Message Actions 
 			! cColumnLabeled: S46
 .winattr class Column:
 				Class Child Ref Key: 0
@@ -21828,8 +21827,8 @@ Application Description: Для аналитических функций
 						Uncheck Value:
 						Ignore Case? Yes
 .end
-				                                       List Values 
-				                                       Message Actions 
+				                                        List Values 
+				                                        Message Actions 
 			! cColumnLabeled: S47
 .winattr class Column:
 				Class Child Ref Key: 0
@@ -21861,8 +21860,8 @@ Application Description: Для аналитических функций
 						Uncheck Value:
 						Ignore Case? Yes
 .end
-				                                       List Values 
-				                                       Message Actions 
+				                                        List Values 
+				                                        Message Actions 
 			! cColumnLabeled: S48
 .winattr class Column:
 				Class Child Ref Key: 0
@@ -21894,8 +21893,8 @@ Application Description: Для аналитических функций
 						Uncheck Value:
 						Ignore Case? Yes
 .end
-				                                       List Values 
-				                                       Message Actions 
+				                                        List Values 
+				                                        Message Actions 
 			! cColumnLabeled: S49
 .winattr class Column:
 				Class Child Ref Key: 0
@@ -21927,8 +21926,8 @@ Application Description: Для аналитических функций
 						Uncheck Value:
 						Ignore Case? Yes
 .end
-				                                       List Values 
-				                                       Message Actions 
+				                                        List Values 
+				                                        Message Actions 
 			! cColumnLabeled: S50
 .winattr class Column:
 				Class Child Ref Key: 0
@@ -21960,8 +21959,8 @@ Application Description: Для аналитических функций
 						Uncheck Value:
 						Ignore Case? Yes
 .end
-				                                       List Values 
-				                                       Message Actions 
+				                                        List Values 
+				                                        Message Actions 
 			!
 			! cColumnLabeled: sFSQL
 .winattr class Column:
@@ -21995,8 +21994,8 @@ Application Description: Для аналитических функций
 						Uncheck Value:
 						Ignore Case? Yes
 .end
-				                                                                                                 List Values 
-				                                                                                                 Message Actions 
+				                                                                                                  List Values 
+				                                                                                                  Message Actions 
 			!
 			Column: TOBO
 				Class Child Ref Key: 0
@@ -22924,20 +22923,20 @@ Application Description: Для аналитических функций
 				Message Actions
 		Functions
 			! Function: F_Mod
-				                                                                                          Description: 
-				                                                                                          Returns 
-				                                                                                          Parameters 
-				                                                                                          Static Variables 
-				                                                                                          Local variables 
-					                                                                                          Long String: pFSQL
-					                                                                                          Long String: pFXLS
-				                                                                                          Actions 
-					                                                                                          Set pFSQL = sFSQL
-					                                                                                          Set pFXLS = sFXLS
-					                                                                                          If SalModalDialog(dlg_SQL, hWndForm, TRUE, ID, KOD, NAME, pFSQL, pFXLS ) = 1
-						                                                                                          Set sFSQL = pFSQL
-						                                                                                          Set sFXLS = pFXLS
-						                                                                                          Call SalTblSetRowFlags( hWndForm, lParam, ROW_Edited, TRUE )
+				                                                                                           Description: 
+				                                                                                           Returns 
+				                                                                                           Parameters 
+				                                                                                           Static Variables 
+				                                                                                           Local variables 
+					                                                                                           Long String: pFSQL
+					                                                                                           Long String: pFXLS
+				                                                                                           Actions 
+					                                                                                           Set pFSQL = sFSQL
+					                                                                                           Set pFXLS = sFXLS
+					                                                                                           If SalModalDialog(dlg_SQL, hWndForm, TRUE, ID, KOD, NAME, pFSQL, pFXLS ) = 1
+						                                                                                           Set sFSQL = pFSQL
+						                                                                                           Set sFXLS = pFXLS
+						                                                                                           Call SalTblSetRowFlags( hWndForm, lParam, ROW_Edited, TRUE )
 		Window Parameters
 			Number: nMode
 			Number: nPar
@@ -22970,7 +22969,7 @@ Application Description: Для аналитических функций
 					! Call XSalTblSetRowBackColor( hWndForm, lParam, SalColorFromRGB( 255,240,255 )  )
 					Call XSalTblSetCellBackColor( sFSQL, SalColorFromRGB( 255,255,180) )
 			! On SAM_DoubleClick
-				                                                                                           Call F_Mod()
+				                                                                                            Call F_Mod()
 	! Dialog Box: dlg_SQL
 .winattr
 		Class:
@@ -22997,58 +22996,58 @@ Application Description: Для аналитических функций
 			Text Color: Default
 			Background Color: Default
 .end
-		                                                                                          Description: 
-		                                                                                          Tool Bar 
-			                                                                                          Contents 
-		                                                                                          Contents 
-			                                                                                          Background Text: SQL 
-			                                                                                          Background Text: v
-			                                                                                          Background Text: ^
-			                                                                                          Multiline Field: ml_SQL
-				                                                                                          Message Actions 
-					                                                                                          On SAM_AnyEdit
-						                                                                                          Set fEdited = TRUE
+		                                                                                           Description: 
+		                                                                                           Tool Bar 
+			                                                                                           Contents 
+		                                                                                           Contents 
+			                                                                                           Background Text: SQL 
+			                                                                                           Background Text: v
+			                                                                                           Background Text: ^
+			                                                                                           Multiline Field: ml_SQL
+				                                                                                           Message Actions 
+					                                                                                           On SAM_AnyEdit
+						                                                                                           Set fEdited = TRUE
 			!
-			                                                                                          Background Text: Оригинал_XLS
-			                                                                                          Multiline Field: ml_XLS
-				                                                                                          Message Actions 
-					                                                                                          On SAM_AnyEdit
-						                                                                                          Set fEdited = TRUE
+			                                                                                           Background Text: Оригинал_XLS
+			                                                                                           Multiline Field: ml_XLS
+				                                                                                           Message Actions 
+					                                                                                           On SAM_AnyEdit
+						                                                                                           Set fEdited = TRUE
 			!
-			                                                                                          Background Text: Ф   О    Р    М    У    Л    И 
-		                                                                                          Functions 
-		                                                                                          Window Parameters 
-			                                                                                          Boolean: FL
-			                                                                                          Number: ID
-			                                                                                          String: KOD
-			                                                                                          String: NAME
-			                                                                                          Receive Long String: pFSQL
-			                                                                                          Receive Long String: pFXLS
-		                                                                                          Window Variables 
-			                                                                                          Boolean: fEdited
-			                                                                                          Number: K_
-		                                                                                          Message Actions 
-			                                                                                          On SAM_Create
-				                                                                                          Set ml_XLS = pFXLS
-				                                                                                          Set ml_SQL = pFSQL
-				                                                                                          Call SalCenterWindow(hWndForm)
-				                                                                                          Call SalSetWindowText( hWndForm, Str(ID) || ') ' || KOD || ' ' || NAME  )
-			                                                                                          On SAM_Close
-				                                                                                          If FL and fEdited
-					                                                                                          If SqlPrepareAndExecute( hSql(),
+			                                                                                           Background Text: Ф   О    Р    М    У    Л    И 
+		                                                                                           Functions 
+		                                                                                           Window Parameters 
+			                                                                                           Boolean: FL
+			                                                                                           Number: ID
+			                                                                                           String: KOD
+			                                                                                           String: NAME
+			                                                                                           Receive Long String: pFSQL
+			                                                                                           Receive Long String: pFXLS
+		                                                                                           Window Variables 
+			                                                                                           Boolean: fEdited
+			                                                                                           Number: K_
+		                                                                                           Message Actions 
+			                                                                                           On SAM_Create
+				                                                                                           Set ml_XLS = pFXLS
+				                                                                                           Set ml_SQL = pFSQL
+				                                                                                           Call SalCenterWindow(hWndForm)
+				                                                                                           Call SalSetWindowText( hWndForm, Str(ID) || ') ' || KOD || ' ' || NAME  )
+			                                                                                           On SAM_Close
+				                                                                                           If FL and fEdited
+					                                                                                           If SqlPrepareAndExecute( hSql(),
 							"SELECT TEST_SQL(:ml_SQL) into :K_ from dual " ) 
 							and SqlFetchNext(hSql(), nFetchRes)  
-						                                                                                          If K_ = 1 
+						                                                                                           If K_ = 1 
 								Or SalMessageBox(
 								'Ош.синтаксис SQL-формулы ! 
 								 Сохранить ее ?',
 								 'Внимание !',
 								MB_IconQuestion | MB_YesNo) = IDYES
-							                                                                                          Set pFXLS = ml_XLS 
-							                                                                                          Set pFSQL = ml_SQL 
-							                                                                                          Call SalEndDialog(hWndForm, 1)
+							                                                                                           Set pFXLS = ml_XLS 
+							                                                                                           Set pFSQL = ml_SQL 
+							                                                                                           Call SalEndDialog(hWndForm, 1)
 				!
-				                                                                                          Call SalEndDialog(hWndForm, 0)
+				                                                                                           Call SalEndDialog(hWndForm, 0)
 	Table Window: RTA	!! Для ОБ Рентабельность BRANCH по аналитите 6 -7 кл Идея ОБ (Ровно)
 		Class: cGenericTable
 		Property Template:
@@ -23341,9 +23340,9 @@ Application Description: Для аналитических функций
 					Text Color: Dark Red
 					Background Color: Default
 .end
-					                                                                           Message Actions 
-						                                                                           On SAM_Click
-							                                                                           Call SalSendMsg( pbRefresh, SAM_Click, 0, 0 )
+					                                                                            Message Actions 
+						                                                                            On SAM_Click
+							                                                                            Call SalSendMsg( pbRefresh, SAM_Click, 0, 0 )
 				Radio Button: rb_ZAG
 					Class Child Ref Key: 0
 					Class ChildKey: 0
@@ -23391,9 +23390,9 @@ Application Description: Для аналитических функций
 						On SAM_Click
 							Call SalSendMsg( pbRefresh, SAM_Click, 0, 0 )
 				!
-					                                                                                                                                      Message Actions 
-						                                                                                                                                      On SAM_Click
-							                                                                                                                                      Call SalSendMsg( pbRefresh, SAM_Click, 0, 0 )
+					                                                                                                                                       Message Actions 
+						                                                                                                                                       On SAM_Click
+							                                                                                                                                       Call SalSendMsg( pbRefresh, SAM_Click, 0, 0 )
 				Check Box: cb_0
 					Class Child Ref Key: 0
 					Class ChildKey: 0
@@ -23476,7 +23475,7 @@ Application Description: Для аналитических функций
 									Call SalListAdd(YYYYMM, sTmp)
 								Call SalListSetSelect(hWndItem, 0)
 						! On SAM_Click
-							                                                                                                                        Call NASELENIE()
+							                                                                                                                         Call NASELENIE()
 						On SAM_SetFocus
 							Call SalStatusSetText(hWndForm, 'Виберіть звітний місяць')
 				Pushbutton: pb_Run
@@ -25375,7 +25374,7 @@ Application Description: Для аналитических функций
 				! Call Debug(Subs(strSqlPopulate, 401,200) )
 				! Call Debug(Subs(strSqlPopulate, 601,200) )
 				! If rb_ZAG
-					   Set RTA.strSqlPopulate =
+					    Set RTA.strSqlPopulate =
 							"SELECT BRANCH.BRANCH, BRANCH.name, 
 							        b.KOD, b.name, b.id, b.NAMBER,
 							        nvl(TANI_BUd6/100,0),
@@ -25394,7 +25393,7 @@ Application Description: Для аналитических функций
 							        IifS(sFilter="",""," and "||sFilter ) || " 
 							  ORDER BY BRANCH.BRANCH, b.id "
 				! Else If rb_BU
-					   Set RTA.strSqlPopulate =
+					    Set RTA.strSqlPopulate =
 							"SELECT BRANCH.BRANCH, BRANCH.name, 
 							        b.KOD, b.name, b.id, b.NAMBER, 
 							        nvl(TANI_BUd6/100,0),
@@ -26300,8 +26299,8 @@ Application Description: Для аналитических функций
 						Uncheck Value:
 						Ignore Case? Yes
 .end
-				                                                                                                                                  List Values 
-				                                                                                                                                  Message Actions 
+				                                                                                                                                   List Values 
+				                                                                                                                                   Message Actions 
 			!
 			Column: S6
 				Class Child Ref Key: 0
@@ -26472,8 +26471,8 @@ Application Description: Для аналитических функций
 						Uncheck Value:
 						Ignore Case? Yes
 .end
-				                                                                                                                                  List Values 
-				                                                                                                                                  Message Actions 
+				                                                                                                                                   List Values 
+				                                                                                                                                   Message Actions 
 			!
 		Functions
 			Function: F_DAT
@@ -27030,7 +27029,7 @@ Application Description: Для аналитических функций
 						Input Mask: Unformatted
 					Message Actions
 						! On SAM_SetFocus
-							                                                                                                                                                                                                                                                                Set dTmp = dDat
+							                                                                                                                                                                                                                                                                 Set dTmp = dDat
 				Combo Box: cmb_Rb
 .data INHERITPROPS
 0000: 0100
@@ -27179,7 +27178,7 @@ Application Description: Для аналитических функций
 									"(SELECT 2 FI,'Позичковi рах.ЮО (КП)' NAME FROM dual UNION ALL
 									  SELECT 3,   'Позичковi рах.ФО (КП)'      FROM dual UNION ALL
 									  SELECT 2600,'Поточнi рах.ЮО:2600,2650'   FROM dual UNION ALL
-									  SELECT 2610,'Cтрок.рах.ЮО:2610,2615,2651,2652' FROM dual UNION ALL
+									  SELECT 2610,'Cтрок.рах.ЮО:2610,2651'     FROM dual UNION ALL
 									  SELECT 2620,'Поточнi рах.ФО:2620+2625'   FROM dual UNION ALL
 									  SELECT 2630,'Cтрок.рах.ФО:2630,2635'     FROM dual UNION ALL 
 									  SELECT 9999,'Довільна маска бал/рах'     FROM dual 
@@ -28278,20 +28277,14 @@ Application Description: Для аналитических функций
 				Else If nFi >= 2600 and nFi <= 2630 OR nFi = 9999
 					Call SalHideWindow( G11 )
 					Call SalHideWindow( G12 )
-					! SELECT 2600,'Поточні рах.ЮО:2600,2650' FROM dual UNION ALL
-							  SELECT 2610,'Cтрок.рах.ЮО:2610,2615,2651,2652' FROM dual UNION ALL
-							  SELECT 2620,'Поточні рах.ФО:2620' FROM dual UNION ALL
-							  SELECT 2630,'Строк.рах.ФО:2630,2635' FROM dual
 					If Subs(sOst,1,3) != 'Abs' 
 						Set sOst = 'Abs(' || sOst || ')'
 					Set sAccounts = sAccounts || " and nbs " ||
 							IifS (nFi=2600,"in ('2600','2650')",
-							IifS (nFi=2610,"in ('2610','2615','2651','2652')",
-							IifS (nFi=2620,"in ('2620','2625')",
-							IifS (nFi=2630,"in ('2630','2635')", 
-							IifS (nFi=9999," like '" || SalStrTrimX( BBBB ) || "%'", 
-							               "like '2%' "
-							)))))
+							IifS (nFi=2610,"in ('2610','2651')",
+							IifS (nFi=2620,"in ('2620')",
+							IifS (nFi=2630,"in ('2630')", 
+							IifS (nFi=9999," like '" || SalStrTrimX( BBBB ) || "%'", "like '2%' " )))))
 					! В зависимости от вида концентрации
 					If nRb = 0  !! По сумі
 						If nPar = 7
@@ -28588,14 +28581,14 @@ Application Description: Для аналитических функций
 				Call IG()
 			On SAM_DoubleClick
 				! If IsWindow( hWin_RES1 )
-					                                                                                    Call SalDestroyWindow(hWin_RES1 )
+					                                                                                     Call SalDestroyWindow(hWin_RES1 )
 				! If qRES1 != ''
-					                                                                                    Call SalGetWindowText( hWndForm, hWndForm.RES.sRES1, 100 )
+					                                                                                     Call SalGetWindowText( hWndForm, hWndForm.RES.sRES1, 100 )
 					! Call Debug(qRES1)
-					                                                                                    If SqlPrepareAndExecute( hSql(),"DELETE from TMP_IRR " )
+					                                                                                     If SqlPrepareAndExecute( hSql(),"DELETE from TMP_IRR " )
 							and SqlPrepareAndExecute(hSql(),"INSERT into TMP_IRR (n,s) "|| qRES1 )
 							and SqlCommit( hSql() )
-						                                                                                    Set hWin_RES1 =
+						                                                                                     Set hWin_RES1 =
 								SalCreateWindow( RES1, hWndMDI,
 								hWndForm.RES.nMode, hWndForm.RES.nPar,
 								hWndForm.RES.strPar01, hWndForm.RES.sRES1, hWndForm.RES.dDat )
@@ -29639,10 +29632,10 @@ Application Description: Для аналитических функций
 						On SAM_TooltipSetText
 							Return XSalTooltipSetText(lParam, 'Дата розрахунку ')
 				! ctb_pbExecute: pbExecute
-					                                                                                                                                                                                                                                    Message Actions
-						                                                                                                                                                                                                                                    On SAM_Create
-							                                                                                                                                                                                                                                    Set strTip = 'Протокол розрахунку (корреляція, коваріація)'
-						                                                                                                                                                                                                                                    On SAM_Click
+					                                                                                                                                                                                                                                     Message Actions
+						                                                                                                                                                                                                                                     On SAM_Create
+							                                                                                                                                                                                                                                     Set strTip = 'Протокол розрахунку (корреляція, коваріація)'
+						                                                                                                                                                                                                                                     On SAM_Click
 							! Call SalCreateWindow
 									(KAR, hWndParent, nMode, nPar, SalFmtFormatDateTime( dDat, 'dd/MM/yyyy'), strPar02)
 				Radio Button: rb1
@@ -30906,10 +30899,10 @@ Application Description: Для аналитических функций
 						On SAM_TooltipSetText
 							Return XSalTooltipSetText(lParam, 'Дата розрахунку ')
 				! ctb_pbExecute: pbExecute
-					                                                                                                                                                                                                                                    Message Actions
-						                                                                                                                                                                                                                                    On SAM_Create
-							                                                                                                                                                                                                                                    Set strTip = 'Протокол розрахунку (корреляція, коваріація)'
-						                                                                                                                                                                                                                                    On SAM_Click
+					                                                                                                                                                                                                                                     Message Actions
+						                                                                                                                                                                                                                                     On SAM_Create
+							                                                                                                                                                                                                                                     Set strTip = 'Протокол розрахунку (корреляція, коваріація)'
+						                                                                                                                                                                                                                                     On SAM_Click
 							! Call SalCreateWindow
 									(KAR, hWndParent, nMode, nPar, SalFmtFormatDateTime( dDat, 'dd/MM/yyyy'), strPar02)
 		Contents
@@ -31768,7 +31761,7 @@ Application Description: Для аналитических функций
 						On SAM_Validate
 							Call F_DAT()
 						! On SAM_KillFocus
-							                                                                                                                                                                                                          Call SalTblSetColumnTitle( OST, "Залишок на
+							                                                                                                                                                                                                           Call SalTblSetColumnTitle( OST, "Залишок на
 									" || SalFmtFormatDateTime( DAT2, 'dd/MM/yyyy') )
 				Pushbutton: pbExecute
 					Class Child Ref Key: 0
@@ -32009,60 +32002,60 @@ Application Description: Для аналитических функций
 						Maximum Rows in Memory: Default
 						Discardable? No
 .end
-					                                                                                                                                                                                                           Contents 
-						                                                                                                                                                                                                           Column: nSORT
-							                                                                                                                                                                                                           List Values 
-							                                                                                                                                                                                                           Message Actions 
-						                                                                                                                                                                                                           Column: sSELE
-							                                                                                                                                                                                                           List Values 
-							                                                                                                                                                                                                           Message Actions 
-						                                                                                                                                                                                                           Column: sINTO
-							                                                                                                                                                                                                           List Values 
-							                                                                                                                                                                                                           Message Actions 
-						                                                                                                                                                                                                           Column: sNAME
-							                                                                                                                                                                                                           List Values 
-							                                                                                                                                                                                                           Message Actions 
-						                                                                                                                                                                                                           Column: nFLAG
-							                                                                                                                                                                                                           List Values 
-							                                                                                                                                                                                                           Message Actions 
-								                                                                                                                                                                                                           On SAM_AnyEdit
-									                                                                                                                                                                                                           If nFLAG != 0
-										                                                                                                                                                                                                           Set n3 = n3 + 1
-										                                                                                                                                                                                                           Set colN = n3
-										                                                                                                                                                                                                           Call SalTblSortRows(tbl1, SalTblQueryColumnID(colN), TBL_SortIncreasing)
-										                                                                                                                                                                                                           Set nN = 0
-										                                                                                                                                                                                                           Set nRw = TBL_MinRow
-										                                                                                                                                                                                                           While SalTblFindNextRow(hWndForm, nRw, 0, 0)
-											                                                                                                                                                                                                           Call SalTblSetContext(hWndForm, nRw)
-											                                                                                                                                                                                                           If nFLAG
-												                                                                                                                                                                                                           Set nN = nN + 1
-												                                                                                                                                                                                                           Set nSORT = nN
-									                                                                                                                                                                                                           Else 
-										                                                                                                                                                                                                           Set colN = 0
-										                                                                                                                                                                                                           Set nSORT = NUMBER_Null
-										                                                                                                                                                                                                           Set nN = 0
-										                                                                                                                                                                                                           Call SalTblSortRows(tbl1, SalTblQueryColumnID(colN), TBL_SortIncreasing)
-										                                                                                                                                                                                                           Set nRw = TBL_MinRow
-										                                                                                                                                                                                                           While SalTblFindNextRow(hWndForm, nRw, 0, 0)
-											                                                                                                                                                                                                           Call SalTblSetContext(hWndForm, nRw)
-											                                                                                                                                                                                                           If nFLAG
-												                                                                                                                                                                                                           Set nN = nN + 1
-												                                                                                                                                                                                                           Set nSORT = nN
-						                                                                                                                                                                                                           Column: colN
-							                                                                                                                                                                                                           List Values 
-							                                                                                                                                                                                                           Message Actions 
-					                                                                                                                                                                                                           Functions 
-					                                                                                                                                                                                                           Window Variables 
-						                                                                                                                                                                                                           Number: nRw
-						                                                                                                                                                                                                           Number: nN
-					                                                                                                                                                                                                           Message Actions 
-						                                                                                                                                                                                                           On SAM_Create
-							                                                                                                                                                                                                           Call SalSendMsgToChildren(hWndForm, UM_QueryLabelText, 0, 0)
-						                                                                                                                                                                                                           On SAM_DoubleClick
-							                                                                                                                                                                                                           Set nFLAG=1-nFLAG
-							                                                                                                                                                                                                           Call SalSendMsg(nFLAG,SAM_AnyEdit,0,0)
-						                                                                                                                                                                                                           On SAM_FetchRowDone
-							                                                                                                                                                                                                           Set colN = 0
+					                                                                                                                                                                                                            Contents 
+						                                                                                                                                                                                                            Column: nSORT
+							                                                                                                                                                                                                            List Values 
+							                                                                                                                                                                                                            Message Actions 
+						                                                                                                                                                                                                            Column: sSELE
+							                                                                                                                                                                                                            List Values 
+							                                                                                                                                                                                                            Message Actions 
+						                                                                                                                                                                                                            Column: sINTO
+							                                                                                                                                                                                                            List Values 
+							                                                                                                                                                                                                            Message Actions 
+						                                                                                                                                                                                                            Column: sNAME
+							                                                                                                                                                                                                            List Values 
+							                                                                                                                                                                                                            Message Actions 
+						                                                                                                                                                                                                            Column: nFLAG
+							                                                                                                                                                                                                            List Values 
+							                                                                                                                                                                                                            Message Actions 
+								                                                                                                                                                                                                            On SAM_AnyEdit
+									                                                                                                                                                                                                            If nFLAG != 0
+										                                                                                                                                                                                                            Set n3 = n3 + 1
+										                                                                                                                                                                                                            Set colN = n3
+										                                                                                                                                                                                                            Call SalTblSortRows(tbl1, SalTblQueryColumnID(colN), TBL_SortIncreasing)
+										                                                                                                                                                                                                            Set nN = 0
+										                                                                                                                                                                                                            Set nRw = TBL_MinRow
+										                                                                                                                                                                                                            While SalTblFindNextRow(hWndForm, nRw, 0, 0)
+											                                                                                                                                                                                                            Call SalTblSetContext(hWndForm, nRw)
+											                                                                                                                                                                                                            If nFLAG
+												                                                                                                                                                                                                            Set nN = nN + 1
+												                                                                                                                                                                                                            Set nSORT = nN
+									                                                                                                                                                                                                            Else 
+										                                                                                                                                                                                                            Set colN = 0
+										                                                                                                                                                                                                            Set nSORT = NUMBER_Null
+										                                                                                                                                                                                                            Set nN = 0
+										                                                                                                                                                                                                            Call SalTblSortRows(tbl1, SalTblQueryColumnID(colN), TBL_SortIncreasing)
+										                                                                                                                                                                                                            Set nRw = TBL_MinRow
+										                                                                                                                                                                                                            While SalTblFindNextRow(hWndForm, nRw, 0, 0)
+											                                                                                                                                                                                                            Call SalTblSetContext(hWndForm, nRw)
+											                                                                                                                                                                                                            If nFLAG
+												                                                                                                                                                                                                            Set nN = nN + 1
+												                                                                                                                                                                                                            Set nSORT = nN
+						                                                                                                                                                                                                            Column: colN
+							                                                                                                                                                                                                            List Values 
+							                                                                                                                                                                                                            Message Actions 
+					                                                                                                                                                                                                            Functions 
+					                                                                                                                                                                                                            Window Variables 
+						                                                                                                                                                                                                            Number: nRw
+						                                                                                                                                                                                                            Number: nN
+					                                                                                                                                                                                                            Message Actions 
+						                                                                                                                                                                                                            On SAM_Create
+							                                                                                                                                                                                                            Call SalSendMsgToChildren(hWndForm, UM_QueryLabelText, 0, 0)
+						                                                                                                                                                                                                            On SAM_DoubleClick
+							                                                                                                                                                                                                            Set nFLAG=1-nFLAG
+							                                                                                                                                                                                                            Call SalSendMsg(nFLAG,SAM_AnyEdit,0,0)
+						                                                                                                                                                                                                            On SAM_FetchRowDone
+							                                                                                                                                                                                                            Set colN = 0
 				Frame
 					Resource Id: 51820
 					Class Child Ref Key: 0
@@ -32788,8 +32781,8 @@ Application Description: Для аналитических функций
 						Uncheck Value:
 						Ignore Case? Yes
 .end
-				                                                                                                                                                                                                              List Values 
-				                                                                                                                                                                                                              Message Actions 
+				                                                                                                                                                                                                               List Values 
+				                                                                                                                                                                                                               Message Actions 
 		Functions
 			Function: F_DAT
 				Description:
@@ -34348,8 +34341,8 @@ Application Description: Для аналитических функций
 						Call SalSendMsg( hWndForm, SAM_TblDoDetails, 0, 0 )
 						Call SalWaitCursor(FALSE)
 					! On SAM_TblDoDetails
-						                                                                                                                                                                                               Call SalSendMsg( tbl2, UM_Populate, 0, 0 )
-						                                                                                                                                                                                               Call SalSendMsg( tbl3, UM_Populate, 0, 0 )
+						                                                                                                                                                                                                Call SalSendMsg( tbl2, UM_Populate, 0, 0 )
+						                                                                                                                                                                                                Call SalSendMsg( tbl3, UM_Populate, 0, 0 )
 					On SAM_SetFocus
 					On SAM_KillFocus
 						Set hWndLost = BR0.tbl
@@ -34668,25 +34661,25 @@ Application Description: Для аналитических функций
 						Message Actions
 				Functions
 					! Function: F_UPD
-						                                                                                                                                                                                               Description:
-						                                                                                                                                                                                               Returns
-							                                                                                                                                                                                               Boolean:
-						                                                                                                                                                                                               Parameters
-						                                                                                                                                                                                               Static Variables
-						                                                                                                                                                                                               Local variables
-						                                                                                                                                                                                               Actions
-							                                                                                                                                                                                               Call SalWaitCursor( TRUE )
-							                                                                                                                                                                                               Set nRow = TBL_MinRow
-							                                                                                                                                                                                               While SalTblFindNextRow(BR0.tbl3, nRow, ROW_Edited, 0)
-								                                                                                                                                                                                               Call SalTblSetContext(BR0.tbl3, nRow)
-								                                                                                                                                                                                               If NOT SqlPrepareAndExecute( hSql(),"delete from br_branch where branch=:BRANCH and BR=:nSch " )
-									                                                                                                                                                                                               Return FALSE
+						                                                                                                                                                                                                Description:
+						                                                                                                                                                                                                Returns
+							                                                                                                                                                                                                Boolean:
+						                                                                                                                                                                                                Parameters
+						                                                                                                                                                                                                Static Variables
+						                                                                                                                                                                                                Local variables
+						                                                                                                                                                                                                Actions
+							                                                                                                                                                                                                Call SalWaitCursor( TRUE )
+							                                                                                                                                                                                                Set nRow = TBL_MinRow
+							                                                                                                                                                                                                While SalTblFindNextRow(BR0.tbl3, nRow, ROW_Edited, 0)
+								                                                                                                                                                                                                Call SalTblSetContext(BR0.tbl3, nRow)
+								                                                                                                                                                                                                If NOT SqlPrepareAndExecute( hSql(),"delete from br_branch where branch=:BRANCH and BR=:nSch " )
+									                                                                                                                                                                                                Return FALSE
 								!
-								                                                                                                                                                                                               If BR0.tbl3.OTM = 1
-									                                                                                                                                                                                               If NOT SqlPrepareAndExecute( hSql(),"insert into br_branch(branch,br) values (:BRANCH,:nSch) " )
-										                                                                                                                                                                                               Return FALSE
+								                                                                                                                                                                                                If BR0.tbl3.OTM = 1
+									                                                                                                                                                                                                If NOT SqlPrepareAndExecute( hSql(),"insert into br_branch(branch,br) values (:BRANCH,:nSch) " )
+										                                                                                                                                                                                                Return FALSE
 							!
-							                                                                                                                                                                                               Return TRUE
+							                                                                                                                                                                                                Return TRUE
 				Window Variables
 					String: strSqlPop
 				Message Actions
@@ -34717,11 +34710,11 @@ Application Description: Для аналитических функций
 					On SAM_KillFocus
 						Set hWndLost = BR0.tbl3
 					! On UM_Update
-						                                                                                                                                                                                               If tbl3.F_UPD()
-							                                                                                                                                                                                               Call SqlCommit( hSql())
-						                                                                                                                                                                                               Else
-							                                                                                                                                                                                               Call SqlRollback( hSql())
-						                                                                                                                                                                                               Call SalSendMsg(BR0.tbl3, UM_Populate, 0, 0)
+						                                                                                                                                                                                                If tbl3.F_UPD()
+							                                                                                                                                                                                                Call SqlCommit( hSql())
+						                                                                                                                                                                                                Else
+							                                                                                                                                                                                                Call SqlRollback( hSql())
+						                                                                                                                                                                                                Call SalSendMsg(BR0.tbl3, UM_Populate, 0, 0)
 			!
 		Functions
 			Function: F_Rb
@@ -34811,10 +34804,10 @@ Application Description: Для аналитических функций
 				Call F_Rb()
 			On UM_Close
 				! If SalTblAnyRows( tbl, ROW_Edited | ROW_MarkDeleted | ROW_New, 0 )
-					                                                                                                                                                                                           Call SalMessageBeep( MB_IconQuestion )
-					                                                                                                                                                                                           If SalMessageBox(CurrentLangTable.GetAtomTitle('cGTQuestion'), 
+					                                                                                                                                                                                            Call SalMessageBeep( MB_IconQuestion )
+					                                                                                                                                                                                            If SalMessageBox(CurrentLangTable.GetAtomTitle('cGTQuestion'), 
 							   CurrentLangTable.GetAtomTitle('cMsgWarning'), MB_IconQuestion | MB_YesNo) != IDYES
-						                                                                                                                                                                                           Return FALSE
+						                                                                                                                                                                                            Return FALSE
 				Call SalDestroyWindow( hWndForm )
 	Table Window: CUT
 		Class: cGenericTable

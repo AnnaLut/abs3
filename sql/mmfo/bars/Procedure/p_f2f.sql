@@ -1,18 +1,9 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_F2F.sql =========*** Run *** ===
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure P_F2F ***
-
-  CREATE OR REPLACE PROCEDURE BARS.P_F2F (dat_ IN DATE) 
+CREATE OR REPLACE PROCEDURE BARS.P_F2F(dat_ IN DATE) 
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% DESCRIPTION :    Процедура формирования файла 
+% DESCRIPTION :    Процедура формирования файла                  MMFO
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
 %
-% VERSION     :  v.17.003        07.04.2017
+% VERSION     :  v.17.005        13.11.2017
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
    Структура показателя   L DDD N R E KKK ЛЛ MMM VVV H
@@ -30,6 +21,7 @@ PROMPT *** Create  procedure P_F2F ***
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+13.11.2017 переход на новый план счетов
 07.04.2017 DDD=208 исключена корреспонденция дт 2620,2625 -кт 3800
            DDD=211 сегмент MMM:  при счете кт=2900 код страны =804
            DDD=количество клиентов: расширена проверка с окпо клиента с окпо банка
@@ -169,7 +161,7 @@ IS
        else
            if p_typ_cust is null then
                if p_form = 1 then
-                   insert /*+APPEND PARALLEL (8) */ 
+                   insert /*+APPEND */ 
                    into OTCN_ACC (ACC, NLS, KV, NBS, RNK, DAOS, DAPP, ISP, NMS, 
                         LIM, PAP, TIP, VID, MDATE, DAZS, ACCC, TOBO) 
                    select a.acc, a.nls, a.kv, a.nbs, a.rnk, a.daos, a.dapp, a.isp, a.nms, 
@@ -185,7 +177,7 @@ IS
                         a.pap = p_typ_ap;           
                    commit;
                else
-                   insert /*+APPEND PARALLEL (8) */ 
+                   insert /*+APPEND  */ 
                    into OTCN_ACC (ACC, NLS, KV, NBS, RNK, DAOS, DAPP, ISP, NMS, 
                         LIM, PAP, TIP, VID, MDATE, DAZS, ACCC, TOBO) 
                    select a.acc, a.nls, a.kv, a.nbs, a.rnk, a.daos, a.dapp, a.isp, a.nms, 
@@ -203,7 +195,7 @@ IS
                end if;
            else
                if p_form = 1 then
-                   insert /*+APPEND PARALLEL (8) */ 
+                   insert /*+APPEND */ 
                    into OTCN_ACC (ACC, NLS, KV, NBS, RNK, DAOS, DAPP, ISP, NMS, 
                         LIM, PAP, TIP, VID, MDATE, DAZS, ACCC, TOBO) 
                    select a.acc, a.nls, a.kv, a.nbs, a.rnk, a.daos, a.dapp, a.isp, a.nms, 
@@ -220,7 +212,7 @@ IS
                         a.pap = p_typ_ap;           
                    commit;
                else
-                   insert /*+APPEND PARALLEL (8) */ 
+                   insert /*+APPEND  */ 
                    into OTCN_ACC (ACC, NLS, KV, NBS, RNK, DAOS, DAPP, ISP, NMS, 
                         LIM, PAP, TIP, VID, MDATE, DAZS, ACCC, TOBO) 
                    select a.acc, a.nls, a.kv, a.nbs, a.rnk, a.daos, a.dapp, a.isp, a.nms, 
@@ -1048,7 +1040,8 @@ BEGIN
         gl.p_icurval(kv, s, dat_), acc, nls, kv, rnk, ref, 
         comm, nbuc_
    from (
-    select '1207'||'3'||
+    select /*+ordered*/
+        '1207'||'3'||
         decode(NVL(c.country,'804'),'804','1','2')  pok1, 
         '2' segm_H, 
         decode((case when mfo_!=344443 and trim(r.risk_id) in (2, 3, 64) then '101' 
@@ -1079,7 +1072,7 @@ BEGIN
         o1.acc = a1.acc); 
    commit;    
 
-   logger.info ('P_F2F: part 2.6 '||to_char(dat_,'dd.mm.yyyy'));
+   logger.info ('P_F2F: part 2.6.1 '||to_char(dat_,'dd.mm.yyyy'));
    
    -- купівля БЕЗготівкової валюти
    INSERT /*+APPEND */ 
@@ -1104,7 +1097,7 @@ BEGIN
                  lpad(a.kv_doc, 3, '0') segm_VVV,
                  a.s, a.acc, a.nls, a.kv, a.rnk, a.ref, a.comm 
     from (
-    select /*+ leading(ad) */
+    select /* leading(ad) index(od,IDX_OPLDOK_KF_FDAT_ACC)  */
         od.ref, od.s, ak.acc, ak.nls, ak.kv, ak.rnk, 
         p.kv kv_doc, p.branch, 
         p.dk||' '||p.nlsa||' '||p.nlsb||' '||p.kv||' '||p.kv2||' '||p.nazn comm
@@ -1138,6 +1131,8 @@ BEGIN
          nvl(trim(r.risk_id(+)),0) in (2, 3, 62, 63, 64, 65)
         );
 
+   logger.info ('P_F2F: part 2.6.2 '||to_char(dat_,'dd.mm.yyyy'));
+   
    -- продаж БЕЗготівкової валюти
    INSERT /*+APPEND */ 
    INTO  rnbu_trace(recid, kodp, znap, acc, nls, kv, rnk, ref, comm, nbuc)    
@@ -1160,8 +1155,7 @@ BEGIN
                  lpad(F_Codobl_branch(a.branch, 4),3,'0') segm_KKK,
                  lpad(a.kv_doc, 3, '0') segm_VVV,
                  a.s, a.acc, a.nls, a.kv, a.rnk, a.ref, a.comm 
-    from (select /*+ leading(ak) */
-                od.ref, od.s, ad.acc, ad.nls, p.kv, ad.rnk, 
+    from (select od.ref, od.s, ad.acc, ad.nls, p.kv, ad.rnk, 
                 p.kv kv_doc, p.branch, 
                 p.dk||' '||p.nlsa||' '||p.nlsb||' '||p.kv||' '||p.kv2||' '||p.nazn comm
             from opldok od, accounts ad, opldok ok, accounts ak, oper p
@@ -1179,9 +1173,11 @@ BEGIN
                 od.ref = p.ref and
                 (ad.nbs in ('1600', '1602', '2520', '2530', 
                             '2541', '2544', '2600', '2603',
-                            '2620', '2650', '3640','2062','2063','2072','2073') 
+                            '2620', '2650', '3640',
+                            '2043','2063','2301','2303','2390' )
+                                      --'2062','2063','2072','2073') 
                   and  ak.nbs = '2900' or
-                ad.nbs in ('2610', '2615') --, '2630', '2635')   --'2620', '2625'
+                ad.nbs = '2610'
                   and  ak.nbs = '3800') and
                 p.kv not in (959, 961, 962, 964, 980) and
                 p.pdat between dat1_ - 10 and dat_ + 10 and
@@ -1200,10 +1196,17 @@ BEGIN
    -- показник 211 пасив дебетові обороти
    p_form_pok(1, '211', null, 2, 0);
    
+   logger.info ('P_F2F: part 2.8.1 '||to_char(dat_,'dd.mm.yyyy'));   
+   
    -- показник 213 актив дебетові обороти
    p_form_pok(2, '001', null, 2, 1); 
+
+   logger.info ('P_F2F: part 2.8.2 '||to_char(dat_,'dd.mm.yyyy'));   
+   
    p_form_pok(2, '002', null, 1, 0);  
 
+   logger.info ('P_F2F: part 2.8.3 '||to_char(dat_,'dd.mm.yyyy')); 
+   
    -- купівля готівкових металів
    INSERT /*+APPEND NOPARALLEL*/  
    INTO  rnbu_trace(recid, kodp, znap, acc, nls, kv, rnk, ref, comm, nbuc)    
@@ -1237,6 +1240,8 @@ BEGIN
       and substr(p.nlsb,1,3) in ('100','110')
       and p.pdat between dat1_ - 10 and dat_ + 10); 
    commit;    
+   
+   logger.info ('P_F2F: part 2.8.4 '||to_char(dat_,'dd.mm.yyyy'));    
 
    -- продаж готівкових металів
    INSERT /*+APPEND NOPARALLEL*/  
@@ -1271,6 +1276,8 @@ BEGIN
       and substr(p.nlsb,1,3) in ('100','110')
       and p.pdat between dat1_ - 10 and dat_ + 10); 
    commit;    
+   
+   logger.info ('P_F2F: part 2.8.5 '||to_char(dat_,'dd.mm.yyyy'));    
 
    -- изменение кода 201 на 215 (Кт обороты) или 216 (Дт обороты) 
    update rnbu_trace set kodp = '1' || '215' || substr(kodp,5)
@@ -1279,7 +1286,7 @@ BEGIN
    update rnbu_trace set kodp = '1' || '216' || substr(kodp,5)
    where kodp like '1201%' and isp = 0;
 
-   logger.info ('P_F2F: part 2.8 '||to_char(dat_,'dd.mm.yyyy'));
+   logger.info ('P_F2F: part 2.8.6 '||to_char(dat_,'dd.mm.yyyy'));
 ----------------------------------------------------------------------------
 -- новые коды 217, 219
 -- отбор проводок, удовлетворяющих условию
@@ -1287,7 +1294,7 @@ BEGIN
    -- переказ коштiв нерезидентам (отримання коштiв вiд нерезидентiв)
    INSERT INTO OTCN_PROV_TEMP
    (ko, rnk, fdat, REF, tt, accd, nlsd, kv, acck, nlsk, s_nom, s_eqv, s_kom, nazn, branch)
-   select /*+ FULL(k) LEADING(k ad) */
+   select /* FULL(k) LEADING(k ad) */
            k.d060, 1, od.fdat, od.ref, od.tt, 
            ad.acc accd, ad.nls nlsd, ad.kv, ak.acc acck, ak.nls nlsk, od.s  s_nom,
            gl.p_icurval (ad.kv, od.s, od.fdat) s_eqv, 
@@ -1756,22 +1763,24 @@ BEGIN
    INSERT INTO tmp_nbu(datf, kodf, kodp, znap, nbuc)
    select dat_, kodf_, '3301000000000000000' kodp, 
         sum(znap), nbuc_ 
-   from (select 
-              count(distinct p.ref) znap
+   from (select /*+ parallel(8) */
+                count(distinct p.ref) znap
          from opldok o, oper p
          where o.fdat between dat1_ and dat_ and
                o.ref = p.ref and
                p.pdat between dat1_ - 10 and dat_ + 10 and
                p.sos = 5 and
-               (o.fdat, o.acc) in (select s.fdat, s.acc
-                                    from saldoa s
-                                    where s.fdat between dat1_ and dat_ and
-                                        S.ACC in (select unique a.acc
-                                                  from kl_f3_29 k, accounts a
-                                                  where k.kf = '2F' and
-                                                        k.ddd = '102' and
-                                                        a.nbs = k.r020) and
-                                    s.dos+s.kos<>0));
+               (o.fdat, o.acc) in (SELECT S.FDAT, S.ACC
+                                            FROM SALDOA S, accounts a
+                                           WHERE     S.FDAT BETWEEN dat1_ AND dat_
+                                                 AND S.ACC = a.acc
+                                                 and a.nbs in  (SELECT k.r020
+                                                                 FROM KL_F3_29 K
+                                                                WHERE     K.KF =
+                                                                             '2F'
+                                                                      AND K.DDD =
+                                                                             '102')
+                                                 AND S.DOS + S.KOS <> 0));
                                     
    logger.info ('P_F2F: part 3.2 '||to_char(dat_,'dd.mm.yyyy'));
    
@@ -1797,16 +1806,16 @@ BEGIN
 --        logger.info ('P_F2F: Error '||sqlerrm||' '||to_char(dat_,'dd.mm.yyyy'));   
 END;
 /
-show err;
 
-PROMPT *** Create  grants  P_F2F ***
-grant EXECUTE                                                                on P_F2F           to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on P_F2F           to RPBN002;
-grant EXECUTE                                                                on P_F2F           to START1;
-grant EXECUTE                                                                on P_F2F           to WR_ALL_RIGHTS;
+GRANT EXECUTE ON BARS.P_F2F TO BARS_ACCESS_DEFROLE
+/
 
+GRANT EXECUTE ON BARS.P_F2F TO RPBN002
+/
 
+GRANT EXECUTE ON BARS.P_F2F TO START1
+/
 
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_F2F.sql =========*** End *** ===
-PROMPT ===================================================================================== 
+GRANT EXECUTE ON BARS.P_F2F TO WR_ALL_RIGHTS
+/
+

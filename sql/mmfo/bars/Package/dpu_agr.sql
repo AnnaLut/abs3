@@ -1,4 +1,4 @@
-CREATE OR REPLACE PACKAGE DPU_AGR
+create or replace package DPU_AGR
 is
   g_header_version  constant varchar2(64)  := 'version 1.03 09.12.2015';
   g_header_awk_defs constant varchar2(512) := '';
@@ -89,7 +89,7 @@ is
 end DPU_AGR;
 /
 
-Show errors;
+show errors;
 
 ----
 
@@ -98,7 +98,7 @@ is
   --
   -- constants
   --
-  g_body_version             constant varchar2(64)  := 'version 1.10  04.07.2017';
+  g_body_version             constant varchar2(64)  := 'version 1.11  20.11.2017';
   modcode                    constant varchar2(3)   := 'DPU';
   
   --
@@ -499,15 +499,13 @@ $end
         select nvl( min( case when v1.FLAG = 1 then v1.VIDD else null end ), min( v1.VIDD ) )
           into r_dpu.VIDD
           from DPU_VIDD v1
-          join ( select TYPE_ID, KV, BSD, DPU_TYPE, TERM_TYPE
-                      , FREQ_V
+          join ( select TYPE_ID, KV, BSD, TERM_TYPE, FREQ_V
                    from DPU_VIDD
                   where VIDD = r_dpu.VIDD
                ) v2
             on ( v2.TYPE_ID   = v1.TYPE_ID   and
                  v2.KV        = v1.KV        and
                  v2.BSD       = v1.BSD       and
-                 v2.DPU_TYPE  = v1.DPU_TYPE  and
                  v2.TERM_TYPE = v1.TERM_TYPE )
          where v1.VIDD  <> r_dpu.VIDD
            and v1.FREQ_V = r_dpu.FREQV;
@@ -733,7 +731,7 @@ BEGIN
 end DPU_AGR;
 /
 
-Show errors;
+show errors;
 
-GRANT EXECUTE ON BARS.DPU_AGR TO DPT_ROLE;
-GRANT EXECUTE ON BARS.DPU_AGR TO BARS_ACCESS_DEFROLE;
+GRANT EXECUTE ON DPU_AGR TO DPT_ROLE;
+GRANT EXECUTE ON DPU_AGR TO BARS_ACCESS_DEFROLE;

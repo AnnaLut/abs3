@@ -1,5 +1,3 @@
-
- 
  PROMPT ===================================================================================== 
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/rez.sql =========*** Run *** =======
  PROMPT ===================================================================================== 
@@ -7,7 +5,6 @@
   CREATE OR REPLACE PACKAGE BARS.REZ 
 IS
 /*
-
 DESCRIPTION : Функции и процедуры для расчета резерва
 VERSION     : 12.11.2008
 СOMMENT     :
@@ -26,7 +23,7 @@ VERSION     : 12.11.2008
  'REZPAR4'  = 1 - не учитывать при расчете дисконт
  'REZPAR5'  = 1 - процент резервирования по 83 постанове (уст по умолч в пакете, нету в PARAMS !!!)
  'REZPAR6'  = 1 - расчет с учетом однородных кредитов (уст по умолч в пакете, нету в PARAMS !!!)
- 'REZPAR7'  = 1 - флаг - значение по умолчанию типа клиента для счетов 3579 (custtype=1) (АКБ Киев)
+ 'REZPAR7'  = 1 - флаг - значение по умолчанию типа клиента для счетов (SK9) (custtype=1) (АКБ Киев)
  'REZPAR8'  = 1 - при расчете резерва по счетам просроченных процентов используется "смешанный алгоритм"
                   т.е. если параметр R013 заполнен
                        = 2 - резервируем 100 % остатка на отчетную дату,
@@ -278,16 +275,17 @@ FUNCTION ostc96_3 (acc_ INT, dat_ IN DATE)
 
 
 END rez;
+ 
 /
 CREATE OR REPLACE PACKAGE BODY BARS.REZ 
 /*
 
-  VERSION : 09.01.2009
+  VERSION : 22.11.2017
 
 */
 IS
    -- версия пакета
-   version_        VARCHAR2 (30)   := '22.01.2009';
+   version_        VARCHAR2 (30)   := '22.11.2017';
   sss varchar2(1000);
    c_dt date := to_date('28122008','ddmmyyyy');
    curdate_        DATE; -- текущая отчетная дата
@@ -312,7 +310,7 @@ IS
       := '2236,2226,2216,2206,2116,2106,2086,2076,2066,2036,2026,1626,1526,1326,1316,';
    -- балансовые счета премии
    nbspremiy_      VARCHAR2 (2000)
-      := '2075,2065,2085,2105,2115,2125,2135,2205,2215,2235,2617,2637,2653,2707,';
+      := '';
    -- балансовые счета страхового фонда
    nbsfond_        VARCHAR2 (2000)
            := ',1492,1590,1591,1592,1593,1790,2400,2401,2490,3291,3599,3690,';
@@ -333,7 +331,6 @@ IS
    rezpar9_        NUMBER          DEFAULT 0;
    rezpar10_        NUMBER          DEFAULT 0; --T 22.01.2009
    rezpar11_        NUMBER          DEFAULT 0; --T 07.04.2009
-
    -- флаг - обесп. по кредитам просроченным >30 дней по спец. алгоритму
    flagallrez_     NUMBER          DEFAULT 0;
    par_ob22        number := nvl(GetGlobalOption('OB22'),0);
@@ -761,6 +758,7 @@ IS
       THEN
          IF salost_ (acc_).fdat = dat_
          THEN
+            --     to_log (acc_, '..остаток1=', TO_CHAR (salost_ (acc_).ost));
             dbms_output.put_line('..остаток1= '|| TO_CHAR (salost_ (acc_).ost));
             RETURN salost_ (acc_).ost;
          END IF;
@@ -788,7 +786,7 @@ IS
 
       IF flagkorprov_ = 0
       THEN
-         SELECT NVL (SUM (DECODE (o.dk, 1, o.s, -o.s)), 0)
+         SELECT /*+ index(o IDX_OPLDOK_ACC) */NVL (SUM (DECODE (o.dk, 1, o.s, -o.s)), 0)
            INTO ob_
            FROM opldok o, oper p
           WHERE o.REF = p.REF
@@ -928,6 +926,7 @@ IS
       RETURN ost_;
    END ostc96_3;
 
+
 -------------------------------------
    FUNCTION fin (dat_ DATE)
       RETURN NUMBER
@@ -1035,7 +1034,6 @@ IS
       s080_                  CHAR (1);
       s090_                  CHAR (1);
       r013_                  CHAR (5);
-      r013_2                  CHAR (5);
       r031_                  CHAR (1);
       istval_                NUMBER;
       pr_                    NUMBER;
@@ -1070,7 +1068,6 @@ IS
       ern           CONSTANT POSITIVE        := 208;
       err                    EXCEPTION;
       erm                    VARCHAR2 (80);
-      cnt                    number;
    BEGIN
       IF acc_ IS NULL
       THEN
@@ -1096,15 +1093,14 @@ IS
                 NVL (p.s080, '1') s080, p.s090, NVL (p.istval, '0') istval,
                 a.nbs || DECODE (NVL (p.r013, '1'), '9', '9', '1'), a.kv,
                 a.nls, a.nbs, c.rnk
-                ,a.nbs || p.r013
            INTO sk1_,
                 s080_, s090_, istval_,
                 r013_, kvk_,
-                nls_, nbs_, rnk_, r013_2
+                nls_, nbs_, rnk_
            FROM accounts a, specparam p, cust_acc c
           WHERE a.acc = p.acc(+) AND a.acc = c.acc AND a.acc = acc_;
 
-         to_log (acc_, 'sk1_', TO_CHAR (sk1_));
+         to_log (acc_, 'sk1_ остаток по '||acc_, TO_CHAR (sk1_));
          to_log (acc_, 's080_', s080_);
          to_log (acc_, 'istval_', istval_);
          to_log (acc_, 'r013_', r013_);
@@ -1139,12 +1135,7 @@ IS
               FROM cc_add
              WHERE nd = nd_ AND adds = 0;
 
-            if dat_ <= to_date('31122011','ddmmyyyy') then --В соответствии с Постановой №650 (от 03,11,2009)
-                dni_ := greatest(to_date('01102008','ddmmyyyy') - wdate_,0);
-            else
-                dni_ := dat_ - wdate_;
-            end if;
-
+            dni_ := dat_ - wdate_;
          EXCEPTION
             WHEN OTHERS
             THEN
@@ -1163,9 +1154,9 @@ IS
          sk1_ := sk1_ + delq_ + discont_ + premiy_;
          to_log (acc_, 'sk1_ остаток по '||acc_||' +диск. и прем.', sk1_);
 
-         IF r013_ = '91299' OR r013_ = '90231' OR sk1_ > 0
+         IF r013_ = '91299' OR r013_ = '90031' OR sk1_ > 0
          THEN
-            to_log (acc_, 'спец обр 9129, 9023 sk1_=0', '');
+            to_log (acc_, 'спец обр 9129, 9003 sk1_=0', '');
             sk1_ := 0;
          END IF;
 
@@ -1255,7 +1246,7 @@ IS
             --    OR fl_use_as_first_zal_ = 0 and not prcrezal_.EXISTS (k.acc)
             -- THEN
                 --       to_log (acc_, '*** 1', '');
-            IF k1.s < 0 AND k1.r013 <> '91299' AND k1.r013 <> '90231'
+            IF k1.s < 0 AND k1.r013 <> '91299' AND k1.r013 <> '90031'
             THEN
 --            to_log (acc_, '*** 1', '');
                   -- 1. рассматриваем как кредиты все кроме однородных кредитов
@@ -1319,7 +1310,6 @@ IS
             -- 15 майнови права на грошов_ депозити
             -- 25 нерухоме майно що належить до житлового фонду
             -- 26 майнови права на майбутне нерухоме майно
-            -- 31 інше нерухоме майно
             IF k.s031 = '15'
             THEN
                IF kvk_ <> k.kv AND k.r031 NOT IN ('2')
@@ -1341,23 +1331,6 @@ IS
                THEN
                   pr_ := 0;
                END IF;
-            ELSIF k.s031 = '31' then
-               if dat_ <= to_date('31122011','ddmmyyyy') --В соответствии с Постановой №650 (от 03,11,2009)
-               then
-                 cnt := 0;
-                 --товаровиробники
-                 select count(*)
-                 into cnt
-                 from kl_f3_29
-                 where kf in ('00','42') and ddd = '071' and
-                       r020 || R012 = r013_2
-                 ;
-                 if cnt <> 0 then
-                   pr_ := NVL (pr2_, pr_) ;
-                 end if;
-
-               end if;
-
             END IF;
 
             IF mode_ = 1
@@ -1681,13 +1654,13 @@ IS
                   0)
         INTO sdqall_
         FROM accounts a, nd_acc n
-       WHERE a.acc = n.acc AND f_nbs_is_disc (a.nbs) = 1 AND n.nd = nd_;
+       WHERE a.acc = n.acc AND a.tip = 'SDI' AND n.nd = nd_;
 
       FOR k IN (SELECT a.acc,
                        gl.p_icurval (a.kv, rez.ostc96 (a.acc, dat_),
                                      dat_) sdq
                   FROM accounts a, nd_acc n
-                 WHERE a.acc = n.acc AND f_nbs_is_disc (a.nbs) = 1
+                 WHERE a.acc = n.acc AND a.tip = 'SDI'
                        AND n.nd = nd_)
       LOOP
          ndiscont1_ := ndiscont1_ + 1;
@@ -1860,7 +1833,7 @@ IS
                   0)
         INTO spqall_
         FROM accounts a, nd_acc n
-       WHERE a.acc = n.acc AND f_nbs_is_disc (a.nbs) = 1 AND n.nd = nd_;
+       WHERE a.acc = n.acc AND a.tip='SDI' AND n.nd = nd_;
 
       FOR k IN (SELECT a.acc,
                        gl.p_icurval (a.kv, rez.ostc96 (a.acc, dat_),
@@ -2079,6 +2052,7 @@ IS
       RETURN ret_;
    END;
 
+   --T 24.03.2009
    function f_get_rest_over_30(acc_ number, last_work_date_ date) return number
    is
 
@@ -2138,7 +2112,6 @@ IS
       dbms_output.put_line('SZ = '||sz_);
       return sz_;
     end;
-
 --------------------------------------
    -- Процедура предварительного накопления данных в массивы
    -- используется уменьшения времени выполнения процедуры REZ_RISK
@@ -2167,10 +2140,8 @@ IS
                               FROM accounts a, specparam s, cust_acc ca
                              WHERE a.acc = s.acc
                                AND a.nbs IN
-                                      ('2202',
-                                       '2203',
+                                      ('2203',
                                        '2206',
-                                       '2207',
                                        '2290',
                                        '2620',
                                        '2625',
@@ -2232,19 +2203,7 @@ IS
                              WHERE s.acc = a.acc
                                AND a.acc = n.acc
                                AND a.acc = p.acc
-                               AND a.nbs IN
-                                      ('2207',
-                                       '2217',
-                                       '2227',
-                                       '2237',
-                                       '2290',
-                                       '2027',
-                                       '2037',
-                                       '2067',
-                                       '2077',
-                                       '2087',
-                                       '2097'
-                                      )
+                               AND a.tip in ('SP ')
                                AND a.acc = NVL (acc_, a.acc)
                                --AND p.s090 = '4'
                                AND s.fdat <= dat_
@@ -2368,7 +2327,7 @@ IS
    END;
 
 --------------------------------------
-   PROCEDURE rez_risk (id_ INT, dat_ DATE, mode_ IN INT DEFAULT 0)
+   PROCEDURE rez_risk (id_ INT, dat_ DATE, mode_ IN INT DEFAULT 0/*, pr_ in int default null*/)
    IS
       ostq_            NUMBER;
       ostqold_         NUMBER;
@@ -2388,6 +2347,7 @@ IS
       szq2_            NUMBER;
       grp_             INT;
       sz_              NUMBER;
+      sz_60_           NUMBER;
       wdate_           DATE;
       pr_rez_          NUMBER;
       kdate_           DATE;
@@ -2439,7 +2399,6 @@ IS
       loop
             bars_error.raise_error('REZ',2);
       end loop;
-
       -- не перезапускать расчет для пользователя который делал проводки
       -- по формированию фонда
       BEGIN
@@ -2486,8 +2445,10 @@ IS
          acckr_ := NULL;
          p_load_data (dat_);
 
-         DELETE FROM cp_rez_log
-               WHERE userid = id_;
+         if uselog_ <> 0 then
+             DELETE FROM cp_rez_log
+                   WHERE userid = id_;
+         end if;
 
          DELETE FROM tmp_rez_risk
                WHERE ID = id_ AND dat = dat_;
@@ -2500,6 +2461,9 @@ IS
 
          DELETE FROM tmp_rez_risk4
                WHERE userid = id_ AND dat = dat_;
+
+         DELETE FROM tmp_rez_params
+                       WHERE ID = id_ AND dat = dat_;
 
 
 
@@ -2619,10 +2583,8 @@ IS
                   OR a.nbs = '1513'--T 09.01.2009
                   OR a.nbs = '1514'--T 09.01.2009
                   OR a.nbs = '1520'--T 09.01.2009
-                  OR a.nbs = '3548'
                  )
              AND a.nbs not in ('1590','1591','2400','2401','3690')
-             and not(a.nbs = '3548' and nvl(p.r011,'0') = '9')
               --T 09.01.2009
              AND cu.acc = a.acc
              AND a.acc = NVL (acckr_, a.acc)
@@ -2669,7 +2631,7 @@ IS
 
          -- флаг - счет включен в портфель однородных кредитов
          IF     dodncre_.EXISTS (k.rnk)
-            AND k.nbs IN ('2202', '2203', '2207', '2290', '2620', '2625','2605')
+            AND k.nbs IN ('2203', '2290', '2620', '2625','2605')
             AND k.s090 = '4'
          THEN
             odncre_ := 'y';
@@ -3214,11 +3176,11 @@ IS
                szq2_ := 0;
                ostq_ := 0;
             --2. Авалі, що надані клієнтам за податковими векселями
-            ELSIF k.nbs = '9023' AND k.r013_2 = '1'
+            ELSIF k.nbs = '9003' AND k.r013_2 = '1'
             THEN
                to_log
                     (k.acc,
-                     'Специальная обработка: nbs = 9023 r013=1. Резерв = 0.',
+                     'Специальная обработка: nbs = 9003 r013=1. Резерв = 0.',
                      ''
                     );
                sz_ := 0;
@@ -3298,6 +3260,7 @@ IS
                             skq2,
                             discont, prem, sn, szq2, corp,
                             istval, odncre, dnipr
+                            ,fl_newacc
                            )
                     VALUES (dat_, id_, s080_, s080_name_, custtype_, k.rnk,
                             k.nmk, k.kv, k.nls, ROUND (ostc_ + del_),
@@ -3310,7 +3273,19 @@ IS
                             GREATEST (ostq_ - discont_ + prem_, 0),
                             discont_, prem_, sn_, ROUND (szq2_), k.corp,
                             istval_, odncre_, dnipr_
+                            ,'n'
                            );
+
+                 insert into TMP_REZ_PARAMS
+                 (dat , id  , acc , r013 ,
+                  s270 , istval , s090 ,ob22
+                  )
+                  values(dat_, id_, k.acc, k.r013_2,
+                  null, k.istval, k.s090,
+                  (select ob22 from specparam_int where acc = k.acc)
+                  );
+
+
             END IF;
          END IF;
       END LOOP;
@@ -3337,12 +3312,9 @@ IS
                              AND p.vdat = datpr_
                              AND p.nlsa NOT LIKE '3589%'
                              AND p.nlsb NOT LIKE '3589%'
-                             AND p.nlsa NOT LIKE '3579%'
-                             AND p.nlsb NOT LIKE '3579%'
                           OR     o.fdat BETWEEN dat_ + 1 AND dat_ + 15
                              AND p.vdat = dat_
                              AND (p.nlsa LIKE '3589%' OR p.nlsb LIKE '3589%'
-                                   or p.nlsa LIKE '3579%' OR p.nlsb LIKE '3579%'
                                  )
                          )
                 GROUP BY o.acc)
@@ -3351,6 +3323,9 @@ IS
          korprov_ (k.acc).fdat := datpr_;
       END LOOP;
 
+
+
+
 -- РЕЗЕРВЫ ПО ПРОСРОЧЕННЫМ ПРОЦЕНТАМ и СОМНИТЕЛЬНЫМ ПРОЦЕНТАМ
 --1. не учитывается обеспечение
 --2. резервируются только сомнительные и просроченные свыше 30 дней
@@ -3358,79 +3333,46 @@ IS
 --4. категория риска одна - 9 в таблице CRISK
       FOR k IN
          (WITH cw AS
-               (SELECT DISTINCT rnk, tag,
-                                FIRST_VALUE (VALUE) OVER (PARTITION BY rnk ORDER BY rnk)
-                                                                         corp
-                           FROM customerw
-                          WHERE tag = 'CORP'
-                       ORDER BY rnk)
-          SELECT c.rnk, SUBSTR (c.nmk, 1, 35) nmk,
-                 --c.custtype,
-                 DECODE (TRIM (c.sed),
-                         '91', DECODE (custtype, 3, 2, custtype),
-                         c.custtype
-                        ) custtype,  --T 02.12.2008
+               (SELECT DISTINCT rnk, tag, FIRST_VALUE (VALUE) OVER (PARTITION BY rnk ORDER BY rnk) corp
+                FROM customerw
+                WHERE tag = 'CORP'
+                ORDER BY rnk)
+          --просроченные %
+          SELECT a.tip, c.rnk, SUBSTR (c.nmk, 1, 35) nmk, DECODE (TRIM (c.sed), '91', DECODE (custtype, 3, 2, custtype), c.custtype ) custtype,
                  a.tobo,
                  NVL (p.s080, '') s080,
                  NVL (p.r013, '') r013,
-                 --decode(NVL (p.r013, ''),'3','2',NVL (p.r013, '')) r013, --T 02.02.2008
                  a.acc, a.kv,
                  a.nls, a.isp, SUBSTR (a.nbs, 3, 2) priz, a.nbs, c.crisk fin,
                  NVL (c.country, acountry) country,
                  DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6', 2, 1) rz,
-                 cw.corp,
-                 a.daos,--T 23.01.2008
-                 p.s182 --T 23.01.2008
-                  ,p.s270 --T 19.03.2009
+                 cw.corp, a.daos, p.s182, p.s270 
             FROM accounts a, cust_acc cu, customer c, specparam p, cw
            WHERE cu.acc = a.acc
              AND cu.rnk = c.rnk
              AND a.acc = NVL (acckr_, a.acc)
              AND a.acc = p.acc(+)
              AND (a.dazs IS NULL OR a.dazs > dat_)
-             AND (   a.nbs IN (
-                        SELECT DISTINCT r020
-                                   FROM kl_r011
-                                  WHERE prem = 'КБ '
-                                    AND SUBSTR (r020, 4, 1) = '9'
-                                    AND r020r011 IS NOT NULL)
-                  OR a.nbs IN ('2480', '1780', '3589', '2239','2089')
-                 )
+             AND a.tip IN ( 'SPN') 
              AND c.rnk = cw.rnk(+)
              union all
            --начисленные
-           SELECT c.rnk, SUBSTR (c.nmk, 1, 35) nmk,
-                 --c.custtype,
-                 DECODE (TRIM (c.sed),
-                         '91', DECODE (custtype, 3, 2, custtype),
-                         c.custtype
-                        ) custtype,  --T 02.12.2008
+           SELECT a.tip, c.rnk, SUBSTR (c.nmk, 1, 35) nmk, DECODE (TRIM (c.sed),'91', DECODE (custtype, 3, 2, custtype),c.custtype) custtype, 
                  a.tobo,
                  NVL (p.s080, '') s080,
                  NVL (p.r013, '') r013,
-                -- decode(NVL (p.r013, ''),'3','2',NVL (p.r013, '')) r013, --T 02.02.2008
                  a.acc, a.kv,
                  a.nls, a.isp, SUBSTR (a.nbs, 3, 2) priz, a.nbs, c.crisk fin,
                  NVL (c.country, acountry) country,
                  DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6', 2, 1) rz,
-                 cw.corp,
-                 a.daos,--T 23.01.2008
-                 p.s182 --T 23.01.2008
-                 ,p.s270 --T 19.03.2009
+                 cw.corp, a.daos, p.s182, p.s270 
             FROM accounts a, cust_acc cu, customer c, specparam p, cw
            WHERE cu.acc = a.acc
              AND cu.rnk = c.rnk
              AND a.acc = NVL (acckr_, a.acc)
              AND a.acc = p.acc(+)
              AND (a.dazs IS NULL OR a.dazs > dat_)
-             AND (   a.nbs IN (
-                        SELECT DISTINCT r020
-                                   FROM kl_r011
-                                  WHERE prem = 'КБ '
-                                    AND SUBSTR (r020, 4, 1) = '8'
-                                    AND r020r011 IS NOT NULL)
-
-                 )
+             AND a.tip IN ( 'SN ')
              and p.s270 = '08'
              AND c.rnk = cw.rnk(+)
              and rezpar11_ = 1
@@ -3461,7 +3403,6 @@ IS
                otd_ := 0;
          END;
 
-         --IF k.priz = '80' OR k.nbs = '3589'
          if k.s270 = '08' and rezpar11_ = 1 then --T19.03.2009
             sz_ := -rez.ostc96 (k.acc, dat_);
             IF k.r013 = '3' and SUBSTR (k.nbs, 4, 1) <> '8' then s080_name_ := 'Сомнительные %';
@@ -3526,6 +3467,7 @@ IS
             END IF;
          END IF;
 
+
          -- dbms_output.put_line('sz_='||to_char(sz_));
            --сумма резерва
          IF sz_ > 0
@@ -3535,15 +3477,9 @@ IS
             szq_ := gl.p_icurval (k.kv, sz_, dat_);
             rezerv_ := sz_;
 
-            IF rezpar1_ = '1' AND k.custtype = '3'
-            THEN
-               custtype_ := '2';
-            ELSIF rezpar7_ = '1' AND k.custtype IN ('2', '3')
-                  AND k.nbs = '3579'
-            THEN
-               custtype_ := '1';
-            ELSE
-               custtype_ := k.custtype;
+            IF    rezpar1_ = '1' AND k.custtype = '3'                                      THEN custtype_ := '2';
+            ELSIF rezpar7_ = '1' AND k.custtype IN ('2', '3')  AND k.tip in ('SK9','OFR')  THEN custtype_ := '1';
+            ELSE                                                                                custtype_ := k.custtype;
             END IF;
 
             IF mode_ <> 2 AND calcdoppar_ = 1
@@ -3660,6 +3596,7 @@ IS
                             acc, nd, wdate, kdate, sg, sv, kprolog,
                             pawn, obesp, dat_prol, isp, otd, tobo,
                             skq2, discont, prem, sn, szq2, corp
+                            ,fl_newacc
                            )
                     VALUES (dat_, id_, '9', s080_name_, custtype_, k.rnk,
                             k.nmk, k.kv, k.nls, sz_, szq_, 0, szq_, szq_,
@@ -3668,10 +3605,35 @@ IS
                             k.acc, nd_, wdate_, kdate_, sg_, sv_, kprolog_,
                             vid_zal, zal_, dat_prol_, k.isp, otd_, k.tobo,
                             szq_, discont_, prem_, sn_, szq_, k.corp
+                            ,'n'
                            );
+
+                 insert into TMP_REZ_PARAMS
+                 (dat , id  , acc , r013 ,
+                  s270 , istval , s090 ,ob22
+                  )
+                  values(dat_, id_, k.acc, k.r013,
+                  k.s270,null, null,
+                  (select ob22 from specparam_int where acc = k.acc)
+                  );
             END IF;
          END IF;
       END LOOP;
+
+    /*  if pr_ = 1 then
+         for k in
+         (select acc, min(sz1) sz1 from tmp_rez_risk
+          where sz1 is not null
+                and dat = dat_ and id <> userid_
+          group by acc
+          )
+          loop
+            update tmp_rez_risk r
+            set r.sz1 = k.sz1
+            where r.dat = dat_ and r.id = userid_ and r.acc = k.acc
+            ;
+          end loop;
+      end if;*/
 
 
       IF mode_ <> 2
@@ -3882,22 +3844,10 @@ IS
 
       --Для сбербанка
       if nvl(GetGlobalOption('OB22'),0) = 1 then
-          execute immediate 'begin REZ_PAY_OB22 (:dat_ , :mode_ , :p_user,0) ; end;'
-          using dat_ , mode_, p_user;
-      end if;
-
-      --Для сбербанка
-      if nvl(GetGlobalOption('OB22'),0) = 1 then
-          execute immediate 'begin REZ_PAY_OB22 (:dat_ , :mode_ , :p_user,1) ; end;'
-          using dat_ , mode_, p_user;
-      end if;
-
-      if nvl(GetGlobalOption('OB22'),0) = 1 then
-          execute immediate 'begin REZ_PAY_OB22 (:dat_ , :mode_ , :p_user,2) ; end;'
+          execute immediate 'begin REZ_PAY_OB22 (:dat_ , :mode_ , :p_user) ; end;'
           using dat_ , mode_, p_user;
           RETURN;
       end if;
-
 
       -- применять программу оплаты 2
       IF rezpay2_ = 1
@@ -3906,9 +3856,10 @@ IS
          RETURN;
       END IF;
 
+
       dat2_ := bankdate;
 
-     /* SELECT NVL (MAX (vdat), dat_)
+      /* SELECT NVL (MAX (vdat), dat_)
         INTO dat_form
         FROM oper
        WHERE tt IN ('ARE', 'AR*') AND sos = 5 AND vdat <= dat_;*/
@@ -3954,7 +3905,6 @@ IS
              end if;
            end loop;
       end if;
-
 
       -- ОКПО
       BEGIN
@@ -4163,12 +4113,12 @@ IS
                            (tt, vob, pdat, vdat, datd, datp, nam_a,
                             nlsa, mfoa, id_a, nam_b, nlsb,
                             mfob, id_b, kv, s, kv2, s2,
-                            nazn, userid,dk
+                            nazn, userid
                            )
                     VALUES (tt_, vob_, SYSDATE, dat_, dat2_, dat2_, nam_a_,
                             k.s_fond, gl.amfo, okpoa_, nam_b_, r7702_,
                             gl.amfo, okpoa_, k.kv, s_old_q, 980, s_old_,
-                            nazn_, otvisp_,0
+                            nazn_, otvisp_
                            );
             END IF;
          END IF;
@@ -4464,12 +4414,12 @@ IS
                            (tt, vob, pdat, vdat, datd, datp, nam_a,
                             nlsa, mfoa, id_a, nam_b, nlsb,
                             mfob, id_b, kv, s, kv2, s2,
-                            nazn, userid,dk
+                            nazn, userid
                            )
                     VALUES (tt_, vob_, SYSDATE, dat_, dat2_, dat2_, nam_b_,
                             f7702_, gl.amfo, okpoa_, nam_a_, k.s_fond,
                             gl.amfo, okpoa_, 980, s_new_q, k.kv, s_new_,
-                            nazn_, otvisp_,1
+                            nazn_, otvisp_
                            );
             END IF;
          END IF;
@@ -4551,11 +4501,9 @@ s varchar2(100);
 
    BEGIN
 
-     -- raise_application_error(-20001, ' sdfsdfsd = '||dummy);
+       dat2_ := bankdate;
 
-      dat2_ := bankdate;
-
-      /*SELECT NVL (MAX (vdat), dat_)
+       /* SELECT NVL (MAX (vdat), dat_)
         INTO dat_form
         FROM oper
        WHERE tt IN ('ARE', 'AR*') AND sos = 5 AND vdat < dat_;*/
@@ -4565,7 +4513,6 @@ s varchar2(100);
         INTO dat_form
         FROM oper
        WHERE tt like 'AR_' AND sos = 5 AND vdat between (dat_-90) and dat_;
-
 
       -- Возвращает код тек. пользователя STAFF.ID
       BEGIN
@@ -4825,12 +4772,12 @@ dummy := 4;
                               (tt, vob, pdat, vdat, datd, datp,
                                nam_a, nlsa, mfoa, id_a, nam_b,
                                nlsb, mfob, id_b, kv, s, kv2,
-                               s2, nazn, userid,dk
+                               s2, nazn, userid
                               )
                        VALUES (tt_, vob_, SYSDATE, dat_, dat2_, dat2_,
                                nam_a_, k.s_fond, gl.amfo, okpoa_, nam_b_,
                                r7702_, gl.amfo, okpoa_, k.kv, s_old_q, 980,
-                               s_old_, nazn_, otvisp_,0
+                               s_old_, nazn_, otvisp_
                               );
 
 
@@ -4931,7 +4878,7 @@ dummy := 8;
                                   nam_a, nlsa, mfoa, id_a, nam_b,
                                   nlsb, mfob, id_b, kv,
                                   s, kv2, s2,
-                                  nazn, userid,dk
+                                  nazn, userid
                                  )
                           VALUES (tt_, vob_, SYSDATE, dat_, dat2_, dat2_,
                                   nam_a_, k.s_fond, gl.amfo, okpoa_, nam_b_,
@@ -4940,7 +4887,7 @@ dummy := 8;
                                                    --s_new_,
                                   980, -s_old_ + s_new_,
                                   --s_new_,
-                                  nazn_, otvisp_,1
+                                  nazn_, otvisp_
                                  );
 
                   END IF;
@@ -4986,13 +4933,13 @@ dummy := 10;
                                   nam_a, nlsa, mfoa, id_a, nam_b,
                                   nlsb, mfob, id_b, kv,
                                   s, kv2, s2,
-                                  nazn, userid,dk
+                                  nazn, userid
                                  )
                           VALUES (tt_, vob_, SYSDATE, dat_, dat2_, dat2_,
                                   nam_a_, k.s_fond, gl.amfo, okpoa_, nam_b_,
                                   r7702_, gl.amfo, okpoa_, 980,
                                   s_old_ - s_new_, 980, s_old_ - s_new_,
-                                  nazn_, otvisp_,0
+                                  nazn_, otvisp_
                                  );
 
                   END IF;
@@ -5302,12 +5249,12 @@ dummy := 17;
                               (tt, vob, pdat, vdat, datd, datp,
                                nam_a, nlsa, mfoa, id_a, nam_b,
                                nlsb, mfob, id_b, kv, s,
-                               kv2, s2, nazn, userid,dk
+                               kv2, s2, nazn, userid
                               )
                        VALUES (tt_, vob_, SYSDATE, dat_, dat2_, dat2_,
                                nam_b_, r7702_, gl.amfo, okpoa_, nam_a_,
                                k.s_fond, gl.amfo, okpoa_, 980, s_new_q,
-                               k.kv, s_new_, nazn_, otvisp_,1
+                               k.kv, s_new_, nazn_, otvisp_
                               );
 
                END IF;
@@ -5355,7 +5302,6 @@ dummy := 20;
          else
            raise;
          end if;
-
    END ca_pay_rez2;
 
 --------------------------------------
@@ -6123,8 +6069,8 @@ BEGIN
   /* SELECT ID
      INTO userid_
      FROM staff
-    WHERE UPPER (logname) = UPPER (USER);*/
-
+    WHERE UPPER (logname) = UPPER (USER);
+*/
    userid_ := user_id;
 
    -- флаг - использовать для опр. проср > 31 % спецпараметр R013
@@ -6187,7 +6133,7 @@ BEGIN
          rezpar4_ := 0;
    END;
 
-   -- флаг - считать 3579 внутрибанковским счетом (custtype=1)
+   -- флаг - считать (SK9) внутрибанковским счетом (custtype=1)
    BEGIN
       SELECT TO_NUMBER (NVL (val, '0'))
         INTO rezpar7_
