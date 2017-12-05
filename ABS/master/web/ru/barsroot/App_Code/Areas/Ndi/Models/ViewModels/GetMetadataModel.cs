@@ -1,25 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-
-/// <summary>
-/// Summary description for GetMetadataModel
-/// </summary>
-public class GetMetadataModel
+﻿namespace BarsWeb.Areas.Ndi.Models.ViewModels
 {
-	public GetMetadataModel()
-	{
-		//
-		// TODO: Add constructor logic here
-		//
-	}
+    /// <summary>
+    /// Summary description for GetMetadataModel
+    /// </summary>
+    public class GetMetadataModel
+    {
+        public int TableId { get; set; }
+        public int? CodeOper  { get; set; }
+        public int? SparColumn  { get; set; }
+        public int? NativeTabelId  { get; set; }
+        public int? NsiTableId { get; set; }
+        public int? NsiFuncId { get; set; }
+        public string Base64JsonSqlProcParams = "";
+        public int? BaseCodeOper { get; set; }
+        public string Filtercode { get; set; }
 
-    public int tableId;
-    public int? codeOper;
-    public int? sParColumn;
-    public int? nativeTabelId;
-    public int? nsiTableId;
-    public int? nsiFuncId;
-    public string base64jsonSqlProcParams = "";
+        public string Code { get; set; }
+
+        public string Base64InsertDefParamsString { get; set; }
+    }
 }

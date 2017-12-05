@@ -20,9 +20,6 @@
         var thistExtBox = this;
         thistExtBox.listeners = {
             change: function (field, newValue, oldValue, eOpts) {
-                //debugger;
-                //alert('textchange');
-                //debugger;
               
             }
         };

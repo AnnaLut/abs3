@@ -1,27 +1,29 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using System.Linq;
 
-/// <summary>
-/// Summary description for FilterHelper
-/// </summary>
-public class FilterHelper
+namespace barsroot.Areas.Ndi.Infrastructure.Helpers
 {
-	public FilterHelper()
-	{
-		//
-		// TODO: Add constructor logic here
-		//
-	}
-
-    public static string BuildValueForLike(string value)
+    /// <summary>
+    /// Summary description for FilterHelper
+    /// </summary>
+    public class FilterHelper
     {
-        if (string.IsNullOrEmpty(value))
-            return "%";
-        value = value.Replace('*', '%');
-        if (!value.Contains('%'))
-            value += '%';
-        return value;
+        public FilterHelper()
+        {
+            //
+            // TODO: Add constructor logic here
+            //
+        }
+
+        public static string BuildValueForLike(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+                return  "%";
+            value = value.Replace('*', '%');
+            if (!value.Contains('%'))
+                value += '%';
+            return value;
+        }
+
+   
     }
 }

@@ -11,12 +11,8 @@ public class MainOptionAttribute : Attribute
 {
 	public MainOptionAttribute(string Name,bool CanInheritance)
 	{
-
         this.OptionName = Name;
         this.CanInheritance = CanInheritance;
-		//
-		// TODO: Add constructor logic here
-		//
 	}
     public string OptionName { get; set; }
     public bool CanInheritance { get; set; }

@@ -1,152 +1,162 @@
-﻿using Bars.Classes;
-using Oracle.DataAccess.Client;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Data;
-using System.Linq;
-using System.Web;
+using Bars.Classes;
+using Oracle.DataAccess.Client;
 
-/// <summary>
-/// Summary description for OracleDbModel
-/// </summary>
-public class OracleDbModel : IDisposable
+namespace BarsWeb.Areas.Ndi.Models
 {
-    public OracleDbModel()
+    /// <summary>
+    /// Summary description for OracleDbModel
+    /// </summary>
+    public class OracleDbModel// : IDisposable
     {
-        //
-        // TODO: Add constructor logic here
-        //
-    }
-
-    private OracleConnection conn = null;
-
-    //private static OracleDbModel thisInstance;
-    //public static OracleDbModel OracleDbModelFactory
-    //{
-    //    get
-    //    {
-    //        if (thisInstance == null)
-    //            thisInstance = new OracleDbModel();
-    //        return thisInstance;
-    //    }
-    //}
-    public OracleConnection GetConn
-    {
-        get
+        public OracleDbModel()
         {
-            if (conn == null)
-                conn = OraConnector.Handler.UserConnection;
-            return conn;
+            //
+            // TODO: Add constructor logic here
+            //
         }
 
-    }
-    private OracleCommand command = null;
+        private OracleConnection _conn = null;
 
-    public OracleCommand GetCommandOrCreate
-    {
-        get
+        //private static OracleDbModel thisInstance;
+        //public static OracleDbModel OracleDbModelFactory
+        //{
+        //    get
+        //    {
+        //        if (thisInstance == null)
+        //            thisInstance = new OracleDbModel();
+        //        return thisInstance;
+        //    }
+        //}
+        public void CreateAndSetConn()
         {
-            if (command == null)
+            if (_conn == null || _conn.State != ConnectionState.Open)
+                _conn = OraConnector.Handler.UserConnection;
+        }
+
+        public OracleConnection GetConnOrCreate
+        {
+            get { return _conn ?? (_conn = OraConnector.Handler.UserConnection); }
+        }
+        private OracleCommand _command = null;
+
+        public bool IsOpenConnection { get { return _conn != null && _conn.State == ConnectionState.Open; } }
+        public OracleCommand GetCommandOrCreate
+        {
+            get
             {
-                if (conn == null)
-                    conn = OraConnector.Handler.UserConnection;
-                command = conn.CreateCommand();
-            }
-            return command;
-        }
-
-    }
-    public OracleCommand CreateCommand
-    {
-        get
-        {
-            if (conn == null)
-                conn = OraConnector.Handler.UserConnection;
-            OracleCommand command = conn.CreateCommand();
-            return command;
-        }
-
-    }
-    public OracleCommand GetCommand
-    {
-        get
-        {
-            return command;
-        }
-
-    }
-    public OracleCommand GetCommandWithBeginTransaction
-    {
-        get
-        {
-            if (command == null)
-            {
-                if (conn == null)
-                    conn = OraConnector.Handler.UserConnection;
-                command = conn.CreateCommand();
-            }
-            if (myTransaction == null)
-                myTransaction = conn.BeginTransaction();
-            //if (command.Transaction == null)
-            //    command.Transaction = myTransaction;
-            //command.Transaction = myTransaction;
-            return command;
-        }
-
-    }
-    public OracleConnection GetConnectionWithBeginTransaction
-    {
-        get
-        {
-            if (conn == null)
-            {
-                conn = OraConnector.Handler.UserConnection;
-                myTransaction = conn.BeginTransaction();
+                if (_command == null)
+                {
+                    if (_conn == null)
+                        _conn = OraConnector.Handler.UserConnection;
+                    _command = _conn.CreateCommand();
+                    //_command.CommandType = CommandType.StoredProcedure;
+                }
+                return _command;
             }
 
-            //command.Transaction = myTransaction;
-            return conn;
         }
-    }
-
-    private OracleTransaction myTransaction;
-
-    public OracleTransaction MyTransaction
-    {
-        get { return myTransaction; }
-        set { myTransaction = value; }
-    }
-    public void Dispose()
-    {
-        if (command != null)
+        public OracleCommand CreateCommand
         {
-            if (command.Connection.State == ConnectionState.Open)
-                command.Dispose();
-            command = null;
+            get
+            {
+                if (_conn == null)
+                    _conn = OraConnector.Handler.UserConnection;
+                 _command = _conn.CreateCommand();
+                return _command;
+            }
+
         }
-        if (conn != null && conn.State == ConnectionState.Open)
+        public OracleCommand GetCommand
         {
-            conn.Close();
-            conn.Dispose();
-            conn = null;
+            get
+            {
+                return _command;
+            }
+
         }
-        if (myTransaction != null)
+        public OracleCommand GetCommandWithBeginTransaction
         {
-            myTransaction.Dispose();
-            myTransaction = null;
+            get
+            {
+                if (_command == null)
+                {
+                    if (_conn == null)
+                        _conn = OraConnector.Handler.UserConnection;
+                    _command = _conn.CreateCommand();
+                
+                if (_myTransaction == null)
+                    _myTransaction = _conn.BeginTransaction();
+                _command.Transaction = _myTransaction;
+                }
+                //if (command.Transaction == null)
+                //    command.Transaction = myTransaction;
+                //command.Transaction = myTransaction;
+                return _command;
+            }
+
+        }
+        public OracleConnection GetConnectionWithBeginTransaction
+        {
+            get
+            {
+                if (_conn == null)
+                {
+                    _conn = OraConnector.Handler.UserConnection;
+                    _myTransaction = _conn.BeginTransaction();
+                }
+
+                //command.Transaction = myTransaction;
+                return _conn;
+            }
         }
 
-    }
+        private OracleTransaction _myTransaction;
 
-    public void DisposeWithTransaction(bool result)
-    {
-        if (myTransaction != null)
+        public OracleTransaction MyTransaction
         {
-            if (result)
-                myTransaction.Commit();
-            else
-                myTransaction.Rollback();
+            get { return _myTransaction; }
+            set { _myTransaction = value; }
         }
-        this.Dispose();
+
+        public bool CommitTransaction()
+        {
+            this._myTransaction.Commit();
+            return true;
+        }
+        public void Dispose()
+        {
+            if (_command != null)
+            {
+                if (_command.Connection.State == ConnectionState.Open)
+                    _command.Dispose();
+                _command = null;
+            }
+            if (_conn != null && _conn.State == ConnectionState.Open)
+            {
+                _conn.Close();
+                _conn.Dispose();
+                _conn = null;
+            }
+            if (_myTransaction != null)
+            {
+                _myTransaction.Dispose();
+                _myTransaction = null;
+            }
+
+        }
+
+        public void DisposeWithTransaction(bool result)
+        {
+            if (_myTransaction != null)
+            {
+                if (result)
+                    _myTransaction.Commit();
+                else
+                    _myTransaction.Rollback();
+            }
+            this.Dispose();
+        }
     }
 }
