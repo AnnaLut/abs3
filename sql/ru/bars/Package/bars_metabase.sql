@@ -1,10 +1,10 @@
 CREATE OR REPLACE PACKAGE bars_metabase is
 
---~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~+
 --| Пакет bars_metabase для работы с метаописанием таблиц комплекса |
---~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~+
 
-g_header_version   constant varchar2(64)  := 'version 2.43 23/08/2017';
+g_header_version   constant varchar2(64)  := 'version 2.48 04/12/2017';
 g_header_defs      constant varchar2(512) := '';
 
 /**
@@ -17,41 +17,59 @@ function header_version return varchar2;
  */
 function body_version return varchar2;
 
-function get_tabid (p_tabname meta_tables.tabname%type ) return number;
+function get_tabid
+( p_tabname           meta_tables.tabname%type
+) return number;
 
-function get_colid (
-  p_tabid   meta_columns.tabid%type,
-  p_colname meta_columns.colname%type
+function get_colid
+( p_tabid             meta_columns.tabid%type
+, p_colname           meta_columns.colname%type
 ) return number;
 
 function get_newtabid return number;
 
-function get_newcolid (p_tabid meta_tables.tabid%type ) return number;
+function get_newcolid
+( p_tabid             meta_tables.tabid%type ) return number;
 
-procedure set_tablinesdef (
-  p_tabid     meta_tables.tabid%type,
-  p_linesdef  varchar2);
+procedure set_tablinesdef
+( p_tabid             meta_tables.tabid%type
+, p_linesdef          meta_tables.linesdef%type
+);
 
 procedure set_tabsemantic (
-  p_tabid       meta_tables.tabid%type,
-  p_tabsemantic meta_tables.semantic%type);
+  p_tabid             meta_tables.tabid%type,
+  p_tabsemantic       meta_tables.semantic%type);
 
 procedure set_tabselect_statement (
-  p_tabid            meta_tables.tabid%type,
-  p_select_statement meta_tables.select_statement%type) ;
+  p_tabid             meta_tables.tabid%type,
+  p_select_statement  meta_tables.select_statement%type);
 
-procedure delete_metatables (p_tabid meta_tables.tabid%type);
+procedure delete_metatables
+( p_tabid             meta_tables.tabid%type);
 
 procedure delete_metacolumns (
-  p_tabid meta_columns.tabid%type,
-  p_colid meta_columns.colid%type);
+  p_tabid             meta_columns.tabid%type,
+  p_colid             meta_columns.colid%type);
 
-procedure add_table (
-  p_tabid       meta_tables.tabid%type,
-  p_tabname     meta_tables.tabname%type,
-  p_tabsemantic meta_tables.semantic%type,
-  p_tabselect_statement  meta_tables.select_statement%type default null,
-  p_linesdef    int default 10);
+  --***************************************************************************--
+-- Процедура: ADD_TBL
+-- Опис     : додавання метаопису нової таблиці (ДЛЯ CENTURA!!!) 
+-- Параметры: ЯКІ Є ТАКІ Є, НОВІ НЕ ДОБАВЛЯТИ!!!
+--***************************************************************************--
+procedure ADD_TBL
+( p_tabid             meta_tables.tabid%type
+, p_tabname           meta_tables.tabname%type
+, p_tabsemantic       meta_tables.semantic%type
+, p_linesdef          meta_tables.linesdef%type default 10
+);
+
+procedure add_table
+( p_tabid             meta_tables.tabid%type
+, p_tabname           meta_tables.tabname%type
+, p_tabsemantic       meta_tables.semantic%type
+, p_tabsel_stmt       meta_tables.select_statement%type default null
+, p_linesdef          meta_tables.linesdef%type         default 10
+);
 
 procedure add_column (
   p_tabid             meta_tables.tabid%type,
@@ -79,74 +97,74 @@ procedure add_column (
   p_inputinnewrecord  meta_columns.INPUT_IN_NEW_RECORD%type default 0);
 
 procedure add_extrnval (
-  p_tabid          meta_extrnval.tabid%type,
-  p_colid          meta_extrnval.colid%type,
-  p_srctabid       meta_extrnval.srctabid%type,
-  p_srccolid       meta_extrnval.srccolid%type,
-  p_tab_alias      meta_extrnval.tab_alias%type,
-  p_tab_cond       meta_extrnval.tab_cond%type default null,
-  p_src_cond       meta_extrnval.src_cond%type default null,
-  p_coldyntabname  varchar2                    default null);
+  p_tabid             meta_extrnval.tabid%type,
+  p_colid             meta_extrnval.colid%type,
+  p_srctabid          meta_extrnval.srctabid%type,
+  p_srccolid          meta_extrnval.srccolid%type,
+  p_tab_alias         meta_extrnval.tab_alias%type,
+  p_tab_cond          meta_extrnval.tab_cond%type default null,
+  p_src_cond          meta_extrnval.src_cond%type default null,
+  p_coldyntabname     varchar2                    default null);
 
 procedure add_browsetbl (
-  p_hosttabid    meta_browsetbl.hosttabid%type,
-  p_addtabid     meta_browsetbl.addtabid%type,
-  p_addtabalias  meta_browsetbl.addtabalias%type,
-  p_hostcolkeyid meta_browsetbl.hostcolkeyid%type,
-  p_addcolkeyid  meta_browsetbl.addcolkeyid%type,
-  p_var_colid    meta_browsetbl.var_colid%type,
-  p_cond_tag     meta_browsetbl.cond_tag%type);
+  p_hosttabid         meta_browsetbl.hosttabid%type,
+  p_addtabid          meta_browsetbl.addtabid%type,
+  p_addtabalias       meta_browsetbl.addtabalias%type,
+  p_hostcolkeyid      meta_browsetbl.hostcolkeyid%type,
+  p_addcolkeyid       meta_browsetbl.addcolkeyid%type,
+  p_var_colid         meta_browsetbl.var_colid%type,
+  p_cond_tag          meta_browsetbl.cond_tag%type);
 
 procedure add_sortorder (
-  p_tabid     meta_sortorder.tabid%type,
-  p_colid     meta_sortorder.colid%type,
-  p_sortorder meta_sortorder.sortorder%type,
-  p_sortway   meta_sortorder.sortway%type);
+  p_tabid             meta_sortorder.tabid%type,
+  p_colid             meta_sortorder.colid%type,
+  p_sortorder         meta_sortorder.sortorder%type,
+  p_sortway           meta_sortorder.sortway%type);
 
 procedure add_filtertbl (
-  p_tabid     meta_filtertbl.tabid%type,
-  p_colid     meta_filtertbl.colid%type,
-  p_flt_tabid meta_filtertbl.filter_tabid%type,
-  p_flt_code  meta_filtertbl.filter_code%type,
-  p_flg_ins   meta_filtertbl.flag_ins%type default 0,
-  p_flg_del   meta_filtertbl.flag_del%type default 0,
-  p_flg_upd   meta_filtertbl.flag_upd%type default 0);
+  p_tabid             meta_filtertbl.tabid%type,
+  p_colid             meta_filtertbl.colid%type,
+  p_flt_tabid         meta_filtertbl.filter_tabid%type,
+  p_flt_code          meta_filtertbl.filter_code%type,
+  p_flg_ins           meta_filtertbl.flag_ins%type default 0,
+  p_flg_del           meta_filtertbl.flag_del%type default 0,
+  p_flg_upd           meta_filtertbl.flag_upd%type default 0);
 
 procedure add_actiontbl (
-  p_tabid     meta_actiontbl.tabid%type,
-  p_code      meta_actiontbl.action_code%type,
-  p_proc      meta_actiontbl.action_proc%type);
+  p_tabid             meta_actiontbl.tabid%type,
+  p_code              meta_actiontbl.action_code%type,
+  p_proc              meta_actiontbl.action_proc%type);
 
 procedure add_nsifunction (
-  p_tabid        meta_nsifunction.tabid%type,
-  p_funcid       meta_nsifunction.funcid%type,
-  p_descr        meta_nsifunction.descr%type,
-  p_procname     meta_nsifunction.proc_name%type,
-  p_procpar      meta_nsifunction.proc_par%type,
-  p_procexec     meta_nsifunction.proc_exec%type,
-  p_qst          meta_nsifunction.qst%type,
-  p_msg          meta_nsifunction.msg%type,
-  p_formname     meta_nsifunction.form_name%type,
-  p_checkfunc    meta_nsifunction.check_func%type,
-  p_webformname  varchar2 default null,
-  p_iconid       int default 0);
+  p_tabid             meta_nsifunction.tabid%type,
+  p_funcid            meta_nsifunction.funcid%type,
+  p_descr             meta_nsifunction.descr%type,
+  p_procname          meta_nsifunction.proc_name%type,
+  p_procpar           meta_nsifunction.proc_par%type,
+  p_procexec          meta_nsifunction.proc_exec%type,
+  p_qst               meta_nsifunction.qst%type,
+  p_msg               meta_nsifunction.msg%type,
+  p_formname          meta_nsifunction.form_name%type,
+  p_checkfunc         meta_nsifunction.check_func%type,
+  p_webformname       varchar2 default null,
+  p_iconid            int default 0);
 
 procedure add_dependency (
-  p_tabid         number,
-  p_colid         number,
-  p_event         varchar2,
-  p_depcolid      number,
-  p_action_type   varchar2,
-  p_action_name   varchar2,
-  p_default_value varchar2,
-  p_condition     varchar2
+  p_tabid             number,
+  p_colid             number,
+  p_event             varchar2,
+  p_depcolid          number,
+  p_action_type       varchar2,
+  p_action_name       varchar2,
+  p_default_value     varchar2,
+  p_condition         varchar2
   );
 
 procedure update_table (
-  p_tabid       meta_tables.tabid%type   ,
-  p_tabname     meta_tables.tabname%type ,
-  p_tabsemantic meta_tables.semantic%type,
-  p_linesdef    meta_tables.linesdef%type);
+  p_tabid             meta_tables.tabid%type   ,
+  p_tabname           meta_tables.tabname%type ,
+  p_tabsemantic       meta_tables.semantic%type,
+  p_linesdef          meta_tables.linesdef%type);
 
 procedure update_column (
   p_tabid             meta_tables.tabid%type,
@@ -174,126 +192,151 @@ procedure update_column (
   p_inputinnewrecord  meta_columns.input_in_new_record%type default 0);
 
 procedure update_extrnval (
-  p_tabid          meta_extrnval.tabid%type,
-  p_colid          meta_extrnval.colid%type,
-  p_srctabid       meta_extrnval.srctabid%type,
-  p_srccolid       meta_extrnval.srccolid%type,
-  p_tab_alias      meta_extrnval.tab_alias%type,
-  p_tab_cond       meta_extrnval.tab_cond%type default null,
-  p_coldyntabname  varchar2                    default null);
+  p_tabid             meta_extrnval.tabid%type,
+  p_colid             meta_extrnval.colid%type,
+  p_srctabid          meta_extrnval.srctabid%type,
+  p_srccolid          meta_extrnval.srccolid%type,
+  p_tab_alias         meta_extrnval.tab_alias%type,
+  p_tab_cond          meta_extrnval.tab_cond%type default null,
+  p_coldyntabname     varchar2                    default null);
 
 procedure update_browsetbl (
-  p_hosttabid    meta_browsetbl.hosttabid%type,
-  p_addtabid     meta_browsetbl.addtabid%type,
-  p_addtabalias  meta_browsetbl.addtabalias%type,
-  p_hostcolkeyid meta_browsetbl.hostcolkeyid%type,
-  p_addcolkeyid  meta_browsetbl.addcolkeyid%type,
-  p_var_colid    meta_browsetbl.var_colid%type,
-  p_cond_tag     meta_browsetbl.cond_tag%type);
+  p_hosttabid         meta_browsetbl.hosttabid%type,
+  p_addtabid          meta_browsetbl.addtabid%type,
+  p_addtabalias       meta_browsetbl.addtabalias%type,
+  p_hostcolkeyid      meta_browsetbl.hostcolkeyid%type,
+  p_addcolkeyid       meta_browsetbl.addcolkeyid%type,
+  p_var_colid         meta_browsetbl.var_colid%type,
+  p_cond_tag          meta_browsetbl.cond_tag%type);
 
 procedure update_sortorder (
-  p_tabid     meta_sortorder.tabid%type,
-  p_colid     meta_sortorder.colid%type,
-  p_sortorder meta_sortorder.sortorder%type,
-  p_sortway   meta_sortorder.sortway%type);
+  p_tabid             meta_sortorder.tabid%type,
+  p_colid             meta_sortorder.colid%type,
+  p_sortorder         meta_sortorder.sortorder%type,
+  p_sortway           meta_sortorder.sortway%type);
 
 procedure update_filtertbl (
-  p_tabid     meta_filtertbl.tabid%type,
-  p_colid     meta_filtertbl.colid%type,
-  p_flt_tabid meta_filtertbl.filter_tabid%type,
-  p_flt_code  meta_filtertbl.filter_code%type,
-  p_flg_ins   meta_filtertbl.flag_ins%type default 0,
-  p_flg_del   meta_filtertbl.flag_del%type default 0,
-  p_flg_upd   meta_filtertbl.flag_upd%type default 0);
+  p_tabid             meta_filtertbl.tabid%type,
+  p_colid             meta_filtertbl.colid%type,
+  p_flt_tabid         meta_filtertbl.filter_tabid%type,
+  p_flt_code          meta_filtertbl.filter_code%type,
+  p_flg_ins           meta_filtertbl.flag_ins%type default 0,
+  p_flg_del           meta_filtertbl.flag_del%type default 0,
+  p_flg_upd           meta_filtertbl.flag_upd%type default 0);
 
 procedure update_actiontbl (
-  p_tabid     meta_actiontbl.tabid%type,
-  p_code      meta_actiontbl.action_code%type,
-  p_proc      meta_actiontbl.action_proc%type);
+  p_tabid             meta_actiontbl.tabid%type,
+  p_code              meta_actiontbl.action_code%type,
+  p_proc              meta_actiontbl.action_proc%type);
 
 procedure update_dependency (
-  p_id            number,
-  p_event         varchar2,
-  p_action_type   varchar2,
-  p_action_name   varchar2,
-  p_default_value varchar2,
-  p_condition     varchar2);
+  p_id                number,
+  p_event             varchar2,
+  p_action_type       varchar2,
+  p_action_name       varchar2,
+  p_default_value     varchar2,
+  p_condition         varchar2);
 
 procedure sync_column (
-  p_tabid          meta_tables.tabid%type,
-  p_colname        meta_columns.colname%type,
-  p_coltype        meta_columns.coltype%type,
-  p_semantic       meta_columns.semantic%type,
-  p_showmaxchar    meta_columns.showmaxchar%type);
+  p_tabid             meta_tables.tabid%type,
+  p_colname           meta_columns.colname%type,
+  p_coltype           meta_columns.coltype%type,
+  p_semantic          meta_columns.semantic%type,
+  p_showmaxchar       meta_columns.showmaxchar%type);
 
 procedure delete_table (p_tabid meta_tables.tabid%type);
 
 procedure delete_column (
-  p_tabid meta_columns.tabid%type,
-  p_colid meta_columns.colid%type);
+  p_tabid             meta_columns.tabid%type,
+  p_colid             meta_columns.colid%type);
 
 procedure delete_extrnval (
-  p_tabid meta_extrnval.tabid%type,
-  p_colid meta_extrnval.colid%type);
+  p_tabid             meta_extrnval.tabid%type,
+  p_colid             meta_extrnval.colid%type);
 
 procedure delete_browsetbl (
-  p_hosttabid    meta_browsetbl.hosttabid%type,
-  p_addtabid     meta_browsetbl.addtabid%type,
-  p_hostcolkeyid meta_browsetbl.hostcolkeyid%type,
-  p_addcolkeyid  meta_browsetbl.addcolkeyid%type,
-  p_var_colid    meta_browsetbl.var_colid%type);
+  p_hosttabid         meta_browsetbl.hosttabid%type,
+  p_addtabid          meta_browsetbl.addtabid%type,
+  p_hostcolkeyid      meta_browsetbl.hostcolkeyid%type,
+  p_addcolkeyid       meta_browsetbl.addcolkeyid%type,
+  p_var_colid         meta_browsetbl.var_colid%type);
 
 procedure delete_sortorder (
-  p_tabid meta_sortorder.tabid%type,
-  p_colid meta_sortorder.colid%type);
+  p_tabid             meta_sortorder.tabid%type,
+  p_colid             meta_sortorder.colid%type);
 
 procedure delete_filtertbl (
-  p_tabid meta_filtertbl.tabid%type,
-  p_colid meta_filtertbl.colid%type);
+  p_tabid             meta_filtertbl.tabid%type,
+  p_colid             meta_filtertbl.colid%type);
 
 procedure delete_actiontbl (
-  p_tabid meta_actiontbl.tabid%type,
-  p_code  meta_actiontbl.action_code%type);
+  p_tabid             meta_actiontbl.tabid%type,
+  p_code              meta_actiontbl.action_code%type);
 
 procedure delete_nsifunction (
-  p_tabid meta_nsifunction.tabid%type);
+  p_tabid             meta_nsifunction.tabid%type);
 
 procedure delete_dependency (p_id number);
 
-procedure change_filter (
-  p_code      meta_filtercodes.code%type,
-  p_name      meta_filtercodes.name%type,
-  p_condition meta_filtercodes.condition%type);
+procedure change_filter(
+  p_code              meta_filtercodes.code%type,
+  p_name              meta_filtercodes.name%type,
+  p_condition         meta_filtercodes.condition%type);
 
-procedure delete_filter (p_code meta_filtercodes.code%type);
+procedure delete_filter
+( p_code              meta_filtercodes.code%type);
 
 procedure addTableToRef (
-  p_tabid  references.tabid%type,
-  p_refid  references.type%type);
+  p_tabid             references.tabid%type,
+  p_refid             references.type%type);
 
 procedure add_tblcolor (
-  p_tabid      meta_tblcolor.tabid%type,
-  p_ord        meta_tblcolor.ord%type,
-  p_colid      meta_tblcolor.colid%type,
-  p_condition  meta_tblcolor.condition%type,
-  p_colorindex meta_tblcolor.color_index%type,
-  p_colorname  meta_tblcolor.color_name%type);
+  p_tabid             meta_tblcolor.tabid%type,
+  p_ord               meta_tblcolor.ord%type,
+  p_colid             meta_tblcolor.colid%type,
+  p_condition         meta_tblcolor.condition%type,
+  p_colorindex        meta_tblcolor.color_index%type,
+  p_colorname         meta_tblcolor.color_name%type);
 
-procedure delete_tblcolor (
-  p_tabid meta_tblcolor.tabid%type);
+procedure delete_tblcolor
+( p_tabid             meta_tblcolor.tabid%type);
 
-procedure import_bmd (p_tabname varchar2, p_filename varchar2);
+procedure import_bmd
+( p_tabname           varchar2
+, p_filename          varchar2
+);
+
+procedure create_dyn_filter
+( p_tabid                in number,
+  p_filter_name          in varchar2,
+  p_dyn_filter_cond_list in t_dyn_filter_cond_list,
+  p_save_filter          in number default 1,
+  p_where_clause         in out varchar2,
+  p_condition_list       in clob
+);
+
+procedure update_dyn_filter
+( p_tabid                in number,
+  p_filterid             in number,
+  p_filter_name          in varchar2,
+  p_dyn_filter_cond_list in t_dyn_filter_cond_list,
+  p_where_clause         in out varchar2,
+  p_condition_list       in clob
+);
 
 end bars_metabase;
 /
-CREATE OR REPLACE PACKAGE BODY bars_metabase is
 
+show errors;
+
+CREATE OR REPLACE PACKAGE BODY bars_metabase
+is
 --***************************************************************************--
 --
 -- bars_metabase - пакет для работы с метаописанием таблиц комплекса
 --
 --***************************************************************************--
-g_body_version   constant varchar2(64)  := 'version 2.43 23/08/2017';
+g_body_version   constant varchar2(64)  := 'version 2.44 01/12/2017';
 g_body_defs      constant varchar2(512) := '';
 
 g_modcode        constant varchar2(3)   := 'BMD';
@@ -316,9 +359,8 @@ G_RELATIONAL_NOTNULL  varchar2(100) := 'IS NOT NULL';
  */
 function header_version return varchar2 is
 begin
-  return 'Package header ACCREG ' || g_header_version || '.' || chr(10)
-	   || 'AWK definition: '  || chr(10)
-	   || g_header_defs;
+  return 'Package ' || $$PLSQL_UNIT || ' header ' || g_header_version || '.' || chr(10)
+                    || 'AWK definition: '||chr(10)|| g_header_defs;
 end header_version;
 
 /**
@@ -326,9 +368,8 @@ end header_version;
  */
 function body_version return varchar2 is
 begin
-  return 'Package body ACCREG '  || g_body_version || '.' || chr(10)
-	   || 'AWK definition: ' || chr(10)
-	   || g_body_defs;
+  return 'Package ' || $$PLSQL_UNIT || ' body '   || g_body_version || '.' || chr(10)
+                    || 'AWK definition: '||chr(10)|| g_body_defs;
 end body_version;
 
 --***************************************************************************--
@@ -391,9 +432,7 @@ end;
 function get_newtabid return number
 is
 begin
-
   return s_metatables.nextval;
-
 end;
 
 --***************************************************************************--
@@ -420,10 +459,10 @@ end;
 --   p_tabid    - код таблицы
 --   p_linesdef - linesdef
 --***************************************************************************--
-procedure set_tablinesdef (
-  p_tabid     meta_tables.tabid%type,
-  p_linesdef  varchar2)
-is
+procedure set_tablinesdef
+( p_tabid             meta_tables.tabid%type
+, p_linesdef          meta_tables.linesdef%type
+) is
 begin
   update meta_tables set linesdef = to_number(p_linesdef) where tabid = p_tabid;
 end;
@@ -508,55 +547,58 @@ begin
 end;
 
 --***************************************************************************--
+-- Процедура: ADD_TBL
+-- Опис     : додавання метаопису нової таблиці (ДЛЯ CENTURA!!!) 
+-- Параметры: ЯКІ Є ТАКІ Є, НОВІ НЕ ДОБАВЛЯТИ!!!
+--***************************************************************************--
+procedure ADD_TBL
+( p_tabid             meta_tables.tabid%type
+, p_tabname           meta_tables.tabname%type
+, p_tabsemantic       meta_tables.semantic%type
+, p_linesdef          meta_tables.linesdef%type default 10
+) is
+begin
+  ADD_TABLE
+  ( p_tabid       => p_tabid
+  , p_tabname     => p_tabname
+  , p_tabsemantic => p_tabsemantic
+  , p_linesdef    => p_linesdef
+  );
+end ADD_TBL;
+
+--***************************************************************************--
 -- Процедура: add_table
--- Описание:  добавление метаописания новой таблицы
+-- Описание : добавление метаописания новой таблицы
 -- Параметры:
 --   p_tabid       - код таблицы
 --   p_tabname     - имя таблицы
 --   p_tabsemantic - семантика таблицы
 --   p_linesdef    - количество строк по умолчанию
+--   p_tabsel_stmt - SQL запрос (вместо реального объекта из p_tabname)
 --***************************************************************************--
-procedure add_table (
-  p_tabid        meta_tables.tabid%type,
-  p_tabname      meta_tables.tabname%type,
-  p_tabsemantic  meta_tables.semantic%type,
-  p_tabselect_statement  meta_tables.select_statement%type default null,
-  p_linesdef     int default 10)
-is
-  l_tabname      meta_tables.tabname%type;
-  l_tabsemantic  meta_tables.semantic%type;
-  l_tabselect_statement  meta_tables.select_statement%type;
-  l_tabid        meta_tables.tabid%type;
-  l_1            int;
+procedure add_table
+( p_tabid             meta_tables.tabid%type
+, p_tabname           meta_tables.tabname%type
+, p_tabsemantic       meta_tables.semantic%type
+, p_tabsel_stmt       meta_tables.select_statement%type default null
+, p_linesdef          meta_tables.linesdef%type         default 10
+) is
+  l_tabid             meta_tables.tabid%type;
 begin
 
-  l_tabid := p_tabid;
-
-  if l_tabid is null then
-     l_tabid := get_newtabid;
-  end if;
-
-  select count(1)
-  into   l_1
-  from   user_tab_columns
-  where  table_name='META_TABLES' and
-         COLUMN_NAME='LINESDEF';
-
-  l_tabsemantic := replace(replace(p_tabsemantic, chr(39), chr(39) || chr(39)),chr(38), '''||chr(38)||''');
-  l_tabname     := replace(replace(p_tabname,     chr(39), chr(39) || chr(39)),chr(38), '''||chr(38)||''');
-  l_tabselect_statement     := replace(replace(p_tabselect_statement,     chr(39), chr(39) || chr(39)),chr(38), '''||chr(38)||''');
-
-  if l_1>0 and p_linesdef is not null then
-    execute immediate '
-    insert into meta_tables(tabid, tabname, semantic, select_statement, linesdef)
-    values ('||to_char(l_tabid)||', '''||l_tabname||''', '''||l_tabsemantic||''', '''||l_tabselect_statement||''', '||
-            to_char(p_linesdef)||')';
+  if p_tabid is null
+  then
+    l_tabid := get_newtabid();
   else
-    insert into meta_tables(tabid, tabname, semantic, select_statement)
-    values (l_tabid, p_tabname, p_tabsemantic,p_tabselect_statement);
+    l_tabid := p_tabid;
   end if;
 
-end;
+  insert into META_TABLES( TABID, TABNAME, SEMANTIC, LINESDEF, SELECT_STATEMENT )
+  values ( l_tabid, p_tabname, p_tabsemantic, p_linesdef, p_tabsel_stmt );
+
+end add_table;
+
+
 
 --***************************************************************************--
 -- Процедура: add_column
@@ -863,12 +905,12 @@ end;
 -- Процедура: update_table
 -- Описание:  обновление описания таблицы
 --***************************************************************************--
-procedure update_table (
-  p_tabid       meta_tables.tabid%type   ,
+procedure update_table
+( p_tabid       meta_tables.tabid%type   ,
   p_tabname     meta_tables.tabname%type ,
   p_tabsemantic meta_tables.semantic%type,
-  p_linesdef    meta_tables.linesdef%type)
-is
+  p_linesdef    meta_tables.linesdef%type
+) is
   l_1           int;
 begin
 
@@ -2007,28 +2049,69 @@ begin
       into l_type, l_coln
       from meta_columns mc
      where mc.tabid = p_tabid and mc.colname = p_colname;
-    if l_type in ('A', 'C') then
-      l_value := UPPER(replace(l_value,'''',''''''));
+    -- case sensitive
+    if l_type in ('C') then
+      l_value := replace(l_value,'''','''''');
+      if p_relational in (G_RELATIONAL_NULL, G_RELATIONAL_NOTNULL) then
+        l_value := '$~~ALIAS~~$.'|| p_colname||' '|| p_relational;
+      elsif  p_relational in (G_RELATIONAL_IN, G_RELATIONAL_NOTIN) then
+        l_value := '$~~ALIAS~~$.'|| p_colname||' '|| p_relational || ' ('''||REGEXP_REPLACE(l_value, ' {0,}, {0,}', ''',''')||''')';
+      elsif p_relational in (G_RELATIONAL_LIKE, G_RELATIONAL_NOTLIKE) then
+
+        if regexp_like(l_value, '[*%_?]') then
+          l_value := regexp_replace(regexp_replace(regexp_replace(l_value,
+                                                      '([^\])(\*|%){1,}',
+                                                      '\1%'),
+                                       '([^\])(\?)',
+                                       '\1_'),
+                        '([^\])(\?)',
+                        '\1_');
+          l_value := replace(replace(l_value,'\*','*'), '\?', '?');
+          l_value := '$~~ALIAS~~$.'|| p_colname||' '|| p_relational||' '''||l_value||'''';
+        else
+          l_value := '$~~ALIAS~~$.'|| p_colname||' '|| p_relational||' ''%'||l_value||'%''';
+        end if;
+        l_value := l_value||' ESCAPE ''\''';
+      else
+        l_value := '$~~ALIAS~~$.'|| p_colname||' '|| p_relational||' '''||l_value||'''';
+      end if;
+      -- not case sensitive
+    elsif l_type = 'A' then
+      l_value := upper(replace(l_value,'''',''''''));
       if p_relational in (G_RELATIONAL_NULL, G_RELATIONAL_NOTNULL) then
         l_value := '$~~ALIAS~~$.'|| p_colname||' '|| p_relational;
       elsif  p_relational in (G_RELATIONAL_IN, G_RELATIONAL_NOTIN) then
         l_value := 'UPPER('||'$~~ALIAS~~$.'|| p_colname||') '|| p_relational || ' ('''||REGEXP_REPLACE(l_value, ' {0,}, {0,}', ''',''')||''')';
       elsif p_relational in (G_RELATIONAL_LIKE, G_RELATIONAL_NOTLIKE) then
-        l_value := 'UPPER('||'$~~ALIAS~~$.'|| p_colname||') '|| p_relational||' ''%'||l_value||'%''';
+
+        if regexp_like(l_value, '[*%_?]') then
+          l_value := regexp_replace(regexp_replace(regexp_replace(l_value,
+                                                      '([^\])(\*|%){1,}',
+                                                      '\1%'),
+                                       '([^\])(\?)',
+                                       '\1_'),
+                        '([^\])(\?)',
+                        '\1_');
+          l_value := replace(replace(l_value,'\*','*'), '\?', '?');
+          l_value := 'UPPER('||'$~~ALIAS~~$.'|| p_colname||') '|| p_relational||' '''||l_value||'''';
+        else
+          l_value := 'UPPER('||'$~~ALIAS~~$.'|| p_colname||') '|| p_relational||' ''%'||l_value||'%''';
+        end if;
+        l_value := l_value||' ESCAPE ''\''';
       else
         l_value := 'UPPER('||'$~~ALIAS~~$.'|| p_colname||') '|| p_relational||' '''||l_value||'''';
       end if;
-
     elsif l_type = 'D' then
-      if regexp_like(l_value, '^+([0-9]{2}.[0-9]{2}.[0-9]{4} {0,},{0,} {0,}){1,}$') or p_relational in (G_RELATIONAL_NULL, G_RELATIONAL_NOTNULL) then
+
+      if regexp_like(l_value, '^+([0-9]{2}[.\/-][0-9]{2}[.\/-][0-9]{4}( {0,1}| [0-9]{2}:[0-9]{2}),{0,1} {0,}){1,}$') or p_relational in (G_RELATIONAL_NULL, G_RELATIONAL_NOTNULL) then
         if p_relational in (G_RELATIONAL_NULL, G_RELATIONAL_NOTNULL) then
           l_value := '$~~ALIAS~~$.'|| p_colname||' '|| p_relational;
         elsif  p_relational in (G_RELATIONAL_IN, G_RELATIONAL_NOTIN) then
-          l_value := '$~~ALIAS~~$.'|| p_colname||' '|| p_relational || ' ('||REGEXP_REPLACE(l_value,'([0-9]{2}.[0-9]{2}.[0-9]{4})', 'to_date(''\1'',''dd.mm.yyyy'')' )||')';
+          l_value := '$~~ALIAS~~$.'|| p_colname||' '|| p_relational || ' ('||REGEXP_REPLACE(l_value, '([0-9]{2}[.\/-][0-9]{2}[.\/-][0-9]{4}?( [0-9]{2}:[0-9]{2}){0,1})', 'to_date(''\1'',''dd.mm.yyyy hh24:mi'')')||')';
         elsif p_relational in (G_RELATIONAL_LIKE, G_RELATIONAL_NOTLIKE) then
-          raise_application_error(-20000, 'Операто ПОХОЖ/НЕ ПОХОЖ для дат заборонений');
+          raise_application_error(-20000, 'Операто СХОЖИЙ/НЕ СХОЖИЙ для дат заборонений');
         else
-          l_value := '$~~ALIAS~~$.'|| p_colname||' '|| p_relational||' '||REGEXP_REPLACE(l_value,'([0-9]{2}.[0-9]{2}.[0-9]{4})', 'to_date(''\1'',''dd.mm.yyyy'')' )||'';
+          l_value := '$~~ALIAS~~$.'|| p_colname||' '|| p_relational||' '||REGEXP_REPLACE(l_value, '([0-9]{2}[.\/-][0-9]{2}[.\/-][0-9]{4}?( [0-9]{2}:[0-9]{2}){0,1})', 'to_date(''\1'',''dd.mm.yyyy hh24:mi'')')||'';
         end if;
       else
          raise_application_error(-20000, 'Некоректно задана дата для колонки: ' ||  l_coln);
@@ -2040,7 +2123,20 @@ begin
       elsif  p_relational in (G_RELATIONAL_IN, G_RELATIONAL_NOTIN) then
         l_value := '$~~ALIAS~~$.'|| p_colname||' '|| p_relational || ' ('||l_value||')';
       elsif p_relational in (G_RELATIONAL_LIKE, G_RELATIONAL_NOTLIKE) then
-        l_value := '$~~ALIAS~~$.'|| p_colname||' '|| p_relational||' ''%'||l_value||'%''';
+        if regexp_like(l_value, '[*%_?]') then
+          l_value := regexp_replace(regexp_replace(regexp_replace(l_value,
+                                                      '([^\])(\*|%){1,}',
+                                                      '\1%'),
+                                       '([^\])(\?)',
+                                       '\1_'),
+                        '([^\])(\?)',
+                        '\1_');
+          l_value := replace(replace(l_value,'\*','*'), '\?', '?');
+          l_value := '$~~ALIAS~~$.'|| p_colname||' '|| p_relational||' '''||l_value||'''';
+        else
+          l_value := '$~~ALIAS~~$.'|| p_colname||' '|| p_relational||' ''%'||l_value||'%''';
+        end if;
+        l_value := l_value||' ESCAPE ''\''';
       else
         l_value := '$~~ALIAS~~$.'|| p_colname||' '|| p_relational||' '||l_value||'';
       end if;
@@ -2049,12 +2145,13 @@ begin
       end if;
     end if;
   end if;
+
   return l_value;
 
 exception
   when no_data_found then
     raise_application_error(-20000, 'Не найдено колонку ' || p_tabid || '.' || p_colname);
-end;
+end get_value;
 
 function remove_empty_lines(p_dyn_filter_cond_list in t_dyn_filter_cond_list)
   return t_dyn_filter_cond_list is
@@ -2086,6 +2183,7 @@ procedure check_dyn_filter(p_tabid        in number,
   l_statement    varchar2(4000);
 
 begin
+
   select t.tabname
     into l_tabname
     from meta_tables t
@@ -2093,23 +2191,25 @@ begin
 
   l_cur := dbms_sql.open_cursor();
   l_where_clause := replace(p_where_clause, '$~~ALIAS~~$', l_tabname);
-  l_statement := 'select 1 from ' || l_tabname || ' where ' ||
-                 l_where_clause;
+  l_statement := 'select 1 from ' || l_tabname || ' where ' || l_where_clause;
+
+  bars_audit.trace('create_dyn_filter: '||l_statement);
+
   dbms_sql.parse(l_cur, l_statement, dbms_sql.native);
   dbms_sql.close_cursor(l_cur);
+
 exception
   when others then
     dbms_sql.close_cursor(l_cur);
     raise_application_error(-20000, 'Невірно заданий фільт. Перевірте умови фільтру');
-
-
-end;
+end check_dyn_filter;
 
 procedure create_dyn_filter(p_tabid                in number,
                             p_filter_name          in varchar2,
                             p_dyn_filter_cond_list in t_dyn_filter_cond_list,
                             p_save_filter          in number default 1,
-                            p_where_clause         in out varchar2
+                            p_where_clause         in out varchar2,
+                            p_condition_list       in clob
                             ) is
   l_where_clause dyn_filter .where_clause%type;
   l_logic        varchar2(24);
@@ -2151,15 +2251,74 @@ begin
     check_dyn_filter(p_tabid, l_where_clause);
     if nvl(p_save_filter, 1) = 1 then
       insert into dyn_filter
-        (filter_id, tabid, userid, semantic, from_clause, where_clause)
+        (filter_id, tabid, userid, semantic, from_clause, where_clause, condition_list)
       values
         (s_dyn_filter.nextval, p_tabid, user_id, p_filter_name, null,
-         l_where_clause);
+         l_where_clause, p_condition_list);
     end if;
     p_where_clause := l_where_clause;
   end if;
 
 end;
 
-end bars_metabase;
+procedure update_dyn_filter(p_tabid                in number,
+                            p_filterid             in number,
+                            p_filter_name          in varchar2,
+                            p_dyn_filter_cond_list in t_dyn_filter_cond_list,
+                            p_where_clause         in out varchar2,
+                            p_condition_list       in clob
+                            ) is
+  l_where_clause dyn_filter .where_clause%type;
+  l_logic        varchar2(24);
+  l_colname      varchar2(30);
+  l_relational   varchar2(24);
+  l_value        varchar2(300);
+  l_dyn_filter_cond_list   t_dyn_filter_cond_list := p_dyn_filter_cond_list;
+
+begin
+  bars_audit.info('update_dyn_filter ' || 'Start. p_filterid=>' || p_filterid);
+  l_dyn_filter_cond_list := remove_empty_lines(l_dyn_filter_cond_list);
+  if p_where_clause is null then
+    if l_dyn_filter_cond_list.count > 0 then
+      for c_l in l_dyn_filter_cond_list.first .. l_dyn_filter_cond_list.last
+      loop
+
+        if c_l = 1 and l_dyn_filter_cond_list(c_l).logical_op is not null and
+           l_dyn_filter_cond_list(c_l).logical_op not in('(')then
+          raise_application_error(-20000, 'Некоректний логічний вираз початку фільтру');
+        end if;
+        l_logic      := get_logical_op(l_dyn_filter_cond_list(c_l).logical_op);
+        l_colname    := l_dyn_filter_cond_list(c_l).colname;
+        l_relational := get_reletional_op(l_dyn_filter_cond_list(c_l).relational_op);
+        l_value      := get_value(p_tabid, l_colname, l_relational, l_dyn_filter_cond_list(c_l).value);
+
+        l_where_clause := l_where_clause || case when l_where_clause is not null then ' ' else null end ||
+                          l_logic ||
+                          case when l_value is not null and l_logic is not null then ' ' else null end||l_value;
+        bars_audit.info('create_dyn_filter ' || 'Start. l_where_clause=>' ||
+                        l_where_clause);
+      end loop;
+    else
+      raise_application_error(-20000, 'Фільтр не задано');
+    end if;
+  else
+     l_where_clause := p_where_clause;
+  end if;
+  if l_where_clause is not null then
+    check_dyn_filter(p_tabid, l_where_clause);
+    update dyn_filter t
+       set t.semantic       = p_filter_name,
+           t.where_clause   = l_where_clause,
+           t.condition_list = p_condition_list
+     where t.filter_id = p_filterid;
+     p_where_clause := l_where_clause;
+  end if;
+
+end update_dyn_filter;
+
+end BARS_METABASE;
 /
+
+show errors;
+
+grant execute on BARS_METABASE to BARS_ACCESS_DEFROLE;

@@ -48,7 +48,6 @@ PROMPT *** ALTER_POLICIES to META_BROWSETBL ***
 
 
 COMMENT ON TABLE BARS.META_BROWSETBL IS 'Метаописание. Описание полей условия для динамического запроса';
-COMMENT ON COLUMN BARS.META_BROWSETBL.BRANCH IS '';
 COMMENT ON COLUMN BARS.META_BROWSETBL.HOSTTABID IS 'Идентификатор базовой таблицы';
 COMMENT ON COLUMN BARS.META_BROWSETBL.ADDTABID IS 'Идентификатор связанной таблицы';
 COMMENT ON COLUMN BARS.META_BROWSETBL.ADDTABALIAS IS 'Синоним связанной таблицы';
@@ -56,6 +55,7 @@ COMMENT ON COLUMN BARS.META_BROWSETBL.HOSTCOLKEYID IS 'Идентификатор столбца клю
 COMMENT ON COLUMN BARS.META_BROWSETBL.ADDCOLKEYID IS 'Идентификатор столбца ключа связанной таблицы';
 COMMENT ON COLUMN BARS.META_BROWSETBL.VAR_COLID IS 'Идентификатор столбца поля в базовой таблице';
 COMMENT ON COLUMN BARS.META_BROWSETBL.COND_TAG IS 'Наименование поля';
+COMMENT ON COLUMN BARS.META_BROWSETBL.BRANCH IS 'Hierarchical Branch Code';
 
 
 
