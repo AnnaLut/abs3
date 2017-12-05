@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Web.Script.Serialization;
+using BarsWeb.Areas.Ndi.Models;
 
-namespace BarsWeb.Areas.Ndi.Models
+namespace BarsWeb.Areas.Ndi.Models.FilterModels
 {
     /// <summary>
     /// Информация о дополнительных фильтрах для работы приложения с внешними клиентами

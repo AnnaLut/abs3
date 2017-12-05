@@ -24,7 +24,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
             }
         }
 
-        public static IEnumerable<Dictionary<string, object>> ReadAllWithDivesion(OracleDataReader reader, List<META_COLUMNS> columns)
+        public static IEnumerable<Dictionary<string, object>> ReadAllWithDivesion(OracleDataReader reader, List<ColumnMetaInfo> columns)
         {
 
             List<Dictionary<string, object>> dicts = new List<Dictionary<string, object>>();
@@ -110,7 +110,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
         {
             IEnumerable<Dictionary<string, object>> allData;
             int getCount = selectBuilder.RecordsCount;
-            List<META_COLUMNS> columnsForDiv = startInfo.NativeMetaColumns;
+            List<ColumnMetaInfo> columnsForDiv = startInfo.NativeMetaColumns;
             List<ColumnMetaInfo> resultRowColumns = selectBuilder.TotalColumns;
             bool hasTotalColumns = selectBuilder.TotalColumns.Any();
             int startRowNum = selectBuilder.StartRecord;
@@ -121,6 +121,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
                 allData = ReadAll(reader);
             if (selectBuilder.TableName == "DYN_FILTER")
                 allData = ReplaceResult(allData, "WHERE_CLAUSE", "$~~ALIAS~~$", selectBuilder.NativeTableNameForFilter);
+            
             int rowsCount = 0;
             List<Dictionary<string, object>> resultData = allData.ToList();
             if (resultData.Count <= 0)
@@ -162,6 +163,19 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
                 TotalRecord = summaryData
             };
 
+        }
+
+
+        public static ResultForExcel GetDataForExcelCsv(OracleDataReader reader, string excelParam = "")
+        {
+            return new ResultForExcel()
+            {
+                DataRecords = ReadAll(reader),
+                RecordsCount = 0,
+                TotalRecord = null,
+                ExcelParam = excelParam
+            };
+            
         }
 
         public static IEnumerable<Dictionary<string, object>> GetRsultRecords(IEnumerable<Dictionary<string, object>> data, List<ColumnMetaInfo> columns)

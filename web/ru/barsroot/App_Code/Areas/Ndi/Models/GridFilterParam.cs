@@ -56,6 +56,14 @@ namespace BarsWeb.Areas.Ndi.Models
                         return Value.AsDateTime();
                     case "boolean":
                         return Value == "True" ? 1 : 0;
+                    case "string":
+                        {
+                            Value = Value.Replace('*', '%');
+                            if(!Value.Contains('%'))
+                            Value += '%';
+                            return Value;
+                        }
+                       
                 }
                 return Value;
             }

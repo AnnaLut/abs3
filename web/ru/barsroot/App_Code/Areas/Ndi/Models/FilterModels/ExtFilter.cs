@@ -1,4 +1,6 @@
-﻿namespace BarsWeb.Areas.Ndi.Models
+﻿using BarsWeb.Areas.Ndi.Models;
+
+namespace BarsWeb.Areas.Ndi.Models.FilterModels
 {
     /// <summary>
     /// Параметры дополнительных фильтров справочника (не по колонкам грида, задаются в отдельной форме, описываются в META_BROWSETBL)

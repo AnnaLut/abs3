@@ -1,7 +1,7 @@
 ﻿using System.Web.Script.Serialization;
 using BarsWeb.Areas.Ndi.Infrastructure;
 
-namespace BarsWeb.Areas.Ndi.Models
+namespace BarsWeb.Areas.Ndi.Models.FilterModels
 {
     /// <summary>
     /// Метаданные дополнительных фильтров справочника (не по колонкам грида, задаются в отдельной форме, описываются в META_BROWSETBL)

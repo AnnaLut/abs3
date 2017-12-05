@@ -144,6 +144,7 @@ Ext.define('Writer.Grid', {
                     tooltip: 'When enabled, Store will execute Ajax requests as soon as a Record becomes dirty.',
                     scope: this,
                     toggleHandler: function (btn, pressed) {
+                        
                         this.store.autoSync = pressed;
                     }
                 }, {
@@ -324,7 +325,7 @@ Ext.onReady(function () {
     var store = Ext.create('Ext.data.Store', {
         model: 'Writer.Person',
         autoLoad: true,
-        autoSync: true,
+        autoSync: false,
         proxy: {
             type: 'ajax',
             api: {

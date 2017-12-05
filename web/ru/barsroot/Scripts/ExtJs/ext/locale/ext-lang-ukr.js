@@ -130,7 +130,8 @@ Ext.define("Ext.locale.ukr.form.field.Date", {
     minText: "Дата у цьому полі повинна бути більша {0}",
     maxText: "Дата у цьому полі повинна бути меньша {0}",
     invalidText: "{0} хибна дата - дата повинна бути вказана у форматі {1}",
-    format: "d.m.y"
+    format: "d.m.y",
+    startDay: 1
 });
 
 Ext.define("Ext.locale.ukr.form.field.ComboBox", {
@@ -238,7 +239,11 @@ Ext.define("Ext.locale.ukr.grid.header.Container", {
     unlockText: "Відкріпити стовпець",
     columnsText: "Стовпці"
 });
+Ext.define("Ext.locale.ukr.Ext.menu.Item", {
+    override: "Ext.menu.Item",
+    renderTpl: ['<tpl if="plain">', "{text}", "<tpl else>", '<a id="{id}-itemEl"', ' class="' + Ext.baseCSSPrefix + 'menu-item-link{childElCls}"', ' href="{href}"', '<tpl if="hrefTarget"> target="{hrefTarget}"</tpl>', ' hidefocus="true"', ' unselectable="on"', '<tpl if="tabIndex">', ' tabIndex="{tabIndex}"', "</tpl>", ">", '<div role="img" id="{id}-iconEl" class="' + Ext.baseCSSPrefix + "menu-item-icon {iconCls}", '{childElCls} {glyphCls}" style="<tpl if="icon">background-image:url({icon});</tpl>', '<tpl if="glyph && glyphFontFamily">font-family:{glyphFontFamily};</tpl>">', '<tpl if="glyph">&#{glyph};</tpl>', "</div>", '<span id="{id}-textEl" class="' + Ext.baseCSSPrefix + 'menu-item-text" unselectable="on">{text}</span>', "</a>", "</tpl>"]
 
+});
 Ext.define("Ext.locale.ukr.grid.PropertyColumnModel", {
     override: "Ext.grid.PropertyColumnModel",
     nameText: "Назва",

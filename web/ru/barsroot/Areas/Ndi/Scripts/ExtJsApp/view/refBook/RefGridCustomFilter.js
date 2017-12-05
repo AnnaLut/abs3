@@ -3,72 +3,84 @@
     alias: 'widget.GridCustomFilter',
     id: 'CustomFilterGrid',
     columns: [],
-
+    minHeight: 350,
+    maxHeight: 350,
+    //autoExpandColumn: 'lastUpdated',
+    
     //в данный метод пихаем конфигурацию, которую нужно получить динамически из метаданных
     initComponent: function () {
         //наш грид-представление, конфигурацию которого будем дополнять
-        var referenceGrid = this;
-        referenceGrid.metadata = referenceGrid.thisController.controllerMetadata;
-        //устанавливаем заголовок грида по имени таблицы 
-        referenceGrid.title = referenceGrid.thisController.controllerMetadata.filtersMetainfo.SEMANTIC;
+        var customFilterGrid = this;
+        var thisController = customFilterGrid.thisController;
+        customFilterGrid.metadata = customFilterGrid.thisController.controllerMetadata;
+        //устанавливаем заголовок грида по имени таблицы   
+        customFilterGrid.title = customFilterGrid.thisController.controllerMetadata.filtersMetainfo.SEMANTIC;
 
         //ширина грида будет установлена динамически в зависимости от ширины колонок
-        referenceGrid.dynamicGridWidth = 15;
+        customFilterGrid.dynamicGridWidth = 15;
 
         //первая колонка - номер строки
         var rowNumberColumn = new Ext.grid.RowNumberer({ width: 40, header: '№' });
-        referenceGrid.columns.push(rowNumberColumn);
-        referenceGrid.dynamicGridWidth += rowNumberColumn.width;
+        customFilterGrid.columns.push(rowNumberColumn);
+        customFilterGrid.dynamicGridWidth += rowNumberColumn.width;
 
         //поля модели, вместо модели используем свойство store.fields, которое построит динамическую модель
         var modelFields = new Array();
         //поля для формы редактирования
         var formFields = new Array();
-        //debugger;
+        //
         //цикл по метаданным колонок
-        Ext.each(referenceGrid.metadata.filtersMetainfo.FiltersMetaColumns, function () {
+        Ext.each(customFilterGrid.metadata.filtersMetainfo.FiltersMetaColumns, function () {
             var colMetaInfo = this;
 
             //заполняем поля модели
-            modelFields.push(referenceGrid.configModelField(colMetaInfo));
+            modelFields.push(customFilterGrid.configModelField(colMetaInfo));
 
             //если нужно отображать поле
             if (colMetaInfo.NOT_TO_SHOW == 0) {
                 //заполняем колонки грида
-                referenceGrid.columns.push(referenceGrid.configGridColumn(colMetaInfo));
+                customFilterGrid.columns.push(customFilterGrid.configGridColumn(colMetaInfo));
                 //заполняем поля формы редактирования
                 formFields.push(ExtApp.utils.RefBookUtils.configFormField(colMetaInfo));
             }
         });
 
         //присваиваем ширину, которую вычислили динамически
-        referenceGrid.width = referenceGrid.dynamicGridWidth;
+        // customFilterGrid.width = customFilterGrid.dynamicGridWidth;
         //минимальная ширина грида, нужна чтобы не прятались кнопки тулбаров
         var minGridWidth = 455;
-        if (referenceGrid.width < minGridWidth) {
-            referenceGrid.width = minGridWidth;
+        if (customFilterGrid.width < minGridWidth) {
+            customFilterGrid.width = minGridWidth;
         }
 
         //заполняем свойства формы редактирования грида
+        var getCustFilterModel = {
+            tableId: customFilterGrid.metadata.filtersMetainfo.TABID === 'undefined' ? '' : customFilterGrid.metadata.filtersMetainfo.TABID,
+            tableName: customFilterGrid.metadata.filtersMetainfo.TABNAME === 'undefined' ? '' : customFilterGrid.metadata.filtersMetainfo.TABNAME,
+            filterTblId: customFilterGrid.metadata.tableInfo.TABID === 'undefined' ? '' : customFilterGrid.metadata.tableInfo.TABID,
+            kindOfFilter: 'CustomFilter'
+
+        }
 
         //уже можем создать store, так как у нас есть modelFields
-        referenceGrid.store = Ext.create('Ext.data.Store', {
+        customFilterGrid.store = Ext.create('Ext.data.Store', {
             fields: modelFields,
             autoLoad: true,
-            pageSize: 10,
+            pageSize: customFilterGrid.metadata.tableInfo.LINESDEF ? customFilterGrid.metadata.tableInfo.LINESDEF : 10,
             remoteSort: true,
-            sorters: referenceGrid.metadata.sorters,
+            sorters: customFilterGrid.metadata.sorters,
             proxy: {
                 type: 'ajax',
-                url: '/barsroot/ndi/ReferenceBook/GetData?tableId=' +
-                    referenceGrid.metadata.filtersMetainfo.TABID +
-                    '&tableName=' + referenceGrid.metadata.filtersMetainfo.TABNAME + '&filterTblId=' + referenceGrid.metadata.tableInfo.TABID + '&kindOfFilter=CustomFilter',
+                url: '/barsroot/ndi/ReferenceBook/GetData/',
+                //referenceGrid.metadata.filtersMetainfo.TABID +
+                //'&tableName=' + referenceGrid.metadata.filtersMetainfo.TABNAME + '&filterTblId=' + referenceGrid.metadata.tableInfo.TABID + '&kindOfFilter=CustomFilter',
                 reader: {
                     type: 'json',
                     root: 'data'
                 },
+                method: 'POST',
                 afterRequest: function (req, res) {
-                    //debugger;
+                    //
                     //window.executeBeforFunc = 'no';
                     var response = Ext.decode(req.operation.response.responseText);
                     if (response.status !== "ok") {
@@ -79,10 +91,24 @@
                             buttons: Ext.Msg.OK
                         });
                     }
+                },
+                extraParams: {
+                    tableId: customFilterGrid.metadata.filtersMetainfo.TABID === 'undefined' ? '' : customFilterGrid.metadata.filtersMetainfo.TABID,
+                    tableName: customFilterGrid.metadata.filtersMetainfo.TABNAME === 'undefined' ? '' : customFilterGrid.metadata.filtersMetainfo.TABNAME,
+                    filterTblId: customFilterGrid.metadata.tableInfo.TABID === 'undefined' ? '' : customFilterGrid.metadata.tableInfo.TABID,
+                    kindOfFilter: 'CustomFilter'
                 }
             },
             listeners: {
                 load: function (store) {
+                 
+
+                    //if (customFilterGrid.metadata.saveFilterLocal) {
+                    //    var filters = customFilterGrid.thisController.controllerMetadata.applyFilters.CustomBeforeFilters;
+                    //    var controller = customFilterGrid.metadata.thisController;
+                    //    controller.SetFiltersByApplyFilters(customFilterGrid, filters);
+                    //}
+
                     //всегда выбирать первую строку
                     //referenceGrid.getSelectionModel().select(0);
                     //устанавливать доступность кнопки сброса фильтра
@@ -94,8 +120,12 @@
                     //    referenceGrid.filters.getFilterData().length > 0;
                     //clearFiltersBtn.setDisabled(!anyFilter);
                     //выключим альтернативный индикатор загрузки в заголовке грида
-                 
+
                     //Ext.select('.x-panel-header-text:first').removeCls('x-mask-msg-text');
+
+                },
+                afterload: function () {
+
 
                 },
                 beforeload: function () {
@@ -104,11 +134,11 @@
         });
 
         //добавляем к гриду всякие пэйджинги, тулбары 
-        referenceGrid.dockedItems = [
+        customFilterGrid.dockedItems = [
         {
             xtype: 'pagingtoolbar',
             dock: 'bottom',
-            store: referenceGrid.store,
+            store: customFilterGrid.store,
             beforePageText: 'Фільтри користувача',
             afterPageText: '',
             plugins: [new Ext.ux.PageSizePlugin()],
@@ -136,33 +166,43 @@
                     tooltip: 'Видалити вибраний рядок',
                     iconCls: 'minus_once',
                     disabled: true
+                },
+                 {
+                     xtype: 'tbseparator'
+                 },
+                {
+                    itemId: 'updateFilterButton',
+                    text: 'редагувати фільтр',
+                    tooltip: 'редагувати вибраний фільтр',
+                    iconCls: 'EDITG',
+                    disabled: true
                 }
+
+
             ]
         }
         ];
 
         ////находим тулбар в dockedItems грида
-        var toolbar = Ext.Array.filter(referenceGrid.dockedItems, function (obj) {
+        var toolbar = Ext.Array.filter(customFilterGrid.dockedItems, function (obj) {
             return obj.xtype == "toolbar";
         })[0];
-        //toolbar.items.unshift({
-        //    itemId: 'removeFilterButton',
-        //    text: 'Видалити',
-        //    tooltip: 'Видалити вибраний рядок',
-        //    iconCls: 'minus_once',
-        //    disabled: true
-        //});
 
-
-
-        //установить единожды разделители для decimal полей
-       // Ext.util.Format.thousandSeparator = ' ';
-        //Ext.util.Format.decimalSeparator = '.';
-
-        //TODO: перенести в locale файл
-        Ext.grid.RowEditor.prototype.saveBtnText = "Зберегти";
-        Ext.grid.RowEditor.prototype.cancelBtnText = "Відмінити";
-
+        var filters = customFilterGrid.thisController.controllerMetadata.applyFilters.CustomBeforeFilters;
+        if (customFilterGrid.metadata.saveFilterLocal && filters && filters.length > 0) {
+            toolbar.items.push(
+                {
+                    xtype: 'tbseparator'
+                });
+            toolbar.items.push(
+    {
+        itemId: 'revertCustomFilters',
+        text: 'відновити фільтри',
+        tooltip: 'обрати фільтри, застосовані минулого разу',
+        iconCls: 'TUDASUDA',
+        disabled: false
+    });
+        }
         this.callParent();
     },
 
@@ -195,7 +235,10 @@
 
     //сконфигурировать колонку грида по переданным метаданным
     configGridColumn: function (colMetaInfo) {
-        var referenceGrid = this;
+        var customFilterGrid = this;
+        customFilterGrid.thisGridMetadata = new Object();
+        customFilterGrid.thisGridMetadata.wasCheckChange = false;
+
         //заполняем информацию о колонках грида
         var gridColumn = {};
         gridColumn.dataIndex = colMetaInfo.COLNAME;
@@ -204,10 +247,10 @@
             gridColumn.header = colMetaInfo.SEMANTIC.replace(/~/g, "<br/>");
         }
         gridColumn.width = this.calcColWidth(colMetaInfo.SHOWWIDTH);
-        referenceGrid.dynamicGridWidth += gridColumn.width;
+        customFilterGrid.dynamicGridWidth += gridColumn.width;
 
         gridColumn.filter = {
-            type: referenceGrid.getFilterType(colMetaInfo.COLTYPE)
+            type: customFilterGrid.getFilterType(colMetaInfo.COLTYPE)
         };
 
         //получаем элемент для редактирования поля в зависимости от типа данных
@@ -226,20 +269,19 @@
             gridColumn.listeners = {
                 //нужно для того чтобы чекбоксы были readonly
                 // beforecheckchange: function () { return false; }
-                checkchange: function (comp, rowIndex, checked, eOpts) {
-                    var thisGrid = this.up('grid');
-                    referenceGrid.thisController.controllerMetadata.CustomBeforeFilters = [];
-                    thisGrid.getStore().each(function (record) {
-                       if (record.data['IsApplyFilter'] == 1)
-                            referenceGrid.thisController.controllerMetadata.CustomBeforeFilters.push({
-                                //к имени поля добавляем имя таблицы
-                                FILTER_ID: record.data['FILTER_ID'],
-                                WHERE_CLAUSE: record.data['WHERE_CLAUSE']
-                            });
-                    });
-                    referenceGrid.thisController.controllerMetadata.mainGrid = Ext.getCmp('mainReferenceGrid');
-                    if (referenceGrid.thisController.controllerMetadata.mainGrid)
-                        referenceGrid.thisController.updateGridByFilters();
+                checkchange: function () {
+                    
+                    var revertFilterBtn;
+                   
+                    var thisController = customFilterGrid.thisController;
+                    if (customFilterGrid.thisGridMetadata.wasCheckChange && customFilterGrid.down('#revertCustomFilters'))
+                    {
+                        revertFilterBtn = customFilterGrid.down('#revertCustomFilters');
+                        revertFilterBtn.setDisabled(true);
+                        customFilterGrid.thisGridMetadata.wasCheckChange = true;
+                    }
+                        
+                    thisController.updateApplyFilters(customFilterGrid);
                 }
             };
         }
@@ -277,11 +319,39 @@
         //кастомный обработчик отрисовки, отвечат за форматирование ячеек
         //колоноки с чекбоксами раскрашивать не будем потому что renderer для checkcolumn ломает такие колонки
         if (!gridColumn.renderer && colMetaInfo.COLTYPE !== "B") {
-            gridColumn.renderer = referenceGrid.gridColumnRenderer;
+            gridColumn.renderer = customFilterGrid.gridColumnRenderer;
         }
 
         return gridColumn;
     },
+
+    //updateApplyFilters: function () {
+    //    
+    //    var customFilterGrid = this;
+    //    
+    //    var customBeforeFilters = [];
+    //    customFilterGrid.getStore().each(function (record) {
+    //        if (record.data['IsApplyFilter'] == 1)
+    //            customBeforeFilters.push({
+    //                //к имени поля добавляем имя таблицы
+    //                FILTER_ID: record.data['FILTER_ID'],
+    //                Where_clause: record.data['Where_clause']
+    //            });
+    //    });
+    //    if (customBeforeFilters.length) {
+    //        var cleareFilterBtn = Ext.getCmp('clareFilersInDialogId');
+    //        if(cleareFilterBtn)
+    //            cleareFilterBtn.setDisable(false);
+    //    }
+
+    //    customFilterGrid.thisController.controllerMetadata.applyFilters.CustomBeforeFilters = customBeforeFilters;
+    //    customFilterGrid.thisController.setFiltersToLocalStorage();
+    //    customFilterGrid.thisController.setDisableCleareFiltersBtn();
+    //    customFilterGrid.thisController.controllerMetadata.mainGrid = Ext.getCmp('mainReferenceGrid');
+    //    if (customFilterGrid.thisController.controllerMetadata.mainGrid)
+    //        customFilterGrid.thisController.updateGridByFilters();
+
+    //},
 
     getFilterType: function (codeType) {
         switch (codeType) {
@@ -361,13 +431,6 @@
 
 
         return value;
-    },
-
-    //получить значение параметра текущего url по имени
-    getUrlParameterByName: function (name) {
-        var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
-            results = regex.exec(location.search);
-        return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
     },
 
     //поиск и возврат типа колонки текущего справочника по названию колонки

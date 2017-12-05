@@ -28,7 +28,7 @@ Ext.define('Ext.ux.grid.filter.NumericFilter', {
         var me = this,
             menu;
         menu = Ext.create('Ext.ux.grid.menu.RangeMenu', config);
-        menu.on('update', me.fireUpdate, me);
+       // menu.on('update', me.fireUpdate, me);
         return menu;
     },
 

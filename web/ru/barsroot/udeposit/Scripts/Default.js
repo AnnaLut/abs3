@@ -56,39 +56,6 @@ function printTable() {
     window.print();
 }
 
-function exportToExcel() {
-    webService.DPU.callService(onExportExcel, "ExportToExcel", v_data, forceExecute);
-}
-
-//the same method as in CustAcc.js
-function onExportExcel(result) {
-    if (!getError(result)) return;
-    debugger;
-    if (-1 === result.value.indexOf(".xls")) {
-        var warningMsg = "<div>Кількість запиcів на вивантаження: <strong>" + result.value + "</strong></div><br/><div>Завантаження може тривати кілька хвилин.</div><br/><div>Ви можете зберегти час, встановивши більше фільтрів пошуку.\nБажаєте встановити додаткові фільтри?</div>";
-
-        alertify.set({
-            labels: {
-                ok: "Так",
-                cancel: "&nbspНі&nbsp"
-            },
-            modal: true
-        });
-
-        alertify.confirm(warningMsg, function (e) {
-            if (e) {
-                return;
-            } else {
-                forceExecute = true;
-                exportToExcel();
-            }
-        });
-    } else {
-        forceExecute = false;
-        location.href = "/barsroot/cim/handler.ashx?action=download&fname=deposits&file=" + result.value + "&fext=xls";
-    }
-}
-
 //**********************************************************************// 
 function LoadBaseData() {
     our_mfo = returnServiceValue[2].text;

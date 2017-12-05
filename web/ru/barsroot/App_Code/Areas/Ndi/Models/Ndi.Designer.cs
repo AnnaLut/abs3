@@ -316,7 +316,9 @@ namespace Areas.Ndi.Models
         /// <param name="nOT_TO_EDIT">Initial value of the NOT_TO_EDIT property.</param>
         /// <param name="nOT_TO_SHOW">Initial value of the NOT_TO_SHOW property.</param>
         /// <param name="sIMPLE_FILTER">Initial value of the SIMPLE_FILTER property.</param>
-        public static META_COLUMNS CreateMETA_COLUMNS(global::System.Decimal tABID, global::System.Decimal cOLID, global::System.String cOLNAME, global::System.String cOLTYPE, global::System.Int16 sHOWIN_RO, global::System.Int16 sHOWRETVAL, global::System.Int16 iNSTNSSEMANTIC, global::System.Int16 eXTRNVAL, global::System.Int16 sHOWIN_FLTR, global::System.Int16 sHOWREF, global::System.Int16 nOT_TO_EDIT, global::System.Int16 nOT_TO_SHOW, global::System.Int16 sIMPLE_FILTER)
+        /// <param name="bRANCH">Initial value of the BRANCH property.</param>
+        /// <param name="iNPUT_IN_NEW_RECORD">Initial value of the INPUT_IN_NEW_RECORD property.</param>
+        public static META_COLUMNS CreateMETA_COLUMNS(global::System.Decimal tABID, global::System.Decimal cOLID, global::System.String cOLNAME, global::System.String cOLTYPE, global::System.Int16 sHOWIN_RO, global::System.Int16 sHOWRETVAL, global::System.Int16 iNSTNSSEMANTIC, global::System.Int16 eXTRNVAL, global::System.Int16 sHOWIN_FLTR, global::System.Int16 sHOWREF, global::System.Int16 nOT_TO_EDIT, global::System.Int16 nOT_TO_SHOW, global::System.Int16 sIMPLE_FILTER, global::System.String bRANCH, global::System.Int16 iNPUT_IN_NEW_RECORD)
         {
             META_COLUMNS mETA_COLUMNS = new META_COLUMNS();
             mETA_COLUMNS.TABID = tABID;
@@ -332,6 +334,8 @@ namespace Areas.Ndi.Models
             mETA_COLUMNS.NOT_TO_EDIT = nOT_TO_EDIT;
             mETA_COLUMNS.NOT_TO_SHOW = nOT_TO_SHOW;
             mETA_COLUMNS.SIMPLE_FILTER = sIMPLE_FILTER;
+            mETA_COLUMNS.BRANCH = bRANCH;
+            mETA_COLUMNS.INPUT_IN_NEW_RECORD = iNPUT_IN_NEW_RECORD;
             return mETA_COLUMNS;
         }
 
@@ -920,6 +924,54 @@ namespace Areas.Ndi.Models
         private Nullable<global::System.Decimal> _OPER_ID;
         partial void OnOPER_IDChanging(Nullable<global::System.Decimal> value);
         partial void OnOPER_IDChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.String BRANCH
+        {
+            get
+            {
+                return _BRANCH;
+            }
+            set
+            {
+                OnBRANCHChanging(value);
+                ReportPropertyChanging("BRANCH");
+                _BRANCH = StructuralObject.SetValidValue(value, false);
+                ReportPropertyChanged("BRANCH");
+                OnBRANCHChanged();
+            }
+        }
+        private global::System.String _BRANCH;
+        partial void OnBRANCHChanging(global::System.String value);
+        partial void OnBRANCHChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.Int16 INPUT_IN_NEW_RECORD
+        {
+            get
+            {
+                return _INPUT_IN_NEW_RECORD;
+            }
+            set
+            {
+                OnINPUT_IN_NEW_RECORDChanging(value);
+                ReportPropertyChanging("INPUT_IN_NEW_RECORD");
+                _INPUT_IN_NEW_RECORD = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("INPUT_IN_NEW_RECORD");
+                OnINPUT_IN_NEW_RECORDChanged();
+            }
+        }
+        private global::System.Int16 _INPUT_IN_NEW_RECORD;
+        partial void OnINPUT_IN_NEW_RECORDChanging(global::System.Int16 value);
+        partial void OnINPUT_IN_NEW_RECORDChanged();
 
         #endregion
 
@@ -1170,13 +1222,15 @@ namespace Areas.Ndi.Models
         /// <param name="tABNAME">Initial value of the TABNAME property.</param>
         /// <param name="sEMANTIC">Initial value of the SEMANTIC property.</param>
         /// <param name="tABRELATION">Initial value of the TABRELATION property.</param>
-        public static META_TABLES CreateMETA_TABLES(global::System.Decimal tABID, global::System.String tABNAME, global::System.String sEMANTIC, global::System.Int16 tABRELATION)
+        /// <param name="bRANCH">Initial value of the BRANCH property.</param>
+        public static META_TABLES CreateMETA_TABLES(global::System.Decimal tABID, global::System.String tABNAME, global::System.String sEMANTIC, global::System.Int16 tABRELATION, global::System.String bRANCH)
         {
             META_TABLES mETA_TABLES = new META_TABLES();
             mETA_TABLES.TABID = tABID;
             mETA_TABLES.TABNAME = tABNAME;
             mETA_TABLES.SEMANTIC = sEMANTIC;
             mETA_TABLES.TABRELATION = tABRELATION;
+            mETA_TABLES.BRANCH = bRANCH;
             return mETA_TABLES;
         }
 
@@ -1330,6 +1384,30 @@ namespace Areas.Ndi.Models
         private Nullable<global::System.Decimal> _LINESDEF;
         partial void OnLINESDEFChanging(Nullable<global::System.Decimal> value);
         partial void OnLINESDEFChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.String BRANCH
+        {
+            get
+            {
+                return _BRANCH;
+            }
+            set
+            {
+                OnBRANCHChanging(value);
+                ReportPropertyChanging("BRANCH");
+                _BRANCH = StructuralObject.SetValidValue(value, false);
+                ReportPropertyChanged("BRANCH");
+                OnBRANCHChanged();
+            }
+        }
+        private global::System.String _BRANCH;
+        partial void OnBRANCHChanging(global::System.String value);
+        partial void OnBRANCHChanged();
 
         #endregion
 

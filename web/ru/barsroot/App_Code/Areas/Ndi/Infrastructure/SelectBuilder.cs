@@ -6,6 +6,7 @@ using Areas.Ndi.Models;
 using BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation;
 using BarsWeb.Areas.Ndi.Models;
 using Oracle.DataAccess.Client;
+using BarsWeb.Areas.Ndi.Models.FilterModels;
 
 namespace BarsWeb.Areas.Ndi.Infrastructure
 {
@@ -14,7 +15,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
     /// </summary>
     public class SelectBuilder
     {
-        List<string> SKIP_KEYS = new List<string>{ "COL_ALL_ALIAS" };
+        List<string> SKIP_KEYS = new List<string> { "COL_ALL_ALIAS" };
 
         /// <summary>
         /// Конструктор построителя запросов
@@ -64,7 +65,9 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
 
         public string NativeTableNameForFilter { get; set; }
 
-        public  bool SummaryForRecordsOnScrean { get; set; }
+        public bool SummaryForRecordsOnScrean { get; set; }
+
+        public string SelectStatement { get; set; }
         /// <summary>
         /// Перечень дополнительных колонок-выражений над полями текущей строки (ключ - имя колонки, значение - sql-выражение)
         /// </summary>
@@ -79,16 +82,15 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
         }
         private Dictionary<string, string> _additionalColumns;
 
+
         public static IEnumerable<FilterInfo> CustomFilterBuild(IEnumerable<FilterInfo> filters, string tableName, IEnumerable<FilterInfo> filtersFromDb)
         {
-            foreach (var item in filters)
-            {
-                var itemValue = item.FILTER_ID;
-            }
+            if (filters == null || filtersFromDb == null) return new List<FilterInfo>();
+
             IEnumerable<FilterInfo> resultFilters = filtersFromDb.Where(u => filters.FirstOrDefault(x => x.FILTER_ID == u.FILTER_ID) != null).ToList();
             foreach (var item in resultFilters)
             {
-                item.WHERE_CLAUSE = item.WHERE_CLAUSE.Replace(ClauseAlias, tableName);
+                item.Where_clause = item.Where_clause.Replace(ClauseAlias, tableName);
             }
             return resultFilters;
         }
@@ -102,7 +104,8 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
             string condition = filter.Condition;
             if (!string.IsNullOrEmpty(condition))
             {
-                filter.FilterParams = sqlParams.Where(x => filter.Condition.Contains(x.Name)).ToList();
+                if (sqlParams != null)
+                    filter.FilterParams = sqlParams.Where(x => filter.Condition.Contains(x.Name)).ToList();
                 filter.Condition = condition.Replace(ClauseAlias, tableName);
             }
 
@@ -113,31 +116,110 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
         /// </summary>
         /// <param name="columnList"></param>
         /// <returns></returns>
-        public static List<ColumnMetaInfo> MetaColumnsToColumnInfo(List<META_COLUMNS> columnList)
+        public static List<ColumnMetaInfo> MetaColumnsToColumnsForSelect(List<ColumnMetaInfo> columnList)
         {
-            List<ColumnMetaInfo> allColumnsInfo = columnList.Select(ci => new ColumnMetaInfo
+            List<ColumnMetaInfo> listToClone = new List<ColumnMetaInfo>(columnList.Count);
+
+
+            columnList.ForEach((item) =>
             {
-                COLID = ci.COLID,
-                COLNAME = string.IsNullOrEmpty(ci.COLNAME) ? ci.COLNAME : ci.COLNAME.Replace("/100", "").Trim(),
-                COLTYPE = string.IsNullOrEmpty(ci.COLTYPE) ? ci.COLTYPE : ci.COLTYPE.Trim(),
-                SEMANTIC = string.IsNullOrEmpty(ci.SEMANTIC) ? ci.SEMANTIC : ci.SEMANTIC.Trim(),
-                SHOWWIDTH = ci.SHOWWIDTH,
-                SHOWMAXCHAR = ci.SHOWMAXCHAR,
-                SHOWFORMAT = string.IsNullOrEmpty(ci.SHOWFORMAT) ? ci.SHOWFORMAT : ci.SHOWFORMAT.Trim(),
-                SHOWIN_FLTR = ci.SHOWIN_FLTR,
-                NOT_TO_EDIT = ci.NOT_TO_EDIT,
-                NOT_TO_SHOW = ci.NOT_TO_SHOW,
-                EXTRNVAL = ci.EXTRNVAL,
-                SHOWPOS = ci.SHOWPOS,
-                TABID = ci.TABID,
-                SHOWRESULT = ci.SHOWRESULT
-            }).ToList();
-            return allColumnsInfo;
+                ColumnMetaInfo clonItem = item.Clone() as ColumnMetaInfo;
+                if (!string.IsNullOrEmpty(clonItem.COLNAME) && clonItem.COLNAME.Contains("/100"))
+                    clonItem.COLNAME = clonItem.COLNAME.Replace("/100", "").Trim();
+                listToClone.Add(clonItem);
+
+            });
+            return listToClone;
+            
+        }
+
+
+        public static List<ColumnMetaInfo> DbColumnsToMetaColumns(List<MetaColumnsDbModel> columnList)
+        {
+            bool isFuncOnly;
+            CallFunctionMetaInfo functionMetaInfo;
+            List<string> paramNames = new List<string>();
+
+            List<ColumnMetaInfo> columnsInfo = new List<ColumnMetaInfo>();
+            foreach (var item in columnList)
+            {
+                var col = new ColumnMetaInfo();
+
+                col.COLID = Convert.ToInt32(item.COLID);
+                col.COLNAME = string.IsNullOrEmpty(item.COLNAME) ? item.COLNAME : item.COLNAME.Trim();
+                col.COLTYPE = string.IsNullOrEmpty(item.COLTYPE) ? item.COLTYPE : item.COLTYPE.Trim();
+                col.SEMANTIC = string.IsNullOrEmpty(item.SEMANTIC) ? item.SEMANTIC : item.SEMANTIC.Trim();
+                col.SHOWWIDTH = Convert.ToInt32(item.SHOWWIDTH);
+                col.SHOWMAXCHAR = Convert.ToInt32(item.SHOWMAXCHAR);
+                col.SHOWFORMAT = string.IsNullOrEmpty(item.SHOWFORMAT) ? item.SHOWFORMAT : item.SHOWFORMAT.Trim();
+                col.SHOWIN_FLTR = item.SHOWIN_FLTR;
+                col.NOT_TO_EDIT = item.NOT_TO_EDIT;
+                col.NOT_TO_SHOW = item.NOT_TO_SHOW;
+                col.EXTRNVAL = item.EXTRNVAL;
+                col.SHOWPOS = item.SHOWPOS;
+                col.SHOWRESULT = item.SHOWRESULT;
+                col.TABID = Convert.ToInt32(item.TABID);
+                col.IsPk = item.SHOWRETVAL;
+                col.InputInNewRecord = item.INPUT_IN_NEW_RECORD;
+                col.WEB_FORM_NAME = ReplaceParameter(item.WEB_FORM_NAME, "sPar=", Convert.ToInt32(item.COLID), Convert.ToInt32(item.TABID),
+                    out isFuncOnly, out functionMetaInfo, out paramNames);
+                col.IsFuncOnly = isFuncOnly;
+                col.FunctionMetaInfo = functionMetaInfo;
+                col.ParamsNames = paramNames.ToList();
+                columnsInfo.Add(col);
+
+            }
+            foreach (var column in columnsInfo)
+            {
+                if (!string.IsNullOrEmpty(column.SHOWFORMAT))
+                {
+                    if (column.COLTYPE == "N" || column.COLTYPE == "E")
+                    {
+                        column.SHOWFORMAT = FormatConverter.ConvertToExtJsDecimalFormat(column.SHOWFORMAT);
+                    }
+                    if (column.COLTYPE == "D")
+                    {
+                        column.SHOWFORMAT = FormatConverter.ConvertToExtJsDateFormat(column.SHOWFORMAT);
+                    }
+                }
+            }
+            return columnsInfo;
+        }
+
+        public static string ReplaceParameter(string url, string searchParam, int? sParColumn, int? nativeTabelId, out bool isFuncOnly, out CallFunctionMetaInfo function, out List<string> paramNames)
+        {
+            isFuncOnly = false;
+            FunNSIEditFParams parameters = null;
+            function = null;
+            string res;
+            paramNames = new List<string>();
+            if (string.IsNullOrEmpty(url) || url.IndexOf(searchParam) != 0)
+                return url;
+            string searchparamValue = url.Substring(url.IndexOf(searchParam) + searchParam.Length);
+            if (url.Contains("sPar=["))
+            {
+                isFuncOnly = true;
+                function = new FunNSIEditFParams(searchparamValue).BuildToCallFunctionMetaInfo(function);
+                function.TABID = nativeTabelId;
+                function.PROC_EXEC = "ON_ROW_CLICK";
+                function.ColumnId = Convert.ToInt32(sParColumn);
+            }
+            res = UrlTamplates.MainUrlTemplate + "?" + "sParColumn" + "=" + sParColumn + "&" + "nativeTabelId" + "=" + nativeTabelId;
+
+            if (url.IndexOf(":") != 0)
+            {
+                parameters = new FunNSIEditFParams(searchparamValue);
+                paramNames = parameters.ParamsNames;
+            }
+            //string paramvalue = url.Substring(url.LastIndexOf(firstParamName) + firstParamName.Length);
+            //string addParam = string.IsNullOrEmpty(additionParameterName) && string.IsNullOrEmpty(additionParameterValue) ? "" : "&" + additionParameterName + "=" + additionParameterValue;
+            //string resWebName = url.Replace(paramvalue, firstPramValue) + addParam;
+            return res.Trim();
         }
 
         public static List<ColumnMetaInfo> ReplaseDivisionColumnNames(List<ColumnMetaInfo> columns)
         {
-            if (columns.Select(x => x.COLNAME.IndexOf("/") > 0).Count() > 0)
+            if (columns.Select(x => x.COLNAME.IndexOf("/") > 0).Any())
                 foreach (var item in columns)
                 {
                     if (item.COLNAME.IndexOf("/") > 0)
@@ -220,17 +302,26 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
         {
             get
             {
-                string result = TableName;
+                string result = string.IsNullOrEmpty(this.SelectStatement) ? TableName : GetMainTableSelectTemplate;
                 if (!ExternalMetaColumns.IsNullOrEmpty())
                 {
                     result += "," + string.Join(",", ExternalMetaColumns.Select(ecp => string.IsNullOrEmpty(ecp.Tab_Alias) ? ecp.SrcTableName : ecp.SrcTableName + " " + ecp.Tab_Alias).Distinct());
                 }
-                if (StartFilter != null && StartFilter.Count() > 0 && StartFilter.FirstOrDefault(u => !string.IsNullOrEmpty(u.FROM_CLAUSE)) != null)
+                if (StartFilter != null && StartFilter.Any() && StartFilter.FirstOrDefault(u => !string.IsNullOrEmpty(u.FROM_CLAUSE)) != null)
                 {
                     result += "," + string.Join(",", StartFilter.Where(u => !string.IsNullOrEmpty(u.FROM_CLAUSE)).Select(x => x.FROM_CLAUSE).Distinct());
                 }
                 return result;
             }
+        }
+
+        public string GetMainTableSelectTemplate
+        {
+            get
+            {
+                return string.Format("( {0} ) {1}", this.SelectStatement, this.TableName);
+            }
+         
         }
         public static List<ColumnMetaInfo> BuildExternalColumnsToColumns(List<ColumnMetaInfo> extCols)
         {
@@ -293,33 +384,35 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
                 foreach (GridFilter param in GridFilter)
                 {
                     // if (param.Type == "boolean" && param.Value == "0")
-                    BuildGridParameter(param);
+                    //  BuildGridParameter(param);
                     selectCmd.Parameters.Add(param.ParamName, param.ParamValue);
 
                     //fullFilter.Append(" OR " + param.ParamName + "IS NULL");
                 }
                 fullFilter.Append(filterWhere);
             }
-            //временный кастыль. На днях сделать нормально.
+
             if (hasSelectConditions)
             {
-                foreach (var data in SqlParams)
-                {
-
-                    if (SelectConditions.Contains(":" + data.Name) && (System.Text.RegularExpressions.Regex.IsMatch(SelectConditions, ":" + data.Name + "[\\W]{1}") || SelectConditions.IndexOf(":" + data.Name) + data.Name.Length + 1 == SelectConditions.Length))
+                if (SqlParams != null && SqlParams.Count > 0)
+                    foreach (var data in SqlParams)
                     {
-                        //SelectConditions =  SelectConditions.Replace(":" + data.Name, ":p_" + data.Name);
-                        var parValue = Convert.ChangeType(data.Value, ReferenceBookRepository.GetCsTypeCode(data.Type));
-                        var param = new OracleParameter(data.Name, parValue);
-                        selectCmd.Parameters.Add(param);
-                        selectCmd.BindByName = true;
-                    }
+                        //временный кастыль. На днях сделать нормально.
+                        if (SelectConditions.Contains(":" + data.Name) && (System.Text.RegularExpressions.Regex.IsMatch(SelectConditions, ":" + data.Name + "[\\W]{1}") || SelectConditions.IndexOf(":" + data.Name) + data.Name.Length + 1 == SelectConditions.Length))
+                        {
 
-                }
+                            //SelectConditions =  SelectConditions.Replace(":" + data.Name, ":p_" + data.Name);
+                            var parValue = Convert.ChangeType(data.Value, SqlStatementParamsParser.GetCsTypeCode(data.Type));
+                            var param = new OracleParameter(data.Name, parValue);
+                            selectCmd.Parameters.Add(param);
+                            selectCmd.BindByName = true;
+                        }
+
+                    }
                 // SelectConditions = SqlStatementParamsParser.ReplaceParamsToValuesInSqlString(SelectConditions, SqlParams);
                 if (!string.IsNullOrEmpty(fullFilter.ToString()))
                     fullFilter.Append(" and ");
-                fullFilter.Append(SelectConditions);
+                fullFilter.Append("(" + SelectConditions + ")");
             }
 
             // условия фильтрации по заполнению диалога фильтра перед населением таблицы
@@ -329,7 +422,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
                 {
                     fullFilter.Append(" and ");
                 }
-                IEnumerable<string> startFilters = StartFilter.Select(u => u.WHERE_CLAUSE);
+                IEnumerable<string> startFilters = StartFilter.Select(u => u.Where_clause);
                 fullFilter.Append("(");
                 //foreach (CustomFilterInfo filter in StartFilter)
                 //{
@@ -431,7 +524,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
                     else
                     {
                         selectCmd.Parameters.Add(par.Name,
-                            Convert.ChangeType(par.Value, ReferenceBookRepository.GetCsTypeCode(par.Type)));
+                            Convert.ChangeType(par.Value, SqlStatementParamsParser.GetCsTypeCode(par.Type)));
                     }
                 }
 
@@ -452,35 +545,35 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
             //}
             selectCmd.CommandText += " where " + fullFilter;
         }
-        private GridFilter BuildGridParameter(GridFilter parameter)
-        {
-            StringBuilder str;
-            if (parameter.Value.FirstOrDefault() == '*')
-            {
-                str = new StringBuilder(parameter.Value);
-                str[0] = '%';
-                parameter.Value = str.ToString();
-            }
-            return parameter;
+        //private GridFilter BuildGridParameter(GridFilter parameter)
+        //{
+        //    StringBuilder str;
+        //    if (parameter.Value.FirstOrDefault() == '*')
+        //    {
+        //        str = new StringBuilder(parameter.Value);
+        //        str[0] = '%';
+        //        parameter.Value = str.ToString();
+        //    }
+        //    return parameter;
 
-        }
+        //}
         string GetOrderBy(bool isAllowEmpty)
         {
             StringBuilder result = new StringBuilder("order by ");
             if (OrderParams != null && OrderParams.Any())
-            {                
+            {
                 var combinedOrders = (from order in OrderParams
-                                        join extCol in ExternalMetaColumns on order.Property equals extCol.ColumnAlias into extGroup
-                                        from extOrder in extGroup.DefaultIfEmpty(null)
-                                        select new SortParam
-                                        {
-                                            Property = extOrder != null ? extOrder.ResultColFullName : TableName + "." + order.Property,
-                                            Direction = order.Direction
-                                        });
+                                      join extCol in ExternalMetaColumns on order.Property equals extCol.ColumnAlias into extGroup
+                                      from extOrder in extGroup.DefaultIfEmpty(null)
+                                      select new SortParam
+                                      {
+                                          Property = extOrder != null ? extOrder.ResultColFullName : TableName + "." + order.Property,
+                                          Direction = order.Direction
+                                      });
                 result.Append(string.Join(",", combinedOrders.Select(o => o.Property + " " + o.Direction)));
                 return result.ToString();
             }
-            return isAllowEmpty ? result.Append("0").ToString() : "";            
+            return isAllowEmpty ? result.Append("0").ToString() : "";
         }
         private void AdaptFilterList()
         {
@@ -505,7 +598,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
                 var extColumn = ExternalMetaColumns.FirstOrDefault(nci => nci.ColumnAlias == filter.Field);
                 if (extColumn != null)
                 {
-                    filter.Field = string.IsNullOrEmpty(extColumn.Tab_Alias) ? extColumn.SrcTableName : extColumn.Tab_Alias + "." + extColumn.COLNAME;
+                    filter.Field = string.IsNullOrEmpty(extColumn.Tab_Alias) ? extColumn.SrcTableName + "." + extColumn.COLNAME : extColumn.Tab_Alias + "." + extColumn.COLNAME;
                 }
             }
         }
@@ -585,6 +678,12 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
                 return internalCommand;
         }
 
+        public OracleCommand GetSystemProcCommand(string systemProcName)
+        {
+            OracleCommand cmd = GetInternalCommand();
+            cmd.CommandText = string.Format("select {0} from ({1}) {2}", systemProcName, cmd.CommandText, TableName);
+            return cmd;
+        }
         /// <summary>
         /// Формировать запрос получения итоговой строки
         /// </summary>
@@ -654,8 +753,8 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
             {
                 result.Append(",");
                 result.Append(string.Join(",", AdditionalColumns.Select(pair =>
-                (SKIP_KEYS.FindIndex(item => item == pair.Key) == -1) ? 
-                string.Format("{0} as {1}", pair.Value, pair.Key):
+                (SKIP_KEYS.FindIndex(item => item == pair.Key) == -1) ?
+                string.Format("{0} as {1}", pair.Value, pair.Key) :
                 pair.Value
                 )));
             }

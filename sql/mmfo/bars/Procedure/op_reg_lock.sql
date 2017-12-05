@@ -59,7 +59,7 @@ PROMPT *** Create  procedure OP_REG_LOCK ***
 
 --***************************************************************--
 --          Регистрация - открытие счетов
---             ver 5.3.0.23    15.07.2013
+--             ver 5.4    04.12.2018
 --
 --          Функция открытия/обновления реквизитов счета
 --          с оптимистической блокировкой
@@ -97,10 +97,12 @@ ern        CONSTANT POSITIVE := 021;
 erm        VARCHAR2(254);
 err        EXCEPTION;
 par1       VARCHAR2(25)  := null;
+l_count    number;
 l_title    varchar2(100) := 'op_reg: ';
 
 BEGIN
-
+   bars_audit.info (l_title||'старт открытия счета kf='||gl.amfo||', nls='||p_nls_);
+   
    bars_audit.trace('%s params: mod_=%s, p1_=%s, p2_=%s, p3_=%s, p4_=%s, rnk_=%s, p_nls_=%s, kv_=%s',
         l_title, to_char(mod_), to_char(p1_), to_char(p2_), to_char(p3_), to_char(p4_), to_char(rnk_), p_nls_, to_char(kv_));
    bars_audit.trace('%s params: nms_=%s, tip_=%s, isp_=%s, accR_=%s, nbsnull_=%s, pap_=%s, vid_=%s, pos_=%s',
@@ -132,7 +134,7 @@ BEGIN
    ELSE
       grp_ := NULL;
    END IF;
-   bars_audit.info('NLS ='||p_nls_);
+   
    l_nls := p_nls_ ;
 
    bars_audit.trace('%s подготовка: l_bankdate=%s, grp_=%s, l_nls=%s',
@@ -149,35 +151,42 @@ BEGIN
       end if;
    end if;
 
+  
+ 
+      
+      select count(*) into l_count from transform_2017_forecast where kf = gl.amfo and new_nls  = l_nls;     
+      if l_count  > 0 then 
+         raise_application_error(-(20000 + 10), 'Рахунок '||l_nls||' зарезервовано під новий план рахунків', TRUE);
+      end if;         
+      
    -- определяем, есть ли счет
    BEGIN
 
-      IF mod_ = 4 AND p2_ > 0 THEN
-         SELECT acc, dazs INTO acc_, l_dazs FROM accounts WHERE acc=p2_ ;
-      ELSE
-         SELECT acc, dazs INTO acc_, l_dazs FROM accounts WHERE nls=l_nls AND kv=kv_ ;
-      END IF;
+      if mod_ = 4 and p2_ > 0 then
+         select acc, dazs into acc_, l_dazs from accounts where acc=p2_ ;
+      else
+         select acc, dazs into acc_, l_dazs from accounts where nls=l_nls and kv=kv_ ;
+      end if;
 
-      bars_audit.trace('%s найден счет: acc_=%s, l_dazs=%s',
-           l_title, to_char(acc_), to_char(l_dazs, 'dd/MM/yyyy'));
+	  
+	  
+	  
+      bars_audit.trace('%s найден счет: acc_=%s, l_dazs=%s',  l_title, to_char(acc_), to_char(l_dazs, 'dd/MM/yyyy'));
 
    EXCEPTION WHEN NO_DATA_FOUND THEN
-
       acc_   := NULL;
       l_dazs := null;
-
       bars_audit.trace('%s счет не найден.', l_title);
-
    END;
 
+   -- счет существует , но он закрыт
    IF acc_ is not null AND l_dazs is not null THEN
 
       if fl_ is not null then
         goto nowarn;
       end if;
 
-      bars_audit.trace('%s невозможно изменить реквизиты закрытого счета %s',
-           l_title, l_nls);
+      bars_audit.trace('%s невозможно изменить реквизиты закрытого счета %s', l_title, l_nls);
 
       erm := '9206 - Неможливо змiнити реквiзити закритого рахунку #'||l_nls ;
       er  := 5;

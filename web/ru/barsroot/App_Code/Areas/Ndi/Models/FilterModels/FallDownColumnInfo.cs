@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace BarsWeb.Areas.Ndi.Models
+namespace BarsWeb.Areas.Ndi.Models.FilterModels
 {
     /// <summary>
     /// Информация о проваливании для колонки (передается на клиент для формирования ссылки на проваливаемый справочник)

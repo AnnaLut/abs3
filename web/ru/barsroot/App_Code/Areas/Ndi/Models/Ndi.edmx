@@ -10,7 +10,7 @@
             <PropertyRef Name="COLTYPE" />
           </Key>
           <Property Name="COLTYPE" Type="char" MaxLength="1" Nullable="false" />
-          <Property Name="TYPENAME" Type="varchar2" MaxLength="15" />
+          <Property Name="TYPENAME" Type="varchar2" MaxLength="15" Nullable="false" />
         </EntityType>
         <EntityType Name="META_COLUMNS">
           <Key>
@@ -19,49 +19,52 @@
           </Key>
           <Property Name="TABID" Type="number" Precision="38" Scale="0" Nullable="false" />
           <Property Name="COLID" Type="number" Precision="38" Scale="0" Nullable="false" />
-          <Property Name="COLNAME" Type="varchar2" MaxLength="30" />
-          <Property Name="COLTYPE" Type="char" MaxLength="1" />
+          <Property Name="COLNAME" Type="varchar2" MaxLength="30" Nullable="false" />
+          <Property Name="COLTYPE" Type="char" MaxLength="1" Nullable="false" />
           <Property Name="SEMANTIC" Type="varchar2" MaxLength="80" />
-          <Property Name="SHOWWIDTH" Type="number" Precision="3" Scale="1" />
+          <Property Name="SHOWWIDTH" Type="number" Precision="5" Scale="1" />
           <Property Name="SHOWMAXCHAR" Type="number" Precision="5" Scale="0" />
           <Property Name="SHOWPOS" Type="number" Precision="3" Scale="0" />
-          <Property Name="SHOWIN_RO" Type="number" Precision="1" Scale="0" />
-          <Property Name="SHOWRETVAL" Type="number" Precision="1" Scale="0" />
-          <Property Name="INSTNSSEMANTIC" Type="number" Precision="1" Scale="0" />
-          <Property Name="EXTRNVAL" Type="number" Precision="1" Scale="0" />
+          <Property Name="SHOWIN_RO" Type="number" Precision="1" Scale="0" Nullable="false" />
+          <Property Name="SHOWRETVAL" Type="number" Precision="1" Scale="0" Nullable="false" />
+          <Property Name="INSTNSSEMANTIC" Type="number" Precision="1" Scale="0" Nullable="false" />
+          <Property Name="EXTRNVAL" Type="number" Precision="1" Scale="0" Nullable="false" />
           <Property Name="SHOWREL_CTYPE" Type="char" MaxLength="1" />
           <Property Name="SHOWFORMAT" Type="varchar2" MaxLength="30" />
-          <Property Name="SHOWIN_FLTR" Type="number" Precision="1" Scale="0" />
-          <Property Name="SHOWREF" Type="number" Precision="1" Scale="0" />
+          <Property Name="SHOWIN_FLTR" Type="number" Precision="1" Scale="0" Nullable="false" />
+          <Property Name="SHOWREF" Type="number" Precision="1" Scale="0" Nullable="false" />
           <Property Name="SHOWRESULT" Type="varchar2" MaxLength="254" />
           <Property Name="CASE_SENSITIVE" Type="number" Precision="1" Scale="0" />
-          <Property Name="NOT_TO_EDIT" Type="number" Precision="1" Scale="0" />
-          <Property Name="NOT_TO_SHOW" Type="number" Precision="1" Scale="0" />
-          <Property Name="SIMPLE_FILTER" Type="number" Precision="1" Scale="0" />
+          <Property Name="NOT_TO_EDIT" Type="number" Precision="1" Scale="0" Nullable="false" />
+          <Property Name="NOT_TO_SHOW" Type="number" Precision="1" Scale="0" Nullable="false" />
+          <Property Name="SIMPLE_FILTER" Type="number" Precision="1" Scale="0" Nullable="false" />
           <Property Name="FORM_NAME" Type="varchar2" MaxLength="254" />
+          <Property Name="BRANCH" Type="varchar2" MaxLength="30" Nullable="false" />
           <Property Name="WEB_FORM_NAME" Type="varchar2" MaxLength="254" />
           <Property Name="OPER_ID" Type="number" Precision="38" Scale="0" />
+          <Property Name="INPUT_IN_NEW_RECORD" Type="number" Precision="1" Scale="0" Nullable="false" />
         </EntityType>
         <EntityType Name="META_RELTYPES">
           <Key>
             <PropertyRef Name="CODE" />
           </Key>
           <Property Name="CODE" Type="char" MaxLength="1" Nullable="false" />
-          <Property Name="NAME" Type="varchar2" MaxLength="35" />
+          <Property Name="NAME" Type="varchar2" MaxLength="35" Nullable="false" />
         </EntityType>
         <EntityType Name="META_TABLES">
           <Key>
             <PropertyRef Name="TABID" />
           </Key>
           <Property Name="TABID" Type="number" Precision="38" Scale="0" Nullable="false" />
-          <Property Name="TABNAME" Type="varchar2" MaxLength="30" />
-          <Property Name="SEMANTIC" Type="varchar2" MaxLength="80" />
-          <Property Name="TABRELATION" Type="number" Precision="1" Scale="0" />
+          <Property Name="TABNAME" Type="varchar2" MaxLength="30" Nullable="false" />
+          <Property Name="SEMANTIC" Type="varchar2" MaxLength="80" Nullable="false" />
+          <Property Name="TABRELATION" Type="number" Precision="1" Scale="0" Nullable="false" />
           <Property Name="TABLDEL" Type="number" Precision="1" Scale="0" />
+          <Property Name="BRANCH" Type="varchar2" MaxLength="30" Nullable="false" />
           <Property Name="LINESDEF" Type="number" Precision="38" Scale="0" />
         </EntityType>
         <Association Name="FK_METACOLUMNS_METACOLTYPES">
-          <End Role="META_COLTYPES" Type="Self.META_COLTYPES" Multiplicity="0..1" />
+          <End Role="META_COLTYPES" Type="Self.META_COLTYPES" Multiplicity="1" />
           <End Role="META_COLUMNS" Type="Self.META_COLUMNS" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="META_COLTYPES">
@@ -176,6 +179,8 @@
           <NavigationProperty Name="META_TABLES" Relationship="BarsWeb.Areas.Ndi.Models.FK_METACOLUMNS_METATABLES" FromRole="META_COLUMNS" ToRole="META_TABLES" />
           <Property Name="WEB_FORM_NAME" Type="String" MaxLength="254" FixedLength="false" Unicode="false" />
           <Property Name="OPER_ID" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="BRANCH" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="INPUT_IN_NEW_RECORD" Type="Int16" Nullable="false" />
         </EntityType>
         <EntityType Name="META_RELTYPES">
           <Key>
@@ -196,6 +201,7 @@
           <Property Name="TABLDEL" Type="Int16" />
           <NavigationProperty Name="META_COLUMNS" Relationship="BarsWeb.Areas.Ndi.Models.FK_METACOLUMNS_METATABLES" FromRole="META_TABLES" ToRole="META_COLUMNS" />
           <Property Name="LINESDEF" Type="Decimal" Precision="38" Scale="0" />
+          <Property Name="BRANCH" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
         </EntityType>
         <Association Name="FK_METACOLUMNS_METACOLTYPES">
           <End Type="BarsWeb.Areas.Ndi.Models.META_COLTYPES" Role="META_COLTYPES" Multiplicity="1" />
@@ -250,6 +256,8 @@
           <EntitySetMapping Name="META_COLUMNS">
             <EntityTypeMapping TypeName="BarsWeb.Areas.Ndi.Models.META_COLUMNS">
               <MappingFragment StoreEntitySet="META_COLUMNS">
+                <ScalarProperty Name="INPUT_IN_NEW_RECORD" ColumnName="INPUT_IN_NEW_RECORD" />
+                <ScalarProperty Name="BRANCH" ColumnName="BRANCH" />
                 <ScalarProperty Name="OPER_ID" ColumnName="OPER_ID" />
                 <ScalarProperty Name="WEB_FORM_NAME" ColumnName="WEB_FORM_NAME" />
                 <ScalarProperty Name="FORM_NAME" ColumnName="FORM_NAME" />
@@ -288,6 +296,7 @@
           <EntitySetMapping Name="META_TABLES">
             <EntityTypeMapping TypeName="BarsWeb.Areas.Ndi.Models.META_TABLES">
               <MappingFragment StoreEntitySet="META_TABLES">
+                <ScalarProperty Name="BRANCH" ColumnName="BRANCH" />
                 <ScalarProperty Name="LINESDEF" ColumnName="LINESDEF" />
                 <ScalarProperty Name="TABLDEL" ColumnName="TABLDEL" />
                 <ScalarProperty Name="TABRELATION" ColumnName="TABRELATION" />

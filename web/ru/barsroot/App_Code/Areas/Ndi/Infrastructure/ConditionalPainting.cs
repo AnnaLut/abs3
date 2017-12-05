@@ -47,9 +47,9 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
         {
             var colorColumns = new Dictionary<string, string>
             {
-                {COL_ALL_ALIAS, (new ColorRowNameSelector(tableId, ColorType.All)).GetSqlExpressionColumn()},
-                {FontRowColorNameAlias, (new ColorRowNameSelector(tableId, ColorType.FontColor)).GetSqlExpression()},
-                {BackgroundRowColorNameAlias,(new ColorRowNameSelector(tableId, ColorType.BackgroundColor)).GetSqlExpression()},
+                {COL_ALL_ALIAS, new ColorRowNameSelector(tableId, ColorType.All).GetSqlExpressionColumn()},
+                {FontRowColorNameAlias, new ColorRowNameSelector(tableId, ColorType.FontColor).GetSqlExpression()},
+                {BackgroundRowColorNameAlias,new ColorRowNameSelector(tableId, ColorType.BackgroundColor).GetSqlExpression()},
             };
 
             Dictionary<string, string> notEmptyColorColumns = colorColumns.Where(x => x.Value != null).ToDictionary(x => x.Key, x => x.Value);

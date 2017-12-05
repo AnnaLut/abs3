@@ -9,7 +9,7 @@
                       xtype: 'toolbar',
                       itemid: 'testbuttonId',
                       items:[ {
-                          text: 'очистити',
+                          text: 'Очистити',
                           iconCls: 'minus_once',
                           itemId: 'removeSymple',
                           handler: function (btn) {
@@ -47,7 +47,6 @@
 
     ],
     overflowY: 'auto',
-    labelWidth: 110,
     layout: {
         //размещение элементов вертикально один за одним
         type: 'vbox',
@@ -66,7 +65,7 @@
        
         //var form = self.down('mainFormPanel').getForm();
         //columns = sympleFiltersParameter.SympleFilters;
-        //Ext.each(sympleFiltersParameter.SympleFilters, function (item) {
+        //Ext.each(sympleFiltersParameter.SympleFilters, function (item) {deletуLineBreaks
         //    form.items.push(item);
         //})
        
@@ -80,11 +79,11 @@
             {
                 title: 'введіть значення для фільтрації',
                 items: Ext.create('ExtApp.view.refBook.SypleFilterFormPanel', {
-                    items: columns,
-                    height: 220,
+                    items: ExtApp.utils.RefBookUtils.deleteLineBreaks(columns),
+                    height: 270,
                     fieldDefaults: {
                         labelAlign: 'left',
-                        labelWidth: 300
+                        labelWidth: ExtApp.utils.RefBookUtils.getLabelWidthForPanel(columns)
                     }
                 }),
                 autoscroll: true,

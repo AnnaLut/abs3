@@ -11,12 +11,15 @@ PROMPT *** Create  procedure P_F27SB ***
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :	Процедура формирование файла @27 для КБ
 % COPYRIGHT   :	Copyright UNITY-BARS Limited, 2009.All Rights Reserved.
-% VERSION     : 18/02/2016 (17/02/2016, 08/02/2016)
+% VERSION     : 05/12/2017 (13/11/2017, 18/02/2016)
 %             :             Версия для Сбербанка)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+05.12.2017 - добавлен блок для формирования виртуальных оборотов для бал.
+             счетов перехода на новый план счетов 
+13.11.2017 - удалил ненужные строки и изменил некоторые блоки формирования 
 18.02.2016 - для файла за последний рабочий день года 
              из оборотов за месяц коды 50,51,60,61 не будут вычитаться 
              годовые корретирующие обороты
@@ -97,9 +100,12 @@ k_sum_   number;
 
 -------------------------------------------------------------------------------
 CURSOR Saldo IS
-   SELECT s.rnk, s.acc, s.nls, s.kv, s.fdat, s.nbs, s.ost, s.ostq,
-          s.dos, s.dosq, s.kos, s.kosq,
-          s.dos96p, s.dosq96p, s.kos96p, s.kosq96p,
+   SELECT s.rnk, s.acc, s.nls, s.kv, s.fdat, s.nbs, 
+          s.ost, s.ostq,
+          s.dos, s.dosq, 
+          s.kos, s.kosq,
+          s.dos96p, s.dosq96p, 
+          s.kos96p, s.kosq96p,
           s.dos96, s.dosq96, s.kos96, s.kosq96,
           s.dos99, s.dosq99, s.kos99, s.kosq99,
           s.doszg, s.koszg, s.dos96zg, s.kos96zg,
@@ -108,15 +114,42 @@ CURSOR Saldo IS
    WHERE s.acc=a.acc      
      and s.rnk=cc.rnk   
      and NVL(lpad(to_char(cc.country),3,'0'),'804')=l.k040(+) 
-     and a.acc=sp.acc(+);
-
----------------------------------------------------------------------------
-CURSOR BaseL IS
-    SELECT kodp, nbuc, SUM (znap)
-    FROM rnbu_trace
-    WHERE userid=userid_
-    GROUP BY kodp, nbuc;
----------------------------------------------------------------------------
+     and a.acc=sp.acc(+)
+     and trunc(nvl(a.dat_alt, dat_ - 1), 'mm') <> trunc(dat_, 'mm')
+         union all
+   SELECT s.rnk, s.acc, a.nls, s.kv, s.fdat, substr(d.acc_num, 1, 4) nbs, 
+          (case when d.acc_type = 'OLD' then 0 else s.ost end) ost,
+          (case when d.acc_type = 'OLD' then 0 else s.ostq end) ostq,
+          (case when d.acc_type = 'OLD' then d.dos_repm  else s.dos - d.dos_repm end) dos,
+          (case when d.acc_type = 'OLD' then d.dosq_repm  else s.dosq - d.dosq_repm end) dosq,
+          (case when d.acc_type = 'OLD' then d.kos_repm  else s.kos - d.kos_repm end) kos,
+          (case when d.acc_type = 'OLD' then d.kosq_repm  else s.kosq - d.kosq_repm end) kosq,
+          (case when d.acc_type = 'OLD' then s.dos96p else 0 end) dos96p,
+          (case when d.acc_type = 'OLD' then s.dosq96p else 0 end) dosq96p,
+          (case when d.acc_type = 'OLD' then s.kos96p else 0 end) kos96p,
+          (case when d.acc_type = 'OLD' then s.kosq96p else 0 end) kosq96p,
+          (case when d.acc_type = 'OLD' then 0 else s.dos96 end) dos96,
+          (case when d.acc_type = 'OLD' then 0 else s.dosq96 end) dosq96,
+          (case when d.acc_type = 'OLD' then 0 else s.kos96 end) kos96,
+          (case when d.acc_type = 'OLD' then 0 else s.kosq96 end) kosq96,
+          (case when d.acc_type = 'OLD' then 0 else s.dos99 end) dos99,
+          (case when d.acc_type = 'OLD' then 0 else s.dosq99 end) dosq99,
+          (case when d.acc_type = 'OLD' then 0 else s.kos99 end) kos99,
+          (case when d.acc_type = 'OLD' then 0 else s.kosq99 end) kosq99,
+          (case when d.acc_type = 'OLD' then 0 else s.doszg end) doszg,
+          (case when d.acc_type = 'OLD' then 0 else s.koszg end) koszg,
+          (case when d.acc_type = 'OLD' then 0 else s.dos96zg end) dos96zg,
+          (case when d.acc_type = 'OLD' then 0 else s.kos96zg end) kos96zg,
+          nvl(l.k041,'1'), a.tobo, a.nms, NVL(trim(sp.ob22),'00')
+   FROM  otcn_saldo s, otcn_acc a, nbur_kor_balances d, customer cc, kl_k040 l, 
+         specparam_int sp
+   WHERE a.acc=s.acc    and
+         a.rnk=cc.rnk   and
+         NVL(lpad(to_char(cc.country),3,'0'),'804')=l.k040(+)  and
+         a.acc=sp.acc(+) and 
+         d.report_date between trunc(dat_, 'mm') and dat_ and 
+         s.acc = d.acc_id and
+         trunc(nvl(a.dat_alt, dat_ - 1), 'mm') = trunc(dat_, 'mm')  ;
 -------------------------------------------------------------------------------
 procedure p_ins(p_dat_ date, p_tp_ varchar2, p_acc_ number, p_nls_ varchar2,
                 p_nbs_ varchar2, p_ob22_ varchar2, p_kv_ smallint, p_k041_ varchar2, 
@@ -143,7 +176,6 @@ end;
 -------------------------------------------------------------------------------
 BEGIN
 -------------------------------------------------------------------
---SELECT id INTO userid_ FROM staff WHERE upper(logname)=upper(USER);
 userid_ := user_id;
 EXECUTE IMMEDIATE 'TRUNCATE TABLE RNBU_TRACE';
 -------------------------------------------------------------------
@@ -179,14 +211,16 @@ OPEN Saldo;
 
    comm_ := '';
 
-   IF typ_>0 THEN
+   IF typ_ > 0 
+   THEN
       nbuc_ := NVL(F_Codobl_Tobo(acc_,typ_),nbuc1_);
    ELSE
       nbuc_ := nbuc1_;
    END IF;
 
    --- обороты по перекрытию 6,7 классов на 5040,5041
-   IF to_char(Dat_,'MM') = '12' and (nls_ like '6%' or nls_ like '7%' or nls_ like '504%') THEN
+   IF to_char(Dat_,'MM') = '12' and (nls_ like '6%' or nls_ like '7%' or nls_ like '504%') 
+   THEN
       SELECT NVL(SUM(decode(dk,0,1,0)*s),0),
              NVL(SUM(decode(dk,1,1,0)*s),0)
          INTO d_sum_, k_sum_
@@ -394,17 +428,10 @@ CLOSE Saldo;
 ---------------------------------------------------
 DELETE FROM tmp_irep where kodf=kodf_ and datf=dat_;
 ---------------------------------------------------
-OPEN BaseL;
-LOOP
-   FETCH BaseL INTO  kodp_, nbuc_, znap_;
-   EXIT WHEN BaseL%NOTFOUND;
-
-   INSERT INTO tmp_irep
-	  (kodf, datf, kodp, znap, nbuc)
-   VALUES
-	  (kodf_, Dat_, kodp_, znap_, nbuc_);
-END LOOP;
-CLOSE BaseL;
+INSERT INTO tmp_irep (kodf, datf, kodp, znap, nbuc)
+select '27', Dat_, kodp, SUM (znap), nbuc
+FROM rnbu_trace
+GROUP BY kodp, nbuc;
 ------------------------------------------------------------------
 END p_f27sb;
 /

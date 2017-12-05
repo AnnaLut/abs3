@@ -36,7 +36,7 @@ Ext.define('ExtApp.view.refBook.FilterPanel', {
                  //        //handler: function () {
                  //        //   // var form = this.findParentByType('form');
                  //        //    // form.applyFilters(form.store);
-                 //        //    debugger;
+                 //        //    
                  //        //   alert(  this.metadata.tableInfo.TABNAME)
                  //        //}
                  //    }
@@ -44,7 +44,7 @@ Ext.define('ExtApp.view.refBook.FilterPanel', {
              }
     ],
     constructor: function (metadata) {
-        var self = this
+        var self = this;
         thisControllerFunc = metadata.metadata.thisController;
         metadataFunc = metadata.metadata;
         self.superclass.constructor.call(this);
@@ -59,36 +59,9 @@ Ext.define('ExtApp.view.refBook.FilterPanel', {
             var myTabPanel = metadataFunc.tabPanel;
             myTabPanel.down('#SypleFilterFormPanelId').removeAll(true);
             myTabPanel.down('#SypleFilterFormPanelId').add(thisControllerFunc.controllerMetadata.SympleFilters);
-            //myTabPanel.items.items[3].remove('SimpleFilterPanelId', true);
+  
             myTabPanel.down('#SypleFilterFormPanelId').doLayout();
-            //myTabPanel.items.items[3].add(Ext.create('ExtApp.view.refBook.SimpleFilterPanel', { thisController: thisControllerFunc }));
-            //myTabPanel.items.items[3].doLayout();
-            //myTabPanel.add(
-            //{
-            //    title: 'звичайні',
-            //    items: Ext.create('ExtApp.view.refBook.SimpleFilterPanel', { thisController: thisControllerFunc }),
-            //    //    items: thisController.controllerMetadata.SympleFilters,
-            //    //    height: 300,
-            //    //    fieldDefaults: {
-            //    //        labelAlign: 'left',
-            //    //        labelWidth: 200
-            //    //    }
-            //    //}),
-            //    id: 'SympleFilterTub2',
-            //    minHeight: 100,
-            //    width: '100%',
-            //    maxHeight: 600
-            //});// = Ext.create('ExtApp.view.refBook.ConstructorFiltersGrid', { thisController: thisController });
-          
-            //if (myTabPanel.items.length > 4)
-            //    myTabPanel.setActiveTab(4);
-            //if (myTabPanel.items.length > 3)
-            //    myTabPanel.setActiveTab(3);
-            //if (myTabPanel.items.length > 2)
-            //    myTabPanel.setActiveTab(2);
-            //if (myTabPanel.items.length > 1)
-            //    myTabPanel.setActiveTab(1);
-            //myTabPanel.setActiveTab(0);
+       
             self.items = myTabPanel;
             ExtApp.view.refBook.FilterPanel.superclass.initComponent.call(this);
             return this;
@@ -105,13 +78,7 @@ Ext.define('ExtApp.view.refBook.FilterPanel', {
             id: 'tabFilterPanel',
            // renderTo: Ext.getBody(),
             items: [
-                //{
-                //    title: 'Конструктор фільтрів',
-                //    //items: Ext.create('ExtApp.view.refBook.ConstructorFiltersGrid', { thisController: thisController }),
-                //    //minHeight: 100,
-                //   // width: '100%',
-                //   // maxHeight: 600
-                //}
+             
             ]
         });
         tab.add(

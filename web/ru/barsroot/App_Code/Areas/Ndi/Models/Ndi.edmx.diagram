@@ -4,7 +4,7 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2008/10/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="c284b41de82c482ab2d1fded9add12f7" Name="Diagram1">
+      <Diagram DiagramId="c284b41de82c482ab2d1fded9add12f7" Name="Diagram1" ZoomLevel="82">
         <EntityTypeShape EntityType="BarsWeb.Areas.Ndi.Models.META_COLTYPES" Width="1.5" PointX="0.75" PointY="7.125" />
         <EntityTypeShape EntityType="BarsWeb.Areas.Ndi.Models.META_COLUMNS" Width="2.75" PointX="4.625" PointY="1.75" />
         <EntityTypeShape EntityType="BarsWeb.Areas.Ndi.Models.META_RELTYPES" Width="2.125" PointX="0.75" PointY="0.75" />
