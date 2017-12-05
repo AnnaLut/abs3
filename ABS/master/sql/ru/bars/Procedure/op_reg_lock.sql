@@ -59,7 +59,7 @@ PROMPT *** Create  procedure OP_REG_LOCK ***
 
 --***************************************************************--
 --          Регистрация - открытие счетов
---             ver 5.3.0.23    15.07.2013
+--             ver 5.4   04.12.2017
 --
 --          Функция открытия/обновления реквизитов счета
 --          с оптимистической блокировкой
@@ -98,6 +98,7 @@ erm        VARCHAR2(254);
 err        EXCEPTION;
 par1       VARCHAR2(25)  := null;
 l_title    varchar2(100) := 'op_reg: ';
+l_count    number;
 
 BEGIN
 
@@ -148,6 +149,12 @@ BEGIN
       end if;
    end if;
 
+   select count(*) into l_count from transform_2017_forecast where kf = gl.amfo and new_nls  = l_nls;     
+      if l_count  > 0 then 
+         raise_application_error(-(20000 + 10), 'Рахунок '||l_nls||' зарезервовано під новий план рахунків', TRUE);
+      end if;    
+   
+   
    -- определяем, есть ли счет
    BEGIN
 
