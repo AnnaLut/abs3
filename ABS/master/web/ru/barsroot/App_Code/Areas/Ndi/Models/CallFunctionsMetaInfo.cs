@@ -15,7 +15,7 @@ namespace BarsWeb.Areas.Ndi.Models
 
         public CallFunctionMetaInfo ()
         {
-
+            this.SystemParamsInfo = new List<ParamMetaInfo>();
         }
         public decimal? TABID { get; set; }
         public int? ColumnId { get; set; }
@@ -24,7 +24,7 @@ namespace BarsWeb.Areas.Ndi.Models
 
         public bool isFuncOnly = true;
         public string BtnDysplayName { get; set; }
-        public List<string> DysplayParamsNames { get; set; }
+        public List<string> RowParamsNames { get; set; }
         public string IconClassName { get; set; }
         public decimal? FUNCID { get; set; }
         public string PROC_NAME { get; set; }
@@ -39,7 +39,20 @@ namespace BarsWeb.Areas.Ndi.Models
         public List<string> ConditionParamNames { get; set; }
         public int? CodeOper { get; set; }
         public string OutParams { get; set; }
+        public string SysPar { get; set; }
+        public string UploadParams { get; set; }
+        public List<UploadParamsInfo> UploadParamsInfo { get; set; }
+        public  List<ParamMetaInfo> SystemParamsInfo { get; set; }
+        public List<OutParamsInfo> OutParamsInfo { get; set; }
+        public string MultiParams { get; set; }
+        public List<MultiRowsParams> MultiRowsParams { get; set; }
+        public bool HasFileResult { get; set; }
         public string LinkWebFormName { get; set; }
         public bool OpenInWindow { get; set; }
+
+        public ThrowParams ThrowNsiParams { get; set; }
+        public List<string> InputParamsNames { get; set; }
+
+
     }
 }

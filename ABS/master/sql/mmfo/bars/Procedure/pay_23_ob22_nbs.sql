@@ -557,7 +557,7 @@ BEGIN
                END;
                if isp_ = 20094 THEN isp_ := l_absadm; end if;
                logger.info('PAY1 : nbs_rez= ' || k.nbs_rez||' ob22_rez='||k.ob22_rez || ' isp_=' || isp_ || ' NLS_=' || nls_ || ' KV=' || k.kv) ;
-               op_reg(99,0,0,GRP_,p4_,rnk_b,nls_,k.kv,nms_,'ODB',isp_,acc_);
+               op_reg(99,0,0,GRP_,p4_,rnk_b,nls_,k.kv,nms_,'REZ',isp_,acc_);
                --logger.info('PAY55 : nls_= ' || nls_||' '||acc_) ;
                k.r_acc:=acc_;
                update accounts set                 daos=dat31_ where acc= acc_ and daos > dat31_ ;

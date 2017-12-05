@@ -64,7 +64,12 @@ using Oracle.DataAccess.Client;
         public void Dispose()
         {
             if (_connection != null)
+            {
+                _connection.Close();
                 _connection = null;
+            }
+                
+            
         }
 
         #endregion

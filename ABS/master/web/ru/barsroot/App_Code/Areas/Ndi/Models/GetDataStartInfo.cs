@@ -1,5 +1,7 @@
 ﻿using Areas.Ndi.Models;
+using BarsWeb.Areas.Ndi.Models.FilterModels;
 using System.Collections.Generic;
+
 namespace BarsWeb.Areas.Ndi.Models
 {
     /// <summary>
@@ -7,6 +9,11 @@ namespace BarsWeb.Areas.Ndi.Models
     /// </summary>
     public class GetDataStartInfo
     {
+
+        public GetDataStartInfo()
+        {
+            this.StartFilter = new List<FilterInfo>();
+        }
         /// <summary>
         /// ID таблицы
         /// </summary>
@@ -60,7 +67,7 @@ namespace BarsWeb.Areas.Ndi.Models
         /// </summary>
         public int RecordsCount { get; set; }
 
-        public List<META_COLUMNS> NativeMetaColumns { get; set; }
+        public List<ColumnMetaInfo> NativeMetaColumnsForeSelect { get; set; }
         public List<ColumnMetaInfo> ExternalMetaColumns { get; set; }
         /// <summary>
         /// Получить все строки
@@ -69,12 +76,15 @@ namespace BarsWeb.Areas.Ndi.Models
         public string SelectConditions { get; set; }
         public string ProcedureText { get; set; }
 
-        public List<FieldProperties> SelectFieldProperties { get; set; }
+        public List<FieldProperties> AllFieldProperties { get; set; }
 
-        public string nativTableNameForFilter { get; set; }
+        public string NativTableNameForFilter { get; set; }
 
         public string Clause { get; set; }
 
         public bool SummaryForRecordsOnScrean { get; set; }
+        public string SelectStatement { get; set; }
+        public List<MetaColumnsDbModel> DbMetaColumns { get; internal set; }
+        public List<ColumnMetaInfo> NativeMetaColumns { get; internal set; }
     }
 }

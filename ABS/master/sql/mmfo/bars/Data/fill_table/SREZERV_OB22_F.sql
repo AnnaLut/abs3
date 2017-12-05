@@ -1,8 +1,8 @@
 ﻿prompt
 prompt Синхронзация таблицы-справочника "SREZERV_OB22_F"
-prompt Дата+время экспорта: 28.11.2017 17:44:51
+prompt Дата+время экспорта: 05.12.2017 12:17:21
 prompt
-exec bars_audit.info('Синхронзация таблицы-справочника "SREZERV_OB22_F" Дата+время экспорта: 28.11.2017 17:44:51  ');
+exec bars_audit.info('Синхронзация таблицы-справочника "SREZERV_OB22_F" Дата+время экспорта: 05.12.2017 12:17:21  ');
 alter session set nls_date_format='DD.MM.YYYY HH24:MI:SS';
 alter session set NLS_NUMERIC_CHARACTERS = '. ';
 declare
@@ -23,6 +23,12 @@ exception when err then
   null;
 end;
 /
+insert into REFSYNC_SREZERV_OB22_F(NBS,OB22,S080,CUSTTYPE,KV,NBS_REZ,OB22_REZ,NBS_7F,OB22_7F,NBS_7R,OB22_7R,PR,NAL,R013)
+values('3102', '0', '0', '0', '0', '3119', '11', '3739', '03', '3739', '03', 0, '1', 4.0);
+insert into REFSYNC_SREZERV_OB22_F(NBS,OB22,S080,CUSTTYPE,KV,NBS_REZ,OB22_REZ,NBS_7F,OB22_7F,NBS_7R,OB22_7R,PR,NAL,R013)
+values('3103', '0', '0', '0', '0', '3119', '11', '3739', '03', '3739', '03', 0, '1', 4.0);
+insert into REFSYNC_SREZERV_OB22_F(NBS,OB22,S080,CUSTTYPE,KV,NBS_REZ,OB22_REZ,NBS_7F,OB22_7F,NBS_7R,OB22_7R,PR,NAL,R013)
+values('3105', '0', '0', '0', '0', '3119', '11', '3739', '03', '3739', '03', 0, '1', 4.0);
 insert into REFSYNC_SREZERV_OB22_F(NBS,OB22,S080,CUSTTYPE,KV,NBS_REZ,OB22_REZ,NBS_7F,OB22_7F,NBS_7R,OB22_7R,PR,NAL,R013)
 values('2607', '0', '0', '0', '0', '2609', '05', '3739', '03', '3739', '03', 0, '5', 3.0);
 insert into REFSYNC_SREZERV_OB22_F(NBS,OB22,S080,CUSTTYPE,KV,NBS_REZ,OB22_REZ,NBS_7F,OB22_7F,NBS_7R,OB22_7R,PR,NAL,R013)
@@ -600,3 +606,4 @@ exception when err then
   null;
 end;
 /
+

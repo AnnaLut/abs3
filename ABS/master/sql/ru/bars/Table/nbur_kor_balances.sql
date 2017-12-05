@@ -12,7 +12,7 @@ BEGIN
         execute immediate  
           'begin  
                bpa.alter_policy_info(''NBUR_KOR_BALANCES'', ''CENTER'' , null, ''E'', ''E'', ''E'');
-               bpa.alter_policy_info(''NBUR_KOR_BALANCES'', ''FILIAL'' , null, ''M'', ''M'', ''M'');
+               bpa.alter_policy_info(''NBUR_KOR_BALANCES'', ''FILIAL'' , ''M'', ''M'', ''M'', ''M'');
                bpa.alter_policy_info(''NBUR_KOR_BALANCES'', ''WHOLE'' , null, ''E'', ''E'', ''E'');
                null;
            end; 
@@ -160,7 +160,7 @@ exception when others then
 PROMPT *** Create  constraint PK_KORBALANCE ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.NBUR_KOR_BALANCES ADD CONSTRAINT PK_KORBALANCE PRIMARY KEY (REPORT_DATE, KF, CUST_ID, ACC_ID, ACC_NUM, KV)
+  ALTER TABLE BARS.NBUR_KOR_BALANCES ADD CONSTRAINT PK_KORBALANCE PRIMARY KEY (REPORT_DATE, KF, CUST_ID, ACC_TYPE, ACC_ID, ACC_NUM, KV)
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSSMLI  ENABLE';
 exception when others then

@@ -58,8 +58,8 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
                     break;
                 case (ParamType.String):
                     sqlTextTemplate = CaseSensitive
-                        ? "{0} like  :{1} || '%'"
-                        : "UPPER({0}) like UPPER( :{1} || '%')";
+                        ? "{0} like  :{1}"
+                        : "UPPER({0}) like UPPER( :{1})";
                     break;
                 default:
                     // на случай, если добавится тип перечесления без обработки

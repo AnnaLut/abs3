@@ -3,29 +3,32 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-/// <summary>
-/// Summary description for CreateFiltersModel
-/// </summary>
-public class CreateFiltersModel
+namespace BarsWeb.Areas.Ndi.Models.FilterModels
 {
-	public CreateFiltersModel()
-	{
-        FillFilterTypes();
-	}
-    public int TableId { get; set; }
-    public Dictionary<FilterType, string> FilterTypes { get; set; }
-    public List<CreateFilterModel> FiltersList { get; set; }
-    private void FillFilterTypes()
+    /// <summary>
+    /// Summary description for CreateFiltersModel
+    /// </summary>
+    public class CreateFiltersModel
     {
-        FilterTypes = new Dictionary<FilterType, string>();
-        FilterTypes.Add(FilterType.EmptyFilter, "простий фільтр");
-        FilterTypes.Add(FilterType.ComplexFilter, "складний фільтр");
+        public CreateFiltersModel()
+        {
+            FillFilterTypes();
+        }
+        public int TableId { get; set; }
+        public Dictionary<FilterType, string> FilterTypes { get; set; }
+        public List<CreateFilterModel> FiltersList { get; set; }
+        private void FillFilterTypes()
+        {
+            FilterTypes = new Dictionary<FilterType, string>();
+            FilterTypes.Add(FilterType.EmptyFilter, "простий фільтр");
+            FilterTypes.Add(FilterType.ComplexFilter, "складний фільтр");
+        }
+
     }
 
-}
-
-public enum FilterType
-{
-    EmptyFilter,
-    ComplexFilter
+    public enum FilterType
+    {
+        EmptyFilter,
+        ComplexFilter
+    }
 }

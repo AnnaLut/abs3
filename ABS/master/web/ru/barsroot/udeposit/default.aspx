@@ -41,8 +41,6 @@
                         onclick="ShowModalFilter()" src="/Common/Images/FILTER_.gif" />
                     <img class="outset" id="btPrint" title="Друк" alt=""
                         onclick="printTable()" src="/Common/Images/PRINT.gif" style="visibility: visible" />
-                    <img class="outset" id="btExcelExport" title="Вивантажити в Excel" alt="Вивантажити в Excel"
-                        onclick="exportToExcel()" src="\Common\Images\default\16\export_excel.png" style="visibility: visible" />
                     &nbsp;
                 </td>
                 <td>

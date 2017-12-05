@@ -3,6 +3,9 @@ using System.Drawing;
 using System.Text;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
+using System.Collections.Generic;
+using ibank.core;
+using System.Web;
 
 namespace BarsWeb.Areas.Ndi.Infrastructure
 {
@@ -102,7 +105,16 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
         public static Color CenturaColorToExcelColor(string centuraColor)
         {
             string hex = CenturaColorToWebColor(centuraColor);
-            Color color = ColorTranslator.FromHtml(hex);
+            Color color;
+            if (hex.ToUpper().Contains("RGB"))
+            {
+                string rgbstr = hex.Substring(hex.IndexOf('(') + 1, hex.IndexOf(')') - hex.IndexOf('(') -1);
+                string[] strArray = rgbstr.Split(',');
+                color = Color.FromArgb(Convert.ToInt32(strArray[0]), Convert.ToInt32(strArray[1]), Convert.ToInt32(strArray[2]));
+
+            }
+            else
+                color = ColorTranslator.FromHtml(hex);
             return color;
         }
 
@@ -234,6 +246,58 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
                 resultObject = JsonConvert.DeserializeObject<T>(json);
             }
             return resultObject;
+        }
+
+
+        public static string ObjectToJsom(Object obj)
+        {
+            string jsonRes = string.Empty;
+            if (obj != null)
+            {
+                jsonRes = JsonConvert.SerializeObject(obj);
+            }
+            return jsonRes;
+        }
+
+        /// <summary>
+        /// Преобразовать Json в объект
+        /// </summary>
+        /// <typeparam name="T">Результирующий тип</typeparam>
+        /// <param name="json">Строка в формате Json</param>
+        /// <returns>Объект</returns>
+        public static string ConvertFormBase64ToUTF8(string base64String)
+        {
+            string res = string.Empty;
+            if (!string.IsNullOrEmpty(base64String))
+            {
+                var  bytes = Convert.FromBase64String(base64String);
+                res =  Encoding.UTF8.GetString(bytes);
+            }
+            return res;
+        }
+
+        public static string ConvertToUrlBase4UTF8(string param)
+        {
+
+            string res = string.Empty;
+            if (!string.IsNullOrEmpty(param))
+            {
+                var bytes = Encoding.UTF8.GetBytes(param);
+                res = HttpServerUtility.UrlTokenEncode(bytes);
+            }
+            return res;
+        }
+            
+
+        public static string ConvertFromUrlBase64UTF8(string param)
+        {
+            string res = string.Empty;
+            if (!string.IsNullOrEmpty(param))
+            {
+                var bytes = HttpServerUtility.UrlTokenDecode(param);
+                res = Encoding.UTF8.GetString(bytes);
+            }
+            return res;
         }
     }
 }

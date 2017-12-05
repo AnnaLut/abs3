@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using BarsWeb.Areas.Ndi.Models.ViewModels;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Web.Script.Serialization;
 
@@ -7,29 +9,39 @@ namespace BarsWeb.Areas.Ndi.Models
     /// <summary>
     /// Метаданные колонок справочника (на основе META_COLUMNS)
     /// </summary>
-    public class ColumnMetaInfo
+    public class ColumnMetaInfo : ICloneable
     {
+        public ColumnMetaInfo()
+        {
+            Dependencies = new List<DependencyModel>();
+            ParamsNames = new List<string>();
+        }
         //основные поля
-        public decimal TABID { get; set; }
-        public decimal COLID { get; set; }
+        public int TABID { get; set; }
+        public int COLID { get; set; }
         public string COLNAME { get; set; }
         public string COLTYPE { get; set; }
         public string SEMANTIC { get; set; }
         public decimal? SHOWWIDTH { get; set; }
         public decimal? SHOWMAXCHAR { get; set; }
         public string SHOWFORMAT { get; set; }
-        public short SHOWIN_FLTR { get; set; }
+        public int SHOWIN_FLTR { get; set; }
         public string SHOWRESULT { get; set; }
-        public short NOT_TO_EDIT { get; set; }
-        public short NOT_TO_SHOW { get; set; }
+        public int NOT_TO_EDIT { get; set; }
+        public int NOT_TO_SHOW { get; set; }
         public short? SHOWPOS { get; set; }
         public short EXTRNVAL { get; set; }
         public string FORM_NAME { get; set; }
         public string WEB_FORM_NAME { get; set; }
-        public string DYN_TABNAME { get; set; }
+        public string COL_DYN_TABNAME { get; set; }
         public bool IsFuncOnly { get; set; }
-        public int IsPk { get; set; }
+        public short? IsPk { get; set; }
+        public bool HasSrcCond { get; set; }
+        public short? InputInNewRecord { get; set; }
+        public List<string> ParamsNames { get; set; }
         public CallFunctionMetaInfo FunctionMetaInfo { get; set; }
+        public List<DependencyModel> Dependencies { get; set; }
+        public SrcQueryModel srcQueryModel { get; set; }
 
         //поля реквизитов внешних колонок
         [ScriptIgnore]
@@ -44,7 +56,7 @@ namespace BarsWeb.Areas.Ndi.Models
         public string SrcTab_Alias { get; set; }
         [ScriptIgnore]
         public string Tab_Cond { get; set; }
-        [ScriptIgnore]
+       // [ScriptIgnore]
         public string Src_Cond { get; set; }
         [ScriptIgnore]
         public string SrcColFullName
@@ -110,10 +122,17 @@ namespace BarsWeb.Areas.Ndi.Models
             return nativeColumnMeta != null ? nativeColumnMeta.COLNAME : "";
         }
 
+        public object Clone()
+        {
+            return this.MemberwiseClone();
+        }
+
         /// <summary>
         /// Информация о проваливании для колонки
         /// </summary>
-        public FallDownColumnInfo FallDownInfo { get; set; }
+        // public FallDownColumnInfo FallDownInfo { get; set; }
+
+
     }
 }
 

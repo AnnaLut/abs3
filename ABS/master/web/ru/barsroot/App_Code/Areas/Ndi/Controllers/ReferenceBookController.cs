@@ -11,9 +11,9 @@ using Newtonsoft.Json;
 using System.Text;
 using BarsWeb.Core.Logger;
 using Ninject;
-using System.Net.Http;
-using System.Net;
 using System.Web;
+using BarsWeb.Areas.Ndi.Models.ViewModels;
+using BarsWeb.Areas.Ndi.Models.FilterModels;
 
 namespace BarsWeb.Areas.Ndi.Controllers
 {
@@ -34,11 +34,66 @@ namespace BarsWeb.Areas.Ndi.Controllers
         /// </summary>
         /// <param name="appId">Код приложения (REFAPP.CODEAPP)</param>
         /// <returns></returns>
+
         public ViewResult ReferenceList(string appId)
         {
             ViewBag.AppId = appId;
             return View();
         }
+
+        [AcceptVerbs(HttpVerbs.Post)]
+        public ActionResult UploadTemplateFile(string fieldFileName, int? tableId, int? funcId, int? codeOper, string jsonFuncParams = "", string procName = "", string msg = "",
+                  string web_form_name = "", string sPar = "", string jsonSqlProcParams = "")
+        {
+            string[] supportedTypes = new string[]{
+                "png", "gif", "tiff", "bmp", "jpg", "jpeg", "htm" ,"rtf", "xml", "txt", "doc"
+            };
+            List<FieldProperties> additionalParams = new List<FieldProperties>();
+            List<FieldProperties> funcParams = FormatConverter.JsonToObject<List<FieldProperties>>(jsonFuncParams) ?? new List<FieldProperties>();
+            //if (!string.IsNullOrEmpty(jsonSqlProcParams))
+            //{
+            //    jsonSqlProcParameter = JsonConvert.DeserializeObject<List<FieldProperties>>(jsonSqlProcParams);
+            //    funcParams.AddRange(jsonSqlProcParameter.Where(x => !funcParams.Select(c => c.Name).Contains(x.Name)));
+            //}
+
+            HttpPostedFileBase postedFile = Request.Files[fieldFileName];
+            if (postedFile != null)
+            {
+                string x = Path.GetExtension(postedFile.FileName);
+
+                if (supportedTypes.Contains(x.TrimStart('.')))
+                {
+                    BinaryReader b = new BinaryReader(postedFile.InputStream);
+                    byte[] binData = b.ReadBytes(Convert.ToInt32(postedFile.ContentLength));
+                    string fileName = postedFile.FileName;
+                    if (fileName.Contains('\\'))
+                        fileName = fileName.Substring(fileName.LastIndexOf('\\') + 1);
+                    if (fileName.Contains('.'))
+                        fileName = fileName.Substring(0, fileName.LastIndexOf('.'));
+                    string result = Encoding.UTF8.GetString(binData);
+                    if (funcParams.Count() > 0 && funcParams.FirstOrDefault(c => c.Type == "CLOB") != null)
+                        funcParams.FirstOrDefault(c => c.Type == "CLOB").Value = result;
+                    additionalParams.Add(new FieldProperties { Name = "FileName", Value = fileName, Type = "S" });
+                    string res = _repository.CallRefFunction(tableId, funcId, codeOper, null, funcParams, procName, msg, web_form_name, null, additionalParams);
+                    //_repository.ExecProcWithClobParam(result, fileName, null, 0);
+                    //to do sth with the file
+                    return Json(new { success = "true", resultMessage = res });
+                }
+                else
+                {
+                    //unsupported file type
+                    return Content("{success:false, error:\"Unsupported file type\"}");
+                }
+            }
+
+            return new JsonResult()
+            {
+                ContentType = "text/html",
+                Data = new { success = false, error = "File uploaded error" }
+            };
+        }
+
+
 
         /// <summary>
         /// Вывод грида с данными справочника
@@ -47,10 +102,11 @@ namespace BarsWeb.Areas.Ndi.Controllers
         /// <param name="mode">Режим достапа RO-readonly, RW-readwrite</param>
         /// <param name="accessCode">Расширеный 8уровневый режим доступа, более приоритетен предыдущего</param>
         /// <returns></returns>
-        public ViewResult ReferenceGrid(int? tableId, string mode, string accessCode)
+        public ViewResult ReferenceGrid(int? tableId, string mode, string accessCode, string codeApp = "")
         {
-            ViewBag.TableId = tableId;
+            //ViewBag.TableId = tableId;
             //read only by default
+            MetaCallSettings metaCallSettings = null;
             string accessLevel = AccessParams.WithoutUpdate.ToString();
             if (mode == "RW")
             {
@@ -62,20 +118,31 @@ namespace BarsWeb.Areas.Ndi.Controllers
             {
                 accessLevel = accessCode;
             }
-            ViewBag.TableMode = accessLevel;
-            return View();
+            MainOptionsViewModel tableViwModel = new MainOptionsViewModel();
+            tableViwModel.TableMode = accessLevel;
+            tableViwModel.TableId = tableId;
+            if (!string.IsNullOrEmpty(codeApp) && tableId.HasValue)
+                metaCallSettings = _repository.GetMetaCallSettingsByAppCodeAndTabid(codeApp, tableId.Value);
+            if (metaCallSettings != null && !string.IsNullOrEmpty(metaCallSettings.CODE))
+                tableViwModel.Code = metaCallSettings.CODE;
+            return View("ReferenceGrid", tableViwModel);
         }
 
         /// <summary>
         /// Получить метаданные справочников
         /// </summary>
         /// <param name="tableId">Id таблицы</param>
+        /// <param name="data">Модель для получения метаданных</param>
         /// <returns></returns>
-        public JsonResult GetMetadata(int tableId, int? CodeOper, int? sParColumn, int? nativeTabelId, int? nsiTableId, int? nsiFuncId, string base64jsonSqlProcParams = "")
+        [HttpPost]
+        public JsonResult GetMetadata(string data)
         {
+            if (data == null) throw new ArgumentNullException("data");
             try
             {
-                var result = new { success = true, metadata = _repository.GetMetaData(tableId, CodeOper, sParColumn, nativeTabelId, nsiTableId, nsiFuncId, base64jsonSqlProcParams) };
+                GetMetadataModel metaData = FormatConverter.JsonToObject<GetMetadataModel>(data);// JsonConvert.DeserializeObject<GetMetadataModel>(data) as GetMetadataModel;
+
+                object result = new { success = true, metadata = _repository.GetMetaData(metaData) };
                 return Json(result);
             }
             catch (Exception e)
@@ -95,20 +162,23 @@ namespace BarsWeb.Areas.Ndi.Controllers
         /// <param name="externalFilter">json с информацией о внешних фильтрах</param>
         /// <param name="fallDownFilter">json с информацией о дополнительных фильтрах для вычитки данных (используется при проваливании из другого справочника)</param>
         /// <param name="sort">json с информацией о сортировке</param>
+        /// <param name="data">Модель для получения данных</param>
         /// <param name="limit">Количество строк, которые должны быть отображены на странице (с сервера тянем на 1 больше для пэйджинга)</param>
         /// <param name="start">С какой строки начинать отбирать данные</param>
         /// <returns></returns>
-        public ContentResult GetData(int tableId, string tableName, string gridFilter, string CustomFilters, string externalFilter, string startFilter, string dynamicFilter, string sort, int limit = 10,
-            int start = 0, int? nativeTabelId = null, int? codeOper = null, int? sParColumn = null, int? nsiTableId = null, int? nsiFuncId = null, string jsonSqlProcParams = "",
-            string base64jsonSqlProcParams = "", string filterCode = "", string executeBeforFunc = "", int? filterTblId = null, string kindOfFilter = "", bool isReserPages = false)
+        //public ContentResult GetData(int tableId, string tableName, string gridFilter, string externalFilter, string startFilter, string dynamicFilter, string sort, int limit = 10,
+        //    int start = 0, int? nativeTabelId = null, int? codeOper = null, int? sParColumn = null, int? nsiTableId = null, int? nsiFuncId = null, string jsonSqlProcParams = "",
+        //    string base64jsonSqlProcParams = "", string filterCode = "", string executeBeforFunc = "", int? filterTblId = null, string kindOfFilter = "", bool isResetPages = false)
+        public ContentResult GetData(DataModel data)
         {
             try
             {
-                GetDataResultInfo resultInfo = _repository.GetData(tableId, tableName, gridFilter, externalFilter, startFilter, dynamicFilter, sort, limit, start, nativeTabelId, codeOper,
-                    sParColumn, nsiTableId, nsiFuncId, jsonSqlProcParams, base64jsonSqlProcParams, executeBeforFunc, filterTblId, kindOfFilter, filterCode, isReserPages);
+                if (data == null) throw new ArgumentNullException("data");
+                // new GetDataModel();// FormatConverter.JsonToObject<GetDataModel>(data);
+                GetDataResultInfo resultInfo = _repository.GetData(data);
                 var result = new
                 {
-                    data = resultInfo.DataRecords.Take(limit),
+                    data = resultInfo.DataRecords.Take(data.Limit),
                     total = resultInfo.RecordsCount,
                     summaryData = resultInfo.TotalRecord,
                     status = "ok"
@@ -123,52 +193,33 @@ namespace BarsWeb.Areas.Ndi.Controllers
             }
         }
 
-        public ActionResult GetCustomImg()
+
+        //public ActionResult GetCustomImg()
+        //{
+        //    byte[] res = _repository.GetCustomImage();
+        //    return File(res.ToArray(), "image/png");
+        //}
+        public ActionResult GetRefBookData(RequestMolel requestModel)
         {
-            byte[] res = _repository.GetCustomImage();
-            return File(res.ToArray(), "image/png");
-        }
-        public ActionResult GetRefBookData(int? accessCode, string tableName = "", string jsonSqlParams = "", int? sPar = null, int? sParColumn = null, int? nativeTabelId = null,
-            int? nsiTableId = null, int? nsiFuncId = null, string RowParamsNames = "", bool hasCallbackFunction = false, string filterCode = "", string jsonTblFilterParams = "", bool getFiltersOnly = false)
-        {
-            FunNSIEditFParams nsiEditParams = null;
-            Logger.Debug(string.Format(" begin GetRefBookData for: accessCode: {0},tableName: {1}, jsonSqlParams: {2},sPar: {3},sParColumn: {4},nativeTabelId: {5}, RowParamsNames{6} ", accessCode.HasValue ? accessCode.Value.ToString() : "", tableName, jsonSqlParams, sPar.HasValue ? sPar.Value.ToString() : "", sParColumn.HasValue ? sParColumn.Value.ToString() : "", nativeTabelId.HasValue ? nativeTabelId.Value.ToString() : "", RowParamsNames), LoggerPrefix + "GetMetaData");
-            List<FieldProperties> RowParams = string.IsNullOrEmpty(jsonSqlParams) || jsonSqlParams == "undefined" ? new List<FieldProperties>() : JsonConvert.DeserializeObject<List<FieldProperties>>(jsonSqlParams) as List<FieldProperties>;
-            bool isFuncOnly = false;
-            string FunNSIEditFParamsString = _repository.GetFunNSIEditFParamsString(null, sPar, sParColumn, nativeTabelId, nsiTableId, nsiFuncId);
-            if (!string.IsNullOrEmpty(FunNSIEditFParamsString))
+            try
             {
-                nsiEditParams = new FunNSIEditFParams(FunNSIEditFParamsString);
-                nsiEditParams.ReplaceParams(RowParams);
+                Logger.Debug(string.Format(" begin GetRefBookData for: accessCode: {0},tableName: {1}, jsonSqlParams: {2},sPar: {3},sParColumn: {4},nativeTabelId: " +
+                " {5}, RowParamsNames{6} ", requestModel.AccessCode.HasValue ? requestModel.AccessCode.Value.ToString() : "", requestModel.TableName, requestModel.JsonSqlParams, requestModel.Spar.HasValue ? requestModel.Spar.Value.ToString() : "",
+                requestModel.SparColumn.HasValue ? requestModel.SparColumn.Value.ToString() : "", requestModel.NativeTabelId.HasValue ? requestModel.NativeTabelId.Value.ToString() : "", requestModel.RowParamsNames), LoggerPrefix + "GetMetaData");
+
+                RequestProvider requestProvider = new RequestProvider(_repository);
+                MainOptionsViewModel tableViwModel = requestProvider.BuildResponseViewModel(requestModel);
+
+                Logger.Debug(string.Format(" end GetRefBookData for: accessLevel: {0},tableName: {1}, jsonSqlParams: {2},sPar: {3},sParColumn: {4},nativeTabelId: {5}, RowParamsNames{6} ",
+                    tableViwModel.TableMode, requestModel.TableName, requestModel.JsonSqlParams, requestModel.Spar.HasValue ? requestModel.Spar.Value.ToString() : "",
+                    requestModel.SparColumn.HasValue ? requestModel.SparColumn.Value.ToString() : "", requestModel.NativeTabelId.HasValue ? requestModel.NativeTabelId.Value.ToString() : "", requestModel.RowParamsNames), LoggerPrefix + "GetMetaData");
+                return View("ReferenceGrid", tableViwModel);
             }
-
-            tableName = nsiEditParams == null || string.IsNullOrEmpty(nsiEditParams.TableName) ? tableName : nsiEditParams.TableName;
-            if (string.IsNullOrEmpty(tableName) && nsiEditParams != null && nsiEditParams.IsFuncOnly)
-                isFuncOnly = true;
-            var meta_table = _repository.GetMetaTableByName(tableName);
-            ViewBag.TableId = meta_table != null ? meta_table.TABID.ToString() : (nativeTabelId != null && nativeTabelId.HasValue ? nativeTabelId.Value.ToString() : "");
-            ViewBag.CodeOper = sPar;
-            ViewBag.sParColumn = sParColumn;
-            string accessLevel = AccessParams.WithoutUpdate.ToString();
-            //custom access level
-            if (accessCode != null && accessCode.HasValue)
-                accessLevel = AccessSettings.GetAll().FirstOrDefault(u => (int)u == accessCode).ToString();
-
-            if (nsiEditParams != null && nsiEditParams.ACCESS_CODE.HasValue)
-                accessLevel = AccessSettings.GetAll().FirstOrDefault(u => (int)u == nsiEditParams.ACCESS_CODE).ToString();
-            ViewBag.filterCode = filterCode;
-            ViewBag.hasCallbackFunction = hasCallbackFunction;
-            ViewBag.nativeTabelId = nativeTabelId != null && nativeTabelId.HasValue ? nativeTabelId.ToString() : "";
-            ViewBag.TableMode = accessLevel;
-            var bytes = Encoding.UTF8.GetBytes(jsonSqlParams);
-            ViewBag.base64jsonSqlProcParams = Convert.ToBase64String(bytes);
-            ViewBag.isFuncOnly = isFuncOnly;
-            ViewBag.nsiTableId = nsiTableId;
-            ViewBag.nsiFuncId = nsiFuncId;
-            ViewBag.getFiltersOnly = getFiltersOnly;
-            Logger.Debug(string.Format(" end GetRefBookData for: accessLevel: {0},tableName: {1}, jsonSqlParams: {2},sPar: {3},sParColumn: {4},nativeTabelId: {5}, RowParamsNames{6} ", accessLevel, tableName, jsonSqlParams, sPar.HasValue ? sPar.Value.ToString() : "", sParColumn.HasValue ? sParColumn.Value.ToString() : "", nativeTabelId.HasValue ? nativeTabelId.Value.ToString() : "", RowParamsNames), LoggerPrefix + "GetMetaData");
-
-            return View("ReferenceGrid");
+            catch (Exception e)
+            {
+                var result = new { status = "error", errorMessage = e.Message };
+                return Content(JsonConvert.SerializeObject(result));
+            }
         }
 
         /// <summary>
@@ -181,21 +232,25 @@ namespace BarsWeb.Areas.Ndi.Controllers
         /// <param name="start">Начальная позиция (для пэйджинга)</param>
         /// <param name="limit">Количество записей для выбора (для пэйджинга)</param>
         /// <returns></returns>
-        public ContentResult GetRelatedReferenceData(string tableName, string fieldForId, string fieldForName, string query, int start = 0, int limit = 10)
+        public ContentResult GetRelatedReferenceData(int? nativeTableId, string tableName, string fieldForId, string fieldForName, string query, int start = 0, int limit = 10)
         {
             try
             {
-                ParamMetaInfo refParam;
+                
+                if (string.IsNullOrEmpty(tableName))
+                    throw new Exception("значення вьюшки порожне");
+
                 List<Dictionary<string, object>> allData;
-                if(string.IsNullOrEmpty(tableName))
-                    throw new  Exception("значення вьюшки порожне");
-                if (!string.IsNullOrEmpty(tableName) && (string.IsNullOrEmpty(fieldForId) || fieldForId == "undefined") && (string.IsNullOrEmpty(fieldForName) || fieldForName == "undefined"))
-                {
-                    refParam = SqlStatementParamsParser.GetDefaultRelatedData(tableName);
-                    allData = _repository.GetRelatedReferenceData(refParam.SrcTableName, refParam.SrcColName, refParam.SrcTextColName, query, start, limit);
-                }
+                var metaTable = _repository.GetMetaTableByName(tableName);
+                ParamMetaInfo refParam = _repository.GetDefaultRelatedData(metaTable);
+                if ( (string.IsNullOrEmpty(fieldForId) || fieldForId == "undefined") && (string.IsNullOrEmpty(fieldForName) || fieldForName == "undefined"))
+                    allData = _repository.GetRelatedReferenceData(nativeTableId, refParam.SrcTableName, refParam.SrcColName, refParam.SrcTextColName, query, refParam.SrcTextColName2, start, limit);
                 else
-                    allData = _repository.GetRelatedReferenceData(tableName, fieldForId, fieldForName, query, start, limit);
+                {
+                    string name2 = !string.IsNullOrEmpty(refParam.SrcTextColName2) && refParam.SrcTextColName2 != fieldForName ? refParam.SrcTextColName2 :
+                        !string.IsNullOrEmpty(refParam.SrcTextColName) && refParam.SrcTextColName != fieldForName ? refParam.SrcTextColName : null;
+                    allData = _repository.GetRelatedReferenceData(nativeTableId, tableName, fieldForId, fieldForName, query, name2, start, limit);
+                }
                 var result = new
                 {
                     data = allData.Take(limit),
@@ -211,10 +266,46 @@ namespace BarsWeb.Areas.Ndi.Controllers
             }
         }
 
-        //public ContentResult GetCustomFilterData(int tableId,string kindOfFilter,string tableName)
-        //{
 
-        //}
+        public ContentResult GerSrcQueryData(string srcQueryModel, string query, int start = 0, int limit = 10)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(srcQueryModel))
+                    throw new Exception("значення порожне");
+                SrcQueryModel queryModel = FormatConverter.JsonToObject<SrcQueryModel>(srcQueryModel);
+                List<Dictionary<string, object>> allData;
+                allData = _repository.GetSrcQueryResult(queryModel, query, start, limit);
+                var result = new
+                {
+                    data = allData.Take(limit),
+                    total = start + allData.Count(),
+                    status = "ok"
+                };
+                return Content(JsonConvert.SerializeObject(result));
+
+            }
+            catch (Exception e)
+            {
+                var result = new { status = "error", errorMessage = e.Message };
+                return Content(JsonConvert.SerializeObject(result));
+            }
+        }
+
+        public JsonResult GetFiltersMetaInfo(int tableId)
+        {
+            try
+            {
+                var filters = _repository.GetFiltersInfo(tableId);
+                return Json(new { success = true, filtersInfo = filters });
+            }
+            catch (Exception e)
+            {
+                var result = new { success = false, errorMessage = e.Message };
+                return Json(result);
+            }
+
+        }
 
         /// <summary>
         /// Обновить данные справочника
@@ -224,14 +315,20 @@ namespace BarsWeb.Areas.Ndi.Controllers
         /// <param name="jsonUpdatableRowKeys">json cо значениями ключевых полей по которым выполнять update (используется оптимистическая блокировка)</param>
         /// <param name="jsonUpdatableRowData">json c новыми значениями полей, которые были изменены</param>
         /// <returns></returns>
-        public JsonResult UpdateData(int tableId, string tableName, string jsonUpdatableRowKeys, string jsonUpdatableRowData)
+
+        [HttpPost, ValidateInput(false)]
+        public JsonResult UpdateData(int tableId, string tableName)
         {
             try
             {
-                Logger.Debug(string.Format("begin updateData for tabid: {0} tabname: {1} jsonUpdatableRowKeys: {2} jsonUpdatableRowData: {3}", tableId, tableName, jsonUpdatableRowKeys, jsonUpdatableRowData), LoggerPrefix + "UpdateData");
-                var updatableRowKeys = JsonConvert.DeserializeObject<List<FieldProperties>>(jsonUpdatableRowKeys);
-                var updatableRowData = JsonConvert.DeserializeObject<List<FieldProperties>>(jsonUpdatableRowData);
-                bool success = _repository.UpdateData(tableId, tableName, updatableRowKeys, updatableRowData);
+                string req = Request.Form["editData"];
+
+                EditRowModel editDataModel = FormatConverter.JsonToObject<EditRowModel>(req);
+                //Logger.Debug(string.Format("begin updateData for tabid: {0} tabname: {1} jsonUpdatableRowKeys: {2} jsonUpdatableRowData: {3}", 
+                //    editDataModel.TableId, editDataModel.TableName, editDataModel.RowKeysToEdit, editDataModel.RowDataToEdit), LoggerPrefix + "UpdateData");
+                //var updatableRowKeys = JsonConvert.DeserializeObject<List<FieldProperties>>(jsonUpdatableRowKeys);
+                //List<FieldProperties> updatableRowData = editDataModel.JsonUpdatableRowData;// JsonConvert.DeserializeObject<List<FieldProperties>>(jsonUpdatableRowData);
+                bool success = _repository.EditData(tableId, tableName, editDataModel, false);
                 if (success)
                 {
                     return Json(new { status = "ok", msg = "Дані успішно оновлені" });
@@ -243,6 +340,52 @@ namespace BarsWeb.Areas.Ndi.Controllers
                 return Json(new { status = "error", msg = "Помилка при оновленні даних.\r\n" + e.Message });
             }
         }
+
+
+        public JsonResult InsertUpdateRows(int tableId, string tableName, string EditingRowsModel, string AddingRowsModel)
+        {
+            try
+            {
+
+                // Logger.Debug(string.Format("begin updateData for tabid: {0} tabname: {1} jsonUpdatableRowKeys: {2} jsonUpdatableRowData: {3}", tableId, tableName, jsonUpdatableRowKeys, jsonUpdatableRowData), LoggerPrefix + "UpdateData");
+                var edintingRows = JsonConvert.DeserializeObject<List<EditRowModel>>(EditingRowsModel);
+                var addingRowsModel = JsonConvert.DeserializeObject<List<AddRowModel>>(AddingRowsModel);
+                bool success = _repository.InsertUpdateRows(tableId, tableName, edintingRows, addingRowsModel);
+                if (success)
+                {
+                    return Json(new { status = "ok", msg = "Дані успішно оновлені" });
+                }
+                return Json(new { status = "error", msg = "Виникла помилка при оновленні даних.\r\n Можливо цей рядок заблокований для редагування або інший користувач змінив дані цього рядка" });
+            }
+            catch (Exception e)
+            {
+                return Json(new { status = "error", msg = "Помилка при оновленні даних.\r\n" + e.Message });
+            }
+        }
+
+
+        public JsonResult DeleteRows(int tableId, string tableName, string deletingRowsModel)
+        {
+            try
+            {
+                var deletingRows = JsonConvert.DeserializeObject<List<DeleteRowModel>>(deletingRowsModel);
+                bool success = _repository.DeleteRows(tableId, tableName, deletingRows);
+                if (success)
+                {
+                    string msg = deletingRows.Count + " рядків успішно видалені";
+                    return Json(new { status = "ok", msg = msg });
+                }
+                return Json(new { status = "error", msg = "Помилка при видаленні даних.\r\n" });
+            }
+            catch (Exception e)
+            {
+
+                return Json(new { status = "error", msg = "Помилка при видаленні даних.\r\n" + e.Message });
+            }
+
+
+        }
+
 
         /// <summary>
         /// Вставить данные в справочник
@@ -268,16 +411,74 @@ namespace BarsWeb.Areas.Ndi.Controllers
                 return Json(new { status = "error", msg = "Помилка при оновленні даних.<br />" + GetErrorInfo(e) + "<br />" + e.Message });
             }
         }
-
-        public JsonResult InsertFilter(int tableId, string tableName, string parameters, string filterName = "фильтер1", int saveFilter = 1, string clause = null)
+        [HttpPost]
+        public JsonResult InsertFilter(string insertUpdatetModel)
         {
             try
             {
-
-                List<FilterRowInfo> filterRows = JsonConvert.DeserializeObject<List<FilterRowInfo>>(parameters);
-                if ((filterRows == null || filterRows.Count <= 0) && string.IsNullOrEmpty(clause))
+                string req = Request.Form["insertUpdateModel"];
+                InsertFilterModel filterModel = JsonConvert.DeserializeObject<InsertFilterModel>(req);
+                filterModel.JosnStructure = JsonConvert.SerializeObject(filterModel.FilterRows);
+                if ((filterModel.FilterRows == null || filterModel.FilterRows.Count <= 0) && string.IsNullOrEmpty(filterModel.Clause))
                     return Json(new { status = "error", msg = "не заданно данних в фільтрі" });
-                if (string.IsNullOrEmpty(filterName))
+                if (string.IsNullOrEmpty(filterModel.FilterName))
+                    return Json(new { status = "error", msg = "назва фільтра не задана" });
+
+                foreach (FilterRowInfo item in filterModel.FilterRows)
+                {
+                    if (string.IsNullOrEmpty(item.Colname) && string.IsNullOrEmpty(item.LogicalOp) && string.IsNullOrEmpty(item.ReletionalOp) && string.IsNullOrEmpty(item.Value))
+                        return Json(new { status = "error", msg = "строка не заповнена" });
+                    if (item.Colname == null)
+                        item.Colname = "";
+                    if (item.LogicalOp == null)
+                        item.LogicalOp = "";
+                    if (item.ReletionalOp == null)
+                        item.ReletionalOp = "";
+                    if (item.Value == null)
+                        item.Value = "";
+                }
+                string errorMsg = "";
+                string whereClause = _repository.InsertFilter(filterModel.FilterRows, filterModel.JosnStructure, filterModel.TableId, filterModel.FilterName, filterModel.SaveFilter, filterModel.Clause);
+                if (filterModel.SaveFilter == 1)
+                {
+                    if (!string.IsNullOrEmpty(whereClause))
+                    {
+                        return Json(new { status = "ok", msg = "Фільтр успішно додано" });
+                    }
+                    else
+                        errorMsg = "Виникла помилка при збереженні фільтра\r\n";
+                }
+                else
+                    if (filterModel.SaveFilter == 0)
+                {
+                    if (!string.IsNullOrEmpty(whereClause))
+                    {
+                        var result = new { clause = whereClause };
+                        return Json(new { status = "ok", msg = whereClause });
+                    }
+                    else
+                        errorMsg = "Виникла помилка при застосуванні фільтра\r\n";
+                }
+                return Json(new { status = "error", msg = errorMsg });
+            }
+            catch (Exception e)
+            {
+
+                return Json(new { status = "error", msg = "Помилка при при збереженні фільтра.<br />" + e.Message });
+            }
+        }
+        [HttpPost]
+        public JsonResult UpdateFilter(string insertUpdateModel)
+        {
+            try
+            {
+                string req = Request.Form["insertUpdateModel"];
+                EditFilterModel editFilterModel = FormatConverter.JsonToObject<EditFilterModel>(req);
+                List<FilterRowInfo> filterRows = editFilterModel.FilterRows;
+                editFilterModel.JosnStructure = FormatConverter.ObjectToJsom(filterRows);
+                if (filterRows == null || filterRows.Count <= 0)
+                    return Json(new { status = "error", msg = "не заданно данних в фільтрі" });
+                if (string.IsNullOrEmpty(editFilterModel.TableName))
                     return Json(new { status = "error", msg = "назва фільтра не задана" });
 
                 foreach (FilterRowInfo item in filterRows)
@@ -294,93 +495,29 @@ namespace BarsWeb.Areas.Ndi.Controllers
                         item.Value = "";
                 }
                 string errorMsg = "";
-                string whereClause = _repository.InsertFilter(filterRows, tableId, filterName, saveFilter, clause);
-                if (saveFilter == 1)
+                string whereClause = _repository.UpdateFilter(editFilterModel);
+
+                if (!string.IsNullOrEmpty(whereClause))
                 {
-                    if (!string.IsNullOrEmpty(whereClause))
-                    {
-                        return Json(new { status = "ok", msg = "Фільтр успішно додано" });
-                    }
-                    else
-                        errorMsg = "Виникла помилка при збереженні фільтра\r\n";
+                    return Json(new { status = "ok", msg = "Параметри фільтра успішно змінено" });
                 }
                 else
-                    if (saveFilter == 0)
-                    {
-                        if (!string.IsNullOrEmpty(whereClause))
-                        {
-                            var result = new { clause = whereClause };
-                            return Json(new { status = "ok", msg = whereClause });
-                        }
-                        else
-                            errorMsg = "Виникла помилка при застосуванні фільтра\r\n";
-                    }
+                    errorMsg = "Виникла помилка при редагуванні фільтра\r\n";
+
                 return Json(new { status = "error", msg = errorMsg });
             }
             catch (Exception e)
             {
 
-                return Json(new { status = "error", msg = "Помилка при при збереженні фільтра.<br />" + e.Message });
+                return Json(new { status = "error", msg = "Помилка при редагуванні фільтра.<br />" + e.Message });
             }
-
-
         }
 
-        public JsonResult InsertFilters(List<CreateFilterModel> filterModels)
-        {
-            return null;
-            //try
-            //{
 
-            //    List<FilterRowInfo> filterRows = JsonConvert.DeserializeObject<List<FilterRowInfo>>(parameters);
-            //    if ((filterRows == null || filterRows.Count <= 0) && string.IsNullOrEmpty(clause))
-            //        return Json(new { status = "error", msg = "не заданно данних в фільтрі" });
-            //    if (string.IsNullOrEmpty(filterName))
-            //        return Json(new { status = "error", msg = "назва фільтра не задана" });
-
-            //    foreach (FilterRowInfo item in filterRows)
-            //    {
-            //        if (string.IsNullOrEmpty(item.Colname) && string.IsNullOrEmpty(item.LogicalOp) && string.IsNullOrEmpty(item.ReletionalOp) && string.IsNullOrEmpty(item.Value))
-            //            return Json(new { status = "error", msg = "строка не заповнена" });
-            //        if (item.Colname == null)
-            //            item.Colname = "";
-            //        if (item.LogicalOp == null)
-            //            item.LogicalOp = "";
-            //        if (item.ReletionalOp == null)
-            //            item.ReletionalOp = "";
-            //        if (item.Value == null)
-            //            item.Value = "";
-            //    }
-            //    string errorMsg = "";
-            //    string whereClause = _repository.InsertFilter(filterRows, tableId, filterName, saveFilter, clause);
-            //    if (saveFilter == 1)
-            //    {
-            //        if (!string.IsNullOrEmpty(whereClause))
-            //        {
-            //            return Json(new { status = "ok", msg = "Фільтр успішно додано" });
-            //        }
-            //        else
-            //            errorMsg = "Виникла помилка при збереженні фільтра\r\n";
-            //    }
-            //    else
-            //        if (saveFilter == 0)
-            //        {
-            //            if (!string.IsNullOrEmpty(whereClause))
-            //            {
-            //                var result = new { clause = whereClause };
-            //                return Json(new { status = "ok", msg = whereClause });
-            //            }
-            //            else
-            //                errorMsg = "Виникла помилка при застосуванні фільтра\r\n";
-            //        }
-            //    return Json(new { status = "error", msg = errorMsg });
-            //}
-            //catch (Exception e)
-            //{
-
-            //    return Json(new { status = "error", msg = "Помилка при при збереженні фільтра.<br />" + e.Message });
-            //}
-        }
+        //public JsonResult GetFilterStructure(int filterId)
+        //{
+        //    _repository.GetFilterStructure(filterId);
+        //}
         /// <summary>
         /// Удалить данные из справочника
         /// </summary>
@@ -410,7 +547,7 @@ namespace BarsWeb.Areas.Ndi.Controllers
         /// Вызвать произвольную процедуру описанную в таблице META_NSIFUNCTION
         /// </summary>
         /// <returns></returns>
-        public JsonResult CallRefFunction(int? tableId, int? funcId, string jsonFuncParams, int? codeOper,int? columnId, string procName = "", string msg = "",
+        public JsonResult CallRefFunction(int? tableId, int? funcId, string jsonFuncParams, int? codeOper, int? columnId, string procName = "", string msg = "",
             string web_form_name = "", string sPar = "", string jsonSqlProcParams = "")
         {
 
@@ -418,13 +555,13 @@ namespace BarsWeb.Areas.Ndi.Controllers
             {
                 List<FieldProperties> jsonSqlProcParameter;
                 List<FieldProperties> funcParams = JsonConvert.DeserializeObject<List<FieldProperties>>(jsonFuncParams);
-                if (!string.IsNullOrEmpty(jsonSqlProcParams))
-                {
-                    jsonSqlProcParameter = JsonConvert.DeserializeObject<List<FieldProperties>>(jsonSqlProcParams);
-                    funcParams.AddRange(jsonSqlProcParameter.Where(x => !funcParams.Select(c => c.Name).Contains(x.Name)));
-                }
+                //if (!string.IsNullOrEmpty(jsonSqlProcParams))
+                //{
+                //    jsonSqlProcParameter = JsonConvert.DeserializeObject<List<FieldProperties>>(jsonSqlProcParams);
+                //    funcParams.AddRange(jsonSqlProcParameter.Where(x => !funcParams.Select(c => c.Name).Contains(x.Name)));
+                //}
 
-                string resultMessage = _repository.CallRefFunction(tableId, funcId, codeOper,columnId, funcParams, procName, msg, web_form_name);
+                string resultMessage = _repository.CallRefFunction(tableId, funcId, codeOper, columnId, funcParams, procName, msg, web_form_name);
                 return Json(new { status = "ok", msg = resultMessage });
             }
             catch (Exception e)
@@ -441,13 +578,13 @@ namespace BarsWeb.Areas.Ndi.Controllers
 
                 List<FieldProperties> jsonSqlProcParameter;
                 List<FieldProperties> funcParams = JsonConvert.DeserializeObject<List<FieldProperties>>(jsonFuncParams);
-                if (!string.IsNullOrEmpty(jsonSqlProcParams) && jsonSqlProcParams != "undefined")
-                {
-                    jsonSqlProcParameter = JsonConvert.DeserializeObject<List<FieldProperties>>(jsonSqlProcParams);
-                    funcParams.AddRange(jsonSqlProcParameter.Where(x => !funcParams.Select(c => c.Name).Contains(x.Name)));
-                }
+                //if (!string.IsNullOrEmpty(jsonSqlProcParams) && jsonSqlProcParams != "undefined")
+                //{
+                //    jsonSqlProcParameter = JsonConvert.DeserializeObject<List<FieldProperties>>(jsonSqlProcParams);
+                //    funcParams.AddRange(jsonSqlProcParameter.Where(x => !funcParams.Select(c => c.Name).Contains(x.Name)));
+                //}
                 GetFileResult res = _repository.CallFunctionWithFileResult(tableId, funcId, codeOper, funcParams, procName, msg, web_form_name);
-                if (res.Result == "ok" && !string.IsNullOrEmpty(res.FileBody) && !string.IsNullOrEmpty(res.FileName))
+                if (res.Result == "ok" && res.FileBody != null && !string.IsNullOrEmpty(res.FileName))
                     return File(Encoding.Default.GetBytes(res.FileBody), "text/html", HttpUtility.UrlEncode(res.FileName));
                 else
                     return Json(new { status = "error", message = res.Result });
@@ -458,6 +595,31 @@ namespace BarsWeb.Areas.Ndi.Controllers
                 return Json(new { status = "error", msg = e.Message }, JsonRequestBehavior.AllowGet);
             }
         }
+
+        public JsonResult CallFuncWithMultypleRows(int? tableId, int? funcId, string listJsonSqlProcParams, int? codeOper, int? columnId, string procName = "", string msg = "",
+    string web_form_name = "", string sPar = "", string inputProcParams = "")
+        {
+            try
+            {
+                List<CallFuncRowParam> RowsData = FormatConverter.JsonToObject<List<CallFuncRowParam>>(listJsonSqlProcParams);
+                List<FieldProperties> inputParams = FormatConverter.JsonToObject<List<FieldProperties>>(inputProcParams);
+                MultiRowParamsDataModel dataModel = new MultiRowParamsDataModel
+                {
+                    RowsData = RowsData,
+                    InputParams = inputParams
+                };
+
+                string resultMessage = _repository.CallEachFuncWithMultypleRows(tableId, funcId, codeOper, columnId, dataModel, procName, msg, web_form_name);
+                return Json(new { status = "ok", msg = resultMessage });
+            }
+            catch (Exception e)
+            {
+                return Json(new { status = "error", msg = e.Message }, JsonRequestBehavior.AllowGet);
+            }
+
+        }
+
+
         public JsonResult GetFuncOnlyMetaData(int? codeOper)
         {
             try
@@ -505,18 +667,27 @@ namespace BarsWeb.Areas.Ndi.Controllers
         /// <param name="limit"></param>
         /// <param name="tableId"></param>
         /// <returns></returns>
-        public FileContentResult ExportToExcel(int tableId, string tableName, string gridFilter,
-           string startFilter, string dynamicFilter,
-           string externalFilter, string fallDownFilter,
-           string columnsVisible, string sort, int start = 0, int limit = 10, int? nativeTabelId = null, int? codeOper = null, int? sParColumn = null, int? nsiTableId = null, int? nsiFuncId = null, string jsonSqlProcParams = "", string base64jsonSqlProcParams = "", string executeBeforFunc = "")
+        public FileContentResult ExportToExcel(ExcelDataModel excelDataModel)
         {
-            MemoryStream file = _repository.ExportToExcel(
-                 tableId, tableName,
-                 sort, gridFilter, startFilter, dynamicFilter, externalFilter,
-                 columnsVisible, start, limit, nativeTabelId, codeOper, sParColumn,
-                 nsiTableId, nsiFuncId, jsonSqlProcParams, base64jsonSqlProcParams, executeBeforFunc);
-            return File(file.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "data.xlsx");
+            try
+            {
+                //string ftileName = string.IsNullOrEmpty(excelDataModel.TableName) ? "data.xlsx" : excelDataModel.TableName + "-data.xlsx";
+                //string ftileName = string.IsNullOrEmpty(excelDataModel.TableName) ? "data.xlsx" : excelDataModel.TableName + "-data.xlsx";
+                ExcelResulModel resultModel = _repository.ExportToExcel(
+              excelDataModel);
+                //  return File(_repository.ExportToExcel(
+                //excelDataModel), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", ftileName);
+                return File(resultModel.ContentResult, resultModel.ContentType, resultModel.FileName);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+
         }
+
+
+
 
         /// <summary>
         /// Определить нужно ли вычитывать все строки для заданных параметров 

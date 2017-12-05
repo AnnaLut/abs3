@@ -246,6 +246,7 @@ namespace Bars.Oracle
             return NullableTypeHelper.ReplaceNullValues(Value, _replacingValue);
         }
     }
+    public class OraDictionaryList : OracleNestedTable<OraDictionary, OraDictionaryList> { }
 
     public class OracleNestedTableFactory<T, U> : IOracleArrayTypeFactory, IOracleCustomTypeFactory
         where T : class
@@ -310,4 +311,7 @@ namespace Bars.Oracle
 
     [OracleCustomTypeMapping("BARS.T_DICTIONARY_ITEM")]
     public class OraDictionaryItemFactory : OracleCustomTypeFactory<OraDictionaryItem> { }
+
+    [OracleCustomTypeMapping("BARS.T_DICTIONARY_LIST")]
+    public class OraDictionaryListFactory : OracleNestedTableFactory<OraDictionary, OraDictionaryList> { }
 }

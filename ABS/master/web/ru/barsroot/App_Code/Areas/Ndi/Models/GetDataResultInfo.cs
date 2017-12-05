@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Oracle.DataAccess.Client;
+using System.Collections.Generic;
 
 namespace BarsWeb.Areas.Ndi.Models
 {
@@ -21,5 +22,7 @@ namespace BarsWeb.Areas.Ndi.Models
         /// Итоговая строка
         /// </summary>
         public Dictionary<string, object> TotalRecord { get; set; }
+
+      
     }
 }

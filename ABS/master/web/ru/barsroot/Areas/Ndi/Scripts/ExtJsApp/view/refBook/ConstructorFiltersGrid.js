@@ -23,7 +23,7 @@ Ext.onReady(function () {
     //    return value ? Ext.Date.dateFormat(value, 'M d, Y') : '';
     //}
 
-    Ext.define('rowFilterModel', {
+    var model = Ext.define('rowFilterModel', {
         extend: 'Ext.data.Model',
         fields: [
             { name: 'LogicalOp', type: Ext.form.field.ComboBox },
@@ -39,6 +39,15 @@ Ext.onReady(function () {
         // destroy the store if the grid is destroyed
         autoDestroy: true,
         model: 'rowFilterModel',
+        listeners: {
+            afterload: function () {
+                
+
+            },
+            load: function () {
+                
+            }
+        },
         proxy: {
             type: 'ajax',
             // load remote data using HTTP
@@ -58,21 +67,39 @@ Ext.onReady(function () {
     var cellEditing = Ext.create('Ext.grid.plugin.CellEditing', {
         clicksToEdit: 1
     });
+
     // create the grid and specify what field you want
     // to use for the editor at each header.
+    var cancelUpdateFilter = function (btn) {
+       btn.hide();
+       var constructor = btn.up('grid');
+       constructor.additionalProperties.filterModel = {};
+       constructor.additionalProperties.filterModel.isEditingFilter = false;
+        
+        //var toolbar = constructor.down('toolbar');
+        //toolbar.remove(btn);
+        constructor.setTitle('Створення фільтрів');
+        constructor.store.removeAll();
+        constructor.store.sync();
+    };
+
     var grid = Ext.define('ExtApp.view.refBook.ConstructorFiltersGrid', {
         extend: 'Ext.grid.Panel',
         store: store,
         id: 'ConstructorGrid',
         constructor: function (argument) {
             thisController = argument.thisController;
+            var filterModel = {};
+            filterModel.isEditingFilter = false;
+            this.additionalProperties = { filterModel: filterModel };
             this.callParent(new Array());
         },
         columns: [{
             id: 'Logical_Op',
             header: 'І/АБО',
             dataIndex: 'LogicalOp',
-            width: 60,
+            width: 12,
+            flex: 12 / 100,
             editor: new Ext.form.field.ComboBox({
                 typeAhead: true,
                 triggerAction: 'all',
@@ -88,7 +115,8 @@ Ext.onReady(function () {
         }, {
             header: 'Атрибут',
             dataIndex: 'Colname',
-            width: 150,
+            width: 30,
+            flex: 30 / 100,
             editor: new Ext.form.field.ComboBox({
                 typeAhead: true,
                 triggerAction: 'all',
@@ -100,7 +128,8 @@ Ext.onReady(function () {
         }, {
             header: 'Оператор',
             dataIndex: 'ReletionalOp',
-            width: 100,
+            width: 14,
+            flex: 14 / 100,
             align: 'center',
             editor: new Ext.form.field.ComboBox({
                 typeAhead: true,
@@ -127,7 +156,8 @@ Ext.onReady(function () {
         }, {
             header: 'Значення',
             dataIndex: 'Value',
-            width: 150,
+            width: 38,
+            flex: 38 / 100,
             editor: {
                 allowBlank: true
             }
@@ -144,10 +174,11 @@ Ext.onReady(function () {
         //},
         {
             xtype: 'actioncolumn',
-            width: 30,
+            width: 6,
+            flex: 6 / 100,
             sortable: false,
             items: [{
-                title: 'видалити',
+                title: 'Видалити',
                 iconCls: 'minus_once',
                 tooltip: 'Delete',
                 handler: function (grid, rowIndex, colIndex) {
@@ -160,27 +191,33 @@ Ext.onReady(function () {
             selType: 'cellmodel'
         },
 
-        width: 600,
-        height: 300,
+        //width: 600,
+        height: 350,
         title: 'Створення фільтрів',
         frame: true,
         tbar: [{
             text: 'Додати',
             iconCls: 'plus',
             itemId: 'addFilterButton',
-            handler: function () {
+            handler: function (row, e) {
                 // Create a model instance
+                
                 var r = Ext.create('rowFilterModel', {
                 });
                 var grid = this.up('grid');
-                var count = grid.getStore().getCount();
-                store.insert(count, r);
+                var selectedRecord = grid.getSelectionModel().getSelection()[0];
+                var rowNumber;
+                if (selectedRecord)
+                    rowNumber = grid.store.indexOf(selectedRecord) + 1;
+                else
+                    rowNumber = grid.getStore().getCount();
+                store.insert(rowNumber, model);
                 cellEditing.startEditByPosition({ row: 0, column: 0 });
                 //btnSave
             }
         },
         {
-            text: 'видалити все',
+            text: 'Видалити все',
             iconCls: 'minus_once',
             itemId: 'deleteAlll',
             handler: function () {
@@ -189,8 +226,9 @@ Ext.onReady(function () {
                     var store = grid.getStore();
                     store.removeAll();
                 } catch (e) {
-                    if (e.number != '-2146823281')
+                    if (e.number != '-2146823281' && e.message != "Cannot read property 'getId' of undefined") {
                         throw e;
+                    }
                 }
                
             }
@@ -200,9 +238,11 @@ Ext.onReady(function () {
              text: 'Зберегти',
              itemId: 'save',
              iconCls: 'save_brown',
-             handler: function (grid) {
+             handler: function (btn) {
+                 var thisGrid = btn.up('grid');
                  var dataItems = ExtApp.utils.RefBookUtils.buildComplexFiltersRowItems(store.data.items);
-                 thisController.writeFilter(1, dataItems, null);
+                 var filterModel = thisGrid.additionalProperties.filterModel;
+                 thisController.writeFilter(1, dataItems, null,filterModel);
              }
          },
         btnSaveDymanic = {
@@ -212,17 +252,28 @@ Ext.onReady(function () {
             itemId: 'saveDynamic',
             iconCls: 'save',
             handler: function (grid) {
+                
                 var filterNameParam = new Object();
                 filterNameParam.Name = 'filterName';
                 filterNameParam.value = 'Складний фільтр';
                 var dataItems = ExtApp.utils.RefBookUtils.buildComplexFiltersRowItems(store.data.items);
                 thisController.saveFilterBtnHandler(filterNameParam, 0, dataItems, null);
-
+            }
+        },
+        btnCancelEditFilter = {
+            xtype: 'button',
+            text: 'Відмінити редагування',
+            tooltip: 'Відмінити редагування',
+            itemId: 'cancelEditFilterId',
+            iconCls: 'cancel',
+            hidden: true,
+            handler: function (btn) {
+                cancelUpdateFilter(btn);
             }
         }],
         listeners: {
             beforerender: function () {
-                thisController.thisGrid = this;
+               
                 //thisGrid.metadata = thisGrid.thisController.controllerMetadata;
                 //var store = thisGrid.getStore().reload();
                 //var columns = thisGrid.columnManager.getColumns();
@@ -237,24 +288,37 @@ Ext.onReady(function () {
                 if (row.context.colIdx == 0 && cell.rowIdx == 0)
                     return false;
                 // alert("   " + cellindex);
+            },
+            afterrender: function () {
+                
+                
+                //thisController.thisGrid = this;
+                //
+                //var grid = this.up('grid');
+                //var count = 0;
+                //store.insert(count, model);
+                //cellEditing.startEditByPosition({ row: 0, column: 0 });
             }
         },
         plugins: [cellEditing]
     });
 
+   
     // manually trigger the data store load
-    store.load({
-        // store loading is asynchronous, use a load listener or callback to handle results
-        callback: function () {
-            //Ext.Msg.show({
-            //    title: 'Store Load Callback',
-            //    msg: 'store was loaded, data available for processing',
-            //    modal: false,
-            //    icon: Ext.Msg.INFO,
-            //    buttons: Ext.Msg.OK
-            //});
-        }
-    });
-
-
+    //store.load({
+       
+    //    // store loading is asynchronous, use a load listener or callback to handle results
+    //    callback: function () {
+    //        
+    //        //Ext.Msg.show({
+    //        //    title: 'Store Load Callback',
+    //        //    msg: 'store was loaded, data available for processing',
+    //        //    modal: false,
+    //        //    icon: Ext.Msg.INFO,
+    //        //    buttons: Ext.Msg.OK
+    //        //});
+    //    }
+    //});
+  
+   
 });

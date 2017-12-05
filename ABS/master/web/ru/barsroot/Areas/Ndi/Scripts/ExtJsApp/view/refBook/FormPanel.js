@@ -3,8 +3,7 @@ Ext.define('ExtApp.view.refBook.FormPanel', {
     extend: 'Ext.form.Panel',
     alias: 'widget.refFormPanel',
     overflowY: 'auto',
-    id: 'mainFormPanel',
-    labelWidth: 210,
+    labelWidth: 110,
     layout: {
         //размещение элементов вертикально один за одним
         type: 'vbox',
@@ -15,7 +14,7 @@ Ext.define('ExtApp.view.refBook.FormPanel', {
     //без данного признака значения originalValue полей формы undefined при закачке данных на форму
     trackResetOnLoad: true,
     border: false,
-    autoscroll: true,
+
     //в initComponent вынесены свойства которые нужно заполнить с учетом переданных данных при создании комбобокса
     initComponent: function () {
         this.callParent();

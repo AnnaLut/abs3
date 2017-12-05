@@ -41,20 +41,22 @@
             header: 'обрати',
             dataIndex: 'IsApplyFilter',
             xtype: 'checkcolumn',
-            width: 30,
+            width: 5,
+            flex: 5 / 100,
             listeners: {
                 //нужно для того чтобы чекбоксы были readonly
                 // beforecheckchange: function () { return false; }
                 checkchange: function (comp, rowIndex, checked, eOpts) {
                     var thisGrid = this.up('grid');
-                    thisController.controllerMetadata.DynamicBeforeFilters = [];
+                    thisController.controllerMetadata.applyFilters.DynamicBeforeFilters = [];
                     thisGrid.getStore().each(function (record) {
                         if (record.data['IsApplyFilter'] == 1)
-                            thisController.controllerMetadata.DynamicBeforeFilters.push({
+                            thisController.controllerMetadata.applyFilters.DynamicBeforeFilters.push({
                                 //к имени поля добавляем имя таблицы
-                                WHERE_CLAUSE: record.data['Where_clause']
+                                Where_clause: record.data['Where_clause']
                             });
                     });
+                    thisController.updateApplyFilters(thisGrid);
                     thisController.controllerMetadata.mainGrid = Ext.getCmp('mainReferenceGrid');
                     if (thisController.controllerMetadata.mainGrid)
                         thisController.updateGridByFilters();
@@ -63,11 +65,13 @@
         }, {
             header: 'Імя фільтра',
             dataIndex: 'FilterName',
-            width:100
+            width: 30,
+            flex: 30 / 100
         }, {
             header: 'умови фільтра',
             dataIndex: 'Where_clause',
-            width: 300,
+            width: 65,
+            flex: 65 / 100,
             align: 'left'
             
         }
@@ -77,8 +81,8 @@
         //    selType: 'cellmodel'
         //},
 
-        width: 600,
-        height: 300,
+       // width: 600,
+        height: 350,
         title: 'Динамічні фільтри',
         frame: true,
         tbar: [

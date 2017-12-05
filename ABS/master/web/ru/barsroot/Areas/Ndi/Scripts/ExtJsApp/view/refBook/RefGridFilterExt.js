@@ -52,7 +52,7 @@
         }
     ],
     store: null,
-    constructor: function (extFiltersMeta, store) {
+ constructor: function (extFiltersMeta, store) {
         var self = this;
         self.hidden = extFiltersMeta.length <= 0;
         self.items[0].store = store;

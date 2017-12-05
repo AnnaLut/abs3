@@ -60,8 +60,12 @@ END T2017;
 
 
 --------------------------------------------------------
-CREATE OR REPLACE PACKAGE BODY BARS.T2017 IS  g_body_version   CONSTANT VARCHAR2 (64) := 'version 1.6  30.11.2017';
-   g_errN number := -20203 ;  nlchr char(2) := chr(13)||chr(10) ;
+CREATE OR REPLACE PACKAGE BODY BARS.T2017
+IS
+  g_body_version   CONSTANT VARCHAR2 (64) := 'version 1.7  05.12.2017';
+  g_errN number  := -20203;
+  nlchr  char(2) := chr(13)||chr(10);
+  bnk_dt date;
 /*
   30.11.2017 LSO Добавлены коректировки в справочник CCK_OB22
   30.11.2017 Sta Использование прозноз-счетов
@@ -193,7 +197,7 @@ begin
        bars_context.set_policy_group('WHOLE'); -- уходим на группу политик доступную для "/"
 
        insert into PS         (NBS,PAP,NAME,CLASS)  select p_R020_new,x.pap,l_txt,x.CLASS  from ps x           where nbs=p_R020_old and not exists (select 1 from ps             where nbs=p_r020_new); -- План рахунків
-----   update PS set D_CLOSE = nvl(BARS.glb_bankdate,sysdate)  where nbs = p_R020_old  and D_CLOSE is null ;
+----   update PS set D_CLOSE = bnk_dt where nbs = p_R020_old  and D_CLOSE is null ;
 
        insert into RKO_NBS       (NBS)  select p_R020_new   from RKO_NBS        where nbs=p_R020_old and not exists (select 1 from RKO_NBS        where nbs=p_r020_new); -- РКО:  Балансові рахунки
        insert into DEB_REG_NBS   (NBS)  select p_R020_new   from DEB_REG_NBS    where nbs=p_R020_old and not exists (select 1 from DEB_REG_NBS    where nbs=p_r020_new); -- Перелік бал рахунків простроченого боргу
@@ -264,14 +268,18 @@ procedure ob1 ( tt transfer_2017%rowtype )  is
 begin
    bars_audit.info('T2017.OB1 Start '||tt.R020_old||' -> '||tt.R020_new||'. ob22:'||tt.ob_old||' -> '||tt.ob_new);
    suda;
-
+   
+   -- Коди OB22 для рахунків
    insert into SB_OB22(R020,    OB22,    TXT,               D_OPEN)
-   select tt.R020_new, tt.ob_new, NVL(tt.comm,l_txt), nvl(BARS.glb_bankdate,sysdate)  from dual where not exists (select 1 from sb_ob22 where r020=tt.r020_new and ob22=tt.ob_new); -- Коди OB22 для рахунків
+   select tt.R020_new, tt.ob_new, NVL(tt.comm,l_txt), bnk_dt
+     from dual
+    where not exists (select 1 from sb_ob22 where r020=tt.r020_new and ob22=tt.ob_new);
 
-   update SB_OB22 set D_CLOSE = nvl(BARS.glb_bankdate,sysdate) where r020 = tt.r020_old and ob22 = tt.ob_old and D_CLOSE is     null ;
-   update SB_OB22 set D_CLOSE = null     where r020 = tt.r020_new and ob22 = tt.ob_new and D_CLOSE is NOT null ;
+   update SB_OB22 set D_CLOSE = bnk_dt where r020 = tt.r020_old and ob22 = tt.ob_old and D_CLOSE is     null;
+   update SB_OB22 set D_CLOSE = null   where r020 = tt.r020_new and ob22 = tt.ob_new and D_CLOSE is NOT null;
 
-   update tts      set nlsm = REPLACE (nlsm , '''' || tt.r020_old || ''',''' || tt.ob_old||'''',''''|| tt.r020_new||''','''||tt.ob_new||'''' ),  -- Справочник типов транзакций
+   -- Справочник типов транзакций
+   update tts    set nlsm = REPLACE (nlsm , '''' || tt.r020_old || ''',''' || tt.ob_old||'''',''''|| tt.r020_new||''','''||tt.ob_new||'''' ),
                      nlsk = REPLACE (nlsk , '''' || tt.r020_old || ''',''' || tt.ob_old||'''',''''|| tt.r020_new||''','''||tt.ob_new||'''' ),
                      nlsa = REPLACE (nlsa , '''' || tt.r020_old || ''',''' || tt.ob_old||'''',''''|| tt.r020_new||''','''||tt.ob_new||'''' ),
                      nlsb = REPLACE (nlsb , '''' || tt.r020_old || ''',''' || tt.ob_old||'''',''''|| tt.r020_new||''','''||tt.ob_new||'''' ) ;
@@ -334,7 +342,7 @@ begin
     end loop; -- k
 
     suda;
-    update TRANSFER_2017 set dat_beg = nvl(BARS.glb_bankdate ,sysdate)  where r020_old = tt.r020_old and ob_old = tt.ob_old and r020_new = tt.r020_new and ob_new = tt.ob_new;
+    update TRANSFER_2017 set dat_beg = bnk_dt where r020_old = tt.r020_old and ob_old = tt.ob_old and r020_new = tt.r020_new and ob_new = tt.ob_new;
     commit;
    
 exception when others then
@@ -362,7 +370,7 @@ procedure T_CCk   (p_NBS  varchar2,   p_ob22 varchar2  ) is  -- перекодировка CC
   ------
 begin
 
- for OLD in ( select r.* from cck_ob22 r where NBS like L_NBS and OB22 like L_OB22 and d_close is null )
+ for OLD in ( select r.* from cck_ob22 r where NBS like L_NBS and OB22 like L_OB22 and d_close is null and exists(select 1 from transfer_2017 x where r.nbs = x.r020_old and r.ob22 = x.ob_old) )
  loop
 
     NEW     := OLD ;
@@ -401,12 +409,12 @@ begin
     BBBBOO  := TRN (           '6118'           , OLD.SD_9129 ) ; NEW.SD_9129 := Substr(BBBBOO,5,2) ;                                -- SD_9129    OB22~ рах. доходiв ~ для комiсiї~ на 9129'   61* для 9129
     BBBBOO  := TRN (           '6110'           , OLD.SD_SK4  ) ; NEW.SD_SK4  := Substr(BBBBOO,5,2) ;                                -- SD_SK4    OB22~ рах. доходiв ~ для комiсiї~ за достр. пог.
 
-    update cck_ob22 set  D_CLOSE  = nvl(BARS.glb_bankdate,sysdate)  where nbs = OLD.NBS and ob22 = OLD.OB22 and exists(select 1 from transfer_2017 x where OLD.NBS = x.r020_old and OLD.OB22 = x.ob_old) ;
-    
+    update cck_ob22 set D_CLOSE  = bnk_dt where nbs = OLD.NBS and ob22 = OLD.OB22 and exists(select 1 from transfer_2017 x where OLD.NBS = x.r020_old and OLD.OB22 = x.ob_old) ;
+
     bars_audit.info(l_trace||'  обнолвнеие таблицы CCK_OB22  NEW.NBS = '||NEW.NBS||'NEW.Ob22 = '||NEW.Ob22);
     
     begin
-     insert into CCK_OB22 values NEW;
+      insert into CCK_OB22 values NEW;
     exception  WHEN DUP_VAL_ON_INDEX THEN
       update CCK_OB22 set 
         SPI       = case when  NEW.SPI is null then     OLD.SPI     else    NEW.SPI     end,     
@@ -452,17 +460,17 @@ declare
 begin
   for i in (select *
               from w4_nbs_ob22 unpivot(atr_vallue for attribute_name in("OB_9129",
-                                                            "OB_OVR",
-                                                            "OB_2207",
-                                                            "OB_2208",
-                                                            "OB_2209",
-                                                            "OB_3570",
-                                                            "OB_3579",
-                                                            "OB_2627",
-                                                            "OB_2625X",
-                                                            "OB_2627X",
-                                                            "OB_2625D",
-                                                            "OB_2628"))) loop
+                                                                        "OB_OVR",
+                                                                        "OB_2207",
+                                                                        "OB_2208",
+                                                                        "OB_2209",
+                                                                        "OB_3570",
+                                                                        "OB_3579",
+                                                                        "OB_2627",
+                                                                        "OB_2625X",
+                                                                        "OB_2627X",
+                                                                        "OB_2625D",
+                                                                        "OB_2628"))) loop
     if i.attribute_name in ('OB_2207', 'OB_2209', 'OB_3579', 'OB_3570') then
       l_sql := null;
       begin
@@ -564,18 +572,18 @@ procedure ACC_1x (p_nbs varchar2, p_ob22 varchar2, p_nbs_notlike varchar2 ,p_kf 
 begin bc.go( p_KF) ;
 
    bars_audit.info('T2017.ACC_1X Start kf=' ||p_kf);
+   
    ----------------------------------------------- выборка пула счетов по балансовому и об22
-   for aa in (select a.* from accounts a     where a.dat_alt is null and a.dazs is null 
-                and exists (select 1 from transfer_2017 t where nbs=t.r020_old and a.ob22=t.ob_old )
---and a.nbs like p_nbs||'%' 
---and a.ob22 like p_ob22||'%' 
--- and a.nbs NOT LIKE p_nbs_notlike||'%' --and KF like p_kf ||'%' 
-              order by KF, nbs, ob22 )
+   for aa in (select a.* from accounts a     
+               where a.dat_alt is null and a.dazs is null 
+                 and exists (select 1 from transfer_2017 t where nbs=t.r020_old and a.ob22=t.ob_old )
+               order by KF, nbs, ob22 )
    loop
 
-      If aa.nbs <> l_nbs  or aa.ob22 <> l_ob22 then   --------------------------------------------------------------------------- закомитить обработку балансового + об22
+      If aa.nbs <> l_nbs  or aa.ob22 <> l_ob22 then   
+         
          bars_audit.info('T2017.ACC_1X Work kf=' ||p_kf || ' r020_old = '||aa.nbs||' ob_old = '||aa.ob22);
-         update TRANSFER_2017 set dat_end = nvl(BARS.glb_bankdate,sysdate), col = nvl(col,0) + 1  where r020_old =  l_nbs and ob_old = l_ob22;
+         update TRANSFER_2017 set dat_end = bnk_dt, col = nvl(col,0) + 1  where r020_old =  l_nbs and ob_old = l_ob22;
          commit;
          l_nbs  := aa.nbs;
          l_ob22 := aa.ob22;
@@ -589,7 +597,7 @@ begin bc.go( p_KF) ;
 
    end loop ; --
 
-   update TRANSFER_2017 set dat_end = NVL(BARS.glb_bankdate, sysdate)   where r020_old =  l_nbs and ob_old = l_ob22;
+   update TRANSFER_2017 set dat_end = bnk_dt where r020_old =  l_nbs and ob_old = l_ob22;
 
    commit;
 
@@ -628,7 +636,10 @@ begin
 
 
       --30.11.2017 Sta Использование прозноз-счетов
-      begin select nls_new into AA_NEW.NLS from nls_2017 where kf = aa_old.kf and nls_old = aa_old.nls;
+      begin 
+         select new_nls into AA_NEW.NLS 
+           from TRANSFORM_2017_FORECAST 
+          where acc = aa_old.acc;
       EXCEPTION WHEN NO_DATA_FOUND   THEN AA_NEW.NLS :=  Vkrzn( substr( gl.amfo,1,5), tt.r020_new||'0' || substr( aa_OLD.nls, 6,9) ); -- сохраняем старый хвост
       end;     
 
@@ -636,7 +647,7 @@ begin
       while l_count < 100   
       loop
          begin
-            update accounts set tip = aa_NEW.tip, NLS = AA_NEW.NLS, nbs = tt.R020_NEW, nlsalt = aa_old.NLS, DAT_ALT = sysdate, ob22 = tt.ob_new where acc = aa_old.ACC ;
+            update accounts set tip = aa_NEW.tip, NLS = AA_NEW.NLS, nbs = tt.R020_NEW, nlsalt = aa_old.NLS, DAT_ALT = bnk_dt, ob22 = tt.ob_new where acc = aa_old.ACC ;
             l_count    := 0;
             EXIT ;
          exception when others then     
@@ -647,7 +658,7 @@ begin
          end;
 
       end loop;
-                                                                                                                                             
+
       if l_count > 0 then   bars_audit.info( 'T2017.OPN: для old.NLS='||aa_old.NLS ||' не найден NEW.NLS' );
       Else
          update SPECPARAM set OB22_alt = aa_OLD.ob22  where acc = aa_old.ACC ;
@@ -660,34 +671,34 @@ begin
             select * into  cc from customer where rnk = aa_old.rnk ; cc.nmk := nvl(cc.nmkk,substr(cc.nmk,1,38));
             -- закрыть
             Insert into ree_tmp ( mfo,    id_a,     rt, ot,        nls,     odat,        kv,    c_ag,   nmk,   nmkw,   c_reg,    c_dst, prz) --  закрытие
-                      select  gl.aMfo, cc.Okpo, cc.tgr,'3', AA_OLD.NLS, Nvl(BARS.glb_bankdate,sysdate) , aa_old.KV, G.rezid,cc.nmk,cc.nmk, cc.c_reg, cc.c_dst, 1
+                      select  gl.aMfo, cc.Okpo, cc.tgr,'3', AA_OLD.NLS, bnk_dt, aa_old.KV, G.rezid,cc.nmk,cc.nmk, cc.c_reg, cc.c_dst, 1
                       from codcagent G  where codcagent = cc.codcagent and exists (select 1 from DPA_NBS where nbs = tt.R020_OLD and TYPE='DPA' and TAXOTYPE=3) ;
             -- открыть
             Insert into ree_tmp ( mfo,    id_a,     rt, ot,        nls,     odat,        kv,    c_ag,   nmk,   nmkw,   c_reg,    c_dst, prz) -- открытие
-                       select gl.aMfo, cc.Okpo, cc.tgr,'1', AA_NEW.NLS, nvl(BARS.glb_bankdate , sysdate) , aa_old.KV, G.rezid,cc.nmk,cc.nmk, cc.c_reg, cc.c_dst, 1
+                       select gl.aMfo, cc.Okpo, cc.tgr,'1', AA_NEW.NLS, bnk_dt, aa_old.KV, G.rezid,cc.nmk,cc.nmk, cc.c_reg, cc.c_dst, 1
                        from codcagent G  where codcagent = cc.codcagent and exists (select 1 from DPA_NBS where nbs = tt.R020_NEW and TYPE='DPA' and TAXOTYPE=1) ;
          end if ; -- DPA
 
          --- Журнал счетов
-         delete from accounts_update where acc = aa_old.acc and trim(chgdate)  = trim(sysdate);
+         delete from accounts_update where acc = aa_old.acc and trunc(chgdate) = trunc(sysdate);
          ----- закрыть chgaction = 3
-         INSERT INTO   accounts_update
+         INSERT INTO accounts_update
              (acc, nls, nlsalt, kv, nbs, nbs2, daos, isp, nms  , pap, grp, sec, seci, seco, vid, tip, dazs, blkd, blkk, lim, pos, accc, tobo, mdate, ostx, rnk, kf ,
               chgdate , chgaction , doneby ,idupd  , effectdate, branch,ob22, globalbd,send_sms  )
          VALUES (aa_old.acc   ,aa_old.nls  ,aa_old.nlsalt,aa_old.kv    ,tt.R020_OLD   ,aa_old.nbs2,aa_old.daos  ,aa_old.isp   ,aa_old.nms   ,aa_old.pap,
-              aa_old.grp   ,aa_old.sec  ,aa_old.seci  ,aa_old.seco  ,aa_old.vid   ,aa_old.tip , nvl(BARS.glb_bankdate,sysdate) ,  -- дата закр
+              aa_old.grp   ,aa_old.sec  ,aa_old.seci  ,aa_old.seco  ,aa_old.vid   ,aa_old.tip , bnk_dt,  -- дата закр
               aa_old.blkd  ,aa_old.blkk  ,aa_old.lim,   aa_old.pos   ,aa_old.accc ,aa_old.tobo  ,aa_old.mdate ,aa_old.ostx  ,aa_old.rnk ,aa_old.kf    ,
-              sysdate      ,3,user_name ,bars_sqnc.get_nextval('s_accounts_update',aa_old.kf) , nvl(BARS.glb_bankdate ,sysdate), aa_old.branch, aa_old.ob22 , 
-              nvl(BARS.glb_bankdate , sysdate) , aa_old.send_sms);
+              sysdate      ,3,user_name ,bars_sqnc.get_nextval('s_accounts_update',aa_old.kf), bnk_dt, aa_old.branch, aa_old.ob22 , 
+              bnk_dt, aa_old.send_sms);
          ----- открыть chgaction = 1
-         INSERT INTO   accounts_update
+         INSERT INTO accounts_update
              (acc, nls, nlsalt, kv, nbs, nbs2, daos, isp, nms  , pap, grp, sec, seci, seco, vid, tip, dazs, blkd, blkk, lim, pos, accc, tobo, mdate, ostx, rnk, kf ,
               chgdate , chgaction , doneby,idupd  , effectdate, branch,ob22,globalbd,send_sms  )
-         VALUES (aa_old.acc  ,aa_new.nls  ,aa_old.nls ,aa_old.kv ,tt.R020_NEW,aa_old.nbs2, nvl(BARS.glb_bankdate,sysdate)  ,-- дата откр
+         VALUES (aa_old.acc  ,aa_new.nls  ,aa_old.nls ,aa_old.kv ,tt.R020_NEW,aa_old.nbs2, bnk_dt,-- дата откр
                  aa_old.isp  ,aa_old.nms  ,aa_old.pap ,aa_old.grp,aa_old.sec ,aa_old.seci, aa_old.seco,aa_old.vid  ,aa_NEW.tip ,  -- yjdsq nbg cx
                  aa_old.dazs ,aa_old.blkd ,aa_old.blkk,aa_old.lim, aa_old.pos,aa_old.accc,aa_old.tobo ,aa_old.mdate,aa_old.ostx,aa_old.rnk ,aa_old.kf   ,
-                 sysdate     ,1,user_name ,bars_sqnc.get_nextval('s_accounts_update',aa_old.kf), nvl(BARS.glb_bankdate ,sysdate) , aa_old.branch, tt.ob_new , 
-                 nvl(BARS.glb_bankdate , sysdate), aa_old.send_sms   );
+                 sysdate     ,1,user_name ,bars_sqnc.get_nextval('s_accounts_update',aa_old.kf), bnk_dt, aa_old.branch, tt.ob_new , 
+                 bnk_dt, aa_old.send_sms   );
 
           -- Update  chgaction = 2 Восстановить для ХД дату открытия = дате открытия из accounts aa_old.DAOS
          INSERT INTO   accounts_update
@@ -696,8 +707,8 @@ begin
          VALUES (aa_old.acc  ,aa_new.nls  ,aa_old.nls ,aa_old.kv ,tt.R020_NEW,aa_old.nbs2, aa_old.DAOS ,-- дата откр
                  aa_old.isp  ,aa_old.nms  ,aa_old.pap ,aa_old.grp,aa_old.sec ,aa_old.seci, aa_old.seco,aa_old.vid  ,aa_NEW.tip ,  -- yjdsq nbg cx
                  aa_old.dazs ,aa_old.blkd ,aa_old.blkk,aa_old.lim, aa_old.pos,aa_old.accc,aa_old.tobo ,aa_old.mdate,aa_old.ostx,aa_old.rnk ,aa_old.kf   ,
-                 sysdate     ,2,user_name ,bars_sqnc.get_nextval('s_accounts_update',aa_old.kf), nvl(BARS.glb_bankdate ,sysdate) , aa_old.branch, tt.ob_new , 
-                 nvl(BARS.glb_bankdate , sysdate), aa_old.send_sms   );
+                 sysdate     ,2,user_name ,bars_sqnc.get_nextval('s_accounts_update',aa_old.kf), bnk_dt, aa_old.branch, tt.ob_new , 
+                 bnk_dt, aa_old.send_sms   );
        ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
       end if;  -- l_count > 0 
 
@@ -746,7 +757,7 @@ begin
          end loop ;
 
    end loop;
-   update TRANSFER_2017 set dat_end = nvl(BARS.glb_bankdate,sysdate)   where r020_old =  l_nbs and ob_old = l_ob22;
+   update TRANSFER_2017 set dat_end = bnk_dt where r020_old =  l_nbs and ob_old = l_ob22;
    commit;
 
    suda;
@@ -907,16 +918,31 @@ end TAG_KF ;
 procedure spec_par( p_mode int)  is --  Авто-трансформація Specparam_int
 begin
   for k in ( select * from mv_kf)
-  loop  bc.go (k.KF) ; --большая табл счетов, политизированная по KF, потому идем от счета
-        update SPECPARAM_INT s set s.R020_FA = (select r020_new from transfer_2017 t 
-               where kf = k.KF 
-                 and t.r020_old = s.R020_FA and rownum =1 ) where s.R020_FA is not null;
-        commit;
-        T2017.TAG_KF ( k.KF ) ;
-        commit ;
-        T2017.ZAY    ( k.KF ) ; 
+  loop
+    bc.go (k.KF);
+    -- большая табл счетов, политизированная по KF, потому идем от счета
+    update SPECPARAM_INT s set s.R020_FA = (select r020_new from transfer_2017 t 
+           where kf = k.KF 
+             and t.r020_old = s.R020_FA and rownum =1 ) where s.R020_FA is not null;
+    commit;
+    T2017.TAG_KF ( k.KF ) ;
+    commit ;
+    T2017.ZAY    ( k.KF ) ; 
+    commit;
+    
+    for k in ( select  i.rowid, i.mfob, i.nlsb, i.kvb, f.new_nls, i.id 
+                 from bars.int_accn i, bars.transform_2017_forecast f
+                where i.mfob = bars.f_ourmfo()
+                  and i.mfob = f.kf
+                  and i.nlsb = f.nls
+                  and i.kvb  = f.kv
+                  and i.nlsb is not null)
+    loop
+      update bars.int_accn set nlsb = k.new_nls where rowid = k.rowid;
+    end loop;
+    commit;
   end loop;
-end spec_par ;
+end spec_par;
 ------------
 
 procedure OTCN   (p_mode int) is --  Авто-трансформація довідників по звітності
@@ -1062,8 +1088,9 @@ end Get_OB22_old ;
 
 
 ---Аномимный блок --------------
-begin null ;
-END T2017  ;
-/                                                            
+BEGIN
+  bnk_dt := coalesce(GL.GBD(),DAT_NEXT_U(trunc(sysdate),0),trunc(sysdate));
+END T2017;
+/
 
 show err

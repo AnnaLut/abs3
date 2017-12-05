@@ -1,4 +1,5 @@
 ﻿using System;
+
 namespace BarsWeb.Areas.Ndi.Models
 {
 
@@ -21,14 +22,15 @@ namespace BarsWeb.Areas.Ndi.Models
         /// Значение знака сопоставления <= / = / => / < / >
         /// </summary>
         public string Sign { get; set; }
-
         public object Clone()
         {
-            FieldProperties clon = new FieldProperties();
-            clon.Value = this.Value;
-            clon.Name = this.Name;
-            clon.Type = this.Type;
-            clon.Sign = this.Sign;
+            FieldProperties clon = new FieldProperties
+            {
+                Value = this.Value,
+                Name = this.Name,
+                Type = this.Type,
+                Sign = this.Sign
+            };
             return clon;
         }
     }
