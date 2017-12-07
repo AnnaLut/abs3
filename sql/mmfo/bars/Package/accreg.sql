@@ -268,7 +268,7 @@ is
   --***************************************************************************--
   g_modcode       constant varchar2(3) := 'CAC';
 
-  g_body_version  constant varchar2(64)  := 'version 1.8  17/11/2017';
+  g_body_version  constant varchar2(64)  := 'version 1.9  07/12/2017';
   g_body_defs     constant varchar2(512) := ''
 $if ACC_PARAMS.KOD_D6
 $then
@@ -1949,6 +1949,46 @@ procedure P_ACC_RESTORE
   l_acc_tp   accounts.tip%type;
   l_r020     accounts.nbs%type;
   l_active   number(1);
+  ---<NEWNBS>---
+  r_tfm_fc   transform_2017_forecast%rowtype;
+  
+  procedure CHK_EXISTENCE
+  is
+    l_exst  number(1);
+  begin
+
+    begin
+
+      select 1 -- existent
+        into l_exst
+        from ACCOUNTS
+       where KF  = r_tfm_fc.KF
+         and NLS = r_tfm_fc.NEW_NLS
+         and KV  = r_tfm_fc.KV
+       union 
+      select 1 -- forecast
+        from TRANSFORM_2017_FORECAST
+       where KF      = r_tfm_fc.KF
+         and NEW_NLS = r_tfm_fc.NEW_NLS
+         and KV      = r_tfm_fc.KV
+       union all
+      select 1 -- reserved
+        from ACCOUNTS_RSRV
+       where KF  = r_tfm_fc.KF
+         and NLS = r_tfm_fc.NEW_NLS
+         and KV  = r_tfm_fc.KV;
+
+      r_tfm_fc.NEW_NLS := VKRZN( substr(r_tfm_fc.KF,1,5), r_tfm_fc.NEW_NBS||'0'||trunc(dbms_random.value(100000000,999999999)) );
+
+      CHK_EXISTENCE();
+
+    exception
+      when NO_DATA_FOUND then
+        null;
+    end;
+
+  end CHK_EXISTENCE;
+  ---<NEWNBS>---
 begin
 
   DBMS_APPLICATION_INFO.SET_ACTION( 'ACCREG.RestoreAccount' );
@@ -1959,7 +1999,9 @@ begin
   -- ищем счет
   begin
     select nvl(NBS,SubStr(NLS,1,4)), TIP
+         , KF, KV, ACC, NBS, NLS, OB22
       into l_r020, l_acc_tp
+         , r_tfm_fc.KF, r_tfm_fc.KV, r_tfm_fc.ACC, r_tfm_fc.NBS, r_tfm_fc.NLS, r_tfm_fc.OB22
       from ACCOUNTS
      where acc = p_acc;
   exception
@@ -1973,12 +2015,45 @@ begin
       into l_dapp
       from PS
      where NBS = l_r020
-       and D_CLOSE Is Null;
+       and lnnvl( D_CLOSE <= GL.GBD() );
 
   exception
     when no_data_found then
       bars_error.raise_nerror( g_modcode, 'INVALID_R020', l_r020 );
   end;
+
+  ---<NEWNBS>---
+  begin
+
+    if ( r_tfm_fc.OB22 Is Null )
+    then
+      select R020_NEW
+        into r_tfm_fc.NEW_NBS
+        from TRANSFER_2017
+       where R020_OLD = r_tfm_fc.NBS
+         and R020_OLD != R020_NEW;
+    else
+      select R020_NEW, OB_NEW
+        into r_tfm_fc.NEW_NBS, r_tfm_fc.NEW_OB22
+        from TRANSFER_2017
+       where R020_OLD = r_tfm_fc.NBS
+         and OB_OLD   = r_tfm_fc.OB22
+         and R020_OLD != R020_NEW;
+    end if;
+
+    r_tfm_fc.NEW_NLS := VKRZN( substr(r_tfm_fc.KF,1,5), r_tfm_fc.NEW_NBS||'0'||SubStr(r_tfm_fc.NLS,6,9) );
+
+    CHK_EXISTENCE();
+
+    r_tfm_fc.INSERT_DATE := sysdate;
+
+    insert into TRANSFORM_2017_FORECAST values r_tfm_fc;
+
+  exception
+    when NO_DATA_FOUND then
+      null;
+  end;
+  ---<NEWNBS>---
 
   -- если нужно поменять дату открытия счета, проверим дату последнего движения:
   -- дата открытия счета д.б. <= даты последнего движения

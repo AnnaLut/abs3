@@ -969,6 +969,69 @@ begin
 	
     commit;
   end loop;
+  
+  
+  
+      -- Лившиц Геннадий
+	BEGIN
+		For i in (select d.deposit_id, d.branch, a.nls, d.kf
+		from bars.dpt_deposit d, bars.accounts a 
+		where a.nlsalt = d.nls_p and a.kf = d.kf
+		and a.kv = d.kv and d.nls_p like '2635%') loop
+			bc.go(i.kf);
+			update dpt_deposit set nls_p = i.nls where deposit_id = i.deposit_id;
+		end loop;
+		
+		commit;
+		
+		For i in (select d.deposit_id, d.branch, a.nls, d.kf
+		from bars.dpt_deposit d, bars.accounts a 
+		where a.nlsalt = d.nls_d and a.kf = d.kf
+		and a.kv = d.kv and d.nls_d like '2635%') loop
+			bc.go(i.kf);
+			update dpt_deposit set nls_d = i.nls where deposit_id = i.deposit_id;
+		end loop;
+		
+		commit;
+    END;
+
+	
+	-- Липских Александр
+	BEGIN
+    /* "трансформация" макетов ф.190 (sto_det), обновляем nls-ки, назначение платежа не меняем */
+    for rec in (select kf from mv_kf)
+        loop
+            bc.go(rec.kf);
+            For i in (select d.idd, d.branch, a.nls, d.kf
+                        from bars.sto_det d, bars.accounts a
+                       where a.nlsalt = d.nlsa
+                         and a.kf = d.kf
+                         and a.kv = d.kva
+                         and d.nlsa like '2635%') 
+            loop
+                update sto_det
+                   set nlsa = i.nls
+                 where idd = i.idd;
+            end loop;
+
+            For i in (select d.idd, d.branch, a.nls, d.kf
+                        from bars.sto_det d, bars.accounts a
+                       where a.nlsalt = d.nlsb
+                         and a.kf = d.kf
+                         and a.kv = d.kvb
+                         and d.nlsb like '2635%') 
+            loop
+                update sto_det
+                   set nlsb = i.nls
+                 where idd = i.idd;
+            end loop;
+        end loop;
+        bc.home;
+    END;
+
+  
+
+  
 end spec_par;
 ------------
 

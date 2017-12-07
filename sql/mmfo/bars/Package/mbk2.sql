@@ -1,13 +1,8 @@
-
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/mbk2.sql =========*** Run *** ======
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.MBK2 IS
+CREATE OR REPLACE PACKAGE BARS.MBK2 IS
 
 /*
-
-  23.01.2015 Сухова Добавки к основному пакеджу МБК, который потом Ната Ч. объединит в один
+ 17.11.2017 Трансфер-2017 ПОДМЕНА ПРОЦЕДУРЫ ОТКР.СЧЕТА  На уровне бал.счетов - без учета об22 
+ 23.01.2015 Сухова Добавки к основному пакеджу МБК, который потом Ната Ч. объединит в один
              Забрала сюда процедуру mbk_SP
 */
 
@@ -33,10 +28,11 @@ p_nd  number    -- Реф МБК
 
 END MBK2;
 /
+-------------------------------------------------------------
 CREATE OR REPLACE PACKAGE BODY BARS.MBK2 IS
 
 /*
-  24-04-2017 Марценюк В GPK добавлено vidd in (2700,2701,3660,3661) 
+  04.12.2017 Sta 1521 SP - Новый план счетов
   30.01.2015 Сухова Мелочи.
   23.01.2015 Сухова Добавки к основному пакеджу МБК, который потом Ната Ч. объединит в один
              Забрала сюда процедуру mbk_SP
@@ -173,29 +169,17 @@ begin
 end GPK ;
 
 ---------- вынос на просрочку тела и %%
-procedure  mbk_SP (
-n_SP  number,   -- Сума для виноса~HA простроченi~1**7
-p_SS  int   ,   -- FLAG = OK = Тiло+Вiдсотки=>~HA простроченi~1**7
-n_SPN number,   -- Сума для виноса~HA простроченi~1**9
-p_SN  int   ,   --  FLAG = OK =     Вiдсотки=>~HA простроченi~1**9
-p_nd  number    -- Реф МБК
-) is
+procedure  mbk_SP ( n_SP  number,   -- Сума для виноса~HA простроченi~1**7
+                    p_SS  int   ,   -- FLAG = OK = Тiло+Вiдсотки=>~HA простроченi~1**7
+                    n_SPN number,   -- Сума для виноса~HA простроченi~1**9
+                    p_SN  int   ,   --  FLAG = OK =     Вiдсотки=>~HA простроченi~1**9
+                    p_nd  number    -- Реф МБК
+                 ) is
 
-/*
-  процедура вsноса на просрочку МБК  - тело и проценты по остатку на счете
-  =================================
-  20.01.2015 Не заменяю ACCS на просрочку по телу
-  15.12.2014 Переделина дважды на 100
-  09.12.2014 Частичный вынос на просрочку
-  04.12.2014 Добавила реф по просрочке к дог
--- 24.11.2014  Вынос по одному дог.
-*/
-  ---------------------------------------------------------
-  aa    cc_add%rowtype   ; a1523 accounts%rowtype ; a1528 accounts%rowtype ; a1527 accounts%rowtype; a1529 accounts%rowtype;
-  ii    int_accn%rowtype ; rr    int_ratn%rowtype ; l_id  int_accn.id%type ;
-  dd    cc_deal%rowtype  ;
-  sErr_ varchar2  (35)   ; sTmp_ varchar2 (100)   ; nTmp_ number           ; oo oper %rowtype;
-
+  aa    cc_add%rowtype   ; a1523 accounts%rowtype ; a1528 accounts%rowtype ; a1527 accounts%rowtype; a1529 accounts%rowtype ;
+  ii    int_accn%rowtype ; rr    int_ratn%rowtype ; l_id  int_accn.id%type ;  oo oper %rowtype     ; dd    cc_deal%rowtype  ;
+  sErr_ varchar2  (35)   ; sTmp_ varchar2 (100)   ; nTmp_ number           ;
+  -----------------------
   procedure opl1 ( oo IN OUT oper%rowtype ) is
   begin
     If oo.ref is null then    gl.ref (oo.ref );
@@ -203,12 +187,12 @@ p_nd  number    -- Реф МБК
                    kv_  => oo.kv   ,  s_  => oo.s  , kv2_ => oo.kv  , s2_   => oo.s    , sk_  =>null    , data_=> gl.bdate, datp_ => gl.bdate,
                    nam_a_=>oo.nam_a, nlsa_=>oo.nlsa, mfoa_=> gl.aMfo, nam_b_=> oo.nam_b, nlsb_=> oo.nlsb, mfob_=> gl.aMfo , nazn_ => oo.nazn ,
                    d_rec_=> null   , id_a_=> null  , id_b_=> null   , id_o_ => null,  sign_=> null, sos_=> 0, prty_=> null, uid_  => null )  ;
-
     end if;
     gl.payv( 0, oo.ref, gl.bdate, oo.tt, oo.dk, oo.kv, oo.nlsa, oo.s, oo.kv, oo.nlsb, oo.s );
-  end;
+  end OPL1;
 
 begin
+--   raise_application_error(-20000,'Дана заявка (COBUSUPABS-5245) втрачає актуальність з 1 грудня 2017р. у зв’язку з переходом на новий план рахунків. Додаткові роз’яснення щодо введення простроченої заборгованості будуть повідомлені пізніше');
 
   If NOT ( p_SS = 0 and p_SN = 1  and ( n_SPN<>0            )  OR
 
@@ -235,6 +219,9 @@ begin
   update cc_deal set sos=13 where nd = DD.nd ;
   ----------------------------------------------
   a1527.nbs :=  substr(a1523.nbs ,1,3) || '7';
+
+  If dd.vidd = 1521 and newnbs.g_state  = 1 then a1527.nbs := '1521' ;  end if ;
+
   If l_id = 0 then -- Размещения   -- Найти свободную пару счетов по просрочке тела и процентов
      a1529.nbs :=  substr(a1523.nbs ,1,3) || '9';
      begin
@@ -245,14 +232,14 @@ begin
                                 AND (n.mdate<bankdate_g OR n.mdate IS NULL)   AND n.dazs is null
                                 AND (a.dapp is null or a.dapp < bankdate-10)  and rownum = 1;
      EXCEPTION WHEN NO_DATA_FOUND THEN -- автоматом открыть, если не нашли. Сначала смоделировать номерасчетов
-       sTmp_     := Substr(MBK.F_NLS_MB( a1527.nbs, a1523.RNK, Null, a1523.kv, 'MBK'), 1, 30) ;
+       sTmp_     := Substr( MBK.F_NLS_MB( a1527.nbs, a1523.RNK, Null, a1523.kv, 'MBK'), 1, 30) ;
        -- открытие основного счета
        a1527.nls := Vkrzn( substr(gl.aMfo, 1,5), trim( substr(sTmp_,01,15) ) );
-       Op_Reg_ex(1,dd.ND,0,a1523.Grp,nTmp_,dd.RNK, a1527.NLS, a1523.Kv, a1523.NMS,'SP ', a1523.isp, a1527.ACC,'1',null,null,null);  -- KB  pos=1
+       MBK.Op_Reg_ex_2017 (1,dd.ND,0,a1523.Grp,nTmp_,dd.RNK, a1527.NLS, a1523.Kv, a1523.NMS,'SP ', a1523.isp, a1527.ACC,'1',null,null,null);  -- KB  pos=1
 
        -- открытие счета нач.%%
        a1529.nls := Vkrzn( substr(gl.aMfo, 1,5), trim( substr(sTmp_,16,15) ) );
-       Op_Reg_ex(1,dd.ND,0,a1528.Grp,nTmp_,dd.RNK, a1529.NLS, a1528.kv, a1528.NMS,'SPN', a1528.isp, a1529.acc,'1',null,null,null);  -- KB  pos=1
+       MBK.Op_Reg_ex_2017 (1,dd.ND,0,a1528.Grp,nTmp_,dd.RNK, a1529.NLS, a1528.kv, a1528.NMS,'SPN', a1528.isp, a1529.acc,'1',null,null,null);  -- KB  pos=1
 
      end;
   Else    -- Привлечения  -- Найти свободный счетов по просрочке тела (проценты - тот же счет !)
@@ -265,7 +252,7 @@ begin
        sTmp_     := Substr(MBK.F_NLS_MB( a1527.nbs, a1523.RNK, Null, a1523.kv, 'MBK'), 1, 30) ;
        -- открытие основного счета
        a1527.nls := Vkrzn( substr(gl.aMfo, 1,5), trim( substr(sTmp_,01,15) ) );
-       Op_Reg_ex(1,dd.ND,0,a1523.Grp,nTmp_,dd.RNK, a1527.NLS, a1523.Kv, a1523.NMS,'SP ', a1523.isp, a1527.ACC,'1',null,null,null);  -- KB  pos=1
+        MBK.Op_Reg_ex_2017 (1,dd.ND,0,a1523.Grp,nTmp_,dd.RNK, a1527.NLS, a1523.Kv, a1523.NMS,'SP ', a1523.isp, a1527.ACC,'1',null,null,null);  -- KB  pos=1
      end;
      a1529.acc := ii.acra;
   end if;
@@ -335,6 +322,26 @@ begin
   end if;
 
 end MBK_SP;
+
+--- delta=fact-plan
+function get_over_sum ( p_nd number, p_wdate date, p_acc_ss number, p_dat date ) return number  is
+       l_fakt number;
+       l_plan number;
+       l_delta number;
+       last_date date ;
+begin  l_fakt := ABS( fost ( p_acc_ss, p_dat)) ; 
+    select min(fdat) into last_date from  cc_lim   where nd = p_nd and acc = p_acc_ss and fdat >= p_dat; 
+    if last_date  is null then 
+        if p_dat <= p_wdate then l_delta := 0 ; 
+        else  l_delta := l_fakt; 
+        end if ; 
+       return l_delta;
+    else 
+       select lim2+sumg   into l_plan from cc_lim where  nd = p_nd and acc = p_acc_ss and fdat =last_date ;
+    end if ;
+    l_delta := greatest  ( 0, l_fakt - l_plan);
+    return l_delta;
+    end get_over_sum;
 
 END MBK2;
 /
