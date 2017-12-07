@@ -1,6 +1,3 @@
-prompt =====================================
-prompt == Функция формирования виписки
-prompt =====================================
 CREATE OR REPLACE procedure BARS.p_lic_blob_nls (p_rnk customer.rnk%type,
                                                  p_nls varchar2,
                                                  p_dat1 date,
@@ -22,6 +19,7 @@ l_ost_t varchar2(6);
 l_kv  pls_integer;
 l_ number;
 l_nazn varchar2(200);
+l_nlsalt varchar2(15);
  -- маска формата для преобразования char <--> number
   g_number_format constant varchar2(128) := 'FM999999999999999999999999999990.00';
   -- параметры преобразования char <--> number
@@ -118,7 +116,8 @@ execute immediate  l_sql;
     dbms_lob.append(l_blob, UTL_RAW.CAST_TO_RAW(l_txt));
     */
     -- select '  '||rpad(nls,14,' ')|| lpad(kv,3,' ')||' '||nms||l_chr into l_txt from accounts where acc = x.acc;
-    l_txt :='Рахунок: '||rpad(x.nls,14,' ')||'('||lpad(x.kv,3,' ')||') '||x.nms||l_chr;
+     select nlsalt into l_nlsalt from accounts where acc = x.acc;
+    l_txt :='Рахунок: '||rpad(x.nls,14,' ')||' ('||rpad(l_nlsalt,14,' ')||') '||'('||lpad(x.kv,3,' ')||') '||x.nms||l_chr;
     dbms_lob.append(l_blob, UTL_RAW.CAST_TO_RAW(l_txt));    
     
         
@@ -200,13 +199,17 @@ execute immediate  l_sql;
                    ||l_chr;
             DBMS_LOB.append(l_blob, UTL_RAW.CAST_TO_RAW(l_txt));
             
-            l_txt := lpad(d.nmk2,80,' ')||l_chr||lpad(d.nb2,78,' ')||l_chr;
+            --l_txt := lpad(d.nmk2,90,' ')||l_chr||lpad(d.nb2,90,' ')||l_chr;
+            --DBMS_LOB.append(l_blob, UTL_RAW.CAST_TO_RAW(l_txt));
+            l_txt := '       '||lpad(' ',90,' ')||substr(d.nmk2,1,30)||l_chr;
+            DBMS_LOB.append(l_blob, UTL_RAW.CAST_TO_RAW(l_txt));
+            l_txt := '       '||lpad(' ',90,' ')||substr(d.nb2,1,30)||l_chr;
             DBMS_LOB.append(l_blob, UTL_RAW.CAST_TO_RAW(l_txt));
             
             CASE WHEN l_kv = 0 THEN
-                l_txt := '       '||lpad(' ',61,' ')||substr(d.nazn,1,30)||l_chr;
+                l_txt := '       '||lpad(' ',90,' ')||substr(d.nazn,1,30)||l_chr;
             ELSE
-                l_txt := lpad('(екв)',34,' ')||lpad(case when d.dk = 0 then to_char(-d.sq/100, g_number_format,g_number_nlsparam) else '0.00' end,15,' ')||lpad(case when d.dk = 1 then to_char(d.sq/100, g_number_format,g_number_nlsparam) else '0.00' end,15,' ')||' '||substr(d.nazn,1,30)||l_chr;
+                l_txt := lpad('(екв)',34,' ')||lpad(case when d.dk = 0 then to_char(-d.sq/100, g_number_format,g_number_nlsparam) else '0.00' end,15,' ')||lpad(case when d.dk = 1 then to_char(d.sq/100, g_number_format,g_number_nlsparam) else '0.00' end,15,' ')||'                                 '||substr(d.nazn,1,30)||l_chr;
             END CASE;
 
             l_nazn := substr(d.nazn,31);
@@ -284,5 +287,4 @@ execute immediate  l_sql;
  p_blob := l_blob;
 dbms_lob.freetemporary(l_blob);
 end;
-
 /

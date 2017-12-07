@@ -17,13 +17,12 @@ SET TRIMSPOOL    ON
 SET VERIFY       OFF
 
 prompt -- ======================================================
-prompt -- create table NBUR_EXG_1PB
+prompt -- create table NBS_TIPS
 prompt -- ======================================================
 
 begin
   BPA.ALTER_POLICY_INFO( 'NBS_TIPS', 'WHOLE',  null, null, null, null );
   BPA.ALTER_POLICY_INFO( 'NBS_TIPS', 'FILIAL', null,  'E',  'E',  'E' );
-  BPA.ALTER_POLICY_INFO( 'NBS_TIPS', 'CENTER', null,  'E',  'E',  'E' );
 end;
 /
 

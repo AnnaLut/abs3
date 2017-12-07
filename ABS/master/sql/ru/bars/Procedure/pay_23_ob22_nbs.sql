@@ -568,7 +568,7 @@ BEGIN
                   insert into specparam_int(acc,ob22) values(acc_, k.OB22_REZ);
                end if;
                update accounts set ob22 = k.OB22_REZ where acc= acc_ and (ob22 <> k.OB22_REZ or ob22 is null) ;
-
+             
                if k.kv=980 THEN
                   s090_:='1';
                ELSE
@@ -589,8 +589,8 @@ BEGIN
             else
                s080_:=k.r_s080;
             end if;
-
          end if;
+         update accounts set tip='REZ'         where acc= k.r_acc and tip<>'REZ'; 
          -- Для отчетности заполнение R013 для 2400
          --logger.info('PAY6 : acc_= ' || acc_) ;
          --logger.info('PAY7 : k.nbs_rez= ' || k.nbs_rez) ;

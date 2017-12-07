@@ -36,8 +36,6 @@ declare
 begin
   execute immediate 'alter table DPU_VIDD rename column DPU_TYPE to IRVK';
   dbms_output.put_line( 'Table altered.' );
-  execute immediate 'update DPU_VIDD set IRVK = 1 where IRVK = 2';
-  dbms_output.put_line( to_char(sql%rowcount)||' rows updated.');
 exception
   when e_col_not_exists
   then null;
@@ -79,15 +77,5 @@ comment on column DPU_VIDD.IRVK    is '1 - Irrevocable (terminable) / 0 - Revoca
 update DPU_VIDD
    set TT  = 'DU%'
  where lnnvl( TT = 'DU%' );
-
-commit;
-
-update DPU_VIDD v
-   set v.BSD = ( select unique s.R020_NEW
-                   from TRANSFER_2017 s
-                  where s.R020_OLD = v.BSD
-                    and s.R020_OLD != s.R020_NEW )
- where v.BSD in (select R020_OLD
-                   from TRANSFER_2017);
 
 commit;

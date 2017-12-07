@@ -11,7 +11,6 @@ PROMPT *** ALTER_POLICY_INFO to NBUR_LNK_TYPE_R020 ***
 BEGIN 
         execute immediate  
           'begin  
-               bpa.alter_policy_info(''NBUR_LNK_TYPE_R020'', ''CENTER'' , null, ''E'', ''E'', ''E'');
                bpa.alter_policy_info(''NBUR_LNK_TYPE_R020'', ''FILIAL'' , null, ''E'', ''E'', ''E'');
                bpa.alter_policy_info(''NBUR_LNK_TYPE_R020'', ''WHOLE'' , null, null, null, null);
                null;

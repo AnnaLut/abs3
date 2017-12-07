@@ -7,14 +7,15 @@ PROMPT =========================================================================
 
 PROMPT *** ALTER_POLICY_INFO to NBUR_KOR_BALANCES *** 
 
+exec bpa.remove_policies('NBUR_KOR_BALANCES');
+
+exec bpa.refresh_policies('NBUR_KOR_BALANCES');
 
 BEGIN 
         execute immediate  
           'begin  
-               bpa.alter_policy_info(''NBUR_KOR_BALANCES'', ''CENTER'' , null, ''E'', ''E'', ''E'');
-               bpa.alter_policy_info(''NBUR_KOR_BALANCES'', ''FILIAL'' , ''M'', ''M'', ''M'', ''M'');
-               bpa.alter_policy_info(''NBUR_KOR_BALANCES'', ''WHOLE'' , null, ''E'', ''E'', ''E'');
-               null;
+               bpa.alter_policy_info(''NBUR_KOR_BALANCES'', ''WHOLE'' , null, null, null, null);
+               bpa.alter_policy_info(''NBUR_KOR_BALANCES'', ''FILIAL'' , null, null, null, null);
            end; 
           '; 
 END; 

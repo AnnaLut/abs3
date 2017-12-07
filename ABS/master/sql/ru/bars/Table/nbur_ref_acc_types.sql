@@ -11,7 +11,6 @@ PROMPT *** ALTER_POLICY_INFO to NBUR_REF_ACC_TYPES ***
 BEGIN 
         execute immediate  
           'begin  
-               bpa.alter_policy_info(''NBUR_REF_ACC_TYPES'', ''CENTER'' , null, ''E'', ''E'', ''E'');
                bpa.alter_policy_info(''NBUR_REF_ACC_TYPES'', ''FILIAL'' , null, ''E'', ''E'', ''E'');
                bpa.alter_policy_info(''NBUR_REF_ACC_TYPES'', ''WHOLE'' , null, null, null, null);
                null;

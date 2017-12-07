@@ -43,6 +43,19 @@ bars.ui.dialog = function (options) {
         if (options.winType) {
             var imgTemplate = '<div style="margin:0 5px 0 0;display:inline-block;background-repeat:no-repeat;width:24px;height:24px;background-image:url(/' + bars.config.appName + '/Content/images/PureFlat/24/Hot/{0}.png)"></div>';
             var img = '';
+            //IE8 bug: String obj doesnt have 'fromat' method
+            if (!String.format) {
+              String.format = function(format) {
+                var args = Array.prototype.slice.call(arguments, 1);
+                return format.replace(/{(\d+)}/g, function(match, number) { 
+                  return typeof args[number] != 'undefined'
+                    ? args[number] 
+                    : match
+                  ;
+                });
+              };
+            }
+            
             switch (options.winType) {
             case 'error':
                 img = String.format(imgTemplate, 'stop');

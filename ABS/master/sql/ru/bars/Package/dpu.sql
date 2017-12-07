@@ -693,7 +693,7 @@ is
   --
   -- глобальные переменные и константы
   -- 
-  g_body_version  constant varchar2(64)          := 'version 44.10  24.11.2017';
+  g_body_version  constant varchar2(64)          := 'version 44.09  30.11.2017';
   
   modcode         constant varchar2(3)           := 'DPU';
   accispparam     constant varchar2(16)          := 'DPU_ISP';
@@ -1837,9 +1837,10 @@ end p_open_standart;
 --
 -- открытие счетов 8-го класса для обслуживания доп.соглашения
 --
-procedure iopen_agraccs
- (p_agrnum    in  dpu_deal.dpu_add%type,  -- № доп.соглашения
-  p_genid     in  dpu_deal.dpu_id%type,   -- референсе ген.договора
+procedure IOPEN_AGRACCS
+( p_agrid     in  dpu_deal.dpu_id%type,   -- референс доп.соглашения
+  p_agrnum    in  dpu_deal.dpu_add%type,  -- № доп.соглашения
+  p_genid     in  dpu_deal.dpu_id%type,   -- референс ген.договора
   p_gennum    in  dpu_deal.nd%type,       -- № ген.договора
   p_gendepacc in  dpu_deal.acc%type,      -- внутр.№ деп. счета ген.договора
   p_genintacc in  dpu_deal.acc%type,      -- внутр.№ проц.счета ген.договора
@@ -1854,7 +1855,7 @@ procedure iopen_agraccs
   p_accisp    in  accounts.isp%type,      -- ответ.исп.
   p_accgrp    in  accounts.grp%type,      -- группа доступа
   p_mfo       in  banks.mfo%type,         -- МФО банка
-  p_depacc    out r_accrec,               -- параметры деп.счета 8-го класса
+  p_depacc    out r_accrec,               -- параметры деп. счета 8-го класса
   p_intacc    out r_accrec)               -- параметры проц.счета 8-го класса
 is
   title  constant varchar2(60) := 'dpu.iopenagraccs:';
@@ -1862,20 +1863,40 @@ is
   l_isp  accounts.isp%type;
   l_grp  accounts.grp%type; 
   l_tmp  number(38);
-  l_blkd accounts.blkd%type := 0; 
+  l_blkd accounts.blkd%type := 0;
+  ---
+  procedure CHK_ACC_NUM
+  is
+  begin
+    begin
+      select Substr(p_depacc.numb,1,5)||Substr(to_char(trunc(p_agrid/100)),-9)
+        into p_depacc.numb
+        from ACCOUNTS
+       where NLS = p_depacc.numb
+         and KV  = p_curcode;
+      p_intacc.numb := Substr(p_intacc.numb,1,5)||Substr(p_depacc.numb,6,9);
+    exception
+      when NO_DATA_FOUND then
+        null;
+    end;
+  end CHK_ACC_NUM;
+  ---
 begin
   
-  bars_audit.trace('%s entry, agr № %s for № %s/%s, grp = %s', title, 
-                   to_char(p_agrnum), p_gennum, to_char(p_genid), to_char(p_accgrp));
+  bars_audit.trace( '%s entry, agr № %s for № %s/%s, grp = %s', title
+                  , to_char(p_agrnum), p_gennum, to_char(p_genid), to_char(p_accgrp) );
   
-  l_num := substr( '000000'||p_genid, -10, 6 );
+  l_num := substr( '000000'||p_genid, -8, 6 );
   
   -- номера рахунків
   p_depacc.numb := '8'||substr(p_deptype, 2, 3)||'0'||l_num||substr('000'||p_agrnum, -3, 3);  
   p_intacc.numb := '8'||substr(p_inttype, 2, 3)||'0'||l_num||substr('000'||p_agrnum, -3, 3);
 
-  p_depacc.numb := substr(vkrzn(substr(p_mfo, 1, 5), p_depacc.numb), 1, 14);
-  p_intacc.numb := substr(vkrzn(substr(p_mfo, 1, 5), p_intacc.numb), 1, 14);
+  -- перевірка на наявність відкритих рах. з такими номерами
+  CHK_ACC_NUM;
+
+  p_depacc.numb := substr(vkrzn(substr(p_mfo,1,5), p_depacc.numb), 1, 14);
+  p_intacc.numb := substr(vkrzn(substr(p_mfo,1,5), p_intacc.numb), 1, 14);
 
   -- наименования счетов = Дод.угода № ... + наименование клиента 
   p_depacc.name := substr(bars_msg.get_msg(modcode, 'FNLS_NMS_AGREEMENT', to_char(p_agrnum))||' '||p_custname, 1, 70);
@@ -2121,8 +2142,9 @@ $then
 $end
   
   -- открытие счетов 8-го класса для обслуживания доп.соглашения
-  iopen_agraccs( p_agrnum    => l_addnum,
-                 p_genid     => p_gendpuid, 
+  IOPEN_AGRACCS( p_agrid     => l_dpuid,
+                 p_agrnum    => l_addnum,
+                 p_genid     => p_gendpuid,
                  p_gennum    => l_gendpunum,
                  p_gendepacc => l_gendepacc,
                  p_genintacc => l_genintacc,
@@ -2278,7 +2300,7 @@ procedure p_open_deposit_line
    err_         out varchar2)
 is
 begin
-  create_agreement (p_dealnum    => nd_,
+  create_agreement( p_dealnum    => nd_,
                     p_custid     => rnk_,
                     p_dputype    => vidd_,
                     p_gendpuid   => dpu_gen_,
@@ -4703,8 +4725,11 @@ begin
                           || SubStr('3/UA/' || l_city        ,1,35) || chr(10) -- Код країни + Місто
                           ||        '6/UA/' || l_accrec.CUST_IDCODE            -- Код країни + Код ЄДРПОУ Платника
                  when '52A  ' -- SWIFT-код Банка Платника
---               then BRANCH_ATTRIBUTE_UTL.GET_VALUE('BICCODE')
-                 then GetGlobalOption('BICCODE') -- для РУ
+$if DPU_PARAMS.MMFO $then
+                 then BRANCH_ATTRIBUTE_UTL.GET_VALUE('BICCODE')
+$else
+                 then GetGlobalOption('BICCODE')
+$end
                  when '56A  ' -- SWIFT-код Банка Посередника
                  then r_swtags.TAG56_CODE
                  when '57A  ' -- SWIFT-код Банка Посередника
@@ -5936,7 +5961,8 @@ $end
         bars_error.raise_nerror('DPT', 'PAYDOC_ERROR', sqlerrm);  
     end;
   
-  end if;  
+  end if;
+
 end PAY_DOC_EXT;
 
 -- 
@@ -7380,7 +7406,11 @@ begin
                              end as ACC_TIP
                         from DPU_ACCOUNTS da
                         join DPU_DEAL     dd
+$if DPU_PARAMS.MMFO $then
+                          on ( dd.KF = da.KF and dd.DPU_ID = da.DPUID )
+$else
                           on ( dd.DPU_ID = da.DPUID )
+$end
                        where dd.DPU_GEN Is Not Null
                          and dd.CLOSED = 0
                     )
@@ -7394,7 +7424,11 @@ begin
          , l_nls_gen
       from DPU_ACCOUNTS da
       join DPU_DEAL     dd
+$if DPU_PARAMS.MMFO $then
         on ( dd.KF = da.KF and dd.DPU_ID = da.DPUID )
+$else
+        on ( dd.DPU_ID = da.DPUID )
+$end
       join ACCOUNTS     ac
         on ( ac.ACC = da.ACCID )
      where dd.DPU_ID = k.GEN_ID

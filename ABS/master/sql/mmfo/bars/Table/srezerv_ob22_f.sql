@@ -9,7 +9,6 @@ PROMPT *** ALTER_POLICY_INFO to SREZERV_OB22_F ***
 BEGIN 
         execute immediate  
           'begin  
-               bpa.alter_policy_info(''SREZERV_OB22_F'', ''CENTER'' , null, null, null, null);
                bpa.alter_policy_info(''SREZERV_OB22_F'', ''FILIAL'' , null, null, null, null);
                bpa.alter_policy_info(''SREZERV_OB22_F'', ''WHOLE'' , null, null, null, null);
                null;
