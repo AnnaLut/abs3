@@ -31,15 +31,41 @@ IS
   l_acc67  INT;
   l_nls67  VARCHAR2(14);
  ---------------------------------------------
+  nbs_  char(4); 
+  ob22_ char(2);
+ ---------------------------------------------
 
 BEGIN
 
+  -- 06.12.2017 Сухова. Для МБДК Временно, до переделки модуля с учетом об22
+
+  If p_NBS in ('1510','1512','1513','1521','1522','1524','1523','1610','1612','1613','1621','1623','1624') then
+     If    p_nbs  in ('1510') then nbs_ := '6011'; if  p_kv = 980 then ob22_ := '01'; else ob22_:= '02'; End If ;  ---Депозити овернайт, що розмўщенў в ўнших банках
+     ElsIf p_nbs  in ('1512') then nbs_ := '6012'; if  p_kv = 980 then ob22_ := '01'; else ob22_:= '03'; End If ;  ---Короткостроковў вклади (депозити), що розмўщенў в 
+     ElsIf p_nbs  in ('1513') then nbs_ := '6012'; if  p_kv = 980 then ob22_ := '01'; else ob22_:= '03'; End If ;  ---Довгостроковў вклади (депозити), що розмўщенў в ўн
+     ElsIf p_nbs  in ('1521') then nbs_ := '6014'; if  p_kv = 980 then ob22_ := '01'; else ob22_:= '02'; End If ;  ---кредити овернайт, що наданў ўншим банкам
+     ElsIf p_nbs  in ('1522') then nbs_ := '6015'; if  p_kv = 980 then ob22_ := '01'; else ob22_:= '02'; End If ;  ---кредити, що наданў ўншим банкам за операцўями репо
+     ElsIf p_nbs  in ('1524') then nbs_ := '6013'; if  p_kv = 980 then ob22_ := '01'; else ob22_:= '02'; End If ;  ---довгостроковў  кредити, якў наданў ўншим банкам
+     ElsIf p_nbs  in ('1523') then nbs_ := '6013'; if  p_kv = 980 then ob22_ := '03'; else ob22_:= '04'; End If ;  ---короткострокові кредити, що надані іншим банкам
+     ----------------------------------
+     ElsIf p_nbs  in ('1610') then nbs_ := '7011'; if  p_kv = 980 then ob22_ := '01'; else ob22_:= '02'; End If ;  ---Депозити овернайт ўнших банкўв
+     ElsIf p_nbs  in ('1612') then nbs_ := '7012'; if  p_kv = 980 then ob22_ := '01'; else ob22_:= '02'; End If ;  ---вклади (депозити) ўнших банкўв КОРОТКІ
+     ElsIf p_nbs  in ('1613') then nbs_ := '7012'; if  p_kv = 980 then ob22_ := '05'; else ob22_:= '06'; End If ;  ---вклади (депозити) ўнших банкўв ДОВГІ
+     ElsIf p_nbs  in ('1621') then nbs_ := '7014'; if  p_kv = 980 then ob22_ := '01'; else ob22_:= '02'; End If ;  ---кредити овернайт, що отриманў вўд ўнших банкўв
+     ElsIf p_nbs  in ('1623') then nbs_ := '7017'; if  p_kv = 980 then ob22_ := '07'; else ob22_:= '08'; End If ;  ---кредити, що наданў ўншим банкам за операцўями репо
+     ElsIf p_nbs  in ('1624') then nbs_ := '7017'; if  p_kv = 980 then ob22_ := '02'; else ob22_:= '01'; End If ;  ---довгостроковў  кредити, якў наданў ўншим банкам
+     end if;
+
+     begin select acc into l_acc67  FROM accounts  WHERE nls = NBS_ob22(NBS_, OB22_) and kv = gl.baseval;
+                  RETURN   l_acc67 ;
+     EXCEPTION    WHEN NO_DATA_FOUND THEN   null;
+     end;
+ 
+  end if;
+
   -- Нац.валюта
-  BEGIN
-    SELECT to_number(val) INTO l_kvb FROM params WHERE par = 'BASEVAL';
-  EXCEPTION
-    WHEN NO_DATA_FOUND THEN
-      -- erm := '9313 - No baseval found #';
+  BEGIN    SELECT to_number(val) INTO l_kvb FROM params WHERE par = 'BASEVAL';
+  EXCEPTION    WHEN NO_DATA_FOUND THEN      -- erm := '9313 - No baseval found #';
       bars_error.raise_nerror('SVC', 'BASEVAL_NOT_FOUND');
   END;
 
@@ -77,6 +103,7 @@ BEGIN
     l_rnk := p_acc;
     l_nbs := p_nbs;
     l_kv  := p_kv;
+
     BEGIN
       SELECT to_number(mfo) INTO l_code FROM custbank WHERE rnk=l_rnk;
     EXCEPTION
@@ -124,36 +151,20 @@ BEGIN
      END;
 ------------------ БЕЗ БАНТИКОВ (p_mode IS NULL) ------------------------------
   ELSE
-    BEGIN
-      SELECT decode(l_kv, l_kvb,
-                    decode(p_type, 0, g67, nvl(g67n,g67)),
-                    decode(p_type, 0, v67, nvl(v67n,v67)))
-        INTO l_nls67
-        FROM proc_dr
-       WHERE nbs = l_nbs AND sour = p_sour AND nvl(rezid,0) = l_code;
-    EXCEPTION
-      WHEN NO_DATA_FOUND THEN
-        BEGIN
-          SELECT decode(l_kv, l_kvb,
-                        decode(p_type, 0, g67, nvl(g67n,g67)),
-                        decode(p_type, 0, v67, nvl(v67n,v67)))
-            INTO l_nls67
-            FROM proc_dr
-           WHERE nbs = l_nbs AND sour = p_sour AND nvl(rezid,0) = 0;
-        EXCEPTION
-          WHEN NO_DATA_FOUND THEN
-            --erm := '9300 - No account found for (nbs,sour)g = '||'('||l_nbs||','||p_sour||')';
-            --RAISE err;
-            RETURN NULL;
+
+    BEGIN  SELECT decode(l_kv, l_kvb,  decode(p_type, 0, g67, nvl(g67n,g67)),      decode(p_type, 0, v67, nvl(v67n,v67)))         INTO l_nls67      FROM proc_dr
+           WHERE nbs = l_nbs AND sour = p_sour AND nvl(rezid,0) = l_code;
+    EXCEPTION      WHEN NO_DATA_FOUND THEN
+        BEGIN  SELECT decode(l_kv, l_kvb, decode(p_type, 0, g67, nvl(g67n,g67)),   decode(p_type, 0, v67, nvl(v67n,v67)))         INTO l_nls67        FROM proc_dr
+               WHERE nbs = l_nbs AND sour = p_sour AND nvl(rezid,0) = 0;
+        EXCEPTION      WHEN NO_DATA_FOUND THEN        RETURN NULL;
         END;
     END;
 
   END IF;
 
   BEGIN    SELECT acc INTO l_acc67 FROM accounts WHERE l_nls67 in (nls, NVL(nlsalt, nls) )  AND kv = l_kvb;
-  EXCEPTION
-    WHEN NO_DATA_FOUND THEN
-      --erm := '9300 - No account found for nls = '||l_nls67||' !';
+  EXCEPTION    WHEN NO_DATA_FOUND THEN      --erm := '9300 - No account found for nls = '||l_nls67||' !';
       --RAISE err;
       RETURN NULL;
   END;

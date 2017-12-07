@@ -1,16 +1,51 @@
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/mbk.sql =========*** Run *** =======
- PROMPT ===================================================================================== 
- 
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/package/mbk.sql =========*** Run *** =======
+PROMPT ===================================================================================== 
+
 create or replace package mbk
 is
+/*
+-- 17.11.2017 Трансфер-2017 ПОДМЕНА ПРОЦЕДУРЫ ОТКР.СЧЕТА  На уровне бал.счетов - без учета об22 
 
-    MBK_HEAD_VERS  constant varchar2(64)  := 'version 55.0 11.01.2017';
+*/
+    MBK_HEAD_VERS  constant varchar2(64)  := 'version 55.0 02.01.2017';
 
     ATTR_AWAITING_MAIN_AMOUNT     constant varchar2(30 char) := 'MBDK_AWAITING_MAIN_AMOUNT';
     ATTR_AWAITING_INTEREST_AMOUNT constant varchar2(30 char) := 'MBDK_AWAITING_INTEREST_AMOUNT';
 
     ----------------------------------------------------------------------
+
+-- 17.11.2017 Сухова Т. Перехват попытки открыть старый счет после перехода на новый пл.счетов на уровне БАЛ.Счета, сегмент - только МБДК
+PROCEDURE op_reg_ex_2017(
+          mod_       INTEGER,   -- Opening mode : 0, 1, 2, 3, 4, 9, 99, 77
+          p1_        INTEGER,   -- 1st Par      : 0-inst_num   1-nd   2-nd   3-main acc   4-mfo
+          p2_        INTEGER,   -- 2nd Par      : -    -    pawn   4-acc
+          p3_        INTEGER,   -- 3rd Par (Grp): -    -    mpawn
+          p4_ IN OUT INTEGER,   -- 4th Par      : -    -    ndz(O)
+         rnk_        INTEGER,   -- Customer number
+         NLS_        VARCHAR2,  -- Account  number
+          kv_        SMALLINT,  -- Currency code
+         nms_        VARCHAR2,  -- Account name
+         tip_        CHAR,      -- Account type
+         isp_        SMALLINT,
+        accR_    OUT INTEGER,
+     nbsnull_        VARCHAR2 DEFAULT '1',
+     pap_            NUMBER   DEFAULT NULL,
+     vid_            NUMBER   DEFAULT NULL,
+     pos_            NUMBER   DEFAULT NULL,
+     sec_            NUMBER   DEFAULT NULL,
+     seci_           NUMBER   DEFAULT NULL,
+     seco_           NUMBER   DEFAULT NULL,
+     blkd_           NUMBER   DEFAULT NULL,
+     blkk_           NUMBER   DEFAULT NULL,
+     lim_            NUMBER   DEFAULT NULL,
+     ostx_           VARCHAR2 DEFAULT NULL,       -- 'NULL' for update
+   nlsalt_           VARCHAR2 DEFAULT NULL,       -- 'NULL' for update
+     tobo_           VARCHAR2 DEFAULT NULL,
+     accc_           NUMBER   DEFAULT NULL) ;
+   ------------------------------------------------------
+
+
     procedure ro_deal (
         cc_id_new   in varchar2,
         nd_         in integer,
@@ -92,114 +127,114 @@ is
     ----------------------------------------------------------------------
     --    Процедура обновления даты заключения сделки
     --
-    procedure upd_cc_deal (p_nd number, p_sdate date, p_prod varchar2, p_n_nbu varchar2, p_d_nbu date);
+    procedure upd_cc_deal (p_nd number, p_sdate date);
     ----------------------------------------------------------------------
-    procedure inp_deal ( 
-              cc_id_      varchar2, 
+    procedure inp_deal (
+              cc_id_      varchar2,
               nvidd_      integer ,
-              ntipd_      integer , 
-              nkv_        integer , 
+              ntipd_      integer ,
+              nkv_        integer ,
               rnkb_       integer ,
-              dat2_       date    , 
-              p_datv      date    , 
+              dat2_       date    ,
+              p_datv      date    ,
               dat4_       date    ,
-              ir_         number  , 
-              op_         number  , 
+              ir_         number  ,
+              op_         number  ,
               br_         number  ,
-              sum_        number  , 
-              nbasey_     integer , 
+              sum_        number  ,
+              nbasey_     integer ,
               nio_        integer ,
-              s1_         varchar2, 
-              s2_         varchar2, 
-              s3_         varchar2, 
-              s4_         varchar2, 
+              s1_         varchar2,
+              s2_         varchar2,
+              s3_         varchar2,
+              s4_         varchar2,
               s5_         number  ,
-              nlsa_       varchar2, 
-              nms_        varchar2, 
-              nlsna_      varchar2, 
+              nlsa_       varchar2,
+              nms_        varchar2,
+              nlsna_      varchar2,
               nmsn_       varchar2,
-              nlsnb_      varchar2, 
-              nmkb_       varchar2, 
+              nlsnb_      varchar2,
+              nmkb_       varchar2,
               nazn_       varchar2,
-              nlsz_       varchar2, 
-              nkvz_       integer , 
-              p_pawn      number  ,   
+              nlsz_       varchar2,
+              nkvz_       integer ,
+              p_pawn      number  ,
               id_dcp_     integer ,
-              s67_        varchar2, 
-              ngrp_       integer , 
+              s67_        varchar2,
+              ngrp_       integer ,
               nisp_       integer ,
-              bica_       varchar2, 
-              ssla_       varchar2, 
-              bicb_       varchar2, 
+              bica_       varchar2,
+              ssla_       varchar2,
+              bicb_       varchar2,
               sslb_       varchar2,
               sump_       number  ,
-              altb_       varchar2, 
+              altb_       varchar2,
               intermb_    varchar2,
-              intpartya_  varchar2, 
-              intpartyb_  varchar2, 
-              intinterma_ varchar2, 
+              intpartya_  varchar2,
+              intpartyb_  varchar2,
+              intinterma_ varchar2,
               intintermb_ varchar2,
-              nd_    out  integer , 
-              acc1_ out   integer , 
+              nd_    out  integer ,
+              acc1_ out   integer ,
               serr_ out   varchar2) ;
-        
+
     ----------------------------------------------------------------------
-    procedure inp_deal_Ex (   
-              cc_id_        varchar2, 
+    procedure inp_deal_Ex (
+              cc_id_        varchar2,
               nvidd_        integer ,
-              ntipd_        integer , 
-              nkv_          integer , 
+              ntipd_        integer ,
+              nkv_          integer ,
               rnkb_         integer ,
-              dat2_         date    , 
-              p_datv        date    , 
+              dat2_         date    ,
+              p_datv        date    ,
               dat4_         date    ,
-              ir_           number  , 
-              op_           number  , 
+              ir_           number  ,
+              op_           number  ,
               br_           number  ,
-              sum_          number  , 
-              nbasey_       integer , 
+              sum_          number  ,
+              nbasey_       integer ,
               nio_          integer ,
-              s1_           varchar2, 
-              s2_           varchar2, 
-              s3_           varchar2, 
-              s4_           varchar2, 
+              s1_           varchar2,
+              s2_           varchar2,
+              s3_           varchar2,
+              s4_           varchar2,
               s5_           number  ,
-              nlsa_         varchar2, 
-              nms_          varchar2, 
-              nlsna_        varchar2, 
+              nlsa_         varchar2,
+              nms_          varchar2,
+              nlsna_        varchar2,
               nmsn_         varchar2,
-              nlsnb_        varchar2, 
-              nmkb_         varchar2, 
+              nlsnb_        varchar2,
+              nmkb_         varchar2,
               nazn_         varchar2,
-              nlsz_         varchar2, 
-              nkvz_         integer , 
-              p_pawn        number  ,   
+              nlsz_         varchar2,
+              nkvz_         integer ,
+              p_pawn        number  ,
               id_dcp_       integer ,
-              s67_          varchar2, 
-              ngrp_         integer , 
+              s67_          varchar2,
+              ngrp_         integer ,
               nisp_         integer ,
-              bica_         varchar2, 
-              ssla_         varchar2, 
-              bicb_         varchar2, 
+              bica_         varchar2,
+              ssla_         varchar2,
+              bicb_         varchar2,
               sslb_         varchar2,
               sump_         number  ,
-              altb_         varchar2, 
+              altb_         varchar2,
               intermb_      varchar2,
-              intpartya_    varchar2, 
-              intpartyb_    varchar2, 
-              intinterma_   varchar2, 
+              intpartya_    varchar2,
+              intpartyb_    varchar2,
+              intinterma_   varchar2,
               intintermb_   varchar2,
-              nd_           out integer , 
-              acc1_         out integer , 
+              nd_           out integer ,
+              acc1_         out integer ,
               serr_         out varchar2,
               DDAte_        date     default null,  -- Дата заключення
               IRR_          number   default null,  -- Еф. % ставка
               code_product_ number   default null,  -- Код продукта
-              n_nbu_        varchar2 default null,  -- Номер свідоцтва НБУ 
-              d_nbu_        date                    -- Дата реєстрації в НБУ
+              n_nbu_        varchar2 default null   -- Номер свідоцтва НБУ
 ) ;
 
-     ----------------------------------------------------------------------
+
+    ----------------------------------------------------------------------
     procedure set_field58d (p_nd number, p_field58d varchar2);
 
     ----------------------------------------------------------------------
@@ -374,9 +409,9 @@ is
     function body_version return varchar2;
 end;
 /
-CREATE OR REPLACE PACKAGE BODY mbk is
+create or replace package body mbk is
 
-    MBK_BODY_VERS   CONSTANT VARCHAR2(64)  := 'version 75.1 12.09.2017';
+    MBK_BODY_VERS   CONSTANT VARCHAR2(64)  := 'version 75.1 02.08.2017';
 /*
     13.10.2016 Sta - код оп при приеме сумм на заход
 
@@ -416,6 +451,69 @@ CREATE OR REPLACE PACKAGE BODY mbk is
     DEAL_KIND_CRED_SOUR_DEPOSIT constant integer := 3903;
 
     ------------------------------------------------------------------
+-- перехват попытки открыть старый счет после перехода на новый пл.счетов на уровне БАЛ.Счета, сегмент - только МБДК
+PROCEDURE op_reg_ex_2017(
+          mod_       INTEGER,   -- Opening mode : 0, 1, 2, 3, 4, 9, 99, 77
+          p1_        INTEGER,   -- 1st Par      : 0-inst_num   1-nd   2-nd   3-main acc   4-mfo
+          p2_        INTEGER,   -- 2nd Par      : -    -    pawn   4-acc
+          p3_        INTEGER,   -- 3rd Par (Grp): -    -    mpawn
+          p4_ IN OUT INTEGER,   -- 4th Par      : -    -    ndz(O)
+         rnk_        INTEGER,   -- Customer number
+         NLS_        VARCHAR2,  -- Account  number
+          kv_        SMALLINT,  -- Currency code
+         nms_        VARCHAR2,  -- Account name
+         tip_        CHAR,      -- Account type
+         isp_        SMALLINT,
+        accR_    OUT INTEGER,
+     nbsnull_        VARCHAR2 DEFAULT '1',
+     pap_            NUMBER   DEFAULT NULL,
+     vid_            NUMBER   DEFAULT NULL,
+     pos_            NUMBER   DEFAULT NULL,
+     sec_            NUMBER   DEFAULT NULL,
+     seci_           NUMBER   DEFAULT NULL,
+     seco_           NUMBER   DEFAULT NULL,
+     blkd_           NUMBER   DEFAULT NULL,
+     blkk_           NUMBER   DEFAULT NULL,
+     lim_            NUMBER   DEFAULT NULL,
+     ostx_           VARCHAR2 DEFAULT NULL,       -- 'NULL' for update
+   nlsalt_           VARCHAR2 DEFAULT NULL,       -- 'NULL' for update
+     tobo_           VARCHAR2 DEFAULT NULL,
+     accc_           NUMBER   DEFAULT NULL)
+IS  L_NLS accounts.nLs%type := NLS_ ;
+    l_NBS accounts.nBs%type := Substr(NLS_,1,4) ;
+begin 
+
+  -- пробуем открыть в "лоб" с заданныс счетом    |-----|
+  begin op_reg_ex ( mod_, p1_, p2_, p3_, p4_, rnk_, L_NLS, kv_, nms_, tip_, isp_, accR_, nbsnull_, pap_, vid_, pos_, sec_, seci_, seco_, blkd_, blkk_, lim_ , ostx_,   nlsalt_, tobo_, accc_ ) ;
+  exception when others then                 --   |-----|
+        -- при любой ош
+        if  newnbs.g_state  = 1   then -- если включен признак НБУ_2017 , то пытаемся трансформировать Здесь взят фрагмент ( для скорости зашили в текст. т.к. это константы от НБУ, не меняются) 
+                                      -- select distinct r020_old, r020_new  from transfer_2017 where r020_old like '15%' or  r020_old like '16%'
+
+           If    l_NBS = '1509'  then  l_NBS := '1508' ;
+           ElsIf l_NBS = '1512'  then  l_NBS := '1513' ;
+           ElsIf l_NBS = '1517'	 then  l_NBS := '1513' ;
+           ElsIf l_NBS = '1527'  then  l_NBS := '1524' ;
+           ElsIf l_NBS = '1529'	 then  l_NBS := '1528' ;
+           ElsIf l_NBS = '1612'	 then  l_NBS := '1613' ;
+           ElsIf l_NBS = '1523'	 then  l_NBS := '1524' ;
+           ElsIf l_NBS = '1624'	 then  l_NBS := '1623' ;
+           ElsIf l_NBS = '1627'	 then  l_NBS := '1623' ;
+
+           end if;
+
+       ----L_NLS := Vkrzn( Substr( gl.aMfo,1,5), L_NBS || '0' || Substr (l_NLS,6,9) );
+           l_NLS := F_NEWNLS2(null, 'MBK', L_NBS , RNK_,null);
+
+        end if; 
+        ----------- пробуем открыть с обновл.сч.  |-----|
+        op_reg_ex( mod_, p1_, p2_, p3_, p4_, rnk_, L_NLS, kv_, nms_, tip_, isp_, accR_, nbsnull_, pap_, vid_, pos_, sec_, seci_, seco_, blkd_, blkk_, lim_ , ostx_,   nlsalt_, tobo_, accc_ ) ;                                    
+                                             --   |-----|
+  end;
+
+END    op_reg_ex_2017;
+----------------------------
+
     --    Rollover/пролонгация
     procedure ro_deal (
         cc_id_new   in varchar2,     /* новый номер тикета    */
@@ -507,8 +605,7 @@ CREATE OR REPLACE PACKAGE BODY mbk is
            -- новая сделка-клон (ролловер)
            nd_new := bars_sqnc.get_nextval('s_cc_deal');
            INSERT INTO cc_deal d (nd, vidd, rnk, d.user_id, cc_id, sos, wdate, sdate, limit, kprolog)
-           SELECT ND_NEW, VIDD_, rnk, gl.aUID, CC_ID_NEW, 10, DatK_NEW, gl.BDATE, nS_NEW, 0
-             FROM cc_deal WHERE nd=ND_;
+           SELECT ND_NEW, VIDD_, rnk, gl.aUID, CC_ID_NEW, 10, DatK_NEW, gl.BDATE, nS_NEW, 0  FROM cc_deal WHERE nd=ND_;
 
            INSERT INTO cc_add (
              nd,    adds, s, kv, bdate, wdate, sour, acckred, mfokred, freq, accperc, mfoperc, refp, int_amount,
@@ -522,76 +619,52 @@ CREATE OR REPLACE PACKAGE BODY mbk is
 
            insert into nd_acc (nd,acc) select ND_NEW, acc from nd_acc where nd=ND_;
         END IF;
-        logger.info('MBDK out');
+       
      EXCEPTION WHEN NO_DATA_FOUND THEN return;
      END;
 
      IF NLS_OLD <> NLS_NEW THEN   -- другой балансовый счет
-        BEGIN
-           -- Счет уже открыт
-           SELECT acc, tip INTO ACC_NEW, TIP_ FROM accounts WHERE nls=NLS_NEW and kv=nKv_;
-           -- привязываем его к сделке
-           INSERT INTO nd_ACC(nd, acc) VALUES(ND_NEW,ACC_NEW);
-           BEGIN
-              -- Счет Нач.%% открыт
-              SELECT acc INTO ACRA_NEW FROM accounts WHERE nls=NLS8_NEW and kv=nKv_;
+
+        BEGIN SELECT acc, tip INTO ACC_NEW, TIP_ FROM accounts WHERE nls=NLS_NEW and kv=nKv_;     -- Счет уже открыт
               -- привязываем его к сделке
-              INSERT INTO nd_ACC(nd, acc) VALUES(ND_NEW,ACRA_NEW);
-           EXCEPTION WHEN NO_DATA_FOUND THEN
-              -- Счет Нач.%% не открыт, открываем (Op_reg(1, ...) - c insert into nd_acc)
-              IF ACRA_OLD > 0 THEN
-                 SELECT tip into TIP_ from accounts where acc=ACRA_OLD;
-              END IF;
-              Op_Reg_ex(1,ND_NEW,n_,GRP_,n_,RNK_,NLS8_NEW,nKv_,NMK_,TIP_,ISP_,ACRA_NEW,
-                 '1',null,null,
-                 null);   --  KB pos=1
-              p_setAccessByAccmask(ACRA_NEW,ACC_NEW);
-              BEGIN
-                 INSERT INTO nd_ACC(nd, acc) VALUES(ND_NEW,ACRA_NEW);
-              EXCEPTION WHEN DUP_VAL_ON_INDEX THEN NULL;
+              INSERT INTO nd_ACC(nd, acc) VALUES(ND_NEW,ACC_NEW);
+              BEGIN  SELECT acc INTO ACRA_NEW FROM accounts WHERE nls=NLS8_NEW and kv=nKv_;  -- Счет Нач.%% открыт
+                     INSERT INTO nd_ACC(nd, acc) VALUES(ND_NEW,ACRA_NEW);                    -- привязываем его к сделке
+              EXCEPTION WHEN NO_DATA_FOUND THEN
+                    -- Счет Нач.%% не открыт, открываем (Op_reg(1, ...) - c insert into nd_acc)
+                    IF ACRA_OLD > 0 THEN   SELECT tip into TIP_ from accounts where acc=ACRA_OLD;   END IF;
+                    MBK.op_reg_ex_2017 (1,ND_NEW,n_,GRP_,n_,RNK_,NLS8_NEW,nKv_,NMK_,TIP_,ISP_,ACRA_NEW,  '1',null,null,      null);   --  KB pos=1 --
+                    p_setAccessByAccmask(ACRA_NEW,ACC_NEW);
+                    BEGIN INSERT INTO nd_ACC(nd, acc) VALUES(ND_NEW,ACRA_NEW);  EXCEPTION WHEN DUP_VAL_ON_INDEX THEN NULL;   END;
               END;
-           END;
-        EXCEPTION WHEN NO_DATA_FOUND THEN
-           -- открываем счет
-           BEGIN
-              SELECT grp, isp, tip INTO GRP_, ISP_, TIP_
-                FROM accounts WHERE acc=ACC_OLD;
-              Op_Reg_ex(1,ND_NEW,n_,GRP_,n_,RNK_,NLS_NEW,nKv_,NMK_,TIP_,ISP_,ACC_NEW,
-                 '1',null,null,
-               null);   --  KB pos=1
-              p_setAccessByAccmask(ACC_NEW,ACC_OLD);
-              BEGIN
-                 INSERT INTO nd_ACC(nd, acc) VALUES(ND_NEW, ACC_NEW);
-                 If TIP_= 'SS ' THEN
-                    INSERT INTO cc_accp(ACC, ACCS, nD)
-                    SELECT acc, ACC_NEW, nd FROM cc_accp WHERE accs=ACC_OLD ;
-                 END IF;
-              EXCEPTION WHEN DUP_VAL_ON_INDEX THEN NULL;
-              END;
-              -- открываем счет Нач.%%
-              IF ACRA_OLD > 0 THEN
-                SELECT tip INTO TIP_ FROM accounts WHERE acc=ACRA_OLD;
-              END IF;
-              Op_Reg_ex(1,ND_NEW,n_,GRP_,n_,RNK_,NLS8_NEW,nKv_,NMK_,TIP_,ISP_,ACRA_NEW,
-                 '1',null,null,
-                 null);   --  KB pos=1
-              p_setAccessByAccmask(ACRA_NEW,ACC_NEW);
-              BEGIN
-                 INSERT INTO nd_ACC(nd, acc) VALUES(ND_NEW,ACRA_NEW);
-              EXCEPTION WHEN DUP_VAL_ON_INDEX THEN NULL;
-              END;
-           EXCEPTION WHEN NO_DATA_FOUND THEN  return;
-           end;
+
+        EXCEPTION WHEN NO_DATA_FOUND THEN     -- открываем счет
+
+             BEGIN  SELECT grp, isp, tip INTO GRP_, ISP_, TIP_  FROM accounts WHERE acc=ACC_OLD;
+                    MBK.op_reg_ex_2017 (1,ND_NEW,n_,GRP_,n_,RNK_,NLS_NEW,nKv_,NMK_,TIP_,ISP_,ACC_NEW,      '1',null,null,     null);   --  KB pos=1
+                    p_setAccessByAccmask(ACC_NEW,ACC_OLD);
+                    BEGIN INSERT INTO nd_ACC(nd, acc) VALUES(ND_NEW, ACC_NEW);
+                          If TIP_= 'SS ' THEN
+                             INSERT INTO cc_accp(ACC, ACCS, nD)   SELECT acc, ACC_NEW, nd FROM cc_accp WHERE accs=ACC_OLD ;
+                          END IF;
+                   EXCEPTION WHEN DUP_VAL_ON_INDEX THEN NULL;
+                   END;
+                   -- открываем счет Нач.%%
+                   IF ACRA_OLD > 0 THEN    SELECT tip INTO TIP_ FROM accounts WHERE acc=ACRA_OLD;    END IF;
+                      MBK.op_reg_ex_2017 (1,ND_NEW,n_,GRP_,n_,RNK_,NLS8_NEW,nKv_,NMK_,TIP_,ISP_,ACRA_NEW,'1',null,null,  null);   --  KB pos=1
+                      p_setAccessByAccmask(ACRA_NEW,ACC_NEW);
+                      BEGIN   INSERT INTO nd_ACC(nd, acc) VALUES(ND_NEW,ACRA_NEW);  EXCEPTION WHEN DUP_VAL_ON_INDEX THEN NULL;   END;
+             EXCEPTION WHEN NO_DATA_FOUND THEN  return;
+             end;
         end;
+
         /* Для сделок с залогами, по которым пролонгация (не ролл) */
         /* Привязка к новому счету старого залога*/
         acc_ss:=ACC_OLD;
         begin
            /* определим по старому счету текущей сделки наличие залога*/
            /* в данном случае ND_NEW=ND */
-           select c.acc,c.accs into acc_zal,acc_ss
-             from cc_accp c, pawn_acc p
-            where c.acc=p.acc  and c.nd =ND_NEW;
+           select c.acc,c.accs into acc_zal,acc_ss    from cc_accp c, pawn_acc p       where c.acc=p.acc  and c.nd =ND_NEW;
         exception when no_data_found then acc_ss:='0';
         end;
         if acc_ss=ACC_OLD then
@@ -923,7 +996,8 @@ CREATE OR REPLACE PACKAGE BODY mbk is
             if (l_new_account_row.acc is not null) then
                 p_new_main_account_id := l_new_account_row.acc;
             else
-                op_reg_ex(mod_     => 1,
+                MBK.op_reg_ex_2017
+                         (mod_     => 1,
                           p1_      => p_new_deal_id,
                           p2_      => l_dummy,
                           p3_      => l_old_account_row.grp,
@@ -949,7 +1023,8 @@ CREATE OR REPLACE PACKAGE BODY mbk is
 
             if (l_new_interest_account_row.acc is null) then
                 -- не знайшли рахунок відсотків за номером - відкриваємо новий
-                op_reg_ex(mod_     => 1,
+                MBK.op_reg_ex_2017
+                         (mod_     => 1,
                           p1_      => p_new_deal_id,
                           p2_      => l_dummy,
                           p3_      => l_old_account_row.grp,
@@ -997,9 +1072,9 @@ CREATE OR REPLACE PACKAGE BODY mbk is
         where  t.accs = p_new_main_account_id and
                (exists (select 1 from accounts a
                         where  a.acc = t.acc and
-                               (a.dazs is not null or -- 
+                               (a.dazs is not null or --
                                 (l_new_cc_vidd_row.tipd = cck_utl.DEAL_TYPE_ALLOCATION_OF_FUNDS and a.nbs = '9510') or
-                                (l_new_cc_vidd_row.tipd = cck_utl.DEAL_TYPE_FUNDRAISING and a.nbs <> '9510'))) or 
+                                (l_new_cc_vidd_row.tipd = cck_utl.DEAL_TYPE_FUNDRAISING and a.nbs <> '9510'))) or
                 not exists (select 1 from pawn_acc p where p.acc = t.acc));
 
         delete cc_accp t
@@ -1361,7 +1436,7 @@ CREATE OR REPLACE PACKAGE BODY mbk is
     ------------------------------------------------------------------
     -- тип залишку, на який нараховуються відсотки - визначається за таблицею proc_dr$base, знаходиться в полі IO
     -- довідник доступних типів залишку - таблиця int_ion
-    -- таблиця proc_dr$base зберігає одночасно багато значень з одним і тим самим номером балансового рахунку і 
+    -- таблиця proc_dr$base зберігає одночасно багато значень з одним і тим самим номером балансового рахунку і
     -- прив'язаним до нього типом залишку. Предметна логіка, і всі попередні реалізації даної задачі в коді Центури,
     -- розраховують на те, що для одного балансового рахунку не зустрінеться різних IO і беруть перший-ліпший рядок.
     -- Наприклад: If SqlPrepareAndExecute(hSql(), "select nvl(IO, 0) into :nIO from proc_dr where nbs=:nVidd and sour=4") and SqlFetchNext(hSql(), nFetchRes)
@@ -1691,10 +1766,10 @@ CREATE OR REPLACE PACKAGE BODY mbk is
         end if ;
 
         -- открытие основного счета
-        op_reg_ex(1, nd_, ntmp_, l_grp, ntmp_, rnkb_, nlsa_, nkv_, nms_, tip1_, l_isp, acc1_, '1', null, null, null);
+        MBK.op_reg_ex_2017 (1, nd_, ntmp_, l_grp, ntmp_, rnkb_, nlsa_, nkv_, nms_, tip1_, l_isp, acc1_, '1', null, null, null);
 
         -- открытие счета нач.%%
-        op_reg_ex(1, nd_, ntmp_, l_grp, ntmp_, rnkb_, nlsna_, nkv_, nmsn_, tip2_, l_isp, l_interest_account_id, '1', null, null, null);
+        MBK.op_reg_ex_2017(1, nd_, ntmp_, l_grp, ntmp_, rnkb_, nlsna_, nkv_, nmsn_, tip2_, l_isp, l_interest_account_id, '1', null, null, null);
 
         -- основний insert в cc_deal
         insert into cc_deal (nd, vidd, rnk, user_id, cc_id, sos, wdate, sdate, limit, kprolog)
@@ -1800,7 +1875,7 @@ CREATE OR REPLACE PACKAGE BODY mbk is
            update int_accn
            set    nlsb = nlsnb_,
                   mfob = s2_,
-                  namb = nmkb_,
+                  namb = substr(nmkb_, 1, 38),
                   nazn = nazn_
            where  acc = acc1_ and
                   id = 1;
@@ -1809,7 +1884,7 @@ CREATE OR REPLACE PACKAGE BODY mbk is
                 update int_accn
                 set    nlsb = substr(nlsnb_, 1, 14),
                        mfob = s2_,
-                       namb = nmkb_,
+                       namb = substr(nmkb_, 1, 38),
                        nazn = nazn_
                 where  acc = acc1_ and
                        id = 1;
@@ -1852,7 +1927,7 @@ CREATE OR REPLACE PACKAGE BODY mbk is
 
         if (nlsz_ is not null) then
             -- открытие счета залога
-            op_reg_ex(2, nd_, p_pawn, 2, ntmp_, rnkb_, nlsz_, nkvz_, nms_, 'ZAL', l_isp, l_pawn_account_id, '1', null, null, null); -- KB  pos=1
+            MBK.op_reg_ex_2017 (2, nd_, p_pawn, 2, ntmp_, rnkb_, nlsz_, nkvz_, nms_, 'ZAL', l_isp, l_pawn_account_id, '1', null, null, null); -- KB  pos=1
 
             -- проставляем группу доступа для счета залога как для основного счета
             p_setaccessbyaccmask(l_pawn_account_id, acc1_);
@@ -1896,11 +1971,10 @@ CREATE OR REPLACE PACKAGE BODY mbk is
     ----------------------------------------------------------------------
     --    Процедура обновления даты заключения сделки
     --
-    procedure upd_cc_deal (p_nd number, p_sdate date, p_prod varchar2, p_n_nbu varchar2, p_d_nbu date)
+    procedure upd_cc_deal (p_nd number, p_sdate date)
     is
     begin
-      update cc_deal set sdate = p_sdate, prod  = p_prod  where nd = p_nd;
-      update cc_add  set n_nbu = p_n_nbu, d_nbu = p_d_nbu where nd = p_nd and adds=0;
+      update cc_deal set sdate = p_sdate where nd = p_nd;
     end upd_cc_deal;
 
     ----------------------------------------------------------------------
@@ -1955,8 +2029,7 @@ CREATE OR REPLACE PACKAGE BODY mbk is
       DDAte_        date     default null,  -- Дата заключення
       IRR_          number   default null,  -- Еф. % ставка
       code_product_ number   default null,  -- Код продукта
-      n_nbu_        varchar2 default null,  -- Номер свідоцтва НБУ 
-      d_nbu_        date                    -- Дата реєстрації НБУ
+      n_nbu_        varchar2 default null   -- Номер свідоцтва НБУ
     ) IS
 
       title         constant  varchar2(60) := 'mbk.inp_deal';
@@ -1981,11 +2054,13 @@ CREATE OR REPLACE PACKAGE BODY mbk is
       l_grp                   accounts.grp%type;
       l_clt_amnt              oper.s%type; -- сума застава з pul
       inr_err                 exception;   -- Internal error
-      l_nmkb                  int_accn.namb%type;
+	  l_nmkb                  int_accn.namb%type;
+
 
     BEGIN
-      
-      bars_audit.info( SubStr( title || ': Entry with( CC_ID_ => ' || CC_ID_ 
+
+	   
+      bars_audit.info( SubStr( title || ': Entry with( CC_ID_ => ' || CC_ID_
            || chr(10) || ', nVidd_ => '      || nVidd_
            || chr(10) || ', nTipd_ => '      || nTipd_
            || chr(10) || ', nKV_ => '        || nKV_
@@ -1998,69 +2073,69 @@ CREATE OR REPLACE PACKAGE BODY mbk is
            || chr(10) || ', nIO_  => '       || nIO_       || ', S1_  => '        || S1_
            || chr(10) || ', S2_   => '       || S2_        || ', S3_  => '        || S3_
            || chr(10) || ', S4_   => '       || S4_        || ', S5_  => '        || S5_
-           || chr(10) || ', NLSA_ => '       || NLSA_      || ', NMS_ => '        || NMS_       
-           || chr(10) || ', NLSNA_ => '      || NLSNA_     || ', NMSN_ => '       || NMSN_      
-           || chr(10) || ', NLSNB_ => '      || NLSNB_     || ', NMKB_ => '       || NMKB_      
-           || chr(10) || ', Nazn_  => '      || Nazn_      || ', NLSZ_ => '       || NLSZ_      
-           || chr(10) || ', nKVZ_  => '      || nKVZ_      || ', p_pawn => '      || p_pawn     
-           || chr(10) || ', Id_DCP_ => '     || Id_DCP_    || ', S67_ => '        || S67_       
-           || chr(10) || ', nGrp_   => '     || nGrp_      || ', nIsp_ => '       || nIsp_      
-           || chr(10) || ', BICA_   => '     || BICA_      || ', SSLA_ => '       || SSLA_      
-           || chr(10) || ', BICB_   => '     || BICB_      || ', SSLB_ => '       || SSLB_      
-           || chr(10) || ', SUMP_   => '     || SUMP_      || ', AltB_ => '       || AltB_      
-           || chr(10) || ', IntermB_    => ' || IntermB_   || ', IntPartyA_ => '  || IntPartyA_ 
+           || chr(10) || ', NLSA_ => '       || NLSA_      || ', NMS_ => '        || NMS_
+           || chr(10) || ', NLSNA_ => '      || NLSNA_     || ', NMSN_ => '       || NMSN_
+           || chr(10) || ', NLSNB_ => '      || NLSNB_     || ', NMKB_ => '       || NMKB_
+           || chr(10) || ', Nazn_  => '      || Nazn_      || ', NLSZ_ => '       || NLSZ_
+           || chr(10) || ', nKVZ_  => '      || nKVZ_      || ', p_pawn => '      || p_pawn
+           || chr(10) || ', Id_DCP_ => '     || Id_DCP_    || ', S67_ => '        || S67_
+           || chr(10) || ', nGrp_   => '     || nGrp_      || ', nIsp_ => '       || nIsp_
+           || chr(10) || ', BICA_   => '     || BICA_      || ', SSLA_ => '       || SSLA_
+           || chr(10) || ', BICB_   => '     || BICB_      || ', SSLB_ => '       || SSLB_
+           || chr(10) || ', SUMP_   => '     || SUMP_      || ', AltB_ => '       || AltB_
+           || chr(10) || ', IntermB_    => ' || IntermB_   || ', IntPartyA_ => '  || IntPartyA_
            || chr(10) || ', IntPartyB_  => ' || IntPartyB_ || ', IntIntermA_ => ' || IntIntermA_
            || chr(10) || ', IntIntermB_ => ' || IntIntermB_|| ').', 1, 4000 ) );
-      
+
       BEGIN
 
-        l_nmkb := substr(NMKB_,1,38);
-        
+   	    l_nmkb := substr(NMKB_,1,38);
+		
         nUser_ := USER_ID;
         ND_    := null;
-        
+
         -- счет доходов-расходов
         if ( S67_ Is Null )
         then
-          
+
           ACC3_ := BARS.F_PROC_DR( RNKB_, 4, 0, 'MKD', nVidd_, nKv_ );
-          
+
           if ( ACC3_ Is Null )
           then
             sERR_ := 'Не знайдено рахунок доходів/витрат';
             raise inr_err;
           end if;
-          
+
         else
-          
+
           BEGIN
-            SELECT acc 
-              INTO ACC3_ 
+            SELECT acc
+              INTO ACC3_
               FROM accounts
-             WHERE kv=gl.baseval 
-               and nls=S67_ 
+             WHERE kv=gl.baseval
+               and nls=S67_
                and dazs is null;
           EXCEPTION
-            WHEN NO_DATA_FOUND THEN 
+            WHEN NO_DATA_FOUND THEN
               sERR_ := 'Не открыт счет '||S67_;
               raise inr_err;
           END;
-          
+
         end if;
-        
+
         --SELECT s_cc_deal.nextval into ND_  FROM dual;
         nd_ := bars_sqnc.get_nextval('s_cc_deal');
-        
+
         INSERT INTO cc_deal (nd , vidd  , rnk  , user_id, cc_id , sos, wdate, sdate                , limit, kprolog,ir  ,prod         )
                      VALUES (ND_, nVidd_, RNKB_, nUser_ , CC_ID_, 10 , DAT4_, nvl(DDAte_, gl.BDATE), SUM_ , 0      ,IRR_,code_product_);
-        
-        INSERT INTO cc_add (nd         , adds       , s      , kv     , bdate  , wdate  , sour      , acckred   , mfokred , freq      , accperc   , 
-                            mfoperc    , refp       , swi_bic, swi_acc, swo_bic, swo_acc, int_amount, alt_partyb, interm_b, int_partya, int_partyb, 
-                            int_interma, int_intermb, n_nbu  , d_nbu  )
-                    VALUES (ND_        , 0          , Sum_   , nKv_   , DAT2_  , p_datv , 4         , S1_       , S2_     , 2         , S3_       , 
-                            S4_        , S5_        , bica_  , ssla_  , bicb_  , sslb_  , sump_     , altb_     , intermb_, IntPartyA_, IntPartyB_, 
-                            IntIntermA_, IntIntermB_, n_nbu_ , d_nbu_ );
-        
+
+        INSERT INTO cc_add (nd         , adds       , s      , kv     , bdate  , wdate  , sour      , acckred   , mfokred , freq      , accperc   ,
+                            mfoperc    , refp       , swi_bic, swi_acc, swo_bic, swo_acc, int_amount, alt_partyb, interm_b, int_partya, int_partyb,
+                            int_interma, int_intermb, n_nbu  )
+                    VALUES (ND_        , 0          , Sum_   , nKv_   , DAT2_  , p_datv , 4         , S1_       , S2_     , 2         , S3_       ,
+                            S4_        , S5_        , bica_  , ssla_  , bicb_  , sslb_  , sump_     , altb_     , intermb_, IntPartyA_, IntPartyB_,
+                            IntIntermA_, IntIntermB_, n_nbu_ );
+
         if ( nTipd_ Is Null )
         then
           select TIPD
@@ -2070,53 +2145,48 @@ CREATE OR REPLACE PACKAGE BODY mbk is
         else
           l_tipd := nTipd_;
         end if;
-        
-        if l_tipd = 1 
+
+        if l_tipd = 1
         then
-          nID_ :=0; 
+          nID_ :=0;
           Tip1_:='SS ';
           Tip2_:='SN ';
-        else 
+        else
           nID_ :=1;
           Tip1_:='DEP';
           Tip2_:='DEN';
         end if ;
-        
+
         if ( nIsp_ Is Null )
         then
           l_isp := gl.aUID;
         else
           l_isp := nIsp_;
         end if;
-        
+
         if ( nGrp_ Is Null )
         then
           l_grp := 33;
         else
           l_grp := nGrp_;
         end if;
-        
+
         bars_audit.info( title || ': tipd = ' || to_char(l_tipd)
                                || ', grp = '  || to_char(l_grp)
                                || ', isp = '  || to_char(l_isp) );
-        
+
         -- открытие основного счета
-        Op_Reg_ex(1,ND_,nTmp_, l_grp, nTmp_,RNKB_,NLSA_, nKv_,NMS_, Tip1_, l_isp, ACC1_, '1', null, null,
-           null);  -- KB  pos=1
-        
-        bars_audit.info( title || ': ACC1_ = ' || ACC1_ );
-        
+        MBK.op_reg_ex_2017 (1,ND_,nTmp_, l_grp, nTmp_,RNKB_,NLSA_, nKv_,NMS_, Tip1_, l_isp, ACC1_, '1', null, null,  null);  -- KB  pos=1
         -- открытие счета нач.%%
-        Op_Reg_ex(1,ND_,nTmp_, l_grp, nTmp_,RNKB_,NLSNA_,nKv_,NMSN_,Tip2_, l_isp, ACC2_, '1', null, null,
-           null);  -- KB  pos=1
-        
-        UPDATE cc_add 
-           SET accs=ACC1_ 
+        MBK.op_reg_ex_2017 (1,ND_,nTmp_, l_grp, nTmp_,RNKB_,NLSNA_,nKv_,NMSN_,Tip2_, l_isp, ACC2_, '1', null, null,  null);  -- KB  pos=1
+
+        UPDATE cc_add
+           SET accs=ACC1_
          WHERE nd=ND_;
-        
+
         -- 30.08.2010 Sta
         l_INITIATOR := substr( pul.Get_Mas_Ini_Val('INITIATOR'), 1, 2 );
-        
+
         If gl.aMfo = '300465' and l_INITIATOR is not null then
            -- Доп.реквизиты счета SS
            EXECUTE IMMEDIATE 'update SPECPARAM_CP_OB set INITIATOR =''' || l_INITIATOR || ''' where acc= '|| ACC1_ ;
@@ -2124,7 +2194,7 @@ CREATE OR REPLACE PACKAGE BODY mbk is
               EXECUTE IMMEDIATE 'insert into SPECPARAM_CP_OB (ACC,INITIATOR) ' ||
                                 'values ( ' || ACC1_ || ', '''|| l_INITIATOR || ''' )';
            end if;
-        
+
            EXECUTE IMMEDIATE 'update SPECPARAM_CP_OB set INITIATOR =''' || l_INITIATOR || ''' where acc= '|| ACC2_ ;
            if SQL%rowcount = 0 then
               EXECUTE IMMEDIATE 'insert into SPECPARAM_CP_OB (ACC,INITIATOR) ' ||
@@ -2132,85 +2202,38 @@ CREATE OR REPLACE PACKAGE BODY mbk is
            end if;
         end if;
         -------------
-        
-        IF NLSZ_ is not null 
+
+        IF NLSZ_ is not null
         then
           -- открытие счета залога
-          op_reg_ex( 2, ND_, p_pawn -- case when ( l_tipd = 2 ) then 999999 else p_pawn end
-                   , 2, nTmp_, RNKB_, NLSZ_, nKVZ_, NMS_, 'ZAL', l_isp, ACC4_, '1', null, null, null
-                   ); -- KB  pos=1
-          
+          MBK.op_reg_ex_2017 ( 2, ND_, p_pawn -- case when ( l_tipd = 2 ) then 999999 else p_pawn end
+                   , 2, nTmp_, RNKB_, NLSZ_, nKVZ_, NMS_, 'ZAL', l_isp, ACC4_, '1', null, null, null                   ); -- KB  pos=1
+
           bars_audit.info( title || ': ZAL ACC4_ = ' || ACC4_ );
-          
+
           -- проставляем группу доступа для счета залога как для основного счета
           p_setAccessByAccmask(ACC4_, ACC1_);
-          
+
           insert into nd_acc (nd, acc) values (ND_, ACC4_);
-           
-           if ( l_tipd = 1 )
-           then
-              
-              update cc_accp 
-                 set nd=ND_ 
-                 where acc=ACC4_ and accs=ACC1_;
-              
-              IF SQL%rowcount = 0 
-              then
-                 INSERT into cc_accp (ACC,ACCS,nd) values (ACC4_,ACC1_,ND_);
-              END IF;
+
+           if ( l_tipd = 1 )   then
+              update cc_accp     set nd=ND_        where acc=ACC4_ and accs=ACC1_;
+              IF SQL%rowcount = 0  then  INSERT into cc_accp (ACC,ACCS,nd) values (ACC4_,ACC1_,ND_);          END IF;
            END IF;
-           
+
            cck_utl.set_deal_attribute(ND_, 'PAWN', to_char(p_pawn));
-           
+
         END IF;
-        
+
         IF Id_DCP_ is not null then
            -- обеспечение - ДЦП
            UPDATE dcp_p Set ref=-ND_, acc=ACC1_ WHERE id=Id_DCP_;
         END IF;
-        
+
         UPDATE accounts SET mdate=DAT4_,PAP=l_tipd WHERE acc=ACC1_;
         UPDATE accounts SET mdate=DAT4_            WHERE acc=ACC2_;
         UPDATE accounts SET mdate=DAT4_            WHERE acc=ACC4_;
 
-        -- Внесение РНК в CUSTBANK для сделок (2700,2701,3660)
-        if mbdk_tip(nVidd_) = 1 THEN 
-           update custbank set bki = 1 where rnk = RNKB_ ;
-           if SQL%rowcount = 0 then
-              insert into custbank (rnk, bki) values (RNKB_, 1);
-           end if;
-        end if;
-   
-    /*  
-        if substr(nVidd_,1,2) = '39' then
-        
-           -- установка ОБ22
-           l_ob22 := case when nKV_ = gl.baseval then '02' else '12' end;
-           update specparam_int set ob22 = l_ob22 where acc = ACC1_ ;
-           if SQL%rowcount = 0 then
-              insert into specparam_int (acc, ob22)
-              values (ACC1_, l_ob22);
-           end if;
-           update specparam_int set ob22 = '02' where acc = ACC2_ ;
-           if SQL%rowcount = 0 then
-              insert into specparam_int (acc, ob22)
-              values (ACC2_, '02');
-           end if;
-        
-           -- проставим спецпараметр МФО (нужно для файлов 32, 33)
-           update specparam_int set mfo=S2_ where acc = ACC1_ ;
-           if SQL%rowcount = 0 then
-              insert into specparam_int (acc, mfo)
-              values (ACC1_, S2_);
-           end if;
-           update specparam_int set mfo=S2_ where acc = ACC2_ ;
-           if SQL%rowcount = 0 then
-              insert into specparam_int (acc, mfo)
-              values (ACC2_, S2_);
-           end if;
-        
-        end if;
-    */  
         -- Artem Yurchenko, 24.11.2014
         -- для кредитных ресурсов необходимо использовать другие операции
         if (check_if_deal_belong_to_crsour(nVidd_) = 'Y') then
@@ -2218,13 +2241,13 @@ CREATE OR REPLACE PACKAGE BODY mbk is
             l_ob22 := '02';
             accreg.setAccountSParam(ACC1_, 'OB22', l_ob22);
             accreg.setAccountSParam(ACC2_, 'OB22', l_ob22);
-        
+
             -- проставим спецпараметр МФО (нужно для файлов 32, 33)
             accreg.setAccountSParam(ACC1_, 'MFO', s2_);
             accreg.setAccountSParam(ACC2_, 'MFO', s2_);
-        
+
             sTTB_ := 'PS2';
-        
+
             --операция по начислению проц
             l_proc_dr_row := get_proc_dr_row(to_char(nVidd_, 'FM9999'), rnkb_);
             sTTA_ := case when nKv_ = gl.baseval then l_proc_dr_row.tt
@@ -2232,7 +2255,7 @@ CREATE OR REPLACE PACKAGE BODY mbk is
                      end;
         else
             sTTB_ := case when nKv_ = gl.baseval then 'WD2' else 'WD3' end;
-        
+
             --операция по начислению проц
             BEGIN
                SELECT val INTO sTTA_ FROM params WHERE par='MBD_%%1';
@@ -2240,7 +2263,7 @@ CREATE OR REPLACE PACKAGE BODY mbk is
             END;
             BEGIN
               -- резидент-нерезидент
-              SELECT decode (codcagent, 1, sTTA_, 3, sTTA_, decode(l_tipd,1,'%00','%02') )
+              SELECT decode (codcagent,1, sTTA_, decode(l_tipd,1,'%00','%02') )
                 INTO sTTA_
                 FROM customer WHERE rnk=RNKB_;
             EXCEPTION
@@ -2249,7 +2272,7 @@ CREATE OR REPLACE PACKAGE BODY mbk is
                 raise inr_err;
             END;
         end if;
-        
+
         if ( nIO_ Is Null )
         then
           select IO
@@ -2261,7 +2284,7 @@ CREATE OR REPLACE PACKAGE BODY mbk is
         else
           l_io := nIO_;
         end if;
-        
+
         update BARS.INT_ACCN
            set BASEY = nBASEY_
              , TT = sTTA_
@@ -2273,19 +2296,19 @@ CREATE OR REPLACE PACKAGE BODY mbk is
              , acr_dat = decode(l_io,1,gl.BDATE,acr_dat)
          where acc = ACC1_
            and id  = nID_;
-        
-        IF SQL%rowcount = 0 
+
+        IF SQL%rowcount = 0
         then
           INSERT INTO int_accN ( acc, ID, metr, basem, BASEY, freq, ACRA, ACRB, KVB, TT, TTB, STP_DAT, s, IO, acr_dat )
           VALUES (ACC1_, nID_, 0, 0, nBASEY_, 1, ACC2_, ACC3_, nKv_, sTTA_, sTTB_, DAT4_-1, 0, l_io, decode(l_io,1,gl.BDATE,null));
         END IF;
-        
+
         IF ( nID_ = 1 and nKV_=gl.baseval )
         then
            UPDATE int_accN
               Set NLSB=NLSNB_
                 , MFOB=S2_
-                , NAMB=l_nmkb
+                , NAMB= l_nmkb
                 , NAZN=Nazn_
             WHERE acc=ACC1_ AND id=1;
         ELSIF nID_ = 1 and nKV_<>gl.baseval then
@@ -2303,23 +2326,23 @@ CREATE OR REPLACE PACKAGE BODY mbk is
                  WHERE acc=ACC1_ AND id=1;
             end if;
         END IF;
-        
+
         update INT_ratn
            SET ir=IR_, op=OP_, br=BR_
          where acc=ACC1_ and id=nID_ and bdat=DAT2_;
-        
-        if SQL%rowcount = 0 
+
+        if SQL%rowcount = 0
         then
            INSERT INTO INT_ratn (acc  , ID ,bdat ,ir ,op ,br)
            VALUES (ACC1_, nID_, DAT2_, IR_, OP_, BR_);
         end if;
-        
+
         -- При открытии договора D020 := '01'
         UPDATE specparam set D020 = '01' where acc=ACC1_;
         if SQL%rowcount = 0 then
            INSERT INTO specparam (ACC, D020 ) values ( ACC1_, '01' );
         end if;
-        
+
         -- новый код срока только для 1-го класса
         if nVidd_ like '1%' then
            l_s180 := FS180(ACC1_, '1', bankdate);
@@ -2328,7 +2351,7 @@ CREATE OR REPLACE PACKAGE BODY mbk is
               INSERT INTO specparam (ACC, S180) values (ACC1_, l_s180);
            end if;
         end if;
-        
+
         -- установка параметрів Первинний та Поточний ВКР
         begin
           select VALUE
@@ -2341,14 +2364,14 @@ CREATE OR REPLACE PACKAGE BODY mbk is
             bars_audit.info( title || ': not found "VNCRR" for RNK = ' || to_char(RNKB_) );
             -- raise_application_error(-20666, 'Відсутнє занчення ВКР у клієнта з РНК = '||to_char(RNKB_), true);
         end;
-        
+
         -- Поточний ВКР
         cck_utl.set_deal_attribute( ND_, 'VNCRR', l_txt );
-        
+
         -- Первинний ВКР
         begin
           -- первинний ВКР не оновлюється тому юзаєм INSERT
-          insert 
+          insert
             into BARS.ND_TXT
             ( ND, TAG, TXT )
           values
@@ -2358,14 +2381,14 @@ CREATE OR REPLACE PACKAGE BODY mbk is
             -- вже був вставлений тригером
             null;
         end;
-        
+
         begin
-          
+
           l_clt_amnt := to_number( bars.pul.get_mas_ini_val('COLLATERAL_AMOUNT') );
-          
+
           if ( ( l_clt_amnt > 0 ) and ( NLSZ_ is Not Null ) )
           then
-            
+
             collateral_payments( p_mbk_id   => ND_
                                , p_mbk_num  => CC_ID_
                                , p_beg_dt   => DAT2_
@@ -2376,27 +2399,27 @@ CREATE OR REPLACE PACKAGE BODY mbk is
                                , p_rnk      => RNKB_
                                , p_dk       => case when l_tipd = 1 then 1 else 0 end
                                );
-            
+
           end if;
-          
+
         exception
-          when OTHERS then 
+          when OTHERS then
             bars_audit.info( 'mbk.inp_deal: collateral_payments_error => '
-                          || dbms_utility.format_error_stack() 
+                          || dbms_utility.format_error_stack()
                           || dbms_utility.format_error_backtrace() );
         end;
-        
+
       EXCEPTION
-        when INR_ERR then 
+        when INR_ERR then
           null;
         when OTHERS then
-          bars_audit.info( 'mbk.inp_deal: error => '|| dbms_utility.format_error_stack() 
+          bars_audit.info( 'mbk.inp_deal: error => '|| dbms_utility.format_error_stack()
                                                     || dbms_utility.format_error_backtrace() );
           sErr_ := dbms_utility.format_error_stack();
       END;
-      
+
       bars_audit.info( 'mbk.inp_deal: Exit with( ND='|| to_char(ND_) ||', ACC1='|| to_char(ACC1_) || ').' );
-      
+
     END inp_deal_Ex;
     ------------------------------------------------------------------
     -- inp_deal
@@ -2504,7 +2527,6 @@ CREATE OR REPLACE PACKAGE BODY mbk is
                         ND_          ,
                         ACC1_        ,
                         sErr_        ,
-                        null         , 
                         null         ,
                         null         ,
                         null         ,
@@ -2538,7 +2560,6 @@ CREATE OR REPLACE PACKAGE BODY mbk is
 
       -- перевірки
       select count(m.ND)
-
         into l_qty
         from MBD_K_R m
        where m.ND = ND_
@@ -3087,12 +3108,12 @@ CREATE OR REPLACE PACKAGE BODY mbk is
         end if;
 
         return currency_utl.from_fractional_units(
-             round(calp_nr(currency_utl.to_fractional_units(p_amount, p_currency_id),
+                   round(calp_nr(currency_utl.to_fractional_units(p_amount, p_currency_id),
                            p_interest_rate,
                            l_date_from,
                            l_date_through,
                            p_interest_base), 0),
-                   p_currency_id); 
+                   p_currency_id);
     end;
 
     procedure prepare_portfolio_interest(
@@ -3494,7 +3515,7 @@ SELECT a.nls, a.ostc/power(10,:nDig) INTO :sDB_1819, :ost_DB_1819
                                             ' ' || currency_utl.get_currency_lcv(l_main_account_row.kv) ||
                                             ' складає ' ||
                                             to_char(l_operation_item.amount, l_money_format) ||
-                                             ' ' || currency_utl.get_currency_lcv(l_main_account_row.kv) || 
+                                             ' ' || currency_utl.get_currency_lcv(l_main_account_row.kv) ||
                                             '<br>Очікується розміщення на суму різниці';
 
                 if (l_main_account_row.kv = gl.baseval) then
@@ -3528,7 +3549,7 @@ SELECT a.nls, a.ostc/power(10,:nDig) INTO :sDB_1819, :ost_DB_1819
                     l_transaction_code := get_sending_transaction_code(l_cc_deal_row.vidd, l_main_account_row.nls, l_interest_account_row.nls);
 
                     -- Field 72: Sender to Receiver Information
-                    -- 
+                    --
                     -- FORMAT
                     -- 6*35x (Narrative Structured Format)
                     -- The following line formats must be used:
@@ -4028,7 +4049,8 @@ SELECT a.nls, a.ostc/power(10,:nDig) INTO :sDB_1819, :ost_DB_1819
 
         l_operation_item := null;
         l_operation_item.operation_type_name := 'Нарахування відсотків';
-         if (tools.compare_range_borders(l_int_accn_row.acr_dat, l_int_accn_row.stp_dat) < 0) then 
+
+        if (l_int_accn_row.acr_dat is null or l_int_accn_row.acr_dat < l_int_accn_row.stp_dat) then
             l_operation_item.purpose := 'Дата останнього нарахування відсотків: <b>' || to_char(l_int_accn_row.acr_dat, 'dd.mm.yyyy') ||
                                         '</b><br>Дата завершення нарахування відсотків: <b>' || to_char(l_int_accn_row.stp_dat, 'dd.mm.yyyy');
             l_operation_item.url            := '<a href="'||
@@ -4070,30 +4092,6 @@ SELECT a.nls, a.ostc/power(10,:nDig) INTO :sDB_1819, :ost_DB_1819
         l_customer_row := customer_utl.read_customer(l_deal_row.rnk);
 
         l_cc_pawn_row := cck_utl.read_cc_pawn(p_pawn_kind_id);
-/*
-        l_account_number := f_newnls2(acc2_ => null,
-                                      descrname_ => 'ZAL',
-                                      nbs2_ => l_cc_pawn_row.nbsz,
-                                      rnk2_ => l_deal_row.rnk,
-                                      idd2_ => null);
-
-        op_reg(mod_ => 2,
-               p1_ => p_deal_id,
-               p2_ => p_pawn_kind_id,
-               p3_ => p_pawn_location_id,
-               p4_ => l_dummy,
-               rnk_ => l_deal_row.rnk,
-               nls_ => l_account_number,
-               kv_ => l_cc_add_row.kv,
-               nms_ => l_customer_row.nmk || ' Забезпечення',
-               tip_ => 'ZAL',
-               isp_ => user_id(),
-               accR_ => l_account_row.acc);
-
-        l_account_row := account_utl.read_account(l_account_row.acc);
-
-        dbms_output.put_line('grp: ' || l_account_row.grp);
-*/
         p_add_zal(p_nd     => l_deal_row.nd,
                   p_accs   => null, -- l_cc_add_row.accs,
                   p_rnk    => l_customer_row.rnk,
@@ -4111,21 +4109,6 @@ SELECT a.nls, a.ostc/power(10,:nDig) INTO :sDB_1819, :ost_DB_1819
                   p_pr_12  => 1,
                   p_nazn   => 'Оприбуткування застави згідно договору № ' || p_pawn_contract_number || ' від ' || to_char(p_start_date) ||
                               ' для угоди ' || l_deal_row.cc_id || ' від ' || to_char(l_deal_row.sdate, 'dd.mm.yyyy'));
-/*
-        p_pawn_nd(p_nd => l_deal_row.nd,
-                  p_accZ => l_account_row.acc,
-                  p_ob22 => l_cc_pawn_row.ob22_uo,
-                  p_accS => l_cc_add_row.accs,
-                  p_grp => null,
-                  p_ree => p_registry_number,
-                  p_cc_idz => p_pawn_contract_number,
-                  p_sdatz => p_start_date,
-                  p_mdatz => p_expiry_date,
-                  p_idz => user_id(),
-                  p_sv => p_pawn_fair_value,
-                  p_dpt => p_deposit_id,
-                  p_12 => 1);
-*/
     end;
 
     procedure add_lim_sb(
@@ -4256,7 +4239,7 @@ SELECT a.nls, a.ostc/power(10,:nDig) INTO :sDB_1819, :ost_DB_1819
     end;
 end;
 /
- show err;
+show err;
  
 PROMPT *** Create  grants  MBK ***
 grant EXECUTE                                                                on MBK             to BARS_ACCESS_DEFROLE;
