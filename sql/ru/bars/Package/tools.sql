@@ -34,31 +34,86 @@
     procedure hide_hint(
         p_clob in clob);
 
-    function string_to_number_list(
-        p_string in varchar,
-        p_splitting_symbol in varchar default ';')
+    function number_list_to_string_list(
+        p_number_list in number_list,
+        p_number_format in varchar2 default null,
+        p_ignore_nulls in char default 'N')
+    return string_list;
+
+    function date_list_to_string_list(
+        p_date_list in date_list,
+        p_date_format in varchar2 default null,
+        p_ignore_nulls in char default 'N')
+    return string_list;
+
+    function varchar2_list_to_string_list(
+        p_varchar2_list in varchar2_list,
+        p_ignore_nulls in char default 'N',
+        p_truncate_long_values in char default 'N')
+    return string_list;
+
+    function string_list_to_number_list(
+        p_string_list in string_list,
+        p_number_format in varchar2 default null,
+        p_nls_numeric_characters in varchar2 default null,
+        p_ignore_nulls in char default 'N')
     return number_list;
 
-    function string_to_words(
-        p_string in varchar,
-        p_splitting_symbol in varchar default ';')
+    function string_list_to_date_list(
+        p_string_list in string_list,
+        p_date_format in varchar2 default null,
+        p_ignore_nulls in char default 'N')
+    return date_list;
+
+    function string_list_to_varchar2_list(
+        p_string_list in string_list,
+        p_ignore_nulls in char default 'N')
     return varchar2_list;
 
     function words_to_string(
-        p_words_list in varchar2_list,
-        p_splitting_symbol in varchar2 default ';')
+        p_words_list in string_list,
+        p_splitting_symbol in varchar2 default ';',
+        p_ceiling_length in integer default null,
+        p_ignore_nulls in char default 'N')
     return varchar2;
 
     function number_list_to_string(
-        p_numbers_list in number_list,
-        p_splitting_symbol in varchar2 default ';')
+        p_number_list in number_list,
+        p_number_format in varchar2 default null,
+        p_splitting_symbol in varchar2 default ';',
+        p_ceiling_length in integer default null,
+        p_ignore_nulls in char default 'N')
     return varchar2;
 
     function date_list_to_string(
-        p_dates_list in date_list,
+        p_date_list in date_list,
+        p_date_format in varchar2 default null,
         p_splitting_symbol in varchar2 default ';',
-        p_date_format in varchar2 default 'dd.mm.yyyy')
+        p_ceiling_length in integer default null,
+        p_ignore_nulls in char default 'N')
     return varchar2;
+
+    function string_to_words(
+        p_string in varchar2,
+        p_splitting_symbol in varchar2 default ';',
+        p_trim_words in char default 'N',
+        p_ignore_nulls in char default 'N')
+    return string_list;
+
+    function string_to_number_list(
+        p_string in varchar,
+        p_number_format in varchar2 default null,
+        p_nls_numeric_characters in varchar2 default null,
+        p_splitting_symbol in varchar default ';',
+        p_ignore_nulls in char default 'N')
+    return number_list;
+
+    function string_to_date_list(
+        p_string in varchar,
+        p_date_format in varchar2 default null,
+        p_splitting_symbol in varchar default ';',
+        p_ignore_nulls in char default 'N')
+    return date_list;
 
     function boolean_to_int(
         p_boolean in boolean)
@@ -274,56 +329,292 @@ CREATE OR REPLACE PACKAGE BODY BARS.TOOLS as
         null;
     end;
 
-    function string_to_number_list(
-        p_string in varchar,
-        p_splitting_symbol in varchar default ';')
-    return number_list
+    function number_list_to_string_list(
+        p_number_list in number_list,
+        p_number_format in varchar2 default null,
+        p_ignore_nulls in char default 'N')
+    return string_list
     is
-        l_number_list   number_list := number_list();
-        l_start_pos     pls_integer default 1;
-        l_end_pos       pls_integer default 0;
-        l_string_length pls_integer default length(p_string);
-        l_split_length  pls_integer default length(p_splitting_symbol);
-        l_value         varchar(50);
+        l integer;
+        l_string_list string_list;
     begin
-        if (p_splitting_symbol is null) then
-            raise_application_error(-20000, 'Не вказаний разділювач чисел у рядку');
-        end if;
-
-        if (p_string is null) then
+        if (p_number_list is null) then
             return null;
         end if;
 
-        l_end_pos := instr(p_string, p_splitting_symbol);
-        loop
-            l_value := substr(p_string, l_start_pos, (case when l_end_pos = 0 then l_string_length + 1 else l_end_pos end) - l_start_pos);
+        l_string_list := string_list();
+        l := p_number_list.first;
+        while (l is not null) loop
 
-            l_number_list.extend(1);
-            l_number_list(l_number_list.last) := to_number(trim(l_value), '99999999999999999999D999999999999', 'nls_numeric_characters = '',.''');
+            if (p_number_list(l) is not null or nvl(p_ignore_nulls, 'N') <> 'Y') then
+                l_string_list.extend(1);
 
-            exit when l_end_pos = 0;
+                if (p_number_format is null) then
+                    l_string_list(l_string_list.last) := to_char(p_number_list(l));
+                else
+                    l_string_list(l_string_list.last) := to_char(p_number_list(l), p_number_format);
+                end if;
+            end if;
 
-            l_start_pos := l_end_pos + l_split_length;
-            l_end_pos := instr(p_string, p_splitting_symbol, l_start_pos);
+            l := p_number_list.next(l);
+        end loop;
+
+        return l_string_list;
+    end;
+
+    function date_list_to_string_list(
+        p_date_list in date_list,
+        p_date_format in varchar2 default null,
+        p_ignore_nulls in char default 'N')
+    return string_list
+    is
+        l integer;
+        l_string_list string_list;
+    begin
+        if (p_date_list is null) then
+            return null;
+        end if;
+
+        l_string_list := string_list();
+        l := p_date_list.first;
+        while (l is not null) loop
+
+            if (p_date_list(l) is not null or nvl(p_ignore_nulls, 'N') <> 'Y') then
+                l_string_list.extend(1);
+
+                if (p_date_format is null) then
+                    l_string_list(l_string_list.last) := to_char(p_date_list(l));
+                else
+                    l_string_list(l_string_list.last) := to_char(p_date_list(l), p_date_format);
+                end if;
+            end if;
+
+            l := p_date_list.next(l);
+        end loop;
+
+        return l_string_list;
+    end;
+
+    function varchar2_list_to_string_list(
+        p_varchar2_list in varchar2_list,
+        p_ignore_nulls in char default 'N',
+        p_truncate_long_values in char default 'N')
+    return string_list
+    is
+        l integer;
+        l_string_list string_list;
+    begin
+        if (p_varchar2_list is null) then
+            return null;
+        end if;
+
+        l_string_list := string_list();
+        l := p_varchar2_list.first;
+        while (l is not null) loop
+            if (p_varchar2_list(l) is not null or nvl(p_ignore_nulls, 'N') <> 'Y') then
+                if (lengthb(p_varchar2_list(l)) > 4000) then
+                    if (p_truncate_long_values = 'Y') then
+                        l_string_list.extend(1);
+                        l_string_list(l_string_list.last) := substrb(p_varchar2_list(l), 4000);
+                    else
+                        raise_application_error(-20000, 'Довжина елемента {' || l || ' : ' || substr(p_varchar2_list(l), 200) ||
+                                                        '...} перевищує максимально допустиму довжину в 4000 байт');
+                    end if;
+                else
+                    l_string_list.extend(1);
+                    l_string_list(l_string_list.last) := p_varchar2_list(l);
+                end if;
+            end if;
+
+            l := p_varchar2_list.next(l);
+        end loop;
+
+        return l_string_list;
+    end;
+
+    function string_list_to_number_list(
+        p_string_list in string_list,
+        p_number_format in varchar2 default null,
+        p_nls_numeric_characters in varchar2 default null,
+        p_ignore_nulls in char default 'N')
+    return number_list
+    is
+        l integer;
+        l_number_list number_list;
+    begin
+        if (p_string_list is null) then
+            return null;
+        end if;
+
+        l_number_list := number_list();
+        l := p_string_list.first;
+        while (l is not null) loop
+            if (p_string_list(l) is not null or nvl(p_ignore_nulls, 'N') <> 'Y') then
+                l_number_list.extend(1);
+                if (p_number_format is null) then
+                    l_number_list(l_number_list.last) := to_number(trim(p_string_list(l)));
+                else
+                    if (p_nls_numeric_characters is null) then
+                        l_number_list(l_number_list.last) := to_number(trim(p_string_list(l)), p_number_format);
+                    else
+                        l_number_list(l_number_list.last) := to_number(trim(p_string_list(l)), p_number_format, p_nls_numeric_characters);
+                    end if;
+                end if;
+            end if;
+            l := p_string_list.next(l);
         end loop;
 
         return l_number_list;
     end;
 
-    function string_to_words(
-        p_string in varchar,
-        p_splitting_symbol in varchar default ';')
+    function string_list_to_date_list(
+        p_string_list in string_list,
+        p_date_format in varchar2 default null,
+        p_ignore_nulls in char default 'N')
+    return date_list
+    is
+        l integer;
+        l_date_list date_list;
+    begin
+        if (p_string_list is null) then
+            return null;
+        end if;
+
+        l_date_list := date_list();
+        l := p_string_list.first;
+        while (l is not null) loop
+            if (p_string_list(l) is not null or nvl(p_ignore_nulls, 'N') <> 'Y') then
+                l_date_list.extend(1);
+                if (p_date_format is null) then
+                    l_date_list(l_date_list.last) := to_date(trim(p_string_list(l)));
+                else
+                    l_date_list(l_date_list.last) := to_date(trim(p_string_list(l)), p_date_format);
+                end if;
+            end if;
+            l := p_string_list.next(l);
+        end loop;
+
+        return l_date_list;
+    end;
+
+    function string_list_to_varchar2_list(
+        p_string_list in string_list,
+        p_ignore_nulls in char default 'N')
     return varchar2_list
     is
-        l_words_list    varchar2_list := varchar2_list();
-        l_start_pos     pls_integer default 1;
-        l_end_pos       pls_integer default 0;
-        l_string_length pls_integer default length(p_string);
-        l_split_length  pls_integer default length(p_splitting_symbol);
-        l_value         varchar2(2000 char);
+        l integer;
+        l_varchar2_list varchar2_list;
+    begin
+        if (p_string_list is null) then
+            return null;
+        end if;
+
+        l_varchar2_list := varchar2_list();
+        l := p_string_list.first;
+        while (l is not null) loop
+            if (p_string_list(l) is not null or nvl(p_ignore_nulls, 'N') <> 'Y') then
+                l_varchar2_list.extend(1);
+                l_varchar2_list(l_varchar2_list.last) := p_string_list(l);
+            end if;
+            l := p_string_list.next(l);
+        end loop;
+
+        return l_varchar2_list;
+    end;
+
+    function words_to_string(
+        p_words_list in string_list,
+        p_splitting_symbol in varchar2 default ';',
+        p_ceiling_length in integer default null,
+        p_ignore_nulls in char default 'N')
+    return varchar2
+    is
+        l integer;
+        l_string varchar2(32767 byte);
+        l_current_length integer;
+        l_item_length integer;
+        l_length_left integer;
+        l_splitter_length integer;
+        l_ceiling_length integer := nvl(p_ceiling_length, 32767);
+    begin
+        if (p_words_list is null) then
+            return null;
+        end if;
+
+        if (p_splitting_symbol is null) then
+            l_splitter_length := 0;
+        else
+            l_splitter_length := lengthb(p_splitting_symbol);
+        end if;
+
+        l := p_words_list.first;
+
+        l_current_length := 0;
+        while (l is not null) loop
+            if (p_words_list(l) is not null or nvl(p_ignore_nulls, 'N') <> 'Y') then
+                l_item_length := nvl(lengthb(p_words_list(l)), 0);-- + l_splitter_length;
+                l_length_left := l_ceiling_length - l_current_length;
+
+                if (l_item_length > l_length_left) then
+                    -- досягли межі - можна повертати значення
+                    return rtrim(l_string, p_splitting_symbol);
+                elsif (l_item_length = l_length_left) then
+                    l_string := l_string || substrb(p_words_list(l), 1, l_length_left);
+                    -- досягли межі - можна повертати значення
+                    return l_string;
+                else
+                    l_string := l_string || p_words_list(l) || p_splitting_symbol;
+                end if;
+
+                l_current_length := l_current_length + l_item_length + l_splitter_length;
+            end if;
+
+            l := p_words_list.next(l);
+        end loop;
+
+        return substrb(l_string, 1, l_current_length - l_splitter_length);
+    end;
+
+    function number_list_to_string(
+        p_number_list in number_list,
+        p_number_format in varchar2 default null,
+        p_splitting_symbol in varchar2 default ';',
+        p_ceiling_length in integer default null,
+        p_ignore_nulls in char default 'N')
+    return varchar2
+    is
+    begin
+        return words_to_string(number_list_to_string_list(p_number_list, p_number_format, p_ignore_nulls), p_splitting_symbol, p_ceiling_length);
+    end;
+
+    function date_list_to_string(
+        p_date_list in date_list,
+        p_date_format in varchar2 default null,
+        p_splitting_symbol in varchar2 default ';',
+        p_ceiling_length in integer default null,
+        p_ignore_nulls in char default 'N')
+    return varchar2
+    is
+    begin
+        return words_to_string(date_list_to_string_list(p_date_list, p_date_format, p_ignore_nulls), p_splitting_symbol, p_ceiling_length);
+    end;
+
+    function string_to_words(
+        p_string in varchar2,
+        p_splitting_symbol in varchar2 default ';',
+        p_trim_words in char default 'N',
+        p_ignore_nulls in char default 'N')
+    return string_list
+    is
+        l_words_list      string_list := string_list();
+        l_start_pos       pls_integer default 1;
+        l_end_pos         pls_integer default 0;
+        l_string_length   pls_integer default nvl(length(p_string), 0);
+        l_splitter_length pls_integer default nvl(length(p_splitting_symbol), 0);
+        l_value           varchar2(4000 byte);
     begin
         if (p_splitting_symbol is null) then
-            raise_application_error(-20000, 'Не вказаний разділювач слів у рядку');
+            raise_application_error(-20000, 'Не вказаний розділювач слів у рядку');
         end if;
 
         if (p_string is null) then
@@ -333,93 +624,72 @@ CREATE OR REPLACE PACKAGE BODY BARS.TOOLS as
         l_end_pos := instr(p_string, p_splitting_symbol);
         loop
             l_value := substr(p_string, l_start_pos, (case when l_end_pos = 0 then l_string_length + 1 else l_end_pos end) - l_start_pos);
+            if (p_trim_words = 'Y') then
+                l_value := trim(l_value);
+            end if;
 
-            l_words_list.extend(1);
-            l_words_list(l_words_list.last) := l_value;
+            if (l_value is not null or nvl(p_ignore_nulls, 'N') <> 'Y') then
+                l_words_list.extend(1);
+                l_words_list(l_words_list.last) := l_value;
+            end if;
 
             exit when l_end_pos = 0;
 
-            l_start_pos := l_end_pos + l_split_length;
+            l_start_pos := l_end_pos + l_splitter_length;
             l_end_pos := instr(p_string, p_splitting_symbol, l_start_pos);
         end loop;
 
         return l_words_list;
     end;
 
-    function words_to_string(
-        p_words_list in varchar2_list,
-        p_splitting_symbol in varchar2 default ';')
-    return varchar2
+    function string_to_number_list(
+        p_string in varchar,
+        p_number_format in varchar2 default null,
+        p_nls_numeric_characters in varchar2 default null,
+        p_splitting_symbol in varchar default ';',
+        p_ignore_nulls in char default 'N')
+    return number_list
     is
-        l integer;
-        l_string varchar2(32767 byte);
     begin
         if (p_splitting_symbol is null) then
-            raise_application_error(-20000, 'Не вказаний разділювач слів у рядку');
+            raise_application_error(-20000, 'Не вказаний розділювач чисел у рядку');
         end if;
 
-        if (p_words_list is null) then
+        if (p_string is null) then
             return null;
         end if;
 
-        l := p_words_list.first;
-        while (l is not null) loop
-            l_string := l_string || p_splitting_symbol || p_words_list(l);
-            l := p_words_list.next(l);
-        end loop;
-
-        return substr(l_string, length(p_splitting_symbol) + 1);
+        return string_list_to_number_list(
+                   string_to_words(p_string,
+                                   p_splitting_symbol => p_splitting_symbol,
+                                   p_trim_words => 'Y',
+                                   p_ignore_nulls => p_ignore_nulls),
+                   p_number_format => p_number_format,
+                   p_nls_numeric_characters => p_nls_numeric_characters);
     end;
 
-    function number_list_to_string(
-        p_numbers_list in number_list,
-        p_splitting_symbol in varchar2 default ';')
-    return varchar2
+    function string_to_date_list(
+        p_string in varchar,
+        p_date_format in varchar2 default null,
+        p_splitting_symbol in varchar default ';',
+        p_ignore_nulls in char default 'N')
+    return date_list
     is
-        l integer;
-        l_string varchar2(32767 byte);
     begin
         if (p_splitting_symbol is null) then
-            raise_application_error(-20000, 'Не вказаний разділювач чисел у рядку');
+            raise_application_error(-20000, 'Не вказаний розділювач чисел у рядку');
         end if;
 
-        if (p_numbers_list is null) then
+        if (p_string is null) then
             return null;
         end if;
 
-        l := p_numbers_list.first;
-        while (l is not null) loop
-            l_string := l_string || p_splitting_symbol || to_char(p_numbers_list(l));
-            l := p_numbers_list.next(l);
-        end loop;
-
-        return substr(l_string, length(p_splitting_symbol) + 1);
-    end;
-
-    function date_list_to_string(
-        p_dates_list in date_list,
-        p_splitting_symbol in varchar2 default ';',
-        p_date_format in varchar2 default 'dd.mm.yyyy')
-    return varchar2
-    is
-        l integer;
-        l_string varchar2(32767 byte);
-    begin
-        if (p_splitting_symbol is null) then
-            raise_application_error(-20000, 'Не вказаний разділювач дат у рядку');
-        end if;
-
-        if (p_dates_list is null) then
-            return null;
-        end if;
-
-        l := p_dates_list.first;
-        while (l is not null) loop
-            l_string := l_string || p_splitting_symbol || to_char(p_dates_list(l), p_date_format);
-            l := p_dates_list.next(l);
-        end loop;
-
-        return substr(l_string, length(p_splitting_symbol) + 1);
+        return string_list_to_date_list(
+                   string_to_words(p_string,
+                                   p_splitting_symbol => p_splitting_symbol,
+                                   p_trim_words => 'Y',
+                                   p_ignore_nulls => p_ignore_nulls),
+                   p_date_format => p_date_format);
     end;
 
     function boolean_to_int(

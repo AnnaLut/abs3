@@ -202,7 +202,7 @@ order by oper.kf';
 
 	begin
     insert into app_rep (codeapp, coderep, approve)
-    values ('$RM_NBUR', 5502, 1);
+    values ('WNBU', 5502, 1);
     exception when dup_val_on_index then null;
     end;		
 end;                                        

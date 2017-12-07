@@ -121,7 +121,7 @@ begin
   -- добавляем описание полей
   bars_metabase.add_column(l_tabid, 1, 'K013', 'C', 'Параметр~K013', null, 1, 1, 1, 1, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 2, 'NBS_DEP', 'C', 'Бал.рахунок~депозиту', null, 4, 2, 1, 1, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'S181', 'C', 'Код строку договору', null, 1, 3, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'IRVK', 'C', 'Безвідкличний~(1-Так/0-Ні)', null, 1, 3, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('KL_K013');

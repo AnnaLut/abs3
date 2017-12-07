@@ -30,7 +30,7 @@ begin
   switch_of_deps  NUMBER(1) default 0,
   show_count      NUMBER(1) default 0,
   save_column     VARCHAR2(30),
-  codeapp         VARCHAR2(30 CHAR),
+  codeapp         CHAR(4),
   base_options    VARCHAR2(1000)
 )
 tablespace BRSDYND

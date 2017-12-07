@@ -602,19 +602,21 @@ create or replace package body tools as
         l_current_length := 0;
         while (l is not null) loop
             if (p_words_list(l) is not null or nvl(p_ignore_nulls, 'N') <> 'Y') then
-                l_item_length := nvl(lengthb(p_words_list(l)), 0) + l_splitter_length;
+                l_item_length := nvl(lengthb(p_words_list(l)), 0);-- + l_splitter_length;
                 l_length_left := l_ceiling_length - l_current_length;
 
-                if (l_item_length >= l_length_left) then
-                    l_string := l_string || substrb(p_words_list(l), 1, l_length_left + l_splitter_length);
-
+                if (l_item_length > l_length_left) then
+                    -- дос€гли меж≥ - можна повертати значенн€
+                    return rtrim(l_string, p_splitting_symbol);
+                elsif (l_item_length = l_length_left) then
+                    l_string := l_string || substrb(p_words_list(l), 1, l_length_left);
                     -- дос€гли меж≥ - можна повертати значенн€
                     return l_string;
                 else
                     l_string := l_string || p_words_list(l) || p_splitting_symbol;
                 end if;
 
-                l_current_length := l_current_length + l_item_length;
+                l_current_length := l_current_length + l_item_length + l_splitter_length;
             end if;
 
             l := p_words_list.next(l);

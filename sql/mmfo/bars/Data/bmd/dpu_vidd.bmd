@@ -143,7 +143,7 @@ begin
   bars_metabase.add_column(l_tabid, 22, 'TIP_OST', 'N', 'Тип~нарах.~%%', null, 22, 45, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 23, 'TT', 'C', 'Код~опер.~нарах.', null, 3, 47, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 24, 'VIDD', 'N', 'Код', null, 22, 1, 1, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 25, 'DPU_TYPE', 'N', '0-на вимогу,~1-к/строковий,~2-д/строковий', null, 1, 7, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 25, 'IRVK', 'N', 'Безвідкличний~(1-Так/0-Ні)', null, 1, 7, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 26, 'FL_AUTOEXTEND', 'N', 'Ознака~авто~переоф.', null, 1, 11, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 27, 'DPU_CODE', 'C', 'Симв.~код', null, 4, 2, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
 
