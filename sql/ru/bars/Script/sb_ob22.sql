@@ -14,19 +14,27 @@ begin
    begin
       select * into ps_n from ps where nbs = '2609';
    EXCEPTION WHEN NO_DATA_FOUND THEN 
-      insert into ps (nbs,name) values ('2609','Резерв за коштами на вимогу суб’єктів господарювання');
+      insert into ps (nbs,pap,name,class) values ('2609',2,'Резерв за коштами на вимогу суб’єктів господарювання',99);
    end;
    begin
       select * into ps_n from ps where nbs = '2629';
    EXCEPTION WHEN NO_DATA_FOUND THEN 
-      insert into ps (nbs,name) values ('2629','Резерв за коштами на вимогу фізичних осіб');
+      insert into ps (nbs,pap,name,class) values ('2629',2,'Резерв за коштами на вимогу фізичних осіб',99);
    end;
    begin
       select * into ps_n from ps where nbs = '3692';
    EXCEPTION WHEN NO_DATA_FOUND THEN 
-      insert into ps (nbs,name) values ('3692','Резерви за кредитними зобов’язаннями');
+      insert into ps (nbs,pap,name,class) values ('3692',2,'Резерви за кредитними зобов’язаннями',99);
    end;
+
+   begin
+      Insert into BARS.TIPS (TIP, NAME) Values ('REZ', 'Рахунки резерву');
+   exception when others then
+      if SQLCODE = -00001 then null;   else raise; end if; 
+   end;
+
    commit;
+
 end;
 /
 

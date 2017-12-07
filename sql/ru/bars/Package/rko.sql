@@ -1,11 +1,13 @@
 CREATE OR REPLACE PACKAGE rko IS
 /*
 --***************************************************************--
- Плата за расчетно-кассовое обслуживание
- (C) Unity-BARS
+              Плата за расчетно-кассовое обслуживание
 
 
- 14/11/2017 COBUMMFO-5332:   3570 -> 3579 - переносится только ВХОДЯЩИЙ на 01 число остаток 3570
+--    14/11/2017 COBUMMFO-5332:  3570->3579 - переносится только ВХОДЯЩИЙ на 01 число остаток 3570
+
+
+
 
  29-05-2014 Sta Новая процедура-обвертка START_FINISH для Старта-Финиша
 
@@ -65,18 +67,9 @@ CREATE OR REPLACE PACKAGE BODY BARS.rko IS
   
   15.11.2017 Transfer-2017
  
-1.   Ищется индивидуальный 6110, как спецпараметр  AccountsW / TAG='S6110'    Если индивидуальный  не найден, то ищется на BRANCH-e  6110/06:+++
-     nlsb_tobo:=NBS_OB22_NULL('6110','06',tobo_a);
- 
-2.   Открывается 3579/07   -   ты говоришь, что нового счета просрочки еще нет.         
- 
 
+  14/11/2017 COBUMMFO-5332:  3570->3579 - переносится ВХОДЯЩИЙ на 1 число остаток 3570
 
-
-
-  14/11/2017 COBUMMFO-5332:   3570 -> 3579 - переносится только ВХОДЯЩИЙ на 01 число остаток 3570
-
-  29-05-2014 Sta Новая процедура-обвертка START_FINISH для Старта-Финиша
 
 */
 
@@ -850,7 +843,7 @@ nam_d_ VARCHAR2(38);
 okpo_  VARCHAR2(14);
 tobo_a     tobo.tobo%type;-- код ТОБО счета 2600
 mfo_a      VARCHAR2(12);-- "MFO процесс.рахунку" счета 2600, если он в BANK_ACC
-nlsb_tobo  VARCHAR2(15);-- счет 6110 из TOBO_PARAMS: TOBO=tobo_a,TAG='RKO6110'
+nlsb_tobo  VARCHAR2(15);-- счет 6110 из TOBO_PARAMS: TOBO=tobo_a, TAG='RKO6110'
 nam_b_tobo VARCHAR2(38);-- Accounts.NMS счета nlsb_tobo
 
 
@@ -980,11 +973,14 @@ BEGIN
 
    IF ( INSTR(mode_,'0')>0  OR  INSTR(mode_,'1')>0 ) and s0_>0   then
 
+
+
       BEGIN                            -- 1. Вначале ищем "индивидуальный"
-         SELECT  trim(VALUE)           --    6110 в AccountsW / TAG='S6110'
+         SELECT  trim(VALUE)           --    6110/6510 в AccountsW / TAG='S6110'
          into    nlsb_tobo
          FROM    AccountsW
-         WHERE   ACC=acc_ and TAG='S6110';
+         WHERE   ACC=acc_ and TAG='S6110' and VALUE is not NULL and 
+                 trim(VALUE) like ( CASE WHEN newnbs.g_state = 1 THEN '6510%' ELSE '6110%' END );
       EXCEPTION  WHEN NO_DATA_FOUND THEN
          nlsb_tobo := NULL;
       END;
@@ -999,22 +995,28 @@ BEGIN
          END;
       End If;
 
-
                                        -- 2). Ищем 6110 по ОВ22 в этом или
-      IF nlsb_tobo is NULL THEN        --     вышестоящем BRANCH-e:
+                                       --     вышестоящем BRANCH-e:       
+      IF nlsb_tobo is NULL THEN        
 
-         nlsb_tobo := NBS_OB22_NULL(  ( CASE WHEN newnbs.g_state = 1 then '6510' else '6110' end ) , '06', tobo_a );
+         nlsb_tobo := NBS_OB22_NULL( (CASE WHEN newnbs.g_state = 1 THEN '6510' ELSE '6110' END), '06', tobo_a );
 
-         IF nlsb_tobo is NULL  then            raise_application_error(-20000,'Не найден счет 6_10/06 на '||substr(tobo_a,1,15)||' !', true);         END IF;
+         IF nlsb_tobo is NULL  then  
+            if newnbs.g_state = 1 then
+               raise_application_error(-20000,'Не найден счет 6510/06 на '||substr(tobo_a,1,15), true);   
+            else
+               raise_application_error(-20000,'Не найден счет 6110/06 на '||substr(tobo_a,1,15), true);   
+            end if;
+         END IF;
 
       END IF;
 
       BEGIN             ---  Определяем NMS счета  nlsb_tobo (6110)
         SELECT SUBSTR(NMS,1,38)
-        INTO nam_b_tobo
-        FROM accounts
-        WHERE NLS=nlsb_tobo AND KV=980;
-      EXCEPTION  WHEN NO_DATA_FOUND THEN
+        INTO   nam_b_tobo
+        FROM   accounts
+        WHERE  NLS = nlsb_tobo  and  KV = 980  and  DAZS is NULL;
+      EXCEPTION WHEN NO_DATA_FOUND THEN
         raise_application_error(-20000, 'Счет '||nlsb_tobo||' для '||nlsosn_||'  НЕ НАЙДЕН !', true);
       END;
 
@@ -1029,7 +1031,7 @@ BEGIN
 
       IF acc1_ IS NULL THEN
          s1_ := 0 ;
-      ELSE                     --     s1_  - остаток на 3570
+      ELSE                     --     s1_  - остаток на 3570/03
          BEGIN
             SELECT nls,-ostc INTO nlsc_, s1_ 
             FROM   accounts
@@ -1041,7 +1043,7 @@ BEGIN
 
       IF acc2_ IS NULL THEN
          s2_:=0;
-      ELSE                     --     s2_  - остаток на 3579
+      ELSE                     --     s2_  - остаток на 3579  (3570/37)
          BEGIN
             SELECT nls,-ostc INTO nlsd_, s2_ 
             FROM   accounts
@@ -1393,13 +1395,11 @@ BEGIN
 ----------------------------------------------------------------------------
 
 
-      IF INSTR(mode_,'3') > 0  THEN -- переносим ВХОДЯЩИЙ на 01 остаток !!!
+      IF INSTR(mode_,'3') > 0  THEN    -- переносим ВХОДЯЩИЙ остаток на 1 число  !!!
 
 
-
-
-         ---  s1_            (=-OSTC) - текущий ост.3570 c обратным знаком
-         ---  Находим s1_01  (= OSTC) - входящий на нач.месяца ост.3570:
+         ---  s1_            (-OSTC) - текущий ост.3570 c обратным знаком
+         ---  Находим s1_01  ( OSTC) - входящий на нач.месяца ост.3570:
          BEGIN
            Select nvl(ostf-dos+kos,0)
            Into   s1_01 
@@ -1423,9 +1423,10 @@ BEGIN
            and  FDAT>=ADD_MONTHS(TRUNC(gl.bdate,'MM'),0)  and
                 FDAT<=gl.bdate ;
             
-         ---  Переносимая 3570 -> 3579 сумма:
-         s1_ := ABS( least( 0, s1_01 + kos_3570 ));
 
+         -----   Переносимая 3570->3579 сумма:    
+
+         s1_ := ABS( least( 0, s1_01 + kos_3570 ));
 
 
 
@@ -1458,8 +1459,8 @@ BEGIN
                   p_setAccessByAccmask(acc2_,accd_);
                   Update RKO_LST  set ACC2 = acc2_  WHERE acc = acc_;
                   Update ACCOUNTS set TOBO = br_    WHERE acc = acc2_;
-                  --3579.07	=> 3570.37 прострочені нараховані доходи за обслуговування суб`єктів господарювання
-                  Accreg.setAccountSParam( acc2_, 'OB22', CASE WHEN newnbs.g_state = 1 then '37' else '03' end  ) ; -- надо у
+                  ----   3579.07  => 3570.37 прострочені нараховані доходи за обслуговування суб`єктів господарювання
+                  Accreg.setAccountSParam( acc2_, 'OB22', CASE WHEN newnbs.g_state = 1 then '37' else '07' end  ) ; -- надо у
                   Accreg.setAccountSParam( acc2_, 'S270', '01' ) ;
                   Accreg.setAccountSParam( acc2_, 'S240', 'C'  ) ;
 

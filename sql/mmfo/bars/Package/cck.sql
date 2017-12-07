@@ -1165,9 +1165,9 @@ CREATE OR REPLACE PACKAGE cck IS
 
 END cck;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.cck IS
+CREATE OR REPLACE PACKAGE BODY cck IS
   -------------------------------------------------------------------
-  g_body_version CONSTANT VARCHAR2(64) := 'ver.4.2.4  22/11/2017 ';
+  g_body_version CONSTANT VARCHAR2(64) := 'ver.4.2.5  06/12/2017 ';
   ------------------------------------------------------------------
 
   /*
@@ -6430,38 +6430,67 @@ CREATE OR REPLACE PACKAGE BODY BARS.cck IS
 
   END cc_open;
   --------------------------------------
-  PROCEDURE cc_kor(acc_    INT, -- ACC сч 8999
-                   nd_     INT, -- реф КД
-                   nrnk_   INT, -- Рег № заемщика
-                   cc_id_  VARCHAR2, -- Ид КД
-                   datzak_ DATE, -- дата заключения
-                   datend_ DATE, -- дата завершениф
-                   datbeg_ DATE, -- дата начала действия
-                   datwid_ DATE, -- дата выдачи
-                   nkv_    INT, -- вал КД
-                   ns_     NUMBER, -- сумма по дог в цел. т.е. 10000.00
-                   nvid_   INT, -- вид КД
-                   nisto_  INT, -- код источника финансирования
-                   ncel_   INT, -- код цели
-                   ms_nx   VARCHAR2, -- доп.реквизит
-                   nfin_   INT, -- код фин стану
-                   nobs_   INT, -- код обс долга
-                   saim_   VARCHAR2, -- подробно о цели
-                   spawn_  VARCHAR2, -- подробно об обеспечении
-                   nkom_   NUMBER, -- % комис(был код пользователя, его заменила на gl.AUID)
-                   nls_    VARCHAR2, -- сч для пересисления
-                   nbank_  NUMBER, -- МФО для перечисления
-                   nfreq_  INT, -- периодичность погашения кредита
-                   dfproc_ NUMBER, -- % ставка
-                   nbasey_ INT, -- % база
-                   dfden_  INT, -- день погаш
-                   datnp_  DATE, -- дата начала пог
-                   nfreqp_ INT) -- периодичность погаш %
+  PROCEDURE cc_kor
+  (
+    acc_    INT
+   , -- ACC сч 8999
+    nd_     INT
+   , -- реф КД
+    nrnk_   INT
+   , -- Рег № заемщика
+    cc_id_  VARCHAR2
+   , -- Ид КД
+    datzak_ DATE
+   , -- дата заключения
+    datend_ DATE
+   , -- дата завершениф
+    datbeg_ DATE
+   , -- дата начала действия
+    datwid_ DATE
+   , -- дата выдачи
+    nkv_    INT
+   , -- вал КД
+    ns_     NUMBER
+   , -- сумма по дог в цел. т.е. 10000.00
+    nvid_   INT
+   , -- вид КД
+    nisto_  INT
+   , -- код источника финансирования
+    ncel_   INT
+   , -- код цели
+    ms_nx   VARCHAR2
+   , -- доп.реквизит
+    nfin_   INT
+   , -- код фин стану
+    nobs_   INT
+   , -- код обс долга
+    saim_   VARCHAR2
+   , -- подробно о цели
+    spawn_  VARCHAR2
+   , -- подробно об обеспечении
+    nkom_   NUMBER
+   , -- % комис(был код пользователя, его заменила на gl.AUID)
+    nls_    VARCHAR2
+   , -- сч для пересисления
+    nbank_  NUMBER
+   , -- МФО для перечисления
+    nfreq_  INT
+   , -- периодичность погашения кредита
+    dfproc_ NUMBER
+   , -- % ставка
+    nbasey_ INT
+   , -- % база
+    dfden_  INT
+   , -- день погаш
+    datnp_  DATE
+   , -- дата начала пог
+    nfreqp_ INT
+  ) -- периодичность погаш %
    IS
     -- процедура обновления КД
     dat3_   DATE;
     cc_kom_ INT;
- nsos cc_Deal.sos%type;
+    nsos cc_Deal.sos%type;
   BEGIN
  begin
  select t.sos into  nsos from cc_deal t where t.nd= nd_;
@@ -6470,30 +6499,48 @@ CREATE OR REPLACE PACKAGE BODY BARS.cck IS
   end;
 
     UPDATE customer SET crisk = nfin_ WHERE rnk = nrnk_;
-  if nsos=0 then
-   UPDATE cc_deal
-       SET cc_id = cc_id_,
-           sdate = datzak_,
-           wdate = datend_,
-           vidd  = nvid_,
-           LIMIT = ns_,
-           obs   = nobs_,
-           sdog  = ns_
+ if  nsos=0 then
+    UPDATE cc_deal
+       SET cc_id = cc_id_
+          ,sdate = datzak_
+          ,wdate = datend_
+          ,vidd  = nvid_
+          ,LIMIT = ns_
+          ,obs   = nobs_
+          ,sdog  = ns_
      WHERE nd = nd_;
-
     UPDATE cc_add
-       SET aim     = ncel_,
-           s       = ns_,
-           kv      = nkv_,
-           bdate   = datbeg_,
-           wdate   = datwid_,
-           sour    = nisto_,
-           acckred = nls_,
-           mfokred = nbank_,
-           freq    = nfreq_
+       SET aim     = ncel_
+          ,s       = ns_
+          ,kv      = nkv_
+          ,bdate   = datbeg_
+          ,wdate   = datwid_
+          ,sour    = nisto_
+          ,acckred = nls_
+          ,mfokred = nbank_
+          ,freq    = nfreq_
      WHERE nd = nd_
        AND adds = 0;
- end if;
+else
+   UPDATE cc_deal
+       SET cc_id = cc_id_
+          ,sdate = datzak_
+          ,wdate = datend_
+          ,vidd  = nvid_
+          ,obs   = nobs_
+     WHERE nd = nd_;
+    UPDATE cc_add
+       SET aim     = ncel_
+          ,kv      = nkv_
+          ,bdate   = datbeg_
+          ,wdate   = datwid_
+          ,sour    = nisto_
+          ,acckred = nls_
+          ,mfokred = nbank_
+          ,freq    = nfreq_
+     WHERE nd = nd_
+       AND adds = 0;
+end if;
     BEGIN
       INSERT INTO nd_txt
         (nd, tag, txt)
@@ -6523,34 +6570,21 @@ CREATE OR REPLACE PACKAGE BODY BARS.cck IS
     UPDATE accounts
        SET kv = nkv_, ostx = -ns_ * 100, mdate = datend_
      WHERE acc = acc_;
-update   int_ratn i set i.bdat=datbeg_ ,i.ir=dfproc_ where i.acc=acc_
- and i.id=0 and i.op is null;
-if SQL%ROWCOUNT = 0 then
-  INSERT INTO int_ratn
-      (acc, id, bdat, ir,op)
-    VALUES
-      (acc_, 0, datbeg_, dfproc_,null);
 
-end if;
-   /* DELETE FROM int_ratn
+    DELETE FROM int_ratn
      WHERE acc = acc_
-       AND id = 0
-     and  op is null;*/
- update  int_accn i set i.basey=nbasey_,i.freq=nfreqp_,i.s=dfden_,i.apl_dat=datnp_,i.acr_dat=gl.bd - 1 where i.acc=acc_
- and i.id=0 ;
- if SQL%ROWCOUNT = 0 then
-  /* DELETE FROM int_accn
+       AND id = 0;
+    DELETE FROM int_accn
      WHERE acc = acc_
-       AND id = 0;*/
+       AND id = 0;
     INSERT INTO int_accn
       (acc, id, metr, basem, basey, freq, s, apl_dat, acr_dat)
     VALUES
       (acc_, 0, 0, 0, nbasey_, nfreqp_, dfden_, datnp_, gl.bd - 1);
-end if;
-  /*  INSERT INTO int_ratn
+    INSERT INTO int_ratn
       (acc, id, bdat, ir)
     VALUES
-      (acc_, 0, datbeg_, dfproc_);*/
+      (acc_, 0, datbeg_, dfproc_);
 
     IF nkom_ > 0 THEN
       DELETE FROM int_ratn
@@ -6563,23 +6597,23 @@ end if;
          AND p.val = to_char(m.metr)
          AND m.metr > 90;
       UPDATE int_accn
-         SET metr    = nvl(metr, cc_kom_),
-             basey   = 0,
-             freq    = 1,
-             acr_dat = datbeg_ - to_number(to_char(datbeg_, 'dd'))
+         SET metr    = nvl(metr, cc_kom_)
+            ,basey   = 0
+            ,freq    = 1
+            ,acr_dat = datbeg_ - to_number(to_char(datbeg_, 'dd'))
        WHERE acc = acc_
          AND id = 2;
       IF SQL%ROWCOUNT = 0 THEN
         INSERT INTO int_accn
           (acc, id, metr, basem, basey, freq, acr_dat)
         VALUES
-          (acc_,
-           2,
-           cc_kom_,
-           0,
-           0,
-           1,
-           datbeg_ - to_number(to_char(datbeg_, 'dd')));
+          (acc_
+          ,2
+          ,cc_kom_
+          ,0
+          ,0
+          ,1
+          ,datbeg_ - to_number(to_char(datbeg_, 'dd')));
       END IF;
       BEGIN
         INSERT INTO int_ratn
@@ -8548,7 +8582,8 @@ end if;
                                    'CR9',
                                    'SN8',
                                    'SNA',
-                                   'SNO')) LOOP
+                                   'SNO'
+                                   ,'S36')) LOOP
 
           UPDATE accounts
              SET mdate = CASE
@@ -8909,7 +8944,7 @@ end if;
        WHERE d.rnk = cc_deal_row.rnk
          AND extract(YEAR FROM d.sdate) =
              extract(YEAR FROM cc_deal_row.sdate)
-         AND substr(d.prod, 1, 6) IN ('220347', '220257')
+         AND substr(d.prod, 1, 6) IN ('220347', '220257','220373')
          AND d.sos <> 0;
     END;
     BEGIN
@@ -8919,16 +8954,16 @@ end if;
        WHERE d.rnk = cc_deal_row.rnk
          AND extract(YEAR FROM d.sdate) =
              extract(YEAR FROM cc_deal_row.sdate)
-         AND substr(d.prod, 1, 6) IN ('220258', '220348')
+         AND substr(d.prod, 1, 6) IN ('220258', '220348','220374')
          AND d.sos <> 0;
     END;
     IF l_count_boiler >= 1 AND l_count_material >= 1 THEN
       err_code := 1;
     ELSIF l_count_boiler >= 1 AND
-          substr(cc_deal_row.prod, 1, 6) IN ('220347', '220257') THEN
+          substr(cc_deal_row.prod, 1, 6) IN ('220347', '220257','220373') THEN
       err_code := 2;
     ELSIF l_count_material >= 1 AND
-          substr(cc_deal_row.prod, 1, 6) IN ('220258', '220348') THEN
+          substr(cc_deal_row.prod, 1, 6) IN ('220258', '220348','220374') THEN
       err_code := 3;
     ELSE
       err_code := 0;
@@ -15208,8 +15243,8 @@ end if;
                                       p.rnk,
                                       NULL);
             END IF;
-          end if;   
-            
+          end if;
+
             cck.cc_op_nls(p_nd,
                           p.kv,
                           nlsd_,

@@ -30,7 +30,8 @@ begin
 	FROM_CLAUSE VARCHAR2(210), 
 	WHERE_CLAUSE VARCHAR2(2000), 
 	PKEY VARCHAR2(30), 
-	BRANCH VARCHAR2(30) DEFAULT SYS_CONTEXT(''bars_context'',''user_branch'')
+	BRANCH VARCHAR2(30) DEFAULT sys_context(''bars_context'',''user_branch''), 
+	CONDITION_LIST CLOB
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -174,6 +175,13 @@ exception when others then
 /
 
 
+begin
+    execute immediate 'alter table DYN_FILTER add condition_list clob';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
 
 PROMPT *** Create  grants  DYN_FILTER ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on DYN_FILTER      to ABS_ADMIN;

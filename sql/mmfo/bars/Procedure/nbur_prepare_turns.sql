@@ -5,7 +5,7 @@ PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/NBUR_PREPARE_TURNS.sql
 PROMPT ===================================================================================== 
 
 
-PROMPT *** Create  procedure NBUR_PREPARE_TURNS ***
+PROMPT *** Create  procedure NBUR_PREPARE_TURNS *** 
 
 CREATE OR REPLACE PROCEDURE BARS.NBUR_PREPARE_TURNS (p_kod_filii        varchar2,
                                                      p_report_date      date)
@@ -46,7 +46,8 @@ BEGIN
     left outer join snap_balances s
     on (a.acc = s.acc and
         s.fdat = p_report_date)
-    where a.dat_alt is not null and
+    where a.kf = p_kod_filii and
+          a.dat_alt is not null and
           a.dat_alt = p_report_date)
     select 'OLD' ACC_TYPE, t.fdat, t.kf, t.rnk, t.acc, t.nlsalt nls, t.kv, t.ob22alt ob22, 
        t.dos dos_bal, t.dosq dosq_bal, t.kos kos_bal, t.kosq kosq_bal, 

@@ -164,7 +164,12 @@ logger.info ('ZVT_DOC-1 Begin s_FDAT = '|| s_FDAT);
    EXCEPTION WHEN NO_DATA_FOUND THEN null;
    end;
  end loop;
-
+ -- ¬ будущем желательно убрать. чтобы не делать лишний поиск
+        insert into part_zvt_doc (fdat, isp, kv, tt, ref, stmt, nlsd,nlsk,branch,tema,sq,s)
+        select dat_alt, isp, kv, '024', -1,  0, decode (zn,1,nlsalt,nls),  decode(zn,1,nls,nlsalt), branch, 80, gl.p_icurval(kv,vx,p_FDAT), vx
+        from (select dat_alt, isp, kv, ABS(fost(acc,(p_FDAT-1))) vx, sign(fost(acc,(p_FDAT-1))) zn,  nls, nlsalt, branch
+              from accounts where nlsalt is not null and dat_alt = p_FDAT and fost(acc,(p_FDAT-1)) <>0 
+              );
  logger.trace ('PART_ZVT_DOC End s_FDAT = '|| s_FDAT);
 
  -- сбор статистики

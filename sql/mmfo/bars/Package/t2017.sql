@@ -62,11 +62,13 @@ END T2017;
 --------------------------------------------------------
 CREATE OR REPLACE PACKAGE BODY BARS.T2017
 IS
-  g_body_version   CONSTANT VARCHAR2 (64) := 'version 1.7  05.12.2017';
+  g_body_version   CONSTANT VARCHAR2 (64) := 'version 1.10  07.12.2017';
   g_errN number  := -20203;
   nlchr  char(2) := chr(13)||chr(10);
   bnk_dt date;
 /*
+  06.01.2017 Sta 3119 in CP  + CP для всех РУ
+  05.12.2017 Sta надо включить cc_pawn в список изменяемых справочников в полях   NBSZ ,  NBSZ1, NBSZ2,  NBSZ3  поменять 9010 
   30.11.2017 LSO Добавлены коректировки в справочник CCK_OB22
   30.11.2017 Sta Использование прозноз-счетов
   24.11.2017 Sta + В.Харин      -- Update  chgaction = 2 Восстановить для ХД дату открытия = дате открытия из accounts aa_old.DAOS
@@ -206,7 +208,9 @@ begin
        insert into GROUPS_NBS (NBS,ID)              select p_R020_new, ID                  from GROUPS_NBS where nbs=p_R020_old and not exists (select 1 from GROUPS_NBS where nbs=p_r020_new); -- Групи доступу до рахунків <-> Балансові рахунки
        insert into E_NBS      (NBS,FL)              select p_R020_new, FL                  from E_NBS      where nbs=p_R020_old and not exists (select 1 from E_NBS      where nbs=p_r020_new); -- Балансові рахунки під абонплату
 
-       If p_r020_old ='6110' then update E_TARIF$BASE set nls6 ='6510' ; end if;
+       If p_r020_old = '6110' then update E_TARIF$BASE set nls6 ='6510' ; end if;
+
+       If p_r020_old = '9010' then update cc_pawn в set  NBSZ ='9031',  NBSZ1 ='9031', NBSZ2='9031',  NBSZ3='9031'  where nbsz ='9031'; end if;
 
        insert into NBS_K014   (NBS,K014)            select p_R020_new, K014                from NBS_K014   where nbs=p_R020_old and not exists (select 1 from NBS_K014   where nbs=p_r020_new); -- допустимих БР для типів клієнтів
        insert into ZAY_BAL    (NBS,FL_AUTOPEN )     select p_R020_new, FL_AUTOPEN          from ZAY_BAL    where nbs=p_R020_old and not exists (select 1 from ZAY_BAL    where nbs=p_r020_new); --  доп бал.счетов модуля "Биржевые операции"
@@ -216,11 +220,19 @@ begin
        insert into NBS_TIPS (NBS,TIP,OPT,OB22) select p_r020_new,TIP,OPT,OB22 from NBS_TIPS where nbs=p_r020_old and ob22 is null and not exists (select 1 from NBS_TIPS where nbs=p_r020_new and ob22 is null); --Звязок БР <->Типи рахунків
        insert into CC_VIDD (VIDD,CUSTTYPE,TIPD,NAME,SPS) select p_r020_new,CUSTTYPE,TIPD,NAME,SPS from CC_VIDD where vidd=p_r020_old and not exists (select 1 from CC_VIDD where vidd=p_r020_new);
 
-       update dpt_vidd set bsD    = p_r020_new  where bsD   = p_r020_old ;  -- Виды вкладов
-       update dpt_vidd set bsN    = p_r020_new  where bsN   = p_r020_old ;
-       update dpt_vidd set bsA    = p_r020_new  where bsA   = p_r020_old ;
+       -- Виды вкладов ФО
+       update dpt_vidd set bsD = p_r020_new where bsD = p_r020_old;
+       update dpt_vidd set bsN = p_r020_new where bsN = p_r020_old;
+       update dpt_vidd set bsA = p_r020_new where bsA = p_r020_old;
 
-       update CC_AIM     set nbs    = p_r020_new  where nbs   = p_r020_old and D_CLOSE is null; -- Цільове призначення договору
+       -- Виды вкладов ЮО
+       update DPU_VIDD
+          set BSD  = p_r020_new
+            , IRVK = 1
+        where BSD  = p_r020_old;
+
+       -- Цільове призначення договору
+       update CC_AIM     set nbs    = p_r020_new  where nbs   = p_r020_old and D_CLOSE is null;
        update CC_AIM     set nbs2   = p_r020_new  where nbs2  = p_r020_old and D_CLOSE is null;
        update CC_AIM     set nbsf   = p_r020_new  where nbsf  = p_r020_old and D_CLOSE is null;
        update CC_AIM     set nbsf2  = p_r020_new  where nbsf2 = p_r020_old and D_CLOSE is null;
@@ -370,7 +382,9 @@ procedure T_CCk   (p_NBS  varchar2,   p_ob22 varchar2  ) is  -- перекодировка CC
   ------
 begin
 
- for OLD in ( select r.* from cck_ob22 r where NBS like L_NBS and OB22 like L_OB22 and d_close is null and exists(select 1 from transfer_2017 x where r.nbs = x.r020_old and r.ob22 = x.ob_old) )
+ for OLD in ( select r.* from cck_ob22 r where NBS like L_NBS and OB22 like L_OB22 and d_close is null )
+ --for OLD in ( select r.* from cck_ob22 r where NBS like L_NBS and OB22 like L_OB22 and d_close is null and exists(select 1 from transfer_2017 x where r.nbs = x.r020_old and r.ob22 = x.ob_old) )
+
  loop
 
     NEW     := OLD ;
@@ -409,7 +423,8 @@ begin
     BBBBOO  := TRN (           '6118'           , OLD.SD_9129 ) ; NEW.SD_9129 := Substr(BBBBOO,5,2) ;                                -- SD_9129    OB22~ рах. доходiв ~ для комiсiї~ на 9129'   61* для 9129
     BBBBOO  := TRN (           '6110'           , OLD.SD_SK4  ) ; NEW.SD_SK4  := Substr(BBBBOO,5,2) ;                                -- SD_SK4    OB22~ рах. доходiв ~ для комiсiї~ за достр. пог.
 
-    update cck_ob22 set D_CLOSE  = bnk_dt where nbs = OLD.NBS and ob22 = OLD.OB22 and exists(select 1 from transfer_2017 x where OLD.NBS = x.r020_old and OLD.OB22 = x.ob_old) ;
+    update cck_ob22 set D_CLOSE  = nvl(BARS.glb_bankdate,sysdate)  where nbs = OLD.NBS and ob22 = OLD.OB22 and exists(select 1 from transfer_2017 x where OLD.NBS = x.r020_old and OLD.OB22 = x.ob_old) ;
+  --update cck_ob22 set D_CLOSE  = bnk_dt where nbs = OLD.NBS and ob22 = OLD.OB22 and exists(select 1 from transfer_2017 x where OLD.NBS = x.r020_old and OLD.OB22 = x.ob_old) ;
 
     bars_audit.info(l_trace||'  обнолвнеие таблицы CCK_OB22  NEW.NBS = '||NEW.NBS||'NEW.Ob22 = '||NEW.Ob22);
     
@@ -604,7 +619,9 @@ begin bc.go( p_KF) ;
    -- BRANCH_PARAMETERS
    t2017.T_Param ( 0, p_kf );
    ------
-   If p_KF = '300465' then      T2017.T_CP ( 0 ) ; end if ;
+--   If p_KF = '300465' then      
+   T2017.T_CP ( 0 ) ; 
+-- end if ;
 
    bc.go ('/');
 
@@ -682,14 +699,16 @@ begin
          --- Журнал счетов
          delete from accounts_update where acc = aa_old.acc and trunc(chgdate) = trunc(sysdate);
          ----- закрыть chgaction = 3
+
          INSERT INTO accounts_update
              (acc, nls, nlsalt, kv, nbs, nbs2, daos, isp, nms  , pap, grp, sec, seci, seco, vid, tip, dazs, blkd, blkk, lim, pos, accc, tobo, mdate, ostx, rnk, kf ,
               chgdate , chgaction , doneby ,idupd  , effectdate, branch,ob22, globalbd,send_sms  )
          VALUES (aa_old.acc   ,aa_old.nls  ,aa_old.nlsalt,aa_old.kv    ,tt.R020_OLD   ,aa_old.nbs2,aa_old.daos  ,aa_old.isp   ,aa_old.nms   ,aa_old.pap,
-              aa_old.grp   ,aa_old.sec  ,aa_old.seci  ,aa_old.seco  ,aa_old.vid   ,aa_old.tip , bnk_dt,  -- дата закр
-              aa_old.blkd  ,aa_old.blkk  ,aa_old.lim,   aa_old.pos   ,aa_old.accc ,aa_old.tobo  ,aa_old.mdate ,aa_old.ostx  ,aa_old.rnk ,aa_old.kf    ,
+              aa_old.grp   ,aa_old.sec  ,aa_old.seci  ,aa_old.seco  ,aa_old.vid   ,aa_old.tip , bnk_dt,   -- дата закр
+              aa_old.blkd  ,aa_old.blkk  ,aa_old.lim,   aa_old.pos   ,aa_old.accc ,aa_old.tobo,aa_old.mdate ,aa_old.ostx  ,aa_old.rnk ,aa_old.kf    ,
               sysdate      ,3,user_name ,bars_sqnc.get_nextval('s_accounts_update',aa_old.kf), bnk_dt, aa_old.branch, aa_old.ob22 , 
               bnk_dt, aa_old.send_sms);
+
          ----- открыть chgaction = 1
          INSERT INTO accounts_update
              (acc, nls, nlsalt, kv, nbs, nbs2, daos, isp, nms  , pap, grp, sec, seci, seco, vid, tip, dazs, blkd, blkk, lim, pos, accc, tobo, mdate, ostx, rnk, kf ,
@@ -842,9 +861,14 @@ begin
         where d_close is null ;                        
 
         If k.NBS <> SUBSTR(k.nlsalt,1,4) then
-           for  DOCH in (select Rowid RI , nls  from accounts where accc = k.Acc and dazs is null )
-           loop DOCH.nls := VKRZN ( Substr( gl.AMFO,1,5), k.NBS ||'0'|| Substr (DOCH.NLS,6,9) );
-                begin update accounts set nls = DOCH.nls where Rowid  = DOCH.RI;  
+           for  DOCH in (select Rowid RI , nls, nlsalt from accounts where accc = k.Acc and dazs is null )
+           loop DOCH.nlsalt := DOCH.nls;
+
+                If k.NBS ='3118' and DOCH.nls like '3119%' then DOCH.nls := VKRZN ( Substr( gl.AMFO,1,5), '311809'   || Substr (DOCH.NLS,7,8) );
+                Else                                            DOCH.nls := VKRZN ( Substr( gl.AMFO,1,5), k.NBS ||'0'|| Substr (DOCH.NLS,6,9) );
+                end if;
+
+                begin update accounts set nls = DOCH.nls , nlsalt = DOCH.nlsalt where Rowid  = DOCH.RI;  
                 exception  when others then  null;
                 end;
            end loop; -- DOCH
@@ -930,16 +954,19 @@ begin
     T2017.ZAY    ( k.KF ) ; 
     commit;
     
-    for k in ( select  i.rowid, i.mfob, i.nlsb, i.kvb, f.new_nls, i.id 
+	bc.go (k.KF);
+    for j in ( select  i.rowid, i.mfob, i.nlsb, i.kvb, f.new_nls, i.id 
                  from bars.int_accn i, bars.transform_2017_forecast f
-                where i.mfob = bars.f_ourmfo()
+                where i.mfob = k.KF
                   and i.mfob = f.kf
                   and i.nlsb = f.nls
                   and i.kvb  = f.kv
                   and i.nlsb is not null)
     loop
-      update bars.int_accn set nlsb = k.new_nls where rowid = k.rowid;
+      update bars.int_accn set nlsb = j.new_nls where rowid = j.rowid;
     end loop;
+	
+	
     commit;
   end loop;
 end spec_par;
@@ -969,7 +996,6 @@ procedure OTCN   (p_mode int) is --  Авто-трансформація довідників по звітності
        for pp in (select * from transfer_2017 where ( r020_old <> r020_new OR ob_old <> ob_new ) and r020_old = p.r020_old )
        loop
          -- Разом R020 +Об22
-         begin update SB_P0853 set R020_fa = pp.r020_new, ob22 = pp.ob_new  where R020_fa=pp.r020_old and ob22=pp.ob_old ; exception when others then T2017.E01(SQLCODE,'SB_P0853'    ); end; --план рахунків ПО ОБ22 (SB_P0851)                                                                                                                      \
 
          begin update xoz_ob22     set deb = pp.r020_new||       pp.ob_new  where deb = pp.r020_old||          pp.ob_old ; exception when others then T2017.E01(SQLCODE,'xoz_ob22'    ); end; --Рахунки для закриття Деб.заборг.
          begin update xoz_ob22     set krd = pp.r020_new||       pp.ob_new  where krd = pp.r020_old||          pp.ob_old ; exception when others then T2017.E01(SQLCODE,'xoz_ob22'    ); end; --Рахунки для закриття Деб.заборг.

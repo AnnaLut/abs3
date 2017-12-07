@@ -15,6 +15,11 @@ begin
       l_old_nbs := :new.nbs;
    end if;    
    
+   select count(*) into l_count from  srezerv_ob22_f where nbs_rez = l_old_nbs AND :new.TIP = 'REZ' ;
+   if l_count > 0 then
+      -- счет РЕЗЕРВА - открывается даже если есть в transfer_2017
+      return; 
+   end if;
       
    begin
       -- счет не меняет лицевой
@@ -26,7 +31,7 @@ begin
       return;
    end;
 
-   
+
    bars_audit.info(l_trace||'старт внесения счета для прогнозирования kf='||:new.kf||', acc='||:new.acc||', nls='||:new.nls||', nbs='||:new.nbs||', ob22='||:new.ob22);
 /*   
    select * into l_row 

@@ -693,7 +693,7 @@ is
   --
   -- глобальные переменные и константы
   -- 
-  g_body_version  constant varchar2(64)          := 'version 44.09  17.11.2017';
+  g_body_version  constant varchar2(64)          := 'version 44.09  30.11.2017';
   
   modcode         constant varchar2(3)           := 'DPU';
   accispparam     constant varchar2(16)          := 'DPU_ISP';
@@ -1882,12 +1882,12 @@ is
   end CHK_ACC_NUM;
   ---
 begin
-
+  
   bars_audit.trace( '%s entry, agr № %s for № %s/%s, grp = %s', title
                   , to_char(p_agrnum), p_gennum, to_char(p_genid), to_char(p_accgrp) );
-
+  
   l_num := substr( '000000'||p_genid, -8, 6 );
-
+  
   -- номера рахунків
   p_depacc.numb := '8'||substr(p_deptype, 2, 3)||'0'||l_num||substr('000'||p_agrnum, -3, 3);
   p_intacc.numb := '8'||substr(p_inttype, 2, 3)||'0'||l_num||substr('000'||p_agrnum, -3, 3);
@@ -1895,8 +1895,8 @@ begin
   -- перевірка на наявність відкритих рах. з такими номерами
   CHK_ACC_NUM;
 
-  p_depacc.numb := substr(vkrzn(substr(p_mfo,1,5), p_depacc.numb),1, 14);
-  p_intacc.numb := substr(vkrzn(substr(p_mfo,1,5), p_intacc.numb),1, 14);
+  p_depacc.numb := substr(vkrzn(substr(p_mfo,1,5), p_depacc.numb), 1, 14);
+  p_intacc.numb := substr(vkrzn(substr(p_mfo,1,5), p_intacc.numb), 1, 14);
 
   -- наименования счетов = Дод.угода № ... + наименование клиента 
   p_depacc.name := substr(bars_msg.get_msg(modcode, 'FNLS_NMS_AGREEMENT', to_char(p_agrnum))||' '||p_custname, 1, 70);
@@ -4725,7 +4725,11 @@ begin
                           || SubStr('3/UA/' || l_city        ,1,35) || chr(10) -- Код країни + Місто
                           ||        '6/UA/' || l_accrec.CUST_IDCODE            -- Код країни + Код ЄДРПОУ Платника
                  when '52A  ' -- SWIFT-код Банка Платника
-                 then BRANCH_ATTRIBUTE_UTL.GET_VALUE('BICCODE') -- для РУ: GetGlobalOption('BICCODE')
+$if DPU_PARAMS.MMFO $then
+                 then BRANCH_ATTRIBUTE_UTL.GET_VALUE('BICCODE')
+$else
+                 then GetGlobalOption('BICCODE')
+$end
                  when '56A  ' -- SWIFT-код Банка Посередника
                  then r_swtags.TAG56_CODE
                  when '57A  ' -- SWIFT-код Банка Посередника
@@ -7402,7 +7406,11 @@ begin
                              end as ACC_TIP
                         from DPU_ACCOUNTS da
                         join DPU_DEAL     dd
+$if DPU_PARAMS.MMFO $then
+                          on ( dd.KF = da.KF and dd.DPU_ID = da.DPUID )
+$else
                           on ( dd.DPU_ID = da.DPUID )
+$end
                        where dd.DPU_GEN Is Not Null
                          and dd.CLOSED = 0
                     )
@@ -7416,7 +7424,11 @@ begin
          , l_nls_gen
       from DPU_ACCOUNTS da
       join DPU_DEAL     dd
+$if DPU_PARAMS.MMFO $then
         on ( dd.KF = da.KF and dd.DPU_ID = da.DPUID )
+$else
+        on ( dd.DPU_ID = da.DPUID )
+$end
       join ACCOUNTS     ac
         on ( ac.ACC = da.ACCID )
      where dd.DPU_ID = k.GEN_ID

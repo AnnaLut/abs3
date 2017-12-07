@@ -11,6 +11,7 @@ PROMPT *** Create  trigger TAIU_W4ACC_UPDATE ***
 after insert or update or delete
    on BARS.W4_ACC for each row
 declare
+  -- ver. 07.12.2016
   l_rec    W4_ACC_UPDATE%rowtype;
 begin
 
@@ -48,6 +49,7 @@ begin
     l_rec.KOL_SP       := :old.KOL_SP;
     l_rec.S250         := :old.S250;
     l_rec.GRP          := :old.GRP;
+    l_rec.KF           := :old.KF;
 
   else
 
@@ -200,12 +202,13 @@ begin
     l_rec.KOL_SP     := :new.KOL_SP;
     l_rec.S250       := :new.S250;
     l_rec.GRP        := :new.GRP;
+    l_rec.KF         := :new.KF;
 
   end if;
 
   If (l_rec.CHGACTION Is Not Null)
   Then
-    l_rec.IDUPD        := S_W4ACC_UPDATE.NextVal;
+    l_rec.IDUPD        := bars_sqnc.get_nextval('s_w4acc_update', l_rec.KF);
     l_rec.EFFECTDATE   := COALESCE(gl.bd, glb_bankdate);
     l_rec.CHGDATE      := sysdate;
     l_rec.DONEBY       := gl.aUID;

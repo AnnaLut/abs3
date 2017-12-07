@@ -99,9 +99,13 @@ err        EXCEPTION;
 par1       VARCHAR2(25)  := null;
 l_title    varchar2(100) := 'op_reg: ';
 l_count    number;
+l_tries    number;
+l_new_nls  accounts.nls%type;
 
 BEGIN
 
+   bars_audit.info (l_title||'старт открытия счета kf='||gl.amfo||', nls='||p_nls_);
+   
    bars_audit.trace('%s params: mod_=%s, p1_=%s, p2_=%s, p3_=%s, p4_=%s, rnk_=%s, p_nls_=%s, kv_=%s',
         l_title, to_char(mod_), to_char(p1_), to_char(p2_), to_char(p3_), to_char(p4_), to_char(rnk_), p_nls_, to_char(kv_));
    bars_audit.trace('%s params: nms_=%s, tip_=%s, isp_=%s, accR_=%s, nbsnull_=%s, pap_=%s, vid_=%s, pos_=%s',
@@ -149,10 +153,38 @@ BEGIN
       end if;
    end if;
 
-   select count(*) into l_count from transform_2017_forecast where kf = gl.amfo and new_nls  = l_nls;     
-      if l_count  > 0 then 
-         raise_application_error(-(20000 + 10), 'Рахунок '||l_nls||' зарезервовано під новий план рахунків', TRUE);
-      end if;    
+
+    
+      select count(*) into l_count from transform_2017_forecast where kf = gl.amfo and new_nls  = l_nls;     
+      if l_count  > 0 then
+         bars_audit.info(l_title||' рахунок '||l_nls||' зарезервовано під новий план рахунків');
+         l_new_nls := vkrzn( substr( gl.amfo, 1,5),  substr(l_nls,1,4)||'0' || trunc ( dbms_random.value ( 100000000, 999999999 ) )) ;
+
+         l_tries :=0;
+         while l_tries < 100 loop                     
+
+                     l_count := 0 ;
+                     select count(*) into l_count from 
+                     ( select 1  from accounts                   where nls      = l_new_nls   and kf = gl.amfo
+                       union all 
+                       select 1 from TRANSFORM_2017_FORECAST     where new_nls  = l_new_nls   and kf = gl.amfo
+                     );
+                    
+                     -- если такой счет нашли или в счете или в зарезервированных
+                     -- пытаемся еще раз подобрать
+                     if l_count = 0 then              
+                        -- выход, счет подобрали
+                        exit;   
+                     end if;
+                     l_tries := l_tries + 1;
+                     l_new_nls := vkrzn( substr( gl.amfo, 1,5),  substr(l_nls,1,4)||'0' || trunc ( dbms_random.value ( 100000000, 999999999 ) )) ;
+             end loop;  
+        -- делаем сто попыток
+         bars_audit.info(l_title||' рахунок '||l_nls||' в зарезервованх, підібрано новий рахунок = '||l_new_nls);
+         l_nls :=  l_new_nls;
+         --raise_application_error(-(20000 + 10), 'Рахунок '||l_nls||' зарезервовано під новий план рахунків', TRUE);
+      end if;         
+       
    
    
    -- определяем, есть ли счет
