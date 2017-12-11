@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReportInfo.Created="12/22/2015 17:13:37" ReportInfo.Modified="04/14/2016 18:21:27" ReportInfo.CreatorVersion="2014.3.2.0">
+<Report ScriptLanguage="CSharp" ReportInfo.Created="12/22/2015 17:13:37" ReportInfo.Modified="02/10/2017 11:02:00" ReportInfo.CreatorVersion="2014.1.2.0">
   <Dictionary>
-    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXawgQMNksAJZokM+/w71MdJ7Dh+Ji+yv3x3WD7KtdXUA==">
-      <TableDataSource Name="Table" Alias="Total" DataType="System.Int32" Enabled="true" SelectCommand="SELECT name,&#13;&#10;       ndog,&#13;&#10;       to_char(ddog, 'DD.MM.YYYY') AS ddog,&#13;&#10;       amount_fee,&#13;&#10;       fee_mfo,&#13;&#10;       fee_nls,&#13;&#10;       fee_okpo,&#13;&#10;       sum_pays,&#13;&#10;       f_sumpr (sum_pays * 100, '980', 'F', 0) AS sum_pays_word,&#13;&#10;       sum_fee,&#13;&#10;       f_sumpr (sum_fee * 100, '980', 'F', 0) AS sum_fee_word,&#13;&#10;       to_char(period_start, 'DD.MM.YYYY') AS period_start,&#13;&#10;       to_char(period_end, 'DD.MM.YYYY') AS period_end&#13;&#10;  FROM v_accp_act1&#13;&#10; WHERE okpo = :okpo">
+    <OracleDataConnection Name="Connection" ConnectionString="rijcmlq8+HCsj5mnfc2oQWOJAI1rOWOGv68sBpiXMxVx5dIqE6xyYfDaA3srMlhyxUDGC0H8GM5bgxXJ/HMoUAR4uo8gw==">
+      <TableDataSource Name="Table" Alias="Total" DataType="System.Int32" Enabled="true" SelectCommand="SELECT name,&#13;&#10;       ndog,&#13;&#10;       to_char(ddog, 'DD.MM.YYYY') AS ddog,&#13;&#10;       amount_fee,&#13;&#10;       fee_mfo,&#13;&#10;       fee_nls,&#13;&#10;       fee_okpo,&#13;&#10;       sum_pays,&#13;&#10;       f_sumpr (sum_pays * 100, '980', 'F', 0) AS sum_pays_word,&#13;&#10;       sum_fee,&#13;&#10;       f_sumpr (sum_fee * 100, '980', 'F', 0) AS sum_fee_word,&#13;&#10;       to_char(period_start, 'DD.MM.YYYY') AS period_start,&#13;&#10;       to_char(period_end, 'DD.MM.YYYY') AS period_end,&#13;&#10;       (select substr(F_DAT_LIT (period_start, 'U' ),6)  from dual) as DATLIT&#13;&#10;  FROM v_accp_act1&#13;&#10; WHERE okpo = :okpo">
         <Column Name="NAME" DataType="System.String"/>
         <Column Name="NDOG" DataType="System.String"/>
         <Column Name="DDOG" DataType="System.String"/>
@@ -16,6 +16,7 @@
         <Column Name="SUM_FEE_WORD" DataType="System.String"/>
         <Column Name="PERIOD_START" DataType="System.String"/>
         <Column Name="PERIOD_END" DataType="System.String"/>
+        <Column Name="DATLIT" DataType="System.String"/>
         <CommandParameter Name="okpo" DataType="126" Expression="[Param0]" DefaultValue="00000000"/>
       </TableDataSource>
     </OracleDataConnection>
@@ -23,7 +24,7 @@
   </Dictionary>
   <ReportPage Name="Page1" RawPaperSize="9" LeftMargin="25" TopMargin="12" RightMargin="15" BottomMargin="12" FirstPageSource="15" OtherPagesSource="15">
     <ReportTitleBand Name="ReportTitle1" Width="642.6" Height="122.85" CanGrow="true">
-      <TextObject Name="Text1" Top="18.9" Width="642.6" Height="85.05" CanGrow="true" GrowToBottom="true" CanBreak="false" Text="&lt;b&gt;АКТ&lt;/b&gt;&#13;&#10;прийому-здачі виконаних послуг&#13;&#10;по рахунку із спеціальним режимом використання&#13;&#10;згідно &lt;b&gt;Договору № &lt;u&gt;[Total.NDOG]&lt;/u&gt; від &lt;u&gt;[Total.DDOG]&lt;/u&gt; р.&lt;/b&gt;&#13;&#10;&lt;b&gt;за __________ 201__ р.&lt;/b&gt;&#13;&#10;" HorzAlign="Center" HtmlTags="true">
+      <TextObject Name="Text1" Top="18.9" Width="642.6" Height="85.05" CanGrow="true" GrowToBottom="true" CanBreak="false" Text="&lt;b&gt;АКТ&lt;/b&gt;&#13;&#10;прийому-здачі виконаних послуг&#13;&#10;по рахунку із спеціальним режимом використання&#13;&#10;згідно &lt;b&gt;Договору № &lt;u&gt;[Total.NDOG]&lt;/u&gt; від &lt;u&gt;[Total.DDOG]&lt;/u&gt; р.&lt;/b&gt;&#13;&#10;&lt;b&gt;за [Total.DATLIT]&lt;/b&gt;&#13;&#10;" HorzAlign="Center" HtmlTags="true">
         <Formats>
           <GeneralFormat/>
           <DateFormat/>
@@ -67,8 +68,8 @@
       </TableObject>
       <LineObject Name="Line13" Top="37.8" Diagonal="true"/>
     </ReportTitleBand>
-    <DataBand Name="Data1" Top="126.05" Width="642.6" Height="226.8" CanGrow="true" DataSource="Table">
-      <TextObject Name="Text2" Width="642.6" Height="151.2" CanGrow="true" GrowToBottom="true" CanBreak="false" Text="Ми, що нижче підписалися, &lt;b&gt;[Total.NAME]&lt;/b&gt; (надалі - &quot;Клієнт&quot;), в особі директора ______________________, який діє на підставі Статуту з однієї сторони, та &lt;b&gt;Банк (установа Банку) ____________________________________________________________________________________________________________&lt;/b&gt; (надалі &quot;Банк&quot;) в особі ______________________________________________________________, який діє на підставі ____________________________________________________, посвідченої ________________________________________________________________________________ з другої сторони, цим Актом підтверджуємо, що згідно Договору від [Total.DDOG] р. № [Total.NDOG], за __________ 201__ р. &quot;Банком&quot; було прийнято платежів за _________________ від платників за послуги Клієнта на суму &lt;b&gt;[Total.SUM_PAYS]грн.&lt;/b&gt; ([Total.SUM_PAYS_WORD]).&#13;&#10;" HorzAlign="Justify" HtmlTags="true">
+    <DataBand Name="Data1" Top="126.85" Width="642.6" Height="226.8" CanGrow="true" DataSource="Table">
+      <TextObject Name="Text2" Width="642.6" Height="151.2" CanGrow="true" GrowToBottom="true" CanBreak="false" Text="Ми, що нижче підписалися, &lt;b&gt;[Total.NAME]&lt;/b&gt; (надалі - &quot;Клієнт&quot;), в особі директора ______________________, який діє на підставі Статуту з однієї сторони, та &lt;b&gt;Банк (установа Банку) ____________________________________________________________________________________________________________&lt;/b&gt; (надалі &quot;Банк&quot;) в особі ______________________________________________________________, який діє на підставі ____________________________________________________, посвідченої ________________________________________________________________________________ з другої сторони, цим Актом підтверджуємо, що згідно Договору від [Total.DDOG] р. № [Total.NDOG], за [Total.DATLIT] &quot;Банком&quot; було прийнято платежів за _________________ від платників за послуги Клієнта на суму &lt;b&gt;[Total.SUM_PAYS]грн.&lt;/b&gt; ([Total.SUM_PAYS_WORD]).&#13;&#10;" HorzAlign="Justify" HtmlTags="true">
         <Formats>
           <GeneralFormat/>
           <DateFormat/>
@@ -89,7 +90,7 @@
         </Formats>
       </TextObject>
     </DataBand>
-    <ReportSummaryBand Name="ReportSummary1" Top="356.05" Width="642.6" Height="217.35">
+    <ReportSummaryBand Name="ReportSummary1" Top="357.65" Width="642.6" Height="217.35">
       <TableObject Name="Table2" Left="18.9" Top="9.45" Width="603.95" Height="189">
         <TableColumn Name="Column3" Width="302.4"/>
         <TableColumn Name="Column4" Width="301.55"/>
@@ -98,19 +99,19 @@
           <TableCell Name="Cell26" Text="Роботу прийняв:&#13;&#10;Представник Клієнта" Font="Arial, 10pt, style=Bold"/>
         </TableRow>
         <TableRow Name="Row8">
-          <TableCell Name="Cell30" Text="Рах. № _________________"/>
+          <TableCell Name="Cell30" Text="Рах. № [Total.FEE_NLS]"/>
           <TableCell Name="Cell31" Text="Рах. № _________________"/>
         </TableRow>
         <TableRow Name="Row9">
-          <TableCell Name="Cell35" Text="в Банку &quot;________________&quot;, м. Київ,"/>
+          <TableCell Name="Cell35" Text="в Банку АТ Ощадбанк, м. Київ,"/>
           <TableCell Name="Cell36" Text="в Банку &quot;________________&quot;, м. Київ,"/>
         </TableRow>
         <TableRow Name="Row10">
-          <TableCell Name="Cell40" Text="МФО ______"/>
+          <TableCell Name="Cell40" Text="МФО [Total.FEE_MFO]"/>
           <TableCell Name="Cell41" Text="МФО ______"/>
         </TableRow>
         <TableRow Name="Row11">
-          <TableCell Name="Cell45" Text="код ЄДРПОУ _____________"/>
+          <TableCell Name="Cell45" Text="код ЄДРПОУ [Total.FEE_OKPO]"/>
           <TableCell Name="Cell46" Text="код ЄДРПОУ _____________"/>
         </TableRow>
         <TableRow Name="Row12" Height="75.6">

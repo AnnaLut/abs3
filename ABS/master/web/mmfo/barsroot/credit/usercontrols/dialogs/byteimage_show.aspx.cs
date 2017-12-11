@@ -37,7 +37,7 @@ public partial class dialogs_byteimage_show : Bars.BarsPage
     {
         if (!IsPostBack)
         {
-            BImg.BDValue = (ByteData)this.Session[this.ImageDataSessionID];
+            BImg.BDValue = Bars.Utils.ByteImageHolder.GetImageByteDataFromSession(Session, ImageDataSessionID);
         }
     }
     protected void ibPrint_Click(object sender, ImageClickEventArgs e)

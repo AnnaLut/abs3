@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ConvertNulls="false" ReportInfo.Created="12/14/2015 10:55:31" ReportInfo.Modified="02/21/2016 11:15:30" ReportInfo.CreatorVersion="2014.3.2.0">
+<Report ScriptLanguage="CSharp" ConvertNulls="false" ReportInfo.Created="12/14/2015 10:55:31" ReportInfo.Modified="02/10/2017 11:13:43" ReportInfo.CreatorVersion="2014.1.2.0">
   <Dictionary>
-    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXawgQMNksAJZokM+/w71Mdu4aBlSLtaRnX+vfs/m8U/Q==">
+    <OracleDataConnection Name="Connection" ConnectionString="rijcmlq8+HCsj5mnfc2oQWOJAI1rOWOGv68sBpiXMxVx5dIqE6xyYfDaA3srMlhyxUDGC0HupYgYf6tUHcRWWVL0Yq3+A==">
       <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="SELECT branch,&#13;&#10;       nls,&#13;&#10;       sum_pays,&#13;&#10;       sum_fee&#13;&#10;  FROM v_accp_act3&#13;&#10; WHERE branch &lt;&gt; 'Всього:' AND okpo = :okpo">
         <Column Name="BRANCH" DataType="System.String"/>
         <Column Name="NLS" DataType="System.String"/>
@@ -9,7 +9,7 @@
         <Column Name="SUM_FEE" DataType="System.Decimal"/>
         <CommandParameter Name="okpo" DataType="126" Expression="[Param0]" DefaultValue="00000000"/>
       </TableDataSource>
-      <TableDataSource Name="Table4" Alias="Total" DataType="System.Int32" Enabled="true" SelectCommand="SELECT name,&#13;&#10;       ndog,&#13;&#10;       to_char(ddog, 'DD.MM.YYYY') AS ddog,&#13;&#10;       okpo,&#13;&#10;       amount_fee,&#13;&#10;       fee_mfo,&#13;&#10;       fee_nls,&#13;&#10;       fee_okpo,&#13;&#10;       sum_pays,&#13;&#10;       f_sumpr (sum_pays * 100, '980', 'F', 0) AS sum_pays_word,&#13;&#10;       sum_fee,&#13;&#10;       f_sumpr (sum_fee * 100, '980', 'F', 0) AS sum_fee_word,&#13;&#10;       to_char(period_start, 'DD.MM.YYYY') AS period_start,&#13;&#10;       to_char(period_end, 'DD.MM.YYYY') AS period_end&#13;&#10;  FROM v_accp_act3&#13;&#10; WHERE branch = 'Всього:' AND okpo = :okpo">
+      <TableDataSource Name="Table4" Alias="Total" DataType="System.Int32" Enabled="true" SelectCommand="SELECT name,&#13;&#10;       ndog,&#13;&#10;       to_char(ddog, 'DD.MM.YYYY') AS ddog,&#13;&#10;       okpo,&#13;&#10;       amount_fee,&#13;&#10;       fee_mfo,&#13;&#10;       fee_nls,&#13;&#10;       fee_okpo,&#13;&#10;       sum_pays,&#13;&#10;       f_sumpr (sum_pays * 100, '980', 'F', 0) AS sum_pays_word,&#13;&#10;       sum_fee,&#13;&#10;       f_sumpr (sum_fee * 100, '980', 'F', 0) AS sum_fee_word,&#13;&#10;       to_char(period_start, 'DD.MM.YYYY') AS period_start,&#13;&#10;       to_char(period_end, 'DD.MM.YYYY') AS period_end,&#13;&#10;       (select substr(F_DAT_LIT (period_start, 'U' ),6)  from dual) as DATLIT&#13;&#10;  FROM v_accp_act3&#13;&#10; WHERE branch = 'Всього:' AND okpo = :okpo">
         <Column Name="NAME" DataType="System.String"/>
         <Column Name="NDOG" DataType="System.String"/>
         <Column Name="DDOG" DataType="System.String"/>
@@ -24,6 +24,7 @@
         <Column Name="SUM_FEE_WORD" DataType="System.String"/>
         <Column Name="PERIOD_START" DataType="System.String"/>
         <Column Name="PERIOD_END" DataType="System.String"/>
+        <Column Name="DATLIT" DataType="System.String"/>
         <CommandParameter Name="okpo" DataType="126" Expression="[Param0]" DefaultValue="00000000"/>
       </TableDataSource>
     </OracleDataConnection>
@@ -31,14 +32,14 @@
   </Dictionary>
   <ReportPage Name="Page1" RawPaperSize="9" LeftMargin="25" TopMargin="12" RightMargin="15" BottomMargin="12" FirstPageSource="15" OtherPagesSource="15">
     <ReportTitleBand Name="ReportTitle1" Width="642.6" Height="113.4">
-      <TextObject Name="Text1" Top="9.45" Width="642.6" Height="85.05" Text="&lt;b&gt;АКТ&lt;/b&gt;&#13;&#10;прийому-здачі виконаних робіт&#13;&#10;по рахунку із спеціальним режимом використання згідно&#13;&#10;&lt;b&gt;до Договору № &lt;u&gt;[Total.NDOG]&lt;/u&gt; від &lt;u&gt;[Total.DDOG] р.&lt;/u&gt;&#13;&#10;за __________ 201__ р.&lt;/b&gt;" HorzAlign="Center" HtmlTags="true">
+      <TextObject Name="Text1" Top="9.45" Width="642.6" Height="85.05" Text="&lt;b&gt;АКТ&lt;/b&gt;&#13;&#10;прийому-здачі виконаних робіт&#13;&#10;по рахунку із спеціальним режимом використання згідно&#13;&#10;&lt;b&gt;до Договору № &lt;u&gt;[Total.NDOG]&lt;/u&gt; від &lt;u&gt;[Total.DDOG] р.&lt;/u&gt;&#13;&#10;за [Total.DATLIT]&lt;/b&gt;" HorzAlign="Center" HtmlTags="true">
         <Formats>
           <GeneralFormat/>
           <DateFormat/>
         </Formats>
       </TextObject>
     </ReportTitleBand>
-    <DataBand Name="Data1" Top="316.98" Width="642.6" Height="18.9" CanGrow="true" DataSource="Table">
+    <DataBand Name="Data1" Top="319.85" Width="642.6" Height="18.9" CanGrow="true" DataSource="Table">
       <TableObject Name="Table3" Width="642.6" Height="18.9">
         <TableColumn Name="Column7" Width="132.3"/>
         <TableColumn Name="Column8" Width="160.65"/>
@@ -51,8 +52,8 @@
           <TableCell Name="Cell32" Border.Lines="All" Text="[Table.SUM_FEE]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right"/>
         </TableRow>
       </TableObject>
-      <DataHeaderBand Name="DataHeader1" Top="115.96" Width="642.6" Height="198.45" CanGrow="true">
-        <TextObject Name="Text2" Top="9.45" Width="642.6" Height="132.3" CanGrow="true" GrowToBottom="true" CanBreak="false" Text="     Ми, що нижче підписалися, &lt;b&gt;[Total.NAME]&lt;/b&gt; (надалі – &quot;Клієнт&quot;), в особі директора ________________________, який діє на підставі Статуту з однієї сторони, та &lt;b&gt;філія-Головне управління по м. Києву та Київській області АТ &quot;Ощадбанк&quot;&lt;/b&gt;, (надалі – &quot;Банк&quot;), в особі _____________________________________________, який діє на підставі ___________________, посвідченої ________________________, з другої сторони, цим Актом підтверджуємо, що згідно Договору від [Total.DDOG] р. № [Total.NDOG], за __________ 201__ року &quot;Банком&quot; було прийнято платежів за _________________ від Платників на користь &quot;Клієнта&quot; на суму &lt;b&gt;[Total.SUM_PAYS] грн.&lt;/b&gt; ([Total.SUM_PAYS_WORD])." Padding="0, 0, 0, 0" HorzAlign="Justify" HtmlTags="true">
+      <DataHeaderBand Name="DataHeader1" Top="117.4" Width="642.6" Height="198.45" CanGrow="true">
+        <TextObject Name="Text2" Top="9.45" Width="642.6" Height="132.3" CanGrow="true" GrowToBottom="true" CanBreak="false" Text="     Ми, що нижче підписалися, &lt;b&gt;[Total.NAME]&lt;/b&gt; (надалі – &quot;Клієнт&quot;), в особі директора ________________________, який діє на підставі Статуту з однієї сторони, та &lt;b&gt;філія-Головне управління по м. Києву та Київській області АТ &quot;Ощадбанк&quot;&lt;/b&gt;, (надалі – &quot;Банк&quot;), в особі _____________________________________________, який діє на підставі ___________________, посвідченої ________________________, з другої сторони, цим Актом підтверджуємо, що згідно Договору від [Total.DDOG] р. № [Total.NDOG], за [Total.DATLIT]  &quot;Банком&quot; було прийнято платежів за _________________ від Платників на користь &quot;Клієнта&quot; на суму &lt;b&gt;[Total.SUM_PAYS] грн.&lt;/b&gt; ([Total.SUM_PAYS_WORD])." Padding="0, 0, 0, 0" HorzAlign="Justify" HtmlTags="true">
           <Formats>
             <GeneralFormat/>
             <DateFormat/>
@@ -74,7 +75,7 @@
           </TableRow>
         </TableObject>
       </DataHeaderBand>
-      <DataFooterBand Name="DataFooter1" Top="338.44" Width="642.6" Height="122.85" CanGrow="true">
+      <DataFooterBand Name="DataFooter1" Top="342.75" Width="642.6" Height="122.85" CanGrow="true">
         <TextObject Name="Text3" Top="28.35" Width="642.6" Height="66.15" CanGrow="true" GrowToBottom="true" CanBreak="false" Text="     Загальна сума комісійної винагороди, яка сплачується &quot;Клієнтом&quot; &quot;Банку&quot; за звітний період, з [Total.PERIOD_START] р. по [Total.PERIOD_END] р. становить &lt;b&gt;[Total.SUM_FEE] грн.&lt;/b&gt; ([Total.SUM_FEE_WORD]) та перераховується на р/р [Total.FEE_NLS], МФО [Total.FEE_MFO], ЄДРПОУ [Total.FEE_OKPO]." Padding="0, 0, 0, 0" HorzAlign="Justify" HtmlTags="true">
           <Formats>
             <DateFormat/>
@@ -100,7 +101,7 @@
         </TableObject>
       </DataFooterBand>
     </DataBand>
-    <ReportSummaryBand Name="ReportSummary1" Top="463.86" Width="642.6" Height="179.55">
+    <ReportSummaryBand Name="ReportSummary1" Top="469.6" Width="642.6" Height="179.55">
       <TableObject Name="Table1" Left="18.9" Top="9.45" Width="604.8" Height="160.65">
         <TableColumn Name="Column1" Width="302.4"/>
         <TableColumn Name="Column2" Width="302.4"/>
@@ -109,19 +110,19 @@
           <TableCell Name="Cell2" Text="Представник Клієнта:" Font="Arial, 10pt, style=Bold"/>
         </TableRow>
         <TableRow Name="Row2">
-          <TableCell Name="Cell6" Text="Рах. № _________________"/>
+          <TableCell Name="Cell6" Text="Рах. № [Total.FEE_NLS]"/>
           <TableCell Name="Cell7" Text="Рах. № _________________"/>
         </TableRow>
         <TableRow Name="Row3">
-          <TableCell Name="Cell11" Text="в Банку &quot;________________&quot;, м. Київ,"/>
+          <TableCell Name="Cell11" Text="в Банку АТ Ощадбанк, м. Київ,"/>
           <TableCell Name="Cell12" Text="в Банку &quot;________________&quot;,"/>
         </TableRow>
         <TableRow Name="Row4">
-          <TableCell Name="Cell16" Text="МФО ______"/>
+          <TableCell Name="Cell16" Text="МФО [Total.FEE_MFO]"/>
           <TableCell Name="Cell17" Text="МФО ______"/>
         </TableRow>
         <TableRow Name="Row5">
-          <TableCell Name="Cell21" Text="код ЄДРПОУ _____________"/>
+          <TableCell Name="Cell21" Text="код ЄДРПОУ [Total.FEE_OKPO]"/>
           <TableCell Name="Cell22" Text="код ЄДРПОУ _____________"/>
         </TableRow>
         <TableRow Name="Row6" Height="66.15">

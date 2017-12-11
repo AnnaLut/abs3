@@ -576,8 +576,18 @@
                     }
                     else {
                         var success = csxi.PostImage(UploadUrl, 'scan.pdf', '', UploadFormat); //передаем файл формата PDF на сервер
-                          if (success == false) {
-                              alert('Не вдалося завантажити файл на веб-сервер, код відповіді від серверу: ' + csxi.PostReturnCode);
+                        if (success == false) {
+                            if (csxi.PostReturnCode == 401){
+                                var _UploadUrl = location.protocol + '//' + location.host + '/barsroot/api/Upload/UploadApi/ScanUpload';
+                                csxi.AddFormVar('SessionID', SessionID);
+                                success = csxi.PostImage(_UploadUrl, 'scan.pdf', '', UploadFormat);
+                                if (success == false) {
+                                    alert('Не вдалося завантажити файл на веб-сервер, код відповіді від серверу: ' + csxi.PostReturnCode);
+                                }
+                            }
+                            else {
+                                alert('Не вдалося завантажити файл на веб-сервер, код відповіді від серверу: ' + csxi.PostReturnCode);
+                            }
                           }
                           CloseDialog({ SaveBtnEnabled: false, Status: true, SelectedDevice: GetSelectedDevice() });
                     }

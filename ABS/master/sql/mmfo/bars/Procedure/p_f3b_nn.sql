@@ -12,7 +12,7 @@ PROMPT *** Create  procedure P_F3B_NN ***
 % DESCRIPTION :	Процедура формирования #3B для
 % COPYRIGHT   :	Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     : 23.11.2017 (21.08.2017,16.08.2017)
+% VERSION     : 06.12.2017    (23.11.2017, 21.08.2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_    - отчетная дата
                sheme_  - код схемы
@@ -27,6 +27,7 @@ PROMPT *** Create  procedure P_F3B_NN ***
  11    ZZZZZZZZZZ   ОКПО предприятия
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+06.12.2017 Ограниченние набора показателей DDDDD для формы 3
 23.11.2017 Сегмент LL=10 -oбработка данных формы 3 для клиентов
 21.08.2017 Изменено формирование показателя 05 (признак АТО)
            (0 - находится в АТО, 1 - нет) 
@@ -446,32 +447,54 @@ BEGIN
                  order by P, nnnnn, substr(DDDDD,2), M 
        ) loop
         
-          if t.idf =3  then
+          if t.ddddd in ( '33000','33005','33006','33010','33095','33100','33105',
+                          '33110','33115','33190','33195','33200','33205','33215',
+                          '33220','33225','33250','33255','33260','33270','33290',
+                          '33295','33300','33305','33340','33345','33350','33355',
+                          '33360','33390','33395','33400','33405','33410','33415',
+                          '43500','43505','43510','43515','43520','43550','43560',
+                          '43570','43580','43195','43200','43205','43215','43220',
+                          '43225','43250','43255','43260','43270','43290','43295',
+                          '43300','43305','43340','43345','43350','43355','43360',
+                          '43390','43395','43400','43405','43410','43415' )
+          then
 
-             INSERT INTO rnbu_trace (recid, userid, odate, kodp, znap, comm)
-                VALUES (s_rnbu_record.NEXTVAL, userid_, dat_, 
-                        '10'||t.P||t.M||'0'||t.DDDDD||LPAD(t.okpo,10,'0'), TO_CHAR(t.COLUM3), 'OKPO='||t.OKPO);
+             if t.idf =3  then
+         
+                znap_ := t.COLUM3;            --смена знака для списка показателей
+                if     sign(znap_) =1
+                   and t.ddddd in ( '33100','33105','33110','33115','33190','33255',
+                                    '33260','33270','33290','33345','33355','33390')
+                then
+         
+                   znap_ := (-1)* znap_;
+                end if;
+         
+                INSERT INTO rnbu_trace (recid, userid, odate, kodp, znap, comm)
+                   VALUES (s_rnbu_record.NEXTVAL, userid_, dat_, 
+                           '10'||t.P||t.M||'0'||t.DDDDD||LPAD(t.okpo,10,'0'), TO_CHAR(znap_), 'OKPO='||t.OKPO);
+         
+             end if;
+         
+             if t.idf =4 and t.COLUM4 >0 then
+         
+                INSERT INTO rnbu_trace (recid, userid, odate, kodp, znap, comm)
+                   VALUES (s_rnbu_record.NEXTVAL, userid_, dat_, 
+                           '10'||t.P||t.M||'1'||t.DDDDD||LPAD(t.okpo,10,'0'), TO_CHAR(t.COLUM4), 'OKPO='||t.OKPO);
+         
+             end if;
+         
+             if t.idf =4 and t.COLUM3 >0 then
+         
+                INSERT INTO rnbu_trace (recid, userid, odate, kodp, znap, comm)
+                   VALUES (s_rnbu_record.NEXTVAL, userid_, dat_, 
+                           '10'||t.P||t.M||'2'||t.DDDDD||LPAD(t.okpo,10,'0'), TO_CHAR(t.COLUM3), 'OKPO='||t.OKPO);
+             end if;
 
-          end if;
-
-          if t.idf =4 and t.COLUM4 >0 then
-
-             INSERT INTO rnbu_trace (recid, userid, odate, kodp, znap, comm)
-                VALUES (s_rnbu_record.NEXTVAL, userid_, dat_, 
-                        '10'||t.P||t.M||'1'||t.DDDDD||LPAD(t.okpo,10,'0'), TO_CHAR(t.COLUM4), 'OKPO='||t.OKPO);
-
-          end if;
-
-          if t.idf =4 and t.COLUM3 >0 then
-
-             INSERT INTO rnbu_trace (recid, userid, odate, kodp, znap, comm)
-                VALUES (s_rnbu_record.NEXTVAL, userid_, dat_, 
-                        '10'||t.P||t.M||'2'||t.DDDDD||LPAD(t.okpo,10,'0'), TO_CHAR(t.COLUM3), 'OKPO='||t.OKPO);
           end if;
 
        end loop;
 
---    if mfo_ = 300465 then
        delete from rnbu_trace where znap='0' and kodp like '10%';
 
        delete from rnbu_trace r
@@ -480,7 +503,6 @@ BEGIN
                          where substr(r1.kodp, 11, 10) = substr(r.kodp, 11, 10)
                            and r1.kodp like '10_1______' || substr(r.kodp, 11, 10) || '%'
                        );  
---    end if;
     
     ---------------------------------------------------
     delete from tmp_nbu where kodf=kodf_ and datf= dat_;

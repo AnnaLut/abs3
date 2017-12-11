@@ -15,7 +15,7 @@ angular.module(globalSettings.modulesAreas)
 
             var _getFOPData = function (custId) {
                 var deferred = $q.defer();
-                  
+                 
                 $http.get(bars.config.urlContent('/api/corplight/customers/getfopdata/' + custId))
                 .success(function (response) {
                     deferred.resolve(response);
@@ -114,7 +114,7 @@ angular.module(globalSettings.modulesAreas)
                 });
                 return deferred.promise;
             };
-            var _update = function (relCustomer) {
+            var _update = function(relCustomer) {
                 state.isLoading = true;
                 var deferred = $q.defer();
 

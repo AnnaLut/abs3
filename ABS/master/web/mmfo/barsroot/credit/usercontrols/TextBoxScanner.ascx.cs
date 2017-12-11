@@ -113,20 +113,11 @@ namespace Bars.UserControls
         {
             get
             {
-                if (this.Session[this.ImageDataSessionID] == null) return null;
-
-                ByteData bd = (ByteData)this.Session[this.ImageDataSessionID];
-                return bd.Data;
+                return Utils.ByteImageHolder.GetImageFromSession(Session, ImageDataSessionID);
             }
             set
             {
-                if (this.Session[ImageDataSessionID] != null)
-                {
-                    (this.Session[ImageDataSessionID] as ByteData).Dispose();
-                    this.Session[ImageDataSessionID] = null;
-                }
-                
-                this.Session[ImageDataSessionID] = new ByteData(value);
+                Utils.ByteImageHolder.SetImageIntoSession(Session, ImageDataSessionID, value);
             }
         }
         /// <summary>
@@ -137,7 +128,7 @@ namespace Bars.UserControls
         {
             get
             {
-                return this.Session[this.ImageDataSessionID] != null && ((ByteData)this.Session[this.ImageDataSessionID]).HasData;
+                return Utils.ByteImageHolder.IsImageInSession(Session, ImageDataSessionID);
             }
         }
         /// <summary>

@@ -65,12 +65,14 @@ public partial class DepositContract : Bars.BarsPage
             /// 
 
             Deposit dpt = (Deposit)Session["DepositInfo"];
+            _dbLogger.Info("COBUMMFO-5060 : початкове значення wb: " + dpt.wb,"deposit");
 
             // ФИО клиента
             textClientName.Text = dpt.Client.Name;
 
             // Перелік типів депозитів
             FillTypeList();
+            _dbLogger.Info("COBUMMFO-5060 : після завантаження типів депозитів значення wb: " + dpt.wb,"deposit");
 
                 // Дата договора равна текущей системной
                 string dt = DateTime.Now.ToString("dd/MM/yyyy");
@@ -82,6 +84,7 @@ public partial class DepositContract : Bars.BarsPage
             
 
             FillControlsFromClass(dpt);
+            _dbLogger.Info("COBUMMFO-5060 : після завантаження контролів значення wb: " + dpt.wb, "deposit");
         }
         else
         {
@@ -461,6 +464,7 @@ public partial class DepositContract : Bars.BarsPage
             dpt.dpt_duration_months = Convert.ToDecimal(textDurationMonths.Text);
 
         Session["NewDeposit"] = dpt;
+        _dbLogger.Info("COBUMMFO-5060 : після вибору типу, валюти, виду депозиту значення wb: " + dpt.wb, "deposit");
     }
 
     /// <summary>

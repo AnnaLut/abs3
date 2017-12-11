@@ -84,6 +84,25 @@ namespace BarsWeb.Areas.Upload.Controllers.Api
             }
         }
 
+        [HttpPost]
+        public HttpResponseMessage ScanUpload()
+        {
+            HttpRequest r = HttpContext.Current.Request;
+            string SessionID = r.Form.Get("SessionID");
+
+            var file = r.Files.Count > 0 ? r.Files[0] : null;
+            if (file != null && file.ContentLength > 0)
+            {
+                byte[] bytes = new byte[file.InputStream.Length];
+                long data = file.InputStream.Read(bytes, 0, (int)file.InputStream.Length);
+                file.InputStream.Close();
+
+                string path = Path.Combine(Path.GetTempPath(), SessionID);
+                File.WriteAllBytes(path, bytes);
+            }
+            return new HttpResponseMessage() { StatusCode = HttpStatusCode.OK };
+        }
+
         void SaveImage(string imgType, byte[] imgData, string rnk)
         {
             decimal clientRnk = decimal.Parse(rnk);
