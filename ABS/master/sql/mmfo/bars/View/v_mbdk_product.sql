@@ -21,7 +21,10 @@ comment on column v_mbdk_product.tipd is 'Тип дог.: 1-розміщення, 2-залучення';
 comment on column v_mbdk_product.tipp is 'Тип продукту: 1-банки , 2-2700,3660 - ЮО';
 
 PROMPT *** Create  grants  V_MBDK_PRODUCT ***
-grant SELECT                                                                 on V_MBDK_PRODUCT  to BARS_ACCESS_DEFROLE;
+GRANT SELECT, INSERT, UPDATE, DELETE ON BARS.v_mbdk_product TO RCC_DEAL;
+GRANT SELECT, INSERT, UPDATE, DELETE ON BARS.v_mbdk_product TO START1;
+GRANT SELECT, INSERT, UPDATE, DELETE ON BARS.v_mbdk_product TO BARS_ACCESS_DEFROLE;
+GRANT SELECT ON BARS.v_mbdk_product to BARSUPL;
 
 PROMPT ===================================================================================== 
 PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_MBDK_PRODUCT.sql =========*** End ***

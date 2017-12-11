@@ -459,7 +459,7 @@ is
   l_err_rec_id         pls_integer;
   l_frst_yr_dt         date;
   l_attempt_num        number(1);
-  
+
   --
   -- exceptions
   --
@@ -522,7 +522,7 @@ is
     return l_ste;
 
   end CHK_OBJ_POLICY_STE;
-  
+
   --
   --
   --
@@ -538,15 +538,15 @@ is
     l_last_anlyzed        all_tab_statistics.last_analyzed%type;
     l_locked              number(1);
   begin
-    
+
     if ( p_obj_nm Is Not Null )
     then
-      
+
       l_obj_nm := upper(p_obj_nm);
-      
+
       if ( p_kf Is Null )
       then
-        
+
         begin
 --             , GLOBAL_STATS, USER_STATS, STALE_STATS -- ( YES / NO )
           select ts.NUM_ROWS, ts.LAST_ANALYZED, nvl2(ts.STATTYPE_LOCKED,1,0)
@@ -556,12 +556,12 @@ is
              and ts.TABLE_NAME = l_obj_nm
              and ts.OBJECT_TYPE = 'TABLE';
         exception
-          when NO_DATA_FOUND 
+          when NO_DATA_FOUND
           then null;
         end;
-        
+
       else
-        
+
         begin
           select ts.NUM_ROWS, ts.LAST_ANALYZED
             into l_num_rows, l_last_anlyzed
@@ -571,7 +571,7 @@ is
              and ts.OBJECT_TYPE = 'PARTITION'
              and ts.PARTITION_NAME = 'P_'||p_kf;
         exception
-          when NO_DATA_FOUND 
+          when NO_DATA_FOUND
           then
             begin
               select ts.NUM_ROWS, ts.LAST_ANALYZED
@@ -582,11 +582,11 @@ is
                  and ts.OBJECT_TYPE = 'SUBPARTITION'
                  and ts.SUBPARTITION_NAME = 'P_'||p_kf;
             exception
-              when NO_DATA_FOUND 
+              when NO_DATA_FOUND
               then null;
             end;
         end;
-        
+
         case
           when ( l_last_anlyzed Is Null )
           then -- статистика не збиралася взагалі
@@ -597,15 +597,15 @@ is
           else
             null;
         end case;
-        
+
       end if;
-    
+
     end if;
-    
+
     return l_required;
-    
+
   end REQUIRED_GATHER_STATS;
-  
+
   --
   --
   --
@@ -615,36 +615,36 @@ is
   ) is
      l_ptsn_nm             varchar2(30);
   begin
-    
+
     if ( p_kf Is Null )
     then
-      
+
       dbms_application_info.set_client_info( 'Gather stats on "'||p_tbl_nm||'".' );
-      
+
       DBMS_STATS.UNLOCK_TABLE_STATS
       ( ownname    => 'BARS'
       , tabname    => p_tbl_nm );
-      
+
       DM.DM_UTL.GATHER_TBL_STATS
       ( p_own_name => 'BARS'
       , p_tab_name => p_tbl_nm
       , p_dop      => l_dop );
-      
+
       DBMS_STATS.LOCK_TABLE_STATS
       ( ownname    => 'BARS'
       , tabname    => p_tbl_nm );
-      
+
     else
-      
+
       l_ptsn_nm := 'P_'||p_kf;
-      
+
       dbms_application_info.set_client_info( 'Gather stats on "'||p_tbl_nm||'" partition "'||l_ptsn_nm||'".' );
-      
+
       DBMS_STATS.UNLOCK_PARTITION_STATS
       ( ownname     => 'BARS'
       , tabname     => p_tbl_nm
       , partname    => l_ptsn_nm );
-      
+
       /*
       DM.DM_UTL.GATHER_TBL_STATS
       ( p_own_name  => 'BARS'
@@ -655,28 +655,28 @@ is
       , p_grnlr     => 'AUTO'
       , p_cascade   => TRUE
       );
-      
+
       -- or
       DBMS_STATS.COPY_TABLE_STATS
-      ( OWNNAME     => 
-      , TABNAME     => 
-      , SRCPARTNAME => 
-      , DSTPARTNAME => 
+      ( OWNNAME     =>
+      , TABNAME     =>
+      , SRCPARTNAME =>
+      , DSTPARTNAME =>
       , FORCE => TRUE
       );
-      
+
       -- export_table_stats
       */
-      
+
       DBMS_STATS.LOCK_PARTITION_STATS
       ( ownname     => 'BARS'
       , tabname     => p_tbl_nm
       , partname    => l_ptsn_nm );
-      
+
     end if;
-    
+
     dbms_application_info.set_client_info( null );
-    
+
   end GATHER_TABLE_STATS;
 
   --
@@ -815,10 +815,10 @@ is
     title     constant    varchar2(60)  := $$PLSQL_UNIT||'.CHK_OBJ_DPND';
     l_errmsg              varchar2(1000);
   begin
-    
+
     bars_audit.trace( '%s: Entry with ( rpt_dt=%s, kf=%s, vrsn_id =%s, obj_id=%s ).'
                     , title, to_char(p_rpt_dt,'dd.mm.yyyy'), p_kf, to_char(p_vrsn_id), to_char(p_obj_id) );
-    
+
     select LISTAGG( o.OBJECT_NAME, ', ' ) WITHIN GROUP ( order by o.ID )
       into l_errmsg
       from BARS.NBUR_LNK_OBJECT_OBJECT d
@@ -844,7 +844,7 @@ is
     bars_audit.trace( '%s: Exit.', title );
 
   end CHECK_OBJECT_DEPENDENCIES;
-  
+
   --
   --
   --
@@ -868,19 +868,19 @@ is
     title     constant    varchar2(60)  := $$PLSQL_UNIT||'.CHK_OBJ_DPND';
     l_errmsg              varchar2(1000);
   begin
-    
+
     bars_audit.trace( '%s: Entry with ( rpt_dt=%s, kf=%s, obj_id=%s, prd_tp=%s ).'
                     , title, to_char(p_rpt_dt,'dd.mm.yyyy'), p_kf, to_char(p_obj_id), p_prd_tp );
-    
+
     if ( l_errmsg Is Not Null )
     then
       raise_application_error( -20666, 'Відсутні необхідні для формування DM: ' || l_errmsg );
     end if;
-    
+
     bars_audit.trace( '%s: Exit.', title );
-    
+
   end CHECK_OBJECT_DEPENDENCIES;
-  
+
   ---------------------------------------------------------------------
   -- F_GET_OBJECT_ID_BY_NAME
   --
@@ -1078,9 +1078,9 @@ is
 
     bars_audit.trace( '%s: Entry with ( report_dt=%s, kf=%s, version_id =%s ).'
                     , title, to_char(p_report_date,'dd.mm.yyyy'), p_kf, to_char(p_version_id) );
-    
+
     dbms_application_info.set_client_info( title );
-    
+
     execute immediate 'alter session ENABLE PARALLEL DDL';
     execute immediate 'alter session SET DDL_LOCK_TIMEOUT=300';
 
@@ -1133,21 +1133,21 @@ is
   ) is
     title    constant     varchar2(64) := $$PLSQL_UNIT||'.FINISH_LOAD_OBJECT';
   begin
-    
+
     bars_audit.trace( '%s: Entry with ( rpt_dt=%s, kf=%s, vrsn_id=%s, obj_id=%s ).'
                     , title, to_char(p_report_date,'dd.mm.yyyy'), p_kf
                     , to_char(p_version_id), to_char(p_object_id) );
-    
+
     if ( p_kf Is Null )
     then -- for all KF (in future)
-      
+
       update NBUR_LST_OBJECTS
          set OBJECT_STATUS = 'INVALID'
        where REPORT_DATE = p_report_date
          and OBJECT_ID   = p_object_id
          and VERSION_ID  < p_version_id
          and OBJECT_STATUS <> 'BLOCKED';
-      
+
       update NBUR_LST_OBJECTS
          set FINISH_TIME   = systimestamp
            , OBJECT_STATUS = case when p_err_rec_id > 0 then 'ERROR' else 'FINISHED' end
@@ -1156,9 +1156,9 @@ is
        where REPORT_DATE = p_report_date
          and OBJECT_ID   = p_object_id
          and version_id  = p_version_id;
-    
+
     else
-      
+
       update NBUR_LST_OBJECTS
          set OBJECT_STATUS = 'INVALID'
        where REPORT_DATE = p_report_date
@@ -1166,7 +1166,7 @@ is
          and OBJECT_ID   = p_object_id
          and VERSION_ID  < p_version_id
          and OBJECT_STATUS <> 'BLOCKED';
-      
+
       update NBUR_LST_OBJECTS
          set FINISH_TIME   = systimestamp
            , OBJECT_STATUS = case when p_err_rec_id > 0 then 'ERROR' else 'FINISHED' end
@@ -1176,15 +1176,15 @@ is
          and KF          = p_kf
          and OBJECT_ID   = p_object_id
          and version_id  = p_version_id;
-      
+
     end if;
-    
+
     commit;
-    
+
     dbms_application_info.set_client_info( null );
-    
+
     bars_audit.trace( '%s: Exit.', title );
-    
+
   exception
     when others then
       LOG_ERRORS('for obj='||p_object_id||' DAT='||to_char(p_report_date, 'dd.mm.yyyy')||' KF='||p_kf, l_err_rec_id );
@@ -1203,13 +1203,13 @@ is
   ) is
     l_object_name       varchar2(100) := 'NBUR_DM_CUSTOMERS';
   begin
-    
+
     l_object_id := f_get_object_id_by_name(l_object_name);
-    
+
     p_start_load_object (l_object_id, l_object_name, p_version_id, p_report_date, p_kf, systimestamp );
-    
+
     l_frst_yr_dt := trunc(p_report_date,'YYYY');
-    
+
     if ( p_kf is null )
     then
 
@@ -1262,9 +1262,9 @@ is
           on ( k2.k040 = nvl(lpad(to_char(c.country), 3,'0'),'804') )
        where lnnvl( c.DATE_OFF < l_frst_yr_dt ) -- без клієнтів закритих в попередньому році
       ;
-      
+
     else
-      
+
       insert /* append */
         into NBUR_DM_CUSTOMERS
            ( REPORT_DATE, KF, CUST_ID, CUST_TYPE, CUST_CODE, CUST_NAME, CUST_ADR, OPEN_DATE,
@@ -1322,25 +1322,25 @@ is
        where c.KF  = p_kf
          and lnnvl( c.DATE_OFF < l_frst_yr_dt ) -- без клієнтів закритих в попередньому році
       ;
-      
+
     end if;
 
     l_rowcount := sql%rowcount;
 
     p_finish_load_object( l_object_id, p_version_id, p_report_date, p_kf, l_rowcount );
-    
+
     ---
     -- till procedure PARSING_QUEUE_OBJECTS is not finished
     ---
     if ( REQUIRED_GATHER_STATS( l_object_name, p_kf, l_rowcount ) )
     then
-      
+
       GATHER_TABLE_STATS
       ( p_tbl_nm   => l_object_name
       , p_kf       => p_kf );
-      
+
     end if;
-    
+
   exception
     when OTHERS then
       LOG_ERRORS( l_object_name||' for vrsn_id='||p_version_id||' DAT='||to_char(p_report_date, 'dd.mm.yyyy')||' KF='||p_kf, l_err_rec_id );
@@ -1361,16 +1361,16 @@ is
     l_nbuc                varchar2(100);
     l_object_name         varchar2(100) := 'NBUR_DM_ACCOUNTS';
   begin
-    
+
     l_object_id := f_get_object_id_by_name(l_object_name);
-    
+
     p_start_load_object( l_object_id, l_object_name, p_version_id, p_report_date, p_kf, systimestamp );
-    
+
     l_frst_yr_dt := trunc(p_report_date,'YYYY');
-    
+
     if ( p_kf is null )
     then
-      
+
       insert /*+ APPEND */
         into BARS.NBUR_DM_ACCOUNTS
            ( REPORT_DATE, KF, ACC_ID, ACC_NUM, ACC_NUM_ALT, ACC_TYPE, BRANCH, KV,
@@ -1463,7 +1463,7 @@ is
            , case when p_report_date < c.DAT_ALT then c.NLSALT             else c.NLS      end as ACC_NUM
            , case when p_report_date < c.DAT_ALT then null                 else c.NLSALT   end as ACC_NUM_ALT
            , case when p_report_date < c.DAT_ALT then SubStr(c.NLSALT,1,4) else c.NBS      end as NBS
-           , case when p_report_date < c.DAT_ALT then c.OB22_ALT           else c.OB22     end as OB22
+           , case when p_report_date < c.DAT_ALT then nvl(c.OB22_ALT, '00')  else c.OB22     end as OB22
            , case when p_report_date < c.DAT_ALT then null                 else c.OB22_ALT end as OB22_ALT
            , case when p_report_date < c.DAT_ALT then null                 else c.DAT_ALT  end as ACC_ALT_DT
            , c.daos, c.dazs, c.mdate, c.rnk, c.ACCC, c.lim, c.PAP, c.VID, c.BLKD, c.BLKK
@@ -1546,19 +1546,19 @@ is
     l_rowcount := sql%rowcount;
 
     p_finish_load_object(l_object_id, p_version_id, p_report_date, p_kf, l_rowcount);
-    
+
     ---
     -- till procedure PARSING_QUEUE_OBJECTS is not finished
     ---
     if ( REQUIRED_GATHER_STATS( l_object_name, p_kf, l_rowcount ) )
     then
-      
+
       GATHER_TABLE_STATS
       ( p_tbl_nm   => l_object_name
       , p_kf       => p_kf );
-      
+
     end if;
-    
+
   exception
     when others then
       LOG_ERRORS(l_object_name||' for vrsn_id='||p_version_id||' DAT='||to_char(p_report_date, 'dd.mm.yyyy')||' KF='||p_kf, l_err_rec_id );
@@ -1642,24 +1642,24 @@ is
       -- Перевірка звітної дати на БАНКІВСЬКИЙ ДЕНЬ
       if ( CHK_RPT_DT_ON_BANK_DAY( p_report_date ) )
       then
-        
+
         BC.SUBST_MFO( p_kf );
-        
+
         if ( BARS_UTL_SNAPSHOT.CHECK_SNP_RUNNING( 'DAYBALS' ) is Null )
         then --
-          
+
           bars_audit.trace( '%s: run SYNC_DLY_SNAP ( %s ).', title, to_char(p_report_date,'dd.mm.yyyy') );
-          
+
           BARS_UTL_SNAPSHOT.SYNC_SNAP( p_report_date );
-          
+
         else
-          
+
           bars_audit.info( title||': SYNC_DLY_SNAP already running.' );
-          
+
         end if;
-        
+
         BC.HOME;
-        
+
       else
         bars_audit.error( title||': дата '||to_char(p_report_date,'dd.mm.yyyy')||' не є банківським днем!' );
         raise_application_error( -20666, 'Звітна дата '||to_char(p_report_date,'dd.mm.yyyy')||' не є банківським днем.' );
@@ -1732,42 +1732,42 @@ is
 
       if ( l_attempt_num = 1 )
       then
-        
+
         l_attempt_num := l_attempt_num + 1;
-        
+
         --
         CRT_DLY_SNPST
         ( p_report_date => p_report_date
         , p_kf          => p_kf );
-        
+
         --
         P_LOAD_DAILYBAL
         ( p_report_date => p_report_date
         , p_kf          => p_kf
         , p_version_id  => p_version_id );
-        
+
       else
-        
+
         LOG_ERRORS( 'retrying create snapshot for p_report_date='||to_char(p_report_date, 'dd.mm.yyyy')||' and p_kf='||p_kf, l_err_rec_id );
-        
+
       end if;
 
     else
 
       p_finish_load_object( l_object_id, p_version_id, p_report_date, p_kf, l_rowcount );
-      
+
       ---
       -- till procedure PARSING_QUEUE_OBJECTS is not finished
       ---
       if ( REQUIRED_GATHER_STATS( l_object_name, p_kf, l_rowcount ) )
       then
-        
+
         GATHER_TABLE_STATS
         ( p_tbl_nm   => l_object_name
         , p_kf       => p_kf );
-        
+
       end if;
-      
+
     end if;
 
   exception
@@ -1791,7 +1791,7 @@ is
 
     if ( p_kf is null )
     then -- запуск формування щоденного знімку балансу для всіх KF
-      
+
       -- temporarry (until BARS_SNAPSHOT.CREATE_MONTHLY_SNAPSHOT can`t run by all KF in parallel)
       for s in ( select q.KF
                    from NBUR_QUEUE_OBJECTS q
@@ -1799,7 +1799,7 @@ is
                     and q.ID          = l_object_id
                )
       loop
-        
+
         CRT_MO_SNPST
         ( p_report_date => p_report_date
         , p_kf          => s.KF );
@@ -1809,9 +1809,9 @@ is
     else
 
         BC.SUBST_MFO( p_kf );
-        
+
         bars_audit.trace( '%s: run SYNC_MO_SNAP ( %s ).', title, to_char(p_report_date,'dd.mm.yyyy') );
-        
+
         BARS_SNAPSHOT.CREATE_MONTHLY_SNAPSHOT
         ( p_snapshot_dt => trunc(p_report_date,'MM')
         , p_auto_daily  => true );
@@ -1821,7 +1821,7 @@ is
     end if;
 
   end CRT_MO_SNPST;
-  
+
   ---------------------------------------------------------------------
   -- P_LOAD_MONTHBAL
   --
@@ -1844,7 +1844,7 @@ is
       ( p_report_date => p_report_date
       , p_kf          => p_kf );
     end if;
-    
+
     p_start_load_object( l_object_id, l_object_name, p_version_id, p_report_date, p_kf, systimestamp );
 
     if ( p_kf is null )
@@ -1863,9 +1863,9 @@ is
         join NBUR_QUEUE_OBJECTS q
           on ( q.KF = b.KF and q.REPORT_DATE = b.FDAT and q.ID = l_object_id )
        where b.FDAT = trunc(p_report_date,'mm');
-      
+
     else
-      
+
       insert /* APPEND */
         into NBUR_DM_BALANCES_MONTHLY
            ( report_date, kf, acc_id, cust_id, dos,
@@ -1885,12 +1885,12 @@ is
 
     if ( l_rowcount = 0 and trunc(sysdate) > dat_next_u(trunc(sysdate,'MM'),6) )
     then -- відсутній знімок балансу
-      
+
       --
       CRT_MO_SNPST
       ( p_report_date => p_report_date
       , p_kf          => p_kf );
-      
+
       --
       P_LOAD_MONTHBAL
       ( p_report_date => p_report_date
@@ -1898,23 +1898,23 @@ is
       , p_version_id  => p_version_id );
 
     else
-      
+
       p_finish_load_object( l_object_id, p_version_id, p_report_date, p_kf, l_rowcount );
-      
+
       ---
       -- till procedure PARSING_QUEUE_OBJECTS is not finished
       ---
       if ( REQUIRED_GATHER_STATS( l_object_name, p_kf, l_rowcount ) )
       then
-        
+
         GATHER_TABLE_STATS
         ( p_tbl_nm   => l_object_name
         , p_kf       => p_kf );
-        
+
       end if;
-      
+
     end if;
-    
+
   exception
     when others then
       LOG_ERRORS(l_object_name||' for vrsn_id='||p_version_id||' DAT='||to_char(p_report_date, 'dd.mm.yyyy')||' KF='||p_kf, l_err_rec_id );
@@ -2107,21 +2107,21 @@ is
     bars_audit.trace( '%s: Inserted %s records.', title, to_char(l_rowcount) );
 
     p_finish_load_object( l_object_id, p_version_id, p_report_date, p_kf, l_rowcount );
-    
+
     ---
     -- till procedure PARSING_QUEUE_OBJECTS is not finished
     ---
     if ( REQUIRED_GATHER_STATS( l_object_name, p_kf, l_rowcount ) )
     then
-      
+
       GATHER_TABLE_STATS
       ( p_tbl_nm   => l_object_name
       , p_kf       => p_kf );
-      
+
     end if;
-    
+
     bars_audit.trace( '%s: Exit.', title );
-    
+
   exception
     when OTHERS then
       LOG_ERRORS(l_object_name||' for vrsn_id='||p_version_id||' DAT='||to_char(p_report_date, 'dd.mm.yyyy')||' KF='||p_kf, l_err_rec_id );
@@ -2782,7 +2782,7 @@ is
                     , w.REF
                     , w.TAG
                     , case
-                        when ( w.TAG = '50   ' ) 
+                        when ( w.TAG = '50   ' )
                         then SubStr(trim(w.VALUE),1,140)
                         else SubStr(trim(w.VALUE),1,35 )
                       end as VALUE
@@ -3259,9 +3259,9 @@ is
          and a.CLOSE_DATE Is Null
          and i.ID Is Not Null
       ;
-      
+
     else -- for one KF
-      
+
       insert /* APPEND */
         into NBUR_DM_ACNT_RATES
            ( REPORT_DATE, KF, ACC_ID, RATE_TP
@@ -3343,9 +3343,9 @@ is
          and a.CLOSE_DATE Is Null
          and i.ID Is Not Null
       ;
-      
+
     end if;
-    
+
     l_rowcount := sql%rowcount;
 
     commit;
@@ -3500,9 +3500,9 @@ is
 --          on ( r.BR = s.BR_ID and a.CCY_ID = s.KV and nvl(b.OST,0) between s.LWR_LMT and s.UPR_LMT )
 --       where i.ID Is Not Null
       ;
-      
+
     else -- for one KF
-      
+
       insert /* APPEND */
         into BARS.NBUR_DM_AGRM_RATES
            ( REPORT_DATE, KF, AGRM_ID, ACC_ID
@@ -4693,14 +4693,14 @@ is
                              , a.KF, a.ACC_ID, a.NBS, a.KV
                           from CALENDAR c
                          cross
-                          join ( select t.KF, t.ACC_ID, t.NBS, t.KV 
+                          join ( select t.KF, t.ACC_ID, t.NBS, t.KV
                                    from NBUR_DM_ACCOUNTS t
                                    join NBUR_QUEUE_OBJECTS q
                                       on ( q.KF = t.KF and q.REPORT_DATE = p_report_date and q.ID = l_object_id )
                                ) a
                       ) ac
                  left
---               join SNAP_BALANCES b 
+--               join SNAP_BALANCES b
 --                 on ( b.FDAT = ac.BNK_DT and b.KF = ac.KF and b.ACC = ac.ACC_ID )
                  join NBUR_DM_BALANCES_DAILY_ARCH b
                    on ( b.REPORT_DATE = ac.BNK_DT AND b.KF = ac.KF AND b.ACC_ID = ac.ACC_ID )
@@ -4892,9 +4892,9 @@ is
          and doc.VOB in ( 96, 99 )
          and doc.SOS = 5
       ;
-      
+
     else -- for one KF
-      
+
       insert /* APPEND */
         into NBUR_DM_TRANSACTIONS_CNSL
            ( REPORT_DATE, KF, REF, TT, CCY_ID, BAL, BAL_UAH
@@ -4938,31 +4938,31 @@ is
          and doc.VOB in ( 96, 99 )
          and doc.SOS = 5
       ;
-      
+
     end if;
-    
+
     l_rowcount := sql%rowcount;
-     
+
     commit;
-    
+
     bars_audit.trace( '%s: Inserted %s records.', title, to_char(l_rowcount) );
-    
+
     p_finish_load_object( l_object_id, p_version_id, p_report_date, p_kf, l_rowcount );
-    
+
     ---
     -- till procedure PARSING_QUEUE_OBJECTS is not finished
     ---
     if ( REQUIRED_GATHER_STATS( l_object_name, p_kf, l_rowcount ) )
     then
-      
+
       GATHER_TABLE_STATS
       ( p_tbl_nm   => l_object_name
       , p_kf       => p_kf );
-      
+
     end if;
-    
+
     bars_audit.trace( '%s: Exit.', title );
-    
+
   exception
     when OTHERS then
       LOG_ERRORS(l_object_name||' for vrsn_id='||p_version_id||' DAT='||to_char(p_report_date, 'dd.mm.yyyy')||' KF='||p_kf, l_err_rec_id );
@@ -5540,13 +5540,13 @@ is
     end if;
 
     dbms_application_info.set_action( 'SAVE_VERSION' );
-    
+
     if ( t_tbl_lst.count > 0 )
     then -- Data archiving
-      
+
       for i in t_tbl_lst.first .. t_tbl_lst.last
       loop
-      
+
         case t_tbl_lst(i)
           when ( 'NBUR_DM_AGRM_ACCOUNTS' )
           then
@@ -5588,10 +5588,10 @@ is
                 end if;
               end if;
          -- end if;
-      
+
           when ( 'NBUR_DM_CHRON_AVG_BALS' )
           then
-      
+
             CREATE_RANGE_PARTITION
             ( p_dm_tab_nm => 'NBUR_DM_CHRON_AVG_BALS_ARCH'
             , p_rpt_dt    => p_report_date
@@ -5625,9 +5625,9 @@ is
 
           else
             null;
-      
+
         end case;
-        
+
         -- костиль (замінити на ознаку з поля в табл. NBUR_REF_OBJECTS коли таке появиться)
         if ( t_tbl_lst(i) like '%CNSL' )
         then -- for DM that contains consolidated data from another DM
@@ -5638,11 +5638,11 @@ is
                            , p_vrsn_id => l_vrsn_id
                            );
         end if;
-      
+
       end loop;
-      
+
     end if;
-    
+
     --------------------------------------------------------------------------------
     --
     -- change version status
@@ -5762,7 +5762,7 @@ is
          and ( p_kf = KF or p_kf Is Null );
 
       dbms_application_info.set_client_info( 'Clear data from tables.' );
-      
+
       -- NBUR_AGG_PROTOCOLS is a temporary table
       execute immediate 'truncate table NBUR_DETAIL_PROTOCOLS';
 
@@ -5981,7 +5981,7 @@ is
     bars_audit.trace( '%s: Exit.', title );
 
   end RETRIEVE_VERSION;
-  
+
   --
   --
   --
@@ -6001,9 +6001,9 @@ is
   */
     title     constant    varchar2(64)  := $$PLSQL_UNIT||'.RETRIEVE_VERSION_BY_ID';
   begin
-    
+
     bars_audit.trace( '%s: Entry with ( p_report_date=%s, p_kf=%s ).', title, to_char(p_report_date,'dd.mm.yyyy'), p_kf );
-    
+
     for tbl in ( select t1.TABLE_NAME
                       , t1.IOT_TYPE
                       , t2.PARTITIONING_TYPE
@@ -6019,7 +6019,7 @@ is
                     and t1.TABLE_NAME like 'NBUR_DM_%_ARCH' )
     loop
 
-      bars_audit.trace( '%s: TABLE_NAME=%s, KEY_COUNT=%s.', title, tbl.TABLE_NAME, to_char(tbl.KEY_COUNT) );  
+      bars_audit.trace( '%s: TABLE_NAME=%s, KEY_COUNT=%s.', title, tbl.TABLE_NAME, to_char(tbl.KEY_COUNT) );
 
   --    if ( p_kf Is Null )
   --    then
@@ -6072,9 +6072,9 @@ is
   ) is
   /**
   <b>GATHER_DM_STATS</b> - збір статистики після для всіх обєктів ( DM )
-  %param p_start_id - 
-  %param p_end_id   - 
-  
+  %param p_start_id -
+  %param p_end_id   -
+
   %version 1.0 (03/08/2016)
   %usage   збір статистики після завантаження всіх обєктів процедурою LOAD_ALL_OBJECTS
   */
@@ -6096,7 +6096,7 @@ is
       ( p_own_name => k.OWN_NM
       , p_tab_name => k.OBJ_NM
       , p_dop      => l_dop );
-      
+
     end loop;
 
     bars_audit.trace( '%s: Exit.', title );
@@ -6244,46 +6244,46 @@ is
     bars_audit.trace( '%s: Exit.', title );
 
   end LOAD_ALL_OBJECTS;
-  
+
   --
   --
   --
   procedure PARSING_QUEUE_OBJECTS
   is
   /**
-  <b>PARSING_QUEUE_OBJECTS</b> - 
+  <b>PARSING_QUEUE_OBJECTS</b> -
   %param p_report_date - Звітна дата
   %param p_kf          - Код фiлiалу (МФО)
   %param p_version_id  - Iдентифiкатор версії
 
   %version 1.0
-  %usage   
+  %usage
   */
     title     constant    varchar2(60) := $$PLSQL_UNIT||'.PARSING_QUEUE_OBJECTS';
   begin
-    
+
     null;
-    
+
 --  if ( p_version_id = 1 )
 --  then -- для першої версії формуємо всі DM
---    
+--
 --    LOAD_ALL_OBJECTS
---    ( p_report_date => 
---    , p_kf          => 
---    , p_version_id  => 
+--    ( p_report_date =>
+--    , p_kf          =>
+--    , p_version_id  =>
 --    );
---    
+--
 --  else -- для другої і всіх наступних
---    
+--
 --    -- аналіз черги файлів (зміна статусу на "в обробці")
---    
+--
 --    update NBUR_QUEUE_FORMS
 --       set STATUS = 0
 --         , DATE_START = sysdate
 --     where STATUS = 0
 --    returning REPORT_DATE, KF, USER_ID, PROC_TYPE, ID /* file_id */
---      into; 
---    
+--      into;
+--
 --    -- пошук DM необхідних для формування фалів у черзі
 --    -- пошук повязаних DM (DM 2-го рівня)
 --    -- формування DM із врахуванням рівня DM (встівка із статусом RUNNING):
@@ -6291,14 +6291,14 @@ is
 --    -- Інвалідація попередньої версії (про всякий випадок можна усіх у яких version_id об`єкта менший від поточної)
 --    -- після завершення формування.
 --    -- Виклик процедури формування ФАЙЛІВ у черзі
---    
+--
 --    -- Перенесення DM в архів
 --    SAVE_VERSION
---    ( p_report_date => 
---    , p_kf          => 
---    , p_vrsn_id     => 
+--    ( p_report_date =>
+--    , p_kf          =>
+--    , p_vrsn_id     =>
 --    );
---    
+--
 --  end if;
 
     /*
@@ -6315,7 +6315,7 @@ is
               )
     */
     bars_audit.trace( '%s: Exit.', title );
-    
+
   end PARSING_QUEUE_OBJECTS;
 
 
@@ -6332,9 +6332,9 @@ BEGIN
   select greatest( 4, count(1) )
     into l_dop
     from MV_KF;
-  
+
   l_attempt_num := 1;
-  
+
 END NBUR_OBJECTS;
 /
 

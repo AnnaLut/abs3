@@ -1,3 +1,22 @@
+/*
+update cc_vidd set name ='Розміщення 1510 - Депозит овернайт,                      where vidd = 1510   ;
+update cc_vidd set name ='Розміщення 1513 - короткострокові депозити'              where vidd = 1512   ;
+update cc_vidd set name ='Розміщення 1513 - Довгострокові депозити'                where vidd = 1515   ;
+update cc_vidd set name ='Розміщення 1521 - Кредити овернайт'                      where vidd = 1521   ;
+update cc_vidd set name ='Розмiщення  1522-Кредити наданi за операцiями репо'      where vidd = 1522   ;
+update cc_vidd set name ='Розміщення 1524 - Кредити  короткострокові'              where vidd = 1523   ;
+update cc_vidd set name ='Розміщення 1524 - Кредити довгострокові'                 where vidd = 1524   ;
+update cc_vidd set name ='Залучення 1610  - Депозит овернайт'                      where vidd = 1610   ;
+update cc_vidd set name ='Залучення 1613 - короткострокові депозити'               where vidd = 1612   ;
+update cc_vidd set name ='Залучення 1613 - довгострокові  депозити'                where vidd = 1613   ;
+update cc_vidd set name ='Залучення 1621 - Кредити овернайт'                       where vidd = 1621   ;
+update cc_vidd set name ='Залучення 1622--Кредити залученi за операцiями репо'     where vidd = 1622   ;
+update cc_vidd set name ='Залучення 1623 - Кредити  короткострокові'               where vidd = 1623   ;
+update cc_vidd set name ='Залучення 1623 - Кредити  довгострокові'                 where vidd = 1624   ;
+
+commit;
+*/
+
 CREATE OR REPLACE FUNCTION BARS.F_PROC_DR
    (p_acc   INT,
     p_sour  INT       DEFAULT 4,      -- источник финансирования

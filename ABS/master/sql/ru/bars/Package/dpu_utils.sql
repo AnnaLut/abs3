@@ -323,7 +323,7 @@ is
   --
   -- constants
   --
-  body_ver    constant varchar2(64)   := 'version 1.32 17.11.2017';
+  body_ver    constant varchar2(64)   := 'version 1.33 11.12.2017';
   body_awk    constant varchar2(512)  := ''||
 $if DPU_PARAMS.SBER
 $then
@@ -1594,6 +1594,7 @@ $end
   %param p_longation -
   %param p_replenish -
   %param p_comproc   -
+  %param p_irvcbl    - 
   %param p_freq      -
   %param p_br_id     -
   %param p_tt        -
@@ -2020,7 +2021,7 @@ $end
   , p_err_msg      out    varchar2
   ) is
   /**
-  <b>UPD_SUBTYPE</b> - Внесення змін у параметри виду депозиту
+  <b>SET_PENALTY_VALUE</b> - Внесення змін у параметри штрафу депозиту 
   %param pny_lwr_lmt  - нижня межа ( = 0 - вставка, > 0 - редагування
   %param pny_upr_lmt  - верхня межа
   %param penalty_val  - значення штрафу в штрафному періоді
@@ -2029,12 +2030,13 @@ $end
   %param pny_prd_tp   - тип штрафний період
   %param p_err_msg    - повідомлення про помилку
 
-  %version 1.2
-  %usage   зміна параметрів виду депозиту
+  %version 1.3
+  %usage   зміна параметрів штрафу депозиту
   */
-    title       constant  varchar2(60) := 'dpu_utils.set_penalty_value';
+    title       constant  varchar2(64) := $$PLSQL_UNIT || '.SET_PENALTY_VALUE';
     l_lwr_lmt             dpt_stop_a.k_srok%type;
     l_upr_lmt             dpt_stop_a.k_srok%type;
+    l_msr_prd_id          dpt_stop.fl%type;
   begin
 
     bars_audit.trace( '%s: Entry with ( penalty_id=%s, pny_lwr_lmt=%s, pny_upr_lmt=%s, '||
@@ -2042,31 +2044,51 @@ $end
                     , to_char(penalty_id), to_char(pny_lwr_lmt), to_char(pny_upr_lmt), to_char(penalty_val)
                     , to_char(penalty_tp), to_char(pny_prd_val), to_char(pny_prd_tp) );
 
-    -- додати перевірки --
-    -- якщо Одиниці виміру періоду для штрафу = В %% від строку - то не більше 100%
-    -- якщо Тип штрафу                        = Фіксований тип %% ставки то перевірка yfzdyjcns коду BR в довіднику
-
+    case -- перевірки
+      when ( penalty_tp = 5 )
+      then -- Тип штрафу -> "Фіксований тип %% ставки"
+        begin
+          select null
+            into l_lwr_lmt
+            from BRATES
+           where BR_ID = penalty_val;
+        exception
+          when NO_DATA_FOUND then
+            bars_error.raise_nerror( c_modcode, 'GENERAL_ERROR_CODE', 'Не знайдено базову ставку з кодом = '||to_char(penalty_val) );
+        end;
+--    when ( l_msr_prd_id = 0 )
+--    then -- Одиниці виміру періоду для штрафу -> "В %-ах від строку"
+--      case
+--        when ( pny_upr_lmt > 100 )
+--        then bars_error.raise_nerror( c_modcode, 'GENERAL_ERROR_CODE', '' );
+--        when ( penalty_val > 100 )
+--        then bars_error.raise_nerror( c_modcode, 'GENERAL_ERROR_CODE', '' );
+--        else null;
+--      end case;
+      else
+        null;
+    end case;
+    
     begin
-
+      
       p_err_msg := null;
-
-      select max( case when (K_SROK <  pny_upr_lmt) then K_SROK else null end )
-           , min( case when (K_SROK >= pny_upr_lmt) then K_SROK else null end )
-        into l_lwr_lmt
-           , l_upr_lmt
-        from DPT_STOP_A
-       where ID = penalty_id;
-
-      bars_audit.trace( '%s: l_lwr_lmt=%s, l_upr_lmt=%s.', title
-                      , to_char(l_lwr_lmt), to_char(l_upr_lmt) );
-
-      if ( pny_lwr_lmt > 0 )
+      
+      if ( pny_lwr_lmt >= 0 )
       then -- edit record
 
         If ( pny_lwr_lmt >= pny_upr_lmt )
         then
           bars_error.raise_nerror( c_modcode, 'GENERAL_ERROR_CODE', 'Нижня межа штрафного терміну більша або рівна верхній межі!' );
         end if;
+
+        select max( case when (K_SROK <= pny_lwr_lmt) then K_SROK else null end )
+             , min( case when (K_SROK >  pny_lwr_lmt) then K_SROK else null end )
+          into l_lwr_lmt
+             , l_upr_lmt
+          from DPT_STOP_A
+         where ID = penalty_id;
+        
+        bars_audit.trace( '%s: l_lwr_lmt=%s, l_upr_lmt=%s.', title, to_char(l_lwr_lmt), to_char(l_upr_lmt) );
 
         -- edit penalty value
         update DPT_STOP_A
@@ -2084,6 +2106,15 @@ $end
            and K_SROK = l_upr_lmt;
 
       else -- new record
+
+        select max( case when (K_SROK <  pny_upr_lmt) then K_SROK else null end )
+             , min( case when (K_SROK >= pny_upr_lmt) then K_SROK else null end )
+          into l_lwr_lmt
+             , l_upr_lmt
+          from DPT_STOP_A
+         where ID = penalty_id;
+
+        bars_audit.trace( '%s: l_lwr_lmt=%s, l_upr_lmt=%s.', title, to_char(l_lwr_lmt), to_char(l_upr_lmt) );
 
         if ( l_lwr_lmt Is Null and l_upr_lmt Is Null )
         then -- first one
@@ -2148,6 +2179,7 @@ $end
   , p_err_msg      out    varchar2
   ) is
     title       constant  varchar2(60) := 'dpu_utils.del_penalty_value';
+    l_qty                 pls_integer;
   begin
 
     bars_audit.trace( '%s: Entry with ( sbtp_id=%s ).', title, to_char(penalty_id) );
@@ -2157,14 +2189,29 @@ $end
       if ( penalty_prd Is Null )
       then -- delete all records
 
-        delete BARS.DPT_STOP_A
+        delete DPT_STOP_A
          where ID = penalty_id;
 
-      else -- just only one record
+      else -- only one record
 
-        delete BARS.DPT_STOP_A
-         where ID = penalty_id
-           and K_SROK = penalty_prd;
+        select count(1)
+          into l_qty
+          from DPT_STOP_A
+         where ID = penalty_id;
+        
+        if ( l_qty > 2 )
+        then
+
+          delete DPT_STOP_A
+           where ID = penalty_id
+             and K_SROK = penalty_prd;
+
+        else
+          
+          delete DPT_STOP_A
+           where ID = penalty_id;
+          
+        end if;
 
       end if;
 
@@ -2194,10 +2241,10 @@ $end
   %param p_open  - Відкрити рахунок якщо відсутній
   %param p_kf    - Код фiлiалу (МФО)
 
-  %version 1.0
+  %version 1.1
   %usage   автоматичне заповнення довідника рахунків витрат для депозитних продуктів ЮО
   */
-    title     constant    varchar2(60)           := 'dpu_utils.fill_procdr';
+    title     constant    varchar2(64)           := 'dpu_utils.fill_procdr';
     src       constant    proc_dr$base.sour%type := 4;
 
     type t_rec is record( vidd       dpu_vidd.vidd%type
@@ -2225,8 +2272,10 @@ $end
 
     l_nls_exp              accounts.nls%type;
     l_nls_red              accounts.nls%type;
+
+    l_usr_lvl              number(1);
     ---
-    procedure open_account
+    procedure OPEN_ACCOUNT
     ( p_nbs     in  accounts.nbs%type
     , p_ob22    in  accounts.ob22%type
     , p_branch  in  accounts.branch%type
@@ -2259,54 +2308,83 @@ $end
           bars_audit.info( title || sqlerrm || dbms_utility.format_error_backtrace() );
       end;
 
-    end open_account;
+    end OPEN_ACCOUNT;
     ---
   begin
 
     bars_audit.trace( '%s: Entry with ( clean=%s, open=%s, kf=%s ).'
                     , title, to_char(p_clean), to_char(p_open), p_kf );
 
+    -- контекстний рівень користувача
+    l_usr_lvl := (length(sys_context('bars_context','user_branch'))-1)/7;
 
-    if ( length(sys_context('bars_context', 'user_branch')) <> 8 )
-    then -- рівень користувача (для автовідкриття рахунків)
-      raise_application_error( -20666, 'ERR: Заборонено виконання вибраної функції користувачем не рівня МФО!', true);
-    end if;
-
-    if ( p_kf Is Null )
+    case
+    when ( l_usr_lvl = 0 )
     then
-      raise_application_error( -20666, 'ERR: Parameter KF must be Is Not Null!', true );
+      if ( p_kf Is Null )
+      then -- for all KF
+        for i in ( select KF
+                     from MV_KF )
+        loop
+          FILL_PROCDR( p_clean => p_clean
+                     , p_open  => p_open
+                     , p_kf    => i.KF );
+        end loop;
+      else -- for one KF
+        BARS_CONTEXT.SUBST_MFO( p_kf );
+        l_branch_mask := '/' || p_kf || '/______/%';
+      end if;
+    when ( l_usr_lvl = 1 )
+    then -- ігноруємо значення параметру p_kf (так як може бути вказано NULL або KF іншого РУ)
+      l_branch_mask := sys_context('bars_context','user_branch') || '______/%';
     else
-      l_branch_mask := '/' || p_kf || '/______/%';
-    end if;
+      raise_application_error( -20666, 'ERR: Заборонено виконання функції користувачем '||to_char(l_usr_lvl)||'-го рівня!', true );
+    end case;
 
     if ( p_clean = 1 )
     then -- з очищенням наявних записів
 
-      delete BARS.PROC_DR$BASE
+      delete PROC_DR$BASE
        where KF = p_kf
          and ( NBS, SOUR, REZID ) in ( select BSD, 4, VIDD
-                                         from BARS.DPU_VIDD );
+                                         from DPU_VIDD );
 
       bars_audit.trace( title || ' deleted: '||to_char(sql%rowcount)||' rows.' );
 
-    end if;
+      select o.VIDD,
+             o.NBS_DEP, o.NBS_INT,
+             o.NBS_EXP, o.OB22_EXP,
+             o.NBS_RED, o.OB22_RED,
+             b.BRANCH
+        bulk collect
+        into l_tab
+        from DPU_VIDD_OB22 o
+           , BRANCH        b
+       where b.DATE_CLOSED is null
+         and b.BRANCH like l_branch_mask
+       order by o.NBS_EXP, o.OB22_EXP, b.BRANCH;
 
-    select o.vidd,
-           o.nbs_dep, o.nbs_int,
-           o.nbs_exp, o.ob22_exp,
-           o.nbs_red, o.ob22_red,
-           b.branch
-      bulk collect
-      into l_tab
-      from DPU_VIDD_OB22 o,
-           BRANCH        b
-     where b.DATE_CLOSED is null
-       and b.BRANCH like l_branch_mask
-       and not exists ( select 1 from BARS.PROC_DR$BASE
-                         WHERE nbs = o.nbs_dep
-                           AND branch = b.branch
-                           AND sour = 4 AND rezid = o.vidd)
-     order by o.nbs_exp, o.ob22_exp, b.branch;
+    else
+
+      select o.vidd,
+             o.nbs_dep, o.nbs_int,
+             o.nbs_exp, o.ob22_exp,
+             o.nbs_red, o.ob22_red,
+             b.branch
+        bulk collect
+        into l_tab
+        from DPU_VIDD_OB22 o -- активні види депозитів
+           , BRANCH        b
+       where b.DATE_CLOSED is null
+         and b.BRANCH like l_branch_mask
+         and not exists ( select 1 from PROC_DR$BASE
+                           WHERE nbs = o.nbs_dep
+                             AND branch = b.branch
+                             AND sour = 4
+                             AND rezid = o.vidd )
+       order by o.nbs_exp, o.ob22_exp, b.branch;
+
+    end if;
 
     if ( l_tab.count > 0 )
     then
@@ -2354,7 +2432,6 @@ $end
              (l_branch != SubStr(l_tab(k).branch, 1, 15)) )
         then
 
-          -- l_branch   := l_tab(k).branch;
           l_branch   := SubStr(l_tab(k).branch, 1, 15);
           l_nbs_d7   := l_tab(k).bsd7;
           l_ob22d7   := l_tab(k).ob22_d7;
@@ -2377,7 +2454,7 @@ $end
               end if;
           end;
 
-          -- пошук рахунка зменшення витрат
+          -- рахунок зменшення витрат
           if (l_ob22_red is Not Null)
           then
             begin
@@ -2422,9 +2499,16 @@ $end
       t_acc.delete();
 
     else
-      bars_audit.info( title || ' No rows selected!' );
-    end if;
 
+      if ( p_clean = 1 )
+      then -- з очищенням наявних записів
+        rollback;
+        raise_application_error( -20666, 'ERR: Не заповнено довідник ОБ22 для типів депозитів ЮО!', true );
+      else
+        bars_audit.info( title || ' No rows selected!' );
+      end if;
+
+    end if;
 
     bars_audit.trace( '%s: Exit.', title );
 

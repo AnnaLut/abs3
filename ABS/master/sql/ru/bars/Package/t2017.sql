@@ -1,6 +1,6 @@
 CREATE OR REPLACE PACKAGE BARS.T2017 IS
 
-   g_header_version   constant varchar2 (64) := 'version 1.5  24.11.2017';
+   g_header_version   constant varchar2 (64) := 'version 1.6  08.12.2017';
    g_trace            constant varchar2 (64) := 'T2017:';
 
 --============ Зміни в плані рах 2017 р.=======================
@@ -45,6 +45,10 @@ procedure OTCN    ( p_mode int) ; --  Авто-трансформація довідників по звітності
 
 procedure NNLS         ( p_mode int); -- Прогноз-розрахунок ББББкХХХХХХХХХ для трансформації рахунків
 procedure JB           ( p_mode int); -- всеобщий запуск трансформера
+
+procedure disable_scheduler_jobs;
+procedure enable_scheduler_jobs;
+
 function  Get_NLS      (p_nbs accounts.NBS%type) return accounts.NLS%type   ;
 function  OB22_old     (p_R020_new varchar2, p_ob22_new varchar2, p_R020_old varchar2) return accounts.ob22%type   ;
 function  Get_OB22_old (p_acc number, p_dat_alt date ) return accounts.ob22%type   ;
@@ -62,12 +66,13 @@ END T2017;
 --------------------------------------------------------
 CREATE OR REPLACE PACKAGE BODY BARS.T2017
 IS
-  g_body_version   CONSTANT VARCHAR2 (64) := 'version 1.12  07.12.2017';
+  g_body_version   CONSTANT VARCHAR2 (64) := 'version 1.15  11.12.2017';
   g_errN number  := -20203;
   nlchr  char(2) := chr(13)||chr(10);
   bnk_dt date;
 /*
-  06.01.2017 Sta 3119 in CP  + CP для всех РУ
+  08.12.2017 Sta CP - Зашила 2 счета явно
+  06.12.2017 Sta 3119 in CP  + CP для всех РУ
   05.12.2017 Sta надо включить cc_pawn в список изменяемых справочников в полях   NBSZ ,  NBSZ1, NBSZ2,  NBSZ3  поменять 9010 
   30.11.2017 LSO Добавлены коректировки в справочник CCK_OB22
   30.11.2017 Sta Использование прозноз-счетов
@@ -221,15 +226,55 @@ begin
        insert into CC_VIDD (VIDD,CUSTTYPE,TIPD,NAME,SPS) select p_r020_new,CUSTTYPE,TIPD,NAME,SPS from CC_VIDD where vidd=p_r020_old and not exists (select 1 from CC_VIDD where vidd=p_r020_new);
 
        -- Виды вкладов ФО
-       update dpt_vidd set bsD = p_r020_new where bsD = p_r020_old;
+       --update dpt_vidd set bsD = p_r020_new where bsD = p_r020_old;
        update dpt_vidd set bsN = p_r020_new where bsN = p_r020_old;
        update dpt_vidd set bsA = p_r020_new where bsA = p_r020_old;
-
+       --- ===== transform dpt_vidd and dpt_vidd_params by Livshyts ==== ---
+        declare
+        new_value dpt_vidd_params.val%type;
+        old_value dpt_vidd_params.val%type;
+        begin
+        for i in (select * from bars.dpt_vidd where bsd = p_R020_old) loop
+           update bars.dpt_vidd set bsd = p_R020_new where vidd = i.vidd and bsd = p_R020_old;
+           
+           begin
+           select val
+           into old_value
+           from bars.dpt_vidd_params 
+           where vidd = i.vidd and tag = 'DPT_OB22';
+           exception when no_data_found then
+             old_value := '-999999';
+           end;
+           
+           if old_value <> '-999999' then
+             
+           begin
+           select t.ob_new
+           into new_value
+           from bars.transfer_2017 t
+           where t.r020_old = p_R020_old and t.r020_new = p_R020_new and t.ob_old = old_value;
+           exception when no_data_found then
+             new_value := '-999999';
+           end;
+           
+           if new_value <> '-999999' then
+             update bars.dpt_vidd_params dvp set val = new_value where vidd = i.vidd and tag = 'DPT_OB22';
+           end if;
+           
+           end if;
+           
+        end loop;
+        end;
+        --- ============================================================ ---
+       
        -- Виды вкладов ЮО
        update DPU_VIDD
           set BSD  = p_r020_new
             , IRVK = 1
         where BSD  = p_r020_old;
+
+       delete PROC_DR$BASE
+        where NBS = p_r020_old;
 
        -- Цільове призначення договору
        update CC_AIM     set nbs    = p_r020_new  where nbs   = p_r020_old and D_CLOSE is null;
@@ -261,7 +306,8 @@ begin
     bars_audit.info('T2017.NBS1 Finish '||p_R020_old||'->'||p_R020_new);
 end NBS1;
 -------------------------------
-procedure OB      ( p_R020_old varchar2)   IS
+procedure OB      ( p_R020_old varchar2)
+IS
 begin for tt in (select * from TRANSFER_2017 where r020_old like p_R020_old and ob_old is not null and R020_new is not null and ob_new is not null )
        loop T2017.OB1(TT); end loop;
 end OB;
@@ -619,10 +665,13 @@ begin bc.go( p_KF) ;
    -- BRANCH_PARAMETERS
    t2017.T_Param ( 0, p_kf );
    ------
---   If p_KF = '300465' then      
-   T2017.T_CP ( 0 ) ; 
--- end if ;
-
+/* Фіалкович Олена Анатоліївна <FialkovichEA@oschadbank.ua>  МФО регионов, в которых есть АРМ ЦБ и внесистемные счета: 
+Днепропетровское РУ              305482
+Львовское РУ                     325796
+Харьковское РУ                   351823
+Херсонское РУ                    352457
+*/
+   If p_KF in ( '300465' , '305482', '325796', '351823', '352457' ) then     bc.go (p_KF );      T2017.T_CP ( 0 ) ;    end if ;
    bc.go ('/');
 
    bars_audit.info('T2017.ACC_1X Finish kf=' ||p_kf);
@@ -829,11 +878,9 @@ begin
 end T_Param ;
 ------------------------
 procedure T_CP (p_mode int) is
-begin  
-  bars_audit.info('T2017.T_CP Start');
+begin  bars_audit.info('T2017.T_CP Start');
 
-  bc.go('300465');
-  for k in (select acc, NLS, NLSALT, NBS from accounts where  dat_alt is not null and dazs is null 
+  for k in (select acc, kf, NLS, NLSALT, NBS from accounts where  dat_alt is not null and dazs is null 
               and nbs IN ('1416','1426','3116','3328','3216','3118','3320',
                           '6128','6122','6124','6120','6127','6126','6223','6121','6125') 
             )
@@ -864,13 +911,18 @@ begin
            for  DOCH in (select Rowid RI , nls, nlsalt from accounts where accc = k.Acc and dazs is null )
            loop DOCH.nlsalt := DOCH.nls;
 
-                If k.NBS ='3118' and DOCH.nls like '3119%' then DOCH.nls := VKRZN ( Substr( gl.AMFO,1,5), '311809'   || Substr (DOCH.NLS,7,8) );
-                Else                                            DOCH.nls := VKRZN ( Substr( gl.AMFO,1,5), k.NBS ||'0'|| Substr (DOCH.NLS,6,9) );
+--47552101	47540901	980	31190327672156
+--47552201	47539201	980	31199327672298
+
+                If k.KF = '300465' and DOCH.nls in ('31190327672156','31199327672298') then DOCH.nls := VKRZN ( Substr( gl.AMFO,1,5), '311808'   || Substr (DOCH.NLS,7,8) );
+                ElsIf k.NBS='3118' and DOCH.nls like '3119%'                           then DOCH.nls := VKRZN ( Substr( gl.AMFO,1,5), '311809'   || Substr (DOCH.NLS,7,8) );
+                Else                                                                        DOCH.nls := VKRZN ( Substr( gl.AMFO,1,5), k.NBS ||'0'|| Substr (DOCH.NLS,6,9) );
                 end if;
 
                 begin update accounts set nls = DOCH.nls , nlsalt = DOCH.nlsalt where Rowid  = DOCH.RI;  
                 exception  when others then  null;
                 end;
+
            end loop; -- DOCH
         end if;
   end loop; -- k
@@ -971,6 +1023,7 @@ begin
   end loop;
   
   
+  
       -- Лившиц Геннадий
 	BEGIN
 		For i in (select d.deposit_id, d.branch, a.nls, d.kf
@@ -1030,11 +1083,7 @@ begin
 
   
 
-  
-  
-  
-  
-  
+
 end spec_par;
 ------------
 
@@ -1048,14 +1097,14 @@ procedure OTCN   (p_mode int) is --  Авто-трансформація довідників по звітності
     for p in ( select R020_old, min(R020_new) R020_new  from transfer_2017 where r020_old <>  r020_new  GROUP by R020_old )
     loop
        -- Тільки R020
-       begin update KL_F20        set r020    = p.r020_new where r020    = p.r020_old ; exception when others then T2017.E01(SQLCODE,'KL_F20'       ); end;
+------ begin update KL_F20        set r020    = p.r020_new where r020    = p.r020_old ; exception when others then T2017.E01(SQLCODE,'KL_F20'       ); end;
 ------ begin update KL_F3_29      set r020    = p.r020_new where r020    = p.r020_old ; exception when others then T2017.E01(SQLCODE,'KL_F3_29'     ); end;
 ------ begin update KL_F3_29_INT  set r020    = p.r020_new where r020    = p.r020_old ; exception when others then T2017.E01(SQLCODE,'KL_F3_29_INT' ); end;
-       begin update OTC_RISK_S580 set r020    = p.r020_new where r020    = p.r020_old ; exception when others then T2017.E01(SQLCODE,'OTC_RISK_S580'); end;
+------ begin update OTC_RISK_S580 set r020    = p.r020_new where r020    = p.r020_old ; exception when others then T2017.E01(SQLCODE,'OTC_RISK_S580'); end;
 
        --Трансформація + ручне коригування
        begin update SP_NEW_R011   set r020    = p.r020_new where r020    = p.r020_old ; exception when others then T2017.E01(SQLCODE,'SP_NEW_R011'  ); end;
-       begin update SPR_R020_R012 set r020    = p.r020_new where r020    = p.r020_old ; exception when others then T2017.E01(SQLCODE,'SPR_R020_R012'); end;
+------ begin update SPR_R020_R012 set r020    = p.r020_new where r020    = p.r020_old ; exception when others then T2017.E01(SQLCODE,'SPR_R020_R012'); end;
        ----------------------------------------------------------------------------------------------------------------------------------------------------
        bc.go ('/') ;
 
@@ -1173,6 +1222,33 @@ begin
     RETURN l_ob22 ;
 
 end Get_OB22_old ;
+
+procedure disable_scheduler_jobs
+is
+begin
+  for rec in (select owner||'.'||job_name as job_name from dba_scheduler_jobs 
+              where job_name in ('IMPORT_DAY', 'IMPORT_MONTH') 
+              or job_name like 'CIG%'
+              or job_name like 'CRM_UPLOAD%')
+    loop
+      dbms_scheduler.disable(name => rec.job_name, force => true);
+      dbms_output.put_line(rec.job_name || ' disabled');
+    end loop;
+end disable_scheduler_jobs;
+
+procedure enable_scheduler_jobs
+is
+begin
+  for rec in (select owner||'.'||job_name as job_name from dba_scheduler_jobs 
+              where job_name in ('IMPORT_DAY', 'IMPORT_MONTH') 
+              or job_name like 'CIG%'
+              or job_name like 'CRM_UPLOAD%')
+    loop
+      dbms_scheduler.enable(name => rec.job_name);
+      dbms_output.put_line(rec.job_name || ' enabled');
+    end loop;
+end enable_scheduler_jobs;
+
 --------------------
 
   FUNCTION header_version RETURN VARCHAR2 is BEGIN RETURN 'Package header T2017'|| g_header_version; END header_version;

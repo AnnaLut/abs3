@@ -7,6 +7,8 @@
     -- Created : 16.11.2010
     -- Version 2.0   01.10.2017
 
+    gn_dummy   number;  -- Для возвратов функций
+
     lf constant char(1 byte) := chr(10);
     cr constant char(1 byte) := chr(13);
     crlf constant char(2 byte) := cr || lf;

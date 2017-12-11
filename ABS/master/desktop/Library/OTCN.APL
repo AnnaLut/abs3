@@ -6,15 +6,14 @@
 .head 1 +  Design-time Settings
 .data VIEWINFO
 0000: 6F00000003000000 FFFF01000D004347 5458566965775374 6174650400010000
-0020: 00000000003D0100 002C000000030000 0003000000FFFFFF FFFFFFFFFFF8FFFF
-0040: FFE2FFFFFF000000 00000000000C0400 005F020000010000 0000000000010000
-0060: 000F4170706C6963 6174696F6E497465 6D04000000075769 6E646F77730C6672
-0080: 6D5F46696C65734E 62750D4368696C64 2057696E646F7773 0670625F584D4C00
-00A0: 0001800200020000 0000000000000000 002C000000000000 0001000000FFFFFF
-00C0: FFFFFFFFFFF8FFFF FFE2FFFFFF320000 00320000001F0400 009D020000000000
-00E0: 0000000000050000 000F4170706C6963 6174696F6E497465 6D0757696E646F77
-0100: 730C66726D5F4669 6C65734E62750D43 68696C642057696E 646F77730B706246
-0120: 696C655374616D70 00000000
+0020: 0000000000410100 002C000000030000 0003000000FFFFFF FFFFFFFFFFF8FFFF
+0040: FFE1FFFFFF000000 00000000000C0400 005F020000010000 0001000000010000
+0060: 000F4170706C6963 6174696F6E497465 6D02000000075769 6E646F77730C6672
+0080: 6D5F46696C65734E 6275000001800200 0200000000000000 000000002C000000
+00A0: 0000000001000000 FFFFFFFFFFFFFFFF F8FFFFFFE2FFFFFF 3200000032000000
+00C0: 1F0400009D020000 0000000000000000 050000000F417070 6C69636174696F6E
+00E0: 4974656D0757696E 646F77730C66726D 5F46696C65734E62 750D4368696C6420
+0100: 57696E646F77730B 706246696C655374 616D7000000000
 .enddata
 .data DT_MAKERUNDLG
 0000: 0200000000001C51 3A5C424152533938 5C4C494252415259 5C4162736170692E
@@ -8741,72 +8740,73 @@ and SqlFetchNext(hSql(), nFetchRes)
 .head 7 +  If nCount > 0
 .head 8 -  Call SalMessageBox("Не всі файли філій завантажені! ", "Увага!", MB_IconStop)
 .head 8 -  Return FALSE
-.head 6 +  If SalStrTrimX(Rep_ProcName) = '' OR SalMessageBox('Виконати формування?', 'Фомування звітів', MB_OkCancel) = IDOK
-.head 7 -  Call SalWaitCursor(TRUE)
-.head 7 -  Set fRepPopulate = TRUE
-.head 7 -  Call SqlPrepareAndExecute(C.hSql(), 'DELETE FROM ' || strTRCTable || ' WHERE userid = user_id')
-.head 7 -  Call SqlCommit(C.hSql())
-.head 7 -  ! Проверим, ассоциирована ли процедура формирования отчета к форме
-.head 7 +  If SalStrTrimX(Rep_ProcName) != ''
-.head 8 -  ! Проверим, а есть ли уже готовые данные...
-.head 8 -  Set nRow = 0
-.head 8 -  Set fNeedToReform = TRUE
-.head 8 -  Call SqlPrepareAndExecute(C.hSql(), 'SELECT count(*) INTO :nRow FROM ' || strTMPTable || ' WHERE kodf = :Rep_Code AND datf = :dDatF')
-.head 8 -  Call SqlFetchNext(C.hSql(), nFetchRes)
-.head 8 +  If obPersonalReport
-.head 9 +  If nRow > 0
-.head 10 +  If SalMessageBox('Переформувати звіт?', 'Увага!', MB_IconQuestion | MB_YesNo ) = IDNO
-.head 11 -  Set fNeedToReform = FALSE
+.head 6 +  If ( chkBnkDt( dDatF ) ) ! Заборона формувати за дати після переходу на новий план рахункуів НБУ
+.head 7 +  If SalStrTrimX(Rep_ProcName) = '' OR SalMessageBox('Виконати формування?', 'Фомування звітів', MB_OkCancel) = IDOK
+.head 8 -  Call SalWaitCursor(TRUE)
+.head 8 -  Set fRepPopulate = TRUE
+.head 8 -  Call SqlPrepareAndExecute(C.hSql(), 'DELETE FROM ' || strTRCTable || ' WHERE userid = user_id')
+.head 8 -  Call SqlCommit(C.hSql())
+.head 8 -  ! Проверим, ассоциирована ли процедура формирования отчета к форме
+.head 8 +  If SalStrTrimX(Rep_ProcName) != ''
+.head 9 -  ! Проверим, а есть ли уже готовые данные...
+.head 9 -  Set nRow = 0
+.head 9 -  Set fNeedToReform = TRUE
+.head 9 -  Call SqlPrepareAndExecute(C.hSql(), 'SELECT count(*) INTO :nRow FROM ' || strTMPTable || ' WHERE kodf = :Rep_Code AND datf = :dDatF')
+.head 9 -  Call SqlFetchNext(C.hSql(), nFetchRes)
+.head 9 +  If obPersonalReport
+.head 10 +  If nRow > 0
+.head 11 +  If SalMessageBox('Переформувати звіт?', 'Увага!', MB_IconQuestion | MB_YesNo ) = IDNO
+.head 12 -  Set fNeedToReform = FALSE
+.head 9 +  Else
+.head 10 -  Set fNeedToReform = FALSE
+.head 9 +  If fNeedToReform
+.head 10 -  Call F_otcn(SalStrTrimX(SalStrLowerX(Rep_ProcName)), sDatMDY)
+.head 10 +  If SqlPrepareAndExecute(C.hSql(), 'UPDATE ' || strTMPTable || ' SET nbuc = DECODE(nbuc,null,:Rep_MFO,0,:Rep_MFO,nbuc) WHERE kodf = :Rep_Code AND datf = :dDatF')
+.head 11 -  Call SqlCommit(C.hSql())
+.head 10 +  Else
+.head 11 -  Call SqlRollback(C.hSql())
+.head 10 +  If SqlPrepareAndExecute( C.hSql(), 'UPDATE rnbu_trace SET nbuc = DECODE(nbuc,null,:Rep_MFO,0,:Rep_MFO,nbuc) WHERE userid  = user_id')
+.head 11 -  Call SqlCommit(C.hSql())
+.head 10 +  Else
+.head 11 -  Call SqlRollback(C.hSql())
+.head 8 -  ! Случай ручного формирования
 .head 8 +  Else
-.head 9 -  Set fNeedToReform = FALSE
-.head 8 +  If fNeedToReform
-.head 9 -  Call F_otcn(SalStrTrimX(SalStrLowerX(Rep_ProcName)), sDatMDY)
-.head 9 +  If SqlPrepareAndExecute(C.hSql(), 'UPDATE ' || strTMPTable || ' SET nbuc = DECODE(nbuc,null,:Rep_MFO,0,:Rep_MFO,nbuc) WHERE kodf = :Rep_Code AND datf = :dDatF')
-.head 10 -  Call SqlCommit(C.hSql())
+.head 9 +  If obCommonReport
+.head 10 +  If SqlPrepareAndExecute(C.hSql(), 'SELECT max(datf) INTO :dtLastRepDate FROM ' || strTMPTable || ' WHERE kodf = :Rep_Code AND datf <= :dDatF')
+.head 11 -  Call SqlFetchNext(C.hSql(), nFetchRes)
+.head 10 +  If dtLastRepDate
+.head 11 -  Call FunMakeColSetNSQLStr(Rep_Code, dtLastRepDate, nNumColInPKey, strTblPop, SalStrTrimX(Rep_ProcName)='', FALSE)
 .head 9 +  Else
-.head 10 -  Call SqlRollback(C.hSql())
-.head 9 +  If SqlPrepareAndExecute( C.hSql(), 'UPDATE rnbu_trace SET nbuc = DECODE(nbuc,null,:Rep_MFO,0,:Rep_MFO,nbuc) WHERE userid  = user_id')
-.head 10 -  Call SqlCommit(C.hSql())
-.head 9 +  Else
-.head 10 -  Call SqlRollback(C.hSql())
-.head 7 -  ! Случай ручного формирования
-.head 7 +  Else
-.head 8 +  If obCommonReport
-.head 9 +  If SqlPrepareAndExecute(C.hSql(), 'SELECT max(datf) INTO :dtLastRepDate FROM ' || strTMPTable || ' WHERE kodf = :Rep_Code AND datf <= :dDatF')
-.head 10 -  Call SqlFetchNext(C.hSql(), nFetchRes)
-.head 9 +  If dtLastRepDate
-.head 10 -  Call FunMakeColSetNSQLStr(Rep_Code, dtLastRepDate, nNumColInPKey, strTblPop, SalStrTrimX(Rep_ProcName)='', FALSE)
+.head 10 +  If not SalModalDialog(dlg_SetDatZ, hWndForm, dDatZ)
+.head 11 -  Return FALSE
+.head 10 -  Call SalWaitCursor(TRUE)
+.head 10 +  If not SqlPLSQLCommand(hSql(), "p_f00(dDatF, dDatZ, Rep_Code)")
+.head 11 -  Call SqlRollback(hSql())
+.head 10 +  Else
+.head 11 -  Call SqlCommit(hSql())
+.head 10 -  Call SalWaitCursor(FALSE)
+.head 8 -  ! Call SalEnableWindow(pbInsert)
+.head 8 -  ! Call SalEnableWindow(pbDelete)
+.head 8 -  ! Call SalEnableWindow(pbDetPrint)
+.head 8 -  ! Call SalEnableWindow(pbFileStamp)
+.head 8 +  ! If obPersonalReport
+.head 9 -     Call SalEnableWindow(pbProtocol)
+.head 9 -     Call SalEnableWindow(pbUpdate)
+.head 9 -     Call SalDisableWindow(pbImport)
+.head 8 +  ! Else
+.head 9 -     Call SalDisableWindow(pbInsert)
+.head 9 -     Call SalEnableWindow(pbImport)
+.head 9 -     Call SalDisableWindow(pbDelete)
+.head 9 -     Call SalDisableWindow(pbUpdate)
+.head 9 -     Call SalDisableWindow(pbProtocol)
+.head 8 +  If Rep_ProcK
+.head 9 -  Call SalEnableWindow(pbCheckOnProck)
 .head 8 +  Else
-.head 9 +  If not SalModalDialog(dlg_SetDatZ, hWndForm, dDatZ)
-.head 10 -  Return FALSE
-.head 9 -  Call SalWaitCursor(TRUE)
-.head 9 +  If not SqlPLSQLCommand(hSql(), "p_f00(dDatF, dDatZ, Rep_Code)")
-.head 10 -  Call SqlRollback(hSql())
-.head 9 +  Else
-.head 10 -  Call SqlCommit(hSql())
-.head 9 -  Call SalWaitCursor(FALSE)
-.head 7 -  ! Call SalEnableWindow(pbInsert)
-.head 7 -  ! Call SalEnableWindow(pbDelete)
-.head 7 -  ! Call SalEnableWindow(pbDetPrint)
-.head 7 -  ! Call SalEnableWindow(pbFileStamp)
-.head 7 +  ! If obPersonalReport
-.head 8 -     Call SalEnableWindow(pbProtocol)
-.head 8 -     Call SalEnableWindow(pbUpdate)
-.head 8 -     Call SalDisableWindow(pbImport)
-.head 7 +  ! Else
-.head 8 -     Call SalDisableWindow(pbInsert)
-.head 8 -     Call SalEnableWindow(pbImport)
-.head 8 -     Call SalDisableWindow(pbDelete)
-.head 8 -     Call SalDisableWindow(pbUpdate)
-.head 8 -     Call SalDisableWindow(pbProtocol)
-.head 7 +  If Rep_ProcK
-.head 8 -  Call SalEnableWindow(pbCheckOnProck)
-.head 7 +  Else
-.head 8 -  Call SalDisableWindow(pbCheckOnProck)
-.head 7 -  !
-.head 7 -  Call SalWaitCursor(FALSE)
-.head 7 -  Call SalSendMsg(tblDta, SAM_User, 0, 0)
-.head 7 -  Call SalWaitCursor(FALSE)
+.head 9 -  Call SalDisableWindow(pbCheckOnProck)
+.head 8 -  !
+.head 8 -  Call SalWaitCursor(FALSE)
+.head 8 -  Call SalSendMsg(tblDta, SAM_User, 0, 0)
+.head 8 -  Call SalWaitCursor(FALSE)
 .head 3 +  Pushbutton: pbFilter		! Встановити фільтр
 .head 4 -  Class Child Ref Key: 0
 .head 4 -  Class ChildKey: 0
@@ -10003,6 +10003,24 @@ SalTblQueryColumnID( SalTblGetColumnWindow( tblDta, nI, COL_GetPos )), strTemp )
 .head 6 -  Set sTraceTable = strTRCTable
 .head 6 -  Call SalEnableWindow(pbExecute)
 .head 5 -  Return TRUE
+.head 3 +  Function: chkBnkDt
+.head 4 -  Description:
+.head 4 +  Returns
+.head 5 -  Boolean:
+.head 4 +  Parameters
+.head 5 -  Date/Time: rpt_dt
+.head 4 -  Static Variables
+.head 4 +  Local variables
+.head 5 -  Date/Time: sys_dt
+.head 5 -  Date/Time: lmt_dt
+.head 4 +  Actions
+.head 5 -  Set sys_dt = SalDateCurrent()
+.head 5 -  Set lmt_dt = SalDateConstruct ( 2017, 12, 15, 0, 0, 0 )
+.head 5 +  If ( ( sys_dt > lmt_dt ) and ( rpt_dt > lmt_dt ) )
+.head 6 -  Call SalMessageBox( 'Заборонено формувати файли за дату білшу від ' || SalFmtFormatDateTime(lmt_dt,'dd/MM/yyyy'), 'Помилка', MB_IconStop )
+.head 6 -  Return FALSE
+.head 5 +  Else
+.head 6 -  Return TRUE
 .head 2 +  Window Parameters
 .head 3 -  Number: nRunMode
 .head 3 -  ! Режим работы:
@@ -16483,9 +16501,9 @@ GetPrnDir() || '/OTCNCH.TXT', ''  )
 .head 3 -  Window Location and Size
 .head 4 -  Left:   Default
 .head 4 -  Top:    Default
-.head 4 -  Width:  7.1"
+.head 4 -  Width:  7.45"
 .head 4 -  Width Editable? Yes
-.head 4 -  Height: 4.0"
+.head 4 -  Height: 4.298"
 .head 4 -  Height Editable? Yes
 .head 3 -  Form Size
 .head 4 -  Width:  Default

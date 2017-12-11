@@ -73,6 +73,13 @@ end;
 
 
 
+begin 
+  execute immediate 'alter table BARS.TMP_LICM add (NLSALT  VARCHAR2(15))';
+exception when others then       
+  if sqlcode=-1430 then null; else raise; end if; 
+end; 
+/
+
 
 PROMPT *** ALTER_POLICIES to TMP_LICM ***
  exec bpa.alter_policies('TMP_LICM');

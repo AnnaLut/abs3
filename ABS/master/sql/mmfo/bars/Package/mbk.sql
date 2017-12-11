@@ -5,7 +5,8 @@ PROMPT =========================================================================
 create or replace package mbk
 is
 /*
--- 17.11.2017 Трансфер-2017 ПОДМЕНА ПРОЦЕДУРЫ ОТКР.СЧЕТА  На уровне бал.счетов - без учета об22 
+ 08.12.2017 Sta ОТСутствие в Proc-dr
+ 17.11.2017 Трансфер-2017 ПОДМЕНА ПРОЦЕДУРЫ ОТКР.СЧЕТА  На уровне бал.счетов - без учета об22 
 
 */
     MBK_HEAD_VERS  constant varchar2(64)  := 'version 55.0 02.01.2017';
@@ -230,7 +231,8 @@ PROCEDURE op_reg_ex_2017(
               DDAte_        date     default null,  -- Дата заключення
               IRR_          number   default null,  -- Еф. % ставка
               code_product_ number   default null,  -- Код продукта
-              n_nbu_        varchar2 default null   -- Номер свідоцтва НБУ
+              n_nbu_        varchar2 default null,   -- Номер свідоцтва НБУ
+			  d_nbu_        date     default null    -- Дата реєстрації НБУ
 ) ;
 
 
@@ -581,25 +583,22 @@ END    op_reg_ex_2017;
 
      ACC_NEW := to_number(NUll) ;
      VIDD_   := to_number(substr(NLS_NEW ,1,4));
-     logger.info('MBDK in');
      BEGIN
         -- реквизиты старой сделки
-        logger.info('MBDK реквизиты старой сделки');
         SELECT d.cc_id,   a.bDATE,   d.KPROLOG, c.RNK, c.nmkk, a.accs,
                a.acckred, a.mfokred, a.accperc, a.mfoperc,  a.refp
           INTO cc_id_ ,   DAT2_  ,   KPROLOG_,  RNK_, NMK_, ACC_OLD,
                NLSB_OLD,  MFOB_OLD,  NLSNB_OLD, MFONB_OLD,  REFP_OLD
           FROM cc_deal d,  customer c , cc_add a
          WHERE d.nd=ND_ AND d.rnk=c.rnk AND a.nd=d.nd AND a.adds=0 ;
-        logger.info('MBDK ACC_OLD = '||ACC_OLD||' nID = '||nID_);
+
+
         SELECT acra INTO ACRA_OLD FROM int_accn
          WHERE acc=ACC_OLD AND id=nID_ AND acra is not null ;
 
         IF nvl(CC_ID_NEW, cc_id_) = cc_id_ and DATN_NEW = DAT2_ THEN
            --старая сделка (не ролловер, а пролонгация), просто меняем  реквизиты сделки
-           UPDATE cc_deal
-              SET KPROLOG=KPROLOG +1, vidd=VIDD_, limit= nS_NEW, wdate=DatK_NEW
-            WHERE nd= ND_;
+           UPDATE cc_deal              SET KPROLOG=KPROLOG +1, vidd=VIDD_, limit= nS_NEW, wdate=DatK_NEW            WHERE nd= ND_;
            ND_NEW := ND_;
         ELSE
            -- новая сделка-клон (ролловер)
@@ -1219,9 +1218,12 @@ END    op_reg_ex_2017;
                        'maskid_ : ' || maskid_);
      BEGIN
 
-        SELECT nbsn INTO nbsn_ FROM proc_dr WHERE nbs=nbs_ and ROWNUM=1; -- если несколько записей - берем первую
-
-        BEGIN
+        -- Sta 08.12.2017
+        BEGIN SELECT nbsn INTO nbsn_ FROM proc_dr WHERE nbs=nbs_ and ROWNUM=1; -- если несколько записей - берем первую
+        exception when NO_DATA_FOUND THEN  nbsN_ := sUBSTR(nbs_,1,3) ||'8';
+        end;
+      
+         BEGIN
             if nbs_ like '39%' then  MASK_ := 'MFK';
             else                     MASK_ := 'MBK';
             end if;
@@ -1276,22 +1278,17 @@ END    op_reg_ex_2017;
            end if;
 
           -- а как его счет  SN ?
-          SELECT a.nls, i.acra  INTO SN_, acra_  FROM int_accn i, accounts a
-          WHERE i.acc=acc_ AND i.id=id_ AND i.acra=a.acc AND a.dazs is null;
-
+          SELECT a.nls, i.acra  INTO SN_, acra_  FROM int_accn i, accounts a   WHERE i.acc=acc_ AND i.id=id_ AND i.acra=a.acc AND a.dazs is null;
        exception when NO_DATA_FOUND THEN
-
           -- увы, нет --смоделируем следующий (первый) новый
           SS_ := F_NEWNLS2(null, MASK_, nbs_ , RNK_,null);
           SN_ := F_NEWNLS2(null, MASK_, nbsn_, RNK_,null);
-
        END;
     exception when NO_DATA_FOUND THEN null;
     end;
 
-    return (substr(SS_||'               ', 1, 15) ||
-            substr(SN_||'               ', 1, 15)
-           );
+    return (substr(SS_||'               ', 1, 15) ||      substr(SN_||'               ', 1, 15)        );
+   
 
   END F_NLS_MB ;
 
@@ -2029,7 +2026,8 @@ END    op_reg_ex_2017;
       DDAte_        date     default null,  -- Дата заключення
       IRR_          number   default null,  -- Еф. % ставка
       code_product_ number   default null,  -- Код продукта
-      n_nbu_        varchar2 default null   -- Номер свідоцтва НБУ
+      n_nbu_        varchar2 default null,   -- Номер свідоцтва НБУ
+	  d_nbu_        date     default null   -- Дата реєстрації НБУ
     ) IS
 
       title         constant  varchar2(60) := 'mbk.inp_deal';
@@ -2131,10 +2129,10 @@ END    op_reg_ex_2017;
 
         INSERT INTO cc_add (nd         , adds       , s      , kv     , bdate  , wdate  , sour      , acckred   , mfokred , freq      , accperc   ,
                             mfoperc    , refp       , swi_bic, swi_acc, swo_bic, swo_acc, int_amount, alt_partyb, interm_b, int_partya, int_partyb,
-                            int_interma, int_intermb, n_nbu  )
+                            int_interma, int_intermb, n_nbu, d_nbu  )
                     VALUES (ND_        , 0          , Sum_   , nKv_   , DAT2_  , p_datv , 4         , S1_       , S2_     , 2         , S3_       ,
                             S4_        , S5_        , bica_  , ssla_  , bicb_  , sslb_  , sump_     , altb_     , intermb_, IntPartyA_, IntPartyB_,
-                            IntIntermA_, IntIntermB_, n_nbu_ );
+                            IntIntermA_, IntIntermB_, n_nbu_ , d_nbu_ );
 
         if ( nTipd_ Is Null )
         then
@@ -2530,6 +2528,7 @@ END    op_reg_ex_2017;
                         null         ,
                         null         ,
                         null         ,
+						null         ,
                         null
                      );
 
@@ -2777,7 +2776,6 @@ END    op_reg_ex_2017;
 
       -- 4. собственно откат KV1-Ролловер
       -- 4.1 сначала вернем на транзит ( Активный по плану счетов )
-      --logger.info ('MBK_Sel411 = Ref_1=2='||ref1_||'='||ref2_);
         if tipd_=1 then ref_:=Ref2_; else ref_:=Ref1_; end if;
         if Ref2_<>0 then   -- удаляем  документ KV1, если он есть (могли снять с визы)
            p_back_dok(ref_,5,null,par2_,par3_,1);
@@ -2790,14 +2788,10 @@ END    op_reg_ex_2017;
            update operw set value='RollOver. Отказ от визы' where ref=ref_ and tag='BACKR';
          end if;
       -- SDate, WDate предыдущ. сделки
-      BEGIN
-      --logger.info ('MBK_Sel5 = sdate,wdate');
-        SELECT sdate, wdate INTO SDate_, WDate_ FROM cc_deal WHERE nd=ND_Old_ ;
-      EXCEPTION WHEN NO_DATA_FOUND THEN
-        erm := 'Не нашли даты предыдущ. сделки';
-        raise err;
+      BEGIN      SELECT sdate, wdate INTO SDate_, WDate_ FROM cc_deal WHERE nd=ND_Old_ ;
+      EXCEPTION WHEN NO_DATA_FOUND THEN        erm := 'Не нашли даты предыдущ. сделки' ;        raise err;
       END;
-      --logger.info ('MBK_Sel6 = acc_nd_acc');
+
       FOR k IN (SELECT acc FROM nd_acc WHERE nd=ND_)
       LOOP
         DELETE FROM int_ratn WHERE acc=k.ACC AND bdat>=Dat1_ AND bdat>SDate_ ;
@@ -2815,11 +2809,8 @@ END    op_reg_ex_2017;
       DELETE FROM cc_docs WHERE nd=ND_;
       DELETE FROM cc_deal WHERE nd=ND_;
 
-    EXCEPTION
-      WHEN err THEN
-        raise_application_error(-(20000+ern),'\'||erm,TRUE);
-      WHEN OTHERS THEN
-        raise_application_error(-(20000+ern),SQLERRM,TRUE);
+    EXCEPTION  WHEN err THEN        raise_application_error(-(20000+ern),'\'||erm,TRUE);
+               WHEN OTHERS THEN          raise_application_error(-(20000+ern),SQLERRM,TRUE);
     END del_Ro_deal;
 
     ------------------------------------------------------------------
@@ -2838,8 +2829,6 @@ END    op_reg_ex_2017;
     acc_fi  number:=0;
 
     BEGIN
-      --logger.info ('MBK = F_GetNazn1 = MaskId_=ND_'||'старт'||'='||MaskId_||'='||ND_);
-
        begin
          execute immediate
                      'select   nvl(acc,0)
@@ -2883,12 +2872,10 @@ END    op_reg_ex_2017;
         EXCEPTION WHEN NO_DATA_FOUND THEN
           sTmp_ := '' ;
         END;
-        --logger.info ('MBK = F_GetNazn2 =sTmp_='||sTmp_);
         sNazn_ := Replace(sNazn_, '#'||sPar_||'#', sTmp_) ;
         sStr_  := sNazn_ ;
         n_     := InStr(sStr_,'#') ;
       END LOOP;
-      --logger.info ('MBK = F_GetNazn2 = sNazn_'||'='||sNazn_||'=конец');
 
       RETURN sNazn_ ;
 

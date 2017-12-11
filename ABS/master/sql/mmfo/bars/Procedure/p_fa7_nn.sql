@@ -9,7 +9,7 @@ IS
 % DESCRIPTION :  Процедура формирования #A7 для КБ (универсальная)
 % COPYRIGHT   :  Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.17.010  28/11/2017
+% VERSION     :  v.17.011  08/12/2017
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%/%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_ - отчетная дата
                pmode_ = режим (0 - для отчетности, 1 - для ANI-отчетов, 2 - для @77)
@@ -922,7 +922,7 @@ BEGIN
                                 s.DAPP, s.ISP, s.NMS, s.LIM, s.OSTB, s.OSTC, s.OSTF, s.OSTQ, s.DOS, s.KOS,
                                 s.DOSQ, s.KOSQ, s.PAP, s.TIP, s.VID, s.TRCN, s.MDATE, s.DAZS, s.SEC, s.ACCC,
                                 s.BLKD, s.BLKK, s.POS, s.SECI, s.SECO, s.GRP, s.OSTX, s.RNK, s.NOTIFIER_REF,
-                                s.TOBO, s.BDATE, s.OPT, s.OB22, s.DAPPQ, s.SEND_SMS
+                                s.TOBO, s.BDATE, s.OPT, s.OB22, s.DAPPQ, s.SEND_SMS, s.DAT_ALT
                              FROM ACCOUNTS a, V_DPU_REL_ACC_ALL v, accounts s
                              where a.nbs IN (
                                 SELECT r020
@@ -2647,7 +2647,7 @@ BEGIN
                          or
 --  для расшифровки дисконтов по этим договорам
                           exist_cclim_acc >0  and
-                           substr(nls_,1,4) in ('1624','2701','3660') 
+                           substr(nls_,1,4) in ('1624','2701','3660')
                       then
 
 insert into OTCN_FA7_REZ1
@@ -4365,17 +4365,4 @@ insert into OTCN_FA7_REZ1
 --    when others then
 --        logger.info ('P_FA7_NN: Error: '||sqlerrm);
 END p_fa7_nn;
-/
-
-CREATE OR REPLACE PUBLIC SYNONYM P_FA7_NN FOR BARS.P_FA7_NN
-/
-
-
-GRANT EXECUTE ON BARS.P_FA7_NN TO BARS_ACCESS_DEFROLE
-/
-
-GRANT EXECUTE ON BARS.P_FA7_NN TO RPBN002
-/
-
-GRANT EXECUTE ON BARS.P_FA7_NN TO WR_ALL_RIGHTS
 /
