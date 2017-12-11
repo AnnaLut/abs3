@@ -297,7 +297,7 @@ namespace Bars.EAD.Structs.Params
             cmd.CommandText = @"select rnk, personstateid, date_begin_powers, date_end_powers
                                 from TABLE (ead_integration.get_Third_Person_Client_Set(:p_rnk))";//лише клієнти банку
             cmd.Parameters.Clear();
-            cmd.Parameters.Add("p_rnk", OracleDbType.Decimal, Convert.ToDecimal(ObjID), ParameterDirection.Input);
+            cmd.Parameters.Add("p_rnk", OracleDbType.Int64, Convert.ToInt64(ObjID), ParameterDirection.Input);
 
             using (OracleDataReader rdr = cmd.ExecuteReader())
             {
@@ -635,10 +635,10 @@ namespace Bars.EAD.Structs.Params
                     //dbLogger.Info("UAGR DBO(RNK) = " + DBO);
                     cmd.CommandText = @"select agr_code, rnk, changed, created, client_type, branch_id, user_login, user_fio, agr_type, 
                                                agr_status, agr_number, agr_date_open, agr_date_close
-                                          from TABLE (ead_integration.get_UAgrDBO_Instance_Set(:p_rnk))";                    
+                                          from TABLE (ead_integration.get_UAgrDBO_Instance_Set(:p_rnk))";
 
                     cmd.Parameters.Clear();
-                    cmd.Parameters.Add("p_rnk", OracleDbType.Decimal, DBO, ParameterDirection.Input);
+                    cmd.Parameters.Add("p_rnk", OracleDbType.Int64, DBO, ParameterDirection.Input);
                     
                     break;
                 default:
@@ -677,10 +677,9 @@ namespace Bars.EAD.Structs.Params
         }
     }
     /// <summary>
-    /// Счета клиента - Юр-лица
-    /// SetAccountDataU
+    /// Метод «SetAccountDataU» призначено для актуалізації інформації про рахунки корпоративного клієнта в рамках визначеної угоди клієнта
     /// </summary>
-    public struct Acc
+    public struct Account
     {
         [JsonProperty("RNK")]
         public UInt64 RNK;
@@ -717,12 +716,12 @@ namespace Bars.EAD.Structs.Params
         //[JsonProperty("created")]
         //public DateTime Created;
 
-        public static Acc GetInstance(String ObjID, OracleConnection con)
+        public static Account GetInstance(String ObjID, OracleConnection con)
         {
             //   DBLogger.Debug("ACC");
 
             String AgrType = ObjID.Split(';')[0];
-            Decimal ACC = Convert.ToDecimal(ObjID.Split(';')[1]);
+            UInt64 ACC = Convert.ToUInt64(ObjID.Split(';')[1]);
 
             OracleCommand cmd = con.CreateCommand();
             cmd.CommandText = @"select rnk, changed, created, user_login, user_fio, account_number, currency_code, mfo, branch_id, open_date, close_date, account_status, agr_number, agr_code, account_type, agr_type, remote_controled
@@ -731,9 +730,9 @@ namespace Bars.EAD.Structs.Params
             cmd.Parameters.Clear();
             cmd.BindByName = true;
             cmd.Parameters.Add("p_agr_type", OracleDbType.Varchar2, AgrType, ParameterDirection.Input);
-            cmd.Parameters.Add("p_acc", OracleDbType.Decimal, ACC, ParameterDirection.Input);
+            cmd.Parameters.Add("p_acc", OracleDbType.Int64, ACC, ParameterDirection.Input);
 
-            Acc res = new Acc();
+            Account res = new Account();
             using (OracleDataReader rdr = cmd.ExecuteReader())
             {
                 if (rdr.Read())
@@ -756,12 +755,9 @@ namespace Bars.EAD.Structs.Params
                     res.remote_controled = Convert.ToBoolean(rdr["remote_controled"]);
                     //res.Created = Convert.ToDateTime(rdr["created"]);
                 }
-
                 rdr.Close();
             }
-
             //  DBLogger.Debug("ACC ok");
-
             return res;
         }
     }
@@ -785,10 +781,9 @@ namespace Bars.EAD.Structs.Params
         public static Act GetInstance(String ObjID, OracleConnection con)
         {
             OracleCommand cmd = con.CreateCommand();
-            cmd.CommandText = @"select rnk, branch_id, user_login, user_fio,actual_date
-                                  from TABLE (ead_integration.get_Act_Instance_Rec(:p_rnk))";
+            cmd.CommandText = @"select rnk, branch_id, user_login, user_fio,actual_date from TABLE (ead_integration.get_Act_Instance_Rec(:p_rnk))";
             cmd.Parameters.Clear();
-            cmd.Parameters.Add("p_rnk", OracleDbType.Decimal, Convert.ToDecimal(ObjID), ParameterDirection.Input);
+            cmd.Parameters.Add("p_rnk", OracleDbType.Int64, Convert.ToUInt64(ObjID), ParameterDirection.Input);
 
             Act res = new Act();
             using (OracleDataReader rdr = cmd.ExecuteReader())
@@ -847,8 +842,8 @@ namespace Bars.EAD.Structs.Params
             String EadParLogin = "ead.User_Login" + kf;
             String EadParUserFio = "ead.User_Fio" + kf;
             String EadParUserPassword = "ead.User_Password" + kf;
-            String EAdServiceUrl = "ead.ServiceUrl"+ kf;
-               
+            String EAdServiceUrl = "ead.ServiceUrl" + kf;
+
             _dbLogger.Info(String.Format("EadParLogin= {0}, EadParUserFio= {1}, EadParUserPassword= {2} ", EadParLogin, EadParUserFio, EadParUserPassword));
             res.User_Login = Bars.Configuration.ConfigurationSettings.AppSettings[EadParLogin];
             res.User_Fio = Bars.Configuration.ConfigurationSettings.AppSettings[EadParUserFio];
@@ -880,34 +875,46 @@ namespace Bars.EAD.Structs.Params
     /// </summary>
     public class DocumentData
     {
-        [JsonProperty("ID")]
-        public Int64? ID;
         [JsonProperty("RNK")]
-        public Decimal? Rnk;
-        [JsonProperty("agreement_id")]
-        public Double? Agreement_ID;
-        [JsonProperty("struct_code")]
-        public Int16? Struct_Code;       
+        public UInt64? Rnk;
+        [JsonProperty("doc_id")]
+        public String ID;
+        [JsonProperty("doc_type")]
+        public Int16? Struct_Code;
         [JsonProperty("doc_request_number")]
         public String Doc_Request_Number;
+        [JsonProperty("agr_code")]
+        public Double? Agreement_ID;
+        [JsonProperty("agr_type")]
+        public String agr_type;
+        [JsonProperty("account_type")]
+        public String account_type;
+        [JsonProperty("account_number")]
+        public String account_number;
+        [JsonProperty("account_currency")]
+        public String account_currency;
 
-        public DocumentData(Int64? ID)
+
+        public DocumentData(String ID)
         {
             this.ID = ID;
         }
-        public DocumentData(Decimal Rnk, Double? Agreement_ID, Int16 Struct_Code)
+        public DocumentData(Decimal Rnk, Double? Agreement_ID, Int16? Struct_Code)
         {
-            this.Rnk = Rnk;
+            this.Rnk = Convert.ToUInt64(Rnk);
             this.Agreement_ID = Agreement_ID;
             this.Struct_Code = Struct_Code;
         }
-        public DocumentData(Decimal Rnk, Double? Agreement_ID, Int16 Struct_Code, String Doc_Request_Number)
+        public DocumentData(Decimal Rnk, Double? Agreement_ID, Int16? Struct_Code, String Doc_Request_Number, String agr_type, String account_type, String account_number, String account_currency)
         {
-            this.Rnk = Rnk;
+            this.Rnk = Convert.ToUInt64(Rnk);
             this.Agreement_ID = Agreement_ID;
             this.Struct_Code = Struct_Code;
             this.Doc_Request_Number = Doc_Request_Number;
-
+            this.agr_type = agr_type;
+            this.account_type = account_type;
+            this.account_number = account_number;
+            this.account_currency = account_currency;
         }
     }
 }
@@ -925,6 +932,19 @@ namespace Bars.EAD.Structs.Result
         public String Error_Text;
 
         public Error() { }
+    }
+
+    /// <summary>
+    /// Ответ - Ошибка при EA crash
+    /// </summary>
+    public class ErrorOnCrash
+    {
+        [JsonProperty("code")]
+        public String Error_Code;
+        [JsonProperty("message")]
+        public String Error_Text;
+
+        public ErrorOnCrash() { }
     }
 
     /// <summary>
@@ -1259,7 +1279,7 @@ namespace Bars.EAD
                     this._Params = new Object[1] { Structs.Params.Act.GetInstance(this._ObjID, con) };
                     break;
                 case "ACC":
-                    this._Params = new Object[1] { Structs.Params.Acc.GetInstance(this._ObjID, con) };//счета клиента-юр.лица
+                    this._Params = new Object[1] { Structs.Params.Account.GetInstance(this._ObjID, con) };//счета клиента-юр.лица
                     break;
                 case "DICT":
                     this._Params = Structs.Params.Dict.GetData(this._ObjID, con);
@@ -1417,6 +1437,8 @@ namespace Bars.EAD
         public String Message_ID;
         [JsonProperty("responce_id")]
         public String Responce_ID;
+        [JsonProperty("error")]
+        public Bars.EAD.Structs.Result.ErrorOnCrash error;
         # endregion
 
         # region Конструктор
@@ -1445,7 +1467,7 @@ namespace Bars.EAD
 
     /// <summary>
     /// Сервис для интеграции с ЕА
-    /// version 3.0   02/08/2017
+    /// version 3.1   01/01/2018
     /// </summary>
     [WebService(Namespace = "http://ws.unity-bars.com.ua/")]
     [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
@@ -1456,13 +1478,13 @@ namespace Bars.EAD
         {
             _dbLogger = DbLoggerConstruct.NewDbLogger();
         }
-        
-        # region Статические свойства
+
+        #region Статические свойства
         public static String EA_ServiceUrl
-        {           
+        {
             get
-            {   
-                return Convert.ToString(Bars.Configuration.ConfigurationSettings.AppSettings["ead.ServiceUrl"]);
+            {
+                return Bars.Configuration.ConfigurationSettings.AppSettings["ead.ServiceUrl"];
             }
         }
         public static Int32 EA_TimeOut
@@ -1598,7 +1620,6 @@ namespace Bars.EAD
             Response rsp;
             try
             {
-               
                 String ResponseText = GetEAResponseText(Message, _EAServiceUrl);
                 // сохраняем ответ
                 ep.MSG_SET_STATUS_RECEIVED(ID, ResponseText, kf);
@@ -1608,11 +1629,19 @@ namespace Bars.EAD
                 ep.MSG_SET_STATUS_PARSED(ID, rsp.Responce_ID, rsp.Current_Timestamp, kf);
 
                 // Анализируем ответ
-                if (rsp.Status == "ERROR")
+                if (rsp.Status == "ERROR" || String.IsNullOrEmpty(rsp.Status))
                 {
                     // устанавлдиваем статус "Помилка"
-                    Structs.Result.Error err = (rsp.Result as Newtonsoft.Json.Linq.JToken).ToObject<Structs.Result.Error>();
-                    ep.MSG_SET_STATUS_ERROR(ID, String.Format("Помилка на статусі RECEIVED: {0}, {1}", err.Error_Code, err.Error_Text), kf);
+                    if (rsp.Result != null)
+                    {
+                        Structs.Result.Error err = (rsp.Result as Newtonsoft.Json.Linq.JToken).ToObject<Structs.Result.Error>();
+                        ep.MSG_SET_STATUS_ERROR(ID, String.Format("Помилка на статусі RECEIVED: {0}, {1}", err.Error_Code, err.Error_Text), kf);
+                    }
+                    else
+                    {
+                        // Structs.Result.Error2 err2 = (rsp.error as Newtonsoft.Json.Linq.JToken).ToObject<Structs.Result.Error2>();
+                        ep.MSG_SET_STATUS_ERROR(ID, String.Format("Помилка на статусі RECEIVED: {0}, {1}", rsp.error.Error_Code, rsp.error.Error_Text), kf);
+                    }
                 }
                 else
                 {
@@ -1624,11 +1653,12 @@ namespace Bars.EAD
                         if (!String.IsNullOrEmpty(res.Error))
                         {
                             // устанавлдиваем статус "Помилка"
-                            ep.MSG_SET_STATUS_ERROR(ID, String.Format("Помилка на статусі RECEIVED: {0}", res.Error),kf);
+                            ep.MSG_SET_STATUS_ERROR(ID, String.Format("Помилка на статусі RECEIVED: {0}", res.Error), kf);
                             HasErrors = true;
                             break;
                         }
                     }
+
                     if (!HasErrors)
                         // устанавлдиваем статус "Виконано"
                         ep.MSG_SET_STATUS_DONE(ID, kf);
@@ -1669,7 +1699,8 @@ namespace Bars.EAD
         public static String GetEAResponseText(String Message, String _EAServiceUrl)
         {
             Byte[] MessageBytes = Encoding.UTF8.GetBytes(Message);
-            String ResponseText;            
+            String ResponseText;
+
             //создаем соединение WebRequest Request = WebRequest.Create(EA_ServiceUrl);
             HttpWebRequest Request = (HttpWebRequest)WebRequest.Create(_EAServiceUrl);
             if (EA_UsingSSL)//для SSL соединянния добавляем сертификат клиента
@@ -1765,11 +1796,11 @@ namespace Bars.EAD
         }
         // Закрыть сессию взаимодействия с ЕА
         public static void CloseSession(String SessionID, OracleConnection con, String _EA_ServiceUrl)
-        {            
+        {
             // Формируем сообщение
             CloseSessionMessage msg = new CloseSessionMessage(SessionID, con);
             String Message = msg.GetJSONString();
-            
+
             // отправляем запрос по Http
             String ResponseText = GetEAResponseText(Message, _EA_ServiceUrl);
 
@@ -1785,7 +1816,14 @@ namespace Bars.EAD
         }
 
         // получение данных документа
+        /// <summary>
+        /// GetDocumentData(Int64? ID ... String Doc_Request_Number)) - obsolete
+        /// </summary>
         public static List<Structs.Result.DocumentData> GetDocumentData(Int64? ID, Decimal? Rnk, Double? Agreement_ID, Int16? Struct_Code, String Doc_Request_Number, String kf)
+        {
+            return GetDocumentData(ID, Rnk, Agreement_ID, Struct_Code, Doc_Request_Number, null, null, null, null, kf);
+        }
+        public static List<Structs.Result.DocumentData> GetDocumentData(Int64? ID, Decimal? Rnk, Double? Agreement_ID, Int16? Struct_Code, String Doc_Request_Number, String agr_type, String account_type, String account_number, String account_currency, String kf)
         {
             String _EAServiceUrl = Convert.ToString(Bars.Configuration.ConfigurationSettings.AppSettings["ead.ServiceUrl" + kf]);
             List<Structs.Result.DocumentData> res = new List<Structs.Result.DocumentData>();
@@ -1808,8 +1846,8 @@ namespace Bars.EAD
             }
 
             // формируем параметры запроса
-            if (ID.HasValue)
-                msg.Params = new Structs.Params.DocumentData(ID.Value);
+            if (!String.IsNullOrWhiteSpace(ID.ToString()))
+                msg.Params = new Structs.Params.DocumentData(ID.ToString());
             else
             {
                 if (String.IsNullOrEmpty(Doc_Request_Number))
@@ -1818,10 +1856,11 @@ namespace Bars.EAD
                 }
                 else
                 {
-                    msg.Params = new Structs.Params.DocumentData(Rnk.Value, Agreement_ID, Struct_Code.Value, Doc_Request_Number);
+                    msg.Params = new Structs.Params.DocumentData(Rnk.Value, Agreement_ID, Struct_Code.Value, Doc_Request_Number, agr_type, account_type, account_number, account_currency);
 
                 }
             }
+
             // Формируем сообщение
             String Message = msg.GetJSONString();
 
@@ -1844,7 +1883,7 @@ namespace Bars.EAD
                 try
                 {
                     OracleCommand cmd = con.CreateCommand();
-                    cmd.CommandText = "select sc.name from ead_struct_codes sc where sc.id = :p_id";
+                    cmd.CommandText = "select name from ead_struct_codes where id = :p_id";
                     cmd.Parameters.Add("p_id", OracleDbType.Int16, ParameterDirection.Input);
 
                     foreach (Newtonsoft.Json.Linq.JToken obj in (rsp.Result as Newtonsoft.Json.Linq.JArray))
