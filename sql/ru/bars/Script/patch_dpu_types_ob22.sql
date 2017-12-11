@@ -44,10 +44,7 @@ end;
 SET FEEDBACK ON
 
 delete DPU_TYPES_OB22
- where ( K013, NBS_DEP ) not in ( select K013, NBS_DEP
-                                    from DPU_NBS4CUST
-                                   where NBS_DEP != ANY ('2615','2652')
-                                );
+ where NBS_DEP in ('2615','2652');
 
 commit;
 
@@ -58,6 +55,7 @@ update DPU_TYPES_OB22 d
                      and s.NBS_DEP = d.NBS_DEP );
 
 commit;
+
 update DPU_TYPES_OB22 d
    set ( NBS_RED, OB22_RED ) = ( select s.R020_NEW, s.OB_NEW
                                    from TRANSFER_2017 s

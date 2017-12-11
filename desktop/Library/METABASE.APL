@@ -7,8 +7,8 @@
 .head 1 +  Design-time Settings
 .data VIEWINFO
 0000: 6F00000001000000 FFFF01000D004347 5458566965775374 6174650400010000
-0020: 0000000000B20000 002C000000020000 0003000000FFFFFF FFFFFFFFFFFCFFFF
-0040: FFE2FFFFFF2C0000 002E000000960200 00E0010000010000 0000000000010000
+0020: 0000000000D90000 002C000000020000 0003000000FFFFFF FFFFFFFFFFF8FFFF
+0040: FFE1FFFFFF2C0000 002E000000960200 00E0010000010000 0001000000010000
 0060: 000F4170706C6963 6174696F6E497465 6D02000000075769 6E646F77730C7769
 0080: 6E5F4D6574614564 6974
 .enddata
@@ -647,7 +647,7 @@
 .head 3 -  Data Field: cLabelControl
 .head 3 -  Spin Field:
 .head 3 -  Multiline Field:
-.head 3 -  Pushbutton: ctb_pbBrowse
+.head 3 -  Pushbutton: ctb_pbHelp
 .head 3 -  Radio Button: cRadioButtonLabeled
 .head 3 -  Option Button:
 .head 3 -  Check Box:
@@ -1932,6 +1932,33 @@
 .head 5 +  Message Actions
 .head 6 +  On SAM_TooltipSetText
 .head 7 -  Call XSalTooltipShow(dfCount, IifS(GetLang()='RUS', 'Количество таблиц', 'Кількість таблиць'))
+.head 4 +  Pushbutton: pbVERSION
+.head 5 -  Class Child Ref Key: 0
+.head 5 -  Class ChildKey: 0
+.head 5 -  Class: ctb_pbHelp
+.head 5 -  Property Template:
+.head 5 -  Class DLL Name:
+.head 5 -  Title:
+.head 5 -  Window Location and Size
+.head 6 -  Left:   10.883"
+.head 6 -  Top:    0.071"
+.head 6 -  Width:  Class Default
+.head 6 -  Width Editable? Class Default
+.head 6 -  Height: Class Default
+.head 6 -  Height Editable? Class Default
+.head 5 -  Visible? No
+.head 5 -  Keyboard Accelerator: Class Default
+.head 5 -  Font Name: Class Default
+.head 5 -  Font Size: Class Default
+.head 5 -  Font Enhancement: Class Default
+.head 5 -  Picture File Name:
+.head 5 -  Picture Transparent Color: Class Default
+.head 5 -  Image Style: Class Default
+.head 5 -  Text Color: Class Default
+.head 5 -  Background Color: Class Default
+.head 5 +  Message Actions
+.head 6 +  On SAM_Click
+.head 7 -  Call SalMessageBox( 'Версія: 2017.12.01', 'About', MB_Ok )
 .head 2 +  Contents
 .head 3 +  Custom Control: ccSplitter
 .head 4 -  Class Child Ref Key: 1
@@ -2223,12 +2250,8 @@
 .head 6 -  Set nLastSortRow = -1
 .head 6 -  Call SalTblSetTableFlags(hWndItem, TBL_Flag_SelectableCols, TRUE)
 .head 6 +  If bLinesDef
-.head 7 +  If nMTAdd = 4
-.head 8 -  Set strTabInsert = "bars_metabase.add_table(hWndForm.tblTables.colID, hWndForm.tblTables.colName,
+.head 7 -  Set strTabInsert = "bars_metabase.ADD_TBL(hWndForm.tblTables.colID, hWndForm.tblTables.colName,
     hWndForm.tblTables.colSemantic, hWndForm.tblTables.colLinesDef)"
-.head 7 +  Else
-.head 8 -  Set strTabInsert = "bars_metabase.add_table(hWndForm.tblTables.colID, hWndForm.tblTables.colName,
-    hWndForm.tblTables.colSemantic)"
 .head 7 +  If nMTUpd = 4
 .head 8 -  Set strTabUpdate = "bars_metabase.update_table(hWndForm.tblTables.colID, hWndForm.tblTables.colName,
     hWndForm.tblTables.colSemantic, hWndForm.tblTables.colLinesDef)"
@@ -2236,12 +2259,8 @@
 .head 8 -  Set strTabUpdate = "bars_metabase.update_table(hWndForm.tblTables.colID, hWndForm.tblTables.colName,
     hWndForm.tblTables.colSemantic)"
 .head 6 +  Else
-.head 7 +  If nMTAdd = 4
-.head 8 -  Set strTabInsert = "bars_metabase.add_table(hWndForm.tblTables.colID, hWndForm.tblTables.colName,
+.head 7 -  Set strTabInsert = "bars_metabase.ADD_TBL(hWndForm.tblTables.colID, hWndForm.tblTables.colName,
     hWndForm.tblTables.colSemantic, NUMBER_Null)"
-.head 7 +  Else
-.head 8 -  Set strTabInsert = "bars_metabase.add_table(hWndForm.tblTables.colID, hWndForm.tblTables.colName,
-    hWndForm.tblTables.colSemantic)"
 .head 7 +  If nMTUpd = 4
 .head 8 -  Set strTabUpdate = "bars_metabase.update_table(hWndForm.tblTables.colID, hWndForm.tblTables.colName,
     hWndForm.tblTables.colSemantic, NUMBER_Null)"
@@ -2313,10 +2332,10 @@
 .head 9 -  Set nRow = TBL_MinRow
 .head 9 +  While SalTblFindNextRow(hWndItem, nRow, ROW_New, 0)
 .head 10 -  Call SalTblSetContext(hWndItem, nRow)
-.head 10 +  If not SqlPLSQLCommand(conOther.hSql(), strTabInsert)
-.head 11 -  Call SqlRollbackEx(conOther.hSql(), "METABASE. не удалось добавить описание таблицы " || tblTables.colName)
-.head 10 +  Else
+.head 10 +  If SqlPLSQLCommand(conOther.hSql(), strTabInsert)
 .head 11 -  Call SqlCommitEx(conOther.hSql(), "METABASE. Добавлено описание таблицы " || tblTables.colName)
+.head 10 +  Else
+.head 11 -  Call SqlRollbackEx(conOther.hSql(), "METABASE. не удалось добавить описание таблицы " || tblTables.colName)
 .head 10 -  Call SalTblSetRowFlags(hWndItem, nRow, ROW_New, FALSE)
 .head 10 -  Call SalTblSetRowFlags(hWndItem, nRow, ROW_Edited, FALSE)
 .head 8 +  If SalTblAnyRows(hWndItem, ROW_Edited, 0)
@@ -3402,7 +3421,6 @@
 .head 3 -  Number: nI
 .head 3 -  !
 .head 3 -  Boolean: bLinesDef
-.head 3 -  Number: nMTAdd
 .head 3 -  Number: nMTUpd
 .head 3 -  !
 .head 3 -  Boolean: bErr
@@ -3430,10 +3448,6 @@
     SELECT to_char(count(1))
     FROM   user_tab_columns
     WHERE  TABLE_NAME='META_TABLES' AND COLUMN_NAME='LINESDEF'") != '0'
-.head 4 -  Set nMTAdd = Val(GetValueStr("
-    SELECT to_char(count(1))
-    FROM   user_arguments
-    WHERE  OBJECT_NAME='ADD_TABLE' AND package_name='BARS_METABASE'"))
 .head 4 -  Set nMTUpd = Val(GetValueStr("
     SELECT to_char(count(1))
     FROM   user_arguments

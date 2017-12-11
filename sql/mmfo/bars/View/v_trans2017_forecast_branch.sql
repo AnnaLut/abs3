@@ -5,6 +5,8 @@ PROMPT *** Run ** = Scripts /Sql/BARS/View/v_trans2017_forecast_branch.sql =*** 
 PROMPT ===================================================================================== 
 
 
+
+
 PROMPT *** Create  view v_trans2017_forecast_branch ***
 
   CREATE OR REPLACE FORCE VIEW BARS.V_TRANS2017_FORECAST_BRANCH AS 

@@ -2,18 +2,19 @@ Application Description: Вкладные операции
 	Outline Version - 4.0.26
 	Design-time Settings
 .data VIEWINFO
-0000: 6F00000004000000 FFFF01000D004347 5458566965775374 6174650400010000
+0000: 6F00000004000000 FFFF01000D004347 5458566965775374 6174650400800000
 0020: 00000000001D0100 002C000000020000 0003000000000000 00D7020000F8FFFF
-0040: FFE2FFFFFF010000 0004000000F00400 00C7010000010000 0001000000010000
-0060: 000F4170706C6963 6174696F6E497465 6D00000000000001 8002000200000000
-0080: 000000000000002C 0000000000000001 000000FFFFFFFFFF FFFFFFF8FFFFFFE2
-00A0: FFFFFF6400000064 00000051040000CF 0200000000000000 000000050000000F
-00C0: 4170706C69636174 696F6E4974656D07 57696E646F777302 464708546F6F6C20
-00E0: 4261720870624669 6C69616C00000000 0180020002000000 0000000000000000
-0100: 2C00000000000000 01000000FFFFFFFF FFFFFFFFF8FFFFFF E2FFFFFF96000000
-0120: 9600000083040000 0103000000000000 0000000005000000 0F4170706C696361
-0140: 74696F6E4974656D 0757696E646F7773 0F66726D5F566964 6444657461696C73
-0160: 0D4368696C642057 696E646F77730563 6D62425200000000
+0040: FFE1FFFFFF010000 0004000000F00400 00C7010000010000 0000000000010000
+0060: 000F4170706C6963 6174696F6E497465 6D02000000075769 6E646F77730B7462
+0080: 6C5F417263686976 6500000180020002 0000000000000000 0000002C00000000
+00A0: 00000001000000FF FFFFFFFFFFFFFFF8 FFFFFFE2FFFFFF64 0000006400000051
+00C0: 040000CF02000000 0000000000000005 0000000F4170706C 69636174696F6E49
+00E0: 74656D0757696E64 6F77730246470854 6F6F6C2042617208 706246696C69616C
+0100: 0000000001800200 0200000000000000 000000002C000000 0000000001000000
+0120: FFFFFFFFFFFFFFFF F8FFFFFFE2FFFFFF 9600000096000000 8304000001030000
+0140: 0000000000000000 050000000F417070 6C69636174696F6E 4974656D0757696E
+0160: 646F77730F66726D 5F56696464446574 61696C730D436869 6C642057696E646F
+0180: 777305636D624252 00000000
 .enddata
 .data DT_MAKERUNDLG
 0000: 02000000001D513A 5C4241525339385C 4C4942524152595C 424152533031352E
@@ -22,12 +23,12 @@ Application Description: Вкладные операции
 0060: 000101011D513A5C 4241525339385C4C 4942524152595C42 4152533031352E72
 0080: 756E1D513A5C4241 525339385C4C4942 524152595C424152 533031352E646C6C
 00A0: 1D513A5C42415253 39385C4C49425241 52595C4241525330 31352E6170630000
-00C0: 01010123463A5C62 61727339385C4249 4E5C424152533031 36662E6170642E61
-00E0: 70642E6170642019 463A5C6261727339 385C42494E5C4241 52533031352E646C
-0100: 6C19463A5C626172 7339385C42494E5C 424152533031352E 6170630000010101
-0120: 1D513A5C42415253 39385C4C49425241 52595C4241525330 31352E61706C1D51
-0140: 3A5C424152533938 5C4C494252415259 5C42415253303135 2E646C6C1D513A5C
-0160: 4241525339385C4C 4942524152595C42 4152533031352E61 70630000010101
+00C0: 0101011A643A5C62 61727339385C4249 4E5C424152533031 36662E6170641964
+00E0: 3A5C626172733938 5C42494E5C424152 533031352E646C6C 19643A5C62617273
+0100: 39385C42494E5C42 4152533031352E61 706300000101011D 513A5C4241525339
+0120: 385C4C4942524152 595C424152533031 352E61706C1D513A 5C4241525339385C
+0140: 4C4942524152595C 424152533031352E 646C6C1D513A5C42 41525339385C4C49
+0160: 42524152595C4241 52533031352E6170 630000010101
 .enddata
 		Outline Window State: Normal
 		Outline Window Location and Size
@@ -1258,7 +1259,7 @@ Application Description: Вкладные операции
 								     WHERE d.deposit_id=:nID and v.vidd=d.vidd" )
 								and SqlFetchNext(hSql(), nFetchRes)
 						! Else
-							                                                                                                                                                                                                                                                                                            Return 0
+							                                                                                                                                                                                                                                                                                              Return 0
 					If nID
 						If NOT cdoc_SelectDocTemplate("DPT_DOCS", "ID", "NAME", 
 								  " ID IN ( SELECT ID FROM DPT_VIDD_SCHEME WHERE VIDD=" ||
@@ -1288,8 +1289,8 @@ Application Description: Вкладные операции
 												Call SqlCommitEx(hSql(), 'Текст доп.соглашения № ' || SalNumberToStrX(nID,0) || '/' || SalNumberToStrX(nADD,0) || ' сохранен в БД!')
 											! If SqlPrepare(hSql(), 'INSERT INTO CC_DOCS (id,nd,text,adds)
 													 VALUES (:sTemplateId,:nND,:sDoc,:nADD)' )
-												                                                                                                                                                                                                                              If SqlSetLongBindDatatype( 3, 23 )
-													                                                                                                                                                                                                                              If SqlExecute( hSql() )
+												                                                                                                                                                                                                                                If SqlSetLongBindDatatype( 3, 23 )
+													                                                                                                                                                                                                                                If SqlExecute( hSql() )
 										Else
 											If NOT cdoc_SetDocText(hSql(), TRUE,
 													  sTemplateId, nND, 0, DATETIME_Null, sDoc)
@@ -1298,9 +1299,9 @@ Application Description: Вкладные операции
 												Call SqlCommitEx(hSql(), 'Текст договора № ' || SalNumberToStrX(nID,0) || ' сохранен в БД!')
 											! If SqlPrepare( hSql(), 'INSERT INTO CC_DOCS (id,nd,text,adds)
 													 VALUES (:sTemplateId,:nND,:sDoc,0)' )
-												                                                                                                                                                                                                                              If SqlSetLongBindDatatype( 3, 23 )
-													                                                                                                                                                                                                                              If SqlExecute( hSql() )
-														                                                                                                                                                                                                                              Call SqlCommitEx( hSql(), 'Текст договора № ' || SalNumberToStrX(nID,0) || ' сохранен в БД!' )
+												                                                                                                                                                                                                                                If SqlSetLongBindDatatype( 3, 23 )
+													                                                                                                                                                                                                                                If SqlExecute( hSql() )
+														                                                                                                                                                                                                                                Call SqlCommitEx( hSql(), 'Текст договора № ' || SalNumberToStrX(nID,0) || ' сохранен в БД!' )
 														! Return 1
 								Call cCnc.Disconnect()
 								Call cCnc2.Disconnect()
@@ -1355,9 +1356,9 @@ Application Description: Вкладные операции
 												Call SqlCommitEx(hSql(), 'Текст доп.соглашения № ' || SalNumberToStrX(nID,0) || '/' ||SalNumberToStrX(nADD,0) || ' сохранен в БД!')
 											! If SqlPrepare( hSql(), 'INSERT INTO CC_DOCS (id,nd,text,adds)
 													 VALUES (:sTemplateId,:nND,:sDoc,:nADD)' )
-												                                                                                                                                                                                                                              If SqlSetLongBindDatatype( 3, 23 )
-													                                                                                                                                                                                                                              If SqlExecute( hSql() )
-														                                                                                                                                                                                                                              Call SqlCommitEx( hSql(), 'Текст доп.соглашения № ' || SalNumberToStrX(nID,0) ||'/'||SalNumberToStrX(nADD,0) ||' сохранен в БД!' )
+												                                                                                                                                                                                                                                If SqlSetLongBindDatatype( 3, 23 )
+													                                                                                                                                                                                                                                If SqlExecute( hSql() )
+														                                                                                                                                                                                                                                Call SqlCommitEx( hSql(), 'Текст доп.соглашения № ' || SalNumberToStrX(nID,0) ||'/'||SalNumberToStrX(nADD,0) ||' сохранен в БД!' )
 									Call cCnc.Disconnect()
 									Call cCnc2.Disconnect()
 							Else
@@ -1386,10 +1387,10 @@ Application Description: Вкладные операции
 												Call SqlCommitEx(hSql(), 'Текст доп.соглашения № ' || SalNumberToStrX(nID,0) || '/' || SalNumberToStrX(nADD,0) || ' сохранен в БД!')
 											! If SqlPrepare( hSql(), 'INSERT INTO CC_DOCS (id,nd,text,adds)
 													 VALUES (:sTemplateId,:nND,:sDoc,:nADD)' )
-												                                                                                                                                                                                                                              If SqlSetLongBindDatatype( 3, 23 )
-													                                                                                                                                                                                                                              If SqlExecute( hSql() )
+												                                                                                                                                                                                                                                If SqlSetLongBindDatatype( 3, 23 )
+													                                                                                                                                                                                                                                If SqlExecute( hSql() )
 														! Call SqlCommitEx( hSql(), 'Текст доп.соглашения № ' || SalNumberToStrX(nID,0) || ' сохранен в БД!' )
-														                                                                                                                                                                                                                              Call SqlCommitEx( hSql(), 'Текст доп.соглашения № ' || SalNumberToStrX(nID,0) ||'/'||SalNumberToStrX(nADD,0) ||' сохранен в БД!' )
+														                                                                                                                                                                                                                                Call SqlCommitEx( hSql(), 'Текст доп.соглашения № ' || SalNumberToStrX(nID,0) ||'/'||SalNumberToStrX(nADD,0) ||' сохранен в БД!' )
 									Call cCnc.Disconnect()
 									Call cCnc2.Disconnect()
 							Else
@@ -1418,10 +1419,10 @@ Application Description: Вкладные операции
 												Call SqlCommitEx(hSql(), 'Текст доп.соглашения № ' || SalNumberToStrX(nID,0) || '/' ||SalNumberToStrX(nADD,0) || ' сохранен в БД!')
 											! If SqlPrepare( hSql(), 'INSERT INTO CC_DOCS (id,nd,text,adds)
 													 VALUES (:sTemplateId,:nND,:sDoc,:nADD)' )
-												                                                                                                                                                                                                                              If SqlSetLongBindDatatype( 3, 23 )
-													                                                                                                                                                                                                                              If SqlExecute( hSql() )
+												                                                                                                                                                                                                                                If SqlSetLongBindDatatype( 3, 23 )
+													                                                                                                                                                                                                                                If SqlExecute( hSql() )
 														! Call SqlCommitEx( hSql(), 'Текст доп.соглашения № ' || SalNumberToStrX(nID,0) || ' сохранен в БД!' )
-														                                                                                                                                                                                                                              Call SqlCommitEx( hSql(), 'Текст доп.соглашения № ' || SalNumberToStrX(nID,0) ||'/'||SalNumberToStrX(nADD,0) ||' сохранен в БД!' )
+														                                                                                                                                                                                                                                Call SqlCommitEx( hSql(), 'Текст доп.соглашения № ' || SalNumberToStrX(nID,0) ||'/'||SalNumberToStrX(nADD,0) ||' сохранен в БД!' )
 									Call cCnc.Disconnect()
 									Call cCnc2.Disconnect()
 							Else
@@ -9869,7 +9870,7 @@ Application Description: Вкладные операции
 					Background Color: 3D Face Color
 					Input Mask: Unformatted
 .end
-				                                   Message Actions 
+				                                     Message Actions 
 			Data Field: dDATN
 .data CLASSPROPSSIZE
 0000: 1600
@@ -10662,12 +10663,12 @@ Application Description: Вкладные операции
 				Message Actions
 					On SAM_Create
 						! If cmbOST.Init( hWndItem )
-							                                                                                                                                    Call SalListClear(hWndItem)
+							                                                                                                                                      Call SalListClear(hWndItem)
 							! Исключая последний день
-							                                                                                                                                    Call cmbOST.Add(0, CurrentLangTable.GetAtomTitle('frm_ViddDetails.cTOst0')) 
+							                                                                                                                                      Call cmbOST.Add(0, CurrentLangTable.GetAtomTitle('frm_ViddDetails.cTOst0')) 
 							! Исключая первый и последний дни
-							                                                                                                                                    Call cmbOST.Add(1, CurrentLangTable.GetAtomTitle('frm_ViddDetails.cTOst1'))
-							                                                                                                                                    Call cmbOST.SetSelectById( nOST )
+							                                                                                                                                      Call cmbOST.Add(1, CurrentLangTable.GetAtomTitle('frm_ViddDetails.cTOst1'))
+							                                                                                                                                      Call cmbOST.SetSelectById( nOST )
 						Call cmbOST.Init(hWndItem)
 						Call cmbOST.Populate(hSql(),"IO", "NAME", "INT_ION", "ORDER BY 1")
 						Call cmbOST.SetSelectById(nOST)
@@ -12603,7 +12604,7 @@ Application Description: Вкладные операции
 						Set nTARIF = cmbTARIF.GetKey( SalListQuerySelection(cmbTARIF) )
 					! On SAM_TooltipSetText
 						! Наименование формата
-						                                                                         Return XSalTooltipSetText(lParam,CurrentLangTable.GetAtomTitle('frm_ViddDetails.cFTipCmbFORMAT'))
+						                                                                           Return XSalTooltipSetText(lParam,CurrentLangTable.GetAtomTitle('frm_ViddDetails.cFTipCmbFORMAT'))
 			!
 			! Закладка "Доп.параметры"
 			!
@@ -14704,87 +14705,87 @@ Application Description: Вкладные операции
 						Return FALSE
 					Return TRUE
 			! Function: NotNullData
-				                                                                                                                                    Description: Проверка заполнения не совсем обязательных полей
-				                                                                                                                                    Returns 
-					                                                                                                                                    Boolean: 
-				                                                                                                                                    Parameters 
-				                                                                                                                                    Static Variables 
-				                                                                                                                                    Local variables 
-					                                                                                                                                    Number: n1
-					                                                                                                                                    Number: n2
-					                                                                                                                                    Number: n3
-				                                                                                                                                    Actions 
-					                                                                                                                                    If SalIsNull(nMIN_SUMM)  
+				                                                                                                                                      Description: Проверка заполнения не совсем обязательных полей
+				                                                                                                                                      Returns 
+					                                                                                                                                      Boolean: 
+				                                                                                                                                      Parameters 
+				                                                                                                                                      Static Variables 
+				                                                                                                                                      Local variables 
+					                                                                                                                                      Number: n1
+					                                                                                                                                      Number: n2
+					                                                                                                                                      Number: n3
+				                                                                                                                                      Actions 
+					                                                                                                                                      If SalIsNull(nMIN_SUMM)  
 						! Для данного вида вклада не установлена миним.сумма! Продолжить?
-						                                                                                                                                    Set n1=SalMessageBox(CurrentLangTable.GetAtomTitle('frm_ViddDetails.cTMessNotSetMIN_SUMM') || ' ' || 
+						                                                                                                                                      Set n1=SalMessageBox(CurrentLangTable.GetAtomTitle('frm_ViddDetails.cTMessNotSetMIN_SUMM') || ' ' || 
 								    CurrentLangTable.GetAtomTitle('frm_ViddDetails.cTMessNext'),
 								    CurrentLangTable.GetAtomTitle('cTAt'), MB_YesNo)
-						                                                                                                                                    If n1=IDYES 
-							                                                                                                                                    If nSTOP = 0 OR SalIsNull(cmbSTOP) 
+						                                                                                                                                      If n1=IDYES 
+							                                                                                                                                      If nSTOP = 0 OR SalIsNull(cmbSTOP) 
 								! Для данного вида вклада не установлен штраф! Продолжить?
-								                                                                                                                                    Set n2=SalMessageBox(CurrentLangTable.GetAtomTitle('frm_ViddDetails.cTMessNotSetSTOP') || ' ' || 
+								                                                                                                                                      Set n2=SalMessageBox(CurrentLangTable.GetAtomTitle('frm_ViddDetails.cTMessNotSetSTOP') || ' ' || 
 										    CurrentLangTable.GetAtomTitle('frm_ViddDetails.cTMessNext'),
 										    CurrentLangTable.GetAtomTitle('cTAt'), MB_YesNo)
-								                                                                                                                                    If n2=IDYES
-									                                                                                                                                    Set nSTOP = 0
-									                                                                                                                                    If SalIsNull(cmbBRL)
+								                                                                                                                                      If n2=IDYES
+									                                                                                                                                      Set nSTOP = 0
+									                                                                                                                                      If SalIsNull(cmbBRL)
 										! Для данного вида вклада не установлена ставка пролонгации! Продолжить?
-										                                                                                                                                    Set n3=SalMessageBox(CurrentLangTable.GetAtomTitle('frm_ViddDetails.cTMessNotSetBRL') || ' ' || 
+										                                                                                                                                      Set n3=SalMessageBox(CurrentLangTable.GetAtomTitle('frm_ViddDetails.cTMessNotSetBRL') || ' ' || 
 												    CurrentLangTable.GetAtomTitle('frm_ViddDetails.cTMessNext'),
 												    CurrentLangTable.GetAtomTitle('cTAt'), MB_YesNo)
-										                                                                                                                                    If n3=IDYES
-											                                                                                                                                    Return TRUE
-										                                                                                                                                    Else 
-											                                                                                                                                    Return FALSE
-									                                                                                                                                    Else 
-										                                                                                                                                    Return TRUE
-								                                                                                                                                    Else 
-									                                                                                                                                    Return FALSE
-							                                                                                                                                    Else 
-								                                                                                                                                    If SalIsNull(cmbBRL)
+										                                                                                                                                      If n3=IDYES
+											                                                                                                                                      Return TRUE
+										                                                                                                                                      Else 
+											                                                                                                                                      Return FALSE
+									                                                                                                                                      Else 
+										                                                                                                                                      Return TRUE
+								                                                                                                                                      Else 
+									                                                                                                                                      Return FALSE
+							                                                                                                                                      Else 
+								                                                                                                                                      If SalIsNull(cmbBRL)
 									! Для данного вида вклада не установлена ставка пролонгации! Продолжить?
-									                                                                                                                                    Set n3=SalMessageBox(CurrentLangTable.GetAtomTitle('frm_ViddDetails.cTMessNotSetBRL') || ' ' || 
+									                                                                                                                                      Set n3=SalMessageBox(CurrentLangTable.GetAtomTitle('frm_ViddDetails.cTMessNotSetBRL') || ' ' || 
 											    CurrentLangTable.GetAtomTitle('frm_ViddDetails.cTMessNext'),
 											    CurrentLangTable.GetAtomTitle('cTAt'), MB_YesNo)
-									                                                                                                                                    If n3=IDYES
-										                                                                                                                                    Return TRUE
-									                                                                                                                                    Else 
-										                                                                                                                                    Return FALSE
-								                                                                                                                                    Else 
-									                                                                                                                                    Return TRUE
-						                                                                                                                                    Else 
-							                                                                                                                                    Return FALSE
-					                                                                                                                                    Else If (nSTOP = 0 OR SalIsNull(cmbSTOP))
+									                                                                                                                                      If n3=IDYES
+										                                                                                                                                      Return TRUE
+									                                                                                                                                      Else 
+										                                                                                                                                      Return FALSE
+								                                                                                                                                      Else 
+									                                                                                                                                      Return TRUE
+						                                                                                                                                      Else 
+							                                                                                                                                      Return FALSE
+					                                                                                                                                      Else If (nSTOP = 0 OR SalIsNull(cmbSTOP))
 						! Для данного вида вклада не установлен штраф! Продолжить?
-						                                                                                                                                    Set n2=SalMessageBox(CurrentLangTable.GetAtomTitle('frm_ViddDetails.cTMessNotSetSTOP') || ' ' || 
+						                                                                                                                                      Set n2=SalMessageBox(CurrentLangTable.GetAtomTitle('frm_ViddDetails.cTMessNotSetSTOP') || ' ' || 
 								    CurrentLangTable.GetAtomTitle('frm_ViddDetails.cTMessNext'),
 								    CurrentLangTable.GetAtomTitle('cTAt'), MB_YesNo)
-						                                                                                                                                    If n2=IDYES
-							                                                                                                                                    Set nSTOP = 0
-							                                                                                                                                    If SalIsNull(cmbBRL)
+						                                                                                                                                      If n2=IDYES
+							                                                                                                                                      Set nSTOP = 0
+							                                                                                                                                      If SalIsNull(cmbBRL)
 								! Для данного вида вклада не установлена ставка пролонгации! Продолжить?
-								                                                                                                                                    Set n3=SalMessageBox(CurrentLangTable.GetAtomTitle('frm_ViddDetails.cTMessNotSetBRL') || ' ' || 
+								                                                                                                                                      Set n3=SalMessageBox(CurrentLangTable.GetAtomTitle('frm_ViddDetails.cTMessNotSetBRL') || ' ' || 
 										    CurrentLangTable.GetAtomTitle('frm_ViddDetails.cTMessNext'),
 										    CurrentLangTable.GetAtomTitle('cTAt'), MB_YesNo)
-								                                                                                                                                    If n3=IDYES
-									                                                                                                                                    Return TRUE
-								                                                                                                                                    Else 
-									                                                                                                                                    Return FALSE
-							                                                                                                                                    Else 
-								                                                                                                                                    Return TRUE
-						                                                                                                                                    Else 
-							                                                                                                                                    Return FALSE
-					                                                                                                                                    Else If SalIsNull(cmbBRL)
+								                                                                                                                                      If n3=IDYES
+									                                                                                                                                      Return TRUE
+								                                                                                                                                      Else 
+									                                                                                                                                      Return FALSE
+							                                                                                                                                      Else 
+								                                                                                                                                      Return TRUE
+						                                                                                                                                      Else 
+							                                                                                                                                      Return FALSE
+					                                                                                                                                      Else If SalIsNull(cmbBRL)
 						! Для данного вида вклада не установлена ставка пролонгации! Продолжить?
-						                                                                                                                                    Set n3=SalMessageBox(CurrentLangTable.GetAtomTitle('frm_ViddDetails.cTMessNotSetBRL') || ' ' || 
+						                                                                                                                                      Set n3=SalMessageBox(CurrentLangTable.GetAtomTitle('frm_ViddDetails.cTMessNotSetBRL') || ' ' || 
 								    CurrentLangTable.GetAtomTitle('frm_ViddDetails.cTMessNext'),
 								    CurrentLangTable.GetAtomTitle('cTAt'), MB_YesNo)
-						                                                                                                                                    If n3=IDYES
-							                                                                                                                                    Return TRUE
-						                                                                                                                                    Else 
-							                                                                                                                                    Return FALSE
-					                                                                                                                                    Else 
-						                                                                                                                                    Return TRUE
+						                                                                                                                                      If n3=IDYES
+							                                                                                                                                      Return TRUE
+						                                                                                                                                      Else 
+							                                                                                                                                      Return FALSE
+					                                                                                                                                      Else 
+						                                                                                                                                      Return TRUE
 			Function: NotNullData
 				Description: Проверка заполнения не совсем обязательных полей
 				Returns
@@ -15363,30 +15364,30 @@ Application Description: Вкладные операции
 							Call SalWaitCursor(FALSE)
 							Call SalSendMsg(hWndForm, UM_Populate, 0, 0)
 						! On SAM_Click
-							                                                                                                                      Call SalWaitCursor(TRUE)
-							                                                                                                                      Set nRow = TBL_MinRow
+							                                                                                                                        Call SalWaitCursor(TRUE)
+							                                                                                                                        Set nRow = TBL_MinRow
 							! Вы действительно хотите переоформить отмеченные вклады?
-							                                                                                                                      If SalMessageBox(CurrentLangTable.GetAtomTitle('tbl_AvtoExtend.cTMessAvtoDep'), 
+							                                                                                                                        If SalMessageBox(CurrentLangTable.GetAtomTitle('tbl_AvtoExtend.cTMessAvtoDep'), 
 									                 CurrentLangTable.GetAtomTitle('cTAt'), 
 									                 MB_YesNo) = IDYES
-								                                                                                                                      Loop 
-									                                                                                                                      If SalTblFindNextRow(hWndForm, nRow, 0, 0)
-										                                                                                                                      Call SalTblSetContext(hWndForm, nRow)
-										                                                                                                                      If (nRow >= 0 AND tbl_AvtoExtend.cIsExtend) 
-											                                                                                                                      If SqlPLSQLCommand(hSql(), "dpt.p_dpt_extension(tbl_AvtoExtend.cDeposit_id, tbl_AvtoExtend.cNewDatEnd)")
+								                                                                                                                        Loop 
+									                                                                                                                        If SalTblFindNextRow(hWndForm, nRow, 0, 0)
+										                                                                                                                        Call SalTblSetContext(hWndForm, nRow)
+										                                                                                                                        If (nRow >= 0 AND tbl_AvtoExtend.cIsExtend) 
+											                                                                                                                        If SqlPLSQLCommand(hSql(), "dpt.p_dpt_extension(tbl_AvtoExtend.cDeposit_id, tbl_AvtoExtend.cNewDatEnd)")
 												! Автопереоформление депозита № ...
-												                                                                                                                      Call SqlCommitEx(hSql(), CurrentLangTable.GetAtomTitle('tbl_AvtoExtend.cTAvtoDep') || ' '||SalNumberToStrX(tbl_AvtoExtend.cDeposit_id,0))
+												                                                                                                                        Call SqlCommitEx(hSql(), CurrentLangTable.GetAtomTitle('tbl_AvtoExtend.cTAvtoDep') || ' '||SalNumberToStrX(tbl_AvtoExtend.cDeposit_id,0))
 												! Сформировать доп.соглашение к договору № ...?
-												                                                                                                                      If SalMessageBox(CurrentLangTable.GetAtomTitle('tbl_AvtoExtend.cTMessFormDopSogl') ||SalNumberToStrX(tbl_AvtoExtend.cDeposit_id,0)||'?', 
+												                                                                                                                        If SalMessageBox(CurrentLangTable.GetAtomTitle('tbl_AvtoExtend.cTMessFormDopSogl') ||SalNumberToStrX(tbl_AvtoExtend.cDeposit_id,0)||'?', 
 														                 CurrentLangTable.GetAtomTitle('cTAt'), 
 														                 MB_YesNo) = IDYES
-													                                                                                                                      Call SalSendMsg(pbDetails, SAM_Click, 0, 0)
-											                                                                                                                      Else 
-												                                                                                                                      Call SqlRollback(hSql())
-									                                                                                                                      Else 
-										                                                                                                                      Break 
-							                                                                                                                      Call SalWaitCursor(FALSE)
-							                                                                                                                      Call SalSendMsg(hWndForm, UM_Populate, 0, 0)
+													                                                                                                                        Call SalSendMsg(pbDetails, SAM_Click, 0, 0)
+											                                                                                                                        Else 
+												                                                                                                                        Call SqlRollback(hSql())
+									                                                                                                                        Else 
+										                                                                                                                        Break 
+							                                                                                                                        Call SalWaitCursor(FALSE)
+							                                                                                                                        Call SalSendMsg(hWndForm, UM_Populate, 0, 0)
 				Check Box: cbCheckAll
 					Class Child Ref Key: 0
 					Class ChildKey: 0
@@ -19401,7 +19402,7 @@ Application Description: Вкладные операции
 			Window Location and Size
 				Left:   1.175"
 				Top:    2.375"
-				Width:  23.333"
+				Width:  23.1"
 				Width Editable? Class Default
 				Height: 8.774"
 				Height Editable? Class Default
@@ -19558,7 +19559,7 @@ Application Description: Вкладные операции
 					Class ChildKey: 0
 					Class:
 					Window Location and Size
-						Left:   11.75"
+						Left:   11.55"
 						Top:    0.095"
 						Width:  1.0"
 						Width Editable? Yes
@@ -19613,11 +19614,11 @@ Application Description: Вкладные операции
 						Editable? Yes
 					Display Settings
 						Window Location and Size
-							Left:   12.8"
-							Top:    0.07"
-							Width:  1.183"
+							Left:   12.6"
+							Top:    0.05"
+							Width:  1.4"
 							Width Editable? Yes
-							Height: 0.25"
+							Height: 0.28"
 							Height Editable? Yes
 						Visible? Yes
 						Border? Yes
@@ -23492,74 +23493,74 @@ Application Description: Вкладные операции
 			Text Color: Default
 			Background Color: Default
 .end
-		                                                                                                                                      Description: Коррекция срока вклада
-		                                                                                                                                      Tool Bar 
-			                                                                                                                                      Contents 
-		                                                                                                                                      Contents 
-			                                                                                                                                      Background Text: Задайте параметры
-			                                                                                                                                      Data Field: bgParams
-				                                                                                                                                      Message Actions 
-			                                                                                                                                      Background Text: № вклада:
-			                                                                                                                                      Data Field: bgDPT_ID
-				                                                                                                                                      Message Actions 
-			                                                                                                                                      Data Field: dfDPT_ID
-				                                                                                                                                      Message Actions 
-			                                                                                                                                      Background Text: Дата начала:
-			                                                                                                                                      Data Field: bgDAT_BEGIN
-				                                                                                                                                      Message Actions 
-			                                                                                                                                      Data Field: dfDAT_BEGIN
-				                                                                                                                                      Message Actions 
-			                                                                                                                                      Background Text: Дата окончания:
-			                                                                                                                                      Data Field: bgDAT_END
-				                                                                                                                                      Message Actions 
-			                                                                                                                                      Data Field: dfDAT_END
-				                                                                                                                                      Message Actions 
-			                                                                                                                                      Background Text: Укажите новый срок вклада
-			                                                                                                                                      Data Field: bgDAT
-				                                                                                                                                      Message Actions 
-			                                                                                                                                      Data Field: dfDAT1
-				                                                                                                                                      Message Actions 
-			                                                                                                                                      Background Text: -
-			                                                                                                                                      Data Field: dfDAT2
-				                                                                                                                                      Message Actions 
-					                                                                                                                                      On SAM_Validate
-						                                                                                                                                      Set dSTOP = dfDAT2-1
-			                                                                                                                                      Pushbutton: pbLook
-				                                                                                                                                      Message Actions 
-					                                                                                                                                      On SAM_Click
-						                                                                                                                                      Call F_Check()
-			                                                                                                                                      Pushbutton: pbOk
-				                                                                                                                                      Message Actions 
-					                                                                                                                                      On SAM_Click
-						                                                                                                                                      If dfDAT1 = DATETIME_Null 
+		                                                                                                                                        Description: Коррекция срока вклада
+		                                                                                                                                        Tool Bar 
+			                                                                                                                                        Contents 
+		                                                                                                                                        Contents 
+			                                                                                                                                        Background Text: Задайте параметры
+			                                                                                                                                        Data Field: bgParams
+				                                                                                                                                        Message Actions 
+			                                                                                                                                        Background Text: № вклада:
+			                                                                                                                                        Data Field: bgDPT_ID
+				                                                                                                                                        Message Actions 
+			                                                                                                                                        Data Field: dfDPT_ID
+				                                                                                                                                        Message Actions 
+			                                                                                                                                        Background Text: Дата начала:
+			                                                                                                                                        Data Field: bgDAT_BEGIN
+				                                                                                                                                        Message Actions 
+			                                                                                                                                        Data Field: dfDAT_BEGIN
+				                                                                                                                                        Message Actions 
+			                                                                                                                                        Background Text: Дата окончания:
+			                                                                                                                                        Data Field: bgDAT_END
+				                                                                                                                                        Message Actions 
+			                                                                                                                                        Data Field: dfDAT_END
+				                                                                                                                                        Message Actions 
+			                                                                                                                                        Background Text: Укажите новый срок вклада
+			                                                                                                                                        Data Field: bgDAT
+				                                                                                                                                        Message Actions 
+			                                                                                                                                        Data Field: dfDAT1
+				                                                                                                                                        Message Actions 
+			                                                                                                                                        Background Text: -
+			                                                                                                                                        Data Field: dfDAT2
+				                                                                                                                                        Message Actions 
+					                                                                                                                                        On SAM_Validate
+						                                                                                                                                        Set dSTOP = dfDAT2-1
+			                                                                                                                                        Pushbutton: pbLook
+				                                                                                                                                        Message Actions 
+					                                                                                                                                        On SAM_Click
+						                                                                                                                                        Call F_Check()
+			                                                                                                                                        Pushbutton: pbOk
+				                                                                                                                                        Message Actions 
+					                                                                                                                                        On SAM_Click
+						                                                                                                                                        If dfDAT1 = DATETIME_Null 
 								OR dfDAT2 = DATETIME_Null 
 								OR dfDAT1 >= dfDAT2
-							                                                                                                                                      Call SalMessageBox(
+							                                                                                                                                        Call SalMessageBox(
 									     "Неверно указан новый период вклада!", 
 									     "Ошибка!", 
 									     MB_IconStop)
-						                                                                                                                                      Else 
-							                                                                                                                                      Call F_Correct()
-			                                                                                                                                      Pushbutton: pbCancel
-				                                                                                                                                      Message Actions 
-					                                                                                                                                      On SAM_Click
-						                                                                                                                                      Call SalEndDialog(dlg_CorrectDates, FALSE)
-			                                                                                                                                      Picture: pic1
-				                                                                                                                                      Message Actions 
-			                                                                                                                                      Picture: pic2
-				                                                                                                                                      Message Actions 
-		                                                                                                                                      Functions 
-			                                                                                                                                      Function: F_Check
-				                                                                                                                                      Description: 
-				                                                                                                                                      Returns 
-				                                                                                                                                      Parameters 
-				                                                                                                                                      Static Variables 
-				                                                                                                                                      Local variables 
-				                                                                                                                                      Actions 
-					                                                                                                                                      If dfDPT_ID    != NUMBER_Null   AND 
+						                                                                                                                                        Else 
+							                                                                                                                                        Call F_Correct()
+			                                                                                                                                        Pushbutton: pbCancel
+				                                                                                                                                        Message Actions 
+					                                                                                                                                        On SAM_Click
+						                                                                                                                                        Call SalEndDialog(dlg_CorrectDates, FALSE)
+			                                                                                                                                        Picture: pic1
+				                                                                                                                                        Message Actions 
+			                                                                                                                                        Picture: pic2
+				                                                                                                                                        Message Actions 
+		                                                                                                                                        Functions 
+			                                                                                                                                        Function: F_Check
+				                                                                                                                                        Description: 
+				                                                                                                                                        Returns 
+				                                                                                                                                        Parameters 
+				                                                                                                                                        Static Variables 
+				                                                                                                                                        Local variables 
+				                                                                                                                                        Actions 
+					                                                                                                                                        If dfDPT_ID    != NUMBER_Null   AND 
 							   dfDAT_BEGIN != DATETIME_Null AND 
 							   dfDAT_END   != DATETIME_Null
-						                                                                                                                                      Call SqlPrepareAndExecute(hSql(), 
+						                                                                                                                                        Call SqlPrepareAndExecute(hSql(), 
 								    "SELECT d.deposit_id, d.acc, i.acra, 
 								            decode(b.nbs,v.deposit_cod,i.acrb,null) 
 								       INTO :dfDPT_ID, :nACC, :nACCN, :nACCA
@@ -23572,27 +23573,27 @@ Application Description: Вкладные операции
 								        AND i.acrb = b.acc
 								        AND d.dat_begin = :dfDAT_BEGIN 
 								        AND d.dat_end = :dfDAT_END" )
-						                                                                                                                                      If not SqlFetchNext(hSql(), nFetchRes)
-							                                                                                                                                      Call SalMessageBox("Вклад не найден!", "Ошибка!", MB_IconStop)
-							                                                                                                                                      Set dfDPT_ID = NUMBER_Null
-							                                                                                                                                      Set dfDAT_BEGIN = DATETIME_Null
-							                                                                                                                                      Set dfDAT_END = DATETIME_Null
-							                                                                                                                                      Call SalSetFocus(pbCancel)
-						                                                                                                                                      Else 
-							                                                                                                                                      Call SalEnableWindow(dfDAT1)
-							                                                                                                                                      Call SalEnableWindow(dfDAT2)
-							                                                                                                                                      Call SalEnableWindow(pbOk)
-							                                                                                                                                      Call SalSetFocus(dfDAT1)
-					                                                                                                                                      Else 
-						                                                                                                                                      Call SalMessageBox("Не указаны параметры вклада!", "Ошибка!", MB_IconStop)
-			                                                                                                                                      Function: F_Correct
-				                                                                                                                                      Description: 
-				                                                                                                                                      Returns 
-				                                                                                                                                      Parameters 
-				                                                                                                                                      Static Variables 
-				                                                                                                                                      Local variables 
-				                                                                                                                                      Actions 
-					                                                                                                                                      If dfDAT2 >  dfDAT1        AND 
+						                                                                                                                                        If not SqlFetchNext(hSql(), nFetchRes)
+							                                                                                                                                        Call SalMessageBox("Вклад не найден!", "Ошибка!", MB_IconStop)
+							                                                                                                                                        Set dfDPT_ID = NUMBER_Null
+							                                                                                                                                        Set dfDAT_BEGIN = DATETIME_Null
+							                                                                                                                                        Set dfDAT_END = DATETIME_Null
+							                                                                                                                                        Call SalSetFocus(pbCancel)
+						                                                                                                                                        Else 
+							                                                                                                                                        Call SalEnableWindow(dfDAT1)
+							                                                                                                                                        Call SalEnableWindow(dfDAT2)
+							                                                                                                                                        Call SalEnableWindow(pbOk)
+							                                                                                                                                        Call SalSetFocus(dfDAT1)
+					                                                                                                                                        Else 
+						                                                                                                                                        Call SalMessageBox("Не указаны параметры вклада!", "Ошибка!", MB_IconStop)
+			                                                                                                                                        Function: F_Correct
+				                                                                                                                                        Description: 
+				                                                                                                                                        Returns 
+				                                                                                                                                        Parameters 
+				                                                                                                                                        Static Variables 
+				                                                                                                                                        Local variables 
+				                                                                                                                                        Actions 
+					                                                                                                                                        If dfDAT2 >  dfDAT1        AND 
 							   dfDAT1 != DATETIME_Null AND 
 							   dfDAT2 != DATETIME_Null AND
 							 (SqlPrepareAndExecute(hSql(),
@@ -23613,30 +23614,30 @@ Application Description: Вкладные операции
 							    "UPDATE int_ratn SET bdat = :dfDAT2 WHERE id = 1 AND acc = :nACC AND bdat = :dfDAT_END") AND
 							  SqlPrepareAndExecute(hSql(),
 							    "UPDATE int_accn SET acr_dat = :dfDAT1, stp_dat = :dfDAT2 WHERE id = 0 AND acc = :nACCA"))      
-						                                                                                                                                      Call SalMessageBox("Изменение успешно выполнено!", "Поздравляем!", MB_IconExclamation)
-						                                                                                                                                      Call SqlCommitEx(hSql(), 'Изменен срок вклада №'||SalNumberToStrX(dfDPT_ID,0))
-					                                                                                                                                      Else 
-						                                                                                                                                      Call SalMessageBox("Невозможно сохранить новый период вклада!", "Ошибка!", MB_IconStop)
-					                                                                                                                                      Call SalSetFocus(pbCancel)
-		                                                                                                                                      Window Parameters 
-			                                                                                                                                      Number: nPar
-		                                                                                                                                      Window Variables 
-			                                                                                                                                      Number: nFetchRes
-			                                                                                                                                      Number: nACC
-			                                                                                                                                      Number: nACCN
-			                                                                                                                                      Number: nACCA
-			                                                                                                                                      Date/Time: dSTOP
-		                                                                                                                                      Message Actions 
-			                                                                                                                                      On SAM_Create
-				                                                                                                                                      Call SalSendMsgToChildren(hWndForm, UM_QueryLabelText, 0, 0)
-				                                                                                                                                      Call SalSetWindowText(hWndForm, CurrentLangTable.GetAtomTitle('dlg_CorrectDates.cTWndTitle'))
-				                                                                                                                                      Call PrepareWindowEx(hWndForm)
-				                                                                                                                                      Call SalSetFocus(dfDPT_ID)
-				                                                                                                                                      Call SalDisableWindow(dfDAT1)
-				                                                                                                                                      Call SalDisableWindow(dfDAT2)
-				                                                                                                                                      Call SalDisableWindow(pbOk)
-			                                                                                                                                      On SAM_Close
-				                                                                                                                                      Call SalEndDialog(dlg_CorrectDates, FALSE)
+						                                                                                                                                        Call SalMessageBox("Изменение успешно выполнено!", "Поздравляем!", MB_IconExclamation)
+						                                                                                                                                        Call SqlCommitEx(hSql(), 'Изменен срок вклада №'||SalNumberToStrX(dfDPT_ID,0))
+					                                                                                                                                        Else 
+						                                                                                                                                        Call SalMessageBox("Невозможно сохранить новый период вклада!", "Ошибка!", MB_IconStop)
+					                                                                                                                                        Call SalSetFocus(pbCancel)
+		                                                                                                                                        Window Parameters 
+			                                                                                                                                        Number: nPar
+		                                                                                                                                        Window Variables 
+			                                                                                                                                        Number: nFetchRes
+			                                                                                                                                        Number: nACC
+			                                                                                                                                        Number: nACCN
+			                                                                                                                                        Number: nACCA
+			                                                                                                                                        Date/Time: dSTOP
+		                                                                                                                                        Message Actions 
+			                                                                                                                                        On SAM_Create
+				                                                                                                                                        Call SalSendMsgToChildren(hWndForm, UM_QueryLabelText, 0, 0)
+				                                                                                                                                        Call SalSetWindowText(hWndForm, CurrentLangTable.GetAtomTitle('dlg_CorrectDates.cTWndTitle'))
+				                                                                                                                                        Call PrepareWindowEx(hWndForm)
+				                                                                                                                                        Call SalSetFocus(dfDPT_ID)
+				                                                                                                                                        Call SalDisableWindow(dfDAT1)
+				                                                                                                                                        Call SalDisableWindow(dfDAT2)
+				                                                                                                                                        Call SalDisableWindow(pbOk)
+			                                                                                                                                        On SAM_Close
+				                                                                                                                                        Call SalEndDialog(dlg_CorrectDates, FALSE)
 	Dialog Box: dlg_CorrectDates
 		Class:
 		Property Template:
@@ -28334,9 +28335,9 @@ Application Description: Вкладные операции
 						Set hCurrTable = hWndForm
 						Set nDptId     = colDptId
 						! If colProcessingDone = 'Y'
-							                                                                                                                                                                                     Call SalEnableWindow(pbAccept)
+							                                                                                                                                                                                       Call SalEnableWindow(pbAccept)
 						! Else
-							                                                                                                                                                                                     Call SalDisableWindow(pbAccept)
+							                                                                                                                                                                                       Call SalDisableWindow(pbAccept)
 						Call SalSendMsg(tblBonuses, UM_Populate, 0, 0)
 					On UM_Update
 						Call SetBonusRate()
@@ -34590,9 +34591,9 @@ Application Description: Вкладные операции
 							Call GenScript ( tbl_HistChgViddBRID.sModCode )
 							! Set nRow = TBL_MinRow
 							! While SalTblFindNextRow(tbl_HistChgViddBRID, nRow, ROW_Selected, 0)
-								                                                        Call SalTblSetContext(tbl_HistChgViddBRID, nRow)
-								                                                        If tbl_HistChgViddBRID.VIDD != NUMBER_Null
-									                                                        Call GenScript ( tbl_HistChgViddBRID.VIDD )
+								                                                          Call SalTblSetContext(tbl_HistChgViddBRID, nRow)
+								                                                          If tbl_HistChgViddBRID.VIDD != NUMBER_Null
+									                                                          Call GenScript ( tbl_HistChgViddBRID.VIDD )
 							! Call SalTblClearSelection( tbl_HistChgViddBRID )
 				Data Field: dfMODCODE
 					Class Child Ref Key: 0

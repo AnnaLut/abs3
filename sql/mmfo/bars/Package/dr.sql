@@ -174,23 +174,40 @@ begin
   logger.debug('dr.dr_new(): start');
   -- большие дебеторы
   DELETE from deb_reg_rnk;
-
-  INSERT into deb_reg_rnk (rnk, sumd )
-  SELECT a.rnk RNK, -sum(gl.p_icurval(a.kv, fost(a.acc, DAT_) , DAT_)) SUMD
-  FROM accounts a, deb_reg_nbs b
-  WHERE a.nbs=b.nbs and (a.dazs is null or a.dazs > DAT_) 
-  GROUP BY a.rnk
-  HAVING -sum(gl.p_icurval(a.kv, fost(a.acc, DAT_) , DAT_)) > 1000000;
+  if newnbs.g_state = 1 THEN
+     INSERT into deb_reg_rnk (rnk, sumd )
+     SELECT a.rnk RNK, -sum(gl.p_icurval(a.kv, fost(a.acc, DAT_) , DAT_)) SUMD
+     FROM accounts a, nbs_ob22_tip n
+     WHERE n.tip in ('SP ','SPN','SK9') and a.nbs||nvl(a.ob22,'00')=n.nbs||N.OB22 and (a.dazs is null or a.dazs > DAT_) 
+     GROUP BY a.rnk
+     HAVING -sum(gl.p_icurval(a.kv, fost(a.acc, DAT_) , DAT_)) > 1000000;
+  else
+     INSERT into deb_reg_rnk (rnk, sumd )
+     SELECT a.rnk RNK, -sum(gl.p_icurval(a.kv, fost(a.acc, DAT_) , DAT_)) SUMD
+     FROM accounts a, deb_reg_nbs b
+     WHERE a.nbs=b.nbs and (a.dazs is null or a.dazs > DAT_) 
+     GROUP BY a.rnk
+     HAVING -sum(gl.p_icurval(a.kv, fost(a.acc, DAT_) , DAT_)) > 1000000;
+  end if;
 
   -- добавляем RNK контрагентов, которые уже должны < 10 тыс, но записи по ним еще есть в зеркале
-  INSERT into deb_reg_rnk (rnk, sumd )
-  SELECT a.rnk RNK, -sum(gl.p_icurval(a.kv, fost(a.acc, DAT_), DAT_)) SUMD
-  FROM accounts a, deb_reg_nbs b
-  WHERE a.acc=a.acc and a.nbs=b.nbs  
-	and a.rnk not in (select rnk from deb_reg_rnk)
-	and a.acc in (select unique debnum from debreg_res_s  )
-  GROUP BY a.rnk;
-  
+  if newnbs.g_state = 1 THEN
+     INSERT into deb_reg_rnk (rnk, sumd )
+     SELECT a.rnk RNK, -sum(gl.p_icurval(a.kv, fost(a.acc, DAT_), DAT_)) SUMD
+     FROM accounts a, nbs_ob22_tip n
+     WHERE n.tip in ('SP ','SPN','SK9') and a.nbs||nvl(a.ob22,'00')=n.nbs||N.OB22
+           and a.rnk not in (select rnk from deb_reg_rnk)
+           and a.acc in (select unique debnum from debreg_res_s  )
+     GROUP BY a.rnk;
+  else
+     INSERT into deb_reg_rnk (rnk, sumd )
+     SELECT a.rnk RNK, -sum(gl.p_icurval(a.kv, fost(a.acc, DAT_), DAT_)) SUMD
+     FROM accounts a, deb_reg_nbs b
+     WHERE a.acc=a.acc and a.nbs=b.nbs  
+           and a.rnk not in (select rnk from deb_reg_rnk)
+           and a.acc in (select unique debnum from debreg_res_s  )
+     GROUP BY a.rnk;
+  end if;
   --обновление таблицы просмотра
   DELETE from deb_reg_tmp;
 
@@ -214,27 +231,52 @@ begin
 --CRDDATE  - дата договора           | CRDDATE
 --OSN      - Данi про керiвникiв та засновникiв
 -----------------------------------------------------------
-  INSERT INTO deb_reg_tmp (EVENTTYPE, acc, nls, OKPO, NMK, ADR, CUSTTYPE,
-         PRINSIDER, KV, SUM, DEBDATE, day, rezid, CRDAGRNUM, CRDDATE, sumd,
-         OSN,EVENTDATE)
---новые
-   SELECT 1, a.acc, a.nls, c.okpo, c.nmk, c.ADR, decode(c.CUSTTYPE,3,0,1), nvl(c.PRINSIDER,99), a.kv, -(fost(a.acc, DAT_)), 
-          nvl(to_date(cck_app.Get_ND_TXT (n.nd, 'DATSP'),'dd/mm/yyyy'),sd.fdat), DAT_ - sd.fdat, g.rezid, a.nls, to_date(null), r.sumd,
-          substr(nvl2(k.ruk,'Директор: '||k.ruk,NULL)|| nvl2(w.value,'. Засновник: '||w.value,NULL), 1,250), sd.fdat
-   FROM  customer  C, accounts A, deb_reg_rnk R, deb_reg_nbs B, codcagent G, corps K, customerw W, saldoa sd,
-         nd_acc n
-   WHERE C.rnk=R.rnk and C.rnk=a.rnk and fost(a.acc, DAT_) <0 and    
-         A.nbs=B.nbs and A.acc not in (select debnum from debreg_res_s where eventtype in (1,2,3)) and 
-         a.acc=n.acc (+) and G.codcagent=C.codcagent and 
-         nvl(c.okpo,0)<>nvl(F_OUROKPO,0) and  -- исключаем со своим ОКПО
-         a.daos <= DAT_ 
-         -- ищем основателя и директора
-         and c.rnk=k.rnk(+) and c.rnk=w.rnk(+) and w.tag(+)='OSN'
-         -- определяем дату возникновения просрочки
-         and a.acc=sd.acc
-         and
-		 ( 
-		  exists(select acc,max(fdat) mfdat from saldoa where acc=A.acc and fdat<=DAT_
+  if newnbs.g_state = 1 THEN
+     INSERT INTO deb_reg_tmp (EVENTTYPE, acc, nls, OKPO, NMK, ADR, CUSTTYPE,
+            PRINSIDER, KV, SUM, DEBDATE, day, rezid, CRDAGRNUM, CRDDATE, sumd,
+            OSN,EVENTDATE)
+     --новые
+     SELECT 1, a.acc, a.nls, c.okpo, c.nmk, c.ADR, decode(c.CUSTTYPE,3,0,1), nvl(c.PRINSIDER,99), a.kv, -(fost(a.acc, DAT_)), 
+            nvl(to_date(cck_app.Get_ND_TXT (n.nd, 'DATSP'),'dd/mm/yyyy'),sd.fdat), DAT_ - sd.fdat, g.rezid, a.nls, to_date(null), r.sumd,
+            substr(nvl2(k.ruk,'Директор: '||k.ruk,NULL)|| nvl2(w.value,'. Засновник: '||w.value,NULL), 1,250), sd.fdat
+     FROM  customer  C, accounts A, deb_reg_rnk R, nbs_ob22_tip n, codcagent G, corps K, customerw W, saldoa sd,
+           nd_acc n
+     WHERE C.rnk=R.rnk and C.rnk=a.rnk and fost(a.acc, DAT_) <0 and    
+           n.tip in ('SP ','SPN','SK9') and a.nbs||nvl(a.ob22,'00')=n.nbs||N.OB22 and 
+           A.acc not in (select debnum from debreg_res_s where eventtype in (1,2,3)) and 
+           a.acc=n.acc (+) and G.codcagent=C.codcagent and 
+           nvl(c.okpo,0)<>nvl(F_OUROKPO,0) and  -- исключаем со своим ОКПО
+           a.daos <= DAT_ 
+           -- ищем основателя и директора
+           and c.rnk=k.rnk(+) and c.rnk=w.rnk(+) and w.tag(+)='OSN'
+           -- определяем дату возникновения просрочки
+           and a.acc=sd.acc
+           and (exists(select acc,max(fdat) mfdat from saldoa where acc=A.acc and fdat<=DAT_ and ostf=0 and dos>0 group by acc) 
+           and (sd.acc,sd.fdat)=(select acc,max(fdat) mfdat from saldoa 
+                                 where acc=A.acc and fdat<=DAT_ and ostf=0 and dos>0
+                                 group by acc) 
+           or   not exists(select acc,max(fdat) mfdat from saldoa where acc=A.acc and fdat<=DAT_ and ostf=0 and dos>0 group by acc) 
+           and (sd.acc,sd.fdat)=(select acc,min(fdat) mfdat from saldoa where acc=A.acc group by acc));
+  else
+     INSERT INTO deb_reg_tmp (EVENTTYPE, acc, nls, OKPO, NMK, ADR, CUSTTYPE,
+            PRINSIDER, KV, SUM, DEBDATE, day, rezid, CRDAGRNUM, CRDDATE, sumd,
+            OSN,EVENTDATE)
+     --новые
+     SELECT 1, a.acc, a.nls, c.okpo, c.nmk, c.ADR, decode(c.CUSTTYPE,3,0,1), nvl(c.PRINSIDER,99), a.kv, -(fost(a.acc, DAT_)), 
+            nvl(to_date(cck_app.Get_ND_TXT (n.nd, 'DATSP'),'dd/mm/yyyy'),sd.fdat), DAT_ - sd.fdat, g.rezid, a.nls, to_date(null), r.sumd,
+            substr(nvl2(k.ruk,'Директор: '||k.ruk,NULL)|| nvl2(w.value,'. Засновник: '||w.value,NULL), 1,250), sd.fdat
+     FROM  customer  C, accounts A, deb_reg_rnk R, deb_reg_nbs B, codcagent G, corps K, customerw W, saldoa sd,
+           nd_acc n
+     WHERE C.rnk=R.rnk and C.rnk=a.rnk and fost(a.acc, DAT_) <0 and    
+           A.nbs=B.nbs and A.acc not in (select debnum from debreg_res_s where eventtype in (1,2,3)) and 
+           a.acc=n.acc (+) and G.codcagent=C.codcagent and 
+           nvl(c.okpo,0)<>nvl(F_OUROKPO,0) and  -- исключаем со своим ОКПО
+           a.daos <= DAT_ 
+           -- ищем основателя и директора
+           and c.rnk=k.rnk(+) and c.rnk=w.rnk(+) and w.tag(+)='OSN'
+           -- определяем дату возникновения просрочки
+           and a.acc=sd.acc
+           and (exists(select acc,max(fdat) mfdat from saldoa where acc=A.acc and fdat<=DAT_
                     and ostf=0 and dos>0
                     group by acc) 
 		       and (sd.acc,sd.fdat)=(select acc,max(fdat) mfdat from saldoa where acc=A.acc and fdat<=DAT_
@@ -245,7 +287,7 @@ begin
                     group by acc) 
 		       and (sd.acc,sd.fdat)=(select acc,min(fdat) mfdat from saldoa where acc=A.acc group by acc)
 		 );
-
+  end if;
    --UNION
 -- повторные должники=1( RNK есть в deb_reg_rnk)
 INSERT INTO deb_reg_tmp (EVENTTYPE, acc, nls, OKPO, NMK, ADR, CUSTTYPE,
