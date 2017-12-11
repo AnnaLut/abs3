@@ -113,21 +113,29 @@ namespace BarsWeb.Areas.CorpLight.Controllers.Api
        /// </summary>
        /// <param name="phoneNumber"></param>
         [POST("api/CorpLight/Users/validateMobilePhone/{phoneNumber}")]
-        public void ValidateMobilePhone(string phoneNumber)
+        public HttpResponseMessage ValidateMobilePhone(string phoneNumber)
         {
-            var confirmPhoneList = GetConfirmPhoneList();
-            var curentPhone = confirmPhoneList.FirstOrDefault(i => i.Phone == phoneNumber);
-            if (curentPhone == null)
+            try
             {
-                curentPhone = new defaultWebService.ConfirmPhone
+                var confirmPhoneList = GetConfirmPhoneList();
+                var curentPhone = confirmPhoneList.FirstOrDefault(i => i.Phone == phoneNumber);
+                if (curentPhone == null)
                 {
-                    Phone = phoneNumber,
-                    Secret = GetSecret()
-                };
-                _relatedCustRepository.SendSms(phoneNumber, "Your secure code is " + curentPhone.Secret);
+                    curentPhone = new defaultWebService.ConfirmPhone
+                    {
+                        Phone = phoneNumber,
+                        Secret = GetSecret()
+                    };
+                    _relatedCustRepository.SendSms(phoneNumber, "Your secure code is " + curentPhone.Secret);
 
-                confirmPhoneList.Add(curentPhone);
+                    confirmPhoneList.Add(curentPhone);
+                }
             }
+            catch(Exception ex)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.BadRequest, ex.Message);
+            }
+            return Request.CreateResponse(HttpStatusCode.OK, new { Status = "Ok", Message = "Успішно" });
         }
         /// <summary>
         /// Send sms method
@@ -138,7 +146,7 @@ namespace BarsWeb.Areas.CorpLight.Controllers.Api
         private string GetSecret()
         {
             var randObj = new Random((int)DateTime.Now.Ticks & 0x0000FFFF);
-            return string.Format("{0:F8}", randObj.NextDouble());
+            return string.Format("{0:F0}", randObj.Next(10000000, 99999999));
         }
 
         /// <summary>

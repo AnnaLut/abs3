@@ -5,8 +5,13 @@
         var DialogOptions = 'dialogHeight: 600px; dialogWidth: 650px; scroll: no';
         var rnd = Math.random();
 
+
+        var DialogOptions = 'width=1024, height=860, toolbar=yes, location=yes, directories=no, menubar=yes, scrollbars=yes, resizable=yes, status=no';
+
+
         //var result = window.showModalDialog('/barsroot/UserControls/dialogs/ScanIdDocs.aspx?rnk=' + rnk + '&rnd=' + rnd, window, DialogOptions);
-         window.open('/barsroot/UserControls/dialogs/ScanIdDocs.aspx?rnk=' + rnk + '&rnd=' + rnd, "Dialog", 'height: 600px, width: 650px');
+        window.open('/barsroot/UserControls/dialogs/ScanIdDocs.aspx?rnk=' + rnk + '&rnd=' + rnd, "Dialog",
+            DialogOptions);
         //if (result) return true;
         //else return false;
     }

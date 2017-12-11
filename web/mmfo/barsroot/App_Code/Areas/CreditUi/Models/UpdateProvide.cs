@@ -29,7 +29,7 @@ namespace BarsWeb.Areas.CreditUi.Models
 
         public decimal? DEL { get; set; }
 
-        public int? DEPID { get; set; }
+        public decimal? DEPID { get; set; }
 
         public decimal? SV { get; set; }
 

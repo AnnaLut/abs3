@@ -33,7 +33,7 @@ public partial class DepositAccount : Bars.BarsPage
         else
         {
             Deposit dpt = (Deposit)Session["NewDeposit"];
-
+            _dbLogger.Info("COBUMMFO-5060 : після завантаження сторінки рахунків виплат значення wb: " + dpt.wb, "deposit");
 
             // для рах. "до запитання" зразу йдем далі
             if ((dpt.dpt_duration_months == 0) && (dpt.dpt_duration_days == 0))
@@ -176,6 +176,7 @@ public partial class DepositAccount : Bars.BarsPage
             lbIntRcpOKPO.Visible = true;
             textIntRcpOKPO.Visible = true;
         }
+        _dbLogger.Info("COBUMMFO-5060 : після завантаження контролів рахунків виплат значення wb: " + dpt.wb, "deposit");
     }
 
     /// <summary>
@@ -217,6 +218,8 @@ public partial class DepositAccount : Bars.BarsPage
                 break;
             }
         }
+        _dbLogger.Info("COBUMMFO-5060 : після завантаження даних з контролів рахунків виплат значення wb: " + dpt.wb, "deposit");
+
     }
     /// <summary>
     /// Нажатие кнопки "Сформировать договор"
@@ -295,10 +298,13 @@ public partial class DepositAccount : Bars.BarsPage
 
         // Вызываем процесс создания договора
         Deposit dpt = (Deposit)Session["NewDeposit"];
+        _dbLogger.Info("COBUMMFO-5060 : перед процесом створення депозиту значення wb: " + dpt.wb, "deposit");
 
         dpt.WriteToDatabase();
+        _dbLogger.Info("COBUMMFO-5060 : після процесу створення депозиту значення wb: " + dpt.wb, "deposit");
 
         dpt.ReadFromDatabaseExt(true, false, true);
+        _dbLogger.Info("COBUMMFO-5060 : після зчитування депозиту значення wb: " + dpt.wb, "deposit");
 
         //для депозиту, оформленого по довіреності, створюємо довіреність на особу, що оформлювала депозит
         if ((Session["OnTrustee"] != null) && (Convert.ToString(Session["OnTrustee"]) == "YES"))
@@ -337,6 +343,7 @@ public partial class DepositAccount : Bars.BarsPage
                     " не пенсійного віку.", "deposit");
             }
         }
+        _dbLogger.Info("COBUMMFO-5060 : після виходу зі створення депозиту значення wb: " + dpt.wb, "deposit");
 
         // Чистим змінну сесії після відкриття договору
         Session.Remove("NewDeposit");

@@ -80,7 +80,8 @@ namespace BarsWeb.Areas.CorpLight.Controllers
         public ActionResult ValidateOneTimePass(string phoneNumber, string code)
         {
             var confirmPhoneList = GetConfirmPhoneList();
-            var curentPhone = confirmPhoneList.FirstOrDefault(i => i.Phone == phoneNumber);
+            var phone = phoneNumber.Replace('+', ' ');
+            var curentPhone = confirmPhoneList.FirstOrDefault(i => i.Phone == phone);
             if (curentPhone == null || curentPhone.Secret != code)
             {
                 return Json(new { Status = "Error", Message = "Невірний код" }, JsonRequestBehavior.AllowGet);

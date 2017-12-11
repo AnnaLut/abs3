@@ -61,7 +61,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MBM_CURR_RATES as
                                 cn.rate_s_next,
                                 cn.rate_o_next
        bulk collect into l_currency_rates
-       from cur_rates$base cr,
+       from cur_rates cr,
             (select
                 cp.rate_o rate_o_prev,
                 cp.rate_b rate_b_prev,
@@ -73,7 +73,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MBM_CURR_RATES as
                                             crb.kv,
                                             max(crb.vdate) vdate
                                         from
-                                            cur_rates$base crb
+                                            cur_rates crb
                                             ,tabval$global tv
                                         where
                                             crb.vdate <= p_date-1
@@ -93,7 +93,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MBM_CURR_RATES as
                                         crb.kv,
                                         max(crb.vdate) vdate
                                     from
-                                        cur_rates$base crb
+                                        cur_rates crb
                                         ,tabval$global tv
                                     where
                                         crb.vdate <= p_date+1
@@ -108,7 +108,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MBM_CURR_RATES as
                                     crb.kv,
                                     max(crb.vdate) vdate
                                 from
-                                    cur_rates$base crb
+                                    cur_rates crb
                                     ,tabval$global tv
                                 where
                                     crb.vdate <= p_date

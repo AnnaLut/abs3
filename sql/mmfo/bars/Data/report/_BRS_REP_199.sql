@@ -1,10 +1,10 @@
 
 
 PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/Bars/Data/_BRS_***_CAC_14.sql =========*** Run **
+PROMPT *** Run *** ========== Scripts /Sql/Bars/Data/_BRS_***_REP_199.sql =========*** Run *
 PROMPT ===================================================================================== 
 prompt ===================================== 
-prompt == Книга закритих рахунків за період   
+prompt == Довідка про стан рахунку
 prompt ===================================== 
 
 set serveroutput on
@@ -21,8 +21,8 @@ declare
    l_message   varchar2(1000);    
 
 begin     
-   l_zpr.name := 'Книга закритих рахунків за період   ';
-   l_zpr.pkey := '\BRS\***\CAC\14';
+   l_zpr.name := 'Довідка про стан рахунку';
+   l_zpr.pkey := '\BRS\***\REP\199';
 
    l_message  := 'Ключ запроса: '||l_zpr.pkey||'  '||nlchr;
 
@@ -44,35 +44,44 @@ begin
     ------------------------    
                                 
     l_zpr.id           := 1;
-    l_zpr.name         := 'Книга закритих рахунків за період   ';
-    l_zpr.namef        := '';
-    l_zpr.bindvars     := ':sFdat1='''',:sFdat2='''',:Param0=''Маска рахунка(%-всі)'',:Param1=''Реєстр № (0-всі)'',:Param2=''Тип кл.(0-всі,1-банки,2-ЮО,3-ФО)'',:branch=''№ ТВБВ (%-всі)'',:Param3=''Альтернативний рахунок (0-всі, 1-альтернативний)'',:Param4=''Виконавець(0 – не зазначати, 1 – зазначати)''';
+    l_zpr.name         := 'Довідка про стан рахунку';
+    l_zpr.namef        := 'dov.txt';
+    l_zpr.bindvars     := ':sFdat1='''',:Param0=''Реєстр. № кл. (0-всi)'',:Param1=''Маска рахунку (%-всi)'',:Param2=''Виконавець (0-всi)''';
     l_zpr.create_stmt  := '';
-    l_zpr.rpt_template := 'JS_NDU2.qrp';
+    l_zpr.rpt_template := 'AG_31.qrp';
     l_zpr.form_proc    := '';
-    l_zpr.default_vars := ':Param0=''%'',:Param1=''0'',:Param2=''0'',:branch=''%'',:Param3=''0'',:Param4=''0''';
-    l_zpr.bind_sql     := ':branch=''V_USER_BRANCHES|BRANCH|NAME''';
+    l_zpr.default_vars := ':Param0=''0'',:Param1=''%'',:Param2=''0''';
+    l_zpr.bind_sql     := '';
     l_zpr.xml_encoding := 'CL8MSWIN1251';
-    l_zpr.txt          := 'SELECT a.branch TOBO, p1.val boss, p2.val gl_buch,'||nlchr||
-                           '       case when to_number(:Param4)>0 then a.isp else null end isp,'||nlchr||
-                           '       case when to_number(:Param4)>0 then t.fio else null end fio, '||nlchr||
-                           '       r.rnk, substr(r.nmk,1,70) NMK,'||nlchr||
-                           '       a.nls, a.nlsalt NLSALT,  a.kv,   a.daos,r.okpo, a.dazs, substr(a.nls,1,4) nbs'||nlchr||
-                           'FROM Customer r, Accounts a, Cust_acc ra, Staff t ,'||nlchr||
-                           '      (select val from params where par=''BOSS'') p1,'||nlchr||
-                           '      (select val from params where par=''ACCMAN'') p2'||nlchr||
-                           'WHERE r.rnk=ra.rnk and a.acc=ra.acc and a.dazs is not null'||nlchr||
-                           'and a.isp=t.id'||nlchr||
-                           'and  a.dazs>=  :sFdat1  and a.dazs<=  :sFdat2'||nlchr||
-                           'AND trim(a.nls) LIKE :Param0'||nlchr||
-                           'AND trim(a.nlsalt) LIKE decode(:Param3, 0, ''%'', :Param3||''%'')'||nlchr||
-                           'AND trim(a.branch) LIKE :branch||''%'''||nlchr||
-                           'AND r.rnk>=to_number(:Param1) AND r.rnk<='||nlchr||
-                           '             decode(to_number(:Param1),0,999999999,to_number(:Param1))'||nlchr||
-                           'and r.custtype>=to_number(:Param2) AND r.custtype<='||nlchr||
-                           '             decode(to_number(:Param2),0,9999,to_number(:Param2))'||nlchr||
-                           'AND substr(a.nbs,1,1)<>''8'''||nlchr||
-                           'ORDER BY nbs, a.isp, r.rnk, a.nls,  a.kv';
+    l_zpr.txt          := 'SELECT SUBSTR(F_DAT_LIT (to_date(:sFdat1,''DD-MM-YYYY'')),1,25) DAT_LIT,
+       C.RNK, C.OKPO, R.RUK, R.BUH, C.NMK,     
+       A.KV , A.NLS, SUBSTR(A.NMS,1,38) NMS,    
+       T.NAME, T.LCV,
+       (S.OSTF-S.DOS+S.KOS) S,    
+       to_char(abs((S.OSTF-S.DOS+S.KOS)/100),''999G999G999G990D99'') AS_STR,
+       SUBSTR( F_SUMPR(abs(S.OSTF-S.DOS+S.KOS),
+                       TO_CHAR(T.KV),
+                       NVL(T.Gender,''M''),
+                       NVL(T.DIG,2) ),1,250) SUMPR,    
+       SUBSTR(F_DAT_LIT(sysdate),1,25) SYS_LIT, 
+       F.FIO     
+FROM CORPS  R, CUSTOMER C, CUST_ACC U, 
+     ACCOUNTS A, TABVAL T, SALDOA S, STAFF$BASE F    
+WHERE C.RNK = R.RNK(+) 
+  AND C.RNK = U.RNK 
+  AND U.ACC = A.ACC 
+  AND A.KV  = T.KV     
+  AND A.ACC = S.ACC 
+  AND A.ISP = F.ID 
+  AND (A.ISP=to_number(:Param2) OR :Param2=''0'')
+  AND (S.ACC,S.FDAT) = (SELECT ACC,MAX(FDAT) 
+                          FROM SALDOA    
+                         WHERE ACC=A.ACC 
+                           AND FDAT<to_date(:sFdat1,''DD-MM-YYYY'') GROUP BY ACC)    
+  AND A.NLS LIKE :Param1 
+  AND A.DAZS IS NULL     
+  AND C.RNK = DECODE(0,TO_NUMBER(:Param0),C.RNK,TO_NUMBER(:Param0))    
+ORDER BY C.RNK, A.NLS, A.KV';
     l_zpr.xsl_data     := '';
     l_zpr.xsd_data     := '';
 
@@ -103,21 +112,21 @@ begin
                                 
 
     l_rep.name        :='Empty';
-    l_rep.description :='Книга закритих рахунків за період   ';
+    l_rep.description :='Довідка про стан рахунку';
     l_rep.form        :='frm_UniReport';
-    l_rep.param       :=l_zpr.kodz||',3,sFdat,sFdat2,"",TRUE,FALSE';
-    l_rep.ndat        :=2;
-    l_rep.mask        :='';
+    l_rep.param       :=l_zpr.kodz||',3,sFdat,sFdat,"",TRUE,TRUE';
+    l_rep.ndat        :=1;
+    l_rep.mask        :='dov.txt';
     l_rep.usearc      :=0;
     begin                                                                        
-        select idf into l_repfolder from reportsf where idf = 333; 
+        select idf into l_repfolder from reportsf where idf = 30; 
     exception when no_data_found then                                            
         l_repfolder := null;                                                     
     end;                         
     l_rep.idf := l_repfolder;    
 
     -- Фиксированный № печатного отчета   
-    l_rep.id          := 184;
+    l_rep.id          := 380;
 
 
     if l_isnew = 1 then                     
@@ -154,5 +163,5 @@ commit;
 
 
 PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/Bars/Data/_BRS_***_CAC_14.sql =========*** End **
+PROMPT *** End *** ========== Scripts /Sql/Bars/Data/_BRS_***_REP_199.sql =========*** End *
 PROMPT ===================================================================================== 

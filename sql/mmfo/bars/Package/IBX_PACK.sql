@@ -188,7 +188,6 @@ CREATE OR REPLACE PACKAGE BARS.ibx_pack is
 
 end ibx_pack;
 /
-
 CREATE OR REPLACE PACKAGE BODY BARS.ibx_pack is
   -- ================================== Константы ===============================================
   g_body_version constant varchar2(64) := 'version 2.0 15.02.2017';
@@ -2554,7 +2553,7 @@ procedure get_info_doc(p_params in xmltype, -- XML c входящими параметрами
            sb_ => p_sum );
 
     gl.pay( 2, l_ref,l_bdate);
-
+    
     p_res_ref := l_ref;
 
 
@@ -2576,8 +2575,9 @@ procedure get_info_doc(p_params in xmltype, -- XML c входящими параметрами
                           p_res_text out varchar2) is
        l_nd         oper.nd%type;
        l_debit_nls  oper.nlsa%type;
-       l_trans_2902 oper.nlsb%type := '29023061015099';
-       l_6110 oper.nlsb%type := '61108740015099';
+       l_trans_2902 oper.nlsb%type;
+       l_trans_2902_nm accounts.nms%type;
+       l_6110 oper.nlsb%type;
        l_nls_t00 oper.nlsb%type;
        l_debit_name oper.nam_a%type;
        l_dk         number:=1;
@@ -2688,7 +2688,7 @@ procedure get_info_doc(p_params in xmltype, -- XML c входящими параметрами
           gl.in_doc3 (ref_    => l_ref,
                       tt_     => l_tt,
                       vob_    => 6,
-                      nd_     => l_nd,
+                      nd_     => substr(to_char(l_ref), 1, 10),
                       pdat_   => sysdate,
                       vdat_   => l_bdate,
                       dk_     => l_dk,
@@ -2714,9 +2714,9 @@ procedure get_info_doc(p_params in xmltype, -- XML c входящими параметрами
                       sos_    => null,
                       prty_   => 0,
                       uid_    => null);
-
-          select ac.nls
-            into l_trans_2902
+                      
+          select ac.nls, ac.nms
+            into l_trans_2902, l_trans_2902_nm
             from accounts ac
            where ac.nls = '29023061015099'
              and ac.ob22 = '06'
@@ -2741,13 +2741,12 @@ procedure get_info_doc(p_params in xmltype, -- XML c входящими параметрами
               select ac.nls
                 into l_6110
                 from accounts ac
-               where ac.nlsalt = '61108740015099'
+               where ac.nls = '61108740015099'
                  and ac.ob22 = '74'
                  and ac.kf = l_mfo
                  and ac.kv = p_receiver_curr
                  and ac.dazs is null
-                 and ac.branch = '/'||l_mfo||'/'
-                 and ac.dat_alt is not null;
+                 and ac.branch = '/'||l_mfo||'/';
 
               paytt ( flg_ => 0,
                       ref_ => l_ref,
@@ -2761,8 +2760,8 @@ procedure get_info_doc(p_params in xmltype, -- XML c входящими параметрами
                      nls2_ => l_6110,
                        sb_ => l_fee_amount);
            end if;
-
-
+             
+            
 
               if (l_mfo != p_receiver_mfo) then
                 select get_proc_nls('T00',980)
@@ -2798,8 +2797,8 @@ procedure get_info_doc(p_params in xmltype, -- XML c входящими параметрами
                     END IF;
                  end if;
 
-                    sep.in_sep(err_,rec_,mfoa_,nlsa_,mfob_,nlsb_,dk_,s_,
-                               vob_,nd_,kv_,datD_,datP_,nam_a_,nam_b_,nazn_,
+                    sep.in_sep(err_,rec_,mfoa_,l_trans_2902,mfob_,nlsb_,dk_,l_pay_amount,
+                               vob_,nd_,kv_,datD_,datP_,substr(l_trans_2902_nm,1,38),nam_b_,nazn_,
                                NULL,nazns_,id_a_,id_b_,'******',refA_,0,'0123',
                                NULL,NULL,datA_,d_rec_,0,l_ref,0);
               else

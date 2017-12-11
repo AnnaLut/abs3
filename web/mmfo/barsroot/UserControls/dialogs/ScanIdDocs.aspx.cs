@@ -419,6 +419,17 @@ public partial class UserControls_dialogs_ScanIdDocs : System.Web.UI.Page
 
     protected void wzd_FinishButtonClick(object sender, WizardNavigationEventArgs e)
     {
+        try
+        {
+            string[] ps = { scDoc.ImageDataSessionID, scInn.ImageDataSessionID };
+            foreach (var p in ps)
+            {
+                string path = System.IO.Path.Combine(System.IO.Path.GetTempPath(), p);
+                if (System.IO.File.Exists(path)) { System.IO.File.Delete(path); }
+            }
+        }
+        catch (Exception ex) { }
+
         // чистим сессию печати
         OracleConnection con = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnection();
         try
