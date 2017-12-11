@@ -1167,7 +1167,7 @@ END cck;
 /
 CREATE OR REPLACE PACKAGE BODY cck IS
   -------------------------------------------------------------------
-  g_body_version CONSTANT VARCHAR2(64) := 'ver.4.2.5  06/12/2017 ';
+  g_body_version CONSTANT VARCHAR2(64) := 'ver.4.2.6  11/12/2017 ';
   ------------------------------------------------------------------
 
   /*
@@ -5263,9 +5263,17 @@ CREATE OR REPLACE PACKAGE BODY cck IS
         ELSIF tip_ = 'SL ' THEN
           nbs_ := substr(nbs_, 1, 3) || '6';
         ELSIF tip_ = 'SP ' THEN
+         if NEWNBS.GET_STATE = 0 then
           nbs_ := substr(nbs_, 1, 3) || '7';
+         else
+          nbs_ := substr(nbs_, 1, 3) || '3';
+         end if;
         ELSIF tip_ = 'SPN' THEN
+         if NEWNBS.GET_STATE = 0 then
           nbs_ := substr(nbs_, 1, 3) || '9';
+         else
+          nbs_ := substr(nbs_, 1, 3) || '8';
+         end if;
         END IF;
       END IF;
       SELECT bars.f_newnls(acc8_, tip_, nbs_) INTO nls0_ FROM dual;

@@ -210,7 +210,7 @@ P_Proc_Set(kodf_,sheme_,nbuc1_,typ_);
 
 --sql_acc_ := 'select r020 from kl_r020 where prem=''КБ '' and f_01=''1''';
 -- 04.02.2008 вместо классификатора KL_R020 будем использовать KOD_R020
-sql_acc_ := 'select r020 from kod_r020 where prem=''КБ '' and a010=''01'' ';
+sql_acc_ := 'select r020 from kod_r020 where trim(prem)=''КБ'' and a010=''01'' ';
 
 --sql_acc_ := 'select r020 from kl_r020 where prem=''КБ '' and f_01=''1'') or '||
 --            '(nbs is null and substr(nls,1,4) in
