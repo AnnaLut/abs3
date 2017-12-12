@@ -2499,16 +2499,12 @@ CREATE OR REPLACE package body BARS.ow_files_proc is
     -- Для ATRANSFERS намагаємось проплатити в дату постінгу
     if nvl(l_offset, 0) <> 0 and l_filetype <>  g_filetype_atrn then
       if l_offsetexpire is null or sysdate <= l_expiredate then
-        if l_offset < 0 then
-          l_paydate := dat_prev_u(gl.bd, abs(l_offset));
-        else
-          l_paydate := dat_next_u(gl.bd, abs(l_offset));
-        end if;
+        l_paydate := dat_next_u(gl.bd, l_offset);
         gl.pl_dat(l_paydate);
         l_changbd := true;
       end if;
     else
-      if l_offsetexpire is null or sysdate <= l_expiredate then
+      if l_offsetexpire is null or sysdate <= l_expiredate or (f_workday(trunc(sysdate)) is null) then
         begin
           select t.anl_postingdate
             into l_paydate
@@ -2665,15 +2661,15 @@ CREATE OR REPLACE package body BARS.ow_files_proc is
                   from ow_files ow
                        join ow_oic_ref wr
                           on     ow.id = wr.id
-                             and ow.file_date > sysdate - 20
+                             and ow.file_date > sysdate - 10
                              and ow.file_type in ('DOCUMENTS', 'FTRANSFERS')
                              and wr.sign_state = 0
                        join oper o
                           on     wr.ref = o.ref
                              and o.sos between 0 and 4
                              --and o.mfoa <> o.mfob
-                             and o.pdat >= trunc (sysdate) - 20
-                 where rownum <= 10000
+                             and o.pdat >= trunc (sysdate) - 10
+                 where rownum <= 1000
                    )
           loop
 
