@@ -428,7 +428,7 @@ is
 --
 -- constants
 --
-g_body_version    constant varchar2(64)  := 'version 6.017_nb 14/11/2017';
+g_body_version    constant varchar2(64)  := 'version 6.019_nb 23/11/2017';
 g_body_defs       constant varchar2(512) := '';
 
 g_modcode         constant varchar2(3)   := 'BPK';
@@ -3512,8 +3512,11 @@ begin
            if l_srn is not null and l_err is null and l_payflag in (1, 2) then
               b_kvt := false;
               -- успешная квитовка
+          
               if l_payflag = 1 and l_resp_code = '0' then
+                 begin
                  final_payment(l_srn, l_dk, b_kvt);
+
                  -- квитовка документа
                  if b_kvt then
                     -- доп. реквизиты
@@ -3525,6 +3528,18 @@ begin
                     -- удаление из очереди на отправку/квитовку
                     del_pkkque(l_srn, l_dk);
                  end if;
+                 exception
+                   when others then                
+                    l_err := 'Квитовка док. ' || l_srn || ' - ошибка ';
+                    bars_audit.info(h || p_filename || ': ' || l_err);
+                    l_msg := substr(l_msg || l_err, 1, 254);                
+                    update ow_pkk_que
+                       set resp_text  = l_msg
+                    where f_n = l_iic_filename
+                       and ref = l_srn
+                       and dk = l_dk
+                    returning acc into l_acc;                   
+                 end;                  
               end if;
               -- ошибка квитовки
               if l_payflag in (1, 2) and l_resp_code <> '0' then
@@ -3552,7 +3567,15 @@ begin
                     else
                        p_back_dok(l_srn, 5, null, l_p1, l_p2);
                     end if;
-                    update operw set value = 'Повернено по квитанції ПЦ ' || p_filename where ref = l_srn and tag = 'BACKR';
+                    update operw set 
+                           value = substr( 'Повернено по квитанції ПЦ ' ||
+                                            p_filename ||'('||
+                                            l_resp_code||'#'||
+                                            l_resp_text||')'
+                                            ,1,220
+                                          )
+                    where ref = l_srn and tag = 'BACKR';
+
                     insert into oper_visa (ref, dat, userid, groupid, status)
                     values (l_srn, sysdate, user_id, g_chkid, 3);
                  exception when others then
@@ -11236,6 +11259,16 @@ end add_deal;
 --
 procedure set_bpk_parameter(p_nd number, p_tag varchar2, p_value varchar2)
 is
+d_close w4_acc.dat_close%type;
+begin
+   begin
+	select  distinct dat_close into d_close from (
+	select a.dat_close  from  w4_acc a  where a.nd=p_nd
+    union
+    select a.dat_close from  bpk_acc a  where a.nd=p_nd);
+   end;
+
+   if (d_close is null) then
 begin
   if p_value is null then
      delete from bpk_parameters where nd = p_nd and tag = p_tag;
@@ -11249,6 +11282,10 @@ begin
          where nd = p_nd and tag = p_tag;
      end;
   end if;
+  end;
+  else
+  raise_application_error(-20000, 'По клієнту ' || to_char(p_nd) || ' неможливо додати доп.параметр, бо він закритий');
+   end if;
 end set_bpk_parameter;
 
 -------------------------------------------------------------------------------
