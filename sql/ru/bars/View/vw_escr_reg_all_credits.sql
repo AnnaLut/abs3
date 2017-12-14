@@ -604,7 +604,7 @@ AS
                                                 '220348',
                                                 '220372',
                                                 '220373',
-												'220374',)
+												'220374')
                   AND t.branch LIKE
                             SYS_CONTEXT ('bars_context', 'user_branch_mask')
                          || '%') rez
@@ -627,7 +627,7 @@ COMMENT ON COLUMN BARS.VW_ESCR_REG_ALL_CREDITS.AVR_DATE IS 'Дата надання актів в
 
 
 
-GRANT SELECT ON BARS.VW_ESCR_REG_ALL_CREDITS TO BARSREADER_ROLE;
+
 
 GRANT SELECT ON BARS.VW_ESCR_REG_ALL_CREDITS TO BARS_ACCESS_DEFROLE;
 
