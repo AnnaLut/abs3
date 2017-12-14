@@ -765,7 +765,7 @@ begin
 
          --- Журнал счетов
          delete from accounts_update where acc = aa_old.acc and trunc(chgdate) = trunc(sysdate);
-         ----- закрыть chgaction = 3
+         ----- закрыть chgaction = 3 COBUMMFO-5959 - 5
 
          INSERT INTO accounts_update
              (acc, nls, nlsalt, kv, nbs, nbs2, daos, isp, nms  , pap, grp, sec, seci, seco, vid, tip, dazs, blkd, blkk, lim, pos, accc, tobo, mdate, ostx, rnk, kf ,
@@ -773,17 +773,17 @@ begin
          VALUES (aa_old.acc   ,aa_old.nls  ,aa_old.nlsalt,aa_old.kv    ,tt.R020_OLD   ,aa_old.nbs2,aa_old.daos  ,aa_old.isp   ,aa_old.nms   ,aa_old.pap,
               aa_old.grp   ,aa_old.sec  ,aa_old.seci  ,aa_old.seco  ,aa_old.vid   ,aa_old.tip , bnk_dt,   -- дата закр
               aa_old.blkd  ,aa_old.blkk  ,aa_old.lim,   aa_old.pos   ,aa_old.accc ,aa_old.tobo,aa_old.mdate ,aa_old.ostx  ,aa_old.rnk ,aa_old.kf    ,
-              sysdate      ,3,user_name ,bars_sqnc.get_nextval('s_accounts_update',aa_old.kf), bnk_dt, aa_old.branch, aa_old.ob22 , 
+              sysdate      ,5,user_name ,bars_sqnc.get_nextval('s_accounts_update',aa_old.kf), bnk_dt, aa_old.branch, aa_old.ob22 , 
               bnk_dt, aa_old.send_sms);
 
-         ----- открыть chgaction = 1
+         ----- открыть chgaction = 1 COBUMMFO-5959 - 6
          INSERT INTO accounts_update
              (acc, nls, nlsalt, kv, nbs, nbs2, daos, isp, nms  , pap, grp, sec, seci, seco, vid, tip, dazs, blkd, blkk, lim, pos, accc, tobo, mdate, ostx, rnk, kf ,
               chgdate , chgaction , doneby,idupd  , effectdate, branch,ob22,globalbd,send_sms  )
          VALUES (aa_old.acc  ,aa_new.nls  ,aa_old.nls ,aa_old.kv ,tt.R020_NEW,aa_old.nbs2, bnk_dt,-- дата откр
                  aa_old.isp  ,aa_old.nms  ,aa_old.pap ,aa_old.grp,aa_old.sec ,aa_old.seci, aa_old.seco,aa_old.vid  ,aa_NEW.tip ,  -- yjdsq nbg cx
                  aa_old.dazs ,aa_old.blkd ,aa_old.blkk,aa_old.lim, aa_old.pos,aa_old.accc,aa_old.tobo ,aa_old.mdate,aa_old.ostx,aa_old.rnk ,aa_old.kf   ,
-                 sysdate     ,1,user_name ,bars_sqnc.get_nextval('s_accounts_update',aa_old.kf), bnk_dt, aa_old.branch, tt.ob_new , 
+                 sysdate     ,6,user_name ,bars_sqnc.get_nextval('s_accounts_update',aa_old.kf), bnk_dt, aa_old.branch, tt.ob_new , 
                  bnk_dt, aa_old.send_sms   );
 
           -- Update  chgaction = 2 Восстановить для ХД дату открытия = дате открытия из accounts aa_old.DAOS
