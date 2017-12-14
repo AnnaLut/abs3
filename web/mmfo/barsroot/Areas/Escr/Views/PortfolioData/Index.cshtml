@@ -14,6 +14,7 @@
 <script src="~/Areas/Escr/Scripts/index.js"></script>
 <link href="~/Areas/Escr/Css/index.css" rel="stylesheet" />
 <h1>@title</h1>
+<p style="color: red; font-size:12px;">Перед формування реєстру перевірте звіт 888 та 889.Всі КД,які є в них не можуть бути включені в реєстр!</p>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
@@ -317,7 +318,7 @@
                 columns: [{
                     title: "Вартість товару",
                     field: "GOOD_COST",
-                    //format: "{0:#.00}",
+                    format: "{0:#.00}",
                     //template: "#=moneyFormat(GOOD_COST)#",
                     //Console.WriteLine(String.Format("{0:#,### ; #.## ,00##,00}",1232.2345))
                     width: 100

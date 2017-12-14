@@ -304,9 +304,10 @@ AS
                       FROM escr_reg_mapping t
                      WHERE t.oper_type = 1),
                 deal_sum
-                AS (  SELECT c.nd deal_nd,                       /*greatest(*/
-                                          c.sdog * 100 /*, SUM(nvl(cc_pog.sumg, 0)))*/
-                                                      deal_sum ---jeka попросил Литвин 11.05.2017
+                AS (  SELECT c.nd deal_nd,
+                             GREATEST (c.sdog * 100,
+                                       SUM (NVL (cc_pog.sumg, 0)))
+                                deal_sum
                         FROM cc_pog, cc_deal c
                        WHERE cc_pog.nd = c.nd AND (sumg > 0 OR sumo > 0)
                     GROUP BY c.nd, c.sdog),
@@ -494,14 +495,22 @@ AS
                      THEN
                         0
                   END
-                     valid_status,
+                     valid_status /*    CASE  ---(сумма товара*0.9)-сумма кредита>0.
+                                               WHEN   (TO_number(trim(da.good_cost),
+                                                       '99999999999D99999',
+                                                       'NLS_NUMERIC_CHARACTERS = '', ''')*0.9) - (ds.deal_sum / 100)<=0 THEN 1
+                                               WHEN   (TO_number(trim(da.good_cost),
+                                                       '99999999999D99999',
+                                                       'NLS_NUMERIC_CHARACTERS = '', ''')*0.9*0.9) - (ds.deal_sum/ 100)> 0 THEN 0
+                                       END valid_status*/
+                                 ,
                   t.branch branch_code,
                   b.name branch_name,
                   t.kf mfo,
                   er.user_id user_id,
                   er.user_name user_name,
                   CASE
-                     WHEN SUBSTR (t.prod, 1, 6) IN ('220347', '220257', '220380')
+                     WHEN SUBSTR (t.prod, 1, 6) IN ('220347', '220257', '220373')
                      THEN
                         TO_NUMBER (1)
                      ELSE
@@ -535,20 +544,20 @@ AS
                         TO_NUMBER (5)
                      WHEN     cs.subs_numb IS NOT NULL
                           AND EXTRACT (YEAR FROM t.sdate) >= 2017
-                          AND SUBSTR (t.prod, 1, 6) IN ('220257', '220347', '220380')
+                          AND SUBSTR (t.prod, 1, 6) IN ('220257', '220347', '220373')
                           AND t.sdate >= TO_DATE ('19/09/2016', 'dd/mm/yyyy')
                      THEN
                         TO_NUMBER (4)
                      WHEN     cs.subs_numb IS NULL
                           AND EXTRACT (YEAR FROM t.sdate) >= 2017
-                          AND SUBSTR (t.prod, 1, 6) IN ('220257', '220347', '220380')
+                          AND SUBSTR (t.prod, 1, 6) IN ('220257', '220347', '220373')
                           AND t.sdate >= TO_DATE ('19/09/2016', 'dd/mm/yyyy')
                      THEN
                         TO_NUMBER (5)
                      WHEN     EXTRACT (YEAR FROM t.sdate) = 2017
                           AND SUBSTR (t.prod, 1, 6) NOT IN ('220257',
                                                             '220347'
-                                                            , '220380')
+                                                            , '220373')
                      THEN
                         TO_NUMBER (6)
                   END
@@ -563,6 +572,7 @@ AS
                   er.date_to
              FROM escr_reg_mapping rm
                   JOIN cc_deal t ON rm.out_doc_id = t.nd
+                  --and t.kf LIKE SYS_CONTEXT ('bars_context', 'user_branch_mask')
                   JOIN deal_term dt ON dt.nd = t.nd
                   /*join credit_status crs
                    on  t.nd=crs.obj_id
@@ -590,54 +600,9 @@ AS
           JOIN escr_reg_kind ek ON rez.reg_kind_id = ek.id
           JOIN escr_reg_status est ON rez.credit_status_id = est.id;
 
-COMMENT ON TABLE BARS.VW_ESCR_REG_HEADER IS 'Кредитні договори,включені в реєстр';
 
-COMMENT ON COLUMN BARS.VW_ESCR_REG_HEADER.CUSTOMER_ID IS 'Реєстраційний номер  картки платника';
-
-COMMENT ON COLUMN BARS.VW_ESCR_REG_HEADER.CUSTOMER_NAME IS 'Прізвище, ім’я,  по-батькові фізичної особи-позичальника';
-
-COMMENT ON COLUMN BARS.VW_ESCR_REG_HEADER.CUSTOMER_OKPO IS 'ІНН особи-позичальника або дані паспорту ';
-
-COMMENT ON COLUMN BARS.VW_ESCR_REG_HEADER.CUSTOMER_REGION IS 'Клієнт адреса проживання (область)';
-
-COMMENT ON COLUMN BARS.VW_ESCR_REG_HEADER.CUSTOMER_FULL_ADDRESS IS 'Клієнт повна адреса проживання';
-
-COMMENT ON COLUMN BARS.VW_ESCR_REG_HEADER.CUSTOMER_TYPE IS 'Тип клієнта (довідково)';
-
-COMMENT ON COLUMN BARS.VW_ESCR_REG_HEADER.SUBS_NUMB IS 'Номер субсидії (довідково)';
-
-COMMENT ON COLUMN BARS.VW_ESCR_REG_HEADER.SUBS_DATE IS 'Дата субсидії (довідково)';
-
-COMMENT ON COLUMN BARS.VW_ESCR_REG_HEADER.SUBS_DOC_TYPE IS 'Документ про субсидію';
-
-COMMENT ON COLUMN BARS.VW_ESCR_REG_HEADER.DEAL_ID IS 'ID кредитного договору (довідково)';
-
-COMMENT ON COLUMN BARS.VW_ESCR_REG_HEADER.DEAL_NUMBER IS 'Номер кредитного договору';
-
-COMMENT ON COLUMN BARS.VW_ESCR_REG_HEADER.DEAL_DATE_FROM IS 'Дата початку дії кредитного договору';
-
-COMMENT ON COLUMN BARS.VW_ESCR_REG_HEADER.DEAL_DATE_TO IS 'Дата закінчення дії кредитного договору (довідково)';
-
-COMMENT ON COLUMN BARS.VW_ESCR_REG_HEADER.DEAL_TERM IS 'Строк дії (у місяцях)';
-
-COMMENT ON COLUMN BARS.VW_ESCR_REG_HEADER.DEAL_PRODUCT IS 'Продукт (довідково)';
-
-COMMENT ON COLUMN BARS.VW_ESCR_REG_HEADER.DEAL_SUM IS 'Сума кредитного договору';
-
-COMMENT ON COLUMN BARS.VW_ESCR_REG_HEADER.GOOD_COST IS 'Загальна вартість придбаного енергоефективного обладнання та/або матеріалів та відповідних робіт з їх впровадження (у гривнях)';
-
-COMMENT ON COLUMN BARS.VW_ESCR_REG_HEADER.NLS IS 'Рахунок кредитного договору';
-
-COMMENT ON COLUMN BARS.VW_ESCR_REG_HEADER.DOC_DATE IS 'Дата отримання підтверджуючих документів';
-
-COMMENT ON COLUMN BARS.VW_ESCR_REG_HEADER.MONEY_DATE IS 'Дата отримання компенсації';
-
-COMMENT ON COLUMN BARS.VW_ESCR_REG_HEADER.COMP_SUM IS 'Сума компенсації (довідково)';
-
-COMMENT ON COLUMN BARS.VW_ESCR_REG_HEADER.USER_NAME IS 'Відповідальний працівник,який створив реєстр';
-
-COMMENT ON COLUMN BARS.VW_ESCR_REG_HEADER.CREDIT_STATUS_DATE IS 'Дата присвоєння статусу';
-
-
+GRANT SELECT ON BARS.VW_ESCR_REG_HEADER TO BARSREADER_ROLE;
 
 GRANT SELECT ON BARS.VW_ESCR_REG_HEADER TO BARS_ACCESS_DEFROLE;
+
+GRANT SELECT ON BARS.VW_ESCR_REG_HEADER TO UPLD;

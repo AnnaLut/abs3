@@ -1,10 +1,5 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/gl.sql =========*** Run *** ========
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.GL IS
+CREATE OR REPLACE PACKAGE BARS.GL
+IS
 --***************************************************************--
 --                 General Ledger Package Header
 --                 (C) Unity-BARS 2000-2013
@@ -12,44 +7,51 @@
 --
 --***************************************************************--
 
-G_HEADER_VERSION  CONSTANT VARCHAR2(64)  := 'version 7.0  28/12/2015';
+  G_HEADER_VERSION  CONSTANT VARCHAR2(64)  := 'version 7.3  26/10/2017';
 
-G_AWK_HEADER_DEFS CONSTANT VARCHAR2(512) := '';
-    aMFO    VARCHAR(12) DEFAULT NULL;  -- Local bank MFO
-    aOKPO   VARCHAR(12) DEFAULT NULL;  -- Local bank TAX Code
-    bDATE   DATE        DEFAULT NULL;  -- Current Banking day (local)
-    gbDATE  DATE        DEFAULT NULL;  -- Current Banking day (global)
-    vDATE   DATE        DEFAULT NULL;  -- Current Value date
-    aUID    NUMBER      DEFAULT NULL;  -- current user id
-    aUKF    VARCHAR2(6) DEFAULT NULL;  -- current user branch code
-    baseval NUMBER      DEFAULT 980 ;  -- Base Currency
-    aRNK    NUMBER      DEFAULT 1   ;  -- Local bank RNK
-    fRCVR   NUMBER      DEFAULT 0;     -- Recovery flag
-    fSOS0   NUMBER      DEFAULT 0;     -- Normal=0/Clearing=1 transaction
+  G_AWK_HEADER_DEFS CONSTANT VARCHAR2(512) := '';
 
-    aREF    NUMBER      DEFAULT NULL;  -- current refrence
-    aSTMT   NUMBER      DEFAULT 0;     -- current statement number
-    aOROW   UROWID      DEFAULT NULL;  -- current opldok rowid
-    aTT     CHAR(3)     DEFAULT NULL;  -- current tt
-    aSOS    NUMBER      DEFAULT NULL;  -- current doc payment status
-    aFMcheck SMALLINT   DEFAULT NULL;  -- FM-check status
+  p_notpaid   CONSTANT NUMBER := 0;
+  p_booked    CONSTANT NUMBER := 1;
+  p_forward   CONSTANT NUMBER := 3;
+  p_cleared   CONSTANT NUMBER := 5;
 
-    acc_rec accounts%ROWTYPE;       -- Transit record of accounts update(TRIG)
-    acc_otm SMALLINT;               -- Flag of kind changing for Accounts_Update
+  p_vp        CONSTANT CHAR(3) := 'VP ';
+  p_vvp       CONSTANT CHAR(3) := 'VVP';
 
-    TYPE    saldrec IS RECORD      -- Transit record of saldoa table (TRIG)
+  aMFO    VARCHAR(12) DEFAULT NULL;  -- Local bank MFO
+  aOKPO   VARCHAR(12) DEFAULT NULL;  -- Local bank TAX Code
+  bDATE   DATE        DEFAULT NULL;  -- Current Banking day (local)
+--gbDATE  DATE        DEFAULT NULL;  -- Current Banking day (global)
+  vDATE   DATE        DEFAULT NULL;  -- Current Value date
+  aUID    NUMBER      DEFAULT NULL;  -- current user id
+  aUKF    VARCHAR2(6) DEFAULT NULL;  -- current user branch code
+  baseval NUMBER      DEFAULT 980 ;  -- Base Currency
+  aRNK    NUMBER      DEFAULT 1   ;  -- Local bank RNK
+  fRCVR   NUMBER      DEFAULT 0;     -- Recovery flag
+  fSOS0   NUMBER      DEFAULT 0;     -- Normal=0/Clearing=1 transaction
+  
+  aREF    NUMBER      DEFAULT NULL;  -- current refrence
+  aSTMT   NUMBER      DEFAULT 0;     -- current statement number
+  aOROW   UROWID      DEFAULT NULL;  -- current opldok rowid
+  aTT     CHAR(3)     DEFAULT NULL;  -- current tt
+  aSOS    NUMBER      DEFAULT NULL;  -- current doc payment status
+  aFMcheck SMALLINT   DEFAULT NULL;  -- FM-check status
+  
+  acc_rec accounts%ROWTYPE;       -- Transit record of accounts update(TRIG)
+  acc_otm SMALLINT;               -- Flag of kind changing for Accounts_Update
 
+  TYPE    saldrec IS RECORD      -- Transit record of saldoa table (TRIG)
                ( a_acc    NUMBER,
                  a_ost    NUMBER,
                  b_ost    NUMBER,
                  a_ostq   NUMBER,
-		 b_ostq   NUMBER
-	       );
+                 b_ostq   NUMBER
+               );
 
-        val               saldrec;
+  val               saldrec;
 
-    TYPE    t_acc_rec IS RECORD      -- Transit record of accounts update(TRIG)
-
+  TYPE    t_acc_rec IS RECORD      -- Transit record of accounts update(TRIG)
                (n_acc    INTEGER,
                 n_nls    VARCHAR2(15),
                 n_nlsalt VARCHAR2(15),
@@ -70,10 +72,9 @@ G_AWK_HEADER_DEFS CONSTANT VARCHAR2(512) := '';
                 n_blkk   SMALLINT,
                 n_otm    SMALLINT);
 
-        avl               t_acc_rec;
+  avl               t_acc_rec;
 
-    TYPE    cus_rec IS RECORD      -- Transit record of customers update(TRIG)
-
+  TYPE    cus_rec IS RECORD      -- Transit record of customers update(TRIG)
                (n_rnk        customer.rnk%type,
                 n_custtype   customer.custtype%type,
                 n_country    customer.country%type,
@@ -101,23 +102,12 @@ G_AWK_HEADER_DEFS CONSTANT VARCHAR2(512) := '';
                 n_pincode    customer.pincode%type,
                 n_otm        SMALLINT);
 
-        cvl               cus_rec;
+  cvl      cus_rec;
 
-        p_notpaid   CONSTANT NUMBER := 0;
-        p_booked    CONSTANT NUMBER := 1;
-        p_forward   CONSTANT NUMBER := 3;
-        p_cleared   CONSTANT NUMBER := 5;
-
-        p_vp        CONSTANT CHAR(3)  := 'VP ';
-        p_vvp       CONSTANT CHAR(3)  := 'VVP';
-
-
-doc      oper%rowtype;   -- Образ документа
-opl      opldok%rowtype; -- Образ записи проводки
-cus      customer%rowtype; -- Образ записи клиентов
-acc      accounts%rowtype; -- образ записи счетов
-
-
+  doc      oper%rowtype;     -- Образ документа
+  opl      opldok%rowtype;   -- Образ записи проводки
+  cus      customer%rowtype; -- Образ записи клиентов
+  acc      accounts%rowtype; -- образ записи счетов
 
 /**
  * version - возвращает версию пакета
@@ -125,7 +115,6 @@ acc      accounts%rowtype; -- образ записи счетов
 function header_version return varchar2;
 function body_version return varchar2;
 function version return varchar2;
-
 
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -171,7 +160,6 @@ PROCEDURE param;
 
 PROCEDURE ref (i_ref IN OUT NUMBER);
 
-
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % PROCEDURE     : in_doc
@@ -179,7 +167,6 @@ PROCEDURE ref (i_ref IN OUT NUMBER);
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 PROCEDURE in_doc4
-
    (   ref_    NUMBER,
        tt_     CHAR,
        vob_    NUMBER,
@@ -213,7 +200,6 @@ PROCEDURE in_doc4
        uid_    NUMBER DEFAULT NULL);
 
 PROCEDURE in_doc3
-
    (   ref_    NUMBER,
        tt_     CHAR,
        vob_    NUMBER,
@@ -245,7 +231,6 @@ PROCEDURE in_doc3
        uid_    NUMBER DEFAULT NULL);
 
 PROCEDURE in_doc2
-
    (   ref_    NUMBER,
        tt_     CHAR,
        vob_    NUMBER,
@@ -391,6 +376,7 @@ PROCEDURE p_pvp  ( kv_ NUMBER DEFAULT NULL,
 %                 via NBU rate to BASE curency
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
+
 PROCEDURE x_rat ( rat_o OUT NUMBER,     -- xrato
                   rat_b OUT NUMBER,     -- xratb
                   rat_s OUT NUMBER,     -- xrats
@@ -424,8 +410,16 @@ PROCEDURE dyntt2 (sos_ IN OUT NUMBER,
 -- Оплата проводок sos=0
 --
 PROCEDURE paysos0;
-PROCEDURE create_paysos0_job;
 
+--
+-- Оплата проводок переоцінки породжених при формуванні знімків балансу
+--
+procedure OVERPAY_PVP;
+
+--
+--
+--
+PROCEDURE create_paysos0_job;
 
 --
 -- Оплата проводок sos=0 по всем МФО
@@ -456,7 +450,6 @@ FUNCTION p_icurval ( iCur      NUMBER,
 
 RETURN NUMBER;
 
-
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % FUNCTION   : p_Ncurval
@@ -482,7 +475,6 @@ FUNCTION p_Ncurval ( iCur      NUMBER,
 
 RETURN NUMBER;
 
-
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % PROCEDURE     : pl_dat
@@ -501,7 +493,6 @@ PROCEDURE pl_dat(dat_      DATE);
 
 FUNCTION bd RETURN DATE;
 
-
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % FUNCTION    : gbd
@@ -519,9 +510,23 @@ FUNCTION gbd RETURN DATE;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
 FUNCTION kf RETURN VARCHAR2;
+
+/*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION  : USR_ID
+% DESCRIPTION : Returns current user id
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
+
+function USR_ID return number;
+
 END gl;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.GL IS
+
+show errors;
+
+CREATE OR REPLACE PACKAGE BODY GL
+IS
    --***************************************************************--
    --                     General Ledger Package
    --                   (C) Unity-Bars 2000 - 2015
@@ -530,22 +535,18 @@ CREATE OR REPLACE PACKAGE BODY BARS.GL IS
    --
    --***************************************************************--
 
-   G_BODY_VERSION  CONSTANT VARCHAR2(100)  := '$7.2 2016-08-17 vitalii.khomida$';
+  G_BODY_VERSION  CONSTANT VARCHAR2(100)  := '7.2 2017-12-11';
 
-   G_AWK_BODY_DEFS CONSTANT VARCHAR2(512) := ''
-   	||'FM  - с поддержкой ФинМонитроинга' || chr(10)
-   	||'FM  - с поддержкой ФинМонитроинга' || chr(10)
-;
+  G_AWK_BODY_DEFS CONSTANT VARCHAR2(512) := 'FM  - с поддержкой ФинМонитроинга';
 
+  gbDATE     DATE   := NULL;      -- Current Banking day (global)
+  pay_schema NUMBER := 3;         -- MultiCurrency Payment Schema
+  aEQIV      NUMBER := 0;         -- Current document equivalent
 
-   pay_schema NUMBER := 3;         -- MultiCurrency Payment Schema
-   aEQIV      NUMBER := 0;         -- Current document equivalent
+  g_root_initialized  boolean := false;
 
-
-   g_root_initialized  boolean := false;
-
-   TYPE TDig IS TABLE OF BINARY_INTEGER INDEX BY BINARY_INTEGER;
-    Dig TDig;
+  TYPE TDig IS TABLE OF BINARY_INTEGER INDEX BY BINARY_INTEGER;
+  Dig  TDig;
 
 --
 -- именованные исключения
@@ -559,29 +560,44 @@ pragma exception_init(RESOURCE_BUSY,   -54  );
 /**
  * version - возвращает версию пакета
  */
-function header_version return varchar2 is
+function header_version return varchar2
+is
 begin
   return 'Package header GL '||G_HEADER_VERSION||'.'||chr(10)
 	   ||'AWK definition: '||chr(10)
 	   ||G_AWK_HEADER_DEFS;
 end header_version;
-function body_version return varchar2 is
+
+function body_version return varchar2
+is
 begin
   return 'Package body GL '||G_BODY_VERSION||'.'||chr(10)
 	   ||'AWK definition: '||chr(10)
 	   ||G_AWK_BODY_DEFS;
 end body_version;
-function version return varchar2 is
+
+function version return varchar2
+is
 begin
   return 'Package header GL '||G_HEADER_VERSION||'.'||chr(10)
-	   ||'AWK definition: '||chr(10)
-	   ||G_AWK_HEADER_DEFS||chr(10)||chr(10)||
-         'Package body GL '||G_BODY_VERSION||'.'||chr(10)
-	   ||'AWK definition: '||chr(10)
-	   ||G_AWK_BODY_DEFS;
+  ||'AWK definition: '||chr(10)
+  ||G_AWK_HEADER_DEFS ||chr(10)||chr(10)
+  ||'Package body GL '||G_BODY_VERSION||'.'||chr(10)
+  ||'AWK definition: '||chr(10)
+  ||G_AWK_BODY_DEFS;
 end version;
 
-
+  --
+  --
+  --
+  procedure SET_BANK_DATE
+  ( p_bnk_dt       in     date
+  ) is
+  begin
+    gl.bDATE := p_bnk_dt;
+    sys.dbms_session.set_context( 'bars_gl', 'bankdate', to_char(p_bnk_dt,'mm/dd/yyyy')
+                                , client_id => bars_login.get_session_clientid() );
+  end SET_BANK_DATE;
 
      ----
      -- init_root - инициализация для корневого пользователя
@@ -776,10 +792,8 @@ END reinit;
 PROCEDURE clear_session_context
 is
 begin
-    sys.dbms_session.clear_context('bars_gl', client_id=> bars_login.get_session_clientid);
+  sys.dbms_session.clear_context( 'bars_gl', client_id=> bars_login.get_session_clientid );
 end clear_session_context;
-
-
 
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -787,16 +801,18 @@ end clear_session_context;
 % DESCRIPTION : Отримує/Встановлює значення голобальної змінної
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
-PROCEDURE getP( tag VARCHAR2, val OUT VARCHAR2) IS
+PROCEDURE getP( tag VARCHAR2, val OUT VARCHAR2)
+IS
 BEGIN
    sys.DBMS_SESSION.CLEAR_IDENTIFIER;
    val:=SYS_CONTEXT('bars_glparam', tag );
 END getP;
-PROCEDURE setP( tag VARCHAR2, val VARCHAR2, client_id VARCHAR2 DEFAULT NULL) IS
+
+PROCEDURE setP( tag VARCHAR2, val VARCHAR2, client_id VARCHAR2 DEFAULT NULL)
+IS
 BEGIN
    sys.dbms_session.set_context('bars_glparam', tag, val, client_id=>client_id );
 END setP;
-
 
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -1393,6 +1409,7 @@ IF p_flag IS NULL OR p_flag IN (0,1) THEN
           WHERE nls=nls_ AND kv=kv_
             AND BITAND(NVL(opt,0),1)=0
             FOR UPDATE OF ostb,ostf NOWAIT;
+
       END IF;
    EXCEPTION
       WHEN NO_DATA_FOUND THEN
@@ -1414,8 +1431,33 @@ IF p_flag IS NULL OR p_flag IN (0,1) THEN
 
             END IF;
          EXCEPTION WHEN NO_DATA_FOUND THEN
-            erm := '9300 - No account found '||get_account_desc(p_flag, acc_, nls_, kv_);
-            RAISE err;
+           BEGIN
+             
+             kv_ := p_kv;
+
+             SELECT acc, accc, daos, dazs ,nls ,kv, nbs, opt, 1
+               INTO acc_,accc_,daos_,dazs_,nls_,kv_,nbs_,opt_,sos_
+               FROM accounts
+              WHERE nlsalt=nls_ AND kv=kv_ AND dat_alt IS NOT NULL
+                AND BITAND(NVL(opt,0),1)=0
+                FOR UPDATE OF ostb,ostf NOWAIT;
+
+           EXCEPTION WHEN NO_DATA_FOUND THEN
+
+             BEGIN
+
+               SELECT acc, accc, daos, dazs ,nls ,kv, nbs, opt, 0
+                 INTO acc_,accc_,daos_,dazs_,nls_,kv_,nbs_,opt_,sos_
+                 FROM accounts
+                WHERE nlsalt=nls_ AND kv=kv_ AND dat_alt IS NOT NULL
+                  AND BITAND(NVL(opt,0),1)=1;
+
+             EXCEPTION WHEN NO_DATA_FOUND THEN
+               erm := '9300 - No account found '||get_account_desc(p_flag, acc_, nls_, kv_);
+               RAISE err;
+             END;
+           END;
+
          END;
 
       WHEN locked_acc THEN
@@ -1857,7 +1899,6 @@ IF p_flag IN (1,2,3) THEN -- Pay cleared
       n_ := PayRec.NEXT(n_);
    END LOOP;
 
-
    IF sosf_ THEN
       gl.aSOS := 5;
       UPDATE oper SET odat=SYSDATE, bdat=gl.bDATE, sos = 5 WHERE ref=p_ref;
@@ -1867,11 +1908,12 @@ IF p_flag IN (1,2,3) THEN -- Pay cleared
 END IF;
 
 EXCEPTION
-   WHEN err THEN
-        raise_application_error(-(20000+ern),chr(92)||erm,TRUE);
+  WHEN err THEN
+    bars_audit.trace( 'GL.PAYI: REF=>%s, ERRMSG=>%s', to_char(p_ref)
+                    , dbms_utility.format_error_stack() || chr(10) || dbms_utility.format_error_backtrace() );
+    raise_application_error(-(20000+ern),chr(92)||erm,TRUE);
    WHEN NO_DATA_FOUND THEN
-        raise_application_error(-(20000+ern),'\9333 - Cannot execute #pay',TRUE);
-
+     raise_application_error(-(20000+ern),'\9333 - Cannot execute #pay',TRUE);
 END payi;
 
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -2044,8 +2086,7 @@ bars_audit.info('BCK: STARTED ref='||ref_||',bDATE='||gl.bDATE||',lev='||lev_);
          END IF;
          gl.bDATE := dat_;
       ELSE
-         raise_application_error(-(20000+ern),
-         '\9322 - Invalid transaction sos #'||c.sos, TRUE);
+         raise_application_error( -(20000+ern), '\9322 - Invalid transaction sos #'||c.sos, TRUE );
       END IF;
    END LOOP;
 
@@ -2125,8 +2166,6 @@ bars_audit.info('BCK: STARTED ref='||ref_||',bDATE='||gl.bDATE||',lev='||lev_);
                   END;
 
                END IF;
-
-
 
                IF vob_=99 THEN   -- Виконати вилучення виправних за рік
 
@@ -2219,7 +2258,6 @@ bars_audit.info('BCK: STARTED ref='||ref_||',bDATE='||gl.bDATE||',lev='||lev_);
             select a.rowid rwa,b.rowid rwb,a.acc acca,b.acc accb,a.s,a.fdat
               from opldok a,opldok b
              WHERE a.ref=ref_ AND a.tt='BAK' AND a.sos=5
-
                AND a.dk=0
                AND b.dk=1
                AND a.s=b.s
@@ -2229,7 +2267,7 @@ bars_audit.info('BCK: STARTED ref='||ref_||',bDATE='||gl.bDATE||',lev='||lev_);
                AND a.fdat=b.fdat
                AND a.stmt=b.stmt )
          LOOP  -- Вилучити прямі-зворотні проведення
-         BEGIN
+           BEGIN
             select a.rowid,b.rowid INTO rw0_,rw1_
               from opldok a,opldok b
              WHERE a.ref=ref_ AND a.tt<>'BAK' AND a.sos=5
@@ -2247,9 +2285,10 @@ bars_audit.info('BCK: STARTED ref='||ref_||',bDATE='||gl.bDATE||',lev='||lev_);
 
             DELETE FROM opldok WHERE rowid IN (x.rwa,x.rwb,rw0_,rw1_);
 
-         EXCEPTION WHEN NO_DATA_FOUND THEN NULL;
-         END;
-         END LOOP;
+          EXCEPTION
+            WHEN NO_DATA_FOUND THEN NULL;
+          END;
+        END LOOP;
       END;
 
    END IF;
@@ -2260,14 +2299,21 @@ bars_audit.info('BCK: STARTED ref='||ref_||',bDATE='||gl.bDATE||',lev='||lev_);
 
 bars_audit.info('BCK: COMPLETED ref='||ref_||',bDATE='||gl.bDATE||',lev='||lev_);
 
-   DELETE FROM sos0que WHERE ref = ref_
+   DELETE FROM sos0que
+    WHERE ref = ref_
       AND NOT EXISTS (SELECT 1 FROM opldok WHERE sos=4 AND ref = ref_);
-   DELETE FROM ref_que WHERE ref = ref_;
-	  
-EXCEPTION WHEN OTHERS THEN gl.bDATE := dat_; gl.fSOS0 := 0;
-bars_audit.info('BCK: FAILED '||SQLERRM);
-RAISE;
+
+   DELETE FROM ref_que
+    WHERE ref = ref_;
+
+EXCEPTION
+  WHEN OTHERS THEN
+    gl.bDATE := dat_;
+    gl.fSOS0 := 0;
+    bars_audit.info('BCK: FAILED '||SQLERRM);
+    RAISE;
 END bck;
+
 -------------------------------------------------
 -- Динамически вычисляет номер счета по формуле
 -------------------------------------------------
@@ -2331,6 +2377,9 @@ BEGIN
 
   RETURN TRIM(nls_);
 EXCEPTION WHEN OTHERS THEN
+  IF DBMS_SQL.IS_OPEN(c) THEN
+     DBMS_SQL.CLOSE_CURSOR(c);
+  END IF;
   raise_application_error(-20063,
       substr('\9317 - Cannot get account number via function#'||f
              ||chr(10)||'stmt='||x||chr(10)
@@ -2908,10 +2957,12 @@ END LOOP;
 gl.bDATE := bdat_;
 
 EXCEPTION
-   WHEN err    THEN gl.bDATE := bdat_;
-        raise_application_error(-(20000+ern),chr(92)||erm,TRUE);
-   WHEN OTHERS THEN gl.bDATE := bdat_;
-        raise_application_error(-(20000+ern),SQLERRM,TRUE);
+  WHEN err    THEN
+    gl.bDATE := bdat_;
+    raise_application_error(-(20000+ern),chr(92)||erm,TRUE);
+  WHEN OTHERS THEN
+    gl.bDATE := bdat_;
+    raise_application_error(-(20000+ern),SQLERRM,TRUE);
 END p_pvp;
 
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -3023,33 +3074,9 @@ PROCEDURE dyn_paytt (flg_ SMALLINT,  -- флаг оплаты
                     nls2_ VARCHAR2,  -- номер счета Б
                       sb_ DECIMAL    -- сумма в валюте Б
 ) IS
-c         NUMBER;
-n         NUMBER;
 BEGIN
 
-   c := DBMS_SQL.OPEN_CURSOR;
-
-    DBMS_SQL.PARSE(c,
-     'BEGIN
-      PAYTT(:FLG,:REF,:VDAT,
-            :TT,:DK,:KVA,:NLS1,:SA,:KVB,:NLS2,:SB);
-      END;',DBMS_SQL.NATIVE);
-
-    DBMS_SQL.BIND_VARIABLE(c,':FLG',  flg_);
-    DBMS_SQL.BIND_VARIABLE(c,':REF',  ref_);
-    DBMS_SQL.BIND_VARIABLE(c,':VDAT',vdat_);
-    DBMS_SQL.BIND_VARIABLE(c,':TT',    tt_);
-    DBMS_SQL.BIND_VARIABLE(c,':DK',    dk_);
-    DBMS_SQL.BIND_VARIABLE(c,':KVA',  kva_);
-    DBMS_SQL.BIND_VARIABLE(c,':NLS1',nls1_);
-    DBMS_SQL.BIND_VARIABLE(c,':SA',    sa_);
-    DBMS_SQL.BIND_VARIABLE(c,':KVB',  kvb_);
-    DBMS_SQL.BIND_VARIABLE(c,':NLS2',nls2_);
-    DBMS_SQL.BIND_VARIABLE(c,':SB',    sb_);
-
-    n := DBMS_SQL.EXECUTE(c);
-
-    DBMS_SQL.CLOSE_CURSOR(c);
+  PAYTT(flg_, ref_, vdat_, tt_, DK_, kVA_, NLS1_, SA_, KVB_, NLS2_, SB_);
 
 END dyn_paytt;
 
@@ -3085,6 +3112,7 @@ EXCEPTION
         raise_application_error(-(20000+ern),'\9333 - Cannot execute #dyntt',TRUE);
 
 END dyntt;
+
 PROCEDURE dyntt2 (sos_ IN OUT NUMBER,
                  mod1_ NUMBER, mod2_ NUMBER,
                   ref_ NUMBER,
@@ -3104,10 +3132,8 @@ PROCEDURE dyntt2 (sos_ IN OUT NUMBER,
 --      9 - по факту (динамічна прив"язка дочірніх по типу рахунку)
 -- mod2 0 - Відкладена фактична оплата (десь платиться потім в процедурі)
 -------------------------------------------------
-c     NUMBER;
 tt_   CHAR(3);
 dk0_  NUMBER;
-ret_  NUMBER;
 vdat_ DATE;
 s1_   NUMBER;
 s2_   NUMBER;
@@ -3141,17 +3167,9 @@ BEGIN
          S := REPLACE(S,'#(REF)',TO_CHAR(ref_));
          S := REPLACE(S,'#(KVA)',TO_CHAR(kva_));
          S := REPLACE(S,'#(KVB)',TO_CHAR(kvb_));
-         c := DBMS_SQL.OPEN_CURSOR;
 
-         DBMS_SQL.PARSE(c,
-           'BEGIN :REZ := '||S||'; END;',DBMS_SQL.NATIVE);
-
-         DBMS_SQL.BIND_VARIABLE(c,':REZ', rez_);
-
-         ret_ := DBMS_SQL.EXECUTE(c);
-
-         DBMS_SQL.VARIABLE_VALUE(c,':REZ', rez_);
-         DBMS_SQL.CLOSE_CURSOR(c);
+         EXECUTE IMMEDIATE 'BEGIN :REZ := '||S||'; END;'
+         using out rez_;
 
          IF i=0 THEN s1_:=rez_; ELSE s2_:=rez_; END IF;  -- Formula
       END IF;
@@ -3228,119 +3246,144 @@ EXCEPTION
         raise_application_error(-(20000+ern),'\9333 - Cannot execute #dyntt2',TRUE);
 END dyntt2;
 
-         --
-         -- Оплата проводок sos=0
-         -- по одному МФО
-         --
-         PROCEDURE paysos0 IS
-        ref#    NUMBER(38)  := NULL;
-        ref_    NUMBER(38);
-        fdat#   DATE        := NULL;
-        fdat_   DATE;
+  --
+  -- Оплата проводок sos=0
+  -- по одному МФО
+  --
+  PROCEDURE paysos0
+  IS
+    ref#       NUMBER(38)  := NULL;
+    ref_       NUMBER(38);
+    fdat#      DATE        := NULL;
+    fdat_      DATE;
 
-        acc#    NUMBER(38)  := NULL;
-        acc_    NUMBER(38);
+    acc#       NUMBER(38)  := NULL;
+    acc_       NUMBER(38);
 
-        vob#    SMALLINT    := NULL;
-        vob_    SMALLINT;
-        vobO_   SMALLINT    := 0;
+    vob#       SMALLINT    := NULL;
+    vob_       SMALLINT;
+    vobO_      SMALLINT    := 0;
 
+    dk#        opldok.dk%type;
+    s#         opldok.s%type;
+    sq#        opldok.sq%type;
 
-        dk#     SMALLINT    := NULL;
+    sde_       NUMBER(38)  := 0;
+    sdeq_      NUMBER(38)  := 0;
 
-        s#      NUMBER(38);
-        sq#     NUMBER(38);
+    skr_       NUMBER(38)  := 0;
+    skrq_      NUMBER(38)  := 0;
 
-        sde_    NUMBER(38)  := 0;
-        sdeq_   NUMBER(38)  := 0;
+    rowid#     UROWID;
+    i          INTEGER     := 0;
+    j          INTEGER     := 0;
+    k          INTEGER     := 0;
 
-        skr_    NUMBER(38)  := 0;
-        skrq_   NUMBER(38)  := 0;
+    l_kf       oper.kf%type	:= gl.aMFO;
+    l_branch   oper.branch%type	:= sys_context('bars_context','user_branch');
 
-        rowid#  UROWID;
-        i       INTEGER     := 0;
-        j       INTEGER     := 0;
-        k       INTEGER     := 0;
+  CURSOR c0 ( v_min_dt date, v_max_dt date )
+  IS
+  select o.ref, o.acc, o.fdat, decode(p.VOB,96,96,99,99,6) as VOB
+       , o.DK, o.S, o.SQ, o.ROWID
+    from OPER    p
+       , OPLDOK  o
+       , SOS0QUE q
+   where o.sos = 4
+     and o.ref = q.ref
+     and p.ref = q.ref
+     and o.ref = p.ref
+     and o.FDAT between v_min_dt and v_max_dt
+   order by 4, o.ACC, o.FDAT
+     FOR UPDATE OF q.ref NOWAIT;
 
-
-        l_kf	    oper.kf%type	:= gl.aMFO;
-        l_branch    oper.branch%type	:= sys_context('bars_context','user_branch');
-
-
-        CURSOR c0 IS
-        SELECT o.ref,o.acc,o.fdat,DECODE(p.vob,96,96,99,99,6),o.dk,o.s,o.sq,o.rowid
-          FROM oper p,opldok o, sos0que q
-         WHERE o.sos=4 AND o.ref=q.ref and p.ref=q.ref  and o.ref=p.ref
-         ORDER by 4,o.acc,o.fdat FOR UPDATE OF q.ref NOWAIT;
+--r_txn  c0%rowtype;
 
 BEGIN
 
-bars_audit.info('SOS0 STARTED');
+  bars_audit.info( 'SOS0 STARTED' );
 
-gl.fSOS0:=1;
+  gl.fSOS0 := 1;
 
-OPEN c0;
-savepoint this#accountT00;
-LOOP
-FETCH c0 INTO ref#,acc#,fdat#,vob#,dk#,s#,sq#,rowid#;
-   IF c0%NOTFOUND AND ref# IS NULL THEN EXIT; END IF;
-   IF c0%NOTFOUND OR acc#<>acc_ OR fdat# <> fdat_ OR vob# <> vob_ THEN
+  OPEN c0( DAT_NEXT_U( GL.GBD, -1 ), GL.GBD );
+
+  savepoint this#accountT00;
+
+  LOOP
+
+    FETCH c0
+     INTO ref#, acc#, fdat#, vob#, dk#, s#, sq#, rowid#;
+
+    IF c0%NOTFOUND AND ref# IS NULL 
+    THEN EXIT;
+    END IF;
+
+    IF c0%NOTFOUND
+    OR acc#  <> acc_
+    OR fdat# <> fdat_
+    OR vob#  <> vob_
+    THEN
 
       begin
 
-         gl.bDATE := fdat_;
+--     gl.bDATE := fdat_;
+       GL.PL_DAT( fdat_ );
 
-         IF vobO_<>vob_ THEN gl.ref (ref_);
-            INSERT INTO oper (ref,tt,pdat,vdat,vob
-	    ,kf,branch,tobo
-	    )
-            VALUES (ref_,'R00',gl.bDATE,gl.bDATE,vob_
-	    ,l_kf,l_branch,l_branch
-            ) RETURNING vob INTO vobO_;
-         END IF;
+       IF vobO_ <> vob_
+       THEN
 
-         IF sde_>0 THEN
-            INSERT INTO opldok (ref, tt,   acc, fdat, dk, s,  sq, sos, stmt
-				,kf
-				)
-                         VALUES(ref_,'R00',acc_,fdat_,0 ,sde_,sdeq_,4, 1
-				,l_kf
-				);
-         END IF;
-         IF skr_>0 THEN
-            INSERT INTO opldok (ref, tt,   acc, fdat, dk, s,  sq, sos, stmt
-				,kf
-				)
-                         VALUES(ref_,'R00',acc_,fdat_,1 ,skr_,skrq_,4, 1
-				,l_kf
-				);
-         END IF;
+         gl.ref (ref_);
 
-         gl.payi(2,ref_,fdat_);
+         insert
+           into OPER ( REF, TT, PDAT, VDAT, VOB, KF, BRANCH, TOBO )
+         values ( ref_, 'R00', fdat_, fdat_, vob_, l_kf, l_branch, l_branch )
+         return VOB
+           into vobO_;
 
-         DELETE FROM opldok WHERE ref=ref_;
+       END IF;
 
-         i := i + 1;
+       IF sde_ > 0
+       THEN
+         insert
+           into OPLDOK ( REF, TT, ACC, FDAT, DK, S, SQ, SOS, STMT, KF )
+         values ( ref_, 'R00', acc_, fdat_, 0, sde_, sdeq_, 4, 1, l_kf );
+       END IF;
+
+       IF ( skr_ > 0 )
+       THEN
+         insert
+           into OPLDOK ( REF, TT,   ACC, FDAT, DK, S,  SQ, SOS, STMT, KF )
+         values ( ref_, 'R00', acc_, fdat_, 1, skr_, skrq_, 4, 1, l_kf );
+       END IF;
+
+       GL.PAYI( 2, ref_, fdat_ );
+
+       DELETE FROM opldok WHERE ref=ref_;
+
+       i := i + 1;
 
       exception
-         when others then
-            rollback to this#accountT00;
-            j := j + 1;
-            bars_audit.error('SOS0 ('||acc_||') ERROR:'||SUBSTR(sqlerrm
+        when others then
+          rollback to this#accountT00;
+          j := j + 1;
+          bars_audit.error('SOS0 ('||acc_||') ERROR:'||SUBSTR(sqlerrm
                            ||chr(10)||dbms_utility.format_error_backtrace
                            ,1,3000));
       end;
 
       savepoint this#accountT00;
 
-      sde_ := 0;   sdeq_ := 0;
-      skr_ := 0;   skrq_ := 0;
+      sde_  := 0;
+      sdeq_ := 0;
+      skr_  := 0;
+      skrq_ := 0;
 
    END IF;
 
    EXIT WHEN c0%NOTFOUND;
 
-   IF dk#=0 THEN
+   IF dk#=0 
+   THEN
       sde_  := sde_ +s#;
       sdeq_ := sdeq_+sq#;
    ELSE
@@ -3348,37 +3391,155 @@ FETCH c0 INTO ref#,acc#,fdat#,vob#,dk#,s#,sq#,rowid#;
       skrq_ := skrq_+sq#;
    END IF;
 
-   acc_ := acc#; fdat_ := fdat#; vob_ := vob#;
+   acc_  := acc#;
+   fdat_ := fdat#;
+   vob_  := vob#;
 
-   UPDATE opldok SET sos = 5 WHERE rowid = rowid#;
-   DELETE FROM sos0que WHERE ref = ref#
+   UPDATE opldok
+      SET sos = 5
+    WHERE rowid = rowid#;
+
+   DELETE sos0que
+    WHERE ref = ref#
       AND NOT EXISTS (SELECT 1 FROM opldok WHERE sos=4 AND ref = ref#);
-   k := k + 1;
-   bars_audit.trace('SOS0 SELECTED ref:'||ref#);
-END LOOP;
-CLOSE c0;
--- не удаляем запись из OPER, т.к. это приводит к блокировкам по внешним ключам !!!
---IF i>0 THEN DELETE FROM oper WHERE ref=ref_; END IF;
 
-bars_audit.info('SOS0 COMPLETED. Success:'||i||', Errors:'||j);
+    k := k + 1;
+
+    bars_audit.trace('SOS0 SELECTED ref:'||ref#);
+
+  END LOOP;
+
+  CLOSE c0;
+
+  gl.fSOS0 := 0;
+
+  -- не удаляем запись из OPER, т.к. это приводит к блокировкам по внешним ключам !!!
+  -- IF i>0 THEN DELETE FROM oper WHERE ref=ref_; END IF;
+
+  GL.PL_DAT( gl.gbDATE );
+
+  bars_audit.info('SOS0 COMPLETED. Success:'||i||', Errors:'||j);
+
 END paysos0;
+
+--
+--
+--
+procedure OVERPAY_PVP
+is
+  title   constant   varchar2(64) := $$PLSQL_UNIT||'.OVERPAY_PVP';
+  l_bnk_dt           oper.vdat%type;
+  l_ref              oper.ref%type;
+  l_kf               oper.kf%type := gl.aMFO;
+  l_branch           oper.branch%type := '/'||l_kf||'/';
+begin
+
+  bars_audit.trace( '%s: Entry.', title );
+
+  gl.fSOS0 := 1;
+
+  l_bnk_dt := DAT_NEXT_U( GL.GBD, -1 );
+
+  l_ref := to_number( BARS_SQNC.RUKEY( '1', l_kf ) );
+
+  bars_audit.trace( '%s: bnk_dt=%s, ref=%s.', title, to_char(l_bnk_dt,'dd/mm/yyyy'), to_char(l_ref) );
+
+  savepoint SP_BFR_PAY;
+
+  update OPER
+     set PDAT = sysdate
+       , VDAT = l_bnk_dt
+       , VOB  = 6
+       , SOS  = 0
+   where REF  = l_ref;
+
+  if ( sql%rowcount = 0 )
+  then
+    insert
+      into OPER
+         ( REF, TT, PDAT, VDAT, VOB, SOS, MFOA, MFOB, KF, BRANCH, TOBO )
+    values
+         ( l_ref, 'PVP', sysdate, l_bnk_dt, 6, 0, l_kf, l_kf, l_kf, l_branch, l_branch );
+  end if;
+
+  for t in ( select t.REF, DK, ACC, S, SQ, TT, STMT
+               from SOS0QUE q
+               join OPLDOK  t
+                 on ( t.REF = q.REF )
+              where t.SOS  = 4
+                and t.TT   = 'PVP'
+                and t.FDAT = l_bnk_dt
+                and t.KF   = l_kf )
+  loop
+
+    bars_audit.trace( '%s: ref=%s, acc=%s, dk=%s, s=%s, sq=%s.', title
+                    , to_char(t.ref), to_char(t.acc), to_char(t.dk), to_char(t.s), to_char(t.sq) );
+
+    update OPLDOK
+       set SOS = 5
+     where REF = t.REF;
+
+    delete SOS0QUE
+     where ref = t.REF;
+
+    update OPLDOK
+       set S  = S  + t.S
+         , SQ = SQ + t.SQ
+     where FDAT = l_bnk_dt
+       and KF   = l_kf
+       and REF  = l_ref
+       and ACC  = t.ACC
+       and DK   = t.DK;
+
+    if ( sql%rowcount = 0 )
+    then
+      insert
+        into OPLDOK
+           ( FDAT, KF, REF, ACC, DK, TT, S, SQ, SOS, STMT )
+      values
+           ( l_bnk_dt, l_kf, l_ref, t.ACC, t.DK, t.TT, t.S, t.SQ, 4, t.STMT );
+    end if;
+
+  end loop;
+
+  GL.BDATE := l_bnk_dt;
+
+  GL.PAYI( 2, l_ref, l_bnk_dt );
+
+  delete OPLDOK
+   where ref = l_ref;
+
+  gl.bDATE := GL.GBD;
+  gl.fSOS0 := 0;
+
+  bars_audit.trace( '%s: Exit.', title );
+
+exception
+  when OTHERS then
+    gl.bDATE := GL.GBD;
+    gl.fSOS0 := 0;
+    bars_audit.error( title || ': ' || dbms_utility.format_error_stack() || chr(10) || dbms_utility.format_error_backtrace() );
+    rollback to SP_BFR_PAY;
+    raise_application_error( -20666, title || ': ' || SQLERRM, true );
+end OVERPAY_PVP;
 
 --
 -- Создание JOBа оплаты sos0
 --
-PROCEDURE create_paysos0_job IS
-    l_jobid   number;    /* идентификатор созданного задания */
+PROCEDURE create_paysos0_job
+IS
+  l_jobid   number;    /* идентификатор созданного задания */
 BEGIN
-   DBMS_JOB.SUBMIT(l_jobid, 'gl.paysos0;', SYSDATE,'SYSDATE + 1/48');
-   bars_audit.info('SOS0 paysos0 JOB created id='|| to_char(l_jobid));
-   COMMIT;
+  DBMS_JOB.SUBMIT(l_jobid, 'gl.paysos0;', SYSDATE,'SYSDATE + 1/48');
+  bars_audit.info('SOS0 paysos0 JOB created id='|| to_char(l_jobid));
+  COMMIT;
 END create_paysos0_job;
-
 
 --
 -- Оплата проводок sos=0 по всем МФО
 --
-procedure paysos0_full is
+procedure paysos0_full
+is
 begin
   for c in (select kf from mv_kf)
   loop
@@ -3391,9 +3552,6 @@ exception when others then
   bc.set_context;
   raise;
 end paysos0_full;
-
-
-
 
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -3442,7 +3600,8 @@ BEGIN
   EXCEPTION
      WHEN OTHERS THEN
 
-     FOR x IN (SELECT NVL(dig,2) dig,kv FROM tabval) LOOP
+     FOR x IN (SELECT NVL(dig,2) dig,kv FROM tabval)
+     LOOP
         Dig(x.kv):=x.dig;
      END LOOP;
 
@@ -3528,12 +3687,35 @@ END p_Ncurval;
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
-PROCEDURE pl_dat(dat_      DATE) IS
+PROCEDURE pl_dat( dat_      DATE
+) IS
+  l_bnk_dt_st    fdat.stat%type;
 BEGIN
-   gl.bDATE := dat_;
-   sys.dbms_session.set_context('bars_gl', 'bankdate', TO_CHAR(dat_,'MM-DD-YYYY')
-        , client_id => bars_login.get_session_clientid()
-   );
+
+  if ( dat_ < gl.gbDATE )
+  then
+
+    begin
+      select STAT
+        into l_bnk_dt_st
+        from FDAT
+       where FDAT = dat_;
+    exception
+      when NO_DATA_FOUND then
+        raise_application_error( -20666, 'Банківська дата ' || to_char(dat_,'dd/mm/yyyy') || ' ще не відкрита!', true );
+    end;
+
+    if ( l_bnk_dt_st = 9 )
+    then
+      raise_application_error( -20666, 'Банківська дата ' || to_char(dat_,'dd/mm/yyyy') || ' закрита для входу!', true );
+    else -- 0 or null
+      null;
+    end if;
+
+  end if;
+
+  SET_BANK_DATE( dat_ );
+
 END pl_dat;
 
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -3543,7 +3725,8 @@ END pl_dat;
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
-FUNCTION bd RETURN DATE IS
+FUNCTION bd RETURN DATE
+IS
 BEGIN
    RETURN gl.bDATE;
 END bd;
@@ -3555,11 +3738,11 @@ END bd;
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
-FUNCTION gbd RETURN DATE IS
+FUNCTION gbd RETURN DATE
+IS
 BEGIN
    RETURN gl.gbDATE;
 END gbd;
-
 
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -3568,10 +3751,24 @@ END gbd;
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
-FUNCTION kf RETURN VARCHAR2 IS
+FUNCTION kf RETURN VARCHAR2
+IS
 BEGIN
    RETURN gl.aMFO;
 END kf;
+
+/*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION  : USR_ID
+% DESCRIPTION : Returns current user id
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
+
+function USR_ID return number
+is
+begin
+  return GL.aUID;
+end USR_ID;
 
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -3584,40 +3781,30 @@ BEGIN
    param;
 END gl;
 /
- show err;
- 
-PROMPT *** Create  grants  GL ***
-grant EXECUTE                                                                on GL              to ABS_ADMIN;
-grant EXECUTE                                                                on GL              to BARS009;
-grant EXECUTE                                                                on GL              to BARS010;
-grant EXECUTE                                                                on GL              to BARS014;
-grant EXECUTE                                                                on GL              to BARS015;
-grant EXECUTE                                                                on GL              to BARSAQ with grant option;
-grant EXECUTE                                                                on GL              to BARSAQ_ADM with grant option;
-grant EXECUTE                                                                on GL              to BARSDWH_ACCESS_USER;
-grant EXECUTE                                                                on GL              to BARSUPL;
-grant EXECUTE                                                                on GL              to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on GL              to BARS_DM;
-grant EXECUTE                                                                on GL              to FINMON;
-grant EXECUTE                                                                on GL              to OPERKKK;
-grant EXECUTE                                                                on GL              to PYOD001;
-grant EXECUTE                                                                on GL              to RCC_DEAL;
-grant EXECUTE                                                                on GL              to RPBN001;
-grant EXECUTE                                                                on GL              to START1;
-grant EXECUTE                                                                on GL              to TASK_LIST;
-grant EXECUTE                                                                on GL              to TEST;
-grant EXECUTE                                                                on GL              to TOSS;
-grant EXECUTE                                                                on GL              to WR_ACRINT;
-grant EXECUTE                                                                on GL              to WR_ALL_RIGHTS;
-grant EXECUTE                                                                on GL              to WR_CREDIT;
-grant EXECUTE                                                                on GL              to WR_DEPOSIT_U;
-grant EXECUTE                                                                on GL              to WR_DOCHAND;
-grant EXECUTE                                                                on GL              to WR_DOC_INPUT;
-grant EXECUTE                                                                on GL              to WR_IMPEXP;
 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/gl.sql =========*** End *** ========
- PROMPT ===================================================================================== 
- 
+show err;
+
+-- exec sys.utl_recomp.recomp_serial('BARS');
+
+grant EXECUTE on GL to ABS_ADMIN;
+grant EXECUTE on GL to BARSAQ with grant option;
+grant EXECUTE on GL to BARSAQ_ADM with grant option;
+grant EXECUTE on GL to BARSDWH_ACCESS_USER;
+grant EXECUTE on GL to BARSUPL;
+grant EXECUTE on GL to BARS_ACCESS_DEFROLE;
+grant EXECUTE on GL to BARS_DM;
+grant EXECUTE on GL to FINMON;
+grant EXECUTE on GL to PYOD001;
+grant EXECUTE on GL to RCC_DEAL;
+grant EXECUTE on GL to RPBN001;
+grant EXECUTE on GL to START1;
+grant EXECUTE on GL to SWTOSS;
+grant EXECUTE on GL to TASK_LIST;
+grant EXECUTE on GL to TOSS;
+grant EXECUTE on GL to WR_ACRINT;
+grant EXECUTE on GL to WR_ALL_RIGHTS;
+grant EXECUTE on GL to WR_CREDIT;
+grant EXECUTE on GL to WR_DEPOSIT_U;
+grant EXECUTE on GL to WR_DOCHAND;
+grant EXECUTE on GL to WR_DOC_INPUT;
+grant EXECUTE on GL to WR_IMPEXP;

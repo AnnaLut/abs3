@@ -27,11 +27,11 @@ AS
      FROM (WITH ob22_all
                 AS (SELECT '220256' ob22, 2 id FROM DUAL
                     UNION ALL
-                    SELECT '220379' ob22, 2 id FROM DUAL --New
+                    SELECT '220372' ob22, 2 id FROM DUAL --New
                     UNION ALL
                     SELECT '220258' ob22, 2 id FROM DUAL
                     UNION ALL
-                    SELECT '220381' ob22, 2 id FROM DUAL --New
+                    SELECT '220374' ob22, 2 id FROM DUAL --New
                     UNION ALL
                     SELECT '220346' ob22, 2 id FROM DUAL
                     UNION ALL
@@ -39,7 +39,7 @@ AS
                     UNION ALL
                     SELECT '220257' ob22, 1 id FROM DUAL
                     UNION ALL
-                    SELECT '220380' ob22, 1 id FROM DUAL --New
+                    SELECT '220373' ob22, 1 id FROM DUAL --New
                     UNION ALL
                     SELECT '220347' ob22, 1 id FROM DUAL)
              SELECT tt.good_id,

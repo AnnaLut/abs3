@@ -192,8 +192,8 @@ END pkg_escr_reg_utl;
 /
 CREATE OR REPLACE PACKAGE BODY pkg_escr_reg_utl IS
 
-  g_body_version   CONSTANT VARCHAR2(64) := 'VERSION 8.7.0 11/12/2017';
-  g_header_version CONSTANT VARCHAR2(64) := 'VERSION 8.7.0 11/12/2017';
+  g_body_version   CONSTANT VARCHAR2(64) := 'VERSION 8.7.0 13/12/2017';
+  g_header_version CONSTANT VARCHAR2(64) := 'VERSION 8.7.0 13/12/2017';
 
   c_err_txt VARCHAR2(4000);
   --константи
@@ -949,11 +949,11 @@ CREATE OR REPLACE PACKAGE BODY pkg_escr_reg_utl IS
   BEGIN
     BEGIN
       SELECT COUNT(CASE
-                     WHEN substr(t.deal_product, 1, 6) IN ('220347', '220257','220380') THEN
+                     WHEN substr(t.deal_product, 1, 6) IN ('220347', '220257','220373') THEN
                       1
                    END) boiler_count
             ,COUNT(CASE
-                     WHEN substr(t.deal_product, 1, 6) IN ('220258', '220348','220381') THEN
+                     WHEN substr(t.deal_product, 1, 6) IN ('220258', '220348','220374') THEN
                       2
                    END) material_count
             ,t.customer_okpo BULK COLLECT
@@ -969,7 +969,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_escr_reg_utl IS
         SELECT t.deal_id BULK COLLECT
           INTO l_deal_id
           FROM escr_reg_header t
-         WHERE substr(t.deal_product, 1, 6) IN ('220258', '220348', '220381')
+         WHERE substr(t.deal_product, 1, 6) IN ('220258', '220348', '220374')
            AND extract(YEAR FROM t.deal_date_from) = '2017'
            AND t.customer_okpo IN (SELECT * FROM TABLE(l_customer_okpo));
       END;
@@ -991,7 +991,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_escr_reg_utl IS
         SELECT t.deal_id BULK COLLECT
           INTO l_deal_id
           FROM escr_reg_header t
-         WHERE substr(t.deal_product, 1, 6) IN ('220347', '220257', '220380')
+         WHERE substr(t.deal_product, 1, 6) IN ('220347', '220257', '220373')
            AND extract(YEAR FROM t.deal_date_from) = '2017'
            AND t.customer_okpo IN (SELECT * FROM TABLE(l_customer_okpo));
       END;

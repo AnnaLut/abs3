@@ -41,6 +41,11 @@ namespace BarsWeb.Areas.Wcs.Controllers
             return View();
         }
 
+        public ActionResult Journal()
+        {
+            return View();
+        }
+
         public ActionResult GetRegisterMain([DataSourceRequest]DataSourceRequest request, string dateFrom, string dateTo, string type, string kind)
         {
             IQueryable<EscrRegisterMain> session = _escrRepository.GetRegisterMain(dateFrom, dateTo, type, kind);
@@ -328,18 +333,73 @@ namespace BarsWeb.Areas.Wcs.Controllers
 
         public ActionResult GetRefList([DataSourceRequest]DataSourceRequest request)
         {
-            IQueryable<EscrRefList> session = _escrRepository.GetRefList();
-            return Json(session.ToDataSourceResult(request), JsonRequestBehavior.AllowGet);
+            string Status = "ok";
+            try
+            {
+                IQueryable<EscrRefList> session = _escrRepository.GetRefList();
+                return Json(session.ToDataSourceResult(request), JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception e) { Status = e.Message + " StackTrace=" + e.StackTrace; }
+            return Json(new { Status = Status }, JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult RepaymentAll(string all_rows)
+        public ActionResult PayRefs(string all_rows)
         {
             string Status = "ok";
             try
             {
                 var serializer = new JavaScriptSerializer();
                 List<decimal> all = serializer.Deserialize<List<decimal>>(all_rows);
-                _escrRepository.RepaymentAll(all);
+                _escrRepository.PayOrDelete(all, 1);
+            }
+            catch (Exception e) { Status = e.Message + " StackTrace=" + e.StackTrace; }
+            return Json(new { Status = Status });
+        }
+
+        public ActionResult DeleteRefs(string all_rows)
+        {
+            string Status = "ok";
+            try
+            {
+                var serializer = new JavaScriptSerializer();
+                List<decimal> all = serializer.Deserialize<List<decimal>>(all_rows);
+                _escrRepository.PayOrDelete(all, 2);
+            }
+            catch (Exception e) { Status = e.Message + " StackTrace=" + e.StackTrace; }
+            return Json(new { Status = Status });
+        }
+
+        public ActionResult GetJournalList([DataSourceRequest]DataSourceRequest request)
+        {
+            string Status = "ok";
+            try
+            {
+                IQueryable<EscrJournal> session = _escrRepository.GetJournalList();
+                return Json(session.ToDataSourceResult(request), JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception e) { Status = e.Message + " StackTrace=" + e.StackTrace; }
+            return Json(new { Status = Status }, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult GetJournalDetail([DataSourceRequest]DataSourceRequest request, decimal id)
+        {
+            string Status = "ok";
+            try
+            {
+                IQueryable<EscrJournalDetail> session = _escrRepository.GetJournalDetail(id);
+                return Json(session.ToDataSourceResult(request), JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception e) { Status = e.Message + " StackTrace=" + e.StackTrace; }
+            return Json(new { Status = Status }, JsonRequestBehavior.AllowGet);
+
+        }
+
+        public ActionResult RestoreGLK(decimal id)
+        {
+            string Status = "ok";
+            try
+            {
+                _escrRepository.RestoreGLK(id);
             }
             catch (Exception e) { Status = e.Message + " StackTrace=" + e.StackTrace; }
             return Json(new { Status = Status });

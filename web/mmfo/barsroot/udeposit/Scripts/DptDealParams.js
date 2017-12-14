@@ -1,5 +1,5 @@
 //------------------------------
-// 07.11.2017
+// 13.12.2017
 //------------------------------
 window.onload = InitDptDealParams;
 
@@ -30,7 +30,7 @@ var ir_old = null;
 var op_old = null;
 // var bsd;
 // var bsn;
-var srok = 10;
+var srok = 0;
 var fl_extend;
 var switchMode = 0;
 var trustId = null;   // Id доверенного лица
@@ -1747,7 +1747,7 @@ function onGetSecAccounts(result) {
 
 function SetLineNewEndDate( sDate ) {
     var yearQty = 1;
-    if (periodType == 2) {
+    if ( ( parseInt(srok,10) > 12 ) || ( parseFloat(srok.replace(",",".") ) > parseFloat("0.0365") ) ) {
         yearQty = 3;
     }
 

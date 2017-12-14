@@ -1,5 +1,3 @@
-
- 
  PROMPT ===================================================================================== 
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/attribute_utl.sql =========*** Run *
  PROMPT ===================================================================================== 
@@ -1914,7 +1912,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.ATTRIBUTE_UTL as
         p_attribute_row in attribute_kind%rowtype,
         p_values in varchar2_list)
     is
-        l_values_not_in_range varchar2_list;
+        l_values_not_in_range string_list;
         l_check_query_statement varchar2(32767 byte);
     begin
         if (p_values is not null and p_values is not empty) then

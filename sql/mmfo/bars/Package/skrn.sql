@@ -495,7 +495,12 @@ IS
        INTO l_ob22, l_nbs
        FROM SKRYNKA_ACC_TIP
       WHERE tip = 'C';
-
+      
+      ------- «¿√À”ÿ ¿ ƒÀﬂ —◊≈“¿ 6119 (ÒÚ‡Î 6519)
+      if newnbs.g_state <> 1 
+        then l_nbs = 6119; 
+      end if;
+      
      SELECT a.nls, a.nms
        INTO nls6119_, nms6119_
        FROM accounts a

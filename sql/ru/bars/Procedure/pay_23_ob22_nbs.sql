@@ -600,6 +600,7 @@ BEGIN
          elsif acc_ is not null and k.nbs_rez = '3190' and k.r013=2 THEN
                k.r013 := 'B';
          end if;
+         k.r013 := null;
          if mode_ = 0 THEN
 
             --logger.info('PAY9 : k.r013= ' || k.r013) ;
@@ -732,6 +733,11 @@ BEGIN
                   END IF;
                end if;
 */
+               begin
+                  select ostc into s_old_ from accounts where acc=k.r_acc; -- если уже были проводки
+               EXCEPTION WHEN NO_DATA_FOUND THEN s_old_ := 0;
+               end;
+
                --новая сумма резерва
                if    nal_ ='3'                  THEN  s_new_ := k.sz;
                elsif nal_ in ('4','8')          THEN  s_new_ := k.sz;

@@ -132,7 +132,7 @@ end get_nls2924foracc;
                              when '2630' then
                               '2630_046' || substr(l_rec_asvo.branch, 2, 6)
                              when '2635' then
-                              '2630_038' || substr(l_rec_asvo.branch, 2, 6)
+                              '2635_038' || substr(l_rec_asvo.branch, 2, 6)
                            end);
       l_nls_b_opl := vkrzn(substr(l_mfo_a, 1, 5),
                            '3739_' || substr(l_rec_asvo.bsd, 3, 2) ||
@@ -157,9 +157,18 @@ end get_nls2924foracc;
            and kv = l_rec_asvo.kv;
       exception
         when no_data_found then
-          raise_application_error(-20001,
+          begin
+                      select substr(nms, 1, 38), nls
+                          into l_nam_a, l_nls_a
+                          from accounts
+                         where nlsalt = l_nls_a
+                           and kv = l_rec_asvo.kv;
+          exception
+              when no_data_found then
+              raise_application_error(-20001,
                                   'Не знайдено рахунок "' || l_nls_a ||
                                   '", валюта "' || l_rec_asvo.kv || '"!');
+          end;
       end;
       --Назва відправника
       begin
@@ -689,7 +698,7 @@ end get_nls2924foracc;
                              when '2630' then
                               '2630_046' || substr(l_rec_asvo.branch, 2, 6)
                              when '2635' then
-                              '2630_038' || substr(l_rec_asvo.branch, 2, 6)
+                              '2635_038' || substr(l_rec_asvo.branch, 2, 6)
                            end);
       l_nls_b_opl := vkrzn(substr(l_mfo_a, 1, 5),
                            '3739_' || substr(l_rec_asvo.bsd, 3, 2) ||
@@ -723,9 +732,18 @@ end get_nls2924foracc;
            and kv = l_rec_asvo.kv;
       exception
         when no_data_found then
-          raise_application_error(-20001,
+          begin
+                      select substr(nms, 1, 38), nls
+                          into l_nam_a, l_nls_a
+                          from accounts
+                         where nlsalt = l_nls_a
+                           and kv = l_rec_asvo.kv;
+          exception
+              when no_data_found then
+              raise_application_error(-20001,
                                   'Не знайдено рахунок "' || l_nls_a ||
                                   '", валюта "' || l_rec_asvo.kv || '"!');
+          end;
       end;
       --Назва відправника
       begin
