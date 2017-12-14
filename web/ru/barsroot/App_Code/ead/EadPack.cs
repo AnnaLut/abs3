@@ -64,6 +64,7 @@ namespace Bars.EAD
         {
             List<OracleParameter> parameters = new List<OracleParameter>();
             parameters.Add(new OracleParameter("P_SYNC_ID", OracleDbType.Decimal,P_SYNC_ID, ParameterDirection.Input));
+            parameters.Add(new OracleParameter("P_FORCE", OracleDbType.Char, "F", ParameterDirection.Input));
             object ReturnValue = null;
             ExecuteNonQuery("EAD_PACK.MSG_PROCESS", parameters.ToArray(), CommandType.StoredProcedure, out ReturnValue);
         }

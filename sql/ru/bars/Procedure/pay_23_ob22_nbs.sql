@@ -199,7 +199,7 @@ BEGIN
    select EXTRACT(month  FROM dat31_), EXTRACT(YEAR  FROM dat31_) INTO mon_, year_ from dual; -- номер месяца, год
    select name_plain INTO name_mon_ from META_MONTH where n=mon_;
 
-   doform_nazn            := 'Формування резерву за '||name_mon_||' '||year_;
+   doform_nazn            := 'Розгортання резерву за '|| dat31_;
    doform_nazn_korr       := 'Кор.проводка за '||name_mon_||' '||year_ ||' по форм.резерву ';
    doform_nazn_korr_year  := 'Кор.річна проводка за '||name_mon_||' '||year_ ||' по форм.резерву ';
 
@@ -308,7 +308,7 @@ BEGIN
                                         decode(r.kat,1,1,2) = decode(o.s080,'0',decode(r.kat,1,1,2),o.s080) and
                                         nvl(r.custtype,0)= decode(o.custtype,'0',nvl(r.custtype,0),o.custtype) and
                                         r.kv = decode(o.kv,'0',r.kv,o.kv) )
-                where fdat = dat01_  and substr(r.id,1,4) <> 'CACP' and r.nd = decode(l_user,null,r.nd,-1,r.nd,l_user)
+                where fdat = dat01_  and r.nd <> 10970701 and substr(r.id,1,4) <> 'CACP' and r.nd = decode(l_user,null,r.nd,-1,r.nd,l_user)
                       and nvl(decode(nal_,'0',rezn,'A',rezn,2,rezn,5,rez_30,'C',rez_30,6,rez_30,'D',rez_30,8,r.rez,rez_0),0) <> 0
                 group by c.country,o.NBS_REZ, o.OB22_REZ, o.NBS_7f, o.OB22_7f, o.NBS_7r, o.OB22_7r, o.pr, o.r013, r.KV, r.rz,
                          rtrim(substr(r.branch||'/',1,instr(r.branch||'/','/',1,3)-1),'/')||'/',decode(r.kat,1,1,9,9,2),r.kat
@@ -343,7 +343,7 @@ BEGIN
                                         decode(r.kat,1,1,2) = decode(o.s080,'0',decode(r.kat,1,1,2),o.s080) and
                                         nvl(r.custtype,0)= decode(o.custtype,'0',nvl(r.custtype,0),o.custtype) and
                                         r.kv = decode(o.kv,'0',r.kv,o.kv) )
-                where fdat = dat01_ and nvl(decode(nal_,'3',rez-rez_30,rez_30),0) <> 0 and id like 'CACP%' AND
+                where fdat = dat01_ and r.nd <> 10970701 and nvl(decode(nal_,'3',rez-rez_30,rez_30),0) <> 0 and id like 'CACP%' AND
                       r.nls NOT in ('31145020560509','31145020560510','31141039596966','31148011314426')
                       and r.nd = decode(l_user,null,r.nd,-1,r.nd,l_user)
                 group by c.country, o.NBS_REZ, o.OB22_REZ, o.NBS_7f, o.OB22_7f, o.NBS_7r, o.OB22_7r,o.pr, o.r013,'1', r.KV, r.rz,0,
@@ -378,7 +378,7 @@ BEGIN
                                         decode(r.kat,1,1,2) = decode(o.s080,'0',decode(r.kat,1,1,2),o.s080) and
                                         nvl(r.custtype,0)= decode(o.custtype,'0',nvl(r.custtype,0),o.custtype) and
                                         r.kv = decode(o.kv,'0',r.kv,o.kv) )
-                where fdat = dat01_ and nvl(decode(nal_,'0',rezn,2,rezn,3,rez,r.rez),0) <> 0 and
+                where fdat = dat01_ and r.nd <> 10970701 and nvl(decode(nal_,'0',rezn,2,rezn,3,rez,r.rez),0) <> 0 and
                       r.nls in ('31145020560509','31145020560510','31141039596966','31148011314426')
                       and r.nd = decode(l_user,null,r.nd,-1,r.nd,l_user)
                 group by C.COUNTRY,o.NBS_REZ, o.OB22_REZ, o.NBS_7f, o.OB22_7f, o.NBS_7r, o.OB22_7r, o.pr, o.r013, r.nd, r.cc_id,

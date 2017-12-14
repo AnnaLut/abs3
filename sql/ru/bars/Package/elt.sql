@@ -1905,7 +1905,7 @@ for k in (SELECT d.ND, d.CC_ID, d.SDATE, c.OKPO,
      select substr(F_NEWNMS(NULL,descrname_,NULL,k.rnk,NULL),1,70) into nms8p_  from dual;
         if suf_ is NULL then nms8_:=nms8p_; end if;
           nls8_ := Get_NLS_random  ( '3570'  ) ;  --получение № лиц.сч по случ.числам
-          OP_REG(9,0,0,0,tmp_,k.rnk,nls8_,n980_, nms8_,'OFR',k.isp,acc8_);
+          OP_REG(9,0,0,0,tmp_,k.rnk,nls8_,n980_, nms8_,'ODB',k.isp,acc8_);
           p_setAccessByAccMask(acc8_,k.acc);
           update accounts set tobo=k.tobo where acc=acc8_;
           r013f:='1'; s180f:=NULL; s240f:=NULL;

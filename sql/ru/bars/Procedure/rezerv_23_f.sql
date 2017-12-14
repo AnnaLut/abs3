@@ -189,7 +189,7 @@ begin
 */
             if k.nbs in ('3570','3578') THEN
                begin
-                  select nd into k.nd from nd_acc where acc=k.acc;
+                  select nd into k.nd from nd_acc where acc=k.acc and rownum=1;
                EXCEPTION WHEN NO_DATA_FOUND THEN null;
                end;
             end if;

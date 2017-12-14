@@ -32,7 +32,7 @@ begin
     if ( :new.nls36 is not null )
     then -- 3570 02 - нараховані доходи за обсл. Суб.Госп. через системи дистанційного обслуговування
 
-      select acc, nbs, nvl(ob22,'XX'), nls, f_check_elt_ob22(0,nbs,ob22,tip)
+      select acc, nbs, nvl(ob22,'XX'), nls, f_check_elt_ob22(0,nbs,ob22)
         into l_acc36, l_nbs, l_ob22, l_nls36, l_ob22t
         from accounts
        where nls = :new.nls36
@@ -55,7 +55,7 @@ begin
     then -- 3579 24 - прострочені нараховані доходи за обсл. Суб.Госп. через системи дистанційного обслуговування
 
       begin
-      select acc, nbs, nvl(ob22,'YY'), nls, f_check_elt_ob22(0,nbs,ob22, tip)
+      select acc, nbs, nvl(ob22,'YY'), nls, f_check_elt_ob22(0,nbs,ob22)
         into l_accd, l_nbs, l_ob22, l_nls36, l_ob22t
         from accounts
        where nls = :new.nls_d

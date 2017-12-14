@@ -1,13 +1,13 @@
 CREATE OR REPLACE PACKAGE BARS.T2017 IS
 
-   g_header_version   constant varchar2 (64) := 'version 1.8  13.12.2017';
+   g_header_version   constant varchar2 (64) := 'version 1.9  14.12.2017';
    g_trace            constant varchar2 (64) := 'T2017:';
 
 --============ Зміни в плані рах 2017 р.=======================
 /*
 1)	Установка ПО и наполнение базового справочника Transfer_2017
 2)	Скрипт по закрытию суб/портфелей по ЦБ в 300465   Cp_2017.sql
-
+3)      Добавлена процедура по перекодированию proc_dr$base по кредитым ресурсам
 */
 
 -- Процедура закрытия всех счетов с НОЛЬ-ост, бал.сч которых закрыт T2017.CLS   (0 , p_kf)  - надо распараллелить по МФО. Дождаться окончания всех.
@@ -57,6 +57,9 @@ procedure ead_reswitch_cdckeys;
 
 procedure PROCDR;
 
+--Процедура по перекодированию proc_dr$base по кредитым ресурсам
+
+procedure PROCDR_39;
    FUNCTION header_version   RETURN VARCHAR2;
    FUNCTION body_version     RETURN VARCHAR2;
 -------------------
@@ -69,11 +72,12 @@ show errors
 
 CREATE OR REPLACE PACKAGE BODY BARS.T2017
 IS
-  g_body_version   CONSTANT VARCHAR2 (64) := 'version 1.17  12.12.2017';
+  g_body_version   CONSTANT VARCHAR2 (64) := 'version 1.18  14.12.2017';
   g_errN number  := -20203;
   nlchr  char(2) := chr(13)||chr(10);
   bnk_dt date;
 /*
+  14.12.2017 LSO Добавлена процедура по перекодированию proc_dr$base по кредитым ресурсам
   13.12.2017 Sta доп.рекв ELT6_1 
   08.12.2017 Sta CP - Зашила 2 счета явно
   06.12.2017 Sta 3119 in CP  + CP для всех РУ
@@ -751,11 +755,11 @@ begin
             select * into  cc from customer where rnk = aa_old.rnk ; cc.nmk := nvl(cc.nmkk,substr(cc.nmk,1,38));
             -- закрыть
             Insert into ree_tmp ( mfo,    id_a,     rt, ot,        nls,     odat,        kv,    c_ag,   nmk,   nmkw,   c_reg,    c_dst, prz) --  закрытие
-                      select  gl.aMfo, cc.Okpo, cc.tgr,'3', AA_OLD.NLS, bnk_dt, aa_old.KV, G.rezid,cc.nmk,cc.nmk, cc.c_reg, cc.c_dst, 1
+                      select  gl.aMfo, cc.Okpo, cc.tgr,'5', AA_OLD.NLS, bnk_dt, aa_old.KV, G.rezid,cc.nmk,cc.nmk, cc.c_reg, cc.c_dst, 1
                       from codcagent G  where codcagent = cc.codcagent and exists (select 1 from DPA_NBS where nbs = tt.R020_OLD and TYPE='DPA' and TAXOTYPE=3) ;
             -- открыть
             Insert into ree_tmp ( mfo,    id_a,     rt, ot,        nls,     odat,        kv,    c_ag,   nmk,   nmkw,   c_reg,    c_dst, prz) -- открытие
-                       select gl.aMfo, cc.Okpo, cc.tgr,'1', AA_NEW.NLS, bnk_dt, aa_old.KV, G.rezid,cc.nmk,cc.nmk, cc.c_reg, cc.c_dst, 1
+                       select gl.aMfo, cc.Okpo, cc.tgr,'6', AA_NEW.NLS, bnk_dt, aa_old.KV, G.rezid,cc.nmk,cc.nmk, cc.c_reg, cc.c_dst, 1
                        from codcagent G  where codcagent = cc.codcagent and exists (select 1 from DPA_NBS where nbs = tt.R020_NEW and TYPE='DPA' and TAXOTYPE=1) ;
          end if ; -- DPA
 
@@ -1241,6 +1245,7 @@ procedure ead_reswitch_cdckeys is
 begin
   delete from bars.ead_sync_sessions;
   commit work;
+  dbms_output.put_line('ead_sync_sessions has been cleared');
 end ead_reswitch_cdckeys;
 -----------------------
 procedure disable_scheduler_jobs
@@ -1308,6 +1313,60 @@ end enable_scheduler_jobs;
     bc.home;
   end PROCDR;
 
+--------------------
+procedure PROCDR_39
+is
+   g67_new    VARCHAR2 (15);
+   v67_new    VARCHAR2 (15);
+   g67n_new   VARCHAR2 (15);
+   v67n_new   VARCHAR2 (15);
+
+   FUNCTION get_nls_new (p_nls VARCHAR2)
+      RETURN VARCHAR2
+   IS
+      L_NLS   VARCHAR2 (15);
+   BEGIN
+      L_NLS := p_nls;
+
+      SELECT nls
+        INTO L_NLS
+        FROM accounts
+       WHERE nlsalt = p_nls AND dat_alt IS NOT NULL AND dazs IS NULL;
+
+      RETURN l_nls;
+   EXCEPTION
+      WHEN NO_DATA_FOUND
+      THEN
+         L_NLS := p_nls;
+         RETURN l_nls;
+   END;
+
+BEGIN
+   FOR k IN (SELECT kf FROM mv_kf)
+   LOOP
+      bc.go (k.kf);
+
+      FOR c IN (SELECT rowid as ri, d.*
+                  FROM proc_dr$base d
+                 WHERE d.nbs LIKE '390_' AND d.sour = 4)
+      LOOP
+         g67_new := get_nls_new (c.g67);
+         v67_new := get_nls_new (c.v67);
+         g67n_new := get_nls_new (c.g67n);
+         v67n_new := get_nls_new (c.v67n);
+
+         UPDATE proc_dr$base
+            SET g67 = g67_new,
+                v67 = v67_new,
+                g67n = g67n_new,
+                v67n = v67n_new
+          WHERE rowid = c.ri;
+
+      END LOOP;                                                           -- c
+   END LOOP;                                                              -- k
+
+   bc.home;
+END PROCDR_39;
 --------------------
 
   FUNCTION header_version RETURN VARCHAR2 is BEGIN RETURN 'Package header T2017'|| g_header_version; END header_version;
