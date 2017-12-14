@@ -60,8 +60,9 @@ procedure PROCDR;
 --Процедура по перекодированию proc_dr$base по кредитым ресурсам
 
 procedure PROCDR_39;
-   FUNCTION header_version   RETURN VARCHAR2;
-   FUNCTION body_version     RETURN VARCHAR2;
+
+  FUNCTION header_version   RETURN VARCHAR2;
+  FUNCTION body_version     RETURN VARCHAR2;
 -------------------
 END T2017;
 /
@@ -72,7 +73,7 @@ show errors
 
 CREATE OR REPLACE PACKAGE BODY BARS.T2017
 IS
-  g_body_version   CONSTANT VARCHAR2 (64) := 'version 1.18  14.12.2017';
+  g_body_version   CONSTANT VARCHAR2 (64) := 'version 1.19  14.12.2017';
   g_errN number  := -20203;
   nlchr  char(2) := chr(13)||chr(10);
   bnk_dt date;
@@ -274,7 +275,7 @@ begin
         end loop;
         end;
         --- ============================================================ ---
-       
+
        -- Депозити ЮО
        delete DPU_TYPES_OB22
         where NBS_DEP = p_r020_old;
@@ -715,30 +716,41 @@ begin
          If aa_old.tip  = 'ODB'  then   aa_NEW.tip := 'OFR' ; else aa_NEW.tip := aa_OLD.tip ;  end if;  
       end if;
 
-
       --30.11.2017 Sta Использование прозноз-счетов
       begin 
          select nvl(trim(new_nls), vkrzn ( substr(gl.aMfo,1,5) , tt.R020_NEW ||'0'|| trunc ( dbms_random.value (1, 999999999 ) ) )) into AA_NEW.NLS
            from TRANSFORM_2017_FORECAST 
           where acc = aa_old.acc;
       EXCEPTION WHEN NO_DATA_FOUND   THEN AA_NEW.NLS :=  Vkrzn( substr( gl.amfo,1,5), tt.r020_new||'0' || substr( aa_OLD.nls, 6,9) ); -- сохраняем старый хвост
-      end;     
+      end;
 
-      l_count := 0; 
+      l_count := 0;
       dbms_application_info.set_client_info(aa_old.nls||' '|| aa_old.kv);
-      while l_count < 100   
+
+      while l_count < 100
       loop
          begin
             update accounts set tip = aa_NEW.tip, NLS = AA_NEW.NLS, nbs = tt.R020_NEW, nlsalt = aa_old.NLS, DAT_ALT = bnk_dt, ob22 = tt.ob_new where acc = aa_old.ACC ;
-            l_count    := 0;
+
+            if ( aa_old.NBS in ('2615','2652') )
+            then
+              update ACCOUNTS
+                 set NLSALT = aa_new.NLS
+               where NLSALT = aa_old.NLS
+                 and KV     = aa_old.KV
+                 and NLS like '8%'
+                 and DAZS Is Null;
+            end if;
+
+            l_count := 0;
             EXIT ;
          exception when others then     
             l_err := sqlerrm;
             if sqlcode=-1 then AA_NEW.NLS := vkrzn ( substr(gl.aMfo,1,5) , tt.R020_NEW ||'0'|| trunc ( dbms_random.value (1, 999999999 ) ) );
             else 
-              exit;                  
+              exit;
             end if;
-                               l_count := l_count + 1;
+            l_count := l_count + 1;
          end;
 
       end loop;
@@ -1043,10 +1055,11 @@ begin
   
   
       -- Лившиц Геннадий
+	bc.go('/'); -- возвращаемся на слэш
 	BEGIN
 		For i in (select d.deposit_id, d.branch, a.nls, d.kf
 		from bars.dpt_deposit d, bars.accounts a 
-		where a.nlsalt = d.nls_p and a.kf = d.kf
+		where a.nlsalt = d.nls_p and a.kf = d.mfo_p
 		and a.kv = d.kv and d.nls_p like '2635%') loop
 			bc.go(i.kf);
 			update dpt_deposit set nls_p = i.nls where deposit_id = i.deposit_id;
@@ -1056,7 +1069,7 @@ begin
 		
 		For i in (select d.deposit_id, d.branch, a.nls, d.kf
 		from bars.dpt_deposit d, bars.accounts a 
-		where a.nlsalt = d.nls_d and a.kf = d.kf
+		where a.nlsalt = d.nls_d and a.kf = d.mfo_d
 		and a.kv = d.kv and d.nls_d like '2635%') loop
 			bc.go(i.kf);
 			update dpt_deposit set nls_d = i.nls where deposit_id = i.deposit_id;
@@ -1067,6 +1080,7 @@ begin
 
 	
 	-- Липских Александр
+	bc.go('/'); -- возвращаемся на слэш
 	BEGIN
     /* "трансформация" макетов ф.190 (sto_det), обновляем nls-ки, назначение платежа не меняем */
     for rec in (select kf from mv_kf)
@@ -1087,7 +1101,7 @@ begin
             For i in (select d.idd, d.branch, a.nls, d.kf
                         from bars.sto_det d, bars.accounts a
                        where a.nlsalt = d.nlsb
-                         and a.kf = d.kf
+                         and a.kf = d.mfob
                          and a.kv = d.kvb
                          and d.nlsb like '2635%') 
             loop
@@ -1268,7 +1282,7 @@ begin
   for rec in (select owner||'.'||job_name as job_name from dba_scheduler_jobs 
               where job_name in ('IMPORT_DAY', 'IMPORT_MONTH') 
               or job_name like 'CIG%'
-              or job_name like 'EAD%'
+              or (job_name like 'EAD%' and job_name not in ('EAD_SYNC', 'EAD_SYNC_CORP', 'EAD_SYNC_ZAP_BO'))
               or job_name like 'CRM_UPLOAD%')
     loop
       dbms_scheduler.enable(name => rec.job_name);

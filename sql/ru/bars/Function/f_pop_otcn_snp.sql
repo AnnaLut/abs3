@@ -4,7 +4,7 @@
  PROMPT *** Run *** ========== Scripts /Sql/BARS/function/f_pop_otcn_snp.sql =========*** Run
  PROMPT ===================================================================================== 
  
-  CREATE OR REPLACE FUNCTION BARS.F_POP_OTCN_SNP (Dat_ DATE,
+CREATE OR REPLACE FUNCTION BARS.F_POP_OTCN_SNP (Dat_ DATE,
                                            type_ NUMBER,
                                            sql_acc_ VARCHAR2,
                                            datp_ IN DATE DEFAULT NULL,
@@ -14,7 +14,7 @@ RETURN NUMBER IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :	Функция наполнения таблиц для формирования отчетности
 % COPYRIGHT   :	Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     : 15/11/2017 (09/07/2015)
+% VERSION     : 14.12.2017 (15/11/2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 06/02/2015 - в таблице OTCN_SALDO не формировались годовые Кт обороты
              Исправлено.
@@ -133,8 +133,8 @@ end if;
 
 -- отбор только нужных счетов
 if tp_sql_ = 0 then
-    sql_doda_ := 'insert /*+APPEND PARALLEL(8) */  into OTCN_ACC (ACC, NLS, KV, NBS, RNK, DAOS, DAPP, ISP, NMS, LIM, PAP, TIP, VID, MDATE, DAZS, ACCC, TOBO, NLS_ALT, OB22_ALT, DAT_ALT) '||
-                 'select a.acc, a.nls, a.kv, a.nbs, a.rnk, a.daos, a.dapp, a.isp, a.nms, a.lim, a.pap, a.tip, a.vid, a.mdate, a.dazs, a.accc, a.tobo, a.nlsalt, s.ob22_alt, a.dat_alt '||
+    sql_doda_ := 'insert /*+APPEND PARALLEL(8) */  into OTCN_ACC (ACC, NLS, KV, NBS, OB22, RNK, DAOS, DAPP, ISP, NMS, LIM, PAP, TIP, VID, MDATE, DAZS, ACCC, TOBO, NLS_ALT, OB22_ALT, DAT_ALT) '||
+                 'select a.acc, a.nls, a.kv, a.nbs, a.ob22, a.rnk, a.daos, a.dapp, a.isp, a.nms, a.lim, a.pap, a.tip, a.vid, a.mdate, a.dazs, a.accc, a.tobo, a.nlsalt, s.ob22_alt, a.dat_alt '||
                  'from (select * from accounts where nbs ';
 
     IF Trim(sql_acc_) IS NULL THEN
@@ -145,8 +145,8 @@ if tp_sql_ = 0 then
 
     sql_doda_ := sql_doda_ || ') a, specparam s where a.acc = s.acc(+) ';
 else
-    sql_doda_ := 'insert /*+APPEND PARALLEL(8) */ into OTCN_ACC (ACC, NLS, KV, NBS, RNK, DAOS, DAPP, ISP, NMS, LIM, PAP, TIP, VID, MDATE, DAZS, ACCC, TOBO, NLS_ALT, OB22_ALT, DAT_ALT) '||
-                 'select distinct a.acc, a.nls, a.kv, a.nbs, a.rnk, a.daos, a.dapp, a.isp, a.nms, a.lim, a.pap, a.tip, a.vid, a.mdate, a.dazs, a.accc, a.tobo, a.nlsalt, s.ob22_alt, a.dat_alt '||
+    sql_doda_ := 'insert /*+APPEND PARALLEL(8) */ into OTCN_ACC (ACC, NLS, KV, NBS, OB22, RNK, DAOS, DAPP, ISP, NMS, LIM, PAP, TIP, VID, MDATE, DAZS, ACCC, TOBO, NLS_ALT, OB22_ALT, DAT_ALT) '||
+                 'select distinct a.acc, a.nls, a.kv, a.nbs, a.ob22, a.rnk, a.daos, a.dapp, a.isp, a.nms, a.lim, a.pap, a.tip, a.vid, a.mdate, a.dazs, a.accc, a.tobo, a.nlsalt, s.ob22_alt, a.dat_alt '||
                  'from (';
 
     IF Trim(sql_acc_) IS NULL THEN

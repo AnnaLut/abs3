@@ -46,10 +46,9 @@ SET FEEDBACK ON
 update ( select d.TYPE_ID, d.NBS_DEP, d.R034, d.IRVK
               , s.IRVK as IRVK_NEW
            from DPU_TYPES_OB22 d
-           left
            join DPU_NBS4CUST s
              on ( s.K013 = d.K013 and s.NBS_DEP = d.NBS_DEP )
-          where lnnvl( d.IRVK = s.IRVK )
+          where d.IRVK != s.IRVK
        )
    set IRVK = IRVK_NEW
 ;
