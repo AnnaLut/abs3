@@ -496,7 +496,7 @@ IS
       
       ------- гюцксьйю дкъ яверю 6119 (ЯРЮК 6519)
       if newnbs.g_state <> 1 
-        then l_nbs = 6119; 
+        then l_nbs := 6119; 
       end if;
 
      SELECT a.nls, a.nms
