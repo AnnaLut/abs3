@@ -73,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);--, l_tabselect_statement
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);--, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -85,7 +85,7 @@ begin
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
 
     -- обновляем select_statement таблицы
-  --  bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
+    --bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -124,36 +124,29 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'ACC', 'N', 'ACC', '', null, 99, 0, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'DOS', 'N', 'Дб~обороти', '', null, 8, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'FDAT', 'D', 'Дата~трансферу', '', null, 1, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'KOS', 'N', 'Кд~обороти', '', null, 9, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'KV', 'N', 'Код~вал', '', null, 3, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'NBS', 'C', 'Бал~рах', '', null, 2, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'NLS', 'C', 'Особ~рахунок', '', null, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'OB22', 'C', 'Об22', '', null, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'POS', 'C', 'Ознака~(новий/старий)', '', null, 12, 0, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
- -- bars_metabase.add_column(l_tabid, 12, 'KF', 'C', 'Код~МФО', '', null, 0, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  --bars_metabase.add_column(l_tabid, 10, 'NBS1', 'C', 'NBS1', '', null, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
- -- bars_metabase.add_column(l_tabid, 11, 'OB22_1', 'C', 'OB22_1', '', null, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
- bars_metabase.add_column(l_tabid, 30, 'KF', 'C', 'Код~МФО', '', null, 0, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-bars_metabase.add_column(l_tabid, 12, 'OST_IN', 'N', 'Вх.~залишок', '', null, 6, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
- bars_metabase.add_column(l_tabid, 13, 'OST_OUT', 'N', 'Вих.~залишок', '', null, 10, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-   bars_metabase.add_column(l_tabid, 14, 'OSTQ_IN', 'N', 'Вх.~залишок(екв.)', '', null, 7, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-   bars_metabase.add_column(l_tabid, 15, 'OSTQ_OUT', 'N', 'Вих.~залишок(екв.)', '', null, 11, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-
-
-  -- добавляем описание сортировки
-  bars_metabase.add_sortorder(l_tabid, 30, 1, 'ASC ');
-
-  -- добавляем описание сортировки
-  --bars_metabase.add_sortorder(l_tabid, 6, 4, 'ASC ');
+  bars_metabase.add_column(l_tabid, 1, 'ACC', 'N', 'ACC', '', null, 99, 1, 1, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'DOS', 'N', 'Дб~обороти', '', null, 8, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'FDAT', 'D', 'Дата~трансферу', '', null, 1, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'KOS', 'N', 'Кд~обороти', '', null, 9, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'KV', 'N', 'Код~вал', '', null, 3, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'NBS', 'C', 'Бал~рах', '', null, 2, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'NLS', 'C', 'Особ~рахунок', '', null, 5, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'OB22', 'C', 'Об22', '', null, 4, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'POS', 'C', 'Ознака~(новий/старий)', '', null, 12, 1, 1, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'OST_IN', 'N', 'Вх.~залишок', '', null, 6, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'OST_OUT', 'N', 'Вих.~залишок', '', null, 10, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'OSTQ_IN', 'N', 'Вх.~залишок(екв.)', '', null, 7, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'OSTQ_OUT', 'N', 'Вих.~залишок(екв.)', '', null, 11, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 30, 'KF', 'C', 'Код~МФО', '', null, 0, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
 
   -- добавляем описание сортировки
   bars_metabase.add_sortorder(l_tabid, 1, 2, 'ASC ');
 
   -- добавляем описание сортировки
-bars_metabase.add_sortorder(l_tabid, 9, 3, 'ASC ');
+  bars_metabase.add_sortorder(l_tabid, 9, 3, 'ASC ');
+
+  -- добавляем описание сортировки
+  bars_metabase.add_sortorder(l_tabid, 30, 1, 'ASC ');
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);
@@ -221,7 +214,7 @@ bars_metabase.add_sortorder(l_tabid, 9, 3, 'ASC ');
       l_dependency(i).condition );
   end loop;
 
- begin
+  begin
       Insert into BARS.REFERENCES (TABID, TYPE, ROLE2EDIT)
       Values (l_tabid, 6, 'RPBN002');
   exception
@@ -238,16 +231,16 @@ bars_metabase.add_sortorder(l_tabid, 9, 3, 'ASC ');
   end;
 
 
-   begin
+  begin
       Insert into BARS.REFAPP
            (TABID, CODEAPP, ACODE, APPROVE, REVOKED, GRANTOR)
       Values
            (l_tabid, 'OPER', 'RO', 1, 0, 1);
   exception
     when others then null;
-  end;
+  end;	  
 
-
+  
 end;
 /
 
