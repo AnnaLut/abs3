@@ -27,7 +27,7 @@ IS
   SKRNPAR2=1 - использовать индивидуальный счет просрочки
   SKRNPAR3=1 - все проводки в одном референсе документа
 */
-   header_version_        VARCHAR2 (30)            := 'version 6.1 25/04/2012';
+   header_version_        VARCHAR2 (30)            := 'version 6.2 24/05/2017';
 
    skrnpar1_   NUMBER := 0;
    skrnpar2_   NUMBER := 0;
@@ -51,7 +51,7 @@ IS
    PROCEDURE p_tariff2 (n_sk_ NUMBER, dat11_ DATE, dat12_ DATE, bdate_ DATE);
 
    -- точка входа для автоматических операций по сейфам
-   PROCEDURE p_dep_skrn ( dat_    DATE, dat2_   DATE, n_sk_   NUMBER, mode_   NUMBER, par_    NUMBER DEFAULT NULL, p_userid NUMBER DEFAULT NULL, p_sum number default null);
+   PROCEDURE p_dep_skrn ( dat_    DATE, dat2_   DATE, n_sk_   NUMBER, mode_   NUMBER, par_    NUMBER DEFAULT NULL, p_userid NUMBER DEFAULT NULL, p_sum number default null, p_extnd varchar2 DEFAULT NULL);
 
    -- очистка відпрацьованих та незакритих 3600
    PROCEDURE p_cleanup (DUMMY NUMBER);
@@ -123,13 +123,14 @@ END skrn;
 CREATE OR REPLACE PACKAGE BODY BARS.SKRN 
 -- *******************************************************************************
 IS
-   version_   constant  varchar2(30)   := 'version 6.16 28/09/2016';
+   version_   constant  varchar2(30)   := 'version 6.15 24/05/2017';
    body_awk   constant  varchar2(512)  := ''
 		||'IND_ACC' ||chr(10)
 		||'M_AMORT' ||chr(10)
 		||'PRLNG' ||chr(10)
 		||'AMORT_NAZN' ||chr(10)
 		||'RENT' ||chr(10)
+		||'AUTO_PRLNG' ||chr(10)
 		||'FINAL_AMORT' ||chr(10)
 		||'UPB_PENALTY' ||chr(10)
 		||'FULL_AMORT' ||chr(10)
@@ -971,7 +972,8 @@ PROCEDURE p_tariff2 (n_sk_     NUMBER,
       n_sk_   NUMBER,
       mode_   NUMBER,
       par_    NUMBER DEFAULT NULL,
-	  p_userid NUMBER DEFAULT NULL
+	  p_userid NUMBER DEFAULT NULL,
+	  p_sum   NUMBER DEFAULT NULL
    )
    IS
 	  l_userid number;
@@ -982,6 +984,10 @@ PROCEDURE p_tariff2 (n_sk_     NUMBER,
 	  end if;
       -- cумма залога
       sz_ := NVL (skrnd_.sdoc, 0);
+
+	  if nvl(p_sum ,0) != 0
+	       then sz_ := nvl(p_sum ,0);
+	  end if;
 
       IF sz_ = 0
       THEN
@@ -1147,6 +1153,11 @@ PROCEDURE p_tariff2 (n_sk_     NUMBER,
          END IF;
       END IF;
 
+	  	  -- якщо вказаується сума застави(різниці) операції з ключом не проводимо.
+	  if nvl(p_sum ,0) != 0
+	       then return;
+	  end if;
+
       -- ДОКУМЕНТ 2 выдача ключа
       IF NVL (skrnpar3_, 0) = 0
       THEN
@@ -1253,7 +1264,8 @@ PROCEDURE p_tariff2 (n_sk_     NUMBER,
         SELECT tt, tt2, tt3, NAME, sk, NVL (vob, 6), NVL (vob2, 6),NVL (vob3, 6)
           INTO tt_, tt2_, tt3_, itemname_, sk_, vob_, vob2_,vob3_
           FROM skrynka_menu
-         WHERE item = decode(mode_, 12, 14, 13, 15, 14);
+         WHERE item = decode(mode_, 12, 14, 13, 15, 14)
+           and kf = sys_context('bars_context','user_mfo');
 
 		overdue_payment(trunc(sysdate), trunc(sysdate)+(skrnd_.dat_end-skrnd_.dat_begin), n_sk_, (case when mode_= 12 then 14 else 15 end), par_);
       END IF;
@@ -2219,7 +2231,8 @@ end overdue_payment;
       dat2_   DATE,
       n_sk_   NUMBER,
       mode_   NUMBER,
-      par_    NUMBER)
+      par_    NUMBER,
+	  p_extnd varchar2)
    IS
       tipt_     NUMBER;
       dpr_      NUMBER;
@@ -2382,6 +2395,9 @@ end overdue_payment;
 			INSERT into skrynka_nd_acc (acc,nd,tip)
 			values (nAcc,nSND,'D');
 
+			-- Номер угоди нової
+			skrnd_.ndoc := nvl(p_extnd, skrnd_.ndoc);
+
 			insert into skrynka_nd
 		     (nd,	sos, n_sk, ndoc, dat_begin, dat_end, custtype,
 			  fio, dokum, issued, adres,
@@ -2403,7 +2419,8 @@ end overdue_payment;
                       (SELECT s * 100
                          FROM skrynka_tip t, skrynka s
                         WHERE t.o_sk = s.o_sk AND s.n_sk = skrnd_.n_sk)
-             WHERE nd = nSND;
+             WHERE nd = nSND
+			 RETURNING  sdoc INTO  skrnd_.sdoc;
 
             UPDATE accounts
                SET mdate = dat2_
@@ -2448,6 +2465,16 @@ end overdue_payment;
         else
               p_dep_skrn (dat_, dat2_, n_sk_, 14, nSND);
 		end if;
+
+		-- Різниця заставної плати
+
+		If ostc2909_ <  skrnd_.sdoc then
+			If  mode_ = 18
+			   then  p_dep_skrn (dat_, dat2_, n_sk_, 10, nSND, null,  skrnd_.sdoc-ostc2909_);
+			   else  p_dep_skrn (dat_, dat2_, n_sk_, 11, nSND, null,  skrnd_.sdoc-ostc2909_);
+			end if;
+        end if;
+
     END IF;
    END;
 
@@ -3199,7 +3226,8 @@ end;
                           mode_      IN NUMBER,
                           par_       IN NUMBER DEFAULT NULL,
                           p_userid   IN NUMBER DEFAULT NULL,
-                          p_sum      IN NUMBER DEFAULT NULL)
+                          p_sum      IN NUMBER DEFAULT NULL,
+                          p_extnd    IN VARCHAR2 DEFAULT NULL)
     IS
         /*
         параметры:
@@ -3220,8 +3248,8 @@ end;
         14 - аренда
         15 - аренда (безнал.)
         ----15,16 - возврат ключа, выдача ключа
-        17 - пролонгация аренды ( с р.с. клиента )  NVV
-        18 - пролонгация аренды
+        17 - пролонгация аренды ( с р.с. клиента )  NVV extnd_ mandatory
+        18 - пролонгация аренды extnd_ mandatory
         19 - просрочка
         20 - test функции тарифов
         21 - оплата месячного тарифа (вводится начало - конец периода)
@@ -3250,13 +3278,15 @@ end;
 	      SELECT tt, tt2, tt3, NAME, sk, NVL (vob, 6), NVL (vob2, 6),NVL (vob3, 6)
 	        INTO tt_, tt2_, tt3_, itemname_, sk_, vob_, vob2_,vob3_
 	        FROM skrynka_menu
-	       WHERE item = 22;
+	       WHERE item = 22
+             and kf = sys_context('bars_context','user_mfo');
 		   tt_ := 'SN6';
 	  else
 		  SELECT tt, tt2, tt3, NAME, sk, NVL (vob, 6), NVL (vob2, 6),NVL (vob3, 6)
 	        INTO tt_, tt2_, tt3_, itemname_, sk_, vob_, vob2_,vob3_
 	        FROM skrynka_menu
-	       WHERE item = mode_;
+	       WHERE item = mode_
+             and kf = sys_context('bars_context','user_mfo');
 
 	  end if;
       -- обязательно обнулить SK для не кассовых операций
@@ -3462,7 +3492,7 @@ end;
          END IF;
       ELSIF mode_ = 10 OR mode_ = 11 OR mode_ = 12 OR mode_ = 13
       THEN
-         p_oper_zalog (dat_, dat2_, n_sk_, mode_, par_, p_userid);
+         p_oper_zalog (dat_, dat2_, n_sk_, mode_, par_, p_userid, p_sum);
       ELSIF mode_ = 14                                    -- внесение аренды
       THEN
          p_oper_arenda (dat_, dat2_, n_sk_, mode_, par_);
@@ -3471,13 +3501,13 @@ end;
          p_oper_arenda (dat_, dat2_, n_sk_, mode_, par_);
       ELSIF mode_ = 17                                 -- пролонгация аренды безнал
       THEN
-         p_oper_prolong (dat_, dat2_, n_sk_, mode_, par_);
+         p_oper_prolong (dat_, dat2_, n_sk_, mode_, par_,p_extnd);
       ELSIF mode_ = 18                                 -- пролонгация аренды
       THEN
-         p_oper_prolong (dat_, dat2_, n_sk_, mode_, par_);
+         p_oper_prolong (dat_, dat2_, n_sk_, mode_, par_,p_extnd);
       ELSIF mode_ = 19                                          -- просрочка
       THEN
-	     p_oper_prolong (dat_+1, dat_+1, n_sk_, 18, par_);
+	     p_oper_prolong (dat_+1, dat_+1, n_sk_, 18, par_,p_extnd);
       ELSIF mode_ = 20
       THEN
          p_tariff (skr_.o_sk, dat_, dat2_, bankdate_);
