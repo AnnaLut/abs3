@@ -23,6 +23,9 @@ delete from chklist_tts where tt='МГД';
 --------------------------------
 delete from folders_tts where tt='МГД';
 
-delete from tts where tt='МГД';
+--delete from tts where tt='МГД';
+
+-- удаление приводит к полному сканировнаию oper
+update tts set nlsm='XXXX' where tt='МГД';
 
 commit;

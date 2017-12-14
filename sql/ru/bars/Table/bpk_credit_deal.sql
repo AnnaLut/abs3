@@ -53,7 +53,7 @@ begin
  execute immediate '
   ALTER TABLE BARS.BPK_CREDIT_DEAL add ( KF varchar2(6) )';
 exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+  if  sqlcode=-1430  then null; else raise; end if;
  end;
 /
 
