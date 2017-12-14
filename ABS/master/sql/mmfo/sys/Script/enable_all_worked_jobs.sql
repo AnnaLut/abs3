@@ -1,5 +1,8 @@
 begin
-   for c in( select * from bars.tmp_all_enabled_jobs ) loop
+   for c in( select * from bars.tmp_all_enabled_jobs where job_name in ('IMPORT_DAY', 'IMPORT_MONTH') 
+              or job_name like 'CIG%'
+              or job_name like 'EAD%'
+              or job_name like 'CRM_UPLOAD%') loop
        if c.job_type = 'S' then
           dbms_scheduler.enable(name => c.job_name);
        else

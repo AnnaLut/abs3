@@ -1,5 +1,5 @@
 begin 
-   execute immediate 'drop trigger TAU_ACCOUNTS_NBU49'
+   execute immediate 'drop trigger TAU_ACCOUNTS_NBU49';
 exception when others then null;
 end;
 /
