@@ -31,7 +31,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.ovr IS    g_body_version   CONSTANT VARCHAR2
  15.11.2017 Transfer-2017  2067.01 => 2063.33 -- короткостроковў кредити в поточну дўяльнўсть
                            2069.04 => 2068.46 -- простроченў нарахованў доходи за короткостроковими кредитами в поточну дўяльнўсть
                            6111.05 => 6511.05 -- за супроводження кредитів, наданих юридичним особам та іншим суб`єктам підприємницької діяльності
-                           3579.91 => 3578.66 -- --прострочені нараховані доходи за кредитами овердрафт, що неотримані від суб"єктів господарювання	
+                           3579.91 => 3578.55 -- --прострочені нараховані доходи за кредитами овердрафт, що неотримані від суб"єктів господарювання	
 
 
  15/06/2009 Sta  Плавающая ставка в РУ ОБ
@@ -42,7 +42,19 @@ CREATE OR REPLACE PACKAGE BODY BARS.ovr IS    g_body_version   CONSTANT VARCHAR2
    SB_6020 SB_OB22%rowtype;
    SB_6111 SB_OB22%rowtype;
    SB_3579 SB_OB22%rowtype;
-   ------------------------
+--------------------------------
+  function Get_NLS_random  (p_R4 accounts.NBS%type ) return accounts.NLS%type   is   --получение № лиц.сч по случ.числам
+                            nTmp_ number ;            l_nls accounts.NLS%type ;
+  begin
+    While 1<2        loop nTmp_ := trunc ( dbms_random.value (1, 999999999 ) ) ;
+       begin select 1 into nTmp_ from accounts where nls like p_R4||'_'||nTmp_  ;
+       EXCEPTION WHEN NO_DATA_FOUND THEN EXIT ;
+       end;
+    end loop;         l_nls := vkrzn ( substr(gl.aMfo,1,5) , p_R4||'0'||nTmp_ );
+    RETURN l_Nls ;
+  end    Get_NLS_random ;
+----------------------------------
+
    PROCEDURE p_ovr8z (
       nmode_     INT,
       acc_2000   INT,
@@ -1531,7 +1543,7 @@ RETURN;
             --2.OVR-S3: Перенос на просрочку        (D-2067,K-2600,D-2069,K2607)
 
             -- перенос на просрочку задолженности по овердрафту
-            nbs3_ := SB_3579.R020 ;         -- для комиссии за однодневный овердрафт
+            nbs3_ := SB_3579.R020 ;   ---  проср. комиссия ( 3579/91 -> 3578/55 )
             naz_ := 'Перенесення заборгованностi овердрафта на просрочену';
 
             FOR k IN (SELECT a.nls, a.kv, SUBSTR (a.nms, 1, 38) nms, a.acc,
@@ -1552,8 +1564,8 @@ RETURN;
             LOOP
                SAVEPOINT do_provodki_2;
                nbs_  := ovr.f_nbs (k.acc, 2067);  -- пока неясен другой способ
-               nbs9_ := ovr.f_nbs (k.acc, 2069);         -- для нач процентов
-               nbs3_ := SB_3579.R020;                     -- для комиссии
+               nbs9_ := ovr.f_nbs (k.acc, 2069);  -- для нач процентов
+               nbs3_ := SB_3579.R020;             -- проср. комиссия ( 3579/91 -> 3578/55 ) 
 
                --Обнуление 9129
                BEGIN
@@ -1593,7 +1605,9 @@ RETURN;
 
                         IF ovr.ovr_par_val ('DO_3578') = 'TRUE' THEN
 
-                           nls_3579_ := nbs3_ || '0' || SUBSTR (NVL (f_newnls (k.acc, 'OV3579', ''),  k.nls ),  6,  9 );
+                           ---nls_3579_ := nbs3_ || '0' || SUBSTR (NVL (f_newnls (k.acc, 'OV3579', ''),  k.nls ),  6,  9 );
+                           nls_3579_ :=  OVR.Get_NLS_random (SB_3579.R020) ;  --получение № лиц.сч 3578/55 по случ.числам
+
                            nls_3579_ := vkrzn (SUBSTR (mfo5_, 1, 5), nls_3579_);
                            nms_3579_ := SUBSTR ('Просроч.комiс.за дог.овердрафту № ' || trim(k.ndoc),1,70  );
                            ret1_ := 0;
@@ -1939,7 +1953,7 @@ RETURN;
                      END;
 
 
-                     --- Перенос  3578 -> 3579                          
+                     --- Перенос нам проср:   3578/91 -> 3578/55                          
 
                      IF ovr.ovr_par_val ('DO_3578') = 'TRUE'  THEN
 
@@ -2278,7 +2292,8 @@ RETURN;
          ELSIF nmode_ = 12     ---  Перенос только %% на просрочку  ---
          THEN                  ----------------------------------------
 
-            nbs3_ := '3579';         -- для комиссии за однодневный овердрафт
+       -----nbs3_ := '3579';          
+            nbs3_ := SB_3579.R020 ;    -- проср.комиссия  (Новый План счетов:  3579/91 -> 3578/55 )
             naz_ := 'Перенесення только %  на просрочену';
 
 
@@ -2310,8 +2325,10 @@ RETURN;
 
                SAVEPOINT do_provodki_12;
                nbs_  := ovr.f_nbs (k.acc, 2067);  -- пока неясен другой способ
-               nbs9_ := ovr.f_nbs (k.acc, 2069);         -- для нач процентов
-               nbs3_ := '3579';                               -- для комиссии
+               nbs9_ := ovr.f_nbs (k.acc, 2069);  -- для нач процентов
+
+            ---nbs3_ := '3579';                  
+               nbs3_ := SB_3579.R020 ;   -- проср.комиссия  (Новый План счетов:  3579/91 -> 3578/55 )
 
 
                Begin --- Проставляем OB22 уже открытым 2607,9129:
@@ -2331,12 +2348,15 @@ RETURN;
      
 
                If nvl(k.acc_8000,0) > 0 then              
-                  Begin SELECT ACRA  INTO   acc_3578_  FROM   Int_Accn   WHERE  ACC = k.acc_8000         and ID  = 0 ;   ---             ---  3578/36
-                        Accreg.setAccountSParam(acc_3578_ , 'OB22', '36') ;
-                        Begin Select ACC into acc_3579_  From   Accounts       Where  NBS='3579'and NMS like 'Просроч%комiс%за%овердрафт%' and RNK in (Select RNK from Accounts where ACC=k.acc);    ---  3579/91
-                              Accreg.setAccountSParam(acc_3579_ , 'OB22', SB_3579.ob22) ;
-                        Exception when OTHERS then   null;
-                        End;
+                  Begin 
+                      SELECT ACRA  INTO   acc_3578_  FROM   Int_Accn   WHERE  ACC = k.acc_8000 and ID  = 0 ;  ---  3578/36
+                      Accreg.setAccountSParam(acc_3578_ , 'OB22', '36') ;
+                      Begin 
+                        Select ACC into acc_3579_  From  Accounts  Where  NBS=SB_3579.R020 and NMS like 'Просроч%комiс%за%овердрафт%' and RNK in (Select RNK from Accounts where ACC=k.acc);  --- 3678/55 (было 3579/91)
+                        Accreg.setAccountSParam(acc_3579_ , 'OB22', SB_3579.ob22) ;
+                      Exception when OTHERS then 
+                        null;
+                      End;
                   Exception when OTHERS then      null;
                   End;
                End if;
@@ -2465,9 +2485,10 @@ RETURN;
                         UPDATE accounts       SET sec = k.sec,        blkd = 0,    mdate = k.mdate,      nms = nms_2069_,      dazs = NULL    WHERE acc = acc_2069_;
                         Accreg.setAccountSParam(acc_2069_, 'OB22', sb_2069.ob22 ) ;
                         if a_grp_ > 0 then       SEC.addAgrp(acc_2069_, a_grp_);    end if;
------------------------------------------
-                        IF ovr.ovr_par_val ('DO_3578') = 'TRUE'           THEN
-                           nls_3579_ :=  nbs3_ || '0' || SUBSTR (NVL (f_newnls (k.acc, 'OV3579', ''),   k.nls   ),  6,  9      );
+
+                        IF ovr.ovr_par_val ('DO_3578') = 'TRUE'  THEN
+                           ---nls_3579_ :=  nbs3_ || '0' || SUBSTR (NVL (f_newnls (k.acc, 'OV3579', ''),   k.nls   ),  6,  9      );
+                           nls_3579_ :=  OVR.Get_NLS_random (SB_3579.R020) ;  --получение № лиц.сч 3578/55 по случ.числам
                            nls_3579_ :=  vkrzn (SUBSTR (mfo5_, 1, 5), nls_3579_);
                            nms_3579_ :=  SUBSTR  ('Просроч.комiс.за дог.овердрафту № ' ||trim(k.ndoc),    1,38    );
                            ret1_ := 0;
@@ -2495,6 +2516,10 @@ RETURN;
                                   dazs = NULL,
                                   TOBO=k.tobo
                            WHERE acc = acc_3579_;
+
+
+                           Accreg.setAccountSParam( acc_3579_, 'OB22', SB_3579.ob22 ) ;
+
 
                            if a_grp_ > 0 then
                               SEC.addAgrp(acc_3579_, a_grp_);
@@ -3264,7 +3289,7 @@ RETURN;
                      Begin
                        Select ACC into acc_3579_
                        From   Accounts 
-                       Where  NBS='3579'
+                       Where  NBS = SB_3579.R020
                           and NMS like 'Просроч%комiс%за%овердрафт%'
                           and RNK = k.rnk 
                           and rownum = 1; 
