@@ -601,7 +601,8 @@ AS
           JOIN escr_reg_status est ON rez.credit_status_id = est.id;
 
 
-GRANT SELECT ON BARS.VW_ESCR_REG_HEADER TO BARSREADER_ROLE;
+
+
 
 GRANT SELECT ON BARS.VW_ESCR_REG_HEADER TO BARS_ACCESS_DEFROLE;
 
