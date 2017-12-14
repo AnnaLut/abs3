@@ -23,5 +23,6 @@ namespace BarsWeb.Areas.Escr.Models
         public string CC_ID { get; set; }
         public string ID_B { get; set; }
         public string TXT { get; set; }
+        public bool DATE_CHECK { get; set; }
     }
 }

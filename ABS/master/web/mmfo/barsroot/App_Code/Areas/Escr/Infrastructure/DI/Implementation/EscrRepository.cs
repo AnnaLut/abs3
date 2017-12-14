@@ -1,4 +1,4 @@
-﻿using BarsWeb.Areas.Escr.Infrastructure.DI.Abstract;
+using BarsWeb.Areas.Escr.Infrastructure.DI.Abstract;
 using BarsWeb.Areas.Escr.Models;
 using System.Linq;
 using System;
@@ -19,8 +19,8 @@ using Newtonsoft.Json;
 using System.Xml;
 using System.Globalization;
 using barsroot.core;
-
-
+using System.Security.Cryptography.X509Certificates;
+using System.Net.Security;
 namespace BarsWeb.Areas.Escr.Infrastructure.DI.Implementation
 {
     public class EscrRepository : IEscrRepository
@@ -36,7 +36,15 @@ namespace BarsWeb.Areas.Escr.Infrastructure.DI.Implementation
             _dbLogger = DbLoggerConstruct.NewDbLogger();
         }
 
-        private void LoginUser(String userName, OracleCommand cmd)
+        enum TypeQuery: byte
+        {
+            /// <summary>Оплата проводок</summary>
+            Pay = 1,
+            /// <summary>Видалення проводок</summary>
+            Delete = 2
+        }
+
+        private void LoginUser(String userName, OracleCommand cmd) 
         {
             // информация о текущем пользователе
             UserMap userMap = Bars.Configuration.ConfigurationSettings.GetUserInfo(userName);
@@ -61,8 +69,8 @@ namespace BarsWeb.Areas.Escr.Infrastructure.DI.Implementation
         {
             OracleConnection connection = OraConnector.Handler.UserConnection;
             OracleCommand cmd = connection.CreateCommand();
-            // CultureInfo cinfo = CultureInfo.CreateSpecificCulture("en-GB");
-
+           // CultureInfo cinfo = CultureInfo.CreateSpecificCulture("en-GB");
+            
             if (!String.IsNullOrEmpty(dateFrom) && !String.IsNullOrEmpty(dateTo) && !String.IsNullOrEmpty(type.ToString()) && !String.IsNullOrEmpty(kind.ToString()))
             {
                 try
@@ -78,7 +86,7 @@ namespace BarsWeb.Areas.Escr.Infrastructure.DI.Implementation
                 catch (Exception e)
                 {
                     _dbLogger.Error("ESCR.ERROR p_check_before_create:[ " + e.Message + ": " + e.StackTrace + " ]");
-                    throw e;
+                        throw e;
 
                 }
             }
@@ -95,16 +103,16 @@ namespace BarsWeb.Areas.Escr.Infrastructure.DI.Implementation
                 //      " and (to_date(t.avr_date,'dd.mm.yyyy') >= to_date('" + dateFrom + "','dd.mm.yyyy')" +
                 //      " and to_date(t.avr_date,'dd.mm.yyyy') <= to_date('" + dateTo + "','dd.mm.yyyy') or  t.avr_date is null)";
 
-                sql += "  AND ((to_date(t.doc_date, 'dd.mm.yyyy') >" +
-                       " to_date(t.avr_date, 'dd.mm.yyyy') AND" +
-                       " to_date(t.doc_date, 'dd.mm.yyyy') BETWEEN" +
-                       " to_date('" + dateFrom + "','dd.mm.yyyy') AND" +
-                       " to_date('" + dateTo + "','dd.mm.yyyy'))" +
-                       " OR (to_date(t.doc_date, 'dd.mm.yyyy') <=" +
-                       " to_date(t.avr_date, 'dd.mm.yyyy') AND " +
-                       "  to_date(t.avr_date, 'dd.mm.yyyy') BETWEEN " +
-                       " to_date('" + dateFrom + "','dd.mm.yyyy')AND" +
-                       " to_date('" + dateTo + "','dd.mm.yyyy')))";
+                        sql += "  AND ((to_date(t.doc_date, 'dd.mm.yyyy') >"+
+                               " to_date(t.avr_date, 'dd.mm.yyyy') AND"+
+                               " to_date(t.doc_date, 'dd.mm.yyyy') BETWEEN"+
+                               " to_date('" + dateFrom + "','dd.mm.yyyy') AND" +
+                               " to_date('" + dateTo + "','dd.mm.yyyy'))" +
+                               " OR (to_date(t.doc_date, 'dd.mm.yyyy') <="+
+                               " to_date(t.avr_date, 'dd.mm.yyyy') AND "+
+                               "  to_date(t.avr_date, 'dd.mm.yyyy') BETWEEN "+
+                               " to_date('" + dateFrom + "','dd.mm.yyyy')AND" +
+                               " to_date('" + dateTo + "','dd.mm.yyyy')))";
 
             }
             if (!String.IsNullOrEmpty(type))
@@ -128,7 +136,7 @@ namespace BarsWeb.Areas.Escr.Infrastructure.DI.Implementation
                 //cmd.Parameters.Add("p_date_to", OracleDbType.Date, Convert.ToDateTime(dateTo, ci), System.Data.ParameterDirection.Input);
 
                 OracleDataReader reader = cmd.ExecuteReader();
-
+                
                 while (reader.Read())
                 {
                     EscrRegisterMain r = new EscrRegisterMain();
@@ -157,7 +165,7 @@ namespace BarsWeb.Areas.Escr.Infrastructure.DI.Implementation
                     r.CREDIT_STATUS_CODE = String.IsNullOrEmpty(reader.GetValue(22).ToString()) ? String.Empty : reader.GetString(22);
                     r.CREDIT_COMMENT = String.IsNullOrEmpty(reader.GetValue(23).ToString()) ? String.Empty : reader.GetString(23);
                     r.STATE_FOR_UI = String.IsNullOrEmpty(reader.GetValue(24).ToString()) ? String.Empty : reader.GetString(24);
-                    r.NLS = reader.GetValue(26).ToString();
+
                     r.GOOD_COST = String.IsNullOrEmpty(reader.GetValue(25).ToString()) ? (decimal?)null : Convert.ToDecimal(reader.GetValue(25), cinfo);
                     r.ACC = Convert.ToDecimal(reader.GetValue(27).ToString());
                     r.DOC_DATE = String.IsNullOrEmpty(reader.GetValue(28).ToString()) ? (DateTime?)null : Convert.ToDateTime(reader.GetValue(28).ToString(), ci);
@@ -179,7 +187,7 @@ namespace BarsWeb.Areas.Escr.Infrastructure.DI.Implementation
                     r.NEW_COMP_SUM = String.IsNullOrEmpty(reader.GetValue(44).ToString()) ? (decimal?)null : Convert.ToDecimal(reader.GetValue(44).ToString(), cinfo);
                     r.NEW_GOOD_COST = String.IsNullOrEmpty(reader.GetValue(45).ToString()) ? (decimal?)null : Convert.ToDecimal(reader.GetValue(45).ToString(), cinfo);
                     r.AVR_DATE = String.IsNullOrEmpty(reader.GetValue(50).ToString()) ? (DateTime?)null : Convert.ToDateTime(reader.GetValue(50).ToString(), ci);
-
+                   
                     register.Add(r);
                 }
             }
@@ -308,7 +316,7 @@ namespace BarsWeb.Areas.Escr.Infrastructure.DI.Implementation
                 cmd.Parameters.Add(new OracleParameter("in_reg_kind", OracleDbType.Varchar2, param.kind, System.Data.ParameterDirection.Input));
                 cmd.Parameters.Add(new OracleParameter("in_reg_level", OracleDbType.Decimal, 0, System.Data.ParameterDirection.Input));
                 cmd.Parameters.Add(new OracleParameter("in_oper_type", OracleDbType.Decimal, 0, System.Data.ParameterDirection.Input));
-
+                
                 OracleParameter dealListParam = new OracleParameter("in_obj_list", OracleDbType.Array, di.Length, di, System.Data.ParameterDirection.Input);
                 dealListParam.UdtTypeName = "BARS.NUMBER_LIST";
                 cmd.Parameters.Add(dealListParam);
@@ -317,17 +325,17 @@ namespace BarsWeb.Areas.Escr.Infrastructure.DI.Implementation
                 cmd.ExecuteNonQuery();
                 reg_id = Convert.ToDecimal(cmd.Parameters["out_reg_id"].Value.ToString());
 
-
+              
             }
 
             catch (OracleException e)
             {
 
-                _dbLogger.Error("ESCR.ERROR p_reg_create:[ " + e.Message + ": " + e.StackTrace + " ]");
-                throw e;
+                 _dbLogger.Error("ESCR.ERROR p_reg_create:[ " + e.Message + ": " + e.StackTrace + " ]");
+                  throw e;
 
             }
-
+               
             finally
             {
                 cmd.Dispose();
@@ -360,7 +368,7 @@ namespace BarsWeb.Areas.Escr.Infrastructure.DI.Implementation
             {
                 cmd.CommandType = System.Data.CommandType.Text;
                 cmd.CommandText = sql;
-
+                
                 OracleDataReader reader = cmd.ExecuteReader();
 
                 while (reader.Read())
@@ -447,7 +455,7 @@ namespace BarsWeb.Areas.Escr.Infrastructure.DI.Implementation
                     r.GOOD_COST = String.IsNullOrEmpty(readerDeals.GetValue(25).ToString()) ? (decimal?)null : Convert.ToDecimal(readerDeals.GetValue(25).ToString(), cinfo);
                     r.NLS = readerDeals.GetString(26);
                     r.ACC = String.IsNullOrEmpty(readerDeals.GetValue(27).ToString()) ? (decimal?)null : readerDeals.GetDecimal(27);
-                    r.DOC_DATE = String.IsNullOrEmpty(readerDeals.GetValue(28).ToString()) ? (DateTime?)null : Convert.ToDateTime(readerDeals.GetValue(28).ToString(), ci);
+                    r.DOC_DATE = String.IsNullOrEmpty(readerDeals.GetValue(28).ToString()) ? (DateTime?)null : Convert.ToDateTime(readerDeals.GetValue(28).ToString(),ci);
                     r.MONEY_DATE = String.IsNullOrEmpty(readerDeals.GetValue(29).ToString()) ? String.Empty : readerDeals.GetString(29);
                     r.COMP_SUM = String.IsNullOrEmpty(readerDeals.GetValue(30).ToString()) ? (decimal?)null : readerDeals.GetDecimal(30);
                     r.VALID_STATUS = String.IsNullOrEmpty(readerDeals.GetValue(31).ToString()) ? (decimal?)null : readerDeals.GetDecimal(31);
@@ -483,7 +491,7 @@ namespace BarsWeb.Areas.Escr.Infrastructure.DI.Implementation
         {
             OracleConnection connection = OraConnector.Handler.UserConnection;
             OracleCommand cmd = connection.CreateCommand();
-            // CultureInfo ci = CultureInfo.CreateSpecificCulture("en-GB");
+          // CultureInfo ci = CultureInfo.CreateSpecificCulture("en-GB");
             List<EscrParam> outRegister = new List<EscrParam>();
             var result = "";
             try
@@ -597,9 +605,9 @@ namespace BarsWeb.Areas.Escr.Infrastructure.DI.Implementation
                     param.deals = deals;
                     outRegister.Add(param);
                 }
-
+                
                 result = Send(outRegister, "POST", "createregister/create", cmd);
-
+             
                 if (result == "\"Ok\"")
                 {
                     cmd.CommandType = System.Data.CommandType.StoredProcedure;
@@ -615,13 +623,12 @@ namespace BarsWeb.Areas.Escr.Infrastructure.DI.Implementation
                     }
 
                 }
-            }
-            catch (Exception ex)
-            {
+}
+            catch (Exception ex) {
                 _dbLogger.Info("ESCR.ERROR SendRegister:" + ex.Message + System.Environment.NewLine + ex.StackTrace);
                 _dbLogger.Exception(ex);
 
-            }
+             }
             finally
             {
                 cmd.Dispose();
@@ -631,7 +638,7 @@ namespace BarsWeb.Areas.Escr.Infrastructure.DI.Implementation
             return result;
         }
 
-        public void SetComment(decimal deal_id, string comment, string state_code, decimal object_type, decimal obj_check, OracleCommand cmd)
+        public void SetComment(decimal deal_id, string comment, string state_code, decimal object_type, decimal obj_check, OracleCommand cmd) 
         {
             /*OracleConnection connection = OraConnector.Handler.UserConnection;
             OracleCommand cmd = connection.CreateCommand();*/
@@ -692,8 +699,8 @@ namespace BarsWeb.Areas.Escr.Infrastructure.DI.Implementation
 
         public void SetNdTxt(decimal deal_id, string tag, string value, OracleCommand cmd)
         {
-            // OracleConnection connection = OraConnector.Handler.UserConnection;
-            // OracleCommand cmd = connection.CreateCommand();
+           // OracleConnection connection = OraConnector.Handler.UserConnection;
+           // OracleCommand cmd = connection.CreateCommand();
             try
             {
                 cmd.CommandType = System.Data.CommandType.StoredProcedure;
@@ -704,7 +711,7 @@ namespace BarsWeb.Areas.Escr.Infrastructure.DI.Implementation
                 cmd.Parameters.Add(new OracleParameter("p_txt", OracleDbType.Varchar2, value, System.Data.ParameterDirection.Input));
                 cmd.ExecuteNonQuery();
             }
-
+            
             finally
             {
                 //cmd.Dispose();
@@ -713,7 +720,7 @@ namespace BarsWeb.Areas.Escr.Infrastructure.DI.Implementation
             }
         }
 
-        public void SetCreditState(decimal deal_id, string state_code)
+        public void SetCreditState(decimal deal_id, string state_code) 
         {
             OracleConnection connection = OraConnector.Handler.UserConnection;
             OracleCommand cmd = connection.CreateCommand();
@@ -785,7 +792,7 @@ namespace BarsWeb.Areas.Escr.Infrastructure.DI.Implementation
         {
             OracleConnection connection = OraConnector.Handler.UserConnection;
             OracleCommand cmd = connection.CreateCommand();
-            decimal[] diNn = registers.ToArray();
+            decimal[]  diNn = registers.ToArray();
             decimal?[] reg = diNn.Cast<decimal?>().ToArray();
             try
             {
@@ -815,7 +822,7 @@ namespace BarsWeb.Areas.Escr.Infrastructure.DI.Implementation
 
         public void DelDealRegister(List<decimal> deals, OracleCommand cmd)
         {
-            decimal[] diNn = deals.ToArray();
+            decimal[] diNn =   deals.ToArray();
             decimal?[] deal = diNn.Cast<decimal?>().ToArray();
 
             try
@@ -892,7 +899,7 @@ namespace BarsWeb.Areas.Escr.Infrastructure.DI.Implementation
                             errDeals.Add(item.deal_id);
                             DelDealRegister(errDeals, cmd);
                         }
-                        if (item.state_id == 7 || item.state_id == 11 || item.state_id == 3)
+                        if (item.state_id == 7 || item.state_id == 11||item.state_id == 3)
                         {
                             cmd.CommandType = System.Data.CommandType.Text;
                             cmd.CommandText = "select reg_id from vw_escr_reg_header where deal_id = :p_deal_id";
@@ -935,7 +942,7 @@ namespace BarsWeb.Areas.Escr.Infrastructure.DI.Implementation
             }
         }
 
-
+       
         public void SetNewSum(decimal? deal_id, decimal? new_good_cost, decimal? new_deal_sum, decimal? new_comp_sum, OracleCommand cmd)
         {
             //OracleConnection connection = OraConnector.Handler.UserConnection;
@@ -952,8 +959,8 @@ namespace BarsWeb.Areas.Escr.Infrastructure.DI.Implementation
             }
             finally
             {
-                // cmd.Dispose();
-                // connection.Dispose();
+               // cmd.Dispose();
+               // connection.Dispose();
                 //connection.Close();
             }
         }
@@ -1009,8 +1016,8 @@ namespace BarsWeb.Areas.Escr.Infrastructure.DI.Implementation
 
                 }
                 var password = passwdUser;//Hash(passwdUser);
-                                          // var password = "89a88dcfe1061a8e5fef3a79f5b130941629fea1";
-                                          //password = password.Replace("-", "").ToLower();
+               // var password = "89a88dcfe1061a8e5fef3a79f5b130941629fea1";
+               //password = password.Replace("-", "").ToLower();
 
                 byte[] passByte = Encoding.UTF8.GetBytes(loginUser + ":" + password);
                 password = Convert.ToBase64String(passByte);
@@ -1031,15 +1038,30 @@ namespace BarsWeb.Areas.Escr.Infrastructure.DI.Implementation
                     connection.Close();*/
                 }
 
+                ServicePointManager.ServerCertificateValidationCallback =
+                delegate(object s, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
+                {
+                    return true;
+                };
                 var request = (HttpWebRequest)WebRequest.Create(serviceUrl);
                 request.Method = method;
                 request.ContentType = "application/json";
                 request.ContentLength = arrStream.Length;
                 request.Headers.Add("Authorization", "Hashpassword " + password);
+               
                 Stream dataStream = request.GetRequestStream();
                 dataStream.Write(arrStream, 0, arrStream.Length);
                 dataStream.Close();
-                response = (HttpWebResponse)request.GetResponse();
+				try
+				{
+                	response = (HttpWebResponse)request.GetResponse();
+				}
+				catch (System.Net.WebException wex)
+				{
+				    var pageContent = new StreamReader(wex.Response.GetResponseStream()).ReadToEnd();
+					_dbLogger.Error("ESCR.ERROR Send: WebException: " + pageContent);
+					return result;
+				}
                 WebHeaderCollection header = response.Headers;
                 //var encoding = ASCIIEncoding.UTF8;
                 using (var rdr = new StreamReader(response.GetResponseStream()/*, encoding*/))
@@ -1049,7 +1071,9 @@ namespace BarsWeb.Areas.Escr.Infrastructure.DI.Implementation
             }
             catch (Exception e)
             {
-                result = e.Message + " InnerException: " + e.InnerException + " Stack: " + e.StackTrace;
+               // result = e.Message + " InnerException: " + e.InnerException + " Stack: " + e.StackTrace;
+                _dbLogger.Error("ESCR.ERROR Send:[ " + e.Message + ": " + e.StackTrace + " ]");
+                _dbLogger.Exception(e);
             }
 
             return result;
@@ -1123,7 +1147,6 @@ namespace BarsWeb.Areas.Escr.Infrastructure.DI.Implementation
                 return BitConverter.ToString(sha1.ComputeHash(Encoding.UTF8.GetBytes(stringToHash)));
             }
         }
-
         public IQueryable<EscrRefList> GetRefList()
         {
             OracleConnection connection = OraConnector.Handler.UserConnection;
@@ -1131,8 +1154,7 @@ namespace BarsWeb.Areas.Escr.Infrastructure.DI.Implementation
             List<EscrRefList> ref_list = new List<EscrRefList>();
             try
             {
-                cmd.CommandType = System.Data.CommandType.Text;
-                cmd.CommandText = "select TT,REF,NLSB,OSTC,NAZN,S,ACC,ND,SDATE,CC_ID,ID_B,TXT from VW_ESCR_REF_FOR_COMPENSATION";
+                cmd.CommandText = "select TT,REF,NLSB,OSTC,NAZN,S,ACC,ND,SDATE,CC_ID,ID_B,TXT,DATE_CHECK from VW_ESCR_REF_FOR_COMPENSATION";
 
                 OracleDataReader reader = cmd.ExecuteReader();
 
@@ -1151,6 +1173,8 @@ namespace BarsWeb.Areas.Escr.Infrastructure.DI.Implementation
                     r.CC_ID = String.IsNullOrEmpty(reader.GetValue(9).ToString()) ? String.Empty : reader.GetString(9);
                     r.ID_B = String.IsNullOrEmpty(reader.GetValue(10).ToString()) ? String.Empty : reader.GetString(10);
                     r.TXT = String.IsNullOrEmpty(reader.GetValue(11).ToString()) ? String.Empty : reader.GetString(11);
+                    byte? date_check_from_db = String.IsNullOrEmpty(reader.GetValue(12).ToString()) ? (byte?)null : reader.GetByte(12);
+                    r.DATE_CHECK = date_check_from_db.HasValue && date_check_from_db == 1;
                     ref_list.Add(r);
                 }
             }
@@ -1164,20 +1188,123 @@ namespace BarsWeb.Areas.Escr.Infrastructure.DI.Implementation
 
         }
 
-        public void RepaymentAll(List<decimal> all_list)
+        public void PayOrDelete(List<decimal> all_list, byte type)
         {
             OracleConnection connection = OraConnector.Handler.UserConnection;
             OracleCommand cmd = connection.CreateCommand();
             cmd.CommandType = System.Data.CommandType.StoredProcedure;
-            cmd.CommandText = @"escr.oplv";
+            cmd.Parameters.Clear();
+            decimal? id;
             try
-            { 
+            {
+                cmd.CommandText = @"escr.p_log_header_set";
+                cmd.Parameters.Add(new OracleParameter("id_log", OracleDbType.Decimal, System.Data.ParameterDirection.Output));
+     
+                cmd.ExecuteNonQuery();
+                id = cmd.Parameters["id_log"].Value.ToString() == "null" ? (decimal?)null : Convert.ToDecimal(cmd.Parameters["id_log"].Value.ToString());
+
+                cmd.CommandText = type == (byte)TypeQuery.Pay ? @"escr.oplv" : @"escr.p_ref_del";
+            
                 foreach (decimal row in all_list)
                 {
                     cmd.Parameters.Clear();
                     cmd.Parameters.Add("p_ref", OracleDbType.Decimal, row, System.Data.ParameterDirection.Input);
+                    cmd.Parameters.Add("id_log", OracleDbType.Decimal, id, System.Data.ParameterDirection.Input);
                     cmd.ExecuteNonQuery();
                 }
+            }
+            finally
+            {
+                cmd.Dispose();
+                connection.Dispose();
+                connection.Close();
+            }
+        }
+
+        public IQueryable<EscrJournal> GetJournalList()
+        {
+            OracleConnection connection = OraConnector.Handler.UserConnection;
+            OracleCommand cmd = connection.CreateCommand();
+            List<EscrJournal> journal_list = new List<EscrJournal>();
+            try
+            {
+                cmd.CommandText = @"select id ,-- порядковий номер журналу
+                                   total_deal_count,--загальна к-сть кредитів для зарахування
+                                   succes_deal_count,-- к-сть успішних оплат
+                                   error_deal_count, -- к-сть КД з помилками при зарахуванні
+                                   oper_date,-- дата виконання заражування
+                                   kf -- не виводити в грід
+                            from escr_pay_log_header";
+
+                OracleDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    EscrJournal r = new EscrJournal();
+                    r.ID = reader.GetDecimal(0);
+                    r.TOTAL_DEAL_COUNT = String.IsNullOrEmpty(reader.GetValue(1).ToString()) ? (decimal?)null : reader.GetDecimal(1);
+                    r.SUCCESS_DEAL_COUNT = String.IsNullOrEmpty(reader.GetValue(2).ToString()) ? (decimal?)null : reader.GetDecimal(2);
+                    r.ERROR_DEAL_COUNT = String.IsNullOrEmpty(reader.GetValue(3).ToString()) ? (decimal?)null : reader.GetDecimal(3);
+                    r.OPER_DATE = String.IsNullOrEmpty(reader.GetValue(4).ToString()) ? (DateTime?)null : reader.GetDateTime(4);
+                    r.KF = String.IsNullOrEmpty(reader.GetValue(5).ToString()) ? String.Empty : reader.GetString(5);
+                    journal_list.Add(r);
+                }
+            }
+            finally
+            {
+                cmd.Dispose();
+                connection.Dispose();
+                connection.Close();
+            }
+            return journal_list.AsQueryable();
+
+        }
+
+        public IQueryable<EscrJournalDetail> GetJournalDetail(decimal id)
+        {
+            OracleConnection connection = OraConnector.Handler.UserConnection;
+            OracleCommand cmd = connection.CreateCommand();
+            List<EscrJournalDetail> detail_list = new List<EscrJournalDetail>();
+            try
+            {
+                cmd.CommandText = @"select id_log, deal_id, err_code, err_desc, comments 
+                            from VW_escr_pay_log_body
+                            where id_log = :id";
+                cmd.Parameters.Add(new OracleParameter("id", OracleDbType.Decimal, id, System.Data.ParameterDirection.Input));
+                OracleDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    EscrJournalDetail r = new EscrJournalDetail();
+                    r.ID_LOG = id;
+                    r.DEAL_ID = String.IsNullOrEmpty(reader.GetValue(1).ToString()) ? (decimal?)null : reader.GetDecimal(1);
+                    r.ERR_CODE = String.IsNullOrEmpty(reader.GetValue(2).ToString()) ? (decimal?)null : reader.GetDecimal(2);
+                    r.ERR_DESC = String.IsNullOrEmpty(reader.GetValue(3).ToString()) ? String.Empty : reader.GetString(3);
+                    r.COMMENTS = String.IsNullOrEmpty(reader.GetValue(4).ToString()) ? String.Empty : reader.GetString(4);
+                    detail_list.Add(r);
+                }
+            }
+            finally
+            {
+                cmd.Dispose();
+                connection.Dispose();
+                connection.Close();
+            }
+            return detail_list.AsQueryable();
+
+        }
+
+        public void RestoreGLK(decimal id)
+        {
+            OracleConnection connection = OraConnector.Handler.UserConnection;
+            OracleCommand cmd = connection.CreateCommand();
+            try
+            {
+                cmd.Parameters.Clear();
+                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                cmd.CommandText = @"escr.p_cc_lim_repair";
+                cmd.Parameters.Add(new OracleParameter("id_log", OracleDbType.Decimal, id, System.Data.ParameterDirection.Input));
+                cmd.ExecuteNonQuery();
             }
             finally
             {

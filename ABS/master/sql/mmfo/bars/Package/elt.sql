@@ -1026,7 +1026,7 @@ begin
     l_nbs6:='6510';
    else
     l_nbs6:='6110';
-   end if; 
+   end if;
    c:=DBMS_SQL.OPEN_CURSOR; --открыть курсор
 
    FOR d in (SELECT e.NLS6, e.NAME, NVL(e.NDS,pNDS_ ) NDS,
@@ -1216,12 +1216,12 @@ end;
   end;
 
   if l_MFOP ='300465' or l_MFO='300465' then null;       -- тимчасово  28/10-15
-     l_ob22:=d.ob22_6110; 
+     l_ob22:=d.ob22_6110;
        if newnbs.g_state= 1 then  --переход на новый план счетов
         l_nbs6:='6510';
        else
         l_nbs6:='6110';
-       end if; 
+       end if;
   end if;
 
   l_ob22_6:= null;
@@ -1799,10 +1799,10 @@ end;
  TXT_:= TXT_||' аванс за надання ел.послуг в '|| MES_ ;
 
     logger.trace('ELT.BORG 0 '|| MODE_||' '||DAT1_||' '||NLS36_||' '||PAKET_ );
- 
+
   descrname_:='ELT3579';
-  if Variant_ = 0 then descrname_:='ELT3578'; end if;   
-  
+  if Variant_ = 0 then descrname_:='ELT3578'; end if;
+
   begin
   SELECT UPPER(nvl(masknms,NULL))
     INTO suf_ FROM nlsmask WHERE UPPER(maskid)=UPPER(descrname_);
@@ -1952,8 +1952,8 @@ for k in (SELECT d.ND, d.CC_ID, d.SDATE, c.OKPO,
       if S_ >0 then
 -------
     if k.nls8 is NULL then     -- 5
-    if newnbs.g_state= 1 then  --переход на новый план счетов       
-    
+    if newnbs.g_state= 1 then  --переход на новый план счетов
+
      select substr(F_NEWNMS(NULL,descrname_,NULL,k.rnk,NULL),1,70) into nms8p_  from dual;
         if suf_ is NULL then nms8_:=nms8p_; end if;
           nls8_ := Get_NLS_random  ( '3570'  ) ;  --получение № лиц.сч по случ.числам
@@ -1963,19 +1963,15 @@ for k in (SELECT d.ND, d.CC_ID, d.SDATE, c.OKPO,
           r013f:='1'; s180f:=NULL; s240f:=NULL;
 
           if l_mfop = '300465' or l_MFO='300465' then     -- Ощадбанк
-            if newnbs.g_state= 1 then  --переход на новый план счетов
-             r013f:='1'; s180f:='1'; s240f:='1';  ob22f:='24';
-            else
-             r013f:='1'; s180f:='1'; s240f:='1';  ob22f:='44';
-            end if; 
+             r013f:='1'; s180f:='1'; s240f:='1';  ob22f:='38';
           end if;
 
           if l_mfo = '380764' then     -- НАДРА
              r013f:='1'; s180f:='1'; s240f:='1';  ob22f:='74';
-          end if;               
+          end if;
           Accreg.setAccountSParam(acc8_, 'R013', r013f);
           Accreg.setAccountSParam(acc8_, 'S180', s180f);
-          Accreg.setAccountSParam(acc8_, 'S240', s240f);    
+          Accreg.setAccountSParam(acc8_, 'S240', s240f);
 
           if l_mfo = '380764'
           then      -- НАДРА
@@ -2051,7 +2047,7 @@ for k in (SELECT d.ND, d.CC_ID, d.SDATE, c.OKPO,
       EXCEPTION
         WHEN NO_DATA_FOUND THEN    pnt:=71;
 
-          OP_REG(9,0,0,0,tmp_,k.rnk,nls8_,n980_, nms8_,'ODB',k.isp,acc8_);
+          OP_REG(9,0,0,0,tmp_,k.rnk,nls8_,n980_, nms8_,'OFR',k.isp,acc8_);
 
           p_setAccessByAccMask(acc8_,k.acc);
 
@@ -2119,7 +2115,7 @@ for k in (SELECT d.ND, d.CC_ID, d.SDATE, c.OKPO,
           end if;
 
       END;
-     end if;    
+     end if;
       update E_DEAL set NLS_D=nls8_ where nd=k.nd;
 
     else
@@ -2716,7 +2712,7 @@ BEGIN
 
     descrname_:='ELT3579';
     if Variant_s = '0' then descrname_:='ELT3578'; end if;
-  
+
      Variant_ :=0;
   if Variant_s = '1' then
      Variant_:=1;

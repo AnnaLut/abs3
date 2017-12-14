@@ -4,7 +4,7 @@ CREATE OR REPLACE PACKAGE ESCR IS
   Бизнес-логика модуля Кредиты ФЛ на энергосбережение , слоган КОТЛЫ
   http://svn.unity-bars.com.ua:8080/svn/Products/ABSBars/Sql/_OLD/Modules/ESCR
   */
-  G_HEADER_VERSION CONSTANT VARCHAR2(64) := 'ver.4.0.2 23/11/2017 Кредиты ФЛ на энергосбереж, <<КОТЛЫ>>';
+  G_HEADER_VERSION CONSTANT VARCHAR2(64) := 'ver.4.1.2 12/12/2017 Кредиты ФЛ на энергосбереж, <<КОТЛЫ>>';
 
   PROCEDURE p_log_header_set(id_log            in out number,
                              TOTAL_DEAL_COUNT  in escr_pay_log_header.total_deal_count%type default 0,
@@ -16,14 +16,16 @@ CREATE OR REPLACE PACKAGE ESCR IS
                            comments in escr_pay_log_body.comments%type);
   procedure p_cc_lim_repair(id_log  escr_pay_log_body.id_log%type default null,
                             deal_id in cc_deal.nd%type default null);
-  procedure p_deal_comp_sum(p_deal_id cc_Deal.nd%type, l_comp_sum out number);
+  procedure p_deal_comp_sum(p_deal_id  cc_Deal.nd%type,
+                            l_comp_sum out number);
+  PROCEDURE p_ref_del(p_ref  NUMBER,
+                      id_log in escr_pay_log_header.id%type default null);
   PROCEDURE oplv(p_ref  NUMBER,
                  id_log in escr_pay_log_header.id%type default null);
 
-  procedure p_cc_lim_count (deal_id cc_Deal.nd%type,
-    cc_lim_count out number);
-   procedure p_deal_sumg (deal_id cc_Deal.nd%type,
-    l_lim_sumg out number);
+  procedure p_cc_lim_count(deal_id      cc_Deal.nd%type,
+                           cc_lim_count out number);
+  procedure p_deal_sumg(deal_id cc_Deal.nd%type, l_lim_sumg out number);
   PROCEDURE DOP(p_ref number,
                 s_ND  varchar2,
                 s_SD  varchar2,
@@ -53,10 +55,11 @@ CREATE OR REPLACE PACKAGE ESCR IS
 end ESCR;
 /
 CREATE OR REPLACE PACKAGE BODY escr IS
-  g_body_version CONSTANT VARCHAR2(64) := 'ver.4.0.5 11/12/2017';
+  g_body_version CONSTANT VARCHAR2(64) := 'ver.4.1.5 12/12/2017';
   nlchr CHAR(2) := chr(13) || chr(10);
 
   /*
+
   24/05/2017 Піванова додано формування копії ГПК до перебудови
   23/12/2016 Піванова виправлена помилка при парсінгу призначення платежу
   19.09.2016 Sta Заменила код оп 013 на PS1
@@ -124,47 +127,47 @@ CREATE OR REPLACE PACKAGE BODY escr IS
   end p_cc_lim_count;
 
   procedure p_deal_sumg(deal_id cc_Deal.nd%type, l_lim_sumg out number) is
-  l_cc_lim_count number;
- begin
-   escr.p_cc_lim_count(deal_id => deal_id,
-                      cc_lim_count => l_cc_lim_count);
-if l_cc_lim_count>2 then
-begin
- SELECT nvl(t.sumg/100, 0)
-      INTO l_lim_sumg
-      FROM cc_lim t
-     WHERE t.nd = deal_id
-       --and fdat >= gl.bDATE
-       and t.sumg<>0
-       and rownum = 1;
-  exception
-    when no_data_found then
-      l_lim_sumg := 0;
-end;
-else
+    l_cc_lim_count number;
   begin
-   SELECT nvl(t.sumg/100, 0)
-      INTO l_lim_sumg
-      FROM cc_lim_arc t
-     WHERE t.nd = deal_id
-       --and fdat >= gl.bDATE
-       and t.sumg<>0
-       and rownum = 1;
-  exception
-    when no_data_found then
-      l_lim_sumg := 0;
-end;
-end if;
-end p_deal_sumg;
+    escr.p_cc_lim_count(deal_id => deal_id, cc_lim_count => l_cc_lim_count);
+    if l_cc_lim_count > 2 then
+      begin
+        SELECT nvl(t.sumg / 100, 0)
+          INTO l_lim_sumg
+          FROM cc_lim t
+         WHERE t.nd = deal_id
+              --and fdat >= gl.bDATE
+           and t.sumg <> 0
+           and rownum = 1;
+      exception
+        when no_data_found then
+          l_lim_sumg := 0;
+      end;
+    else
+      begin
+        SELECT nvl(t.sumg / 100, 0)
+          INTO l_lim_sumg
+          FROM cc_lim_arc t
+         WHERE t.nd = deal_id
+              --and fdat >= gl.bDATE
+           and t.sumg <> 0
+           and rownum = 1;
+      exception
+        when no_data_found then
+          l_lim_sumg := 0;
+      end;
+    end if;
+  end p_deal_sumg;
 
-   procedure p_deal_comp_sum(p_deal_id cc_Deal.nd%type, l_comp_sum out number) is
-  --Переписати на селект
+  procedure p_deal_comp_sum(p_deal_id  cc_Deal.nd%type,
+                            l_comp_sum out number) is
+    --Переписати на селект
   begin
 
     SELECT nvl(t.comp_sum, 0)
       INTO l_comp_sum
       FROM vw_escr_reg_header t
-     WHERE t.deal_id = p_deal_id ;
+     WHERE t.deal_id = p_deal_id;
   exception
     when no_data_found then
       l_comp_sum := 0;
@@ -181,7 +184,6 @@ end p_deal_sumg;
     p_R1                  number;
     p_R2                  number;
     p_P1                  number;
-  p_P2            number;
     p_K2                  number;
     aa                    accounts%rowtype;
     kv_                   int := 980;
@@ -239,9 +241,17 @@ end p_deal_sumg;
         select ND, FDAT, LIM2, ACC, NOT_9129, SUMG, SUMO, OTM, SUMK, NOT_SN
           from cc_lim_arc
          where nd = i.nd
-           and mdat = (select max(mdat) from cc_lim_arc where nd = i.ND and typm is not null);
-      delete from cc_lim_arc t where nd = i.ND and  mdat = (select max(mdat) from cc_lim_arc where nd = i.ND and typm is not null)
-      and t.typm is not null;
+           and mdat = (select max(mdat)
+                         from cc_lim_arc
+                        where nd = i.ND
+                          and typm is not null);
+      delete from cc_lim_arc t
+       where nd = i.ND
+         and mdat = (select max(mdat)
+                       from cc_lim_arc
+                      where nd = i.ND
+                        and typm is not null)
+         and t.typm is not null;
       select s
         into p_k2
         from int_accn
@@ -271,57 +281,68 @@ end p_deal_sumg;
                   p_Z5      => p_Z5, --OUT number, -- Плановый остаток по телу  z5 = (SS - z3)
                   p_R1      => p_R1, --OUT number, -- Общий ресурс (ост на SG(262*)
                   p_R2      => p_R2, --OUT number, --  Свободный ресурс R2 =  R1 - z4
-                  p_P1      => p_P1/*, --OUT number  --  Реф.платежа
-                  p_P2      => p_P2*/
+                  p_P1      => p_P1 --OUT number  --  Реф.платежа
                   );
       escr.p_cc_lim_count(deal_id      => i.nd,
                           cc_lim_count => l_lim_count_after);
-      escr.p_deal_comp_sum(p_deal_id      => i.nd,
-                          l_comp_sum => l_sum_comp);
+      escr.p_deal_comp_sum(p_deal_id => i.nd, l_comp_sum => l_sum_comp);
       l_lim_diff := TRUNC(l_sum_comp / l_lim_sumg, 0);
 
       /*if abs (l_lim_count_before - l_lim_count_after) < 2 then--допрцювати умову*/
 
-       escr.p_log_body_set(id_log   => l_escr_pay_log_header,
-                                deal_id  => i.nd,
-                                err_code => 24,
-                                comments => 'Кількість платіжних періодів до та після виконання перебудови різняться на недопустиме значення ' ||
-                                            'к-сть записів в ГПК до l_lim_count_before=' ||
-                                            l_lim_count_before ||
-                                            ', після l_lim_count_after=' ||
-                                            l_lim_count_after ||
-                                            ', розрахована різниця l_lim_diff=' ||
-                                            l_lim_diff || ',сума компенсаці l_sum_comp:=' || l_sum_comp
-                                            || ',сума щомісячного погашення  l_lim_sumg:=' || l_lim_sumg);
+      escr.p_log_body_set(id_log   => l_escr_pay_log_header,
+                          deal_id  => i.nd,
+                          err_code => 24,
+                          comments => 'Кількість платіжних періодів до та після виконання перебудови різняться на недопустиме значення ' ||
+                                      'к-сть записів в ГПК до l_lim_count_before=' ||
+                                      l_lim_count_before ||
+                                      ', після l_lim_count_after=' ||
+                                      l_lim_count_after ||
+                                      ', розрахована різниця l_lim_diff=' ||
+                                      l_lim_diff ||
+                                      ',сума компенсаці l_sum_comp:=' ||
+                                      l_sum_comp ||
+                                      ',сума щомісячного погашення  l_lim_sumg:=' ||
+                                      l_lim_sumg);
       /*end if;*/
     end loop;
 
   end p_cc_lim_repair;
+  -------------------------------------
+  PROCEDURE p_ref_del(p_ref  NUMBER,
+                      id_log in escr_pay_log_header.id%type default null) IS
+  BEGIN
+    delete from bars.nlk_ref t where t.ref1 = p_ref;
+    bars.bars_audit.info('Delete from nlk_ref ref1:=' || p_ref);
+    --Додати логування в журнали
 
+  END p_ref_del;
+  ---------------------
   PROCEDURE oplv(p_ref  NUMBER,
                  id_log in escr_pay_log_header.id%type default null) IS
   BEGIN
---Очищаємо картотеку від записів попередніх місяців
-  for c in (SELECT o.REF
-              FROM bars.oper o, bars.nlk_ref r, bars.accounts a
-             WHERE a.tip = 'NLQ'
-               AND a.acc = r.acc
-               AND r.ref2 IS NULL
-               AND r.ref1 = o.REF
-               and extract(month from o.vdat) <> extract(month from gl.bd)) loop
-    delete from bars.nlk_ref t where t.ref1 = c.ref;
+    --Очищаємо картотеку від записів попередніх місяців, якщо попередньо користувачі не вичистили непотрібні записи
+    for c in (SELECT o.REF
+                FROM bars.oper o, bars.nlk_ref r, bars.accounts a
+               WHERE a.tip = 'NLQ'
+                 AND a.acc = r.acc
+                 AND r.ref2 IS NULL
+                 AND r.ref1 = o.REF
+                 and extract(month from o.vdat) <> extract(month from gl.bd)) loop
+      delete from bars.nlk_ref t where t.ref1 = c.ref;
 
-    bars.bars_audit.info('Delete from nlk_ref ref1:=' || c.ref);
-  end loop;
---Додано умову, що виконання зарахування можливе лише місяць в місяць
-   FOR k IN (SELECT o.*
+      bars.bars_audit.info('Delete from nlk_ref ref1:=' || c.ref);
+    end loop;
+    --Додано умову, що виконання зарахування можливе лише місяць в місяць
+    FOR k IN (SELECT o.*
                 FROM oper o, nlk_ref r, accounts a
                WHERE a.tip = 'NLQ'
                  AND a.acc = r.acc
                  AND r.ref2 IS NULL
                  AND r.ref1 = o.ref
-                 AND (p_ref = 0 OR p_ref = o.ref
-                 and extract (month from o.vdat)=extract (month from gl.bd))) LOOP
+                 AND (p_ref = 0 OR
+                     p_ref = o.ref and
+                     extract(month from o.vdat) = extract(month from gl.bd))) LOOP
       escr.pay1(0,
                 k.ref,
                 gl.bdate,
@@ -392,10 +413,10 @@ end p_deal_sumg;
     status_ VARCHAR2(10);
     l_recid NUMBER;
     ------------------------------------------------
-    s_nd VARCHAR2(255);
-    s_sd VARCHAR2(255);
-    s_cd VARCHAR2(255);
-    s_id VARCHAR2(255);
+    s_nd VARCHAR2(10);
+    s_sd VARCHAR2(10);
+    s_cd VARCHAR2(30);
+    s_id VARCHAR2(20);
     -----------------------------------------------
     i_ost   NUMBER;
     v_ost   NUMBER;
@@ -409,7 +430,6 @@ end p_deal_sumg;
     p_r1    NUMBER;
     p_r2    NUMBER;
     p_p1    NUMBER;
-    p_p2    NUMBER;
     p_k2    NUMBER;
     phone_  acc_sms_phones.phone%TYPE;
     l_msgid INTEGER;
@@ -504,7 +524,6 @@ end p_deal_sumg;
         END IF;
       END IF;
     END IF;
-
     BEGIN
       dd.nd := to_number(s_nd);
     EXCEPTION
@@ -519,92 +538,176 @@ end p_deal_sumg;
         l_txt := l_tx2;
         GOTO no_pay;
     END;
-   dd.cc_id := s_cd;
-    BEGIN dd.nd := to_number(s_nd);                   EXCEPTION      WHEN OTHERS THEN   l_txt := l_tx1;   GOTO no_pay;    END;
-    BEGIN dd.sdate := to_date(s_sd, 'dd/mm/yyyy');    EXCEPTION      WHEN OTHERS THEN   l_txt := l_tx2;   GOTO no_pay;    END;
-    IF length(dd.cc_id) = 0                                                      THEN   l_txt := l_tx3;   GOTO no_pay;    END IF;
+    dd.cc_id := s_cd;
+    BEGIN
+      dd.nd := to_number(s_nd);
+    EXCEPTION
+      WHEN OTHERS THEN
+        l_txt := l_tx1;
+        GOTO no_pay;
+    END;
+    BEGIN
+      dd.sdate := to_date(s_sd, 'dd/mm/yyyy');
+    EXCEPTION
+      WHEN OTHERS THEN
+        l_txt := l_tx2;
+        GOTO no_pay;
+    END;
+    IF length(dd.cc_id) = 0 THEN
+      l_txt := l_tx3;
+      GOTO no_pay;
+    END IF;
     oo.id_b := s_id;
 
-    BEGIN SELECT * INTO dd
-          FROM ( SELECT *  FROM  cc_deal    WHERE vidd = 11   AND sos > 0 AND (nd = dd.nd OR sdate = dd.sdate AND cc_id = dd.cc_id)   ORDER BY sos)
-          WHERE rownum = 1;
-    EXCEPTION    WHEN no_data_found                                              THEN   l_txt := l_tx4 ;  GOTO no_pay;
+    BEGIN
+      SELECT *
+        INTO dd
+        FROM (SELECT *
+                FROM cc_deal
+               WHERE vidd = 11
+                 AND sos > 0
+                 AND (nd = dd.nd OR sdate = dd.sdate AND cc_id = dd.cc_id)
+               ORDER BY sos)
+       WHERE rownum = 1;
+    EXCEPTION
+      WHEN no_data_found THEN
+        l_txt := l_tx4;
+        GOTO no_pay;
     END;
 
     IF length(TRIM(oo.id_b)) > 0 THEN
-      BEGIN SELECT 1  INTO ntmp_  FROM customer   WHERE rnk = dd.rnk   AND okpo = oo.id_b;
-      EXCEPTION        WHEN no_data_found THEN          l_txt := l_tx5;          GOTO no_pay;      END;
+      BEGIN
+        SELECT 1
+          INTO ntmp_
+          FROM customer
+         WHERE rnk = dd.rnk
+           AND okpo = oo.id_b;
+      EXCEPTION
+        WHEN no_data_found THEN
+          l_txt := l_tx5;
+          GOTO no_pay;
+      END;
     END IF;
 
-    BEGIN SELECT * INTO aa  FROM accounts WHERE kv = kv_  AND nbs = '2620' AND dazs IS NULL AND acc IN (SELECT acc FROM nd_acc WHERE nd = dd.nd) AND rownum = 1;
-    EXCEPTION    WHEN no_data_found                                              THEN   l_txt := l_tx6;   GOTO no_pay;
-    END;                                                                                l_txt := NULL ;
+    BEGIN
+      SELECT *
+        INTO aa
+        FROM accounts
+       WHERE kv = kv_
+         AND nbs = '2620'
+         AND dazs IS NULL
+         AND acc IN (SELECT acc FROM nd_acc WHERE nd = dd.nd)
+         AND rownum = 1;
+    EXCEPTION
+      WHEN no_data_found THEN
+        l_txt := l_tx6;
+        GOTO no_pay;
+    END;
+    l_txt := NULL;
     -------------------------------------------------------------------------------------------------------------------
 
     SAVEPOINT do_opl;
     Declare
-      Dat20_ date := to_date ('20.11.2017','dd.mm.yyyy');
-      sa1_    DECIMAL := SA_ ; -- Поступившая сумма возмещения для зачисления на 2600
-      sa2_    DECIMAL := 0   ; -- Поступившая сумма возмещения для Возврата в ЦА
-      l_REF_RET  number;
+      Dat20_    date := to_date('20.11.2017', 'dd.mm.yyyy');
+      sa1_      DECIMAL := SA_; -- Поступившая сумма возмещения для зачисления на 2600
+      sa2_      DECIMAL := 0; -- Поступившая сумма возмещения для Возврата в ЦА
+      l_REF_RET number;
     BEGIN
       ----------------------------------------------------------------------- зачислить всю сумму на 2620
       l_txt := l_tx7;
 
       -- 23.11.2017 Повернення надлишкових сум  COBUMMFO-5548  - ESCR.
-      If dd.sdate >= Dat20_ then  -------- дати укладення Кредитних договорів – до 19/11/2017 ВКЛЮЧНО (<20),  та після 20.11.2017р ВКЛЮЧНО.(>=20)
-         select LEAST ( SA_, -a.ostc)  into SA1_ from accounts a, nd_acc n where  n.nd = dd.ND and n.acc= a.acc and a.tip ='LIM';
-         SA2_ := SA_ - SA1_ ;
+      If dd.sdate >= Dat20_ then
+        -------- дати укладення Кредитних договорів – до 19/11/2017 ВКЛЮЧНО (<20),  та після 20.11.2017р ВКЛЮЧНО.(>=20)
+        select LEAST(SA_, -a.ostc)
+          into SA1_
+          from accounts a, nd_acc n
+         where n.nd = dd.ND
+           and n.acc = a.acc
+           and a.tip = 'LIM';
+        SA2_ := SA_ - SA1_;
       end if;
 
       If SA2_ > 0 then
-         oo.tt := case when oo.mfoa = oo.mfob then 'PS1'  else 'PS2'  end ;
-         gl.ref( l_REF_RET );
-         gl.in_doc3(ref_   => l_REF_RET ,
-                     tt_   => oo.tt     ,
-                     vob_  => 6         ,
-                     nd_   => oo.nd     ,
-                     pdat_ => SYSDATE   ,
-                     vdat_ => gl.BDATE  ,
-                     dk_   => 1         ,
-                     kv_   => oo.kv     ,
-                      s_   => SA2_      ,
-                     kv2_  => oo.kv2    ,
-                      s2_  => SA2_      ,
-                     sk_   => null      ,
-                     data_ => oo.datd   ,
-                     datp_ => gl.bdate  ,
-                    nam_a_ => oo.nam_b  ,
-                    nlsa_  => oo.nlsb   ,
-                    mfoa_  => gl.aMfo   ,
-                    nam_b_ => oo.nam_a  ,
-                    nlsb_  => oo.nlsa   , -- 37393000980030
-                    mfob_  => oo.mfoa   ,
-                    nazn_  => Substr('ПОВЕРНЕННЯ ' || oo.nazn,1,160),
-                    d_rec_ => oo.d_rec  ,
-                    id_a_  => oo.id_b   ,
-                    id_b_  => oo.id_a   ,
-                    id_o_  => null      ,
-                    sign_  => null      ,
-                    sos_   => 1         ,
-                    prty_  => null      ,
-                    uid_   => null
-                  );
+        oo.tt := case
+                   when oo.mfoa = oo.mfob then
+                    'PS1'
+                   else
+                    'PS2'
+                 end;
+        gl.ref(l_REF_RET);
+        gl.in_doc3(ref_   => l_REF_RET,
+                   tt_    => oo.tt,
+                   vob_   => 6,
+                   nd_    => oo.nd,
+                   pdat_  => SYSDATE,
+                   vdat_  => gl.BDATE,
+                   dk_    => 1,
+                   kv_    => oo.kv,
+                   s_     => SA2_,
+                   kv2_   => oo.kv2,
+                   s2_    => SA2_,
+                   sk_    => null,
+                   data_  => oo.datd,
+                   datp_  => gl.bdate,
+                   nam_a_ => oo.nam_b,
+                   nlsa_  => oo.nlsb,
+                   mfoa_  => gl.aMfo,
+                   nam_b_ => oo.nam_a,
+                   nlsb_  => oo.nlsa, -- 37393000980030
+                   mfob_  => oo.mfoa,
+                   nazn_  => Substr('ПОВЕРНЕННЯ ' || oo.nazn,
+                                    1,
+                                    160),
+                   d_rec_ => oo.d_rec,
+                   id_a_  => oo.id_b,
+                   id_b_  => oo.id_a,
+                   id_o_  => null,
+                   sign_  => null,
+                   sos_   => 1,
+                   prty_  => null,
+                   uid_   => null);
 
-         paytt( 0, l_REF_RET, gl.bDATE, oo.TT, 1, oo.kv, oo.nlsb, SA2_, oo.kv2, oo.nlsa, SA2_);
+        paytt(0,
+              l_REF_RET,
+              gl.bDATE,
+              oo.TT,
+              1,
+              oo.kv,
+              oo.nlsb,
+              SA2_,
+              oo.kv2,
+              oo.nlsa,
+              SA2_);
       end if;
 
       --- Зарахувати на 2625 ---------------------------
       If sa1_ > 0 then
-          gl.payv(flg_, ref_, vdat_, tt_, 1, kv_, nlsm_, sa1_, kv_, aa.nls, sa1_); -------------3739_05 ---> 2620
-          gl.pay(2, ref_, vdat_);
+        gl.payv(flg_,
+                ref_,
+                vdat_,
+                tt_,
+                1,
+                kv_,
+                nlsm_,
+                sa1_,
+                kv_,
+                aa.nls,
+                sa1_); -------------3739_05 ---> 2620
+         gl.pay(2, ref_, vdat_);
+         bars_audit.info('ESCR PAY1 По КД '||dd.nd ||' ,сума компенсації рівна '|| sa1_);
+      elsif sa1_=0 then
+         DELETE FROM nlk_ref WHERE ref1 = ref_;
+         bars_audit.info('ESCR PAY1 По КД '||dd.nd ||' ,сума компенсації рівна 0. Запис з референсом '||ref_ ||' видалено з картотеки.');
       else
-          RETURN ;
+        RETURN;
       end if;
       -------------------------------------------------------------------------------------------------------------------
       DELETE FROM nlk_ref WHERE ref1 = ref_;
 
-      IF dd.sos >= 14 THEN  RETURN; END IF;
+      IF dd.sos >= 14 THEN
+        RETURN;
+      END IF;
 
       l_txt   := l_tx8;
       aa.ostc := sa1_;
@@ -733,14 +836,13 @@ end p_deal_sumg;
                       p_z5      => p_z5, --OUT number, -- Плановый остаток по телу  z5 = (SS - z3)
                       p_r1      => p_r1, --OUT number, -- Общий ресурс (ост на SG(262*)
                       p_r2      => p_r2, --OUT number, --  Свободный ресурс R2 =  R1 - z4
-                      p_p1      => p_p1/* ,
-                      p_p2      => p_p2*/--OUT number  --  Реф.платежа
+                      p_p1      => p_p1 --OUT number  --  Реф.платежа
                       );
           escr.p_cc_lim_count(deal_id      => dd.nd,
                               cc_lim_count => l_lim_count_after);
 
           --Визначаємо орієнтовну к-сть періодів, на яку повинен зменшшитися ГПК після перебудови
-          l_lim_diff := TRUNC((oo.s/100) / l_lim_sumg, 0);
+          l_lim_diff := TRUNC((oo.s / 100) / l_lim_sumg, 0);
           if abs(l_lim_diff - (l_lim_count_before - l_lim_count_after)) > 1 then
 
             escr.p_log_body_set(id_log   => id_log,
@@ -752,8 +854,11 @@ end p_deal_sumg;
                                             ', після l_lim_count_after=' ||
                                             l_lim_count_after ||
                                             ', розрахована різниця l_lim_diff=' ||
-                                            l_lim_diff || ',сума компенсаці l_sum_comp:=' || oo.s/100
-                                            || ',сума щомісячного погашення  l_lim_sumg:=' || l_lim_sumg);
+                                            l_lim_diff ||
+                                            ',сума компенсаці l_sum_comp:=' ||
+                                            oo.s / 100 ||
+                                            ',сума щомісячного погашення  l_lim_sumg:=' ||
+                                            l_lim_sumg);
 
           end if;
         END IF;
@@ -794,9 +899,8 @@ end p_deal_sumg;
                                                  to_char(SYSDATE,
                                                          'DD.MM.YYYY') ||
                                                  '. Dovidka 0800210800',
-                            p_kf              =>sys_context('bars_context','user_mfo'));
-
-       l_msgid := NULL;
+                           p_kf              =>sys_context('bars_context','user_mfo'));
+        l_msgid := NULL;
         phone_  := NULL; -- освобождаем переменную
       EXCEPTION
         WHEN no_data_found THEN

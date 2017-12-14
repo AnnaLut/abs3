@@ -183,12 +183,13 @@ procedure p_acc_restore (
 -- Reservation of the account number
 --
 procedure RSRV_ACC_NUM
-( p_nls      in     accounts_rsrv.nls%type
-, p_kv       in     accounts_rsrv.kv%type
-, p_nms      in     accounts_rsrv.nms%type
-, p_branch   in     accounts_rsrv.branch%type
-, p_isp      in     accounts_rsrv.isp%type
-, p_rnk      in     accounts_rsrv.rnk%type
+( p_nls      in     accounts_rsrv.nls%type            -- Account  number
+, p_kv       in     accounts_rsrv.kv%type             -- Currency code
+, p_nms      in     accounts_rsrv.nms%type            -- Account name
+, p_branch   in     accounts_rsrv.branch%type         -- 
+, p_isp      in     accounts_rsrv.isp%type            -- 
+, p_rnk      in     accounts_rsrv.rnk%type            -- Customer number
+, p_agrm_num in     accountsw.value%type default null -- 
 --, p_errmsg      out varchar2
 );
 
@@ -247,6 +248,12 @@ procedure P_UNRESERVE_ACC
 , p_ob22     in     accounts.ob22%type default null
 );
 
+procedure UNRSRV_ACC
+( p_acc      in     accounts.acc%type
+, p_kv       in     accounts.kv%type
+, p_errmsg      out varchar2
+);
+
 procedure DUPLICATE_ACC
 ( p_acc      in out accounts.acc%type -- Existing account identifier
 , p_kv       in     accounts.kv%type  -- New currency code
@@ -268,7 +275,7 @@ is
   --***************************************************************************--
   g_modcode       constant varchar2(3) := 'CAC';
 
-  g_body_version  constant varchar2(64)  := 'version 1.9  07/12/2017';
+  g_body_version  constant varchar2(64)  := 'version 2.0  12/12/2017';
   g_body_defs     constant varchar2(512) := ''
 $if ACC_PARAMS.KOD_D6
 $then
@@ -602,8 +609,16 @@ begin
      where NLS = p_nls
        and KV  = p_kv;
 
-    raise_application_error( -20666, 'Рахунок '||p_nls||'/'||to_char(p_kv)||' уже існує (#'||to_char(l_acc)||')!' , true );
+    raise_application_error( -20666, 'Рахунок '||p_nls||'/'||to_char(p_kv)||' уже існує (#'||to_char(l_acc)||')!', true );
 --  bars_error.raise_nerror( g_modcode, 'GENERAL_ERROR_CODE', 'Недопустимий тип '||tip_||' для балансового рахунку '||l_nbs  );
+
+    select RNK
+      into l_acc
+      from ACCOUNTS_RSRV
+     where NLS = p_nls
+       and KV  = p_kv;
+
+    raise_application_error( -20666, 'Рахунок '||p_nls||'/'||to_char(p_kv)||' зарезервовано для клієнта #'||to_char(l_acc), true );
 
   exception
     when NO_DATA_FOUND then
@@ -1785,8 +1800,8 @@ begin
 
   begin
 
-    select a.OSTC, a.OSTB, a.OSTF, a.DAPP, a.DAZS, a.DAOS, a.KV, a.NLS, a.TIP
-      into l_ostc, l_ostb, l_ostf, l_dapp, l_dazs, l_daos, l_kv, l_nls, l_tip
+    select a.OSTC, a.OSTB, a.OSTF, a.DAPP, a.DAPPQ, a.DAZS, a.DAOS, a.KV, a.NLS, a.TIP
+      into l_ostc, l_ostb, l_ostf, l_dapp, l_dappQ, l_dazs, l_daos, l_kv, l_nls, l_tip
       from ACCOUNTS a
      where a.ACC = p_acc;
 
@@ -1971,7 +1986,7 @@ procedure P_ACC_RESTORE
        where KF      = r_tfm_fc.KF
          and NEW_NLS = r_tfm_fc.NEW_NLS
          and KV      = r_tfm_fc.KV
-       union all
+       union 
       select 1 -- reserved
         from ACCOUNTS_RSRV
        where KF  = r_tfm_fc.KF
@@ -2130,7 +2145,7 @@ procedure RSRV_ACC_NUM
 , p_branch   in     accounts_rsrv.branch%type
 , p_isp      in     accounts_rsrv.isp%type
 , p_rnk      in     accounts_rsrv.rnk%type
---, p_agrm_num in     accountsw.value%type default null -- номер договору банківського обслуговування
+, p_agrm_num in     accountsw.value%type default null -- номер договору банківського обслуговування
 --, p_trf_id   in     sh_tarif.ids%type    default null -- код тарифного пакету
 --, p_errmsg      out varchar2
 ) is
@@ -2141,17 +2156,30 @@ begin
   bars_audit.trace( '%s: Entry with ( p_nls=>%s, p_kv=>%s, p_nms=>%s, p_branch=>%s, p_isp=>%s, p_rnk=>%s ).'
                   , title, p_nls, to_char(p_kv), p_nms, p_branch, to_char(p_isp), to_char(p_rnk) );
 
-  begin
-    insert
-      into ACCOUNTS_RSRV
-         ( NLS, KV, NMS, BRANCH, ISP, RNK, USR_ID, CRT_DT )
-    values
-         ( p_nls, p_kv, p_nms, p_branch, p_isp, p_rnk, user_id, sysdate );
-  exception
-    when others then
-      p_errmsg := sqlerrm;
-      bars_audit.error( title||': '||p_errmsg );
-  end;
+  case
+  when ( p_nls Is Null )
+  then p_errmsg := 'Не вказано номер рахунку!';
+  when ( p_kv  Is Null )
+  then p_errmsg := 'Не вказано валюту рахунку!';
+  when ( p_rnk Is Null )
+  then p_errmsg := 'Не вказано РНК власника рахунку!';
+--when ( p_agrm_num Is Null )
+--then p_errmsg := 'Не вказано номер договору банківського обслуговування!';
+--when ( p_trf_id   Is Null )
+--then p_errmsg := 'Не вказано код тарифного пакету';
+  else
+    begin
+      insert
+        into ACCOUNTS_RSRV
+           ( NLS, KV, NMS, BRANCH, ISP, RNK, AGRM_NUM, USR_ID, CRT_DT )
+      values
+           ( p_nls, p_kv, p_nms, p_branch, p_isp, p_rnk, p_agrm_num, user_id, sysdate );
+    exception
+      when others then
+        p_errmsg := sqlerrm;
+        bars_audit.error( title||': '||p_errmsg );
+    end;
+  end case;
 
   bars_audit.trace( '%s: Exit with p_errmsg=>%s.', title, p_errmsg );
 
@@ -2219,15 +2247,7 @@ procedure P_RESERVE_ACC
   l_acc             accounts.acc%type;
 begin
 
-  bars_audit.trace( $$PLSQL_UNIT || 'P_RESERVE_ACC: Entry.' );
-
---case
---when ( p_agrm_num Is Null )
---then raise_application_error( -20666, 'Не вказано номер договору банківського обслуговування!', true);
---when ( p_trf_id   Is Null )
---then raise_application_error( -20666, 'Не вказано код тарифного пакету', true);
---else null;
---end case;
+  bars_audit.trace( $$PLSQL_UNIT || 'P_RESERVE_ACC: Entry with ( p_rnk=%s, p_nls=%s, p_kv=%s ).', to_char(p_rnk), p_nls, to_char(p_kv) );
 
   RSRV_ACC_NUM
   ( p_nls      => p_nls
@@ -2236,8 +2256,7 @@ begin
   , p_branch   => p_branch
   , p_isp      => p_isp
   , p_rnk      => p_rnk
---, p_agrm_num => p_agrm_num
---, p_trf_id   => p_trf_id
+  , p_agrm_num => p_agrm_num
   );
 
   OPN_ACC
@@ -2545,7 +2564,74 @@ $end
 
   end if;
 
-end p_unreserve_acc;
+  bars_audit.trace( $$PLSQL_UNIT || 'P_UNRESERVE_ACC: Exit.' );
+
+end P_UNRESERVE_ACC;
+
+
+procedure UNRSRV_ACC
+( p_acc      in     accounts.acc%type
+, p_kv       in     accounts.kv%type
+, p_errmsg      out varchar2
+) is
+  title    constant varchar2(64) := $$PLSQL_UNIT||'.UNRSRV_ACC';
+  l_main_nls        accounts.nls%type;
+  l_main_rnk        accounts.rnk%type;
+  l_rsrv_rnk        accounts_rsrv.rnk%type;
+  l_acc             accounts.acc%type;
+begin
+
+  bars_audit.trace( '%s: Entry with ( p_acc=%s, p_kv=%s ).', title, to_char(p_acc), to_char(p_kv) );
+
+  begin
+
+    select NLS, RNK
+      into l_main_nls
+         , l_main_rnk
+      from ACCOUNTS
+     where ACC = p_acc;
+
+    begin
+
+      select RNK
+        into l_rsrv_rnk
+        from ACCOUNTS_RSRV r
+       where r.NLS = l_main_nls
+         and r.KV  = p_kv;
+
+      if ( l_main_rnk = l_rsrv_rnk )
+      then
+
+        l_acc := p_acc;
+
+        CNCL_RSRV_ACC_NUM
+        ( p_nls    => l_main_nls
+        , p_kv     => p_kv
+        );
+
+        DUPLICATE_ACC
+        ( p_acc    => l_acc
+        , p_kv     => p_kv
+        , p_errmsg => p_errmsg
+        );
+
+      else
+        p_errmsg := 'РНК вказаного рахунку #'||to_char(p_acc)||' не відповідає РНК зарезервованого рахунку '||l_main_nls||'/'||to_char(p_kv);
+      end if;
+
+    exception
+      when NO_DATA_FOUND then
+        p_errmsg := 'Номер рахунку '||l_main_nls||'/'||to_char(p_kv)||' не зарезервовано!';
+    end;
+
+  exception
+    when NO_DATA_FOUND then
+      p_errmsg := 'Не знайдено рахунок #'||to_char(p_acc);
+  end;
+
+  bars_audit.trace( '%s: Exit.', title );
+
+end UNRSRV_ACC;
 
 --
 --
@@ -2559,8 +2645,6 @@ procedure DUPLICATE_ACC
   r_accounts             accounts%rowtype;
   r_specparam            specparam%rowtype;
   l_acc_id               accounts.acc%type;
-  l_cls_dt               accounts.dazs%type;
-  l_cust_id              accounts.rnk%type;
 begin
 
   bars_audit.trace( '%s: Entry with ( p_acc=%s, p_kv=%s ).', title, to_char(p_acc), to_char(p_kv) );

@@ -27,7 +27,7 @@ if p_ob22 is null then l_ret:='-9'; return l_ret; end if;
     begin
     select p_ob22 into l_ret from e_tarif
     where p_ob22 in
-    (select '44' ob22_3579 from dual union all select ob22_3579 from e_tarif where ob22_3579 is not null)
+    (select '38' ob22_3579 from dual union all select ob22_3579 from e_tarif where ob22_3579 is not null)
           and rownum=1;
     exception when no_data_found then null; l_ret:='-5';
     end;

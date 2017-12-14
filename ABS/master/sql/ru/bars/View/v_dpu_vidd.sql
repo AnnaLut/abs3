@@ -1,7 +1,7 @@
 -- ======================================================================================
 -- Module : ADR
 -- Author : BAA
--- Date   : 27.08.2016
+-- Date   : 13.12.2017
 -- ======================================================================================
 -- create view V_DPU_VIDD
 -- ======================================================================================
@@ -44,8 +44,10 @@ CREATE OR REPLACE VIEW BARS.V_DPU_VIDD
 , IS_ACTIVE
 , IRREVOCABLE
 , TERM_TP
+, TERM_MIN
 , TERM_MIN_MO
 , TERM_MIN_DY
+, TERM_MAX
 , TERM_MAX_MO
 , TERM_MAX_DY
 , TERM_ADD
@@ -53,7 +55,8 @@ CREATE OR REPLACE VIEW BARS.V_DPU_VIDD
 , DEAL_QTY
 ) 
 as
-select DPU_VIDD.VIDD
+select /*+ NO_PARALLEL ORDERED */
+       DPU_VIDD.VIDD
      , DPU_VIDD.NAME
      , DPU_VIDD.DPU_CODE
      , DPU_VIDD.TYPE_ID
@@ -63,8 +66,11 @@ select DPU_VIDD.VIDD
      , DPU_VIDD.SROK
      , DPU_VIDD.BSD
      , DPU_VIDD.BSN
-     , BRATES.BR_ID
-     , BRATES.NAME
+     , DPU_VIDD.BR_ID
+     , ( select b.NAME
+           from BRATES b
+          where b.BR_ID = DPU_VIDD.BR_ID
+       ) as BR_NM
      , FREQ.FREQ
      , FREQ.NAME
      , DPU_VIDD.COMPROC
@@ -81,8 +87,10 @@ select DPU_VIDD.VIDD
      , nvl(DPU_VIDD.FLAG,0)
      , DPU_VIDD.IRVK
      , DPU_VIDD.TERM_TYPE
+     , DPU_VIDD.TERM_MIN
      , trunc(DPU_VIDD.TERM_MIN) as TERM_MIN_MO
      , (DPU_VIDD.TERM_MIN - trunc(DPU_VIDD.TERM_MIN))*10000 as TERM_MIN_DY
+     , DPU_VIDD.TERM_MAX
      , trunc(DPU_VIDD.TERM_MAX) as TERM_MAX_MO
      , (DPU_VIDD.TERM_MAX - trunc(DPU_VIDD.TERM_MAX))*10000 as TERM_MAX_DY
      , DPU_VIDD.TERM_ADD
@@ -101,9 +109,6 @@ select DPU_VIDD.VIDD
     on ( DPT_STOP.ID = DPU_VIDD.ID_STOP )
   join FREQ
     on ( FREQ.FREQ = DPU_VIDD.FREQ_V )
-  left
-  join BRATES
-    on ( BRATES.BR_ID = DPU_VIDD.BR_ID )
 ;
 
 show err
@@ -141,8 +146,10 @@ COMMENT ON COLUMN BARS.V_DPU_VIDD.IRREVOCABLE   IS 'Безвідкличний депозитний дог
 COMMENT ON COLUMN BARS.V_DPU_VIDD.TYPE_ID       IS 'Ід. типу депозиту (депозитного продукту )';
 COMMENT ON COLUMN BARS.V_DPU_VIDD.TYPE_NM       IS 'Назва типу депозиту (депозитного продукту )';
 COMMENT ON COLUMN BARS.V_DPU_VIDD.TERM_TP       IS 'Тип терміну депозиту (1 - фікований, 2 - діапазон)';
+COMMENT ON COLUMN BARS.V_DPU_VIDD.TERM_MIN      IS 'Мінімальний термін дії депозиту';
 COMMENT ON COLUMN BARS.V_DPU_VIDD.TERM_MIN_MO   IS 'Мінімальний термін дії депозиту (в місяцях)';
 COMMENT ON COLUMN BARS.V_DPU_VIDD.TERM_MIN_DY   IS 'Мінімальний термін дії депозиту (в днях)';
+COMMENT ON COLUMN BARS.V_DPU_VIDD.TERM_MAX      IS 'Максимальний термін дії депозиту';
 COMMENT ON COLUMN BARS.V_DPU_VIDD.TERM_MAX_MO   IS 'Максимальний термін дії депозиту (в місяцях)';
 COMMENT ON COLUMN BARS.V_DPU_VIDD.TERM_MAX_DY   IS 'Максимальний термін дії депозиту (в днях)';
 COMMENT ON COLUMN BARS.V_DPU_VIDD.TERM_ADD      IS 'Термін протягом якого дозволено поповнення депозиту';

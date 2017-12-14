@@ -103,7 +103,7 @@ begin
 begin
    for k in ( select n.rowid RI, n.acc, n.nls nls_old, a.nls nls_new, a.ob22 ob22_new, 1 kat, substr(a.nls,1,4) nbs_new
                   from nbu23_rez n, accounts a,specparam s 
-                  where n.fdat=p_dat01_ and n.acc=a.acc and a.acc=s.acc  )
+                  where n.fdat=dat01_ and n.acc=a.acc and a.acc=s.acc  )
    LOOP
       update nbu23_rez set nls = k.nls_new, ob22=k.ob22_new, nbs = k.nbs_new, kat = 1 where rowid = k.ri;
    end LOOP;

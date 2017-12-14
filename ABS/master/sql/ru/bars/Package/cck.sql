@@ -4798,9 +4798,17 @@ CREATE OR REPLACE PACKAGE BODY CCK IS
         ELSIF tip_ = 'SL ' THEN
           nbs_ := substr(nbs_, 1, 3) || '6';
         ELSIF tip_ = 'SP ' THEN
+         if NEWNBS.GET_STATE = 0 then
           nbs_ := substr(nbs_, 1, 3) || '7';
+         else
+          nbs_ := substr(nbs_, 1, 3) || '3';
+         end if;
         ELSIF tip_ = 'SPN' THEN
+         if NEWNBS.GET_STATE = 0 then
           nbs_ := substr(nbs_, 1, 3) || '9';
+         else
+          nbs_ := substr(nbs_, 1, 3) || '8';
+         end if;
         END IF;
       END IF;
       SELECT bars.f_newnls(acc8_, tip_, nbs_) INTO nls0_ FROM dual;
@@ -8370,7 +8378,7 @@ CREATE OR REPLACE PACKAGE BODY CCK IS
        WHERE d.rnk = cc_deal_row.rnk
          AND extract(YEAR FROM d.sdate) =
              extract(YEAR FROM cc_deal_row.sdate)
-         AND substr(d.prod, 1, 6) IN ('220347', '220257')
+         AND substr(d.prod, 1, 6) IN ('220347', '220257','220373')
          AND d.sos <> 0;
     END;
     BEGIN
@@ -8380,17 +8388,17 @@ CREATE OR REPLACE PACKAGE BODY CCK IS
        WHERE d.rnk = cc_deal_row.rnk
          AND extract(YEAR FROM d.sdate) =
              extract(YEAR FROM cc_deal_row.sdate)
-         AND substr(d.prod, 1, 6) IN ('220258', '220348')
+         AND substr(d.prod, 1, 6) IN ('220258', '220348','220374')
          AND d.sos <> 0;
     END;
     IF l_count_boiler >= 1
        AND l_count_material >= 1 THEN
       err_code := 1;
     ELSIF l_count_boiler >= 1
-          AND substr(cc_deal_row.prod, 1, 6) IN ('220347', '220257') THEN
+          AND substr(cc_deal_row.prod, 1, 6) IN ('220347', '220257','220373') THEN
       err_code := 2;
     ELSIF l_count_material >= 1
-          AND substr(cc_deal_row.prod, 1, 6) IN ('220258', '220348') THEN
+          AND substr(cc_deal_row.prod, 1, 6) IN ('220258', '220348','220374') THEN
       err_code := 3;
     ELSE
       err_code := 0;

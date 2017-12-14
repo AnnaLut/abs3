@@ -510,7 +510,7 @@ AS
                   er.user_id user_id,
                   er.user_name user_name,
                   CASE
-                     WHEN SUBSTR (t.prod, 1, 6) IN ('220347', '220257', '220380')
+                     WHEN SUBSTR (t.prod, 1, 6) IN ('220347', '220257', '220373')
                      THEN
                         TO_NUMBER (1)
                      ELSE
@@ -544,20 +544,20 @@ AS
                         TO_NUMBER (5)
                      WHEN     cs.subs_numb IS NOT NULL
                           AND EXTRACT (YEAR FROM t.sdate) >= 2017
-                          AND SUBSTR (t.prod, 1, 6) IN ('220257', '220347', '220380')
+                          AND SUBSTR (t.prod, 1, 6) IN ('220257', '220347', '220373')
                           AND t.sdate >= TO_DATE ('19/09/2016', 'dd/mm/yyyy')
                      THEN
                         TO_NUMBER (4)
                      WHEN     cs.subs_numb IS NULL
                           AND EXTRACT (YEAR FROM t.sdate) >= 2017
-                          AND SUBSTR (t.prod, 1, 6) IN ('220257', '220347', '220380')
+                          AND SUBSTR (t.prod, 1, 6) IN ('220257', '220347', '220373')
                           AND t.sdate >= TO_DATE ('19/09/2016', 'dd/mm/yyyy')
                      THEN
                         TO_NUMBER (5)
                      WHEN     EXTRACT (YEAR FROM t.sdate) = 2017
                           AND SUBSTR (t.prod, 1, 6) NOT IN ('220257',
                                                             '220347'
-                                                            , '220380')
+                                                            , '220373')
                      THEN
                         TO_NUMBER (6)
                   END

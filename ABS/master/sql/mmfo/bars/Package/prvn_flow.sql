@@ -82,7 +82,7 @@ show errors
 
 create or replace package body PRVN_FLOW
 is
-  g_body_version  constant varchar2(64) := 'version 9.8  21.11.2017';
+  g_body_version  constant varchar2(64) := 'version 9.9  11.12.2017';
   
   individuals_shd signtype := 1; -- 1/0 - формувати графіки для ФО
   
@@ -2310,27 +2310,27 @@ end nos_del;
       insert 
         into PRVN_FIN_DEB
            ( ACC_SS, ACC_SP, KF, AGRM_ID )
-      select nvl(ACC_3570,ACC_3579) as ACC_SS
-           , ACC_3579
-           , KF
-           , ND
-        from ( select w4.ACC_3570, w4.ACC_3579, w4.KF, w4.ND
-                 from ( select ACC_3570, ACC_3579, KF, ND
-
+      select ACC_SS, ACC_SP, KF, ND
+        from ( select w4.ACC_SS, w4.ACC_SP, w4.KF, w4.ND
+                 from ( select nvl(ACC_3570,ACC_3579) as ACC_SS
+                             , ACC_3579               as ACC_SP
+                             , KF, ND
                           from W4_ACC
                          where coalesce( ACC_3570, ACC_3579, 0 ) > 0
                            and DAT_CLOSE Is Null
                          union all
-                        select ACC_3570, ACC_3579, KF, ND
+                        select nvl(ACC_3570,ACC_3579) as ACC_SS
+                             , ACC_3579               as ACC_SP
+                             , KF, ND
                           from BPK_ACC
                          where coalesce( ACC_3570, ACC_3579, 0 ) > 0
                            and DAT_CLOSE Is Null
                       ) w4
                  join ACCOUNTS an
-                   on ( an.KF = w4.KF and an.ACC = w4.ACC_3570 )
+                   on ( an.KF = w4.KF and an.ACC = w4.ACC_SS )
                  left
                  join ACCOUNTS ap
-                   on ( ap.KF = w4.KF and ap.ACC = w4.ACC_3579 )
+                   on ( ap.KF = w4.KF and ap.ACC = w4.ACC_SP )
                  where an.DAZS is Null
                     or ap.DAZS is Null
              )
@@ -2499,7 +2499,12 @@ end nos_del;
         fd.EFFECTDATE := l_eff_dt;
         fd.ACC_SP     := k.ACC_SP;
         
-        insert into PRVN_FIN_DEB values FD;
+        begin
+          insert into PRVN_FIN_DEB values FD;
+           exception
+        when OTHERS then
+           bars_audit.error( title ||': ACC_SS='||to_char(fd.ACC_SS)||', ACC_SP='||to_char(fd.ACC_SP)||chr(10)||sqlerrm );
+        end;
         
       Else
         Null; -- BAD

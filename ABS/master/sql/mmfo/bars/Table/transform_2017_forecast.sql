@@ -16,8 +16,7 @@ END;
 begin 
   execute immediate '
 CREATE TABLE BARS.TRANSFORM_2017_FORECAST
-(
-  KF              VARCHAR2(6 BYTE),
+( KF              VARCHAR2(6 BYTE),
   KV              NUMBER(3),
   ACC             NUMBER(38)                    NOT NULL,
   NBS             CHAR(4 BYTE),
@@ -33,33 +32,27 @@ exception when others then
 end; 
 /
                                                    
-
+declare
+  e_idx_exists           exception;
+  pragma exception_init( e_idx_exists,      -00955 );
+  e_col_already_idx      exception;
+  pragma exception_init( e_col_already_idx, -01408 );
 begin
-  execute immediate 'create index xuk_TRANSFORM_FORECAST on TRANSFORM_2017_FORECAST ( KF, NEW_NLS )';
+  execute immediate 'create unique index UK_TRANSFORM_FORECAST_ACC ON TRANSFORM_2017_FORECAST ( ACC ) TABLESPACE BRSMDLI';
+
+declare
+  e_idx_exists           exception;
+  pragma exception_init( e_idx_exists,      -00955 );
+  e_col_already_idx      exception;
+  pragma exception_init( e_col_already_idx, -01408 );
+begin
+  execute immediate 'create unique index UK_TRANSFORM_FORECAST_NLS ON TRANSFORM_2017_FORECAST ( KF, NEW_NLS, KV ) TABLESPACE BRSMDLI COMPRESS 1';
+  dbms_output.put_line( 'Index created.' );
 exception
-  when others then
-    if sqlcode=-955 then null; else raise; end if;
+  when e_idx_exists 
+  then dbms_output.put_line( 'Name is already used by an existing object.' );
+  when e_col_already_idx 
+  then dbms_output.put_line( 'Such column list already indexed.' );
 end;
 /
-
-begin
-  execute immediate 'create index xuk_TRANSFORM_FORECAST on TRANSFORM_2017_FORECAST ( KF, NLS )';
-exception
-  when others then
-    if sqlcode=-955 then null; else raise; end if;
-end;
-/
-
-
-
-begin
-  execute immediate 'create index xak_TRANSFORM_FORECAST_acc on TRANSFORM_2017_FORECAST ( ACC)';
-exception
-  when others then
-    if sqlcode=-955 then null; else raise; end if;
-end;
-/
-
-
-
 grant select on TRANSFORM_2017_FORECAST to bars_access_defrole; 

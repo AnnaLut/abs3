@@ -1,8 +1,8 @@
-п»їprompt
-prompt РЎРёРЅС…СЂРѕРЅР·Р°С†РёСЏ С‚Р°Р±Р»РёС†С‹-СЃРїСЂР°РІРѕС‡РЅРёРєР° "SREZERV_OB22_R"
-prompt Р”Р°С‚Р°+РІСЂРµРјСЏ СЌРєСЃРїРѕСЂС‚Р°: 24.11.2017 09:58:40
 prompt
-exec bars_audit.info('РЎРёРЅС…СЂРѕРЅР·Р°С†РёСЏ С‚Р°Р±Р»РёС†С‹-СЃРїСЂР°РІРѕС‡РЅРёРєР° "SREZERV_OB22_R" Р”Р°С‚Р°+РІСЂРµРјСЏ СЌРєСЃРїРѕСЂС‚Р°: 24.11.2017 09:58:40  ');
+prompt Синхронзация таблицы-справочника "SREZERV_OB22_R"
+prompt Дата+время экспорта: 24.11.2017 09:58:40
+prompt
+exec bars_audit.info('Синхронзация таблицы-справочника "SREZERV_OB22_R" Дата+время экспорта: 24.11.2017 09:58:40  ');
 alter session set nls_date_format='DD.MM.YYYY HH24:MI:SS';
 alter session set NLS_NUMERIC_CHARACTERS = '. ';
 declare

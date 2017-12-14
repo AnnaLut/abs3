@@ -1,6 +1,6 @@
 CREATE OR REPLACE PACKAGE BARS.T2017 IS
 
-   g_header_version   constant varchar2 (64) := 'version 1.6  08.12.2017';
+   g_header_version   constant varchar2 (64) := 'version 1.8  13.12.2017';
    g_trace            constant varchar2 (64) := 'T2017:';
 
 --============ Зміни в плані рах 2017 р.=======================
@@ -49,9 +49,13 @@ procedure JB           ( p_mode int); -- всеобщий запуск трансформера
 procedure disable_scheduler_jobs;
 procedure enable_scheduler_jobs;
 
-function  Get_NLS      (p_nbs accounts.NBS%type) return accounts.NLS%type   ;
-function  OB22_old     (p_R020_new varchar2, p_ob22_new varchar2, p_R020_old varchar2) return accounts.ob22%type   ;
-function  Get_OB22_old (p_acc number, p_dat_alt date ) return accounts.ob22%type   ;
+function  Get_NLS      (p_nbs accounts.NBS%type) return accounts.NLS%type;
+function  OB22_old     (p_R020_new varchar2, p_ob22_new varchar2, p_R020_old varchar2) return accounts.ob22%type;
+function  Get_OB22_old (p_acc number, p_dat_alt date ) return accounts.ob22%type;
+
+procedure ead_reswitch_cdckeys;
+
+procedure PROCDR;
 
    FUNCTION header_version   RETURN VARCHAR2;
    FUNCTION body_version     RETURN VARCHAR2;
@@ -59,18 +63,18 @@ function  Get_OB22_old (p_acc number, p_dat_alt date ) return accounts.ob22%type
 END T2017;
 /
 
-
-
-
+show errors
 
 --------------------------------------------------------
+
 CREATE OR REPLACE PACKAGE BODY BARS.T2017
 IS
-  g_body_version   CONSTANT VARCHAR2 (64) := 'version 1.15  11.12.2017';
+  g_body_version   CONSTANT VARCHAR2 (64) := 'version 1.17  12.12.2017';
   g_errN number  := -20203;
   nlchr  char(2) := chr(13)||chr(10);
   bnk_dt date;
 /*
+  13.12.2017 Sta доп.рекв ELT6_1 
   08.12.2017 Sta CP - Зашила 2 счета явно
   06.12.2017 Sta 3119 in CP  + CP для всех РУ
   05.12.2017 Sta надо включить cc_pawn в список изменяемых справочников в полях   NBSZ ,  NBSZ1, NBSZ2,  NBSZ3  поменять 9010 
@@ -267,14 +271,14 @@ begin
         end;
         --- ============================================================ ---
        
-       -- Виды вкладов ЮО
+       -- Депозити ЮО
+       delete DPU_TYPES_OB22
+        where NBS_DEP = p_r020_old;
+
        update DPU_VIDD
           set BSD  = p_r020_new
             , IRVK = 1
         where BSD  = p_r020_old;
-
-       delete PROC_DR$BASE
-        where NBS = p_r020_old;
 
        -- Цільове призначення договору
        update CC_AIM     set nbs    = p_r020_new  where nbs   = p_r020_old and D_CLOSE is null;
@@ -360,10 +364,16 @@ begin
    begin update RAZ_KOM      set KOD  =  tt.r020_new||      tt.ob_new  where KOD    = tt.r020_old||          tt.ob_old ; exception when others then T2017.E01(SQLCODE,'RAZ_KOM'     ); end; --<<ФО:Комiсiя за послуги>>
    begin update MONEY2       set nbs  =  tt.r020_new, ob22 =tt.ob_new  where nbs    = tt.r020_old and ob22 = tt.ob_old ; exception when others then T2017.E01(SQLCODE,'MONEY2'      ); end; --Закордоннi перекази ФО. Котловi рах обiлiку
 
- --begin update DPU_TYPES_OB22 set NBS_DEP = tt.r020_new, OB22_DEP=tt.ob_new  where NBS_DEP= tt.r020_old and OB22_DEP= tt.ob_old ; exception when others then T2017.E01(SQLCODE,'DPU_TYPES_OB22'); end; --Depozit UL
- --begin update DPU_TYPES_OB22 set NBS_int = tt.r020_new, OB22_int=tt.ob_new  where NBS_int= tt.r020_old and OB22_int= tt.ob_old ; exception when others then T2017.E01(SQLCODE,'DPU_TYPES_OB22'); end;
- --begin update DPU_TYPES_OB22 set NBS_EXP = tt.r020_new, OB22_EXP=tt.ob_new  where NBS_EXP= tt.r020_old and OB22_EXP= tt.ob_old ; exception when others then T2017.E01(SQLCODE,'DPU_TYPES_OB22'); end;
- --begin update DPU_TYPES_OB22 set NBS_RED = tt.r020_new, OB22_RED=tt.ob_new  where NBS_RED= tt.r020_old and OB22_RED= tt.ob_old ; exception when others then T2017.E01(SQLCODE,'DPU_TYPES_OB22'); end;
+   begin
+     update DPU_TYPES_OB22
+        set NBS_RED  = tt.R020_NEW
+          , OB22_RED = tt.OB_NEW
+      where NBS_RED  = tt.R020_OLD
+        and OB22_RED = tt.OB_OLD;
+   exception
+     when others then
+       T2017.E01( SQLCODE, 'DPU_TYPES_OB22' );
+   end;
 
    begin update NBS_TIPS     set nbs  = tt.r020_new, ob22    =tt.ob_new  where nbs    = tt.r020_old and ob22    = tt.ob_old ; exception when others then T2017.E01(SQLCODE,'NBS_TIPS'      ); end; --Звязок БР <->Типи рахунків
 
@@ -693,6 +703,7 @@ procedure opn     ( p_mode int,  aa_old accounts%rowtype,  tt transfer_2017%rowt
       l_mod       char(3);
       l_choosen   number;
       l_count     number :=0;
+      L_err       varchar2(1000);
 
 begin
       aa_new := aa_old;
@@ -703,13 +714,14 @@ begin
 
       --30.11.2017 Sta Использование прозноз-счетов
       begin 
-         select new_nls into AA_NEW.NLS 
+         select nvl(trim(new_nls), vkrzn ( substr(gl.aMfo,1,5) , tt.R020_NEW ||'0'|| trunc ( dbms_random.value (1, 999999999 ) ) )) into AA_NEW.NLS
            from TRANSFORM_2017_FORECAST 
           where acc = aa_old.acc;
       EXCEPTION WHEN NO_DATA_FOUND   THEN AA_NEW.NLS :=  Vkrzn( substr( gl.amfo,1,5), tt.r020_new||'0' || substr( aa_OLD.nls, 6,9) ); -- сохраняем старый хвост
       end;     
 
       l_count := 0; 
+      dbms_application_info.set_client_info(aa_old.nls||' '|| aa_old.kv);
       while l_count < 100   
       loop
          begin
@@ -717,10 +729,12 @@ begin
             l_count    := 0;
             EXIT ;
          exception when others then     
+            l_err := sqlerrm;
             if sqlcode=-1 then AA_NEW.NLS := vkrzn ( substr(gl.aMfo,1,5) , tt.R020_NEW ||'0'|| trunc ( dbms_random.value (1, 999999999 ) ) );
-                               l_count := l_count + 1;
+            else 
+              exit;                  
             end if;
-
+                               l_count := l_count + 1;
          end;
 
       end loop;
@@ -979,7 +993,7 @@ procedure TAG_KF ( p_KF varchar2) is --  Авто-трансформація додаткових рекв  в A
 begin
   bc.go(p_KF);
  
-  For w in  (select  Rowid RI,  value from accountsW where tag in ( 'S6110' )  and kf = p_KF  )
+  For w in  (select  Rowid RI,  value from accountsW where tag in ( 'S6110' ,'ELT6_1')  and kf = p_KF  )
   loop begin select  nls into w.value from accounts  where nlsalt = w.value and dat_alt is not null and rownum = 1  ;
              update accountsW set value = w.value where rowid = w.RI;
        EXCEPTION WHEN NO_DATA_FOUND   THEN null;
@@ -1222,13 +1236,20 @@ begin
     RETURN l_ob22 ;
 
 end Get_OB22_old ;
-
+-----------------------
+procedure ead_reswitch_cdckeys is
+begin
+  delete from bars.ead_sync_sessions;
+  commit work;
+end ead_reswitch_cdckeys;
+-----------------------
 procedure disable_scheduler_jobs
 is
 begin
   for rec in (select owner||'.'||job_name as job_name from dba_scheduler_jobs 
               where job_name in ('IMPORT_DAY', 'IMPORT_MONTH') 
               or job_name like 'CIG%'
+              or job_name like 'EAD%'
               or job_name like 'CRM_UPLOAD%')
     loop
       dbms_scheduler.disable(name => rec.job_name, force => true);
@@ -1242,6 +1263,7 @@ begin
   for rec in (select owner||'.'||job_name as job_name from dba_scheduler_jobs 
               where job_name in ('IMPORT_DAY', 'IMPORT_MONTH') 
               or job_name like 'CIG%'
+              or job_name like 'EAD%'
               or job_name like 'CRM_UPLOAD%')
     loop
       dbms_scheduler.enable(name => rec.job_name);
@@ -1249,16 +1271,52 @@ begin
     end loop;
 end enable_scheduler_jobs;
 
+  --
+  --
+  --
+  procedure PROCDR
+  is
+  begin
+    for c in ( select kf from MV_KF )
+    loop
+      dbms_output.put_line( 'KF='||c.kf );
+      bc.go('/'||c.kf||'/');
+      delete PROC_DR$BASE
+       where NBS in ( select R020_OLD
+                        from TRANSFER_2017
+                       where R020_OLD != R020_NEW
+                    );
+      dbms_output.put_line( to_char(sql%rowcount)||' rows deleted.' );
+      commit;
+      begin
+        DPT_PROCDR('DPT',1,1);
+        commit;
+      exception
+        when others then
+          dbms_output.put_line( sqlerrm );
+          rollback;
+      end;
+      begin
+        DPU_UTILS.FILL_PROCDR(1,1,c.kf);
+        commit;
+      exception
+        when others then
+          dbms_output.put_line( sqlerrm );
+          rollback;
+      end;
+    end loop;
+    bc.home;
+  end PROCDR;
+
 --------------------
 
   FUNCTION header_version RETURN VARCHAR2 is BEGIN RETURN 'Package header T2017'|| g_header_version; END header_version;
   FUNCTION body_version   RETURN VARCHAR2 is BEGIN RETURN 'Package body T2017'  || g_body_version;   END body_version;
 
 
----Аномимный блок --------------
+
 BEGIN
   bnk_dt := coalesce(GL.GBD(),DAT_NEXT_U(trunc(sysdate),0),trunc(sysdate));
 END T2017;
 /
-
-show err
+show errors

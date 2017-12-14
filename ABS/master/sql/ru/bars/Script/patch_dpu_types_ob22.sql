@@ -2,7 +2,7 @@
 -- Module   : DPU
 -- Author   : BAA
 -- Modifier : BAA
--- Date     : dd.mm.yyyy
+-- Date     : 12.12.2017
 -- ================================== <Comments> ==================================
 -- ОБ22 не міститиме ознаки строковості
 -- ================================================================================
@@ -12,6 +12,18 @@ SET DEFINE       OFF
 SET FEEDBACK     OFF
 SET TERMOUT      ON
 SET TRIMSPOOL    ON
+
+declare
+  E_CNSTRN_NOT_EXISTS     exception;
+  pragma exception_init( E_CNSTRN_NOT_EXISTS, -02443 );
+begin
+  execute immediate 'alter table DPU_TYPES_OB22 drop constraint CC_DPUTYPESOB22_K013_S181';
+  dbms_output.put_line( 'Table altered.' );
+exception
+  when E_CNSTRN_NOT_EXISTS
+  then null;
+end;
+/
 
 declare
   e_col_not_exists       exception;
@@ -29,40 +41,18 @@ exception
 end;
 /
 
-declare
-  E_CNSTRN_NOT_EXISTS     exception;
-  pragma exception_init( E_CNSTRN_NOT_EXISTS, -02443 );
-begin
-  execute immediate 'alter table DPU_TYPES_OB22 drop constraint CC_DPUTYPESOB22_K013_S181';
-  dbms_output.put_line( 'Table altered.' );
-exception
-  when E_CNSTRN_NOT_EXISTS
-  then null;
-end;
-/
-
 SET FEEDBACK ON
 
-delete DPU_TYPES_OB22
- where NBS_DEP in ('2615','2652');
-
-commit;
-
-update DPU_TYPES_OB22 d
-   set d.IRVK = ( select s.IRVK
-                    from DPU_NBS4CUST s
-                   where s.K013    = d.K013
-                     and s.NBS_DEP = d.NBS_DEP );
-
-commit;
-
-update DPU_TYPES_OB22 d
-   set ( NBS_RED, OB22_RED ) = ( select s.R020_NEW, s.OB_NEW
-                                   from TRANSFER_2017 s
-                                  where s.R020_OLD = d.NBS_RED
-                                    and s.OB_OLD   = d.OB22_RED )
- where ( NBS_RED,OB22_RED ) in ( select R020_OLD, OB_OLD
-                                   from TRANSFER_2017 );
+update ( select d.TYPE_ID, d.NBS_DEP, d.R034, d.IRVK
+              , s.IRVK as IRVK_NEW
+           from DPU_TYPES_OB22 d
+           left
+           join DPU_NBS4CUST s
+             on ( s.K013 = d.K013 and s.NBS_DEP = d.NBS_DEP )
+          where lnnvl( d.IRVK = s.IRVK )
+       )
+   set IRVK = IRVK_NEW
+;
 
 commit;
 

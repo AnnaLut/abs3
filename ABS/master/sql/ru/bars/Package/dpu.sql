@@ -693,7 +693,7 @@ is
   --
   -- глобальные переменные и константы
   -- 
-  g_body_version  constant varchar2(64)          := 'version 44.09  30.11.2017';
+  g_body_version  constant varchar2(64)          := 'version 44.10  12.12.2017';
   
   modcode         constant varchar2(3)           := 'DPU';
   accispparam     constant varchar2(16)          := 'DPU_ISP';
@@ -1868,17 +1868,25 @@ is
   procedure CHK_ACC_NUM
   is
   begin
+
     begin
+
       select Substr(p_depacc.numb,1,5)||Substr(to_char(trunc(p_agrid/100)),-9)
         into p_depacc.numb
         from ACCOUNTS
        where NLS = p_depacc.numb
          and KV  = p_curcode;
+
       p_intacc.numb := Substr(p_intacc.numb,1,5)||Substr(p_depacc.numb,6,9);
+
+      p_depacc.numb := SubStr(vkrzn( SubStr(p_mfo,1,5), p_depacc.numb ),1,14);
+      p_intacc.numb := SubStr(vkrzn( SubStr(p_mfo,1,5), p_intacc.numb ),1,14);
+
     exception
       when NO_DATA_FOUND then
         null;
     end;
+
   end CHK_ACC_NUM;
   ---
 begin
@@ -1892,11 +1900,11 @@ begin
   p_depacc.numb := '8'||substr(p_deptype, 2, 3)||'0'||l_num||substr('000'||p_agrnum, -3, 3);  
   p_intacc.numb := '8'||substr(p_inttype, 2, 3)||'0'||l_num||substr('000'||p_agrnum, -3, 3);
 
-  -- перевірка на наявність відкритих рах. з такими номерами
-  CHK_ACC_NUM;
-
   p_depacc.numb := substr(vkrzn(substr(p_mfo,1,5), p_depacc.numb), 1, 14);
   p_intacc.numb := substr(vkrzn(substr(p_mfo,1,5), p_intacc.numb), 1, 14);
+
+  -- перевірка наявністі рах. з такими номерами
+  CHK_ACC_NUM;
 
   -- наименования счетов = Дод.угода № ... + наименование клиента 
   p_depacc.name := substr(bars_msg.get_msg(modcode, 'FNLS_NMS_AGREEMENT', to_char(p_agrnum))||' '||p_custname, 1, 70);

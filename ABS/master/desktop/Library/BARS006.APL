@@ -5,12 +5,12 @@
 0000: 6F00000003000000 FFFF01000D004347 5458566965775374 6174650400010000
 0020: 0000000000FE0000 002C000000020000 0003000000FFFFFF FFFFFFFFFFF8FFFF
 0040: FFE1FFFFFFFEFFFF FFFDFFFFFF0A0400 00C2010000010000 0000000000010000
-0060: 000F4170706C6963 6174696F6E497465 6D02000000075769 6E646F7773076672
-0080: 6D5F446F67000001 8002000200000000 000000000000002C 0000000000000001
-00A0: 000000FFFFFFFFFF FFFFFFF8FFFFFFE2 FFFFFF3200000032 0000001F0400009D
-00C0: 0200000000000000 000000050000000F 4170706C69636174 696F6E4974656D07
-00E0: 57696E646F777308 66726D5F4F70656E 0D4368696C642057 696E646F77730564
-0100: 66524E4B00000000
+0060: 000F4170706C6963 6174696F6E497465 6D02000000075769 6E646F7773086672
+0080: 6D5F4F70656E0000 0180020002000000 0000000000000000 2C00000000000000
+00A0: 01000000FFFFFFFF FFFFFFFFF8FFFFFF E2FFFFFF32000000 320000001F040000
+00C0: 9D02000000000000 0000000005000000 0F4170706C696361 74696F6E4974656D
+00E0: 0757696E646F7773 0866726D5F4F7065 6E0D4368696C6420 57696E646F777305
+0100: 6466524E4B000000 00
 .enddata
 .data DT_MAKERUNDLG
 0000: 02000000001B443A 5C4241525339385C 42494E5C42415261 72733030362E6170
@@ -237,7 +237,7 @@
 .head 3 +  System
 .head 3 +  User
 .head 4 -  ! << Версія бібліотеки >>
-.head 4 -  String: sLibraryVersion =  '2.82 від 07.12.2017'
+.head 4 -  String: sLibraryVersion =  '2.83 від 13.12.2017'
 .head 4 -  Number: nNegativeValue = -1
 .head 2 +  Resources
 .head 2 +  Variables
@@ -11184,7 +11184,39 @@ and SqlFetchNext(hSql(),nFetchRes)
 .head 6 -  Ignore Case? Class Default
 .head 4 -  List Values
 .head 4 -  Message Actions
-.head 3 +  Column: colSROK
+.head 3 +  Column: colTermMin
+.head 4 -  Class Child Ref Key: 0
+.head 4 -  Class ChildKey: 0
+.head 4 -  Class: cColumnLabeled
+.head 4 -  Property Template:
+.head 4 -  Class DLL Name:
+.head 4 -  Title: Срок
+
+.head 4 -  Visible? Yes
+.head 4 -  Editable? No
+.head 4 -  Maximum Data Length: Default
+.head 4 -  Data Type: Number
+.head 4 -  Justify: Left
+.head 4 -  Width:  0.717"
+.head 4 -  Width Editable? Yes
+.head 4 -  Format: Unformatted
+.head 4 -  Country: Default
+.head 4 -  Input Mask: Unformatted
+.head 4 -  Cell Options
+.head 5 -  Cell Type? Standard
+.head 5 -  Multiline Cell? No
+.head 5 -  Cell DropDownList
+.head 6 -  Sorted? Yes
+.head 6 -  Vertical Scroll? Yes
+.head 6 -  Auto Drop Down? No
+.head 6 -  Allow Text Editing? Yes
+.head 5 -  Cell CheckBox
+.head 6 -  Check Value:
+.head 6 -  Uncheck Value:
+.head 6 -  Ignore Case? Yes
+.head 4 -  List Values
+.head 4 -  Message Actions
+.head 3 +  Column: colTermMax
 .head 4 -  Class Child Ref Key: 0
 .head 4 -  Class ChildKey: 0
 .head 4 -  Class: cColumnLabeled
@@ -11824,7 +11856,8 @@ and SqlFetchNext(hSql(),nFetchRes)
       , TYPE_ID
       , TYPE_NM 
       , CCY_CODE 
-      , SROK
+      , TERM_MIN
+      , TERM_MAX
       , R020_DEP 
       , R020_INT 
       , BR_ID
@@ -11848,7 +11881,8 @@ and SqlFetchNext(hSql(),nFetchRes)
         :DPU_VIDD.colTYPEID,
         :DPU_VIDD.cmbTYPENAME,
         :DPU_VIDD.colKV,
-        :DPU_VIDD.colSROK,   
+        :DPU_VIDD.colTermMin,
+        :DPU_VIDD.colTermMax,
         :DPU_VIDD.colBSD,
         :DPU_VIDD.colBSN,   
         :DPU_VIDD.colBRID,
@@ -11915,9 +11949,9 @@ AND SqlFetchNext( hSql(), nFetchRes )
 .head 3 -  Window Location and Size
 .head 4 -  Left:   Default
 .head 4 -  Top:    Default
-.head 4 -  Width:  10.733"
+.head 4 -  Width:  11.0"
 .head 4 -  Width Editable? Class Default
-.head 4 -  Height: 5.929"
+.head 4 -  Height: 5.9"
 .head 4 -  Height Editable? Class Default
 .head 3 -  Form Size
 .head 4 -  Width:  Class Default
@@ -12166,16 +12200,16 @@ and SqlCommitEx( hSql(),CurrentLangTable.GetAtomTitle('frm_ViddDetails.Created')
 .head 2 +  Contents
 .head 3 +  Picture: picTabs
 .data CLASSPROPS
-0000: 5461624F7269656E 746174696F6E0001 0000005461624C65 66744D617267696E
-0020: 0002003000005461 6243757272656E74 001300CEF1EDEEE2 EDFBE520EFE0F0E0
-0040: ECE5F2F0FB000054 6162426F74746F6D 4D617267696E0002 0030000054616250
-0060: 616765436F756E74 0002003100005461 624C6162656C7300 15004C6162656C30
-0080: 094C6162656C3109 4C6162656C320000 5461624E616D6573 004600CEF1EDEEE2
-00A0: EDFBE520EFE0F0E0 ECE5F2F0FB09CFE0 F0E0ECE5F2F0FB20 EDE0F7E8F1EBE5ED
-00C0: E8FF20EFF0EEF6E5 EDF2EEE209C4EEE4 E0F2EAEEE2B320EF E0F0E0ECE5F2F0E8
-00E0: 0000546162526967 68744D617267696E 0002003000005461 6244726177537479
-0100: 6C65000B0057696E 39355374796C6500 00546162466F726D 5061676573000300
-0120: 0909000054616254 6F704D617267696E 0002003000000000 0000000000000000
+0000: 546162546F704D61 7267696E00020030 0000546162466F72 6D50616765730003
+0020: 0009090000546162 447261775374796C 65000B0057696E39 355374796C650000
+0040: 5461625269676874 4D617267696E0002 003000005461624E 616D6573004600CE
+0060: F1EDEEE2EDFBE520 EFE0F0E0ECE5F2F0 FB09CFE0F0E0ECE5 F2F0FB20EDE0F7E8
+0080: F1EBE5EDE8FF20EF F0EEF6E5EDF2EEE2 09C4EEE4E0F2EAEE E2B320EFE0F0E0EC
+00A0: E5F2F0E800005461 624C6162656C7300 15004C6162656C30 094C6162656C3109
+00C0: 4C6162656C320000 5461625061676543 6F756E7400020031 0000546162426F74
+00E0: 746F6D4D61726769 6E00020030000054 616243757272656E 74001300CEF1EDEE
+0100: E2EDFBE520EFE0F0 E0ECE5F2F0FB0000 5461624C6566744D 617267696E000200
+0120: 3000005461624F72 69656E746174696F 6E00010000000000 0000000000000000
 0140: 0000000000000000 00000000
 .enddata
 .data CLASSPROPSSIZE
@@ -14041,7 +14075,7 @@ and SqlFetchNext(hSql(), nFetchRes)
 .head 5 -  Top:    2.643"
 .head 5 -  Width:  10.0"
 .head 5 -  Width Editable? Yes
-.head 5 -  Height: 1.93"
+.head 5 -  Height: 1.8"
 .head 5 -  Height Editable? Yes
 .head 4 -  Visible? No
 .head 4 -  Corners: Square
@@ -15584,7 +15618,7 @@ and SqlFetchNext(hSql(), nFetchRes)
 .head 4 -  Class:
 .head 4 -  Window Location and Size
 .head 5 -  Left:   0.35"
-.head 5 -  Top:    3.762"
+.head 5 -  Top:    3.595"
 .head 5 -  Width:  2.5"
 .head 5 -  Width Editable? Yes
 .head 5 -  Height: 0.2"
@@ -15622,7 +15656,7 @@ and SqlFetchNext(hSql(), nFetchRes)
 .head 5 -  Vertical Scroll? Yes
 .head 5 -  Window Location and Size
 .head 6 -  Left:   0.35"
-.head 6 -  Top:    4.012"
+.head 6 -  Top:    3.845"
 .head 6 -  Width:  9.6"
 .head 6 -  Width Editable? Yes
 .head 6 -  Height: 0.45"
@@ -15651,7 +15685,7 @@ and SqlFetchNext(hSql(), nFetchRes)
 .head 4 -  Class:
 .head 4 -  Window Location and Size
 .head 5 -  Left:   0.2"
-.head 5 -  Top:    3.869"
+.head 5 -  Top:    3.702"
 .head 5 -  Width:  10.0"
 .head 5 -  Width Editable? Yes
 .head 5 -  Height: 0.7"
@@ -16182,7 +16216,7 @@ OR ( dfTERM_MAX_D = 0 AND dfTERM_MAX_M = 0 )
 .head 4 -  Display Settings
 .head 5 -  Window Location and Size
 .head 6 -  Left:   0.35"
-.head 6 -  Top:    3.39"
+.head 6 -  Top:    3.226"
 .head 6 -  Width:  3.5"
 .head 6 -  Width Editable? Yes
 .head 6 -  Height: 0.27"
@@ -16216,7 +16250,7 @@ OR ( dfTERM_MAX_D = 0 AND dfTERM_MAX_M = 0 )
 .head 4 -  Class: cQuickGroupBox
 .head 4 -  Window Location and Size
 .head 5 -  Left:   0.2"
-.head 5 -  Top:    3.2"
+.head 5 -  Top:    3.036"
 .head 5 -  Width:  10.0"
 .head 5 -  Width Editable? Class Default
 .head 5 -  Height: 0.55"
@@ -16245,10 +16279,10 @@ OR ( dfTERM_MAX_D = 0 AND dfTERM_MAX_M = 0 )
 .head 4 -  Class DLL Name:
 .head 4 -  Window Location and Size
 .head 5 -  Left:   4.0"
-.head 5 -  Top:    3.4"
+.head 5 -  Top:    3.238"
 .head 5 -  Width:  6.0"
 .head 5 -  Width Editable? Class Default
-.head 5 -  Height: 0.417"
+.head 5 -  Height: 0.262"
 .head 5 -  Height Editable? Class Default
 .head 4 -  Visible? No
 .head 4 -  Editable? Class Default
@@ -16414,7 +16448,7 @@ OR ( dfTERM_MAX_D = 0 AND dfTERM_MAX_M = 0 )
 .head 5 -  Top:    0.46"
 .head 5 -  Width:  10.0"
 .head 5 -  Width Editable? Yes
-.head 5 -  Height: 2.7"
+.head 5 -  Height: 2.5"
 .head 5 -  Height Editable? Yes
 .head 4 -  Visible? No
 .head 4 -  Corners: Square
@@ -17254,17 +17288,13 @@ CurrentLangTable.GetAtomTitle('_cTErrRekv') ||' <'|| CurrentLangTable.GetAtomTit
 .head 7 -  ! Депозитні Лінії
 .head 7 +  If ( ( nFlExtend = 2 ) AND ( dfDPUADD = 0 ) )
 .head 8 -  Set dfDATN = dfDATO
-.head 8 +  Select Case ( nPeriodType )
-.head 9 +  Case 1
-.head 10 -  ! вид депозиту короткострокова лінія
-.head 10 -  Set dfDATO = GetCloseDate(dfDATN, 12, dfKV)
-.head 10 -  Break
-.head 9 +  Case 2
-.head 10 -  ! вид депозиту довгострокова лінія
+.head 8 +  If ( nPeriodType = 0 )
+.head 9 -  Set dfDATO = GetCloseDate(dfDATN, nMaxTerm, dfKV)
+.head 8 +  Else
+.head 9 +  If ( nMaxTerm > 12 ) OR ( nMaxTerm > 0.0365 AND nMaxTerm < 1)
 .head 10 -  Set dfDATO = GetCloseDate(dfDATN, 36, dfKV)
-.head 10 -  Break
-.head 9 +  Default
-.head 10 -  Set dfDATO = GetCloseDate(dfDATN, dfTERM, dfKV)
+.head 9 +  Else
+.head 10 -  Set dfDATO = GetCloseDate(dfDATN, 12, dfKV)
 .head 8 -  Set dfDATV = dfDATO
 .head 7 +  Else
 .head 8 -  ! Дати угоди
@@ -18521,8 +18551,8 @@ and SqlFetchNext(hSql(), nFetchRes)
 .head 6 -  Set dfVIDD = cmbVIDD.nCurrentId
 .head 6 +  If ( dfVIDD != NUMBER_Null ) And f_get_viddpar()
 .head 7 -  ! << Якщо термін депозиту != 0 >>
-.head 7 +  If dfTERM != 0
-.head 8 -  Set dfDATO = GetCloseDate(dfDATN, dfTERM, dfKV)
+.head 7 +  If ( nMaxTerm != 0 )
+.head 8 -  Set dfDATO = GetCloseDate(dfDATN, nMaxTerm, dfKV)
 .head 8 -  Set dfDATV = f_GetDateReturn()
 .head 8 -  Set dfKTDAY= F_CALC_KTDAYS()
 .head 8 -  ! фіксований термін депозиту
@@ -18533,9 +18563,13 @@ and SqlFetchNext(hSql(), nFetchRes)
 .head 7 -  ! <<<< Якщо генугода >>>>
 .head 7 +  If ( nFlExtend = 2 ) AND ( pDPU_GEN = NUMBER_Null )
 .head 8 +  If ( nPeriodType = 1 )
-.head 9 -  Set dfDATO = GetCloseDate( dfDATN, 12, dfKV )
-.head 8 +  If ( nPeriodType = 2 )
-.head 9 -  Set dfDATO = GetCloseDate( dfDATN, 36, dfKV )
+.head 9 -  ! Строковий депозит
+.head 9 +  If ( nMaxTerm > 12 ) OR ( nMaxTerm > 0.0365 AND nMaxTerm < 1 )
+.head 10 -  ! Довгострокова деп. лінія
+.head 10 -  Set dfDATO = GetCloseDate(dfDATN, 36, dfKV)
+.head 9 +  Else
+.head 10 -  ! Короткострокова деп. лінія
+.head 10 -  Set dfDATO = GetCloseDate(dfDATN, 12, dfKV)
 .head 8 -  Set dfDATV = dfDATO
 .head 8 -  Set dfIR = 0
 .head 8 -  Set cbIR = 1
@@ -19391,8 +19425,8 @@ dfMIN_SUM >  dfSUM
 .head 7 -  Set dfDATN = dfDATZ
 .head 7 -  Call SalSetFocus(dfDATN)
 .head 6 -  Set dfDATN = DptCorrectDate(dfKV, dfDATN, dfDATN + 1)
-.head 6 +  If dfTERM != 0
-.head 7 -  Set dfDATO = GetCloseDate(dfDATN, dfTERM, dfKV)
+.head 6 +  If ( nMaxTerm != 0 )
+.head 7 -  Set dfDATO = GetCloseDate(dfDATN, nMaxTerm, dfKV)
 .head 7 -  Set dfDATV = f_GetDateReturn()
 .head 6 +  If dfDPU_ID = NUMBER_Null
 .head 7 -  Set dfIR = f_getscalerate(dfVIDD, dfDATN, dfDATO, dfSUM, FALSE)
@@ -19485,7 +19519,7 @@ dfMIN_SUM >  dfSUM
 .head 9 -  Set dfIR = f_getscalerate( dfVIDD, dfDATN, dfDATO, dfSUM, FALSE )
 .head 8 -  Return VALIDATE_Ok
 .head 7 +  Else
-.head 8 -  Set dfDATO = GetCloseDate(dfDATN, dfTERM, dfKV)
+.head 8 -  Set dfDATO = GetCloseDate(dfDATN, nMaxTerm, dfKV)
 .head 8 -  Return VALIDATE_Cancel
 .head 6 -  Return VALIDATE_Cancel
 .head 5 +  ! On SAM_KillFocus
@@ -21287,36 +21321,6 @@ SalMessageBox(CurrentLangTable.GetAtomTitle('_cTMessAccRnk'),
 .head 5 -  Background Color: Default
 .head 5 -  Input Mask: Unformatted
 .head 4 -  Message Actions
-.head 3 +  Data Field: dfTERM
-.head 4 -  Class Child Ref Key: 0
-.head 4 -  Class ChildKey: 0
-.head 4 -  Class:
-.head 4 -  Property Template:
-.head 4 -  Class DLL Name:
-.head 4 -  Data
-.head 5 -  Maximum Data Length: Default
-.head 5 -  Data Type: Number
-.head 5 -  Editable? No
-.head 4 -  Display Settings
-.head 5 -  Window Location and Size
-.head 6 -  Left:   6.5"
-.head 6 -  Top:    2.833"
-.head 6 -  Width:  0.383"
-.head 6 -  Width Editable? Yes
-.head 6 -  Height: 0.25"
-.head 6 -  Height Editable? Yes
-.head 5 -  Visible? No
-.head 5 -  Border? Yes
-.head 5 -  Justify: Left
-.head 5 -  Format: Unformatted
-.head 5 -  Country: Default
-.head 5 -  Font Name: Default
-.head 5 -  Font Size: Default
-.head 5 -  Font Enhancement: Default
-.head 5 -  Text Color: Default
-.head 5 -  Background Color: Default
-.head 5 -  Input Mask: Unformatted
-.head 4 -  Message Actions
 .head 3 +  Data Field: dfAMOUNT
 .head 4 -  Class Child Ref Key: 0
 .head 4 -  Class ChildKey: 0
@@ -21614,7 +21618,6 @@ AND NOT SqlFetchNext(hSql(), nFetchRes)
 .head 6 -  ! Set dfMIN_SUM = NUMBER_Null
 .head 6 -  Set dfDPUGEN  = NUMBER_Null 
 .head 6 -  Set dfDPUADD  = NUMBER_Null
-.head 6 -  Set dfTERM    = NUMBER_Null
 .head 6 -  !
 .head 6 -  Set dfDATZ    = GetBankDate()
 .head 6 -  Set dfDATN    = GetBankDate()
@@ -21656,7 +21659,7 @@ SELECT c.rnk, c.nmk, c.okpo, c.adr,
        :frm_Open.dfMFOD,   :frm_Open.dfNBD,     :frm_Open.dfNLSD,     :frm_Open.dfNMSD, 
        :frm_Open.dfMFOP,   :frm_Open.dfNBP,     :frm_Open.dfNLSP,     :frm_Open.dfNMSP,   :frm_Open.dfOKPOP, 
        :frm_Open.sCOMMENT, :frm_Open.dfBRANCH,  :frm_Open.sBranchName,:frm_Open.dfDPUGEN, 
-       :frm_Open.dfDPUADD, :frm_Open.nFlExtend, :frm_Open.dfTERM,     :frm_Open.nPeriodType
+       :frm_Open.dfDPUADD, :frm_Open.nFlExtend, :frm_Open.nMaxTerm,   :frm_Open.nPeriodType
    FROM dpu_deal  d, 
         dpu_vidd  v, 
         customer  c,
@@ -22052,7 +22055,7 @@ And nTmp = 1
 .head 6 -  Set dfBRANCH  = get_OneStringValue("SELECT SubStr(sys_context('bars_context','user_branch'),1,30) INTO :sResult FROM dual")
 .head 6 -  Set dfDPUGEN  = NUMBER_Null
 .head 6 -  Set dfDPUADD  = NUMBER_Null
-.head 6 -  Set dfTERM    = NUMBER_Null
+.head 6 -  Set nMaxTerm  = NUMBER_Null
 .head 6 -  !
 .head 6 -  Call SalDisableWindow( pbPrint )
 .head 6 -  Call SalDisableWindow( pbSos )
@@ -22307,17 +22310,16 @@ SalMessageBox(CurrentLangTable.GetAtomTitle('_cTMessDopSogl'),
 .head 4 -  Local variables
 .head 4 +  Actions
 .head 5 +  If SqlPrepareAndExecute( hSql(), "
-SELECT dpu_types.type_id, 
-       dpu_types.type_name,
+SELECT dpu_types.type_id, dpu_types.type_name,
        tabval.kv, tabval.lcv, tabval.name, 
-       dpu_vidd.TERM_MIN, dpu_vidd.COMPROC, nvl(dpu_vidd.FL_EXTEND, 0), 
+       dpu_vidd.TERM_MIN, dpu_vidd.TERM_MAX, dpu_vidd.COMPROC, nvl(dpu_vidd.FL_EXTEND, 0), 
        nvl(dpu_vidd.MIN_SUMM,0)/100, nvl(dpu_vidd.MAX_SUMM,0)/100,
        dpu_vidd.TERM_TYPE, dpu_vidd.IRVK,
        freq.freq,    freq.Name,
        brates.BR_ID, brates.Name,  
        dpt_stop.id,  dpt_stop.Name
   INTO :dfTYPEID,  :cmbTYPE,   :dfKV,  :dfISO,  :cmbKV, 
-       :dfTERM,    :cbCOMPROC, :nFlExtend,  
+       :nMinTerm,  :nMaxTerm,  :cbCOMPROC, :nFlExtend,  
        :dfMIN_SUM, :nMaxAmnt,  :nTermType, :nPeriodType,
        :dfFREQ,    :cmbFREQ, 
        :dfBRID,    :cmbBR,
@@ -22454,10 +22456,12 @@ WHERE  d.dpu_id = " || Str( nDPU_ID ) ) And SqlFetchNext(hSql(), nFetchRes)
 .head 3 -  Number: nTmp
 .head 3 -  ! Date/Time: dTmp
 .head 3 -  Number: nSUBDEALID
-.head 3 -  Number: nFlExtend   !! лінія /стандарт
-.head 3 -  Number: nTermType   !! 
-.head 3 -  Number: nPeriodType !! S181
-.head 3 -  Number: nMaxAmnt    !! Максимальна сума депозиту
+.head 3 -  Number: nFlExtend   !! Лінія     / Стандарт
+.head 3 -  Number: nPeriodType !! Строковий / На вимогу
+.head 3 -  Number: nTermType   !! фіксованй / Діапазон
+.head 3 -  Number: nMaxAmnt    !! Max. сума депозиту
+.head 3 -  Number: nMinTerm    !! Min. термін депозиту
+.head 3 -  Number: nMaxTerm    !! Max. термін депозиту
 .head 3 -  Boolean: bProl      !! прапорець пролонгації вкладу
 .head 2 +  Message Actions
 .head 3 +  On SAM_Create

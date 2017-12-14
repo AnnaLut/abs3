@@ -143,9 +143,12 @@ function InitCustAcc() {
     obj.v_funcFilterBefore = "toggleNotFillBefore";
     obj.v_funcFilter = "toggleNotFill";
     obj.v_notFill = true;
-    if (type == 0 || (type == 3 && getParamFromUrl("nd", location.href))) {
+    if (type == 0
+        || (type == 3 && getParamFromUrl("nd", location.href))
+        || (type == 5 && getParamFromUrl("bpkw4nd", location.href))
+    ) {
         obj.v_notFill = false;
-    }
+    }		
 
     fn_InitVariables(obj);
     InitGrid(v_NotFill);

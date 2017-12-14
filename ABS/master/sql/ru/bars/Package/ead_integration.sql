@@ -1,12 +1,10 @@
-
- 
  PROMPT ===================================================================================== 
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/ead_integration.sql =========*** Run
  PROMPT ===================================================================================== 
  
   CREATE OR REPLACE PACKAGE BARS.EAD_INTEGRATION 
 IS
-   g_header_version   CONSTANT VARCHAR2 (64) := 'version 1.6 11.05.2017';
+   g_header_version   CONSTANT VARCHAR2 (64) := 'version 2.2   01.10.2017';
 
    FUNCTION header_version
       RETURN VARCHAR2;
@@ -159,7 +157,7 @@ IS
       branch_id        branch.branch%TYPE,
       user_login       staff$base.logname%TYPE,
       user_fio         staff$base.fio%TYPE,
-      agr_type         VARCHAR2 (10),
+      agr_type         VARCHAR2 (50),
       agr_status       SMALLINT,
       agr_number       dpt_deposit_clos.nd%TYPE,
       agr_date_open    dpt_deposit_clos.dat_begin%TYPE,
@@ -213,7 +211,7 @@ IS
    -----------------------------------------------------------------------
    TYPE UAgrDPU_Instance_Rec IS RECORD
    (
-      agr_code         varchar2(50),
+      agr_code         dpu_deal.dpu_id%TYPE,
       rnk              customer.rnk%TYPE,
       changed          DATE,
       created          DATE,
@@ -303,7 +301,7 @@ IS
 
    FUNCTION get_UAgrDBO_Instance_Set (p_rnk customer.rnk%TYPE)
       RETURN UAgrDBO_Instance_Set
-      PIPELINED;      
+      PIPELINED;
    -----------------------------------------------------------------------
    -- EADService.cs         Structs.Params.Acc.GetInstance
    -----------------------------------------------------------------------
@@ -324,14 +322,12 @@ IS
       agr_number       specparam.nkd%TYPE,
       agr_code         VARCHAR2 (500),
       account_type     VARCHAR2 (500),
-      agr_type         VARCHAR2 (10)
+      agr_type         VARCHAR2 (10),
+      remote_controled number(1)
    );
 
    TYPE ACC_Instance_Set IS TABLE OF ACC_Instance_Rec;
-   FUNCTION get_ACC_Instance_Set (p_agr_type varchar2,
-                                  p_acc     accounts.acc%TYPE)
-      RETURN ACC_Instance_Set
-      PIPELINED;
+   function get_ACC_Instance_Set (p_agr_type string, p_acc accounts.acc%type) return ACC_Instance_Set pipelined;
 
    -----------------------------------------------------------------------
    -- EADService.cs         Structs.Params.Act.GetInstance
@@ -354,13 +350,15 @@ IS
    -- EADService.cs         Structs.Params.GercClient.GetInstance!!!
    -----------------------------------------------------------------------
 
-
-
 END ead_integration;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.EAD_INTEGRATION 
+show errors
+
+
+
+CREATE OR REPLACE PACKAGE BODY BARS.EAD_INTEGRATION
 IS
-   g_body_version   CONSTANT VARCHAR2 (64) := 'version 1.27 11.05.2017';
+   g_body_version   CONSTANT VARCHAR2 (64) := 'version 2.3   01.12.2017';
 
    FUNCTION body_version
       RETURN VARCHAR2
@@ -418,7 +416,8 @@ IS
                NVL (pages_count, 1) AS pages_count,
                binary_data,
                NVL (rnk, linkedrnk) AS rnk,
-               CASE WHEN rnk <> linkedrnk THEN linkedrnk ELSE NULL END AS linkedrnk,
+--               CASE WHEN rnk <> linkedrnk THEN linkedrnk ELSE NULL END AS linkedrnk,
+               nullif(linkedrnk, rnk) as linkedrnk,
                (CASE
                    WHEN STRUCT_CODE = 146 THEN
                    (SELECT max(T1.REQ_ID) FROM CUST_REQUESTS T1 WHERE T1.TRUSTEE_RNK = NVL(rnk, linkedrnk) AND T1.REQ_STATE=0 and T1.REQ_TYPE =0 )
@@ -441,15 +440,13 @@ IS
                        d.crt_date AS created,
                        d.page_count AS pages_count,
                        d.scan_data AS binary_data,
-                       (SELECT DISTINCT
-                               FIRST_VALUE (dds.rnk) OVER (ORDER BY idupd DESC)
-                          FROM dpt_deposit_clos dds
-                         WHERE dds.deposit_id = d.agr_id)
-                          AS rnk
+--                       (SELECT DISTINCT FIRST_VALUE (dds.rnk) OVER (ORDER BY idupd DESC) FROM dpt_deposit_clos dds WHERE dds.deposit_id = d.agr_id) AS rnk
+                       (select min(rnk) keep(dense_rank last order by idupd) from bars.dpt_deposit_clos dds where dds.deposit_id = d.agr_id) as rnk
                   FROM ead_docs d, staff$base sb
                  WHERE d.id = p_doc_id AND d.crt_staff_id = sb.id
-                   AND (not exists (select 1 from dpt_deposit_clos where deposit_id = d.agr_id and wb='Y')
-                      or (d.ea_struct_id in (541,542,543) and d.scan_data is not null))))
+--                   AND (not exists (select 1 from dpt_deposit_clos where deposit_id = d.agr_id and wb='Y')
+--                      or (d.ea_struct_id in (541,542,543) and d.scan_data is not null))
+           ))
     loop
         l_Doc_Instance_Rec.id            :=  i.id;
         l_Doc_Instance_Rec.agreement_id  :=  i.agreement_id;
@@ -471,7 +468,7 @@ IS
    END;
 
  -----------------------------------------------------------------------
-   -- EADService.cs         Structs.Params.Client.GetInstance
+   -- EADService.cs         Structs.Params.Client.GetInstance      BMS.Method = SetClientData
    -----------------------------------------------------------------------
 
    FUNCTION get_Client_Instance (p_rnk customer.rnk%TYPE)
@@ -534,6 +531,10 @@ IS
         l_Client_Instance_Rec.document_number   := i.document_number;
         l_Client_Instance_Rec.client_data       := i.client_data;
 
+        if l_Client_Instance_Rec.birth_date is null then
+          raise_application_error(-20002, 'Дата народження клієнта не заповнена [birth_date]');
+        end if;
+
         PIPE ROW (l_Client_Instance_Rec);
     end loop;
    end;
@@ -550,7 +551,7 @@ IS
                         UNION ALL
                         SELECT rt.rnkfrom, rt.rnkto
                           FROM rnk2tbl rt)
-                 WHERE rnkto = p_rnk order by rnkfrom desc)
+                 WHERE rnkfrom != p_rnk and rnkto = p_rnk order by rnkfrom desc)
     loop
         l_MergedRNK_Rec.mrg_rnk := i.mrg_rnk;
         PIPE ROW (l_MergedRNK_Rec);
@@ -558,7 +559,7 @@ IS
    end;
 
    -----------------------------------------------------------------------
-   -- EADService.cs         Structs.Params.UClient.GetInstance
+   -- EADService.cs         Structs.Params.UClient.GetInstance        BMS.Method = SetClientDataU
    -----------------------------------------------------------------------
    FUNCTION get_UClient_Instance (p_rnk customer.rnk%TYPE)
       RETURN UClient_Instance_Set
@@ -664,7 +665,7 @@ IS
 
     end;
    -----------------------------------------------------------------------
-   -- EADService.cs         Structs.Params.Agr.GetInstance
+   -- EADService.cs         Structs.Params.Agr.GetInstance       BMS.Method = SetAgreementData
    -----------------------------------------------------------------------
    FUNCTION get_AgrDPT_Instance_Set (p_agr_id dpt_deposit.deposit_id%TYPE)
       RETURN AgrDPT_Instance_Set
@@ -673,52 +674,39 @@ IS
         l_AgrDPT_Instance_Rec   AgrDPT_Instance_Rec;
     begin
 
-      for i in (SELECT agr_code,
-                       rnk,
-                       changed,
-                       created,
-                       branch_id,
-                       user_login,
-                       user_fio,
-                       agr_type,
-                       agr_status,
-                       agr_number,
-                       agr_date_open,
-                       agr_date_close,
-                       account_number
-                  FROM (SELECT dc.deposit_id AS agr_code,
-                               dc.rnk rnk,
-                               dc.when AS changed,
-                               dc.datz AS created,
-                               dc.branch AS branch_id,
-                               sb.logname AS user_login,
-                               sb.fio AS user_fio,
-                               'deposit' AS agr_type,
-                               (SELECT DECODE (COUNT (dc0.deposit_id), 0, 1, 0)
-                                  FROM dpt_deposit_clos dc0
-                                 WHERE     dc0.deposit_id = dc.deposit_id
-                                       AND dc0.action_id IN (1, 2))
-                                  AS agr_status,
-                               dc.nd AS agr_number,
-                               dc.dat_begin AS agr_date_open,
-                               CASE
-                                  WHEN DC.ACTION_ID IN (1, 2) THEN DC.BDATE
-                                  WHEN DC.ACTION_ID NOT IN (1, 2) THEN NULL
-                                  ELSE NULL
-                               END
-                                  AS agr_date_close,
-                               (SELECT a.nls
-                                  FROM accounts a
-                                 WHERE a.acc = dc.acc)
-                                  AS account_number,
-                               idupd,
-                               MAX (idupd) OVER (ORDER BY deposit_id) max_idupd
-                          FROM dpt_deposit_clos dc, staff$base sb
-                         WHERE     dc.deposit_id = p_agr_id
-                               AND dc.actiion_author = sb.id
-                               AND dc.wb = 'N') main               
-                 WHERE idupd = max_idupd   
-        )
+        for i in (SELECT ddc.deposit_id AS                                                         agr_code,
+                         ddc.rnk                                                                     rnk,
+                         ddc.when AS                                                                 changed,
+                         ddc.datz AS                                                                 created,
+                         ddc.branch AS                                                               branch_id,
+                         sb.logname AS                                                              user_login,
+                         sb.fio AS                                                                  user_fio,
+/*                       case when d.wb = 'N' then 'deposit'
+                              when d.wb = 'Y' then 'dep_online_fo'
+                         end       AS                                                               agr_type,
+*/                       'deposit' AS                                                               agr_type,
+                         (SELECT DECODE (COUNT (1), 0, 1, 0)
+                            FROM dpt_deposit_clos dc0
+                           WHERE dc0.deposit_id = ddc.deposit_id AND dc0.action_id IN (1, 2))
+                            AS                                                                      agr_status,
+                         ddc.nd AS                                                                   agr_number,
+                         ddc.dat_begin AS                                                            agr_date_open,
+                         CASE
+                            WHEN ddc.ACTION_ID IN (1, 2) THEN ddc.BDATE
+                            WHEN ddc.ACTION_ID NOT IN (1, 2) THEN NULL
+                            ELSE NULL
+                         END
+                            AS                                                                      agr_date_close,
+                         (SELECT a.nls
+                            FROM accounts a
+                           WHERE a.acc = ddc.acc)
+                            AS                                                                      account_number
+                   FROM dpt_deposit_clos ddc
+                   join dpt_deposit d on ddc.deposit_id = d.deposit_id
+                   left outer join staff$base sb on ddc.actiion_author = sb.id
+                  WHERE ddc.deposit_id = p_agr_id
+--                    and d.wb = 'N'
+                  ORDER BY ddc.idupd DESC)
         loop
             l_AgrDPT_Instance_Rec.agr_code        := i.agr_code;
             l_AgrDPT_Instance_Rec.rnk             := i.rnk;
@@ -786,7 +774,7 @@ IS
 
         for i in ( SELECT agr_code,
                          rnk,
-                         CHGDATE AS changed,
+                         (case when daos between trunc(chgdate) and bankdate() then daos else chgdate end) AS changed,
                          DAOS AS created,
                          branch AS branch_id,
                          user_login,
@@ -832,7 +820,7 @@ IS
     end;
 
    -----------------------------------------------------------------------
-   -- EADService.cs         Structs.Params.UAgr.GetInstance
+   -- EADService.cs         Structs.Params.UAgr.GetInstance      BMS.Method = SetAgreementDataU
    -----------------------------------------------------------------------
    FUNCTION get_UAgrDPU_Instance_Set (p_dpu_id dpu_deal.dpu_id%TYPE)
       RETURN UAgrDPU_Instance_Set
@@ -903,7 +891,7 @@ IS
         l_dazs date;
         l_nbs accounts.nbs%type;
    begin
-     bc.go('/');
+
       begin
             SELECT kl.get_customerw (rnk, 'NDBO'),
                    kl.get_customerw (rnk, 'DDBO'),
@@ -928,63 +916,43 @@ IS
         then
         l_agr_code     := l_NDBO;
         l_agr_status   := 10;--case when l_dazs is null then 10 else 0 end;
-        l_agr_type     := 'dbo_uo';
+        l_agr_type     := tools.iif(l_SDBO is not null, 'dbo_uo');
          p_agr_code:= l_agr_code;
          p_agr_status := l_agr_status;
          p_agr_date := l_DDBO;
         end if;
 
-          if l_nbs in ('2655', '2605')
-           then  l_acc_type := 'kpk_uo';
-           elsif l_nbs in ('2525', '2546', '2610', '2615', '2651', '2652')
-           then  l_acc_type := 'dep_uo'; 
-           else l_acc_type:= 'pr_uo';
+          if l_nbs in ('2655', '2605') then
+            l_acc_type := 'kpk_uo';
+          elsif l_nbs in ('2525', '2546', '2610', '2615', '2651', '2652') then
+            l_acc_type := 'dep_uo';
+          else
+            l_acc_type:= 'pr_uo';
           end if;
          p_acc_type := l_acc_type;
-		 p_agr_type := coalesce(l_agr_type,l_acc_type);
-   end;
+--         p_agr_type := nvl(l_agr_type,l_acc_type);
+         p_agr_type := case when l_acc_type ='dep_uo' then 'dep_uo' else nvl(l_agr_type,l_acc_type) end;   --- temporary until dkbo
+   end get_accagr_param;
 
-       procedure get_rnkagr_param(p_rnk in customer.rnk%type,
-                               p_agr_code out specparam.nkd%type,
-                               p_agr_type out varchar2,
-                               p_agr_date out varchar2,
-                               p_agr_status out number)
-   is
-        l_agr_code specparam.nkd%type;
-        l_agr_type varchar2(10);
-        l_agr_status number(2);
-        l_NDBO varchar2(40);
-        l_NKD  varchar2(40);
-        l_DDBO varchar2(50);
-        l_SDBO varchar2(50);
-   begin
-    bc.go('/');
-      begin
-            SELECT kl.get_customerw (p_rnk, 'NDBO'),
-                   kl.get_customerw (p_rnk, 'DDBO'),
-                   kl.get_customerw (p_rnk, 'SDBO')
-              INTO l_NDBO,
-                   l_DDBO,
-                   l_SDBO
-              FROM dual;
-      end;
-        p_agr_code:= l_NDBO;
-        p_agr_type := 'dbo_uo';
+    procedure get_rnkagr_param(p_rnk        in customer.rnk%type,
+                               p_agr_code   out specparam.nkd%type,
+                               p_agr_type   out varchar2,
+                               p_agr_date   out varchar2,
+                               p_agr_status out number) is
+    begin
+      p_agr_code := kl.get_customerw(p_rnk, 'NDBO');
+      p_agr_date := kl.get_customerw(p_rnk, 'DDBO');
+      p_agr_type := 'dbo_uo';
 
-        begin
-         select count(acc)
-           into p_agr_status
-           from accounts
-          where rnk = p_rnk
-            and ead_pack.get_acc_info(acc) = 1
-            and nbs is not null;
-        exception when others then p_agr_status := 0;
-        end;
-        p_agr_status := case when p_agr_status = 0 then 10 -- проект
-                             else 1 -- открытый
-                        end;
-        p_agr_date := l_DDBO;
-   end;
+      select count(acc) into p_agr_status
+        from accounts
+       where rnk = p_rnk
+         and ead_pack.get_acc_info(acc) = 1
+         and nbs is not null;
+
+      p_agr_status := tools.iif(p_agr_status = 0 or kl.get_customerw(p_rnk, 'SDBO') is null, 10 /*проект*/, 1 /*открытый*/);
+
+    end get_rnkagr_param;
 
     FUNCTION get_UAgrDBO_Instance_Set (p_rnk customer.rnk%TYPE)
       RETURN UAgrDBO_Instance_Set
@@ -1057,7 +1025,7 @@ IS
                        p_agr_type => l_agr_type,
                        p_agr_date => l_agr_date,
                        p_agr_status => l_agr_status);
-     bars_audit.info('get_UAgrACC_Instance_Set.get_accagr_param: l_agr_code='|| l_agr_code  ||', l_acc_type='||l_acc_type||', l_agr_type='||l_agr_type||',l_agr_date = '||l_agr_date||',l_agr_status='||l_agr_status );
+--     bars_audit.info('get_UAgrACC_Instance_Set.get_accagr_param: l_agr_code='|| l_agr_code  ||', l_acc_type='||l_acc_type||', l_agr_type='||l_agr_type||',l_agr_date = '||l_agr_date||',l_agr_status='||l_agr_status );
         for i in (  SELECT agr_code, rnk, changed, daos AS created,
                            EAD_PACK.GET_CUSTTYPE (rnk) AS client_type,
                            branch AS branch_id, user_login, user_fio,
@@ -1176,13 +1144,10 @@ IS
     end;
 
    -----------------------------------------------------------------------
-   -- EADService.cs         Structs.Params.Acc.GetInstance
+   -- EADService.cs         Structs.Params.Acc.GetInstance       BMS.Method = SetAccountDataU
    -----------------------------------------------------------------------
 
-    FUNCTION get_ACC_Instance_Set (p_agr_type VARCHAR2, p_acc accounts.acc%TYPE)
-       RETURN ACC_Instance_Set
-       PIPELINED
-    IS
+    function get_ACC_Instance_Set (p_agr_type string, p_acc accounts.acc%type) return ACC_Instance_Set pipelined is
      l_ACC_Instance_Rec ACC_Instance_Rec;
      l_agr_code specparam.nkd%type;
      l_acc_type varchar2(10);
@@ -1211,12 +1176,11 @@ IS
                        a.dazs AS close_date,
                        CASE
                           WHEN (a.dazs IS NULL AND a.blkd = 0 AND a.blkk = 0) THEN 1
-                          WHEN a.dazs IS NOT NULL and a.dazs != a.daos and a.nbs is not null THEN 2
-                          WHEN a.dazs IS NOT NULL THEN 6
+                          WHEN a.dazs = a.daos and a.nbs is null THEN 6
+                          WHEN a.dazs != a.daos and a.nbs is not null THEN 2
                           WHEN (a.blkd <> 0 AND a.blkk = 0) THEN 3
                           WHEN (a.blkk <> 0 AND a.blkd = 0) THEN 4
                           WHEN (a.blkd <> 0 AND a.blkd <> 0) THEN 5
-                          WHEN a.dazs IS NOT NULL and a.dazs = a.daos and a.nbs is null THEN 6
                        END
                           AS account_status,
                        CASE
@@ -1252,7 +1216,7 @@ IS
                        END
                           AS agr_code,
                     /*Поточні рахунки:
-                    2512, 2513, 2520,        2523,     2526,     2530,     2531,     2541,     2542,     2544,     2545, 2550,2551,   2552, 2553,2554, 2555, 2556, 2560,  2561,  2562,         2565,     2570,     2571,2572, 2600, 2601, 2602, 2603, 2604,  2640, 2641, 2642, 2643,  2644, 2650.
+                    2512, 2513, 2520, 2523, 2526, 2530, 2531, 2541, 2542, 2544, 2545, 2550, 2551, 2552, 2553, 2554, 2555, 2556, 2560, 2561, 2562, 2565, 2570, 2571,2572, 2600, 2601, 2602, 2603, 2604, 2640, 2641, 2642, 2643, 2644, 2650.
                     Депозитніе:
                     2610, 2615, 2651 ,2652, 2600 з типом DEP та ОБ22=03, 2650 з типом DEP та ОБ22=03*/
                          case WHEN
@@ -1271,7 +1235,7 @@ IS
      loop
         l_ACC_Instance_Rec.rnk              := i.rnk;
         l_ACC_Instance_Rec.changed          := i.changed;
-        l_ACC_Instance_Rec.created          := i.created;
+--        l_ACC_Instance_Rec.created          := i.created;
         l_ACC_Instance_Rec.user_login       := i.user_login;
         l_ACC_Instance_Rec.user_fio         := i.user_fio;
         l_ACC_Instance_Rec.account_number   := i.account_number;
@@ -1285,6 +1249,12 @@ IS
         l_ACC_Instance_Rec.agr_code         := i.agr_code;
         l_ACC_Instance_Rec.account_type     := i.account_type;
         l_ACC_Instance_Rec.agr_type         := l_agr_type;
+        l_ACC_Instance_Rec.remote_controled := barsAQ.Ibank_Accounts.is_subscribed(p_acc);
+
+        if l_ACC_Instance_Rec.agr_code is null then
+          raise_application_error(-20001, 'Код угоди не заповнений [agr_code]'); 
+        end if;
+
         PIPE ROW (l_ACC_Instance_Rec);
      end loop;
 
@@ -1300,19 +1270,10 @@ IS
    is
     l_Act_Instance_Rec Act_Instance_Rec;
    begin
-    for i in (  SELECT vd.rnk,
-                       sb.branch AS branch_id,
-                       sb.logname AS user_login,
-                       sb.fio AS user_fio,
-                       vd.chgdate AS actual_date
-                  FROM (SELECT vd.rnk, vd.chgdate, vd.userid
-                          FROM PERSON_VALID_DOCUMENT_UPDATE vd
-                         WHERE (vd.rnk, vd.chgdate) = (  SELECT rnk, MAX (chgdate)
-                                                           FROM PERSON_VALID_DOCUMENT_UPDATE
-                                                          WHERE rnk = p_rnk AND doc_state = 1
-                                                       GROUP BY rnk)) vd,
-                       STAFF$BASE sb
-                 WHERE vd.userid = sb.id)
+    for i in (SELECT vd.rnk, sb.branch AS branch_id, sb.logname AS user_login, sb.fio AS user_fio, vd.chgdate AS actual_date
+                FROM (SELECT p_rnk as rnk, max(chgdate) as chgdate, max(userid) keep(dense_rank first order by chgdate desc nulls last) as userid
+                         FROM bars.PERSON_VALID_DOCUMENT_UPDATE WHERE rnk = p_rnk AND doc_state = 1) vd
+                inner join bars.STAFF$BASE sb on vd.userid = sb.id)
     loop
         l_Act_Instance_Rec.rnk          := i.rnk;
         l_Act_Instance_Rec.branch_id    := i.branch_id;
@@ -1331,10 +1292,12 @@ IS
 
 END ead_integration;
 /
- show err;
- 
+show errors
+
+
+
 PROMPT *** Create  grants  EAD_INTEGRATION ***
-grant EXECUTE                                                                on EAD_INTEGRATION to BARS_ACCESS_DEFROLE;
+grant EXECUTE on BARS.EAD_INTEGRATION to BARS_ACCESS_DEFROLE;
 
  
  

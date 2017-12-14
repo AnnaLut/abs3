@@ -519,7 +519,7 @@ AS
                   t.user_id user_id,
                   s.fio user_name,
                   CASE
-                     WHEN SUBSTR (t.prod, 1, 6) IN ('220347', '220257', '220380')
+                     WHEN SUBSTR (t.prod, 1, 6) IN ('220347', '220257', '220373')
                      THEN
                         TO_NUMBER (1)
                      ELSE
@@ -553,20 +553,20 @@ AS
                         TO_NUMBER (5)
                      WHEN     cs.subs_numb IS NOT NULL
                           AND EXTRACT (YEAR FROM t.sdate) >= 2017
-                          AND SUBSTR (t.prod, 1, 6) IN ('220257', '220347', '220380')
+                          AND SUBSTR (t.prod, 1, 6) IN ('220257', '220347', '220373')
                           AND t.sdate >= TO_DATE ('19/09/2016', 'dd/mm/yyyy')
                      THEN
                         TO_NUMBER (4)
                      WHEN     cs.subs_numb IS NULL
                           AND EXTRACT (YEAR FROM t.sdate) >= 2017
-                          AND SUBSTR (t.prod, 1, 6) IN ('220257', '220347', '220380')
+                          AND SUBSTR (t.prod, 1, 6) IN ('220257', '220347', '220373')
                           AND t.sdate >= TO_DATE ('19/09/2016', 'dd/mm/yyyy')
                      THEN
                         TO_NUMBER (5)
                      WHEN     EXTRACT (YEAR FROM t.sdate) = 2017
                           AND SUBSTR (t.prod, 1, 6) NOT IN ('220257',
                                                             '220347', 
-                                                            '220380')
+                                                            '220373')
                      THEN
                         TO_NUMBER (6)
                   END
@@ -602,8 +602,9 @@ AS
                                                 '220258',
                                                 '220347',
                                                 '220348',
-                                                '220380',
-                                                '220381')
+                                                '220372',
+                                                '220373',
+												'220374',)
                   AND t.branch LIKE
                             SYS_CONTEXT ('bars_context', 'user_branch_mask')
                          || '%') rez
@@ -626,4 +627,8 @@ COMMENT ON COLUMN BARS.VW_ESCR_REG_ALL_CREDITS.AVR_DATE IS 'Дата надання актів в
 
 
 
+GRANT SELECT ON BARS.VW_ESCR_REG_ALL_CREDITS TO BARSREADER_ROLE;
+
 GRANT SELECT ON BARS.VW_ESCR_REG_ALL_CREDITS TO BARS_ACCESS_DEFROLE;
+
+GRANT SELECT ON BARS.VW_ESCR_REG_ALL_CREDITS TO UPLD;
