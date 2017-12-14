@@ -1,0 +1,1 @@
+grant select on dba_scheduler_jobs to bars;

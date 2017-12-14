@@ -101,15 +101,20 @@ begin
 
 
 begin
-   for k in ( select n.rowid RI, n.acc, n.nls nls_old, a.nls nls_new, a.ob22 ob22_new, 1 kat, substr(a.nls,1,4) nbs_new
-                  from nbu23_rez n, accounts a,specparam s 
+   for k in ( select n.rowid RI, a.dazs,a.nbs, n.acc, n.nls nls_old, a.nls nls_new, a.ob22 ob22_new, 1 kat, substr(a.nls,1,4) nbs_new
+                  from nbu23_rez n, accounts a,specparam s
                   where n.fdat=dat01_ and n.acc=a.acc and a.acc=s.acc  )
    LOOP
+      if k.dazs is not null THEN
+         begin
+            select r020_new, ob_new into k.nbs_new,  k.ob22_new from transfer_2017 where r020_old=k.nbs and ob_old=k.ob22_new;
+         EXCEPTION WHEN NO_DATA_FOUND THEN NULL;
+         end;
+      end if;     
       update nbu23_rez set nls = k.nls_new, ob22=k.ob22_new, nbs = k.nbs_new, kat = 1 where rowid = k.ri;
    end LOOP;
    commit;
-end;   
-
+end;
 
 /*
    if p_user is null and nal_ = 0 THEN
