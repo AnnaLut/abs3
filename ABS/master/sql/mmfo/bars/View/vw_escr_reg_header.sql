@@ -600,9 +600,6 @@ AS
           JOIN escr_reg_kind ek ON rez.reg_kind_id = ek.id
           JOIN escr_reg_status est ON rez.credit_status_id = est.id;
 
-
-GRANT SELECT ON BARS.VW_ESCR_REG_HEADER TO BARSREADER_ROLE;
-
 GRANT SELECT ON BARS.VW_ESCR_REG_HEADER TO BARS_ACCESS_DEFROLE;
 
 GRANT SELECT ON BARS.VW_ESCR_REG_HEADER TO UPLD;
