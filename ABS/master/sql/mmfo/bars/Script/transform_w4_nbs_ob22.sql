@@ -2,6 +2,7 @@ declare
   l_sql    varchar2(32000);
   l_new_ob varchar2(2);
 begin
+  bc.home;
   for i in (select *
               from w4_nbs_ob22 unpivot(atr_vallue for attribute_name in("OB_9129",
                                                                         "OB_OVR",
@@ -15,7 +16,7 @@ begin
                                                                         "OB_2627X",
                                                                         "OB_2625D",
                                                                         "OB_2628"))) loop
-    if i.attribute_name in ('OB_2207', 'OB_2209', 'OB_3579', 'OB_3570') then
+    if i.attribute_name not in ('OB_OVR')  then
       l_sql := null;
       begin
         select t.ob_new
@@ -29,7 +30,7 @@ begin
       end;
       l_sql := 'update w4_nbs_ob22 set '||i.attribute_name||' = '''||l_new_ob||''' where nbs = :nbs2 and ob22 = :ob222 and tip = :tip2';
       execute immediate l_sql
-        using substr(i.attribute_name, 4, 4), i.ob22, i.tip;
+        using i.nbs, i.ob22, i.tip;
     elsif i.tip = 'W4C' and i.attribute_name = 'OB_OVR' then
       l_sql := null;
       begin
@@ -44,7 +45,7 @@ begin
       end;
       l_sql := 'update w4_nbs_ob22 set '||i.attribute_name||' = '''||l_new_ob||''' where nbs = :nbs2 and ob22 = :ob222 and tip = :tip2';
       execute immediate l_sql
-        using substr(i.attribute_name, 4, 4), i.ob22, i.tip;
+        using i.nbs, i.ob22, i.tip;
     end if;
 
   end loop;
