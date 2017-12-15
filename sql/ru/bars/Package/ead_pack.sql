@@ -1329,10 +1329,12 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
                            AND status_id IN ('NEW', 'ERROR')
                            AND nvl(err_count, 0) < 30
 --                             and regexp_like(err_text, 'rnk \d+ not found', 'i')
-                           AND crt_date > ADD_MONTHS(SYSDATE, -g_process_actual_time)
+--                           AND crt_date > ADD_MONTHS(SYSDATE, -g_process_actual_time)
+                           and crt_date > sysdate - interval '15' day
                          order by status_id  desc, trans_date asc, id asc)
                  where ROWNUM < NVL(l_rows, 1000)
-                   and trans_date <= l_s_row.sync_start)
+--                   and trans_date <= l_s_row.sync_start)
+                   and trans_date <= sysdate)
     loop
       msg_process(cur.id);
 /*

@@ -323,7 +323,7 @@ is
   --
   -- constants
   --
-  body_ver    constant varchar2(64)   := 'version 1.33 11.12.2017';
+  body_ver    constant varchar2(64)   := 'version 1.34 15.12.2017';
   body_awk    constant varchar2(512)  := ''||
 $if DPU_PARAMS.SBER
 $then
@@ -2241,7 +2241,7 @@ $end
   %param p_open  - Відкрити рахунок якщо відсутній
   %param p_kf    - Код фiлiалу (МФО)
 
-  %version 1.1
+  %version 1.2
   %usage   автоматичне заповнення довідника рахунків витрат для депозитних продуктів ЮО
   */
     title     constant    varchar2(64)           := 'dpu_utils.fill_procdr';
@@ -2391,6 +2391,8 @@ $end
 
       bars_audit.trace( '%s: %s rows selected.', title, to_char(l_tab.count) );
 
+      l_branch_mask := SubStr( l_branch_mask, 1, 15 );
+
       -- пошук рахунків витрат / зменшення витрат
       for acc in ( select NBS || OB22 || BRANCH as CODE, NLS
                      from ( select a7.NBS, a7.OB22, a7.BRANCH, a7.NLS
@@ -2402,6 +2404,7 @@ $end
                                 on ( a7.NBS = ob.NBS_EXP and a7.OB22 = ob.OB22_EXP )
                              where a7.KV = 980
                                and a7.DAZS Is NULL
+                               and a7.BRANCH like l_branch_mask
                           )
                     where MIN_ACC_F = 1
                     union all
@@ -2417,6 +2420,7 @@ $end
                                 on ( a6.NBS = ob.NBS_RED and a6.OB22 = ob.OB22_RED )
                              where a6.KV = 980
                                and a6.DAZS Is NULL
+                               and a6.BRANCH like l_branch_mask
                           )
                     where MIN_ACC_F = 1 )
       loop

@@ -40,7 +40,7 @@ CREATE OR REPLACE PACKAGE pkg_escr_reg_utl IS
   **************************************************************/
   PROCEDURE p_get_status_id(in_status_code escr_reg_status.code%TYPE,
                             out_status_id  OUT escr_reg_status.id%TYPE
-                            
+
                             );
   /***************************************************************
      PROCEDURE   p_get_status_ID
@@ -48,7 +48,7 @@ CREATE OR REPLACE PACKAGE pkg_escr_reg_utl IS
   **************************************************************/
   PROCEDURE p_get_status_code(in_status_id    escr_reg_status.id%TYPE,
                               out_status_code OUT escr_reg_status.code%TYPE
-                              
+
                               );
   /***************************************************************
      PROCEDURE   p_get_status_name
@@ -56,7 +56,7 @@ CREATE OR REPLACE PACKAGE pkg_escr_reg_utl IS
   **************************************************************/
   PROCEDURE p_get_status_name(in_status_code  escr_reg_status.code%TYPE,
                               out_status_name OUT escr_reg_status.name%TYPE
-                              
+
                               );
   /**********************************************
      PROCEDURE   P_SET_REG_OUT_NUMBER
@@ -97,7 +97,8 @@ CREATE OR REPLACE PACKAGE pkg_escr_reg_utl IS
      PROCEDURE  p_reg_del
      DESCRIPTION: Видалення реєстру
   *********************************************/
-  PROCEDURE p_reg_del(in_reg_id escr_register.id%TYPE);
+   PROCEDURE p_reg_del(in_reg_id     escr_register.id%TYPE,
+                      in_check_flag number default 1);
   /************************************************************
      PROCEDURE   p_unmapping
      DESCRIPTION: Видаляє зв*язки між об*єктами реєстру
@@ -173,7 +174,7 @@ CREATE OR REPLACE PACKAGE pkg_escr_reg_utl IS
                           in_new_comp_sum  number);
   /**********************************************
      PROCEDURE   p_check_comp_sum
-     DESCRIPTION: Процедура перевірки суми, к-сті 
+     DESCRIPTION: Процедура перевірки суми, к-сті
                   реєстрів ,які будуть оплачуватися
   *********************************************/
   PROCEDURE p_check_comp_sum(in_reg_id      escr_register.id%type,
@@ -184,7 +185,7 @@ CREATE OR REPLACE PACKAGE pkg_escr_reg_utl IS
   /**********************************************
      PROCEDURE    p_reg_repay
      DESCRIPTION: Переплати у випадку помилки під основної оплати
-                  Фактично зміна стасутів об*єктів, що дозволить  виконати 
+                  Фактично зміна стасутів об*єктів, що дозволить  виконати
                   повторну оплату
   *********************************************/
   PROCEDURE p_reg_repay(in_reg_list number_list);
@@ -192,8 +193,8 @@ END pkg_escr_reg_utl;
 /
 CREATE OR REPLACE PACKAGE BODY pkg_escr_reg_utl IS
 
-  g_body_version   CONSTANT VARCHAR2(64) := 'VERSION 8.7.0 13/12/2017';
-  g_header_version CONSTANT VARCHAR2(64) := 'VERSION 8.7.0 13/12/2017';
+  g_body_version   CONSTANT VARCHAR2(64) := 'VERSION 8.7.1 15/12/2017';
+  g_header_version CONSTANT VARCHAR2(64) := 'VERSION 8.7.1 15/12/2017';
 
   c_err_txt VARCHAR2(4000);
   --константи
@@ -846,7 +847,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_escr_reg_utl IS
       END LOOP;
     END IF;
     out_branch_list :=  /*'24/' || l_reg_list_dif.count ||' '||lc_new_line
-                                                                                                                                                                                                                       ||*/
+                                                                                                                                                                                                                                   ||*/
      substr(out_branch_list,
                               1,
                               length(out_branch_list) - 1);
@@ -945,72 +946,77 @@ CREATE OR REPLACE PACKAGE BODY pkg_escr_reg_utl IS
     l_material_count number_list;
     l_customer_okpo  number_list;
     l_deal_id        number_list;
-
+  
   BEGIN
     BEGIN
       SELECT COUNT(CASE
-                     WHEN substr(t.deal_product, 1, 6) IN ('220347', '220257','220373') THEN
+                     WHEN substr(t.deal_product, 1, 6) IN
+                          ('220347', '220257', '220380') THEN
                       1
-                   END) boiler_count
-            ,COUNT(CASE
-                     WHEN substr(t.deal_product, 1, 6) IN ('220258', '220348','220374') THEN
+                   END) boiler_count,
+             COUNT(CASE
+                     WHEN substr(t.deal_product, 1, 6) IN
+                          ('220258', '220348', '220381') THEN
                       2
-                   END) material_count
-            ,t.customer_okpo BULK COLLECT
+                   END) material_count,
+             t.customer_okpo
+        BULK COLLECT
         INTO l_boiler_count, l_material_count, l_customer_okpo
         FROM escr_reg_header t
        WHERE extract(YEAR FROM t.deal_date_from) = '2017'
        GROUP BY t.customer_okpo
       HAVING COUNT(*) > 1;
     END;
-
+  
     IF l_material_count.count > 0 THEN
       BEGIN
-        SELECT t.deal_id BULK COLLECT
+        SELECT t.deal_id
+          BULK COLLECT
           INTO l_deal_id
           FROM escr_reg_header t
-         WHERE substr(t.deal_product, 1, 6) IN ('220258', '220348', '220374')
+         WHERE substr(t.deal_product, 1, 6) IN
+               ('220258', '220348', '220381')
            AND extract(YEAR FROM t.deal_date_from) = '2017'
            AND t.customer_okpo IN (SELECT * FROM TABLE(l_customer_okpo));
       END;
       IF l_deal_id.count > 0 THEN
-        FOR i IN 1 .. l_deal_id.count
-        LOOP
+        FOR i IN 1 .. l_deal_id.count LOOP
           NULL;
-          p_set_obj_status(in_obj_id         => l_deal_id(i)
-                          ,in_obj_type       => 0
-                          ,in_status_code    => 'DUPLICATE_DEAL'
-                          ,in_status_comment => 'Позичальник перевищив допустиму к-сть КД по матеріалам'
-                          ,in_obj_check      => 0
-                          ,in_set_date       => SYSDATE
-                          ,in_oper_level     => 1);
+          p_set_obj_status(in_obj_id         => l_deal_id(i),
+                           in_obj_type       => 0,
+                           in_status_code    => 'DUPLICATE_DEAL',
+                           in_status_comment => 'Позичальник перевищив допустиму к-сть КД по матеріалам',
+                           in_obj_check      => 0,
+                           in_set_date       => SYSDATE,
+                           in_oper_level     => 1);
         END LOOP;
       END IF;
     ELSIF l_boiler_count.count > 0 THEN
       BEGIN
-        SELECT t.deal_id BULK COLLECT
+        SELECT t.deal_id
+          BULK COLLECT
           INTO l_deal_id
           FROM escr_reg_header t
-         WHERE substr(t.deal_product, 1, 6) IN ('220347', '220257', '220373')
+         WHERE substr(t.deal_product, 1, 6) IN
+               ('220347', '220257', '220380')
            AND extract(YEAR FROM t.deal_date_from) = '2017'
            AND t.customer_okpo IN (SELECT * FROM TABLE(l_customer_okpo));
       END;
       IF l_deal_id.count > 0 THEN
-        FOR i IN 1 .. l_deal_id.count
-        LOOP
+        FOR i IN 1 .. l_deal_id.count LOOP
           NULL;
-          p_set_obj_status(in_obj_id         => l_deal_id(i)
-                          ,in_obj_type       => 0
-                          ,in_status_code    => 'DUPLICATE_DEAL'
-                          ,in_status_comment => 'Позичальник перевищив допустиму к-сть КД по котлам'
-                          ,in_obj_check      => 0
-                          ,in_set_date       => SYSDATE
-                          ,in_oper_level     => 1);
+          p_set_obj_status(in_obj_id         => l_deal_id(i),
+                           in_obj_type       => 0,
+                           in_status_code    => 'DUPLICATE_DEAL',
+                           in_status_comment => 'Позичальник перевищив допустиму к-сть КД по котлам',
+                           in_obj_check      => 0,
+                           in_set_date       => SYSDATE,
+                           in_oper_level     => 1);
         END LOOP;
       END IF;
-
+    
     END IF;
-
+  
   END p_check_after_create;
   /************************************************************
      PROCEDURE   p_check_before_create
@@ -1342,15 +1348,42 @@ CREATE OR REPLACE PACKAGE BODY pkg_escr_reg_utl IS
      PROCEDURE  p_reg_del
      DESCRIPTION: Видалення реєстру
   *********************************************/
-  PROCEDURE p_reg_del(in_reg_id escr_register.id%TYPE) IS
+  PROCEDURE p_reg_del(in_reg_id     escr_register.id%TYPE,
+                      in_check_flag number default 1) IS
   BEGIN
     -- перевіряємо чи має реєстр зв*язки по входу і виходу
     p_reg_has_in_mapping(in_reg_id => in_reg_id, out_has_flag => l_in_flag);
     p_reg_has_out_mapping(in_reg_id    => in_reg_id,
                           out_has_flag => l_out_flag);
-    IF l_in_flag = 0 AND l_out_flag = 0 THEN
-      DELETE FROM escr_register t WHERE t.id = in_reg_id;
-    END IF;
+    if in_check_flag = 1 then
+      IF l_in_flag = 0 AND l_out_flag = 0 THEN
+        DELETE FROM escr_register t WHERE t.id = in_reg_id;
+      END IF; 
+   elsif in_check_flag = 0 then
+      delete from escr_reg_mapping t
+      where t.out_doc_id = in_reg_id
+        and t.oper_type = 1;
+     delete from escr_reg_body t
+      where t.deal_id in (select t1.out_doc_id
+                            from escr_reg_mapping t1
+                           where t1.in_doc_id = in_reg_id
+                             and t1.oper_type = 0);
+     delete from nd_txt t
+      where t.nd in (select t1.out_doc_id
+                       from escr_reg_mapping t1
+                      where t1.in_doc_id = in_reg_id
+                        and t1.oper_type = 0)
+        and t.tag = 'ES000';
+     delete from escr_reg_header t
+      where t.deal_id in (select t1.out_doc_id
+                            from escr_reg_mapping t1
+                           where t1.in_doc_id = in_reg_id
+                             and t1.oper_type = 0);
+     delete from escr_reg_mapping t
+      where t.in_doc_id = in_reg_id
+        and t.oper_type = 0;
+     delete from escr_register t where t.id = in_reg_id;
+    end if;
   END p_reg_del;
   /**********************************************
      PROCEDURE   P_SET_REG_OUT_NUMBER
@@ -1503,7 +1536,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_escr_reg_utl IS
       l_reg_rec(l_reg_rec.last).user_name :=  /*TRIM(convert(*/
        l_str
       /*,'CL8MSWIN1251'
-                                                                                                                                                                                                                                       ,'UTF8'))*/
+                                                                                                                                                                                                                                                   ,'UTF8'))*/
         ;
     
       dbms_xslprocessor.valueof(l_escrparam,
@@ -2032,7 +2065,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_escr_reg_utl IS
   END p_change_comp_sum;
   /**********************************************
      PROCEDURE   p_check_comp_sum
-     DESCRIPTION: Процедура перевірки суми, к-сті 
+     DESCRIPTION: Процедура перевірки суми, к-сті
                   реєстрів ,які будуть оплачуватися
   *********************************************/
   PROCEDURE p_check_comp_sum(in_reg_id      escr_register.id%type,
@@ -2096,7 +2129,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_escr_reg_utl IS
   /**********************************************
      PROCEDURE    p_reg_repay
      DESCRIPTION: Переплати у випадку помилки під основної оплати
-                  Фактично зміна стасутів об*єктів, що дозволить  виконати 
+                  Фактично зміна стасутів об*єктів, що дозволить  виконати
                   повторну оплату
   *********************************************/
   PROCEDURE p_reg_repay(in_reg_list number_list) IS
@@ -2438,7 +2471,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_escr_reg_utl IS
     RETURN l_clob;
   END;
 
-    PROCEDURE p_sync_state IS
+  PROCEDURE p_sync_state IS
     --l_url         VARCHAR2(1000);
     l_url         params$global.val%TYPE := getglobaloption('ESCR_URL_RU');
     l_wallet_path VARCHAR2(256); --:= getglobaloption('OWWALLETPATH');
@@ -2446,15 +2479,13 @@ CREATE OR REPLACE PACKAGE BODY pkg_escr_reg_utl IS
     l_response    wsm_mgr.t_response;
     l_cursor      SYS_REFCURSOR;
     l_deals       t_vw_escr_list_for_sync;
-     l_id     staff$base.id%TYPE;
-    l_branch staff$base.branch%TYPE;
-
+    l_id          staff$base.id%TYPE;
+    l_branch      staff$base.branch%TYPE;
+  
     -- Для теста
-   --l_url := BRANCH_ATTRIBUTE_UTL.GET_VALUE ('/300465/','ESCR_URL_RU');
+    --l_url := BRANCH_ATTRIBUTE_UTL.GET_VALUE ('/300465/','ESCR_URL_RU');
   BEGIN
-
-
-
+  
     BEGIN
       BEGIN
         SELECT branch INTO l_branch FROM staff$base WHERE id = user_id;
@@ -2485,33 +2516,37 @@ CREATE OR REPLACE PACKAGE BODY pkg_escr_reg_utl IS
         EXECUTE IMMEDIATE 'alter session set current_schema=BARS';
         bars.bars_login.login_user(sys_guid, l_id, NULL, NULL);
     END;
-
+  
     BEGIN
       SELECT MAX(val)
         INTO l_wallet_path
         FROM web_barsconfig
        WHERE key = 'SMPP.Wallet_dir';
     END;
-
+  
     BEGIN
       SELECT MAX(val)
         INTO l_wallet_pwd
         FROM web_barsconfig
        WHERE key = 'SMPP.Wallet_pass';
     END;
-
+  
     OPEN l_cursor FOR
     /*      SELECT rm.* \*DEAL_ID,
-                                     decode(rm.credit_status_id, 11, rm.credit_status_id, null) as state_id,
-                                     null as comment,
-                                     decode(rm.credit_status_id, 11, 'true', 'false') as is_set*\
-            FROM vw_escr_reg_header rm
-           WHERE rm.credit_status_id IN (1, 2, 3, 16, 6, 7, 5, 12, -999)
-             AND rm.credit_status_id IS NOT NULL;
-    */
-       SELECT t.deal_id ,t.credit_status_id ,TO_NUMBER(NULL) state_id   ,t.kf   ,'' AS "COMMENT"
-       ,'false' AS is_set
-    FROM vw_escr_list_for_sync t;
+                                             decode(rm.credit_status_id, 11, rm.credit_status_id, null) as state_id,
+                                             null as comment,
+                                             decode(rm.credit_status_id, 11, 'true', 'false') as is_set*\
+                    FROM vw_escr_reg_header rm
+                   WHERE rm.credit_status_id IN (1, 2, 3, 16, 6, 7, 5, 12, -999)
+                     AND rm.credit_status_id IS NOT NULL;
+            */
+      SELECT t.deal_id,
+             t.credit_status_id,
+             TO_NUMBER(NULL) state_id,
+             t.kf,
+             '' AS "COMMENT",
+             'false' AS is_set
+        FROM vw_escr_list_for_sync t;
     LOOP
       FETCH l_cursor BULK COLLECT
         INTO l_deals LIMIT 100;
@@ -2529,13 +2564,12 @@ CREATE OR REPLACE PACKAGE BODY pkg_escr_reg_utl IS
         IF l_deals.count = 0 THEN
           RETURN;
         END IF;
-        FOR i IN 1 .. l_deals.count
-        LOOP
-          SELECT xmlagg(xmlelement("deal"
-                                   ,xmlelement("deal_id", l_deals(i).deal_id)
-                                   ,xmlelement("state_id"
-                                              ,l_deals(i).credit_status_id)
-                                   ,xmlelement("is_set", 'false')))
+        FOR i IN 1 .. l_deals.count LOOP
+          SELECT xmlagg(xmlelement("deal",
+                                   xmlelement("deal_id", l_deals(i).deal_id),
+                                   xmlelement("state_id",
+                                              l_deals(i).credit_status_id),
+                                   xmlelement("is_set", 'false')))
             INTO l_xml
             FROM dual;
           SELECT appendchildxml(l_dealsxml, 'deals', l_xml)
@@ -2545,34 +2579,34 @@ CREATE OR REPLACE PACKAGE BODY pkg_escr_reg_utl IS
         SELECT appendchildxml(l_root, 'root', l_dealsxml)
           INTO l_root
           FROM dual;
-
+      
         UPDATE tmp_klp_clob
            SET c = l_root.getclobval()
          WHERE namef = 'EWA';
         /*bars.logger.info('ESCR syncstate body:' || '<?xml version="1.0"?>' ||
-                         l_root.getclobval());*/
+        l_root.getclobval());*/
         wsm_mgr.prepare_request(p_url         => l_url ||
-                                                 'createregister/syncstate'
-                               ,p_action      => NULL
-                               ,p_http_method => wsm_mgr.g_http_post
-                               ,p_wallet_path => l_wallet_path
-                               ,p_wallet_pwd  => l_wallet_pwd
-                               ,p_body        => '<?xml version="1.0"?>' ||
+                                                 'createregister/syncstate',
+                                p_action      => NULL,
+                                p_http_method => wsm_mgr.g_http_post,
+                                p_wallet_path => l_wallet_path,
+                                p_wallet_pwd  => l_wallet_pwd,
+                                p_body        => '<?xml version="1.0"?>' ||
                                                  l_root.getclobval());
-
-        wsm_mgr.add_header(p_name  => 'Content-Type'
-                          ,p_value => 'application/xml;charset=utf-8');
+      
+        wsm_mgr.add_header(p_name  => 'Content-Type',
+                           p_value => 'application/xml;charset=utf-8');
         -- iicaaou iaoia aaa-na?aena
         wsm_mgr.execute_api(l_response);
         /*bars.logger.info('ESCR l_response' || '<?xml version="1.0"?>' ||
-                         l_response.cdoc);*/
-        l_response.cdoc := decodeclobfrombase64(dbms_lob.substr(l_response.cdoc
-                                                               ,length(l_response.cdoc) - 2
-                                                               ,2));
+        l_response.cdoc);*/
+        l_response.cdoc := decodeclobfrombase64(dbms_lob.substr(l_response.cdoc,
+                                                                length(l_response.cdoc) - 2,
+                                                                2));
       END;
       EXIT WHEN l_cursor%NOTFOUND;
     END LOOP;
-
+  
     /*wsm_mgr.prepare_request(p_url         => l_url ||
                                              'createregister/syncstate'
                            ,p_action      => NULL
@@ -2580,12 +2614,12 @@ CREATE OR REPLACE PACKAGE BODY pkg_escr_reg_utl IS
                            ,p_wallet_path => l_wallet_path
                            ,p_wallet_pwd  => l_wallet_pwd
                            ,p_body        => 'sync states');
-
+    
     wsm_mgr.add_header(p_name  => 'Content-Type'
                       ,p_value => 'text/plain; charset=utf-8');
     -- iicaaou iaoia aaa-na?aena
     wsm_mgr.execute_api(l_response);
-
+    
     l_response.cdoc := decodeclobfrombase64(dbms_lob.substr(l_response.cdoc
                                                            ,length(l_response.cdoc) - 2
                                                            ,2));*/

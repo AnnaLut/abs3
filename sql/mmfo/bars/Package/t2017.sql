@@ -73,7 +73,7 @@ show errors
 
 CREATE OR REPLACE PACKAGE BODY BARS.T2017
 IS
-  g_body_version   CONSTANT VARCHAR2 (64) := 'version 1.19  14.12.2017';
+  g_body_version   CONSTANT VARCHAR2(64) := 'version 1.21  15.12.2017';
   g_errN number  := -20203;
   nlchr  char(2) := chr(13)||chr(10);
   bnk_dt date;
@@ -104,10 +104,16 @@ begin return;
 end CLS;
 ---------------------------------------------------------------------------
 
-procedure E01(p_Er number, p_tbl varchar2 )  is 
+procedure E01
+( p_Er        number
+, p_tbl       varchar2
+, p_nbs_old   varchar2 default null
+, p_nbs_new   varchar2 default null
+)  is 
 begin 
-  if p_Er = -00001 then null;  
-  else raise_application_error(-20000 ,'Помилка '|| p_er || '/'|| p_tbl); 
+  if ( p_Er = -00001 )
+  then null;
+  else raise_application_error( -20000 ,'Помилка: '|| p_er || '/'|| p_tbl || '( r020_old='||p_nbs_old||', r020_new='|| p_nbs_new||' ).' ); 
   end if; 
 end E01;
 -----------------------------------------------------------------------------
@@ -277,9 +283,6 @@ begin
         --- ============================================================ ---
 
        -- Депозити ЮО
-       delete DPU_TYPES_OB22
-        where NBS_DEP = p_r020_old;
-
        update DPU_VIDD
           set BSD  = p_r020_new
             , IRVK = 1
@@ -364,10 +367,25 @@ begin
    update tts set nlsa = REPLACE (nlsa , ''''||tt.r020_old||'''', ''''||tt.r020_new||'''' ) where  nlsa  like y_like and nlsm not like n_like;
    update tts set nlsb = REPLACE (nlsb , ''''||tt.r020_old||'''', ''''||tt.r020_new||'''' ) where  nlsb  like y_like and nlsm not like n_like;
  
-   begin update PS_TTS       set nbs  =  tt.r020_new, ob22 =tt.ob_new  where nbs    = tt.r020_old and ob22 = tt.ob_old ; exception when others then T2017.E01(SQLCODE,'PS_TTS'      ); end; --БалРахунки  <->   Операцiї
-   begin update tarif        set nbs  =  tt.r020_new, ob22 =tt.ob_new  where nbs    = tt.r020_old and ob22 = tt.ob_old ; exception when others then T2017.E01(SQLCODE,'tarif'       ); end; --0. БАЗОВI тарифи
-   begin update RAZ_KOM      set KOD  =  tt.r020_new||      tt.ob_new  where KOD    = tt.r020_old||          tt.ob_old ; exception when others then T2017.E01(SQLCODE,'RAZ_KOM'     ); end; --<<ФО:Комiсiя за послуги>>
-   begin update MONEY2       set nbs  =  tt.r020_new, ob22 =tt.ob_new  where nbs    = tt.r020_old and ob22 = tt.ob_old ; exception when others then T2017.E01(SQLCODE,'MONEY2'      ); end; --Закордоннi перекази ФО. Котловi рах обiлiку
+   begin --БалРахунки  <->   Операцiї
+     update PS_TTS       set nbs  =  tt.r020_new, ob22 =tt.ob_new  where nbs    = tt.r020_old and ob22 = tt.ob_old ;
+   exception when others then T2017.E01(SQLCODE,'PS_TTS',tt.r020_old,tt.r020_new);
+   end;
+   
+   begin --0. БАЗОВI тарифи
+     update tarif        set nbs  =  tt.r020_new, ob22 =tt.ob_new  where nbs    = tt.r020_old and ob22 = tt.ob_old ;
+   exception when others then T2017.E01(SQLCODE,'tarif',tt.r020_old,tt.r020_new);
+   end;
+   
+   begin --<<ФО:Комiсiя за послуги>>
+     update RAZ_KOM      set KOD  =  tt.r020_new||      tt.ob_new  where KOD    = tt.r020_old||          tt.ob_old ;
+   exception when others then T2017.E01(SQLCODE,'RAZ_KOM',tt.r020_old,tt.r020_new);
+   end;
+   
+   begin --Закордоннi перекази ФО. Котловi рах обiлiку
+     update MONEY2       set nbs  =  tt.r020_new, ob22 =tt.ob_new  where nbs    = tt.r020_old and ob22 = tt.ob_old ;
+   exception when others then T2017.E01(SQLCODE,'MONEY2',tt.r020_old,tt.r020_new);
+   end;
 
    begin
      update DPU_TYPES_OB22
@@ -377,10 +395,10 @@ begin
         and OB22_RED = tt.OB_OLD;
    exception
      when others then
-       T2017.E01( SQLCODE, 'DPU_TYPES_OB22' );
+       T2017.E01( SQLCODE, 'DPU_TYPES_OB22', tt.r020_old, tt.r020_new );
    end;
 
-   begin update NBS_TIPS     set nbs  = tt.r020_new, ob22    =tt.ob_new  where nbs    = tt.r020_old and ob22    = tt.ob_old ; exception when others then T2017.E01(SQLCODE,'NBS_TIPS'      ); end; --Звязок БР <->Типи рахунків
+   begin update NBS_TIPS     set nbs  = tt.r020_new, ob22    =tt.ob_new  where nbs    = tt.r020_old and ob22    = tt.ob_old ; exception when others then T2017.E01( SQLCODE, 'NBS_TIPS', tt.r020_old, tt.r020_new ); end; --Звязок БР <->Типи рахунків
 
    If tt.r020_old = '6110' then
       begin EXECUTE IMMEDIATE         -- кліринг по пл.системам -- только в ГОУ = ММФО
@@ -777,7 +795,7 @@ begin
 
          --- Журнал счетов
          delete from accounts_update where acc = aa_old.acc and trunc(chgdate) = trunc(sysdate);
-         ----- закрыть chgaction = 3 COBUMMFO-5959 - 5
+         ----- закрыть chgaction = 3
 
          INSERT INTO accounts_update
              (acc, nls, nlsalt, kv, nbs, nbs2, daos, isp, nms  , pap, grp, sec, seci, seco, vid, tip, dazs, blkd, blkk, lim, pos, accc, tobo, mdate, ostx, rnk, kf ,
@@ -785,17 +803,17 @@ begin
          VALUES (aa_old.acc   ,aa_old.nls  ,aa_old.nlsalt,aa_old.kv    ,tt.R020_OLD   ,aa_old.nbs2,aa_old.daos  ,aa_old.isp   ,aa_old.nms   ,aa_old.pap,
               aa_old.grp   ,aa_old.sec  ,aa_old.seci  ,aa_old.seco  ,aa_old.vid   ,aa_old.tip , bnk_dt,   -- дата закр
               aa_old.blkd  ,aa_old.blkk  ,aa_old.lim,   aa_old.pos   ,aa_old.accc ,aa_old.tobo,aa_old.mdate ,aa_old.ostx  ,aa_old.rnk ,aa_old.kf    ,
-              sysdate      ,5,user_name ,bars_sqnc.get_nextval('s_accounts_update',aa_old.kf), bnk_dt, aa_old.branch, aa_old.ob22 , 
+              sysdate      ,3,user_name ,bars_sqnc.get_nextval('s_accounts_update',aa_old.kf), bnk_dt, aa_old.branch, aa_old.ob22 , 
               bnk_dt, aa_old.send_sms);
 
-         ----- открыть chgaction = 1 COBUMMFO-5959 - 6
+         ----- открыть chgaction = 1
          INSERT INTO accounts_update
              (acc, nls, nlsalt, kv, nbs, nbs2, daos, isp, nms  , pap, grp, sec, seci, seco, vid, tip, dazs, blkd, blkk, lim, pos, accc, tobo, mdate, ostx, rnk, kf ,
               chgdate , chgaction , doneby,idupd  , effectdate, branch,ob22,globalbd,send_sms  )
          VALUES (aa_old.acc  ,aa_new.nls  ,aa_old.nls ,aa_old.kv ,tt.R020_NEW,aa_old.nbs2, bnk_dt,-- дата откр
                  aa_old.isp  ,aa_old.nms  ,aa_old.pap ,aa_old.grp,aa_old.sec ,aa_old.seci, aa_old.seco,aa_old.vid  ,aa_NEW.tip ,  -- yjdsq nbg cx
                  aa_old.dazs ,aa_old.blkd ,aa_old.blkk,aa_old.lim, aa_old.pos,aa_old.accc,aa_old.tobo ,aa_old.mdate,aa_old.ostx,aa_old.rnk ,aa_old.kf   ,
-                 sysdate     ,6,user_name ,bars_sqnc.get_nextval('s_accounts_update',aa_old.kf), bnk_dt, aa_old.branch, tt.ob_new , 
+                 sysdate     ,1,user_name ,bars_sqnc.get_nextval('s_accounts_update',aa_old.kf), bnk_dt, aa_old.branch, tt.ob_new , 
                  bnk_dt, aa_old.send_sms   );
 
           -- Update  chgaction = 2 Восстановить для ХД дату открытия = дате открытия из accounts aa_old.DAOS
@@ -1135,7 +1153,7 @@ procedure OTCN   (p_mode int) is --  Авто-трансформація довідників по звітності
 ------ begin update OTC_RISK_S580 set r020    = p.r020_new where r020    = p.r020_old ; exception when others then T2017.E01(SQLCODE,'OTC_RISK_S580'); end;
 
        --Трансформація + ручне коригування
-       begin update SP_NEW_R011   set r020    = p.r020_new where r020    = p.r020_old ; exception when others then T2017.E01(SQLCODE,'SP_NEW_R011'  ); end;
+       begin update SP_NEW_R011   set r020    = p.r020_new where r020    = p.r020_old ; exception when others then T2017.E01(SQLCODE,'SP_NEW_R011',p.r020_old,p.r020_new ); end;
 ------ begin update SPR_R020_R012 set r020    = p.r020_new where r020    = p.r020_old ; exception when others then T2017.E01(SQLCODE,'SPR_R020_R012'); end;
        ----------------------------------------------------------------------------------------------------------------------------------------------------
        bc.go ('/') ;
@@ -1144,24 +1162,23 @@ procedure OTCN   (p_mode int) is --  Авто-трансформація довідників по звітності
        loop
          -- Разом R020 +Об22
 
-         begin update xoz_ob22     set deb = pp.r020_new||       pp.ob_new  where deb = pp.r020_old||          pp.ob_old ; exception when others then T2017.E01(SQLCODE,'xoz_ob22'    ); end; --Рахунки для закриття Деб.заборг.
-         begin update xoz_ob22     set krd = pp.r020_new||       pp.ob_new  where krd = pp.r020_old||          pp.ob_old ; exception when others then T2017.E01(SQLCODE,'xoz_ob22'    ); end; --Рахунки для закриття Деб.заборг.
-
-         begin update xoz_ob22_cl  set deb = pp.r020_new||       pp.ob_new  where deb = pp.r020_old||          pp.ob_old ; exception when others then T2017.E01(SQLCODE,'xoz_ob22_cl' ); end; --XOZ_OB22_CL.Референтні  терміни знаходження на балансі
-         begin update Fin_debt   set NBS_N = pp.r020_new||       pp.ob_new  where NBS_N= pp.r020_old||          pp.ob_old ; exception when others then T2017.E01(SQLCODE,'xoz_ob22'    ); end; --основа для продукт ФДЗ,
-         begin update Fin_debt   set NBS_P = pp.r020_new||       pp.ob_new  where NBS_N= pp.r020_old||          pp.ob_old ; exception when others then T2017.E01(SQLCODE,'xoz_ob22'    ); end; --основа для продукт ФДЗ,
-         begin update Fin_debt   set NBS_K = pp.r020_new||       pp.ob_new  where NBS_N= pp.r020_old||          pp.ob_old ; exception when others then T2017.E01(SQLCODE,'xoz_ob22'    ); end; --основа для продукт ФДЗ,
-         begin update GRP_REZ_NBS  set nbs = pp.r020_new, ob22 = pp.ob_new  where nbs = pp.r020_old and ob22 = pp.ob_old ; exception when others then T2017.E01(SQLCODE,'GRP_REZ_NBS' ); end; --Группа резервирования - бал.счет. - ОБ22
-         begin update TMP_NBS_2401 set nbs = pp.r020_new, ob22 = pp.ob_new  where nbs = pp.r020_old and ob22 = pp.ob_old ; exception when others then T2017.E01(SQLCODE,'TMP_NBS_2401'); end; --Продукти кредитів портфельного методу
+         begin update xoz_ob22     set deb = pp.r020_new||       pp.ob_new  where deb  = pp.r020_old||          pp.ob_old; exception when others then T2017.E01(SQLCODE,'xoz_ob22'    ,pp.r020_old,pp.r020_new); end; --Рахунки для закриття Деб.заборг.
+         begin update xoz_ob22     set krd = pp.r020_new||       pp.ob_new  where krd  = pp.r020_old||          pp.ob_old; exception when others then T2017.E01(SQLCODE,'xoz_ob22'    ,pp.r020_old,pp.r020_new); end; --Рахунки для закриття Деб.заборг.
+         begin update xoz_ob22_cl  set deb = pp.r020_new||       pp.ob_new  where deb  = pp.r020_old||          pp.ob_old; exception when others then T2017.E01(SQLCODE,'xoz_ob22_cl' ,pp.r020_old,pp.r020_new); end; --XOZ_OB22_CL.Референтні  терміни знаходження на балансі
+         begin update Fin_debt   set NBS_N = pp.r020_new||       pp.ob_new  where NBS_N= pp.r020_old||          pp.ob_old; exception when others then T2017.E01(SQLCODE,'xoz_ob22'    ,pp.r020_old,pp.r020_new); end; --основа для продукт ФДЗ,
+         begin update Fin_debt   set NBS_P = pp.r020_new||       pp.ob_new  where NBS_N= pp.r020_old||          pp.ob_old; exception when others then T2017.E01(SQLCODE,'xoz_ob22'    ,pp.r020_old,pp.r020_new); end; --основа для продукт ФДЗ,
+         begin update Fin_debt   set NBS_K = pp.r020_new||       pp.ob_new  where NBS_N= pp.r020_old||          pp.ob_old; exception when others then T2017.E01(SQLCODE,'xoz_ob22'    ,pp.r020_old,pp.r020_new); end; --основа для продукт ФДЗ,
+         begin update GRP_REZ_NBS  set nbs = pp.r020_new, ob22 = pp.ob_new  where nbs  = pp.r020_old and ob22 = pp.ob_old; exception when others then T2017.E01(SQLCODE,'GRP_REZ_NBS' ,pp.r020_old,pp.r020_new); end; --Группа резервирования - бал.счет. - ОБ22
+         begin update TMP_NBS_2401 set nbs = pp.r020_new, ob22 = pp.ob_new  where nbs  = pp.r020_old and ob22 = pp.ob_old; exception when others then T2017.E01(SQLCODE,'TMP_NBS_2401',pp.r020_old,pp.r020_new); end; --Продукти кредитів портфельного методу
 
          --Не знаю що за таблиці і де використовуються
-         begin update STRU1  set R020 = pp.r020_new, OB22 = pp.ob_new  where R020 = pp.r020_old and OB22 = pp.ob_old ; exception when others then T2017.E01(SQLCODE,'STRU1' ); end;
-         begin update STRU2  set R020 = pp.r020_new, OB22 = pp.ob_new  where R020 = pp.r020_old and OB22 = pp.ob_old ; exception when others then T2017.E01(SQLCODE,'STRU2' ); end;
-         begin update STRU2a set R020 = pp.r020_new, OB22 = pp.ob_new  where R020 = pp.r020_old and OB22 = pp.ob_old ; exception when others then T2017.E01(SQLCODE,'STRU2a'); end;
-         begin update STRU3  set R020 = pp.r020_new, OB22 = pp.ob_new  where R020 = pp.r020_old and OB22 = pp.ob_old ; exception when others then T2017.E01(SQLCODE,'STRU3' ); end;
-         begin update STRU3a set R020 = pp.r020_new, OB22 = pp.ob_new  where R020 = pp.r020_old and OB22 = pp.ob_old ; exception when others then T2017.E01(SQLCODE,'STRU3a'); end;
-         begin update STRU4  set R020 = pp.r020_new, OB22 = pp.ob_new  where R020 = pp.r020_old and OB22 = pp.ob_old ; exception when others then T2017.E01(SQLCODE,'STRU4' ); end;
-         begin update STRU5  set R020 = pp.r020_new, OB22 = pp.ob_new  where R020 = pp.r020_old and OB22 = pp.ob_old ; exception when others then T2017.E01(SQLCODE,'STRU5' ); end;
+         begin update STRU1  set R020 = pp.r020_new, OB22 = pp.ob_new  where R020 = pp.r020_old and OB22 = pp.ob_old ; exception when others then T2017.E01(SQLCODE,'STRU1' ,pp.r020_old,pp.r020_new); end;
+         begin update STRU2  set R020 = pp.r020_new, OB22 = pp.ob_new  where R020 = pp.r020_old and OB22 = pp.ob_old ; exception when others then T2017.E01(SQLCODE,'STRU2' ,pp.r020_old,pp.r020_new); end;
+         begin update STRU2a set R020 = pp.r020_new, OB22 = pp.ob_new  where R020 = pp.r020_old and OB22 = pp.ob_old ; exception when others then T2017.E01(SQLCODE,'STRU2a',pp.r020_old,pp.r020_new); end;
+         begin update STRU3  set R020 = pp.r020_new, OB22 = pp.ob_new  where R020 = pp.r020_old and OB22 = pp.ob_old ; exception when others then T2017.E01(SQLCODE,'STRU3' ,pp.r020_old,pp.r020_new); end;
+         begin update STRU3a set R020 = pp.r020_new, OB22 = pp.ob_new  where R020 = pp.r020_old and OB22 = pp.ob_old ; exception when others then T2017.E01(SQLCODE,'STRU3a',pp.r020_old,pp.r020_new); end;
+         begin update STRU4  set R020 = pp.r020_new, OB22 = pp.ob_new  where R020 = pp.r020_old and OB22 = pp.ob_old ; exception when others then T2017.E01(SQLCODE,'STRU4' ,pp.r020_old,pp.r020_new); end;
+         begin update STRU5  set R020 = pp.r020_new, OB22 = pp.ob_new  where R020 = pp.r020_old and OB22 = pp.ob_old ; exception when others then T2017.E01(SQLCODE,'STRU5' ,pp.r020_old,pp.r020_new); end;
 
        end loop; -- pp
 
@@ -1312,7 +1329,7 @@ end enable_scheduler_jobs;
         commit;
       exception
         when others then
-          dbms_output.put_line( sqlerrm );
+          dbms_output.put_line( 'DPT_PROCDR: '||dbms_utility.format_error_stack() ||chr(10)|| dbms_utility.format_error_backtrace() );
           rollback;
       end;
       begin
@@ -1320,7 +1337,7 @@ end enable_scheduler_jobs;
         commit;
       exception
         when others then
-          dbms_output.put_line( sqlerrm );
+          dbms_output.put_line( 'DPU_PROCDR: '||dbms_utility.format_error_stack() ||chr(10)|| dbms_utility.format_error_backtrace() );
           rollback;
       end;
     end loop;

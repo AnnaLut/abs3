@@ -5,12 +5,12 @@
 0000: 6F00000003000000 FFFF01000D004347 5458566965775374 6174650400010000
 0020: 0000000000FE0000 002C000000020000 0003000000FFFFFF FFFFFFFFFFF8FFFF
 0040: FFE1FFFFFFFEFFFF FFFDFFFFFF0A0400 00C2010000010000 0000000000010000
-0060: 000F4170706C6963 6174696F6E497465 6D02000000075769 6E646F7773086672
-0080: 6D5F4F70656E0000 0180020002000000 0000000000000000 2C00000000000000
-00A0: 01000000FFFFFFFF FFFFFFFFF8FFFFFF E2FFFFFF32000000 320000001F040000
-00C0: 9D02000000000000 0000000005000000 0F4170706C696361 74696F6E4974656D
-00E0: 0757696E646F7773 0866726D5F4F7065 6E0D4368696C6420 57696E646F777305
-0100: 6466524E4B000000 00
+0060: 000F4170706C6963 6174696F6E497465 6D02000000075769 6E646F77730F6672
+0080: 6D5F566964644465 7461696C73000001 8002000200000000 000000000000002C
+00A0: 0000000000000001 000000FFFFFFFFFF FFFFFFF8FFFFFFE2 FFFFFF3200000032
+00C0: 0000001F0400009D 0200000000000000 000000050000000F 4170706C69636174
+00E0: 696F6E4974656D07 57696E646F777308 66726D5F4F70656E 0D4368696C642057
+0100: 696E646F77730564 66524E4B00000000
 .enddata
 .data DT_MAKERUNDLG
 0000: 02000000001B443A 5C4241525339385C 42494E5C42415261 72733030362E6170
@@ -12076,7 +12076,7 @@ AND SqlFetchNext( hSql(), nFetchRes )
            freq_n        = :dfFREQN, 
            metr          = :dfMETR,  
            tip_ost       = :dfOST,
-           IRREVOCABLE   = :dfPeriodType,
+           IRVK          = :dfPeriodType,
            term_type     = :nTermType,
            term_min      = :nTermMin,
            term_max      = :nTermMax,
@@ -12113,7 +12113,7 @@ and not SqlFetchNext(hSql(), nFetchRes)
       bsd,       bsn,      fl_extend, 
       min_summ,  max_summ, limit,    fl_add,
       id_stop,   penya,    shablon,
-      basey,     freq_n,   metr,     tip_ost,  IRREVOCABLE,
+      basey,     freq_n,   metr,     tip_ost,  IRVK,
       term_type, term_min, term_max,
       br_id,     tt,       acc7,  
       comproc,   freq_v,   comments, flag,  type_id )
@@ -16572,7 +16572,7 @@ OR ( dfTERM_MAX_D = 0 AND dfTERM_MAX_M = 0 )
            doc.id, doc.name,
            bsy.basey, bsy.name, 
            fqn.freq, fqn.name, 
-           mtr.metr, mtr.name, nvl(v.tip_ost,0), v.irrevocable,
+           mtr.metr, mtr.name, nvl(v.tip_ost,0), v.IRVK,
            v.term_type, v.term_min, v.term_max,
            brt.br_id,  brt.name, 
            tts.tt, tts.name, 

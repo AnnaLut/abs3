@@ -16,7 +16,7 @@ begin
        and ba.acc_num = c0.nlsalt
        and ba.cur_id = c0.kv;
        
-    l_cnt0 := lcnt0 + sql%rowcount;
+    l_cnt0 := l_cnt0 + sql%rowcount;
 
     update ibank.v_accounts ia
        set ia.acc_num = c0.nls
@@ -24,14 +24,14 @@ begin
        and ia.acc_num = c0.nlsalt
        and ia.cur_id = c0.kv;
        
-    l_cnt1 := lcnt1 + sql%rowcount;
+    l_cnt1 := l_cnt1 + sql%rowcount;
        
     update ibank.v_accounts2 ia
        set ia.acc_num = c0.nls
       where ia.bank_id = c0.kf
        and ia.acc_num = c0.nlsalt
        and ia.cur_id = c0.kv;
-    l_cnt2 := lcnt2 + sql%rowcount;
+    l_cnt2 := l_cnt2 + sql%rowcount;
 
   end loop;
   dbms_output.put_line('barsaq.accounts:'||l_cnt0);
