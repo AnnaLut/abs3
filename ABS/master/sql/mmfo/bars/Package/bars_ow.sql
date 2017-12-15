@@ -13,6 +13,12 @@ function body_version return varchar2;
 -- Конвертит blob в clob
 function blob_to_clob (blob_in in blob) return clob;
 
+-------------------------------------------------------------------------------
+-- ow_init
+-- процедура инициализации параметров пакета
+--
+procedure ow_init;
+
 -- процедура импорта файлов от Way4 - для вертушки
 procedure w4_import_files (
   p_filename     varchar2,
@@ -587,10 +593,10 @@ begin
                 when '2209' then
                  '2208'
                 when '3579' then
-                 '3570'                                                                         
+                 '3570'
                 else
                  substr(p_nbs, 1, 4)
-         end;   
+         end;
 end;
 -------------------------------------------------------------------------------
 --процедура для проставления счетам 2924 признака пакетной оплаты
@@ -1604,7 +1610,7 @@ is
   l_txt   cc_sob.txt%type;
   l_kv2   oper.kv2%type;
   l_accounts_row accounts%rowtype;
-  
+
 begin
 
   select max(n.nd) into l_nd_kd
@@ -1618,7 +1624,7 @@ begin
      select decode(dk,p_dk,nlsa,nlsb), decode(dk,p_dk,kv,kv2) into l_nlsb, l_kv2 from oper where ref = p_ref;
      if newnbs.g_state = 1 then
         l_accounts_row := account_utl.read_account(l_nlsb, l_kv2);
-       
+
         l_txt := case when l_nlsb like '2__9%' and l_accounts_row.tip = 'SPN' then 'Погашення проср. %%'
                       when l_nlsb like '3578%' and l_accounts_row.tip = 'SK9' then 'Погашення проср. комісії'
                       when l_nlsb like '2__7%' and l_accounts_row.tip = 'SP ' then 'Погашення проср. тіла КД'
@@ -1635,7 +1641,7 @@ begin
                       when l_nlsb like '3578%' then 'Погашення комісії'
                       when l_nlsb like '6___%' then 'Погашення пені'
                       else 'Погашення тіла КД'
-                  end;   
+                  end;
      end if;
      l_txt := l_txt || ': Реф.' || p_ref || ' ' ||
               case when p_transfer_flag = 1 then 'відправлено до ПЦ'
@@ -2738,7 +2744,7 @@ begin
                                    then dbms_xslprocessor.valueof(l_parm, 'Value/text()', l_str);
                                    l_rec_commision.bill_amount:=convert_to_number(l_str);
                                    if  nvl(l_rec_commision.bill_amount,0)=0
-                                           then 
+                                           then
                                            l_fee_doc:=0;
                                            else
                                            l_fee_doc:=1;
@@ -2836,7 +2842,7 @@ begin
                  then
                  insert into ow_oic_documents_data values l_rec_commision;
                  else q:=q-1;
-                 end if;              
+                 end if;
          else q:=q-2;
          end if;
 
@@ -3491,6 +3497,7 @@ begin
               b_kvt := false;
               -- успешная квитовка
               if l_payflag = 1 and l_resp_code = '0' then
+                 begin
                  final_payment(l_srn, l_dk, b_kvt);
                  -- квитовка документа
                  if b_kvt then
@@ -3503,6 +3510,20 @@ begin
                     -- удаление из очереди на отправку/квитовку
                     del_pkkque(l_srn, l_dk);
                  end if;
+                 exception
+                   when others then
+                     
+                    l_err := substr('Квитовка док.' || l_srn || '-ошибка:'||sqlerrm,1,254);
+                    bars_audit.info(h ||'Err:' || p_filename|| ' Ref:'||l_srn||' '|| dbms_utility.format_error_stack() || chr(10) ||
+                                    dbms_utility.format_error_backtrace());
+                    l_msg := substr(l_msg || l_err, 1, 254);
+                    update ow_pkk_que
+                       set resp_text  = l_err
+                    where f_n = l_iic_filename
+                       and ref = l_srn
+                       and dk = l_dk
+                    returning acc into l_acc;
+                 end;
               end if;
               -- ошибка квитовки
               if l_payflag in (1, 2) and l_resp_code <> '0' then
@@ -3530,7 +3551,15 @@ begin
                     else
                        p_back_dok(l_srn, 5, null, l_p1, l_p2);
                     end if;
-                    update operw set value = 'Повернено по квитанції ПЦ ' || p_filename where ref = l_srn and tag = 'BACKR';
+                    update operw set
+                           value = substr( 'Повернено по квитанції ПЦ ' ||
+                                            p_filename ||'('||
+                                            l_resp_code||'#'||
+                                            l_resp_text||')'
+                                            ,1,220
+                                          )
+                    where ref = l_srn and tag = 'BACKR';
+
                     insert into oper_visa (ref, dat, userid, groupid, status)
                     values (l_srn, sysdate, user_id, g_chkid, 3);
                  exception when others then
@@ -3767,9 +3796,9 @@ begin
   end;
 
   -- определение БС
-  
+
   if newnbs.g_state = 1 then
-     l_nbs := get_new_nbs(substr(p_mode,1,4));     
+     l_nbs := get_new_nbs(substr(p_mode,1,4));
   else
      l_nbs := substr(p_mode,1,4);
   end if;
@@ -4424,7 +4453,7 @@ begin
   if lower(substr(l_filename,-4)) = '.zip' then
      -- zip
      l_u := ow_utl .get_filefromzip(l_fileblob);
-  else 
+  else
      -- gzip
      l_u := utl_compress.lz_uncompress(l_fileblob);
   end if;
@@ -5697,7 +5726,7 @@ begin
                      p_nlsa := nbs_ob22_null(l_newnb.nbs, l_newnb.ob22, l_branch);
                   else
                      p_nlsa := nbs_ob22_null(substr(l_nls,5,4), substr(l_nls,-2), l_branch);
-                  end if;                 
+                  end if;
                -- нормальный счет - оставляем как есть
                end if;
             end if;
@@ -5714,7 +5743,7 @@ begin
                      p_nlsb := nbs_ob22_null(l_newnb.nbs, l_newnb.ob22, l_branch);
                   else
                      p_nlsb := nbs_ob22_null(substr(l_nls,5,4), substr(l_nls,-2), l_branch);
-                  end if;  
+                  end if;
                -- нормальный счет - оставляем как есть
                end if;
             end if;
@@ -5794,7 +5823,7 @@ is
             l_nls := nbs_ob22_null(l_newnb.nbs, l_newnb.ob22, l_pk_branch);
          else
             l_nls := nbs_ob22_null(substr(p_nls,5,4), substr(p_nls,-2), l_pk_branch);
-         end if;  
+         end if;
 
          begin
            for i in (select *
@@ -5913,7 +5942,7 @@ begin
                      p_nlsb := nbs_ob22_null(l_newnb.nbs, l_newnb.ob22, l_branch);
                   else
                      p_nlsb := nbs_ob22_null(substr(p_nlsb,5,4), substr(p_nlsb,-2), l_branch);
-                  end if;                   
+                  end if;
                else
                   p_nlsb := get_nls_cardpay(p_dat, p_drn, p_orn, p_nlsb, p_kv2);
                end if;
@@ -5960,7 +5989,7 @@ begin
                   p_nlsb := nbs_ob22_null(l_newnb.nbs, l_newnb.ob22, l_branch);
                else
                   p_nlsb := nbs_ob22_null(substr(p_nlsb,5,4), substr(p_nlsb,-2), l_branch);
-               end if;                
+               end if;
             else
                p_nlsb := get_nls_cardpay(p_dat, p_drn, p_orn, p_nlsb, p_kv2);
             end if;
@@ -6635,11 +6664,11 @@ begin
                   bPay   := false;
                   l_err  := l_nlsa || '-Недостатньо коштів на рахунку;';
                end if;
-            exception 
+            exception
               when others then
                 if sqlcode = -54 then
                    bPay   := false;
-                   l_err  := l_nlsa || '-locked account';                  
+                   l_err  := l_nlsa || '-locked account';
                 else
                    raise;
                 end if;
@@ -6654,15 +6683,15 @@ begin
                  bPay   := false;
                  l_err  := l_nlsb || '-Недостатньо коштів на рахунку;';
               end if;
-            exception 
+            exception
               when others then
                 if sqlcode = -54 then
                    bPay   := false;
-                   l_err  := l_nlsb || '-locked account';                  
+                   l_err  := l_nlsb || '-locked account';
                 else
                    raise;
                 end if;
-            end;            
+            end;
          end if;
       end if;
       if l_err is not null then
@@ -6684,7 +6713,7 @@ begin
                   l_nlsa := nbs_ob22 (l_newnb.nbs, l_newnb.ob22);
                else
                   l_nlsa := nbs_ob22 ('2909','80');
-               
+
                end if;
             else
                l_tt := 'OW1';
@@ -7178,11 +7207,11 @@ begin
                   bPay   := false;
                   l_err  := l_nlsa || '-Недостатньо коштів на рахунку;';
                end if;
-            exception 
+            exception
               when others then
                 if sqlcode = -54 then
                    bPay   := false;
-                   l_err  := l_nlsa || '-locked account';                  
+                   l_err  := l_nlsa || '-locked account';
                 else
                    raise;
                 end if;
@@ -7197,15 +7226,15 @@ begin
                  bPay   := false;
                  l_err  := l_nlsb || '-Недостатньо коштів на рахунку;';
               end if;
-            exception 
+            exception
               when others then
                 if sqlcode = -54 then
                    bPay   := false;
-                   l_err  := l_nlsb || '-locked account';                  
+                   l_err  := l_nlsb || '-locked account';
                 else
                    raise;
                 end if;
-            end;            
+            end;
          end if;
       end if;
 
@@ -7918,7 +7947,7 @@ begin
            if l_id_b <> l_doc(i).cnt_clientregnumber then
               bPay  := false;
               l_err := substr(iif_s(length(l_err), 0, '', '', l_err||' ') || 'Код клієнта в файлі (' || l_doc(i).cnt_clientregnumber || ') не відповідає коду клієнта в АБС (' || l_id_b || ')', 1, 254);
-       
+
            end if;
         else
            bPay  := false;
@@ -8000,7 +8029,7 @@ begin
             l_mode := 2;
             l_tt := 'OW7';
             l_nazn := substr('Відміна операції по причині: '||l_err, 1, 160);
-            
+
             if newnbs.g_state = 1 then
                l_newnb :=  get_new_nbs_ob22('2909', '80');
                l_nlsb := nbs_ob22 (l_newnb.nbs, l_newnb.ob22);
@@ -11241,8 +11270,8 @@ is
 d_close w4_acc.dat_close%type;
 begin
    begin
-	select  distinct dat_close into d_close from (
-	select a.dat_close  from  w4_acc a  where a.nd=p_nd
+  select  distinct dat_close into d_close from (
+  select a.dat_close  from  w4_acc a  where a.nd=p_nd
     union
     select a.dat_close from  bpk_acc a  where a.nd=p_nd);
    end;
@@ -13181,39 +13210,39 @@ begin
         l_project.okpo <> '000000000' and
         l_project.okpo <> '0000000000' then
         l_project.rnk := found_client(l_project.okpo, l_project.paspseries, l_project.paspnum);
-		--Проверка на терористов і публічних діячів
-		if l_project.rnk is not null and finmon_is_public(l_project.last_name||' '||l_project.first_name||' '||l_project.middle_name,null)<>0 then
+    --Проверка на терористов і публічних діячів
+    if l_project.rnk is not null and finmon_is_public(l_project.last_name||' '||l_project.first_name||' '||l_project.middle_name,null)<>0 then
         l_project.str_err:= substr('Публічний діяч, клієнт', 1, 254);
         l_project.flag_open:=2;
         elsif l_project.rnk is null and finmon_is_public(l_project.last_name||' '||l_project.first_name||' '||l_project.middle_name,null)<>0 then
         l_project.str_err:= substr('Публічний діяч, не клієнт', 1, 254);
         l_project.flag_open:=null;
-		end if;
+    end if;
         if l_project.str_err is null and f_istr(l_project.last_name||' '||l_project.first_name||' '||l_project.middle_name)<>0 then
         l_project.str_err:= substr('Увага! Виявлено збіг з переліком осіб, пов''язаних із здійсненням терористичної діяльності або стосовно яких застосовано міжнародні санкції. Зверніться до підрозділу фінансового моніторингу!', 1, 254);
         l_project.flag_open:=2;
-		elsif l_project.str_err is not null and f_istr(l_project.last_name||' '||l_project.first_name||' '||l_project.middle_name)<>0 then
-		l_project.str_err:= substr(l_project.str_err || '; Увага! Виявлено збіг з переліком осіб, пов''язаних із здійсненням терористичної діяльності або стосовно яких застосовано міжнародні санкції. Зверніться до підрозділу фінансового моніторингу!', 1, 254);
+    elsif l_project.str_err is not null and f_istr(l_project.last_name||' '||l_project.first_name||' '||l_project.middle_name)<>0 then
+    l_project.str_err:= substr(l_project.str_err || '; Увага! Виявлено збіг з переліком осіб, пов''язаних із здійсненням терористичної діяльності або стосовно яких застосовано міжнародні санкції. Зверніться до підрозділу фінансового моніторингу!', 1, 254);
         l_project.flag_open:=2;
         else
         l_project.flag_open:=null;
         end if;
-		------
+    ------
      else
         l_project.rnk := null;
-		l_project.flag_open:=null;
-		--Проверка на терористов і публічних діячів
+    l_project.flag_open:=null;
+    --Проверка на терористов і публічних діячів
         if l_project.str_err is not null and finmon_is_public(l_project.last_name||' '||l_project.first_name||' '||l_project.middle_name,null)<>0 then
         l_project.str_err:= substr(l_project.str_err || ';Публічний діяч', 1, 254);
-		elsif l_project.str_err is null and finmon_is_public(l_project.last_name||' '||l_project.first_name||' '||l_project.middle_name,null)<>0 then
-		l_project.str_err:= substr('Публічний діяч', 1, 254);
-        end if;    
+    elsif l_project.str_err is null and finmon_is_public(l_project.last_name||' '||l_project.first_name||' '||l_project.middle_name,null)<>0 then
+    l_project.str_err:= substr('Публічний діяч', 1, 254);
+        end if;
         if l_project.str_err is not null and f_istr(l_project.last_name||' '||l_project.first_name||' '||l_project.middle_name)<>0 then
         l_project.str_err:= substr(l_project.str_err || ';Терорист', 1, 254);
-		elsif l_project.str_err is null and f_istr(l_project.last_name||' '||l_project.first_name||' '||l_project.middle_name)<>0 then
-		l_project.str_err:= substr('Терорист', 1, 254);
+    elsif l_project.str_err is null and f_istr(l_project.last_name||' '||l_project.first_name||' '||l_project.middle_name)<>0 then
+    l_project.str_err:= substr('Терорист', 1, 254);
         end if;
-		------
+    ------
      end if;
      l_project.nd  := null;
      l_project.id  := l_id;
@@ -14892,7 +14921,7 @@ is
   l_ovr_old_ob22  accounts.ob22%type;
   l_ovr_new_nbs   accounts.nbs%type;
   l_ovr_new_acc   number;
-  l_ovr_new_ob22  accounts.ob22%type;  
+  l_ovr_new_ob22  accounts.ob22%type;
   l_bpk_proect_id_new    number;
   l_name_new             bpk_proect.name%type;
   l_bpk_proect_id_old    number;
@@ -15002,7 +15031,7 @@ begin
                     c.okpo, c.okpo_n
                from cm_acc_request c
               where c.oper_type  = g_cmaccrequest_altersub
-                and c.oper_date <= bankdate 
+                and c.oper_date <= bankdate
                 and p_mode = 0
              union all
              select p_cm_acc_req.contract_number, p_cm_acc_req.product_code, p_cm_acc_req.card_type, p_cm_acc_req.oper_type, p_cm_acc_req.oper_date, p_cm_acc_req.date_in,
@@ -15136,7 +15165,7 @@ begin
                          and t.tip = l_new_tip;
                      exception when no_data_found then
                         l_ovr_new_ob22 := null;
-                     end;                       
+                     end;
                     -- новый долгоср. 2203
                     if l_old_tip = 'W4C' and l_ovr_new_ob22 <> l_ovr_old_ob22 then
                        l_ovr_new_nbs := case when l_ovr_old_nbs = '2203' then '2203' else '2063' end;
@@ -15146,7 +15175,7 @@ begin
                     -- БС не меняется
                     else
                        l_ovr_new_nbs := null;
-                    end if;                   
+                    end if;
                  else
                     -- новый долгоср. 2203
                     if l_new_tip = 'W4B' and l_ovr_old_nbs in ('2202', '2062') then
@@ -15158,7 +15187,7 @@ begin
                     else
                        l_ovr_new_nbs := null;
                     end if;
-                 
+
                  end if;
                  -- если БС меняется, открываем новый счет
                  if l_ovr_new_nbs is not null then
