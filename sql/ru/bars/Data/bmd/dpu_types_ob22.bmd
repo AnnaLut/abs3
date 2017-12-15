@@ -119,18 +119,19 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'TYPE_ID', 'N', 'Код~продукту', null, null, 1, 0, 1, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'K013', 'C', 'Код виду~клієнта~(K013)', null, 1, 2, 0, 1, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'IRVK', 'C', 'Безвідкличний~(1-Так/0-Ні)', null, 1, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'R034', 'C', 'Нацвалюта/~Інвалюта~(R034)', null, 1, 4, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'NBS_DEP', 'C', 'Бал.Рах.~депозиту', null, 4, 5, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'OB22_DEP', 'C', 'OB22~депозиту', null, 2, 6, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'NBS_INT', 'C', 'Бал.Рах.~відсотків', null, 4, 7, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'OB22_INT', 'C', 'OB22~відсотків', null, 2, 8, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'NBS_EXP', 'C', 'Бал.Рах.~процентних~витрат', null, 4, 9, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid,  1, 'TYPE_ID',  'N', 'Код~продукту', null, null, 1, 0, 1, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid,  2, 'K013',     'C', 'Код виду~клієнта~(K013)', null, 1, 2, 0, 1, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid,  3, 'S181',     'C', 'Код~строку~(S181)', null, 1, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid,  4, 'R034',     'C', 'Нацвалюта/~Інвалюта~(R034)', null, 1, 4, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid,  5, 'NBS_DEP',  'C', 'Бал.Рах.~депозиту', null, 4, 5, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid,  6, 'OB22_DEP', 'C', 'OB22~депозиту', null, 2, 6, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid,  7, 'NBS_INT',  'C', 'Бал.Рах.~відсотків', null, 4, 7, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid,  8, 'OB22_INT', 'C', 'OB22~відсотків', null, 2, 8, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid,  9, 'NBS_EXP',  'C', 'Бал.Рах.~процентних~витрат', null, 4, 9, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 10, 'OB22_EXP', 'C', 'OB22~ процентних~витрат', null, 2, 10, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'NBS_RED', 'C', 'Бал.Рах.~зменшення~%% витрат', null, 4, 11, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'NBS_RED',  'C', 'Бал.Рах.~зменшення~%% витрат', null, 4, 11, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 12, 'OB22_RED', 'C', 'OB22~зменшення~%% витрат', null, 2, 12, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'IRVK',     'C', 'Безвідкличний~(1-Так/0-Ні)', null, 1, 13, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('DPU_TYPES');
