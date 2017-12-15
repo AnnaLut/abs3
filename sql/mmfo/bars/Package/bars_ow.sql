@@ -6658,7 +6658,7 @@ begin
       end if;
 
       if bpay then
-         if substr(l_nlsa,1,4) in ('2909', '2208', '2900') then
+         if substr(l_nlsa,1,4) in ('2909', '2900') then
             begin
                if not check_available(l_nlsa, l_atrn(i).debit_currency, l_atrn(i).debit_amount) then
                   bPay   := false;
@@ -7201,7 +7201,7 @@ begin
          end if;
       end if;
       if bpay then
-         if substr(l_nlsa,1,4) in ('2909', '2208', '2900') then
+         if substr(l_nlsa,1,4) in ('2909', '2900') then
             begin
                if not check_available(l_nlsa, l_atrn(i).debit_currency, l_atrn(i).debit_amount) then
                   bPay   := false;
