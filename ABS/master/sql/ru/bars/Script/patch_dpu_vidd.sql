@@ -185,3 +185,91 @@ update DPU_VIDD
  where lnnvl( TT = 'DU%' );
 
 commit;
+
+update DPU_VIDD
+   set TERM_TYPE = 2
+ where TERM_TYPE is Null;
+
+commit;
+
+update DPU_VIDD
+   set TERM_MIN = case 
+                   when SROK  = 0 then 0.0003
+                   when SROK >= 1 then case when SROK > 12 then 12 else trunc(SROK)+(SROK-trunc(SROK))/100 end
+                   else SROK / 100
+                   end
+ where TERM_MIN Is Null;
+
+commit;
+
+update DPU_VIDD
+   set TERM_MAX = case
+                  when SROK  = 0 then 0.1095
+                  when SROK >= 1 then case when SROK > 12 then trunc(SROK)+(SROK-trunc(SROK))/100 else 12 end
+                  else SROK / 100
+                  end
+ where TERM_MAX Is Null;
+
+commit;
+
+SET FEEDBACK OFF
+
+begin
+  execute immediate 'alter table DPU_VIDD modify TERM_TYPE constraint CC_DPUVIDD_TERMTYPE_NN NOT NULL';
+  dbms_output.put_line( 'Table altered.' );
+exception
+  when others then 
+    if (sqlcode = -01442)
+    then dbms_output.put_line( 'Column "TERM_TYPE" is already NOT NULL.' );
+    else raise;
+    end if;
+end;
+/
+
+declare
+  E_CHK_CNSTRN_EXISTS exception;
+  pragma exception_init( E_CHK_CNSTRN_EXISTS, -02264 );
+begin
+  execute immediate 'alter table DPU_VIDD add constraint CC_DPUVIDD_TERMTYPE check ( TERM_TYPE in ( 1, 2 ) )';
+  dbms_output.put_line( 'Table altered.' );
+exception
+  when E_CHK_CNSTRN_EXISTS
+  then null;
+end;
+/
+
+begin
+  execute immediate 'alter table DPU_VIDD modify TERM_MIN constraint CC_DPUVIDD_TERMMIN_NN NOT NULL';
+  dbms_output.put_line('Table altered.');
+exception
+  when others then 
+    if (sqlcode = -01442)
+    then dbms_output.put_line( 'Column "TERM_MIN" is already NOT NULL.' );
+    else raise;
+    end if;
+end;
+/
+
+declare
+  E_CHK_CNSTRN_EXISTS exception;
+  pragma exception_init( E_CHK_CNSTRN_EXISTS, -02264 );
+begin
+  execute immediate 'alter table DPU_VIDD add constraint CC_DPUVIDD_TERMMIN check ( TERM_MIN > 0 )';
+  dbms_output.put_line( 'Table altered.' );
+exception
+  when E_CHK_CNSTRN_EXISTS
+  then null;
+end;
+/
+
+declare
+  E_CHK_CNSTRN_EXISTS exception;
+  pragma exception_init( E_CHK_CNSTRN_EXISTS, -02264 );
+begin
+  execute immediate 'alter table DPU_VIDD add constraint CC_DPUVIDD_SHABLON_EXISTS check ( FLAG = nvl2(SHABLON,FLAG,0) ) NOVALIDATE';
+  dbms_output.put_line( 'Table altered.' );
+exception
+  when E_CHK_CNSTRN_EXISTS
+  then null;
+end;
+/

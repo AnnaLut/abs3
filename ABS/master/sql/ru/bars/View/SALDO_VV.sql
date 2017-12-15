@@ -9,7 +9,7 @@ CREATE OR REPLACE FORCE VIEW BARS.SALDO_VV
    OB22,
    DOS,
    KOS,
-   POS,
+   POST,
    ost_in,
    ost_out,
    ostQ_in,
@@ -25,7 +25,7 @@ AS
           ob22,
           DECODE (SIGN (fost (acc, dat_alt - 1) / 100), -1, -fost (acc, dat_alt - 1) / 100, 0) dOS,
           DECODE (SIGN (fost (acc, dat_alt - 1) / 100), 1, fost (acc, dat_alt - 1) / 100, 0) kOS,
-          'NEW' POS,
+          'NEW' POST,
           0,
           ABS(fost (acc, dat_alt - 1) / 100),
           0,
@@ -51,5 +51,7 @@ AS
       where dat_alt is not null;
 
 grant select on SALDO_VV to bars_access_defrole;
+
+grant select on SALDO_VV to start1;
 
 

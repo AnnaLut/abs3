@@ -9485,7 +9485,8 @@ is
       domain    customer_address.domain%type,
       region    customer_address.region%type,
       locality  customer_address.locality%type,
-      address   customer_address.address%type);
+      address   customer_address.address%type,
+      nbs_term  accounts.nbs%type);
     r_immobile r_immobile_type;
     l_ref      oper.ref%type;
     l_tt       oper.tt%type := 'N24'; -- 'АСВ';
@@ -9527,7 +9528,7 @@ is
             l_ob22 := case p_nbs
                         when '2620' then '30'
                         when '2630' then '46'
-                        --when '2635' then '38'
+                        when '2635' then 'D3'
                         else null
                       end;
         end;
@@ -9677,7 +9678,8 @@ is
                    ca.domain,
                    ca.region,
                    ca.locality,
-                   ca.address
+                   ca.address,
+                   decode(sp.s181, 2, '2635', ad.nbs) nbs_term -- для довгострокового треба встановити вже неіснуючий 2635
               into r_immobile
               from dpt_deposit d
              inner join customer c
@@ -9694,6 +9696,8 @@ is
                 on (ai.acc = i.acra)
              inner join accounts ae
                 on (ae.acc = i.acrb)
+              left join specparam sp
+                on (sp.acc = ad.acc)
              where d.deposit_id = p_dptid(i);
             -- for update of ad.ostb nowait;
           
@@ -9710,7 +9714,7 @@ is
               end if;
             
               -- пошук котлового рахунка (нерухомі вклади для РНВ із залишками більше 10 одиниць)
-              l_nls := get_nls_immobile(r_immobile.nbs_dep,
+              l_nls := get_nls_immobile(r_immobile.nbs_term,  --r_immobile.nbs_dep,
                                         r_immobile.kv,
                                         r_immobile.branch,
                                         null);

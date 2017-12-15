@@ -132,7 +132,7 @@ begin
   bars_metabase.add_column(l_tabid, 6, 'NBS', 'C', 'Ѕал~рах', '', null, 2, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
   bars_metabase.add_column(l_tabid, 7, 'NLS', 'C', 'ќсоб~рахунок', '', null, 5, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
   bars_metabase.add_column(l_tabid, 8, 'OB22', 'C', 'ќб22', '', null, 4, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'POS', 'C', 'ќзнака~(новий/старий)', '', null, 12, 1, 1, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'POST', 'C', 'ќзнака~(новий/старий)', '', null, 12, 1, 1, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
   bars_metabase.add_column(l_tabid, 12, 'OST_IN', 'N', '¬х.~залишок', '', null, 6, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 1, '', '', 0);
   bars_metabase.add_column(l_tabid, 13, 'OST_OUT', 'N', '¬их.~залишок', '', null, 10, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 1, '', '', 0);
   bars_metabase.add_column(l_tabid, 14, 'OSTQ_IN', 'N', '¬х.~залишок(екв.)', '', null, 7, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 1, '', '', 0);
@@ -152,10 +152,10 @@ begin
   bars_metabase.delete_nsifunction(l_tabid);
 
   -- добавл€ем описание раскраски
-  bars_metabase.add_tblcolor(l_tabid, 1, null, 'POS = ''OLD''', 2, 'COLOR_LightGray');
+ -- bars_metabase.add_tblcolor(l_tabid, 1, null, 'POS = ''OLD''', 2, 'COLOR_LightGray');
 
   -- добавл€ем описание раскраски
-  bars_metabase.add_tblcolor(l_tabid, 2, null, 'POS = ''NEW''', 2, 'COLOR_LightBlue');
+ -- bars_metabase.add_tblcolor(l_tabid, 2, null, 'POS = ''NEW''', 2, 'COLOR_LightBlue');
 
   -- восстанавливаем ссылки сложных полей других таблиц
   for i in 1..l_extrnval.count loop

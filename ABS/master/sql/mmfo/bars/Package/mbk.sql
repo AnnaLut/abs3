@@ -5,6 +5,7 @@ PROMPT =========================================================================
 create or replace package mbk
 is
 /*
+ 15.12.2017 ВВод сделки - снова Proc-dr
  08.12.2017 Sta ОТСутствие в Proc-dr
  17.11.2017 Трансфер-2017 ПОДМЕНА ПРОЦЕДУРЫ ОТКР.СЧЕТА  На уровне бал.счетов - без учета об22 
 
@@ -413,8 +414,10 @@ end;
 /
 create or replace package body mbk is
 
-    MBK_BODY_VERS   CONSTANT VARCHAR2(64)  := 'version 75.1 02.08.2017';
+    MBK_BODY_VERS   CONSTANT VARCHAR2(64)  := 'version 1 15.12.2017';
 /*
+ 15.12.2017 ВВод сделки - снова Proc-dr
+
     13.10.2016 Sta - код оп при приеме сумм на заход
 
     28.09.2016 Sta - Функция для создания вюшки "Операции" по договору
@@ -2087,46 +2090,20 @@ END    op_reg_ex_2017;
 
       BEGIN
 
-   	    l_nmkb := substr(NMKB_,1,38);
-		
+        l_nmkb := substr(NMKB_,1,38);
         nUser_ := USER_ID;
         ND_    := null;
 
         -- счет доходов-расходов
-        if ( S67_ Is Null )
-        then
-
-          ACC3_ := BARS.F_PROC_DR( RNKB_, 4, 0, 'MKD', nVidd_, nKv_ );
-
-          if ( ACC3_ Is Null )
-          then
-            sERR_ := 'Не знайдено рахунок доходів/витрат';
-            raise inr_err;
-          end if;
-
-        else
-
-          BEGIN
-            SELECT acc
-              INTO ACC3_
-              FROM accounts
-             WHERE kv=gl.baseval
-               and nls=S67_
-               and dazs is null;
-          EXCEPTION
-            WHEN NO_DATA_FOUND THEN
-              sERR_ := 'Не открыт счет '||S67_;
-              raise inr_err;
-          END;
-
+        if ( S67_ Is Null )    then      ACC3_ := BARS.F_PROC_DR( RNKB_, 4, 0, 'MKD', nVidd_, nKv_ );
+           if ( ACC3_ Is Null ) then     sERR_ := 'Не знайдено рахунок доходів/витрат';          raise inr_err;       end if;
+        else  BEGIN  SELECT acc  INTO ACC3_  FROM accounts  WHERE kv=gl.baseval   and nls=S67_            and dazs is null;
+              EXCEPTION  WHEN NO_DATA_FOUND THEN      sERR_ := 'Не открыт счет '||S67_;          raise inr_err;
+              END;
         end if;
-
-        --SELECT s_cc_deal.nextval into ND_  FROM dual;
         nd_ := bars_sqnc.get_nextval('s_cc_deal');
-
         INSERT INTO cc_deal (nd , vidd  , rnk  , user_id, cc_id , sos, wdate, sdate                , limit, kprolog,ir  ,prod         )
                      VALUES (ND_, nVidd_, RNKB_, nUser_ , CC_ID_, 10 , DAT4_, nvl(DDAte_, gl.BDATE), SUM_ , 0      ,IRR_,code_product_);
-
         INSERT INTO cc_add (nd         , adds       , s      , kv     , bdate  , wdate  , sour      , acckred   , mfokred , freq      , accperc   ,
                             mfoperc    , refp       , swi_bic, swi_acc, swo_bic, swo_acc, int_amount, alt_partyb, interm_b, int_partya, int_partyb,
                             int_interma, int_intermb, n_nbu, d_nbu  )
@@ -2134,286 +2111,93 @@ END    op_reg_ex_2017;
                             S4_        , S5_        , bica_  , ssla_  , bicb_  , sslb_  , sump_     , altb_     , intermb_, IntPartyA_, IntPartyB_,
                             IntIntermA_, IntIntermB_, n_nbu_ , d_nbu_ );
 
-        if ( nTipd_ Is Null )
-        then
-          select TIPD
-            into l_tipd
-            from CC_VIDD
-           where VIDD = nVidd_;
-        else
-          l_tipd := nTipd_;
-        end if;
-
-        if l_tipd = 1
-        then
-          nID_ :=0;
-          Tip1_:='SS ';
-          Tip2_:='SN ';
-        else
-          nID_ :=1;
-          Tip1_:='DEP';
-          Tip2_:='DEN';
-        end if ;
-
-        if ( nIsp_ Is Null )
-        then
-          l_isp := gl.aUID;
-        else
-          l_isp := nIsp_;
-        end if;
-
-        if ( nGrp_ Is Null )
-        then
-          l_grp := 33;
-        else
-          l_grp := nGrp_;
-        end if;
-
-        bars_audit.info( title || ': tipd = ' || to_char(l_tipd)
-                               || ', grp = '  || to_char(l_grp)
-                               || ', isp = '  || to_char(l_isp) );
+        if ( nTipd_ Is Null )  then select TIPD into l_tipd  from CC_VIDD where VIDD = nVidd_;   else  l_tipd := nTipd_; end if;
+        if l_tipd = 1   then   nID_ :=0;  Tip1_:='SS ';  Tip2_:='SN '; else  nID_ :=1;  Tip1_:='DEP';  Tip2_  :='DEN'  ; end if ;
+        l_isp := Nvl( nIsp_, gl.aUID) ;
+        l_grp := Nvl(nGrp_, 33) ;
 
         -- открытие основного счета
         MBK.op_reg_ex_2017 (1,ND_,nTmp_, l_grp, nTmp_,RNKB_,NLSA_, nKv_,NMS_, Tip1_, l_isp, ACC1_, '1', null, null,  null);  -- KB  pos=1
         -- открытие счета нач.%%
         MBK.op_reg_ex_2017 (1,ND_,nTmp_, l_grp, nTmp_,RNKB_,NLSNA_,nKv_,NMSN_,Tip2_, l_isp, ACC2_, '1', null, null,  null);  -- KB  pos=1
 
-        UPDATE cc_add
-           SET accs=ACC1_
-         WHERE nd=ND_;
-
-        -- 30.08.2010 Sta
+        UPDATE cc_add           SET accs=ACC1_         WHERE nd=ND_;
         l_INITIATOR := substr( pul.Get_Mas_Ini_Val('INITIATOR'), 1, 2 );
 
         If gl.aMfo = '300465' and l_INITIATOR is not null then
            -- Доп.реквизиты счета SS
            EXECUTE IMMEDIATE 'update SPECPARAM_CP_OB set INITIATOR =''' || l_INITIATOR || ''' where acc= '|| ACC1_ ;
-           if SQL%rowcount = 0 then
-              EXECUTE IMMEDIATE 'insert into SPECPARAM_CP_OB (ACC,INITIATOR) ' ||
-                                'values ( ' || ACC1_ || ', '''|| l_INITIATOR || ''' )';
-           end if;
-
+           if SQL%rowcount = 0 then  EXECUTE IMMEDIATE 'insert into SPECPARAM_CP_OB (ACC,INITIATOR) '  ||   'values ( ' || ACC1_ || ', '''|| l_INITIATOR || ''' )';           end if;
            EXECUTE IMMEDIATE 'update SPECPARAM_CP_OB set INITIATOR =''' || l_INITIATOR || ''' where acc= '|| ACC2_ ;
-           if SQL%rowcount = 0 then
-              EXECUTE IMMEDIATE 'insert into SPECPARAM_CP_OB (ACC,INITIATOR) ' ||
-                                'values ( ' || ACC2_ || ', '''|| l_INITIATOR || ''' )';
-           end if;
+           if SQL%rowcount = 0 then  EXECUTE IMMEDIATE 'insert into SPECPARAM_CP_OB (ACC,INITIATOR) ' ||    'values ( ' || ACC2_ || ', '''|| l_INITIATOR || ''' )';           end if;
         end if;
         -------------
 
-        IF NLSZ_ is not null
-        then
-          -- открытие счета залога
-          MBK.op_reg_ex_2017 ( 2, ND_, p_pawn -- case when ( l_tipd = 2 ) then 999999 else p_pawn end
-                   , 2, nTmp_, RNKB_, NLSZ_, nKVZ_, NMS_, 'ZAL', l_isp, ACC4_, '1', null, null, null                   ); -- KB  pos=1
+        IF NLSZ_ is not null      then
+           -- открытие счета залога
+           MBK.op_reg_ex_2017 ( 2, ND_, p_pawn  , 2, nTmp_, RNKB_, NLSZ_, nKVZ_, NMS_, 'ZAL', l_isp, ACC4_, '1', null, null, null                   ); -- KB  pos=1
+           -- проставляем группу доступа для счета залога как для основного счета
+           p_setAccessByAccmask(ACC4_, ACC1_);
+           insert into nd_acc (nd, acc) values (ND_, ACC4_);
 
-          bars_audit.info( title || ': ZAL ACC4_ = ' || ACC4_ );
-
-          -- проставляем группу доступа для счета залога как для основного счета
-          p_setAccessByAccmask(ACC4_, ACC1_);
-
-          insert into nd_acc (nd, acc) values (ND_, ACC4_);
-
-           if ( l_tipd = 1 )   then
-              update cc_accp     set nd=ND_        where acc=ACC4_ and accs=ACC1_;
-              IF SQL%rowcount = 0  then  INSERT into cc_accp (ACC,ACCS,nd) values (ACC4_,ACC1_,ND_);          END IF;
-           END IF;
-
+           if l_tipd = 1 then update cc_accp set nd=ND_ where acc=ACC4_ and accs=ACC1_; IF SQL%rowcount = 0 then INSERT into cc_accp (ACC,ACCS,nd) values (ACC4_,ACC1_,ND_); END IF; END IF;
            cck_utl.set_deal_attribute(ND_, 'PAWN', to_char(p_pawn));
-
         END IF;
 
-        IF Id_DCP_ is not null then
-           -- обеспечение - ДЦП
-           UPDATE dcp_p Set ref=-ND_, acc=ACC1_ WHERE id=Id_DCP_;
-        END IF;
-
+        IF Id_DCP_ is not null then            UPDATE dcp_p Set ref=-ND_, acc=ACC1_ WHERE id=Id_DCP_; END IF;          -- обеспечение - ДЦП
         UPDATE accounts SET mdate=DAT4_,PAP=l_tipd WHERE acc=ACC1_;
         UPDATE accounts SET mdate=DAT4_            WHERE acc=ACC2_;
         UPDATE accounts SET mdate=DAT4_            WHERE acc=ACC4_;
 
-        -- Artem Yurchenko, 24.11.2014
-        -- для кредитных ресурсов необходимо использовать другие операции
-        if (check_if_deal_belong_to_crsour(nVidd_) = 'Y') then
-            -- установка ОБ22
-            l_ob22 := '02';
-            accreg.setAccountSParam(ACC1_, 'OB22', l_ob22);
-            accreg.setAccountSParam(ACC2_, 'OB22', l_ob22);
+        sTTB_ := case when nKv_ = gl.baseval then 'WD2' else 'WD3' end;
 
-            -- проставим спецпараметр МФО (нужно для файлов 32, 33)
-            accreg.setAccountSParam(ACC1_, 'MFO', s2_);
-            accreg.setAccountSParam(ACC2_, 'MFO', s2_);
+        BEGIN        SELECT val INTO sTTA_ FROM params WHERE par='MBD_%%1';          --операция по начислению проц
+        EXCEPTION WHEN NO_DATA_FOUND THEN sTTA_ := '%%1';
+        END;
 
-            sTTB_ := 'PS2';
+        BEGIN  SELECT decode (codcagent,1, sTTA_, decode(l_tipd,1,'%00','%02') )    INTO sTTA_     FROM customer WHERE rnk=RNKB_;
+        EXCEPTION   WHEN NO_DATA_FOUND THEN     sERR_ := 'Не найден RNKB '||RNKB_;  raise inr_err;
+        END;       -- резидент-нерезидент
 
-            --операция по начислению проц
-            l_proc_dr_row := get_proc_dr_row(to_char(nVidd_, 'FM9999'), rnkb_);
-            sTTA_ := case when nKv_ = gl.baseval then l_proc_dr_row.tt
-                          else l_proc_dr_row.ttv
-                     end;
-        else
-            sTTB_ := case when nKv_ = gl.baseval then 'WD2' else 'WD3' end;
+        l_io := NVL(nIO_,0);
 
-            --операция по начислению проц
-            BEGIN
-               SELECT val INTO sTTA_ FROM params WHERE par='MBD_%%1';
-            EXCEPTION WHEN NO_DATA_FOUND THEN sTTA_ := '%%1';
-            END;
-            BEGIN
-              -- резидент-нерезидент
-              SELECT decode (codcagent,1, sTTA_, decode(l_tipd,1,'%00','%02') )
-                INTO sTTA_
-                FROM customer WHERE rnk=RNKB_;
-            EXCEPTION
-              WHEN NO_DATA_FOUND THEN
-                sERR_ := 'Не найден RNKB '||RNKB_;
-                raise inr_err;
-            END;
-        end if;
-
-        if ( nIO_ Is Null )
-        then
-          select IO
-            into l_io
-            from BARS.PROC_DR
-           where NBS = nVidd_
-             and sour = 4
-             and rownum = 1;
-        else
-          l_io := nIO_;
-        end if;
-
-        update BARS.INT_ACCN
-           set BASEY = nBASEY_
-             , TT = sTTA_
-             , STP_DAT = DAT4_-1
-             , ACRA = ACC2_
-             , ACRB = ACC3_
-             , s = 0
-             , IO = l_io
-             , acr_dat = decode(l_io,1,gl.BDATE,acr_dat)
-         where acc = ACC1_
-           and id  = nID_;
-
-        IF SQL%rowcount = 0
-        then
-          INSERT INTO int_accN ( acc, ID, metr, basem, BASEY, freq, ACRA, ACRB, KVB, TT, TTB, STP_DAT, s, IO, acr_dat )
-          VALUES (ACC1_, nID_, 0, 0, nBASEY_, 1, ACC2_, ACC3_, nKv_, sTTA_, sTTB_, DAT4_-1, 0, l_io, decode(l_io,1,gl.BDATE,null));
+        update BARS.INT_ACCN set BASEY = nBASEY_, TT = sTTA_, STP_DAT = DAT4_-1 , ACRA = ACC2_, ACRB = ACC3_, s = 0, IO = l_io , acr_dat = decode(l_io,1,gl.BDATE,acr_dat)   where acc = ACC1_  and id  = nID_;
+        IF SQL%rowcount = 0  then  INSERT INTO int_accN ( acc, ID, metr, basem, BASEY, freq, ACRA, ACRB, KVB, TT, TTB, STP_DAT, s, IO, acr_dat )
+                                                VALUES (ACC1_, nID_, 0, 0, nBASEY_, 1, ACC2_, ACC3_, nKv_, sTTA_, sTTB_, DAT4_-1, 0, l_io, decode(l_io,1,gl.BDATE,null));
         END IF;
 
-        IF ( nID_ = 1 and nKV_=gl.baseval )
-        then
-           UPDATE int_accN
-              Set NLSB=NLSNB_
-                , MFOB=S2_
-                , NAMB= l_nmkb
-                , NAZN=Nazn_
-            WHERE acc=ACC1_ AND id=1;
-        ELSIF nID_ = 1 and nKV_<>gl.baseval then
-            if (check_if_deal_belong_to_crsour(nVidd_) = 'Y') then
-                update int_accn
-                set    nlsb = substr(nlsnb_, 1, 14),
-                       mfob = s2_,
-                       namb = l_nmkb,
-                       nazn = nazn_
-                 where acc = acc1_ and
-                       id = 1;
-            else
-                UPDATE int_accN
-                   Set NLSB=substr(NLSNB_,1,14), NAMB=l_nmkb, NAZN=Nazn_
-                 WHERE acc=ACC1_ AND id=1;
-            end if;
-        END IF;
-
-        update INT_ratn
-           SET ir=IR_, op=OP_, br=BR_
-         where acc=ACC1_ and id=nID_ and bdat=DAT2_;
-
-        if SQL%rowcount = 0
-        then
-           INSERT INTO INT_ratn (acc  , ID ,bdat ,ir ,op ,br)
-           VALUES (ACC1_, nID_, DAT2_, IR_, OP_, BR_);
+        IF    nID_ = 1 and nKV_=gl.baseval  then UPDATE int_accN   Set NLSB=NLSNB_     , MFOB=S2_     , NAMB= l_nmkb     , NAZN=Nazn_ WHERE acc=ACC1_ AND id=1;
+        ELSIF nID_ = 1 and nKV_<>gl.baseval then UPDATE int_accN   Set NLSB=substr(NLSNB_,1,14), NAMB=l_nmkb, NAZN=Nazn_              WHERE acc=ACC1_ AND id=1;
         end if;
+
+        update INT_ratn   SET ir=IR_, op=OP_, br=BR_ where acc=ACC1_ and id=nID_ and bdat=DAT2_;
+        if SQL%rowcount = 0 then  INSERT INTO INT_ratn (acc  , ID ,bdat ,ir ,op ,br)     VALUES (ACC1_, nID_, DAT2_, IR_, OP_, BR_);  end if;
 
         -- При открытии договора D020 := '01'
-        UPDATE specparam set D020 = '01' where acc=ACC1_;
-        if SQL%rowcount = 0 then
-           INSERT INTO specparam (ACC, D020 ) values ( ACC1_, '01' );
+        UPDATE specparam set D020 = '01' where acc=ACC1_;         if SQL%rowcount = 0 then   INSERT INTO specparam (ACC, D020 ) values ( ACC1_, '01' );     end if;
+        if nVidd_ like '1%' then   l_s180 := FS180(ACC1_, '1', bankdate);          -- новый код срока только для 1-го класса
+           update specparam set s180 = l_s180 where acc = acc1_;  if SQL%rowcount = 0 then  INSERT INTO specparam (ACC, S180) values (ACC1_, l_s180);       end if;
         end if;
-
-        -- новый код срока только для 1-го класса
-        if nVidd_ like '1%' then
-           l_s180 := FS180(ACC1_, '1', bankdate);
-           update specparam set s180 = l_s180 where acc = acc1_;
-           if SQL%rowcount = 0 then
-              INSERT INTO specparam (ACC, S180) values (ACC1_, l_s180);
-           end if;
-        end if;
-
         -- установка параметрів Первинний та Поточний ВКР
-        begin
-          select VALUE
-            into l_txt
-            from BARS.CUSTOMERW
-           where RNK = RNKB_
-             and TAG = 'VNCRR';
-        exception
-          when NO_DATA_FOUND then
-            bars_audit.info( title || ': not found "VNCRR" for RNK = ' || to_char(RNKB_) );
-            -- raise_application_error(-20666, 'Відсутнє занчення ВКР у клієнта з РНК = '||to_char(RNKB_), true);
+        begin  select VALUE    into l_txt    from BARS.CUSTOMERW   where RNK = RNKB_     and TAG = 'VNCRR';
+        exception     when NO_DATA_FOUND then    bars_audit.info( title || ': not found "VNCRR" for RNK = ' || to_char(RNKB_) );      -- raise_application_error(-20666, 'Відсутнє занчення ВКР у клієнта з РНК = '||to_char(RNKB_), true);
         end;
-
-        -- Поточний ВКР
-        cck_utl.set_deal_attribute( ND_, 'VNCRR', l_txt );
-
+        cck_utl.set_deal_attribute( ND_, 'VNCRR', l_txt );         -- Поточний ВКР
         -- Первинний ВКР
-        begin
-          -- первинний ВКР не оновлюється тому юзаєм INSERT
-          insert
-            into BARS.ND_TXT
-            ( ND, TAG, TXT )
-          values
-            ( ND_, 'VNCRP', l_txt );
-        exception
-          when DUP_VAL_ON_INDEX then
-            -- вже був вставлений тригером
-            null;
+        begin  insert   into BARS.ND_TXT       ( ND, TAG, TXT )    values    ( ND_, 'VNCRP', l_txt );
+        exception  when DUP_VAL_ON_INDEX then   null;      -- вже був вставлений тригером
         end;
 
-        begin
-
-          l_clt_amnt := to_number( bars.pul.get_mas_ini_val('COLLATERAL_AMOUNT') );
-
-          if ( ( l_clt_amnt > 0 ) and ( NLSZ_ is Not Null ) )
-          then
-
-            collateral_payments( p_mbk_id   => ND_
-                               , p_mbk_num  => CC_ID_
-                               , p_beg_dt   => DAT2_
-                               , p_end_dt   => DAT4_
-                               , p_clt_amnt => l_clt_amnt
-                               , p_acc_num  => NLSZ_
-                               , p_ccy_id   => nKVZ_
-                               , p_rnk      => RNKB_
-                               , p_dk       => case when l_tipd = 1 then 1 else 0 end
-                               );
-
+        begin l_clt_amnt := to_number( bars.pul.get_mas_ini_val('COLLATERAL_AMOUNT') );
+           if l_clt_amnt > 0  and  NLSZ_ is Not Null    then
+              collateral_payments( p_mbk_id   => ND_   , p_mbk_num  => CC_ID_  , p_beg_dt   => DAT2_  , p_end_dt   => DAT4_  , p_clt_amnt => l_clt_amnt, 
+                                   p_acc_num  => NLSZ_ , p_ccy_id   => nKVZ_   , p_rnk      => RNKB_  , p_dk       => case when l_tipd = 1 then 1 else 0 end   );
           end if;
-
-        exception
-          when OTHERS then
-            bars_audit.info( 'mbk.inp_deal: collateral_payments_error => '
-                          || dbms_utility.format_error_stack()
-                          || dbms_utility.format_error_backtrace() );
+------- exception  when OTHERS then      bars_audit.info( 'mbk.inp_deal: collateral_payments_error => '|| dbms_utility.format_error_stack()   || dbms_utility.format_error_backtrace() );
         end;
 
-      EXCEPTION
-        when INR_ERR then
-          null;
-        when OTHERS then
-          bars_audit.info( 'mbk.inp_deal: error => '|| dbms_utility.format_error_stack()
-                                                    || dbms_utility.format_error_backtrace() );
-          sErr_ := dbms_utility.format_error_stack();
+      EXCEPTION when INR_ERR then  null;
+--------------- when OTHERS  then  bars_audit.info( 'mbk.inp_deal: error => '|| dbms_utility.format_error_stack() || dbms_utility.format_error_backtrace() );  sErr_ := dbms_utility.format_error_stack();
       END;
 
       bars_audit.info( 'mbk.inp_deal: Exit with( ND='|| to_char(ND_) ||', ACC1='|| to_char(ACC1_) || ').' );

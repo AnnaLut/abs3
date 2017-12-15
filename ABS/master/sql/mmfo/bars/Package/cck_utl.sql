@@ -434,7 +434,7 @@ CREATE OR REPLACE package body BARS.cck_utl as
                 p_transit_account,              -- nls_1819    varchar2(14),
                 p_partner_alt_requisites,       -- field_58d   varchar2(250)
                 p_certificate_nbu,              -- n_nbu       varchar2(50)   номер свідоцтва НБУ
-                p_date_reestr_nbu);             -- d_nbu       date           дата реєстрації в НБУ
+                p_date_reestr_nbu);             -- d_nbu       date           дата реєстрації в НБУ                    
     end;
 --------
     function get_deal_kind_name(

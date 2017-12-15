@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view V_EAD_SYNC_QUEUE ***
 
-  CREATE OR REPLACE FORCE VIEW BARS.V_EAD_SYNC_QUEUE ("SYNC_ID", "CRT_DATE", "TYPE_ID", "TYPE_NAME", "OBJ_ID", "RNK", "STATUS_ID", "STATUS_NAME", "ERR_TEXT", "ERR_COUNT", "MESSAGE_ID", "MESSAGE_DATE", "RESPONCE_ID", "RESPONCE_DATE") AS 
+  CREATE OR REPLACE VIEW BARS.V_EAD_SYNC_QUEUE AS 
   SELECT sq.id AS sync_id,
             sq.crt_date,
             sq.type_id,
@@ -45,10 +45,9 @@ PROMPT *** Create  view V_EAD_SYNC_QUEUE ***
             sq.responce_id,
             sq.responce_date
        FROM ead_sync_queue sq, ead_types t, ead_statuses s
-      WHERE     sq.crt_date >
-                   ADD_MONTHS (SYSDATE, -1 * ead_pack.g_process_actual_time)
-            AND sq.type_id = t.id
-            AND sq.status_id = s.id
+      where sq.crt_date > sysdate - interval '15' day
+        AND sq.type_id = t.id
+        AND sq.status_id = s.id
    ORDER BY sq.id DESC;
 
 PROMPT *** Create  grants  V_EAD_SYNC_QUEUE ***
