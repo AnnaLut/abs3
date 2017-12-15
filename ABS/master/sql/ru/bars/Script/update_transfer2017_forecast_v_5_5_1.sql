@@ -4,6 +4,8 @@ delete from transform_2017_forecast where nbs = '3570' and ob22 = '19';
 delete from transform_2017_forecast where nbs = '6399' and ob22 = '14';
 delete from transform_2017_forecast where nbs = '7060' and ob22 = '01';
 
+Insert into BARS.TRANSFER_2017(R020_OLD, OB_OLD, R020_NEW, OB_NEW, COMM, ID1)
+ Values ('1527', '02', '1521', '02', 'прострочена заборгованість за кредитами овернайт, що надані іншим банкам',  9999);
 commit;
 
 /*
