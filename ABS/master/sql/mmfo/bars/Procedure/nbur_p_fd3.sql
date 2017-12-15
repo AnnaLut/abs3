@@ -18,9 +18,9 @@ is
 % DESCRIPTION : Процедура формирования #D3 для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.16.018  10.11.2017
+% VERSION     :  v.16.019  07/12/2017
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_          char(30)  := ' v.16.018  10.11.2017';
+  ver_          char(30)  := ' v.16.019  07.12.2017';
 /*
    Структура показника DD NNN
 
@@ -56,7 +56,7 @@ BEGIN
     if p_report_date <= to_date('31052017','ddmmyyyy') then
        l_gr_sum_840 := 100000;
     else 
-       l_gr_sum_840 := 100; 
+       l_gr_sum_840 := 0; 
     end if;
 
     l_gr_sum_980 := gl.p_icurval(840, 100000, p_report_date);
@@ -110,7 +110,7 @@ BEGIN
                      a.p10, a.p20, a.p31, a.p35, a.p40, a.p42, nvl(trim(nvl(b.p99, a.p99)), ' ') p99, 
                      nbuc, branch, flag_kons
               from
-                (select /*+ ordered */
+                (select /*+ ordered dynamic_sampling(k 0)*/ 
                     t.report_date, t.kf, t.ref,
                     c.cust_id, t.acc_id_db acc_id, t.acc_num_db acc_num, t.kv,
                     lpad(t.kv, 3, '0') P10,
@@ -146,7 +146,7 @@ BEGIN
                                     lower(o.nazn) like '%перерах%продаж%мвру%' or
                                     lower(o.nazn) like '%зарах%валют%продаж%' 
                                then '11'   
-                               else '16' end)) P40,
+                               else '' end)) P40,
                     (case when trim(DD#70) is not null
                             then trim(DD#70)
                           else 
@@ -202,7 +202,7 @@ BEGIN
                 select a.report_date, a.kf, a.ref, a.cust_id, a.acc_id, a.acc_num, a.kv, 
                      a.p10, a.p20, a.p31, a.p35, a.p40, a.p42, nvl(trim(nvl(b.p99, a.p99)), ' ') p99, 
                      nbuc, branch, flag_kons
-              from (select /*+ ordered */
+              from (select /*+ ordered dynamic_sampling(k 0) */
                     t.report_date, t.kf, t.ref,
                     c.cust_id, t.acc_id_db acc_id, t.acc_num_db acc_num, t.kv,
                     lpad(t.kv, 3, '0') P10,
@@ -237,7 +237,7 @@ BEGIN
                                     lower(o.nazn) like '%перерах%продаж%мвру%' or
                                     lower(o.nazn) like '%зарах%валют%продаж%' 
                                then '11'   
-                               else '16' end)) P40,
+                               else '' end)) P40,
                     (case when trim(DD#70) is not null
                             then trim(DD#70)
                           else 

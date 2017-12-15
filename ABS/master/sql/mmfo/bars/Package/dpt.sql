@@ -542,9 +542,10 @@ begin
   begin
 
    /*accreg.SetAccountAttr(99, 0, 0, p1_grp, l_tmp, p1_custid, l_tmpacc.acc_num, l_tmpacc.acc_cur,l_tmpacc.acc_name, p1_type,p1_isp,l_tmpacc.acc_id,'1',p1_ob22);*/
-      op_reg_exfl(99, 0, 0, p1_grp, l_tmp, p1_custid, l_tmpacc.acc_num, l_tmpacc.acc_cur,
-           l_tmpacc.acc_name, p1_type, p1_isp, l_tmpacc.acc_id, 1, 2);
-
+     /* op_reg_exfl(99, 0, 0, p1_grp, l_tmp, p1_custid, l_tmpacc.acc_num, l_tmpacc.acc_cur,
+           l_tmpacc.acc_name, p1_type, p1_isp, l_tmpacc.acc_id, 1, 2); */
+ 	accreg.SetAccountAttr( 99, 0, 0, p1_grp, l_tmp, p1_custid, l_tmpacc.acc_num, l_tmpacc.acc_cur
+                        , l_tmpacc.acc_name, p1_type, p1_isp, l_tmpacc.acc_id, '1', p1_ob22, 2 );
   exception
     when others then
       bars_audit.info('OPENACC_FAILED' || dbms_utility.format_error_stack()||chr(10)||dbms_utility.format_error_backtrace());

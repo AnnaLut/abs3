@@ -13,10 +13,11 @@ SELECT o.tt,
        (SELECT txt
           FROM opldok
          WHERE REF = o.REF
-           AND ROWNUM = 1) txt
+           AND ROWNUM = 1) txt,
+       case   when extract(month from o.vdat) =extract(month from gl.bd) then 0 else 1
+       end date_check   
   FROM oper o, nlk_ref r, accounts a
  WHERE a.tip = 'NLQ'
    AND a.acc = r.acc
    AND r.ref2 IS NULL
    AND r.ref1 = o.REF;
-grant select on VW_ESCR_REF_FOR_COMPENSATION to BARS_ACCESS_DEFROLE;
