@@ -1,13 +1,13 @@
 -- ======================================================================================
 -- Module : DPU
 -- Author : BAA
--- Date   : 28.11.2017
+-- Date   : 15.12.2017
 -- ===================================== <Comments> =====================================
 -- reorganization PRIMARY KEY on table DPU_VIDD
 -- creation       UNIQUE  KEY on table DPU_VIDD
 -- recreation     FOREIGN KEY on table DPU_VIDD
 -- add column     EXN_MTH_ID
--- ОБ22 не міститиме ознаки строковості
+-- 
 -- ======================================================================================
 
 SET SERVEROUTPUT ON SIZE UNLIMITED FORMAT WRAPPED
@@ -34,7 +34,7 @@ exception
       when (sqlcode = -02429)
       then dbms_output.put_line( 'Cannot drop index used for enforcement of unique/primary key' );
       else raise;
-    end case;  
+    end case;
 end;
 /
 
@@ -90,7 +90,7 @@ END;
 -- recreate FOREIGN KEYs
 --
 begin
-  execute immediate 'ALTER TABLE DPU_DEAL ADD CONSTRAINT FK_DPUDEAL_DPUVIDD FOREIGN KEY (VIDD) REFERENCES DPU_VIDD (VIDD)';  
+  execute immediate 'ALTER TABLE DPU_DEAL ADD CONSTRAINT FK_DPUDEAL_DPUVIDD FOREIGN KEY (VIDD) REFERENCES DPU_VIDD (VIDD)';
   dbms_output.put_line('Foreign key FK_DPUDEAL_DPUVIDD created.');
 exception
   when OTHERS then
@@ -123,28 +123,20 @@ end;
 /
 
 declare
-  e_col_not_exists exception;
-  pragma exception_init(e_col_not_exists,-00904);
-begin
-  execute immediate 'alter table DPU_VIDD drop column IRREVOCABLE';
-  dbms_output.put_line( 'Table altered.' );
-exception
-  when e_col_not_exists then
-    dbms_output.put_line( 'Column "IRREVOCABLE" does not exist in table.' );
-end;
-/
-
-declare
   e_col_not_exists       exception;
   pragma exception_init( e_col_not_exists,-00904 );
   e_dup_col_nm           exception;
   pragma exception_init( e_dup_col_nm, -00957 );
 begin
-  execute immediate 'alter table DPU_VIDD rename column DPU_TYPE to IRVK';
+  execute immediate 'alter table DPU_VIDD rename column IRREVOCABLE to IRVK';
   dbms_output.put_line( 'Table altered.' );
 exception
   when e_col_not_exists
-  then null;
+  then
+    begin
+      execute immediate 'alter table DPU_VIDD add ( IRVK number(1) )';
+      dbms_output.put_line('Table altered.');
+    end;
   when e_dup_col_nm
   then dbms_output.put_line('Duplicate column name.');
 end;

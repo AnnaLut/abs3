@@ -693,7 +693,7 @@ is
   --
   -- глобальные переменные и константы
   -- 
-  g_body_version  constant varchar2(64)          := 'version 44.10  12.12.2017';
+  g_body_version  constant varchar2(64)          := 'version 44.11  15.12.2017';
   
   modcode         constant varchar2(3)           := 'DPU';
   accispparam     constant varchar2(16)          := 'DPU_ISP';
@@ -884,11 +884,13 @@ end get_secaccparams;
 -- поиск счета процентных расходов для договора
 --
 function GET_EXPACC
-( p_dptype   in  dpu_vidd.vidd%type     -- код вида договора
-, p_balacc   in  dpu_vidd.bsd%type      -- бал.счет депозита
-, p_curid    in  dpu_vidd.kv%type       -- код валюты
-, p_branch   in  varchar2               -- код подразделения
-, p_penalty  in  number default 0       -- счет для (0 - начисления, 1 - штрафования)
+( p_dptype   in  dpu_vidd.vidd%type              -- код вида договора
+, p_balacc   in  dpu_vidd.bsd%type               -- бал.счет депозита
+, p_curid    in  dpu_vidd.kv%type                -- код валюты
+, p_branch   in  varchar2                        -- код подразделения
+, p_penalty  in  number default 0                -- счет для (0 - начисления, 1 - штрафования)
+, p_r020     in  accounts.nbs%type  default null --
+, p_ob22     in  accounts.ob22%type default null --
 ) return accounts.acc%type
 is
   title     constant varchar2(30)      := 'dpu.getexpacc:';
@@ -915,19 +917,17 @@ begin
                      to_char(p_dptype), p_branch, l_accnum);
   exception
     when NO_DATA_FOUND then
-      
-      select min(a.acc)
-        into l_accid
-        from ACCOUNTS      a
-           , DPU_VIDD_OB22 o
-       where o.VIDD   = p_dptype
-         and a.NBS    = decode(p_penalty, 0, o.NBS_EXP , o.NBS_RED )
-         and a.OB22   = decode(p_penalty, 0, o.OB22_EXP, o.OB22_RED)
-         and a.BRANCH = substr(p_branch, 1, 15)
-         and a.KV     = basecur
-         and a.DAZS Is null;
 
-      if l_accid is not null 
+      select min(ACC)
+        into l_accid
+        from ACCOUNTS
+       where NBS    = p_r020
+         and OB22   = p_ob22
+         and BRANCH = substr(p_branch, 1, 15)
+         and KV     = basecur
+         and DAZS Is null;
+
+      if ( l_accid is not null )
       then
         bars_audit.trace( '%s acc #%s found for vidd № %s and branch %s', title, to_char(l_accid), to_char(p_dptype), p_branch );
       else
@@ -954,7 +954,7 @@ begin
 exception 
   when others then
     bars_error.raise_nerror( modcode, 'EXPENSACC_NOT_FOUND', to_char(p_dptype), p_branch, sqlerrm );
-end get_expacc;
+end GET_EXPACC;
 
 --
 -- определение конечной даты для начисления процентов
@@ -1351,6 +1351,25 @@ begin
   
 end IS_OSCHADBANK;
 
+function GET_S181
+( p_beg_dt date
+, p_end_dt date
+)return specparam.s181%type
+is
+  l_s181   specparam.s181%type;
+begin
+  begin
+     select S181
+       into l_s181
+       from KL_S180
+      where S180 = F_SROK( p_beg_dt, p_end_dt, 2 );
+  exception
+    when NO_DATA_FOUND then
+      l_s181 := null;
+  end;
+  return nvl(l_s181,'1');
+end GET_S181;
+
 $end
 
 --
@@ -1402,7 +1421,7 @@ is
   l_accgrp      accounts.grp%type; 
   l_blkd        accounts.blkd%type;
   l_blkd_ins    accounts.blkd%type;
-  l_blkk        accounts.blkk%type;  
+  l_blkk        accounts.blkk%type;
   l_lim         accounts.lim%type; 
   l_mdate       accounts.mdate%type;
   l_expaccid    int_accn.acra%type;
@@ -1413,8 +1432,11 @@ is
   l_combdputype dpu_deal.vidd%type;
   l_combdpuid   dpu_deal.dpu_id%type;
   l_combstopid  dpu_deal.id_stop%type;
-  l_depob22     dpu_vidd_ob22.ob22_dep%type;
-  l_intob22     dpu_vidd_ob22.ob22_int%type;
+  l_depob22     dpu_types_ob22.ob22_dep%type;
+  l_intob22     dpu_types_ob22.ob22_int%type;
+  l_exp_ob22    dpu_types_ob22.ob22_exp%type;
+  l_exp_r020    dpu_types_ob22.nbs_exp%type;
+  l_s181        specparam.s181%type;
 begin
 
   bars_audit.trace('%s entry, № %s, custid %s, dputype %s, grp %s', title,
@@ -1494,7 +1516,7 @@ $end
   bars_audit.trace('%s accgrp = %s, accisp = %s', title, to_char(l_accgrp), to_char(l_accisp) );
   
   -- блокировка по дебету - для генеральных договоров по деп.линиям
-  l_blkd  := case when l_typerow.fl_extend = 2   then  8 else 0 end;
+  l_blkd := case when l_typerow.fl_extend = 2 then 8 else 0 end;
   
 $if DPU_PARAMS.SBER
 $then
@@ -1526,15 +1548,20 @@ $end
   
   -- параметри OB22 для рахунків
   begin
-    
-    select ob22_dep, ob22_int 
-      into l_depob22, l_intob22 
-      from DPU_VIDD_OB22 
-     where vidd = p_dputype
+
+    l_s181 := GET_S181( p_datn, p_dato );
+
+    select OB22_DEP, OB22_INT, NBS_EXP, OB22_EXP
+      into l_depob22, l_intob22, l_exp_r020, l_exp_ob22
+      from DPU_TYPES_OB22
+     where TYPE_ID = l_typerow.TYPE_ID
+       and NBS_DEP = l_typerow.BSD
+       and R034    = decode(l_typerow.kv,980,1,2)
+       and S181    = l_s181
        and rownum  = 1;
-    
-    bars_audit.trace('%s OB22(деп/проц) = %s/%s', title, l_depob22, l_intob22);
-    
+
+    bars_audit.trace( '%s OB22(деп/проц) = %s/%s', title, l_depob22, l_intob22 );
+
   exception
     when NO_DATA_FOUND then 
       bars_audit.Info( title || ' не знайдено параметри OB22 для виду депозиту ' || to_char(p_dputype) );
@@ -1607,10 +1634,13 @@ $end
   bars_audit.trace('%s intaccid = %s', title, to_char(l_intacc.id));  
   
   -- счет процентных расходов для договора
-  l_expaccid := get_expacc( p_dptype => l_typerow.vidd,
+  l_expaccid := GET_EXPACC( p_dptype => l_typerow.vidd,
                             p_balacc => l_typerow.bsd,
                             p_curid  => l_typerow.kv,
-                            p_branch => l_branch );
+                            p_branch => l_branch,
+                            p_r020   => l_exp_r020,
+                            p_ob22   => l_exp_ob22
+                          );
   
   bars_audit.trace('%s expaccid = %s', title, to_char(l_expaccid));  
 
@@ -1662,7 +1692,7 @@ $end
   bars_audit.trace('%s rate (%s,%s,%s)', title, to_char(p_indrate), to_char(p_operat), to_char(p_basrate));  
 
   -- заполнение спецпараметров
-  fill_specparams (p_depaccid   => l_depacc.id, 
+  FILL_SPECPARAMS (p_depaccid   => l_depacc.id, 
                    p_depacctype => l_typerow.bsd, 
                    p_intaccid   => l_intacc.id,
                    p_intacctype => l_typerow.bsn,
@@ -3677,12 +3707,12 @@ $end
     if ( SubStr(l_dpu.branch,1,15) != SubStr(p_branch,1,15) )
     then -- зміна значення ACRB в %% картці рахунка
     
-      l_expacc := get_expacc( p_dptype => l_dpu.vidd,
+      l_expacc := GET_EXPACC( p_dptype => l_dpu.vidd,
                               p_balacc => r_vidd.bsd,
                               p_curid  => r_vidd.kv,
                               p_branch => p_branch );
       
-      update BARS.INT_ACCN 
+      update INT_ACCN
          set ACRB = l_expacc
        where ACC  = l_dpu.acc
          and ID   = l_intid;
@@ -7077,7 +7107,6 @@ exception
     bars_context.set_context;
     raise_application_error(-20000, dbms_utility.format_error_stack()||chr(10)||dbms_utility.format_error_backtrace());
 end INTEREST_RECALCULATION;
-
 
 --
 -- Стягнення штрафу при достроковому розірванні договору

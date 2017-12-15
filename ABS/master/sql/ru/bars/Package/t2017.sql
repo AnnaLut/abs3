@@ -73,7 +73,7 @@ show errors
 
 CREATE OR REPLACE PACKAGE BODY BARS.T2017
 IS
-  g_body_version   CONSTANT VARCHAR2(64) := 'version 1.21  15.12.2017';
+  g_body_version   CONSTANT VARCHAR2(64) := 'version 1.22  15.12.2017';
   g_errN number  := -20203;
   nlchr  char(2) := chr(13)||chr(10);
   bnk_dt date;
@@ -285,7 +285,6 @@ begin
        -- Депозити ЮО
        update DPU_VIDD
           set BSD  = p_r020_new
-            , IRVK = 1
         where BSD  = p_r020_old;
 
        -- Цільове призначення договору
@@ -295,15 +294,15 @@ begin
        update CC_AIM     set nbsf2  = p_r020_new  where nbsf2 = p_r020_old and D_CLOSE is null;
        ---update W4_SPARAM  set nbs    = p_r020_new  where nbs   = p_r020_old ;
 
-       update ACC_OVER_NBS set  NBS2600 = decode ( NBS2600, p_r020_old, p_r020_new, NBS2600),  -- БР оверд
-                                NBS2000 = decode ( NBS2000, p_r020_old, p_r020_new, NBS2000),
-                                NBS2607 = decode ( NBS2607, p_r020_old, p_r020_new, NBS2607),
-                                NBS2067 = decode ( NBS2067, p_r020_old, p_r020_new, NBS2067),
-                                NBS2069 = decode ( NBS2069, p_r020_old, p_r020_new, NBS2069),
-                                NBS2096 = decode ( NBS2096, p_r020_old, p_r020_new, NBS2096),
-                                NBS2480 = decode ( NBS2480, p_r020_old, p_r020_new, NBS2480),
-                                NBS9129 = decode ( NBS9129, p_r020_old, p_r020_new, NBS9129),
-                                NBS3579 = decode ( NBS3579, p_r020_old, p_r020_new, NBS3579);
+       update ACC_OVER_NBS set NBS2600 = decode( NBS2600, p_r020_old, p_r020_new, NBS2600),  -- БР оверд
+                               NBS2000 = decode( NBS2000, p_r020_old, p_r020_new, NBS2000),
+                               NBS2607 = decode( NBS2607, p_r020_old, p_r020_new, NBS2607),
+                               NBS2067 = decode( NBS2067, p_r020_old, p_r020_new, NBS2067),
+                               NBS2069 = decode( NBS2069, p_r020_old, p_r020_new, NBS2069),
+                               NBS2096 = decode( NBS2096, p_r020_old, p_r020_new, NBS2096),
+                               NBS2480 = decode( NBS2480, p_r020_old, p_r020_new, NBS2480),
+                               NBS9129 = decode( NBS9129, p_r020_old, p_r020_new, NBS9129),
+                               NBS3579 = decode( NBS3579, p_r020_old, p_r020_new, NBS3579);
 
         update NLSMASK set  MASK =  p_r020_new || substr(MASK, 6,9) where  substr(MASK, 1,4)  = p_r020_old;
         EXECUTE IMMEDIATE 'insert into NOTPORTFOLIO_NBS(NBS,USERID,PORTFOLIO_CODE) select :p_r020_new,USERID, PORTFOLIO_CODE from NOTPORTFOLIO_NBS where nbs= :p_r020_old and not exists (select 1 from NOTPORTFOLIO_NBS where nbs= :p_r020_new )'  ----  Непортвельні nbs

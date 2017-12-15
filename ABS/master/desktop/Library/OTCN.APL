@@ -10016,7 +10016,7 @@ SalTblQueryColumnID( SalTblGetColumnWindow( tblDta, nI, COL_GetPos )), strTemp )
 .head 5 -  Date/Time: lmt_dt
 .head 4 +  Actions
 .head 5 -  Set sys_dt = SalDateCurrent()
-.head 5 -  Set lmt_dt = SalDateConstruct ( 2017, 12, 17, 0, 0, 0 )
+.head 5 -  Set lmt_dt = SalDateConstruct ( 2017, 12, 15, 0, 0, 0 )
 .head 5 +  If ( ( sys_dt > lmt_dt ) and ( rpt_dt > lmt_dt ) )
 .head 6 -  Call SalMessageBox( 'Заборонено формувати файли за дату білшу від ' || SalFmtFormatDateTime(lmt_dt,'dd/MM/yyyy'), 'Помилка', MB_IconStop )
 .head 6 -  Return FALSE

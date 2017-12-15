@@ -865,27 +865,27 @@ namespace Bars.EAD.Structs.Params
     /// </summary>
     public class DocumentData
     {
+        [JsonProperty("ID")]
+        public Int64? ID;
         [JsonProperty("RNK")]
         public UInt64? Rnk;
-        [JsonProperty("doc_id")]
-        public String ID;
-        [JsonProperty("doc_type")]
+        [JsonProperty("struct_code")]
         public Int16? Struct_Code;
+        [JsonProperty("agreement_id")]
+        public Double? Agreement_ID;
         [JsonProperty("doc_request_number")]
         public String Doc_Request_Number;
-        [JsonProperty("agr_code")]
-        public Double? Agreement_ID;
-        [JsonProperty("agr_type")]
+//        [JsonProperty("agr_type")]
         public String agr_type;
-        [JsonProperty("account_type")]
+//        [JsonProperty("account_type")]
         public String account_type;
-        [JsonProperty("account_number")]
+//        [JsonProperty("account_number")]
         public String account_number;
-        [JsonProperty("account_currency")]
+//        [JsonProperty("account_currency")]
         public String account_currency;
 
 
-        public DocumentData(String ID)
+        public DocumentData(Int64? ID)
         {
             this.ID = ID;
         }
@@ -1830,8 +1830,8 @@ namespace Bars.EAD
             }
 
             // формируем параметры запроса
-            if (!String.IsNullOrWhiteSpace(ID.ToString()))
-                msg.Params = new Structs.Params.DocumentData(ID.ToString());
+            if (ID.HasValue)
+                msg.Params = new Structs.Params.DocumentData(ID.Value);
             else
             {
                 if (String.IsNullOrEmpty(Doc_Request_Number))

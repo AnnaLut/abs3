@@ -580,6 +580,13 @@ is
 
            return l_ret_mes;
         end if;
+		
+        if p_report_date <= to_date('15122017', 'ddmmyyyy') then
+           l_ret_mes := 'Дата '||to_char(p_report_date, 'dd.mm.yyyy')||' не доступна для формування, бо вже перейшли на новий план рахунків!'||
+                        ' Виберіть іншу дату, що більша за 15.12.2017!';
+
+           return l_ret_mes;
+        end if;		
 
         select count(*)
         into l_cnt
