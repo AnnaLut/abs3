@@ -9544,7 +9544,7 @@ is
         select a.nls
           into l_nls
           from accounts a
-         where a.nbs = p_nbs
+         where a.nbs = decode(p_nbs, '2635', '2630', p_nbs) --2635 в новом плане счетов стал 2630
            and a.kv = p_kv
            and a.branch = l_branch
            and a.ob22 = l_ob22
