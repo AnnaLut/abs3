@@ -295,7 +295,7 @@
           <command type="Redirect" target="Self" url="/barsroot/credit/fin_nbu/Print_fin.aspx">
             <customfields oktext="Ok" canceltext="Cancel" title="Звіт ?">
               <customfield name="frt" altname="frt" datatype="String" required="true" label="Звітна форма"  >
-                <uicontrol type="DropDownList" table="(Select 'Fin_nbu_CGD23_agr_bal' frx , 'Агрегований баланс' name from dual union all Select 'Fin_nbu_CGD23_forms' frx , 'Форма 1 та 2' name from dual )" keyfield="frx" valuefield="name"  addemptyitem="true"></uicontrol>
+                <uicontrol type="DropDownList" table="(Select 'Fin_agr_bal' frx , 'Агрегований звіт(квартальний)' name from dual union all Select 'Fin_agr_bal_kym' frx , 'Агрегований звіт(кумулятивний)' name from dual union all Select 'Fin_nbu_CGD23_forms' frx , 'Форма 1 та 2' name from dual )" keyfield="frx" valuefield="name"  addemptyitem="true"></uicontrol>
               </customfield>
             </customfields>
             <parameters>

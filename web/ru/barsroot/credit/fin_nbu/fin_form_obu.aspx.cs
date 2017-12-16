@@ -551,7 +551,12 @@ public partial class credit_fin_form_obu : Bars.BarsPage
             }
 
             // обмеження на макисмальну суму tb_BZB , не повинна перевищувати суму за рядками балансу 500+440  (ZPB_max)
-            tb_BZB.MaxValue = Convert.ToDecimal(calc_nd("ZPB_max", tb_datf.Text, tb_okpo.Text, tb_RNK.Text, tb_nd.Text))*1000; 
+            Decimal l_ = Convert.ToDecimal(calc_nd("ZPB_max", tb_datf.Text, tb_okpo.Text, tb_RNK.Text, tb_nd.Text)) * 1000;
+             
+             if (l_ > 0)
+             { tb_BZB.MaxValue = Convert.ToDecimal(calc_nd("ZPB_max", tb_datf.Text, tb_okpo.Text, tb_RNK.Text, tb_nd.Text)) * 1000; }
+             else
+             {tb_BZB.MaxValue = 0;} 
         }
 
         if (!IsPostBack)
@@ -581,7 +586,7 @@ public partial class credit_fin_form_obu : Bars.BarsPage
                 tb_ZB.Value = Convert.ToDecimal(p_ZB);
 
             Decimal p_BZB = (read_nd_n(tb_nd.Text, tb_RNK.Text, "BZB", "32", tb_datf.Text));
-            if (p_BZB != null)
+            if (p_BZB != null && tb_BZB.MaxValue > Convert.ToDecimal(p_BZB))
                 tb_BZB.Value = Convert.ToDecimal(p_BZB);
 
             Decimal p_NKO = (read_nd_n(tb_nd.Text, tb_RNK.Text, "NKO", "32", tb_datf.Text));
@@ -1757,7 +1762,7 @@ public partial class credit_fin_form_obu : Bars.BarsPage
     }
     protected void agr_bal_Click(object sender, EventArgs e)
     {
-        String TemplateId = "Fin_nbu_CGD23_agr_bal.frx";
+        String TemplateId = "Fin_agr_bal.frx";  //"Fin_nbu_CGD23_agr_bal.frx";
         //String TemplateId = "test1.frx";
 
         FrxParameters pars = new FrxParameters();
