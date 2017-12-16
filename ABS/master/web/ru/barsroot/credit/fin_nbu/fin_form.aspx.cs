@@ -573,7 +573,7 @@ public partial class credit_fin_form : Bars.BarsPage
         {
             DisposeOraConnection();
         }
-        Get_read();
+        //Get_read();
     }
 
     // блокування введення даних якщо форма завведенна правильно і недаємо зберігати
@@ -612,9 +612,9 @@ public partial class credit_fin_form : Bars.BarsPage
 
             par_read = Convert.ToString(rdr.GetValue(0));
 
-            // t_read.Text = par_read;
+             t_read.Text = par_read;
             // блокумвання кнопки зберегти коли форма заповнена без помилок
-            //if (par_read == "0") btOk.Enabled = false;
+            if (par_read == "0") btOk.Enabled = false;
             //return 0;           -- повністю заповненна форма та пройде
             //return 1;           -- створена форма , клієгт ненадав дан або не заповнена
             //return 2;           -- створена форма , набрана з помилками
