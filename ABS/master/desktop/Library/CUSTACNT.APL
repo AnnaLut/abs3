@@ -13,9 +13,8 @@
 .data VIEWINFO
 0000: 6F00000001000000 FFFF01000D004347 5458566965775374 6174650400010000
 0020: 0000000000390100 002C000000030000 0003000000010000 0061020000F8FFFF
-0040: FFE1FFFFFFFFFFFF FFFFFFFFFF1E0300 00C4010000010000 0000000000010000
-0060: 000F4170706C6963 6174696F6E497465 6D04000000075769 6E646F7773107462
-0080: 6C5F4163636F756E 74734C6973740743 6F6C756D6E730963 6F6C4E4C53414C54
+0040: FFE1FFFFFFFFFFFF FFFFFFFFFF1E0300 00C4010000010000 0001000000010000
+0060: 000F4170706C6963 6174696F6E497465 6D00000000
 .enddata
 .data DT_MAKERUNDLG
 0000: 02000000001A513A 5C4241525339385C 42494E5C63757374 61636E742E657865
@@ -8887,60 +8886,55 @@ hWndCust.AbstractCustomer..getPassp(), hWndCust.AbstractCustomer..getSer(), hWnd
 .head 9 +  If res != 0
 .head 10 -  Break 
 .head 7 -  ! Регистрация нового Клиента банка: cCustomer.getNmk()
-.head 7 +  If SqlPLSQLCommand( hSql(), "P_BEFORE_SAVE_CLIENT( nCustomerRN, sErrMsg )" ) 
-AND ( sErrMsg = STRING_Null )
-.head 8 +  If NOT SqlCommitEx( hSql(), 
+.head 7 +  If NOT SqlCommitEx( hSql(), 
    CurrentLangTable.GetAtomTitle('Frm_Customer.cTMsgOpenOK') || ': ' ||
    Str(hWndCust.AbstractCustomer..getRnk()) || ' ' || hWndCust.AbstractCustomer..getNmk())
-.head 9 -  ! Call Debug('SqlCommitEx')
-.head 9 -  Break
-.head 8 -  ! Клиенту банка cCustomer.getNmk присвоен регистрационный номер: nCustomerRN
-.head 8 -  Call MessageInfo(CurrentLangTable.GetAtomTitle('Frm_Customer.cTMsgRNK1') || ' ' ||
+.head 8 -  ! Call Debug('SqlCommitEx')
+.head 8 -  Break
+.head 7 -  ! Клиенту банка cCustomer.getNmk присвоен регистрационный номер: nCustomerRN
+.head 7 -  Call MessageInfo(CurrentLangTable.GetAtomTitle('Frm_Customer.cTMsgRNK1') || ' ' ||
      hWndCust.AbstractCustomer..getNmk() || ' ' ||
      CurrentLangTable.GetAtomTitle('Frm_Customer.cTMsgRNK2') || ' ' ||
      NumberToStr(hWndCust.AbstractCustomer..getRnk()) ||
      IifS(bPAR_CUSTCLV=TRUE and not (nCtrlFlags & CVIEW_ApproveKK) and (nCType=3 and bPersonSPD=TRUE or nCType=2), PutCrLf() || 'Зміни набудуть чинності після підтвердження контролером.', ''))
-.head 8 -  Set nCustomerRN = hWndCust.AbstractCustomer..getRnk()
-.head 8 -  ! Инициализация закладок, доступных после регистрации клиента
-.head 8 -  ! Call Debug('before if bNN')
-.head 8 +  If bNN 
-.head 9 -  Call picTabs.AddPage(cTabCustNNCard.Name, cTabCustNNCard.DlgName, hWndNULL)
-.head 9 -  Call picTabs.Enable(cTabCustNNCard.TabNum, TRUE)
-.head 8 +  Else
-.head 9 -  Set cTabCustGeneral.hWnd.Dlg_CustGeneral.dfRnk = nCustomerRN
-.head 9 -  ! Info
-.head 9 +  If cTabCustInfo.EditMode != TAB_Hide
-.head 10 -  ! Для ПРАВЭКСа для физ.лиц-СПД читаем счета в других банках
-.head 10 +  If PAR_BANKTYPE = 'PRVX' and bPersonSPD
-.head 11 +  If NOT hWndCust.AbstractCustomer..initCorpAcc(nCustomerRN, bShowKK, bPAR_CUSTCLV)
-.head 12 -  Return FALSE
-.head 9 -  ! Rel
-.head 9 +  If cTabCustRel.EditMode != TAB_Hide
-.head 10 -  Call hWndCust.AbstractCustomer..initCustomerRel(nCustomerRN, bShowKK, bPAR_CUSTCLV)
-.head 10 -  Call linkTab(cTabCustRel)
-.head 10 -  Call picTabs.Enable(cTabCustRel.TabNum, TRUE)
-.head 8 -  ! Call Debug('before If nCtrlFlags & CVIEW_Accounts')
-.head 8 +  If nCtrlFlags & CVIEW_Accounts
-.head 9 -  Call SalEnableWindow(pbAccounts)
-.head 8 -  ! Call Debug('before SqlPLSQLCommand')
-.head 8 +  If not SqlPLSQLCommand(hSql(), "p_after_edit_client(nCustomerRN)")
-.head 9 -  Call SqlRollbackEx(hSql(), "РНК " || Str(nCustomerRN) || ": ошибка выполнения p_after_edit_client")
-.head 8 +  Else
-.head 9 -  Call SqlCommit(hSql())
-.head 9 -  Call SalPostMsg(hWndForm, UM_Populate, 6, 0)
-.head 8 +  ! If bPAR_CUSTCLV
-.head 9 -  Call hWndCust.AbstractCustomer..setShowKK(FALSE)
-.head 8 -  Call picTabs.InitializeFormPages( 
+.head 7 -  Set nCustomerRN = hWndCust.AbstractCustomer..getRnk()
+.head 7 -  ! Инициализация закладок, доступных после регистрации клиента
+.head 7 -  ! Call Debug('before if bNN')
+.head 7 +  If bNN 
+.head 8 -  Call picTabs.AddPage(cTabCustNNCard.Name, cTabCustNNCard.DlgName, hWndNULL)
+.head 8 -  Call picTabs.Enable(cTabCustNNCard.TabNum, TRUE)
+.head 7 +  Else
+.head 8 -  Set cTabCustGeneral.hWnd.Dlg_CustGeneral.dfRnk = nCustomerRN
+.head 8 -  ! Info
+.head 8 +  If cTabCustInfo.EditMode != TAB_Hide
+.head 9 -  ! Для ПРАВЭКСа для физ.лиц-СПД читаем счета в других банках
+.head 9 +  If PAR_BANKTYPE = 'PRVX' and bPersonSPD
+.head 10 +  If NOT hWndCust.AbstractCustomer..initCorpAcc(nCustomerRN, bShowKK, bPAR_CUSTCLV)
+.head 11 -  Return FALSE
+.head 8 -  ! Rel
+.head 8 +  If cTabCustRel.EditMode != TAB_Hide
+.head 9 -  Call hWndCust.AbstractCustomer..initCustomerRel(nCustomerRN, bShowKK, bPAR_CUSTCLV)
+.head 9 -  Call linkTab(cTabCustRel)
+.head 9 -  Call picTabs.Enable(cTabCustRel.TabNum, TRUE)
+.head 7 -  ! Call Debug('before If nCtrlFlags & CVIEW_Accounts')
+.head 7 +  If nCtrlFlags & CVIEW_Accounts
+.head 8 -  Call SalEnableWindow(pbAccounts)
+.head 7 -  ! Call Debug('before SqlPLSQLCommand')
+.head 7 +  If not SqlPLSQLCommand(hSql(), "p_after_edit_client(nCustomerRN)")
+.head 8 -  Call SqlRollbackEx(hSql(), "РНК " || Str(nCustomerRN) || ": ошибка выполнения p_after_edit_client")
+.head 7 +  Else
+.head 8 -  Call SqlCommit(hSql())
+.head 8 -  Call SalPostMsg(hWndForm, UM_Populate, 6, 0)
+.head 7 +  ! If bPAR_CUSTCLV
+.head 8 -  Call hWndCust.AbstractCustomer..setShowKK(FALSE)
+.head 7 -  Call picTabs.InitializeFormPages( 
      SalNumberToStrX(nCustomerRN,0)|| ';' ||
      SalNumberToStrX(nCType,0)     || ';' ||
      Str(SalWindowHandleToNumber(hWndForm)) || ';' || 
      Str(SalWindowHandleToNumber(hWndCust)))
-.head 8 -  Call picTabs.BringToTop(nActivTab,TRUE)
-.head 8 -  !
-.head 8 -  Return TRUE
-.head 7 +  Else
-.head 8 -  Call SqlRollbackEx(hSql(), "P_BEFORE_SAVE_CLIENT: РНК " || Str(nCustomerRN) || sErrMsg )
-.head 8 -  Call MessageError( sErrMsg )
+.head 7 -  Call picTabs.BringToTop(nActivTab,TRUE)
+.head 7 -  !
+.head 7 -  Return TRUE
 .head 5 +  Else
 .head 6 +  While TRUE
 .head 7 -  Set nActivTab = picTabs.GetTop()
@@ -9041,39 +9035,34 @@ or bPAR_CUSTCLV
 .head 9 +  If NOT hWndCust.AbstractCustomer..saveCustomerCategory()
 .head 10 -  ! Call Debug('saveCustomerCategory')
 .head 10 -  Break
-.head 7 +  If SqlPLSQLCommand( hSql(), "P_BEFORE_SAVE_CLIENT( nCustomerRN, sErrMsg )" ) 
-AND ( sErrMsg = STRING_Null )
-.head 8 -  ! Сохранение изменений в реквизитах Клиента банка: cCustomer.getNmk()
-.head 8 +  If not SqlCommitEx(hSql(), CurrentLangTable.GetAtomTitle('Frm_Customer.cTMsgSaveOK') || ': ' ||
+.head 7 -  ! Сохранение изменений в реквизитах Клиента банка: cCustomer.getNmk()
+.head 7 +  If not SqlCommitEx(hSql(), CurrentLangTable.GetAtomTitle('Frm_Customer.cTMsgSaveOK') || ': ' ||
    Str(hWndCust.AbstractCustomer..getRnk()) || ' ' || hWndCust.AbstractCustomer..getNmk())
-.head 9 -  ! Call Debug('getNmk')
-.head 9 -  Break
-.head 8 -  ! Сохранены реквизиты Клиента
-.head 8 -  ! Call MessageInfo(CurrentLangTable.GetAtomTitle('Frm_Customer.cTMsgRNK3') || ' ' || hWndCust.AbstractCustomer..getNmk() || '.' ||
+.head 8 -  ! Call Debug('getNmk')
+.head 8 -  Break
+.head 7 -  ! Сохранены реквизиты Клиента
+.head 7 -  ! Call MessageInfo(CurrentLangTable.GetAtomTitle('Frm_Customer.cTMsgRNK3') || ' ' || hWndCust.AbstractCustomer..getNmk() || '.' ||
      IifS(bPAR_CUSTCLV=TRUE and not (nCtrlFlags & CVIEW_ApproveKK) and not bVerifyClientParams and (nCType=3 and bPersonSPD=TRUE or nCType=2), 
      PutCrLf() || 'Зміни набудуть чинності після підтвердження контролером.', ''))
-.head 8 -  Call MessageInfo(CurrentLangTable.GetAtomTitle('Frm_Customer.cTMsgRNK3') || ' ' || hWndCust.AbstractCustomer..getNmk() || '.' ||
+.head 7 -  Call MessageInfo(CurrentLangTable.GetAtomTitle('Frm_Customer.cTMsgRNK3') || ' ' || hWndCust.AbstractCustomer..getNmk() || '.' ||
      IifS(bPAR_CUSTCLV=TRUE and not (nCtrlFlags & CVIEW_ApproveKK) and (nCType=3 and bPersonSPD=TRUE or nCType=2), 
      PutCrLf() || 'Зміни набудуть чинності після підтвердження контролером.', ''))
-.head 8 +  If not SqlPLSQLCommand(hSql(), "p_after_edit_client(nCustomerRN)")
-.head 9 -  Call SqlRollbackEx(hSql(), "РНК " || Str(nCustomerRN) || ": ошибка выполнения p_after_edit_client")
-.head 8 +  Else
-.head 9 -  Call SqlCommit(hSql())
-.head 9 -  Call SalPostMsg(hWndForm, UM_Populate, 6, 0)
-.head 8 +  ! If bPAR_CUSTCLV
-.head 9 -  Call hWndCust.AbstractCustomer..setShowKK(FALSE)
-.head 8 -  ! Инициализация после сохранения
-.head 8 -  Call picTabs.InitializeFormPages( 
+.head 7 +  If not SqlPLSQLCommand(hSql(), "p_after_edit_client(nCustomerRN)")
+.head 8 -  Call SqlRollbackEx(hSql(), "РНК " || Str(nCustomerRN) || ": ошибка выполнения p_after_edit_client")
+.head 7 +  Else
+.head 8 -  Call SqlCommit(hSql())
+.head 8 -  Call SalPostMsg(hWndForm, UM_Populate, 6, 0)
+.head 7 +  ! If bPAR_CUSTCLV
+.head 8 -  Call hWndCust.AbstractCustomer..setShowKK(FALSE)
+.head 7 -  ! Инициализация после сохранения
+.head 7 -  Call picTabs.InitializeFormPages( 
      SalNumberToStrX(nCustomerRN,0)|| ';' ||
      SalNumberToStrX(nCType,0)     || ';' ||
      Str(SalWindowHandleToNumber(hWndForm)) || ';' || 
      Str(SalWindowHandleToNumber(hWndCust)))
-.head 8 -  Call picTabs.BringToTop(nActivTab,TRUE)
-.head 8 -  !
-.head 8 -  Return TRUE
-.head 7 +  Else
-.head 8 -  Call SqlRollbackEx(hSql(), "P_BEFORE_SAVE_CLIENT: РНК " || Str(nCustomerRN) || sErrMsg )
-.head 8 -  Call MessageError( sErrMsg )
+.head 7 -  Call picTabs.BringToTop(nActivTab,TRUE)
+.head 7 -  !
+.head 7 -  Return TRUE
 .head 5 -  Call hWndCust.AbstractCustomer..setRnk(nCustomerRN)
 .head 5 -  Call SqlRollback(hSql())
 .head 5 -  ! Ошибка регистрации Клиента банка:

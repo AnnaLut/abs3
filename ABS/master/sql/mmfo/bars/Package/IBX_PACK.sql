@@ -2578,6 +2578,7 @@ procedure get_info_doc(p_params in xmltype, -- XML c входящими параметрами
        l_trans_2902 oper.nlsb%type;
        l_trans_2902_nm accounts.nms%type;
        l_6110 oper.nlsb%type;
+       l_trans_2902_nm accounts.nms%type;
        l_nls_t00 oper.nlsb%type;
        l_debit_name oper.nam_a%type;
        l_dk         number:=1;
