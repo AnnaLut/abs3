@@ -7,7 +7,7 @@
 .data VIEWINFO
 0000: 6F00000001000000 FFFF01000D004347 5458566965775374 6174650400010000
 0020: 0000000000F40000 002C000000030000 00030000000E0300 000B000000F8FFFF
-0040: FFE2FFFFFF200000 0015000000EA0200 00D7010000010000 0001000000010000
+0040: FFE1FFFFFF200000 0015000000EA0200 00D7010000010000 0001000000010000
 0060: 000F4170706C6963 6174696F6E497465 6D00000000
 .enddata
 .data DT_MAKERUNDLG
@@ -3659,27 +3659,47 @@ or NOT SqlFetchNext( hSql(), nFetchRes)
 .head 6 +  Select Case nTip
 .head 7 +  Case 1	! @F
 .head 8 -  Set ss =
-"select " || IifS(sBANKTYPE='AVAL', "", "/*+ index(a) */ ") || "ree_tmp.rowid, ree_tmp.id_a, ree_tmp.rt,
-        ree_tmp.ot, ree_tmp.odat, ree_tmp.nls, 
-        ree_tmp.kv, ree_tmp.c_ag, ree_tmp.nmk, " ||
-        IifS(sBANKTYPE='AVAL' or sBANKTYPE='KAZNA', "ree_tmp.adr", "c.adr") || ",
-        ree_tmp.c_reg, ree_tmp.c_dst, s.kod_reg, ree_tmp.rec_o
+"select ROW_ID, ID_A, RT, OT, ODAT, NLS, KV, C_AG, NMK, ADR, C_REG, C_DST, KOD_REG, REC_O
    into :tblFTax.ROWID, :tblFTax.OKPO, :tblFTax.TYP_REES, :tblFTax.TYP_OPER,
         :tblFTax.DAT_OPER, :tblFTax.NLS, 
         :tblFTax.KV, :tblFTax.REZ, :tblFTax.NMS, :tblFTax.ADR,
         :tblFTax.OBL, :tblFTax.RAY, :tblFTax.SIMVOL, :tblFTax.NUMS
-   from ree_tmp, dpa_nbs d, accounts a, spr_obl s " ||
-        IifS(sBANKTYPE='AVAL' or sBANKTYPE='KAZNA', "", ", customer c") || "
-  where ree_tmp.odat <= :sDat1
-    and a.nls = ree_tmp.nls and a.kv = ree_tmp.kv
-    and substr(ree_tmp.nls,1,4) = d.nbs
-    and ree_tmp.fn_o is null
-    and ree_tmp.c_reg = s.c_reg
-    and ree_tmp.ot = d.taxotype and d.type='DPA' " ||
-        IifS(sFltrWhereClause='', "", " and " || sFltrWhereClause) ||
-        IifS(sBANKTYPE='AVAL' or sBANKTYPE='KAZNA', "", " and a.rnk=c.rnk") ||
-        IifS(sFilterTip[nTip]!='', " and ("||sFilterTip[nTip]||")", "") || "
-  order by s.kod_reg"
+   from ( select " || IifS(sBANKTYPE='AVAL', "", "/*+ index(a) */ ") || "
+                 ree_tmp.rowid as ROW_ID, ree_tmp.id_a, ree_tmp.rt,
+                 ree_tmp.ot, ree_tmp.odat, ree_tmp.nls, 
+                 ree_tmp.kv, ree_tmp.c_ag, ree_tmp.nmk, " ||
+                 IifS(sBANKTYPE='AVAL' or sBANKTYPE='KAZNA', "ree_tmp.adr", "c.adr") || ",
+                 ree_tmp.c_reg, ree_tmp.c_dst, s.kod_reg, ree_tmp.rec_o
+            from ree_tmp, dpa_nbs d, accounts a, spr_obl s " ||
+                 IifS(sBANKTYPE='AVAL' or sBANKTYPE='KAZNA', "", ", customer c") || "
+           where ree_tmp.odat <= :sDat1
+             and a.nls = ree_tmp.nls and a.kv = ree_tmp.kv
+             and substr(ree_tmp.nls,1,4) = d.nbs
+             and ree_tmp.fn_o is null
+             and ree_tmp.c_reg = s.c_reg
+             and ree_tmp.ot = d.taxotype and d.type='DPA' " ||
+             IifS(sFltrWhereClause='', "", " and " || sFltrWhereClause) ||
+             IifS(sBANKTYPE='AVAL' or sBANKTYPE='KAZNA', "", " and a.rnk=c.rnk") ||
+             IifS(sFilterTip[nTip]!='', " and ("||sFilterTip[nTip]||")", "") || "
+           union all
+          select /*+ index(a) */ ree_tmp.rowid as ROW_ID, ree_tmp.id_a, ree_tmp.rt,
+                 ree_tmp.ot, ree_tmp.odat, ree_tmp.nls, 
+                 ree_tmp.kv, ree_tmp.c_ag, ree_tmp.nmk, " ||
+                 IifS(sBANKTYPE='AVAL' or sBANKTYPE='KAZNA', "ree_tmp.adr", "c.adr") || ",
+                 ree_tmp.c_reg, ree_tmp.c_dst, s.kod_reg, ree_tmp.rec_o
+            from ree_tmp, dpa_nbs d, accounts a, spr_obl s " ||
+                 IifS(sBANKTYPE='AVAL' or sBANKTYPE='KAZNA', "", ", customer c") || "
+           where ree_tmp.odat <= :sDat1
+             and a.NLSALT = ree_tmp.nls and a.DAT_ALT is not null
+             and a.kv = ree_tmp.kv
+             and substr(ree_tmp.nls,1,4) = d.nbs
+             and ree_tmp.fn_o is null
+             and ree_tmp.c_reg = s.c_reg
+             and ree_tmp.ot = d.taxotype and d.type='DPA' " ||
+             IifS(sFltrWhereClause='', "", " and " || sFltrWhereClause) ||
+             IifS(sBANKTYPE='AVAL' or sBANKTYPE='KAZNA', "", " and a.rnk=c.rnk") ||
+             IifS(sFilterTip[nTip]!='', " and ("||sFilterTip[nTip]||")", "") || "
+        ) order by KOD_REG"
 .head 8 -  Break
 .head 7 +  Case 2	! @B
 .head 8 -  Break
