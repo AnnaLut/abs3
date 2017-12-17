@@ -444,6 +444,7 @@ namespace Bars
             }
 
             int startPos = query.IndexOf(sort);
+            if (startPos < 0) return sort;
             int endPosComa = query.IndexOf(",", startPos);
             int endPosFrom = query.ToLower().IndexOf("from", startPos);
             int endPos = endPosComa < endPosFrom ? endPosComa : endPosFrom;

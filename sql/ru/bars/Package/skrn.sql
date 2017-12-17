@@ -14,11 +14,11 @@ IS
   DEP_KAS - счет кассы
   DEP_S1  - счет внебаланса 9898
   DEP_S2  - счет внебаланса 9819
-  DEP_S3  - счет 6119
+  DEP_S3  - счет 6519 (по старому плану счетов 6119)
   DEP_S4  - счет 3600
   DEP_S5  - сводный 2909 для отражения НДС
   DEP_S6  - сводный 3579
-  DEP_S7  - сводный счет для списания НДС 6119
+  DEP_S7  - сводный счет для списания НДС 6519 (по старому плану счетов 6119)
   DEP_S9  - рахунок для перерахування плати за довіреність 2909
   DEP_S10  - рахунок для перерахування штрафу 6397
 
@@ -172,9 +172,9 @@ IS
 
    nls9819_        VARCHAR2 (15);
    nms9819_        accounts.nms%TYPE;
-   -- Рахунок прибутків теперішнього періоду
-   nls6119_        VARCHAR2 (15);
-   nms6119_        accounts.nms%TYPE;
+   -- Рахунок прибутків теперішнього періоду (по старому плану счетов 6119)
+   nls6519_        VARCHAR2 (15);
+   nms6519_        accounts.nms%TYPE;
    -- Рахунок прибутків майбутнього періоду
    nls3600_        VARCHAR2 (15);
    nms3600_        accounts.nms%TYPE;
@@ -479,7 +479,7 @@ IS
    END;
 
 
-    Procedure p_nls_6119 (p_cust number)
+    Procedure p_nls_6519 (p_cust number)
     as
     l_nbs  accounts.nbs%type;
     l_ob22 accounts.ob22%type;
@@ -501,7 +501,7 @@ IS
       end if;
 
      SELECT a.nls, a.nms
-       INTO nls6119_, nms6119_
+       INTO nls6519_, nms6519_
        FROM accounts a
       WHERE a.nls = nbs_ob22(l_nbs, l_ob22)
         and a.kv = 980;
@@ -1422,7 +1422,7 @@ PROCEDURE p_tariff2 (n_sk_     NUMBER,
      THEN new_ref_flag := 1;
 	 END IF;
 
-	 IF sc1_ IS NOT NULL AND sc1_ > 0 AND nls6119_ IS NOT NULL
+	 IF sc1_ IS NOT NULL AND sc1_ > 0 AND nls6519_ IS NOT NULL
      THEN
          IF (new_ref_flag = 1) OR NVL (skrnpar3_, 0) = 0
          THEN
@@ -1431,7 +1431,7 @@ PROCEDURE p_tariff2 (n_sk_     NUMBER,
 
          sk_    := NULL;
          nam_a_ := SUBSTR (nmss2909_, 1, 38);
-         nam_b_ := SUBSTR (nms6119_, 1, 38);
+         nam_b_ := SUBSTR (nms6519_, 1, 38);
 		 IF mode_ = 15
          then
 			nazn_ := 'Орендна плата за користування сейфом № '      || TO_CHAR (skr_.snum)
@@ -1464,11 +1464,11 @@ PROCEDURE p_tariff2 (n_sk_     NUMBER,
                          nazn, userid, id_a, id_b, sk)
                  VALUES (ref_, tt2_, vob2_, substr(ref_,4,10), dk_, SYSDATE, bankdate_,
                          bankdate_, bankdate_, nam_a_, nlss2909_, mfoa_,
-                         kv_, sc1_, nam_b_, nls6119_, mfob_, kv_, sc1_,
+                         kv_, sc1_, nam_b_, nls6519_, mfob_, kv_, sc1_,
                          nazn_, userid_, okpoa_, okpob_, sk_);
          END IF;
 
-         gl.payv (0,ref_,bankdate_,tt2_,dk_,kv_,nlss2909_,sc1_,kv_,nls6119_,scperiod_);
+         gl.payv (0,ref_,bankdate_,tt2_,dk_,kv_,nlss2909_,sc1_,kv_,nls6519_,scperiod_);
 
          IF ref_ IS NOT NULL AND ((mode_ = 15 and nmsnls_ is null) OR NVL (skrnpar3_, 0) = 0)
          THEN
@@ -1792,7 +1792,7 @@ PROCEDURE p_tariff2 (n_sk_     NUMBER,
                --end if;
                sk_    := NULL;
                nam_a_ := SUBSTR (nmss2909_, 1, 38);
-               nam_b_ := SUBSTR (nms6119_, 1, 38);
+               nam_b_ := SUBSTR (nms6519_, 1, 38);
                okpob_ := f_ourokpo;
                nazn_  := 'Орендна плата за користування сейфом № '      || TO_CHAR (skr_.snum)
                             || ' з '                                    || TO_CHAR (skrnd_.dat_begin, 'dd.mm.yyyy')
@@ -1814,11 +1814,11 @@ PROCEDURE p_tariff2 (n_sk_     NUMBER,
                        VALUES (ref_, tt2_, vob2_, substr(ref_,4,10), dk_, SYSDATE,
                                bankdate_, bankdate_, bankdate_, nam_a_,
                                nlss2909_, mfoa_, kv_, scperiod_, nam_b_,
-                               nls6119_, mfob_, kv_, scperiod_, nazn_,
+                               nls6519_, mfob_, kv_, scperiod_, nazn_,
                                userid_, okpoa_, okpob_, sk_);
                END IF;
 
-               gl.payv (0,ref_,bankdate_,tt2_,dk_,kv_,nlss2909_,scperiod_,kv_,nls6119_,scperiod_);
+               gl.payv (0,ref_,bankdate_,tt2_,dk_,kv_,nlss2909_,scperiod_,kv_,nls6519_,scperiod_);
 
                IF ref_ IS NOT NULL AND ((mode_ = 15 and nmsnls_ is null) OR NVL (skrnpar3_, 0) = 0)
                THEN
@@ -2193,8 +2193,8 @@ IS
 
 		dk_ := 1;
          -- доходи
-        IF sc1_ IS NOT NULL AND sc1_ > 0 AND nls6119_ IS NOT NULL THEN
-		    gl.payv (0,ref_,bankdate_,tt2_,dk_,kv_,nlss2909_,sc1_+sf1_,kv_,nls6119_,scperiod_);
+        IF sc1_ IS NOT NULL AND sc1_ > 0 AND nls6519_ IS NOT NULL THEN
+		    gl.payv (0,ref_,bankdate_,tt2_,dk_,kv_,nlss2909_,sc1_+sf1_,kv_,nls6519_,scperiod_);
 		end if;
 
 	    IF nlsnds_ IS NOT NULL AND snds1_ IS NOT NULL AND snds1_ > 0  THEN
@@ -2504,8 +2504,8 @@ end overdue_payment;
                      AND n.n_sk = sk.n_sk)
       LOOP
 		 init(null);
-		 -- визначаємо рахунок 6119 відповідно типу клієнта
-         p_nls_6119(k.CUSTTYPE);
+		 -- визначаємо рахунок 6519 відповідно типу клієнта
+         p_nls_6519(k.CUSTTYPE);
          sdoc_ := k.sp2;
 
          IF sdoc_ > 0
@@ -2525,8 +2525,8 @@ end overdue_payment;
             nam_a_  := SUBSTR (nms3600_, 1, 38);
             --okpoa_ := skrnd_.okpo1;
             mfoa_   := gl.amfo;
-            nlsb_   := nls6119_;
-            nam_b_  := SUBSTR (nms6119_, 1, 38);
+            nlsb_   := nls6519_;
+            nam_b_  := SUBSTR (nms6519_, 1, 38);
             --okpob_ := skrnd_.okpo1;
             okpob_  := f_ourokpo;
             mfob_   := gl.amfo;
@@ -2591,8 +2591,8 @@ PROCEDURE p_oper_amort_doh (dat_    IN DATE,
                 ORDER BY n_sk)
       LOOP
 		 init(null);
-		 -- визначаємо рахунок 6119 відповідно типу клієнта
-         p_nls_6119(k.CUSTTYPE);
+		 -- визначаємо рахунок 6519 відповідно типу клієнта
+         p_nls_6519(k.CUSTTYPE);
 
 		 IF k.amort_date is not null
 		 then
@@ -2618,8 +2618,8 @@ PROCEDURE p_oper_amort_doh (dat_    IN DATE,
             nam_a_  := SUBSTR (nms3600_, 1, 38);
           --okpoa_  := skrnd_.okpo1;
             mfoa_   := gl.amfo;
-            nlsb_   := nls6119_;
-            nam_b_  := SUBSTR (nms6119_, 1, 38);
+            nlsb_   := nls6519_;
+            nam_b_  := SUBSTR (nms6519_, 1, 38);
           --okpob_  := skrnd_.okpo1;
             okpob_  := f_ourokpo;
             mfob_   := gl.amfo;
@@ -3328,8 +3328,8 @@ end;
 		end if;
       END IF;
 
--- визначаємо рахунок 6119 відповідно типу клієнта
-   p_nls_6119(skrnd_.CUSTTYPE);
+-- визначаємо рахунок 6519 відповідно типу клієнта
+   p_nls_6519(skrnd_.CUSTTYPE);
 
 
 
@@ -4091,7 +4091,7 @@ END;
 
 		BEGIN
 		 SELECT a.nls, a.nms
-		   INTO nls6119_, nms6119_
+		   INTO nls6519_, nms6519_
 		   FROM accounts a
 		  WHERE a.nls = (SELECT val
 						   FROM branch_parameters
@@ -4100,8 +4100,8 @@ END;
 		EXCEPTION
 		 WHEN NO_DATA_FOUND
 		 THEN
-			nls6119_ := NULL;
-			nms6119_ := NULL;
+			nls6519_ := NULL;
+			nms6519_ := NULL;
 		END;
 
         SELECT s_ + ostc
@@ -4113,7 +4113,7 @@ END;
           INTO s_
           FROM opldok o, accounts a, skrynka_nd_ref r
          WHERE o.acc = a.acc
-           AND a.nls IN (nls6119_, nlsnds_)
+           AND a.nls IN (nls6519_, nlsnds_)
            AND o.s > 0
            AND o.sos = 5
            AND o.REF = r.REF
@@ -4453,7 +4453,7 @@ END;
 
       BEGIN
          SELECT a.nls, a.nms
-           INTO nls6119_, nms6119_
+           INTO nls6519_, nms6519_
            FROM accounts a
           WHERE a.nls = (SELECT val
                            FROM branch_parameters

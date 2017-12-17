@@ -2149,15 +2149,46 @@ END    op_reg_ex_2017;
         UPDATE accounts SET mdate=DAT4_            WHERE acc=ACC2_;
         UPDATE accounts SET mdate=DAT4_            WHERE acc=ACC4_;
 
-        sTTB_ := case when nKv_ = gl.baseval then 'WD2' else 'WD3' end;
+        -- Artem Yurchenko, 24.11.2014
+        -- для кредитных ресурсов необходимо использовать другие операции
+        if (check_if_deal_belong_to_crsour(nVidd_) = 'Y') then
+            -- установка ОБ22
+            l_ob22 := '02';
+            accreg.setAccountSParam(ACC1_, 'OB22', l_ob22);
+            accreg.setAccountSParam(ACC2_, 'OB22', l_ob22);
 
-        BEGIN        SELECT val INTO sTTA_ FROM params WHERE par='MBD_%%1';          --операция по начислению проц
-        EXCEPTION WHEN NO_DATA_FOUND THEN sTTA_ := '%%1';
-        END;
+            -- проставим спецпараметр МФО (нужно для файлов 32, 33)
+            accreg.setAccountSParam(ACC1_, 'MFO', s2_);
+            accreg.setAccountSParam(ACC2_, 'MFO', s2_);
 
-        BEGIN  SELECT decode (codcagent,1, sTTA_, decode(l_tipd,1,'%00','%02') )    INTO sTTA_     FROM customer WHERE rnk=RNKB_;
-        EXCEPTION   WHEN NO_DATA_FOUND THEN     sERR_ := 'Не найден RNKB '||RNKB_;  raise inr_err;
-        END;       -- резидент-нерезидент
+            sTTB_ := 'PS2';
+
+            --операция по начислению проц
+            l_proc_dr_row := get_proc_dr_row(to_char(nVidd_, 'FM9999'), rnkb_);
+            sTTA_ := case when nKv_ = gl.baseval then l_proc_dr_row.tt
+                          else l_proc_dr_row.ttv
+                     end;
+        else
+            sTTB_ := case when nKv_ = gl.baseval then 'WD2' else 'WD3' end;
+            --операция по начислению проц
+            BEGIN
+              SELECT val INTO sTTA_ FROM params WHERE par='MBD_%%1';
+            EXCEPTION WHEN NO_DATA_FOUND THEN sTTA_ := '%%1';
+            END;
+            BEGIN              -- резидент-нерезидент
+              SELECT decode (codcagent,1, sTTA_, decode(l_tipd,1,'%00','%02') ) INTO sTTA_ FROM customer WHERE rnk=RNKB_;
+            EXCEPTION WHEN NO_DATA_FOUND THEN sERR_ := 'Не найден RNKB '||RNKB_; raise inr_err;
+            END;
+        end if;
+
+--        sTTB_ := case when nKv_ = gl.baseval then 'WD2' else 'WD3' end;
+ --      BEGIN        SELECT val INTO sTTA_ FROM params WHERE par='MBD_%%1';          --операция по начислению проц
+--        EXCEPTION WHEN NO_DATA_FOUND THEN sTTA_ := '%%1';
+--        END;
+
+--        BEGIN  SELECT decode (codcagent,1, sTTA_, decode(l_tipd,1,'%00','%02') )    INTO sTTA_     FROM customer WHERE rnk=RNKB_;
+--        EXCEPTION   WHEN NO_DATA_FOUND THEN     sERR_ := 'Не найден RNKB '||RNKB_;  raise inr_err;
+--        END;       -- резидент-нерезидент
 
         l_io := NVL(nIO_,0);
 
@@ -2167,7 +2198,19 @@ END    op_reg_ex_2017;
         END IF;
 
         IF    nID_ = 1 and nKV_=gl.baseval  then UPDATE int_accN   Set NLSB=NLSNB_     , MFOB=S2_     , NAMB= l_nmkb     , NAZN=Nazn_ WHERE acc=ACC1_ AND id=1;
-        ELSIF nID_ = 1 and nKV_<>gl.baseval then UPDATE int_accN   Set NLSB=substr(NLSNB_,1,14), NAMB=l_nmkb, NAZN=Nazn_              WHERE acc=ACC1_ AND id=1;
+        ELSIF nID_ = 1 and nKV_<>gl.baseval then
+            if (check_if_deal_belong_to_crsour(nVidd_) = 'Y') then
+                update int_accn
+                set    nlsb = substr(nlsnb_, 1, 14),
+                       mfob = s2_,
+                       namb = l_nmkb,
+                       nazn = nazn_
+                 where acc = acc1_ and
+                       id = 1;
+            else
+                UPDATE int_accN   Set NLSB=substr(NLSNB_,1,14), NAMB=l_nmkb, NAZN=Nazn_              WHERE acc=ACC1_ AND id=1;
+            end if;
+
         end if;
 
         update INT_ratn   SET ir=IR_, op=OP_, br=BR_ where acc=ACC1_ and id=nID_ and bdat=DAT2_;

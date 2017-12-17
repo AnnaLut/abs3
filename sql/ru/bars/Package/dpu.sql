@@ -693,7 +693,7 @@ is
   --
   -- глобальные переменные и константы
   -- 
-  g_body_version  constant varchar2(64)          := 'version 44.11  15.12.2017';
+  g_body_version  constant varchar2(64)          := 'version 44.12  17.12.2017';
   
   modcode         constant varchar2(3)           := 'DPU';
   accispparam     constant varchar2(16)          := 'DPU_ISP';
@@ -1564,9 +1564,10 @@ $end
 
   exception
     when NO_DATA_FOUND then 
-      bars_audit.Info( title || ' не знайдено параметри OB22 для виду депозиту ' || to_char(p_dputype) );
+--    bars_audit.Info( title || ' не знайдено параметри OB22 для TYPE_ID=' || to_char(l_typerow.TYPE_ID) || ', S181=' || l_s181 );
+      bars_error.raise_nerror( modcode, 'GENERAL_ERROR_CODE', 'Не знайдено OB22 для TYPE_ID=' || to_char(l_typerow.TYPE_ID) || ', S181=' || l_s181 );
   end;
-  
+
   -- открытие депозитного счета
   begin
     ACCREG.SetAccountAttr

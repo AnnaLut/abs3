@@ -25,6 +25,8 @@ CREATE OR REPLACE FUNCTION BARS.F_PROC_DR
     p_nbs   VARCHAR2  DEFAULT NULL,   -- БС
     p_kv    INT       DEFAULT NULL)   -- код валюты
 RETURN INT
+
+--17.12.2017 Sta + 2701
 --15.12.2017 Sta Уточнения для об22 по бал.7017
 
 --29.11.2017 Sta Поиск в accounts по NLS (NLSALT) = счету из PROC_DR 
@@ -51,7 +53,10 @@ BEGIN
 
   -- 06.12.2017 Сухова. Для МБДК Временно, до переделки модуля с учетом об22
 
-  If p_NBS in ('1510','1512','1513','1521','1522','1524','1523','1610','1612','1613','1621','1623','1624') then
+  If p_NBS in ('1510','1512','1513','1521','1522','1524','1523','1610','1612','1613','1621','1623','1624',
+               '2701' ) then
+--RE: 2701 (короткострокові) - не подбирается счет расходов, должен быть БС=7060 (ОБ22=01)/
+
      If    p_nbs  in ('1510') then nbs_ := '6011'; if  p_kv = 980 then ob22_ := '01'; else ob22_:= '02'; End If ;  ---Депозити овернайт, що розмўщенў в ўнших банках
      ElsIf p_nbs  in ('1512') then nbs_ := '6012'; if  p_kv = 980 then ob22_ := '01'; else ob22_:= '03'; End If ;  ---Короткостроковў вклади (депозити), що розмўщенў в 
      ElsIf p_nbs  in ('1513') then nbs_ := '6012'; if  p_kv = 980 then ob22_ := '01'; else ob22_:= '03'; End If ;  ---Довгостроковў вклади (депозити), що розмўщенў в ўн
@@ -66,7 +71,8 @@ BEGIN
      ElsIf p_nbs  in ('1621') then nbs_ := '7014'; if  p_kv = 980 then ob22_ := '01'; else ob22_:= '02'; End If ;  ---кредити овернайт, що отриманў вўд ўнших банкўв
      ElsIf p_nbs  in ('1623') then nbs_ := '7017'; if  p_kv = 980 then ob22_ := '06'; else ob22_:= '05'; End If ;  ---кредити, що наданў ўншим банкам за операцўями репо
      ElsIf p_nbs  in ('1624') then nbs_ := '7017'; if  p_kv = 980 then ob22_ := '02'; else ob22_:= '01'; End If ;  ---довгостроковў  кредити, якў наданў ўншим банкам
-     end if;
+     ElsIf p_nbs  in ('2701') then nbs_ := '7060'; ob22_ := '03';
+   end if;
 
      begin select acc into l_acc67  FROM accounts  WHERE nls = NBS_ob22(NBS_, OB22_) and kv = gl.baseval;
                   RETURN   l_acc67 ;
