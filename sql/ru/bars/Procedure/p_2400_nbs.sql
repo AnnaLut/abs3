@@ -62,7 +62,7 @@ begin
                         nvl(r.rez*100,0) sz,nvl(r.rezn*100,0) szn,nvl(r.rez_30*100,0) sz_30, decode(r.kat,1,1,9,9,2) s080,r.kat r_s080
                 from nbu23_rez r
                 join customer     c on (r.rnk = c.rnk)
-                join srezerv_ob22_f o on (r.nbs = o.nbs and o.nal=nal_ AND r.arjk=decode(o.nal,'2',1,0) AND 
+                join srezerv_ob22_f o on (r.nbs = o.nbs and o.nal=nal_  AND 
                                         nvl(r.ob22,0) = decode(o.ob22,'0', nvl(r.ob22,0),o.ob22) and
                                         decode(r.kat,1,1,2) = decode(o.s080,'0',decode(r.kat,1,1,2),o.s080) and
                                         r.custtype = decode(o.custtype,'0',r.custtype,o.custtype) and r.kv = decode(o.kv,'0',r.kv,o.kv) )
@@ -88,7 +88,7 @@ begin
                       nvl(r.rez*100,0) sz,nvl(r.rezn*100,0) szn,nvl(r.rez_30*100,0) sz_30, decode(r.kat,1,1,9,9,2) s080,r.kat r_s080
                from nbu23_rez r
                join customer     c on (r.rnk = c.rnk)
-               join srezerv_ob22_f o on (r.nbs = o.nbs and o.nal = decode(nal_,'3','1',nal_) AND r.arjk = decode(o.nal,'2',1,0) AND
+               join srezerv_ob22_f o on (r.nbs = o.nbs and o.nal = decode(nal_,'3','1',nal_) AND 
                                        nvl(r.ob22,0) = decode(o.ob22,'0',nvl(r.ob22,0),o.ob22) and
                                        decode(r.kat,1,1,2) = decode(o.s080,'0',decode(r.kat,1,1,2),o.s080) and
                                        nvl(r.custtype,0) = decode(o.custtype,'0',nvl(r.custtype,0),o.custtype) and
@@ -113,7 +113,7 @@ begin
                       nvl(r.rez*100,0) sz,nvl(r.rezn*100,0) szn,0 sz_30, decode(r.kat,1,1,9,9,2) s080,r.kat r_s080
                from nbu23_rez r
                join customer     c on (r.rnk = c.rnk)
-               join srezerv_ob22_f o on (r.nbs = o.nbs and o.nal=decode(nal_,'3','0','4','1',nal_) AND r.arjk=decode(o.nal,'2',1,0) AND
+               join srezerv_ob22_f o on (r.nbs = o.nbs and o.nal=decode(nal_,'3','0','4','1',nal_) AND 
                                        nvl(r.ob22,0)= decode(o.ob22,'0',nvl(r.ob22,0),o.ob22) and
                                        decode(r.kat,1,1,2) = decode(o.s080,'0',decode(r.kat,1,1,2),o.s080) and
                                        nvl(r.custtype,0)= decode(o.custtype,'0',nvl(r.custtype,0),o.custtype) and

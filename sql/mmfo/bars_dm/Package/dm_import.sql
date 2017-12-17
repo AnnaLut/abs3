@@ -212,7 +212,7 @@ end;
 create or replace package body DM_IMPORT
  is
 
-    g_body_version constant varchar2(64) := 'Version 3.3.0 01/11/2017';
+    g_body_version constant varchar2(64) := 'Version 3.3.1 16/12/2017'; -- bf, секционирование не вошло
     g_body_defs    constant varchar2(512) := null;
     G_TRACE        constant varchar2(20) := 'dm_import.';
   -- 26.09.2017 изменена выгрузка сегментов

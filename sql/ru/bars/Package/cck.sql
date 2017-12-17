@@ -686,7 +686,7 @@ END CCK;
 /
 CREATE OR REPLACE PACKAGE BODY CCK IS
   -------------------------------------------------------------------
-  g_body_version CONSTANT VARCHAR2(64) := 'ver.3.23  22/02/2017 ';
+  g_body_version CONSTANT VARCHAR2(64) := 'ver.3.24  16/12/2017 ';
   ------------------------------------------------------------------
 
   /*
@@ -2626,7 +2626,7 @@ CREATE OR REPLACE PACKAGE BODY CCK IS
       FOR p IN (SELECT a.kv
                       ,a.acc
                       ,vkrzn(substr(gl.amfo, 1, 5)
-                            ,substr(a.nls, 1, 3) || '90' ||
+                            ,substr(a.nls, 1, 3) ||case when newnbs.get_state = 1 then '80' else '90' end ||
                              substr(a.nls, 6, 9)) nls
                       ,a.isp
                       ,a.grp

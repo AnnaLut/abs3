@@ -7,7 +7,7 @@ PROMPT *** Create  procedure PAY_23_OB22_NBS ***
   CREATE OR REPLACE PROCEDURE BARS.PAY_23_OB22_NBS (dat01_ DATE, mode_ NUMBER DEFAULT 0, p_user number default null,
                                                     nal_ varchar2, nn number)  IS
 
-/* РУ+ГОУ          Версия 3.0 13-06-2017  17-03-2017 23-11-2016  29-07-2016 27-07-2016  18-05-2016  
+/* РУ+ГОУ          Версия 3.1 13-06-2017  17-03-2017 23-11-2016  29-07-2016 27-07-2016  18-05-2016  
 
 10) 23-06-2017  -   Оплата через процедуру gl.payv вместо paytt
  9) 17-03-2017  -   R013 по  1590,1592,2400,2401,3590 не зависит от категории риска
