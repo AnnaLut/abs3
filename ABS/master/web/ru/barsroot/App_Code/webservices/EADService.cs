@@ -875,15 +875,16 @@ namespace Bars.EAD.Structs.Params
         public Double? Agreement_ID;
         [JsonProperty("doc_request_number")]
         public String Doc_Request_Number;
-//        [JsonProperty("agr_type")]
+/*
+        [JsonProperty("agr_type")]
         public String agr_type;
-//        [JsonProperty("account_type")]
+        [JsonProperty("account_type")]
         public String account_type;
-//        [JsonProperty("account_number")]
+        [JsonProperty("account_number")]
         public String account_number;
-//        [JsonProperty("account_currency")]
+        [JsonProperty("account_currency")]
         public String account_currency;
-
+*/
 
         public DocumentData(Int64? ID)
         {
@@ -901,10 +902,12 @@ namespace Bars.EAD.Structs.Params
             this.Agreement_ID = Agreement_ID;
             this.Struct_Code = Struct_Code;
             this.Doc_Request_Number = Doc_Request_Number;
+/*
             this.agr_type = agr_type;
             this.account_type = account_type;
             this.account_number = account_number;
             this.account_currency = account_currency;
+*/
         }
     }
 }

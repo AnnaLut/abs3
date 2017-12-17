@@ -222,7 +222,7 @@ declare
   E_CHK_CNSTRN_EXISTS exception;
   pragma exception_init( E_CHK_CNSTRN_EXISTS, -02264 );
 begin
-  execute immediate 'alter table DPU_VIDD add constraint CC_DPUVIDD_TERMTYPE check ( TERM_TYPE in ( 1, 2 ) )';
+  execute immediate 'alter table DPU_VIDD add constraint CC_DPUVIDD_TERMTYPE check ( TERM_TYPE in ( 1, 2 ) ) NOVALIDATE';
   dbms_output.put_line( 'Table altered.' );
 exception
   when E_CHK_CNSTRN_EXISTS
@@ -231,7 +231,7 @@ end;
 /
 
 begin
-  execute immediate 'alter table DPU_VIDD modify TERM_MIN constraint CC_DPUVIDD_TERMMIN_NN NOT NULL';
+  execute immediate 'alter table DPU_VIDD modify TERM_MIN constraint CC_DPUVIDD_TERMMIN_NN NOT NULL NOVALIDATE';
   dbms_output.put_line('Table altered.');
 exception
   when others then 

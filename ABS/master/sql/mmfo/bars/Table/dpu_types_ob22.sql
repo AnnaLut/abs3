@@ -1,7 +1,7 @@
 -- ======================================================================================
 -- Module : DPU
 -- Author : BAA
--- Date   : 22.01.2015
+-- Date   : 15.12.2017
 -- ===================================== <Comments> =====================================
 -- create table DPU_TYPES_OB22
 -- 30.09.2015 - Депозити буджетних орган. відкриваються лише в нац.валюті та лише терміном до року
@@ -32,7 +32,7 @@ begin
   execute immediate 'create table DPU_TYPES_OB22
 ( TYPE_ID    NUMBER(38)  constraint CC_DPUTYPESOB22_TYPEID_NN   NOT NULL
 , K013       CHAR(1)     constraint CC_DPUTYPESOB22_K013_NN     NOT NULL
-, IRVK       VARCHAR2(1) constraint CC_DPUTYPESOB22_IRVK_NN     NOT NULL
+, S181       VARCHAR2(1) constraint CC_DPUTYPESOB22_S181_NN     NOT NULL
 , R034       VARCHAR2(1) constraint CC_DPUTYPESOB22_R034_NN     NOT NULL
 , NBS_DEP    CHAR(4)     constraint CC_DPUTYPESOB22_NBSDEP_NN   NOT NULL
 , OB22_DEP   CHAR(2)     constraint CC_DPUTYPESOB22_OB22DEP_NN  NOT NULL
@@ -42,10 +42,13 @@ begin
 , OB22_EXP   CHAR(2)     constraint CC_DPUTYPESOB22_OB22EXP_NN  NOT NULL
 , NBS_RED    CHAR(4)
 , OB22_RED   CHAR(2)
-, constraint PK_DPUTYPESOB22 primary key ( TYPE_ID, K013, R034, IRVK ) using index tablespace BRSSMLI
+, IRVK       VARCHAR2(1) constraint CC_DPUTYPESOB22_IRVK_NN     NOT NULL
+, constraint PK_DPUTYPESOB22 primary key ( TYPE_ID, NBS_DEP, R034, S181 ) using index tablespace BRSSMLI
 , constraint UK_DPUTYPESOB22 unique ( R034, NBS_DEP, OB22_DEP ) using index tablespace BRSSMLI
-, constraint CC_DPUTYPESOB22_IRVK check (IRVK in (''0'',''1''))
+, constraint CC_DPUTYPESOB22_S181 CHECK (S181 in (''1'',''2''))
 , constraint CC_DPUTYPESOB22_R034 check (R034 in (''1'',''2''))
+, constraint CC_DPUTYPESOB22_IRVK check (IRVK in (''0'',''1''))
+, constraint CC_DPUTYPESOB22_K013_S181   check ( S181 = case when K013 = ''1'' then ''1'' else S181 end )
 , constraint CC_DPUTYPESOB22_K013_IRVK   check ( IRVK = case when K013 = ''1'' then ''0'' else IRVK end )
 , constraint CC_DPUTYPESOB22_K013_R034   check ( R034 = case when K013 = ''1'' then ''1'' else R034 end )
 ) TABLESPACE BRSSMLD';
@@ -82,7 +85,7 @@ begin
 
   begin
     dbms_output.put_line( '-- ======================================================' );
-    dbms_output.put_line( '-- == create "FK_DPUTYPESOB22_NBSDEP"' );
+    dbms_output.put_line( '-- == create "FK_DPUTYPESOB22_DPUNBS4CUST"' );
     dbms_output.put_line( '-- ======================================================' );
     execute immediate q'[alter table DPU_TYPES_OB22 add constraint FK_DPUTYPESOB22_DPUNBS4CUST foreign key (K013,NBS_DEP)
     references DPU_NBS4CUST (K013,NBS_DEP) ON DELETE CASCADE]';
@@ -164,7 +167,7 @@ COMMENT ON TABLE  DPU_TYPES_OB22          IS 'Параметри OB22 депозитів ЮО';
 
 COMMENT ON COLUMN DPU_TYPES_OB22.TYPE_ID  IS 'Тип (вид) договору';
 COMMENT ON COLUMN DPU_TYPES_OB22.K013     IS 'Код виду клієнта';
-COMMENT ON COLUMN DPU_TYPES_OB22.IRVK     IS '1 - безвідкличний (строковий) / 0 - відкличний (на вимогу)';
+COMMENT ON COLUMN DPU_TYPES_OB22.S181     IS 'Код строку';
 COMMENT ON COLUMN DPU_TYPES_OB22.R034     IS 'Ознака належності до національної/іноземної валюти';
 COMMENT ON COLUMN DPU_TYPES_OB22.NBS_DEP  IS 'Балансовий рахунок депозиту';
 COMMENT ON COLUMN DPU_TYPES_OB22.OB22_DEP IS 'Значення OB22 рах. депозиту';
@@ -174,6 +177,7 @@ COMMENT ON COLUMN DPU_TYPES_OB22.NBS_EXP  IS 'Балансовий рахунок ПРОЦЕНТНИХ витр
 COMMENT ON COLUMN DPU_TYPES_OB22.OB22_EXP IS 'Значення OB22 рах. ПРОЦЕНТНИХ витрат';
 COMMENT ON COLUMN DPU_TYPES_OB22.NBS_RED  IS 'Балансовий рахунок ЗМЕНШЕННЯ витрат';
 COMMENT ON COLUMN DPU_TYPES_OB22.OB22_RED IS 'Значення OB22 рах. ЗМЕНШЕННЯ витрат';
+COMMENT ON COLUMN DPU_TYPES_OB22.IRVK     IS '1 - безвідкличний (строковий) / 0 - відкличний (на вимогу)';
 
 prompt -- ======================================================
 prompt -- FINISH

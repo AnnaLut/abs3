@@ -48,9 +48,15 @@ public class RegisterCountsDPARepository : IRegisterCountsDPARepository
       ,bars.dpa_nbs  d
       ,bars.spr_obl  s
       ,bars.customer c
- WHERE (t.odat <= to_date(:entereddate
-                         ,'dd/mm/yyyy') OR t.odat IS NULL)
-   AND a.nls = t.nls
+ WHERE (t.odat <= (CASE
+                     WHEN a.dat_alt IS NOT NULL THEN -- была трансформация
+                      t.odat
+                     ELSE
+                      to_date(:entereddate
+                             ,'dd/mm/yyyy')
+                   END) OR t.odat IS NULL)
+   AND (   a.nls    = t.nls
+        OR a.nlsalt = t.nls)
    AND a.kv = t.kv
    AND a.kf = t.mfo
    AND substr(t.nls
@@ -61,13 +67,17 @@ public class RegisterCountsDPARepository : IRegisterCountsDPARepository
    AND t.ot = d.taxotype
    AND c.c_reg = s.c_reg
    AND a.rnk = c.rnk
-   AND greatest(daos
-               ,nvl(dazs
-                   ,a.daos)) >=
-       to_date(:entereddate
-              ,'dd/mm/yyyy') - 30
+   AND CASE
+         WHEN a.dat_alt IS NOT NULL THEN -- была трансформация
+          t.odat
+         ELSE
+          greatest(daos
+                  ,nvl(dazs
+                      ,a.daos))
+       END >= to_date(:entereddate
+                     ,'dd/mm/yyyy') - 30
 
-union all 
+UNION ALL
 -- COBUMMFO-4028 часть для нотариусов
 SELECT t.rowid AS idrow
       ,t.mfo
@@ -88,21 +98,30 @@ SELECT t.rowid AS idrow
       ,bars.accounts a
       ,bars.spr_obl  s
       ,bars.customer c
- WHERE (t.odat <= to_date(:entereddate
-                         ,'dd/mm/yyyy') OR t.odat IS NULL)
-   and a.nbs = '2620'
-   and a.ob22 = '07'   
+ WHERE (t.odat <= (CASE
+                     WHEN a.dat_alt IS NOT NULL THEN -- была трансформация
+                      t.odat
+                     ELSE
+                      to_date(:entereddate
+                             ,'dd/mm/yyyy')
+                   END) OR t.odat IS NULL)
+   AND a.nbs = '2620'
+   AND a.ob22 = '07'
    AND a.nls = t.nls
    AND a.kv = t.kv
    AND a.kf = t.mfo
    AND t.fn_o IS NULL
    AND c.c_reg = s.c_reg
    AND a.rnk = c.rnk
-   AND greatest(daos
-               ,nvl(dazs
-                   ,a.daos)) >=
-       to_date(:entereddate
-              ,'dd/mm/yyyy') - 30";
+   AND CASE
+         WHEN a.dat_alt IS NOT NULL THEN -- была трансформация
+          t.odat
+         ELSE
+          greatest(daos
+                  ,nvl(dazs
+                      ,a.daos))
+       END >= to_date(:entereddate
+                     ,'dd/mm/yyyy') - 30";
             using (var connection = OraConnector.Handler.UserConnection)
             {
                 return connection.Query<T>(sql, new { entereddate }).ToList();

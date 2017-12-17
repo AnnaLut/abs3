@@ -58,7 +58,7 @@ begin
    z23.to_log_rez (user_id , 33 , dat01_ ,'Рівчачок - Початок ');
    l_mfo := gl.aMfo;
    If (getglobaloption('MFOP') = '300465' ) or l_mfo = '300465' THEN l_oschad := true; else l_oschad := false; end if; -- ОЩАД
-   for k in (select substr(n.id,1,4) ID, n.id idkod, n.nd    , n.acc     , n.bvu bv    , a.tip     , a.ob22  , n.rz  , n.cc_id   , n.rnk, a.accc, nd_cp,
+   for k in (select substr(n.id,1,4) ID, n.id idkod, n.nd    , n.acc     , n.bvu bv    , a.tip     , n.ob22  , n.rz  , n.cc_id   , n.rnk, a.accc, nd_cp,
                     n.kv, n.nbs, n.nls , n.r013    , n.branch, n.ROWID RI, nvl(n.kat23 ,n.kat ) kat, s.istval, n.tipa, n.custtype,
                     -- Если FINEVARE в резерв берется рез.39, только по DEBH - REZ23
                     -- (Совещание в Делойте 12-01-2016, Костенко Г.С.)
@@ -195,10 +195,11 @@ begin
             end if;
 
             -- определение по начисленным процентам не погашенные до 30 дней и более 30 дней
-            if k.tip in ('SN ','SNO') or (k.nbs in ('3570','3578') and k.tip in ('ODB','SK0'))
-               --('1508','1528','2068','2078','2088','2108','2118','2128','2138',
-               --          '2208','2238','2607','2627','2657','3118','3570','3578')
-                         and k.rez<>0 THEN
+            if (k.tip in ('SN ','SNO') or 
+               (k.nbs in ('3570') and k.ob22 in ('01','02','03','04','09','11','13','14','15','16','17','18','19','20','21','22',
+                                               '23','24','25','26','27','28','29','30','31','32','33','34','35','36')) or 
+               (k.nbs in ('3578') and k.ob22 in ('01','05','09','15','17','19','21','24','26','28','30','32','33','34','35','36',
+                                               '37','38'))) and k.rez<>0 THEN
                se1_ := -k.bv*100;
 
                begin
@@ -243,7 +244,7 @@ begin
                   l_rezq_30:= gl.p_icurval (k.kv, (k.rez)*100, dat31_)/100;
                   l_rez_0  := 0;  l_rezq_0 := 0;
 
-            elsif k.tip in ('SK9','OFR') and k.rez<>0  THEN   --k.nbs in ('3579') and k.rez<>0  THEN
+            elsif (k.tip in ('SK9','OFR') or k.nbs in ('3570','3578')) and k. nbs not in ('3548') and k.rez<>0  THEN   --k.nbs in ('3579') and k.rez<>0  THEN
                   o_se_2   := -k.bv*100; l_rez_30 := k.rez; l_rezq_30:= k.rezq;
                   l_rez_0  := 0        ; l_rezq_0 := 0    ; 
             else

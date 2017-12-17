@@ -117,7 +117,7 @@ declare
   pragma exception_init( E_REF_CNSTRN_EXISTS, -02275 );
 begin
   execute immediate q'[alter table DPU_TYPES_OB22 add constraint FK_DPUTYPESOB22_DPUNBS4CUST foreign key (K013,NBS_DEP)
-  references DPU_NBS4CUST (K013,NBS_DEP) ON DELETE CASCADE]';
+  references DPU_NBS4CUST (K013,NBS_DEP) ON DELETE CASCADE NOVALIDATE]';
   dbms_output.put_line( 'Table altered.' );
 exception
   when E_REF_CNSTRN_EXISTS
@@ -129,7 +129,7 @@ declare
   E_REF_CNSTRN_EXISTS exception;
   pragma exception_init( E_REF_CNSTRN_EXISTS, -02275 );
 begin
-  execute immediate q'[alter table DPU_TYPES_OB22 add constraint FK_DPUTYPESOB22_SBOB22_INT foreign key (NBS_DEP,OB22_DEP)
+  execute immediate q'[alter table DPU_TYPES_OB22 add constraint FK_DPUTYPESOB22_SBOB22_DEP foreign key (NBS_DEP,OB22_DEP)
   references SB_OB22 (R020,OB22) ON DELETE CASCADE]';
   dbms_output.put_line( 'Table altered.' );
 exception

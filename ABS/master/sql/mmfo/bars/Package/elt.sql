@@ -2047,7 +2047,7 @@ for k in (SELECT d.ND, d.CC_ID, d.SDATE, c.OKPO,
       EXCEPTION
         WHEN NO_DATA_FOUND THEN    pnt:=71;
 
-          OP_REG(9,0,0,0,tmp_,k.rnk,nls8_,n980_, nms8_,'OFR',k.isp,acc8_);
+          OP_REG(9,0,0,0,tmp_,k.rnk,nls8_,n980_, nms8_,'ODB',k.isp,acc8_);
 
           p_setAccessByAccMask(acc8_,k.acc);
 

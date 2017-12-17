@@ -563,7 +563,7 @@ FUNCTION  F_ELT_TAR_PAK (p_ND INT) RETURN NUMBER is
   select acc26 into l_acc from e_deal where nd=p_nd;
 
     begin
-    SELECT  to_number(translate(w.VALUE,'.',','), '9999D99') into n_tpak
+    SELECT  to_number(translate(w.VALUE,'.',','), '9999D99','NLS_NUMERIC_CHARACTERS='', ''') into n_tpak
     FROM   AccountsW W
     WHERE  w.acc=l_acc
            and w.TAG='SHTAR' and w.VALUE is not null;
@@ -867,7 +867,7 @@ BEGIN
       pnt:=-2;
       if l_mfop = '300465' or l_MFO='300465' then
          begin
-         SELECT to_number(translate(w.VALUE,'.',','), '9999D99') into n_tar_pak
+         SELECT to_number(translate(w.VALUE,'.',','), '9999D99','NLS_NUMERIC_CHARACTERS='', ''') into n_tar_pak
          FROM   AccountsW W
          WHERE  w.acc=k.acc
                 and w.TAG='SHTAR' and w.VALUE is not null;
@@ -1848,7 +1848,7 @@ for k in (SELECT d.ND, d.CC_ID, d.SDATE, c.OKPO,
 
     if l_mfop = '300465' or l_MFO='300465' then
        begin pnt:=2;
-         SELECT to_number(translate(w.VALUE,'.',','), '9999D99') into n_tar_pak
+         SELECT to_number(translate(w.VALUE,'.',','), '9999D99','NLS_NUMERIC_CHARACTERS='', ''') into n_tar_pak
          FROM   AccountsW W
          WHERE  w.acc=k.acc
                 and w.TAG='SHTAR' and w.VALUE is not null;
