@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view V_ACCOUNTS ***
 
-  CREATE OR REPLACE FORCE VIEW BARS.V_ACCOUNTS ("ACC", "NLS", "NLSALT", "KV", "LCV", "DIG", "DENOM", "KF", "BRANCH", "TOBO", "NBS", "NBS2", "DAOS", "DAPP", "ISP", "RNK", "NMS", "LIM", "OST", "OSTB", "OSTC", "OSTF", "OSTQ", "OSTX", "DOS", "KOS", "DOSQ", "KOSQ", "PAP", "TIP", "VID", "TRCN", "MDATE", "DAZS", "SEC", "ACCC", "BLKD", "BLKK", "POS", "SECI", "SECO", "GRP", "OB22", "NOTIFIER_REF", "BDATE", "OPT", "FIO") AS 
+  CREATE OR REPLACE FORCE VIEW BARS.V_ACCOUNTS ("ACC", "NLS", "NLSALT", "KV", "LCV", "DIG", "DENOM", "KF", "BRANCH", "TOBO", "NBS", "NBS2", "DAOS", "DAPP", "ISP", "RNK", "NMS", "LIM", "OST", "OSTB", "OSTC", "OSTF", "OSTQ", "OSTX", "DOS", "KOS", "DOSQ", "KOSQ", "PAP", "TIP", "VID", "TRCN", "MDATE", "DAZS", "SEC", "ACCC", "BLKD", "BLKK", "POS", "SECI", "SECO", "GRP", "OB22", "NOTIFIER_REF", "BDATE", "OPT", "FIO", "INTACCN") AS 
   SELECT "ACC",
           "NLS",
           "NLSALT",
@@ -54,7 +54,8 @@ PROMPT *** Create  view V_ACCOUNTS ***
           "NOTIFIER_REF",
           "BDATE",
           "OPT",
-          "FIO"
+          "FIO",
+		  "INTACCN"
      FROM v_tobo_accounts_lite;
 
 PROMPT *** Create  grants  V_ACCOUNTS ***
