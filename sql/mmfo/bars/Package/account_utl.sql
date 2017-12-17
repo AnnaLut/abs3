@@ -182,7 +182,9 @@ create or replace package body account_utl as
             select *
             into   l_accounts_row
             from   accounts a
-            where  a.nls = p_account_number and
+            where  (a.nls = p_account_number or
+                    a.nlsalt = p_account_number and
+                    a.dat_alt is not null ) and
                    a.kv = p_currency_id and
                    a.kf = p_mfo
             for update;
@@ -190,7 +192,9 @@ create or replace package body account_utl as
             select *
             into   l_accounts_row
             from   accounts a
-            where  a.nls = p_account_number and
+            where  (a.nls = p_account_number or
+                    a.nlsalt = p_account_number and
+                    a.dat_alt is not null )  and
                    a.kv = p_currency_id and
                    a.kf = p_mfo;
         end if;

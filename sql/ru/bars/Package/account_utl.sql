@@ -115,7 +115,9 @@ CREATE OR REPLACE PACKAGE BODY BARS.ACCOUNT_UTL as
             select *
             into   l_accounts_row
             from   accounts a
-            where  a.nls = p_account_number and
+            where  (a.nls = p_account_number or
+                    a.nlsalt = p_account_number and 
+                    a.dat_alt is not null) and
                    a.kv = p_currency and
                    a.kf = p_branch
             for update;
@@ -123,7 +125,9 @@ CREATE OR REPLACE PACKAGE BODY BARS.ACCOUNT_UTL as
             select *
             into   l_accounts_row
             from   accounts a
-            where  a.nls = p_account_number and
+            where  (a.nls = p_account_number or
+                    a.nlsalt = p_account_number and
+                    a.dat_alt is not null ) and
                    a.kv = p_currency and
                    a.kf = p_branch;
         end if;
