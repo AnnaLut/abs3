@@ -6,8 +6,7 @@ angular.module("BarsWeb.Areas")
         var proectId = bars.extension.getParamFromUrl('proectId', localUrl);
         var cardCode = bars.extension.getParamFromUrl('cardCode', localUrl);
 
-//        var portfolioUrl = "/barsroot/Way4Bpk/Way4Bpk";
-		var portfolioUrl = "/barsroot/barsweb/dynform.aspx?form=bpkw4.frm.portfolio";
+        var portfolioUrl = "/barsroot/Way4Bpk/Way4Bpk";
     
         $scope.model = null;
         $scope.params = {
@@ -22,14 +21,13 @@ angular.module("BarsWeb.Areas")
             bars.ui.loader('body', false);
             bars.ui.success({
                 text: "Договір збережено №" + ND,
-                close: function () { 
-					$window.location.href = portfolioUrl; 
-				}
+                close: function () { $window.location.href = portfolioUrl+"?nd="+ND; }
             });
         };
-    
+
         $http.get(bars.config.urlContent('/bpkw4/RegisteringNewCard/GetIsIns?cardCode=' + cardCode))
             .then(function (request) {
+
                 $scope.params.isIns = request.data.haveins;
                 $scope.params.insUkrId = request.data.insUkrId;
                 $scope.params.insWrdId = request.data.insWrdId;
