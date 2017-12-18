@@ -9,10 +9,8 @@ BEGIN
                  AND a.daos = a.dazs
                  AND ree.fn_o IS NULL)
   LOOP
-    bc.go(rec.kf);
     DELETE FROM ree_tmp r
-     WHERE r.kf = rec.kf
-       AND r.nls = rec.nls
+     WHERE r.nls = rec.nls
        AND r.kv = rec.kv
        AND r.odat = rec.odat
        AND r.fn_o IS NULL;
