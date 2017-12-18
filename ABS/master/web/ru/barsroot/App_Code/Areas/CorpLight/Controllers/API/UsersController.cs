@@ -112,22 +112,31 @@ namespace BarsWeb.Areas.CorpLight.Controllers.Api
        /// Validate mobile phone
        /// </summary>
        /// <param name="phoneNumber"></param>
-        [POST("api/CorpLight/Users/validateMobilePhone")]
-        public void ValidateMobilePhone(string phoneNumber)
+        [POST("api/CorpLight/Users/validateMobilePhone/{phoneNumber}")]
+        public HttpResponseMessage ValidateMobilePhone(string phoneNumber)
         {
-            var confirmPhoneList = GetConfirmPhoneList();
-            var curentPhone = confirmPhoneList.FirstOrDefault(i => i.Phone == phoneNumber);
-            if (curentPhone == null)
+            try
             {
-                curentPhone = new defaultWebService.ConfirmPhone
+ var confirmPhoneList = GetConfirmPhoneList();
+                var phone = phoneNumber.Replace(" ", "+");
+                var curentPhone = confirmPhoneList.FirstOrDefault(i => i.Phone == phone);
+                if (curentPhone == null)
                 {
-                    Phone = phoneNumber,
-                    Secret = GetSecret()
-                };
-                var smsStatus = SendSms(phoneNumber, "You secure code is " + curentPhone.Secret);
+                    curentPhone = new defaultWebService.ConfirmPhone
+                    {
+                        Phone = phone,
+                        Secret = GetSecret()
+                    };
+                    _relatedCustRepository.SendSms(curentPhone.Phone, "Your secure code is " + curentPhone.Secret);
 
-                confirmPhoneList.Add(curentPhone);
+                    confirmPhoneList.Add(curentPhone);
+                }
             }
+            catch(Exception ex)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.BadRequest, ex.Message);
+            }
+            return Request.CreateResponse(HttpStatusCode.OK, new { Status = "Ok", Message = "Успішно" });
         }
         /// <summary>
         /// Send sms method
@@ -135,15 +144,10 @@ namespace BarsWeb.Areas.CorpLight.Controllers.Api
         /// <param name="phone"></param>
         /// <param name="message"></param>
         /// <returns></returns>
-        private SMSInfo SendSms(string phone, string message)
-        {
-            var smsProvider = new send_sms();
-            return smsProvider.Send(phone, message);
-        }
         private string GetSecret()
         {
             var randObj = new Random((int)DateTime.Now.Ticks & 0x0000FFFF);
-            return string.Format("{0:F8}", randObj.NextDouble());
+            return string.Format("{0:F0}", randObj.Next(10000000, 99999999));
         }
 
         /// <summary>

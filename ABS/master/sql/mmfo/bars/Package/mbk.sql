@@ -504,6 +504,7 @@ begin
            ElsIf l_NBS = '1523'	 then  l_NBS := '1524' ;
            ElsIf l_NBS = '1624'	 then  l_NBS := '1623' ;
            ElsIf l_NBS = '1627'	 then  l_NBS := '1623' ;
+		   ElsIf l_NBS = '2700'	 then  l_NBS := '2701' ;
 
            end if;
 

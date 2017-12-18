@@ -47,3 +47,7 @@ border-top:1px solid #eee; padding:10px; text-align:center
 #acskRulesWindow .row {
     padding: 5px;
 }
+
+.k-grid-header {
+    padding-right: 17px !important;
+}

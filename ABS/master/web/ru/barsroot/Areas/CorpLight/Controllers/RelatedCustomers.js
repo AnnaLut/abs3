@@ -86,8 +86,12 @@
 
             
             var validateEmail = function (email) {
-                var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-                return re.test(email);
+                var emailPattern = /^[a-z0-9_.-]+@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                var check = emailPattern.test(email.toLowerCase());
+                if (check){
+                    vm.currentUser.Email = email.toLowerCase();
+                }
+                return check;
             }
             vm.validateMobilePhone = function () {
                 var phoneNum = vm.currentUser.CellPhone;
@@ -356,10 +360,10 @@
                     return false;
                 }
 
-                /*if (!vm.currentUser.isConfirmedPhone && !vm.currentUser.isMappingCustomers) {
+                if (!vm.currentUser.isConfirmedPhone && !vm.currentUser.isMappingCustomers) {
                     bars.ui.error({ text: 'Не підтверджено мобільний телефон.' });
                     return false;
-                } */
+                }
 
                 return true;
             }
@@ -566,7 +570,7 @@
                         '&bankId=' + document.getElementById('bankId').value),
                     success: function (data, textStatus, jqXHR) {
                         bars.ui.loader(userForm, false);
-                        bars.ui.notify('Успішно!', 'Користувача розблоковано', 'success');
+                        bars.ui.notify('Успішно!', 'Користувача заблоковано', 'success');
                         vm.relatedCustomersGrid.dataSource.read();
                     },
                     error: function () {
@@ -588,7 +592,7 @@
                         '&bankId=' + document.getElementById('bankId').value),
                     success: function (data, textStatus, jqXHR) {
                         bars.ui.loader(userForm, false);
-                        bars.ui.notify('Успішно!', 'Користувача заблоковано', 'success');
+                        bars.ui.notify('Успішно!', 'Користувача розблоковано', 'success');
                         vm.relatedCustomersGrid.dataSource.read();
                     },
                     error: function () {
@@ -1354,7 +1358,7 @@
                     }, {
                         field: 'LockoutEnabled',
                         title: ' ',
-                        width: '150px',
+                        width: '160px',
                         filterable: false,
                         sortable: false,
                         template: function (data) {
@@ -1380,8 +1384,8 @@
                                             data.Id + ',' + data.CustId + ')">\
                                             Підтвердити\
                                         </button>';
-                                html += '<button style="min-width: 40px;" class="k-button" ng-click="deleteRequest(\'' + data.Id + '\', \'' + data.CustId + '\');" title="Видалити">\
-                                            <i style="font-size:18px;" class="fa fa-times-circle text-danger"></i> видалити\
+                                html += '<button style="min-width: 40px;" class="k-button" ng-click="deleteRequest(\'' + data.Id + '\', \'' + data.CustId + '\');" title="Відхилити">\
+                                            <i style="font-size:18px;" class="fa fa-times-circle text-danger"></i> Відхилити\
                                         </button>';
                             }
                             //if (data.IsApproved) {
@@ -1396,7 +1400,7 @@
                     }, {
                         field: 'LockoutEnabled',
                         title: 'АЦСК',
-                        width: '200px',
+                        width: '190px',
                         filterable: false,
                         sortable: false,
                         template: function (data) {
@@ -1414,7 +1418,7 @@
                                     html +=
                                         '<button style="min-width: 40px;" class="k-button" '
                                                     + 'ng-click="sendProfileToAcsk(' + data.Id + ');" '
-                                                    + 'title="Відправити дані клієнта в АЦСК">\
+                                                    + 'title="Відправити дані користувача в АЦСК">\
                                             <i style="font-size:18px;" class="fa fa-paper-plane"></i>\
                                         </button>';
                                 }

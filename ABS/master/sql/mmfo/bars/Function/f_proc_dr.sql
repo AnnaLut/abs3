@@ -14,6 +14,10 @@ update cc_vidd set name ='Залучення 1622--Кредити залученi за операцiями репо'  
 update cc_vidd set name ='Залучення 1623 - Кредити  короткострокові'               where vidd = 1623   ;
 update cc_vidd set name ='Залучення 1623 - Кредити  довгострокові'                 where vidd = 1624   ;
 
+update cc_vidd set name ='Залучення 2701 -  короткострокові кредити, залучені Банком від інших організацій'  where vidd = 2700;
+update cc_vidd set name ='Залучення 2701 - довгострокові кредити, залучені Банком від інших організацій' '   where vidd = 2701;
+
+
 commit;
 */
 
@@ -72,6 +76,7 @@ BEGIN
      ElsIf p_nbs  in ('1623') then nbs_ := '7017'; if  p_kv = 980 then ob22_ := '06'; else ob22_:= '05'; End If ;  ---кредити, що наданў ўншим банкам за операцўями репо
      ElsIf p_nbs  in ('1624') then nbs_ := '7017'; if  p_kv = 980 then ob22_ := '02'; else ob22_:= '01'; End If ;  ---довгостроковў  кредити, якў наданў ўншим банкам
      ElsIf p_nbs  in ('2701') then nbs_ := '7060'; ob22_ := '03';
+	 ElsIf p_nbs  in ('2700') then nbs_ := '7060'; ob22_ := '01';
    end if;
 
      begin select acc into l_acc67  FROM accounts  WHERE nls = NBS_ob22(NBS_, OB22_) and kv = gl.baseval;

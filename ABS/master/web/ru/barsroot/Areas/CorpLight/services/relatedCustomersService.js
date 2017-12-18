@@ -15,7 +15,7 @@ angular.module(globalSettings.modulesAreas)
 
             var _getFOPData = function (custId) {
                 var deferred = $q.defer();
-
+                 
                 $http.get(bars.config.urlContent('/api/corplight/customers/getfopdata/' + custId))
                 .success(function (response) {
                     deferred.resolve(response);
@@ -27,7 +27,7 @@ angular.module(globalSettings.modulesAreas)
 
             var _getCustomerRelatedCustomers = function (custId) {
                 var deferred = $q.defer();
-
+                 
                 $http.get(bars.config.urlContent('/api/corplight/GetCustomerRelatedCustomers/' + custId))
                 .success(function (response) {
                     deferred.resolve(response);
@@ -39,6 +39,7 @@ angular.module(globalSettings.modulesAreas)
 
             var _getModuleVersion = function() {
                 var deferred = $q.defer();
+                 
                 $http.get(bars.config.urlContent('/corplight/version')).success(function (response) {
                     deferred.resolve(response);
                 }).error(function (response) {
@@ -49,10 +50,10 @@ angular.module(globalSettings.modulesAreas)
 
             var mapResponse = function (data) {
                 if (data && data.DocDate) {
-                    data.DocDate = new Date(data.DocDate.match(/\d+/)[0] * 1);
+                    data.DocDate = kendo.parseDate(data.DocDate);
                 }
                 if (data && data.BirthDate) {
-                    data.BirthDate = new Date(data.BirthDate.match(/\d+/)[0] * 1);
+                    data.BirthDate = kendo.parseDate(data.BirthDate);
                 }
                 return data;
             }
@@ -60,7 +61,7 @@ angular.module(globalSettings.modulesAreas)
             var _getById = function(id, custId) {
                 state.isLoading = true;
                 var deferred = $q.defer();
-
+                 
                 $http.get(_url + 'getById/' + id + '/' + custId).success(function(response) {
                     state.isLoading = false;
                     var result = mapResponse(response);
@@ -74,7 +75,7 @@ angular.module(globalSettings.modulesAreas)
             var _getByTaxCode = function(taxCode, custId) {
                 state.isLoading = true;
                 var deferred = $q.defer();
-
+                 
                 $http.get(_url + 'getByTaxCode/' + taxCode + '/' + custId).success(function (response) {
                     state.isLoading = false;
                     var result = mapResponse(response);
@@ -89,6 +90,7 @@ angular.module(globalSettings.modulesAreas)
                 state.isLoading = true;
                 var deferred = $q.defer();
 
+                 
                 $http.get(_url + custId).success(function(response) {
                     state.isLoading = false;
                     deferred.resolve(response);
@@ -158,7 +160,7 @@ angular.module(globalSettings.modulesAreas)
                 state.isLoading = true;
                 var deferred = $q.defer();
 
-                $http.post(bars.config.urlContent('/corpLight/users/validateMobilePhone'), { phoneNumber: phoneNum})
+                $http.post(bars.config.urlContent('/api/CorpLight/Users/validateMobilePhone/?phoneNumber=' + phoneNum))
                 .success(function (response) {
                     state.isLoading = false;
                     deferred.resolve(response);

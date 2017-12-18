@@ -12,6 +12,8 @@ using CorpLight.Users.Models.Enums;
 using Models;
 using BarsWeb.Areas.CorpLight.Infrastructure.Services;
 using System.Text.RegularExpressions;
+using Bars.Classes;
+using Oracle.DataAccess.Client;
 
 // ReSharper disable once CheckNamespace
 namespace BarsWeb.Areas.CorpLight.Infrastructure.Repository
@@ -133,6 +135,34 @@ namespace BarsWeb.Areas.CorpLight.Infrastructure.Repository
             return result;
         }
 
+public bool IsExistByEmail(string email)
+        {
+            var sql = @"select 
+                            count(*) 
+                        from 
+                            MBM_REL_CUSTOMERS
+                        where 
+                            email = :p_email";
+            var result = _entities.ExecuteStoreQuery<decimal>(sql, email).FirstOrDefault();
+
+            var IsClUsers = _usersManage.GetAllUsers().FirstOrDefault(x => x.Email == email);
+
+            return result > 0 || IsClUsers != null ? true : false;
+
+        }
+
+        public bool IsExistByPhone(string phone)
+        {
+            var sql = @"select 
+                            count(*) 
+                        from 
+                            MBM_REL_CUSTOMERS
+                        where 
+                            CELL_PHONE = :phone";
+            var result = _entities.ExecuteStoreQuery<decimal>(sql, phone).FirstOrDefault();
+            var IsClUsers = _usersManage.GetAllUsers().FirstOrDefault(x => x.PhoneNumber == phone);
+            return result > 0 || IsClUsers != null ? true : false;
+        }
         public IEnumerable<RelatedCustomer> GetAll(decimal custId)
         {
             var sql = string.Format(baseSql, "") + " where um.cust_id = :p_cust_id";
@@ -229,7 +259,7 @@ namespace BarsWeb.Areas.CorpLight.Infrastructure.Repository
         public void Add(RelatedCustomer relatedCustomer)
         {
             var id = _entities.ExecuteStoreQuery<decimal>(
-                "select MBM_REL_CUST_SEQ.nextval from dual").FirstOrDefault();
+                "select bars_sqnc.get_nextval('mbm_rel_cust_seq') from dual").FirstOrDefault();
 
             var sql = @"Insert into MBM_REL_CUSTOMERS
                             (ID, 
@@ -611,6 +641,20 @@ namespace BarsWeb.Areas.CorpLight.Infrastructure.Repository
             return result;
         }
 
+        public void SendSms(string phone, string message)
+        {
+            
+            var sql = new Kernel.Models.BarsSql {
+                SqlText = @"begin 
+                                BARS.p_clt_sendsms(:p_phone, :p_msg_text); 
+                            end;",
+                 SqlParams = new object[] {
+                     new OracleParameter("p_phone", OracleDbType.Varchar2) { Value = phone },
+                     new OracleParameter("p_msg_text", OracleDbType.Varchar2) { Value = message }
+                 }
+            };
+            int res = _entities.ExecuteStoreCommand(sql.SqlText, sql.SqlParams);
+        }
     }
 
     /// <summary>
@@ -728,5 +772,8 @@ namespace BarsWeb.Areas.CorpLight.Infrastructure.Repository
         /// <param name="val"></param>
         void SetAcskActual(decimal relCustId, decimal val);
 
+        void SendSms(String phone, String message);
+        bool IsExistByEmail(string email);
+        bool IsExistByPhone(string phone);
     }
 }
