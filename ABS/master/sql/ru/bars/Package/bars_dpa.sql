@@ -1202,7 +1202,7 @@ begin
            or l_filedigit in ('1','2') and substr(fn,2,1) = l_filetype
             )
         and substr(fn,2,1) in ('F', 'P', 'K')
-        and substr(fn,4) = substr(p_filename,4)
+        and substr(fn,1) = substr(p_filename,1)
         and dat > sysdate-30;
   exception when no_data_found then
      raise_application_error(-20000, ' витанц≥€ на не≥снуючий файл', true);
