@@ -7,7 +7,7 @@
             { TypeId: 'DEPOSIT', TypeName: 'Депозитні рахунки' },
             { TypeId: 'LOAN', TypeName: 'Кредитні рахунки' }
         ];
-    }
+    };
 
     function getTypeNameById(id) {
         var data = getTypeDropDownEditor();
@@ -17,16 +17,7 @@
             }
         }
         return '';
-    }
-
-    function typeDropDownEditor(container, options) {
-        $('<input required data-text-field="TypeName" data-value-field="TypeId" data-bind="value:' + options.field + '"/>')
-            .appendTo(container)
-            .kendoDropDownList({
-                autoBind: false,
-                dataSource: getTypeDropDownEditor()
-            });
-    }
+    };
 
     function getTransportObject(type) {
         return {
@@ -40,10 +31,20 @@
             error: function () {
 
             },
-            complete: function() {
+            complete: function () {
             }
         };
-    }
+    };
+
+    function addNewNbs() {
+        $('#typeId')
+            .kendoDropDownList({
+                autoBind: false,
+                dataSource: getTypeDropDownEditor()
+            });
+        $("#nameNbs").val(null);
+        $("#addNbsWindow").data("kendoWindow").center().open();
+    };
 
     $('#accountsGrid').kendoGrid({
         height: 120,
@@ -55,7 +56,10 @@
         resizable: true,
         filterable: true,
         scrollable: true,
-        toolbar: ["create"],
+        toolbar: [{
+            name: "Add",
+            template: "<button id='addNbsBtn' class='k-button'>Додати</button>"
+        }],
         pageable: {
             refresh: true,
             pageSizes: [10, 20, 50, 100, 200],
@@ -64,7 +68,7 @@
         dataBound: function (e) {
             bars.extension.kendo.grid.noDataRow(e);
         },
-        dataSource:new kendo.data.DataSource({
+        dataSource: new kendo.data.DataSource({
             type: 'webapi',
             pageSize: 10,
             page: 1,
@@ -80,23 +84,23 @@
                     type: 'GET'
                 },
                 create: {
-                        url: bars.config.urlContent('/api/corplight/accounts'),
-                        type: 'POST',
-                        success: function() {
-                            debugger
-                            $('#accountsGrid').data('kendoGrid').dataSource.read();
-                            bars.ui.notify('Успішно', 'Зміни успішно збережено', 'success');
-                        },
-                        error: function() {
-                            debugger
-                            alert()
-                        },
-                        coplete: function() {
-                            debugger
-                            $('#accountsGrid').data('kendoGrid').dataSource.read();
-                            bars.ui.notify('Успішно', 'Зміни успішно збережено', 'success');
-                        }
-                    
+                    url: bars.config.urlContent('/api/corplight/accounts'),
+                    type: 'POST',
+                    success: function () {
+                        debugger
+                        $('#accountsGrid').data('kendoGrid').dataSource.read();
+                        bars.ui.notify('Успішно', 'Зміни успішно збережено', 'success');
+                    },
+                    error: function () {
+                        debugger
+                        alert()
+                    },
+                    coplete: function () {
+                        debugger
+                        $('#accountsGrid').data('kendoGrid').dataSource.read();
+                        bars.ui.notify('Успішно', 'Зміни успішно збережено', 'success');
+                    }
+
                 },
                 destroy: getTransportObject('DELETE')
             },
@@ -134,13 +138,12 @@
             {
                 field: 'TypeId',
                 title: 'Код модуля',
-                width: '180px',
-                editor: typeDropDownEditor
+                width: '180px'
             },
             {
                 field: 'TypeName',
                 title: 'Назва модуля',
-                template: function(data) {
+                template: function (data) {
                     if (data.TypeName) {
                         return data.TypeName;
                     } else {
@@ -153,35 +156,72 @@
             },
             {
                 command: [
-                {
-                    name: "Видалити",
-                    click: function (e) {  //add a click event listener on the delete button
-                        console.log(e);
-                        var grid = $('#accountsGrid').data('kendoGrid');
-                        var tr = $(e.target).closest("tr"); //get the row for deletion
-                        var data = this.dataItem(tr); //get the row data so it can be referred later
-                        bars.ui.confirm({
-                            text: 'Ви впевнені, що хочете видатити рахунок ' + data.Nbs,
-                            func: function () {
-                                var params = {
-                                    url: bars.config.urlContent('/api/corplight/accounts'),
-                                    //dataType: 'json',
-                                    type: 'DELETE',
-                                    data: { Nbs: data.Nbs, TypeId: data.TypeId },
-                                    success: function() {
-                                        bars.ui.notify('Успішно', 'Зміни успішно збережено', 'success');
-                                        grid.dataSource.read();
-                                    }
-                                };
-                                $.ajax(params);
+                    {
+                        name: "Видалити",
+                        click: function (e) {  //add a click event listener on the delete button
+                            console.log(e);
+                            var grid = $('#accountsGrid').data('kendoGrid');
+                            var tr = $(e.target).closest("tr"); //get the row for deletion
+                            var data = this.dataItem(tr); //get the row data so it can be referred later
+                            bars.ui.confirm({
+                                text: 'Ви впевнені, що хочете видатити рахунок ' + data.Nbs,
+                                func: function () {
+                                    var params = {
+                                        url: bars.config.urlContent('/api/corplight/accounts'),
+                                        //dataType: 'json',
+                                        type: 'DELETE',
+                                        data: { Nbs: data.Nbs, TypeId: data.TypeId },
+                                        success: function () {
+                                            bars.ui.notify('Успішно', 'Зміни успішно збережено', 'success');
+                                            grid.dataSource.read();
+                                        }
+                                    };
+                                    $.ajax(params);
 
-                            }
-                        });
-                    }
-                }],
+                                }
+                            });
+                        }
+                    }],
                 title: "&nbsp;",
                 width: "250px"
             }
         ]
+    });
+
+    $("#addNbsBtn").click(function () {
+        addNewNbs();
+    });
+
+    $("#btnOk").click(function () {
+        var accType = new Object();
+        accType.Nbs = $("#nameNbs").val(),
+        accType.TypeId = $('#typeId').val(),
+        accType.TypeName = getTypeNameById($('#typeId').val())
+        if (accType.Nbs != "" && accType.Nbs != undefined && accType.TypeId != "" && accType.TypeId != undefined)
+        {
+            $.ajax({
+                method: "POST",
+                dataType: "json",
+                data: accType,
+                async: false,
+                url: bars.config.urlContent('/api/corplight/accounts'),
+                success: function (response) {
+                    $('#accountsGrid').data('kendoGrid').dataSource.read();
+                    bars.ui.notify('Успішно', 'Зміни успішно збережено', 'success');
+                },
+                error: function (response) {
+                    bars.ui.notify('Увага', 'Виникла помилка', 'error');
+                }
+            });
+            $("#addNbsWindow").data("kendoWindow").close();
+        }
+        else
+        {
+            bars.ui.notify('Увага', 'Не заповнені поля', 'error');
+        }
+    });
+
+    $("#btnCancel").click(function () {
+        $("#addNbsWindow").data("kendoWindow").close();
     });
 });

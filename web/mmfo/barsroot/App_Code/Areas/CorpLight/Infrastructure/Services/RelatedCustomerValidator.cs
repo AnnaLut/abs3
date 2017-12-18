@@ -4,6 +4,7 @@ using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using BarsWeb.Areas.CorpLight.Infrastructure.Repository;
 using Models;
+using BarsWeb.Areas.CorpLight.Models;
 
 namespace BarsWeb.Areas.CorpLight.Infrastructure.Services
 {
@@ -70,20 +71,29 @@ namespace BarsWeb.Areas.CorpLight.Infrastructure.Services
             }
             return false;
         }
-        public bool IsExistByEmail(string email)
+
+        public bool IsEmailEdited(string email, decimal? id)
         {
             var sql = @"select 
-                            count(*) 
+                            *
                         from 
                             MBM_REL_CUSTOMERS
                         where 
-                            email = :p_email";
-            var result = _entities.ExecuteStoreQuery<decimal>(sql, email).FirstOrDefault();
-            if (result > 0)
-            {
-                return true;
-            }
-            return false;
+                            id = :id";
+            var result = _entities.ExecuteStoreQuery<RelatedCustomer>(sql, id).FirstOrDefault();
+            return result.Email != email ? true : false;
+        }
+
+        public bool IsPhoneEdited(string phone, decimal? id)
+        {
+            var sql = @"select 
+                            count(*)
+                        from 
+                            MBM_REL_CUSTOMERS
+                        where 
+                            id = :id and  CELL_PHONE = :phone";
+            var result = _entities.ExecuteStoreQuery<decimal>(sql, id, phone).FirstOrDefault();
+            return result > 0 ? false : true;
         }
     }
 
@@ -91,6 +101,7 @@ namespace BarsWeb.Areas.CorpLight.Infrastructure.Services
     {
         bool CustomerIsMapped(decimal id, decimal custId);
         bool IsExistByParameters(string taxCode, string phoneNumber, string email);
-        bool IsExistByEmail(string email);
+        bool IsEmailEdited(string email, decimal? custId);
+        bool IsPhoneEdited(string phone, decimal? id);
     }
 }

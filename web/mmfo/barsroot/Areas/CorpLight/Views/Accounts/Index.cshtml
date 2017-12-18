@@ -39,9 +39,37 @@
         line-height: 1.3em;
         font-size: 1.3em;
     }
+
+    td {
+        padding: 5px;
+    }
 </style>
-<script src="@Url.Content("~/scripts/respond.min.js")"></script>
-<script src="@Url.Content("~/Areas/CorpLight/Scripts/Accounts.js")"></script>
+<script src="~/scripts/respond.min.js"></script>
+<script src="~/Areas/CorpLight/Scripts/Accounts.js"></script>
 <h1>Доступ до рахунків CorpLight</h1>
 
 <div id="accountsGrid"></div>
+<div id="addNbsWindow" kendo-window hidden="hidden" k-title="'Додати'" k-modal="true">
+    <form>
+        <table>
+            <tbody>
+                <tr>
+                    <td>Балансовий рахунок</td>
+                    <td>
+                        <input id="nameNbs" class="k-input" type="number" style="width: 153px" required />
+                    </td>
+                </tr>
+                <tr>
+                    <td>Назва модуля</td>
+                    <td>
+                        <input id="typeId" data-text-field="TypeName" data-value-field="TypeId" required/>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="k-content k-window-footer">
+            <button id="btnOk" type="submit" class="delete-confirm k-button k-primary" style="float:right;margin:7px 5px 7px 5px;"><span class="k-icon k-i-tick"></span> Додати</button>
+            <button id="btnCancel" class="delete-confirm k-button" style="float:right;margin:7px 5px 7px 5px;">Відмінити</button>
+        </div>
+    </form>
+</div>

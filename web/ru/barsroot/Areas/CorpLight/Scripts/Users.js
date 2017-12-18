@@ -654,7 +654,7 @@ function lockUser(userId) {
             '&bankId=' + document.getElementById('bankId').value),
         success: function () {
             bars.ui.loader(userForm, false);
-            bars.ui.notify('Успішно!', 'Користувача розблоковано', 'success');
+            bars.ui.notify('Успішно!', 'Користувача заблоковано', 'success');
             $("#existingUserList").html('');
             loadCustomerUsers();
         },
@@ -677,7 +677,7 @@ function unLockUser(userId) {
             '&bankId=' + document.getElementById('bankId').value),
         success: function () {
             bars.ui.loader(userForm, false);
-            bars.ui.notify('Успішно!', 'Користувача заблоковано', 'success');
+            bars.ui.notify('Успішно!', 'Користувача розблоковано', 'success');
             $("#existingUserList").html(''),
             loadCustomerUsers();
         },

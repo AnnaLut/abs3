@@ -215,14 +215,25 @@ namespace BarsWeb.Areas.CorpLight.Controllers.Api
         [PUT("api/corpLight/RelatedCustomers/{id}")]
         public HttpResponseMessage Put(decimal id, RelatedCustomer relatedCustomer)
         {
-            var existUser = _relaredCustRepository.GetAll((decimal)relatedCustomer.CustId).FirstOrDefault(x =>x.CellPhone == relatedCustomer.CellPhone && x.Email==relatedCustomer.Email);
-            if (_relCustValidator.IsExistByEmail(relatedCustomer.Email) && existUser == null)
+ if (_relCustValidator.IsEmailEdited(relatedCustomer.Email, relatedCustomer.Id))
             {
-                return Request.CreateResponse(
-                    HttpStatusCode.BadRequest,
-                    "Користувач з вказаним e-mail вже існує");
-            }
+                if (_relaredCustRepository.IsExistByEmail(relatedCustomer.Email))
+                {
+                    return Request.CreateResponse(
+                   HttpStatusCode.BadRequest,
+                   "Користувач з вказаним e-mail вже існує");
+                }
 
+            }
+            if (_relCustValidator.IsPhoneEdited(relatedCustomer.CellPhone, relatedCustomer.Id))
+            {
+                if (_relaredCustRepository.IsExistByPhone(relatedCustomer.CellPhone))
+                {
+                    return Request.CreateResponse(
+                   HttpStatusCode.BadRequest,
+                   "Користувач з вказаним телефоном вже існує");
+                }
+            }
             _relaredCustRepository.Update(relatedCustomer);
 
             _logger.Info(string.Format(

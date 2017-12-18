@@ -117,16 +117,17 @@ namespace BarsWeb.Areas.CorpLight.Controllers.Api
         {
             try
             {
-                var confirmPhoneList = GetConfirmPhoneList();
-                var curentPhone = confirmPhoneList.FirstOrDefault(i => i.Phone == phoneNumber);
+ var confirmPhoneList = GetConfirmPhoneList();
+                var phone = phoneNumber.Replace(" ", "+");
+                var curentPhone = confirmPhoneList.FirstOrDefault(i => i.Phone == phone);
                 if (curentPhone == null)
                 {
                     curentPhone = new defaultWebService.ConfirmPhone
                     {
-                        Phone = phoneNumber,
+                        Phone = phone,
                         Secret = GetSecret()
                     };
-                    _relatedCustRepository.SendSms(phoneNumber, "Your secure code is " + curentPhone.Secret);
+                    _relatedCustRepository.SendSms(curentPhone.Phone, "Your secure code is " + curentPhone.Secret);
 
                     confirmPhoneList.Add(curentPhone);
                 }

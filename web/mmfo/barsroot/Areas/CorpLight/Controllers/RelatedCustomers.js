@@ -570,7 +570,7 @@
                         '&bankId=' + document.getElementById('bankId').value),
                     success: function (data, textStatus, jqXHR) {
                         bars.ui.loader(userForm, false);
-                        bars.ui.notify('Успішно!', 'Користувача розблоковано', 'success');
+                        bars.ui.notify('Успішно!', 'Користувача заблоковано', 'success');
                         vm.relatedCustomersGrid.dataSource.read();
                     },
                     error: function () {
@@ -592,7 +592,7 @@
                         '&bankId=' + document.getElementById('bankId').value),
                     success: function (data, textStatus, jqXHR) {
                         bars.ui.loader(userForm, false);
-                        bars.ui.notify('Успішно!', 'Користувача заблоковано', 'success');
+                        bars.ui.notify('Успішно!', 'Користувача розблоковано', 'success');
                         vm.relatedCustomersGrid.dataSource.read();
                     },
                     error: function () {
@@ -1358,7 +1358,7 @@
                     }, {
                         field: 'LockoutEnabled',
                         title: ' ',
-                        width: '150px',
+                        width: '160px',
                         filterable: false,
                         sortable: false,
                         template: function (data) {
@@ -1384,8 +1384,8 @@
                                             data.Id + ',' + data.CustId + ')">\
                                             Підтвердити\
                                         </button>';
-                                html += '<button style="min-width: 40px;" class="k-button" ng-click="deleteRequest(\'' + data.Id + '\', \'' + data.CustId + '\');" title="Видалити">\
-                                            <i style="font-size:18px;" class="fa fa-times-circle text-danger"></i> видалити\
+                                html += '<button style="min-width: 40px;" class="k-button" ng-click="deleteRequest(\'' + data.Id + '\', \'' + data.CustId + '\');" title="Відхилити">\
+                                            <i style="font-size:18px;" class="fa fa-times-circle text-danger"></i> Відхилити\
                                         </button>';
                             }
                             //if (data.IsApproved) {
@@ -1400,7 +1400,7 @@
                     }, {
                         field: 'LockoutEnabled',
                         title: 'АЦСК',
-                        width: '200px',
+                        width: '190px',
                         filterable: false,
                         sortable: false,
                         template: function (data) {

@@ -135,6 +135,34 @@ namespace BarsWeb.Areas.CorpLight.Infrastructure.Repository
             return result;
         }
 
+public bool IsExistByEmail(string email)
+        {
+            var sql = @"select 
+                            count(*) 
+                        from 
+                            MBM_REL_CUSTOMERS
+                        where 
+                            email = :p_email";
+            var result = _entities.ExecuteStoreQuery<decimal>(sql, email).FirstOrDefault();
+
+            var IsClUsers = _usersManage.GetAllUsers().FirstOrDefault(x => x.Email == email);
+
+            return result > 0 || IsClUsers != null ? true : false;
+
+        }
+
+        public bool IsExistByPhone(string phone)
+        {
+            var sql = @"select 
+                            count(*) 
+                        from 
+                            MBM_REL_CUSTOMERS
+                        where 
+                            CELL_PHONE = :phone";
+            var result = _entities.ExecuteStoreQuery<decimal>(sql, phone).FirstOrDefault();
+            var IsClUsers = _usersManage.GetAllUsers().FirstOrDefault(x => x.PhoneNumber == phone);
+            return result > 0 || IsClUsers != null ? true : false;
+        }
         public IEnumerable<RelatedCustomer> GetAll(decimal custId)
         {
             var sql = string.Format(baseSql, "") + " where um.cust_id = :p_cust_id";
@@ -615,7 +643,7 @@ namespace BarsWeb.Areas.CorpLight.Infrastructure.Repository
 
         public void SendSms(string phone, string message)
         {
-            phone = phone.Replace(" ", "+");
+            
             var sql = new Kernel.Models.BarsSql {
                 SqlText = @"begin 
                                 BARS.p_clt_sendsms(:p_phone, :p_msg_text); 
@@ -745,6 +773,7 @@ namespace BarsWeb.Areas.CorpLight.Infrastructure.Repository
         void SetAcskActual(decimal relCustId, decimal val);
 
         void SendSms(String phone, String message);
-
+        bool IsExistByEmail(string email);
+        bool IsExistByPhone(string phone);
     }
 }
