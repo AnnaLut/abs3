@@ -262,7 +262,7 @@ CIM.pay_module = function () {
 
     // save frx doc 
     function SaveDocFRX(rf) {
-        window.location = '/barsroot/cim/LoadFile/ExportDoc?rf=' + rf;
+        window.location = '/barsroot/cimmanager/LoadFile/ExportDoc?rf=' + rf;
     }
 
     //#region  Картка документу
