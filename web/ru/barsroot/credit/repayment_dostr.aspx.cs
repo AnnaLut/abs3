@@ -146,10 +146,6 @@ public partial class credit_repayment_dostr : Bars.BarsPage
             LinREF.Text = "0";
             lbRef.Visible = false;
 
-            LinREF2.Visible = false;
-            LinREF2.Text = "0";
-            lbRef2.Visible = false;
-
         }
         form2.DataBind();
     }
@@ -314,9 +310,6 @@ public partial class credit_repayment_dostr : Bars.BarsPage
             Decimal? ND1;
             Decimal? S;
             Decimal? Ref_;
-
-            Decimal? Ref2_;
-
             Int16?   p_gpk_;
            // Decimal? p_mode; //0 - справка, 1 - модификация
             //Decimal? ErrCode;
@@ -354,53 +347,34 @@ public partial class credit_repayment_dostr : Bars.BarsPage
             cmd.Parameters.Add("p_R1", OracleDbType.Decimal, null, ParameterDirection.InputOutput);
             cmd.Parameters.Add("p_R2", OracleDbType.Decimal, null, ParameterDirection.InputOutput);
             cmd.Parameters.Add("p_P1", OracleDbType.Decimal, null , ParameterDirection.Output);
-            cmd.Parameters.Add("p_P2", OracleDbType.Decimal, null, ParameterDirection.Output);
 
 
 
-            //  drl_gpl.SelectedValue = Convert.ToString( p_gpk_); 
+           //  drl_gpl.SelectedValue = Convert.ToString( p_gpk_); 
 
             cmd.ExecuteNonQuery();
             Ref_ = (cmd.Parameters["p_P1"].Status == OracleParameterStatus.Success ? ((OracleDecimal)cmd.Parameters["p_P1"].Value).Value : (Decimal?)null);
-            Ref2_ = (cmd.Parameters["p_P2"].Status == OracleParameterStatus.Success ? ((OracleDecimal)cmd.Parameters["p_P2"].Value).Value : (Decimal?)null);
-
             pb_del.Visible = true;
 
             if (Ref_ != null)
-            {
-                LinREF.Visible = true;
-                lbRef.Visible = true;
-                lbRef.Text = "Документ по тілу (Реф. №): ";
-                LinREF.Text =  Convert.ToString(Ref_);
-                LinREF.NavigateUrl = "/barsroot/documentview/default.aspx?ref=" + Convert.ToString(Ref_) ;
-                LinREF.Attributes.Add("onclick",
-                    "javascript:"+
-                    "window.showModalDialog("+
-                    LinREF.ClientID+".href,"+
-                    "'ModalDialog',"+
-                    "'dialogHeight:600px; dialogLeft:100px; dialogTop:100px; dialogWidth:1100px; help:no; resizable:yes; scroll:yes;'"+
-                    ");"+
-                    "return false;"
-                );
-            }
+            { LinREF.Visible = true;
+            lbRef.Visible = true;
+            lbRef.Text = "Документ Реф. №: ";
+            LinREF.Text =  Convert.ToString(Ref_);
+            LinREF.NavigateUrl = "/barsroot/documentview/default.aspx?ref=" + Convert.ToString(Ref_) ;
+                
 
-            if (Ref2_ != null)
-            {
-                LinREF2.Visible = true;
-                lbRef2.Visible = true;
-                lbRef2.Text = "Документ по відсотках (Реф. №): ";
-                LinREF2.Text = Convert.ToString(Ref2_);
-                LinREF2.NavigateUrl = "/barsroot/documentview/default.aspx?ref=" + Convert.ToString(Ref2_);
-                LinREF2.Attributes.Add("onclick",
-                    "javascript:" +
-                    "window.showModalDialog(" +
-                    LinREF2.ClientID + ".href," +
-                    "'ModalDialog'," +
-                    "'dialogHeight:600px; dialogLeft:100px; dialogTop:100px; dialogWidth:1100px; help:no; resizable:yes; scroll:yes;'" +
-                    ");" +
-                    "return false;"
-                );
+          LinREF.Attributes.Add("onclick",
+            "javascript:"+
+            "window.showModalDialog("+
+            LinREF.ClientID+".href,"+
+            "'ModalDialog',"+
+            "'dialogHeight:600px; dialogLeft:100px; dialogTop:100px; dialogWidth:1100px; help:no; resizable:yes; scroll:yes;'"+
+            ");"+
+            "return false;"
+            );
             }
+                
         }
         finally
         {
@@ -424,7 +398,6 @@ public partial class credit_repayment_dostr : Bars.BarsPage
 
             Decimal? ND1;
             Decimal? ref_;
-            Decimal? ref2_;
 
 
             ND1 = Convert.ToDecimal(tbsCC_ID.Value);
@@ -434,24 +407,17 @@ public partial class credit_repayment_dostr : Bars.BarsPage
             else
             { ref_ = Convert.ToDecimal(LinREF.Text); }
 
-            if (LinREF2.Text == null)
-            { ref2_ = 0; }
-            else
-            { ref2_ = Convert.ToDecimal(LinREF2.Text); }
-
-
             cmd.CommandType = CommandType.StoredProcedure;
             cmd.CommandText = "CCK_dpk.MODI_RET";
 
             cmd.Parameters.Add("p_ND", OracleDbType.Decimal, ND1, ParameterDirection.Input);
             cmd.Parameters.Add("p_REF", OracleDbType.Decimal, ref_, ParameterDirection.Input);
+     
 
-            cmd.Parameters.Add("p_ref2", OracleDbType.Decimal, ref2_, ParameterDirection.Input);
 
 
             cmd.ExecuteNonQuery();
             LinREF.Font.Strikeout = true;
-            LinREF2.Font.Strikeout = true;
 
             pb_del.Enabled = false;
 

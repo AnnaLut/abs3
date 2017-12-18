@@ -302,24 +302,8 @@
             </tr>
             <tr>
                 <td>
-                    <table>
-                        <tr>
-                            <td>
-                                <asp:Label ID="lbRef" runat="server" Font-Size="Medium"></asp:Label>
-                            </td>
-                            <td>
-                                <asp:HyperLink ID="LinREF" runat="server" Target="_blank" Font-Size="Medium">[LinREF]</asp:HyperLink>        
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <asp:Label ID="lbRef2" runat="server" Font-Size="Medium"></asp:Label>
-                            </td>
-                            <td>
-                                <asp:HyperLink ID="LinREF2" runat="server" Target="_blank" Font-Size="Medium">[LinREF2]</asp:HyperLink>
-                            </td>
-                        </tr>
-                    </table>
+                    <asp:Label ID="lbRef" runat="server" Font-Size="Medium"></asp:Label>
+                    <asp:HyperLink ID="LinREF" runat="server" Target="_blank" Font-Size="Medium">[LinREF]</asp:HyperLink>
                 </td>
                 <td>
                     <asp:Button ID="btPay" meta:resourcekey="btPayResource1" Text="Сплатити" runat="server"
