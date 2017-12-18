@@ -1,9 +1,11 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS_DM/package/dm_import.sql =========*** Run **
- PROMPT ===================================================================================== 
- 
+ PROMPT ===================================================================================== 
+
+ PROMPT *** Run *** ========== Scripts /Sql/BARS_DM/package/dm_import.sql =========*** Run **
+
+ PROMPT ===================================================================================== 
+
+ 
+
 CREATE OR REPLACE PACKAGE DM_IMPORT
 is
 
@@ -242,11 +244,14 @@ is
                       p_periodtype in varchar2 default C_FULLIMP);
 
 end;
-/
+/
+show errors
+
+
 
 CREATE OR REPLACE PACKAGE BODY DM_IMPORT is
 
-  g_body_version constant varchar2(64) := 'Version 3.0.0 13/09/2017';
+  g_body_version constant varchar2(64) := 'Version 3.3.1 18/12/2017';
   g_body_defs    constant varchar2(512) := null;
   G_TRACE        constant varchar2(20) := 'dm_import.';
 
@@ -259,7 +264,7 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT is
 /*07.06.2017 lypskykh: добавил в выгрузки customers_plt отслеживание изменений по адресам
 14.06.2017 добавил в депозиты выгрузку признака открытия в веб-банкинге
 09.08.2017 добавлен признак открытия в ВБ в депозиты-пилот
-            добавлено поле "тип клиента" в выгрузку связанных лиц; теперь выгружаются все типы, а не только юрлица 
+            добавлено поле "тип клиента" в выгрузку связанных лиц; теперь выгружаются все типы, а не только юрлица
 13.09.2017 добавлена выгрузка залогов по кредитам*/
 /** header_version -  */
 function header_version return varchar2 is
@@ -602,8 +607,7 @@ begin
                         join bars.customer c on ccd.rnk = c.rnk
                         join bars.cc_vidd ccv on ccd.vidd = ccv.vidd
                   where c.CUSTTYPE in (2, 3) and ccd.vidd in (1, 2, 3, 11, 12, 13)
---                    and not (C.ise in ('14100', '14200', '14101','14201') and C.sed ='91') --фильтруем ФОПов
-                    and not (C.ise in ('14100', '14200', '14101','14201')) -- 20.03.2017  COBUSUPABS-5659
+-- 20.03.2017  COBUSUPABS-5659  and not (C.ise in ('14100', '14200', '14101','14201') and C.sed ='91') --фильтруем ФОПов
                )
      loop
        begin
@@ -806,9 +810,8 @@ begin
                         and ba.acc_ovr = a.acc
                         and a.nbs in ('2202','2203')
                         and a.rnk      = c.rnk
-                        and c.custtype in (2, 3) -- and nvl(trim(c.sed),'00')<>'91'
---                        and not (C.ise in ('14100', '14200', '14101','14201') and C.sed ='91') --фильтруем ФОПов
-                        and not (C.ise in ('14100', '14200', '14101','14201')) -- 20.03.2017  COBUSUPABS-5659
+                        and c.custtype in (2, 3)
+-- 20.03.2017  COBUSUPABS-5659  and not (C.ise in ('14100', '14200', '14101','14201') and C.sed ='91') --фильтруем ФОПов
                         and ba.acc_pk = aa.acc and aa.nbs = '2625'
                         and ba.acc_9129 = a9129.acc(+)
                  union
@@ -819,9 +822,8 @@ begin
                     where ba.acc_ovr is null
                         and ba.acc_pk = a.acc and a.nbs = '2625'
                         and a.rnk = c.rnk
-                        and c.custtype in (2, 3) -- and nvl(trim(c.sed),'00')<>'91'
---                        and not (C.ise in ('14100', '14200', '14101','14201') and C.sed ='91') --фильтруем ФОПов
-                        and not (C.ise in ('14100', '14200', '14101','14201')) -- 20.03.2017  COBUSUPABS-5659
+                        and c.custtype in (2, 3)
+-- 20.03.2017  COBUSUPABS-5659  and not (C.ise in ('14100', '14200', '14101','14201') and C.sed ='91') --фильтруем ФОПов
                         and ba.acc_9129 is not null
                         and ba.acc_9129 = a9129.acc
                )
@@ -1019,8 +1021,7 @@ begin
                         join bars.customer c on ccd.rnk = c.rnk
                         join bars.cc_vidd ccv on ccd.vidd = ccv.vidd
                   where c.CUSTTYPE in (2, 3) and ccd.vidd in (1, 2, 3, 11, 12, 13)
---                    and not (C.ise in ('14100', '14200', '14101','14201') and C.sed ='91') --фильтруем ФОПов
-                    and not (C.ise in ('14100', '14200', '14101','14201')) -- 20.03.2017  COBUSUPABS-5659
+-- 20.03.2017  COBUSUPABS-5659  and not (C.ise in ('14100', '14200', '14101','14201') and C.sed ='91') --фильтруем ФОПов
                )
     loop
       begin
@@ -1634,9 +1635,8 @@ begin
                         and ba.acc_ovr = a.acc
                         and a.nbs in ('2202','2203')
                         and a.rnk      = c.rnk
-                        and c.custtype in (2, 3) -- and nvl(trim(c.sed),'00')<>'91'
---                        and not (C.ise in ('14100', '14200', '14101','14201') and C.sed ='91') --фильтруем ФОПов
-                        and not (C.ise in ('14100', '14200', '14101','14201')) -- 20.03.2017  COBUSUPABS-5659
+                        and c.custtype in (2, 3)
+-- 20.03.2017  COBUSUPABS-5659  and not (C.ise in ('14100', '14200', '14101','14201') and C.sed ='91') --фильтруем ФОПов
                         and ba.acc_pk = aa.acc and aa.nbs = '2625'
                         and ba.acc_9129 = a9129.acc(+)
                         union
@@ -1647,9 +1647,8 @@ begin
                     where ba.acc_ovr is null
                         and ba.acc_pk = a.acc and a.nbs = '2625'
                         and a.rnk = c.rnk
-                        and c.custtype in (2, 3) -- and nvl(trim(c.sed),'00')<>'91'
---                        and not (C.ise in ('14100', '14200', '14101','14201') and C.sed ='91') --фильтруем ФОПов
-                        and not (C.ise in ('14100', '14200', '14101','14201')) -- 20.03.2017  COBUSUPABS-5659
+                        and c.custtype in (2, 3)
+-- 20.03.2017  COBUSUPABS-5659  and not (C.ise in ('14100', '14200', '14101','14201') and C.sed ='91') --фильтруем ФОПов
                         and ba.acc_9129 is not null
                         and ba.acc_9129 = a9129.acc
                )
@@ -2512,8 +2511,6 @@ begin
     end if;
 
     l_row.per_id := l_per_id;
-    -- test
-    --insert into t_clob values(sysdate,q_str);
 
     loop
       begin
@@ -2966,7 +2963,7 @@ procedure custur_rel_imp(p_dat        in date default trunc(sysdate),
 
     q_str_inc  varchar2(4000) :=
             'with customer_rel_updated as
-              (select distinct rnk, rel_rnk, rel_id, rel_intext from bars.customer_rel_update cru where cru.chgdate between :p_dat and :p_dat+0.99999)
+              (select distinct rnk, rel_rnk, rel_id, rel_intext from bars.customer_rel_update cru where cru.chgdate between trunc(:p_dat) and trunc(:p_dat)+0.99999)
             select
                    cru.rnk,
                    cru.rel_id,
@@ -2990,31 +2987,34 @@ procedure custur_rel_imp(p_dat        in date default trunc(sysdate),
              join bars.customer c on cru.rnk = c.rnk
             where (r.vaga1 is not null or r.vaga2 is null)   -- COBUSUPABS-5519';
 
-    q_str_full  varchar2(4000) :=
-            'select
-                   c.rnk,
-                   r.rel_id,
-                   r.rel_rnk,
-                   r.rel_intext,
-                   r.name,
-                   r.okpo,
-                   r.vaga1,
-                   r.custtype,
-                   r.tel,
-                   r.email,
-                   r.position,
-                   r.sed,
-                   r.bdate,
-                   r.edate,
-                   r.sign_privs,
-                   null as change_type,
-                   case when c.custtype = 3 and C.ise in (''14100'', ''14200'', ''14101'',''14201'') and C.sed =''91'' then 4 else c.custtype end CL_TYPE
-             from bars.customer c, bars.V_CUSTOMER_REL r
-            where (r.vaga1 is not null or r.vaga2 is null)   -- COBUSUPABS-5519
-              and c.rnk = r.rnk';
+        /* #COBUXRMCORP-5 костыль - уже не "полная" выгрузка, а вдобавок ко всему выгружаем удаленные записи за 30 календ. дней */
+        q_str_full  varchar2(4000) :=
+                'with customer_rel_updated as
+                  (select distinct rnk, rel_rnk, rel_id, rel_intext from bars.customer_rel_update cru where cru.chgdate between trunc(:p_dat)-30 and trunc(:p_dat)+0.99999)
+                select c.rnk,
+                       coalesce(r.rel_id, cru.rel_id),
+                       coalesce(r.rel_rnk, cru.rel_rnk),
+                       coalesce(r.rel_intext, cru.rel_intext),
+                       r.name,
+                       r.okpo,
+                       r.vaga1,
+                       r.custtype,
+                       r.tel,
+                       r.email,
+                       r.position,
+                       r.sed,
+                       r.bdate,
+                       r.edate,
+                       r.sign_privs,
+                       case when r.rnk is null then ''D'' else '''' end as change_type,
+                       case when c.custtype = 3 and C.ise in (''14100'', ''14200'', ''14101'',''14201'') and C.sed =''91'' then 4 else c.custtype end CL_TYPE
+                 from customer_rel_updated cru
+                 full join bars.V_CUSTOMER_REL r on (cru.rnk = r.rnk and cru.rel_rnk = r.rel_rnk and cru.rel_intext = r.rel_intext and cru.rel_id = r.rel_id)
+                 join bars.customer c on cru.rnk = c.rnk or r.rnk = c.rnk
+                where (r.vaga1 is not null or r.vaga2 is null)   -- COBUSUPABS-5519';
 begin
     bars.bars_audit.info(l_trace||' start');
-    -- get period id
+
     l_per_id := get_period_id (p_periodtype, p_dat);
 
     if l_per_id is null then
@@ -3029,7 +3029,7 @@ begin
     if (p_periodtype = C_INCRIMP) then
         open c for q_str_inc using p_dat, p_dat;
     else
-        open c for q_str_full;
+        open c for q_str_full using p_dat, p_dat;
     end if;
 
     loop
@@ -4169,8 +4169,7 @@ end deposits_plt_imp;
         -- денні зміни
 
         l_row.per_id := l_per_id;
-        -- test
-        --insert into t_clob values(sysdate,q_str);
+
         for c in (with dapp as
                  (select a.acc
                     from bars.accounts a
@@ -4208,6 +4207,7 @@ end deposits_plt_imp;
                       ,pk_prct.okpo pk_okpo    --зарплатний проект, ЄДРПОУ організації
                       ,pk_prct.name pk_name    --зарплатний проект, назва організації
                       ,pk_prct.okpo_n pk_okpo_n  --зарплатний проект, код організації
+                      ,pk_prct.id pk_oldnd
                       ,a.VID --????
                       ,ww.lie_sum
                       ,ww.lie_val
@@ -4216,7 +4216,6 @@ end deposits_plt_imp;
                       ,ww.lie_atrt
                       ,ww.lie_doc
                       ,ww.pk_term
-                      ,ww.pk_oldnd
                       ,pk_work
                       ,pk_cntrw
                       ,pk_ofax
@@ -4259,16 +4258,15 @@ end deposits_plt_imp;
                               "'PK_OFFIC'_CC"  as pk_offic,
                               "'W4_ARSUM'_CC"  as w4_arsum,
                               "'W4_KPROC'_CC"  as w4_kproc,
-                              "'W4_SEC'_CC"  as w4_sec,
-                              "'PK_OLDND'_CC" as pk_oldnd
+                              "'W4_SEC'_CC"  as w4_sec
                          from (select w.acc, w.tag, w.value
                                  from bars.accountsw w
-                                where tag in ('LIE_SUM','LIE_VAL','LIE_DATE','LIE_DOCN','LIE_ATRT', 'LIE_DOC', 'PK_TERM', 'PK_WORK', 'PK_CNTRW', 'PK_OFAX', 'PK_PHONE', 'PK_PCODW', 'PK_ODAT', 'PK_STRTW', 'PK_CITYW', 'PK_OFFIC', 'W4_ARSUM', 'W4_KPROC', 'W4_SEC', 'PK_OLDND')
+                                where tag in ('LIE_SUM','LIE_VAL','LIE_DATE','LIE_DOCN','LIE_ATRT', 'LIE_DOC', 'PK_TERM', 'PK_WORK', 'PK_CNTRW', 'PK_OFAX', 'PK_PHONE', 'PK_PCODW', 'PK_ODAT', 'PK_STRTW', 'PK_CITYW', 'PK_OFFIC', 'W4_ARSUM', 'W4_KPROC', 'W4_SEC')
                               )
-                       pivot ( max(value) cc for tag in ('LIE_SUM', 'LIE_VAL', 'LIE_DATE', 'LIE_DOCN', 'LIE_ATRT', 'LIE_DOC', 'PK_TERM', 'PK_WORK', 'PK_CNTRW', 'PK_OFAX', 'PK_PHONE', 'PK_PCODW', 'PK_ODAT', 'PK_STRTW', 'PK_CITYW', 'PK_OFFIC', 'W4_ARSUM', 'W4_KPROC', 'W4_SEC', 'PK_OLDND'))
+                       pivot ( max(value) cc for tag in ('LIE_SUM', 'LIE_VAL', 'LIE_DATE', 'LIE_DOCN', 'LIE_ATRT', 'LIE_DOC', 'PK_TERM', 'PK_WORK', 'PK_CNTRW', 'PK_OFAX', 'PK_PHONE', 'PK_PCODW', 'PK_ODAT', 'PK_STRTW', 'PK_CITYW', 'PK_OFFIC', 'W4_ARSUM', 'W4_KPROC', 'W4_SEC'))
                                              ) ww,
                          bars.deal d,
-                         (select acc, kos, dos from bars.saldoa where FDAT = p_dat) S
+                         (select acc, kos, dos from bars.saldoa where FDAT = trunc(p_dat)) S
                   where w.acc_pk = a.acc and a.rnk = c.rnk
                    and c.custtype = 3 and nvl(trim(c.sed),'00')<>'91'
                    and not (C.ise in ('14100', '14200', '14101','14201') and C.sed ='91') --фильтруем ФОПов
@@ -4282,7 +4280,7 @@ end deposits_plt_imp;
 
                    union all
 
-                                   select a.branch      --відділення
+                select a.branch      --відділення
                       ,a.kf          --РУ
                       ,a.rnk         --РНК
                       ,w.nd          --Номер договору
@@ -4306,6 +4304,7 @@ end deposits_plt_imp;
                       ,pk_prct.okpo pk_okpo    --зарплатний проект, ЄДРПОУ організації
                       ,pk_prct.name pk_name    --зарплатний проект, назва організації
                       ,pk_prct.okpo_n pk_okpo_n  --зарплатний проект, код організації
+                      ,pk_prct.id pk_oldnd
                       ,a.VID --????
                       ,ww.lie_sum
                       ,ww.lie_val
@@ -4314,7 +4313,6 @@ end deposits_plt_imp;
                       ,ww.lie_atrt
                       ,ww.lie_doc
                       ,ww.pk_term
-                      ,ww.pk_oldnd
                       ,pk_work
                       ,pk_cntrw
                       ,pk_ofax
@@ -4357,16 +4355,15 @@ end deposits_plt_imp;
                               "'PK_OFFIC'_CC"  as pk_offic,
                               "'W4_ARSUM'_CC"  as w4_arsum,
                               "'W4_KPROC'_CC"  as w4_kproc,
-                              "'W4_SEC'_CC"  as w4_sec,
-                              "'PK_OLDND'_CC" as pk_oldnd
+                              "'W4_SEC'_CC"  as w4_sec
                          from (select w.acc, w.tag, w.value
                                  from bars.accountsw w
-                                where tag in ('LIE_SUM','LIE_VAL','LIE_DATE','LIE_DOCN','LIE_ATRT', 'LIE_DOC', 'PK_TERM', 'PK_WORK', 'PK_CNTRW', 'PK_OFAX', 'PK_PHONE', 'PK_PCODW', 'PK_ODAT', 'PK_STRTW', 'PK_CITYW', 'PK_OFFIC', 'W4_ARSUM', 'W4_KPROC', 'W4_SEC', 'PK_OLDND')
+                                where tag in ('LIE_SUM','LIE_VAL','LIE_DATE','LIE_DOCN','LIE_ATRT', 'LIE_DOC', 'PK_TERM', 'PK_WORK', 'PK_CNTRW', 'PK_OFAX', 'PK_PHONE', 'PK_PCODW', 'PK_ODAT', 'PK_STRTW', 'PK_CITYW', 'PK_OFFIC', 'W4_ARSUM', 'W4_KPROC', 'W4_SEC')
                               )
-                       pivot ( max(value) cc for tag in ('LIE_SUM', 'LIE_VAL', 'LIE_DATE', 'LIE_DOCN', 'LIE_ATRT', 'LIE_DOC', 'PK_TERM', 'PK_WORK', 'PK_CNTRW', 'PK_OFAX', 'PK_PHONE', 'PK_PCODW', 'PK_ODAT', 'PK_STRTW', 'PK_CITYW', 'PK_OFFIC', 'W4_ARSUM', 'W4_KPROC', 'W4_SEC', 'PK_OLDND'))
+                       pivot ( max(value) cc for tag in ('LIE_SUM', 'LIE_VAL', 'LIE_DATE', 'LIE_DOCN', 'LIE_ATRT', 'LIE_DOC', 'PK_TERM', 'PK_WORK', 'PK_CNTRW', 'PK_OFAX', 'PK_PHONE', 'PK_PCODW', 'PK_ODAT', 'PK_STRTW', 'PK_CITYW', 'PK_OFFIC', 'W4_ARSUM', 'W4_KPROC', 'W4_SEC'))
                                              ) ww,
                          bars.deal d,
-                         (select acc, kos, dos from bars.saldoa where FDAT = p_dat) S
+                         (select acc, kos, dos from bars.saldoa where FDAT = trunc(p_dat)) S
                   where w.acc_pk = a.acc and a.rnk = c.rnk
                    and c.custtype = 3 and nvl(trim(c.sed),'00')<>'91'
                    and not (C.ise in ('14100', '14200', '14101','14201') and C.sed ='91') --фильтруем ФОПов
@@ -4550,6 +4547,10 @@ end deposits_plt_imp;
                        decode(vipk,'1',1,0) vipk,--значення параметру
                        decode(vipk,'1', (select max(fio_manager) from bars.vip_flags where rnk=c.rnk),'') vip_fio_manager,--піб працівника по віп
                        decode(vipk,'1', (select max(phone_manager) from bars.vip_flags where rnk=c.rnk),'') vip_phone_manager,--телефон працівника по віп
+                       decode(vipk,'1', (select s.active_directory_name
+                                        from bars.vip_flags v
+                                        join bars.staff_ad_user s on v.account_manager = s.user_id
+                                        where rnk=c.rnk),'') vip_account_manager,--аккаунт працівника по віп в форматі АД
                        date_on,--дата відкриття клієнта
                        date_off,--дата закриття
                        p.eddr_id,
@@ -4621,7 +4622,6 @@ end deposits_plt_imp;
                        ww.SUBS,
                        c.K050,
                        ww.DEATH,
---                       case when p.CELLPHONE is null then 1 else 0 end as NO_PHONE, /*mpno?*/
                        nvl2(w.mpno, 0, 1) as NO_PHONE,
                        ww.NSMCV,
                        ww.NSMCC,
@@ -5050,6 +5050,10 @@ end deposits_plt_imp;
                        decode(vipk,'1',1,0) vipk,--значення параметру
                        decode(vipk,'1', (select max(fio_manager) from bars.vip_flags where rnk=c.rnk),'') vip_fio_manager,--піб працівника по віп
                        decode(vipk,'1', (select max(phone_manager) from bars.vip_flags where rnk=c.rnk),'') vip_phone_manager,--телефон працівника по віп
+                       decode(vipk,'1', (select s.active_directory_name
+                                        from bars.vip_flags v
+                                        join bars.staff_ad_user s on v.account_manager = s.user_id
+                                        where rnk=c.rnk),'') vip_account_manager,--аккаунт працівника по віп в форматі АД
                        date_on,--дата відкриття клієнта
                        date_off,--дата закриття
                        p.eddr_id,
@@ -5121,7 +5125,6 @@ end deposits_plt_imp;
                        ww.SUBS,
                        c.K050,
                        ww.DEATH,
---                       case when p.CELLPHONE is null then 1 else 0 end as NO_PHONE, /*mpno?*/
                        nvl2(w.mpno, 0, 1) as NO_PHONE,
                        ww.NSMCV,
                        ww.NSMCC,
@@ -5510,7 +5513,7 @@ end deposits_plt_imp;
               l_row.NUMDOC := c.NUMDOC;
               l_row.PDATE := c.PDATE;
               l_row.ORGAN := c.ORGAN;
-              l_row.PASSP_EXPIRE_TO := null;
+              l_row.PASSP_EXPIRE_TO := c.ACTUAL_DATE;
               l_row.PASSP_TO_BANK := null;
               l_row.OKPO := c.OKPO;
               l_row.CUST_STATUS := c.CUST_STATUS;
@@ -5520,24 +5523,27 @@ end deposits_plt_imp;
               l_row.TELD := c.TELD;
               l_row.TELADD := c.TELADD;
               l_row.EMAIL := c.EMAIL;
+              
               l_row.ADR_POST_COUNTRY := c.ap_contry;
               l_row.ADR_POST_DOMAIN := c.ap_domain;
               l_row.ADR_POST_REGION := c.ap_region;
               l_row.ADR_POST_LOC := c.ap_locality;
               l_row.ADR_POST_ADR := c.ap_adress;
               l_row.ADR_POST_ZIP := c.ap_zip;
-              l_row.ADR_FACT_COUNTRY := c.af_contry;
-              l_row.ADR_FACT_DOMAIN := c.af_domain;
-              l_row.ADR_FACT_REGION := c.af_region;
-              l_row.ADR_FACT_LOC := c.af_locality;
-              l_row.ADR_FACT_ADR := c.af_adress;
-              l_row.ADR_FACT_ZIP := c.af_zip;
+              /* В adr_fact - адрес регистрации - выгружаем юридический адрес; Место работы - аналогично, т.е. дублируем */
+              l_row.ADR_FACT_COUNTRY := c.au_contry;
+              l_row.ADR_FACT_DOMAIN := c.au_domain;
+              l_row.ADR_FACT_REGION := c.au_region;
+              l_row.ADR_FACT_LOC := c.au_locality;
+              l_row.ADR_FACT_ADR := c.au_adress;
+              l_row.ADR_FACT_ZIP := c.au_zip;
               l_row.ADR_WORK_COUNTRY := c.au_contry;
               l_row.ADR_WORK_DOMAIN := c.au_domain;
               l_row.ADR_WORK_REGION := c.au_region;
               l_row.ADR_WORK_LOC := c.au_locality;
               l_row.ADR_WORK_ADR := c.au_adress;
               l_row.ADR_WORK_ZIP := c.au_zip;
+              
               l_row.NEGATIV_STATUS := null;
               l_row.REESTR_MOB_BANK := null;
               l_row.REESTR_INET_BANK := null;
@@ -5545,7 +5551,7 @@ end deposits_plt_imp;
               l_row.MONTH_INCOME := null;
               l_row.SUBJECT_ROLE := null;
               l_row.REZIDENT := c.REZIDENT;
-              l_row.MERRIED := null;
+              l_row.MERRIED := c.PC_SS;
               l_row.EMP_STATUS := c.EMP_STATUS;
               l_row.SUBJECT_CLASS := c.SUBJECT_CLASS;
               l_row.INSIDER := c.INSIDER;
@@ -5762,6 +5768,7 @@ end deposits_plt_imp;
               l_row.P_STREET_ID := c.p_street_id;
               l_row.P_HOUSE_ID := c.p_house_id;
 
+              l_row.vip_account_manager := c.vip_account_manager;
 
             insert into customers_plt values l_row;
 
@@ -5797,10 +5804,10 @@ end deposits_plt_imp;
     --     Тип зв’язку (застоводавець/поручитель);
     --     Сума.
     --
-    procedure credits_zal_imp ( p_dat in date default trunc(sysdate), 
-                                p_periodtype in varchar2 default C_FULLIMP, 
-                                p_rows out number, 
-                                p_rows_err out number, 
+    procedure credits_zal_imp ( p_dat in date default trunc(sysdate),
+                                p_periodtype in varchar2 default C_FULLIMP,
+                                p_rows out number,
+                                p_rows_err out number,
                                 p_state out varchar2)
     is
         l_trace  varchar2(500) := G_TRACE||'credits_zal_imp: ';
@@ -5820,15 +5827,15 @@ end deposits_plt_imp;
             return;
         end if;
         begin
-            
+
             delete from credits_zal where per_id=l_per_id;
             --
             bars.tuda;
             -- денні зміни
-            
+
             l_row.per_id := l_per_id;
             insert into credits_zal (per_id, kf, nd, vidd_name, rnk, rel_type, zal_sum)
-            with changes_ccd as 
+            with changes_ccd as
             (select distinct nd from bars.cc_deal_update c
              where c.EFFECTDATE between trunc(p_dat) and trunc(p_dat)+0.99999), -- изменения по кредитам
                  changes_cc_accp as
@@ -5840,17 +5847,17 @@ end deposits_plt_imp;
              and exists (select 1 from bars.cc_accp cp where c.acc = cp.acc)) -- изменения по счетам
             select  l_per_id,
                     cd.kf,
-                    cd.nd, 
-                    v.name, 
-                    a.rnk, 
-                    case when a.nbs like '95%' then 'заставодавець' when a.nbs like '90%' then 'поручитель' else '' end as rel_type, 
+                    cd.nd,
+                    v.name,
+                    a.rnk,
+                    case when a.nbs like '95%' then 'заставодавець' when a.nbs like '90%' then 'поручитель' else '' end as rel_type,
                     a.ostb --нужен плановый
             from bars.cc_deal cd
             join bars.cc_vidd v on cd.vidd = v.vidd
             join (select distinct acc, nd from bars.cc_accp) ca on cd.nd = ca.nd
             join bars.accounts a on a.acc = ca.acc
             where
-            p_periodtype = 'MONTH' 
+            p_periodtype = 'MONTH'
             or
             p_periodtype = 'DAY'
             and
@@ -5858,7 +5865,7 @@ end deposits_plt_imp;
                 cd.nd in (select nd from changes_ccd)
                 or
                 (ca.nd, ca.acc) in (select nd, acc from changes_cc_accp)
-                or 
+                or
                 a.acc in (select acc from changes_acc)
             )
             ;
@@ -5867,7 +5874,7 @@ end deposits_plt_imp;
 
             dbms_application_info.set_client_info(l_trace||to_char(l_rows)|| ' processed');
             p_state := 'SUCCESS';
-        
+
      exception
         when others then
           p_state := 'ERROR';
@@ -5950,11 +5957,11 @@ end deposits_plt_imp;
         delete from bars_dm.customers_plt   c
          where C.PER_ID in (select id from periods p where P.SDATE < p_dat - c_cntdays);
         commit;
-        
+
         delete from bars_dm.credits_zal   c
          where C.PER_ID in (select id from periods p where P.SDATE < p_dat - c_cntdays);
         commit;
-        
+
         select p.id
         bulk collect into l_periods
         from   periods p
@@ -6144,9 +6151,14 @@ end deposits_plt_imp;
 
 end;
 /
- show err;
- 
-PROMPT *** Create  grants  DM_IMPORT ***
-grant EXECUTE                                                                on DM_IMPORT       to BARSUPL;
-grant EXECUTE                                                                on DM_IMPORT       to BARS_SUP;
- 
+show errors
+
+
+
+PROMPT *** Create  grants  DM_IMPORT ***
+
+
+grant EXECUTE                                                                on DM_IMPORT       to BARSUPL;
+
+
+grant EXECUTE                                                                on DM_IMPORT       to BARS_SUP; 

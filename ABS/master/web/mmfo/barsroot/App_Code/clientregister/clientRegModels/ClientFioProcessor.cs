@@ -133,7 +133,7 @@ namespace clientregister
 			}
 			else
 			{
-				var pname = RemoveLastVowel(data.Name);
+				var pname = RemoveLastVowel(data.MName);
 
 				//female
 				if (data.Sex == "2")
