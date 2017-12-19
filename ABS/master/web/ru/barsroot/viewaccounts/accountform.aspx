@@ -8,7 +8,7 @@
     <link href="Styles.css" type="text/css" rel="stylesheet" />
     <script type="text/javascript" src="/Common/Script/Localization.js"></script>
     <script type="text/javascript" src="Scripts/Common.js?v1.1"></script>
-    <script type="text/javascript" src="Scripts/Default.js?v1.10"></script>
+    <script type="text/javascript" src="Scripts/Default.js?v1.12"></script>
 
     <link href="../lib/alertify/css/alertify.core.css" rel="stylesheet" />
     <link href="../lib/alertify/css/alertify.default.css" rel="stylesheet" />
