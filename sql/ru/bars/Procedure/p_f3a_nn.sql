@@ -6,7 +6,7 @@ IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирования #3A для КБ (универсальная) с 01.06.2009
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION (RU) : 16/11/2017 (06/11/2017)
+% VERSION     : 16/11/2017 (06/11/2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
@@ -209,7 +209,7 @@ IS
 
    CURSOR saldo
    IS
-      SELECT s.acc, s.nls, s.kv, s.PAP, a.FDAT, s.nbs,
+      SELECT s.acc, s.nls, s.kv, s.PAP, a.FDAT, s.nbs, k.r050,
              s.mdate, s.isp,
              DECODE( NVL(Trim (p.s180), '0'), '0', Fs180 (a.acc, substr(s.nls, 1, 1), dat_),p.s180),
              p.d020,
@@ -242,12 +242,18 @@ IS
                  and v.dep_acc = s.acc) s,
              SALDOA a,
              CUSTOMER c,
-             SPECPARAM p
+             SPECPARAM p,
+             (select r020, max(r050) r050
+                from kl_r020
+                where d_open <= date_spr and
+                    (d_close is null or d_close > date_spr)
+                group by r020) k
        WHERE a.dos+a.kos<>0
          AND s.acc = a.acc
          AND a.FDAT = Dat_
          AND s.acc = p.acc(+)
-         AND s.rnk = c.rnk;
+         AND s.rnk = c.rnk
+         and s.nbs = k.r020;
 
    --- овердрафты ---
    CURSOR saldoost
@@ -657,7 +663,7 @@ BEGIN
 
        LOOP
           FETCH saldo
-           INTO acc_, nls_, kv_, pap_, data_, nbs_, mdate_, isp_,
+           INTO acc_, nls_, kv_, pap_, data_, nbs_, r050_, mdate_, isp_,
                 s180_, d020_acc, r013p_, cntr_, rnk_, sdos_, skos_, se_, spcnt_,
                 tips_, kom_, acc8_, ob22_, tobo_, nms_, r011_;
 
@@ -831,7 +837,7 @@ BEGIN
                         '2650',
                         '2655'
                        )
-                AND se_ < 0 AND sdos_ > 0
+                AND r050_ = '11' AND sdos_ > 0
              THEN
                 BEGIN
                   SELECT
@@ -1186,7 +1192,7 @@ BEGIN
                 sdos_ := sdos_ - vost_;
 
                 -- дебетовые обороты
-                IF sdos_ > 0 AND spcnt_ >= 0 AND se_ < 0
+                IF sdos_ > 0 AND spcnt_ >= 0 and r050_ = '11' AND se_ <= 0
                 THEN
                    sdos_ := Gl.P_Icurval (kv_, sdos_, data_);
 
@@ -1231,7 +1237,7 @@ BEGIN
                 END IF;
 
                 -- обороты пролонгации
-                IF s_prol_ > 0 AND spcnt_ >= 0 AND se_ < 0
+                IF s_prol_ > 0 AND spcnt_ >= 0 AND r050_ = '11' and se_ < 0 
                 THEN
 
                    s_prol_ := Gl.P_Icurval (kv_, s_prol_, data_);
@@ -2491,7 +2497,7 @@ BEGIN
                 END IF;
 
                 -- кредитовые обороты
-                IF (skos_ > 0 AND se_ >= 0) OR
+                IF (skos_ > 0 AND r050_ = '22' and se_ >= 0) OR
                    (skos_ > 0 and se_ >= 0 and nbs_ = '2600' and r013p_ in ('1','7','8','A')) OR
                    (skos_ > 0 and se_ >= 0 and nbs_ = '2605' and r013p_ in ('1','3')) OR
                    (skos_ > 0 and se_ >= 0 and nbs_ = '2655' and r013p_ = '3') OR
@@ -2545,7 +2551,7 @@ BEGIN
                 END IF;
 
                 -- обороты пролонгации
-                IF (s_prol_ > 0 AND se_ > 0) OR
+                IF (s_prol_ > 0 AND r050_ = '22'  and se_ > 0) OR
                    (s_prol_ > 0 and se_ > 0 and nbs_ = '2600' and r013p_ in ('1','7','8','A')) OR
                    (s_prol_ > 0 and se_ > 0 and nbs_ = '2605' and r013p_ in ('1','3')) OR
                    (s_prol_ > 0 and se_ > 0 and nbs_ = '2655' and r013p_ = '3') OR
