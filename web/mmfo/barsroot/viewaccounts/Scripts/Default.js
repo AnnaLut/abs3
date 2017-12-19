@@ -1,6 +1,4 @@
-﻿var _useNewNbs = useNewNbs();
-
-function useNewNbs() {
+﻿function useNewNbs() {
     var res = 'true';
     $.ajax({
         type: "POST",
@@ -354,6 +352,7 @@ function GetErrAccount() {
         //var stage2 = ",2062,2063,2067,2071,2072,2073,2074,2077,2082,2083,2089,";
 
         var stage2;
+        var _useNewNbs = useNewNbs();
         if (_useNewNbs) {
             stage2 = ",2063,2071,2072,2073,2074,2083,2088,";
         } else {

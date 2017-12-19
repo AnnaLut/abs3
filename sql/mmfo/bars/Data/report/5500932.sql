@@ -57,7 +57,7 @@ select b.branch
 from branch b left join 
     (Select sum(fost(a.acc,to_date(:zDate,''dd.mm.yyyy''))/100) ost_dep_980,count(branch) count_dep_980,branch 
      from accounts a
-     where (a.nbs in (2630) )
+     where (a.nbs in (2630, 2635) )
        and (a.dazs is null or a.dazs>to_date(:zDate,''dd.mm.yyyy''))
        and a.kv=980
        and fost(a.acc,to_date(:zDate,''dd.mm.yyyy''))<>0
@@ -65,7 +65,7 @@ from branch b left join
      left join
     (Select sum(fost(a.acc,to_date(:zDate,''dd.mm.yyyy''))/100) ost_dep_840,count(branch) count_dep_840,branch
      from accounts a
-     where (a.nbs in (2630) )
+     where (a.nbs in (2630, 2635) )
        and (a.dazs is null or a.dazs>to_date(:zDate,''dd.mm.yyyy''))
        and a.kv=840
        and fost(a.acc,to_date(:zDate,''dd.mm.yyyy''))<>0
@@ -73,7 +73,7 @@ from branch b left join
      left join
     (Select sum(fost(a.acc,to_date(:zDate,''dd.mm.yyyy''))/100) ost_dep_978,count(branch) count_dep_978,branch
      from accounts a
-     where (a.nbs in (2630) )
+     where (a.nbs in (2630, 2635) )
        and (a.dazs is null or a.dazs>to_date(:zDate,''dd.mm.yyyy''))
        and a.kv=978
        and fost(a.acc,to_date(:zDate,''dd.mm.yyyy''))<>0
@@ -81,7 +81,7 @@ from branch b left join
      left join
     (Select sum(fost(a.acc,to_date(:zDate,''dd.mm.yyyy''))/100) ost_dep_643,count(branch) count_dep_643,branch
      from accounts a
-     where (a.nbs in (2630) )
+     where (a.nbs in (2630, 2635) )
        and (a.dazs is null or a.dazs>to_date(:zDate,''dd.mm.yyyy''))
        and a.kv=643
        and fost(a.acc,to_date(:zDate,''dd.mm.yyyy''))<>0
@@ -96,7 +96,7 @@ select SUBSTR(b.branch,1,15)
 from branch b left join 
     (Select sum(fost(a.acc,to_date(:zDate,''dd.mm.yyyy''))/100) ost_dep_980,count(branch) count_dep_980,branch
      from accounts a
-     where (a.nbs in (2630) )
+     where (a.nbs in (2630, 2635) )
        and (a.dazs is null or a.dazs>to_date(:zDate,''dd.mm.yyyy''))
        and a.kv=980
        and fost(a.acc,to_date(:zDate,''dd.mm.yyyy''))<>0
@@ -104,7 +104,7 @@ from branch b left join
      left join
     (Select sum(fost(a.acc,to_date(:zDate,''dd.mm.yyyy''))/100) ost_dep_840,count(branch) count_dep_840,branch
      from accounts a
-     where (a.nbs in (2630))
+     where (a.nbs in (2630, 2635))
        and (a.dazs is null or a.dazs>to_date(:zDate,''dd.mm.yyyy''))
        and a.kv=840
        and fost(a.acc,to_date(:zDate,''dd.mm.yyyy''))<>0
@@ -112,7 +112,7 @@ from branch b left join
      left join
     (Select sum(fost(a.acc,to_date(:zDate,''dd.mm.yyyy''))/100) ost_dep_978,count(branch) count_dep_978,branch
      from accounts a
-     where (a.nbs in (2630) )
+     where (a.nbs in (2630, 2635) )
        and (a.dazs is null or a.dazs>to_date(:zDate,''dd.mm.yyyy''))
        and a.kv=978
        and fost(a.acc,to_date(:zDate,''dd.mm.yyyy''))<>0
@@ -120,7 +120,7 @@ from branch b left join
      left join
     (Select sum(fost(a.acc,to_date(:zDate,''dd.mm.yyyy''))/100) ost_dep_643,count(branch) count_dep_643,branch
      from accounts a
-     where (a.nbs in (2630))
+     where (a.nbs in (2630, 2635))
        and (a.dazs is null or a.dazs>to_date(:zDate,''dd.mm.yyyy''))
        and a.kv=643
        and fost(a.acc,to_date(:zDate,''dd.mm.yyyy''))<>0
