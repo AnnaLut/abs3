@@ -6,7 +6,6 @@ is
     --                                                             --
     -----------------------------------------------------------------
 
-
     -----------------------------------------------------------------
     --  онстанты                                                   --
     -----------------------------------------------------------------
@@ -27,8 +26,6 @@ is
     --
     function header_version return varchar2;
 
-
-
     ------------------------------------------------------------------
     -- BODY_VERSION
     --
@@ -36,17 +33,12 @@ is
     --
     function body_version return varchar2;
 
-
-
-
     ------------------------------------------------------------------
     -- NEXT_SHIFT
     --
     --  ƒл€ системной даты сервера отдает следующий номер смены
     --
     function next_shift return smallint;
-
-
 
     ------------------------------------------------------------------
     -- NEXT_SHIFT_DATE
@@ -60,8 +52,6 @@ is
                   p_currshift number,
                   p_opdate    date    ) return date;
 
-
-
     ------------------------------------------------------------------
     -- OPEN_CASH
     --
@@ -70,8 +60,6 @@ is
     --
     --
     procedure open_cash;
-
-
 
     ------------------------------------------------------------------
     -- OPEN_CASH
@@ -85,15 +73,12 @@ is
     --
     procedure open_cash(p_shift number, p_force number default 1);
 
-
     ------------------------------------------------------------------
     -- CURRENT_OPDATE
     --
     --
     --
     function current_opdate return date;
-
-
 
     ------------------------------------------------------------------
     -- CURRENT_SHITFT
@@ -102,8 +87,6 @@ is
     --
     --
     function current_shift return smallint;
-
-
 
     ------------------------------------------------------------------
     -- OPEN_CASH_MANUALY
@@ -117,8 +100,6 @@ is
     --
     procedure open_cash_manualy(p_bankdate date);
 
-
-
     ------------------------------------------------------------------
     -- CLEAR_CASH_JOURNALS
     --
@@ -128,8 +109,6 @@ is
     --
     procedure clear_cash_journals(p_dat date);
 
-
-
     ------------------------------------------------------------------
     -- MODIFY_CASH_SNAPSHOT
     --
@@ -138,7 +117,6 @@ is
     -- p_ref - референс сторнируемого докумнета
     --
     procedure modify_cash_snapshot(p_ref number);
-
 
     ------------------------------------------------------------------
     -- MAKE_REPORT_DATA
@@ -193,8 +171,6 @@ is
     --
     function  get_branch(p_branch  varchar2) return varchar2;
 
-
-
     ------------------------------------------------------------------
     -- IS_CASHVISA
     --
@@ -204,7 +180,6 @@ is
     --  p_visagroup
     --
     function is_cashvisa(p_visagroup number) return number;
-
 
     ------------------------------------------------------------------
     --  IS_CASHVISA
@@ -216,8 +191,6 @@ is
     --  p_status    - статус из oper_visa
     --
     function is_cashvisa(p_visagroup number, p_status number) return number;
-
-
 
     ------------------------------------------------------------------
     -- GET_SK
@@ -241,9 +214,6 @@ is
                       p_sk   number,
                       p_tt   varchar2 default null  ) return number;
 
-
-
-
     ------------------------------------------------------------------
     -- GET_NAZN
     --
@@ -253,7 +223,6 @@ is
     function get_nazn( p_nazn      varchar2,
                        p_opertt    varchar2,
                        p_opldoktt  varchar2) return varchar2;
-
 
     ------------------------------------------------------------------
     -- ENQUE_REF
@@ -267,7 +236,6 @@ is
                p_ref     number,
                p_userid  number );
 
-
     ------------------------------------------------------------------
     --  VALIDATE_FOR_CASHVISA
     --
@@ -277,7 +245,6 @@ is
     --  p_refcount -кол-во документов, обрабатываемых за один цикл
     --
     procedure validate_for_cashvisa( p_refcount     number default 10000);
-
 
     ------------------------------------------------------------------
     --  CHECK_FOR_CASHVISA
@@ -305,7 +272,7 @@ is
     --  онстанты                                                   --
     -----------------------------------------------------------------
 
-    VERSION_BODY      constant varchar2(64)  := 'version 5.7 20.11.2017';
+    VERSION_BODY      constant varchar2(64)  := 'version 6.1 18.12.2017';
     G_MODULE          constant varchar2(4)   := 'CSH';
     G_CASH_JOURNAL    constant varchar2(4)   := 'CJ';
     G_SVOD_DAY        constant varchar2(4)   := 'SD';
@@ -1942,13 +1909,13 @@ is
        bars_audit.info(l_trace||'разбор очереди виз на проверку пренадлежности кассе');
 
 
-       for c in (select c.ref, c.userid, status, groupid, dat
+       for c in (select c.ref, c.userid, status, groupid, dat, o.KF
                    from cash_refque c, oper_visa o
                   where c.ref = o.ref and c.userid = o.userid
                     and rownum <= p_refcount
                     and status <> 0
                   union all  -- это те, которые идут с оплатой по-факту
-                 select c.ref, r.userid, status, groupid, dat
+                 select c.ref, r.userid, status, groupid, dat, o.KF
                    from cash_refque c, oper_visa o, oper r
                   where c.ref = o.ref and c.ref = r.ref
                     and rownum <= p_refcount
@@ -1959,30 +1926,39 @@ is
            l_iscash := check_for_cashvisa(c.ref, c.status, c.groupid);
 
            if l_iscash = 1 then
-              select branch into l_branch
-                from staff$base
-               where id = c.userid;
+             begin
+               
+               select branch into l_branch
+                 from staff$base
+                where id = c.userid;
+             
                bars_audit.info(l_trace||'l_branch='||l_branch||' ref= '||c.ref);
+               -- есть пользователи,кто зареган на /, но они визируют, тогда в≥ставл€ем бранч в код филиала из oper_visa,
+               -- поскольку невозможно узнать на каком бранче б≥л представлен пользователь, когда в≥полн€л визирование
+               if l_branch = '/' then
+                  l_branch := '/'||c.kf||'/';
+               end if;
+              
+             end;
 
-
-              begin
+             begin
                  -- иногда один и тож чел. визирует один документ
                  insert into cash_lastvisa(kf, ref, dat,userid, branch)
-                 values(substr(l_branch,2,6), c.ref, c.dat, c.userid, l_branch) ;
-              exception when dup_val_on_index then
+                 values( c.KF, c.ref, c.dat, c.userid, l_branch) ;
+             exception when dup_val_on_index then
                  bars_audit.error(l_trace||'ƒокумент реф='||c.ref||' userid='||c.userid||' уже есть в списке виз');
                  null;
-              end;
+             end;
 
-              --если есть св€занные с другими рефами (чеки)
+             --если есть св€занные с другими рефами (чеки)
               select refl into l_refl
                 from oper
                where ref = c.ref;
 
               if l_refl is not null then
                  bars_audit.info(l_trace||'св€занный к реф='||c.ref||' рефл='||l_refl||' userid='||c.userid);
-                 insert into cash_lastvisa(kf, ref, dat, userid, branch)
-                 select substr(l_branch,2,6), ref, c.dat, c.userid, l_branch
+                 insert into cash_lastvisa( kf, ref, dat, userid, branch )
+                 select KF, ref, c.dat, c.userid, l_branch
                    from oper
                   where ref <> c.ref
                   start with ref = c.ref connect by prior refl = ref;
@@ -1991,7 +1967,6 @@ is
 
            delete from cash_refque where ref = c.ref and userid = c.userid;
        end loop;
-
 
     exception when others then
        bars_audit.error(l_trace||'ошибка выполнени€ разбора очереди виз: '||sqlerrm);

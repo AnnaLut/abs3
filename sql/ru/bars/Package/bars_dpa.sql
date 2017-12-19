@@ -1202,7 +1202,7 @@ begin
            or l_filedigit in ('1','2') and substr(fn,2,1) = l_filetype
             )
         and substr(fn,2,1) in ('F', 'P', 'K')
-        and substr(fn,1) = substr(p_filename,1)
+        and substr(fn,4) = substr(p_filename,4)
         and dat > sysdate-30;
   exception when no_data_found then
      raise_application_error(-20000, ' витанц≥€ на не≥снуючий файл', true);
@@ -1252,7 +1252,10 @@ begin
 exception when others then
   if ( sqlcode = -19202 or sqlcode = -31011 ) then
      p_errcode := '-1';
-  else raise_application_error(-20000, sqlerrm, true);
+  else
+  bars_audit.error( 'BARS_DPA.IMPORT_TICKET: ' || dbms_utility.format_error_stack() || 
+                                       CHR(10) || dbms_utility.format_error_backtrace() );
+  raise_application_error( -20000, sqlerrm || CHR(10) || dbms_utility.format_error_backtrace(), true );
   end if;
 end import_ticket;
 
