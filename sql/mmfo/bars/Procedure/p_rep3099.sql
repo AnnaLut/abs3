@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure P_REP3099 ***
 
-  CREATE OR REPLACE PROCEDURE BARS.P_REP3099 (p_dat date)
+CREATE OR REPLACE procedure BARS.p_rep3099(p_dat date)
  as
 
   /*
@@ -55,12 +55,12 @@ begin
  for x in (
 
                Select c.rnk, c.nmk, cc.nd, cc.cc_id, cc.sdate, cc.wdate, a.kv,
-           sum(case when regexp_like(a.nbs,'(0|1|2|3)$')  then S.OSTF - s.dos+s.kos else 0 end)/100*-1 ost_ss,
-           sum(case when a.tip != 'SNA' and regexp_like(a.nbs,'8$')  then S.OSTF - s.dos+s.kos else 0 end)/100*-1 ost_sn,
-           sum(case when regexp_like(a.nbs,'7$') then S.OSTF - s.dos+s.kos else 0 end)/100*-1 ost_sp,
-           sum(case when a.tip != 'SNA' and regexp_like(a.nbs,'9$') then S.OSTF - s.dos+s.kos else 0 end)/100*-1 ost_spn,
-           LISTAGG(case when regexp_like(a.nbs,'7$')                    then a.acc else null end ,',') WITHIN GROUP (ORDER BY a.acc)  acc_sp,
-           LISTAGG(case when a.tip != 'SNA' and regexp_like(a.nbs,'9$') then a.acc else null end ,',') WITHIN GROUP (ORDER BY a.acc)  acc_spn
+           sum(case when a.tip = 'SS '/*regexp_like(a.nbs,'(0|1|2|3)$')*/  then S.OSTF - s.dos+s.kos else 0 end)/100*-1 ost_ss,
+           sum(case when a.tip != 'SNA' and a.tip = 'SN '/*regexp_like(a.nbs,'8$')*/  then S.OSTF - s.dos+s.kos else 0 end)/100*-1 ost_sn,
+           sum(case when a.tip = 'SP '/*regexp_like(a.nbs,'7$')*/ then S.OSTF - s.dos+s.kos else 0 end)/100*-1 ost_sp,
+           sum(case when a.tip != 'SNA' and a.tip = 'SPN'/* and regexp_like(a.nbs,'9$')*/  then S.OSTF - s.dos+s.kos else 0 end)/100*-1 ost_spn,
+           LISTAGG(case when a.tip = 'SP '/*regexp_like(a.nbs,'7$')*/                    then a.acc else null end ,',') WITHIN GROUP (ORDER BY a.acc)  acc_sp,
+           LISTAGG(case when a.tip != 'SNA' and a.tip = 'SPN' /*regexp_like(a.nbs,'9$')*/  then a.acc else null end ,',') WITHIN GROUP (ORDER BY a.acc)  acc_spn
           from  table(l_list_nd) nd,
            cc_deal cc, nd_acc na, customer c, v_gl a, saldoa s,
               (select to_char(column_value) nbs from table(getTokens(l_list_nbs))) nb

@@ -35,11 +35,6 @@
                 <input type="text" class="form-control" id="searchEPC" placeholder="Номер ЕПП" />
             </div>
         </div>
-        <div class="col-md-offset-2 col-md-4">
-            <div class="form-group">
-                <input type="checkbox" id="searchBlocked" /> <b>Заблокований</b>
-            </div>
-        </div>
     </div>
     <div class="row">
         <div class="col-md-offset-5">
@@ -64,24 +59,11 @@
     </div>
 </div>
 
-<div id="dialogUnblockEpc">
-    <div style="margin-top: 4px;text-align: center;">
-        <br />
-        <label><strong>Ви підтверджуєте розблокування?</strong></label>
-        <br /><br />
-        <button id="confirmUnblock" class="k-button k-button" width="150px">Так</button>
-        <button id="rejectUnblock" class="k-button k-primary" width="150px">Ні</button>
-    </div>
-</div>
-
 <script type="text/x-kendo-template" id="destroyEpc-template">
     <div class="toolbar">
         <button id="destroyEpc" class='btn btn-warning'>
             <span class="glyphicon glyphicon-ok-circle" aria-hidden="true"></span>
-            Знищити
-        </button>
-        <button id="unblockEpc" class='btn btn-default' disabled>
-            Розблокувати
+            Обробити
         </button>
     </div>
 </script>
