@@ -8,8 +8,6 @@ WITH ob22_all
                     UNION ALL
                     SELECT '220374' ob22, 2 id FROM DUAL --New
                     UNION ALL
-                    SELECT '220346' ob22, 2 id FROM DUAL
-                    UNION ALL
                     SELECT '220348' ob22, 2 id FROM DUAL
                     UNION ALL
                     SELECT '220257' ob22, 1 id FROM DUAL
