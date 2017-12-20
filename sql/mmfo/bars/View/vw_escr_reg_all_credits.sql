@@ -1,58 +1,5 @@
-CREATE OR REPLACE FORCE VIEW BARS.VW_ESCR_REG_ALL_CREDITS
-(
-   CUSTOMER_ID,
-   CUSTOMER_NAME,
-   CUSTOMER_OKPO,
-   CUSTOMER_REGION,
-   CUSTOMER_FULL_ADDRESS,
-   CUSTOMER_TYPE,
-   SUBS_NUMB,
-   SUBS_DATE,
-   SUBS_DOC_TYPE,
-   DEAL_ID,
-   DEAL_NUMBER,
-   DEAL_DATE_FROM,
-   DEAL_DATE_TO,
-   DEAL_TERM,
-   DEAL_PRODUCT,
-   DEAL_STATE,
-   DEAL_TYPE_CODE,
-   DEAL_TYPE_NAME,
-   DEAL_SUM,
-   CREDIT_STATUS_ID,
-   CREDIT_STATUS_NAME,
-   CREDIT_STATUS_CODE,
-   CREDIT_COMMENT,
-   STATE_FOR_UI,
-   GOOD_COST,
-   NLS,
-   ACC,
-   DOC_DATE,
-   MONEY_DATE,
-   COMP_SUM,
-   VALID_STATUS,
-   BRANCH_CODE,
-   BRANCH_NAME,
-   MFO,
-   USER_ID,
-   USER_NAME,
-   REG_KIND_CODE,
-   REG_KIND_NAME,
-   REG_TYPE_CODE,
-   REG_TYPE_NAME,
-   CREDIT_STATUS_DATE,
-   OUTER_NUMBER,
-   NEW_DEAL_SUM,
-   NEW_COMP_SUM,
-   NEW_GOOD_COST,
-   REG_TYPE_ID,
-   REG_KIND_ID,
-   STATE_PRIORITY,
-   SUBS_AVAILABLE,
-   AVR_DATE
-)
-AS
-   SELECT rez.customer_id,
+CREATE OR REPLACE VIEW VW_ESCR_REG_ALL_CREDITS AS
+SELECT rez.customer_id,
           rez.customer_name,
           rez.customer_okpo,
           CASE
@@ -316,12 +263,12 @@ AS
           rez.avr_date
      FROM (WITH deal_sum
                 AS (  SELECT c.nd deal_nd,
-                             GREATEST (c.sdog * 100,
-                                       SUM (NVL (cc_pog.sumg, 0)))
+                             /*GREATEST (*/c.sdog * 100/*,
+                                       SUM (NVL (cc_pog.sumg, 0)))*/
                                 deal_sum
-                        FROM cc_pog, bars.cc_deal c
-                       WHERE cc_pog.nd = c.nd AND (sumg > 0 OR sumo > 0)
-                    GROUP BY c.nd, c.sdog),
+                        FROM /*cc_pog,*/ bars.cc_deal c
+                       /*WHERE cc_pog.nd = c.nd AND (sumg > 0 OR sumo > 0)
+                    GROUP BY c.nd, c.sdog*/),
                 deal_term
                 AS (SELECT t.nd, t.wdate
                       FROM bars.cc_deal_update t
@@ -565,7 +512,7 @@ AS
                         TO_NUMBER (5)
                      WHEN     EXTRACT (YEAR FROM t.sdate) = 2017
                           AND SUBSTR (t.prod, 1, 6) NOT IN ('220257',
-                                                            '220347', 
+                                                            '220347',
                                                             '220373')
                      THEN
                         TO_NUMBER (6)
@@ -609,22 +556,12 @@ AS
                             SYS_CONTEXT ('bars_context', 'user_branch_mask')
                          || '%') rez
           JOIN bars.escr_reg_kind ek ON rez.reg_kind_id = ek.id
-          JOIN bars.escr_reg_types et ON rez.reg_type_id = et.id;
-
-COMMENT ON TABLE BARS.VW_ESCR_REG_ALL_CREDITS IS 'Кредитний портфель для енерго';
-
-COMMENT ON COLUMN BARS.VW_ESCR_REG_ALL_CREDITS.CUSTOMER_ID IS 'Реєстраційний номер  картки платника';
-
-COMMENT ON COLUMN BARS.VW_ESCR_REG_ALL_CREDITS.CUSTOMER_NAME IS 'Прізвище, ім’я,  по-батькові фізичної особи-позичальника';
-
-COMMENT ON COLUMN BARS.VW_ESCR_REG_ALL_CREDITS.CUSTOMER_OKPO IS 'ІНН особи-позичальника ';
-
-COMMENT ON COLUMN BARS.VW_ESCR_REG_ALL_CREDITS.CUSTOMER_REGION IS 'Клієнт адреса проживання (область)';
-
-COMMENT ON COLUMN BARS.VW_ESCR_REG_ALL_CREDITS.CUSTOMER_FULL_ADDRESS IS 'Клієнт повна адреса проживання';
-
-COMMENT ON COLUMN BARS.VW_ESCR_REG_ALL_CREDITS.AVR_DATE IS 'Дата надання актів виконаних робіт або заяви про власноручне встановлення';
-
-GRANT SELECT ON BARS.VW_ESCR_REG_ALL_CREDITS TO BARS_ACCESS_DEFROLE;
-
-GRANT SELECT ON BARS.VW_ESCR_REG_ALL_CREDITS TO UPLD;
+          JOIN bars.escr_reg_types et ON rez.reg_type_id = et.id
+;
+comment on table VW_ESCR_REG_ALL_CREDITS is 'Кредитний портфель для енерго';
+comment on column VW_ESCR_REG_ALL_CREDITS.CUSTOMER_ID is 'Реєстраційний номер  картки платника';
+comment on column VW_ESCR_REG_ALL_CREDITS.CUSTOMER_NAME is 'Прізвище, ім’я,  по-батькові фізичної особи-позичальника';
+comment on column VW_ESCR_REG_ALL_CREDITS.CUSTOMER_OKPO is 'ІНН особи-позичальника ';
+comment on column VW_ESCR_REG_ALL_CREDITS.CUSTOMER_REGION is 'Клієнт адреса проживання (область)';
+comment on column VW_ESCR_REG_ALL_CREDITS.CUSTOMER_FULL_ADDRESS is 'Клієнт повна адреса проживання';
+comment on column VW_ESCR_REG_ALL_CREDITS.AVR_DATE is 'Дата надання актів виконаних робіт або заяви про власноручне встановлення';

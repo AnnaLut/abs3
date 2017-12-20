@@ -193,8 +193,8 @@ END pkg_escr_reg_utl;
 /
 CREATE OR REPLACE PACKAGE BODY pkg_escr_reg_utl IS
 
-  g_body_version   CONSTANT VARCHAR2(64) := 'VERSION 8.7.1 15/12/2017';
-  g_header_version CONSTANT VARCHAR2(64) := 'VERSION 8.7.1 15/12/2017';
+  g_body_version   CONSTANT VARCHAR2(64) := 'VERSION 8.7.4 19/12/2017';
+  g_header_version CONSTANT VARCHAR2(64) := 'VERSION 8.7.2 18/12/2017';
 
   c_err_txt VARCHAR2(4000);
   --константи
@@ -847,7 +847,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_escr_reg_utl IS
       END LOOP;
     END IF;
     out_branch_list :=  /*'24/' || l_reg_list_dif.count ||' '||lc_new_line
-                                                                                                                                                                                                                                   ||*/
+                                                                                                                                                                                                                                         ||*/
      substr(out_branch_list,
                               1,
                               length(out_branch_list) - 1);
@@ -951,12 +951,12 @@ CREATE OR REPLACE PACKAGE BODY pkg_escr_reg_utl IS
     BEGIN
       SELECT COUNT(CASE
                      WHEN substr(t.deal_product, 1, 6) IN
-                          ('220347', '220257', '220380') THEN
+                          ('220347', '220257', '220373') THEN
                       1
                    END) boiler_count,
              COUNT(CASE
                      WHEN substr(t.deal_product, 1, 6) IN
-                          ('220258', '220348', '220381') THEN
+                          ('220258', '220348', '220374') THEN
                       2
                    END) material_count,
              t.customer_okpo
@@ -975,7 +975,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_escr_reg_utl IS
           INTO l_deal_id
           FROM escr_reg_header t
          WHERE substr(t.deal_product, 1, 6) IN
-               ('220258', '220348', '220381')
+               ('220258', '220348', '220374')
            AND extract(YEAR FROM t.deal_date_from) = '2017'
            AND t.customer_okpo IN (SELECT * FROM TABLE(l_customer_okpo));
       END;
@@ -998,7 +998,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_escr_reg_utl IS
           INTO l_deal_id
           FROM escr_reg_header t
          WHERE substr(t.deal_product, 1, 6) IN
-               ('220347', '220257', '220380')
+               ('220347', '220257', '220373')
            AND extract(YEAR FROM t.deal_date_from) = '2017'
            AND t.customer_okpo IN (SELECT * FROM TABLE(l_customer_okpo));
       END;
@@ -1358,31 +1358,31 @@ CREATE OR REPLACE PACKAGE BODY pkg_escr_reg_utl IS
     if in_check_flag = 1 then
       IF l_in_flag = 0 AND l_out_flag = 0 THEN
         DELETE FROM escr_register t WHERE t.id = in_reg_id;
-      END IF; 
-   elsif in_check_flag = 0 then
+      END IF;
+    elsif in_check_flag = 0 then
       delete from escr_reg_mapping t
-      where t.out_doc_id = in_reg_id
-        and t.oper_type = 1;
-     delete from escr_reg_body t
-      where t.deal_id in (select t1.out_doc_id
-                            from escr_reg_mapping t1
-                           where t1.in_doc_id = in_reg_id
-                             and t1.oper_type = 0);
-     delete from nd_txt t
-      where t.nd in (select t1.out_doc_id
-                       from escr_reg_mapping t1
-                      where t1.in_doc_id = in_reg_id
-                        and t1.oper_type = 0)
-        and t.tag = 'ES000';
-     delete from escr_reg_header t
-      where t.deal_id in (select t1.out_doc_id
-                            from escr_reg_mapping t1
-                           where t1.in_doc_id = in_reg_id
-                             and t1.oper_type = 0);
-     delete from escr_reg_mapping t
-      where t.in_doc_id = in_reg_id
-        and t.oper_type = 0;
-     delete from escr_register t where t.id = in_reg_id;
+       where t.out_doc_id = in_reg_id
+         and t.oper_type = 1;
+      delete from escr_reg_body t
+       where t.deal_id in (select t1.out_doc_id
+                             from escr_reg_mapping t1
+                            where t1.in_doc_id = in_reg_id
+                              and t1.oper_type = 0);
+      delete from nd_txt t
+       where t.nd in (select t1.out_doc_id
+                        from escr_reg_mapping t1
+                       where t1.in_doc_id = in_reg_id
+                         and t1.oper_type = 0)
+         and t.tag = 'ES000';
+      delete from escr_reg_header t
+       where t.deal_id in (select t1.out_doc_id
+                             from escr_reg_mapping t1
+                            where t1.in_doc_id = in_reg_id
+                              and t1.oper_type = 0);
+      delete from escr_reg_mapping t
+       where t.in_doc_id = in_reg_id
+         and t.oper_type = 0;
+      delete from escr_register t where t.id = in_reg_id;
     end if;
   END p_reg_del;
   /**********************************************
@@ -1464,12 +1464,21 @@ CREATE OR REPLACE PACKAGE BODY pkg_escr_reg_utl IS
     h     VARCHAR2(100) := 'bars.pkg_escr_reg_utls.p_reg_ins_xml.';
     l_str VARCHAR2(2000);
   
-    l_reg_rec   t_register := t_register();
-    l_reg_count NUMBER;
+    l_reg_rec            t_register := t_register();
+    l_reg_count          NUMBER;
+    l_error_count_before NUMBER;
+    l_error_count_after  NUMBER;
   BEGIN
   
     bars_audit.trace(h || 'Started');
-  
+    begin
+      select count(t.id)
+        into l_error_count_before
+        from err$_escr_register t;
+    exception
+      when others then
+        l_error_count_before := 0;
+    end;
     --  Формуємо колекцію реєстрів
     l_escrparamlist := dbms_xmldom.getelementsbytagname(in_dom_doc,
                                                         'EscrParam');
@@ -1536,7 +1545,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_escr_reg_utl IS
       l_reg_rec(l_reg_rec.last).user_name :=  /*TRIM(convert(*/
        l_str
       /*,'CL8MSWIN1251'
-                                                                                                                                                                                                                                                   ,'UTF8'))*/
+                                                                                                                                                                                                                                                         ,'UTF8'))*/
         ;
     
       dbms_xslprocessor.valueof(l_escrparam,
@@ -1560,6 +1569,18 @@ CREATE OR REPLACE PACKAGE BODY pkg_escr_reg_utl IS
           (j) log errors INTO err$_escr_register
           ('INSERT') reject LIMIT unlimited;
     END;
+    begin
+      select count(t.id)
+        into l_error_count_after
+        from err$_escr_register t;
+    exception
+      when others then
+        l_error_count_after := 0;
+    end;
+    if l_error_count_after <> l_error_count_before then
+      RAISE_APPLICATION_ERROR(-20001,
+                              'Помилка при створенні реєстру на ЦБД. Деталі в таблиці err$_escr_register  ');
+    end if;
     l_reg_count := l_reg_rec.count;
     UPDATE escr_reg_xml_files t
        SET t.reg_count = l_reg_count
@@ -1589,14 +1610,33 @@ CREATE OR REPLACE PACKAGE BODY pkg_escr_reg_utl IS
     l_escrdealparamlist dbms_xmldom.domnodelist;
     l_escrdealparam     dbms_xmldom.domnode;
   
-    l_reg_header       t_reg_header := t_reg_header();
-    l_reg_mapping      t_reg_mapping := t_reg_mapping();
-    l_str              VARCHAR(4000);
-    l_reg_header_count NUMBER;
+    l_reg_header         t_reg_header := t_reg_header();
+    l_reg_mapping        t_reg_mapping := t_reg_mapping();
+    l_str                VARCHAR(4000);
+    l_reg_header_count   NUMBER;
+    l_error_count_before NUMBER;
+    l_error_count_after  NUMBER;
+    l_error_count_before_1 NUMBER;
+    l_error_count_after_1   NUMBER;
   BEGIN
   
     bars_audit.trace(h || 'Started');
-  
+    begin
+      select count(t.id)
+        into l_error_count_before
+        from err$_escr_reg_header t;
+    exception
+      when others then
+        l_error_count_before := 0;
+    end;
+    begin
+      select count(t.id)
+        into l_error_count_before_1
+        from err$_escr_reg_mapping t;
+    exception
+      when others then
+        l_error_count_before_1 := 0;
+    end;
     --Формуємо колекцію кредитів ,а також мапінг між кредитами та реєстрами
     l_escrdealparamlist := dbms_xmldom.getelementsbytagname(in_dom_doc,
                                                             'EscrDealParam');
@@ -1788,7 +1828,31 @@ CREATE OR REPLACE PACKAGE BODY pkg_escr_reg_utl IS
       l_reg_mapping.delete;
       bars_audit.trace(h || 'Finished');
     END;
-    --Проставляємо ркредитам еєстрам статуси
+    begin
+      select count(t.id)
+        into l_error_count_after
+        from err$_escr_reg_header t;
+    exception
+      when others then
+        l_error_count_after := 0;
+    end;
+    if l_error_count_after <> l_error_count_before then
+      RAISE_APPLICATION_ERROR(-20001,
+                              'Помилка при додаванні інформації по КД на ЦБД. Деталі в таблиці err$_escr_reg_header  ');
+    end if;
+        begin
+      select count(t.id)
+        into l_error_count_after_1
+        from err$_escr_reg_mapping t;
+    exception
+      when others then
+        l_error_count_after_1 := 0;
+    end;
+    if l_error_count_after_1 <> l_error_count_before_1 then
+      RAISE_APPLICATION_ERROR(-20001,
+                              'Помилка при додаванні інформації по КД на ЦБД. Деталі в таблиці err$_escr_reg_mapping  ');
+    end if;
+    --Проставляємо по кредитам  статуси
     FOR i IN 1 .. l_reg_header.count LOOP
       p_set_obj_status(in_obj_id         => l_reg_header(i).deal_id,
                        in_obj_type       => 0,
@@ -1825,10 +1889,19 @@ CREATE OR REPLACE PACKAGE BODY pkg_escr_reg_utl IS
     l_reg_body       t_reg_body := t_reg_body();
     l_str            VARCHAR(4000);
     l_reg_body_count NUMBER;
+    l_error_count_before NUMBER;
+    l_error_count_after  NUMBER;
   BEGIN
   
     bars_audit.trace(h || 'Started');
-  
+    begin
+      select count(t.id)
+        into l_error_count_before
+        from err$_escr_reg_body t;
+    exception
+      when others then
+        l_error_count_before := 0;
+    end;
     --Формуємо колекцію кредитів ,а також мапінг між кредитами та реєстрами
     l_escreventsparamlist := dbms_xmldom.getelementsbytagname(in_dom_doc,
                                                               'EscrHeaderEvents');
@@ -1875,6 +1948,18 @@ CREATE OR REPLACE PACKAGE BODY pkg_escr_reg_utl IS
           ('INSERT') reject LIMIT unlimited;
       -- l_reg_header.delete;
     END;
+    begin
+      select count(t.id)
+        into l_error_count_after
+        from err$_escr_reg_body t;
+    exception
+      when others then
+        l_error_count_after := 0;
+    end;
+    if l_error_count_after <> l_error_count_before then
+      RAISE_APPLICATION_ERROR(-20001,
+                              'Помилка при додаванні інформації по КД на ЦБД. Деталі в таблиці err$_escr_reg_body  ');
+    end if;
     l_reg_body_count := l_reg_body.count;
     UPDATE escr_reg_xml_files t
        SET t.reg_body_count = l_reg_body_count
@@ -1922,8 +2007,15 @@ CREATE OR REPLACE PACKAGE BODY pkg_escr_reg_utl IS
     p_reg_ins_xml(l_doc, in_file_id);
     p_reg_header_ins_xml(l_doc, in_file_id);
     p_reg_body_ins_xml(l_doc, in_file_id);
-    --
-    p_check_after_create;
+    --Перевірка на дублі
+    begin
+      p_check_after_create;
+    exception
+      when others then
+        bars_audit.error('PKG_ESCR_REG_UTL.P_CHECK_AFTER_CREATE Реєстри, створені по файлу  in_file_id= ' ||
+                         in_file_id ||
+                         ' не пройшли перевірку на дублікати.');
+    end;
     --
     dbms_xmlparser.freeparser(l_parser);
     dbms_xmldom.freedocument(l_doc);
@@ -2089,30 +2181,35 @@ CREATE OR REPLACE PACKAGE BODY pkg_escr_reg_utl IS
                      er.deal_id,
                      er.deal_sum,
                      er.good_cost,
-                     er.comp_sum
+                     er.comp_sum,
+                     reg.outer_number
                 from escr_reg_header er,
-                     (select t.id, t.OUTER_NUMBER
+                     (select  t.id,t1.in_doc_id
                         from escr_register t, escr_reg_mapping t1
                        where t1.in_doc_id = in_reg_id
                          and t1.out_doc_id = t.id) r,
-                     escr_reg_mapping em
-               where em.in_doc_id = r.id
-                 and er.deal_id = em.out_doc_id
-                 and er.credit_status_id = 7
-                 and r.outer_number is not null
+                    escr_reg_mapping em,
+                       escr_register reg 
+                 where em.in_doc_id = r.id
+                   and er.deal_id = em.out_doc_id
+                   and reg.id=r.in_doc_id
+                   and er.credit_status_id = 7
+                   and reg.outer_number is not null
               union all
               select in_reg_id reg_id,
                      er.deal_id,
                      er.deal_sum,
                      er.good_cost,
-                     er.comp_sum
+                     er.comp_sum,
+                     r.outer_number
                 from escr_reg_header  er,
                      escr_reg_mapping em,
                      escr_register    r
                where r.id = in_reg_id
                  and er.deal_id = em.out_doc_id
                  and em.in_doc_id = r.id
-                 and er.credit_status_id = 7) rez
+                 and er.credit_status_id = 7
+                 and r.outer_number is not null) rez
        group by rez.reg_id;
     exception
       when no_data_found then
@@ -2278,17 +2375,19 @@ CREATE OR REPLACE PACKAGE BODY pkg_escr_reg_utl IS
                        er.branch_name,
                        er.mfo,
                        er.credit_status_id,
-                       r.OUTER_NUMBER reg_n
+                       reg.OUTER_NUMBER reg_n
                   from escr_reg_header er,
-                       (select t.id, t.OUTER_NUMBER
+                       (select t.id,t1.in_doc_id, t.OUTER_NUMBER
                           from escr_register t, escr_reg_mapping t1
                          where t1.in_doc_id = in_reg_list(i)
                            and t1.out_doc_id = t.id) r,
-                       escr_reg_mapping em
+                       escr_reg_mapping em,
+                       escr_register reg 
                  where em.in_doc_id = r.id
                    and er.deal_id = em.out_doc_id
+                   and reg.id=r.in_doc_id
                    and er.credit_status_id = 7
-                   and r.outer_number is not null
+                   and reg.outer_number is not null
                 union all
                 select er.id,
                        er.customer_name,
@@ -2533,13 +2632,13 @@ CREATE OR REPLACE PACKAGE BODY pkg_escr_reg_utl IS
   
     OPEN l_cursor FOR
     /*      SELECT rm.* \*DEAL_ID,
-                                             decode(rm.credit_status_id, 11, rm.credit_status_id, null) as state_id,
-                                             null as comment,
-                                             decode(rm.credit_status_id, 11, 'true', 'false') as is_set*\
-                    FROM vw_escr_reg_header rm
-                   WHERE rm.credit_status_id IN (1, 2, 3, 16, 6, 7, 5, 12, -999)
-                     AND rm.credit_status_id IS NOT NULL;
-            */
+                                                 decode(rm.credit_status_id, 11, rm.credit_status_id, null) as state_id,
+                                                 null as comment,
+                                                 decode(rm.credit_status_id, 11, 'true', 'false') as is_set*\
+                        FROM vw_escr_reg_header rm
+                       WHERE rm.credit_status_id IN (1, 2, 3, 16, 6, 7, 5, 12, -999)
+                         AND rm.credit_status_id IS NOT NULL;
+                */
       SELECT t.deal_id,
              t.credit_status_id,
              TO_NUMBER(NULL) state_id,

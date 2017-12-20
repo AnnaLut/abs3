@@ -55,11 +55,11 @@ CREATE OR REPLACE PACKAGE ESCR IS
 end ESCR;
 /
 CREATE OR REPLACE PACKAGE BODY escr IS
-  g_body_version CONSTANT VARCHAR2(64) := 'ver.4.1.5 12/12/2017';
+  g_body_version CONSTANT VARCHAR2(64) := 'ver.4.1.6 20/12/2017';
   nlchr CHAR(2) := chr(13) || chr(10);
 
   /*
-  
+
   24/05/2017 Піванова додано формування копії ГПК до перебудови
   23/12/2016 Піванова виправлена помилка при парсінгу призначення платежу
   19.09.2016 Sta Заменила код оп 013 на PS1
@@ -90,18 +90,18 @@ CREATE OR REPLACE PACKAGE BODY escr IS
     else
       l_TOTAL_DEAL_COUNT := TOTAL_DEAL_COUNT;
     end if;
-  
+
     insert into escr_pay_log_header
       (id, total_deal_count, succes_deal_count, error_deal_count)
     values
       (id_log, l_TOTAL_DEAL_COUNT, SUCCES_DEAL_COUNT, ERROR_DEAL_COUNT);
-  
+
     update escr_pay_log_header
        set total_deal_count  = l_TOTAL_DEAL_COUNT,
            succes_deal_count = SUCCES_DEAL_COUNT,
            error_deal_count  = ERROR_DEAL_COUNT
      where id = id_log;
-  
+
   end p_log_header_set;
   PROCEDURE p_log_body_set(id_log   in escr_pay_log_header.id%type,
                            deal_id  in cc_deal.nd%type,
@@ -112,7 +112,7 @@ CREATE OR REPLACE PACKAGE BODY escr IS
       (id_log, deal_id, err_code, comments)
     values
       (id_log, deal_id, err_code, comments);
-  
+
   END p_log_body_set;
   procedure p_cc_lim_count(deal_id      cc_Deal.nd%type,
                            cc_lim_count out number) is
@@ -163,7 +163,7 @@ CREATE OR REPLACE PACKAGE BODY escr IS
                             l_comp_sum out number) is
     --Переписати на селект
   begin
-  
+
     SELECT nvl(t.comp_sum, 0)
       INTO l_comp_sum
       FROM vw_escr_reg_header t
@@ -174,7 +174,7 @@ CREATE OR REPLACE PACKAGE BODY escr IS
   end p_deal_comp_sum;
   procedure p_cc_lim_repair(id_log  escr_pay_log_body.id_log%type default null,
                             deal_id in cc_deal.nd%type default null) is
-  
+
     p_k0                  number := 2;
     p_Z1                  number;
     p_Z2                  number;
@@ -184,6 +184,7 @@ CREATE OR REPLACE PACKAGE BODY escr IS
     p_R1                  number;
     p_R2                  number;
     p_P1                  number;
+    p_P2                  number;
     p_K2                  number;
     aa                    accounts%rowtype;
     kv_                   int := 980;
@@ -235,7 +236,7 @@ CREATE OR REPLACE PACKAGE BODY escr IS
           FROM cc_lim t
          WHERE t.nd = i.nd;
       delete from cc_lim where nd = i.ND;
-    
+
       insert into cc_lim
         (ND, FDAT, LIM2, ACC, NOT_9129, SUMG, SUMO, OTM, SUMK, NOT_SN)
         select ND, FDAT, LIM2, ACC, NOT_9129, SUMG, SUMO, OTM, SUMK, NOT_SN
@@ -257,7 +258,7 @@ CREATE OR REPLACE PACKAGE BODY escr IS
         from int_accn
        where acc = i.acc
          and id = 0;
-    
+
       select *
         into aa
         from accounts
@@ -282,14 +283,15 @@ CREATE OR REPLACE PACKAGE BODY escr IS
                   p_R1      => p_R1, --OUT number, -- Общий ресурс (ост на SG(262*)
                   p_R2      => p_R2, --OUT number, --  Свободный ресурс R2 =  R1 - z4
                   p_P1      => p_P1 --OUT number  --  Реф.платежа
+
                   );
       escr.p_cc_lim_count(deal_id      => i.nd,
                           cc_lim_count => l_lim_count_after);
       escr.p_deal_comp_sum(p_deal_id => i.nd, l_comp_sum => l_sum_comp);
       l_lim_diff := TRUNC(l_sum_comp / l_lim_sumg, 0);
-    
+
       /*if abs (l_lim_count_before - l_lim_count_after) < 2 then--допрцювати умову*/
-    
+
       escr.p_log_body_set(id_log   => l_escr_pay_log_header,
                           deal_id  => i.nd,
                           err_code => 24,
@@ -306,7 +308,7 @@ CREATE OR REPLACE PACKAGE BODY escr IS
                                       l_lim_sumg);
       /*end if;*/
     end loop;
-  
+
   end p_cc_lim_repair;
   -------------------------------------
   PROCEDURE p_ref_del(p_ref  NUMBER,
@@ -315,7 +317,7 @@ CREATE OR REPLACE PACKAGE BODY escr IS
     delete from bars.nlk_ref t where t.ref1 = p_ref;
     bars.bars_audit.info('Delete from nlk_ref ref1:=' || p_ref);
     --Додати логування в журнали
-  
+
   END p_ref_del;
   ---------------------
   PROCEDURE oplv(p_ref  NUMBER,
@@ -330,7 +332,7 @@ CREATE OR REPLACE PACKAGE BODY escr IS
                  AND r.ref1 = o.REF
                  and extract(month from o.vdat) <> extract(month from gl.bd)) loop
       delete from bars.nlk_ref t where t.ref1 = c.ref;
-    
+
       bars.bars_audit.info('Delete from nlk_ref ref1:=' || c.ref);
     end loop;
     --Додано умову, що виконання зарахування можливе лише місяць в місяць
@@ -372,7 +374,7 @@ CREATE OR REPLACE PACKAGE BODY escr IS
     escr.oplv(p_ref, null);
   END dop;
   ----------------------------------------------------------------------------------------------------------
-  PROCEDURE pay1(flg_   SMALLINT, -- флаг оплаты
+   PROCEDURE pay1(flg_   SMALLINT, -- флаг оплаты
                  ref_   INTEGER, -- референция
                  vdat_  DATE, -- дата валютировния
                  tt_    CHAR, -- тип транзакции
@@ -396,7 +398,7 @@ CREATE OR REPLACE PACKAGE BODY escr IS
     nazn_    VARCHAR2(160);
     i_       INT;
     l_txt    VARCHAR2(70) := NULL;
-  
+
     l_tx1 VARCHAR2(70) := 'Неможливо вичленити реф КД з признач.платежу';
     l_tx2 VARCHAR2(70) := 'Дата КД*';
     l_tx3 VARCHAR2(70) := '№ КД*';
@@ -413,10 +415,10 @@ CREATE OR REPLACE PACKAGE BODY escr IS
     status_ VARCHAR2(10);
     l_recid NUMBER;
     ------------------------------------------------
-    s_nd VARCHAR2(10);
-    s_sd VARCHAR2(10);
-    s_cd VARCHAR2(30);
-    s_id VARCHAR2(20);
+    s_nd VARCHAR2(255);
+    s_sd VARCHAR2(255);
+    s_cd VARCHAR2(255);
+    s_id VARCHAR2(255);
     -----------------------------------------------
     i_ost   NUMBER;
     v_ost   NUMBER;
@@ -430,6 +432,7 @@ CREATE OR REPLACE PACKAGE BODY escr IS
     p_r1    NUMBER;
     p_r2    NUMBER;
     p_p1    NUMBER;
+    p_p2    NUMBER;
     p_k2    NUMBER;
     phone_  acc_sms_phones.phone%TYPE;
     l_msgid INTEGER;
@@ -442,7 +445,7 @@ CREATE OR REPLACE PACKAGE BODY escr IS
     l_lim_diff         NUMBER;
     l_sum_comp         NUMBER;
   BEGIN
-  
+
     BEGIN
       SELECT * INTO oo FROM oper WHERE REF = ref_;
     EXCEPTION
@@ -451,11 +454,11 @@ CREATE OR REPLACE PACKAGE BODY escr IS
                                 '\9517 - ESCR.Не знайдено Вх.ВПС-док');
     END;
     ---------------------------------------
-    s_nd := substr(f_dop(ref_, 'ND'), 1, 10);
+    s_nd := substr(f_dop(ref_, 'ND'), 1, 12);
     s_sd := substr(f_dop(ref_, 'DAT1'), 1, 10);
     s_cd := substr(f_dop(ref_, 'CC_ID'), 1, 30);
     s_id := substr(f_dop(ref_, 'IDB'), 1, 14);
-  
+   -- bars.bars_audit.info('ESCR.PAY1 p_ref=' || ref_||',s_nd= '||s_nd||',s_sd= '||s_sd||',s_cd= '||s_cd||',s_id= '||s_id);
     IF s_cd IS NULL OR s_sd IS NULL THEN
       nazn_ := oo.nazn;
       BEGIN
@@ -486,10 +489,11 @@ CREATE OR REPLACE PACKAGE BODY escr IS
         set_operw(ref_, 'CC_ID', s_cd);
         set_operw(ref_, 'IDB  ', s_id);
       END IF;
-      IF l_nazn <> 0 THEN
+     
+      IF l_nazn <> 0  or L_nazn=0 and l_count<>5  THEN
         i_    := instr(nazn_, ';', 1, 1);
         nazn_ := substr(nazn_, i_ + 1, 160);
-      
+
         IF l_count = 6 THEN
           i_    := instr(nazn_, ';', 1);
           s_nd  := substr(nazn_, 1, i_ - 1);
@@ -558,7 +562,7 @@ CREATE OR REPLACE PACKAGE BODY escr IS
       GOTO no_pay;
     END IF;
     oo.id_b := s_id;
-  
+
     BEGIN
       SELECT *
         INTO dd
@@ -574,7 +578,7 @@ CREATE OR REPLACE PACKAGE BODY escr IS
         l_txt := l_tx4;
         GOTO no_pay;
     END;
-  
+
     IF length(TRIM(oo.id_b)) > 0 THEN
       BEGIN
         SELECT 1
@@ -588,7 +592,7 @@ CREATE OR REPLACE PACKAGE BODY escr IS
           GOTO no_pay;
       END;
     END IF;
-  
+
     BEGIN
       SELECT *
         INTO aa
@@ -605,7 +609,7 @@ CREATE OR REPLACE PACKAGE BODY escr IS
     END;
     l_txt := NULL;
     -------------------------------------------------------------------------------------------------------------------
-  
+
     SAVEPOINT do_opl;
     Declare
       Dat20_    date := to_date('20.11.2017', 'dd.mm.yyyy');
@@ -615,7 +619,7 @@ CREATE OR REPLACE PACKAGE BODY escr IS
     BEGIN
       ----------------------------------------------------------------------- зачислить всю сумму на 2620
       l_txt := l_tx7;
-    
+
       -- 23.11.2017 Повернення надлишкових сум  COBUMMFO-5548  - ESCR.
       If dd.sdate >= Dat20_ then
         -------- дати укладення Кредитних договорів – до 19/11/2017 ВКЛЮЧНО (<20),  та після 20.11.2017р ВКЛЮЧНО.(>=20)
@@ -627,7 +631,7 @@ CREATE OR REPLACE PACKAGE BODY escr IS
            and a.tip = 'LIM';
         SA2_ := SA_ - SA1_;
       end if;
-    
+
       If SA2_ > 0 then
         oo.tt := case
                    when oo.mfoa = oo.mfob then
@@ -667,7 +671,7 @@ CREATE OR REPLACE PACKAGE BODY escr IS
                    sos_   => 1,
                    prty_  => null,
                    uid_   => null);
-      
+
         paytt(0,
               l_REF_RET,
               gl.bDATE,
@@ -680,7 +684,7 @@ CREATE OR REPLACE PACKAGE BODY escr IS
               oo.nlsa,
               SA2_);
       end if;
-    
+
       --- Зарахувати на 2625 ---------------------------
       If sa1_ > 0 then
         gl.payv(flg_,
@@ -704,11 +708,11 @@ CREATE OR REPLACE PACKAGE BODY escr IS
       end if;
       -------------------------------------------------------------------------------------------------------------------
       DELETE FROM nlk_ref WHERE ref1 = ref_;
-    
+
       IF dd.sos >= 14 THEN
         RETURN;
       END IF;
-    
+
       l_txt   := l_tx8;
       aa.ostc := sa1_;
       n_ss    := 0; ------------2620 ---> 2203
@@ -741,7 +745,7 @@ CREATE OR REPLACE PACKAGE BODY escr IS
         aa.ostc := aa.ostc - oo.s;
       END LOOP;
       gl.pay(2, ref_, vdat_);
-    
+
       --- Перестроить ГПК, без досрочного погашения.
       IF n_ss > 0 AND l_acc8 > 0 THEN
         l_txt := l_tx9;
@@ -749,7 +753,7 @@ CREATE OR REPLACE PACKAGE BODY escr IS
           INTO i_ost, v_ost
           FROM accounts
          WHERE acc = l_acc8;
-      
+
         IF i_ost = 0 THEN
           ------------------------------------------------------------------- тело погашено полностью
           UPDATE cc_lim
@@ -783,12 +787,12 @@ CREATE OR REPLACE PACKAGE BODY escr IS
         ELSE
           ------------p_K2 := CCK_DPK.Day_PL(dd.nd) ; --------------------------------------  nMode = 122 Просто Перебудова ГПК
           -- Визначаємо к-сть записів в ГПК до перебудови та суму щомісячного погашення тіла
-        
+
           escr.p_cc_lim_count(deal_id      => dd.nd,
                               cc_lim_count => l_lim_count_before);
-        
+
           escr.p_deal_sumg(deal_id => dd.nd, l_lim_sumg => l_lim_sumg);
-        
+
           SELECT s
             INTO p_k2
             FROM int_accn
@@ -837,14 +841,15 @@ CREATE OR REPLACE PACKAGE BODY escr IS
                       p_r1      => p_r1, --OUT number, -- Общий ресурс (ост на SG(262*)
                       p_r2      => p_r2, --OUT number, --  Свободный ресурс R2 =  R1 - z4
                       p_p1      => p_p1 --OUT number  --  Реф.платежа
+                     --OUT number  --  Реф.платежа
                       );
           escr.p_cc_lim_count(deal_id      => dd.nd,
                               cc_lim_count => l_lim_count_after);
-        
+
           --Визначаємо орієнтовну к-сть періодів, на яку повинен зменшшитися ГПК після перебудови
           l_lim_diff := TRUNC((oo.s / 100) / l_lim_sumg, 0);
           if abs(l_lim_diff - (l_lim_count_before - l_lim_count_after)) > 1 then
-          
+
             escr.p_log_body_set(id_log   => id_log,
                                 deal_id  => dd.nd,
                                 err_code => 24,
@@ -859,7 +864,7 @@ CREATE OR REPLACE PACKAGE BODY escr IS
                                             oo.s / 100 ||
                                             ',сума щомісячного погашення  l_lim_sumg:=' ||
                                             l_lim_sumg);
-          
+
           end if;
         END IF;
       END IF;
@@ -905,10 +910,10 @@ CREATE OR REPLACE PACKAGE BODY escr IS
         WHEN no_data_found THEN
           NULL;
       END;
-    
+
     END IF;
     RETURN;
-  
+
   END pay1;
 
   PROCEDURE del1(p_ref NUMBER) IS -- вилучення реф з картотеки NLQ в звязку з ручним обробленням

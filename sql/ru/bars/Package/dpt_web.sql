@@ -8944,7 +8944,23 @@ create or replace package body dpt_web is
       bars_audit.trace('%s exit', title);
     else
       -- если сумма остатка депозита меньше минимальной суммы вида вклада, то пролонгации не будет
-      p_errmsg := 'Сума остатка на депозитному рахунку меньша за мінімальну суму виду вкладу';
+      --p_errmsg := 'Сума остатка на депозитному рахунку меньша за мінімальну суму виду вкладу';
+      
+      -- COBUMMFO-5162
+      begin
+      bars_audit.trace('%s встановлення ознаки дозволу на закриття вкладу до запитання dpt_id = %s',
+                     title, to_char(p_dptdata.dptid));
+      dpt.fill_dptparams(p_dptid => p_dptdata.dptid,
+                         p_tag => '2CLOS',
+                         p_val => 'Y');
+      bars_audit.trace('%s Возврат депозита и начисленных процентов по окончанию депозитных договоров dpt_id = %s',
+                     title, to_char(p_dptdata.dptid));         
+                               
+      auto_maturity_payoff(p_dptdata.dptid, 0, sys_context('bars_context','user_branch'), p_bdate);            
+                         
+      exception when others then
+        p_errmsg := 'Не вдалося встановити ознаку дозволу на закриття вкладу та зробити возврат депозита та нарахування відсотків';
+      end;
     end if;
   
   exception
@@ -19013,11 +19029,14 @@ create or replace package body dpt_web is
         left join dpt_extrefusals er
           on (er.dptid = d.deposit_id and er.req_state = 1 and
              er.req_bnkdat <= sysdate)
+        left join dpt_depositw dw -- COBUMMFO-5162
+          on (dw.dpt_id = d.deposit_id and dw.tag = '2CLOS' and dw.value = 'Y')     
        where d.deposit_id = p_dptid
          and (v.fl_dubl = 2 or ec.dpt_id is not null)
          and er.dptid is null
          and (nvl(d.cnt_dubl, 0) < nvl(v.term_dubl, 0) or
-             nvl(v.term_dubl, 0) = 0);
+             nvl(v.term_dubl, 0) = 0)
+         and dw.dpt_id is null;
     exception
       when no_data_found then
         l_out := 0;

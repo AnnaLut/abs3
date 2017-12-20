@@ -1,60 +1,5 @@
-CREATE OR REPLACE FORCE VIEW BARS.VW_ESCR_REG_HEADER
-(
-   CUSTOMER_ID,
-   CUSTOMER_NAME,
-   CUSTOMER_OKPO,
-   CUSTOMER_REGION,
-   CUSTOMER_FULL_ADDRESS,
-   CUSTOMER_TYPE,
-   SUBS_NUMB,
-   SUBS_DATE,
-   SUBS_DOC_TYPE,
-   DEAL_ID,
-   DEAL_NUMBER,
-   DEAL_DATE_FROM,
-   DEAL_DATE_TO,
-   DEAL_TERM,
-   DEAL_PRODUCT,
-   DEAL_STATE,
-   DEAL_TYPE_CODE,
-   DEAL_TYPE_NAME,
-   DEAL_SUM,
-   CREDIT_STATUS_ID,
-   CREDIT_STATUS_NAME,
-   CREDIT_STATUS_CODE,
-   CREDIT_COMMENT,
-   STATE_FOR_UI,
-   GOOD_COST,
-   NLS,
-   ACC,
-   DOC_DATE,
-   MONEY_DATE,
-   COMP_SUM,
-   VALID_STATUS,
-   BRANCH_CODE,
-   BRANCH_NAME,
-   MFO,
-   USER_ID,
-   USER_NAME,
-   REG_TYPE_ID,
-   REG_KIND_ID,
-   REG_ID,
-   CREATE_DATE,
-   DATE_FROM,
-   DATE_TO,
-   CREDIT_COUNT,
-   REG_KIND_CODE,
-   REG_TYPE_CODE,
-   REG_KIND_NAME,
-   REG_TYPE_NAME,
-   CREDIT_STATUS_DATE,
-   OUTER_NUMBER,
-   NEW_DEAL_SUM,
-   NEW_COMP_SUM,
-   NEW_GOOD_COST
-)
-AS
-   SELECT rez.CUSTOMER_ID,
+CREATE OR REPLACE VIEW VW_ESCR_REG_HEADER AS
+SELECT rez.CUSTOMER_ID,
           rez.CUSTOMER_NAME,
           rez.CUSTOMER_OKPO,
           CASE
@@ -305,12 +250,12 @@ AS
                      WHERE t.oper_type = 1),
                 deal_sum
                 AS (  SELECT c.nd deal_nd,
-                             GREATEST (c.sdog * 100,
-                                       SUM (NVL (cc_pog.sumg, 0)))
+                             /*GREATEST (*/c.sdog * 100/*,
+                                       SUM (NVL (cc_pog.sumg, 0)))*/
                                 deal_sum
-                        FROM cc_pog, cc_deal c
-                       WHERE cc_pog.nd = c.nd AND (sumg > 0 OR sumo > 0)
-                    GROUP BY c.nd, c.sdog),
+                        FROM /*cc_pog,*/ bars.cc_deal c
+                       /*WHERE cc_pog.nd = c.nd AND (sumg > 0 OR sumo > 0)
+                    GROUP BY c.nd, c.sdog*/),
                 deal_term
                 AS (SELECT t.nd, t.wdate
                       FROM cc_deal_update t
@@ -598,12 +543,5 @@ AS
                   JOIN escr_register er ON er.id = rm.in_doc_id
             WHERE c.custtype = '3') rez
           JOIN escr_reg_kind ek ON rez.reg_kind_id = ek.id
-          JOIN escr_reg_status est ON rez.credit_status_id = est.id;
-
-
-
-
-
-GRANT SELECT ON BARS.VW_ESCR_REG_HEADER TO BARS_ACCESS_DEFROLE;
-
-GRANT SELECT ON BARS.VW_ESCR_REG_HEADER TO UPLD;
+          JOIN escr_reg_status est ON rez.credit_status_id = est.id
+;
