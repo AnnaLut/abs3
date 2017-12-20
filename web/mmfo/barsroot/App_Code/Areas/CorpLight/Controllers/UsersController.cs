@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -79,9 +79,13 @@ namespace BarsWeb.Areas.CorpLight.Controllers
 
         public ActionResult ValidateOneTimePass(string phoneNumber, string code)
         {
-            var confirmPhoneList = GetConfirmPhoneList();
-            var phone = phoneNumber.Replace('+', ' ');
-            var curentPhone = confirmPhoneList.FirstOrDefault(i => i.Phone == phone);
+           var confirmPhoneList = GetConfirmPhoneList();
+            var charsToRemove = new string[] { "+", " " };
+            foreach (var c in charsToRemove)
+            {
+                phoneNumber = phoneNumber.Replace(c, string.Empty);
+            }
+            var curentPhone = confirmPhoneList.FirstOrDefault(i => i.Phone.Contains(phoneNumber));
             if (curentPhone == null || curentPhone.Secret != code)
             {
                 return Json(new { Status = "Error", Message = "Невірний код" }, JsonRequestBehavior.AllowGet);
