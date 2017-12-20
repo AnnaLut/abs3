@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bars_sms_clearance.sql =========*** 
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.BARS_SMS_CLEARANCE 
+CREATE OR REPLACE PACKAGE BARS.BARS_SMS_CLEARANCE
 IS
    ----
    -- Package bars_sms_clearance - пакет процедур для подготовки дебиторской задолженности за  SMS-сообщения
@@ -62,13 +56,16 @@ IS
    PROCEDURE init;
 END bars_sms_clearance;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.BARS_SMS_CLEARANCE 
+
+
+
+CREATE OR REPLACE PACKAGE BODY BARS.BARS_SMS_CLEARANCE
 IS
    ----
    --  Package bars_sms_clearance - пакет процедур для подготовки дебиторской задолженности за  SMS-сообщения
    --
 
-   g_body_version      CONSTANT VARCHAR2 (64) := 'version 1.04 20/11/2017';
+   g_body_version      CONSTANT VARCHAR2 (64) := 'version 1.05 20/12/2017';
 
    g_awk_body_defs     CONSTANT VARCHAR2 (512) := '';
 
@@ -79,13 +76,13 @@ IS
    g_ob22_exp          CONSTANT VARCHAR2 (2) := case when newnbs.g_state = 1 then '47' else '88' end; -- за новим планом рахунків замість 3579/88 відкриваються рахунки 3570/47
 
    --глобальний параметрт NBS для рахунків 3579
-   g_nbs_3579          CONSTANT VARCHAR2 (2) := case when newnbs.g_state = 1 then '3570' else '3579' end; -- за новим планом рахунків замість 3579 відкриваються рахунки 3570
+   g_nbs_3579          CONSTANT VARCHAR2 (4) := case when newnbs.g_state = 1 then '3570' else '3579' end; -- за новим планом рахунків замість 3579 відкриваються рахунки 3570
 
    --глобальний параметрт ОВ22 для рахунків 6110 (за новим планом рахунків 6510, ОБ22 залишається той самий)
    g_ob22_6110         CONSTANT VARCHAR2 (2) := 'E8';
 
    --глобальний параметрт NBS для рахунків 6110
-   g_nbs_6110          CONSTANT VARCHAR2 (2) := case when newnbs.g_state = 1 then '6510' else '6110' end; -- за новим планом рахунків замість 6110 відкриваються рахунки 6510
+   g_nbs_6110          CONSTANT VARCHAR2 (4) := case when newnbs.g_state = 1 then '6510' else '6110' end; -- за новим планом рахунків замість 6110 відкриваються рахунки 6510
 
    --глобальний параметрт код валюти
    g_kv                 CONSTANT NUMBER(3) := 980;
@@ -1442,15 +1439,3 @@ BEGIN
    init;
 END bars_sms_clearance;
 /
- show err;
- 
-PROMPT *** Create  grants  BARS_SMS_CLEARANCE ***
-grant EXECUTE                                                                on BARS_SMS_CLEARANCE to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on BARS_SMS_CLEARANCE to START1;
-
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/bars_sms_clearance.sql =========*** 
- PROMPT ===================================================================================== 
- 
