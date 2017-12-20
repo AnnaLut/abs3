@@ -59,7 +59,7 @@ PROMPT *** Create  procedure OP_REG_LOCK ***
 
 --***************************************************************--
 --          Регистрация - открытие счетов
---             ver 5.5    05.12.2018
+--             ver 5.6    17.12.2018
 --
 --          Функция открытия/обновления реквизитов счета
 --          с оптимистической блокировкой
@@ -154,35 +154,7 @@ BEGIN
    end if;
 
   
-      select count(*) into l_count from transform_2017_forecast where kf = gl.amfo and new_nls  = l_nls;     
-      if l_count  > 0 then
-         bars_audit.info(l_title||' рахунок '||l_nls||' зарезервовано під новий план рахунків');
-         l_new_nls := vkrzn( substr( gl.amfo, 1,5),  substr(l_nls,1,4)||'0' || trunc ( dbms_random.value ( 100000000, 999999999 ) )) ;
-
-         l_tries :=0;
-         while l_tries < 100 loop                     
-
-                     l_count := 0 ;
-                     select count(*) into l_count from 
-                     ( select 1  from accounts                   where nls      = l_new_nls   and kf = gl.amfo
-                       union all 
-                       select 1 from TRANSFORM_2017_FORECAST     where new_nls  = l_new_nls   and kf = gl.amfo
-                     );
-                    
-                     -- если такой счет нашли или в счете или в зарезервированных
-                     -- пытаемся еще раз подобрать
-                     if l_count = 0 then              
-                        -- выход, счет подобрали
-                        exit;   
-                     end if;
-                     l_tries := l_tries + 1;
-                     l_new_nls := vkrzn( substr( gl.amfo, 1,5),  substr(l_nls,1,4)||'0' || trunc ( dbms_random.value ( 100000000, 999999999 ) )) ;
-             end loop;  
-        -- делаем сто попыток
-         bars_audit.info(l_title||' рахунок '||l_nls||' в зарезервованх, підібрано новий рахунок = '||l_new_nls);
-         l_nls :=  l_new_nls;
-         --raise_application_error(-(20000 + 10), 'Рахунок '||l_nls||' зарезервовано під новий план рахунків', TRUE);
-      end if;         
+        
       
    -- определяем, есть ли счет
    BEGIN
