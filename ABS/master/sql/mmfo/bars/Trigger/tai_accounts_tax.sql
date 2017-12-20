@@ -15,7 +15,7 @@ EXCEPTION
       RAISE;
     END IF;
 END;
-
+/
 
 PROMPT ===================================================================================== 
 PROMPT *** End *** ========== Scripts /Sql/BARS/Trigger/tai_accounts_tax.sql =========*** En

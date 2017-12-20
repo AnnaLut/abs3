@@ -4,11 +4,6 @@ var record = 0;
 var isGridInited = false;
 
 function getSearchData(qv) {
-    var p = $("#gridSearchBox").data("kendoGrid");
-    if (p) {
-        p.destroy();
-    }
-
     var searchDataSource = new kendo.data.DataSource({
         type: "aspnetmvc-ajax",
         pageSize: 12,
@@ -53,7 +48,7 @@ function getSearchData(qv) {
     var searchSettings = {
         autoBind: true,
         resizable: true,
-        selectable: "multiple row",
+        selectable: "row",
         scrollable: true,
         sortable: true,
         pageable: {
@@ -113,57 +108,21 @@ function getSearchData(qv) {
                 title: "Причина знищення",
                 template: "#= getDDNameById(KILL_TYPE) #",
                 width: 200
-            },
-            {
-                field: "IS_BLK",
-                title: "Заблокований",
-                width: "10%",
-                //template: "<div># if (IS_BLK==1) { #Так# } else {#Ні#} #</div>"
             }
         ],
         filterMenuInit: function (e) { e.container.addClass("widerMenu"); },
         dataSource: searchDataSource,
-        dataBinding: function () {
-            record = (this.dataSource.page() - 1) * this.dataSource.pageSize();
+        dataBinding: function() {
+            record = (this.dataSource.page() -1) * this.dataSource.pageSize();
         },
         dataBound: function () {
             kendo.ui.progress($(".search-box"), false);
         },
-        filterable: true,
-        change: onChange
+        filterable: true
     };
 
     $("#gridSearchBox").kendoGrid(searchSettings);
-    $("#unblockEpc").attr("disabled", "true");
 }
-
-function onChange() {
-    updateUnblockBtnState();
-}
-
-function updateUnblockBtnState() {
-    var gridSearchBox = $("#gridSearchBox").data("kendoGrid");
-    var rows = gridSearchBox.select();
-
-    var canActivate = false;
-
-    for (var i = 0, max = rows.length; i < max; i++) {
-        var row = gridSearchBox.dataItem(rows[i]);
-        if (row.IS_BLK === "ні") {
-            canActivate = false;
-            break;
-        } else {
-            canActivate = true;
-        }
-    }
-
-    if (canActivate) {
-        $("#unblockEpc").removeAttr("disabled");
-    } else {
-        $("#unblockEpc").attr("disabled", "true");
-    }
-}
-
 
 //***** drop down for grid
 var DropDownData = null;
@@ -209,12 +168,12 @@ function getDDNameById(value) {
 // (fill data for dropdown )
 function renderDropDown(container, options) {
     $('<input required  name="' + options.field + '"/>')
-        .appendTo(container)
-        .kendoDropDownList({
-            dataTextField: "NAME",
-            dataValueField: "ID_TYPE",
-            dataSource: { data: DropDownData }
-        });
+          .appendTo(container)
+          .kendoDropDownList({
+              dataTextField: "NAME",
+              dataValueField: "ID_TYPE",
+              dataSource: { data: DropDownData }
+          });
 }
 //**************
 
@@ -249,7 +208,7 @@ function buildUI2DestroyEpc() {
 
     var pensioners = [];
     var grid = $("#gridSearchBox").data("kendoGrid");
-    var dataSource = grid.dataSource;
+    var dataSource = grid.dataSource;    
 
     //grid.tbody.find("input:checked").closest("tr").each(function (index) {
     //    var uid = $(this).attr('data-uid');
@@ -314,83 +273,29 @@ function buildUI2DestroyEpc() {
     $('#dialogDestroyEpc').data('kendoWindow').center().open();
 }
 
-function buildUI2UnblockEpc() {
-    $("#dialogUnblockEpc").kendoWindow({
-        actions: ["Close"],
-        draggable: true,
-        modal: true,
-        resizable: false,
-        title: "",
-        width: "350px",
-        visible: false,
-        open: function () { }
-
-    });
-    $("#dialogUnblockEpc").data("kendoWindow").center().open();
-}
-
-function confirmUnblock() {
-    var query = [];
-    var gridSearchBox = $("#gridSearchBox").data("kendoGrid");
-    var rows = gridSearchBox.select();
-    //var data = dataSource.data();
-
-    for (var i = 0; i < rows.length; i++) {
-        var item = gridSearchBox.dataItem(rows[i]);
-        var pensioner = { EPP_NUMBER: item.EPP_NUMBER, KILL_TYPE: item.KILL_TYPE, NLS: item.NLS };
-        query.push(pensioner);
-    }
-
-    $.ajax({
-        type: "POST",
-        dataType: "json",
-        data: JSON.stringify(query),
-        contentType: 'application/json; charset=utf-8',
-        url: bars.config.urlContent("/api/pfu/filesgrid/UnblockPensioner")
-    }).done(function () {
-        $('#dialogUnblockEpc').data('kendoWindow').close();
-        $('#gridSearchBox').data('kendoGrid').dataSource.read();
-        $('#gridSearchBox').data('kendoGrid').refresh();
-    }).always(function () {
-        $('#dialogUnblockEpc').data('kendoWindow').close();
-    });
-
-}
-
-function rejectUnblock() {
-    $("#dialogUnblockEpc").data("kendoWindow").close();
-}
-
 function SearchPensioners() {
     kendo.ui.progress($(".search-box"), true);
     var qv = {};
-    qv.EPP_NUMBER = NullOrValue($("#searchEPC").val());
-    qv.TAX_REGISTRATION_NUMBER = NullOrValue($("#searchInn").val());
-    qv.NAME_PENSIONER = NullOrValue($("#searchName").val());
-    qv.NLS = NullOrValue($("#searchNls").val());
-    qv.IS_BLK = $("#searchBlocked")[0].checked ? "так" : null;
+    qv.Epc = NullOrValue($("#searchEPC").val());
+    qv.Okpo = NullOrValue($("#searchInn").val());
+    qv.Nmk = NullOrValue($("#searchName").val());
+    qv.Nls = NullOrValue($("#searchNls").val());
+
     getSearchData(qv);
 }
 
 $(document).ready(function () {
     GetDropDownData();
 
-    InitGridWindow({ windowID: "#dialogDestroyEpc", srcSettings: { title: "Знищення ЕПП" } });
-    InitGridWindow({ windowID: "#dialogUnblockEpc", srcSettings: { title: "Розблокування ЕПП", width: "350px" } });
-
+    InitGridWindow({windowID: "#dialogDestroyEpc", srcSettings: {title: "Знищення ЕПП"}});
 
     $('#SearchPensioner').click(SearchPensioners);
 
     $('body').on('click', '#confirmDestroy', confirmDestroyEpc);
-    $('body').on('click', '#confirmUnblock', confirmUnblock);
-    $('body').on('click', '#rejectUnblock', rejectUnblock);
-    $('body').on('click', '#unblockEpc', buildUI2UnblockEpc);
-    $('body').on('click', '#destroyEpc', buildUI2DestroyEpc);
+    $('body').on('click', '#destroyEpc', buildUI2DestroyEpc);    
 
-    $(document.body).keydown(function (e) {
-        if (e.keyCode == KEY_CODE_ENTER) {
-            e.preventDefault(); // Stops IE from triggering the button to be clicked
-            SearchPensioners();
-        }
-    });
+    $(document.body).keydown(function (e) { if (e.keyCode == KEY_CODE_ENTER) {
+        e.preventDefault(); // Stops IE from triggering the button to be clicked
+        SearchPensioners();
+    } });
 });

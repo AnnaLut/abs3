@@ -253,8 +253,7 @@ namespace BarsWeb.Areas.Pfu.Infrastructure.Repository.DI.Implementation
                     (tax_registration_number = :p_tax_registration_number OR :p_tax_registration_number IS NULL)
                        AND (name_pensioner LIKE '%' || :p_name_pensioner || '%' OR :p_name_pensioner IS NULL)
                        AND (nls = :p_nls OR :p_nls IS NULL)
-                       AND (epp_number = :p_epp_number OR :p_epp_number IS NULL)
-                       AND (is_blk = :p_is_blocked OR :p_is_blocked IS NULL)",
+                       AND (epp_number = :p_epp_number OR :p_epp_number IS NULL)",
                 SqlParams = new object[]
                 {
                     new OracleParameter("tax_registration_number", OracleDbType.Varchar2) { Value = qv.TAX_REGISTRATION_NUMBER },
@@ -264,9 +263,7 @@ namespace BarsWeb.Areas.Pfu.Infrastructure.Repository.DI.Implementation
                     new OracleParameter("p_nls", OracleDbType.Varchar2) { Value = qv.NLS },
                     new OracleParameter("p_nls", OracleDbType.Varchar2) { Value = qv.NLS },
                     new OracleParameter("epp_number", OracleDbType.Varchar2) { Value = qv.EPP_NUMBER },
-                    new OracleParameter("epp_number", OracleDbType.Varchar2) { Value = qv.EPP_NUMBER },
-                    new OracleParameter("is_blk", OracleDbType.Varchar2){Value=qv.IS_BLK},
-                    new OracleParameter("is_blk", OracleDbType.Varchar2){Value=qv.IS_BLK}
+                    new OracleParameter("epp_number", OracleDbType.Varchar2) { Value = qv.EPP_NUMBER }
                 }
             };
         }
@@ -544,7 +541,7 @@ namespace BarsWeb.Areas.Pfu.Infrastructure.Repository.DI.Implementation
                 BarsSql sql = new BarsSql()
                 {
                     SqlText = @"begin
-                        pfu.pfu_ru_file_utl.set_epp_killed(:p_epp_number, :p_kill_type);
+                        bars.pfu_ru_file_utl.set_epp_killed(:p_epp_number, :p_kill_type);
                     end;",
                     SqlParams = new object[] {
                         new OracleParameter("p_epp_number", OracleDbType.Varchar2) { Value = pen.EPP_NUMBER },
