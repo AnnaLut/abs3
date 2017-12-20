@@ -70,7 +70,7 @@
                         if (res)
                             vm.reatedCustomers.unshift(res);
                     }, function (err) {
-                        console.log(err);
+                        ////console.log(err);
                     });
             }
 
@@ -175,7 +175,7 @@
                         }
                     },
                     function (response) {
-                        console.log(response);
+                        //console.log(response);
                         bars.ui.loader(userForm, false);
                         bars.ui.notify('Помилка', 'Сталася помилка при виклику сервісу', 'error');
                     }
@@ -268,7 +268,7 @@
                                 }
                             },
                             function (response) {
-                                console.log(response);
+                                //console.log(response);
                                 bars.ui.notify('Помилка', 'Сталася помилка при перавірці ІПН', 'error');
                             }
                         );
@@ -786,7 +786,7 @@
 
                     acskService.enrollRequest(relCustId, subjectData).then(
                         function (response) {
-                            console.log(response);
+                            //console.log(response);
                             bars.ui.loader('body', false);
 
                             bars.ui.notify('Успішно', 'Запит успішно відправлено', 'success');
@@ -794,7 +794,7 @@
                             vm.acskRulesWindow.close();
                         },
                         function (response) {
-                            console.log(response);
+                            //console.log(response);
                             bars.ui.loader('body', false);
                             bars.ui.notify('Помилка',
                                             'Виникла помилка при запиті Enroll. <small>' +
@@ -809,13 +809,13 @@
                             vm.acsk.selectedTemplate.TemplateId,
                             vm.acsk.selectedProvider.Id).then(
                         function (response) {
-                            console.log(response);
+                            //console.log(response);
                             bars.ui.loader('body', false);
 
                             vm.acsk.enrollRequest(vm.acskRulesWindow.userId, response.Data);
                         },
                         function (response) {
-                            console.log(response);
+                            //console.log(response);
                             bars.ui.loader('body', false);
                             bars.ui.notify('Помилка',
                                             'Виникла помилка при запиті Subject. <small>' +
