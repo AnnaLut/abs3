@@ -23,7 +23,7 @@ CREATE TABLE BARS.TRANSFER_2017
   COL       INTEGER,
   ID1       NUMBER
 )
-TABLESPACE BRSDYND '
+TABLESPACE BRSDYND ';
 exception when others then       
   if sqlcode=-955 then null; else raise; end if; 
 end; 

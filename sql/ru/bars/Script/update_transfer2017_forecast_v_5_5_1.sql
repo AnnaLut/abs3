@@ -4,8 +4,20 @@ delete from transform_2017_forecast where nbs = '3570' and ob22 = '19';
 delete from transform_2017_forecast where nbs = '6399' and ob22 = '14';
 delete from transform_2017_forecast where nbs = '7060' and ob22 = '01';
 
-Insert into BARS.TRANSFER_2017(R020_OLD, OB_OLD, R020_NEW, OB_NEW, COMM, ID1)
+
+delete from BARS.TRANSFER_2017 where r020_old = '1527' and ob_old = '02' and r020_new = '1501' and ob_new =  '02';
+delete from BARS.TRANSFER_2017 where r020_old = '2205' and ob_old = '00';
+delete from BARS.TRANSFER_2017 where r020_old = '3570' and ob_old = '19';
+delete from BARS.TRANSFER_2017 where r020_old = '6399' and ob_old = '14';
+delete from BARS.TRANSFER_2017 where r020_old = '7060' and ob_old = '01';
+
+
+begin 
+  Insert into BARS.TRANSFER_2017(R020_OLD, OB_OLD, R020_NEW, OB_NEW, COMM, ID1)
  Values ('1527', '02', '1521', '02', 'прострочена заборгованість за кредитами овернайт, що надані іншим банкам',  9999);
+exception when dup_val_on_index then null;
+end;
+/ 
 commit;
 
 /*
