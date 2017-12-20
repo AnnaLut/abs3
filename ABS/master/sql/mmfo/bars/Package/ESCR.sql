@@ -55,7 +55,7 @@ CREATE OR REPLACE PACKAGE ESCR IS
 end ESCR;
 /
 CREATE OR REPLACE PACKAGE BODY escr IS
-  g_body_version CONSTANT VARCHAR2(64) := 'ver.4.1.5 12/12/2017';
+  g_body_version CONSTANT VARCHAR2(64) := 'ver.4.1.6 20/12/2017';
   nlchr CHAR(2) := chr(13) || chr(10);
 
   /*
