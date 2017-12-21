@@ -29,5 +29,6 @@ namespace Bars.WebServices.GercPayModels
         public string DocumentAuthor { get; set; }
         public string Branch { get; set; }
         public string ExternalDocumentId { get; set; }
+        public string AdditionalOperRequisites { get; set; }
     }
 }

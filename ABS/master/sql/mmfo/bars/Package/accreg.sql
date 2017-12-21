@@ -727,7 +727,7 @@ $end
 
 $if ACC_PARAMS.MMFO
 $then
-  if ( BARS_DPA.DPA_NBS( l_nbs, p_ob22 ) = 1 )
+  if ( BARS_DPA.DPA_NBS( l_nbs, p_ob22 ) = 1 and p_mode <> 9)
   then -- COBUMMFO-4028
     BARS_DPA.ACCOUNTS_TAX( p_acc  => p_acc
                          , p_daos => trunc(SYSDATE)
