@@ -306,7 +306,7 @@ public partial class cim_payments_link_form : System.Web.UI.Page
                     lbConclEndDat.Text = (rec.END_DATE.HasValue) ? (rec.END_DATE.Value.ToString("dd/MM/yyyy")) : ("");
                 }
             }
-            dsLinks.SelectCommand = "select * from (select cim_mgr.get_cnc_link_sum(:BOUND_ID, type_id, bound_id) f_sum, :TYPE_ID d1, bound_id,contr_id,vmd_id,direct,type_id,doc_type,num,doc_date,allow_date,vt,s_vt,rate_vk,s_vk,file_date,file_name,s_pl_vk,z_vt,z_vk,s_pl_after_vk,control_date,overdue,comments from v_cim_bound_vmd where contr_id=:CONTR_ID and vt=" + lbConclKv.Text + ") where f_sum > 0 or " + CimManager.StrToNumber(lbConclSumDoc.Text) + " < " + CimManager.StrToNumber(lbConclSum.Text) + " and doc_date < to_date('" + lbConclEndDat.Text + "','DD/MM/YYYY') order by 1 desc";
+            dsLinks.SelectCommand = "select * from (select cim_mgr.get_cnc_link_sum(:BOUND_ID, type_id, bound_id) f_sum, :TYPE_ID d1, bound_id,contr_id,vmd_id,direct,type_id,doc_type,num,doc_date,allow_date,vt,s_vt,rate_vk,s_vk,file_date,file_name,s_pl_vk,z_vt,z_vk,s_pl_after_vk,control_date,overdue,comments, null as link_date from v_cim_bound_vmd where contr_id=:CONTR_ID and vt=" + lbConclKv.Text + ") where f_sum > 0 or " + CimManager.StrToNumber(lbConclSumDoc.Text) + " < " + CimManager.StrToNumber(lbConclSum.Text) + " and doc_date < to_date('" + lbConclEndDat.Text + "','DD/MM/YYYY') order by 1 desc";
         }
         else if (mode.Equals("4"))
         {
@@ -436,6 +436,11 @@ public partial class cim_payments_link_form : System.Web.UI.Page
 			{
             	e.Row.Cells[e.Row.Cells.Count - 1].Text = "<img src='/Common/Images/default/16/document.png' title='Змінити дату привязки' onclick='curr_module.EditRegDate(" + paymentType + "," + paymentId + "," + vmdType + "," + vmdId + ",\"" + Convert.ToDateTime(DataBinder.Eval(e.Row.DataItem, "LINK_DATE")).ToString("dd/MM/yyyy") + "\")'></img>&nbsp;&nbsp;" + e.Row.Cells[e.Row.Cells.Count - 1].Text;
 			}
+        }
+        if (Request["mode"] == "21" && e.Row.RowType == DataControlRowType.Header)
+        {
+            // hide column link_date
+            gvLinksMd.Columns[gvLinksMd.Columns.Count - 1].Visible = false;
         }
     }
 

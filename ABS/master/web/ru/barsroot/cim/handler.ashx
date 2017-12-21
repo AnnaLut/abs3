@@ -50,10 +50,11 @@ public class handler : IHttpHandler, IRequiresSessionState
                 fileName += Path.GetExtension(filePath);
             else
                 fileName += (fileExt.StartsWith("."))?(fileExt):("." + fileExt);
-            
+
             try
             {
-                context.Response.Charset = "windows-1251";
+                //context.Response.Charset = "windows-1251";
+                context.Response.Charset = System.Text.Encoding.UTF8.WebName;
                 context.Response.AppendHeader("content-disposition", "attachment;filename=" + Uri.EscapeDataString(fileName));
                 context.Response.ContentType = "application/octet-stream";
                 context.Response.WriteFile(filePath, true);
@@ -63,7 +64,7 @@ public class handler : IHttpHandler, IRequiresSessionState
             finally
             {
                 if (File.Exists(filePath))
-                   File.Delete(filePath);
+                    File.Delete(filePath);
             }
         }
         context.Response.End();

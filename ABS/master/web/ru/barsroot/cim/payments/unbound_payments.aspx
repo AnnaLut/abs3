@@ -7,11 +7,17 @@
 <asp:Content ID="ContentHead" ContentPlaceHolderID="HeadContent" runat="Server">
     <style type="text/css">
         .selectedRow {
-            background-color: #d3d3d3;
+            background-color: #87CEFA;
         }
     </style>
 </asp:Content>
 <asp:Content ID="ContentMain" ContentPlaceHolderID="MainContent" runat="Server">
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#btnExcelExport').attr('title', 'Експорт в Excel');
+            $('img[alt="Перечитати данi"]').attr('title', 'Перечитати данi');
+        });
+    </script>
     <bars:BarsSqlDataSourceEx runat="server" ID="dsCimTypes" ProviderName="barsroot.core"
         SelectCommand="select type_id, type_name from cim_types where type_id < 2">
     </bars:BarsSqlDataSourceEx>

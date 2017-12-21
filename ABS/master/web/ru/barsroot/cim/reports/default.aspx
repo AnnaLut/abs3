@@ -33,5 +33,10 @@
                 <asp:Button ID="btFormReport" runat="server" Text="Сформувати" OnClick="btFormReport_Click" Visible="false" />
             </td>
         </tr>
+        <tr>
+            <td colspan="2">
+                <asp:Label runat="server" ID="lbError" ForeColor="Red"></asp:Label>
+            </td>
+        </tr>
     </table>
 </asp:Content>

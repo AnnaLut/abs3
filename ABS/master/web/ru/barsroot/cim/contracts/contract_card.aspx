@@ -113,19 +113,17 @@
                         </td>
                     </tr>
                     <tr>
-                        <td colspan="2">Коментар
+                        <td>Коментар
                         </td>
-                       
-                        <td colspan="2">Інформація про перехід з іншого банку
+                       <td colspan="3">
+                            <textarea cols="108" rows="2" id="tbComments" title="Вкажіть коментар до контракту" class="k-input"></textarea>
                         </td>
-                        
                     </tr>
                     <tr>
-                         <td colspan="2">
-                            <textarea cols="70" rows="5" id="tbComments" title="Вкажіть коментар до контракту" class="k-input"></textarea>
-                        </td>
-                        <td colspan="2">
-                            <textarea cols="70" rows="5" id="tbInfoOtherBank" title="Вкажіть інформацію про перехід з іншого банку" class="k-input"></textarea>
+                        <td>Інформація про <br/>перехід з іншого банку
+                        </td> 
+                        <td colspan="3">
+                            <textarea cols="108" rows="2" id="tbInfoOtherBank" title="Вкажіть інформацію про перехід з іншого банку" class="k-input"></textarea>
                         </td>
                     </tr>
                 </table>

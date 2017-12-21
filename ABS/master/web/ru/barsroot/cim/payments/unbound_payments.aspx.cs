@@ -4,6 +4,8 @@ using cim;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
+using System.Linq;
 using System.Web;
 using System.Web.Script.Serialization;
 using System.Web.Services;
@@ -13,6 +15,8 @@ using System.Web.UI.WebControls;
 public partial class cim_payments_unbound_payments : System.Web.UI.Page
 {
     #region Protected
+
+    private const string SuprovidniDocs = "Супровідні документи";
 
     protected void Page_Load(object sender, EventArgs e)
     {
@@ -56,24 +60,46 @@ public partial class cim_payments_unbound_payments : System.Web.UI.Page
 
         pnSearchByRef.Visible = false;
         odsVCimUnboundPayments.SelectParameters["CUST_RNK"].DefaultValue = Request["CUST_RNK"];
+        var gridBoundColumns = gvVCimUnboundPayments.Columns.OfType<DataControlField>();
 
         if (chAll)
         {
             odsVCimUnboundPayments.TypeName = "cim.VCimUnboundPayments";
             gvVCimUnboundPayments.Columns[2].Visible = true;
+
+            SetVisibility(gridBoundColumns, SuprovidniDocs, false);
         }
         else if (chIn)
         {
             odsVCimUnboundPayments.TypeName = "cim.VCimInUnboundPayments";
             gvVCimUnboundPayments.Columns[2].Visible = false;
+
+            SetVisibility(gridBoundColumns, SuprovidniDocs, false);
         }
         else if (chOut)
         {
             odsVCimUnboundPayments.TypeName = "cim.VCimOutUnboundPayments";
+
+            TemplateField attachmentsCountField = new TemplateField()
+            {
+                ItemTemplate = new ChebkBooxColumn(),
+                HeaderText = SuprovidniDocs,
+                SortExpression = "ATTACHMENTS_COUNT"
+            };
+            if (gridBoundColumns.Any(bf => bf.HeaderText.Equals(SuprovidniDocs)))
+            {
+                var col = gridBoundColumns.FirstOrDefault(c=> c.HeaderText== SuprovidniDocs);
+                if (col != null) gvVCimUnboundPayments.Columns.Remove(col);
+            }
+            gvVCimUnboundPayments.Columns.Add(attachmentsCountField);
+            SetVisibility(gridBoundColumns, SuprovidniDocs, true);
+
             gvVCimUnboundPayments.Columns[2].Visible = false;
         }
         else if (rbSearchByRef.Checked)
         {
+            SetVisibility(gridBoundColumns, SuprovidniDocs, false);
+
             odsVCimUnboundPayments.TypeName = "cim.VCimFoundPayments";
             {
                 odsVCimUnboundPayments.SelectParameters["CUST_RNK"].DefaultValue = tbSearchRef.Text;
@@ -93,6 +119,14 @@ public partial class cim_payments_unbound_payments : System.Web.UI.Page
         if (Request["contr_id"] != null)
         {
             gvVCimUnboundPayments.DataBind();
+        }
+    }
+
+    private static void SetVisibility(IEnumerable<DataControlField> gridBoundColumns, string columnHeaderText, bool visibility)
+    {
+        if (gridBoundColumns.Any(bf => bf.HeaderText.Equals(columnHeaderText)) == true)
+        {
+            gridBoundColumns.First(bf => bf.HeaderText.Equals(columnHeaderText)).Visible = visibility;
         }
     }
 
@@ -117,8 +151,13 @@ public partial class cim_payments_unbound_payments : System.Web.UI.Page
 
     protected void gvVCimUnboundPayments_RowDataBound(object sender, GridViewRowEventArgs e)
     {
+        if (e.Row.RowType == DataControlRowType.Header)
+        {
+            e.Row.Cells[9].Visible = false;
+        }
         if (e.Row.RowType == DataControlRowType.DataRow)
         {
+            e.Row.Cells[9].Visible = false;
             var objJson = new Dictionary<string, object>
                 {
                     {"rf",getJsonMapping(e.Row.DataItem, "REF")},
@@ -321,4 +360,25 @@ public partial class cim_payments_unbound_payments : System.Web.UI.Page
         gvVCimUnboundPayments.DataBind();
     }
 
+}
+
+class ChebkBooxColumn : ITemplate
+{
+    public void InstantiateIn(System.Web.UI.Control container)
+    {
+        CheckBox cbAttachmentsCount = new CheckBox();
+        cbAttachmentsCount.Enabled = false;
+        cbAttachmentsCount.ID = "cbAttachmentsCount";
+        cbAttachmentsCount.DataBinding += new EventHandler(this.AttachmentsCount_DataBinding);
+        container.Controls.Add(cbAttachmentsCount);
+    }
+
+    private void AttachmentsCount_DataBinding(object sender, EventArgs e)
+    {
+        CheckBox cb = (CheckBox)sender;
+        GridViewRow row = (GridViewRow)cb.NamingContainer;
+        int attachmentsCount;
+        int.TryParse(DataBinder.Eval(row.DataItem, "ATTACHMENTS_COUNT").ToString(), out attachmentsCount);
+        cb.Checked = attachmentsCount > 0;
+    }
 }

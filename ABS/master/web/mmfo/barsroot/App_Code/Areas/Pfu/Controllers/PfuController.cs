@@ -77,6 +77,10 @@ namespace BarsWeb.Areas.Pfu.Controllers
             return View();
         }
         
+        public ActionResult RegistersAndRecords()
+        {
+            return View();
+        }
         public PfuController(IGridRepository repo)
         {
             _repo = repo;

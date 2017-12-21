@@ -6,31 +6,44 @@
 <asp:Content ID="contents_head" ContentPlaceHolderID="HeadContent" runat="Server">
 </asp:Content>
 <asp:Content ID="contents_body" ContentPlaceHolderID="MainContent" runat="Server">
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#btnExcelExport').attr('title', 'Експорт в Excel');
+            $('img[alt="Перечитати данi"]').attr('title', 'Перечитати данi');
+        });
+    </script>
+    <%--<bars:BarsSqlDataSourceEx runat="server" ID="dsCountries" ProviderName="barsroot.core"
+        SelectCommand="select country, country || ' - '|| name name from country union all select null, null from dual order by country">
+    </bars:BarsSqlDataSourceEx>--%>
 
     <bars:BarsSqlDataSourceEx runat="server" ID="dsCountries" ProviderName="barsroot.core"
-        SelectCommand="select country, country || ' - '|| name name from country union all select null, null from dual order by country">
+        SelectCommand="select country, TO_CHAR(country, '000') || ' - '|| name name from country union all select null, null from dual order by country">
     </bars:BarsSqlDataSourceEx>
 
     <asp:ObjectDataSource ID="odsVCimBeneficiaries" runat="server" SelectMethod="Select"
         TypeName="cim.VCimBeneficiaries" SortParameterName="SortExpression" EnablePaging="True"></asp:ObjectDataSource>
+
+    <bars:BarsSqlDataSourceEx runat="server" ID="dsVCimBeneficiaries" ProviderName="barsroot.core">
+        </bars:BarsSqlDataSourceEx>
     <div style="overflow: auto; padding: 10px 0 10px 0">
         <div runat="server" id="divMsg" style="padding-left: 10px; color: red">
         </div>
         <asp:Panel runat="server" ID="pbActions" GroupingText="Дії">
             <div style="padding-left: 10px;">
-                <asp:Button runat="server" ID="btAddNew" Text="Добавити запис" OnClick="btAddNew_Click" />
+                <asp:Button runat="server" ID="btAddNew" Text="Додати новий запис" OnClick="btAddNew_Click" />
             </div>
         </asp:Panel>
         <asp:Panel runat="server" ID="Panel1" GroupingText="Перелік бенефіціарів">
             <bars:BarsGridViewEx ID="gvVCimBeneficiaries" runat="server" AutoGenerateColumns="false" ShowFilter="true"
-                DataSourceID="odsVCimBeneficiaries" CaptionType="Cool" CaptionAlign="Left" AllowSorting="true" AutoSelectFirstRow="false"
+                DataSourceID="dsVCimBeneficiaries" CaptionType="Cool" CaptionAlign="Left" AllowSorting="true" AutoSelectFirstRow="false"
                 AllowPaging="True" ShowFooter="True" JavascriptSelectionType="ServerSelect" DataKeyNames="BENEF_ID, DELETE_DATE"
-                ShowPageSizeBox="false" OnRowCommand="gvVCimBeneficiaries_RowCommand" OnRowDeleting="gvVCimBeneficiaries_RowDeleting" OnRowDataBound="gvVCimBeneficiaries_RowDataBound">
+                ShowPageSizeBox="true" OnRowCommand="gvVCimBeneficiaries_RowCommand" OnRowDeleting="gvVCimBeneficiaries_RowDeleting" OnRowDataBound="gvVCimBeneficiaries_RowDataBound">
                 <Columns>
                     <asp:TemplateField ShowHeader="False">
                         <ItemTemplate>
                             <asp:ImageButton runat="server" ID="imgEdit" Width="16px" ToolTip="Редагувати запис"
-                                CommandName="Select" CausesValidation="false" CommandArgument='<%# Eval("BENEF_ID") %>' Visible='<%# Eval("DELETE_DATE") == null %>'
+                                CommandName="Select" CausesValidation="false" CommandArgument='<%# Eval("BENEF_ID") %>' 
+                                Visible='<%# ParseValue(Eval("DELETE_DATE"))== "" %>'
                                 ImageUrl="/Common/Images/default/16/open_blue.png"></asp:ImageButton>
                         </ItemTemplate>
                         <ItemStyle Width="18px" />
@@ -74,7 +87,7 @@
                         <td>Країна :
                         </td>
                         <td>
-                            <asp:DropDownList ID="ddCOUNTRY" DataSourceID="dsCountries" DataTextField="NAME" DataValueField="COUNTRY" runat="server" SelectedValue='<%# Eval("COUNTRY_ID") %>' />
+                            <asp:DropDownList ID="ddCOUNTRY" DataSourceID="dsCountries" DataTextField="NAME" DataValueField="COUNTRY" Width="100%" runat="server" SelectedValue='<%# Eval("COUNTRY_ID") %>' />
                         </td>
                     </tr>
                     <tr>

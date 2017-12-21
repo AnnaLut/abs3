@@ -15,7 +15,10 @@
 
 var checkOperCloseRights = {
     isItemInArr: function (item, arr) {
-        return arr.indexOf(item) !== -1;
+        for (var i = 0; i < arr.length; i++) {
+            if (arr[i] == item) return true;
+        }
+        return false;
     },
 
     accCanBeClosed: function (nbs, ob22) {
@@ -23,8 +26,15 @@ var checkOperCloseRights = {
 
         nbs = String(nbs);
         ob22 = String(ob22);
+        
+        var arrNBS = [];
 
-        var arrNBS = Object.keys(iData);
+        for (var property in iData) {
+            if (iData.hasOwnProperty(property)) {
+                arrNBS.push(property);
+            }
+        }
+
         if (nbs === "2625") {
             return false;
         }

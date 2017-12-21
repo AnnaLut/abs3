@@ -11,11 +11,16 @@ public partial class cim_contracts_beneficiaries : Bars.BarsPage
     protected void Page_Load(object sender, EventArgs e)
     {
         dsCountries.ConnectionString = OraConnector.Handler.IOraConnection.GetUserConnectionString();
+        dsVCimBeneficiaries.ConnectionString = OraConnector.Handler.IOraConnection.GetUserConnectionString();
+        dsVCimBeneficiaries.SelectCommand = "select * from V_Cim_Beneficiaries";
     }
 
     protected void gvVCimBeneficiaries_RowCommand(object sender, GridViewCommandEventArgs e)
     {
-        fvBeneficiar.ChangeMode(FormViewMode.Edit);
+        if (e.CommandName != "Page")
+        {
+            fvBeneficiar.ChangeMode(FormViewMode.Edit);
+        }   
     }
     protected void btSave_Click(object sender, EventArgs e)
     {
@@ -144,7 +149,23 @@ public partial class cim_contracts_beneficiaries : Bars.BarsPage
                 imgDel.ToolTip = "Відновити бенефіціара";
                 imgDel.Attributes["onclick"] = "return confirm('Відновити видаленого бенефіціара ?')";
             }
-
         }
     }
+
+
+    /// <summary>
+    /// Перевірка на null
+    /// </summary>
+    /// <param name="myValue"></param>
+    /// <returns></returns>
+    public string ParseValue(object myValue)
+    {
+        if (myValue == null)
+        {
+            return "";
+        }
+
+        return myValue.ToString();
+    }
+
 }

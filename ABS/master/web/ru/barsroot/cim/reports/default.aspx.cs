@@ -26,6 +26,7 @@ public partial class cim_reports_default : System.Web.UI.Page
     }
     protected void ReportsChange()
     {
+        lbError.Text = string.Empty;
         btFormReport.Visible = ddReports.SelectedIndex > 0;
         pbParamsList.Visible = ddReports.SelectedIndex > 0;
         if (ddReports.SelectedIndex > 0)
@@ -146,6 +147,7 @@ public partial class cim_reports_default : System.Web.UI.Page
 
     protected void btFormReport_Click(object sender, EventArgs e)
     {
+        lbError.Text = string.Empty;
 
         if (ddReports.SelectedIndex >= 0)
         {
@@ -221,6 +223,7 @@ public partial class cim_reports_default : System.Web.UI.Page
                                 Response.Flush();
                                 Response.End();
                             }
+                          
                             finally
                             {
                                 if (File.Exists(fileName))
@@ -275,6 +278,10 @@ public partial class cim_reports_default : System.Web.UI.Page
                 }
                 rdr.Close();
             }
+            catch (Exception ex)
+            {
+                lbError.Text = ex.Message;
+            }
             finally
             {
                 if (cText != null)
@@ -290,4 +297,5 @@ public partial class cim_reports_default : System.Web.UI.Page
 
 
     }
+  
 }

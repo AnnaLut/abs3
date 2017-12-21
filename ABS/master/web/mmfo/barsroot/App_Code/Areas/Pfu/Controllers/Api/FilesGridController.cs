@@ -7,9 +7,11 @@ using Ionic.Zip;
 using Kendo.Mvc.Extensions;
 using Kendo.Mvc.UI;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -383,6 +385,43 @@ namespace BarsWeb.Areas.Pfu.Controllers.Api
                 return response;
             }
         }
+        [HttpGet]
+        //[GET("/api/pfu/filesgrid/searchcataloginpay")]
+        public HttpResponseMessage SearchCatalogInPay([ModelBinder(typeof(WebApiDataSourceRequestModelBinder))] DataSourceRequest request, decimal? IdCatalog, string Mfo, DateTime? CatalogDate, DateTime? PayDate)
+        {
+            try
+            {
+                var search = new SearchCatalog { IdCatalog = IdCatalog, Mfo = Mfo, CatalogDate = CatalogDate, PayDate = PayDate };
+                var dataCount = _repo.CountCatalogInPay(search, request);
+                var data = _repo.CatalogInPay(search, request);
+                HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK,
+                    new { Data = data, Total = dataCount });
+                return response;
+            }
+            catch (Exception ex)
+            {
+                HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.InternalServerError,
+                    ex.Message);
+                return response;
+            }
+        }
+        [HttpPost]
+        //[POST("/api/pfu/filesgrid/processregistres")]
+        public HttpResponseMessage ProcessRegistres(int[] ids)
+        {
+            try
+            {
+                _repo.ProcessRegistres(ids);
+                HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.InternalServerError,
+                    ex.Message);
+                return response;
+            }
+        }
 
         [HttpGet]
         //[GET("/api/pfu/filesgrid/searchcataloghistory")]
@@ -527,6 +566,44 @@ namespace BarsWeb.Areas.Pfu.Controllers.Api
                 var data = _repo.LineCatalog(Id, request);
                 HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK,
                     new { Data = data, Total = dataCount });
+                return response;
+            }
+            catch (Exception ex)
+            {
+                HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.InternalServerError,
+                    ex.Message);
+                return response;
+            }
+        }
+        [HttpGet]
+        //[GET("/api/pfu/filesgrid/linecataloginpay")]
+        public HttpResponseMessage LineCatalogInPay(decimal? id, [ModelBinder(typeof(WebApiDataSourceRequestModelBinder))] DataSourceRequest request)
+        {
+            try
+            {
+                var dataCount = _repo.CountLineCatalogInPay(id, request);
+                var data = _repo.LineCatalogInPay(id, request);
+                HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK,
+                    new { Data = data, Total = dataCount });
+                return response;
+            }
+            catch (Exception ex)
+            {
+                HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.InternalServerError,
+                    ex.Message);
+                return response;
+            }
+        }
+        [HttpPost]
+        //[POST("/api/pfu/filesgrid/ProcessRecords")]
+        public HttpResponseMessage ProcessRecords(dynamic data)
+        {
+            try
+            {
+                string stateName = data["stateName"];
+                int[] ids = ((JArray)data["ids"]).Select(jv => (int)jv).ToArray();
+                _repo.ProcessRecords(ids, stateName);
+                HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK);
                 return response;
             }
             catch (Exception ex)
