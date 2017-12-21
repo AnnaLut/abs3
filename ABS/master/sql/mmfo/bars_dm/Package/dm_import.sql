@@ -212,7 +212,7 @@ end;
 create or replace package body DM_IMPORT
  is
 
-    g_body_version constant varchar2(64) := 'Version 3.3.1 16/12/2017'; -- bf, секционирование не вошло
+    g_body_version constant varchar2(64) := 'Version 3.3.3 21/12/2017';
     g_body_defs    constant varchar2(512) := null;
     G_TRACE        constant varchar2(20) := 'dm_import.';
   -- 26.09.2017 изменена выгрузка сегментов
@@ -1635,13 +1635,13 @@ create or replace package body DM_IMPORT
             -- тип договору (для БПК = 19)
             l_row.vidd  := 19;
             -- Тип клиєнта по виду договора
-
+			/* Для БПК не ведется
             begin
                 select custtype into l_row.VIDD_CUSTTYPE from bars.cc_vidd where vidd = l_row.vidd;
             exception
                 when no_data_found then l_row.vidd_custtype := null;
             end;
-
+			*/
             -- Дата укладання договору
             -- беремо, як дату відкриття 9129
             -- !до 15.12.2015 брали дату відкриття рах.овердрафту
@@ -3059,6 +3059,7 @@ create or replace package body DM_IMPORT
         l_user_mfo varchar2(256) := sys_context('bars_context', 'user_mfo');
         dml_errors exception;
         pragma exception_init(dml_errors, -24381);
+		l_limit number := 10000;
     begin
         p_rows_count := 0;
         p_errors_count := 0;
@@ -3120,7 +3121,7 @@ create or replace package body DM_IMPORT
         group by object_id)
         group by object_id;
         loop
-            fetch l_cursor bulk collect into l_customer_segments limit 1008;
+            fetch l_cursor bulk collect into l_customer_segments limit l_limit;
 
             p_rows_count := p_rows_count + l_customer_segments.count;
 
@@ -3181,7 +3182,7 @@ create or replace package body DM_IMPORT
         l_rows_count integer;
         l_errors_count integer;
         l_trace varchar2(500) := G_TRACE||'customer_segment_changes: ';
-        l_limit number := 1000;
+        l_limit number := 10000;
     begin
         p_rows_count := 0;
         p_errors_count := 0;
@@ -3259,6 +3260,7 @@ create or replace package body DM_IMPORT
         l_rows_count integer;
         l_trace varchar2(500) := G_TRACE||'customer_segment_snapshot: ';
         l_errors_count integer;
+		l_limit number := 10000;
     begin
         p_rows_count := 0;
         p_errors_count := 0;
@@ -3303,7 +3305,7 @@ create or replace package body DM_IMPORT
                                                                 'CUSTOMER_PRDCT_AMNT_CARDS', 'CUSTOMER_PRDCT_AMNT_ACC') and k.value_by_date_flag = 'N';
 
             loop
-                fetch l_cursor bulk collect into l_attribute_values limit 1000;
+                fetch l_cursor bulk collect into l_attribute_values limit l_limit;
 
                 store_customer_segments_data(l_period_id, l_attribute_values, l_rows_count, l_errors_count);
 
