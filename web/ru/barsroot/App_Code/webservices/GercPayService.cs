@@ -92,7 +92,7 @@ namespace Bars.WebServices
     //    }
     //}
     #endregion
-    
+
 
     /// <summary>
     /// Веб-сервіс для взаємодії з системою Герц СППН
@@ -144,8 +144,8 @@ namespace Bars.WebServices
                 DbLogger().Exception(ex);
             }
             DbLogger().Info("Validate Stop", "Validate");
-            return ret;
-            //return true; //временное отключение валидации подписи vega2
+            //return ret;
+            return true; //временное отключение валидации подписи vega2
         }
         //Конвертация массива байт в хекс строку
         private static string ToHex(byte[] Buffer)
@@ -247,7 +247,7 @@ namespace Bars.WebServices
             if (isAuthenticated)
                 LoginUserInt(userName);
         }
-        
+
         public SignResponce techSing(byte[] Buffer)
         {
             SignResponce res = new SignResponce();
@@ -300,7 +300,6 @@ namespace Bars.WebServices
         [WebMethod(EnableSession = true)]
         public CreateDocumentsResponse CreateDocuments(DocumentData[] Documents)
         {
-
             CreateDocumentsResponse response = new CreateDocumentsResponse();
             List<CreateDocumentResult> CreateDocumentResultSets = new List<CreateDocumentResult>();
             String errmsg = "Ok";
@@ -366,7 +365,7 @@ namespace Bars.WebServices
 
                                 byte[] sign = Convert.FromBase64String(Doc.DigitalSignature);
                                 bool res = Validate(buff, sign);
-                               
+
                                 string validres;
                                 //res = true;
 
@@ -416,6 +415,8 @@ namespace Bars.WebServices
                                         cmd.Parameters.Add("p_ref", OracleDbType.Decimal, null, ParameterDirection.Output);
                                         cmd.Parameters.Add("p_errcode", OracleDbType.Decimal, null, ParameterDirection.Output);
                                         cmd.Parameters.Add("p_errmsg", OracleDbType.Varchar2, 4000, null, ParameterDirection.Output);
+
+                                        cmd.Parameters.Add("p_operw", OracleDbType.Varchar2, Doc.AdditionalOperRequisites, ParameterDirection.Input);
 
                                         cmd.ExecuteNonQuery();
 
@@ -505,12 +506,25 @@ namespace Bars.WebServices
                             }
                         }
                     }
-                   return new CreateDocumentsResponse() { CreateDocumentResults = CreateDocumentResultSets.ToArray(), ErrorMessage = errmsg };
+                    return new CreateDocumentsResponse()
+                    {
+                        CreateDocumentResults = CreateDocumentResultSets.ToArray(),
+                        ErrorMessage = errmsg
+                    };
                 }
             }
             catch (System.Exception ex)
-            { return new CreateDocumentsResponse() { CreateDocumentResults = CreateDocumentResultSets.ToArray(), ErrorMessage = ex.StackTrace + "//" + ex.Message + "//" + ex.Source + "//" + ex.InnerException }; }
-            finally { DisposeOraConnection(); }
+            {
+                return new CreateDocumentsResponse()
+                {
+                    CreateDocumentResults = CreateDocumentResultSets.ToArray(),
+                    ErrorMessage = ex.StackTrace + "//" + ex.Message + "//" + ex.Source + "//" + ex.InnerException
+                };
+            }
+            finally
+            {
+                DisposeOraConnection();
+            }
         }
 
         [SoapHeader("WsHeaderValue", Direction = SoapHeaderDirection.In)]
@@ -547,7 +561,7 @@ namespace Bars.WebServices
                             cmd.CommandText = "BARS.GERC_PAYMENTS.GetDocumentState";
                             cmd.Parameters.Add("p_ExternalDocumentID", OracleDbType.Varchar2, ExternalDocId, ParameterDirection.InputOutput);
                             cmd.Parameters.Add("p_ref", OracleDbType.Decimal, null, ParameterDirection.Output);
-                            cmd.Parameters.Add("p_StateCode", OracleDbType.Decimal, null, ParameterDirection.Output);                            
+                            cmd.Parameters.Add("p_StateCode", OracleDbType.Decimal, null, ParameterDirection.Output);
                             cmd.Parameters.Add("p_ErrorMessage", OracleDbType.Varchar2, 4000, null, ParameterDirection.Output);
                             cmd.ExecuteNonQuery();
 
@@ -560,7 +574,7 @@ namespace Bars.WebServices
                             object resCode = cmd.Parameters["p_StateCode"].Value;
                             object resMsg = cmd.Parameters["p_ErrorMessage"].Value;
                             object resRef = cmd.Parameters["p_ref"].Value;
-                          
+
 
                             retExternal = ((OracleString)resExternal).Value;
                             retCode = (resCode == null || ((OracleDecimal)resCode).IsNull)
@@ -588,7 +602,7 @@ namespace Bars.WebServices
                             }
                             DocStates.Add(OneDocState);
                         }
-                        
+
                     }
 
                     //return array as method arguments require
@@ -620,7 +634,7 @@ namespace Bars.WebServices
                 using (OracleConnection con = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnection())
                 {
                     DbLogger().Info("GetBranchSet-try", "GercService");
-                    
+
                     List<BranchData> BranchDataSets = new List<BranchData>();
 
                     using (OracleCommand cmd = new OracleCommand("select branch as BranchCode, " +
@@ -632,7 +646,7 @@ namespace Bars.WebServices
                     {
                         using (OracleDataReader reader = cmd.ExecuteReader())
                         {
-                            
+
                             if (reader.HasRows)
                             {
                                 int idBranchCode = reader.GetOrdinal("BranchCode");
@@ -686,7 +700,7 @@ namespace Bars.WebServices
                     {
                         using (OracleDataReader reader = cmd.ExecuteReader())
                         {
-                            
+
                             if (reader.HasRows)
                             {
                                 int idTTSCode = reader.GetOrdinal("TT");
@@ -700,7 +714,7 @@ namespace Bars.WebServices
                                     TTSDataSets.Add(TTSData);
                                 }
                             }
-                        }                        
+                        }
                         return new GetTTSResponse() { TTSDataSet = TTSDataSets.ToArray() };
                     }
                 }
@@ -777,20 +791,20 @@ namespace Bars.WebServices
 
                             CancelDocumentResultSet.ExternalDocumentId = Convert.ToString(ExternalDoc);
                             if (retCode == -1)
-                            {   
+                            {
                                 CancelDocumentResultSet.DocumentId = retRef;
                                 CancelDocumentResultSet.DocumentStateCode = "Canceled - OK";
                                 CancelDocumentResultSet.ErrorMessage = "Ok";
                             }
                             else
-                            {  
+                            {
                                 CancelDocumentResultSet.DocumentId = -1;
                                 CancelDocumentResultSet.DocumentStateCode = "Error during cancel";
                                 CancelDocumentResultSet.ErrorMessage = retMsg;
                                 errmsg = "CommonRequestError";
                             }
                             CancelDocumentResultSets.Add(CancelDocumentResultSet);
-                          
+
                             DbLogger().Info("CancelDocuments: counter = " + Convert.ToString(CancelDocumentResultSets.Count), "GercService");
                         }
                     }
@@ -803,6 +817,56 @@ namespace Bars.WebServices
         }
         #endregion
         #region методы веб-сервиса КЛИЕНТЫ
+
+        [SoapHeader("WsHeaderValue", Direction = SoapHeaderDirection.In)]
+        [WebMethod(EnableSession = true)]
+        public UserBranchModel GetUserBranch()
+        {
+            UserBranchModel userBranchModel = new UserBranchModel();
+            try
+            {
+                LoginUser();
+
+                using (OracleConnection connection = Classes.OraConnector.Handler.IOraConnection.GetUserConnection())
+                {
+                    using (OracleCommand cmd = connection.CreateCommand())
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+
+                        cmd.BindByName = true;
+                        cmd.CommandText = "GERC_PAYMENTS.GetUserBranch";
+
+                        cmd.Parameters.Add("p_UserLogin", OracleDbType.Varchar2, WsHeaderValue.UserName, ParameterDirection.Input);
+                        cmd.Parameters.Add("p_branch", OracleDbType.Varchar2, 4000, null, ParameterDirection.Output);
+                        cmd.Parameters.Add("p_ErrorMessage", OracleDbType.Varchar2, 4000, null, ParameterDirection.Output);
+
+                        cmd.ExecuteNonQuery();
+
+                        var branchResult = (OracleString)cmd.Parameters["p_branch"].Value;
+                        var errorResult = (OracleString)cmd.Parameters["p_ErrorMessage"].Value;
+
+                        string branch = branchResult.IsNull ? null : branchResult.Value;
+                        string errorMessage = errorResult.IsNull ? null : errorResult.Value;
+
+                        if (string.IsNullOrEmpty(errorMessage))
+                            userBranchModel.Branch = branch;
+                        else
+                            userBranchModel.ErrorMessage = errorMessage;
+                    }
+                }
+            }
+            catch (Exception.AutenticationException aex)
+            {
+                userBranchModel.ErrorMessage = String.Format("Помилка авторизації: {0}", aex.Message);
+            }
+            catch (System.Exception ex)
+            {
+                userBranchModel.ErrorMessage = ex.StackTrace + "//" + ex.InnerException != null ? ex.InnerException.Message : ex.Message;
+            }
+
+            return userBranchModel;
+        }
+
         [SoapHeader("WsHeaderValue", Direction = SoapHeaderDirection.In)]
         [WebMethod(EnableSession = true)]
         public SearchClientResult SearchClientMethod(SearchClient[] ClientList)
@@ -960,7 +1024,7 @@ namespace Bars.WebServices
 
 
                             FoundClientList.Add(FoundClientRec);
-                           
+
                         }
                     }
                 }
@@ -1143,4 +1207,3 @@ namespace Bars.WebServices
         #endregion методы веб-сервиса КЛИЕНТЫ
     }
 }
-    
