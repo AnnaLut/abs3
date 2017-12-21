@@ -8,9 +8,17 @@ using Bars.Classes;
 using barsroot.cim;
 using Oracle.DataAccess.Client;
 using Oracle.DataAccess.Types;
+using BarsWeb.Core.Logger;
 
 public partial class cim_sanctions_default : System.Web.UI.Page
 {
+	private readonly IDbLogger _dbLogger;
+
+    public cim_sanctions_default()
+    {
+        _dbLogger = DbLoggerConstruct.NewDbLogger();
+    }
+	
     private void loadData()
     {
         dsSanctions.SelectParameters.Clear();
@@ -104,7 +112,7 @@ public partial class cim_sanctions_default : System.Web.UI.Page
 
             byte syncSide = Convert.ToByte(Session[barsroot.cim.Constants.StateKeys.SyncSide]);
             pnImportF98.Visible = syncSide == 1;
-            pnSyncF98.Visible = syncSide == 0;
+            pnSyncF98.Visible = false;//syncSide == 0;
             if (Request["code"] != null)
             {
                 if (Request["code"] == "3")
@@ -149,73 +157,92 @@ public partial class cim_sanctions_default : System.Web.UI.Page
         }
     }
 
+    private void loadDbf(OracleCommand command)
+    {
+        command.CommandText = "bars_dbf.load_dbf";
+        command.Parameters.Add("p_dbfblob", OracleDbType.Blob, fuF98.FileBytes, ParameterDirection.Input);
+        command.Parameters.Add("p_tabname", OracleDbType.Varchar2, "CIM_F98_LOAD", ParameterDirection.InputOutput);
+        command.Parameters.Add("p_createmode", OracleDbType.Decimal, 2, ParameterDirection.Input);
+        command.Parameters.Add("p_srcencode", OracleDbType.Varchar2, "UKG", ParameterDirection.Input);
+        command.Parameters.Add("p_destencode", OracleDbType.Varchar2, "WIN", ParameterDirection.Input);
+        command.ExecuteNonQuery();
+    }
+
+    private void counts(OracleCommand command)
+    {
+        command.Parameters.Clear();
+        command.Parameters.Add("p_total_count", OracleDbType.Decimal, ParameterDirection.Output);
+        command.Parameters.Add("p_upd_count", OracleDbType.Decimal, ParameterDirection.Output);
+        command.Parameters.Add("p_ins_count", OracleDbType.Decimal, ParameterDirection.Output);
+        command.CommandText = "cim_sync.f98_update";
+        command.ExecuteNonQuery();
+    }
+
+    private void gcCollect()
+    {
+        GC.Collect();
+        GC.WaitForPendingFinalizers();
+        GC.Collect();
+    }
+
     protected void btImportF98_Click(object sender, EventArgs e)
     {
         Master.WriteMessage(lbInfo, string.Empty, MessageType.Info);
 
         if (fuF98.HasFile)
         {
-            string tempFile = string.Empty;
+            Master.WriteMessage(lbInfo, "Розпочата обробка файлу, зачекайте ...", MessageType.Info);
+
+            OracleConnection con = OraConnector.Handler.UserConnection;
             try
             {
-                string tempDir = Path.Combine(Path.GetTempPath(), "F98");
-                if (!Directory.Exists(tempDir))
-                    Directory.CreateDirectory(tempDir);
-                tempFile = Path.Combine(tempDir, Path.GetFileName(fuF98.FileName));
-                if (File.Exists(tempFile))
-                    File.Delete(tempFile);
-                fuF98.SaveAs(tempFile);
                 DateTime dt = DateTime.Now;
-                Master.WriteMessage(lbInfo, "Розпочата обробка файлу, зачекайте ...", MessageType.Info);
-
-                OracleConnection con = Bars.Classes.OraConnector.Handler.UserConnection;
-                try
+                using (var command = new OracleCommand())
                 {
-                    var command = new OracleCommand();
                     command.Connection = con;
-                    byte[] data = File.ReadAllBytes(tempFile);
                     command.CommandType = CommandType.StoredProcedure;
 
-                    command.CommandText = "bars_dbf.load_dbf";
-                    command.Parameters.Add("p_dbfblob", OracleDbType.Blob, data, ParameterDirection.Input);
-                    command.Parameters.Add("p_tabname", OracleDbType.Varchar2, "CIM_F98_LOAD", ParameterDirection.InputOutput);
-                    command.Parameters.Add("p_createmode", OracleDbType.Decimal, 2, ParameterDirection.Input);
-                    command.Parameters.Add("p_srcencode", OracleDbType.Varchar2, "UKG", ParameterDirection.Input);
-                    command.Parameters.Add("p_destencode", OracleDbType.Varchar2, "WIN", ParameterDirection.Input);
-                    command.ExecuteNonQuery();
+                    try
+                    {
+                        loadDbf(command);
+                    } catch (OutOfMemoryException ex)
+                    {
+                        _dbLogger.Exception(ex);
+                        gcCollect();
+                        loadDbf(command);
+                    }
 
-                    command.Parameters.Clear();
-                    command.Parameters.Add("p_total_count", OracleDbType.Decimal, ParameterDirection.Output);
-                    command.Parameters.Add("p_upd_count", OracleDbType.Decimal, ParameterDirection.Output);
-                    command.Parameters.Add("p_ins_count", OracleDbType.Decimal, ParameterDirection.Output);
-                    command.CommandText = "cim_sync.f98_update";
-                    command.ExecuteNonQuery();
+                    try
+                    {
+                        counts(command);
+                    }
+                    catch (OutOfMemoryException ex)
+                    {
+                        _dbLogger.Exception(ex);
+                        gcCollect();
+                        counts(command);
+                    }
+
 
                     decimal totalCount = ((OracleDecimal)command.Parameters["p_total_count"].Value).Value;
                     decimal updCount = ((OracleDecimal)command.Parameters["p_upd_count"].Value).Value;
                     decimal insCount = ((OracleDecimal)command.Parameters["p_ins_count"].Value).Value;
 
-                    int sec = Convert.ToInt32((DateTime.Now - dt).TotalSeconds);
+                    int sec = Convert.ToInt32((DateTime.Now - dt).TotalSeconds);                    
                     Master.WriteMessage(lbInfo, string.Format("Файл успішно завантажено! Оброблено {0} стрічки(ок)(з них {1} - оновлено, {2} - добавлено). Час імпорту - {3} сек.", totalCount, updCount, insCount, sec), MessageType.Success);
                     loadData();
-                }
-                finally
-                {
-                    con.Close();
-                    con.Dispose();
-                }
-                lbTotalCount.Text = getF98Count();
+                }                  
             }
             catch (Exception ex)
             {
                 Master.WriteMessage(lbInfo, "Помилка обробки файлу [" + ex.Message + "]", MessageType.Error);
-                return;
             }
             finally
             {
-                try { File.Delete(tempFile); }
-                catch { }
+                con.Close();
+                con.Dispose();
             }
+            lbTotalCount.Text = getF98Count();
         }
         else
         {

@@ -664,7 +664,7 @@
         </asp:Panel>
         <asp:Panel runat="server" ID="pnLinks4" GroupingText="МД для лінкування" Visible="False">
             <div style="overflow: auto">
-                <bars:BarsGridViewEx ID="BarsGridViewEx1" runat="server" AutoGenerateColumns="False"
+                <bars:BarsGridViewEx ID="gvLinksMd" runat="server" AutoGenerateColumns="False"
                     DataSourceID="dsLinks"
                     ShowCaption="true" CaptionType="Cool" CaptionAlign="Left" AllowSorting="True"
                     AllowPaging="True" ShowFooter="True" JavascriptSelectionType="SingleRow" DataKeyNames="vmd_id"
@@ -726,7 +726,7 @@
                         <asp:BoundField DataField="file_date" HeaderText="Дата реєстру " SortExpression="file_date" DataFormatString="{0:dd/MM/yyyy}">
                             <ItemStyle HorizontalAlign="Center" />
                         </asp:BoundField>
-                        <asp:BoundField DataField="comments" HeaderText="Примітка1" SortExpression="comments"></asp:BoundField>
+                        <asp:BoundField DataField="comments" HeaderText="Примітка" SortExpression="comments"></asp:BoundField>
                         <asp:BoundField DataField="link_date" HeaderText="Дата прив'язки" SortExpression="link_date"></asp:BoundField>
                     </Columns>
                 </bars:BarsGridViewEx>

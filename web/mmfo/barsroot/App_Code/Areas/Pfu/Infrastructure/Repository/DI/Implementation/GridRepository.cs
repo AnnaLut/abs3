@@ -343,7 +343,29 @@ namespace BarsWeb.Areas.Pfu.Infrastructure.Repository.DI.Implementation
                 }
             };
         }
-
+        private BarsSql InitSearchCatalogInPay(SearchCatalog qv)
+        {
+            return new BarsSql()
+            {
+                SqlText = @"select * from pfu.v_pfu_registers
+                    where (id = :id or :id is null)
+                      and (receiver_mfo = :mfo or :mfo is null)
+                      and state = 'IN_PAY'
+                      and (register_date = :register_date or :register_date is null)
+                      and (payment_date = :payment_date or :payment_date is null)",
+                SqlParams = new object[]
+                {
+                    new OracleParameter(":id", OracleDbType.Varchar2) { Value = qv.IdCatalog },
+                    new OracleParameter(":id", OracleDbType.Varchar2) { Value = qv.IdCatalog },
+                    new OracleParameter(":mfo", OracleDbType.Varchar2) { Value = qv.Mfo },
+                    new OracleParameter(":mfo", OracleDbType.Varchar2) { Value = qv.Mfo },
+                    new OracleParameter(":register_date", OracleDbType.Date) { Value = qv.CatalogDate },
+                    new OracleParameter(":register_date", OracleDbType.Date) { Value = qv.CatalogDate },
+                    new OracleParameter(":payment_date", OracleDbType.Date) { Value = qv.PayDate},
+                    new OracleParameter(":payment_date", OracleDbType.Date) { Value = qv.PayDate }
+                }
+            };
+        }
         private BarsSql InitSearchEnvelope(SearchEnvelop qv)
         {
             return new BarsSql()
@@ -371,7 +393,21 @@ namespace BarsWeb.Areas.Pfu.Infrastructure.Repository.DI.Implementation
             var item = _pfu.ExecuteStoreQuery<V_PFU_REGISTERS>(query.SqlText, query.SqlParams);
             return item;
         }
-
+        public IEnumerable<V_PFU_REGISTERS> CatalogInPay(SearchCatalog search, DataSourceRequest request)
+        {
+            var searchQuery = InitSearchCatalogInPay(search);
+            var query = _sqlTransformer.TransformSql(searchQuery, request);
+            var item = _pfu.ExecuteStoreQuery<V_PFU_REGISTERS>(query.SqlText, query.SqlParams);
+            return item;
+        }
+        public void ProcessRegistres(int[] registersIds)
+        {
+            for (int i = 0; i < registersIds.Length; i++)
+            {
+                _pfu.ExecuteStoreCommand("begin pfu.pfu_files_utl.check_set_file_state_payed(p_file_id => :p_file_id); end;",
+                    new OracleParameter("p_file_id", OracleDbType.Int32) { Value = registersIds[i] });
+            }
+        }
         public IEnumerable<V_PFU_REGISTERS_EPC> SearchRegisterEpc(SearchRegisterEpc search, DataSourceRequest request)
         {
             var searchQuery = SqlCreator.InitSearchRegisterEpc(search);
@@ -441,6 +477,13 @@ namespace BarsWeb.Areas.Pfu.Infrastructure.Repository.DI.Implementation
             var count = _pfu.ExecuteStoreQuery<decimal>(query.SqlText, query.SqlParams).Single();
             return count;
         }
+        public decimal CountCatalogInPay(SearchCatalog search, DataSourceRequest request)
+        {
+            var searchQuery = InitSearchCatalogInPay(search);
+            var query = _kendoSqlCounter.TransformSql(searchQuery, request);
+            var count = _pfu.ExecuteStoreQuery<decimal>(query.SqlText, query.SqlParams).Single();
+            return count;
+        }
         #endregion
         #region Інформаційні рядки Реєстру
         private BarsSql InitLineCatalog(decimal Id)
@@ -454,7 +497,17 @@ namespace BarsWeb.Areas.Pfu.Infrastructure.Repository.DI.Implementation
                 }
             };
         }
-
+        private BarsSql InitLineCatalogInPay(decimal? id)
+        {
+            return new BarsSql()
+            {
+                SqlText = @"select * from pfu.v_pfu_records where state in (0,19,20) and file_id = :p_id",
+                SqlParams = new object[]
+                {
+                    new OracleParameter("p_id", OracleDbType.Decimal) { Value = id}
+                }
+            };
+        }
         public IEnumerable<V_PFU_RECORDS> LineCatalog(decimal Id, DataSourceRequest request)
         {
             var lineQuery = InitLineCatalog(Id);
@@ -462,13 +515,35 @@ namespace BarsWeb.Areas.Pfu.Infrastructure.Repository.DI.Implementation
             var item = _pfu.ExecuteStoreQuery<V_PFU_RECORDS>(query.SqlText, query.SqlParams);
             return item;
         }
-
+        public IEnumerable<V_PFU_RECORDS> LineCatalogInPay(decimal? id, DataSourceRequest request)
+        {
+            var lineQuery = InitLineCatalogInPay(id);
+            var query = _sqlTransformer.TransformSql(lineQuery, request);
+            var item = _pfu.ExecuteStoreQuery<V_PFU_RECORDS>(query.SqlText, query.SqlParams);
+            return item;
+        }
         public decimal CountLineCatalog(decimal Id, DataSourceRequest request)
         {
             var lineQuery = InitLineCatalog(Id);
             var query = _kendoSqlCounter.TransformSql(lineQuery, request);
             var count = _pfu.ExecuteStoreQuery<decimal>(query.SqlText, query.SqlParams).Single();
             return count;
+        }
+        public decimal CountLineCatalogInPay(decimal? id, DataSourceRequest request)
+        {
+            var lineQuery = InitLineCatalogInPay(id);
+            var query = _kendoSqlCounter.TransformSql(lineQuery, request);
+            var count = _pfu.ExecuteStoreQuery<decimal>(query.SqlText, query.SqlParams).Single();
+            return count;
+        }
+        public void ProcessRecords(int[] ids, string stateName)
+        {
+            for (int i = 0; i < ids.Length; i++)
+            {
+                _pfu.ExecuteStoreCommand("begin pfu.pfu_files_utl.set_file_record_state(p_file_rec_id => :p_file_rec_id, p_state => :p_state); end;",
+                    new OracleParameter("p_file_rec_id", OracleDbType.Int32) { Value = ids[i] },
+                    new OracleParameter("p_state", OracleDbType.Varchar2) { Value = stateName });
+            }
         }
         #endregion
         public void BlockPensioner(IList<BlockPensioner> pensioners)

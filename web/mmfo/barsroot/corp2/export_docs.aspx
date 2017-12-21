@@ -48,18 +48,33 @@
                 <td>Референс:</td>
                 <td>
                     <asp:TextBox id="tbRef" runat="server"></asp:TextBox>
+                    <asp:RegularExpressionValidator ID="RegularExpressionValidator1"
+                        ControlToValidate="tbRef" runat="server"
+                        ErrorMessage="Дозволяються тільки цифри"
+                        ValidationExpression="\d+">
+                    </asp:RegularExpressionValidator>
                 </td>
             </tr>
             <tr>
                 <td>Валюта:</td>
                 <td>
                     <asp:TextBox id="tbKv" runat="server" Width="40px" MaxLength="3"></asp:TextBox>
+                     <asp:RegularExpressionValidator ID="RegularExpressionValidator2"
+                        ControlToValidate="tbKv" runat="server"
+                        ErrorMessage="Дозволяються тільки цифри"
+                        ValidationExpression="\d+">
+                    </asp:RegularExpressionValidator>
                 </td>
             </tr>
             <tr>
                 <td>Користувач(id):</td>
                 <td>
                     <asp:TextBox id="tbUserId" runat="server"></asp:TextBox>
+                     <asp:RegularExpressionValidator ID="RegularExpressionValidator3"
+                        ControlToValidate="tbUserId" runat="server"
+                        ErrorMessage="Дозволяються тільки цифри"
+                        ValidationExpression="\d+">
+                    </asp:RegularExpressionValidator>
                 </td>
             </tr>
             <tr>

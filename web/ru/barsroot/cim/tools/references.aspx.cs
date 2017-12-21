@@ -50,13 +50,6 @@ public partial class cim_tools_references : System.Web.UI.Page
         },
         new CimRefList()
         {
-            Code = "frm_cim_credit_opertype",
-            Name = "Типи кредитних операцій",
-            XmlForm = "frm_cim_credit_opertype",
-            Mode = "RW"
-        },
-        new CimRefList()
-        {
             Code = "frm_cim_contract_specs",
             Name = "Спеціалізації контрактів",
             XmlForm = "frm_cim_contract_specs",

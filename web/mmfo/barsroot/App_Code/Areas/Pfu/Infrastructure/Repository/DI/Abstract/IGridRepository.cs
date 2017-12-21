@@ -35,10 +35,15 @@ namespace BarsWeb.Areas.Pfu.Infrastructure.Repository.DI.Abstract
         void BlockPensioner(IList<BlockPensioner> pensioners);
 
         IEnumerable<V_PFU_REGISTERS> Catalog(SearchCatalog search, DataSourceRequest request);
+        IEnumerable<V_PFU_REGISTERS> CatalogInPay(SearchCatalog search, DataSourceRequest request);
+        void ProcessRegistres(int[] registersIds);
         decimal CountCatalog(SearchCatalog search, DataSourceRequest request);
-
+        decimal CountCatalogInPay(SearchCatalog search, DataSourceRequest request);
         IEnumerable<V_PFU_RECORDS> LineCatalog(decimal Id, DataSourceRequest request);
+        IEnumerable<V_PFU_RECORDS> LineCatalogInPay(decimal? id, DataSourceRequest request);
         decimal CountLineCatalog(decimal Id, DataSourceRequest request);
+        decimal CountLineCatalogInPay(decimal? id, DataSourceRequest request);
+        void ProcessRecords(int[] ids, string stateName);
         void SetReadyForSignStatus(decimal id);
         void SetCheckingPayStatus(decimal id, decimal docRef);
         Payment VerifyFile(decimal id);

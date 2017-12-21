@@ -8,6 +8,12 @@
 <asp:Content ID="ContentHead" ContentPlaceHolderID="HeadContent" runat="Server">
 </asp:Content>
 <asp:Content ID="ContentMain" ContentPlaceHolderID="MainContent" runat="Server">
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#btnExcelExport').attr('title', 'Експорт в Excel');
+            $('img[alt="Перечитати данi"]').attr('title', 'Перечитати данi');
+        });
+    </script>
     <table>
         <tr style="vertical-align: top">
             <td>
@@ -110,12 +116,24 @@
             <asp:QueryStringParameter Name="CUST_OKPO" QueryStringField="okpo" DbType="String" />
         </SelectParameters>
     </asp:ObjectDataSource>
+
     <div style="overflow: scroll; padding: 10px 10px 10px 0; margin-left: -10px">
-        <bars:BarsGridViewEx ID="gvVCimUnboundVmd" runat="server" AutoGenerateColumns="False"
-            DataSourceID="odsVCimUnboundVmd" ShowFilter="true"
-            ShowCaption="true" CaptionType="Cool" CaptionAlign="Left" AllowSorting="True"
-            AllowPaging="True" ShowFooter="True" JavascriptSelectionType="SingleRow" DataKeyNames="VMD_ID"
-            ShowPageSizeBox="true" OnRowDataBound="gvVCimUnboundVmd_RowDataBound" OnPreRender="gvVCimUnboundVmd_PreRender">
+        <bars:BarsGridViewEx ID="gvVCimUnboundVmd" 
+							 runat="server" 
+							 AutoGenerateColumns="False"
+							 DataSourceID="odsVCimUnboundVmd" 
+							 ShowFilter="true"
+							 ShowCaption="true" 
+							 CaptionType="Cool" 
+							 CaptionAlign="Left" 
+							 AllowSorting="True"
+							 AllowPaging="True" 
+							 ShowFooter="True" 
+							 JavascriptSelectionType="SingleRow" 
+							 DataKeyNames="VMD_ID"
+							 ShowPageSizeBox="true" 
+							 OnRowDataBound="gvVCimUnboundVmd_RowDataBound" 
+							 OnPreRender="gvVCimUnboundVmd_PreRender">
             <Columns>
                 <asp:BoundField DataField="NUM" HeaderText="№" SortExpression="NUM">
                     <ItemStyle HorizontalAlign="Right" />

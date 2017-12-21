@@ -67,7 +67,7 @@ public partial class cim_master : System.Web.UI.MasterPage
 
     # region Публичные свойства
     public String TitleFormat = "{0} - {1}";
-    public string BuildVersion = (CimManager.IsDebug) ? ("t" + DateTime.Now.Ticks) : ("t00035");
+    public string BuildVersion = (CimManager.IsDebug) ? ("t" + DateTime.Now.Ticks) : ("t00036");
     # endregion
 
     # region Публичные методы

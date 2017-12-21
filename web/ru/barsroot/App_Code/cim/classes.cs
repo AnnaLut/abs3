@@ -268,7 +268,7 @@ namespace barsroot.cim
         protected OracleCommand oraCmd;
         protected OracleDataReader oraRdr;
 
-        public static string Version = "1.0.0.56";
+        public static string Version = "1.0.0.57";
         public static bool IsDebug = false;
 
         public string BankId = string.Empty;
@@ -1277,6 +1277,7 @@ namespace barsroot.cim
 
                 if (Bank_change.Length > 300)
                     throw new System.Exception("Контракт НЕ збережено!\nПоле \"Інформація про перехід з іншого банку\" не може містити більше 300 символів!");
+                   
 
                 // Update 
                 if (ContrId.HasValue)

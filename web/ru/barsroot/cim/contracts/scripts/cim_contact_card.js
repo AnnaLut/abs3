@@ -284,6 +284,7 @@ CIM.contract_card_module = function () {
             // коментар
             $("#tbComments").val(res.Comments);
             $("#tbInfoOtherBank").val(res.Bank_change);
+
             if (!res.OwnerName) {
                 $("#lbOwnerUserId").text("[не задано]");
                 $("#lbIOwnerName").text("[не задано]");
