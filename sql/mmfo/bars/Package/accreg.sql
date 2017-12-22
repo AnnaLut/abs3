@@ -540,6 +540,15 @@ $end
   
 $if ACC_PARAMS.MMFO
 $then
+  bars_audit.info( 'DPA_ACCREG: l_nbs - ' || l_nbs 
+                          || '; nls_ - ' || nls_
+                          || '; accR_ - ' || accR_
+                          || '; rnk_ - ' || rnk_
+                          || '; nms_ - ' || nms_
+                          || '; ob22_ - ' || ob22_
+                          || '; BARS_DPA.DPA_NBS - ' || BARS_DPA.DPA_NBS( l_nbs, ob22_ )
+                   );
+				   
   if ( BARS_DPA.DPA_NBS( l_nbs, ob22_ ) = 1 )
   then -- COBUMMFO-4028
     BARS_DPA.ACCOUNTS_TAX( p_acc  => accr_
@@ -727,6 +736,16 @@ $end
 
 $if ACC_PARAMS.MMFO
 $then
+  bars_audit.info( 'DPA_ACCREG: l_nbs - ' || l_nbs 
+                          || '; p_acc - ' || p_acc
+                          || '; p_nls - ' || p_nls
+                          || '; p_nbs - ' || p_nbs
+                          || '; p_rnk - ' || p_rnk                          
+                          || '; p_ob22 - ' || p_ob22
+                          || '; p_ob22 - ' || p_mode
+                          || '; BARS_DPA.DPA_NBS - ' || BARS_DPA.DPA_NBS( l_nbs, p_ob22 )
+                          || '; BARS_DPA.DPA_NBS - ' || BARS_DPA.DPA_NBS( p_nbs, p_ob22 )
+                  );
   if ( BARS_DPA.DPA_NBS( l_nbs, p_ob22 ) = 1 and p_mode <> 9)
   then -- COBUMMFO-4028
     BARS_DPA.ACCOUNTS_TAX( p_acc  => p_acc
