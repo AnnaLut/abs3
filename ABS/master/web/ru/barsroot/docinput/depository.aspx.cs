@@ -124,16 +124,16 @@ public partial class docinput_depository : Bars.BarsPage
                 SetParameters("tt", DB_TYPE.Varchar2, tt, DIRECTION.Input);
                 if (tt.Equals("VS3") || tt.Equals("VSA"))
                 {
-                    colK = @"(select a.nls from accounts a, specparam_int s, valuables v2 
-                    where a.branch=:branch and a.nbs in decode(substr(v2.ob22,1,4),'9819','9899','9820','9891','9821','9893','9812','9899','9810','9899',NULL) and a.acc=s.acc 
-                    and s.ob22=decode (:tt,'VS3',v2.OB22_DOR,v2.OB22_DORS) 
+                    colK = @"(select a.nls from accounts a, valuables v2 
+                    where a.branch=:branch and a.nbs in decode(substr(v2.ob22,1,4),'9819','9899','9820','9891','9821','9893','9812','9899','9810','9899',NULL) 
+                    and a.ob22=decode (:tt,'VS3',v2.OB22_DOR,v2.OB22_DORS) 
                     and v2.ob22=v.OB22 and a.dazs is null and rownum<2)";
                 }
                 else if (tt.Equals("VS4") || tt.Equals("VSB"))
                 {
-                    colD = @"(select a.nls from accounts a, specparam_int s, valuables v2 
-                    where a.branch=:branch and a.nbs in decode(substr(v2.ob22,1,4),'9819','9899','9820','9891','9821','9893','9812','9899','9810','9899',NULL) and a.acc=s.acc 
-                    and s.ob22=decode (:tt,'VS4',v2.OB22_DOR,v2.OB22_DORS) 
+                    colD = @"(select a.nls from accounts a, valuables v2 
+                    where a.branch=:branch and a.nbs in decode(substr(v2.ob22,1,4),'9819','9899','9820','9891','9821','9893','9812','9899','9810','9899',NULL) 
+                    and a.ob22=decode (:tt,'VS4',v2.OB22_DOR,v2.OB22_DORS) 
                     and v2.ob22=v.OB22 and a.dazs is null and rownum<2)";
                 }
             }
