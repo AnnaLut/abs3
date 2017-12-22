@@ -1893,12 +1893,13 @@ namespace DocInput
                 else if (TT_Flags[58] == '1')
                     CrossRat.Text = (Decimal.Parse(Request["SumC_t"], cinfo) / 100).ToString();
             }
-            if (Request["flag_se"] == "1") SumC.ReadOnly = false;
+           // if (Request["flag_se"] == "1") SumC.ReadOnly = false;
             if (Request["SumC"] != null)
             {
                 SumC.Text = Decimal.Parse(System.Web.HttpUtility.UrlDecode(Request["SumC"]).Replace(",", ".").Replace(" ", ""), cinfo).ToString();
                 SumC.ReadOnly = true;
             }
+           if (Request["flag_se"] == "1") SumC.ReadOnly = false;
             // Номер документа
             if (Request["Nd"] != null)
                 DocN.Text = Request["Nd"].Trim();

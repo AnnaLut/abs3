@@ -1,6 +1,6 @@
 CREATE OR REPLACE PACKAGE KWT_2924 IS
 
- G_HEADER_VERSION  CONSTANT VARCHAR2(64)  :=  'ver.4/ 07.09.2017';
+ G_HEADER_VERSION  CONSTANT VARCHAR2(64)  :=  'ver.4.1 30.11.2017';
 
 /*
  добавлено АТМ
@@ -157,15 +157,35 @@ begin l_ACC  := NVL ( p_acc, to_number( pul.get('ATM_ACC' ))) ;
       l_REF2 := NVL( p_ref2, gl.aRef ) ;
       l_DK1  :=              to_number (pul.get('ATM_DK'  ))  ; l_DK2 := 1- l_DK1;
 
+  bars_audit.trace('KWT_2924_INS_ATM2('
+            ||' p_ACC   => '||p_ACC
+            ||',p_REF1  => '||p_REF1
+            ||',p_REF2  => '||p_REF2
+            ||',l_ACC   => '||l_ACC
+            ||',l_REF1  => '||l_REF1
+            ||',l_REF2  => '||l_REF2
+            ||',l_DK1   => '||l_DK1
+            ||')'
+            );
+
       select         s     into l_D1 from opldok where ref =        l_ref1                                     and acc = l_acc and dk =  l_dk1 ;
 
       select NVL(sum(s),0) into l_D2 from opldok where ref in (select ref2 from atm_ref2 where ref1 = l_ref1 ) and acc = l_acc and dk =  l_dk2 ;
       l_del  := l_D1 - l_D2 ;
 
       If l_Del <= 0 then  raise_application_error(n_err,'Сума введеного доку HE може бути більшою, ніж '||l_Del/100  )  ;  end if ;
+begin
+        select ref into l_ref2 from opldok o where o.acc = l_acc and o.ref = p_ref2 and o.dk = l_DK2 and o.s <= l_Del;
+     exception when no_data_found then null;
+   end;      
+      insert into atm_ref2 (ref1, ref2) values (l_ref1, l_ref2);
 
-      insert into atm_ref2 (ref1, ref2) select l_ref1, l_ref2 from opldok o where o.acc = l_acc and o.ref = p_ref2 and o.dk = l_DK2 and o.s <= l_Del;
-
+      --insert into atm_ref2 (ref1, ref2) select l_ref1, l_ref2 from opldok o where o.acc = l_acc and o.ref = p_ref2 and o.dk = l_DK2 and o.s <= l_Del;
+       bars_audit.trace'KWT_2924_INS_ATM2_atmref2('
+            ||',l_REF2  => '||l_REF2
+            ||',l_REF1  => '||l_REF1
+            ||')'
+            );
 end INS_ATM2;
 
 procedure RR ( p_mode int, p_acc number, p_s number, p_ref number ) is
