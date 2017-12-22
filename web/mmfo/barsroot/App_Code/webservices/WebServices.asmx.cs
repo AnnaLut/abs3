@@ -731,7 +731,7 @@ namespace Bars.WebServices
                 string ob22 = GetGlobalParam("OB22", "basic_info");
                 string ob22Tail = string.Empty;
                 if ("1" == ob22)
-                    ob22Tail = " AND ( p.ob22 IS NULL or EXISTS ( SELECT 1 FROM specparam_int i WHERE s.acc=i.acc AND p.ob22=i.ob22 ))";
+                    ob22Tail = " AND ( p.ob22 IS NULL or EXISTS ( SELECT 1 FROM accounts a WHERE s.acc=a.acc AND p.ob22=a.ob22 ))";
                 string col = "1";
                 if (xps_tts == "Y")
                     col = "nvl(x, 1)";
