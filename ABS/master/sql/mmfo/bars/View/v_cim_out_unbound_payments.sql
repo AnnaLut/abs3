@@ -1,43 +1,7 @@
-PROMPT =====================================================================================
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_CIM_OUT_UNBOUND_PAYMENTS.sql ========
-PROMPT =====================================================================================
-
-
-PROMPT *** Create  view V_CIM_OUT_UNBOUND_PAYMENTS ***
-
-PROMPT
-PROMPT v_cim_out_unbound_payments -  Нерозібрані вихідні платежі модуля Валютний Контроль
-PROMPT
-
-CREATE OR REPLACE FORCE VIEW BARS.V_CIM_OUT_UNBOUND_PAYMENTS
-(
-   REF,
-   CUST_RNK,
-   CUST_OKPO,
-   CUST_NMK,
-   CUST_ND,
-   BENEF_NMK,
-   ACC,
-   NLS,
-   PDAT,
-   VDAT,
-   KV,
-   TOTAL_SUM,
-   UNBOUND_SUM,
-   NAZN,
-   OP_TYPE_ID,
-   OP_TYPE,
-   PAY_TYPE,
-   PAY_TYPE_NAME,
-   IS_VISED,
-   DIRECT,
-   DIRECT_NAME,
-   TT,
-   BACKGROUND_COLOR,
-   ATTACHMENTS_COUNT
-)
+CREATE OR REPLACE VIEW V_CIM_OUT_UNBOUND_PAYMENTS
+(ref, cust_rnk, cust_okpo, cust_nmk, cust_nd, benef_nmk, acc, nls, pdat, vdat, kv, total_sum, unbound_sum, nazn, op_type_id, op_type, pay_type, pay_type_name, is_vised, direct, direct_name, tt, background_color, attachments_count)
 AS
-   SELECT ip.REF,
+SELECT ip.REF,
           c.rnk,
           c.okpo,
           c.nmkk,
@@ -214,74 +178,29 @@ AS
           AND fb.delete_date IS NULL
           AND fb.direct = 1
           AND fb.contr_id IS NULL;
-
-COMMENT ON TABLE BARS.V_CIM_OUT_UNBOUND_PAYMENTS IS
-   'Нерозібрані вихідні (імпортні) платежі v 1.00.02';
-
-COMMENT ON COLUMN BARS.V_CIM_OUT_UNBOUND_PAYMENTS.REF IS
-   'Референс платежу';
-
-COMMENT ON COLUMN BARS.V_CIM_OUT_UNBOUND_PAYMENTS.CUST_RNK IS
-   'Реєстраційний номер клієнта';
-
-COMMENT ON COLUMN BARS.V_CIM_OUT_UNBOUND_PAYMENTS.CUST_OKPO IS
-   'ЄДРПОУ клієнта';
-
-COMMENT ON COLUMN BARS.V_CIM_OUT_UNBOUND_PAYMENTS.CUST_NMK IS
-   'Назва клієнта';
-
-COMMENT ON COLUMN BARS.V_CIM_OUT_UNBOUND_PAYMENTS.CUST_ND IS
-   '№ договору з клієнтом';
-
-COMMENT ON COLUMN BARS.V_CIM_OUT_UNBOUND_PAYMENTS.BENEF_NMK IS
-   'Найменування контрагента';
-
-COMMENT ON COLUMN BARS.V_CIM_OUT_UNBOUND_PAYMENTS.ACC IS 'ACC рахунку';
-
-COMMENT ON COLUMN BARS.V_CIM_OUT_UNBOUND_PAYMENTS.NLS IS 'Рахунок';
-
-COMMENT ON COLUMN BARS.V_CIM_OUT_UNBOUND_PAYMENTS.PDAT IS
-   'Дата створення локумента';
-
-COMMENT ON COLUMN BARS.V_CIM_OUT_UNBOUND_PAYMENTS.VDAT IS
-   'Дата валютування';
-
-COMMENT ON COLUMN BARS.V_CIM_OUT_UNBOUND_PAYMENTS.KV IS
-   'Валюта платежу';
-
-COMMENT ON COLUMN BARS.V_CIM_OUT_UNBOUND_PAYMENTS.TOTAL_SUM IS
-   'Сума платежу';
-
-COMMENT ON COLUMN BARS.V_CIM_OUT_UNBOUND_PAYMENTS.UNBOUND_SUM IS
-   'Частина суми платежу, не прив’язана до жодного з контрактів';
-
-COMMENT ON COLUMN BARS.V_CIM_OUT_UNBOUND_PAYMENTS.NAZN IS
-   'Призначення платежу';
-
-COMMENT ON COLUMN BARS.V_CIM_OUT_UNBOUND_PAYMENTS.OP_TYPE IS
-   'Тип операції (додатковий реквізит)';
-
-COMMENT ON COLUMN BARS.V_CIM_OUT_UNBOUND_PAYMENTS.PAY_TYPE IS
-   'Тип, 0-раніше не прив''язані, 1-відв''язані реальні, 2-відв''язані фантоми';
-
-COMMENT ON COLUMN BARS.V_CIM_OUT_UNBOUND_PAYMENTS.PAY_TYPE_NAME IS
-   'Назва типу';
-
-COMMENT ON COLUMN BARS.V_CIM_OUT_UNBOUND_PAYMENTS.IS_VISED IS
-   'Признак візи, 0-незавізований,1-завізований';
-
-COMMENT ON COLUMN BARS.V_CIM_OUT_UNBOUND_PAYMENTS.DIRECT IS
-   'Напрям платежу 0 - вхідні, 1 - вихідні';
-
-COMMENT ON COLUMN BARS.V_CIM_OUT_UNBOUND_PAYMENTS.TT IS
-   'Код операції';
-
-COMMENT ON COLUMN BARS.V_CIM_OUT_UNBOUND_PAYMENTS.BACKGROUND_COLOR IS
-   'Колір фону (1 - жовтий, 0 - колір по замовчуванню)';
-
-COMMENT ON COLUMN BARS.V_CIM_OUT_UNBOUND_PAYMENTS.ATTACHMENTS_COUNT IS
-   'Клієнт надав супровідні док. в CORP';
-
+comment on table V_CIM_OUT_UNBOUND_PAYMENTS is 'Нерозібрані вихідні (імпортні) платежі v 1.00.02';
+comment on column V_CIM_OUT_UNBOUND_PAYMENTS.REF is 'Референс платежу';
+comment on column V_CIM_OUT_UNBOUND_PAYMENTS.CUST_RNK is 'Реєстраційний номер клієнта';
+comment on column V_CIM_OUT_UNBOUND_PAYMENTS.CUST_OKPO is 'ЄДРПОУ клієнта';
+comment on column V_CIM_OUT_UNBOUND_PAYMENTS.CUST_NMK is 'Назва клієнта';
+comment on column V_CIM_OUT_UNBOUND_PAYMENTS.CUST_ND is '№ договору з клієнтом';
+comment on column V_CIM_OUT_UNBOUND_PAYMENTS.BENEF_NMK is 'Найменування контрагента';
+comment on column V_CIM_OUT_UNBOUND_PAYMENTS.ACC is 'ACC рахунку';
+comment on column V_CIM_OUT_UNBOUND_PAYMENTS.NLS is 'Рахунок';
+comment on column V_CIM_OUT_UNBOUND_PAYMENTS.PDAT is 'Дата створення локумента';
+comment on column V_CIM_OUT_UNBOUND_PAYMENTS.VDAT is 'Дата валютування';
+comment on column V_CIM_OUT_UNBOUND_PAYMENTS.KV is 'Валюта платежу';
+comment on column V_CIM_OUT_UNBOUND_PAYMENTS.TOTAL_SUM is 'Сума платежу';
+comment on column V_CIM_OUT_UNBOUND_PAYMENTS.UNBOUND_SUM is 'Частина суми платежу, не прив’язана до жодного з контрактів';
+comment on column V_CIM_OUT_UNBOUND_PAYMENTS.NAZN is 'Призначення платежу';
+comment on column V_CIM_OUT_UNBOUND_PAYMENTS.OP_TYPE is 'Тип операції (додатковий реквізит)';
+comment on column V_CIM_OUT_UNBOUND_PAYMENTS.PAY_TYPE is 'Тип, 0-раніше не прив''язані, 1-відв''язані реальні, 2-відв''язані фантоми';
+comment on column V_CIM_OUT_UNBOUND_PAYMENTS.PAY_TYPE_NAME is 'Назва типу';
+comment on column V_CIM_OUT_UNBOUND_PAYMENTS.IS_VISED is 'Признак візи, 0-незавізований,1-завізований';
+comment on column V_CIM_OUT_UNBOUND_PAYMENTS.DIRECT is 'Напрям платежу 0 - вхідні, 1 - вихідні';
+comment on column V_CIM_OUT_UNBOUND_PAYMENTS.TT is 'Код операції';
+comment on column V_CIM_OUT_UNBOUND_PAYMENTS.BACKGROUND_COLOR is 'Колір фону (1 - жовтий, 0 - колір по замовчуванню)';
+comment on column V_CIM_OUT_UNBOUND_PAYMENTS.ATTACHMENTS_COUNT is 'Клієнт надав супровідні док. в CORP';
 
 
 GRANT SELECT ON BARS.V_CIM_OUT_UNBOUND_PAYMENTS TO BARSREADER_ROLE;
