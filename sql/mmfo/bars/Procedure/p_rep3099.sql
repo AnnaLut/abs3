@@ -56,7 +56,7 @@ begin
 
                Select c.rnk, c.nmk, cc.nd, cc.cc_id, cc.sdate, cc.wdate, a.kv,
            sum(case when a.tip = 'SS '/*regexp_like(a.nbs,'(0|1|2|3)$')*/  then S.OSTF - s.dos+s.kos else 0 end)/100*-1 ost_ss,
-           sum(case when a.tip != 'SNA' and a.tip in ('SN ','SNO')/*regexp_like(a.nbs,'8$')*/  then S.OSTF - s.dos+s.kos else 0 end)/100*-1 ost_sn,
+           sum(case when a.tip != 'SNA' and a.tip = 'SN '/*regexp_like(a.nbs,'8$')*/  then S.OSTF - s.dos+s.kos else 0 end)/100*-1 ost_sn,
            sum(case when a.tip = 'SP '/*regexp_like(a.nbs,'7$')*/ then S.OSTF - s.dos+s.kos else 0 end)/100*-1 ost_sp,
            sum(case when a.tip != 'SNA' and a.tip = 'SPN'/* and regexp_like(a.nbs,'9$')*/  then S.OSTF - s.dos+s.kos else 0 end)/100*-1 ost_spn,
            LISTAGG(case when a.tip = 'SP '/*regexp_like(a.nbs,'7$')*/                    then a.acc else null end ,',') WITHIN GROUP (ORDER BY a.acc)  acc_sp,
