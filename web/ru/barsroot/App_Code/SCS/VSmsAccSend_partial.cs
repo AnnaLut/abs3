@@ -20,21 +20,25 @@ namespace Bars.SCS
     {
         public List<VSmsAccSendRecord> SelectSyncQueue(DateTime From, DateTime To, List<String> Status, List<String> Type, List<String> ObjID, List<String> ObjRnk, String SortExpression, int maximumRows, int startRowIndex)
         {
-          /*  // обязательная фильтрация по датам
-            this.Filter.CRT_DATE.Between(From, To);
+            /*  // обязательная фильтрация по датам
+              this.Filter.CRT_DATE.Between(From, To);
 
-            // фильтрация по статусу
-            if (0 < Status.Count && Status.Count < 8)
-                this.Filter.STATUS_ID.In(Status);
+              // фильтрация по статусу
+              if (0 < Status.Count && Status.Count < 8)
+                  this.Filter.STATUS_ID.In(Status);
 
-            // фильтрация по типу
-            if (0 < Type.Count && Type.Count < 5)
-                this.Filter.TYPE_ID.In(Type);
+              // фильтрация по типу
+              if (0 < Type.Count && Type.Count < 5)
+                  this.Filter.TYPE_ID.In(Type);
 
-            // фильтрация по перечню объектов
-            if (0 < ObjID.Count)
-                this.Filter.OBJ_ID.In(ObjID);*/
+              // фильтрация по перечню объектов
+              if (0 < ObjID.Count)
+                  this.Filter.OBJ_ID.In(ObjID);*/
 
+            return Select(SortExpression, maximumRows, startRowIndex);
+        }
+        public List<VSmsAccSendRecord> SelectSyncQueue(DateTime From, DateTime To, List<String> Status, List<String> Type, List<String> ObjID, String SortExpression, int maximumRows, int startRowIndex)
+        {
             return Select(SortExpression, maximumRows, startRowIndex);
         }
     }
