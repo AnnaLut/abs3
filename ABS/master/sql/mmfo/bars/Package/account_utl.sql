@@ -551,7 +551,7 @@ create or replace package body account_utl as
     end;  
 end;
 /
- show err;
+show err;
  
  
  
