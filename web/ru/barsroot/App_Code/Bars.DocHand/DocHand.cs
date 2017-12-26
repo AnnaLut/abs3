@@ -370,8 +370,8 @@ namespace Bars.DocHand
 
                     string ob22Tail = string.Empty;
                     if ("1" == ob22)
-                        ob22Tail = " AND ( p.ob22 IS NULL or EXISTS ( SELECT 1 FROM specparam_int i WHERE s.acc=i.acc AND p.ob22=i.ob22 ))";
-
+                        ob22Tail = " AND ( p.ob22 IS NULL or EXISTS ( SELECT 1 FROM accounts a WHERE s.acc=a.acc AND p.ob22=a.ob22 ))";
+					
                     string column = "1";
                     if ("Y" == xps_tts)
                         column = "nvl(x, 1)";
