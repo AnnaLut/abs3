@@ -8,9 +8,17 @@ using Bars.Classes;
 using barsroot.cim;
 using Oracle.DataAccess.Client;
 using Oracle.DataAccess.Types;
+using BarsWeb.Core.Logger;
 
 public partial class cim_sanctions_default : System.Web.UI.Page
 {
+	private readonly IDbLogger _dbLogger;
+
+    public cim_sanctions_default()
+    {
+        _dbLogger = DbLoggerConstruct.NewDbLogger();
+    }
+	
     private void loadData()
     {
         dsSanctions.SelectParameters.Clear();
@@ -149,6 +157,34 @@ public partial class cim_sanctions_default : System.Web.UI.Page
         }
     }
 
+    private void loadDbf(OracleCommand command)
+    {
+        command.CommandText = "bars_dbf.load_dbf";
+        command.Parameters.Add("p_dbfblob", OracleDbType.Blob, fuF98.FileBytes, ParameterDirection.Input);
+        command.Parameters.Add("p_tabname", OracleDbType.Varchar2, "CIM_F98_LOAD", ParameterDirection.InputOutput);
+        command.Parameters.Add("p_createmode", OracleDbType.Decimal, 2, ParameterDirection.Input);
+        command.Parameters.Add("p_srcencode", OracleDbType.Varchar2, "UKG", ParameterDirection.Input);
+        command.Parameters.Add("p_destencode", OracleDbType.Varchar2, "WIN", ParameterDirection.Input);
+        command.ExecuteNonQuery();
+    }
+
+    private void counts(OracleCommand command)
+    {
+        command.Parameters.Clear();
+        command.Parameters.Add("p_total_count", OracleDbType.Decimal, ParameterDirection.Output);
+        command.Parameters.Add("p_upd_count", OracleDbType.Decimal, ParameterDirection.Output);
+        command.Parameters.Add("p_ins_count", OracleDbType.Decimal, ParameterDirection.Output);
+        command.CommandText = "cim_sync.f98_update";
+        command.ExecuteNonQuery();
+    }
+
+    private void gcCollect()
+    {
+        GC.Collect();
+        GC.WaitForPendingFinalizers();
+        GC.Collect();
+    }
+
     protected void btImportF98_Click(object sender, EventArgs e)
     {
         Master.WriteMessage(lbInfo, string.Empty, MessageType.Info);
@@ -166,20 +202,27 @@ public partial class cim_sanctions_default : System.Web.UI.Page
                     command.Connection = con;
                     command.CommandType = CommandType.StoredProcedure;
 
-                    command.CommandText = "bars_dbf.load_dbf";
-                    command.Parameters.Add("p_dbfblob", OracleDbType.Blob, fuF98.FileBytes, ParameterDirection.Input);
-                    command.Parameters.Add("p_tabname", OracleDbType.Varchar2, "CIM_F98_LOAD", ParameterDirection.InputOutput);
-                    command.Parameters.Add("p_createmode", OracleDbType.Decimal, 2, ParameterDirection.Input);
-                    command.Parameters.Add("p_srcencode", OracleDbType.Varchar2, "UKG", ParameterDirection.Input);
-                    command.Parameters.Add("p_destencode", OracleDbType.Varchar2, "WIN", ParameterDirection.Input);
-                    command.ExecuteNonQuery();
+                    try
+                    {
+                        loadDbf(command);
+                    } catch (OutOfMemoryException ex)
+                    {
+                        _dbLogger.Exception(ex);
+                        gcCollect();
+                        loadDbf(command);
+                    }
 
-                    command.Parameters.Clear();
-                    command.Parameters.Add("p_total_count", OracleDbType.Decimal, ParameterDirection.Output);
-                    command.Parameters.Add("p_upd_count", OracleDbType.Decimal, ParameterDirection.Output);
-                    command.Parameters.Add("p_ins_count", OracleDbType.Decimal, ParameterDirection.Output);
-                    command.CommandText = "cim_sync.f98_update";
-                    command.ExecuteNonQuery();
+                    try
+                    {
+                        counts(command);
+                    }
+                    catch (OutOfMemoryException ex)
+                    {
+                        _dbLogger.Exception(ex);
+                        gcCollect();
+                        counts(command);
+                    }
+
 
                     decimal totalCount = ((OracleDecimal)command.Parameters["p_total_count"].Value).Value;
                     decimal updCount = ((OracleDecimal)command.Parameters["p_upd_count"].Value).Value;

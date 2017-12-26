@@ -1481,8 +1481,8 @@
                     content: {
                         url: url
                     },
-                    width: 999,
-                    height: 610
+                    width: '97%',
+                    height: '95%'
                 });
             }
 

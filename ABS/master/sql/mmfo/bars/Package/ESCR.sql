@@ -184,6 +184,7 @@ CREATE OR REPLACE PACKAGE BODY escr IS
     p_R1                  number;
     p_R2                  number;
     p_P1                  number;
+    p_P2                  number;
     p_K2                  number;
     aa                    accounts%rowtype;
     kv_                   int := 980;
@@ -282,6 +283,7 @@ CREATE OR REPLACE PACKAGE BODY escr IS
                   p_R1      => p_R1, --OUT number, -- Îáùèé ğåñóğñ (îñò íà SG(262*)
                   p_R2      => p_R2, --OUT number, --  Ñâîáîäíûé ğåñóğñ R2 =  R1 - z4
                   p_P1      => p_P1 --OUT number  --  Ğåô.ïëàòåæà
+                  
                   );
       escr.p_cc_lim_count(deal_id      => i.nd,
                           cc_lim_count => l_lim_count_after);
@@ -413,10 +415,10 @@ CREATE OR REPLACE PACKAGE BODY escr IS
     status_ VARCHAR2(10);
     l_recid NUMBER;
     ------------------------------------------------
-    s_nd VARCHAR2(10);
-    s_sd VARCHAR2(10);
-    s_cd VARCHAR2(30);
-    s_id VARCHAR2(20);
+    s_nd VARCHAR2(255);
+    s_sd VARCHAR2(255);
+    s_cd VARCHAR2(255);
+    s_id VARCHAR2(255);
     -----------------------------------------------
     i_ost   NUMBER;
     v_ost   NUMBER;
@@ -430,6 +432,7 @@ CREATE OR REPLACE PACKAGE BODY escr IS
     p_r1    NUMBER;
     p_r2    NUMBER;
     p_p1    NUMBER;
+    p_p2    NUMBER;
     p_k2    NUMBER;
     phone_  acc_sms_phones.phone%TYPE;
     l_msgid INTEGER;
@@ -451,11 +454,11 @@ CREATE OR REPLACE PACKAGE BODY escr IS
                                 '\9517 - ESCR.Íå çíàéäåíî Âõ.ÂÏÑ-äîê');
     END;
     ---------------------------------------
-    s_nd := substr(f_dop(ref_, 'ND'), 1, 10);
+    s_nd := substr(f_dop(ref_, 'ND'), 1, 12);
     s_sd := substr(f_dop(ref_, 'DAT1'), 1, 10);
     s_cd := substr(f_dop(ref_, 'CC_ID'), 1, 30);
     s_id := substr(f_dop(ref_, 'IDB'), 1, 14);
-
+   -- bars.bars_audit.info('ESCR.PAY1 p_ref=' || ref_||',s_nd= '||s_nd||',s_sd= '||s_sd||',s_cd= '||s_cd||',s_id= '||s_id);
     IF s_cd IS NULL OR s_sd IS NULL THEN
       nazn_ := oo.nazn;
       BEGIN
@@ -837,6 +840,7 @@ CREATE OR REPLACE PACKAGE BODY escr IS
                       p_r1      => p_r1, --OUT number, -- Îáùèé ğåñóğñ (îñò íà SG(262*)
                       p_r2      => p_r2, --OUT number, --  Ñâîáîäíûé ğåñóğñ R2 =  R1 - z4
                       p_p1      => p_p1 --OUT number  --  Ğåô.ïëàòåæà
+                     --OUT number  --  Ğåô.ïëàòåæà
                       );
           escr.p_cc_lim_count(deal_id      => dd.nd,
                               cc_lim_count => l_lim_count_after);
