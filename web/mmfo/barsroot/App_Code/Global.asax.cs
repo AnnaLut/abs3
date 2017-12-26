@@ -18,6 +18,8 @@ using Bars.Application;
 using BarsWeb.Core.Logger;
 using BarsWeb.Infrastructure;
 using BarsWeb.Areas.MyCard.Helpers;
+using System.Threading;
+using System.IO;
 
 
 //***********************
@@ -226,6 +228,53 @@ namespace BarsWeb
             {
                 Context.Response.StatusCode = 301;
                 Context.Response.Redirect("~/Account/Login");
+            }
+        }
+
+        protected void Application_EndRequest(Object sender, EventArgs e)
+        {
+            if(Response.StatusCode == 401)
+            {
+                if (System.Configuration.ConfigurationManager.AppSettings["EnabledLogForStatusCode401"] != "Off")
+                {
+                    var AbsoluteUri = Request.Url.AbsoluteUri;
+                    var Host = Request.Headers.Get("Host");
+                    var UserHost = WebUtility.GetHostName();
+                    string SERVER_NAME = Request.ServerVariables["SERVER_NAME"];
+                    string SERVER_PORT = Request.ServerVariables["SERVER_PORT"];
+
+                    string userName = Context.User.Identity.Name.ToLower();
+
+                    string msg = string.Format("AbsoluteUri:[{0}] Host:[{1}] userHost:[{2}] SERVER:[{3}:{4}] userName:[{5}]",
+                        AbsoluteUri,
+                        Host,
+                        UserHost,
+                        SERVER_NAME,
+                        SERVER_PORT,
+                        userName
+                        );
+
+                    try
+                    {
+                        Thread thread = new Thread(() =>
+                        {
+                            string logFile = Path.Combine(Path.GetTempPath(), "barsweb401.log");
+                            try
+                            {
+                                if (!File.Exists(logFile))
+                                    new FileInfo(logFile);
+
+                                using (StreamWriter sw = new StreamWriter(logFile, true))
+                                    sw.WriteLine("401: [" + DateTime.Now.ToString() + "] " + msg);
+                            }
+                            catch { }
+                        });
+                        thread.Priority = ThreadPriority.Lowest;
+                        thread.IsBackground = true;
+                        thread.Start();
+                    }
+                    catch { }
+                }
             }
         }
 
