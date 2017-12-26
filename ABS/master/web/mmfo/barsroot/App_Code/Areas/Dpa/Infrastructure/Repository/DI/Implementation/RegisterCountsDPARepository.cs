@@ -609,40 +609,48 @@ SELECT t.rowid AS idrow
     public void InsertTicket(string path, string fileType, string fileName, string fileBody)
     {
         var branch = GetBranch();
-        DynamicParameters p = null;
+        OracleParameter[] p = null;
         var sql = "";
         if (fileType == "F")
         {
-            p = new DynamicParameters();
-			p.Add("p_filename", dbType: DbType.String, size: 100, value: fileName, direction: ParameterDirection.Input);
-            p.Add("p_filedata", dbType: DbType.String, size: fileBody.Length, value: fileBody, direction: ParameterDirection.Input);
+            p = new OracleParameter[2];
+            p[0] =  new OracleParameter("p_filename", OracleDbType.Varchar2,  100, fileName,  ParameterDirection.Input);
+            p[1] =  new OracleParameter("p_filedata", OracleDbType.Clob, fileBody, ParameterDirection.Input);
 
-            sql = @"begin
-                        bars_dpa.ins_ticket(:p_filename, :p_filedata);
-                     end;";
+            //sql = @"begin
+            //            bars_dpa.ins_ticket(:p_filename, :p_filedata);
+            //         end;";
 
             using (var connection = OraConnector.Handler.UserConnection)
             {
-                connection.Execute(sql, p);
+                OracleCommand oraCommand = connection.CreateCommand();
+                oraCommand.CommandText = "bars_dpa.ins_ticket";
+                oraCommand.CommandType = CommandType.StoredProcedure;
+                oraCommand.Parameters.AddRange(p);
+                oraCommand.ExecuteNonQuery();
             }
         }
         else if (fileType == "R0")
         {
-			p = new DynamicParameters();
-            p.Add("p_filename", dbType: DbType.String, size: 100, value: fileName, direction: ParameterDirection.Input);
-            p.Add("p_filedata", dbType: DbType.String, size: fileBody.Length, value: fileBody, direction: ParameterDirection.Input);
-            p.Add("p_tickname", dbType: DbType.String, size: 100, direction: ParameterDirection.Output);
-
-            sql = @"begin
-                        bars_dpa.ins_r0(:p_filename, :p_filedata, :p_tickname);
-                     end;";
-
+            p = new OracleParameter[3];
+            p[0] = new OracleParameter("p_filename", OracleDbType.Varchar2, 100, fileName, ParameterDirection.Input);
+            p[1] = new OracleParameter("p_filedata", OracleDbType.Clob, fileBody, ParameterDirection.Input);
+            p[2] = new OracleParameter("p_tickname", OracleDbType.Varchar2,4000, direction: ParameterDirection.Output);
+            
+            //sql = @"begin
+            //            bars_dpa.ins_r0(:p_filename, :p_filedata, :p_tickname);
+            //         end;";
+           
             using (var connection = OraConnector.Handler.UserConnection)
             {
-                connection.Execute(sql, p);
+                OracleCommand oraCommand  =  connection.CreateCommand();
+                oraCommand.CommandText = "bars_dpa.ins_r0";
+                oraCommand.CommandType = CommandType.StoredProcedure;
+                oraCommand.Parameters.AddRange(p);
+                oraCommand.ExecuteNonQuery();
             }
-
-            string p_tickname = p.Get<string>("p_tickname");
+           
+            string p_tickname = p[2].Value.ToString();// p.Get<string>("p_tickname");
 
             sql = @"select 
                        val
