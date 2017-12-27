@@ -9,8 +9,9 @@ PROMPT *** Create  procedure P_ANALIZ_R013_CALC ***
 
   CREATE OR REPLACE PROCEDURE BARS.P_ANALIZ_R013_CALC (
 -------------------------------------------------------------------------------
--- VERSION: 22/11/2017 (25.10.2016)
+-- VERSION: 26.12.2017
 -------------------------------------------------------------------------------
+-- 26.12.2017 новые значени€ дл€ r013
 -- 25.10.2016 дл€ SN обороты ƒ“ со счетов SNO сопоставл€ютс€ оборотам  “ в более
 --             поздние даты дл€ расчета R013 >30дн
 -- 28.07.2016 дл€ счетов SN обороты ƒ“ со счетов SNO учитываютс€ с R013 >30дн
@@ -74,6 +75,7 @@ IS
           WHERE trim(prem) = ' Ѕ'
             AND r020 = p_nbs_
             AND r013 = r013_old
+            and d_open < dat_
             AND (d_close IS NULL OR d_close >= dat_);
       EXCEPTION
          WHEN NO_DATA_FOUND
@@ -81,235 +83,18 @@ IS
             find_ok := 0;
       END;
 
-      -- балансовые счета, у которых только 2 значени€ параметра (3 и 4)
-      IF p_nbs_ NOT IN
-            ('1408',
-             '1418',
-             '1428',
-             '1508',
-             '1518',
-             '1528',
-             '2068',
-             '2088',
-             '2108',
-             '2118',
-             '2128',
-             '2138',
-             '2238',
-             '3018',
-             '3118',
-             '3218',
-             '3328',
-             '3338',
-             '3348'
-            ) or
-          p_nbs_ IN
-            ('2108',
-             '2118',
-             '2128',
-             '2138') and
-          dat_ <  to_date('12092015','ddmmyyyy')
-      THEN
-         if p_nbs_ = '1438' then -- "нестандартний" рахунок, дл€ €кого немаЇ розпод≥лу по R013
-            r013_new := '0';
-         else
+      -- балансовые счета, у которых только 2 значени€ параметра (2 и 3)
+      if p_nbs_ in ('1438','1448','1458')  then
+           r013_new := '9';
+      else
              IF tp_ = 1
              THEN                                                   -- до 30 дней
-                r013_new := '3';
+                r013_new := '2';
              ELSE                                                 -- свыше 30 дней
-                r013_new := '4';
+                r013_new := '3';
              END IF;
-         end if;
-      ELSE
-         -- неоднозначные комбинации параметров
-         IF p_nbs_ IN ('1408', '1418', '1428')
-         THEN
-            IF find_ok = 1
-            THEN                                  -- есть такие в справочнике
-               IF tp_ = 1
-               THEN                                             -- до 30 дней
-                  IF r013_old IN ('3', '5', '9')
-                  THEN
-                     r013_new := TO_CHAR (TO_NUMBER (r013_old) - 1);
-                  END IF;
-               ELSE                                           -- свыше 30 дней
-                  IF r013_old IN ('2', '4', '8')
-                  THEN
-                     r013_new := TO_CHAR (TO_NUMBER (r013_old) + 1);
-                  END IF;
-               END IF;
-            ELSE         -- нет в справочнике - тогда неизвестно, что ставить?
-               NULL;                                      -- не мен€ем ничего
-            END IF;
-         END IF;
-
-         IF p_nbs_ IN ('1508', '2068')
-         THEN
-            IF find_ok = 1
-            THEN                                  -- есть такие в справочнике
-               IF tp_ = 1
-               THEN                                             -- до 30 дней
-                  IF r013_old IN ('4', '6')
-                  THEN
-                     r013_new := TO_CHAR (TO_NUMBER (r013_old) - 1);
-                  END IF;
-               ELSE                                           -- свыше 30 дней
-                  IF r013_old IN ('3', '5')
-                  THEN
-                     r013_new := TO_CHAR (TO_NUMBER (r013_old) + 1);
-                  END IF;
-               END IF;
-            ELSE         -- нет в справочнике - тогда неизвестно, что ставить?
-               NULL;                                      -- не мен€ем ничего
-            END IF;
-         END IF;
-         
-         IF p_nbs_ IN ('1518', '1528', '2088')
-         THEN
-            IF find_ok = 1
-            THEN                                  -- есть такие в справочнике
-               IF tp_ = 1
-               THEN                                             -- до 30 дней
-                  IF r013_old IN ('7', '8')
-                  THEN
-                     r013_new := TO_CHAR (TO_NUMBER (r013_old) - 2);
-                  END IF;
-               ELSE                                           -- свыше 30 дней
-                  IF r013_old IN ('5', '6')
-                  THEN
-                     r013_new := TO_CHAR (TO_NUMBER (r013_old) + 2);
-                  END IF;
-               END IF;
-            ELSE                                          -- нет в справочнике
-               IF tp_ = 1
-               THEN                                             -- до 30 дней
-                  r013_new := '5';
-               ELSE                                           -- свыше 30 дней
-                  r013_new := '7';
-               END IF;
-            END IF;
-         END IF;
-
-         IF p_nbs_ IN ('2108', '2118', '2128')
-         THEN
-            IF find_ok = 1
-            THEN                                  -- есть такие в справочнике
-               IF tp_ = 1
-               THEN                                             -- до 30 дней
-                  IF r013_old IN ('6', '8')
-                  THEN
-                     r013_new := TO_CHAR (TO_NUMBER (r013_old) - 1);
-                  ELSIF r013_old IN ('A')
-                  THEN
-                     r013_new := '9';
-                  END IF;
-               ELSE                                           -- свыше 30 дней
-                  IF r013_old IN ('5', '7')
-                  THEN
-                     r013_new := TO_CHAR (TO_NUMBER (r013_old) + 1);
-                  ELSIF r013_old IN ('9')
-                  THEN
-                     r013_new := 'A';
-                  END IF;
-               END IF;
-            ELSE                                          -- нет в справочнике
-               IF tp_ = 1
-               THEN                                             -- до 30 дней
-                  r013_new := '7';
-               ELSE                                           -- свыше 30 дней
-                  r013_new := '8';
-               END IF;
-            END IF;
-         END IF;
-
-         IF p_nbs_ IN ('2138')
-         THEN
-            IF find_ok = 1
-            THEN                                  -- есть такие в справочнике
-               IF tp_ = 1
-               THEN                                             -- до 30 дней
-                  IF r013_old IN ('6', '8')
-                  THEN
-                     r013_new := TO_CHAR (TO_NUMBER (r013_old) - 1);
-                  END IF;
-               ELSE                                           -- свыше 30 дней
-                  IF r013_old IN ('5', '7')
-                  THEN
-                     r013_new := TO_CHAR (TO_NUMBER (r013_old) + 1);
-                  END IF;
-               END IF;
-            ELSE                                          -- нет в справочнике
-               IF tp_ = 1
-               THEN                                             -- до 30 дней
-                  r013_new := '7';
-               ELSE                                           -- свыше 30 дней
-                  r013_new := '8';
-               END IF;
-            END IF;
-         END IF;
-
-         IF p_nbs_ IN ('2238')
-         THEN
-            IF find_ok = 1
-            THEN                                  -- есть такие в справочнике
-               IF tp_ = 1
-               THEN                                             -- до 30 дней
-                  IF r013_old IN ('4', '6', '9')
-                  THEN
-                     r013_new := TO_CHAR (TO_NUMBER (r013_old) - 1);
-                  END IF;
-               ELSE                                           -- свыше 30 дней
-                  IF r013_old IN ('3', '5', '8')
-                  THEN
-                     r013_new := TO_CHAR (TO_NUMBER (r013_old) + 1);
-                  END IF;
-               END IF;
-            ELSE                                          -- нет в справочнике
-               IF kv_ <> 980
-               THEN
-                  IF tp_ = 1
-                  THEN                                          -- до 30 дней
-                     r013_new := '8';
-                  ELSE                                        -- свыше 30 дней
-                     r013_new := '9';
-                  END IF;
-               ELSE
-                  NULL;                                   -- не мен€ем ничего
-               END IF;
-            END IF;
-         END IF;
-
-         IF p_nbs_ IN ('3018', '3118', '3218') and r013_old <> '9'
-         THEN
-            IF find_ok = 1
-            THEN                                  -- есть такие в справочнике
-               IF tp_ = 1
-               THEN                                             -- до 30 дней
-                  IF r013_old IN ('4', '6', '8')
-                  THEN
-                     r013_new := TO_CHAR (TO_NUMBER (r013_old) - 1);
-                  elsif r013_old IN ('C', 'E', 'G') then
-                     r013_new := (case when r013_old = 'C' then 'B' when r013_old = 'E' then 'D' else 'F' end);
-                  END IF;
-               ELSE                                           -- свыше 30 дней
-                  IF r013_old IN ('3', '5', '7')
-                  THEN
-                     r013_new := TO_CHAR (TO_NUMBER (r013_old) + 1);
-                  elsif r013_old IN ('B', 'D', 'F') then
-                     r013_new := (case when r013_old = 'B' then 'C' when r013_old = 'D' then 'E' else 'G' end);
-                  END IF;
-               END IF;
-            ELSE                                          -- нет в справочнике
-               IF tp_ = 1
-               THEN                                             -- до 30 дней
-                  r013_new := '3';
-               ELSE                                           -- свыше 30 дней
-                  r013_new := '4';
-               END IF;
-            END IF;
-         END IF;
-      END IF;
-
+      end if;
+      
       RETURN r013_new;
    END;
 BEGIN
@@ -433,11 +218,11 @@ BEGIN
       end if;
    elsif 300465 IN (mfo_, mfou_) and tip_ = 'SNO' then
       -- ƒолинченко и —ухова: относить с таким типом к R013 = 4
-      if r013_ = '3' then
+      if r013_ = '2' then
          o_r013_1 := r013_;
          o_comm_1 := comm_ || ' (SNO) не м≥н€Їмо R013='||r013_;
          o_se_1 := se_;
-      elsif r013_ = '4' then
+      elsif r013_ = '3' then
          o_r013_2 := r013_;
          o_comm_2 := comm_ || ' (SNO) не м≥н€Їмо R013='||r013_;
          o_se_2 := se_;

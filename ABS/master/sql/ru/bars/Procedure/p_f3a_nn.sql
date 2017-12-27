@@ -6,11 +6,14 @@ IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирования #3A для КБ (универсальная) с 01.06.2009
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     : 16/11/2017 (06/11/2017)
+% VERSION     : 27/12/2017 (26/12/2017, 16/11/2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+27/12/2017 - с 26.12.2017 (на 27.12.2017) в показателе вместо параметра R013 
+             будет формироваться параметр R011 
+26/12/2017 - для KL_R020 изменено условие для поля D_CLOSE
 06/11/2017 - вместо кл-ра KL_F3_29 будем использовать кл-р KOD_R020
 27/10/2017 - для бал.рах.2630 добавил обробку OB22 IN ('B2','B3','B4','B5')
              т.к. будет переброска с 2635 и OB22 IN ('13','14','15','16')
@@ -159,6 +162,8 @@ IS
    d020_acc   VARCHAR2 (2);
    r013_      VARCHAR2 (1);
    r011_      VARCHAR2 (1);
+   r011_1     VARCHAR2 (1);
+   r011p_     VARCHAR2 (1);
    r013_1     VARCHAR2 (1);
    r013p_     VARCHAR2 (1);
    flag_      BOOLEAN        := TRUE;
@@ -192,6 +197,7 @@ IS
    sql_acc_ clob;
    ret_     number;
    date_spr date := dat_next_u(dat_, 1);
+   dat_izm1     date := to_date('26/12/2017','dd/mm/yyyy');
 --------------------------------------------------------------------------
    CURSOR scheta
    IS
@@ -246,7 +252,7 @@ IS
              (select r020, max(r050) r050
                 from kl_r020
                 where d_open <= date_spr and
-                    (d_close is null or d_close > date_spr)
+                    (d_close is null or d_close >= date_spr)
                 group by r020) k
        WHERE a.dos+a.kos<>0
          AND s.acc = a.acc
@@ -261,7 +267,7 @@ IS
       SELECT a.acc, a.nls, a.kv, a.FDAT,
              a.nbs, a.mdate,
              NVL (Trim (p.s180), Fs180 (a.acc, substr(a.nls, 1, 1), dat_)),
-             NVL(Trim (p.r013),'0'), trim(p.d020),
+             NVL(Trim (p.r013),'0'), NVL(Trim (p.r011),'0'), trim(p.d020),
              MOD (c.CODCAGENT, 2), c.rnk,
              a.dos, a.kos, a.ostf,
              a.ostf - a.dos + a.kos,
@@ -297,13 +303,14 @@ IS
     select a.*, c.codcagent
     FROM (
             SELECT  b.acc, b.nls, b.kv, b.nbs, b.md_new, b.isp,
-                b.s180_new, b.r013, b.rnk, b.se, b.prc_old, b.tip, b.tobo, b.nms, b.odate
+                b.s180_new, b.r013, b.r011, b.rnk, b.se, b.prc_old, b.tip, b.tobo, b.nms, b.odate
             from (
             SELECT r.odate, r.acc, a.nls, a.kv, a.nbs, a.PAP, a.rnk, a.isp, a.tip,
                    r.mdate md_old, a.mdate md_new, r.s180 s180_old,
                    NVL (Trim (s.s180), Fs180 (r.acc, substr(a.nls, 1, 1), dat_)) s180_new,
                    r.ints prc_old,
-                   0 se, NVL(r.mb,s.r013) r013, a.tobo, a.nms
+                   0 se, NVL(r.mb,s.r013) r013, NVL(r.mb,s.r011) r011,
+                   a.tobo, a.nms
               FROM RNBU_HISTORY r, ACCOUNTS a, SPECPARAM s
               WHERE r.acc NOT IN (SELECT acc FROM RNBU_HISTORY WHERE odate=dat_) AND
                     (r.odate, r.acc) in (SELECT MAX(h.odate), h.acc
@@ -687,26 +694,51 @@ BEGIN
              s180_ := '1';
           end if;
 
-          if r013_ <> '0' then
-             BEGIN
-                select r013
-                   into r013_1
-                from kl_r013
-                where trim(prem) = 'КБ' and r020 = nbs_ and r013 = r013_
-                  and d_close is not null and d_close <= dat_
-                  and (r020, r013 ) not in ( select k.r020, k.r013
-                                             from kl_r013 k
-                                             where trim(k.prem) = 'КБ'
-                                               and k.r020 = nbs_
-                                               and k.r013 = r013_
-                                               and k.d_close is null
-                                           );
-                r013_ := '0';
-             EXCEPTION
-                WHEN NO_DATA_FOUND
-                THEN
-                null;
-             END;
+          if dat_ < dat_izm1
+          then
+             if r013_ <> '0' then
+                BEGIN
+                   select r013
+                      into r013_1
+                   from kl_r013
+                   where trim(prem) = 'КБ' and r020 = nbs_ and r013 = r013_
+                     and d_close is not null and d_close <= dat_
+                     and (r020, r013 ) not in ( select k.r020, k.r013
+                                                from kl_r013 k
+                                                where trim(k.prem) = 'КБ'
+                                                  and k.r020 = nbs_
+                                                  and k.r013 = r013_
+                                                  and k.d_close is null
+                                              );
+                   r013_ := '0';
+                EXCEPTION
+                   WHEN NO_DATA_FOUND
+                   THEN
+                   null;
+                END;
+             end if;    
+          else
+             if r011_ <> '0' then
+                BEGIN
+                   select r011
+                      into r011_1
+                   from kl_r011
+                   where trim(prem) = 'КБ' and r020 = nbs_ and r011 = r011_
+                     and d_close is not null and d_close <= dat_
+                     and (r020, r011 ) not in ( select k.r020, k.r011
+                                                from kl_r011 k
+                                                where trim(k.prem) = 'КБ'
+                                                  and k.r020 = nbs_
+                                                  and k.r011 = r011_
+                                                  and k.d_close is null
+                                              );
+                   r011_ := '0';
+                EXCEPTION
+                   WHEN NO_DATA_FOUND
+                   THEN
+                   null;
+                END;
+             end if;
           end if;
 
           spcnt_     := Acrn_otc.fproc (acc_, data_);
@@ -1196,14 +1228,26 @@ BEGIN
                 THEN
                    sdos_ := Gl.P_Icurval (kv_, sdos_, data_);
 
-                   kodp_ :=
-                         '5'
-                      || nbs_
-                      || r013_
-                      || s180_
-                      || TO_CHAR (2 - cntr_)
-                      || d020_
-                      || LPAD (kv_, 3, '0');
+                   if dat_ < dat_izm1 
+                   then
+                      kodp_ :=
+                            '5'
+                         || nbs_
+                         || r013_
+                         || s180_
+                         || TO_CHAR (2 - cntr_)
+                         || d020_
+                         || LPAD (kv_, 3, '0');
+                   else
+                      kodp_ :=
+                            '5'
+                         || nbs_
+                         || r011_
+                         || s180_
+                         || TO_CHAR (2 - cntr_)
+                         || d020_
+                         || LPAD (kv_, 3, '0');
+                   end if;  
 
                    IF s180_ = '0' THEN
                       nls_ := 'X' || nls_;
@@ -1220,20 +1264,38 @@ BEGIN
                    -- Дт.обороты*%% ставка
                    p_ins ('3' || kodp_, TO_CHAR (sdos_*ROUND(spcnt_,4)));
 
-                   INSERT INTO RNBU_HISTORY
-                                (odate,
-                                 nls,
-                                 kv, CODCAGENT, ints, s180, k081, k092, dos,
-                                 kos, mdate, k112, mb, d020, isp, ost, acc
-                                )
-                         VALUES (dat_,
-                                 DECODE (SUBSTR (nls_, 1, 1),
-                                         'X', SUBSTR (nls_, 2, 14),
-                                         nls_
-                                        ),
-                                 kv_, cntr_, spcnt_, s180_, k081_, k092_, sdos_,
-                                 skos_, mdate_, k112_, r013_, d020_, isp_, se_, acc_
-                                );
+                   if dat_ < dat_izm1
+                   then
+                      INSERT INTO RNBU_HISTORY
+                                   (odate,
+                                    nls,
+                                    kv, CODCAGENT, ints, s180, k081, k092, dos,
+                                    kos, mdate, k112, mb, d020, isp, ost, acc
+                                   )
+                            VALUES (dat_,
+                                    DECODE (SUBSTR (nls_, 1, 1),
+                                            'X', SUBSTR (nls_, 2, 14),
+                                            nls_
+                                           ),
+                                    kv_, cntr_, spcnt_, s180_, k081_, k092_, sdos_,
+                                    skos_, mdate_, k112_, r013_, d020_, isp_, se_, acc_
+                                   );
+                   else
+                      INSERT INTO RNBU_HISTORY
+                                   (odate,
+                                    nls,
+                                    kv, CODCAGENT, ints, s180, k081, k092, dos,
+                                    kos, mdate, k112, mb, d020, isp, ost, acc
+                                   )
+                            VALUES (dat_,
+                                    DECODE (SUBSTR (nls_, 1, 1),
+                                            'X', SUBSTR (nls_, 2, 14),
+                                            nls_
+                                           ),
+                                    kv_, cntr_, spcnt_, s180_, k081_, k092_, sdos_,
+                                    skos_, mdate_, k112_, r011_, d020_, isp_, se_, acc_
+                                   );
+                   end if;
                 END IF;
 
                 -- обороты пролонгации
@@ -1242,15 +1304,26 @@ BEGIN
 
                    s_prol_ := Gl.P_Icurval (kv_, s_prol_, data_);
 
-                   kodp_ :=
-                         '5'
-                      || nbs_
-                      || r013_
-                      || s180_
-                      || TO_CHAR (2 - cntr_)
-                      || '02'
-                      || LPAD (kv_, 3, '0');
-
+                   if dat_ < dat_izm1
+                   then
+                      kodp_ :=
+                            '5'
+                         || nbs_
+                         || r013_
+                         || s180_
+                         || TO_CHAR (2 - cntr_)
+                         || '02'
+                         || LPAD (kv_, 3, '0');
+                   else
+                      kodp_ :=
+                            '5'
+                         || nbs_
+                         || r011_
+                         || s180_
+                         || TO_CHAR (2 - cntr_)
+                         || '02'
+                         || LPAD (kv_, 3, '0');
+                   end if;
 
                    IF s180_ = '0' THEN
                       nls_ := 'X' || nls_;
@@ -1266,20 +1339,38 @@ BEGIN
                    sdos_ := s_prol_;
                    d020_ := '02';
 
-                   INSERT INTO RNBU_HISTORY
-                                (odate,
-                                 nls,
-                                 kv, CODCAGENT, ints, s180, k081, k092, dos,
-                                 kos, mdate, k112, mb, d020, isp, ost, acc
-                                )
-                         VALUES (dat_,
-                                 DECODE (SUBSTR (nls_, 1, 1),
-                                         'X', SUBSTR (nls_, 2, 14),
-                                         nls_
-                                        ),
-                                 kv_, cntr_, spcnt_, s180_, k081_, k092_, sdos_,
-                                 skos_, mdate_, k112_, r013_, d020_, isp_, se_, acc_
-                                );
+                   if dat_ < dat_izm1
+                   then
+                      INSERT INTO RNBU_HISTORY
+                                   (odate,
+                                    nls,
+                                    kv, CODCAGENT, ints, s180, k081, k092, dos,
+                                    kos, mdate, k112, mb, d020, isp, ost, acc
+                                   )
+                            VALUES (dat_,
+                                    DECODE (SUBSTR (nls_, 1, 1),
+                                            'X', SUBSTR (nls_, 2, 14),
+                                            nls_
+                                           ),
+                                    kv_, cntr_, spcnt_, s180_, k081_, k092_, sdos_,
+                                    skos_, mdate_, k112_, r013_, d020_, isp_, se_, acc_
+                                   );
+                   else
+                      INSERT INTO RNBU_HISTORY
+                                   (odate,
+                                    nls,
+                                    kv, CODCAGENT, ints, s180, k081, k092, dos,
+                                    kos, mdate, k112, mb, d020, isp, ost, acc
+                                   )
+                            VALUES (dat_,
+                                    DECODE (SUBSTR (nls_, 1, 1),
+                                            'X', SUBSTR (nls_, 2, 14),
+                                            nls_
+                                           ),
+                                    kv_, cntr_, spcnt_, s180_, k081_, k092_, sdos_,
+                                    skos_, mdate_, k112_, r011_, d020_, isp_, se_, acc_
+                                   );
+                   end if;  
                 END IF;
              END IF;
 
@@ -1287,7 +1378,11 @@ BEGIN
              IF mfou_ not in (300465) and
                   (nbs_ = '2620' AND r013_ in ('1','2','3') OR
                    nbs_ = '2625' AND r013_ = '2') AND
-                   se_ >= 0 and skos_ > 0
+                   se_ >= 0 and skos_ > 0 and dat_ < dat_izm1
+                     OR
+                mfou_ not in (300465) and
+                  (nbs_  in ('2620', '2625') AND r011_ = '3') AND
+                   se_ >= 0 and skos_ > 0 and dat_ >= dat_izm1
                      OR
                 mfou_  in (300465) and
                    nbs_ = '2620' AND se_ >= 0 and skos_ > 0 and
@@ -1299,7 +1394,11 @@ BEGIN
                 (nbs_ NOT IN ('1500','1600','2600','2605',
                               '2620','2625','2630','2635','2650','2655') and skos_ > 0 )
                      OR
+                (nbs_ = '2600' and r013_  in ('1','7','8','A') and skos_ > 0) 
+                 and dat_ < dat_izm1
+                     OR
                 (nbs_ = '2600' and r013_  in ('1','7','8','A') and skos_ > 0)
+                 and dat_ >= dat_izm1
                      OR
                 mfou_ not in (300465) and
                    nbs_ IN ('2630', '2635') and skos_ > 0
@@ -1310,13 +1409,28 @@ BEGIN
                     OR
                 (mfou_ <> 300465 and
                    (nbs_ = '2605' AND r013_ in ('1','3') OR
-                    nbs_ = '2655' AND r013_ = '3') and skos_ > 0)
+                    nbs_ = '2655' AND r013_ = '3') and skos_ > 0) and 
+                 dat_ < dat_izm1
+                     OR
+                (mfou_ <> 300465 and
+                   (nbs_ in ('2605', '2655') AND r011_ = '3') and skos_ > 0) and
+                 dat_ >= dat_izm1
                      OR
                  mfou_ in (300465) and
                    ((nbs_ = '2605' and r013_ in ('1','3') and skos_ > 0 and spcnt_ <> 0)   OR
-                    (nbs_ = '2655' and r013_ = '3' and skos_ > 0) )
+                    (nbs_ = '2655' and r013_ = '3' and skos_ > 0) ) and 
+                    dat_ < dat_izm1  
                      OR
-                (nbs_ = '2650' and r013_ in ('1','3','8') and skos_ > 0)
+                 mfou_ in (300465) and
+                   ((nbs_ ='2605' and r011_ = '3' and skos_ > 0 and spcnt_ <> 0)   OR
+                    (nbs_ = '2655' and r011_ = '3' and skos_ > 0) ) and
+                    dat_ >= dat_izm1
+                     OR
+                (nbs_ = '2650' and r013_ in ('1','3','8') and skos_ > 0) and 
+                dat_ < dat_izm1
+                     OR
+                (nbs_ = '2650' and r011_ = '3' and skos_ > 0) and 
+                dat_ >= dat_izm1
              THEN
                 if nbs_ in ('2610','2611','2615','2616','2617','2630','2635',
                             '2636','2637','2651','2652','2653','2656') and
@@ -2513,8 +2627,14 @@ BEGIN
                       cntr1_ := TO_CHAR (2 - cntr_);
                    END IF;
 
-                   kodp_ :=
-                      '6' || nbs_ || r013_ || s180_ || cntr1_ || d020_ || LPAD (kv_, 3, '0');
+                   if dat_ < dat_izm1
+                   then
+                      kodp_ :=
+                         '6' || nbs_ || r013_ || s180_ || cntr1_ || d020_ || LPAD (kv_, 3, '0');
+                   else
+                      kodp_ :=
+                         '6' || nbs_ || r011_ || s180_ || cntr1_ || d020_ || LPAD (kv_, 3, '0');
+                   end if;
 
                    IF s180_ = '0'
                    THEN
@@ -2533,20 +2653,38 @@ BEGIN
                       -- Кт.обороты*%% ставка
                       p_ins ('3' || kodp_, TO_CHAR (skos_*ROUND(spcnt_,4)));
 
-                      INSERT INTO RNBU_HISTORY
-                                    (odate,
-                                     nls,
-                                     kv, CODCAGENT, ints, s180, k081, k092, dos,
-                                     kos, mdate, k112, mb, d020, isp, ost, acc
-                                    )
-                             VALUES (dat_,
-                                     DECODE (SUBSTR (nls_, 1, 1),
-                                             'X', SUBSTR (nls_, 2, 14),
-                                             nls_
-                                            ),
-                                     kv_, cntr_, spcnt_, s180_, k081_, k092_, sdos_,
-                                     skos_, mdate_, k112_, r013_, d020_, isp_, se_, acc_
-                                    );
+                      if dat_ < dat_izm1
+                      then
+                         INSERT INTO RNBU_HISTORY
+                                       (odate,
+                                        nls,
+                                        kv, CODCAGENT, ints, s180, k081, k092, dos,
+                                        kos, mdate, k112, mb, d020, isp, ost, acc
+                                       )
+                                VALUES (dat_,
+                                        DECODE (SUBSTR (nls_, 1, 1),
+                                                'X', SUBSTR (nls_, 2, 14),
+                                                nls_
+                                               ),
+                                        kv_, cntr_, spcnt_, s180_, k081_, k092_, sdos_,
+                                        skos_, mdate_, k112_, r013_, d020_, isp_, se_, acc_
+                                       );
+                      else
+                         INSERT INTO RNBU_HISTORY
+                                       (odate,
+                                        nls,
+                                        kv, CODCAGENT, ints, s180, k081, k092, dos,
+                                        kos, mdate, k112, mb, d020, isp, ost, acc
+                                       )
+                                VALUES (dat_,
+                                        DECODE (SUBSTR (nls_, 1, 1),
+                                                'X', SUBSTR (nls_, 2, 14),
+                                                nls_
+                                               ),
+                                        kv_, cntr_, spcnt_, s180_, k081_, k092_, sdos_,
+                                        skos_, mdate_, k112_, r011_, d020_, isp_, se_, acc_
+                                       );
+                      end if;
                    END IF;
                 END IF;
 
@@ -2567,8 +2705,14 @@ BEGIN
                       cntr1_ := TO_CHAR (2 - cntr_);
                    END IF;
 
+                   if dat_ < dat_izm1
+                   then 
                    kodp_ :=
                       '6' || nbs_ || r013_ || s180_ || cntr1_ || '02' || LPAD (kv_, 3, '0');
+                   else
+                   kodp_ :=
+                      '6' || nbs_ || r011_ || s180_ || cntr1_ || '02' || LPAD (kv_, 3, '0');
+                   end if;
 
                    IF s180_ = '0'
                    THEN
@@ -2589,20 +2733,38 @@ BEGIN
                       skos_ := s_prol_;
                       d020_ := '02';
 
-                      INSERT INTO RNBU_HISTORY
-                                    (odate,
-                                     nls,
-                                     kv, CODCAGENT, ints, s180, k081, k092, dos,
-                                     kos, mdate, k112, mb, d020, isp, ost, acc
-                                    )
-                             VALUES (dat_,
-                                     DECODE (SUBSTR (nls_, 1, 1),
-                                             'X', SUBSTR (nls_, 2, 14),
-                                             nls_
-                                            ),
-                                     kv_, cntr_, spcnt_, s180_, k081_, k092_, sdos_,
-                                     skos_, mdate_, k112_, r013_, d020_, isp_, se_, acc_
-                                    );
+                      if dat_ < dat_izm1
+                      then
+                         INSERT INTO RNBU_HISTORY
+                                       (odate,
+                                        nls,
+                                        kv, CODCAGENT, ints, s180, k081, k092, dos,
+                                        kos, mdate, k112, mb, d020, isp, ost, acc
+                                       )
+                                VALUES (dat_,
+                                        DECODE (SUBSTR (nls_, 1, 1),
+                                                'X', SUBSTR (nls_, 2, 14),
+                                                nls_
+                                               ),
+                                        kv_, cntr_, spcnt_, s180_, k081_, k092_, sdos_,
+                                        skos_, mdate_, k112_, r013_, d020_, isp_, se_, acc_
+                                        );
+                      else
+                         INSERT INTO RNBU_HISTORY
+                                       (odate,
+                                        nls,
+                                        kv, CODCAGENT, ints, s180, k081, k092, dos,
+                                        kos, mdate, k112, mb, d020, isp, ost, acc
+                                       )
+                                VALUES (dat_,
+                                        DECODE (SUBSTR (nls_, 1, 1),
+                                                'X', SUBSTR (nls_, 2, 14),
+                                                nls_
+                                               ),
+                                         kv_, cntr_, spcnt_, s180_, k081_, k092_, sdos_,
+                                        skos_, mdate_, k112_, r011_, d020_, isp_, se_, acc_
+                                       );
+                      end if;  
                    END IF;
                 END IF;
              END IF;
@@ -2614,20 +2776,38 @@ BEGIN
                 sdos_ := Gl.P_Icurval (kv_, s_prol_03d, data_);
                 skos_ := Gl.P_Icurval (kv_, s_prol_03k, data_);
 
-                INSERT INTO RNBU_HISTORY
-                            (odate,
-                             nls,
-                             kv, CODCAGENT, ints, s180, k081, k092, dos,
-                             kos, mdate, k112, mb, d020, isp, ost, acc
-                            )
-                     VALUES (dat_,
-                             DECODE (SUBSTR (nls_, 1, 1),
-                                     'X', SUBSTR (nls_, 2, 14),
-                                     nls_
-                                    ),
-                             kv_, cntr_, spcnt_, s180_, k081_, k092_, sdos_,
-                             skos_, mdate_, k112_, r013_, d020_, isp_, se_, acc_
-                            );
+                if dat_ < dat_izm1
+                then
+                   INSERT INTO RNBU_HISTORY
+                               (odate,
+                                nls,
+                                kv, CODCAGENT, ints, s180, k081, k092, dos,
+                                kos, mdate, k112, mb, d020, isp, ost, acc
+                              )
+                        VALUES (dat_,
+                                DECODE (SUBSTR (nls_, 1, 1),
+                                        'X', SUBSTR (nls_, 2, 14),
+                                        nls_
+                                       ),
+                                kv_, cntr_, spcnt_, s180_, k081_, k092_, sdos_,
+                                skos_, mdate_, k112_, r013_, d020_, isp_, se_, acc_
+                               );
+                else
+                   INSERT INTO RNBU_HISTORY
+                               (odate,
+                                nls,
+                                kv, CODCAGENT, ints, s180, k081, k092, dos,
+                                kos, mdate, k112, mb, d020, isp, ost, acc
+                               )
+                        VALUES (dat_,
+                                DECODE (SUBSTR (nls_, 1, 1),
+                                       'X', SUBSTR (nls_, 2, 14),
+                                       nls_
+                                       ),
+                                kv_, cntr_, spcnt_, s180_, k081_, k092_, sdos_,
+                                skos_, mdate_, k112_, r011_, d020_, isp_, se_, acc_
+                              );
+                end if;
              END IF;
           END IF;
        END LOOP;
@@ -2640,7 +2820,7 @@ BEGIN
 
        LOOP
           FETCH saldoost
-           INTO acc_, nls_, kv_, data_, nbs_, mdate_, s180_, r013_,
+           INTO acc_, nls_, kv_, data_, nbs_, mdate_, s180_, r013_, r011_,
                 d020_acc, cntr_, rnk_, sdos_, skos_, vost_, se_, spcnt_, isp_, tips_,
                 tobo_, nms_;
 
@@ -2691,15 +2871,26 @@ BEGIN
                 cntr1_ := TO_CHAR (2 - cntr_);
              END IF;
 
-             kodp_ :=
-                   '6'
-                || nbs_
-                || r013_
-                || s180_
-                || cntr1_
-                || d020_
-                || LPAD (kv_, 3, '0');
-
+             if dat_ < dat_izm1
+             then
+                kodp_ :=
+                      '6'
+                   || nbs_
+                   || r013_
+                   || s180_
+                   || cntr1_
+                   || d020_
+                   || LPAD (kv_, 3, '0');
+              else
+                kodp_ :=
+                      '6'
+                   || nbs_
+                   || r011_
+                   || s180_
+                   || cntr1_
+                   || d020_
+                   || LPAD (kv_, 3, '0');
+              end if;
 
              IF s180_ = '0' AND LENGTH(trim(nls_)) <= 14
              THEN
@@ -2714,20 +2905,38 @@ BEGIN
              p_ins ('3' || kodp_, TO_CHAR (to_number(znap_)*ROUND(spcnt_,4)));
 
              ---  вставка записей в таблицу RNBU_HISTORY для месячных файлов #04,#05
-             INSERT INTO RNBU_HISTORY
-                         (odate,
-                          nls,
-                          kv, CODCAGENT, ints, s180, k081, k092, dos, kos, mdate,
-                          k112, ost, mb, d020, isp, acc
-                         )
-                  VALUES (dat_,
-                          DECODE (SUBSTR (nls_, 1, 1),
-                                  'X', SUBSTR (nls_, 2, 14),
-                                  nls_
-                                 ),
-                          kv_, cntr_, spcnt_, s180_, k081_, k092_, 0, 0, mdate_,
-                          k112_, TO_NUMBER (znap_), r013_, d020_, isp_, acc_
-                         );
+             if dat_ < dat_izm1
+             then
+                INSERT INTO RNBU_HISTORY
+                            (odate,
+                             nls,
+                             kv, CODCAGENT, ints, s180, k081, k092, dos, kos, mdate,
+                             k112, ost, mb, d020, isp, acc
+                            )
+                     VALUES (dat_,
+                             DECODE (SUBSTR (nls_, 1, 1),
+                                     'X', SUBSTR (nls_, 2, 14),
+                                     nls_
+                                    ),
+                             kv_, cntr_, spcnt_, s180_, k081_, k092_, 0, 0, mdate_,
+                             k112_, TO_NUMBER (znap_), r013_, d020_, isp_, acc_
+                            );
+             else
+                INSERT INTO RNBU_HISTORY
+                            (odate,
+                             nls,
+                             kv, CODCAGENT, ints, s180, k081, k092, dos, kos, mdate,
+                             k112, ost, mb, d020, isp, acc
+                            )
+                     VALUES (dat_,
+                             DECODE (SUBSTR (nls_, 1, 1),
+                                     'X', SUBSTR (nls_, 2, 14),
+                                     nls_
+                                    ),
+                             kv_, cntr_, spcnt_, s180_, k081_, k092_, 0, 0, mdate_,
+                             k112_, TO_NUMBER (znap_), r011_, d020_, isp_, acc_
+                            );
+             end if;
           END IF;
 
     --- если остаток на конец Дебетовый, а на начало дня Кредитовый или
@@ -2814,14 +3023,26 @@ BEGIN
                          nbs1_ := nbs_;
                       end if;
 
-                      kodp_ :=
-                            '5'
-                         || nbs1_
-                         || r013_
-                         || s180_
-                         || cntr1_
-                         || d020_
-                         || LPAD (kv_, 3, '0');
+                      if dat_ < dat_izm1
+                      then
+                         kodp_ :=
+                               '5'
+                            || nbs1_
+                            || r013_
+                            || s180_
+                            || cntr1_
+                            || d020_
+                            || LPAD (kv_, 3, '0');
+                      else
+                         kodp_ :=
+                               '5'
+                            || nbs1_
+                            || r011_
+                            || s180_
+                            || cntr1_
+                            || d020_
+                            || LPAD (kv_, 3, '0');
+                      end if;
 
                       p_ins ('1' || kodp_, znap_);
                       p_ins ('2' || kodp_, LTRIM (TO_CHAR (ROUND (spcnt_, 4), fmt_)));
@@ -2830,20 +3051,38 @@ BEGIN
 
                    END IF;
                    ---  вставка записей в таблицу RNBU_HISTORY для месячных файлов #04,#05
-                   INSERT INTO RNBU_HISTORY
-                               (odate,
-                                nls,
-                                kv, CODCAGENT, ints, s180, k081, k092, dos, kos,
-                                mdate, k112, ost, mb, d020, isp, acc
-                               )
-                        VALUES (dat_,
-                                DECODE (SUBSTR (nls_, 1, 1),
-                                        'X', SUBSTR (nls_, 2, 14),
-                                        nls_
-                                       ),
-                                kv_, cntr_, spcnt_, s180_, k081_, k092_, 0, 0,
-                                mdate_, k112_, TO_NUMBER (znap_), r013_, d020_, isp_, acc_
-                               );
+                   if dat_ < dat_izm1
+                   then
+                      INSERT INTO RNBU_HISTORY
+                                  (odate,
+                                   nls,
+                                   kv, CODCAGENT, ints, s180, k081, k092, dos, kos,
+                                   mdate, k112, ost, mb, d020, isp, acc
+                                  )
+                           VALUES (dat_,
+                                   DECODE (SUBSTR (nls_, 1, 1),
+                                           'X', SUBSTR (nls_, 2, 14),
+                                           nls_
+                                          ),
+                                   kv_, cntr_, spcnt_, s180_, k081_, k092_, 0, 0,
+                                   mdate_, k112_, TO_NUMBER (znap_), r013_, d020_, isp_, acc_
+                                  );
+                   else
+                      INSERT INTO RNBU_HISTORY
+                                  (odate,
+                                   nls,
+                                   kv, CODCAGENT, ints, s180, k081, k092, dos, kos,
+                                   mdate, k112, ost, mb, d020, isp, acc
+                                  )
+                           VALUES (dat_,
+                                   DECODE (SUBSTR (nls_, 1, 1),
+                                           'X', SUBSTR (nls_, 2, 14),
+                                           nls_
+                                          ),
+                                   kv_, cntr_, spcnt_, s180_, k081_, k092_, 0, 0,
+                                   mdate_, k112_, TO_NUMBER (znap_), r011_, d020_, isp_, acc_
+                                  );
+                   end if;
                 END IF;
              END IF;
           END IF;
@@ -2861,7 +3100,7 @@ BEGIN
        LOOP
           FETCH izm_proc
            INTO acc_, nls_, kv_, nbs_, mdate_, isp_,
-                s180_, r013p_, rnk_, se_, spcnt_, tips_, tobo_, nms_, pdat_, codc_;
+                s180_, r013p_, r011p_, rnk_, se_, spcnt_, tips_, tobo_, nms_, pdat_, codc_;
 
           EXIT WHEN izm_proc%NOTFOUND;
 
@@ -2952,27 +3191,53 @@ BEGIN
                 k071_ := null;
                 mb_ := null;
 
-                if r013p_ <> '0' then
-                   BEGIN
-                      select r013
-                         into r013_1
-                      from kl_r013
-                      where trim(prem) = 'КБ' and r020 = nbs_ and r013 = r013_
-                        and d_close is not null and d_close <= dat_
-                        and (r020, r013 ) not in ( select k.r020, k.r013
-                                             from kl_r013 k
-                                             where trim(k.prem) = 'КБ'
-                                               and k.r020 = nbs_
-                                               and k.r013 = r013_
-                                               and k.d_close is null
-                                           );
+                if dat_ < dat_izm1
+                then
+                   if r013p_ <> '0' then
+                      BEGIN
+                         select r013
+                            into r013_1
+                         from kl_r013
+                         where trim(prem) = 'КБ' and r020 = nbs_ and r013 = r013p_
+                           and d_close is not null and d_close <= dat_
+                           and (r020, r013 ) not in ( select k.r020, k.r013
+                                                from kl_r013 k
+                                                where trim(k.prem) = 'КБ'
+                                                  and k.r020 = nbs_
+                                                  and k.r013 = r013p_
+                                                  and k.d_close is null
+                                              );
 
-                      r013p_ := '0';
-                   EXCEPTION
-                      WHEN NO_DATA_FOUND
-                        THEN
-                        null;
-                     END;
+                         r013p_ := '0';
+                      EXCEPTION
+                         WHEN NO_DATA_FOUND
+                           THEN
+                           null;
+                      END;
+                   end if;
+                else
+                   if r011p_ <> '0' then
+                      BEGIN
+                         select r011
+                            into r011_1
+                         from kl_r011
+                         where trim(prem) = 'КБ' and r020 = nbs_ and r011 = r011p_
+                           and d_close is not null and d_close <= dat_
+                           and (r020, r011 ) not in ( select k.r020, k.r011
+                                                from kl_r011 k
+                                                where trim(k.prem) = 'КБ'
+                                                  and k.r020 = nbs_
+                                                  and k.r011 = r011p_
+                                                  and k.d_close is null
+                                              );
+
+                         r011p_ := '0';
+                      EXCEPTION
+                         WHEN NO_DATA_FOUND
+                           THEN
+                           null;
+                      END;
+                   end if;
                 end if;
 
                 if se_ < 0 then
@@ -2982,8 +3247,14 @@ BEGIN
                 end if;
 
                 -- записывает в тек. отчет
-                kodp_ := ddd_ || nbs_ || r013p_ || s180_ || TO_CHAR (2 - cntr_) || d020_ || LPAD (kv_, 3, '0')||
-                	(case when dat_ >= to_date('02092013','ddmmyyyy') then '0' else '' end);
+                if dat_ < dat_izm1
+                then
+                   kodp_ := ddd_ || nbs_ || r013p_ || s180_ || TO_CHAR (2 - cntr_) || d020_ || LPAD (kv_, 3, '0')||
+                            (case when dat_ >= to_date('02092013','ddmmyyyy') then '0' else '' end);
+                else
+                   kodp_ := ddd_ || nbs_ || r011p_ || s180_ || TO_CHAR (2 - cntr_) || d020_ || LPAD (kv_, 3, '0')||
+                            (case when dat_ >= to_date('02092013','ddmmyyyy') then '0' else '' end);
+                end if;
 
                 -- историзация
                 INSERT INTO RNBU_HISTORY
@@ -3216,3 +3487,5 @@ BEGIN
 ----------------------------------------------------------------------
 END;
 /
+
+show err;
