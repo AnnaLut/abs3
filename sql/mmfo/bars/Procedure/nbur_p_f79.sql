@@ -1,13 +1,3 @@
-DROP PROCEDURE BARS.NBUR_P_F79;
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/NBUR_P_F79.sql =========*** Run **
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure NBUR_P_F79 ***
-
 CREATE OR REPLACE PROCEDURE BARS.NBUR_P_F79 (p_kod_filii        varchar2,
                                              p_report_date      date,
                                              p_form_id          number,
@@ -19,18 +9,18 @@ is
 % DESCRIPTION : ѕроцедура формировани€ #79 дл€  Ѕ
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.16.004  19.12.2016
+% VERSION     :  v.16.006  27.12.2017
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_          char(30)  := 'v.16.004  19.12.2016';
+  ver_          char(30)  := 'v.16.006  27.12.2017';
 /*
    —труктура показника   DD ZZZZZZZZZZ VVV NNNN
 
     DD    -    може приймати значенн€:
-    
+
     01 Ц назва ≥нвестора / ѕ.≤.Ѕ. ф≥зичноњ особи
-    02 Ц дата укладенн€ угоди 
-    03 Ц дата зак≥нченн€ д≥њ угоди 
-    04 Ц дата р≥шенн€ отриманого дозволу 
+    02 Ц дата укладенн€ угоди
+    03 Ц дата зак≥нченн€ д≥њ угоди
+    04 Ц дата р≥шенн€ отриманого дозволу
     05 Ц номер р≥шенн€ отриманого дозволу
     07 Ц сума субординованого боргу дл€ включенн€ до кап≥талу банку (у грн.екв.), €ка обл≥ковуЇтьс€ на б/р 3660,3661
     08 Ц сума отриманого дозволу на включенн€ субординованого боргу до кап≥талу банку
@@ -41,11 +31,11 @@ is
     13 Ц резидентн≥сть ≥нвестора
     14 Ц номер реЇстрац≥њ договору
     15 Ц дата реЇстрац≥њ договору
-    16 Ц сума перевищенн€ обмеженн    
-    
+    16 Ц сума перевищенн€ обмеженн
+
     ZZZZZZZZZZ    -    ≥дентиф≥кац≥йний код кл≥Їнта (10 знак≥в)
     VVV    -    код валюти;
-    NNNN    -    пор€дковий номер боргу дл€ конкретного кл≥Їнта    
+    NNNN    -    пор€дковий номер боргу дл€ конкретного кл≥Їнта
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
    l_nbuc          varchar2(20);
@@ -54,10 +44,10 @@ is
    l_file_code     varchar2(2) := substr(p_file_code, 2, 2);
 BEGIN
     logger.info ('NBUR_P_F79 begin for date = '||to_char(p_report_date, 'dd.mm.yyyy'));
- 
+
     -- определение начальных параметров (код области или ћ‘ќ или подразделение)
     nbur_files.P_PROC_SET(p_kod_filii, p_file_code, p_scheme, l_datez, 0, l_file_code, l_nbuc, l_type);
-                 
+
     BEGIN
        INSERT INTO nbur_detail_protocols (report_date,
                                           kf,
@@ -98,12 +88,12 @@ BEGIN
                          cust_id,
                          trim(value) field_value,
                          (case when substr(colname, 2, 2) = '11' and kv <> 980
-                            then '12' 
+                            then '12'
                             else substr(colname, 2, 2)
                          end) || kod1 || kod2 || kod3 field_code,
                          branch,
                          nbuc
-                    FROM (SELECT 
+                    FROM (SELECT
                                  b.acc_id,
                                  a.kf,
                                  a.acc_num,
@@ -130,7 +120,8 @@ BEGIN
                                  to_char(c.k030) p13,
                                  NVL(trim(w.D#79_14),'номер реЇстрац≥њ договору') p14,
                                  NVL(trim(w.D#79_15),'дата реЇстрац≥њ договору') p15,
-                                 '0' p16
+                                 '0' p16,
+                                 NVL(trim(z.value),'ознака ≥дентиф≥кац≥йного коду') p17
                             FROM NBUR_DM_ACCOUNTS a,
                                  NBUR_DM_CUSTOMERS c,
                                  NBUR_DM_BALANCES_DAILY b,
@@ -139,13 +130,14 @@ BEGIN
                                     select *
                                     from ACCOUNTSW
                                     where tag like 'D#79%' and
-                                        substr(trim(tag), 6, 2) in ('01', '02', '03', '04', '05', 
+                                        substr(trim(tag), 6, 2) in ('01', '02', '03', '04', '05',
                                             '08', '09', '14', '15'))
-                                    PIVOT (max(value) for tag in 
+                                    PIVOT (max(value) for tag in
                                     ('D#79_01' as D#79_01,  'D#79_02' as D#79_02, 'D#79_03' as D#79_03,
                                     'D#79_04' as D#79_04,  'D#79_05' as D#79_05, 'D#79_08' as D#79_08,
                                     'D#79_09' as D#79_09,  'D#79_14' as D#79_14, 'D#79_15' as D#79_15))) w,
-                                 NBUR_DM_ACNT_RATES r
+                                 NBUR_DM_ACNT_RATES r,
+                                 CUSTOMERW z
                            WHERE     a.report_date = p_report_date
                                  AND a.kf = p_kod_filii
                                  AND a.nbs in ('3660','3661')
@@ -159,10 +151,13 @@ BEGIN
                                  and a.acc_id = w.acc(+)
                                  and r.report_date(+) = p_report_date
                                  AND r.kf(+) = p_kod_filii
-                                 and a.acc_id = r.acc_id(+)) 
-                                 UNPIVOT (VALUE FOR colname IN  
-                                 (P01, P02, P03, P04, P05, P07, P08, P09, P10, 
-                                  P11, P13, P14, P15, P16 
+                                 and a.acc_id = r.acc_id(+)
+                                 and c.cust_id = z.rnk(+)
+                                 and nvl(z.tag(+), 'K021 ') = 'K021 '
+                                 )
+                                 UNPIVOT (VALUE FOR colname IN
+                                 (P01, P02, P03, P04, P05, P07, P08, P09, P10,
+                                  P11, P13, P14, P15, P16, P17
                                  ))) d;
     EXCEPTION
        WHEN OTHERS
@@ -196,10 +191,3 @@ BEGIN
 
 END;
 /
-show err;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/NBUR_P_F79.sql =========*** End **
-PROMPT ===================================================================================== 

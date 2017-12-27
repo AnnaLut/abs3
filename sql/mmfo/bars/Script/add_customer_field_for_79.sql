@@ -8,7 +8,12 @@ Insert into DBF_IMP_TABS
    ('KOD_K021', NULL);
 COMMIT;
 
-grant select on kod_k021 to start1;
+begin
+	execute immediate 'grant select on kod_k021 to start1';
+exception	
+	when others then null; 
+end;	
+/
 
 begin
     Insert into CUSTOMER_FIELD
