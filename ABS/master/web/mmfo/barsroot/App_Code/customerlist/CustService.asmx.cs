@@ -323,7 +323,7 @@ namespace CustomerList
                 string selStatement = BuildSelectStatementForTable(sql, table + " a", where, data, false);
                 string query = selStatement;
                 string replaceExp = sql;
-                query = query.Replace("RNK,", "RNK, a.kv,");
+                query = query.Replace("a.rnk RNK,", "a.rnk RNK,a.kv,");
                 if (query.Contains(":Dat1"))
                 {
                     query = query.Replace(":Dat1", "to_date('" + Dat1_url + "', 'DD.MM.YYYY')");
@@ -920,7 +920,7 @@ namespace CustomerList
 
                 string query = BuildSelectStatementForTable(sql, table + " a", where, data, false);
 
-                query = query.Replace("RNK,", "RNK, a.kv,");
+                query = query.Replace("a.rnk RNK,", "a.rnk RNK,a.kv,");
                 if (query.Contains(":Dat1"))
                     query = query.Replace(":Dat1", "to_date('" + Dat1_url + "', 'DD.MM.YYYY')");
                 if (query.Contains(":Dat2"))
