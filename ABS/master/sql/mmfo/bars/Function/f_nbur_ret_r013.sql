@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/function/f_nbur_ret_r013.sql =========*** Ru
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE FUNCTION BARS.F_NBUR_RET_R013 (
+CREATE OR REPLACE FUNCTION BARS.f_nbur_ret_r013 (
   p_dat         in      date,
   p_nbs         IN      VARCHAR2,
   p_kv          IN      NUMBER,
@@ -21,7 +15,7 @@ BEGIN
      SELECT COUNT (*)
        INTO l_find_ok
        FROM kl_r013
-      WHERE trim(prem) = 'EA'
+      WHERE trim(prem) = 'สม'
         AND r020 = p_nbs
         AND r013 = p_r013_old
         AND (d_close IS NULL OR d_close >= p_dat);
@@ -31,7 +25,6 @@ BEGIN
         l_find_ok := 0;
   END;
 
-  -- aaeainiaua n?aoa, o eio?uo oieuei 2 cia?aiey ia?aiao?a (3 e 4)
   IF p_nbs NOT IN
         ('1408',
          '1418',
@@ -264,11 +257,3 @@ BEGIN
 
 END;
 /
- show err;
- 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/function/f_nbur_ret_r013.sql =========*** En
- PROMPT ===================================================================================== 
- 

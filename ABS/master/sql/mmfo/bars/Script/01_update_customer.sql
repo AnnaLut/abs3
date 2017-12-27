@@ -1,13 +1,29 @@
--- на 27.12.2017 заменяем K070 со старых значений на новые
-SET LINES 1000
-SET TRIMSPOOL ON
-SET SERVEROUTPUT ON SIZE 1000000
-SET FEED OFF
+@params.sql
 
-spool c:\upd_customer_26122017_304665.log;
+set verify off
+set echo off
+set serveroutput on size 1000000
+spool log\update_customer(&&dbname-&&1).log
+set lines 3000
+set SQLBL on
+set timing on
+
+prompt...
+prompt ...
+prompt ... loading params
+prompt ...
+@params.sql
+whenever sqlerror exit
+prompt ...
+prompt ... connecting as bars 
+prompt ...
+conn bars@&&dbname/&&bars_pass
+whenever sqlerror continue
+
+prompt ================ update customer for &&1 ===============
 
 begin
-    for z in (select kf from mv_kf where kf = '304665')
+    for z in (select kf from mv_kf where kf = '&&1')
     loop
       bc.subst_mfo(z.kf);
       
@@ -54,4 +70,5 @@ begin
 end;
 /
 
-spool off;
+spool off
+quit
