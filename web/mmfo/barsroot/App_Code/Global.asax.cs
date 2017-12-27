@@ -243,15 +243,12 @@ namespace BarsWeb
                     string SERVER_NAME = Request.ServerVariables["SERVER_NAME"];
                     string SERVER_PORT = Request.ServerVariables["SERVER_PORT"];
 
-                    string userName = Context.User.Identity.Name.ToLower();
-
-                    string msg = string.Format("AbsoluteUri:[{0}] Host:[{1}] userHost:[{2}] SERVER:[{3}:{4}] userName:[{5}]",
+                    string msg = string.Format("AbsoluteUri:[{0}] Host:[{1}] userHost:[{2}] SERVER:[{3}:{4}]",
                         AbsoluteUri,
                         Host,
                         UserHost,
                         SERVER_NAME,
-                        SERVER_PORT,
-                        userName
+                        SERVER_PORT
                         );
 
                     try
