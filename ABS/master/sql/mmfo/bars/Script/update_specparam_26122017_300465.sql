@@ -6,14 +6,14 @@ SET TRIMSPOOL ON
 SET SERVEROUTPUT ON SIZE 1000000
 SET FEED OFF
 
-spool c:\upd_specparam_26122017.log;
+spool c:\upd_specparam_26122017_300465.log;
 
 declare 
 acco_   number;
 r011_   varchar2(1);
 
 begin
-    for z in (select kf from mv_kf)
+    for z in (select kf from mv_kf where kf = '300465')
     loop
         bc.subst_mfo(z.kf);
 

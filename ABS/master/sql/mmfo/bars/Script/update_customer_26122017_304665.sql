@@ -4,10 +4,10 @@ SET TRIMSPOOL ON
 SET SERVEROUTPUT ON SIZE 1000000
 SET FEED OFF
 
-spool c:\upd_customer_26122017.log;
+spool c:\upd_customer_26122017_304665.log;
 
 begin
-    for z in (select kf from mv_kf)
+    for z in (select kf from mv_kf where kf = '304665')
     loop
       bc.subst_mfo(z.kf);
       
@@ -17,11 +17,13 @@ begin
                  from customer 
                  where ise in ('12211', '12212', '12213', '12501',
                     '12502', '12503', '12301', '12302', '12303',  
-                    '12401', '12402', '12403', '20000')
+                    '12401', '12402', '12403', '20000')  and
+					date_off is null
                )
       loop
          update customer 
-         set ise=
+         set ved = (case ved when '99999' then '00000' else ved end),
+			 ise=
             (case ise 
                 when '12211' then '12201'
                 when '12212' then '12202'
@@ -35,8 +37,7 @@ begin
                 when '12401' then '12601'
                 when '12402' then '12602'
                 when '12403' then '12603'   
-                when '20000' then (case when codcagent = 2 then '20001' 
-                                        when codcagent = 4 then '20002' 
+                when '20000' then (case when codcagent = 6 then '20008' 
                                         else ise 
                                    end)
                 else ise 

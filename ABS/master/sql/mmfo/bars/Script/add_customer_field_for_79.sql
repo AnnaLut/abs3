@@ -18,7 +18,7 @@ begin
         U_NREZ, F_NREZ, F_SPD)
      Values
        ('K021', 'Ознака ідентифікаційного коду (K021)', 1, 1, 1, 
-        'KOD_K021', NULL, 'S', 1, 'K140', 
+        'KOD_K021', NULL, 'S', 1, 'K021', 
         NULL, 'OTHERS', 0, 1, NULL, 
         1, 1, 1);
     COMMIT;
