@@ -4,12 +4,8 @@ CREATE OR REPLACE PACKAGE rko IS
               Плата за расчетно-кассовое обслуживание
 
 
---    14/11/2017 COBUMMFO-5332:  3570->3579 - переносится только ВХОДЯЩИЙ на 01 число остаток 3570
+-- 14/11/2017 COBUMMFO-5332:  3570/03 -> 3570/37 - переносится только ВХОДЯЩИЙ на 01 число остаток 3570
 
-
-
-
- 29-05-2014 Sta Новая процедура-обвертка START_FINISH для Старта-Финиша
 
  Накопление идет по Opldok.FDAT !!!
  ------------------------------------
@@ -65,10 +61,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.rko IS
 
 /*
   
-  15.11.2017 Transfer-2017
- 
 
-  14/11/2017 COBUMMFO-5332:  3570->3579 - переносится ВХОДЯЩИЙ на 1 число остаток 3570
+  COBUMMFO-5332:  3570/03 -> 3570/37 - переносится только ВХОДЯЩИЙ на 01 число остаток 3570/03
 
 
 */
@@ -91,7 +85,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.rko IS
     end loop;         l_nls := vkrzn ( substr(gl.aMfo,1,5) , p_R4||'0'||nTmp_ );
     RETURN l_Nls ;
   end    Get_NLS_random ;
-----------------------------------
+-----------------------------------------------------------------------
 
 PROCEDURE START_FINISH (p_mode int, ---- 1 = фініш,  2 = старт,  .....НЕважл.
                         p_dat DATE DEFAULT NULL  -- Банк.дата
@@ -112,7 +106,7 @@ begin If p_mode not in (1,2) then RETURN; end if;
 
    ElsIf p_Mode = 2 then  --- = Старт
 
-      -- Перенесення заборгованості на прострочку 3570-3579
+      -- Перенесення заборгованості на прострочку 3570/03->3570/37
       -- 6 числа кожного місяця
 
       if To_Number( to_char (l_DAT,'DD') ) >= 6               and    --- тек  дд = 6 или  7, 8 если 6 -выходной
@@ -123,11 +117,14 @@ begin If p_mode not in (1,2) then RETURN; end if;
 
    end if;
 
-   --Погашення комісії за РКО 2600-3570,3579
-   --Кожного робочого дня на старты та фініші
+   --Погашення комісії за РКО  2600 -> 3570/37,3570/03
+   --Виконується КОЖНОГО робочого дня на Старті
+
    RKO.PAY( 2, l_dat, ' and a.ACC not in (select ACC from RKO_3570) ' ) ;
 
 end  START_FINISH ;
+
+----------------------------------------------------------------------------------------------------------------
 
 
 PROCEDURE acr(mode_ VARCHAR2, dat_ DATE, filt_ VARCHAR2 DEFAULT NULL) IS
@@ -137,15 +134,15 @@ end acr;
 
 
 PROCEDURE acr2(mode_ VARCHAR2, dat_ DATE, filt_ VARCHAR2 DEFAULT NULL, p_acc number DEFAULT NULL) IS
--- ---------------------------------------------------
---     ( 1 )   Накопление платы за РКО              --
+
+---- ( 1 )   Накопление платы за РКО              --
 /*
 
 Если mode_ <0, то это  расчет по одному РКК = -mode_,
 он предназначен для печати по одному клиенту
 
 */
--- ---------------------------------------------------
+-----------------------------------------------------
   acc_   NUMBER;
   accd_  NUMBER;
 
@@ -274,26 +271,9 @@ BEGIN
           WHERE  w.ACC = acc_
              AND w.TAG = 'SHTAR'
              AND to_number(w.VALUE) = t.ID;
-       EXCEPTION
-         WHEN NO_DATA_FOUND THEN
+       EXCEPTION WHEN NO_DATA_FOUND THEN
           L_DOC_NOPAY := 0;
           n_tarpak    := 0;
-         when OTHERS then
-           if ( sqlcode = -01722 )
-           then
-             SELECT w.VALUE
-               INTO l_shtar
-               FROM ACCOUNTSW w
-              WHERE w.ACC = acc_
-                AND w.TAG = 'SHTAR';
-             bars_audit.error( $$PLSQL_UNIT||'.PAY2: l_shtar='||l_shtar );
-             l_shtar := replace( l_shtar, ',', '.' );
-             n_tarpak := to_number( l_shtar, 'FM999990D099', 'NLS_NUMERIC_CHARACTERS = ''. ''' );
-             select nvl(DOC_NOPAY,0)
-               into l_doc_nopay
-               from TARIF_SCHEME
-              where ID = n_tarpak;
-           end if;
        END;
 
 ----------------------   Р А С Ч Е Т   --------------------------
@@ -760,28 +740,16 @@ END IF;
 
     End If;
 
--------------------------------------------------------------------------
---  Для "ДЕМАРКА":
---    Eсли после начисления "Начислено"=0, то меняем "С" на "По"+1,
---    т.е. передвигаем дату "С" до тех пор, пока по счету не начнется
---    накопление платы  ( s0>0 ).
---
-----  UPDATE rko_lst SET dat0a=dat_+1 WHERE  acc=acc_  and  s0=0;
--------------------------------------------------------------------------
-
-
-      COMMIT;
+    COMMIT;
 <<nextrec0>>
-      NULL;
+    NULL;
 
    END LOOP;
    CLOSE c0;
 END acr2;
 
 
-
-
----===========================================================================
+---======================================================================================================
 
 PROCEDURE pay2(mode_ VARCHAR2, dat_ DATE,filt_ VARCHAR2 DEFAULT NULL, p_acc number default null) IS
 -- ---------------------------------------------------
@@ -893,6 +861,20 @@ BEGIN
    END;
 --------------------------------------------------------------------
 
+--  Удаляем 3570 ( RKO_LST.ACC1 = null ) у счетов 2600, которые сидят в "Плате за РО", если 
+--  этот же 3570 встречается в счетах 2600, сидящих в "Плате за РО - только на 3570".
+--  То же самое делаем с 3579 (3570/37 - в новом ПС)
+
+
+   UPDATE RKO_LST set ACC1=null where
+      ACC not in (Select ACC from RKO_3570)   and
+      ACC1 in (Select ACC1 from RKO_LST where ACC in (Select ACC from RKO_3570));
+            
+   UPDATE RKO_LST set ACC2=null where
+      ACC not in (Select ACC from RKO_3570)   and
+      ACC2 in (Select ACC2 from RKO_LST where ACC in (Select ACC from RKO_3570));
+
+--------------------------------------------------------------------
 
    deb.trace(3,'DATE',dat_);
 
@@ -967,8 +949,8 @@ BEGIN
 
 
 
-------   Определяем 6110 (nlsb_tobo) для текущ.2600 только при --------------
-------   КНОПКАХ "0" и "1"  и  если начисл.сумма s0_>0 :       --------------
+------   Определяем 6510 (nlsb_tobo) для текущ. 2600 только при --------------
+------   КНОПКАХ "0" и "1"  и  если начисл.сумма s0_>0 :        --------------
 
 
    IF ( INSTR(mode_,'0')>0  OR  INSTR(mode_,'1')>0 ) and s0_>0   then
@@ -976,11 +958,10 @@ BEGIN
 
 
       BEGIN                            -- 1. Вначале ищем "индивидуальный"
-         SELECT  trim(VALUE)           --    6110/6510 в AccountsW / TAG='S6110'
+         SELECT  trim(VALUE)           --    6510 в AccountsW/TAG='S6110'
          into    nlsb_tobo
          FROM    AccountsW
-         WHERE   ACC=acc_ and TAG='S6110' and VALUE is not NULL and 
-                 trim(VALUE) like ( CASE WHEN newnbs.g_state = 1 THEN '6510%' ELSE '6110%' END );
+         WHERE   ACC=acc_ and TAG='S6110' and VALUE is not NULL and trim(VALUE) like '6510%' ;
       EXCEPTION  WHEN NO_DATA_FOUND THEN
          nlsb_tobo := NULL;
       END;
@@ -995,23 +976,19 @@ BEGIN
          END;
       End If;
 
-                                       -- 2). Ищем 6110 по ОВ22 в этом или
+                                       -- 2). Ищем 6510 по ОВ22 в этом или
                                        --     вышестоящем BRANCH-e:       
       IF nlsb_tobo is NULL THEN        
 
-         nlsb_tobo := NBS_OB22_NULL( (CASE WHEN newnbs.g_state = 1 THEN '6510' ELSE '6110' END), '06', tobo_a );
+         nlsb_tobo := NBS_OB22_NULL( '6510','06',tobo_a );
 
          IF nlsb_tobo is NULL  then  
-            if newnbs.g_state = 1 then
-               raise_application_error(-20000,'Не найден счет 6510/06 на '||substr(tobo_a,1,15), true);   
-            else
-               raise_application_error(-20000,'Не найден счет 6110/06 на '||substr(tobo_a,1,15), true);   
-            end if;
+            raise_application_error(-20000,'Не найден счет 6510/06 на '||substr(tobo_a,1,15), true);   
          END IF;
 
       END IF;
 
-      BEGIN             ---  Определяем NMS счета  nlsb_tobo (6110)
+      BEGIN             ---  Определяем NMS счета  nlsb_tobo (6510)
         SELECT SUBSTR(NMS,1,38)
         INTO   nam_b_tobo
         FROM   accounts
@@ -1022,16 +999,16 @@ BEGIN
 
    END IF;
 
--------------------- END поиска 6110 ----------------------------------
+-------------------- END поиска 6510 ----------------------------------
 
 
-      nlsc_:= VKRZN(SUBSTR(gl.aMFO,1,5),'3570'||SUBSTR(nlsa_,5));
-      nlsd_:= RKO.Get_NLS_random  ( CASE WHEN newnbs.g_state = 1 then '3570' else '3579' end  ) ;  --получение № лиц.сч по случ.числам
+      ----nlsc_:= VKRZN(SUBSTR(gl.aMFO,1,5),'3570'||SUBSTR(nlsa_,5));
+      ----nlsd_:= RKO.Get_NLS_random  ('3570') ;  --получение № лиц.сч по случ.числам
 
 
       IF acc1_ IS NULL THEN
          s1_ := 0 ;
-      ELSE                     --     s1_  - остаток на 3570/03
+      ELSE                     --     s1_  - остаток на ACC1 (3570/03)
          BEGIN
             SELECT nls,-ostc INTO nlsc_, s1_ 
             FROM   accounts
@@ -1043,7 +1020,7 @@ BEGIN
 
       IF acc2_ IS NULL THEN
          s2_:=0;
-      ELSE                     --     s2_  - остаток на 3579  (3570/37)
+      ELSE                     --     s2_  - остаток на ACC2 (3570/37)
          BEGIN
             SELECT nls,-ostc INTO nlsd_, s2_ 
             FROM   accounts
@@ -1104,7 +1081,7 @@ BEGIN
       END IF;
 
 ----------------------------------------------------------------------------
--- 1.  Начисленную плату взять с 3570  (кнопка "1"):  3570 --> 6110
+-- 1.  Начисление на 3570  (кнопка "1"):      3570/03 --> 6510
 ----------------------------------------------------------------------------
       IF INSTR(mode_,'1') > 0 AND s0_>0 THEN  -- На прострочку
 
@@ -1123,14 +1100,11 @@ BEGIN
             end if;
 
 
-            -----------------   Открытие 3570*  ---------------------
-            ---  Внимание !  Открытие идет по маске Счета Списания,
-            ---              а не по маске основного счета.
-            ---------------------------------------------------------
 
             IF acc1_ is NULL  or  acc1_zakr=0  THEN
 
-               nlsc_ := RKO.Get_NLS_random  ( '3570'  ) ;  --получение № лиц.сч по случ.числам
+               nlsc_ := RKO.Get_NLS_random ('3570') ;  -- получение № лиц.сч 3570/03 по случ.числам
+
                OP_REG(99,0,0, grp_,tmp_, rnk_, nlsc_,kva_, substr('Нарах.РКО '||nam_a_,1,70),'ODB',isp_,acc1_);
                p_setAccessByAccmask(acc1_,accd_);
                Accreg.setAccountSParam( acc1_, 'OB22', '03' ) ;
@@ -1141,7 +1115,7 @@ BEGIN
 
 
             END IF;
-            ----------  Еnd открытия 3570* ---------------
+            ----------  Еnd открытия АСС1 - 3570/03 ---------------
 
             gl.ref (ref_);
 
@@ -1202,7 +1176,7 @@ BEGIN
       NULL;
 
 ----------------------------------------------------------------------------
--- 2.  Взыскание долга за РКО  (кнопка "2"):     2600 -->  3579,3570
+-- 2.  Взыскание долга за РКО  (кнопка "2"):     2600 ->  3570/37, 3570/03
 ----------------------------------------------------------------------------
 
       IF INSTR(mode_,'2') > 0 THEN       -- Пробуем взыскать долг по РКО
@@ -1210,8 +1184,9 @@ BEGIN
          deb.trace(2,to_char(ostc_),s2_);
 
 
-     -- 1). Гасим сначала просроченный долг 3579:
-     ---------------------------------------------
+     -- 1). Гасим сначала просроченный долг 3570/37 (АСС2):
+     -------------------------------------------------------
+
          IF s2_ > 0 AND ostc_ > 0  AND  blkd_ = 0 THEN
 
             IF   ostc_ < s2_ THEN
@@ -1251,8 +1226,8 @@ BEGIN
          deb.trace(1,to_char(ostc_),s1_);
 
 
-       --   2). Затем гасим простой долг 3570:
-       ----------------------------------------
+       --   2). Затем гасим простой долг 3570/03  (АСС1):
+       ---------------------------------------------------
 
          IF s1_ > 0 AND ostc_ > 0  AND  blkd_ = 0  THEN
 
@@ -1391,7 +1366,7 @@ BEGIN
       END IF;
 
 ----------------------------------------------------------------------------
--- 3. Перенос долга на просрочку  (кнопка "3"):    3570 -> 3579
+-- 3. Перенос долга на просрочку  (кнопка "3"):    3570/03 -> 3570/37
 ----------------------------------------------------------------------------
 
 
@@ -1424,7 +1399,7 @@ BEGIN
                 FDAT<=gl.bdate ;
             
 
-         -----   Переносимая 3570->3579 сумма:    
+         -----   Переносимая ACC1->ACC2 (3570/03->3570/37) сумма:    
 
          s1_ := ABS( least( 0, s1_01 + kos_3570 ));
 
@@ -1446,21 +1421,17 @@ BEGIN
                   END;              --- вообще нет в ACCOUNTS
                end if;
    
-               -------------------   Открытие 3579*  ---------------------
-               ---  Внимание !  Открытие идет по маске Счета Списания,
-               ---              а не по маске основного счета.
-               -----------------------------------------------------------
+
                IF acc2_ IS NULL  or  acc2_zakr=0  THEN
    
-                  ------  Подбор номера 3579*
-                  nlsd_:= RKO.Get_NLS_random  ( CASE WHEN newnbs.g_state = 1 then '3570' else '3579' end  ) ;  --получение № лиц.сч по случ.числам
+                  nlsd_:= RKO.Get_NLS_random ('3570') ;  -- Получение № лиц.сч 3570/37 по случ.числам
   
                   OP_REG(99,0,0,grp_,tmp_,rnk_,nlsd_,kva_,    substr('Простр.РКО до 31д. '||nam_a_,1,70),'ODB',isp_,acc2_);
                   p_setAccessByAccmask(acc2_,accd_);
                   Update RKO_LST  set ACC2 = acc2_  WHERE acc = acc_;
                   Update ACCOUNTS set TOBO = br_    WHERE acc = acc2_;
                   ----   3579.07  => 3570.37 прострочені нараховані доходи за обслуговування суб`єктів господарювання
-                  Accreg.setAccountSParam( acc2_, 'OB22', CASE WHEN newnbs.g_state = 1 then '37' else '07' end  ) ; -- надо у
+                  Accreg.setAccountSParam( acc2_, 'OB22', '37' ) ; -- надо у
                   Accreg.setAccountSParam( acc2_, 'S270', '01' ) ;
                   Accreg.setAccountSParam( acc2_, 'S240', 'C'  ) ;
 
