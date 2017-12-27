@@ -41,7 +41,7 @@ RETURN NUMERIC IS
 --------------------------------------------------------------------------- 
 BEGIN
 
-  bars_audit.trace( 'RKO.f_tarif_rko: kod_='||to_char(kod_)||', kv_='||to_char(kv_)||', nls_='||nls_||', s_'||to_char(s_)||', PDAT_='||to_char(PDAT_,'dd.mm.yyyy hh24:mi:ss')||', TT_='||TT_ );
+  ---bars_audit.trace( 'RKO.f_tarif_rko: kod_='||to_char(kod_)||', kv_='||to_char(kv_)||', nls_='||nls_||', s_'||to_char(s_)||', PDAT_='||to_char(PDAT_,'dd.mm.yyyy hh24:mi:ss')||', TT_='||TT_ );
   
   If kod_<>15 and TT_ in ('001','002','PKR') then
 
@@ -98,9 +98,8 @@ BEGIN
 
     --  Не берем за Кт на балансовые  (кроме ПФУ и Укрпошты):
     ---------------------------------------------------------
---15.11.2017 Transfer-2017 
-    if     substr(NLSB_,1,4) in ('2525','2546','2610','2611','2615','2651','2652','3570', '3579','2900','6110','6114' ) and MFOA_=MFOB_ and kkk_ not in (1,2) and newnbs.g_state = 0  
-       OR  substr(NLSB_,1,4) in ('2525','2546','2610','2611',       '2651',       '3570', '3578','2900','6510','6514' ) and MFOA_=MFOB_ and kkk_ not in (1,2) and newnbs.g_state = 1    then
+    if substr(NLSB_,1,4) in ('2525','2546','2610','2611','2651','3570','2900','6510','6514' ) and 
+       MFOA_=MFOB_  and  kkk_ not in (1,2)  then
 
        RETURN 0;
 
@@ -1435,7 +1434,7 @@ BEGIN
 
  end if;
 
- bars_audit.trace( 'RKO.f_tarif_rko: sk_='||to_char(sk_) );
+ ---bars_audit.trace( 'RKO.f_tarif_rko: sk_='||to_char(sk_) );
  
  RETURN sk_;
 
