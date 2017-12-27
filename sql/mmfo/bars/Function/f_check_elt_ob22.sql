@@ -2,17 +2,29 @@ CREATE OR REPLACE FUNCTION F_CHECK_ELT_OB22
 (p_id int, p_nbs varchar2, p_ob22 varchar2)
 RETURN e_tarif.ob22_3570%type IS
 
--- *** ver 1.1 в_д 16/02-16 ***
+-- *** ver 1.2 в_д 27/12-17 ***
 -- Пошук допустимих OB22 по E_TARIF
 
 l_ret   e_tarif.ob22_3570%type;
+l_3570  number(10);
+l_3579  number(10);
 
 begin
 if newnbs.g_state= 1 then  --переход на новый план счетов
 if p_ob22 is null then l_ret:='-9'; return l_ret; end if;
 
+  begin
+  select count(*) into l_3570 from e_tarif e where e.ob22_3570 = p_ob22;
+  exception when others then l_3570:=0;
+  end;
+  
+  begin
+  select count(*) into l_3579 from e_tarif e where e.ob22_3579 = p_ob22;
+  exception when others then l_3579:=0;
+  end;
+
  if p_id=0 then  -- id
-    if p_nbs='3570' and p_ob22 = '02' then
+    if p_nbs='3570' and l_3570>0 then
     begin
     select p_ob22 into l_ret from e_tarif
     where p_ob22 in
@@ -23,7 +35,7 @@ if p_ob22 is null then l_ret:='-9'; return l_ret; end if;
     RETURN l_ret;
     end if;
 
-    if p_nbs='3570' and p_ob22 <> '02'then
+    if p_nbs='3570' and l_3579>0 then
     begin
     select p_ob22 into l_ret from e_tarif
     where p_ob22 in
@@ -59,7 +71,7 @@ if p_ob22 is null then l_ret:='-9'; return l_ret; end if;
  if l_ret is null then
     if p_nbs='6510' then RETURN l_ret; end if;
     if p_nbs='3570' and p_ob22='02' then RETURN p_ob22; end if;
-    if p_nbs='3578' and p_ob22='38' then RETURN p_ob22; end if;
+    if p_nbs='3570' and p_ob22='38' then RETURN p_ob22; end if;
  end if;
 
  end if;  -- id  

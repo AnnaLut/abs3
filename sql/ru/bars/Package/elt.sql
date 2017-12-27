@@ -322,7 +322,7 @@ begin
      end;
   end loop;         l_nls := vkrzn ( substr(gl.aMfo,1,5) , p_R4||'0'||nTmp_ );
   RETURN l_Nls ;
-end    Get_NLS_random ;  
+end    Get_NLS_random ;
 ---=====================
 FUNCTION  F_All (nd_ int, id_ int, sdate_ date, p_wdate_ date) RETURN number is
 --общее по всем функциям
@@ -1020,8 +1020,8 @@ begin
     l_nbs6:='6510';
    else
     l_nbs6:='6110';
-   end if; 
-  
+   end if;
+
 
    c:=DBMS_SQL.OPEN_CURSOR; --открыть курсор
 
@@ -1211,12 +1211,12 @@ end;
   end;
 
   if l_MFOP ='300465' or l_MFO='300465' then null;       -- тимчасово  28/10-15
-     l_ob22:=d.ob22_6110; 
+     l_ob22:=d.ob22_6110;
        if newnbs.g_state= 1 then  --переход на новый план счетов
         l_nbs6:='6510';
        else
         l_nbs6:='6110';
-       end if; 
+       end if;
   end if;
 
   l_ob22_6:= null;
@@ -1315,6 +1315,7 @@ end;
 
          exception when others then  rollback to DO_PROVODKI_2;
             begin
+              logger.info('ELT.OPL 2 info'||SQLERRM);
               insert into TMP_OVR (DAT, ID, DK, NLSA, NLSB, S, txt ) values
                                (GL.BDATE, 36, 1, k.NLS3, NLSB_, S_, STXT_ );
     logger.info('ELT.OPL 2 Отказ проводки для ND='||k.ND
@@ -1758,7 +1759,7 @@ end;
     logger.trace('ELT.BORG 0 '|| MODE_||' '||DAT1_||' '||NLS36_||' '||PAKET_ );
 
   descrname_:='ELT3579';
-  if Variant_ = 0 then descrname_:='ELT3578'; end if;   
+  if Variant_ = 0 then descrname_:='ELT3578'; end if;
 
   begin
   SELECT UPPER(nvl(masknms,NULL))
@@ -1900,8 +1901,8 @@ for k in (SELECT d.ND, d.CC_ID, d.SDATE, c.OKPO,
       if S_ >0 then
 -------
     if k.nls8 is NULL then     -- 5
-    if newnbs.g_state= 1 then  --переход на новый план счетов       
-    
+    if newnbs.g_state= 1 then  --переход на новый план счетов
+
      select substr(F_NEWNMS(NULL,descrname_,NULL,k.rnk,NULL),1,70) into nms8p_  from dual;
         if suf_ is NULL then nms8_:=nms8p_; end if;
           nls8_ := Get_NLS_random  ( '3570'  ) ;  --получение № лиц.сч по случ.числам
@@ -1916,10 +1917,10 @@ for k in (SELECT d.ND, d.CC_ID, d.SDATE, c.OKPO,
 
           if l_mfo = '380764' then     -- НАДРА
              r013f:='1'; s180f:='1'; s240f:='1';  ob22f:='74';
-          end if;               
+          end if;
           Accreg.setAccountSParam(acc8_, 'R013', r013f);
           Accreg.setAccountSParam(acc8_, 'S180', s180f);
-          Accreg.setAccountSParam(acc8_, 'S240', s240f);    
+          Accreg.setAccountSParam(acc8_, 'S240', s240f);
 
           if l_mfo = '380764'
           then      -- НАДРА
@@ -1964,7 +1965,7 @@ for k in (SELECT d.ND, d.CC_ID, d.SDATE, c.OKPO,
       if k.nls3 like '3600%'
       then nls8_ := sb_acc('3578??????????',k.nls3);
       else nls8_ := sb_acc('3579??????????',k.nls3);
-      end if;      
+      end if;
 
 
       nls8_:=VKRZN(SUBSTR(gl.aMFO,1,5),nls8_);
@@ -2637,7 +2638,7 @@ BEGIN
   end ;
 
   Variant_  := 0;
-  
+
     descrname_:='ELT3579';
 
     if Variant_s = '0' then descrname_:='ELT3578'; end if;
