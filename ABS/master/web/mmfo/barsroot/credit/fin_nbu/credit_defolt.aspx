@@ -56,8 +56,7 @@
     </asp:Panel>
     <asp:Panel ID="Panel1" runat="server" Width="950px">
         <asp:Wizard ID="Wizard1" runat="server" Width="100%" BackColor="#EFF3FB" BorderColor="#B5C7DE"
-            BorderWidth="1px" Font-Names="Verdana" CellPadding="10" 
-            ActiveStepIndex="1" Font-Size="Small"
+            BorderWidth="1px" Font-Names="Verdana" CellPadding="10" ActiveStepIndex="5" Font-Size="Small"
             StartNextButtonText="Наступна" StepNextButtonText="Наступна" StepPreviousButtonText="Попередня"
             CancelButtonText="Відмінити" FinishCompleteButtonText="Готово" FinishPreviousButtonText="Попередня"
             OnNextButtonClick="BtNext" OnPreviousButtonClick="BtPrevious">
@@ -448,8 +447,8 @@
                                 </tr>
                                 <tr>
                                     <td>
-                                        <asp:Label ID="Lb_GP2" runat="server" Text="2. Контрагент належить до ОСББ/ЖБК"
-                                            Width="655px" Visible="true"></asp:Label>
+                                        <asp:Label ID="Lb_GP2" runat="server" Text="2. Контрагент належить до ОСББ/ЖБК" Width="655px"
+                                            Visible="true"></asp:Label>
                                     </td>
                                     <td>
                                         <asp:DropDownList ID="Dl_GP2" runat="server" DataSource='<%# SQL_SELECT_dataset("select val, name as name from FIN_QUESTION_REPLY where kod=" + ((char)39).ToString() + "GP2" +((char)39).ToString() + "and idf = 51 ") %>'
@@ -693,7 +692,25 @@
                             </Columns>
                         </asp:GridView>
                     </asp:Panel>
-                    <asp:Panel ID="Pn_Wizar5_2" runat="server" GroupingText="Судження банку...">
+                    <asp:Panel ID="p_events" runat="server"  Visible="false">
+                        <table>
+                            <tr>
+                                <td style="width: 550Px">
+                                    <asp:Label ID="lb_ZD4" runat="server" Text="  3 - З моменту усунення події/подій, на підставі якої/яких було визнано дефолт божника, минуло щонайменше 180 днів " Width="550"></asp:Label>
+                                </td>
+                                <td style="width: 100Px">
+                                    <asp:DropDownList ID="dl_ZD4" runat="server" DataSource='<%# SQL_SELECT_dataset("select val, name as name from FIN_QUESTION_REPLY where kod=" + ((char)39).ToString() + "ZD4" +((char)39).ToString() + "and idf = 55 ") %>'
+                                        DataTextField="NAME" DataValueField="VAL" Enabled="false" Width="100px">
+                                    </asp:DropDownList>
+                                </td>
+                                <td style="width: 50Px">
+                                <%-- <asp:Image ID="Im_ZD4" runat="server" Visible='<%# (Convert.ToString(Eval("DESCRIPT")).Length == 0)?(false):(true) %>'
+                                            ToolTip='<%# Eval("DESCRIPT")%>' ImageUrl="/Common/Images/default/16/help2.png" />--%>
+                                </td>
+                            </tr>
+                        </table>
+                    </asp:Panel>
+                    <asp:Panel ID="Pn_Wizar5_2" runat="server" GroupingText="Судження банку..." Visible="false">
                         <table>
                             <tr>
                                 <td style="width: 400Px">

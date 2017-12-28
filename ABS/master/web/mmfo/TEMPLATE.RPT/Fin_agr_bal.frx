@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReportInfo.Created="01/19/2013 16:38:25" ReportInfo.Modified="10/05/2017 13:51:29" ReportInfo.CreatorVersion="2013.2.2.0">
+<Report ScriptLanguage="CSharp" ReportInfo.Created="01/19/2013 16:38:25" ReportInfo.Modified="11/07/2017 11:57:28" ReportInfo.CreatorVersion="2013.2.2.0">
   <ScriptText>using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -73,7 +73,7 @@ namespace FastReport
         <CommandParameter Name="fdat" DataType="126" Expression="[fdat]"/>
         <CommandParameter Name="rnk" DataType="126" Expression="[rnk]"/>
       </TableDataSource>
-      <TableDataSource Name="Table" Alias="Zap" DataType="System.Int32" Enabled="true" SelectCommand="   SELECT IDF, KOD, NAME,&#13;&#10;          fin_obu.CALC_POK_DOP(kod,:DAT1,:okpo,:PTYP) AB1,&#13;&#10;          fin_obu.CALC_POK_DOP(kod,:DAT2,:okpo,:PTYP) AB2,&#13;&#10;          fin_obu.CALC_POK_DOP(kod,:DAT3,:okpo,:PTYP) AB3,&#13;&#10;          fin_obu.CALC_POK_DOP(kod,:DAT4,:okpo,:PTYP) AB4,&#13;&#10;          fin_obu.CALC_POK_DOP(kod,:DAT5,:okpo,:PTYP) AB5,&#13;&#10;          case when idf = 11&#13;&#10;               then  fin_obu.CALC_POK_DOP(kod,add_months(:DAT5,-12),:okpo,:PTYP)&#13;&#10;               else  fin_obu.CALC_POK_DOP(kod,trunc(:DAT5,'YYYY'),:okpo,:PTYP)&#13;&#10;          end pdyn&#13;&#10;     FROM FIN_KOD&#13;&#10;    WHERE idf between 11 and 13 &#13;&#10;    ORDER BY IDF, ORD">
+      <TableDataSource Name="Table" Alias="Zap" DataType="System.Int32" Enabled="true" SelectCommand="   SELECT IDF, KOD, NAME,&#13;&#10;          fin_obu.CALC_POK_DOP(kod,:DAT1,:okpo,:PTYP) AB1,&#13;&#10;          fin_obu.CALC_POK_DOP(kod,:DAT2,:okpo,:PTYP) AB2,&#13;&#10;          fin_obu.CALC_POK_DOP(kod,:DAT3,:okpo,:PTYP) AB3,&#13;&#10;          fin_obu.CALC_POK_DOP(kod,:DAT4,:okpo,:PTYP) AB4,&#13;&#10;          fin_obu.CALC_POK_DOP(kod,:DAT5,:okpo,:PTYP) AB5,&#13;&#10;          case when idf = 11&#13;&#10;               then  fin_obu.CALC_POK_DOP(kod,add_months(:DAT5,-12),:okpo,:PTYP)&#13;&#10;               else  fin_obu.CALC_POK_DOP(kod,trunc(:DAT5-1,'YYYY'),:okpo,:PTYP)&#13;&#10;          end pdyn&#13;&#10;     FROM FIN_KOD&#13;&#10;    WHERE idf between 11 and 13 &#13;&#10;    ORDER BY IDF, ORD">
         <Column Name="IDF" DataType="System.Decimal"/>
         <Column Name="KOD" DataType="System.String"/>
         <Column Name="NAME" DataType="System.String"/>
@@ -152,7 +152,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </PageHeaderBand>
-    <DataBand Name="Data1" Top="119.8" Width="718.2" Height="18.9" CanGrow="true" CanShrink="true" AfterDataEvent="Data1_AfterData" DataSource="Table">
+    <DataBand Name="Data1" Top="119.33" Width="718.2" Height="18.9" CanGrow="true" CanShrink="true" AfterDataEvent="Data1_AfterData" DataSource="Table">
       <TableObject Name="Table1" Width="718.2" Height="18.9">
         <TableColumn Name="Column1" Width="255.15"/>
         <TableColumn Name="Column2"/>
@@ -173,7 +173,7 @@ namespace FastReport
           <TableCell Name="Cell8" Border.Lines="All" Border.Color="DarkGray" Border.Width="0.25" Text="[Zap.Perc]" Format="Percent" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt"/>
         </TableRow>
       </TableObject>
-      <DataHeaderBand Name="DataHeader1" Top="78.8" Width="718.2" Height="37.8">
+      <DataHeaderBand Name="DataHeader1" Top="78.56" Width="718.2" Height="37.8">
         <TableObject Name="Table1" Width="718.2" Height="37.8">
           <TableColumn Name="Column25" Width="255.15"/>
           <TableColumn Name="Column26"/>
@@ -206,7 +206,7 @@ namespace FastReport
         </TableObject>
       </DataHeaderBand>
     </DataBand>
-    <DataBand Name="Data2" Top="182.9" Width="718.2" Height="18.9" CanGrow="true" CanShrink="true" AfterDataEvent="Data2_AfterData" DataSource="Table">
+    <DataBand Name="Data2" Top="181.95" Width="718.2" Height="18.9" CanGrow="true" CanShrink="true" AfterDataEvent="Data2_AfterData" DataSource="Table">
       <TableObject Name="Table1" Width="718.2" Height="18.9">
         <TableColumn Name="Column9" Width="255.15"/>
         <TableColumn Name="Column10"/>
@@ -227,7 +227,7 @@ namespace FastReport
           <TableCell Name="Cell16" Border.Lines="All" Border.Color="DarkGray" Border.Width="0.25" Text="[Zap.Perc]" Format="Percent" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt"/>
         </TableRow>
       </TableObject>
-      <DataHeaderBand Name="DataHeader2" Top="141.9" Width="718.2" Height="37.8">
+      <DataHeaderBand Name="DataHeader2" Top="141.19" Width="718.2" Height="37.8">
         <TableObject Name="Table1" Width="718.2" Height="37.8">
           <TableColumn Name="Column33" Width="255.15"/>
           <TableColumn Name="Column34"/>
@@ -260,7 +260,7 @@ namespace FastReport
         </TableObject>
       </DataHeaderBand>
     </DataBand>
-    <DataBand Name="Data3" Top="227.1" Width="718.2" Height="18.9" CanGrow="true" CanShrink="true" AfterDataEvent="Data3_AfterData" DataSource="Table">
+    <DataBand Name="Data3" Top="225.68" Width="718.2" Height="18.9" CanGrow="true" CanShrink="true" AfterDataEvent="Data3_AfterData" DataSource="Table">
       <TableObject Name="Table1" Width="718.2" Height="18.9">
         <TableColumn Name="Column17" Width="255.15"/>
         <TableColumn Name="Column18"/>
@@ -281,7 +281,7 @@ namespace FastReport
           <TableCell Name="Cell24" Border.Lines="All" Border.Color="DarkGray" Border.Width="0.25" Text="[Zap.Perc]" Format="Percent" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center" Font="Arial, 7pt"/>
         </TableRow>
       </TableObject>
-      <DataHeaderBand Name="DataHeader3" Top="205" Width="718.2" Height="18.9">
+      <DataHeaderBand Name="DataHeader3" Top="203.81" Width="718.2" Height="18.9">
         <TableObject Name="Table1" Width="718.2" Height="18.9">
           <TableColumn Name="Column41" Width="255.15"/>
           <TableColumn Name="Column42"/>
@@ -304,6 +304,6 @@ namespace FastReport
         </TableObject>
       </DataHeaderBand>
     </DataBand>
-    <PageFooterBand Name="PageFooter1" Top="249.2" Width="718.2" Height="9.45"/>
+    <PageFooterBand Name="PageFooter1" Top="247.54" Width="718.2" Height="9.45"/>
   </ReportPage>
 </Report>

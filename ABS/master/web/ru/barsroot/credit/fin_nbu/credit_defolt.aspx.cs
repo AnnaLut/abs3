@@ -1053,7 +1053,9 @@ public partial class credit_defolt : Bars.BarsPage
         record_fp_nd("VD0", Dd_VD0.SelectedValue, "56");
         record_fp_nd("VDN1", Tb_VDN1.Text, "56");
         record_fp_nd_date("VDD1", Convert.ToDateTime(Tb_VDD1.Value) , "56");
-        
+
+        //З моменту усунення подій на підставі яких було визнано дефолт минуло щонайменше 180 днів
+        elimination_events();
         
 
     }
@@ -1382,6 +1384,10 @@ public partial class credit_defolt : Bars.BarsPage
             Dl_ZD3.DataBind();
             Dl_ZD3.Items.Insert(0, new ListItem("", ""));
 
+            dl_ZD4.DataBind();
+            dl_ZD4.Items.Insert(0, new ListItem("", ""));
+
+            
 
             Dl_val.DataBind();
             Dl_tzvd.DataBind();
@@ -1652,7 +1658,6 @@ public partial class credit_defolt : Bars.BarsPage
     /// </summary>
     private void FillData_Wizar5()
     {
-
         try
         {
             CultureInfo cinfo = CultureInfo.CreateSpecificCulture("en-GB");
@@ -1670,7 +1675,7 @@ public partial class credit_defolt : Bars.BarsPage
                                                                  'select -99 as val, null as name from dual union all select val, name as name from FIN_QUESTION_REPLY where kod='''||KOD||''' and idf = '||IDF  l_sql
                                                                  --,(select count(1) from fin_question_reply where kod = q.kod and idf = q.idf) tip
                                                           from  FIN_QUESTION q
-                                                           where  q.idf = 55  and kod != 'ZD3'
+                                                           where  q.idf = 55  and kod not in ( 'ZD3','ZD4','ZD5' )
                                                            ORDER BY ord");
 
 
@@ -2605,5 +2610,62 @@ public partial class credit_defolt : Bars.BarsPage
 
         clas_run.Visible = true;
         BtI_Print.Visible = true;
+    }
+
+    /// <summary>
+    /// З моменту усунення подій на підставі яких було визнано дефолт минуло щонайменше 180 днів
+    /// </summary>
+    protected void elimination_events()
+    {
+
+        try
+        {
+            InitOraConnection();
+            {
+                CultureInfo cinfo = CultureInfo.CreateSpecificCulture("en-GB");
+                cinfo.DateTimeFormat.ShortDatePattern = "dd/MM/yyyy";
+                cinfo.DateTimeFormat.DateSeparator = "/";
+
+                ClearParameters();
+
+                SetParameters("rnk_", DB_TYPE.Decimal, Convert.ToDecimal(RNK_.Value), DIRECTION.Input);
+                SetParameters("nd_", DB_TYPE.Decimal, Convert.ToDecimal(ND_.Value), DIRECTION.Input);
+                SetParameters("dat_", DB_TYPE.Date, Convert.ToDateTime(Dl_Zdat.SelectedValue, cinfo), DIRECTION.Input);
+
+                SQL_NONQUERY(@"begin  
+                                   fin_nbu.elimination_events(:rnk_, :nd_, :dat_, '53,54', 55);
+                               end;");
+
+            }
+
+        }
+        finally
+        {
+            DisposeOraConnection();
+        }
+
+        if (read_nd(ND_.Value, RNK_.Value, "ZD5", "55", Dl_Zdat.SelectedValue) == "1")
+        {
+            p_events.Visible = true;
+            dl_ZD4.SelectedValue = read_nd(ND_.Value, RNK_.Value, "ZD4", "55", Dl_Zdat.SelectedValue);
+
+            if (dl_ZD4.SelectedValue == "1")
+            { 
+                Pn_Wizar5_2.Visible = true;
+                Dl_ZD3.SelectedValue = read_nd(ND_.Value, RNK_.Value, "ZD3", "55", Dl_Zdat.SelectedValue);
+                Tb_ZDN1.Text = read_nd(ND_.Value, RNK_.Value, "ZDN1", "57", Dl_Zdat.SelectedValue);
+                Tb_ZDD1.Value = read_nd_date(ND_.Value, RNK_.Value, "ZDD1", "57", Dl_Zdat.SelectedValue);
+
+
+            }
+            else { Pn_Wizar5_2.Visible = false; }
+
+        }
+        else
+        {
+            p_events.Visible = false;
+            Pn_Wizar5_2.Visible = false;
+        }
+
     }
 }
