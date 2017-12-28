@@ -191,7 +191,7 @@ BEGIN
             BEGIN
                NULL;
                gl.REF (ref_);
-
+               /*
                INSERT INTO oper
                            (REF, tt, vob, nd, dk, pdat, vdat,
                             datd, datp, nam_a, nlsa, mfoa,
@@ -205,7 +205,37 @@ BEGIN
                             ABS (k.ost), 980, ABS (k.ost), nazn_, id_,
                             HEXTORAW ('4155544F5452414E53414354494F4E')
                            );
-
+               */
+			   gl.in_doc3(ref_=> ref_  , 
+                    tt_  =>tt_, 
+                    vob_=> vob_, 
+                    nd_ => ref_, 
+                    pdat_=> SYSDATE, 
+                    vdat_=> datv_,
+                    dk_ => 1   , 
+                    kv_  =>980, 
+                    s_  => ABS (k.ost), 
+                    kv2_=> 980, 
+                    s2_  => ABS (k.ost), 
+                    sk_  => null, 
+                    data_=> bankdate, 
+                    datp_=> bankdate,
+                    nam_a_=> nam1_, 
+                    nlsa_=> nlsd_,
+                    mfoa_=> gl.amfo, 
+                    nam_b_=> nam2_, 
+                    nlsb_=> nlsk_, 
+                    mfob_=> gl.amfo,
+                    nazn_ => nazn_,
+                    d_rec_=> null,
+                    id_a_=> okpo1_, 
+                    id_b_=> okpo2_, 
+                    id_o_ => null, 
+                    sign_=> HEXTORAW ('4155544F5452414E53414354494F4E'), 
+                    sos_=>1, 
+                    prty_=>null, 
+                    uid_=>id_) ;
+			   
                paytt (0,
                       ref_,
                       bankdate,
