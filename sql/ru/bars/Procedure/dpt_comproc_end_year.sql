@@ -23,18 +23,19 @@ is
       begin
         l_dat := (l_dat - 1);  --31/12/20NN року
       
-        select holiday 
+        select HOLIDAY
           into l_out
-          from holiday 
-         where holiday = l_dat;
+          from HOLIDAY
+         where HOLIDAY = l_dat
+           and KV = 980;
       
       exception
         when NO_DATA_FOUND THEN 
           l_out := null;
       end;
     EXIT
-      when l_out is null;   
-    end loop;  
+      when l_out is null;
+    end loop;
 
   RETURN l_dat;
     
