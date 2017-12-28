@@ -12,8 +12,8 @@ BEGIN
         execute immediate  
           'begin  
                bpa.alter_policy_info(''PEREK6_7'', ''CENTER'' , null, null, null, null);
-               bpa.alter_policy_info(''PEREK6_7'', ''FILIAL'' , null, null, null, null);
-               bpa.alter_policy_info(''PEREK6_7'', ''WHOLE'' , null, null, null, null);
+               bpa.alter_policy_info(''PEREK6_7'', ''FILIAL'' , ''M'', ''M'', ''M'', ''M'');
+               bpa.alter_policy_info(''PEREK6_7'', ''WHOLE'' , null, ''E'', ''E'', ''E'');
                null;
            end; 
           '; 

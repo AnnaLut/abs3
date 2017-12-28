@@ -12,8 +12,8 @@ BEGIN
         execute immediate  
           'begin  
                bpa.alter_policy_info(''PER6_7KP'', ''CENTER'' , null, null, null, null);
-               bpa.alter_policy_info(''PER6_7KP'', ''FILIAL'' , null, null, null, null);
-               bpa.alter_policy_info(''PER6_7KP'', ''WHOLE'' , null, null, null, null);
+               bpa.alter_policy_info(''PER6_7KP'', ''FILIAL'' , ''M'', ''M'', ''M'', ''M'');
+               bpa.alter_policy_info(''PER6_7KP'', ''WHOLE'' , null, ''E'', ''E'', ''E'');
                null;
            end; 
           '; 

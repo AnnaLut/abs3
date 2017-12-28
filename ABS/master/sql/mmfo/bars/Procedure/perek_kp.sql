@@ -180,7 +180,7 @@ BEGIN
     IF ABS(ostf_) > 0 THEN
        BEGIN
           GL.REF (ref_);
-          INSERT INTO oper (ref , tt , vob , nd  , dk, pdat   , vdat , datd    ,
+         /* INSERT INTO oper (ref , tt , vob , nd  , dk, pdat   , vdat , datd    ,
                             datp    , nam_a, nlsa , mfoa   , id_a  , nam_b, nlsb,
                             mfob   , id_b  , kv , s         , kv2, s2        ,
                             nazn , userid, sign)
@@ -188,6 +188,36 @@ BEGIN
                             BANKDATE, nam1_, nlsd_, gl.AMFO, okpo1_, nam2_, nlsk_,
                             gl.AMFO, okpo2_, 980, ABS(ostf_), 980, ABS(ostf_),
                             NAZN_, id_   ,HEXTORAW('4155544F5452414E53414354494F4E'));
+		*/
+		 gl.in_doc3(ref_=> ref_  , 
+                    tt_  =>tt_, 
+                    vob_=> vob_, 
+                    nd_ => ref_, 
+                    pdat_=> SYSDATE, 
+                    vdat_=> datv_,
+                    dk_ => 1   , 
+                    kv_  =>980, 
+                    s_  => ABS(ostf_), 
+                    kv2_=> 980, 
+                    s2_  => ABS(ostf_), 
+                    sk_  => null, 
+                    data_=> bankdate, 
+                    datp_=> bankdate,
+                    nam_a_=> nam1_, 
+                    nlsa_=> nlsd_,
+                    mfoa_=> gl.amfo, 
+                    nam_b_=> nam2_, 
+                    nlsb_=> nlsk_, 
+                    mfob_=> gl.amfo,
+                    nazn_ => nazn_,
+                    d_rec_=> null,
+                    id_a_=> okpo1_, 
+                    id_b_=> okpo2_, 
+                    id_o_ => null, 
+                    sign_=> HEXTORAW ('4155544F5452414E53414354494F4E'), 
+                    sos_=>1, 
+                    prty_=>null, 
+                    uid_=>id_) ;
           PAYTT(0,ref_,BANKDATE,tt_,1,980,nlsd_,ABS(ostf_),980,nlsk_,ABS(ostf_));
        EXCEPTION WHEN OTHERS THEN
           BEGIN
