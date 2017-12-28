@@ -767,8 +767,8 @@ public partial class credit_defolt_bud : Bars.BarsPage
        // record_fp_nd("RK2", RK2_, "76");
        // Dd_RK2.SelectedValue = RK2_;
 
-        
 
+        elimination_events();
 
 
         
@@ -816,6 +816,7 @@ public partial class credit_defolt_bud : Bars.BarsPage
             pos++;
         }
 
+        if ( dl_ZD4.SelectedValue == "0") RK3_ = "0";
 
         CultureInfo cinfo = CultureInfo.CreateSpecificCulture("en-GB");
         cinfo.DateTimeFormat.ShortDatePattern = "dd/MM/yyyy";
@@ -864,7 +865,7 @@ public partial class credit_defolt_bud : Bars.BarsPage
         {
             Dd_RK3.SelectedValue = "0";  
         }
-        record_fp_nd("ZD3", Dd_RK3.SelectedValue, "75");
+        record_fp_nd("ZD3", Dl_ZD3.SelectedValue, "75");
 
         record_fp_nd("ZDN1", Tb_ZDN1.Text, "75");
         record_fp_nd_date("ZDD1", Convert.ToDateTime(Tb_ZDD1.Value), "75");
@@ -1031,6 +1032,8 @@ public partial class credit_defolt_bud : Bars.BarsPage
             Dl_ZD3.DataBind();
             Dl_ZD3.Items.Insert(0, new ListItem("", ""));
 
+            dl_ZD4.DataBind();
+            dl_ZD4.Items.Insert(0, new ListItem("", ""));
         }
         finally
         {
@@ -1228,7 +1231,7 @@ public partial class credit_defolt_bud : Bars.BarsPage
                                                                  'select -99 as val, null as name from dual union all select val, name as name from FIN_QUESTION_REPLY where kod='''||KOD||''' and idf = '||IDF  l_sql
                                                                  --,(select count(1) from fin_question_reply where kod = q.kod and idf = q.idf) tip
                                                           from  FIN_QUESTION q
-                                                           where  q.idf = 75  and kod != 'ZD3'
+                                                           where  q.idf = 75  and kod not in ( 'ZD3', 'ZD4', 'ZD5')
                                                            ORDER BY ord");
 
 
@@ -1434,7 +1437,7 @@ public partial class credit_defolt_bud : Bars.BarsPage
 
     protected void Tb_ZDN1_TextChanged(object sender, EventArgs e)
     {
-        if ((!String.IsNullOrEmpty(Tb_ZDN1.Text) & Dd_RK1.SelectedValue == "1")       || Dd_RK1.SelectedValue == "0")
+        if ((!String.IsNullOrEmpty(Tb_ZDN1.Text) & Dd_RK1.SelectedValue == "1") || Dd_RK1.SelectedValue == "0")
         { Dl_ZD3.SelectedValue = "1"; }
         else
         {
@@ -1491,5 +1494,60 @@ public partial class credit_defolt_bud : Bars.BarsPage
 
         save_gr6();
         
+    }
+
+    /// <summary>
+    /// З моменту усунення подій на підставі яких було визнано дефолт минуло щонайменше 180 днів
+    /// </summary>
+    protected void elimination_events()
+    {
+
+        try
+        {
+            InitOraConnection();
+            {
+                CultureInfo cinfo = CultureInfo.CreateSpecificCulture("en-GB");
+                cinfo.DateTimeFormat.ShortDatePattern = "dd/MM/yyyy";
+                cinfo.DateTimeFormat.DateSeparator = "/";
+
+                ClearParameters();
+
+                SetParameters("rnk_", DB_TYPE.Decimal, Convert.ToDecimal(RNK_.Value), DIRECTION.Input);
+                SetParameters("nd_", DB_TYPE.Decimal, Convert.ToDecimal(ND_.Value), DIRECTION.Input);
+                SetParameters("dat_", DB_TYPE.Date, Convert.ToDateTime(Dl_Zdat.SelectedValue, cinfo), DIRECTION.Input);
+
+                SQL_NONQUERY(@"begin  
+                                   fin_nbu.elimination_events(:rnk_, :nd_, :dat_, '73,74', 75);
+                               end;");
+
+            }
+
+        }
+        finally
+        {
+            DisposeOraConnection();
+        }
+
+        if (read_nd(ND_.Value, RNK_.Value, "ZD5", "75", Dl_Zdat.SelectedValue) == "1")
+        {
+            p_events.Visible = true;
+            dl_ZD4.SelectedValue = read_nd(ND_.Value, RNK_.Value, "ZD4", "75", Dl_Zdat.SelectedValue);
+
+            if (dl_ZD4.SelectedValue == "1")
+            {
+                Pn_Wizar5_2.Visible = true;
+                Dl_ZD3.SelectedValue = read_nd(ND_.Value, RNK_.Value, "ZD3", "75", Dl_Zdat.SelectedValue);
+                Tb_ZDN1.Text = read_nd(ND_.Value, RNK_.Value, "ZDN1", "75", Dl_Zdat.SelectedValue);
+                Tb_ZDD1.Value = read_nd_date(ND_.Value, RNK_.Value, "ZDD1", "75", Dl_Zdat.SelectedValue);
+            }
+            else { Pn_Wizar5_2.Visible = false; }
+
+        }
+        else
+        {
+            p_events.Visible = false;
+            Pn_Wizar5_2.Visible = false;
+        }
+
     }
 }

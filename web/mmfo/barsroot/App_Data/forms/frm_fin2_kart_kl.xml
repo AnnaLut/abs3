@@ -82,6 +82,11 @@
               union all
               select k.fdat fdat, '2' idf, kod, 0 s, k.OKPO okpo, SYS_CONTEXT ('bars_context', 'user_branch') branch from fin_forma2m where kod is not null  and fm = case when k.fm ='C'then 'R' else  k.fm end);
 
+              if k.fdat = trunc(k.fdat,'YYYY')  then
+              fin_formaf3.load_in_data(k.okpo, k.fdat,3);
+              fin_formaf3.load_in_data(k.okpo, k.fdat,4);
+              end if;
+
               end loop;
               END;
               /*    Fin_rnk_check(dat_, 1, okpo_);
@@ -115,17 +120,19 @@
           <command type="PlSqlBlock"  successurl="/barsroot/barsweb/dynform.aspx?form=frm_fin2_kart_kl">
             <sql>
               DECLARE
-               okpo_  varchar2(10)       := :OKPO;
-               dat_   date               := to_date( :DAT1, 'dd/mm/yyyy');
-               rnk_   number             := :RNK;
+              okpo_  varchar2(10)       := :OKPO;
+              dat_   date               := to_date( :DAT1, 'dd/mm/yyyy');
+              rnk_   number             := :RNK;
               begin
               for k in (
-                   select * from fin_fm where okpo = okpo_ and fdat = dat_
-                        )
-               loop
-                 delete fin_rnk where okpo = k.okpo and fdat = k.fdat;
-                 delete fin_fm  where okpo = k.okpo and fdat = k.fdat;
-               end loop;
+              select * from fin_fm where okpo = okpo_ and fdat = dat_
+              )
+              loop
+              delete fin_rnk where okpo = k.okpo and fdat = k.fdat;
+              delete fin_fm  where okpo = k.okpo and fdat = k.fdat;
+              fin_formaf3.data_deletion(k.okpo, k.fdat,3);
+              fin_formaf3.data_deletion(k.okpo, k.fdat,4);
+              end loop;
               end;
             </sql>
           
@@ -210,7 +217,9 @@
         <sql>
           select okpo, fdat, fm, decode(fin_nbu.LOGK_read(fdat, okpo, 1,1), 0, 'Без помилок', 2, 'З помилками', 1, 'Не введені дані') f1 ,
           decode(fin_nbu.LOGK_read(fdat, okpo, 2,1), 0, 'Без помилок', 2, 'З помилками', 1, 'Не введені дані') f2,
-          (fin_nbu.LOGK_read(fdat, okpo, 1,1)+fin_nbu.LOGK_read(fdat, okpo, 2,1)) as col, :VED as ved, fin_nbu.ZN_P('IPB', 6, fdat, okpo) as IPB,
+          decode(fin_formaf3.LOGK_read(fdat, okpo, 3,1), 0, 'Без помилок', 2, 'З помилками', 1, 'Не введені дані') f3,
+          decode(fin_formaf3.LOGK_read(fdat, okpo, 4,1), 0, 'Без помилок', 2, 'З помилками', 1, 'Не введені дані') f3n,
+          (fin_nbu.LOGK_read(fdat, okpo, 1,1)+fin_nbu.LOGK_read(fdat, okpo, 2,1)+sign(fin_formaf3.f_prot_kol( okpo,fdat, 3)+fin_formaf3.f_prot_kol(okpo,fdat, 4))) as col, :VED as ved, fin_nbu.ZN_P('IPB', 6, fdat, okpo) as IPB,
           fin_zp.f_get_fin_nd (:RNK ,  0 ,  '110' , fdat,  sysdate ) kl_110,
           fin_zp.f_get_fin_nd (:RNK ,  0 ,  '080' , fdat,  sysdate ) kl_080,
           fin_zp.f_get_fin_nd (:RNK ,  0 ,  'OBS' , fdat,  sysdate ) kl_OBS,
@@ -264,7 +273,32 @@
             </parameters>
           </command>
         </button>
-        
+        <!--КНОПКА Введення даних форми №3 -->
+        <button id="Bt303" type="Image" imagename="edit"  hint="Форма №3" caption="F3" >
+          <command type="Redirect" url="\barsroot\credit\fin_nbu\fin_form_f3.aspx" checkselectedrow="true">
+            <parameters>
+              <parameter name="OKPO" altname="okpo" datatype="Int64" type="DataField"></parameter>
+              <parameter name="frm"  altname="frm"  datatype="Int64" type="Constant">
+                <defaultvalue type="Constant" value="3"/>
+              </parameter>
+              <parameter name="DAT" altname="dat" datatype="String" type="DataField"></parameter>
+              <parameter name="RNK"  altname="rnk"  datatype="Int64" type="DataField" ></parameter>
+            </parameters>
+          </command>
+        </button>
+        <!--КНОПКА Введення даних форми №3n -->
+        <button id="Bt304" type="Image" imagename="notebook_preferences"  hint="Форма №3n" caption="F3n" >
+          <command type="Redirect" url="\barsroot\credit\fin_nbu\fin_form_f3.aspx" checkselectedrow="true">
+            <parameters>
+              <parameter name="OKPO" altname="okpo" datatype="Int64" type="DataField"></parameter>
+              <parameter name="frm"  altname="frm"  datatype="Int64" type="Constant">
+                <defaultvalue type="Constant" value="4"/>
+              </parameter>
+              <parameter name="DAT" altname="dat" datatype="String" type="DataField"></parameter>
+              <parameter name="RNK"  altname="rnk"  datatype="Int64" type="DataField" ></parameter>
+            </parameters>
+          </command>
+        </button>
         
         <button id="btIPS" type="Image" imagename="document_gear" caption="Рорахувати інтгрований показник та клас боржника"  hint="Рорахувати інтгрований показник та клас боржника" confirmmessage="Провести розрахунок" >
           <command type="PlSqlBlock" checkselectedrow="true">
@@ -336,6 +370,15 @@
         <field name="F2" datatype="String" key="false">
           <column caption="Форма №2 (“Звіт про фінансові результати” )" show="true" width="235"></column>
         </field>
+        
+        <field name="F3" datatype="String" key="false">
+          <column caption="Форма №3 (“Звіт про рух грошових коштів” )" show="true" width="235"></column>
+        </field>
+
+        <field name="F3N" datatype="String" key="false">
+          <column caption="Форма №3 (“Звіт про грошових коштів непрямий метод” )" show="true" width="235"></column>
+        </field>
+
 
         <field name="RNK" datatype="Int64" key="true">
           <column caption="RNK" show="false" width="70"></column>

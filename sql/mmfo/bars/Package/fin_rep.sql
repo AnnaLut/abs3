@@ -6,7 +6,7 @@
  
   CREATE OR REPLACE PACKAGE BARS.FIN_REP 
 AS
-   G_HEADER_VERSION  CONSTANT VARCHAR2(64)  := 'version 1.0.0  28.11.2016';
+   G_HEADER_VERSION  CONSTANT VARCHAR2(64)  := 'version 1.0.1  10.12.2017';
 
 
    -- маска формата для преобразования char <--> number
@@ -17,6 +17,23 @@ AS
   g_date_format constant varchar2(30) := 'YYYY.MM.DD HH24:MI:SS';   
   
  
+ TYPE t_601_kol IS RECORD (   rnk      cc_deal.rnk%type   --
+                            , nd       cc_deal.nd%type    --
+							, column7  fin_fm.ved%type    --  (K110) – вид економічної діяльності
+							, column8  varchar2(4)        -- (ec_year) – період, за який визначено вид економічної діяльності (календарний рік). 
+							, column9  number             -- (sales) – показник сукупного обсягу реалізації (SALES);  
+							, column10 number             -- (ebit) – показник фінансового результату від операційної діяльності (EBIT);    
+							, column11 number             -- (ebitda) – показник фінансового результату від звичайної діяльності до оподаткування фінансових витрат і нарахування амортизації (EBITDA); 
+							, column12 number             -- (totalDebt)– показник концентрації залучених коштів (TOTAL NET DEBT). 
+							, column13 number             -- (isMember)– зазначається приналежність боржника до групи юридичних осіб, що перебувають під спільним контролем (так/ні) – 1 знак: 1 – так; 2 – ні
+							, column17 number             --  під спільним контролем(sales) – показник сукупного обсягу реалізації (SALES);  
+							, column18 number             --  під спільним контролем(ebit) – показник фінансового результату від операційної діяльності (EBIT);    
+							, column19 number             --  під спільним контролем(ebitda) – показник фінансового результату від звичайної діяльності до оподаткування фінансових витрат і нарахування амортизації (EBITDA); 
+							, column20 number             --  під спільним контролем(totalDebt)– показник концентрації залучених коштів (TOTAL NET DEBT). 
+							, column21 number             --  під спільним контролем  (classGr) – зазначається клас групи, визначений на підставі консолідованої/комбінованої фінансової звітності
+						  ); 
+ g_601  t_601_kol;
+  
   type tp_nds is record
       ( nd     number
        ,dd     number
@@ -215,14 +232,18 @@ function f_rep_z1 ( p_sFdat1 date
                        )
                         RETURN t_rep_nbu_351_1 PIPELINED  PARALLEL_ENABLE;
 						
-						
+procedure indicator_601 ( p_rnk     number
+                         ,p_nd      number
+                         ,p_dat 	date
+                         ,p_601     out t_601_kol						 
+						 );						
 						
 END fin_rep;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.FIN_REP 
 AS
 
- G_BODY_VERSION  CONSTANT VARCHAR2(64)  :=  'version 1.0.5 20.07.2017';
+ G_BODY_VERSION  CONSTANT VARCHAR2(64)  :=  'version 1.0.6 10.12.2017';
  
 /*
  2017-05-23 1.0.2  - COBUSUPMMFO-588 Если Клиент одновременно входит в группу под общим контролем 
@@ -235,6 +256,8 @@ AS
  2017-05-23 1.0.4 - COBUSUPABS-6001 Необхідно внести зміни у формування поля kol25 в rez_cr при формуванні резервів станом на 01.07.2017.
                     Згідно змін у формі 613 (файл Д8) при визначенні ознаки про високий кредитний ризик - замість кодів 1631,1632 повинен 
 				    формуватися код 1630 ( згідно пункту 163 Постанови 351).
+
+ 2017-12-10 1.0.6 - COBUMMFO-5544  Розрахунок показників для ф601					
  
 */ 
  
@@ -2635,6 +2658,153 @@ if regexp_like(p_indic, p_value)
 end if;
 
 end;
+
+
+function get_indicator(  p_okpo  number
+						,p_dat  date
+						,p_kod  varchar2
+						) return number
+is
+l_tmp number;
+FZ_  varchar2(1)  := fin_nbu.F_FM (p_okpo, p_dat ) ;
+dat_   date   :=  p_dat;
+okpo_  number :=  p_okpo;
+begin
+
+ case  p_kod
+   when  'SALES'  then
+        IF FZ_ = 'N'      
+		    THEN  l_tmp := fin_nbu.ZN_F2('2000',4,dat_, okpo_) + fin_nbu.ZN_F2('2010',4,dat_, okpo_);
+			ELSE  l_tmp := fin_nbu.ZN_F2('2000',4,dat_, okpo_);
+		END IF;
+
+   when  'EBIT'  then
+        IF FZ_ = 'N'      
+		    THEN  l_tmp := fin_nbu.ZN_F2('2190',4,dat_, okpo_) - fin_nbu.ZN_F2('2195',4,dat_, okpo_);
+			ELSE  l_tmp := fin_nbu.ZN_F2('2000',4,dat_, okpo_) - fin_nbu.ZN_F2('2050',4,dat_, okpo_);
+		END IF;
+
+   when  'EBITDA'  then
+        IF FZ_ = 'N'      
+		    THEN  l_tmp := fin_nbu.ZN_F2('2190',4,dat_, okpo_) - fin_nbu.ZN_F2('2195',4,dat_, okpo_) +  fin_nbu.ZN_F2('2515',4,dat_, okpo_);
+			ELSE  l_tmp := null;
+		END IF;
+
+   when  'TOTAL_NET_DEBT'  then
+        IF FZ_ = 'N'      
+		    THEN  l_tmp := fin_nbu.ZN_F1('1510',4,dat_, okpo_) + fin_nbu.ZN_F1('1515',4,dat_, okpo_) + fin_nbu.ZN_F1('1600',4,dat_, okpo_) + fin_nbu.ZN_F1('1610',4,dat_, okpo_) - fin_nbu.ZN_F1('1165',4,dat_, okpo_);
+			ELSE  l_tmp := fin_nbu.ZN_F1('1595',4,dat_, okpo_) + fin_nbu.ZN_F1('1600',4,dat_, okpo_) + fin_nbu.ZN_F1('1610',4,dat_, okpo_) - fin_nbu.ZN_F1('1165',4,dat_, okpo_);
+		END IF;		
+
+		
+   else l_tmp := null;
+ end case;
+
+   return l_tmp;
+exception when no_data_found then 
+      return null;
+end;
+
+procedure indicator_601 ( p_rnk     number
+                         ,p_nd      number
+                         ,p_dat 	date
+                         ,p_601     out t_601_kol						 
+						 )
+is
+l_okpo  customer.okpo%type;
+z_dat date;  --дата звітності яка береться до разрахунку 351
+l_okpo_grp number;
+begin
+/*
+                              rnk      cc_deal.rnk%type   --
+                            , nd       cc_deal.nd%type    --
+							, column7  fin_fm.ved%type    --  (K110) – вид економічної діяльності
+							, column8  varchar2(4)        -- (ec_year) – період, за який визначено вид економічної діяльності (календарний рік). 
+							, column9  number             -- (sales) – показник сукупного обсягу реалізації (SALES);  
+							, column10 number             -- (ebit) – показник фінансового результату від операційної діяльності (EBIT);    
+							, column11 number             -- (ebitda) – показник фінансового результату від звичайної діяльності до оподаткування фінансових витрат і нарахування амортизації (EBITDA); 
+							, column12 number             -- (totalDebt)– показник концентрації залучених коштів (TOTAL NET DEBT). 
+							, column13 number             -- (isMember)– зазначається приналежність боржника до групи юридичних осіб, що перебувають під спільним контролем (так/ні) – 1 знак: 1 – так; 2 – ні
+							, column17 number             --  під спільним контролем(sales) – показник сукупного обсягу реалізації (SALES);  
+							, column18 number             --  під спільним контролем(ebit) – показник фінансового результату від операційної діяльності (EBIT);    
+							, column19 number             --  під спільним контролем(ebitda) – показник фінансового результату від звичайної діяльності до оподаткування фінансових витрат і нарахування амортизації (EBITDA); 
+							, column20 number             --  під спільним контролем(totalDebt)– показник концентрації залучених коштів (TOTAL NET DEBT). 
+							, column21 number             --  під спільним контролем  (classGr) – зазначається клас групи, визначений на підставі консолідованої/комбінованої фінансової звітності
+*/
+
+g_601.rnk :=  p_rnk;
+g_601.nd  :=  p_nd;
+
+  Begin
+     Select okpo
+	   into l_okpo
+	   from customer
+      where rnk =  g_601.rnk; 
+   exception when no_data_found then 
+      return;   
+  end;
+ 
+  begin 
+   Select ved, to_char(trunc(fdat-1,'YEAR'),'YYYY')
+     into g_601.column7,  g_601.column8
+     from fin_fm f
+    where okpo = l_okpo 	 
+	  and fdat in (select max(fdat)
+	                 from fin_fm
+					where okpo =  f.okpo
+                      and ved is not null);					
+   exception when no_data_found then 
+      g_601.column7 := null;  
+	  g_601.column8 := null;  
+  end;
+  
+  z_dat :=  FIN_NBU.ZN_P_ND_DATE_HIST('ZVTP', 51, p_dat, p_nd, p_rnk); 
+
+  g_601.column9   :=  get_indicator(l_okpo,z_dat,'SALES');
+  g_601.column10  :=  get_indicator(l_okpo,z_dat,'EBIT');
+  g_601.column11  :=  get_indicator(l_okpo,z_dat,'EBITDA');
+  g_601.column12  :=  get_indicator(l_okpo,z_dat,'TOTAL_NET_DEBT');
+  g_601.column13  :=  FIN_NBU.ZN_P_ND_HIST('NGRK', 51, p_dat, p_nd, p_rnk);
+  g_601.column21  :=  FIN_NBU.ZN_P_ND_HIST('GRKL', 51, p_dat, p_nd, p_rnk);
+ 
+ 					  
+  if g_601.column13 = 1  then 
+	
+
+	 Begin 
+	  Select okpo
+		into l_okpo_grp
+		from fin_cust
+		where okpo like '_'||lpad(lpad(FIN_NBU.ZN_P_ND_HIST('NUMG', 51, p_dat, p_nd, p_rnk),10,'0'),11,'9')  
+		  and  custtype = 5
+		  and rownum = 1; 	
+		  
+		  
+		  
+		Select max(fdat)
+		  into z_dat
+		  from fin_fm
+		 where okpo = l_okpo_grp;	  
+		 
+		 dbms_output.put_line('OkpoGrp='||l_okpo_grp||' ZdatGrp='||to_char(z_dat));
+		 
+		  
+		g_601.column17  :=  get_indicator(l_okpo_grp,z_dat,'SALES');
+		g_601.column18  :=  get_indicator(l_okpo_grp,z_dat,'EBIT');
+		g_601.column19  :=  get_indicator(l_okpo_grp,z_dat,'EBITDA');
+		g_601.column20  :=  get_indicator(l_okpo_grp,z_dat,'TOTAL_NET_DEBT');  
+		  
+	  exception when no_data_found then 
+		  null;   
+	  end;
+
+   end if;
+
+	  
+   p_601 :=  g_601;
+ exception when others then 
+   p_601 :=  g_601; 
+end;						 
 
 
 END fin_rep;

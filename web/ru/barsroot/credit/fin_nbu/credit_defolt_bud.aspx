@@ -56,7 +56,7 @@
     <asp:Panel ID="Panel1" runat="server" Width="950px">
         <asp:Wizard ID="Wizard1" runat="server" Width="100%" BackColor="#EFF3FB" BorderColor="#B5C7DE" 
             BorderWidth="1px" Font-Names="Verdana" CellPadding="10" 
-            ActiveStepIndex="3" Font-Size="Small"
+            ActiveStepIndex="4" Font-Size="Small"
             StartNextButtonText="Наступна" StepNextButtonText="Наступна" StepPreviousButtonText="Попередня"
             CancelButtonText="Відмінити" FinishCompleteButtonText="Готово" FinishPreviousButtonText="Попередня"
             OnNextButtonClick="BtNext"  >
@@ -365,6 +365,24 @@
                                 </asp:TemplateField>
                             </Columns>
                         </asp:GridView>
+                        <asp:Panel ID="p_events" runat="server"  Visible="false">
+                        <table>
+                            <tr>
+                                <td style="width: 550Px">
+                                    <asp:Label ID="lb_ZD4" runat="server" Text="  3 - З моменту усунення події/подій, на підставі якої/яких було визнано дефолт божника, минуло щонайменше 180 днів " Width="550"></asp:Label>
+                                </td>
+                                <td style="width: 100Px">
+                                    <asp:DropDownList ID="dl_ZD4" runat="server" DataSource='<%# SQL_SELECT_dataset("select val, name as name from FIN_QUESTION_REPLY where kod=" + ((char)39).ToString() + "ZD4" +((char)39).ToString() + "and idf = 75 ") %>'
+                                        DataTextField="NAME" DataValueField="VAL" Enabled="false" Width="100px">
+                                    </asp:DropDownList>
+                                </td>
+                                <td style="width: 50Px">
+                                <%-- <asp:Image ID="Im_ZD4" runat="server" Visible='<%# (Convert.ToString(Eval("DESCRIPT")).Length == 0)?(false):(true) %>'
+                                            ToolTip='<%# Eval("DESCRIPT")%>' ImageUrl="/Common/Images/default/16/help2.png" />--%>
+                                </td>
+                            </tr>
+                        </table>
+                    </asp:Panel>
                         <asp:Panel ID="Pn_Wizar5_2" runat="server" Width="550Px" GroupingText="Судження Банку...">
                         <table>
                               <tr>

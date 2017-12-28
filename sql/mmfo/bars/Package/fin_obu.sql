@@ -1630,7 +1630,7 @@ Begin
 		/* AZ11	11	Ğåçóëüòàò â³ä ó÷àñò³ â êàï³òàë³ (êóìóëÿòèâíà) */
     elsif 	kod_ = 'AZ11' and p_type_ = 2 then
 	        Case
-			   when FZ_ = 'N'         then return fin_nbu.ZN_F2('2200',3,dat_, okpo_) - fin_nbu.ZN_F2('2250',3,dat_, okpo_);
+			   when FZ_ = 'N'         then return fin_nbu.ZN_F2('2200',3,dat_, okpo_) - fin_nbu.ZN_F2('2255',3,dat_, okpo_);
  			   when FZ_ in ('R','C')  then return null;
 			 		                  else return null;
 			End case; 				
@@ -2626,7 +2626,7 @@ l_t1 int;
    	/*
 9.	Äèíàì³êà âèğó÷êè â³ä ğåàë³çàö³¿ ïğîäóêö³¿ (òîâàğ³â, ğîá³ò, ïîñëóã) (ÄÂ)
 	*/
-
+            begin
 					if cl_tip = 7 or kol_fz_ != 0 then dat1_  := add_months(trunc(DAT_),-3);
 								                  else dat1_  := add_months(trunc(DAT_),-(kol_m-3));
 					end if;
@@ -2667,7 +2667,10 @@ l_t1 int;
 					end if;
 
 				    return sTmp*100;
-
+ 
+                exception when others then 
+                     if sqlcode=-20000 then return 0; else raise; end if;
+            end; 
 
 	elsif kod_ = 'KGP' then
  /*
@@ -2745,7 +2748,7 @@ l_t1 int;
  /*
 12.	Äèíàì³êà äåá³òîğñüêî¿ çàáîğãîâàíîñò³ (ÄÄ)
  */
-
+    begin
      					if cl_tip = 7 or kol_fz_ != 0 then dat1_  := add_months(trunc(DAT_),-3);
 													  else dat1_  := add_months(trunc(DAT_),-(kol_m-3));
 					    end if;
@@ -2805,13 +2808,16 @@ l_t1 int;
 		 else return sTmp;
 		 end if;
 
+                exception when others then 
+                     if sqlcode=-20000 then return 0; else raise; end if;
+            end; 
 
-
-		 		 	elsif kod_ = 'DK0' then
+    elsif kod_ = 'DK0' then
  /*
 13.	Äèíàì³êà êğåäèòîğñüêî¿ çàáîğãîâàíîñò³ (ÄÊ)
  */
-
+     begin
+ 
      					if cl_tip = 7 or kol_fz_ != 0 then dat1_  := add_months(trunc(DAT_),-3);
 								                      else dat1_  := add_months(trunc(DAT_),-(kol_m-3));
 					    end if;
@@ -2852,7 +2858,10 @@ l_t1 int;
 		 else return sTmp;
 		 end if;
 
-
+                exception when others then 
+                     if sqlcode=-20000 then return 0; else raise; end if;
+            end; 
+		 
 		 elsif kod_ = 'DZP' then
 
 		 /*
@@ -3010,7 +3019,10 @@ l_t1 int;
                      end if;                    
 
             end if;
-					  end;
+	
+              exception when others then 
+                     if sqlcode=-20000 then return 0; else raise; end if;
+   	     end;
 		        if s2_ = 0 then return 0;
 				           else return (s_/s2_)*100;
 				end if;
@@ -3023,7 +3035,7 @@ l_t1 int;
 	*/
 
 
-           			begin
+	begin
 /*
  						 while  k>=3 and l_ != 0 loop
 								select count(*)
@@ -3306,8 +3318,10 @@ l_t1 int;
 
 	end if;
 
-
-	  end;
+      exception when others then 
+                     if sqlcode=-20000 then return 0; else raise; end if;
+            end; 
+ 
 
 
 elsif kod_ = 'DRP' then
@@ -3317,8 +3331,7 @@ elsif kod_ = 'DRP' then
 	*/
 
 
-
-           			begin
+	begin
     if (kol_m > 3 and FZ_ in (' ', 'N'))  then
 
 
@@ -3471,7 +3484,10 @@ elsif kod_ = 'DRP' then
 	end if;
 
 
-	  end;
+      exception when others then 
+                     if sqlcode=-20000 then return 0; else raise; end if;
+    end; 
+
 
 
 	elsif kod_ = 'KOB' then
@@ -3558,8 +3574,10 @@ elsif kod_ = 'DRP' then
 
 
 
+      exception when others then 
+                     if sqlcode=-20000 then return 0; else raise; end if;
+    end; 
 
-	end;
 
 
 	elsif kod_ = 'KPF' then
@@ -3923,7 +3941,7 @@ elsif kod_ = 'DRP' then
 	  --,cck_app.Get_ND_TXT_ex( ND_, 'VNCRR', add_months(sysdate-3));
   case 
     when ZN_P_ND ('KP3', 5) = 2 then return 1;
-    when l_t1-l_t > 2 and  g_kol_dely> 7  then return 1;
+    when l_t-l_t1 > 2 and  g_kol_dely> 7  then return 1;
 	when l_t > 7      and  g_kol_dely> 7  then return 1;
 	else                                       return 2;
   end case;

@@ -474,7 +474,14 @@ procedure adjustment_class_kons (RNK_  number,
 					             DAT_  date);
 
 
-
+--З моменту усунення подій на підставі яких було визнано дефолт минуло щонайменше 180 днів
+-- elimination_events(p_rnk, p_nd, p_fdat, '53,54', 55)
+procedure  elimination_events (  p_rnk        fin_nd.rnk%type 
+                                ,p_nd         fin_nd.nd%type 
+								,p_fdat       date
+								,p_idf_list   varchar2
+								,p_idf        number
+                               );
 
 	--*Цінні папери   (бюджетники)
 
@@ -2450,10 +2457,14 @@ begin
    tp_logks.logk(t_ind).dat    := DAT_;
    tp_logks.logk(t_ind).okpo   := OKPO_;
    tp_logks.logk(t_ind).idf    := IDF_;
-   tp_logks.logk(t_ind).err    := LOGK_read (DAT_  => tp_logks.logk(t_ind).dat,
+   tp_logks.logk(t_ind).err    := LOGK      (DAT_  => tp_logks.logk(t_ind).dat,
+ 										     OKPO_ => tp_logks.logk(t_ind).okpo ,
+										     IDF_  => tp_logks.logk(t_ind).idf);
+
+   /*tp_logks.logk(t_ind).err    := LOGK_read (DAT_  => tp_logks.logk(t_ind).dat,
  										     OKPO_ => tp_logks.logk(t_ind).okpo ,
 										     IDF_  => tp_logks.logk(t_ind).idf,
-										     mode_ => 1);
+										     mode_ => 1);*/											 
  
     --trace(l_mod,'read table-'||tp_logks.logk(t_ind).okpo||'-'||TO_CHAR(tp_logks.logk(t_ind).DAT,'DD-MM-YYYY')); 
     return tp_logks.logk(t_ind).err;
@@ -5645,6 +5656,53 @@ begin
 fin_nbu.record_fp_nd('CLS', greatest(l_cls,l_klass), 59, DAT_);
 
 
+
+end;
+
+
+
+--З моменту усунення подій на підставі яких було визнано дефолт минуло щонайменше 180 днів
+-- elimination_events(p_rnk, p_nd, p_fdat, '53,54', 55)
+procedure  elimination_events (  p_rnk        fin_nd.rnk%type 
+                                ,p_nd         fin_nd.nd%type 
+								,p_fdat       date
+								,p_idf_list   varchar2
+								,p_idf        number
+                               )
+is
+l_events      number := 0;
+l_passed180   number := 6;
+begin
+ 
+   for k in (
+         Select nd, rnk, idf, kod, sum(s) kol_m
+		   from fin_nd_hist
+		  where fdat between add_months(p_fdat,-12) and p_fdat 
+			and  (nd, rnk, idf, kod) in (       
+											select nd, rnk, idf, kod           
+											 from fin_nd_hist h
+											where h.idf in  ( select column_value from table(gettokens(p_idf_list)))
+											  and nd   = p_nd
+											  and rnk  = p_rnk
+											  and fdat = p_fdat
+											  and h.s= 1)  
+		  Group by nd, rnk, idf, kod 
+             )
+    loop
+	l_events    := 1;
+	l_passed180 :=  least(l_passed180,k.kol_m);
+    end loop;
+	
+  if  l_events = 0 
+   then  fin_nbu.record_fp_nd('ZD5', 0, p_idf, p_fdat, p_nd, p_rnk);     -- немає подій дефолту
+         fin_nbu.record_fp_nd('ZD4', null, p_idf, p_fdat, p_nd, p_rnk);
+   else                     -- наявні події дефолту   
+         fin_nbu.record_fp_nd('ZD5', 1, p_idf, p_fdat, p_nd, p_rnk);
+			if l_passed180 >= 6    
+			 then   fin_nbu.record_fp_nd('ZD4', 1, p_idf, p_fdat, p_nd, p_rnk);   -- 6 звітних період ів подія дефолту і більше
+			 else   fin_nbu.record_fp_nd('ZD4', 0, p_idf, p_fdat, p_nd, p_rnk);   -- менше 180 днів подія дефолту
+			end if;
+  end if;
 
 end;
 
