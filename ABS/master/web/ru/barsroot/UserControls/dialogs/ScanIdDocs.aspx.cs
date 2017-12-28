@@ -815,7 +815,8 @@ public partial class UserControls_dialogs_ScanIdDocs : System.Web.UI.Page
             String ErrorText = "Виникли помилки при отриманні відповіді від ЕА: Message = " + ex.Message + "; StackTrace = " + ex.StackTrace;
             Decimal RecID = _dbLogger.Error(ErrorText.Length > 3000 ? ErrorText.Substring(0, 3000) : ErrorText);
 
-            ScriptManager.RegisterStartupScript(this, this.GetType(), "ead_errors", String.Format("alert('Виникли помилки при отриманні відповіді від ЕА. Номер запису в журналі аудиту {0}'); ", RecID), true);
+            //ScriptManager.RegisterStartupScript(this, this.GetType(), "ead_errors", String.Format("alert('Виникли помилки при отриманні відповіді від ЕА. Номер запису в журналі аудиту {0}'); ", RecID), true);
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "ead_errors", String.Format("core$ErrorBox('{0}.  Номер запису в журналі аудиту {1}', 'Помилка отримання документів з ЕА')", ex.Message.Replace("'", null).Replace("\r\n", null), RecID), true);  // alert не показывалсо с '  \r\n
         }
 
         return DocData;

@@ -923,6 +923,8 @@ namespace Bars.EAD.Structs.Result
         public String Error_Code;
         [JsonProperty("error_text")]
         public String Error_Text;
+        [JsonProperty("error")]
+        public String Error_Text2;
 
         public Error() { }
     }
@@ -1858,14 +1860,25 @@ namespace Bars.EAD
             Response rsp = Response.CreateFromJSONString(msg.Method, ResponseText);
 
             // Анализируем ответ
-            if (rsp.Status == "ERROR")
+            if (rsp.Status == "ERROR" || String.IsNullOrEmpty(rsp.Status))
             {
                 // устанавлдиваем статус "Помилка"
-                Structs.Result.Error err = (rsp.Result as Newtonsoft.Json.Linq.JToken).ToObject<Structs.Result.Error>();
-                throw new System.Exception(String.Format("Помилка отримання документів з ЕА: {0}, {1}", err.Error_Code, err.Error_Text));
+                if (rsp.Result != null)
+                {
+                    Structs.Result.Error err = (rsp.Result as Newtonsoft.Json.Linq.JToken).ToObject<Structs.Result.Error>();
+                    throw new System.Exception(err.Error_Code + err.Error_Text);
+                }
+                else
+                {
+                    // Structs.Result.Error2 err2 = (rsp.error as Newtonsoft.Json.Linq.JToken).ToObject<Structs.Result.Error2>();
+                    throw new System.Exception(rsp.error.Error_Code + rsp.error.Error_Text);
+                }
             }
             else
             {
+                Structs.Result.Error err = (rsp.Result as Newtonsoft.Json.Linq.JToken).First.ToObject<Structs.Result.Error>();
+                if (!String.IsNullOrEmpty(err.Error_Text2) && err.Error_Text2.Contains("Documents not found.Document file name is empty")) throw new System.Exception(err.Error_Text2);
+
                 if (con.State != ConnectionState.Open) con.Open();
                 try
                 {

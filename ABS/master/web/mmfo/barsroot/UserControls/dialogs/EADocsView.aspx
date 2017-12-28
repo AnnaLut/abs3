@@ -12,6 +12,7 @@
     <link rel="stylesheet" type="text/css" href="/Common/CSS/jquery/jquery.css" />
     <script type="text/javascript" src="/Common/jquery/jquery.js"></script>
     <script type="text/javascript" src="/Common/jquery/jquery-ui.js"></script>
+    <script type="text/javascript" src="/Common/jquery/jquery.alerts.js"></script>
     <script type="text/javascript">
         $(function () {
             $("#dvDocs")
