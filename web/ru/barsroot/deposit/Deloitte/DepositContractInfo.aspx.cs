@@ -575,8 +575,8 @@ public partial class DepositContractInfo : Page
         {
             // Перегляд документів в ЕА
             EADocsView.Enabled = true;
-            EADocsView.RNK = Convert.ToDecimal(rnk.Value.Substring(0, rnk.Value.Length - 2)); // отсечь хвост ММФО
-            EADocsView.AgrID = Convert.ToDouble(dpt_id.Value.Substring(0, dpt_id.Value.Length - 2)); // отсечь хвост ММФО;
+            EADocsView.RNK = Convert.ToDecimal(rnk.Value);
+            EADocsView.AgrID = Convert.ToDouble(dpt_id.Value);
 
             // 
             if (Request["readonly"] == null)

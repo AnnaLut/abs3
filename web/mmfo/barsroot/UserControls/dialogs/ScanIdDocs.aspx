@@ -17,6 +17,10 @@
     <link href="/Common/CSS/default.css" type="text/css" rel="stylesheet" />
     <link href="/Common/CSS/barsextenders.css" type="text/css" rel="stylesheet" />
     <link href="/Common/CSS/BarsGridView.css" type="text/css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="/Common/CSS/jquery/jquery.css" />
+    <script type="text/javascript" src="/Common/jquery/jquery.js"></script>
+    <script type="text/javascript" src="/Common/jquery/jquery-ui.js"></script>
+    <script type="text/javascript" src="/Common/jquery/jquery.alerts.js"></script>
     <base target="_self" />
     <style type="text/css">
         .header {

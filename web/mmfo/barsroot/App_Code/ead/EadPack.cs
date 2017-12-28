@@ -155,11 +155,12 @@ namespace Bars.EAD
             OracleDecimal res = (OracleDecimal)ReturnValue;
             return res.IsNull ? (Decimal?)null : res.Value;
         }
-        public Decimal? MSG_CREATE ( String P_TYPE_ID,  String P_OBJ_ID, String kf)
+        public Decimal? MSG_CREATE (String P_TYPE_ID,  String P_OBJ_ID, UInt64? P_RNK, String kf)
         {
             List<OracleParameter> parameters = new List<OracleParameter>();
             parameters.Add(new OracleParameter("P_TYPE_ID", OracleDbType.Varchar2,P_TYPE_ID, ParameterDirection.Input));
             parameters.Add(new OracleParameter("P_OBJ_ID", OracleDbType.Varchar2,P_OBJ_ID, ParameterDirection.Input));
+            //parameters.Add(new OracleParameter("P_RNK", OracleDbType.Int64, P_RNK, ParameterDirection.Input));
             parameters.Add(new OracleParameter("P_KF", OracleDbType.Varchar2, kf, ParameterDirection.Input));
             parameters.Add(new OracleParameter("$$RETVAL$$", OracleDbType.Decimal, ParameterDirection.ReturnValue));
             object ReturnValue = null;

@@ -829,7 +829,7 @@ public partial class UserControls_dialogs_ScanIdDocs : System.Web.UI.Page
             }
 
             // Получаем перечень документов из ЕА
-            List<Bars.EAD.Structs.Result.DocumentData> docs = Bars.EAD.EADService.GetDocumentData(null, this.RNK, (Int64?)null, 1, null, KF);
+            List<Bars.EAD.Structs.Result.DocumentData> docs = Bars.EAD.EADService.GetDocumentData(null, (int)this.RNK/100, (Int64?)null, 1, null, KF);
 
             // смотрим есть ли тут паспорт
             String DocUrl = String.Empty;
@@ -852,7 +852,8 @@ public partial class UserControls_dialogs_ScanIdDocs : System.Web.UI.Page
             String ErrorText = "Виникли помилки при отриманні відповіді від ЕА: Message = " + ex.Message + "; StackTrace = " + ex.StackTrace;
             Decimal RecID = _dbLogger.Error(ErrorText.Length > 3000 ? ErrorText.Substring(0, 3000) : ErrorText);
 
-            ScriptManager.RegisterStartupScript(this, this.GetType(), "ead_errors", String.Format("alert('Виникли помилки при отриманні відповіді від ЕА. Номер запису в журналі аудиту {0}'); ", RecID), true);
+            //ScriptManager.RegisterStartupScript(this, this.GetType(), "ead_errors", String.Format("alert('Виникли помилки при отриманні відповіді від ЕА. Номер запису в журналі аудиту {0}'); ", RecID), true);
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "ead_errors", String.Format("core$ErrorBox('{0}.  Номер запису в журналі аудиту {1}', 'Помилка отримання документів з ЕА')", ex.Message.Replace("'", null).Replace("\r\n", null), RecID), true);  // alert не показывалсо с '  \r\n
         }
         finally
         {
