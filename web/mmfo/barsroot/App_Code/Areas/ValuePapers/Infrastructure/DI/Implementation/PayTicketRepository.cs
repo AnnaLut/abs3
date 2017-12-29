@@ -55,11 +55,11 @@ namespace BarsWeb.Areas.ValuePapers.Infrastructure.DI.Implementation
                             value_paper.saveCPR(:p_nTipD, :p_cb_Zo, :p_nGrp, :p_nID, :p_nRYN, :p_nVidd, :p_SUMK, :p_sREF, :p_sErr, :p_REF_MAIN);
                            end;";
             var p = new DynamicParameters();
-            p.Add("p_nTipD", dbType: DbType.Int16, value: p_nTipD, direction: ParameterDirection.Input);
-            p.Add("p_cb_Zo", dbType: DbType.Int16, value: p_cb_Zo, direction: ParameterDirection.Input);
-            p.Add("p_nGrp", dbType: DbType.Int16, value: p_nGrp, direction: ParameterDirection.Input);
-            p.Add("p_nID", dbType: DbType.Int16, value: p_nID, direction: ParameterDirection.Input);
-            p.Add("p_nRYN", dbType: DbType.Int16, value: p_nRYN, direction: ParameterDirection.Input);
+            p.Add("p_nTipD", dbType: DbType.Int32, value: p_nTipD, direction: ParameterDirection.Input);
+            p.Add("p_cb_Zo", dbType: DbType.Int32, value: p_cb_Zo, direction: ParameterDirection.Input);
+            p.Add("p_nGrp", dbType: DbType.Int32, value: p_nGrp, direction: ParameterDirection.Input);
+            p.Add("p_nID", dbType: DbType.Int32, value: p_nID, direction: ParameterDirection.Input);
+            p.Add("p_nRYN", dbType: DbType.Int32, value: p_nRYN, direction: ParameterDirection.Input);
             p.Add("p_nVidd", dbType: DbType.String, size: 50, value: p_nVidd, direction: ParameterDirection.Input);
             p.Add("p_SUMK", dbType: DbType.Decimal, value: p_SUMK, direction: ParameterDirection.Input);
             p.Add("p_sREF", dbType: DbType.String, size: 50, direction: ParameterDirection.Output);
