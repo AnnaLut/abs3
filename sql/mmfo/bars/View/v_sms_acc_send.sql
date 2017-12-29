@@ -162,6 +162,8 @@ PROMPT *** Create  view V_SMS_ACC_SEND ***
                                     AND T11.STATUS = 'SUBMITTED'
                                     AND T11.PAYEDREF IS NULL
                                     AND t12.acc = t4.acc);
+									
+		where acc_clearance_exp not in(540108513)						
 
 PROMPT *** Create  grants  V_SMS_ACC_SEND ***
 grant SELECT                                                                 on V_SMS_ACC_SEND  to BARS_ACCESS_DEFROLE;

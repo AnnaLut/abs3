@@ -4,7 +4,7 @@
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bars_sms_clearance.sql =========*** 
  PROMPT ===================================================================================== 
  
- CREATE OR REPLACE PACKAGE BODY bars_sms_clearance
+CREATE OR REPLACE PACKAGE BODY bars_sms_clearance
 IS
    ----
    --  Package bars_sms_clearance - пакет процедур для подготовки дебиторской задолженности за  SMS-сообщения
@@ -22,14 +22,14 @@ IS
    -- маска формата для преобразования char <--> date
    g_date_format       CONSTANT VARCHAR2 (30) := 'YYYY.MM.DD HH24:MI:SS';
 
-   --глобальний параметрт ОВ22 для рахунків 3570
-   g_ob22              CONSTANT VARCHAR2 (2) := '33';
+  --глобальний параметрт ОВ22 для рахунків 3570/ -- новый счет 3570 (19)!!!
+   g_ob22              CONSTANT VARCHAR2 (2) := '19';
 
-   --глобальний параметрт ОВ22 для рахунків 3579
-   g_ob22_exp          CONSTANT VARCHAR2 (2) := '88';
+   --глобальний параметрт ОВ22 для рахунків 3579/--новый счет 3570(47)
+   g_ob22_exp          CONSTANT VARCHAR2 (2) := '47';
 
-   --глобальний параметрт ОВ22 для рахунків 6110
-   g_ob22_6110          CONSTANT VARCHAR2 (2) := 'E8';
+   --глобальний параметрт ОВ22 для рахунків 6110/--новый счет 6510 (E8)
+   g_ob22_6510          CONSTANT VARCHAR2 (2) := 'E8';
 
    --глобальний параметрт код валюти
    g_kv                 CONSTANT NUMBER(3) := 980;
@@ -101,28 +101,29 @@ IS
    END init;
 
 
-
-   ---
-   -- open_3579 -відкриття рахунку 3579 для виставлення простроченої заборгованості за СМС по рахунку.
+ ---
+   -- open_3579 -відкриття рахунку 3579 для виставлення простроченої заборгованості за СМС по рахунку. OLD
    --
+   --!!!новый счет (3570_ob47)!!!
+   --open_3570_ob47
 
-   PROCEDURE open_3579 (p_acc_parent          accounts.acc%TYPE,
+   PROCEDURE open_3570_ob47 (p_acc_parent          accounts.acc%TYPE,
                         p_acc_clearance_exp   OUT accounts.acc%TYPE)
    IS
       acc_       NUMBER;                                          --  ACC 2600
       nls_       VARCHAR2 (15);                                   --  NLS 2600
       acc1_      NUMBER;                                          --  ACC 3579
-      nls_3579   VARCHAR2 (15);                                   --  NLS 3579
+      nls_3570_ob47   VARCHAR2 (15);                                   --  NLS 3570_ob47
       nms_       VARCHAR2 (70);                                        --  NMS
       isp_       NUMBER;                                               --  ISP
       i          INT;
-      tmp_3579   VARCHAR2 (15);
+      tmp_3570_ob47   VARCHAR2 (15);
       tobo_      VARCHAR2 (30);
       grp_       NUMBER;
       tmp_       NUMBER;
       rnk_       NUMBER;
    BEGIN
-      logger.info ('open_3579. Для счета ACC=' || p_acc_parent);
+      logger.info ('open_3570_ob47. Для счета ACC=' || p_acc_parent);
 
       SELECT NLS,
              ACC,
@@ -143,13 +144,13 @@ IS
 
       BEGIN
          logger.debug ('gl.aMFO=' || gl.aMFO || ' nls_ = ' || nls_);
-         nls_3579 :=
-            VKRZN (SUBSTR (gl.aMFO, 1, 5), '3579' || SUBSTR (nls_, 5));
+         nls_3570_ob47 :=
+            VKRZN (SUBSTR (gl.aMFO, 1, 5), '3570' || SUBSTR (nls_, 5));
 
          SELECT NLS
-           INTO tmp_3579
+           INTO tmp_3570_ob47
            FROM accounts
-          WHERE     NLS = nls_3579
+          WHERE     NLS = nls_3570_ob47
                 AND KV = g_kv
                 AND (RNK <> rnk_ OR OB22 <> g_ob22_exp OR DAZS IS NOT NULL);
 
@@ -163,10 +164,10 @@ IS
          i := 1;
 
          LOOP
-            nls_3579 :=
+            nls_3570_ob47 :=
                vkrzn (
                   SUBSTR (gl.aMFO, 1, 5),
-                     '3579'
+                     '3570'
                   || '0'
                   || SUBSTR (nls_, 6, 1)
                   || LPAD (TO_CHAR (i), 2, '0')
@@ -174,9 +175,9 @@ IS
 
             BEGIN                                      -- Есть ли такой счет ?
                SELECT NLS
-                 INTO tmp_3579
+                 INTO tmp_3570_ob47
                  FROM accounts
-                WHERE     NLS = nls_3579
+                WHERE     NLS = nls_3570_ob47
                       AND KV = g_kv
                       AND (RNK <> rnk_ OR OB22 <> g_ob22_exp OR DAZS IS NOT NULL);
             EXCEPTION
@@ -198,7 +199,7 @@ IS
             NULL;
       END;                          ---------- END подбора номера 3579*  -----
 
-      logger.info ('open_3579. g_tt=' || g_tt);
+      logger.info ('open_3570_ob47. g_tt=' || g_tt);
 
 
       OP_REG (99,
@@ -207,7 +208,7 @@ IS
               grp_,
               tmp_,
               rnk_,
-              nls_3579,
+              nls_3570_ob47,
               g_kv,
               SUBSTR ('Нар.дох.SMS за прострочення до 31g' || nms_, 1, 70),
               'ODB',
@@ -220,7 +221,7 @@ IS
       ----  Добавление Доступа по GROUPS_NBS:
       FOR n IN (SELECT ID
                   FROM GROUPS_NBS
-                 WHERE NBS = '3579')
+                 WHERE NBS = '3570')
       LOOP
          sec.addAgrp (acc1_, n.ID);
       END LOOP;
@@ -252,19 +253,18 @@ IS
 
       p_acc_clearance_exp := acc1_;
 
-      --заносимо дані в таблицю зв'язку рахунок=рахунок оплати за СМС
+    --заносимо дані в таблицю зв'язку рахунок=рахунок оплати за СМС
       INSERT INTO SMS_ACC_CLEARANCE_EXP (ACC_CLEARANCE, ACC_CLEARANCE_EXP)
            VALUES (p_acc_parent, p_acc_clearance_exp);
 		  Exception when dup_val_on_index then null;
-	
 
 
       logger.info (
-            'open_3579. для счета ACC='
+            'open_3570_ob47. для счета ACC='
          || p_acc_parent
-         || 'відкрито 3579 = '
-         || p_acc_clearance_exp );
-   END open_3579;
+         || 'відкрито 3570_ob47 = '
+         || p_acc_clearance_exp);
+   END open_3570_ob47;
 
    -- знаходить рахунок для переносу заборгованост на прострочкуі, при відсутності рахунку створює його
    --
@@ -284,7 +284,7 @@ IS
          WHEN NO_DATA_FOUND
          THEN
             --якщо не знайшли - відкриваємо
-            open_3579 (p_acc_clearance, p_acc_clearance_exp);
+            open_3570_ob47 (p_acc_clearance, p_acc_clearance_exp);
          when others
          then raise;
       END;
@@ -308,7 +308,7 @@ IS
       acc1_      NUMBER;                                          --  ACC 3570
       nls_3570   VARCHAR2 (15);                                   --  NLS 3570
       nms_       VARCHAR2 (70);                                        --  NMS
-      isp_       NUMBER;                                               --  ISP
+      isp_       NUMBER;                                                --  ISP
       i          INT;
       tmp_3570   VARCHAR2 (15);
       tobo_      VARCHAR2 (30);
@@ -458,11 +458,14 @@ IS
       END;
 
       p_acc_clearance := acc1_;
+      
+      
+    
 
       --заносимо дані в таблицю зв'язку рахунок=рахунок оплати за СМС
       INSERT INTO SMS_ACC_CLEARANCE (acc, ACC_CLEARANCE)
            VALUES (p_acc_parent, p_acc_clearance);
-
+      Exception when dup_val_on_index then null;     
 
       logger.info (
             'open_3570. для счета ACC='
@@ -470,8 +473,8 @@ IS
          || 'відкрито 3570 = '
          || p_acc_clearance);
 
-   --відкриваємо 3579,оскільки він 100% ще не відкритий немає сенсу його шукати
-    open_3579(p_acc_clearance,l_acc_clearance_exp);
+   --відкриваємо 3579,оскільки він 100% ще не відкритий немає сенсу його шукати !!! NEW open_3570_ob47!!!
+    open_3570_ob47(p_acc_clearance,l_acc_clearance_exp);
 
    END open_3570;
    ----
@@ -649,9 +652,9 @@ IS
         FROM accounts t2, customer t3
        WHERE t2.acc = p_acc_clearance AND t3.rnk = t2.rnk;
 
-      --шукаємо рахунок оплати 6110
+      --шукаємо рахунок оплати 6110 !!!NEW 6510 !!
       BEGIN
-         l_nlsb := NBS_OB22_NULL ('6110', g_ob22_6110, l_toboa);
+         l_nlsb := NBS_OB22_NULL ('6510', g_ob22_6510, l_toboa);
 
          SELECT SUBSTR (t4.NMS, 1, 38), T5.OKPO, T4.TOBO
            INTO l_nmsb, l_okpob, l_tobob
@@ -661,7 +664,7 @@ IS
          WHEN NO_DATA_FOUND
          THEN
             g_err_num := -20003;
-            g_erm :=nvl(g_erm, DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE()) || ' - Не найден счет оплаты 6110!';
+            g_erm :=nvl(g_erm, DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE()) || ' - Не найден счет оплаты 6510!';
             raise_application_error (g_err_num, g_erm);
       END;
 
@@ -932,7 +935,7 @@ IS
          WHEN NO_DATA_FOUND
          THEN
             g_err_num := -20003;
-            g_erm :=nvl(g_erm, DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE()) || ' - Не найден счет заборгованості';  
+            g_erm :=nvl(g_erm, DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE()) || ' - Не найден счет заборгованості';
             raise_application_error (g_err_num, g_erm);
       END;
 
@@ -954,7 +957,7 @@ IS
       BEGIN
          gl.REF (l_ref);
          logger.info ('l_ref=' || l_ref);
-               
+
    gl.in_doc3 (l_ref,l_tt,6, l_ref,SYSDATE,gl.bDATE,1,g_kv,l_sum_to_pay,g_kv,l_sum_to_pay,null,gl.bDATE,gl.bDATE,l_nmsa,l_nlsa,gl.aMFO,l_tobob,l_nlsb,
                 gl.aMFO, 'За SMS інформування рах. '|| l_nls_parent,null,l_okpoa,gl.aOKPO,null,null,null,null,gl.aUID);
 
@@ -983,7 +986,7 @@ IS
          WHEN OTHERS
          THEN
             g_err_num := -20004;
-            g_erm :=nvl(g_erm, DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE()) || ' - Ошибка при погашении задолжености за СМC!';            
+            g_erm :=nvl(g_erm, DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE()) || ' - Ошибка при погашении задолжености за СМC!';
             --RAISE;
             raise_application_error (g_err_num, g_erm);
       END;
