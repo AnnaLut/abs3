@@ -635,7 +635,7 @@ SELECT t.rowid AS idrow
             p = new OracleParameter[3];
             p[0] = new OracleParameter("p_filename", OracleDbType.Varchar2, 100, fileName, ParameterDirection.Input);
             p[1] = new OracleParameter("p_filedata", OracleDbType.Clob, fileBody, ParameterDirection.Input);
-            p[2] = new OracleParameter("p_tickname", OracleDbType.Varchar2,4000, direction: ParameterDirection.Output);
+            p[2] = new OracleParameter("p_tickname", OracleDbType.Varchar2,4000,null, direction: ParameterDirection.Output);
             
             //sql = @"begin
             //            bars_dpa.ins_r0(:p_filename, :p_filedata, :p_tickname);
