@@ -1,205 +1,102 @@
+-- ======================================================================================
+-- Module : PRVN
+-- Author : BAA
+-- Date   : 29.12.2017
+-- ===================================== <Comments> =====================================
+-- create table BPK_CREDIT_DEAL_VAR
+-- ======================================================================================
 
+SET SERVEROUTPUT ON SIZE UNLIMITED FORMAT WRAPPED
+set echo         Off
+set lines        500
+set pages        500
+set termout      On
+set timing       Off
+set trimspool    On
 
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Table/BPK_CREDIT_DEAL_VAR.sql =========*** R
-PROMPT ===================================================================================== 
+SET FEEDBACK     OFF
 
+prompt -- ======================================================
+prompt -- == create table BPK_CREDIT_DEAL_VAR
+prompt -- ======================================================
 
-PROMPT *** ALTER_POLICY_INFO to BPK_CREDIT_DEAL_VAR ***
-
-
-BEGIN 
-        execute immediate  
-          'begin  
-               bpa.alter_policy_info(''BPK_CREDIT_DEAL_VAR'', ''FILIAL'' , null, null, null, null);
-               bpa.alter_policy_info(''BPK_CREDIT_DEAL_VAR'', ''WHOLE'' , null, null, null, null);
-               null;
-           end; 
-          '; 
-END; 
+begin
+  bpa.alter_policy_info( 'BPK_CREDIT_DEAL_VAR', 'WHOLE',  null, null, null, null );
+  bpa.alter_policy_info( 'BPK_CREDIT_DEAL_VAR', 'FILIAL', null, null, null, null );
+end;
 /
 
-PROMPT *** Create  table BPK_CREDIT_DEAL_VAR ***
-begin 
-  execute immediate '
-  CREATE TABLE BARS.BPK_CREDIT_DEAL_VAR 
-   (	REPORT_DT DATE, 
-	DEAL_ND NUMBER(24,0), 
-	DEAL_SUM NUMBER(24,0), 
-	DEAL_RNK NUMBER(24,0), 
-	RATE NUMBER(5,3), 
-	MATUR_DT DATE, 
-	SS NUMBER(24,0), 
-	SN NUMBER(24,0), 
-	SP NUMBER(24,0), 
-	SPN NUMBER(24,0), 
-	CR9 NUMBER(24,0), 
-	CREATE_DT DATE, 
-	ADJ_FLG NUMBER(1,0)
-   ) SEGMENT CREATION IMMEDIATE 
-  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
- NOCOMPRESS LOGGING
-  TABLESPACE BRSMDLD ';
-exception when others then       
-  if sqlcode=-955 then null; else raise; end if; 
+declare
+  e_tab_exists           exception;
+  pragma exception_init( e_tab_exists, -00955 );
+begin
+  execute immediate
+  'create table BARS.BPK_CREDIT_DEAL_VAR
+   ( REPORT_DT  date        constraint CC_BPKCRDTDEALVAR_REPDT_NN   not Null,
+     ADJ_FLG    number(1)   constraint CC_BPKCRDTDEALVAR_ADJFLG_NN  not Null,
+     DEAL_ND    number(24)  constraint CC_BPKCRDTDEALVAR_DEALND_NN  not Null,
+     DEAL_SUM   number(24)  constraint CC_BPKCRDTDEALVAR_DEALSUM_NN not Null,
+     DEAL_RNK   number(24)  constraint CC_BPKCRDTDEALVAR_DEALRNK_NN not Null,
+     RATE       number(5,3) constraint CC_BPKCRDTDEALVAR_RATE_NN    not Null,
+     MATUR_DT   date,
+     SS         number(24),
+     SN         number(24),
+     SP         number(24),
+     SPN        number(24),
+     CR9        number(24),
+     CREATE_DT  date        constraint CC_BPKCRDTDEALVAR_CREATDT_NN not Null,
+     constraint PK_BPKCRDTDEALVAR primary key ( REPORT_DT, ADJ_FLG, DEAL_ND ) using index tablespace BRSMDLI,
+     constraint FK_BPKCRDTDEALVAR_BPKCRDTDEAL foreign key ( DEAL_ND ) references BPK_CREDIT_DEAL (deal_nd)
+   ) tablespace BRSMDLD';
+
+  dbms_output.put_line( 'Table "BPK_CREDIT_DEAL_VAR" created.' );
+
+exception
+  when e_tab_exists then
+    dbms_output.put_line( 'Table "BPK_CREDIT_DEAL_VAR" already exists.' );
 end; 
 /
 
+SET FEEDBACK ON
 
+prompt -- ======================================================
+prompt -- Apply table policies
+prompt -- ======================================================
 
-
-PROMPT *** ALTER_POLICIES to BPK_CREDIT_DEAL_VAR ***
- exec bpa.alter_policies('BPK_CREDIT_DEAL_VAR');
-
-
-COMMENT ON TABLE BARS.BPK_CREDIT_DEAL_VAR IS 'Значення параметрів дог.кредитних лімітів БПК на звітну дату';
-COMMENT ON COLUMN BARS.BPK_CREDIT_DEAL_VAR.ADJ_FLG IS 'Ознака включення коригуючих оборотів (0-Ні/1-Так)';
-COMMENT ON COLUMN BARS.BPK_CREDIT_DEAL_VAR.REPORT_DT IS 'Звітна дата';
-COMMENT ON COLUMN BARS.BPK_CREDIT_DEAL_VAR.DEAL_ND IS 'Номер договору кредитного ліміту';
-COMMENT ON COLUMN BARS.BPK_CREDIT_DEAL_VAR.DEAL_SUM IS 'Сума договору (кредитний ліміт)';
-COMMENT ON COLUMN BARS.BPK_CREDIT_DEAL_VAR.DEAL_RNK IS 'РНК';
-COMMENT ON COLUMN BARS.BPK_CREDIT_DEAL_VAR.RATE IS 'Відсоткова ставка по договору';
-COMMENT ON COLUMN BARS.BPK_CREDIT_DEAL_VAR.MATUR_DT IS 'Дата погашення (на звітну дату)';
-COMMENT ON COLUMN BARS.BPK_CREDIT_DEAL_VAR.SS IS 'Сума використаного кредитного ліміту';
-COMMENT ON COLUMN BARS.BPK_CREDIT_DEAL_VAR.SN IS 'Сума нарахованих відсотків';
-COMMENT ON COLUMN BARS.BPK_CREDIT_DEAL_VAR.SP IS 'Сума простроченого боргу';
-COMMENT ON COLUMN BARS.BPK_CREDIT_DEAL_VAR.SPN IS 'Сума прострочених відсотків';
-COMMENT ON COLUMN BARS.BPK_CREDIT_DEAL_VAR.CR9 IS 'Сума НЕвикористаного кредитного ліміту';
-COMMENT ON COLUMN BARS.BPK_CREDIT_DEAL_VAR.CREATE_DT IS 'Дата створення запису';
-
-
-
-
-PROMPT *** Create  constraint FK_BPKCRDTDEALVAR_BPKCRDTDEAL ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BPK_CREDIT_DEAL_VAR ADD CONSTRAINT FK_BPKCRDTDEALVAR_BPKCRDTDEAL FOREIGN KEY (DEAL_ND)
-	  REFERENCES BARS.BPK_CREDIT_DEAL (DEAL_ND) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
+begin
+  bpa.alter_policies( 'BPK_CREDIT_DEAL_VAR' );
+end;
 /
 
+commit;
 
+prompt -- ======================================================
+prompt -- Comments
+prompt -- ======================================================
 
+COMMENT ON TABLE  BPK_CREDIT_DEAL_VAR           IS 'Значення параметрів дог.кредитних лімітів БПК на звітну дату';
 
-PROMPT *** Create  constraint PK_BPKCRDTDEALVAR ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BPK_CREDIT_DEAL_VAR ADD CONSTRAINT PK_BPKCRDTDEALVAR PRIMARY KEY (REPORT_DT, ADJ_FLG, DEAL_ND)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLI  ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
+COMMENT ON COLUMN BPK_CREDIT_DEAL_VAR.REPORT_DT IS 'Звітна дата';
+COMMENT ON COLUMN BPK_CREDIT_DEAL_VAR.DEAL_ND   IS 'Номер договору кредитного ліміту';
+COMMENT ON COLUMN BPK_CREDIT_DEAL_VAR.DEAL_SUM  IS 'Сума договору (кредитний ліміт)';
+COMMENT ON COLUMN BPK_CREDIT_DEAL_VAR.DEAL_RNK  IS 'РНК';
+COMMENT ON COLUMN BPK_CREDIT_DEAL_VAR.RATE      IS 'Відсоткова ставка по договору';
+COMMENT ON COLUMN BPK_CREDIT_DEAL_VAR.MATUR_DT  IS 'Дата погашення (на звітну дату)';
+COMMENT ON COLUMN BPK_CREDIT_DEAL_VAR.SS        IS 'Сума використаного кредитного ліміту';
+COMMENT ON COLUMN BPK_CREDIT_DEAL_VAR.SN        IS 'Сума нарахованих відсотків';
+COMMENT ON COLUMN BPK_CREDIT_DEAL_VAR.SP        IS 'Сума простроченого боргу';
+COMMENT ON COLUMN BPK_CREDIT_DEAL_VAR.SPN       IS 'Сума прострочених відсотків';
+COMMENT ON COLUMN BPK_CREDIT_DEAL_VAR.CR9       IS 'Сума НЕвикористаного кредитного ліміту';
+COMMENT ON COLUMN BPK_CREDIT_DEAL_VAR.CREATE_DT IS 'Дата створення запису';
+COMMENT ON COLUMN BPK_CREDIT_DEAL_VAR.ADJ_FLG   IS 'Ознака включення коригуючих оборотів (0-Ні/1-Так)';
+COMMENT ON COLUMN BPK_CREDIT_DEAL_VAR.KF        IS 'Код фiлiалу (МФО)';
 
+prompt -- ======================================================
+prompt -- Grants
+prompt -- ======================================================
 
+GRANT SELECT ON BPK_CREDIT_DEAL_VAR TO BARSUPL, UPLD;
 
-
-PROMPT *** Create  constraint CC_BPKCRDTDEALVAR_CREATDT_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BPK_CREDIT_DEAL_VAR MODIFY (CREATE_DT CONSTRAINT CC_BPKCRDTDEALVAR_CREATDT_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_BPKCRDTDEALVAR_RATE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BPK_CREDIT_DEAL_VAR MODIFY (RATE CONSTRAINT CC_BPKCRDTDEALVAR_RATE_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_BPKCRDTDEALVAR_DEALRNK_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BPK_CREDIT_DEAL_VAR MODIFY (DEAL_RNK CONSTRAINT CC_BPKCRDTDEALVAR_DEALRNK_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_BPKCRDTDEALVAR_DEALSUM_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BPK_CREDIT_DEAL_VAR MODIFY (DEAL_SUM CONSTRAINT CC_BPKCRDTDEALVAR_DEALSUM_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_BPKCRDTDEALVAR_DEALND_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BPK_CREDIT_DEAL_VAR MODIFY (DEAL_ND CONSTRAINT CC_BPKCRDTDEALVAR_DEALND_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_BPKCRDTDEALVAR_REPDT_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BPK_CREDIT_DEAL_VAR MODIFY (REPORT_DT CONSTRAINT CC_BPKCRDTDEALVAR_REPDT_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_BPKCRDTDEALVAR_ADJFLG_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.BPK_CREDIT_DEAL_VAR MODIFY (ADJ_FLG CONSTRAINT CC_BPKCRDTDEALVAR_ADJFLG_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  index PK_BPKCRDTDEALVAR ***
-begin   
- execute immediate '
-  CREATE UNIQUE INDEX BARS.PK_BPKCRDTDEALVAR ON BARS.BPK_CREDIT_DEAL_VAR (REPORT_DT, ADJ_FLG, DEAL_ND) 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLI ';
-exception when others then
-  if  sqlcode=-955  then null; else raise; end if;
- end;
-/
-
-
-
-PROMPT *** Create  grants  BPK_CREDIT_DEAL_VAR ***
-grant SELECT                                                                 on BPK_CREDIT_DEAL_VAR to BARSUPL;
-grant SELECT                                                                 on BPK_CREDIT_DEAL_VAR to UPLD;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Table/BPK_CREDIT_DEAL_VAR.sql =========*** E
-PROMPT ===================================================================================== 
+prompt -- ======================================================
+prompt -- FINISH
+prompt -- ======================================================

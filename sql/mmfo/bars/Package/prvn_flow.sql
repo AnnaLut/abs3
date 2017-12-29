@@ -1,6 +1,6 @@
 create or replace package PRVN_FLOW
 is
-  G_HEADER_VERSION  CONSTANT VARCHAR2(64) := 'ver.2.9 11.04.2017';
+  G_HEADER_VERSION  CONSTANT VARCHAR2(64) := 'version 2.9  11.04.2017';
   G_SHOW_LOG                 BOOLEAN default false;
   ------------------------------------
   procedure err_23  ( p_dat01 date   ) ; --- n) Перевірка 100%-ї Готовністі   НБУ-23
@@ -76,13 +76,13 @@ is
 end PRVN_FLOW;
 /
 
-show errors
+show errors;
 
 ----------------------------------------------------------------------------------------------------
 
 create or replace package body PRVN_FLOW
 is
-  g_body_version  constant varchar2(64) := 'version 9.9  11.12.2017';
+  g_body_version  constant varchar2(64) := 'version 10.0  29.12.2017';
   
   individuals_shd signtype := 1; -- 1/0 - формувати графіки для ФО
   
@@ -2403,7 +2403,6 @@ end nos_del;
         join ( select SubStr(NBS_N,1,4) as R020
                     , SubStr(NBS_N,5,2) as OB22
                  from FIN_DEBT
-                where NBS_N Like '3%'
              ) t
           on ( t.R020 = a.NBS and t.OB22 = a.OB22 )
         left
@@ -2435,7 +2434,7 @@ end nos_del;
               )
     loop 
       
-      fd.ACC_SS := null;
+      fd := null;
       
       -- подбор по модулям и по РНК + ВАЛ
       begin
