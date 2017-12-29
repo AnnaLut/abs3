@@ -391,6 +391,9 @@ create or replace package interest_utl is
         p_date_to   in date)
     return number;
 
+    procedure clear_reckonings_utl(
+        p_reckoning_row in int_reckonings%rowtype);
+
     procedure clear_reckonings(
         p_reckoning_row in int_reckonings%rowtype);
 
@@ -1578,7 +1581,7 @@ create or replace package body interest_utl as
                                (r.acc,r.id,r.bdat) = (select acc,id,max(bdat) from int_ratn
                                                       where acc = r.acc and id = r.id and bdat <= dat2_
                                                       group by acc, id) and
-                               i.acc=a.acc and i.id=id_ and 
+                               i.acc=a.acc and i.id=id_ and
                                i.acra is not null and i.acrb is not null;
 
                         -- сумма дисконта/премии
@@ -1735,10 +1738,10 @@ create or replace package body interest_utl as
                        rat.bdat := dat1_;
                     end if;
 
-                    tmp(to_char(rat.bdat,'yyyymmdd')||'3').dat :=rat.bdat;
-                    tmp(to_char(rat.bdat,'yyyymmdd')||'3').ir  :=rat.ir;
-                    tmp(to_char(rat.bdat,'yyyymmdd')||'3').op  :=rat.op;
-                    tmp(to_char(rat.bdat,'yyyymmdd')||'3').brn :=rat.br;
+                    tmp(to_char(rat.bdat,'yyyymmdd')||'0').dat :=rat.bdat;
+                    tmp(to_char(rat.bdat,'yyyymmdd')||'0').ir  :=rat.ir;
+                    tmp(to_char(rat.bdat,'yyyymmdd')||'0').op  :=rat.op;
+                    tmp(to_char(rat.bdat,'yyyymmdd')||'0').brn :=rat.br;
 
                 end loop;
 
@@ -1769,8 +1772,8 @@ create or replace package body interest_utl as
                               bas.bdate := prev_rat.bdat;          --началом действи€ €вл€етс€ ее уст. на счете
                            end if;
 
-                           tmp(to_char(bas.bdate,'yyyymmdd')||'2').dat :=bas.bdate;
-                           tmp(to_char(bas.bdate,'yyyymmdd')||'2').brn:=prev_rat.br;
+                           tmp(to_char(bas.bdate,'yyyymmdd')||'0').dat :=bas.bdate;
+                           tmp(to_char(bas.bdate,'yyyymmdd')||'0').brn:=prev_rat.br;
 
                        end loop;
 
@@ -1784,8 +1787,8 @@ create or replace package body interest_utl as
                               tie.bdate := prev_rat.bdat;
                            end if;
 
-                           tmp(to_char(tie.bdate,'yyyymmdd')||'1').dat :=tie.bdate;
-                           tmp(to_char(tie.bdate,'yyyymmdd')||'1').brn:=prev_rat.br;
+                           tmp(to_char(tie.bdate,'yyyymmdd')||'0').dat :=tie.bdate;
+                           tmp(to_char(tie.bdate,'yyyymmdd')||'0').brn:=prev_rat.br;
 
                        end loop;
                     end if;
@@ -1841,142 +1844,142 @@ create or replace package body interest_utl as
                     tmp(key).brn  := nvl(tmp(key).brn, nb0_);
 
                     if bdat_ <> tmp(key).dat and ostf_ is not null then
-                       if acc.metr=2 then
-
-                          sdat_ := nvl(sdat_, bdat_);
-
-                          if tmp(key).ir = ir0_ and tmp(key).brn = nb0_ then
-
-                             if (acc.pap = 1 and ostf_ <= tmp(key).ostf or
-                                 acc.pap = 2 and ostf_ >= tmp(key).ostf) then
-
-                                 ostf_ := tmp(key).ostf;
-                             end if;
-
-                             if substr(key,-1) <> '4' then
-                                 goto int_333;
-                             end if;
-
-                          end if;
-
-                       end if;
-
-                       if (acc.metr = 1) then    -- по середньому
-                           if (deb.debug and sdat_ is null) then
-                               dbms_output.put_line('key       sdat_         tmp(key).ostf  tmp(key).ir tmp(key).brn ir0_       nb0_ bdat_      tmp(key).dat dlta_          osta_           ostf_' );
-                               dbms_output.put_line('----------------------------------------------------------------------------------------------------------------------------------------------');
-                           end if;
+                        if acc.metr=2 then
 
                            sdat_ := nvl(sdat_, bdat_);
-                           dlta_ := acrn.dlta(acc.basey, bdat_, tmp(key).dat);
-                           osta_ := osta_ + ostf_ * dlta_;
 
-                           if (deb.debug) then
-                               dbms_output.put_line(key || ' ' ||
-                                                    sdat_ || ' ' ||
-                                                    lpad(tmp(key).ostf, 17) || ' ' ||
-                                                    lpad(tmp(key).ir, 12)  || ' ' ||
-                                                    lpad(tmp(key).brn, 12)  || ' ' ||
-                                                    lpad(ir0_, 4) || ' ' ||
-                                                    lpad(nb0_, 10) || ' ' ||
-                                                    to_char(bdat_, 'dd.mm.yyyy') || ' ' ||
-                                                    to_char(tmp(key).dat, 'dd.mm.yyyy') || ' ' ||
-                                                    lpad(dlta_, 8) || ' ' ||
-                                                    lpad(osta_, 15) || ' ' ||
-                                                    lpad(ostf_, 15));
+                           if tmp(key).ir = ir0_ and tmp(key).brn = nb0_ then
+
+                              if (acc.pap = 1 and ostf_ <= tmp(key).ostf or
+                                  acc.pap = 2 and ostf_ >= tmp(key).ostf) then
+
+                                  ostf_ := tmp(key).ostf;
+                              end if;
+
+                              if substr(key,-1) <> '4' then
+                                  goto int_333;
+                              end if;
+
                            end if;
 
-                           if tmp(key).ir <> ir0_ or tmp(key).brn <> nb0_ or substr(key, -1) in ('4', '2', '1') then
-                               -- если ставка измен€лась или дошли до последней строки коллекции - расчитываем значение среднего остатка дл€ данного периода
-                               ostf_ := osta_ / acrn.dlta(acc.basey, sdat_, tmp(key).dat);
-                               osta_ := 0;
+                        end if;
 
-                               if (deb.debug) then
-                                   dbms_output.put_line('');
-                               end if;
-                           else
-                               -- если ставка не мен€лась и не последн€€ строка в коллекции, то накопили остаток в переменной osta_ и выходим на конец цикла
-                               if (substr(key, -1) <> '4') then
-                                   goto int_222;
-                               end if;
-                           end if;
+                        if (acc.metr = 1) then    -- по середньому
+                            if (deb.debug and sdat_ is null) then
+                                dbms_output.put_line('key       sdat_         tmp(key).ostf  tmp(key).ir tmp(key).brn ir0_       nb0_ bdat_      tmp(key).dat dlta_          osta_           ostf_' );
+                                dbms_output.put_line('----------------------------------------------------------------------------------------------------------------------------------------------');
+                            end if;
 
-                       end if;
+                            sdat_ := nvl(sdat_, bdat_);
+                            dlta_ := acrn.dlta(acc.basey, bdat_, tmp(key).dat);
+                            osta_ := osta_ + ostf_ * dlta_;
 
-                       if (acc.metr = 0) then      -- нормальний
-                           sdat_ := bdat_;
-                       end if;
+                            if (deb.debug) then
+                                dbms_output.put_line(key || ' ' ||
+                                                     sdat_ || ' ' ||
+                                                     lpad(tmp(key).ostf, 17) || ' ' ||
+                                                     lpad(tmp(key).ir, 12)  || ' ' ||
+                                                     lpad(tmp(key).brn, 12)  || ' ' ||
+                                                     lpad(ir0_, 4) || ' ' ||
+                                                     lpad(nb0_, 10) || ' ' ||
+                                                     to_char(bdat_, 'dd.mm.yyyy') || ' ' ||
+                                                     to_char(tmp(key).dat, 'dd.mm.yyyy') || ' ' ||
+                                                     lpad(dlta_, 8) || ' ' ||
+                                                     lpad(osta_, 15) || ' ' ||
+                                                     lpad(ostf_, 15));
+                            end if;
 
-                       tdat_ := tmp(key).dat - 1;
-                       ostp_ := 0;
+                            if tmp(key).ir <> ir0_ or tmp(key).brn <> nb0_ or substr(key, -1) in ('4', '2', '1') then
+                                -- если ставка измен€лась или дошли до последней строки коллекции - расчитываем значение среднего остатка дл€ данного периода
+                                ostf_ := osta_ / acrn.dlta(acc.basey, sdat_, tmp(key).dat);
+                                osta_ := 0;
 
-                       if mod(id_, 2) = 0 and ostf_ < 0 or
-                          mod(id_, 2) = 1 and ostf_ > 0 then
+                                if (deb.debug) then
+                                    dbms_output.put_line('');
+                                end if;
+                            else
+                                -- если ставка не мен€лась и не последн€€ строка в коллекции, то накопили остаток в переменной osta_ и выходим на конец цикла
+                                if (substr(key, -1) <> '4') then
+                                    goto int_222;
+                                end if;
+                            end if;
 
-                           ir_ := ir0_;
+                        end if;
 
-                           if (nb0_ > 0) then
-                               acc_form := acc.acc;
-                               p_bns(br_, ostp_, sdat_, nb0_, acc.kv, abs(ostf_), op_, ir_, acc.kf);
+                        if (acc.metr = 0) then      -- нормальний
+                            sdat_ := bdat_;
+                        end if;
 
-                               if (ostf_ < 0) then
-                                   ostp_ := -ostp_;
-                               end if;
+                        tdat_ := tmp(key).dat - 1;
+                        ostp_ := 0;
 
-                               ir_ := 0;
-                           else
-                               br_ := 0;
-                           end if;
-                       else
-                           ir_ := 0;
-                           br_ := 0;
-                       end if;
+                        if mod(id_, 2) = 0 and ostf_ < 0 or
+                           mod(id_, 2) = 1 and ostf_ > 0 then
 
-                       dlta_ := acrn.dlta(acc.basey, sdat_, tmp(key).dat);
+                            ir_ := ir0_;
 
-                       --------------- acrn.cur_nomin
-                       if nvl(acrn.cur_nomin, 0) > 0 then
-                           kol_  := abs(ostf_) / acrn.cur_nomin;
-                           acrd_ := (ir_ * sign(ostf_) * acrn.cur_nomin + ostp_) * dlta_ / b_yea / 100;
-                       else
-                           kol_  := 1;
-                           acrd_ := (ir_ * ostf_ + ostp_) * dlta_ / b_yea / 100;
-                       end if;
+                            if (nb0_ > 0) then
+                                acc_form := acc.acc;
+                                p_bns(br_, ostp_, sdat_, nb0_, acc.kv, abs(ostf_), op_, ir_, acc.kf);
 
-                       if (deb.debug) then
-                           dbms_output.put_line('interest amount: ' || acrd_);
-                       end if;
+                                if (ostf_ < 0) then
+                                    ostp_ := -ostp_;
+                                end if;
 
-                       osts_ := ostf_ * dlta_;
+                                ir_ := 0;
+                            else
+                                br_ := 0;
+                            end if;
+                        else
+                            ir_ := 0;
+                            br_ := 0;
+                        end if;
 
-                       if (acrd_ <> 0 or acc.metr in (1, 2)) then
-                           acrd_:= acrd_ + remi_; -- нарах %% +- частка коп≥йки з минулого разу
-                           remi_:= acrd_ - round(acrd_);
+                        dlta_ := acrn.dlta(acc.basey, sdat_, tmp(key).dat);
 
-                           if (mode_ = 1) then
-                               if (kol_ > 1) then
-                                   acrd_ := round(acrd_, 0) * kol_;
-                               end if;
+                        --------------- acrn.cur_nomin
+                        if nvl(acrn.cur_nomin, 0) > 0 then
+                            kol_  := abs(ostf_) / acrn.cur_nomin;
+                            acrd_ := (ir_ * sign(ostf_) * acrn.cur_nomin + ostp_) * dlta_ / b_yea / 100;
+                        else
+                            kol_  := 1;
+                            acrd_ := (ir_ * ostf_ + ostp_) * dlta_ / b_yea / 100;
+                        end if;
 
-                               insert into acr_intn (acc, id, fdat, tdat, ir, br, osts, acrd, remi)
-                               values (acc_, id_, sdat_, tdat_, ir_, br_, osts_, round(acrd_), remi_)
-                               returning rowid into arow;
-                           end if;
+                        if (deb.debug) then
+                            dbms_output.put_line('interest amount: ' || acrd_);
+                        end if;
 
-                           if (deb.debug) then
-                               dbms_output.put_line('total interest amount (before): ' || acr_);
-                           end if;
+                        osts_ := ostf_ * dlta_;
 
-                           acr_ := acr_ + round(acrd_);
-                           if (substr(key, -1) = '4') then
-                               acr_ := acr_ + remi_;
-                           end if;
+                        if (acrd_ <> 0 or acc.metr in (1, 2)) then
+                            acrd_:= acrd_ + remi_; -- нарах %% +- частка коп≥йки з минулого разу
+                            remi_:= acrd_ - round(acrd_);
 
-                           if (deb.debug) then
-                               dbms_output.put_line('total interest amount (after): ' || acr_);
-                               dbms_output.put_line('');
-                           end if;
-                       end if;
+                            if (mode_ = 1) then
+                                if (kol_ > 1) then
+                                    acrd_ := round(acrd_, 0) * kol_;
+                                end if;
+
+                                insert into acr_intn (acc, id, fdat, tdat, ir, br, osts, acrd, remi)
+                                values (acc_, id_, sdat_, tdat_, ir_, br_, osts_, round(acrd_), remi_)
+                                returning rowid into arow;
+                            end if;
+
+                            if (deb.debug) then
+                                dbms_output.put_line('total interest amount (before): ' || acr_);
+                            end if;
+
+                            acr_ := acr_ + round(acrd_);
+                            if (substr(key, -1) = '4') then
+                                acr_ := acr_ + remi_;
+                            end if;
+
+                            if (deb.debug) then
+                                dbms_output.put_line('total interest amount (after): ' || acr_);
+                                dbms_output.put_line('');
+                            end if;
+                        end if;
                     end if;
 
                     if (acc.metr = 2) then
@@ -3800,7 +3803,7 @@ create or replace package body interest_utl as
                 raise_application_error(-20000, '—ума розрахованого прогнозу (' ||
                                                 to_char(currency_utl.from_fractional_units(p_reckoning_row.interest_amount, l_account_row.kv), 'FM9999999999999990.00') ||
                                                 ' ' || currency_utl.get_currency_lcv(l_account_row.kv) ||
-                                                '} в≥др≥зн€Їтьс€ в≥д результату перерахунку {' || 
+                                                '} в≥др≥зн€Їтьс€ в≥д результату перерахунку {' ||
                                                 to_char(currency_utl.from_fractional_units(round(l_interest_amount), l_account_row.kv), 'FM9999999999999990.00') ||
                                                 ' ' || currency_utl.get_currency_lcv(l_account_row.kv) ||
                                                 '} необх≥дно повторно розрахувати прогноз в≥дсотк≥в');
