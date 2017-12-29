@@ -181,7 +181,7 @@ begin
       insert into atm_ref2 (ref1, ref2) values (l_ref1, l_ref2);
 
       --insert into atm_ref2 (ref1, ref2) select l_ref1, l_ref2 from opldok o where o.acc = l_acc and o.ref = p_ref2 and o.dk = l_DK2 and o.s <= l_Del;
-       bars_audit.trace'KWT_2924_INS_ATM2_atmref2('
+       bars_audit.trace('KWT_2924_INS_ATM2_atmref2('
             ||',l_REF2  => '||l_REF2
             ||',l_REF1  => '||l_REF1
             ||')'
