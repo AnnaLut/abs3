@@ -112,7 +112,7 @@ public partial class cim_sanctions_default : System.Web.UI.Page
 
             byte syncSide = Convert.ToByte(Session[barsroot.cim.Constants.StateKeys.SyncSide]);
             pnImportF98.Visible = syncSide == 1;
-            pnSyncF98.Visible = false;//syncSide == 0;
+            pnSyncF98.Visible = false; //syncSide == 0; на МультіММФО не повинно бути вкладки для РУшок. 
             if (Request["code"] != null)
             {
                 if (Request["code"] == "3")
