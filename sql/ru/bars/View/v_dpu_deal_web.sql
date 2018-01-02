@@ -1,7 +1,7 @@
 -- ======================================================================================
 -- Module : DPU
 -- Author : BAA
--- Date   : 07.06.2017
+-- Date   : 28.12.2017
 -- ======================================================================================
 -- create view V_DPU_DEAL_WEB
 -- ======================================================================================
@@ -101,12 +101,12 @@ CREATE OR REPLACE FORCE VIEW BARS.V_DPU_DEAL_WEB
           d.mfo_d,
           d.nls_d,
           d.nms_d,
-          ( select nb from banks where mfo = d.mfo_d ),
+          ( select nb from BANKS$BASE where mfo = d.mfo_d ),
           d.mfo_p,
           d.nls_p,
           d.nms_p,
           NVL (d.okpo_p, c.okpo),
-          ( select nb from banks where mfo = d.mfo_p ),
+          ( select nb from BANKS$BASE where mfo = d.mfo_p ),
           d.comments,
           v.kv,
           t.lcv,
@@ -114,17 +114,17 @@ CREATE OR REPLACE FORCE VIEW BARS.V_DPU_DEAL_WEB
           c.nmk,
           c.okpo,
           c.adr,
-          (SELECT SUBSTR (w.VALUE, 1, 1)
-             FROM customerw w
+          (SELECT substr(w.VALUE, 1, 1)
+             FROM CUSTOMERW w
             WHERE w.tag = 'K013' AND w.rnk = c.rnk
           ) as K013,
           ir.bdat,
           ir.br,
-          br.name,
+          ( select NAME from BRATES where BR_ID = ir.BR ),
           ir.op,
           ir.ir,
           d.freqv,
-          fr.name,
+          ( select NAME from FREQ where FREQ = d.FREQV ),
           a.acc,
           a.nls,
           a.dapp,
@@ -141,61 +141,58 @@ CREATE OR REPLACE FORCE VIEW BARS.V_DPU_DEAL_WEB
           d.comproc,
           NVL (d.dpu_add, 0),
           d.dpu_gen,
-          d.id_stop,
-          s.name,
+          d.ID_STOP,
+          ( select NAME from DPT_STOP where ID = d.ID_STOP ),
           NVL (d.min_sum / t.denom, 0),
           d.closed,
           NVL (v.fl_add, 0),
           NVL (v.fl_extend, 0),
-          d.branch,
-          brc.name,
+          d.BRANCH,
+          ( select NAME from BRANCH where BRANCH = d.BRANCH ),
           v.DPU_CODE,
-          v.IRVK,
+          v.DPU_TYPE,
           v.TERM_TYPE,
           d.TRUSTEE_ID,
           cast( null as varchar2(70)  ) as FIO,      -- tas.fio,
           cast( null as varchar2(100) ) as POSITION, -- tas.position,
           cast( null as varchar2(100) ) as DOCUMENT, -- tas.document,
           d.acc2,
-          DECODE((NVL(d.dpu_add,0)+NVL(v.fl_extend,0)), 2, NVL(dt.shablon,v.shablon), v.shablon),
+          DECODE((NVL(d.dpu_add,0)+NVL(v.fl_extend,0)), 2, NVL(p.shablon,v.shablon), v.shablon),
           DECODE(a.ostc, a.ostb, 0, 1) + DECODE (a1.ostc, a1.ostb, 0, 1),
-          dt.type_id,
-          dt.type_name,
-          NVL (d.cnt_dubl, 0)
-     FROM dpu_deal d,
-          dpu_vidd v,
-          tabval t,
-          customer c,
-          dpt_stop s,
-          int_accn ia,
-          ( select KF, ACC, ID, BDAT, IR, BR, OP
-              from INT_RATN
-             where ( ACC, ID, BDAT ) in ( select ACC, ID, max(BDAT)
-                                            from INT_RATN
-                                           where ID = 1
-                                             and BDAT <= gl.bd
-                                           group by ACC, ID )
-          ) ir,
-          accounts a,
-          accounts a1,
-          brates br,
-          freq fr,
-          branch brc,
-          dpu_types dt
-    WHERE d.vidd = v.vidd
-      AND v.kv = t.kv
-      AND v.type_id = dt.type_id
-      AND ia.acra = a1.acc
-      AND c.rnk = d.rnk
-      AND a.acc = d.acc
-      AND ia.acc = d.acc
-      AND ia.id = 1
-      AND ir.acc = d.acc
-      AND ir.id = 1
-      AND d.id_stop = s.id(+)
-      AND ir.br = br.br_id(+)
-      AND d.freqv = fr.freq
-      AND d.branch = brc.branch
+          v.TYPE_ID,
+          p.TYPE_NAME,
+          NVL(d.cnt_dubl, 0)
+     from DPU_DEAL d
+     join ACCOUNTS a
+       on ( a.KF  = d.KF  and a.acc  = d.acc )
+     join INT_ACCN ia
+       on ( ia.KF = d.KF and ia.acc = d.acc and ia.id = 1 )
+     join ACCOUNTS a1
+       on ( a1.acc = ia.acra )
+     join CUSTOMER c
+       on ( c.rnk = d.rnk )
+     join DPU_VIDD v
+       on ( v.vidd = d.vidd )
+     join DPU_TYPES p
+       on ( p.TYPE_ID = v.TYPE_ID )
+     join TABVAL$GLOBAL t
+       on ( t.kv = v.kv )
+     join INT_RATN ir
+--     join ( select KF, ACC, ID, BDAT, IR, BR, OP
+--              from INT_RATN
+--             where ( KF, ACC, ID, BDAT ) in ( select KF, ACC, ID, max(BDAT)
+--                                                from INT_RATN
+--                                               where ID = 1
+--                                                 and BDAT <= gl.bd
+--                                               group by KF, ACC, ID )
+--          ) ir
+       on ( ir.KF = ia.KF and ir.ACC = ia.ACC and ir.ID = ia.ID )
+    where ( ir.ACC, ir.ID, ir.BDAT) = ( select ACC, ID, max(BDAT)
+                                          from INT_RATN
+                                         where acc = d.acc 
+                                           and ID = 1
+                                           and BDAT <= GL.BD()
+                                         group by ACC, ID );
 ;
 
 show err
