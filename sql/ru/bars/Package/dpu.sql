@@ -1,7 +1,7 @@
 create or replace package DPU
 is
 
-  g_header_version  constant varchar2(64) := 'version 42.38  03.04.2017';
+  g_header_version  constant varchar2(64) := 'version 42.38 03.04.2017';
 
   --
   -- определение версии пакета
@@ -693,7 +693,7 @@ is
   --
   -- глобальные переменные и константы
   -- 
-  g_body_version  constant varchar2(64)          := 'version 44.12  17.12.2017';
+  g_body_version  constant varchar2(64)          := 'version 44.13  29.12.2017';
   
   modcode         constant varchar2(3)           := 'DPU';
   accispparam     constant varchar2(16)          := 'DPU_ISP';
@@ -774,17 +774,17 @@ is
 -- определение параметров открываемых счетов (депозитного и процентного)
 --
 procedure GET_ACCPARAMS
-( p_dealid    in     dpu_deal.dpu_id%type,
+( p_dealid    in     dpu_deal.dpu_id%type, 
   p_dealnum   in     dpu_deal.nd%type,
   p_dputype   in     dpu_deal.vidd%type,
   p_custid    in     dpu_deal.rnk%type,
-  p_custname  in     customer.nmk%type,
+  p_custname  in     customer.nmk%type, 
   p_deptype   in     accounts.nbs%type,
   p_inttype   in     accounts.nbs%type,
-  p_curcode   in     accounts.kv%type,
+  p_curcode   in     accounts.kv%type, 
   p_branch    in     varchar2,
   p_mfo       in     varchar2,
-  p_dpuline   in     number,
+  p_dpuline   in     number, 
   p_termtype  in     dpu_vidd.irvk%type,
   p_depacc       out r_accrec,
   p_intacc       out r_accrec
@@ -793,9 +793,9 @@ procedure GET_ACCPARAMS
   l_dealnum          number(38);
 begin
 
-  bars_audit.trace( '%s: entry, № %s/%s, dputype %s, customer № %s, acctype %s/%s (%s)',
-                    title, to_char(p_dealid), p_dealnum, to_char(p_dputype),
-                    to_char(p_custid), p_deptype, p_inttype, to_char(p_curcode) );
+  bars_audit.trace( '%s: entry, № %s/%s, dputype %s, customer № %s, acctype %s/%s (%s)', 
+                    title, to_char(p_dealid), p_dealnum, to_char(p_dputype), 
+                    to_char(p_custid), p_deptype, p_inttype, to_char(p_curcode));
   bars_audit.trace( '%s: dpuline=%s, termtype=%s', title, to_char(p_dpuline), to_char(p_termtype));
   
   -- номер договора
@@ -808,25 +808,25 @@ begin
   
   -- номер основного счета и номер процентного счета 
   begin
-    p_depacc.numb := substr(f_newnls2( null, 'DPU', p_deptype, p_custid, l_dealnum, p_curcode ),1,14);
-    p_intacc.numb := substr(f_newnls2( null, 'DPU', p_inttype, p_custid, l_dealnum, p_curcode ),1,14);
+    p_depacc.numb := substr(f_newnls2 (null, 'DPU', p_deptype, p_custid, l_dealnum, p_curcode), 1, 14); 
+    p_intacc.numb := substr(f_newnls2 (null, 'DPU', p_inttype, p_custid, l_dealnum, p_curcode), 1, 14); 
   exception 
     when others then
-     bars_error.raise_nerror( modcode, 'ACCNUM_GENERATION_FAILED', p_custid, to_char(p_dputype), sqlerrm );
+     bars_error.raise_nerror(modcode, 'ACCNUM_GENERATION_FAILED', p_custid, to_char(p_dputype), sqlerrm);
   end;
   
   -- префиксы наименования счетов
   p_depacc.name := case 
                    when p_dpuline  = 1 
                    then bars_msg.get_msg(modcode, 'FNLS_NMS_MASK2_FLEXT1')
-                   else bars_msg.get_msg(modcode, 'FNLS_NMS_MASK2_DEP')
+                   else                     bars_msg.get_msg(modcode, 'FNLS_NMS_MASK2_DEP')
                    end;
-  p_intacc.name := bars_msg.get_msg(modcode, 'FNLS_NMS_MASK2_NBS8');
+  p_intacc.name := bars_msg.get_msg(modcode, 'FNLS_NMS_MASK2_NBS8'); 
 
   -- наименование счетов = префикс + наименование клиента 
   p_depacc.name := substr(p_depacc.name||' '||p_custname, 1, 70);
   p_intacc.name := substr(p_intacc.name||' '||p_custname, 1, 70);
-
+  
   -- вычисление контр.разряда
   p_depacc.numb := vkrzn(substr(p_mfo, 1, 5), p_depacc.numb);
   p_intacc.numb := vkrzn(substr(p_mfo, 1, 5), p_intacc.numb);
@@ -891,7 +891,7 @@ function GET_EXPACC
 , p_penalty  in  number default 0                -- счет для (0 - начисления, 1 - штрафования)
 , p_r020     in  accounts.nbs%type  default null --
 , p_ob22     in  accounts.ob22%type default null --
-) return accounts.acc%type
+) return accounts.acc%type 
 is
   title     constant varchar2(30)      := 'dpu.getexpacc:';
   basecur   constant tabval.kv%type    := gl.baseval;
@@ -902,7 +902,7 @@ begin
 
   bars_audit.trace( '%s entry, dptype=>%s, balacc=>%s, curid=>%s, branch=>%s'
                   , title, to_char(p_dptype), p_balacc, to_char(p_curid), p_branch );
-
+  
   begin
     
     select decode( p_curid, basecur, decode(p_penalty, 0, g67, g67n), decode(p_penalty, 0, v67, v67n) ) 
@@ -926,24 +926,24 @@ begin
          and BRANCH = substr(p_branch, 1, 15)
          and KV     = basecur
          and DAZS Is null;
-
+      
       if ( l_accid is not null )
       then
         bars_audit.trace( '%s acc #%s found for vidd № %s and branch %s', title, to_char(l_accid), to_char(p_dptype), p_branch );
       else
         bars_audit.trace( '%s acc not found for branch %s', title, p_branch);
       end if;
-
+      
   end;
-
-  if (l_accid is null)
+  
+  if (l_accid is null) 
   then
-     select acc
-       into l_accid
-       from accounts
-      where nls    = l_accnum
+     select acc 
+       into l_accid 
+       from accounts 
+      where nls    = l_accnum 
         and kv     = basecur
-        and branch = SubStr( p_branch, 1, 15 )
+        and branch = SubStr(p_branch, 1, 15)
         and dazs   is null;
   end if;
   
@@ -1089,17 +1089,24 @@ begin
   
   -- r011 for deposit account
   begin
-    select r011 
+    select R011
       into p_depr011
-      from kl_r011 
-     where prem     = 'КБ' 
-       and l_bdate >= d_open
-       and l_bdate <  nvl(d_close, l_bdate + 1)
-       and r020     = p_depnbs
-       and r020r011 is null;
+      from KL_R011
+     where PREM    = 'КБ'
+       and R020    = p_depnbs
+       and R020R011 is null
+       and D_OPEN <= l_bdate
+       and LNNVL( D_CLOSE <= l_bdate );
   exception
-    when others then 
-      p_depr011 := case when p_depnbs in ('2600', '2650') then 9 else null end;
+    when others then
+      p_depr011 := case p_depnbs
+                   when '2525' then '3'
+                   when '2546' then '5'
+                   when '2600' then '3'
+                   when '2650' then '3'
+                   when '2610' then '1'
+                   when '2651' then '4'
+                   else null end;
   end;
   
   -- R011 for interest account
@@ -1113,12 +1120,12 @@ begin
        and D_OPEN  <= l_bdate
        and LNNVL( D_CLOSE <= l_bdate );
   exception
-    when no_data_found then  
+    when no_data_found then
       begin 
         select R011 
           into p_intr011
           from kl_r011 
-         where PREM    = 'КБ' 
+         where PREM    = 'КБ'
            and R020    = p_intnbs
            and R020R011 is null
            and D_OPEN <= l_bdate
@@ -1129,13 +1136,15 @@ begin
       end;
     when others then
       p_intr011 := null;
-  end; 
+  end;
   
-  if p_intr011 is null 
+  if ( p_intr011 is null )
   then
     p_intr011 := case 
-                 when (p_depnbs = '2600' and p_intnbs = '2608') then 1
-                 when (p_depnbs = '2650' and p_intnbs = '2658') then 1
+                 when ( p_depnbs = '2525' and p_intnbs = '2528' ) then '3'
+                 when ( p_depnbs = '2546' and p_intnbs = '2548' ) then '5'
+                 when ( p_depnbs = '2600' and p_intnbs = '2608' ) then '3'
+                 when ( p_depnbs = '2650' and p_intnbs = '2658' ) then '3'
                  end;
   end if;
   
@@ -1164,8 +1173,8 @@ procedure FILL_SPECPARAMS
   )
 is
   title     constant varchar2(30) := 'dpu.fillspecparams:';
-  l_s180    specparam.s180%type;
-  l_s181    specparam.s181%type;
+  l_s180    specparam.s180%type;  
+  l_s181    specparam.s181%type;  
   l_depr011 specparam.r011%type;
   l_depr012 specparam.r012%type := 2;
   l_depr013 specparam.r013%type;
@@ -1173,7 +1182,7 @@ is
   l_intr013 specparam.r013%type;
   l_s181et  kl_r020.s181%type;
   l_depnbs  accounts.nbs%type;
-  l_intnbs  accounts.nbs%type;
+  l_intnbs  accounts.nbs%type;  
 begin
   
   bars_audit.trace('%s entry, depacc => %s/%s, intacc => %s/%s', title, 
@@ -1209,7 +1218,7 @@ begin
   bars_audit.trace( '%s r011(dep/int) = %s/%s, r013(dep/int) = %s/%s', title
                   , l_depr011, l_intr011, l_depr013, l_intr013); 
 
-  update SPECPARAM
+      update SPECPARAM 
      set S180 = l_s180,
          S181 = l_s181,
          R011 = l_depr011,
@@ -1224,12 +1233,12 @@ begin
     values ( p_depaccid, l_s180, l_s181, l_depr011, l_depr012, l_depr013, p_d020 );
   end if;
 
-  update SPECPARAM
-     set S180 = l_s180
-       , S181 = l_s181
-       , R011 = nvl(l_intr011,R011)
-       , R013 = l_intr013
-   where ACC  = p_intaccid;
+      update SPECPARAM 
+         set S180 = l_s180
+           , S181 = l_s181
+           , R011 = nvl(l_intr011,R011)
+           , R013 = l_intr013
+       where ACC  = p_intaccid;
 
   if (sql%rowcount=0)
   then
@@ -1500,7 +1509,7 @@ $end
                  p_curcode   =>  l_typerow.kv, 
                  p_branch    =>  l_branch, 
                  p_mfo       =>  l_mfo, 
-                 p_dpuline   =>  nvl(l_typerow.fl_extend, 0),
+                 p_dpuline   =>  nvl(l_typerow.fl_extend, 0), 
                  p_termtype  =>  l_typerow.IRVK,
                  p_depacc    =>  l_depacc, 
                  p_intacc    =>  l_intacc);
@@ -1892,7 +1901,7 @@ is
   title  constant varchar2(60) := 'dpu.iopenagraccs:';
   l_num  dpu_deal.nd%type;
   l_isp  accounts.isp%type;
-  l_grp  accounts.grp%type; 
+  l_grp  accounts.grp%type;
   l_tmp  number(38);
   l_blkd accounts.blkd%type := 0;
   ---
@@ -1928,7 +1937,7 @@ begin
   l_num := substr( '000000'||p_genid, -8, 6 );
   
   -- номера рахунків
-  p_depacc.numb := '8'||substr(p_deptype, 2, 3)||'0'||l_num||substr('000'||p_agrnum, -3, 3);  
+  p_depacc.numb := '8'||substr(p_deptype, 2, 3)||'0'||l_num||substr('000'||p_agrnum, -3, 3);
   p_intacc.numb := '8'||substr(p_inttype, 2, 3)||'0'||l_num||substr('000'||p_agrnum, -3, 3);
 
   p_depacc.numb := substr(vkrzn(substr(p_mfo,1,5), p_depacc.numb), 1, 14);
@@ -1948,18 +1957,18 @@ begin
   -- доступ к счетам 
   l_grp := p_accgrp;
   l_isp := p_accisp;
-  
-  get_secaccparams( p_accmain  =>  p_mainacc, 
-                    p_curmain  =>  p_curcode,
-                    p_accisp   =>  l_isp,
-                    p_accgrp   =>  l_grp);
+
+  get_secaccparams( p_accmain  => p_mainacc,
+                    p_curmain  => p_curcode,
+                    p_accisp   => l_isp,
+                    p_accgrp   => l_grp);
   
 $if DPU_PARAMS.SBER
 $then
   -- код блокування рах. на дебет при відкритті депозиту інсайдеру
   l_blkd := case when is_insider(p_custid) then с_blkd_ins else 0 end;
 $end
-  
+
   -- открытие депозитного счета
   begin
     ACCREG.SetAccountAttr
@@ -2024,20 +2033,20 @@ $end
        , NBS    = '8'||substr(nbs, 2, 3)
        , NLSALT = (select nls from accounts where acc = p_gendepacc)
    where ACC    = p_depacc.id;
-  
+
   update ACCOUNTS 
      set MDATE  = p_datend,
          NBS    = '8'||substr(nbs, 2, 3), 
          NLSALT = (select nls from accounts where acc = p_genintacc)
    where ACC    = p_intacc.id;
-  
+
   -- заповнення спецпараметрів рах.
   fill_specparams( p_depaccid   => p_depacc.id, 
                    p_depacctype => p_deptype, 
                    p_intaccid   => p_intacc.id,
                    p_intacctype => p_inttype,
                    p_d020       => '01' );
-                   
+
   bars_audit.trace('%s exit with (%s,%s,%s) and (%s,%s,%s)', title, 
                    to_char(p_depacc.id), p_depacc.numb, p_depacc.name,
                    to_char(p_intacc.id), p_intacc.numb, p_intacc.name);
@@ -2190,13 +2199,13 @@ $end
                  p_datend    => p_dato,
                  p_custid    => p_custid,
                  p_branch    => l_branch,
-                 p_custname  => l_custname, 
+                 p_custname  => l_custname,
                  p_deptype   => l_typerow.bsd,
                  p_inttype   => l_typerow.bsn,
-                 p_curcode   => l_typerow.kv, 
+                 p_curcode   => l_typerow.kv,
                  p_mainacc   => p_deprcvacnt,
                  p_accisp    => p_accisp,
-                 p_accgrp    => p_accgrp, 
+                 p_accgrp    => p_accgrp,
                  p_mfo       => l_mfo,
                  p_depacc    => l_depacc,
                  p_intacc    => l_intacc);
@@ -2217,13 +2226,13 @@ $end
 
   if p_comproc = 1 
   then
-     l_intrcvacnt := substr(l_depacc.numb, 1, 14);
-     l_intrcvbank := substr(l_mfo,         1,  6);
-     l_intrcvcust := substr(l_depacc.name, 1, 38);
+    l_intrcvacnt := substr(l_depacc.numb, 1, 14);
+    l_intrcvbank := substr(l_mfo,         1,  6);
+    l_intrcvcust := substr(l_depacc.name, 1, 38);
   else
-     l_intrcvacnt := substr(p_intrcvacnt,  1, 14);
-     l_intrcvbank := substr(p_intrcvbank,  1,  6);
-     l_intrcvcust := substr(p_intrcvcust,  1, 38);
+    l_intrcvacnt := substr(p_intrcvacnt,  1, 14);
+    l_intrcvbank := substr(p_intrcvbank,  1,  6);
+    l_intrcvcust := substr(p_intrcvcust,  1, 38);
   end if;
   
   bars_audit.trace('%s int_receiver (%s,%s,%s)', title, 
@@ -2450,10 +2459,10 @@ is
   l_days           integer;
   err_vidd         exception;
 BEGIN
-
+  
   bars_audit.trace( '%s: entry with (vidd = %s, dat_beg = %s, dat_end = %s ).',
                     title, to_char(p_vidd), to_char(p_datbeg, 'dd.mm.yyyy'), to_char(p_datend, 'dd.mm.yyyy') );
-
+  
   begin
     select v.TERM_TYPE, v.TERM_MIN, v.TERM_MAX
       into l_term_type, l_term_min, l_term_max
@@ -2463,59 +2472,59 @@ BEGIN
     when NO_DATA_FOUND then
       raise err_vidd;
   end;
-
+  
   bars_audit.trace( '%s: TERM_TYPE=%s, TERM_MIN=%s, TERM_MAX=%s.'
                   , title, to_char(l_term_type), to_char(l_term_min), to_char(l_term_max) );
-
-  if ( l_term_type = 2 )
-  then -- діапазон
-
-    -- перевірка на відповідність нижній межі
-    l_months := trunc(l_term_min);                 -- к-ть місяців
-    l_days   := ( l_term_min - l_months ) * 10000; -- к-ть днів
-    
+  
+    if ( l_term_type = 2 )
+    then -- діапазон
+      
+      -- перевірка на відповідність нижній межі
+      l_months := trunc(l_term_min);                 -- к-ть місяців
+      l_days   := ( l_term_min - l_months ) * 10000; -- к-ть днів
+      
     bars_audit.trace( '%s: months_min = %s, days_min = %s', title, to_char(l_months), to_char(l_days) );
-    
-    if p_datend >= F_DURATION( p_datbeg, l_months, l_days )
-    then
       
-      -- перевірка на відповідність верхній межі
-      l_months := trunc(l_term_max);                 -- к-ть місяців
-      l_days   := ( l_term_max - l_months ) * 10000; -- к-ть днів
-    
+      if p_datend >= F_DURATION( p_datbeg, l_months, l_days )
+      then
+        
+        -- перевірка на відповідність верхній межі
+        l_months := trunc(l_term_max);                 -- к-ть місяців
+        l_days   := ( l_term_max - l_months ) * 10000; -- к-ть днів
+      
       bars_audit.trace( '%s: months_max = %s, days_max = %s.', title, to_char(l_months), to_char(l_days) );
+        
+        if p_datend <= F_DURATION( p_datbeg, l_months, l_days )
+        then
+          l_errmsg := null;
+        else
+          l_errmsg := 'Термін більший від максимально допустимого ('||to_char(l_months)||' міс. '||to_char(l_days)||' днів)!';
+        end if;
+        
+      else
+        l_errmsg := 'Термін менший від мінімально допустимого ('||to_char(l_months)||' міс. '||to_char(l_days)||' днів)!';
+      end if;
       
-      if p_datend <= F_DURATION( p_datbeg, l_months, l_days )
+    else -- фікований
+    
+      l_months := trunc(l_term_min);                 -- к-ть місяців
+      l_days   := ( l_term_min - l_months ) * 10000; -- к-ть днів
+      
+    bars_audit.trace( '%s: months = %s, days = %s.', title, to_char(l_months), to_char(l_days) );
+      
+      if p_datend = F_DURATION( p_datbeg, l_months, l_days )
       then
         l_errmsg := null;
       else
-        l_errmsg := 'Термін більший від максимально допустимого ('||to_char(l_months)||' міс. '||to_char(l_days)||' днів)!';
+        l_errmsg := 'Термін не відповідає допустимому ('||to_char(l_months)||' міс. '||to_char(l_days)||' днів)!';
       end if;
       
-    else
-      l_errmsg := 'Термін менший від мінімально допустимого ('||to_char(l_months)||' міс. '||to_char(l_days)||' днів)!';
     end if;
     
-  else -- фікований
-
-    l_months := trunc(l_term_min);                 -- к-ть місяців
-    l_days   := ( l_term_min - l_months ) * 10000; -- к-ть днів
-    
-    bars_audit.trace( '%s: months = %s, days = %s.', title, to_char(l_months), to_char(l_days) );
-    
-    if p_datend = F_DURATION( p_datbeg, l_months, l_days )
-    then
-      l_errmsg := null;
-    else
-      l_errmsg := 'Термін не відповідає допустимому ('||to_char(l_months)||' міс. '||to_char(l_days)||' днів)!';
-    end if;
-
-  end if;
-
   bars_audit.trace( '%s: exit with: %s.', title, to_char(l_errmsg) );
-
+    
   Return l_errmsg;
-
+  
 EXCEPTION
   when OTHERS then
     bars_audit.trace( '%s: exit with ERROR: %s', title, 
@@ -2537,14 +2546,14 @@ procedure create_subdeal
  (p_gendpuid in  dpu_deal.dpu_id%type,    -- референс основного договора
   p_subdpuid out dpu_deal.dpu_id%type)    -- референс связанного договора
 is
-  title      constant varchar2(30)       := 'dpu.createsubdeal:';
+  title      constant varchar2(30)       := 'dpu.createsubdeal:'; 
   blk        constant accounts.blkk%type := 99;
   l_bdate    date                        := GL.BD();
   l_dpurow   dpu_deal%rowtype;
   l_maintype dpu_vidd_comb.main_vidd%type;
-  l_dmndtype dpu_vidd_comb.dmnd_vidd%type;
-  l_accisp   accounts.isp%type;
-  l_accgrp   accounts.grp%type;
+  l_dmndtype dpu_vidd_comb.dmnd_vidd%type;  
+  l_accisp   accounts.isp%type;  
+  l_accgrp   accounts.grp%type;  
   l_indrate  int_ratn.ir%type;
   l_basrate  int_ratn.br%type;
   l_operat   int_ratn.op%type;
@@ -2552,7 +2561,7 @@ is
 begin
 
   bars_audit.trace('%s entry, № %s', title, to_char(p_gendpuid));
-
+  
   -- параметры стандартного депозитного договора
   begin
     select * into l_dpurow from dpu_deal where dpu_id = p_gendpuid;
@@ -2562,7 +2571,7 @@ begin
   end;
   bars_audit.trace( '%s dpu_num = %s, cust_id = %s, vidd = %s', title
                   , l_dpurow.nd, to_char(l_dpurow.rnk), to_char(l_dpurow.vidd) );
-
+  
   -- проверка допустимости изменения вида договора
   if subdeal_validation (p_gendpuid) = 0 then
      bars_error.raise_nerror(modcode, 'CRTSUBDEAL_NOTVALID', to_char(p_gendpuid));
@@ -2595,10 +2604,10 @@ begin
      where a.acc  = l_dpurow.acc
        and a.acc  = r.acc
        and r.id   = 1
-       and r.bdat = (select max(i.bdat)
+       and r.bdat = (select max(i.bdat) 
                        from int_ratn i
-                      where i.acc   = r.acc
-                        and i.id    = r.id
+                      where i.acc   = r.acc 
+                        and i.id    = r.id 
                         and i.bdat <= l_bdate);
   exception 
     when no_data_found then
@@ -2611,15 +2620,15 @@ begin
   -- установка неснижаемого остатка и блокировки по кредиту на деп.счете
   update accounts 
      set lim  = nvl(-l_dpurow.min_sum, 0),
-         blkk = blk
+         blkk = blk         
    where acc  = l_dpurow.acc;
   bars_audit.trace('%s accounts.lim => %s', title, to_char(nvl(-l_dpurow.min_sum, 0)));
   
   -- изменение вида договора для основного договора
   update dpu_deal 
-     set vidd    = l_maintype,
+     set vidd    = l_maintype, 
          dpu_gen = dpu_id 
-   where dpu_id  = p_gendpuid;
+   where dpu_id  = p_gendpuid;   
   bars_audit.trace('%s dpu_deal.vidd => %s', title, to_char(l_maintype));
      
   begin
@@ -4565,7 +4574,7 @@ begin
   
     if ( p_ref = -2 )
     then
-      begin
+      begin    
         select NLS
           into l_depnls
           from ACCOUNTS
@@ -4582,7 +4591,7 @@ begin
     else
       l_depnls := p_nls;
     end if;
-  
+    
   -- видалити 6399 після повного переходу на новий план рахунків
   ElsIf ( (SubStr(p_nls, 1, 2) = '70') Or (SubStr(p_nls, 1, 4) in ('6399','6350')) )
   then
@@ -5949,8 +5958,8 @@ $then
 $end
     
     begin
-      gl.ref( p_ref );
-      gl.in_doc3( ref_    => p_ref,                           mfoa_   => gl.amfo,
+      GL.ref( p_ref );
+      GL.in_doc3( ref_    => p_ref,                           mfoa_   => gl.amfo,
                   tt_     => l_tt,                            nlsa_   => l_rec_A.acc_num,
                   vob_    => 6,                               kv_     => l_rec_A.acc_cur,
                   dk_     => 1,                               nam_a_  => l_rec_A.acc_name,
@@ -5976,7 +5985,7 @@ $end
       -- Запис реф. документа в історію платежів по договору
       fill_dpu_payments( p_dpuid, p_ref );
       
-      if ( l_rec_A.acc_cur != gl.baseval and IS_OSCHADBANK( p_mfo_B ) = 0 )
+      if ( l_rec_A.acc_cur != GL.baseval and IS_OSCHADBANK( p_mfo_B ) = 0 )
       then -- для міжбанківських в інвалюті заповнення SWIFT реквізитів
         SET_SWIFT_DETAILS;
       end if;
@@ -7851,7 +7860,7 @@ begin
       
       l_errflg   := false;
       l_errmsg   := null;
-      l_int_ref  := null;  
+      l_int_ref  := null;
       l_int_amnt := null;
       
       if ( d.acr_dat < d.stp_dat and p_bdate is Not Null )
@@ -7866,14 +7875,14 @@ begin
           ( 'DPU', d.dpt_mfo, d.dpt_branch, d.dpt_id, d.dpt_num, d.dpt_dat, 
             d.dpt_acc_id, d.dpt_acc_nm, d.dpt_acc_name, d.dpt_cur_id, d.lcv, 
             d.dpt_nbs, d.daos, d.cust_id, d.int_id, d.int_tt );
-                  
-        make_int( p_dat2      => d.stp_dat,
-                  p_runmode   => 1, 
+
+        MAKE_INT( p_dat2      => d.stp_dat,
+                  p_runmode   => 1,
                   p_runid     => 0,
                   p_intamount => l_int_amnt,
                   p_errflg    => l_errflg );
 
-        if l_errflg 
+        if l_errflg
         then
           
           l_errmsg := substr('Помилка нарахування %% по договору №'||d.dpt_num||' ('||to_char(d.dpt_id)||') '||sqlerrm, 1, 2000 );
@@ -7904,7 +7913,7 @@ begin
             l_errmsg := substr( 'ошибка блокировки счета '||d.int_acc_nm||': '||sqlerrm, 1, 2000 );
             raise error_;
         end;
-        
+
         -- выплата процентов
         if ( l_int_amnt > 0 )
         then
@@ -7921,7 +7930,7 @@ begin
                        p_ref    => l_int_ref );
             
           update INT_ACCN i
-             set i.APL_DAT = l_bdate 
+             set i.APL_DAT = l_bdate
            where i.ACC = d.int_acc_id
              and i.ID  = 1;
           
@@ -8097,7 +8106,7 @@ begin
       
       l_errflg   := false;
       l_errmsg   := null;
-      l_dpt_ref  := null;  
+      l_dpt_ref  := null;
       l_dpt_amnt := null;
       
       If (d.dpt_mfoB is NOT null AND d.dpt_nlsB is NOT null) 
@@ -8140,9 +8149,9 @@ $end
                        p_sum    => l_dpt_amnt,
                        p_nazn   => SubStr('Повернення депозиту згідно '||F_NAZN('U', d.dpt_id), 1, 160),
                        p_ref    => l_dpt_ref );
-          
+
           bars_audit.financial('Зформовано документ на виплату депозиту (ref =  '||to_char(l_dpt_ref)||').' );
-          
+
           dpt_jobs_audit.p_save2log( p_modcode => modcode,
                                    p_runid   => l_runid,
                                    p_dptid   => d.dpt_id,
@@ -9269,7 +9278,7 @@ begin
   -- для депозитних ліній
   If (l_genid is Not Null) 
   then
-    
+
     -- пошук рах. ген. дог. (лінії)
     select   acc
       into l_acc
@@ -9452,7 +9461,7 @@ begin
         --     from ACC_OVER o
         --     join ACCOUNTS a on ( a.acc = o.acc )
         --    where o.ND  = l_nd
-        --      and o.acc = o.acco
+        --      and o.acc = o.acco             
         --      and a.dazs is Null;
         --   
         --   bars_audit.trace( '%s.REPAYMENT_PLEDGE: знайдено договір овердрафту № %s від %s (сума боргу = %s).', 
