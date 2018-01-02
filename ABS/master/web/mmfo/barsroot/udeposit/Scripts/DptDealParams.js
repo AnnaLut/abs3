@@ -1,5 +1,5 @@
 //------------------------------
-// 13.12.2017
+// 28.12.2017
 //------------------------------
 window.onload = InitDptDealParams;
 
@@ -20,7 +20,7 @@ var branchName;
 var acc = null;
 var accN = "";
 var termType = null;   // DPU_VIDD.TERM_TYPE - fixed (1) OR variable interval (2) term
-var periodType = null; // DPU_VIDD.IRREVOCABLE - Irrevocable/term (1) or Revocable/on-demand (0)
+var periodType = null; // DPU_VIDD.DPU_TYPE (S181) - long-term(2), short-term(1) OR on-demand(0) contract duration
 var comments = null;
 var dpu_bal = 0;
 // old values
@@ -1393,7 +1393,7 @@ function onGetVal(result) {
     if (!getError(result)) return;
     var d = document.all;
     d.tbND.focus();
-    srok = result.value[0].text;
+    srok = parseFloat(result.value[0].text);
 
     dd_data["ddFreqV"] = url_dlg_mod + 'FREQ&colnum=2&tail=""';
 
@@ -1467,7 +1467,7 @@ function onGetVal(result) {
         SetProcs();
     }
 
-    if (srok != 0) {
+    if (srok > 0) {
         calcKtDay();
     }
 }
@@ -1747,7 +1747,7 @@ function onGetSecAccounts(result) {
 
 function SetLineNewEndDate( sDate ) {
     var yearQty = 1;
-    if ( ( parseInt(srok,10) > 12 ) || ( parseFloat(srok.replace(",",".") ) > parseFloat("0.0365") ) ) {
+    if (periodType == 2) {
         yearQty = 3;
     }
 
