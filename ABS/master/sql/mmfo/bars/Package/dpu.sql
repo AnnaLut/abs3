@@ -693,7 +693,7 @@ is
   --
   -- ãëîáàëüíûå ïåğåìåííûå è êîíñòàíòû
   -- 
-  g_body_version  constant varchar2(64)          := 'version 44.12  17.12.2017';
+  g_body_version  constant varchar2(64)          := 'version 44.13  29.12.2017';
   
   modcode         constant varchar2(3)           := 'DPU';
   accispparam     constant varchar2(16)          := 'DPU_ISP';
@@ -1089,17 +1089,24 @@ begin
   
   -- r011 for deposit account
   begin
-    select r011 
+    select R011
       into p_depr011
-      from kl_r011 
-     where prem     = 'ÊÁ' 
-       and l_bdate >= d_open
-       and l_bdate <  nvl(d_close, l_bdate + 1)
-       and r020     = p_depnbs
-       and r020r011 is null;
+      from KL_R011
+     where PREM    = 'ÊÁ'
+       and R020    = p_depnbs
+       and R020R011 is null
+       and D_OPEN <= l_bdate
+       and LNNVL( D_CLOSE <= l_bdate );
   exception
-    when others then 
-      p_depr011 := case when p_depnbs in ('2600', '2650') then 9 else null end;
+    when others then
+      p_depr011 := case p_depnbs
+                   when '2525' then '3'
+                   when '2546' then '5'
+                   when '2600' then '3'
+                   when '2650' then '3'
+                   when '2610' then '1'
+                   when '2651' then '4'
+                   else null end;
   end;
   
   -- R011 for interest account
@@ -1113,12 +1120,12 @@ begin
        and D_OPEN  <= l_bdate
        and LNNVL( D_CLOSE <= l_bdate );
   exception
-    when no_data_found then  
+    when no_data_found then
       begin 
         select R011 
           into p_intr011
           from kl_r011 
-         where PREM    = 'ÊÁ' 
+         where PREM    = 'ÊÁ'
            and R020    = p_intnbs
            and R020R011 is null
            and D_OPEN <= l_bdate
@@ -1129,13 +1136,15 @@ begin
       end;
     when others then
       p_intr011 := null;
-  end; 
+  end;
   
-  if p_intr011 is null 
+  if ( p_intr011 is null )
   then
     p_intr011 := case 
-                 when (p_depnbs = '2600' and p_intnbs = '2608') then 1
-                 when (p_depnbs = '2650' and p_intnbs = '2658') then 1
+                 when ( p_depnbs = '2525' and p_intnbs = '2528' ) then '3'
+                 when ( p_depnbs = '2546' and p_intnbs = '2548' ) then '5'
+                 when ( p_depnbs = '2600' and p_intnbs = '2608' ) then '3'
+                 when ( p_depnbs = '2650' and p_intnbs = '2658' ) then '3'
                  end;
   end if;
   
