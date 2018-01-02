@@ -4,7 +4,7 @@ CREATE OR REPLACE PROCEDURE BARS.P_F2K_NN (dat_ DATE ,
 % DESCRIPTION : Процедура формирование файла #2K
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
 %
-% VERSION     : v.17.006     28.11.2017
+% VERSION     : v.17.009     29.12.2017
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: dat_ - отчетная дата
            sheme_ - схема формирования
@@ -18,7 +18,9 @@ CREATE OR REPLACE PROCEDURE BARS.P_F2K_NN (dat_ DATE ,
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
- 01.12.2017  новый план счетов: исключены счета 2615,2635,2652,3330,3340
+ 29.12.2017  уточнение в алгоритме отбора клиентов по доп.параметрам
+ 12.12.2017  условие на счета входящие в выборку только по дате закрытия
+ 05.12.2017  расширение OKPO до 10-ти знаков нулями
  28.11.2017  обработка "примiток" по счетам из доп.параметров
  06.11.2017  доработки по заявке cobummfo-5348
  01.11.2017  обработка ситуаций с незаполенной датой в параметре RNBOD
@@ -260,17 +262,18 @@ DELETE FROM RNBU_TRACE WHERE userid = userid_;
 
    dats_ := trunc(dat_, 'mm');
    
-   for k in ( select c.rnk, c.okpo, c.codcagent, c.nmk, c.adr, 
-                     trim(re.rnbor) rnbor, trim(re.rnbou) rnbou,
-                     trim(re.rnbos) rnbos, trim(re.rnbod) rnbod
+   for k in ( select c.okpo, max(c.codcagent) codcagent,
+                             max(c.nmk) nmk, max(c.adr) adr, max(c.rnk) rnk,
+                             max(re.rnbor) rnbor, max(re.rnbou) rnbou,
+                             max(re.rnbos) rnbos, max(re.rnbod) rnbod
                 from customer c,
                      ( select *
-                         from ( select u.rnk, u.tag, u.value
+                         from ( select u.rnk, u.tag, substr(trim(u.value),1,20) value
                                   from customerw u
                                  where exists (select 1 from customerw p
-                                                where p.tag like 'RNBO_'
-                                                  and 
-decode( upper(trim(p.value)),'НЕМАЄ','','НІ','', trim(p.value) ) is not null
+                                                where p.tag like 'RNBOS'
+       and instr(p.value,'01')+instr(p.value,'02')+instr(p.value,'03')+
+           instr(p.value,'04')+instr(p.value,'05')+instr(p.value,'99') >0
                                                   and p.rnk=u.rnk) 
                               ) pivot
                               ( max(trim(value))
@@ -279,7 +282,8 @@ decode( upper(trim(p.value)),'НЕМАЄ','','НІ','', trim(p.value) ) is not null
                               )
                      ) re
                where c.rnk = re.rnk
-                 and re.rnbor is not null
+                 and trim(re.rnbor) is not null
+               group by c.okpo
             )
    loop
        if     k.codcagent =1   then    segm_a :='3';
@@ -296,12 +300,18 @@ decode( upper(trim(p.value)),'НЕМАЄ','','НІ','', trim(p.value) ) is not null
          dat_rnbo_ := to_date(k.rnbod,'dd/mm/yyyy');
          is_dat_exist_ := 1;
        exception
-           when others  then  dat_rnbo_ :=dat_;
+           when others  then
+              begin
+                dat_rnbo_ := to_date(k.rnbod,'dd.mm.yyyy');
+                is_dat_exist_ := 1;
+              exception
+                  when others  then
+                           dat_rnbo_ :=dat_;
+              end;
        end;
        
---  правильная дата в dat_rnbo_ + RNBOS начинается с цифры
-    if is_dat_exist_ =1 and substr(k.rnbos,1,1) between '0' and '9'
-    then
+--  правильная дата в dat_rnbo_ 
+    if is_dat_exist_ =1  then
 
        flag_acc_ := 0;
        flag_opp_ := 0;
@@ -361,7 +371,7 @@ decode( upper(trim(p.value)),'НЕМАЄ','','НІ','', trim(p.value) ) is not null
                             p.accd, p.nlsa nlsd, p.nam_a, p.id_a okpo_a,
                             p.mfob, r2.nb namb_b, r2.k040 k040b_b,
                             p.acck, p.nlsb nlsk, p.nam_b, p.id_b okpo_b,
-                            p.kv, 100*p.s ostf, p.ref, p.nazn
+                            p.kv, 100*p.s ostf, 100*p.sq ostq, p.ref, p.nazn
                        from rcukru r1, rcukru r2,
                             ( SELECT p.userid isp, p.branch, p.mfoa, p.mfob, p.nam_a, p.nam_b, p.sos soso,
                                      DECODE (o.tt, p.tt, p.nazn, DECODE (o.tt, 'PO3', p.nazn, t.NAME)) nazn,
@@ -428,7 +438,7 @@ decode( upper(trim(p.value)),'НЕМАЄ','','НІ','', trim(p.value) ) is not null
                       p_260, u.p_270, u.p_280 );
 
              p_ins_3( k.rnk, kodp_, p_310, v.pdat, p_330, p_340,
-                      p_350, p_360, v.ostf, v.kv, substr(v.nazn,1,70), p_391 );
+                      p_350, p_360, v.ostq, v.kv, substr(v.nazn,1,70), p_391 );
 
           end loop;                --цикл по операциям
 
@@ -484,4 +494,3 @@ decode( upper(trim(p.value)),'НЕМАЄ','','НІ','', trim(p.value) ) is not null
 
 END P_F2K_NN;
 /
-
