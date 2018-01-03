@@ -99,13 +99,13 @@ public partial class docinput_editPropsVal : BarsPage
                           from(with doc as (select o.ref, o.tt, o.nlsa, o.mfoa, o.kv, o.s, o.nlsb, o.mfob, o.kv2, o.s2, o.nazn from oper o where ref = :REF ),
                        alltags as (  select f.tag, f.name, f.browser, trim(f.chkr) chkr
                            from  op_field f, doc
-                          where   f.tag in ('D1#E2','KOD_G', 'D9#70', 'DA#70','DA#E2','F027 ','D2#E2','D3#E2','59F  ')             
+                          where   f.tag in ('D1#E2','KOD_G', 'D9#70', 'DA#70','DA#E2','12_2C','D2#70','D3#70','59F  ')             
                           union all
                           select w.tag, f.name, f.browser, trim(f.chkr) chkr
                            from operw w, op_field f, doc
                           where w.ref = doc.ref  
                             and w.tag = f.tag
-							and f.tag in ('D1#E2','KOD_G', 'D9#70', 'DA#70','DA#E2','F027 ','D2#E2','D3#E2','59F  ') 
+							and f.tag in ('D1#E2','KOD_G', 'D9#70', 'DA#70','DA#E2','12_2C','D2#70','D3#70','59F  ') 
                             and nvl(f.nomodify,0)=0)
                     select distinct t.tag, t.name,(select nvl(value,'') from operw where ref = doc.ref and tag = t.tag) as value, 
                     decode(t.browser,null,0,1) REL, ref 
