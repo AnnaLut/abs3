@@ -5543,7 +5543,7 @@ create or replace package body DM_IMPORT
               l_row.REESTR_MOB_BANK := null;
               l_row.REESTR_INET_BANK := null;
               l_row.REESTR_SMS_BANK := null;
-              l_row.MONTH_INCOME := c.DJAVI;
+              l_row.MONTH_INCOME := null;
               l_row.SUBJECT_ROLE := null;
               l_row.REZIDENT := c.REZIDENT;
               l_row.MERRIED := c.PC_SS; -- "сімейний стан" берем из рекв. БПК
