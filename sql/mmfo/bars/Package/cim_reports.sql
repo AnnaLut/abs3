@@ -4,7 +4,7 @@
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/cim_reports.sql =========*** Run ***
  PROMPT ===================================================================================== 
  
-  CREATE OR REPLACE PACKAGE BARS.CIM_REPORTS 
+CREATE OR REPLACE PACKAGE CIM_REPORTS
 is
    --
    --  CIM_REPORTS
@@ -96,7 +96,6 @@ function p_f531(p_date in date :=bankdate, p_error out varchar2) return clob;
    procedure sync_f504;
 
 END cim_reports;
-
 /
 CREATE OR REPLACE PACKAGE BODY CIM_REPORTS
 is
@@ -109,7 +108,7 @@ is
 -- g_body_version      constant varchar2 (64) := 'version 1.00.03 04/04/2016';
 -- g_body_version      constant varchar2 (64) := 'version 1.00.04 08/08/2016';
 -- g_body_version      constant varchar2 (64) := 'version 1.00.05 20/09/2016';
-   g_body_version      constant varchar2 (64) := 'version 1.01.04 26/06/2017';
+   g_body_version      constant varchar2 (64) := 'version 1.01.06 29/12/2017';
    g_awk_body_defs     constant varchar2 (512) := '';
 
    type t_indicators_f503 is record (
@@ -738,33 +737,46 @@ begin
                               decode(max(d.d_k), 0, 2, 1) as p01, max(d.p20) as p20, min(case when d.l_doc_date>last_day(d.p21) then d.l_doc_date else null end) as min_ddat,
                               max(l_create_date) as max_pdat, round( (1-nvl(sum(d.ls), 0)/max(d.s_vk))*max(d.s), 0) as p15
                          from
-                         ( select d.p14, d.p21, d.p20, d.d_k, d.type_id, d.bound_id, d.contr_id, d.s, d.s_vk, d.doc_date, l.s as ls, l.create_date as l_create_date,
-                                  decode(d.d_k, 0, nvl2(l.vmd_id, (select v.dat from customs_decl v join cim_vmd_bound b on v.cim_id=b.vmd_id where b.bound_id=l.vmd_id),
-                                                                  (select v.allow_date from cim_acts v join cim_act_bound b on v.act_id=b.act_id where b.bound_id=l.act_id)),
-                                                   nvl2(l.payment_id, (select v.vdat from oper v join cim_payments_bound b on v.ref=b.ref where b.bound_id=l.payment_id),
-                                                                      (select v.val_date from cim_fantom_payments v join cim_fantoms_bound b on v.fantom_id=b.fantom_id where b.bound_id=l.fantom_id))
+                         ( select d.p14, d.p21, d.p20, d.d_k, d.type_id, d.bound_id, d.contr_id, d.s, d.s_vk, d.doc_date, d.ls, d.l_create_date,
+                                  decode(d.d_k, 0, nvl2(d.vmd_id, (select v.dat from customs_decl v join cim_vmd_bound b on v.cim_id=b.vmd_id where b.bound_id=d.vmd_id),
+                                                                  (select v.allow_date from cim_acts v join cim_act_bound b on v.act_id=b.act_id where b.bound_id=d.act_id)),
+                                                   nvl2(d.payment_id, (select v.vdat from oper v join cim_payments_bound b on v.ref=b.ref where b.bound_id=d.payment_id),
+                                                                      (select v.val_date from cim_fantom_payments v join cim_fantoms_bound b on v.fantom_id=b.fantom_id where b.bound_id=d.fantom_id))
                                         ) as l_doc_date
                              from
-                             ( select d.v_pl as p14, cim_mgr.get_control_date(0, d.type_id, d.bound_id)+1 as p21, d.borg_reason as p20,
-                                      0 as d_k, d.type_id, d.bound_id, d.contr_id, (d.s_vpl+d.sk_vpl)*100 as s, d.s_vk*100 as s_vk, d.vdat as doc_date
-                                 from v_cim_bound_payments d
-                                where d.type_id in (0, 1, 4) and d.contr_id is not null and contr_id != 0
+                             ( select o.kv as p14, cim_mgr.get_control_date(0, 0, d.bound_id, d.pay_flag)+1 as p21, d.borg_reason as p20,
+                                      0 as d_k, 0 as type_id, d.bound_id, d.contr_id, (d.s+d.comiss) as s, d.s_cv as s_vk, NVL( (SELECT MAX (fdat) FROM opldok WHERE REF = o.REF ), o.vdat ) as doc_date,
+                                      l.s as ls, l.create_date as l_create_date, l.payment_id, l.fantom_id, l.vmd_id, l.act_id
+                                 from cim_payments_bound d JOIN oper o ON o.REF = d.REF
+                                      left outer join cim_link l on l.delete_date is null and l.create_date<l_date_z_end  and l.payment_id=d.bound_id
+                                where d.delete_date is null and
+                                      d.contr_id is not null and contr_id != 0
+                                  and d.branch like sys_context('bars_context', 'user_mfo_mask')
+                               union all
+                               select f.kv as p14, cim_mgr.get_control_date(0, f.payment_type, d.bound_id, d.pay_flag)+1 as p21, d.borg_reason as p20,
+                                      0 as d_k, f.payment_type as type_id, d.bound_id, d.contr_id, (d.s+d.comiss) as s, d.s_cv as s_vk, f.val_date as doc_date,
+                                      l.s as ls, l.create_date as l_create_date, l.payment_id, l.fantom_id, l.vmd_id, l.act_id
+                                 from cim_fantoms_bound d JOIN cim_fantom_payments f ON f.fantom_id = d.fantom_id
+                                      left outer join cim_link l on l.delete_date is null and l.create_date<l_date_z_end  and l.fantom_id=d.bound_id
+                                where d.delete_date is null and
+                                       f.payment_type in (1, 4) and d.contr_id is not null and contr_id != 0
                                   and d.branch like sys_context('bars_context', 'user_mfo_mask')
                                union all
                                select v.kv as p14, cim_mgr.get_control_date(1, 0, d.bound_id)+1 as p21, d.borg_reason as p20,
-                                      1 as d_k, 0 as type_id, d.bound_id, d.contr_id, d.s_vt as s, d.s_vk, v.allow_dat as doc_date
+                                      1 as d_k, 0 as type_id, d.bound_id, d.contr_id, d.s_vt as s, d.s_vk, v.allow_dat as doc_date,
+                                      l.s as ls, l.create_date as l_create_date, l.payment_id, l.fantom_id, l.vmd_id, l.act_id
                                  from cim_vmd_bound d join customs_decl v on v.cim_id=d.vmd_id
+                                      left outer join cim_link l on l.delete_date is null and l.create_date<l_date_z_end  and l.vmd_id=d.bound_id
                                 where d.delete_date is null
                                   and d.branch like sys_context('bars_context', 'user_mfo_mask')
                                union all
                                select v.kv as p14, cim_mgr.get_control_date(1, v.act_type, d.bound_id)+1 as p21, d.borg_reason as p20,
-                                      1 as d_k, v.act_type as type_id, d.bound_id, d.contr_id, d.s_vt as s, d.s_vk, v.allow_date as doc_date
+                                      1 as d_k, v.act_type as type_id, d.bound_id, d.contr_id, d.s_vt as s, d.s_vk, v.allow_date as doc_date,
+                                      l.s as ls, l.create_date as l_create_date, l.payment_id, l.fantom_id, l.vmd_id, l.act_id
                                  from cim_act_bound d join cim_acts v on v.act_type in (1, 3, 4) and v.act_id=d.act_id
+                                      left outer join cim_link l on l.delete_date is null and l.create_date<l_date_z_end  and l.act_id=d.bound_id
                                 where d.delete_date is null
-                                  and d.branch like sys_context('bars_context', 'user_mfo_mask') ) d
-                             left outer join cim_link l
-                               on l.delete_date is null and l.create_date<l_date_z_end and
-                                  decode(d.d_k, 0, decode(d.type_id, 0, l.payment_id, l.fantom_id), decode(d.type_id, 0, l.vmd_id, l.act_id))=d.bound_id ) d
+                                  and d.branch like sys_context('bars_context', 'user_mfo_mask') ) d ) d
                        group by d.d_k, d.type_id, d.bound_id ) d
                      join cim_contracts c on c.contr_type+1=d.p01 and c.contr_id=d.contr_id
                      join cim_contracts_trade t on t.contr_id=d.contr_id
@@ -1000,6 +1012,7 @@ end  p_f531;
       l_txt:=l_txt||cur.m||'9800'||l_znyvt||cur.p9800||chr(13)||chr(10); l_n:=l_n+1;
       if cur.p9900 is not null then l_txt:=l_txt||cur.m||'9900'||l_znyvt||translatewin2dos(cur.p9900)||chr(13)||chr(10); l_n:=l_n+1; end if;
       l_txt:=l_txt||cur.m||'3000'||l_znyvt||cur.p3000||chr(13)||chr(10); l_n:=l_n+1;
+      l_txt:=l_txt||cur.m||'3200'||l_znyvt||cur.p3200||chr(13)||chr(10); l_n:=l_n+1;
 
       dbms_lob.append(l_txt_clob, l_txt); l_txt:=null;
 
@@ -1084,6 +1097,8 @@ end  p_f531;
            ||cur.m||'103'||l_zn0yvt||to_char(cur.p103,'DDMMYYYY')||chr(13)||chr(10)
            ||cur.m||'107'||l_zn0yvt||translatewin2dos(cur.p107)||chr(13)||chr(10)
 
+           ||cur.m||'010'||l_zn0yvt||cur.p010||chr(13)||chr(10)
+
            ||cur.m||'108'||l_zn0yvt||cur.p108||chr(13)||chr(10)
            ||cur.m||'140'||l_zn0yvt||cur.p140||chr(13)||chr(10)
            ||cur.m||'141'||l_zn0yvt||cur.p141||chr(13)||chr(10)
@@ -1091,8 +1106,10 @@ end  p_f531;
            ||cur.m||'143'||l_zn0yvt||cur.p143||chr(13)||chr(10)
            ||cur.m||'184'||l_zn0yvt||cur.p184||chr(13)||chr(10)
            ||cur.m||'020'||l_zn0yvt||cur.p020||chr(13)||chr(10)
-           ||cur.m||'310'||l_zn0yvt||to_char(cur.p310,'DDMMYYYY')||chr(13)||chr(10);
-       l_n:=l_n+8+6;
+           ||cur.m||'310'||l_zn0yvt||to_char(cur.p310,'DDMMYYYY')||chr(13)||chr(10)
+           
+           ||cur.m||'320'||l_zn0yvt||cur.p320||chr(13)||chr(10);
+       l_n:=l_n+8+1+6+1;
 
       if cur.p960 is not null then
          l_txt:=l_txt||cur.m||'960'||l_zn0yvt||to_char(cur.p960,'fm99')||chr(13)||chr(10); l_n:=l_n+1;
@@ -1793,7 +1810,8 @@ end  p_f531;
                              P141, P020, P143,
                              P050, P060, P090, P960,
                              P310,
-                             P999
+                             P999,
+                             p010
                               )
               values (c.contr_id, l_date_to, substr(c.nmkk,1,27) /*as p101*/, lpad(substr(c.okpo,1,10),10,'0'), lpad(substr(c.r_agree_no,1,5),5,'0') /*r_agree_no*/,
                c.r_agree_date /*as p103*/, lpad(c.kv,3,'0') /*as pval*/, '0' /*as t*/, case when c.credit_type=0 then 1 when c.creditor_type=11 then 3 else 2 end /*as m*/,
@@ -1806,7 +1824,8 @@ end  p_f531;
                substr(c.num, 1, 16) /*as p050*/, c.open_date /*as p060*/, c.s /*as p090*/, c.f503_purpose /*as p960*/,
                --nvl2(c.close_date, c.close_date-c.open_date, '') /*as p970*/, --маЇ бути р≥зниц€ м≥ж датою п≥дписанн€ ≥ зд≥йсненн€ останнього платежу
                c.close_date /*as p310*/,
-               c.f504_note /*as p999*/)
+               c.f504_note /*as p999*/,
+               c.borrower_id /*as p010*/)
                returning f504_id into l_f504_id;
 
         --розрахунок незаповнених показник≥в
@@ -2311,7 +2330,8 @@ end  p_f531;
                          c.close_date as p310_vk,                                                            f.p310 as p310_r,
                          substr(c.num, 1, 16) as p050_vk,                                                    f.p050 as p050_r,
                          c.open_date as p060_vk,                                                             f.p060 as p060_r,
-                         c.s as p090_vk,                                                                     f.p090 as p090_r
+                         c.s as p090_vk,                                                                     f.p090 as p090_r,
+                         c.borrower_id as p010_vk,                                                           f.p010 as p010_r                         
                   from v_cim_credit_contracts c, cim_f504 f where c.contr_id = f.contr_id
                    and f.kf = sys_context('bars_context','user_mfo'))
       loop
@@ -2332,7 +2352,8 @@ end  p_f531;
             p310 = cur.p310_vk,
             p050 = cur.p050_vk,
             p060 = cur.p060_vk,
-            p090 = cur.p090_vk
+            p090 = cur.p090_vk,
+            p010 = cur.p010_vk
         where f504_id = cur.f504_id;
 
         if nvl(cur.m_r,-1)        != nvl(cur.m_vk,-1)  then
@@ -2386,6 +2407,9 @@ end  p_f531;
         end if;
         if nvl(cur.p090_r,-1)     != nvl(cur.p090_vk,-1) then
           add_auto_change_hist(cur.f504_id, '090', 'загальна сума кредиту', cur.p090_r, cur.p090_vk);
+        end if;
+        if nvl(cur.p010_r,'-1')    != nvl(cur.p010_vk,'-1') then
+          add_auto_change_hist(cur.f504_id, '010', 'вид позичальника', cur.p010_r, cur.p010_vk);
         end if;
 
       end loop;
