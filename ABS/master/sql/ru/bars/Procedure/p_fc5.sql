@@ -4,7 +4,7 @@ IS
 % DESCRIPTION : Процедура формирования #С5 для КБ (универсальная)
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     : v.17.010     26.12.2017
+% VERSION     : v.17.010     28.12.2017
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_ - отчетная дата
 
@@ -165,7 +165,7 @@ IS
          r012_  varchar2(1),
          s580_  varchar2(1),
          t020_  varchar2(1),
-         nd1_   number,            
+         nd1_   number,
          nd2_   number,
          nd3_   number,
          nd4_   number,
@@ -182,6 +182,7 @@ IS
    l_rnbu_trace rnbu_trace_t := rnbu_trace_t();
 
    TYPE     t_otcn IS TABLE OF NUMBER(1) INDEX BY VARCHAR2(4);
+   table_R011    t_otcn;
    table_R013    t_otcn;
 
    datz_        date := Dat_Next_U(dat_, 1);
@@ -194,16 +195,15 @@ IS
    s580_        specparam.s580%type;
    s580a_       specparam.s580%type;
    s580r_       specparam.s580%type;
-   s245_        varchar2(1);      
-   k077_        varchar2(1);      
+   s245_        varchar2(1);
+   k077_        varchar2(1);
    r017_        varchar2(1);          --segment   Q
    segm_WWW     varchar2(3);
 
    dat_zmin1    date         := to_date('20022008', 'ddmmyyyy');
    dat_zmin2    date         := to_date('03012013', 'ddmmyyyy');
    dat_zmin3    date         := to_date('01092016', 'ddmmyyyy');
-   dat_zmin4    date         := to_date('01102017', 'ddmmyyyy');
---   dat_zmin4    date         := to_date('26122017', 'ddmmyyyy');
+   dat_zmin4    date         := to_date('26122017', 'ddmmyyyy');
 
    -- балансовые счета дисконта
    nbsdiscont_     VARCHAR2 (2000)
@@ -250,8 +250,11 @@ IS
              ) a,
              kl_r030 l,
              specparam p,
-             ( select l.rnk, nvl(k.k077,'3') k077 
-                 from customer l, kl_k070 k
+             ( select l.rnk, nvl(k.k077,'3') k077
+                 from customer l,
+                     ( select *  from kl_k070
+                        where d_open <= dat_
+                          and d_close is null or d_close > dat_ ) k
                 where l.ise = k.k070 (+)
              ) c
        WHERE a.ost <> 0
@@ -439,6 +442,7 @@ BEGIN
          AND (   LOWER (txt) LIKE '%нарах%доход%'
               OR LOWER (txt) LIKE '%нарах%витр%' )
          and not lower(txt) like '%прострочен%'
+         and trim(pr) is null
          AND d_open between TO_DATE ('01011997', 'ddmmyyyy') and datz_
          and (d_close is null or
               d_close >= datz_);
@@ -481,6 +485,18 @@ BEGIN
        and (d_close is null or
             d_close > datz_);
 
+-- действующие R011 в рабочую таблицу
+
+   for k in ( select distinct r020 pok
+                from kl_r011
+               where trim(prem)='КБ'
+                 and d_open between TO_DATE ('01011997', 'ddmmyyyy') and datz_
+                 and (   d_close is null
+                      or d_close >= datz_) )
+   loop
+       table_r011(k.pok) := 1;
+   end loop;
+
 -- действующие R013 в рабочую таблицу
 
    for k in ( select distinct r020 pok
@@ -495,7 +511,7 @@ BEGIN
 -------------------------------------------------------------------
 
    if pnd_ is null then
-      sql_acc_ := ' SELECT  /*+PARALLEL(a,8)*/ *
+      sql_acc_ := ' SELECT   *
                     FROM ACCOUNTS a
                     where nvl(nbs, substr(nls,1,4))
                             in (select b.r020 from TMP_KOD_R020 b) ';
@@ -511,12 +527,12 @@ BEGIN
 
 --   p_upd_r012('C5', mfou_);
 
-   cursor_sql := 'select /* parallel(8) */
-                         a.*, n.nd nd1, null nd2, null nd3, null nd4, n.nd nd,
+   cursor_sql := 'select a.*, n.nd nd1, null nd2, null nd3, null nd4, n.nd nd,
                          nvl(r.s580, ''0'') s580r, decode(t.r020, null, 0, 1) fa7p, i.freq,
-                         decode(c.k077,null,decode(substr(a.nbs,1,1),''1'',''1'',''3''),c.k077) k077
-                    from (SELECT   a.acc, a.nls, a.kv, a.daos, :dat_, a.nbs,
-                                   NVL(trim(cc.r011), ''0'') r011, 
+                         decode(k.k077,null,decode(substr(a.nbs,1,1),''1'',''1'',''3''),k.k077) k077
+                    from (SELECT  /*+ parallel(8) */ 
+                                   a.acc, a.nls, a.kv, a.daos, :dat_, a.nbs,
+                                   NVL(trim(cc.r011), ''0'') r011,
                                    NVL(trim(cc.r013), ''0'') r013, NVL (cc.s080, ''1'') s080,
                                    decode(a.kv, 980, s.ost, s.ostq) ostq, s.ost, a.rnk,
                                    a.isp, a.mdate, a.tip, a.tobo, a.nms,
@@ -528,14 +544,18 @@ BEGIN
                                 s.acc = cc.acc(+) and
                                 nvl(s.nbs, substr(s.nls,1,4)) not in (''1490'',''1491'',''1492'',''1493'',
                                             ''1590'',''1592'',''1890'',''2400'',''2401'',''2890'',''3190'',''3290'',
-''1429'',''1509'',''1519'',''1529'',''2019'',''2029'',''2039'',''2069'',''2079'',''2089'',
-''2109'',''2119'',''2129'',''2139'',''2209'',''2239'',''2609'',''2629'',''2659'',''3119'',''3219'',''3107'',
-                                            ''3590'',''3599'',''3690'')
+                                            ''1429'',''1509'',''1519'',''1529'',''2019'',''2029'',''2039'',''2069'',''2079'',''2089'',
+                                            ''2109'',''2119'',''2129'',''2139'',''2209'',''2239'',''2609'',''2629'',''2659'',''3119'',''3219'',''3107'',
+                                            ''3590'',''3599'',''3690'',''3692'')
                          ) a
-                         left outer join (select l.rnk, k.k077
-                                            from customer l, kl_k070 k
-                                           where l.ise = k.k070 ) c
-                         on (a.rnk = c.rnk)
+                         join customer c
+                             ON (a.rnk = c.rnk)
+                         left outer join (select *
+                                            from kl_k070
+                                           where d_open <= :dat_
+                                             and d_close is null or d_close>:dat_
+                                         )   k
+                             ON (c.ise = k.k070)
                          left outer join (select n.acc, max(n.nd) nd
                                             from nd_acc n, cc_deal e
                                            WHERE e.sdate <= :Dat_
@@ -561,7 +581,7 @@ BEGIN
                          on (a.nls like t.r020||''%'' )
                   ORDER BY 6, 3, 2 ';
 
-   OPEN saldo FOR cursor_sql USING dat_, dat_;
+   OPEN saldo FOR cursor_sql USING dat_, dat_, dat_, dat_;
    LOOP
        FETCH saldo BULK COLLECT INTO l_rec_t LIMIT 10000;
        EXIT WHEN l_rec_t.count = 0;
@@ -601,7 +621,7 @@ BEGIN
           if     tips_ in ('SK9','SP ','SPN','OFR','KSP','KK9','KPN')
           then
                s245_ :='2';
-          elsif  nbs_ like '150_'  
+          elsif  nbs_ like '150_'
              or  nbs_ like '34__' or  nbs_ like '36__'
              or  nbs_ like '44__' or  nbs_ like '45__'
              or  nbs_ like '9___'
@@ -1059,8 +1079,6 @@ BEGIN
 
       s580a_ := substr(k.kodp, 11, 1);
 
---      s580a_ := (case when nbs_||r013_ in ('15904','15921','24006','24016') then '9' else s580a_ end);
-
       select count( * ) into cnt_ from otcn_fa7_temp where r020 = k.nbs;
 
       -- ознака рахунку нарахованих відсотків
@@ -1074,12 +1092,13 @@ BEGIN
       if k.szq <>0 then
           if TP_SND then
              r012_ :='B';
---             if nbs_='1592'  and  k.nls like '1508%'  then
---                r012_ :=f_get_r012_for_1508(k.acc);
---             end if;
 
              -- для рахунків нарахованих %, де немає розбивки по R013
+             if nbs_ in ('2609','2629','2659') then
+             kodp_ := '2'||nbs_||'0'||r013_||substr(k.kodp,8,3)||s580a_||substr(k.kodp,12);
+             else
              kodp_ := '2'||nbs_||substr(k.kodp,6,1)||r013_||substr(k.kodp,8,3)||s580a_||substr(k.kodp,12);
+             end if;
              comm_ := SUBSTR (' резерв під прострочені відсотки відносимо до R012='||r012_||' sumc='||to_char(sumc_) , 1, 200);
 
              srez_ := k.szq;
@@ -1098,19 +1117,14 @@ BEGIN
              znap_ := to_char(sum_);
           else
              r012_ := 'A';
---             if substr(k.nls,1,4) in ( '1517','1527','2037','2067','2087',
---                                       '2107','2117','2127','2137',
---                                       '2207','2237' )
---             then
---                 r012_ := 'B';
---             end if;
---             if nbs_='1592' and  k.nls like '1500%'  then  r012_:='I';  end if;
---             if nbs_='1592' and  k.nls like '1502%'  then  r012_:='J';  end if;
---             if nbs_='1592' and  k.nls like '1508%'  then
- --               r012_ :=f_get_r012_for_1508(k.acc);
- --            end if;
 
+             if nbs_ in ('2609','2629','2659') then
+             kodp_ := '2'||nbs_||'0'||r013_||substr(k.kodp,8,3)||s580a_||substr(k.kodp,12);
+             elsif nbs_ = '3599' and k.nls like '3710%' then
+                kodp_ := '2'||nbs_||'2'||r013_||substr(k.kodp,8,3)||s580a_||substr(k.kodp,12);
+             else
              kodp_ := '2'||nbs_||substr(k.kodp,6,1)||r013_||substr(k.kodp,8,3)||s580a_||substr(k.kodp,12);
+             end if;
 
              if k.rnum = 1 then
                  discont_ := k.discont;
@@ -1149,14 +1163,7 @@ BEGIN
           end if;
 
           if znap_ <> '0' then
---             if (discont_ <> 0 or premiy_ <> 0) then
---                se_ := nvl(abs(fostq_new(k.acc, dat_, dati_)), 0); -- залишок по кредиту
---
---                insert into OTCN_FA7_REZ1(ND, ACC, nls, kv, KODP, ZNAP, SUMA, SUMD, SUMP)
---                values(k.nd, k.acc, k.nls, k.kv, kodp_, k.sump, se_, k.discont_row, premiy_);
---             end if;
-
-             if nbs_ = '3690' then
+             if nbs_ in ('3690','3692') then
                 znap_ := to_char(k.szq);
                 comm_ := '';
                 srezp_ := 0;
@@ -1175,13 +1182,12 @@ BEGIN
 
              if srezp_ <> 0  then
                 r012_:='B';
---                if nbs_='1592' and  k.nls like '1500%'  then  r012_:='I';  end if;
---                if nbs_='1592' and  k.nls like '1502%'  then  r012_:='J';  end if;
---                if nbs_='1592' and  k.nls like '1508%'  then
---                   r012_ :=f_get_r012_for_1508(k.acc);
---                end if;
 
+                if nbs_ in ('2609','2629','2659') then
+                kodp_ := '2'||nbs_||'0'||r013_||substr(k.kodp,8,3)||s580a_||substr(k.kodp,12);
+                else
                 kodp_ := '2'||nbs_||substr(k.kodp,6,1)||r013_||substr(k.kodp,8,3)||s580a_||substr(k.kodp,12);
+                end if;
 
                 znap_ := srezp_;
                 comm_ := SUBSTR(' перевищення резерву над осн. боргом до R012='||r012_, 1,100);
@@ -1198,30 +1204,28 @@ BEGIN
              end if;
           end if;
       else
-         kodp_ := '2'||nbs_||substr(k.kodp,6,1)||r013_||substr(k.kodp,8,3)||s580a_||substr(k.kodp,12);
+
+         if nbs_ in ('2609','2629','2659') then
+          kodp_ := '2'||nbs_||'0'||r013_||substr(k.kodp,8,3)||s580a_||substr(k.kodp,12);
+         else
+          kodp_ := '2'||nbs_||substr(k.kodp,6,1)||r013_||substr(k.kodp,8,3)||s580a_||substr(k.kodp,12);
+         end if;
 
          if k.rnum = 1 then
               discont_ := k.discont;
               premiy_ := k.prem;
          end if;
-
---         if discont_ <> 0 or premiy_ <> 0 then
---            se_ := nvl(abs(fostq_new(k.acc, dat_, dati_)), 0);
---
---            insert into OTCN_FA7_REZ1(ND, ACC, nls, kv, KODP, ZNAP, SUMA, SUMD, SUMP)
---            values(k.nd, k.acc, k.nls, k.kv, k.kodp, k.sump, se_, k.discont_row, premiy_);
---         end if;
       end if;
    end loop;
 
    for k in (select acc, nbs, nls, kv, rnk, s080, szq, isp, mdate, tobo, r031, r030,
-                    r013, s580, rez, discont, prem, nd, id, ob22, custtype, accr, tip
+                    r011, r013, s580, rez, discont, prem, nd, id, ob22, custtype, accr, tip
                from ( select /*+ index(t PK_NBU23REZ_ID) */
                              t.acc, t.nls, decode(t.kv, 974, 933, t.kv) kv, t.rnk, t.s080,
                              gl.p_icurval(t.kv, t.sz - t.rez_30, dat_) szq,
                              a.isp, a.mdate, a.tobo, nvl(a.nbs, substr(a.nls, 1,4)) nbs,
                              r031, decode(lpad(l.r030, 3, '0'), '974', '933', lpad(l.r030, 3, '0')) r030,
-                             nvl(s.r013, '0') r013, t.rz rez,
+                             nvl(s.r011, '0') r011, nvl(s.r013, '0') r013, t.rz rez,
                              nvl(gl.p_icurval(t.kv, t.discont, dat_),0) discont,
                              nvl(gl.p_icurval(t.kv, t.prem, dat_),0) prem,
                              t.nd, t.id, nvl(s.s580, '0') s580, a.ob22, c.custtype, t.accr, a.tip
@@ -1252,7 +1256,7 @@ BEGIN
                              gl.p_icurval(t.kv, t.rez_30, dat_) szq,
                              a.isp, a.mdate, a.tobo, nvl(a.nbs, substr(a.nls, 1,4)) nbs,
                              r031, decode(lpad(l.r030, 3, '0'), '974', '933', lpad(l.r030, 3, '0')) r030,
-                             nvl(s.r013, '0') r013, t.rz rez,
+                             nvl(s.r011, '0') r011, nvl(s.r013, '0') r013, t.rz rez,
                              nvl(gl.p_icurval(t.kv, t.discont, dat_),0) discont,
                              nvl(gl.p_icurval(t.kv, t.prem, dat_),0) prem,
                              t.nd, t.id, nvl(s.s580, '0') s580, a.ob22, c.custtype, t.accr_30 accr, a.tip
@@ -1287,10 +1291,6 @@ BEGIN
          nbuc_ := nbuc1_;
       END IF;
 
---??
-      r011_ :='0';
-      s245_ :='1';
-      k077_ :='0';
 --?? как здесь определить просрочку
       if substr(k.nls, 4, 1) in ('7', '9') and
          substr(k.nls, 1, 4) not in ('2607','2627','2657','1819','2809','3519','3559')
@@ -1318,6 +1318,60 @@ BEGIN
 
       nbs_ := substr(nbs_r013_, 1, 4);
       r013_ := substr(nbs_r013_, 5, 1);
+
+      s245_ :='1';
+      r011_ := k.r011;
+--   проверка наличия для счета значений R011
+              if not table_r011.exists(nbs_)
+              then
+                  r011_ :='0';
+              end if;
+
+      if      nbs_ in ('2029','2039','2079','2209','2219','2229')
+      then 
+            r011_ :='1';
+      end if;
+
+      if r011_ ='0' then
+
+         if      nbs_ in ('2239','2249','3599')
+         then
+               r011_ :='1';
+         elsif   nbs_ in ('2019','2089','2119','2139')
+         then
+               r011_ :='2';
+         elsif   nbs_ in ('2069','2109','2129')
+         then
+               r011_ :='3';
+         elsif   nbs_ in ('3692')
+         then
+               r011_ :='4';
+         elsif   nbs_ in ('2890')
+         then
+               r011_ :='6';
+         else
+               NULL;
+         end if;
+
+      end if;
+
+      if    k.nbs like '1%'
+         or k.nbs like '31%'
+         or k.nbs like '32%'
+         or nbs_ in ('2890','3590')
+      then  K077_:='1';
+      elsif k.nbs like '20%'
+         or k.nbs like '260%'
+         or k.nbs like '265%'
+         or nbs_ in( '3599', '3690','3692')
+      then  K077_:='3';
+      elsif k.nbs like '22%' or k.nbs like '262%'
+      then  K077_:='5';
+      elsif k.nbs like '21%'
+      then  k077_ :='2';
+      else
+            k077_ :='3';
+      end if;
 
       if k.s580 <> '0' then
          s580a_ := k.s580;
@@ -1380,8 +1434,8 @@ BEGIN
 --             end if;
 
              kodp_ := '2'||nbs_||r011_||r013_||k.r030||s580a_||r017_||segm_WWW||s245_||k077_;
-
              znap_ := to_char(k.szq);
+
           else
 --?? как здесь определить просрочку
              if substr(k.nls, 4, 1)  = '7' and
@@ -1417,7 +1471,7 @@ BEGIN
           end if;
 
           if znap_ <> '0' then
-              if nbs_ = '3690' then
+              if nbs_ in('3690','3692') then
                  znap_ := to_char(k.szq);
                  comm_ := '';
                  srezp_ := 0;
@@ -1567,12 +1621,23 @@ BEGIN
                          a.nls like '289%' or
                          a.nls like '329%' or
                          a.nls like '359%' or
-                         a.nls like '369%')
+                         a.nls like '369%' or
+              o.fdat > to_date('20171218','yyyymmdd') and
+                              (      a.nls like '15_9%'
+                                or   a.nls like '20_9%'
+                                or   a.nls like '21_9%'
+                                or   a.nls like '22_9%'
+                                or   a.nls like '26_9%'
+                                or   a.nls like '3107%'
+                                or   a.nls like '3119%'
+                                or   a.nls like '3219%' )
+                         )
                         and o.tt not like 'AR%'
                         and o.ref = z.ref
                         and o.fdat = z.fdat
                         and o.stmt = z.stmt
                         and o.dk <> z.dk
+                        and o.dk = 0 
                         and z.acc = x.acc
                         and x.nls not like '7%'
                         and x.nls not like '3800%'
@@ -1668,9 +1733,10 @@ BEGIN
                             from otcn_saldo a, otcn_acc s, customer c
                             where nvl(a.nbs, substr(a.nls,1,4)) in ('1410','1412','1415','1416','1417','1418',
                                           '1490','1491','1492','1493','1590','1592','1890',
-                                          '2400','2401','2890','3190','3290','3590','3599','3690',
+                                          '2890','3190','3290','3590','3599','3690','3692',
                                           '9010','9015','9030','9031','9036','9500',
-                                          '1419','1429','1519','1529','2039','2069','2089','2109','2119','2129',
+                                          '1419','1429','1509','1519','1529','2039','2069','2089','2109','2119','2129',
+                                          '2609','2629','2659',
                                           '2139','2209','2239','3119','3219')
                               and a.acc = s.acc
                               and a.rnk = c.rnk
@@ -1684,16 +1750,15 @@ BEGIN
                             substr(r.kodp, 1, 1) t020, 2-MOD(c.codcagent,2) rez,
                             substr(r.kodp, 2, 4) nbs, r.kv,
                             sum(to_number(r.znap)) ostq,
-                            min((case when substr(kodp, 10, 1) = 'B' then '1' else '2' end)||
-                                 substr(kodp, 6, 1)||substr(kodp, 10, 1)) R013_s580,
-                            min((case when substr(kodp, 10, 1) = 'A' then '1' else '2' end)||
-                                 substr(kodp, 6, 1)||substr(kodp, 10, 1)) R013_s580_A
+                            min('1'||substr(kodp, 6, 2)) R013_s580,
+                            min('1'||substr(kodp, 6, 2)) R013_s580_A
                         from rnbu_trace r, customer c
                         where substr(r.kodp, 2, 4) in ('1410','1412','1415','1416','1417','1418',
                                       '1490','1491','1492','1493','1590','1592','1890',
-                                      '2400','2401','2890','3190','3290','3590','3599','3690',
+                                      '2400','2401','2890','3190','3290','3590','3599','3690','3692',
                                       '9010','9015','9030','9031','9036','9500',
-                                      '1419','1429','1519','1529','2039','2069','2089','2109','2119','2129',
+                                      '1419','1429','1509','1519','1529','2039','2069','2089','2109','2119','2129',
+                                      '2609','2629','2659',
                                       '2139','2209','2239','3119','3219')
                           and r.rnk = c.rnk
                         group by r.nbuc, substr(r.kodp, 1, 1), 2-MOD(c.codcagent,2),substr(r.kodp, 2, 4), r.kv) b
@@ -1708,8 +1773,8 @@ BEGIN
                    into recid_
                    from rnbu_trace r, customer c
                    where r.nbuc = k.nbuc and
-                         r.kodp like k.t020||k.nbs||'_'||lpad(k.kv, 3, '0')||'B%' and
-                         substr(kodp, 6, 1)||substr(kodp, 10, 1) = substr(k.R013_s580,2,2) and
+                         r.kodp like k.t020||k.nbs||'__'||lpad(k.kv,3,'0')||'%' and
+                         substr(kodp,6,2) = substr(k.R013_s580,2,2) and
                         (sign(k.rizn) = -1 and to_number(r.znap) >= abs(k.rizn) or
                          sign(k.rizn) = 1 and to_number(r.znap) > 0) and
                          r.rnk = c.rnk and
@@ -1722,8 +1787,8 @@ BEGIN
                            into recid_
                            from rnbu_trace r, customer c
                            where r.nbuc = k.nbuc and
-                                 r.kodp like k.t020||k.nbs||'_'||lpad(k.kv, 3, '0')||'A%' and
-                                 substr(kodp, 6, 1)||substr(kodp, 10, 1) = substr(k.R013_s580_A,2,2) and
+                                 r.kodp like k.t020||k.nbs||'__'||lpad(k.kv, 3, '0')||'%' and
+                                 substr(kodp, 6, 2) = substr(k.R013_s580_A,2,2) and
                                 (sign(k.rizn) = -1 and to_number(r.znap) >= abs(k.rizn) or
                                  sign(k.rizn) = 1 and to_number(r.znap) > 0) and
                                 r.rnk = c.rnk and
@@ -1736,8 +1801,8 @@ BEGIN
                                    into recid_
                                    from rnbu_trace r, customer c
                                    where r.nbuc = k.nbuc and
-                                         r.kodp like k.t020||k.nbs||'_'||lpad(k.kv, 3, '0')||'%' and
-                                         substr(kodp, 6, 1)||substr(kodp, 10, 1) = substr(k.R013_s580,2,2) and
+                                         r.kodp like k.t020||k.nbs||'__'||lpad(k.kv, 3, '0')||'%' and
+                                         substr(kodp, 6, 2) = substr(k.R013_s580,2,2) and
                                         (sign(k.rizn) = -1 and to_number(r.znap) >= abs(k.rizn) or
                                          sign(k.rizn) = 1 and to_number(r.znap) > 0) and
                                          r.rnk = c.rnk and
@@ -1755,8 +1820,8 @@ BEGIN
                    into recid_
                    from rnbu_trace r, customer c
                    where r.nbuc = k.nbuc and
-                         r.kodp like k.t020||k.nbs||'4'||lpad(k.kv, 3, '0')||'B%' and
-                         substr(kodp, 6, 1)||substr(kodp, 10, 1) = substr(k.R013_s580,2,2) and
+                         r.kodp like k.t020||k.nbs||'_2'||lpad(k.kv, 3, '0')||'%' and
+                         substr(kodp, 6, 2) = substr(k.R013_s580,2,2) and
                         (sign(k.rizn) = -1 and to_number(r.znap) >= abs(k.rizn) or
                          sign(k.rizn) = 1 and to_number(r.znap) > 0) and
                          r.rnk = c.rnk and
@@ -1769,8 +1834,8 @@ BEGIN
                            into recid_
                            from rnbu_trace r, customer c
                            where r.nbuc = k.nbuc and
-                                 substr(kodp, 6, 1)||substr(kodp, 10, 1) = substr(k.R013_s580,2,2) and
-                                 r.kodp like k.t020||k.nbs||'5'||lpad(k.kv, 3, '0')||'B%' and
+                                 substr(kodp, 6,2) = substr(k.R013_s580,2,2) and
+                                 r.kodp like k.t020||k.nbs||'_3'||lpad(k.kv, 3, '0')||'%' and
                                 (sign(k.rizn) = -1 and to_number(r.znap) >= abs(k.rizn) or
                                  sign(k.rizn) = 1 and to_number(r.znap) > 0) and
                                  r.rnk = c.rnk and
@@ -1782,8 +1847,8 @@ BEGIN
                                into recid_
                                from rnbu_trace r, customer c
                                where r.nbuc = k.nbuc and
-                                     r.kodp like k.t020||k.nbs||'_'||lpad(k.kv, 3, '0')||'_%' and
-                                     substr(kodp, 6, 1)||substr(kodp, 10, 1) = substr(k.R013_s580_A,2,2) and
+                                     r.kodp like k.t020||k.nbs||'__'||lpad(k.kv, 3, '0')||'%' and
+                                     substr(kodp, 6, 2) = substr(k.R013_s580_A,2,2) and
                                     (sign(k.rizn) = -1 and to_number(r.znap) >= abs(k.rizn) or
                                      sign(k.rizn) = 1 and to_number(r.znap) > 0) and
                                      r.rnk = c.rnk and
@@ -1861,7 +1926,8 @@ BEGIN
                    (SELECT r020 || s240
                       FROM kl_f3_29
                      WHERE kf = '42' AND ddd IN ('101', '201'))
-        and r.kodp not like '23690%';
+        and r.kodp not like '23690%'
+        and r.kodp not like '23692%';
 
    INSERT INTO otc_c5_proc
             ( datf, rnk, nd, acc, nls, kv, kodp, znap )
@@ -1878,7 +1944,7 @@ BEGIN
                    (SELECT r020 || s240
                       FROM kl_f3_29
                      WHERE kf = '42' AND ddd IN ('101', '201'))
-        and r.kodp like '23690%'
+        and ( r.kodp like '23690%' or r.kodp like '23692%' )
         and r.acc not in ( select t.acc  from rnbu_trace t
                           where t.kodp like '191299%' );
 

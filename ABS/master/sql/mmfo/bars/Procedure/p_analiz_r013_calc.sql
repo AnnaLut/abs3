@@ -1,15 +1,6 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_ANALIZ_R013_CALC.sql =========**
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure P_ANALIZ_R013_CALC ***
-
-  CREATE OR REPLACE PROCEDURE BARS.P_ANALIZ_R013_CALC (
+CREATE OR REPLACE PROCEDURE BARS.P_ANALIZ_R013_CALC (
 -------------------------------------------------------------------------------
--- VERSION: 26.12.2017
+-- VERSION: 29.12.2017
 -------------------------------------------------------------------------------
 -- 26.12.2017 новые значения для r013
 -- 25.10.2016 для SN обороты ДТ со счетов SNO сопоставляются оборотам КТ в более
@@ -94,7 +85,7 @@ IS
                 r013_new := '3';
              END IF;
       end if;
-      
+
       RETURN r013_new;
    END;
 BEGIN
@@ -127,7 +118,7 @@ BEGIN
    if type_calc =1 and trim(tip_) ='SN'  then
       begin
           select nvl(sum(od.s),0),
-                 min(od.fdat)     
+                 min(od.fdat)
           into dos_sn_, dos_dat_
           from opldok od, opldok ok, accounts ak
           where od.fdat  between dat_ -29 and dat_
@@ -149,7 +140,7 @@ BEGIN
 
       if dos_sn_ != 0 and dos_dat_ is not null  then
            begin
-              select sum(ok.s)   
+              select sum(ok.s)
               into kos_sn_
               from opldok ok
               where ok.fdat  between dos_dat_  and dat_
@@ -169,7 +160,7 @@ BEGIN
               else
                   dose_sn_ := dos_sn_;
               end if;
-                
+
            else
               dos_sn_ := 0;
               dose_sn_ := 0;
@@ -178,9 +169,10 @@ BEGIN
    end if;
 
    IF NVL(freq_, 400) = 5 and
-      not (300465 IN (mfo_, mfou_) and tip_ = 'SNO')
+      not (300465 IN (mfo_, mfou_) and tip_ in ('SNO')) and
+      tip_ not in ('SPN', 'SK9', 'OFR', 'KK9', 'KPN') 
    THEN                                             -- погашение % ежемесячное
-      ----------------------------------------------------------------------------- 
+      -----------------------------------------------------------------------------
       --   корректировка остатка с учетом наличия оборотов ДТ с SNO
       if type_calc =1 and trim(tip_) ='SN' and dose_sn_ !=0  then
          if abs(dose_sn_) >= abs(l_se_)  then
@@ -189,12 +181,12 @@ BEGIN
          else
             l_se_ := l_se_ -dose_sn_;
          end if;
-         
+
 --    свыше 30 дней  -создать o_r013_2, заполнив  o_se_2  значением  dose_sn
          o_r013_2 := f_ret_r013 (nbs_, kv_, r013_, 2);
          o_comm_2 := comm_ || ' оборот з SNO';
          o_se_2 := dose_sn_;
-         
+
 --    до 30 дней
          o_r013_1 := NULL;
          o_comm_1 := NULL;
@@ -208,12 +200,12 @@ BEGIN
 -----------------------------------------------------------------------------
       else
          o_r013_1 := f_ret_r013 (nbs_, kv_, r013_, 1);
-      
+
          IF o_r013_1 <> r013_
          THEN
             o_comm_1 := comm_ || ' заміна R013 (0) ';
          END IF;
-      
+
          o_se_1 := se_;
       end if;
    elsif 300465 IN (mfo_, mfou_) and tip_ = 'SNO' then
@@ -229,7 +221,7 @@ BEGIN
       else
          o_r013_1 := f_ret_r013 (nbs_, kv_, r013_, 1);
          o_r013_2 := f_ret_r013 (nbs_, kv_, r013_, 2);
-         
+
          if o_r013_1 = r013_ then
             o_se_1 := se_;
             o_comm_1 := comm_ || ' (SNO) не міняємо R013='||r013_;
@@ -244,7 +236,7 @@ BEGIN
             o_r013_2 := null;
          end if;
       end if;
-   elsif newnbs.g_state = 1 and tip_ = 'SPN' then -- після переходу на новий ПР відносимо простроченівідсотки  до > 30 днів
+   elsif tip_ in ('SPN', 'SK9', 'OFR', 'KK9', 'KPN') then -- після переходу на новий ПР відносимо простроченівідсотки  до > 30 днів
          o_r013_2 := f_ret_r013 (nbs_, kv_, r013_, 2);
          o_comm_2 := comm_ || ' (SPN, тобто > 30 днів) міняємо R013='||r013_||' на '||o_r013_2;
          o_se_2 := se_;
@@ -254,22 +246,22 @@ BEGIN
         INTO dos_
         FROM saldoa
        WHERE acc = acc_ AND fdat BETWEEN dat_ - 29 AND dat_;
-      
+
       if ABS (se_) > ABS(gl.p_icurval (kv_, dos_, dat_)) and type_calc = 2 then
           -- корректирующие обороты отчетного месяца
           dos_kor_ := f_get_dos_kor(acc_, dat_ + 1, dat_ + 28);
-          
+
           if dos_ <> 0 then
               -- корректирующие обороты предыдущего месяца
              dos_korp_ := f_get_dos_kor(acc_, dat_ - 29, dat_);
-          else 
+          else
              dos_korp_ := 0;
           end if;
 
           if ABS(dos_korp_) > ABS(dos_) then
              dos_korp_ := 0;
           end if;
-          
+
           dos_ := dos_ - dos_kor_ + dos_korp_;
       end if;
 
@@ -319,7 +311,7 @@ BEGIN
          o_r013_1 := f_ret_r013 (nbs_, kv_, r013_, 1);
          o_comm_1 := comm_ || ' розбивка залишку';
          o_se_1 := dose_;
-         
+
          -- остальная часть остатка
          o_r013_2 := f_ret_r013 (nbs_, kv_, r013_, 2);
          o_comm_2 := comm_ || ' розбивка залишку';
@@ -357,10 +349,3 @@ BEGIN
 
 END;
 /
-show err;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_ANALIZ_R013_CALC.sql =========**
-PROMPT ===================================================================================== 
