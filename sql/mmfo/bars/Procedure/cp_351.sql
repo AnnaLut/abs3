@@ -1,8 +1,13 @@
 CREATE OR REPLACE PROCEDURE BARS.CP_351 (p_dat01 date, p_mode integer  default 0 ) IS
 
-/* Версия 11.0 19-05-2017  26-04-2017  05-04-2017  06-03-2017  03-03-2017  08-02-2017  24-01-2017  10-01-2017  03-01-2017  
+/* Версия 12.4  03-01-2018 27-09-2017  21-09-2017  18-09-2017 31-07-2017   19-05-2017  26-04-2017  05-04-2017  06-03-2017  03-03-2017  
    Розрахунок кредитного ризику по ЦП
 
+20) 03-01-2018(12.4) - R013='' - символьный
+19) 27-09-2017 - уточнила таблиці для опредлеления PD
+18) 21-09-2017 - Проверять 'UUDV' по всем (было по custtype=2)
+17) 18-09-2017 - Новая ф-ция f_get_nd_val_n 
+16) 31-07-2017 - Проверка наличия гарантий (PAWN=11) - может быть несколько записей
 15) 19-05-2017 - S080 по SNA
 14) 26-04-2017 - По ЦБ уточнение условия (d.active=1 or d.active = -1 and d.dazs >= p_dat01)
 13) 05-04-2017 - rnk = 90931101
@@ -59,17 +64,15 @@ begin
       l_dv := 0;
       l_vkr:= 'Ценные бумаги ';
 
-      if D.cusTTYPE = 2 THEN
-         begin 
-               SELECT  CASE WHEN REGEXP_LIKE(value,'^[ |.|,|0-9]+$') 
-                       THEN 0+REPLACE(REPLACE(value ,' ',''),',','.') 
-                       ELSE 0 END
-               INTO l_dv FROM customerw WHERE rnk=d.rnk AND trim(tag)='UUDV';
-         EXCEPTION WHEN NO_DATA_FOUND THEN l_dv := 0;  
-         END; 
-      end if;
+      begin 
+         SELECT  CASE WHEN REGEXP_LIKE(value,'^[ |.|,|0-9]+$')  THEN 0+REPLACE(REPLACE(value ,' ',''),',','.') 
+                 ELSE                                                0 END
+                 INTO l_dv 
+         FROM customerw WHERE rnk=d.rnk AND trim(tag)='UUDV';
+      EXCEPTION WHEN OTHERS THEN l_dv := 0;  
+      END; 
       begin
-         select pawn into l_pawn from tmp_rez_obesp23 where dat = p_dat01 and nd = d.ref and pawn = 11;
+         select pawn into l_pawn from tmp_rez_obesp23 where dat = p_dat01 and nd = d.ref and pawn = 11 and rownum=1;
       EXCEPTION WHEN NO_DATA_FOUND THEN l_pawn := 0;          
       end;
       begin 
@@ -120,11 +123,11 @@ begin
                END; 
             end if; 
 
-            if    d.custtype = 1 and d.RZ =2   THEN l_idf := 80; l_tip_fin := 1;
+            if    d.custtype = 1 and d.RZ =2   THEN l_idf := 81; l_tip_fin := 1;
             elsif d.custtype = 1 and d.RZ =1   THEN l_idf := 80; l_tip_fin := 1;  
             elsif d.custtype = 2               THEN l_idf := 50; l_tip_fin := 2;
-            elsif d.custtype = 3 and d.kv<>980 THEN l_idf := 60; l_tip_fin := 1;
-            else                                    l_idf := 60; l_tip_fin := 1;
+            elsif d.custtype = 3 and d.kv<>980 THEN l_idf := 65; l_tip_fin := 1;
+            else                                    l_idf := 62; l_tip_fin := 1;
             end if;
    
             l_fin      := f_rnk_maxfin(p_dat01, d.rnk, l_tip_fin, d.ref, 1);
@@ -149,7 +152,7 @@ begin
                   SELECT r013 INTO l_r013 FROM specparam p  WHERE  s.acc = p.acc (+);
                EXCEPTION WHEN NO_DATA_FOUND THEN l_r013 := NULL;  
                END; 
-               if l_r013 = 2 THEN l_pd := 0; end if;
+               if l_r013 = '2' THEN l_pd := 0; end if;
             end if;
 
             if l_pawn = 11 THEN l_pd := 0; l_pd_0 := 1; l_fin := 1; end if;
@@ -208,20 +211,22 @@ begin
                l_RCQ     := 0;
                l_CR_LGD  := l_ead*l_pd*l_lgd;
                l_nbs     := substr(s.nls,1,4);
-               l_kol     := f_get_nd_val(d.ref, p_dat01, l_tipa, d.rnk);
+               l_kol     := f_get_nd_val_n('KOL', d.ref, p_dat01, l_tipa, d.rnk);
                l_zal_bv  := z.sall/100;
                l_zal_bvq := p_icurval(s.kv,l_zal_bv*100,l_dat31)/100;      
                --logger.info('REZ_351_cp 4 : nd = ' || d.ref || ' l_fin = '|| l_fin || ' l_pd = ' || l_pd  ) ;   
-               INSERT INTO REZ_CR (fdat   , RNK     , NMK   , ND      , SDATE    , KV      , NLS      , ACC   , EAD       , EADQ   , 
-                                   FIN    , PD      , CR    , CRQ     , bv       , bvq     , VKR      , IDF   , KOL       , FIN23  , 
-                                   tipa   , pawn    , zal   , kpz     , vidd     , tip_zal , LGD      , OVKR  , P_DEF     , OVD    , 
-                                   OPD    , istval  , dv    , CR_LGD  , nbs      , zal_bv  , zal_bvq  , tip   , custtype  , RC     , 
-                                   RCQ    , cc_id   , s080  , ddd_6B  , tip_fin  , ob22    , pd_0     , RZ    , KL_351    , wdate  )     
-                           VALUES (p_dat01, d.RNK   , d.NMK , d.ref   , l_sdate  , d.kv    , s.nls    , s.acc , l_ead     , l_eadq , 
-                                   l_fin  , l_pd    , l_CR  , l_CRQ   , l_bv     , l_bvq   , D.vncrr  , l_idf , l_kol     , d.fin23, 
-                                   l_tipa , z.pawn  , l_zal , z.kpz   , null     , z.tip   , l_LGD    , l_OVKR, l_PDEF    , l_OVD  , 
-                                   l_OPD  , l_istval, l_dv  , l_CR_LGD, l_nbs    , l_zal_bv, l_zal_bvq, s.tip , d.custtype, l_RC   , 
-                                   L_RCQ  , d.cp_id , l_s080, l_ddd   , l_tip_fin, s.ob22  , l_pd_0   , d.rz  , z.kl_351  , d.datp );  
+               INSERT INTO REZ_CR (fdat   , RNK   , NMK     , ND    , SDATE   , KV       , NLS     , ACC      , EAD   , EADQ      , 
+                                   FIN    , PD    , CR      , CRQ   , bv      , bvq      , VKR     , IDF      , KOL   , FIN23     , 
+                                   tipa   , pawn  , zal     , zalq  , kpz     , vidd     , tip_zal , LGD      , OVKR  , P_DEF     , 
+                                   OVD    , OPD   , istval  , dv    , CR_LGD  , nbs      , zal_bv  , zal_bvq  , tip   , custtype  , 
+                                   RC     , RCQ   , cc_id   , s080  , ddd_6B  , tip_fin  , ob22    , pd_0     , RZ    , KL_351    , 
+                                   wdate  )     
+                           VALUES (p_dat01, d.RNK , d.NMK   , d.ref , l_sdate , d.kv     , s.nls   , s.acc    , l_ead , l_eadq    , 
+                                   l_fin  , l_pd  , l_CR    , l_CRQ , l_bv    , l_bvq    , D.vncrr , l_idf    , l_kol , d.fin23   , 
+                                   l_tipa , z.pawn, l_zal   , l_zalq, z.kpz   , null     , z.tip   , l_LGD    , l_OVKR, l_PDEF    , 
+                                   l_OVD  , l_OPD , l_istval, l_dv  , l_CR_LGD, l_nbs    , l_zal_bv, l_zal_bvq, s.tip , d.custtype, 
+                                   l_RC   , L_RCQ , d.cp_id , l_s080, l_ddd   , l_tip_fin, s.ob22  , l_pd_0   , d.rz  , z.kl_351  , 
+                                   d.datp );  
             end loop;
          else
             select    accd, accs, accr, accunrec into l_accd, l_accs, l_accr, l_accunrec from cp_deal where ref = d.ref;
