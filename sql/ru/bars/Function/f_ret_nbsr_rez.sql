@@ -84,7 +84,10 @@ begin
          else
             r013r_ := '5';
          end if;
-      elsif substr(nlsa_,1,3) in ('351','354','355','371') then
+      elsif substr(nlsa_,1,3) in ('371') then
+         nbsr_ := '3599';
+         r013r_ := '0';
+      elsif substr(nlsa_,1,3) in ('351','354','355') then
          nbsr_ := '3590';
          r013r_ := '0';
       elsif substr(nlsa_,1,3) = '280' then
@@ -120,7 +123,7 @@ begin
              end if;
          end if;
       elsif substr(nlsa_,1,4) in ('9001', '9020', '9023','9100', '9122','9129')  then
-         nbsr_ := '3690';
+         nbsr_ := '3692';
 
          r013r_ := '0';
 
@@ -217,22 +220,24 @@ begin
             end if;
          end if;
      else
+
+dbms_output.put_line(accr_);
          begin
             select a.nbs, nvl(trim(s.r013), '0') r013
             into nbsr_, r013r_
             from accounts a, specparam s
             where a.acc = accr_ and
                 a.acc = s.acc(+);
-
-
-            if (substr(nbsr_,1,4) like '159%' or
-                nbsr_ in ('3599') or
-                substr(nbsr_,1,4) like '369%') and
-                r013r_ = '0'
-            then
-                ret_ := f_ret_nbsr_rez(nlsa_, r013a_, s080a_, id_);
-                return ret_;
-            end if;
+--
+--
+--            if (substr(nbsr_,1,4) like '159%' or
+--                nbsr_ in ('3599') or 
+--                substr(nbsr_,1,4) like '3690%') and
+--                r013r_ = '0'
+--            then
+--                ret_ := f_ret_nbsr_rez(nlsa_, r013a_, s080a_, id_);
+--                return ret_;
+--            end if;
          end;
      end if;
   end if;
