@@ -3,7 +3,7 @@ CREATE OR REPLACE PROCEDURE BARS.p_f26 (Dat_ DATE )  IS
 % DESCRIPTION :    Процедура формирование файла #26 для КБ
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
 %
-% VERSION     :   v.16.004  (14.11.2017, 24.10.2017) 
+% VERSION     :   v.16.005  (28.12.2017, 14.11.2017) 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
      параметры:  Dat_ - отчетная дата
 
@@ -13,10 +13,16 @@ CREATE OR REPLACE PROCEDURE BARS.p_f26 (Dat_ DATE )  IS
  3     MMM          K040 код страны банка/контрагента
  6     HHHHHHHHHH   rc_bnk.B010 или rcukru.glb
 16     BBBB         R020 балансовый счет                           
-20     VVV          R030 валюта
-23     P            список значений [0,1,2]
+20     R011         параметр R011
+21     R013         параметр R013
+22     VVV          R030 валюта
+25     J            ознака обтяженосты коштів
+26     S181         код початкового строку погашення
+27     S245         код кінцевого строку погашення
+28     S580         код розподілу активів за групами ризику
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ 28/12/2017 -новая структура показателя
  14/11/2017 -несущественные изменения
  20/02/2017 -для бал.счета 1502 будет формироваться различные значения 
              кода показателя "P" (1 или 2) 
@@ -95,8 +101,22 @@ agent_   Number;
 r1518_   Number;
 r1528_   Number;
 den_     Varchar2(2);
+tips_    VARCHAR2 (3);
+r011_    Varchar2(1);
+r011s_   Varchar2(1);
 r013_    Varchar2(1);
 r013s_   Varchar2(1);
+s180_    Varchar2(1);
+s180s_    Varchar2(1);
+s181_    Varchar2(1);
+s240_    Varchar2(1);
+s240s_   Varchar2(1);
+s245_    Varchar2(1);
+s580_    Varchar2(1);
+s580s_   Varchar2(1);
+s580a_   Varchar2(1);
+kod_j_   Varchar2(1);
+
 rnk_     Number;
 
 comm_           rnbu_trace.comm%TYPE;
@@ -105,6 +125,7 @@ l_o_sum         number;
 l_o_kv          number;
 l_se            number;
 l_sn            number;
+dat_izm1     date := to_date('29/12/2017','dd/mm/yyyy');
 
 --- Остатки
 CURSOR SALDO IS
@@ -112,9 +133,15 @@ CURSOR SALDO IS
           cb.mfo, NVL(rc.glb,0), cb.alt_bic, NVL(cb.rating,' '),
           decode(f_ourmfo, 300205, LTRIM(RTRIM(substr(c.nmkk,1,60))), 
                                    LTRIM(RTRIM(substr(c.nmk,1,60)))), 
-          a.ostf-a.dos+a.kos, NVL(trim(sp.r013),'0'), c.rnk
+          a.ostf-a.dos+a.kos, 
+          NVL(trim(sp.r011),'0'),
+          NVL(trim(sp.r013),'0'),
+          NVL(trim(sp.s180),'0'),
+          NVL(trim(sp.s240),'0'),
+          NVL(trim(sp.s580),'0'), 
+          c.rnk
    FROM (SELECT s.acc, s.nls, s.kv, aa.fdat, s.nbs, aa.ostf,
-         aa.dos, aa.kos, s.rnk
+         aa.dos, aa.kos, s.rnk, s.mdate
          FROM saldoa aa, accounts s
          WHERE aa.acc=s.acc     AND
               (s.acc,aa.fdat) =
@@ -140,6 +167,101 @@ CURSOR BaseL IS
     SELECT kodp, znap
     FROM rnbu_trace
 order by kodp;
+
+
+    procedure P_Set_S580_Def(r020_ in varchar2, r013_ in varchar2) is
+       invk_ varchar2(1);
+    begin
+       if r020_ = '9500' then
+          if r013_ in ('1','3') then
+             s580_ := '5';
+          end if;
+
+          if r013_ = '9' then
+             s580_ := '9';
+          end if;
+       end if;
+
+       if r020_ in ('3570','3578')  then
+          if r013_ in ('3','4')  then   s580_ :='5';  end if;
+          if r013_ in ('5','6')  then   s580_ :='1';  end if;
+       end if;
+
+       if mfou_ = 353575 and r020_ in ('1518', '1520', '1521') or
+          mfou_ <> 353575 and r020_ in ('1500','1502','1508','1509',
+                                        '1510','1512','1513','1515','1516','1517','1518','1519',
+                                        '1520','1521','1523','1524','1525','1526','1528')
+       then
+           begin
+             select nvl(trim(VALUE), '2')
+             into invk_
+             from customerw
+             where rnk = rnk_ and
+                   tag = 'INVCL';
+           exception
+                when no_data_found then
+                    invk_:= null;
+           end;
+       else
+           invk_:= null;
+       end if;
+
+       invk_:= nvl(invk_, '2');
+
+       s580_ := (case
+                   when r020_||invk_ in ('15003','15083','15103','15123') then '1'
+                   when r020_||invk_ in ('15001','15081','15101','15121') then '3'
+                   when r020_||invk_ in ('15002','15082','15102','15122') then '4'
+                   ---
+                   when r020_||r013_ in ('15023') then '1'
+                   when r020_||r013_ in ('15021','15022','15029') and invk_ ='3'  then '1'
+                   when r020_||r013_ in ('15021')         and invk_ in ('1','2')  then '4'
+                   when r020_||r013_ in ('15022','15029') and invk_ in ('1','2')  then '5'
+                   ---
+                   when r020_||invk_ in ('15133') then '1'
+                   when r020_||invk_ in ('15131','15132') then '5'
+                   ---
+                   when r020_||r013_ in ('15185','15186','15187','15188') and invk_ ='3'  then '1'
+                   when r020_||r013_ in ('15185','15187') and invk_ ='1'  then '3'
+                   when r020_||r013_ in ('15186','15188') and invk_ ='2'  then '5'
+                   when r020_||invk_ in ('15182') then '5'
+                   when r020_ in ('1509','1519')  then '5'
+                   ---
+                   when r020_||r013_ in ('15151','15154','15161','15164') and invk_ ='3'  then '1'
+                   when r020_||r013_ in ('15151','15154','15161','15164') and invk_ ='1'  then '3'
+                   when r020_||r013_ in ('15151','15154','15161','15164') and invk_ ='2'  then '4'
+                   when r020_||r013_ in ('15152','15162')  and invk_ ='3'          then '1'
+                   when r020_||r013_ in ('15152','15162')  and invk_ in ('1','2')  then '5'
+                   ---
+                   when r020_||invk_ in ('15203', '15213', '15223','15233') then '1'
+                   when r020_||invk_ in ('15201', '15202', '15221', '15222') then '5'
+                   when r020_||invk_ in ('15211', '15231') then '3'
+                   when r020_||invk_ in ('15212') then '4'
+                   when r020_||invk_ in ('15232') then '5'
+                   ---
+                   when r020_||r013_||invk_ in ('152433') then '1'
+                   when r020_||r013_||invk_ in ('152411', '152412') then '5'
+                   ---
+                   when r020_||invk_ in ('15253') and r013_ in ('1','2','3','4','5','7') then '1'
+                   when r020_||invk_ in ('15251') and r013_ in ('1','4') then '3'
+                   when r020_||invk_ in ('15251') and r013_ in ('2','3','5','7') then '5'
+                   when r020_||r013_ in ('15254') then '4'
+                   when r020_||r013_ in ('15251','15252','15253','15255','15257') and invk_ = '2' then '5'
+                   ---
+                   when r020_||invk_ in ('15263') and r013_ in ('1','2','3','4','5','7')  then '1'
+                   when r020_||invk_ in ('15261') and r013_ in ('1','4') then '3'
+                   when r020_||invk_ in ('15261') and r013_ in ('2','3','5','7')  then '5'
+                   when r020_||r013_ in ('15264') then '4'
+                   when r020_||r013_ in ('15261','15262','15263','15265','15267') and invk_ = '2' then '5'
+                   ---
+                   when r020_||invk_ in ('15283') then '1'
+                   when r020_||invk_ in ('15281') then '3'
+                   when r020_||r013_ in ('15285','15287') then '4'
+                   when r020_||r013_ in ('15286','15288') and invk_ = '2' then '5'
+                     else
+                         s580_
+                   end);
+    end;
 
 BEGIN
 -------------------------------------------------------------------
@@ -177,7 +299,8 @@ kodp1_ := '0' ;
 OPEN SALDO;
 LOOP
    FETCH SALDO INTO acc_, nls_, kv_, data_, nbs_, cs_, agent_, mfo_,
-                    glb_, kb_, rb_, nb_, sn_, r013s_, rnk_ ;
+                    glb_, kb_, rb_, nb_, sn_, r011s_, r013s_, 
+                    s180s_, s240s_,  s580s_, rnk_ ;
    EXIT WHEN SALDO%NOTFOUND;
 
    r1518_ := 0;
@@ -193,7 +316,8 @@ LOOP
       glb_ := 93;
    end if;
 
-   IF nbs_ = '1502' THEN
+   IF nbs_ = '1502' and Dat_ < dat_izm1 
+   THEN
       if r013s_ = '1' then
          r013_ := '1';
       end if;
@@ -202,16 +326,18 @@ LOOP
       end if;
    END IF;
 
-   IF nbs_ in ('1518','1528') THEN
-      if r013s_ in ('5','7') then
+   IF nbs_ in ('1518','1528') and Dat_ < dat_izm1
+   THEN
+      if r013s_ in ('2','5','7') then
          r013_ := '1';
       end if;
-      if r013s_ in ('6','8') then
+      if r013s_ in ('3','6','8') then
          r013_ := '2';
       end if;
    END IF;
 
-   IF nbs_ in ('1518','1528') THEN
+   IF nbs_ in ('1518','1528') and Dat_ < dat_izm1
+   THEN
       BEGIN
          select substr(a.nls,1,4) 
             into nbs_o 
@@ -222,7 +348,7 @@ LOOP
       EXCEPTION WHEN NO_DATA_FOUND THEN
          nbs_o := null;
       END;
- 
+
       if nbs_o in ('1510','1512') then
          r013_ := '1';
       end if;
@@ -232,7 +358,7 @@ LOOP
       end if;
 
       if nbs_o in ('1520','1521','1523') then
-         r013_ := '1';
+          r013_ := '1';
       end if;
  
       if nbs_o in ('1522','1524','1525','1526','1527') then
@@ -241,17 +367,9 @@ LOOP
 
    END IF;
 
-   IF Dat_ >= to_date('31102008','ddmmyyyy') and nbs_ in ('1525','1526') and 
-      r013s_ = '4' then
-      r013_ := '4';
-   END IF;
-
-   IF Dat_ >= to_date('31102008','ddmmyyyy') and nbs_ in ('1525','1526') and 
-      r013s_ != '4' then
-      r013_ := '1';
-   END IF;
-
-   IF Dat_ >= to_date('10012014','ddmmyyyy') and nbs_ in ('1525','1526') then
+   IF Dat_ >= to_date('10012014','ddmmyyyy') and 
+      Dat_ < dat_izm1 and 
+      nbs_ in ('1525','1526') then
       if r013s_ in ('2','3','5','7') then
          r013_ := '1';
       elsif r013s_ = '1' then
@@ -265,18 +383,83 @@ LOOP
       end if;
    END IF;
 
-   IF nbs_  in ('3540','3640','9100') THEN
+   IF nbs_  in ('3540','3640','9100') and Dat_ < dat_izm1
+   THEN
       r013_ := r013s_;
    END IF;
 
-   IF nbs_ not in ('1502','1518','1528','1525','1526','3540','3640','9100') THEN
+   IF nbs_ not in ('1502','1518','1528','1525','1526','3540','3640','9100') and 
+      Dat_ < dat_izm1
+   THEN
       r013_ := '0';
    END IF;
 
-   IF SN_<>0 and ( nbs_ not in ('1525','1526','3540','3640') or 
-                   (nbs_ in ('1525','1526') and r013_ in ('1','2','3','4','5','6','7')) or 
-                   (nbs_ in ('3540','3640') and r013_ in ('4','5','6'))  
-                 ) 
+   IF Dat_ >= dat_izm1
+   THEN
+      r011_ := r011s_;
+      r013_ := r013s_;
+      s180_ := s180s_;
+      s181_ := '0';
+      if s180_ < 'C'
+      then
+         s181_ := '1';
+      end if;
+
+      if s180_ >= 'C'
+      then
+         s181_ := '2';
+      end if;
+
+      s240_ := s240s_;
+      s580_ := s580s_;
+
+      begin
+         select S580
+            into s580a_
+         from otc_risk_s580
+         where s580 <> 'R' and
+               R020 = nbs_ and
+               T020 in ('1', '3') and
+               (r013 = r013_ or r013 = '0');
+      exception
+        when no_data_found then
+         s580a_ := '0';
+      end;
+
+      if s580a_ = '0' then
+         s580_ := null;
+
+         p_set_s580_def(substr(nls_, 1, 4), r013_);
+
+         if s580_ is not null then
+            s580a_ := s580_;
+         else
+            s580a_ := '9';
+         end if;
+      end if;
+
+      kod_j_ := '0';
+
+      s245_ :='1';
+      if tips_ in ('SK9','SP ','SPN','OFR','KSP','KK9','KPN')
+      then
+         s245_ :='2';
+      elsif  nbs_ like '150_'
+         or  nbs_ like '34__' or  nbs_ like '36__'
+         or  nbs_ like '44__' or  nbs_ like '45__'
+         or  nbs_ like '9___'
+         or  nbs_ in ('2920','3500')
+      then
+         s245_ :='0';
+      end if;
+   END IF;
+      
+   IF (SN_ <> 0 and ( nbs_ not in ('1525','1526','3540','3640') or 
+                     (nbs_ in ('1525','1526') and r013_ in ('1','2','3','4','5','6','7')) or 
+                     (nbs_ in ('3540','3640') and r013_ in ('4','5','6'))  
+                    ) and Dat_ < dat_izm1) 
+           OR
+      (SN_ <> 0 and Dat_ >= dat_izm1) 
    THEN
 
       IF kv_<> 980 THEN
@@ -285,11 +468,9 @@ LOOP
          se_ := sn_ ;
       END IF;
    
-      IF Dat_ <= to_date('10012013','ddmmyyyy') and nbs_ = '3540' and r013s_ in ('4','5','6') THEN
-         r013_ := '9';
-      END IF;   
-
-      IF Dat_ >= to_date('30092013','ddmmyyyy') and nbs_ in ('3540','3640') and 
+      IF Dat_ >= to_date('30092013','ddmmyyyy') and 
+         Dat_ < dat_izm1 and 
+         nbs_ in ('3540','3640') and 
          r013s_ in ('4','5','6') 
       THEN
          r013_ := '9';
@@ -312,135 +493,6 @@ LOOP
             end if;
          END IF;
       END IF;
-
-      if nbs_ = '9200' and Dat_ < to_date('07092009','ddmmyyyy') and 
-         mfob_ in (300205,380623,300120) then
-
-         for k in (select ref, accd, nlsd, kv,
-                   NVL(sum(s*100), 0) s,
-                   NVL(sum(GL.P_ICURVAL(kv, s*100, fdat)), 0) sq,
-                   acck, nlsk
-                   from provodki
-                   where fdat BETWEEN Dat1_ and Dat_ and
-                         trim(nlsd) = trim(nls_) and
-                         kv = kv_
-                   group by ref, accd, nlsd, kv, acck, nlsk )
-         loop
-
-         BEGIN
-            select ref
-               into ref_
-            from fx_deal
-            where (DECODE(ref1, NULL, ref, ref1) = k.ref or ref = k.ref+1);
-         EXCEPTION WHEN NO_DATA_FOUND THEN
-            ref_ := NULL;
-         END;
-
-         if ref_ is not null then
-            select NVL(sum(s*100),0),
-                   NVL(sum(GL.P_ICURVAL(kv, s*100, fdat)), 0)
-               into sump_, sumpq_
-            from provodki
-            where fdat BETWEEN Dat1_ and Dat_
-              and ref = ref_
-              and nlsk = nls_
-              and kv = k.kv
-              and nlsd = k.nlsk;
-         end if;
-
-         if k.s - NVL(sump_,0) > 0 then
-
-            BEGIN
-               select a.kod_g, lpad(to_char(nvl(a.mfo,0)),10,'0'), a.name,
-                      lpad(to_char(NVL(r.glb,0)),3,'0')
-                  into cs1_, kb1_, nb1_, glb_
-               from forex_alien a, fx_deal f, rcukru r
-               where (DECODE(f.ref1,NULL,f.ref,f.ref1)=k.ref or f.ref=k.ref+1)
-                 and a.kv = k.kv 
-                 and trim(a.mfo) = trim(f.kodb) 
-                 and rownum = 1
-                 and a.mfo = r.mfo(+);
-            EXCEPTION WHEN NO_DATA_FOUND THEN
-               BEGIN
-                    select a.kod_g, lpad(to_char(nvl(a.mfo,0)),10,'0'), a.name,
-                           lpad(to_char(NVL(r.glb,0)),3,'0')                           
-                     into cs1_, kb1_, nb1_, glb_ 
-                    from forex_alien a, fx_deal f, rcukru r
-                    where (DECODE(f.ref1,NULL,f.ref,f.ref1)=k.ref or f.ref=k.ref+1)
-                      and a.kv = k.kv 
-                      and trim(a.bic) = trim(f.kodb) 
-                      and rownum = 1
-                      and a.mfo = r.mfo(+);
-               EXCEPTION WHEN NO_DATA_FOUND THEN
-                  BEGIN 
-                     select a.kod_g, lpad(to_char(nvl(a.mfo,0)),10,'0'), a.name, 
-                            lpad(to_char(NVL(r.glb,0)),3,'0')
-                        into cs1_, kb1_, nb1_, glb_ 
-                     from forex_alien a, fx_deal f, rcukru r
-                     where (DECODE(f.ref1,NULL,f.ref,f.ref1) = k.ref or f.ref = k.ref+1)
-                       and trim(a.nlsk) = trim(f.swo_acc) 
-                       and trim(a.agrmnt_num) = trim(f.agrmnt_num) 
-                       and rownum = 1
-                       and a.mfo = r.mfo(+);                   
-                  EXCEPTION WHEN NO_DATA_FOUND THEN
-                     cs1_ := 0;
-                     kb1_ := '0000000000';
-                     nb1_ := ' ';
-                     glb_ := '000';
-                  END;
-               END;
-            END;
-
-            if dat_ > to_date('08072010','ddmmyyyy') then
-               kb1_ := lpad(glb_,10,'0') ;
-            end if;
-
-            kodp_ := '11' || LPAD(to_char(cs1_),3,'0') || kb1_ || nbs_ ||
-                     LPAD(to_char(kv_),3,'0') || r013_ ;
-
-            INSERT INTO rnbu_trace
-                    (nls, kv, odate, kodp, znap, acc, rnk)
-            VALUES  (k.nlsd, k.kv, dat_, kodp_, to_char(k.s-sump_), acc_, rnk_);
-
-            sn_ := sn_ + (k.s-sump_);
-
-            -- эквивалент
-            sq_ := NVL(GL.P_ICURVAL(k.kv, k.s, dat_), 0);
-            sumpq_ := NVL(GL.P_ICURVAL(k.kv, sump_, dat_), 0);
-            if sq_ - sumpq_ > 0 then   
-               kodp_ := '10' || LPAD(to_char(cs1_),3,'0') || kb1_ || nbs_ ||
-                        LPAD(to_char(kv_),3,'0') || r013_ ;
-
-               INSERT INTO rnbu_trace
-                       (nls, kv, odate, kodp, znap, acc, rnk)
-               VALUES  (k.nlsd, k.kv, dat_, kodp_, to_char(sq_-sumpq_), acc_, rnk_); 
-
-               se_ := se_ + (sq_-sumpq_);  
-
-            end if;
-
-         end if;
-
-         if k.s - NVL(sump_,0) > 0 then
-            invk_ := ' ';
-
-            kodp_ := '97' || LPAD(to_char(cs1_),3,'0') || kb1_ || '00000000' ;
-            INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, acc, rnk) VALUES
-                             (k.nlsd, k.kv, data_, kodp_, invk_, acc_, rnk_);
-
-            kodp_ := '98' || LPAD(to_char(cs1_),3,'0') || kb1_ || '00000000' ;
-            INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, acc, rnk) VALUES
-                                   (k.nlsd, k.kv, data_, kodp_, nb1_, acc_, rnk_);
-
-            kodp_ := '99' || LPAD(to_char(cs1_),3,'0') || kb1_ || '00000000' ;
-            INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, acc, rnk) VALUES
-                             (k.nlsd, k.kv, data_, kodp_, ' ', acc_, rnk_);
-
-         end if;
-
-         end loop;
-
-      end if;
 
       IF nbs_ = '1500' THEN
 
@@ -486,8 +538,18 @@ LOOP
              end if;
 
              dk_ := IIF_N(l_znak*se_,0,'10','20','20');
-             kodp_:= dk_ || LPAD(to_char(cs_),3,'0') || kb_ || nbs_ ||
-                            LPAD(to_char(kv_),3,'0') || '2' ;
+             
+             -- за 29/12/2017 (на 01/01/2018) новая структура показателя 
+             IF Dat_ < dat_izm1
+             THEN
+                kodp_:= dk_ || LPAD(to_char(cs_),3,'0') || kb_ || nbs_ ||
+                               LPAD(to_char(kv_),3,'0') || '2' ;
+             ELSE
+                kodp_:= dk_ || LPAD(to_char(cs_),3,'0') || kb_ || nbs_ ||
+                        r011_ || r013_ || LPAD(to_char(kv_),3,'0') || '2' ||
+                        s181_ || s245_ || s580a_;
+             END IF;
+
              znap_ := TO_CHAR(ABS(l_se)) ;
 
              INSERT INTO rnbu_trace
@@ -497,8 +559,16 @@ LOOP
              if kv_ != 980  then
 
                 dk_ := IIF_N(l_znak*se_,0,'11','21','21');
-                kodp_ := dk_ || LPAD(to_char(cs_),3,'0') || kb_ || nbs_ ||
-                               LPAD(to_char(kv_),3,'0') || '2' ;
+                IF Dat_ < dat_izm1
+                THEN
+                   kodp_ := dk_ || LPAD(to_char(cs_),3,'0') || kb_ || nbs_ ||
+                                  LPAD(to_char(kv_),3,'0') || '2' ;
+                ELSE
+                   kodp_:= dk_ || LPAD(to_char(cs_),3,'0') || kb_ || nbs_ ||
+                           r011_ || r013_ || LPAD(to_char(kv_),3,'0') || '2' ||
+                           s181_ || s245_ || s580a_;
+                END IF;
+
                 znap_ := TO_CHAR(ABS(l_sn)) ;
 
                 INSERT INTO rnbu_trace
@@ -513,32 +583,55 @@ LOOP
           end if;
 
         end if;
+        
+        IF Dat_ < dat_izm1
+        THEN
+           r013_ := '1';
+        ELSE
+           kod_j_ := '1';
+        END IF;
 
-        r013_ := '1';
       END IF;          
 
       if se_ <> 0 then
          dk_ := IIF_N(se_,0,'10','20','20');
-         if nbs_ = '1500'  and  dk_='20'  then
+         if nbs_ = '1500'  and  dk_='20' and Dat_ < dat_izm1  
+         then
             r013_ := '0';
          end if;
 
-         kodp_ := dk_ || LPAD(to_char(cs_),3,'0') || kb_ || nbs_ ||
-                  LPAD(to_char(kv_),3,'0') || r013_ ;
+         IF Dat_ < dat_izm1
+         THEN
+            kodp_ := dk_ || LPAD(to_char(cs_),3,'0') || kb_ || nbs_ ||
+                     LPAD(to_char(kv_),3,'0') || r013_ ;
+         ELSE
+            kodp_:= dk_ || LPAD(to_char(cs_),3,'0') || kb_ || nbs_ ||
+                    r011_ || r013_ || LPAD(to_char(kv_),3,'0') || kod_j_ ||
+                    s181_ || s245_ || s580a_;
+         END IF;
+
          znap_ := TO_CHAR(ABS(se_)) ;
 
          INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, acc, rnk) VALUES
                                 (nls_, kv_, data_, kodp_, znap_, acc_, rnk_);
       end if;
 
-      IF kv_<> 980 and sn_ <> 0 THEN
+      IF kv_<> 980 and sn_ <> 0 
+      THEN
          dk_ := IIF_N(sn_,0,'11','21','21');
          if nbs_ = '1500'  and  dk_ = '21'  then
             r013_ := '0';
          end if;
 
+         IF Dat_ < dat_izm1
+         THEN
          kodp_ := dk_ || LPAD(to_char(cs_),3,'0') || kb_ || nbs_ ||
                  LPAD(to_char(kv_),3,'0') || r013_ ;
+         ELSE
+            kodp_:= dk_ || LPAD(to_char(cs_),3,'0') || kb_ || nbs_ ||
+                    r011_ || r013_ || LPAD(to_char(kv_),3,'0') || kod_j_ ||
+                    s181_ || s245_ || s580a_;
+         END IF;
 
          if kv_ in (959, 961, 962) and mfou_ not in (300465, 380764) then
             znap_ := TO_CHAR(round(ABS(sn_)/10,0));
@@ -562,8 +655,13 @@ LOOP
             invk_ := '2';
          END IF;
 
-         kodp_ := '97' || LPAD(to_char(cs_),3,'0') || kb_ || '00000000' ;
-         INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, acc, rnk) VALUES
+         IF Dat_ < dat_izm1 
+         THEN
+            kodp_ := '97' || LPAD(to_char(cs_),3,'0') || kb_ || '00000000' ;
+         ELSE
+            kodp_ := '97' || LPAD(to_char(cs_),3,'0') || kb_ || '0000000000009' ;
+         END IF;
+            INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, acc, rnk) VALUES
                                 (nls_, kv_, data_, kodp_, invk_, acc_, rnk_);
 
          IF MOD(agent_,2)=0 THEN
@@ -586,11 +684,23 @@ LOOP
             END;
          END IF;
 
-         kodp_ := '98' || LPAD(to_char(cs_),3,'0') || kb_ || '00000000' ;
+         IF Dat_ < dat_izm1
+         THEN
+            kodp_ := '98' || LPAD(to_char(cs_),3,'0') || kb_ || '00000000' ;
+         ELSE
+            kodp_ := '98' || LPAD(to_char(cs_),3,'0') || kb_ || '0000000000009' ;
+         END IF;
+
          INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, acc, rnk) VALUES
                                 (nls_, kv_, data_, kodp_, nb_, acc_, rnk_);
 
-         kodp_ := '99' || LPAD(to_char(cs_),3,'0') || kb_ || '00000000' ;
+         IF Dat_ < dat_izm1
+         THEN
+            kodp_ := '99' || LPAD(to_char(cs_),3,'0') || kb_ || '00000000' ;
+         ELSE
+            kodp_ := '99' || LPAD(to_char(cs_),3,'0') || kb_ || '0000000000009' ;
+         END IF;
+
          INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, acc, rnk) VALUES
                                 (nls_, kv_, data_, kodp_, rb_, acc_, rnk_);
       end if;
