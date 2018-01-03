@@ -4,7 +4,7 @@
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/cim_mgr.sql =========*** Run *** ===
  PROMPT ===================================================================================== 
  
-  CREATE OR REPLACE PACKAGE BARS.CIM_MGR 
+CREATE OR REPLACE PACKAGE CIM_MGR
 is
    --
    --  CIM_MGR
@@ -15,7 +15,7 @@ is
 -- g_header_version    constant varchar2 (64) := 'version 1.00.02 16/11/2015';
 -- g_header_version    constant varchar2 (64) := 'version 1.00.03 04/04/2016';
 -- g_header_version    constant varchar2 (64) := 'version 1.00.04 08/08/2016';
-   g_header_version    constant varchar2 (64) := 'version 1.01.01 04/04/2017';
+   g_header_version    constant varchar2 (64) := 'version 1.01.02 04/12/2017';
    g_awk_header_defs   constant varchar2 (512) := '';
 
    --------------------------------------------------------------------------------
@@ -668,7 +668,8 @@ function check_bound(p_doc_kind in number, --вид документу (0 - платіж, 1 - МД)
 --
 function get_control_date(p_doc_kind in number, --id висновку
                           p_doc_type in number, --тип документу
-                          p_doc_id in number --id документу
+                          p_doc_id in number, --id документу
+                          p_pay_flag in number default null -- для оптимізації при виклику з cim_reports                          
                          ) return date;
 
 --------------------------------------------------------------------------------
@@ -779,7 +780,7 @@ is
 -- g_body_version      constant varchar2 (64) := 'version 1.00.03 16/11/2015';
 -- g_body_version      constant varchar2 (64) := 'version 1.00.04 04/04/2016';
 -- g_body_version      constant varchar2 (64) := 'version 1.00.05 08/08/2016';
-   g_body_version      constant varchar2 (64) := 'version 1.01.04 12/06/2017';
+   g_body_version      constant varchar2 (64) := 'version 1.01.05 04/12/2017';
    g_awk_body_defs     constant varchar2 (512) := '';
 
    --------------------------------------------------------------------------------
@@ -2642,7 +2643,7 @@ is
   l_s number; -- Cума прив`язки
   l_sos number; -- Стан документу
   l_branch varchar2(30); -- Код установи
-  l_service_branch varchar2(30); -- Відділення, відповідальне за прийом первинних документів   
+  l_service_branch varchar2(30); -- Відділення, відповідальне за прийом первинних документів
   l_direct number;
   l_contr_id number;
   l_status number;
@@ -2654,14 +2655,14 @@ begin
     select count(*), max(ref), max(s), max(branch), max(direct), max(contr_id) into l_n, l_ref, l_s, l_branch, l_direct, l_contr_id
       from cim_payments_bound where delete_date is null and bound_id=p_bound_id;
     if l_n=1 then
-      select c.branch, c.service_branch,  c.status_id 
+      select c.branch, c.service_branch,  c.status_id
       into l_branch, l_service_branch, l_status
       from cim_contracts c where c.contr_id = l_contr_id;
       if l_status=1 or l_status>8 then bars_error.raise_error(g_module_name, 6); end if;
       --if l_branch != sys_context('bars_context', 'user_branch') then bars_error.raise_error(g_module_name, 40); end if;
       if not (l_branch = sys_context('bars_context', 'user_branch') or l_service_branch = sys_context('bars_context', 'user_branch')) then
         bars_error.raise_error(g_module_name, 40);
-      end if;      
+      end if;
       select max(sos) into l_sos from oper where ref=l_ref;
       select count(*) into l_n from cim_link where delete_date is null and payment_id=p_bound_id;
       if l_n>0 then bars_error.raise_error(g_module_name, 53); end if;
@@ -2691,14 +2692,14 @@ begin
     select count(*), max(fantom_id), max(s), max(branch), max(direct), max(contr_id) into l_n, l_ref, l_s, l_branch, l_direct, l_contr_id
       from cim_fantoms_bound where delete_date is null and bound_id=p_bound_id;
     if l_n=1 then
-      select c.branch, c.service_branch,  c.status_id 
+      select c.branch, c.service_branch,  c.status_id
       into l_branch, l_service_branch, l_status
       from cim_contracts c where c.contr_id = l_contr_id;
       if l_status=1 or l_status>8 then bars_error.raise_error(g_module_name, 6); end if;
       --if l_branch != sys_context('bars_context', 'user_branch') then bars_error.raise_error(g_module_name, 40); end if;
       if not (l_branch = sys_context('bars_context', 'user_branch') or l_service_branch = sys_context('bars_context', 'user_branch')) then
         bars_error.raise_error(g_module_name, 40);
-      end if;      
+      end if;
       select count(*) into l_n from cim_link where delete_date is null and fantom_id=p_bound_id;
       if l_n>0 then bars_error.raise_error(g_module_name, 53); end if;
       select count(*) into l_n from cim_fantoms_bound where delete_date is null and contr_id is null and fantom_id=l_ref;
@@ -2951,7 +2952,7 @@ is
   l_ref number;
   l_s number; -- Cума прив`язки
   l_branch varchar2(30); -- Код установи
-  l_service_branch varchar2(30); -- Відділення, відповідальне за прийом первинних документів 
+  l_service_branch varchar2(30); -- Відділення, відповідальне за прийом первинних документів
   l_s_vmd number; -- Cума ВМД
   l_contr_id number;
   l_status number;
@@ -2960,13 +2961,13 @@ begin
     select count(*), max(vmd_id), max(s_vt), max(branch), max(contr_id) into l_n, l_ref, l_s, l_branch, l_contr_id
       from cim_vmd_bound where delete_date is null and bound_id=p_bound_id;
     if l_n=1 then
-      select c.branch, c.service_branch,  c.status_id 
+      select c.branch, c.service_branch,  c.status_id
       into l_branch, l_service_branch, l_status
       from cim_contracts c where c.contr_id = l_contr_id;
       --if l_branch!=sys_context('bars_context', 'user_branch') then bars_error.raise_error(g_module_name, 40); end if;
       if not (l_branch = sys_context('bars_context', 'user_branch') or l_service_branch = sys_context('bars_context', 'user_branch')) then
         bars_error.raise_error(g_module_name, 40);
-      end if;  
+      end if;
       --select status_id into l_status from cim_contracts where contr_id=l_contr_id;
       if l_status=1 or l_status>8 then bars_error.raise_error(g_module_name, 6); end if;
       select count(*) into l_n from cim_link where delete_date is null and vmd_id=p_bound_id;
@@ -2983,10 +2984,10 @@ begin
     if l_n=1 then
       select c.branch, c.service_branch, c.status_id
       into l_branch, l_service_branch, l_status
-      from cim_contracts c where c.contr_id = l_contr_id;   
+      from cim_contracts c where c.contr_id = l_contr_id;
       if not (l_branch = sys_context('bars_context', 'user_branch') or l_service_branch = sys_context('bars_context', 'user_branch')) then
         bars_error.raise_error(g_module_name, 40);
-      end if;           
+      end if;
 --      if l_branch!=sys_context('bars_context', 'user_branch') then bars_error.raise_error(g_module_name, 40); end if;
 --      select status_id into l_status from cim_contracts where contr_id=l_contr_id;
       if l_status=1 or l_status>8 then bars_error.raise_error(g_module_name, 6); end if;
@@ -3212,9 +3213,9 @@ is
   l_date date;
 begin
   if sys_context('bars_context','user_mfo') is null then
-    bars_audit.error(g_module_name||' '||g_trace_module||'journal_numbering: user_id '||user_id()||' kf '||sys_context('bars_context','user_mfo'));    
+    bars_audit.error(g_module_name||' '||g_trace_module||'journal_numbering: user_id '||user_id()||' kf '||sys_context('bars_context','user_mfo'));
     raise_application_error(-20001,'Представтесь відділенням');
-  end if;  
+  end if;
   bars_audit.info(g_module_name||' '||g_trace_module||'journal_numbering: user_id '||user_id()||' kf '||sys_context('bars_context','user_mfo'));
   select to_date(par_value, 'DD/MM/YYYY HH24:MI:SS') into l_date from cim_params where par_name='JOURNAL_NUMBERING_DATE';
   if (sysdate-l_date)<0.0035 then
@@ -3426,7 +3427,8 @@ end check_bound;
 --
 function get_control_date(p_doc_kind in number, --Вид документу
                           p_doc_type in number, --тип документу
-                          p_doc_id in number --id документу
+                          p_doc_id in number, --id документу
+                          p_pay_flag in number default null -- для оптимізації при виклику з cim_reports
                          ) return date
 is
   l_vdat date;
@@ -3455,10 +3457,14 @@ begin
 --  raise_application_error(-20001, 'p_doc_kind='||p_doc_kind||' p_doc_type='||p_doc_type||' p_doc_id='||p_doc_id);
 --  bars_audit.info('CIM_MGR.get_control_date: p_doc_kind='||p_doc_kind||' p_doc_type='||p_doc_type||' p_doc_id='||p_doc_id);
   if p_doc_kind=0 then
-    select b.vdat, b.contr_id, (select contr_type from cim_contracts where contr_id=b.contr_id)--, b.borg_reason
-      into l_vdat, l_contr_id, l_contr_type from /*v_cim_trade_payments*/v_cim_bound_payments b
-      where b.pay_flag = 0 and b.type_id=p_doc_type and b.bound_id=p_doc_id;
-      if l_contr_type!=1 then return null; end if;
+    if nvl(p_pay_flag, 0) = 0 then
+      select b.vdat, b.contr_id, (select contr_type from cim_contracts where contr_id=b.contr_id)--, b.borg_reason
+        into l_vdat, l_contr_id, l_contr_type from /*v_cim_trade_payments*/v_cim_bound_payments b
+        where b.pay_flag = 0 and b.type_id=p_doc_type and b.bound_id=p_doc_id;
+        if l_contr_type!=1 then return null; end if;
+        else --тоді тупо ретурн нулл, бо буде но_дата_фаунд (бо cim_reports використовує також v_cim_bound_payments)
+          return null;
+    end if;   
   else
     if p_doc_type=0 then
       select trunc(v.allow_dat), b.contr_id into l_vdat, l_contr_id
@@ -3489,7 +3495,8 @@ begin
   exception
     when others then
       bars_audit.error('CIM_MGR.get_control_date: p_doc_kind='||p_doc_kind||' p_doc_type='||p_doc_type||' p_doc_id='||p_doc_id||' l_minus_date='||COALESCE(to_char(l_minus_date,'DD.MM.YYYY'),'NULL')||' l_vdat='||l_vdat||' l_deadline='||COALESCE(to_char(l_deadline, 'DD.MM.YYYY'), 'NULL')||' ERR:'||sqlerrm);
-      raise;
+      return null;
+--      raise;
 end get_control_date;
 
 --------------------------------------------------------------------------------
