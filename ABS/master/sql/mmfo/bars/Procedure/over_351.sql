@@ -1,9 +1,9 @@
 CREATE OR REPLACE PROCEDURE BARS.OVER_351 (p_dat01 date, p_mode integer  default 0 ) IS
 
-/* Версия 10.3  28-11-2017  16-11-2017  12-09-2017  04-05-2017   05-04-2017  06-03-2017  
+/* Версия 10.4  03-01-2018  28-11-2017  16-11-2017  12-09-2017  04-05-2017   05-04-2017  06-03-2017  
  Розрахунок кредитного ризику по ОВЕРДРАФТАХ
 -------------------------------------------
-
+14) 03-01-2018(10.4) - тормозился расчет 
 13) 28-11-2017(10.3) - Новый план счетов через REZ_DEB (2069 --> SPN)
 12) 27-11-2017(10.2) - LGD для 9129 безризикових =1 , по ризиковим розраховується
 11) 12-09-2017 - L_CR := round(l_pd * L_LGD *l_EAD,2);
@@ -41,7 +41,7 @@ begin
    delete from REZ_CR where fdat = p_Dat01 and tipa in (10,90);
    for d in ( select * from acc_over )
    LOOP 
-      --logger.info('REZ_351 1 : nd = ' || d.nd || ' d.vidd = '|| d.vidd ) ;
+      
       vkr_  := cck_app.get_nd_txt(d.nd, 'VNCRR') ;
       l_vkr := 'ОВЕР ';
       if d.datd2 is null THEN
@@ -68,7 +68,7 @@ begin
                               DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6', 2, 1) RZ    
                       from accounts  a, customer c  
                       where  acc in (select acc from nd_acc where nd=d.nd) 
-                        and  a.NBS IN (select nbs from rez_deb  where grupa = 4 and ( d_close is null or d_close > p_dat01)) or a.tip in ('SPN')   --and nbs='2069' 
+                        and  a.NBS IN (select nbs from rez_deb  where (grupa = 4 and ( d_close is null or d_close > p_dat01)) or a.tip in ('SPN'))   --and nbs='2069' 
                       and acc not in ( select a.acc from accounts a 
                                        where acc = (select acra from int_accn where id=0 and acc=d.acco) and nbs not like '8%'   and a.rnk=c.rnk)
                       and acc not in (select acc from rez_cr where fdat=p_dat01)
@@ -108,13 +108,13 @@ begin
             EXCEPTION WHEN NO_DATA_FOUND THEN l_istval := 0;  
             END; 
          end if; 
-
+         logger.info('OVER_351 1 : nd = ' || d.nd || ' rnk = '|| s.rnk ) ;
          begin 
             SELECT  CASE WHEN REGEXP_LIKE(value,'^[ |.|,|0-9]+$') 
                     THEN 0+REPLACE(REPLACE(value ,' ',''),',','.') 
                     ELSE 0 END
                INTO l_dv FROM customerw WHERE rnk=s.rnk AND trim(tag)='UUDV';
-         EXCEPTION WHEN NO_DATA_FOUND THEN l_dv := 0;  
+         EXCEPTION WHEN OTHERS THEN l_dv := 0;  
          END; 
 
          l_ovkr := null; --f_ovkr(s.rnk,d.nd); --    ознаки високого кредитного ризику:-

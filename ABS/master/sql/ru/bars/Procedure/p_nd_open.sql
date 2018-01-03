@@ -1,9 +1,9 @@
 CREATE OR REPLACE PROCEDURE p_nd_open (p_dat01 date) IS 
 
-/* Версия 2.3  16-11-2017  17-10-2017  29-09-2017  12-06-2017  30-09-2016
+/* Версия 2.4  03-01-2018 16-11-2017  17-10-2017  29-09-2017  12-06-2017  30-09-2016
    Действующий ли договор (Кредиты ЮЛ и ФЛ) - vidd in (1,2,3,11,12,13,110) 
    -------------------------------------
-
+4) 03-01-2018(2.4) - тормозился расчет 
 3) 16-11-2017(2.3) - через REZ_DEB 
 2) 17-10-2017(2.2) - Добавка из nd_acc по типу a.tip = 'SPN' (было 2069)
 1) 12-06-2017 -    ОВЕР из CC_DEAL по условию VIDD = 110
@@ -79,7 +79,7 @@ begin
                          union all
                          select - ost_korr(a.acc,l_dat31,null,a.nbs) S from accounts  a, customer c  
                          where acc   in (select acc from nd_acc   where nd    = k.nd) 
-                           and a.NBS IN (select nbs from rez_deb  where grupa = 4 and ( d_close is null or d_close > p_dat01)) or a.tip in ('SPN') 
+                           and a.NBS IN (select nbs from rez_deb  where (grupa = 4 and ( d_close is null or d_close > p_dat01)) or a.tip in ('SPN')) 
                            and acc not in (select a.acc from accounts a where acc = (select acra from int_accn where id=0 and acc=k.acco)) 
                            and nbs not like '8%' and a.rnk=c.rnk and a.rnk=c.rnk
                          union all
