@@ -4,7 +4,7 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe2_nn ( dat_     DATE,
 % DESCRIPTION : Процедура формирования #E2 для КБ
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     : v.17.002      07.11.2017 (06.06.2017, 30.05.2017)
+% VERSION     : v.17.003      02.01.2018 (07.11.2017, 06.06.2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
@@ -15,6 +15,7 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe2_nn ( dat_     DATE,
    NNN        условный порядковый номер
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+02.01.2018 на 01.01.2018 добавляются показатели 51, 52, 53, 54, 55
 07.11.2017 удалил блоки для закрытых МФО
 06.06.2017 будут включаться все суммы док-тов >= 0.01 (0.01 USD)
 30.05.2017 на 02.06.2017 будут включаться все суммы док-тов > 100 (1 USD)
@@ -163,6 +164,9 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe2_nn ( dat_     DATE,
    kol_61     number;
    DC1#E2_    VARCHAR2 (70);
    DE#E2_     VARCHAR2 (3);
+   D53#E2_    VARCHAR2 (70) := null;
+   D54#E2_    VARCHAR2 (2) := null;
+   D55#E2_    VARCHAR2 (1) := null;
    nazn_      VARCHAR2 (160);
    mbkOK_     boolean;
    ourOKPO_   varchar2 (14);
@@ -177,6 +181,8 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe2_nn ( dat_     DATE,
    dat_Izm1_  DATE := TO_DATE('18032016','ddmmyyyy'); -- закривається показник 
                                                       -- 41000
    dat_Izm2_  DATE := TO_DATE('01062017','ddmmyyyy'); -- нова сума для відбору 
+   dat_Izm3_  DATE := TO_DATE('29122017','ddmmyyyy'); -- нові показники 
+
    name_sp_        varchar2(30);
    exist_trans     NUMBER                 := 0;
 
@@ -270,7 +276,7 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe2_nn ( dat_     DATE,
     else
          INSERT INTO rnbu_trace
                   (nls, kv, odate, kodp, znap, nbuc, ref, rnk, comm, nd
-	                  )
+                      )
            VALUES (nls_, kv_, dat_, l_kodp_, p_znap1_, nbuc_, ref_, rnk_, to_char(refd_), id_min_
                   );
     end if;
@@ -370,6 +376,7 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe2_nn ( dat_     DATE,
                   p_value_ := '30';
                end if;
             end if;
+            
             d1#E2_ := p_value_;
          end if;
       ELSIF p_i_ = 2
@@ -422,7 +429,7 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe2_nn ( dat_     DATE,
             p_value_ := trim(D6#E2_);
          END IF;
 
-         if Dat_ >= to_date('01092011','ddmmyyyy') and trim(kod_g_) is not null then
+         if trim(kod_g_) is not null then
             p_value_ := trim(kod_g_);
          end if;
 
@@ -613,14 +620,57 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe2_nn ( dat_     DATE,
                p_value_ := NVL (SUBSTR (TRIM (de#E2_), 1, 3), 'код переказу');
             else
                p_value_ := NVL (SUBSTR (TRIM (p_value_), 1, 3), 'код переказу');
-            end if;
+               end if;
+
             IF trim(d1#E2_) not in ('23','24','34','35') THEN
                p_value_:='999';
             end if;
+            
             IF trim(d1#E2_) in ('23','24','34','35') and p_value_='999' THEN
                p_value_:='000';
             end if;
          END IF;
+      -- новые коды с 01.01.2018
+      ELSIF p_i_ = 15
+      THEN
+         IF Dat_ >= dat_Izm3_ 
+         THEN
+            p_kodp_ := '53';
+            -- з 29.12.2017 новий показник
+            --  назва Бенефіціару
+            if TRIM (p_value_) is null and d53#E2_ is not null then
+               p_value_ := NVL (SUBSTR (TRIM (de#E2_), 1, 3), 'назва Бенефіціару');
+            else
+               p_value_ := NVL (SUBSTR (TRIM (p_value_), 1, 70), 'назва Бенефіціару');
+            end if;
+         END IF;
+      ELSIF p_i_ = 16
+      THEN
+         IF Dat_ >= dat_Izm3_ 
+         THEN
+            p_kodp_ := '54';
+            -- з 29.12.2017 новий показник
+            --  код ідентифікатора (F027)
+            if TRIM (p_value_) is null and d54#E2_ is not null then
+               p_value_ := NVL (SUBSTR (TRIM (d54#E2_), 1, 3), 'код індекатора');
+            else
+               p_value_ := NVL (SUBSTR (TRIM (p_value_), 1, 70), 'код індекатора');
+            end if;
+         END IF;
+      ELSIF p_i_ = 17
+      THEN
+         IF Dat_ >= dat_Izm3_ 
+         THEN
+            p_kodp_ := '55';
+            -- з 29.12.2017 новий показник
+            --  ознака консолідації операції (F089)
+            if TRIM (p_value_) is null and d55#E2_ is not null then
+               p_value_ := NVL (SUBSTR (TRIM (d55#E2_), 1, 3), '2');
+            else
+               p_value_ := '2';
+            end if;
+         END IF;
+
       ELSE
          p_kodp_ := 'NN';
       END IF;
@@ -670,17 +720,14 @@ BEGIN
 
    p_exist_trans ();
 
-   -- з 01.06.2009 для переказу безготiвковоi iнвалюти включаються операцii
-   -- >=1000000$  (було 5000000$)
    IF dat_ >= to_date('01062009','ddmmyyyy') THEN
       gr_sum_ := 100;   --1000000;
-   END IF;
-
-   -- з 11.02.2014 для переказу безгот.iнвалюти включаються операцii >=1000.00$ 
-   IF dat_ >= to_date('11022014','ddmmyyyy') THEN
+   ELSIF dat_ >= to_date('11022014','ddmmyyyy') THEN
       gr_sum_ := 100000;
+   elsIF dat_ >= to_date('01062017','ddmmyyyy') THEN
+      gr_sum_ := 0;
    END IF;
-
+   
    -- з 01.06.2017 для переказу безгот.iнвалюти включаються операцii >=1.00$ 
    IF dat_ >= dat_Izm2_ THEN
       gr_sum_ := 1;
@@ -700,7 +747,7 @@ BEGIN
       select count(*)
          INTO kol_ref_
       from arc_rrp
-      where dat_a >= Dat_
+      where trunc(dat_a) >= Dat_
         and dk = 3
         and nlsb like '2909%'
         and nazn like '#E2;%'
@@ -841,24 +888,27 @@ BEGIN
         SELECT *
         FROM (
             SELECT /*+NO_MERGE(v) PUSH_PRED(v) */
-                  '3' ko, ca.rnk, o.REF, tt, o.accd, o.nlsd, o.kv, o.acck,
+                  '3' ko, o.rnkd rnk, o.REF, tt, o.accd, o.nlsd, o.kv, o.acck,
                      o.nlsk, o.nazn,
                      o.s * 100 s_nom,
                      gl.p_icurval (o.kv, o.s * 100, dat_) s_eqv
-            FROM provodki o, cust_acc ca,
-               ( select substr(d_rec, 6+instr(d_rec, '#CREF:'),
-                                           instr(substr(d_rec, 6+instr(d_rec, '#CREF:')), '#')-1) ref
-                             from arc_rrp
-                             where dat_a >= Dat_
-                               and dk = 3
-                               and nlsb like '2909%'
-                               and nazn like '#E2;%'
-                               and trim(d_rec) is not null
-                               and d_rec like '%D' || to_char(Dat_, 'yymmdd')|| '%') v 
+            FROM provodki_otc o, 
+               ( select o.ref
+                  from arc_rrp a, oper o
+                  where trunc(a.dat_a) >= Dat_
+                    and a.dk = 3
+                    and a.nlsb like '2909%'
+                    and a.nazn like '#E2;%'
+                    and trim(a.d_rec) is not null
+                    and a.d_rec like '%D' || to_char(Dat_, 'yymmdd') || '%'
+                    and substr(a.d_rec, 6+instr(a.d_rec, '#CREF:'),
+                        instr(substr(a.d_rec, 6+instr(a.d_rec, '#CREF:')), '#')-1) = o.ref_a and
+                        o.kv = a.kv and 
+                        o.s = a.s) v 
             WHERE o.kv != 980
               and o.fdat between Dat_ - 10 and dat_
               and o.ref = v.ref
-              and o.accd = ca.acc);
+              and lower(o.nazn) not like '%повернен%кошт%');
    end if;
 
    OPEN c_main;
@@ -931,6 +981,10 @@ BEGIN
             dc1#E2_ := '';
             d61#e2_ := null;
             de#E2_ := null;
+            d53#E2_ := null;
+            d54#E2_ := null;
+            d55#E2_ := null;
+ 
             kol_61 := 0;
 
             mbkOK_ := false;
@@ -996,43 +1050,8 @@ BEGIN
                         END;
                      END;
                   END;
-
-                  BEGIN
-                     SELECT substr(value,1,3)
-                        INTO kod_g_
-                     FROM OPERW
-                     WHERE REF = ref_ AND tag = 'KOD_G';
-
-                     If ascii(substr(kod_g_,1,1))<48 OR ascii(substr(kod_g_,1,1))>57 THEn
-                        begin
-                           SELECT nvl(kodc,'000') into kod_g_
-                           from bopcount
-                           where trim(iso_countr)=trim(kod_g_);
-                        EXCEPTION WHEN NO_DATA_FOUND THEN
-                           kod_g_:='000';
-                        end;
-                     end if;
-                  EXCEPTION WHEN NO_DATA_FOUND THEN
-                     BEGIN
-                        SELECT '804'
-                           INTO kod_g_
-                        FROM OPERW
-                        WHERE REF = ref_ 
-                          AND tag like '59%'
-                          AND substr(trim(value),1,3)='/UA';
-                     EXCEPTION WHEN NO_DATA_FOUND THEN
-                         BEGIN
-                            SELECT '804'
-                               INTO kod_g_
-                            FROM OPERW
-                            WHERE REF = ref_ 
-                              AND tag like '59%'
-                              AND instr(UPPER(trim(value)),'UKRAINE') > 0;
-                         EXCEPTION WHEN NO_DATA_FOUND THEN
-                            kod_g_ := NULL;
-                         END;
-                     END;
-                  END;
+                  
+                  kod_g_ := f_nbur_get_kod_g(ref_, 2);
 
                   if d6#E2_ is null and trim(kod_g_) is not null then
                      d6#E2_ := kod_g_;
@@ -1244,7 +1263,7 @@ BEGIN
                                        into D1#E2_, D2#E2_, D3#E2_,
                                             D6#E2_, D7#E2_, D8#E2_, DB#E2_
                                     from top_contracts t
-                                    where t.pid=pid_ ; -- and p.kv=t.kv - Инна сказала, что это условие лишнее (платеж м.б. в другой валюте)
+                                    where t.pid=pid_ ; 
 
                                     if length(trim(D7#E2_))=3 then
                                        D7#E2_ := D7#E2_ ||'0000000';
@@ -1397,6 +1416,11 @@ BEGIN
                            n_ := 14;
                         END IF;
 
+                        IF dat_ >= dat_izm3_
+                        THEN
+                           n_ := 17;
+                        END IF;
+
                         FOR i IN 1 .. n_
                         LOOP
                            IF i < 10
@@ -1414,6 +1438,15 @@ BEGIN
                            ELSIF i=13
                            THEN
                               tag_ := 'DA#E2';  --'DD#70';
+                           ELSIF i=15 
+                           THEN
+                              tag_ := '59F';
+                           ELSIF i=16 
+                           THEN
+                              tag_ := 'F027';
+                           ELSIF i=17 
+                           THEN
+                              tag_ := 'F089';
                            ELSE
                               tag_ := 'DE#E2';
                            END IF;
@@ -1427,9 +1460,15 @@ BEGIN
                         -- изменил 20.11.2007 добавлен доп.реквизит 13 - DD#70
                         -- (вiдомостi про операцiю)
                            IF ((dat_ < to_date('01062009','ddmmyyyy') and
-                               ko_ = 3 AND i IN (1, 2, 3, 4, 6, 9, 10, 11, 12, 13)) OR
+                               ko_ = 3 AND i IN (1, 2, 3, 4, 6, 9, 10, 11, 12, 13)) 
+                                  OR
                                (dat_ >= to_date('01062009','ddmmyyyy') and
-                               ko_ = 3 AND i IN (1, 6, 9, 10, 13, 14)))
+                               ko_ = 3 AND i IN (1, 6, 9, 10, 13, 14)) and
+                                dat_ < dat_izm3_ 
+                                  OR  
+                               (dat_ >= dat_izm3_ and
+                               ko_ = 3 AND i IN (1, 2, 3, 6, 9, 10, 13, 15, 16, 17)) 
+                        )
                            THEN
                               BEGIN
                                  SELECT trim(SUBSTR (VALUE, 1, 70))
@@ -1460,6 +1499,32 @@ BEGIN
                                        val_ := NULL;
                                  END;
                               END;
+
+                              if i=2 and val_ is null and D2#E2_ is null then
+                                 begin
+                                    select value
+                                       into D2#E2_
+                                    from operw
+                                    where ref=refd_
+                                      and tag='D2#70';
+                                 exception
+                                    when no_data_found then
+                                     null;
+                                 end;
+                              end if;
+
+                              if i=3 and val_ is null and D3#E2_ is null then
+                                 begin
+                                    select value
+                                       into D3#E2_
+                                    from operw
+                                    where ref=refd_
+                                      and tag='D3#70';
+                                 exception
+                                    when no_data_found then
+                                     null;
+                                 end;
+                              end if;
 
                               if i=6 and val_ is null and D6#E2_ is null then
                                  begin
@@ -1512,7 +1577,7 @@ BEGIN
                                  end if;
                               end if;
 
-                              if i=10 and val_ is null and D8#E2_ is null then
+                              if i=10 and val_ is null and D7#E2_ is null then
                                  begin
                                     select substr(trim(value),1,10)
                                        into kod_b_
@@ -1576,5 +1641,3 @@ BEGIN
     logger.info ('P_FE2_NN: End for datf = '||to_char(dat_, 'dd/mm/yyyy'));
 END p_fe2_nn;
 /
-show err;
-
