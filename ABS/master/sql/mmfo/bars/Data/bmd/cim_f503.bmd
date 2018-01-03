@@ -187,6 +187,7 @@ begin
   bars_metabase.add_column(l_tabid, 67, 'USER_CH', 'C', 'Користувач ~редагування', null, 30, 67, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 68, 'BRANCH', 'C', 'Відділення', null, 30, 68, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 69, 'KF', 'C', 'МФО', null, 6, 69, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 70, 'P3200', 'N', 'Код ~типу ~реорганізації', null, 2, 61, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('v_cim_kod_51_1');

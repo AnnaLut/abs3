@@ -207,6 +207,16 @@ exception when others then
 
 
 
+begin
+    execute immediate 'alter table bars.cim_f503 add (p3200  number(1))';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+COMMENT ON COLUMN bars.cim_f503.p3200 IS 'Код типу реорганізації';
+
+
 PROMPT *** Create  grants  CIM_F503 ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_F503        to BARS_ACCESS_DEFROLE;
 

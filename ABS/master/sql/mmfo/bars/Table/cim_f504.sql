@@ -143,6 +143,24 @@ exception when others then
  end;
 /
 
+begin
+    execute immediate 'alter table bars.cim_f504 add (p010  number(1))';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+COMMENT ON COLUMN bars.cim_f504.p010 IS 'вид позичальника';
+
+begin
+    execute immediate 'alter table bars.cim_f504 add (p320  number(1))';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+COMMENT ON COLUMN bars.cim_f504.p320 IS 'Код типу реорганізації';
+
 
 
 PROMPT *** Create  grants  CIM_F504 ***
