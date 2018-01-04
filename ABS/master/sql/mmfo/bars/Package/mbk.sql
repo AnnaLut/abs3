@@ -129,7 +129,7 @@ PROCEDURE op_reg_ex_2017(
     ----------------------------------------------------------------------
     --    Процедура обновления даты заключения сделки
     --
-    procedure upd_cc_deal (p_nd number, p_sdate date);
+    procedure upd_cc_deal (p_nd number, p_sdate date, p_prod varchar2, p_n_nbu varchar2, p_d_nbu date);
     ----------------------------------------------------------------------
     procedure inp_deal (
               cc_id_      varchar2,
@@ -1972,10 +1972,11 @@ END    op_reg_ex_2017;
     ----------------------------------------------------------------------
     --    Процедура обновления даты заключения сделки
     --
-    procedure upd_cc_deal (p_nd number, p_sdate date)
+    procedure upd_cc_deal (p_nd number, p_sdate date, p_prod varchar2, p_n_nbu varchar2, p_d_nbu date)
     is
     begin
-      update cc_deal set sdate = p_sdate where nd = p_nd;
+      update cc_deal set sdate = p_sdate, prod  = p_prod  where nd = p_nd;
+      update cc_add  set n_nbu = p_n_nbu, d_nbu = p_d_nbu where nd = p_nd and adds=0;
     end upd_cc_deal;
 
     ----------------------------------------------------------------------
@@ -2149,6 +2150,14 @@ END    op_reg_ex_2017;
         UPDATE accounts SET mdate=DAT4_,PAP=l_tipd WHERE acc=ACC1_;
         UPDATE accounts SET mdate=DAT4_            WHERE acc=ACC2_;
         UPDATE accounts SET mdate=DAT4_            WHERE acc=ACC4_;
+
+        -- Внесение РНК в CUSTBANK для сделок (2700,2701,3660)
+        if mbdk_tip(nVidd_) = 1 THEN 
+           update custbank set bki = 1 where rnk = RNKB_ ;
+           if SQL%rowcount = 0 then
+              insert into custbank (rnk, bki) values (RNKB_, 1);
+           end if;
+        end if;
 
         -- Artem Yurchenko, 24.11.2014
         -- для кредитных ресурсов необходимо использовать другие операции
