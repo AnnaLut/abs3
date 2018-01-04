@@ -1,18 +1,11 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/kl.sql =========*** Run *** ========
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.KL IS
-
+create or replace package KL
+is
 --***************************************************************************--
 -- (C) BARS. Contragents
 --***************************************************************************--
 
-G_HEADER_VERSION  CONSTANT VARCHAR2(64)  := 'Version 1.37 11/10/2016';
+G_HEADER_VERSION  CONSTANT VARCHAR2(64)  := 'Version 1.39 04/01/2018';
 G_AWK_HEADER_DEFS CONSTANT VARCHAR2(512) := ''
-
 $if KL_PARAMS.TREASURY $then
   || 'KAZ  - Для казначейства (без связ.клиентов, счетов юр.лиц в др.банках)' || chr(10)
 $end
@@ -539,18 +532,26 @@ procedure check_attr_foropenacc (p_rnk in number, p_msg out varchar2);
   ---------------------------------------------------
   function get_customer_field_access(p_field_code varchar2) return varchar2;
 
+  -----------------------------------------------------------
+  -- Процедура перерегистрации закрытого контрагента
+  --
+  -- @p_rnk - РНК клиента
+  --  
+  procedure resurrect_customer(p_rnk customer.rnk%type,
+                               p_err_msg out varchar2);
+
 END KL;
 /
 
+show errors;
 
-
-
-CREATE OR REPLACE PACKAGE BODY BARS.KL 
-IS
+create or replace package body KL
+is
 --***************************************************************************--
 -- (C) BARS. Contragents
 --***************************************************************************--
-  G_BODY_VERSION  CONSTANT VARCHAR2(64)  := 'version 1.81 08/09/2017';
+
+  G_BODY_VERSION  CONSTANT VARCHAR2(64)  := 'version 1.82 04/01/2018';
   G_AWK_BODY_DEFS CONSTANT VARCHAR2(512) := ''
 $if KL_PARAMS.TREASURY $then
   || 'KAZ   - Для казначейства (без связ.клиентов, счетов юр.лиц в др.банках)' || chr(10)
@@ -3383,8 +3384,47 @@ end check_attr_foropenacc;
     function generate_dkbo_number(p_rnk customer.rnk%type) return varchar2
       is
       begin
-        return p_rnk||to_char(sysdate, 'YYMMDDHH24MISS');
+        return to_char(p_rnk)||to_char(sysdate, 'YYMMDDHH24MISS');
         end generate_dkbo_number;
+
+  -----------------------------------------------------------
+  -- Процедура перерегистрации закрытого контрагента
+  --
+  -- @p_rnk - РНК клиента
+  --
+  procedure RESURRECT_CUSTOMER
+  ( p_rnk     in     customer.rnk%type
+  , p_err_msg    out varchar2
+  ) is
+    title  constant  varchar2(64) := $$PLSQL_UNIT||'.RESURRECT_CUSTOMER';
+  begin
+    
+    bars_audit.trace( '%s: Entry with ( p_rnk=%s ).', title, to_char(p_rnk) );
+    
+    begin
+
+      update CUSTOMER
+         set DATE_OFF = null
+       where RNK = p_rnk;
+
+      begin
+        -- COBUSUPABS-5726 - перерахунок рівня ризику контрагента
+        FM_SET_RIZIK( p_rnk );
+      exception
+        when others then
+          p_err_msg := sqlerrm;
+          bars_audit.error( title ||': '||chr(10)|| p_err_msg ||chr(10)|| dbms_utility.format_error_backtrace() );
+          p_err_msg := 'Помилка перерахунку рівня ризику: ' || substr( p_err_msg, 1, 150 );
+      end;
+
+    exception
+      when others then
+        p_err_msg := substr( sqlerrm, 1, 200 );
+    end;
+
+    bars_audit.trace( '%s: Exit with ( p_err_msg=%s ).', title, p_err_msg );
+
+  end RESURRECT_CUSTOMER;
 
 BEGIN
 
@@ -3393,20 +3433,12 @@ BEGIN
 
 END KL;
 /
- show err;
- 
-PROMPT *** Create  grants  KL ***
-grant EXECUTE                                                                on KL              to ABS_ADMIN;
-grant EXECUTE                                                                on KL              to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on KL              to CUST001;
-grant EXECUTE                                                                on KL              to WR_ALL_RIGHTS;
-grant EXECUTE                                                                on KL              to WR_CUSTREG;
-grant EXECUTE                                                                on KL              to WR_TOBO_ACCOUNTS_LIST;
-grant EXECUTE                                                                on KL              to WR_USER_ACCOUNTS_LIST;
 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/kl.sql =========*** End *** ========
- PROMPT ===================================================================================== 
- 
+show errors;
+
+grant EXECUTE on KL to ABS_ADMIN;
+grant EXECUTE on KL to BARS_ACCESS_DEFROLE;
+grant EXECUTE on KL to CUST001;
+grant EXECUTE on KL to WR_ALL_RIGHTS;
+grant EXECUTE on KL to WR_CUSTREG;
+grant EXECUTE on KL to WR_TOBO_ACCOUNTS_LIST;
