@@ -3,11 +3,12 @@ CREATE OR REPLACE PROCEDURE BARS.P_FF4_NN (Dat_ DATE ,
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :	Процедура формирования #F4
 % COPYRIGHT   :	Copyright UNITY-BARS Limited, 2009.  All Rights Reserved.
-% VERSION     : 03/01/2018 (14/11/2017, 06/07/2017)
+% VERSION     : 04/01/2018 (03/01/2018, 14/11/2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+04/01/2018 - параметры K072 и D020 будут формироваться 2-х значными 
 03/01/2018 - новая структура показателя (вместо R013 будет R011 и 
              параметр K072 уже 2-х значный вместо однозначного) 
 14/11/2017 - изменил вызов процедуры P_POPULATE_KOR для разных отчетных 
@@ -95,7 +96,7 @@ CURSOR SaldoAOd IS
            NVL(trim(a.k112),'0') k112, lpad(NVL(trim(a.d020),'1'),2,'0') d020, 
            nvl(a.ints,0) ints,
            NVL(trim(a.mb),'0') mb,
-           NVL(trim(p.k072),'0') k072, c.mdate,
+           NVL(trim(p.k072),'00') k072, c.mdate,
            a.dos, a.kos, a.ost, c.nbs, 
            d.rnk, nvl(trim(d.ise), '00000') k070, nvl(trim(d.ved), '00000') k110,
            nvl(trim(P.R011), '0') r011, 
@@ -114,7 +115,7 @@ CURSOR SaldoAOd IS
            NVL(a.k112,'0') k112, lpad(NVL(trim(a.d020),'1'),2,'0') d020, 
            nvl(a.ints,0) ints,
            NVL(trim(a.mb),'0') mb,
-           NVL(trim(p.k072),'0') k072, c.mdate,
+           NVL(trim(p.k072),'00') k072, c.mdate,
            a.dos, a.kos, a.ost, '2'||substr(c.nbs,2) nbs, 
            d.rnk, nvl(trim(d.ise), '00000') k070, nvl(trim(d.ved), '00000') k110,
            nvl(trim(P.R011), '0') r011, 
@@ -137,17 +138,17 @@ CURSOR SaldoAOd IS
 
 CURSOR SaldoKor IS
   select b.acc, b.nls, b.kv, b.fdat, b.nbs, b.s180, b.r011, b.r013,
-         NVL(trim(e.k072),'0') k072, b.mdate,
-         b.codc, b.rnk, b.d020, b.sdos, b.skos, NVL(trim(k.k112),'0') k112
+         NVL(trim(e.k072),'00') k072, 
+         b.codc, b.rnk, lpad(b.d020, 2, '0') d020, b.mdate, b.sdos, b.skos, NVL(trim(k.k112),'0') k112
   from (
     SELECT s.acc, s.nls, s.kv, a.fdat, s.nbs,
            DECODE(trim(p.s180), NULL, FS180(a.acc), p.s180) s180,
            NVL(trim(p.r011),'0') r011,
            NVL(trim(p.r013),'0') r013, 
-           NVL(trim(p.k072),'0') k072,
-           s.mdate, MOD(c.codcagent, 2) codc, c.rnk, 
+           NVL(trim(p.k072),'00') k072,
+           MOD(c.codcagent, 2) codc, c.rnk, 
            nvl(trim(c.ise), '00000') k070, nvl(trim(c.ved), '00000') k110,
-           NVL(to_char(to_number(p.d020)),'01') d020,
+           NVL(to_char(to_number(p.d020)),'01') d020, s.mdate, 
            SUM(DECODE(a.dk, 0, GL.P_ICURVAL(s.kv, a.s, a.fdat), 0)) sdos,
            SUM(DECODE(a.dk, 1, GL.P_ICURVAL(s.kv, a.s, a.fdat), 0)) skos
     FROM kor_prov a, accounts s, customer c, specparam p, kod_r020 k
@@ -162,7 +163,7 @@ CURSOR SaldoKor IS
     GROUP BY s.acc, s.nls, s.kv, a.fdat, s.nbs,
              DECODE(trim(p.s180), NULL, FS180(a.acc), p.s180),
              NVL(trim(p.r011),'0'), NVL(trim(p.r013),'0'), 
-             NVL(trim(p.k072),'0'),
+             NVL(trim(p.k072),'00'),
              MOD(c.codcagent, 2), c.rnk, nvl(trim(c.ise), '00000'),
              nvl(trim(c.ved), '00000'), NVL(to_char(to_number(p.d020)),'01'),
              s.mdate) b
@@ -560,7 +561,7 @@ CLOSE SaldoAOd;
 OPEN SaldoKor;
 LOOP
     FETCH SaldoKor INTO acc_, nls_, Kv_, data_, nbs_, S180_, r011_, r013_,
-                        k072_, mdate_, Cntr_, rnk_, d020_, sDos_, sKos_, k112_;
+                        k072_, Cntr_, rnk_, d020_, mdate_, sDos_, sKos_, k112_;
 
     EXIT WHEN SaldoKor%NOTFOUND;
 
