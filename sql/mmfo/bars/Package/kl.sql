@@ -5,7 +5,7 @@ IS
 -- (C) BARS. Contragents
 --***************************************************************************--
 
-G_HEADER_VERSION  CONSTANT VARCHAR2(64)  := 'Version 1.5 12/10/2017';
+G_HEADER_VERSION  CONSTANT VARCHAR2(64)  := 'Version 1.6 04/01/2018';
 G_AWK_HEADER_DEFS CONSTANT VARCHAR2(512) := ''
 $if KL_PARAMS.TREASURY $then
   || 'KAZ  - Для казначейства (без связ.клиентов, счетов юр.лиц в др.банках)' || chr(10)
@@ -24,8 +24,6 @@ function header_version return varchar2;
 
 --****** body_version - возвращает версию тела пакета ***********************--
 function body_version return varchar2;
-
-
 
 --***************************************************************************--
 -- function 	: isCustomerTr
@@ -444,8 +442,8 @@ procedure setCorpAccEx (
   p_flag_visa  number default 0 );
 
 --***************************************************************************--
--- procedure 	: delCorpAcc
--- description	: процедура удаления реквизитов счетов клиента в др. банках
+-- procedure   : delCorpAcc
+-- description : процедура удаления реквизитов счетов клиента в др. банках
 --***************************************************************************--
 procedure delCorpAcc (
   Id_         corps_acc.id%type,
@@ -453,13 +451,24 @@ procedure delCorpAcc (
 $end
 
 $if KL_PARAMS.SIGN $then
+  -----------------------------------------------------------
+  --
+  -- Процедура вставляет(обновляет) фото клиента и отправляет информацию на CardMake
+  --
+procedure set_cutomer_image
+( p_rnk            in     number
+, p_imgage_type    in     varchar2
+, p_image          in     blob
+);
+
 --***************************************************************************--
 -- procedure 	: setCustomerSeal
 -- description	: Процедура обновления подписи/печати
 --***************************************************************************--
-procedure setCustomerSeal (
-  Id_   OUT customer_bin_data.id%type,
-  Img_   IN customer_bin_data.bin_data%type );
+procedure setCustomerSeal
+( Id_              in out customer_bin_data.id%type
+, Img_             in     customer_bin_data.bin_data%type
+);
 $end
 
 --***************************************************************************--
@@ -548,24 +557,26 @@ procedure check_attr_foropenacc (p_rnk in number, p_msg out varchar2);
   --
   function generate_dkbo_number(p_rnk customer.rnk%type) return varchar2;
 
-
-
   -----------------------------------------------------------
-  -- Процедура вставляет(обновляет) фото клиента и отправляет информацию на CardMake
+  -- Процедура перерегистрации закрытого контрагента
   --
-  --
-  procedure set_cutomer_image(p_rnk number, p_imgage_type  varchar2, p_image blob);
+  -- @p_rnk - РНК клиента
+  --  
+  procedure resurrect_customer(p_rnk customer.rnk%type,
+                               p_err_msg out varchar2);
 
 END KL;
 /
-create or replace package body KL
-IS
 
+show errors;
+
+create or replace package body KL
+is
 --***************************************************************************--
 -- (C) BARS. Contragents
 --***************************************************************************--
 
-  G_BODY_VERSION  CONSTANT VARCHAR2(64)  := 'version 1.9 12/10/2017';
+  G_BODY_VERSION  CONSTANT VARCHAR2(64)  := 'version 1.91 04/01/2018';
   G_AWK_BODY_DEFS CONSTANT VARCHAR2(512) := ''
 $if KL_PARAMS.TREASURY $then
   || 'KAZ   - Для казначейства (без связ.клиентов, счетов юр.лиц в др.банках)' || chr(10)
@@ -2688,22 +2699,57 @@ END delCorpAcc;
 $end
 
 $if KL_PARAMS.SIGN $then
+
+--***************************************************************************--
+-- PROCEDURE  : SET_CUST_IMG
+-- DESCRIPTION: Процедура оновлення графічних даних клієнта
+--***************************************************************************--
+procedure SET_CUTOMER_IMAGE
+( p_rnk          in number
+, p_imgage_type  in varchar2
+, p_image        in blob
+) is
+begin
+
+  begin
+    insert into CUSTOMER_IMAGES
+      ( RNK, TYPE_IMG, DATE_IMG, IMAGE )
+    values
+      ( p_rnk, p_imgage_type, sysdate, p_image );
+  exception
+    when dup_val_on_index then
+     update CUSTOMER_IMAGES
+        set DATE_IMG = sysdate
+          , IMAGE    = p_image
+      where RNK      = p_rnk
+        and TYPE_IMG = p_imgage_type;
+  end;
+  
+  -- отправляет информацию на CardMake на заявку об изменении данных по клиенту
+  OW_UTL.GET_ND( p_rnk );
+  
+end set_cutomer_image;
+
 --***************************************************************************--
 -- PROCEDURE 	: setCustomerSeal
 -- DESCRIPTION	: Процедура обновления подписи/печати
 --***************************************************************************--
-procedure setCustomerSeal (
-  Id_   OUT customer_bin_data.id%type,
-  Img_   IN customer_bin_data.bin_data%type
+procedure setCustomerSeal
+( id_    in out customer_bin_data.id%type
+, img_   in     customer_bin_data.bin_data%type
 ) is
 begin
 
-  if id_ is null then
+  if ( id_ is null )
+  then
 
-     select s_customer_bin_data.nextval into id_ from dual ;
+    id_ := S_CUSTOMER_BIN_DATA.nextval;
 
-     insert into customer_bin_data(id, bin_data)
-     values (id_, img_);
+     insert
+       into CUSTOMER_BIN_DATA
+          ( ID, BIN_DATA )
+     values
+          ( id_, img_ );
 
   else
 
@@ -3288,30 +3334,34 @@ is
      if i_value is null then add_msg(i_name); end if;
   end;
 begin
+  
   -- проверка осуществляется для ЮЛ и ФЛ-СПД
   begin
-     select c.* into l_cust
+     
+     select c.* 
+       into l_cust
        from customer c
       where c.rnk = p_rnk
         and (c.custtype = 2 or c.custtype = 3 and nvl(trim(c.sed),'00') = '91');
+
      -- рекв. клиента
      check_attr(l_cust.country, 'Країна');
      check_attr(l_cust.nmk, 'Найменування клієнта (нац.)');
      check_attr(l_cust.nmkv, 'Найменування (міжн.)');
      check_attr(l_cust.okpo, 'Ідентифікаційний код');
-     check_attr(l_cust.adm, 'Адм. орган реєстрації');
-     check_attr(l_cust.rgtax, 'Реєстр. номер у ПІ');
-     check_attr(l_cust.datet, 'Дата реєстр. у ПІ');
-     check_attr(l_cust.datea, 'Дата реєстр. у Адм.');
+     
      -- адрес
      begin
         select * into l_adr from customer_address where rnk = p_rnk and type_id = 1;
         check_attr(l_adr.locality, 'Населений пункт (значення)');
         check_attr(l_adr.street, 'вул., просп., б-р. (значення)');
         check_attr(l_adr.home, '№ буд., д/в (значення)');
-     exception when no_data_found then null;
+     exception
+       when no_data_found then null;
      end;
+     
      check_attr( get_customerw(p_rnk, 'K013 '), 'Код виду клієнта (K013)');
+     
      -- рекв. ФЛ
      if l_cust.custtype = 3 then
         check_attr(trim(l_cust.ise), 'Інст. сектор економіки (К070)');
@@ -3343,13 +3393,18 @@ begin
         check_attr(get_customerw(p_rnk, 'IDPIB'), 'ПІБ та тел. працівника, відповідальн. за ідент-цію і вивчення клієнта');
         check_attr(get_customerw(p_rnk, 'DJER '), 'Характеристика джерел надходжень коштiв');
         check_attr(get_customerw(p_rnk, 'CIGPO') ,'Статус зайнятості особи');
-     -- ЮЛ-резидент
-     elsif mod(l_cust.codcagent, 2) = 1 then
+     
+     elsif mod(l_cust.codcagent, 2) = 1
+     then -- ЮЛ-резидент
+        check_attr(l_cust.adm,   'Адм. орган реєстрації');
+        check_attr(l_cust.rgtax, 'Реєстр. номер у ПІ');
+        check_attr(l_cust.datet, 'Дата реєстр. у ПІ');
+        check_attr(l_cust.datea, 'Дата реєстр. у Адм.');
         check_attr(trim(l_cust.ise), 'Інст. сектор економіки (К070)');
         check_attr(trim(l_cust.fs), 'Форма власності (К080)');
         check_attr(trim(l_cust.ved), 'Вид ек. діяльності(К110)');
         check_attr(trim(l_cust.k050), 'Форма господарювання (К050)');
-      --check_attr(get_customerw(p_rnk, 'UUCG '), 'Обсяг чистого доходу за календарний рік, що закінчився');
+--      check_attr(get_customerw(p_rnk, 'UUCG '), 'Обсяг чистого доходу за календарний рік, що закінчився');
         check_attr(get_customerw(p_rnk, 'UUDV '), 'Частка державної власності');
      end if;
   exception when no_data_found then null;
@@ -3546,34 +3601,55 @@ end check_attr_foropenacc;
         return p_number;
     end recode_passport_number;
 
+  -----------------------------------------------------------
+  -- Ф-ция генерации номера ДКБО
+  --
+  -- @p_rnk - РНК клиента
+  --
+  function GENERATE_DKBO_NUMBER(p_rnk customer.rnk%type) return varchar2
+  is
+  begin
+    return to_char(p_rnk)||to_char(sysdate, 'YYMMDDHH24MISS');
+  end GENERATE_DKBO_NUMBER;
 
-    -----------------------------------------------------------
-    -- Процедура вставляет(обновляет) фото клиента и отправляет информацию на CardMake
-    --
-    --
-    procedure set_cutomer_image(p_rnk number, p_imgage_type  varchar2, p_image blob)
-    is
-       p         constant varchar2(100)        := 'kl.set_cutomer_image';
+  -----------------------------------------------------------
+  -- Процедура перерегистрации закрытого контрагента
+  --
+  -- @p_rnk - РНК клиента
+  --
+  procedure RESURRECT_CUSTOMER
+  ( p_rnk     in     customer.rnk%type
+  , p_err_msg    out varchar2
+  ) is
+    title  constant  varchar2(64) := $$PLSQL_UNIT||'.RESURRECT_CUSTOMER';
+  begin
+    
+    bars_audit.trace( '%s: Entry with ( p_rnk=%s ).', title, to_char(p_rnk) );
+    
     begin
-       begin
-          insert into customer_images (rnk, type_img, date_img, image) values (p_rnk, p_imgage_type, sysdate, p_image);
-       exception when dup_val_on_index then
-          update customer_images set date_img = sysdate, image = p_image where rnk = p_rnk and type_img = p_imgage_type;
-       end;
-       --отправляет информацию на CardMake на заявку об изменении данных по клиенту
-        bars.ow_utl.get_nd (p_rnk);
-    end ;
 
-    -----------------------------------------------------------
-    -- Ф-ция генерации номера ДКБО
-    --
-    -- @p_rnk - РНК клиента
-    --
-    function generate_dkbo_number(p_rnk customer.rnk%type) return varchar2
-      is
+      update CUSTOMER
+         set DATE_OFF = null
+       where RNK = p_rnk;
+
       begin
-        return p_rnk||to_char(sysdate, 'YYMMDDHH24MISS');
-        end generate_dkbo_number;
+        -- COBUSUPABS-5726 - перерахунок рівня ризику контрагента
+        FM_SET_RIZIK( p_rnk );
+      exception
+        when others then
+          p_err_msg := sqlerrm;
+          bars_audit.error( title ||': '||chr(10)|| p_err_msg ||chr(10)|| dbms_utility.format_error_backtrace() );
+          p_err_msg := 'Помилка перерахунку рівня ризику: ' || substr( p_err_msg, 1, 150 );
+      end;
+
+    exception
+      when others then
+        p_err_msg := substr( sqlerrm, 1, 200 );
+    end;
+
+    bars_audit.trace( '%s: Exit with ( p_err_msg=%s ).', title, p_err_msg );
+
+  end RESURRECT_CUSTOMER;
 
 BEGIN
 
@@ -3582,6 +3658,9 @@ BEGIN
 
 END KL;
 /
+
+show errors;
+
 grant EXECUTE on KL to ABS_ADMIN;
 grant EXECUTE on KL to BARS_ACCESS_DEFROLE;
 grant EXECUTE on KL to CUST001;
