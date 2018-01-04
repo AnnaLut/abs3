@@ -18,9 +18,9 @@ is
 % DESCRIPTION : Процедура формирования #E2 для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION       v.16.017  15.11.2017
+% VERSION       v.16.018  03/01/2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_          char(30)  := 'v.16.017  15.11.2017';
+  ver_          char(30)  := 'v.16.018  03.01.2018';
 /*
    Структура показника DD NNN
 
@@ -81,524 +81,355 @@ BEGIN
             l_ourGLB := null;
     end;
 
-    IF p_kod_filii <> '300465'
-    THEN
-      select count(*)
-         INTO l_kol_ref
-      from arc_rrp
-      where trunc(dat_a) >= p_report_date
-        and dk = 3
-        and nlsb like '2909%'
-        and nazn like '#E2;%'
-        and trim(d_rec) is not null
-        and d_rec like '%D' || to_char(p_report_date, 'yymmdd') || '%';
-    END IF;
-       
-    -- підготовка даних
-    if l_kol_ref = 0 then
-        insert into NBUR_TMP_TRANS_1 (REPORT_DATE, KF, REF, TT, RNK, ACC, NLS, KV,
-            P10, P20, P31, P40, P62, REFD,
-            D1#E2, D6#E2, D7#E2, D8#E2, DA#E2, KOD_G, NB, NAZN, BAL_UAH)
-        select REPORT_DATE, KF, REF, TT, CUST_ID, ACC_ID, ACC_NUM, KV,
-            P10, P20, P31, substr(trim(D1#E2),1,2) P40, P62, REFD,
-            substr(trim(D1#E2),1,2), D6#E2, D7#E2, D8#E2, DA#E2, KOD_G, NB, NAZN, BAL_UAH
-        from (select /*+ ordered */  
-                unique t.report_date, t.kf, t.ref, t.tt,
-                c.cust_id, t.acc_id_db acc_id, t.acc_num_db acc_num, t.kv,
-                lpad((dense_rank() over (order by t.ref)), 3, '0') nnn,
-                lpad(t.kv, 3, '0') P10,
-                TO_CHAR (ROUND (t.bal /  (F_Ret_Dig(t.kv, t.report_date) * 100), 0)) P20,
-                (case when 
-                        t.kf = '300465' and
-                        t.acc_num_cr like '1500%' and
-                        (t.acc_num_db in ('29091000580557',
-                                         '29092000040557',
-                                         '29095000081557',
-                                         '29095000046547',
-                                         '29091927',
-                                         '2909003101',
-                                         '292460205',
-                                         '292490204') OR
-                         substr(t.acc_num_db,1,4) = '1502') 
-                            or
-                         C.CUST_CODE = l_ourOKPO and
-                         not (substr(t.acc_num_db,1,4) = '1919' and substr(t.acc_num_cr,1,4) = '1500') and
-                         not (o.nlsa like '1600%' and o.nlsb like '1500%') and
-                         decode(o.dk, 1, O.ID_A, o.ID_B) = l_ourOKPO 
-                            or
-                         o.nlsa like '3548%' and o.nlsb like '1500%' 
-                            or
-                         (trim(c.CUST_CODE) = l_ourOKPO or c.cust_type = '1' and c.k040 = '804') and
-                         not(substr(t.acc_num_db,1,4) = '1919' and substr(t.acc_num_cr,1,4) = '1500' and t.tt <> 'NOS') and
-                         decode(o.dk, 1, O.ID_A, o.ID_B) = l_ourOKPO
-                    then l_ourGLB
-                    when substr(t.acc_num_db,1,4) = '1919' and substr(t.acc_num_cr,1,4) = '1500' and t.tt <> 'NOS' or
-                         o.nlsa like '1600%' and o.nlsb like '1500%'
-                    then '0'
-                    when decode(o.dk, 1, O.ID_A, o.ID_B) <> l_ourOKPO 
-                    then replace(replace(decode(o.dk, 1, O.ID_A, o.ID_B), '0000000000', '0'), '000000000', '0')
-                    else
-                        (case when c.k030 = '2' or C.K040 <> '804'
-                                then lpad(trim(c.cust_code), 10, '0')
-                              when c.k030 = '1' and length(trim(c.cust_code))<=8 and trim(c.cust_code)<>l_ourOKPO
-                                then lpad(trim(c.cust_code), 8,'0')
-                              when c.k030 = '1' and
-                                   lpad(trim(c.cust_code), 10,'0') in
-                                    ('99999','999999999','00000','000000000','0000000000')
-                                then '0'
-                              when c.k030 = '1' and length(trim(c.cust_code)) > 8 and trim(c.cust_code)<>l_ourOKPO
-                                then lpad(trim(c.cust_code), 10,'0')
-                              else
-                                l_ourGLB
-                        end)
-                end) P31,
-                (case when t.kf = '300465' then
-                     (case when t.acc_num_cr like '1500%' and
-                                t.acc_num_db in ('29091000580557',
-                                                 '29092000040557',
-                                                 '29095000081557',
-                                                 '29095000046547',
-                                                 '29091927',
-                                                 '2909003101',
-                                                 '292460205',
-                                                 '292490204')
-                               then '37'
-                            when t.acc_num_cr like '1500%' and
-                                 t.acc_num_db in ('37394501547')
-                                then '31'
-                            when t.acc_num_db like '1600%' and
-                                 t.acc_num_cr like '1500%'
-                            then
-                               '31'
-                          else
-                               (case when trim(p.d1#e2) is not null
-                                     then trim(p.d1#e2)
-                                     else '00'
-                               end)
-                     end)
+    insert into NBUR_TMP_TRANS_1 (REPORT_DATE, KF, REF, TT, RNK, ACC, NLS, KV,
+        P10, P20, P31, P40, P62, REFD,
+        D1#E2, D6#E2, D7#E2, D8#E2, DA#E2, KOD_G, NB, NAZN, BAL_UAH, 
+        P32, P51, P52, P53, P54, P55)
+    select REPORT_DATE, KF, REF, TT, CUST_ID, ACC_ID, ACC_NUM, a.KV,
+        P10, P20, P31, substr(trim(D1#E2),1,2) P40, P62, REFD,
+        substr(trim(D1#E2),1,2), D6#E2, D7#E2, D8#E2, DA#E2, KOD_G, NB, NAZN, BAL_UAH,
+        p32, p51, p52, substr(c.benef_name,1,135) p53, p54, p54
+    from (select /*+ ordered */  
+            unique t.report_date, t.kf, t.ref, t.tt,
+            c.cust_id, t.acc_id_db acc_id, t.acc_num_db acc_num, t.kv,
+            lpad((dense_rank() over (order by t.ref)), 3, '0') nnn,
+            lpad(t.kv, 3, '0') P10,
+            TO_CHAR (ROUND (t.bal /  (F_Ret_Dig(t.kv, t.report_date) * 100), 0)) P20,
+            (case when 
+                    t.kf = '300465' and
+                    t.acc_num_cr like '1500%' and
+                    (t.acc_num_db in ('29091000580557',
+                                     '29092000040557',
+                                     '29095000081557',
+                                     '29095000046547',
+                                     '29091927',
+                                     '2909003101',
+                                     '292460205',
+                                     '292490204') OR
+                     substr(t.acc_num_db,1,4) = '1502') 
+                        or
+                     C.CUST_CODE = l_ourOKPO and
+                     not (substr(t.acc_num_db,1,4) = '1919' and substr(t.acc_num_cr,1,4) = '1500') and
+                     not (o.nlsa like '1600%' and o.nlsb like '1500%') and
+                     decode(o.dk, 1, O.ID_A, o.ID_B) = l_ourOKPO 
+                        or
+                     o.nlsa like '3548%' and o.nlsb like '1500%' 
+                        or
+                     (trim(c.CUST_CODE) = l_ourOKPO or c.cust_type = '1' and c.k040 = '804') and
+                     not(substr(t.acc_num_db,1,4) = '1919' and substr(t.acc_num_cr,1,4) = '1500' and t.tt <> 'NOS') and
+                     decode(o.dk, 1, O.ID_A, o.ID_B) = l_ourOKPO
+                then l_ourGLB
+                when substr(t.acc_num_db,1,4) = '1919' and substr(t.acc_num_cr,1,4) = '1500' and t.tt <> 'NOS' or
+                     o.nlsa like '1600%' and o.nlsb like '1500%'
+                then '0'
+                when decode(o.dk, 1, O.ID_A, o.ID_B) <> l_ourOKPO 
+                then replace(replace(decode(o.dk, 1, O.ID_A, o.ID_B), '0000000000', '0'), '000000000', '0')
                 else
-                    (case when trim(p.d1#e2) is not null
-                          then trim(p.d1#e2)
-                          when trim(p.d1#70) is null and
-                               trim(p.d1#e2) is null and
-                               trim(o.nazn) is not null
-                          then
-                             (case when instr(lower(o.nazn),'грош') > 0 or
-                                        instr(lower(o.nazn),'комерц') > 0 or
-                                        instr(lower(o.nazn),'соц_альний переказ') > 0 or
-                                        instr(lower(o.nazn),'переказ') > 0 and t.acc_num_db like '2620%'
-                                 then '38'
-                                 else '00'
-                             end)
+                    (case when c.k030 = '2' or C.K040 <> '804'
+                            then lpad(trim(c.cust_code), 10, '0')
+                          when c.k030 = '1' and length(trim(c.cust_code))<=8 and trim(c.cust_code)<>l_ourOKPO
+                            then lpad(trim(c.cust_code), 8,'0')
+                          when c.k030 = '1' and
+                               lpad(trim(c.cust_code), 10,'0') in
+                                ('99999','999999999','00000','000000000','0000000000')
+                            then '0'
+                          when c.k030 = '1' and length(trim(c.cust_code)) > 8 and trim(c.cust_code)<>l_ourOKPO
+                            then lpad(trim(c.cust_code), 10,'0')
                           else
-                            (case when trim(p.d1#e2) is not null
-                                then nvl(substr(trim(p.d1#e2), 1, 2), '00')
-                                else nvl(substr(trim(p.d1#70), 1, 2), '00')
-                             end)
+                            l_ourGLB
                     end)
-                end) D1#E2,
-                nvl((case when substr(trim(p.KOD_G),1,1) in ('O','P','О','П')
-                        then SUBSTR (trim(p.KOD_G), 2, 3)
-                        else SUBSTR (trim(p.KOD_G), 1, 3)
-                     end),
-                     substr(nvl(p.D6#70, p.D6#E2),1,3)) D6#E2,
-                substr(trim(nvl(p.D9#70, p.D7#E2)),1,10) D7#E2,
-                substr(trim(nvl(p.DA#70, p.D8#E2)),1,70) D8#E2,
-                substr(nvl(trim(z.value), trim(p.DD#70)),1,70) DA#E2,
-                (case when c.k040 <> '804' and
-                           not (o.nlsa like '3548%' and o.nlsb like '1500%')
-                             or
-                           substr(t.acc_num_db,1,4) = '1919' and substr(t.acc_num_cr,1,4) = '1500' and t.tt <> 'NOS'
-                      then '2' 
-                      when o.nlsa like '3548%' and o.nlsb like '1500%' 
-                      then '1'
-                      else c.k030 
-                end) P62,
-                --(case when c.k040 <> '804' then '0' else to_char(2 - to_number(c.k030)) end) P62,
-                to_number(trim(f_dop(t.ref, 'NOS_R'))) refd,
-                (case when nvl(b.kodc,'000') <> '000' then b.kodc
-                      else SUBSTR (trim(p.KOD_G), 1, 3)
-                end) kod_g,
-                substr(trim(u.nb), 1, 70) nb,
-                substr(o.nazn,1,70) nazn, t.bal_uah
-            from NBUR_DM_TRANSACTIONS t
-            join NBUR_REF_SEL_TRANS r
-            on (t.acc_num_db like r.acc_num_db||'%' and
-                t.acc_num_cr like r.acc_num_cr||'%')
-            left outer join NBUR_DM_ADL_DOC_RPT_DTL p
-            on (t.report_date = p.report_date and
-                t.kf = p.kf and
-                t.ref = p.ref)
-            join NBUR_DM_CUSTOMERS c
-            on (t.report_date = c.report_date and
-                t.kf = c.kf and
-                t.cust_id_db = c.cust_id)
-            left outer join rcukru u
-            on (trim(c.cust_type) = trim(u.ikod))
-            join oper o
-            on (t.ref = o.ref)
-            left outer join operw z
-            on (t.ref = z.ref and z.tag = 'DA#E2')
-           left outer join bopcount b
-            on (b.iso_countr = SUBSTR (trim(p.KOD_N), 1, 3))
-            where t.report_date = p_report_date and
-                t.kf = p_kod_filii and
-                t.kv not in (959, 961, 962, 964, 980) and
-                r.file_id = l_file_id and
-                --gl.p_ncurval(840, t.bal_uah, t.report_date) > l_gr_sum_840 and 
-                t.ref not in (select ref from NBUR_TMP_DEL_70 where kodf = l_file_code and datf = p_report_date) and
-                not (o.nlsa like '1500%' and o.nlsb like '1500%' or
-                     ((o.nlsa like '1500%' or o.nlsb like '1500%') and nvl(f_get_swift_country(t.ref), 'ZZZ') = '804') or -- 15/08/2017 (Дубина О.)
-                     o.nlsa like '1919%' and o.nlsb like '1600%' and lower(o.nazn) like '%конвер%' or
-                     o.nlsa like '19198%' and o.nlsb like '1600%' or
-                     o.nlsa like '1600%' and o.nlsb like '1500%'  and c.k040 = '804' or
-                     t.acc_num_db like '1600%' and c.k040 = '804' or
-                     o.kf = '300465' and o.mfoa <> o.mfob or
-                     t.kf = '300465' and t.r020_db in ('2600', '2620') and t.r020_cr in ('1919','2909','3739') and t.ref <> 88702330401 or
-                     o.nlsa like '1500%' and (o.nlsb like '7100%' or o.nlsb like '7500%') and
-                     o.dk=0 and round(t.bal_uah / l_kurs_840, 0) < 100000
-                ) and
-                -- виключаємо взаєморозрахунки ПрАТ "УФГ" (15/08/2017 Дубина О.)
-                not ((nlsa = '26507301976' or nlsb = '26507301976') and 
-                      (lower(nazn) like '%vzaimoraschet%po%sistem%' or 
-                       lower(nazn) like '%взаєморозрахун%по%систем%' or
-                       lower(nazn) like '%взаиморасчет%по%систем%')) 
-          );
+            end) P31,
+            (case when t.kf = '300465' then
+                 (case when t.acc_num_cr like '1500%' and
+                            t.acc_num_db in ('29091000580557',
+                                             '29092000040557',
+                                             '29095000081557',
+                                             '29095000046547',
+                                             '29091927',
+                                             '2909003101',
+                                             '292460205',
+                                             '292490204')
+                           then '37'
+                        when t.acc_num_cr like '1500%' and
+                             t.acc_num_db in ('37394501547')
+                            then '31'
+                        when t.acc_num_db like '1600%' and
+                             t.acc_num_cr like '1500%'
+                        then
+                           '31'
+                      else
+                           (case when trim(p.d1#e2) is not null
+                                 then trim(p.d1#e2)
+                                 else '00'
+                           end)
+                 end)
+            else
+                (case when trim(p.d1#e2) is not null
+                      then trim(p.d1#e2)
+                      when trim(p.d1#70) is null and
+                           trim(p.d1#e2) is null and
+                           trim(o.nazn) is not null
+                      then
+                         (case when instr(lower(o.nazn),'грош') > 0 or
+                                    instr(lower(o.nazn),'комерц') > 0 or
+                                    instr(lower(o.nazn),'соц_альний переказ') > 0 or
+                                    instr(lower(o.nazn),'переказ') > 0 and t.acc_num_db like '2620%'
+                             then '38'
+                             else '00'
+                         end)
+                      else
+                        (case when trim(p.d1#e2) is not null
+                            then nvl(substr(trim(p.d1#e2), 1, 2), '00')
+                            else nvl(substr(trim(p.d1#70), 1, 2), '00')
+                         end)
+                end)
+            end) D1#E2,
+            nvl((case when substr(trim(p.KOD_G),1,1) in ('O','P','О','П')
+                    then SUBSTR (trim(p.KOD_G), 2, 3)
+                    else SUBSTR (trim(p.KOD_G), 1, 3)
+                 end),
+                 substr(nvl(p.D6#70, p.D6#E2),1,3)) D6#E2,
+            substr(trim(nvl(p.D9#70, p.D7#E2)),1,10) D7#E2,
+            substr(trim(nvl(p.DA#70, p.D8#E2)),1,70) D8#E2,
+            substr(nvl(trim(z.value), trim(p.DD#70)),1,70) DA#E2,
+            (case when c.k040 <> '804' and
+                       not (o.nlsa like '3548%' and o.nlsb like '1500%')
+                         or
+                       substr(t.acc_num_db,1,4) = '1919' and substr(t.acc_num_cr,1,4) = '1500' and t.tt <> 'NOS'
+                  then '2' 
+                  when o.nlsa like '3548%' and o.nlsb like '1500%' 
+                  then '1'
+                  else c.k030 
+            end) P62,
+            --(case when c.k040 <> '804' then '0' else to_char(2 - to_number(c.k030)) end) P62,
+            to_number(trim(f_dop(t.ref, 'NOS_R'))) refd,
+            (case when nvl(b.kodc,'000') <> '000' then b.kodc
+                  else SUBSTR (trim(p.KOD_G), 1, 3)
+            end) kod_g,
+            substr(trim(u.nb), 1, 70) nb,
+            substr(o.nazn,1,70) nazn, t.bal_uah,
+            c.cust_name p32,
+            trim(p.D2#70) p51, trim(p.D3#70) p52, 
+            trim(z1.value) p54, '2' p55
+        from NBUR_DM_TRANSACTIONS t
+        join NBUR_REF_SEL_TRANS r
+        on (t.acc_num_db like r.acc_num_db||'%' and
+            t.acc_num_cr like r.acc_num_cr||'%')
+        left outer join NBUR_DM_ADL_DOC_RPT_DTL p
+        on (t.report_date = p.report_date and
+            t.kf = p.kf and
+            t.ref = p.ref)
+        join NBUR_DM_CUSTOMERS c
+        on (t.report_date = c.report_date and
+            t.kf = c.kf and
+            t.cust_id_db = c.cust_id)
+        left outer join rcukru u
+        on (trim(c.cust_type) = trim(u.ikod))
+        join oper o
+        on (t.ref = o.ref)
+        left outer join operw z
+        on (t.ref = z.ref and z.tag = 'DA#E2')
+        left outer join operw z1
+        on (t.ref = z1.ref and z1.tag = '12_2C')
+        left outer join bopcount b
+        on (b.iso_countr = SUBSTR (trim(p.KOD_N), 1, 3))
+        where t.report_date = p_report_date and
+            t.kf = p_kod_filii and
+            t.kv not in (959, 961, 962, 964, 980) and
+            r.file_id = l_file_id and
+            t.ref not in (select ref from NBUR_TMP_DEL_70 where kodf = l_file_code and datf = p_report_date) and
+            not (o.nlsa like '1500%' and o.nlsb like '1500%' or
+                 ((o.nlsa like '1500%' or o.nlsb like '1500%') and nvl(f_get_swift_country(t.ref), 'ZZZ') = '804') or -- 15/08/2017 (Дубина О.)
+                 o.nlsa like '1919%' and o.nlsb like '1600%' and lower(o.nazn) like '%конвер%' or
+                 o.nlsa like '19198%' and o.nlsb like '1600%' or
+                 o.nlsa like '1600%' and o.nlsb like '1500%'  and c.k040 = '804' or
+                 t.acc_num_db like '1600%' and c.k040 = '804' or
+                 o.kf = '300465' and o.mfoa <> o.mfob or
+                 t.kf = '300465' and t.r020_db in ('2600', '2620') and t.r020_cr in ('1919','2909','3739') and t.ref <> 88702330401 or
+                 o.nlsa like '1500%' and (o.nlsb like '7100%' or o.nlsb like '7500%') and
+                 o.dk=0 and round(t.bal_uah / l_kurs_840, 0) < 100000
+            ) and
+            -- виключаємо взаєморозрахунки ПрАТ "УФГ" (15/08/2017 Дубина О.)
+            not ((nlsa = '26507301976' or nlsb = '26507301976') and 
+                  (lower(nazn) like '%vzaimoraschet%po%sistem%' or 
+                   lower(nazn) like '%взаєморозрахун%по%систем%' or
+                   lower(nazn) like '%взаиморасчет%по%систем%')) 
+      ) a
+      left outer join v_cim_all_contracts c
+      on (a.p51 = c.num and
+          to_date(a.p52) = c.open_date);
         
-        -- додане користувачем у довідник
-        insert into NBUR_TMP_TRANS_1 (REPORT_DATE, KF, REF, TT, RNK, ACC, NLS, KV,
-            P10, P20, P31, P40, P62, REFD,
-            D1#E2, D6#E2, D7#E2, D8#E2, DA#E2, KOD_G, NB, NAZN, BAL_UAH)
-        select REPORT_DATE, KF, REF, TT, CUST_ID, ACC_ID, ACC_NUM, KV,
-            P10, P20, P31, substr(trim(D1#E2),1,2) P40, P62, REFD,
-            substr(trim(D1#E2),1,2), D6#E2, D7#E2, D8#E2, DA#E2, KOD_G, NB, NAZN, BAL_UAH
-        from (select /*+ ordered */  
-                unique t.report_date, t.kf, t.ref, t.tt,
-                c.cust_id, t.acc_id_db acc_id, t.acc_num_db acc_num, t.kv,
-                lpad((dense_rank() over (order by t.ref)), 3, '0') nnn,
-                lpad(t.kv, 3, '0') P10,
-                TO_CHAR (ROUND (t.bal /  (F_Ret_Dig(t.kv, t.report_date) * 100), 0)) P20,
-                (case when 
-                        t.kf = '300465' and
-                        t.acc_num_cr like '1500%' and
-                        (t.acc_num_db in ('29091000580557',
-                                         '29092000040557',
-                                         '29095000081557',
-                                         '29095000046547',
-                                         '29091927',
-                                         '2909003101',
-                                         '292460205',
-                                         '292490204') OR
-                         substr(t.acc_num_db,1,4) = '1502') 
-                            or
-                         C.CUST_CODE = l_ourOKPO and
-                         not (substr(t.acc_num_db,1,4) = '1919' and substr(t.acc_num_cr,1,4) = '1500') and
-                         not (o.nlsa like '1600%' and o.nlsb like '1500%') and
-                         decode(o.dk, 1, O.ID_A, o.ID_B) = l_ourOKPO 
-                            or
-                         o.nlsa like '3548%' and o.nlsb like '1500%' 
-                            or
-                         (trim(c.CUST_CODE) = l_ourOKPO or c.cust_type = '1' and c.k040 = '804') and
-                         not(substr(t.acc_num_db,1,4) = '1919' and substr(t.acc_num_cr,1,4) = '1500' and t.tt <> 'NOS') and
-                         decode(o.dk, 1, O.ID_A, o.ID_B) = l_ourOKPO
-                    then l_ourGLB
-                    when substr(t.acc_num_db,1,4) = '1919' and substr(t.acc_num_cr,1,4) = '1500' and t.tt <> 'NOS' or
-                         o.nlsa like '1600%' and o.nlsb like '1500%'
-                    then '0'
-                    when decode(o.dk, 1, O.ID_A, o.ID_B) <> l_ourOKPO 
-                    then replace(replace(decode(o.dk, 1, O.ID_A, o.ID_B), '0000000000', '0'), '000000000', '0')
-                    else
-                        (case when c.k030 = '2' or C.K040 <> '804'
-                                then lpad(trim(c.cust_code), 10, '0')
-                              when c.k030 = '1' and length(trim(c.cust_code))<=8 and trim(c.cust_code)<>l_ourOKPO
-                                then lpad(trim(c.cust_code), 8,'0')
-                              when c.k030 = '1' and
-                                   lpad(trim(c.cust_code), 10,'0') in
-                                    ('99999','999999999','00000','000000000','0000000000')
-                                then '0'
-                              when c.k030 = '1' and length(trim(c.cust_code)) > 8 and trim(c.cust_code)<>l_ourOKPO
-                                then lpad(trim(c.cust_code), 10,'0')
-                              else
-                                l_ourGLB
-                        end)
-                end) P31,
-                (case when t.kf = '300465' then
-                     (case when t.acc_num_cr like '1500%' and
-                                t.acc_num_db in ('29091000580557',
-                                                 '29092000040557',
-                                                 '29095000081557',
-                                                 '29095000046547',
-                                                 '29091927',
-                                                 '2909003101',
-                                                 '292460205',
-                                                 '292490204')
-                               then '37'
-                            when t.acc_num_cr like '1500%' and
-                                 t.acc_num_db in ('37394501547')
-                                then '31'
-                            when t.acc_num_db like '1600%' and
-                                 t.acc_num_cr like '1500%'
-                            then
-                               '31'
-                          else
-                               (case when trim(p.d1#e2) is not null
-                                     then trim(p.d1#e2)
-                                     else '00'
-                               end)
-                     end)
+    -- додане користувачем у довідник
+    insert into NBUR_TMP_TRANS_1 (REPORT_DATE, KF, REF, TT, RNK, ACC, NLS, KV,
+        P10, P20, P31, P40, P62, REFD,
+        D1#E2, D6#E2, D7#E2, D8#E2, DA#E2, KOD_G, NB, NAZN, BAL_UAH)
+    select REPORT_DATE, KF, REF, TT, CUST_ID, ACC_ID, ACC_NUM, KV,
+        P10, P20, P31, substr(trim(D1#E2),1,2) P40, P62, REFD,
+        substr(trim(D1#E2),1,2), D6#E2, D7#E2, D8#E2, DA#E2, KOD_G, NB, NAZN, BAL_UAH
+    from (select /*+ ordered */  
+            unique t.report_date, t.kf, t.ref, t.tt,
+            c.cust_id, t.acc_id_db acc_id, t.acc_num_db acc_num, t.kv,
+            lpad((dense_rank() over (order by t.ref)), 3, '0') nnn,
+            lpad(t.kv, 3, '0') P10,
+            TO_CHAR (ROUND (t.bal /  (F_Ret_Dig(t.kv, t.report_date) * 100), 0)) P20,
+            (case when 
+                    t.kf = '300465' and
+                    t.acc_num_cr like '1500%' and
+                    (t.acc_num_db in ('29091000580557',
+                                     '29092000040557',
+                                     '29095000081557',
+                                     '29095000046547',
+                                     '29091927',
+                                     '2909003101',
+                                     '292460205',
+                                     '292490204') OR
+                     substr(t.acc_num_db,1,4) = '1502') 
+                        or
+                     C.CUST_CODE = l_ourOKPO and
+                     not (substr(t.acc_num_db,1,4) = '1919' and substr(t.acc_num_cr,1,4) = '1500') and
+                     not (o.nlsa like '1600%' and o.nlsb like '1500%') and
+                     decode(o.dk, 1, O.ID_A, o.ID_B) = l_ourOKPO 
+                        or
+                     o.nlsa like '3548%' and o.nlsb like '1500%' 
+                        or
+                     (trim(c.CUST_CODE) = l_ourOKPO or c.cust_type = '1' and c.k040 = '804') and
+                     not(substr(t.acc_num_db,1,4) = '1919' and substr(t.acc_num_cr,1,4) = '1500' and t.tt <> 'NOS') and
+                     decode(o.dk, 1, O.ID_A, o.ID_B) = l_ourOKPO
+                then l_ourGLB
+                when substr(t.acc_num_db,1,4) = '1919' and substr(t.acc_num_cr,1,4) = '1500' and t.tt <> 'NOS' or
+                     o.nlsa like '1600%' and o.nlsb like '1500%'
+                then '0'
+                when decode(o.dk, 1, O.ID_A, o.ID_B) <> l_ourOKPO 
+                then replace(replace(decode(o.dk, 1, O.ID_A, o.ID_B), '0000000000', '0'), '000000000', '0')
                 else
-                    (case when trim(p.d1#e2) is not null
-                          then trim(p.d1#e2)
-                          when trim(p.d1#70) is null and
-                               trim(p.d1#e2) is null and
-                               trim(o.nazn) is not null
-                          then
-                             (case when instr(lower(o.nazn),'грош') > 0 or
-                                        instr(lower(o.nazn),'комерц') > 0 or
-                                        instr(lower(o.nazn),'соц_альний переказ') > 0 or
-                                        instr(lower(o.nazn),'переказ') > 0 and t.acc_num_db like '2620%'
-                                 then '38'
-                                 else '00'
-                             end)
+                    (case when c.k030 = '2' or C.K040 <> '804'
+                            then lpad(trim(c.cust_code), 10, '0')
+                          when c.k030 = '1' and length(trim(c.cust_code))<=8 and trim(c.cust_code)<>l_ourOKPO
+                            then lpad(trim(c.cust_code), 8,'0')
+                          when c.k030 = '1' and
+                               lpad(trim(c.cust_code), 10,'0') in
+                                ('99999','999999999','00000','000000000','0000000000')
+                            then '0'
+                          when c.k030 = '1' and length(trim(c.cust_code)) > 8 and trim(c.cust_code)<>l_ourOKPO
+                            then lpad(trim(c.cust_code), 10,'0')
                           else
-                            (case when trim(p.d1#e2) is not null
-                                then nvl(substr(trim(p.d1#e2), 1, 2), '00')
-                                else nvl(substr(trim(p.d1#70), 1, 2), '00')
-                             end)
+                            l_ourGLB
                     end)
-                end) D1#E2,
-                nvl((case when substr(trim(p.KOD_G),1,1) in ('O','P','О','П')
-                        then SUBSTR (trim(p.KOD_G), 2, 3)
-                        else SUBSTR (trim(p.KOD_G), 1, 3)
-                     end),
-                     substr(nvl(p.D6#70, p.D6#E2),1,3)) D6#E2,
-                substr(trim(nvl(p.D9#70, p.D7#E2)),1,10) D7#E2,
-                substr(trim(nvl(p.DA#70, p.D8#E2)),1,70) D8#E2,
-                substr(nvl(trim(z.value), trim(p.DD#70)),1,70) DA#E2,
-                (case when c.k040 <> '804' and
-                           not (o.nlsa like '3548%' and o.nlsb like '1500%')
-                             or
-                           substr(t.acc_num_db,1,4) = '1919' and substr(t.acc_num_cr,1,4) = '1500' and t.tt <> 'NOS'
-                      then '2' 
-                      when o.nlsa like '3548%' and o.nlsb like '1500%' 
-                      then '1'
-                      else c.k030 
-                end) P62,
-                --(case when c.k040 <> '804' then '0' else to_char(2 - to_number(c.k030)) end) P62,
-                to_number(trim(f_dop(t.ref, 'NOS_R'))) refd,
-                (case when nvl(b.kodc,'000') <> '000' then b.kodc
-                      else SUBSTR (trim(p.KOD_G), 1, 3)
-                end) kod_g,
-                substr(trim(u.nb), 1, 70) nb,
-                substr(o.nazn,1,70) nazn, t.bal_uah
-            from NBUR_DM_TRANSACTIONS t
-                join NBUR_TMP_INS_70 r
-                on (t.report_date = r.datf and
-                    t.kf = r.kf and
-                    t.ref = r.ref and
-                    r.kodf = l_file_code)
-            left outer join NBUR_DM_ADL_DOC_RPT_DTL p
-            on (t.report_date = p.report_date and
-                t.kf = p.kf and
-                t.ref = p.ref)
-            join NBUR_DM_CUSTOMERS c
-            on (t.report_date = c.report_date and
-                t.kf = c.kf and
-                t.cust_id_db = c.cust_id)
-            left outer join rcukru u
-            on (trim(c.cust_type) = trim(u.ikod))
-            join oper o
-            on (t.ref = o.ref)
-            left outer join operw z
-            on (t.ref = z.ref and z.tag = 'DA#E2')
-           left outer join bopcount b
-            on (b.iso_countr = SUBSTR (trim(p.KOD_N), 1, 3))
-            where t.report_date = p_report_date and
-                t.kf = p_kod_filii and
-                t.kv not in (959, 961, 962, 964, 980) and
-                --gl.p_ncurval(840, t.bal_uah, t.report_date) > l_gr_sum_840 and 
-                t.ref not in (select ref from nbur_detail_protocols where report_code = p_file_code and report_date = p_report_date) and
-                not (o.nlsa like '1500%' and o.nlsb like '1500%' or
-                     ((o.nlsa like '1500%' or o.nlsb like '1500%') and nvl(f_get_swift_country(t.ref), 'ZZZ') = '804') or -- 15/08/2017 (Дубина О.)
-                     o.nlsa like '1919%' and o.nlsb like '1600%' and lower(o.nazn) like '%конвер%' or
-                     o.nlsa like '19198%' and o.nlsb like '1600%' or
-                     o.nlsa like '1600%' and o.nlsb like '1500%'  and c.k040 = '804' or
-                     t.acc_num_db like '1600%' and c.k040 = '804' or
-                     o.kf = '300465' and o.mfoa <> o.mfob or
-                     t.kf = '300465' and t.r020_db in ('2600', '2620') and t.r020_cr in ('1919','2909','3739') and t.ref <> 88702330401 or
-                     o.nlsa like '1500%' and (o.nlsb like '7100%' or o.nlsb like '7500%') and
-                     o.dk=0 and round(t.bal_uah / l_kurs_840, 0) < 100000
-                ) and
-                -- виключаємо взаєморозрахунки ПрАТ "УФГ" (15/08/2017 Дубина О.)
-                not ((nlsa = '26507301976' or nlsb = '26507301976') and 
-                      (lower(nazn) like '%vzaimoraschet%po%sistem%' or 
-                       lower(nazn) like '%взаєморозрахун%по%систем%' or
-                       lower(nazn) like '%взаиморасчет%по%систем%')) 
-          );
-   else
-        insert into NBUR_TMP_TRANS_1 (REPORT_DATE, KF, REF, TT, RNK, ACC, NLS, KV,
-            P10, P20, P31, P40, P62, REFD,
-            D1#E2, D6#E2, D7#E2, D8#E2, DA#E2, KOD_G, NB, NAZN, BAL_UAH)
-        select REPORT_DATE, KF, REF, TT, CUST_ID, ACC_ID, ACC_NUM, KV,
-            P10, P20, P31, substr(trim(D1#E2),1,2) P40, P62, REFD,
-            substr(trim(D1#E2),1,2), D6#E2, D7#E2, D8#E2, DA#E2, KOD_G, NB, NAZN, BAL_UAH
-        from (select /*+ ordered */  
-                unique t.report_date, t.kf, t.ref, t.tt,
-                c.cust_id, t.acc_id_db acc_id, t.acc_num_db acc_num, t.kv,
-                lpad((dense_rank() over (order by t.ref)), 3, '0') nnn,
-                lpad(t.kv, 3, '0') P10,
-                TO_CHAR (ROUND (t.bal /  (F_Ret_Dig(t.kv, t.report_date) * 100), 0)) P20,
-                (case when 
-                        t.kf = '300465' and
-                        t.acc_num_cr like '1500%' and
-                        (t.acc_num_db in ('29091000580557',
-                                         '29092000040557',
-                                         '29095000081557',
-                                         '29095000046547',
-                                         '29091927',
-                                         '2909003101',
-                                         '292460205',
-                                         '292490204') OR
-                         substr(t.acc_num_db,1,4) = '1502') 
-                            or
-                         C.CUST_CODE = l_ourOKPO and
-                         not (substr(t.acc_num_db,1,4) = '1919' and substr(t.acc_num_cr,1,4) = '1500') and
-                         not (o.nlsa like '1600%' and o.nlsb like '1500%') and
-                         decode(o.dk, 1, O.ID_A, o.ID_B) = l_ourOKPO 
-                            or
-                         o.nlsa like '3548%' and o.nlsb like '1500%' 
-                            or
-                         (trim(c.CUST_CODE) = l_ourOKPO or c.cust_type = '1' and c.k040 = '804') and
-                         not(substr(t.acc_num_db,1,4) = '1919' and substr(t.acc_num_cr,1,4) = '1500' and t.tt <> 'NOS') and
-                         decode(o.dk, 1, O.ID_A, o.ID_B) = l_ourOKPO
-                    then l_ourGLB
-                    when substr(t.acc_num_db,1,4) = '1919' and substr(t.acc_num_cr,1,4) = '1500' and t.tt <> 'NOS' or
-                         o.nlsa like '1600%' and o.nlsb like '1500%'
-                    then '0'
-                    when decode(o.dk, 1, O.ID_A, o.ID_B) <> l_ourOKPO 
-                    then replace(replace(decode(o.dk, 1, O.ID_A, o.ID_B), '0000000000', '0'), '000000000', '0')
-                    else
-                        (case when c.k030 = '2' or C.K040 <> '804'
-                                then lpad(trim(c.cust_code), 10, '0')
-                              when c.k030 = '1' and length(trim(c.cust_code))<=8 and trim(c.cust_code)<>l_ourOKPO
-                                then lpad(trim(c.cust_code), 8,'0')
-                              when c.k030 = '1' and
-                                   lpad(trim(c.cust_code), 10,'0') in
-                                    ('99999','999999999','00000','000000000','0000000000')
-                                then '0'
-                              when c.k030 = '1' and length(trim(c.cust_code)) > 8 and trim(c.cust_code)<>l_ourOKPO
-                                then lpad(trim(c.cust_code), 10,'0')
-                              else
-                                l_ourGLB
-                        end)
-                end) P31,
-                (case when t.kf = '300465' then
-                     (case when t.acc_num_cr like '1500%' and
-                                t.acc_num_db in ('29091000580557',
-                                                 '29092000040557',
-                                                 '29095000081557',
-                                                 '29095000046547',
-                                                 '29091927',
-                                                 '2909003101',
-                                                 '292460205',
-                                                 '292490204')
-                               then '37'
-                            when t.acc_num_cr like '1500%' and
-                                 t.acc_num_db in ('37394501547')
-                                then '31'
-                            when t.acc_num_db like '1600%' and
-                                 t.acc_num_cr like '1500%'
-                            then
-                               '31'
-                          else
-                               (case when trim(p.d1#e2) is not null
-                                     then trim(p.d1#e2)
-                                     else '00'
-                               end)
-                     end)
-                else
-                    (case when trim(p.d1#e2) is not null
-                          then trim(p.d1#e2)
-                          when trim(p.d1#70) is null and
-                               trim(p.d1#e2) is null and
-                               trim(o.nazn) is not null
-                          then
-                             (case when instr(lower(o.nazn),'грош') > 0 or
-                                        instr(lower(o.nazn),'комерц') > 0 or
-                                        instr(lower(o.nazn),'соц_альний переказ') > 0 or
-                                        instr(lower(o.nazn),'переказ') > 0 and t.acc_num_db like '2620%'
-                                 then '38'
+            end) P31,
+            (case when t.kf = '300465' then
+                 (case when t.acc_num_cr like '1500%' and
+                            t.acc_num_db in ('29091000580557',
+                                             '29092000040557',
+                                             '29095000081557',
+                                             '29095000046547',
+                                             '29091927',
+                                             '2909003101',
+                                             '292460205',
+                                             '292490204')
+                           then '37'
+                        when t.acc_num_cr like '1500%' and
+                             t.acc_num_db in ('37394501547')
+                            then '31'
+                        when t.acc_num_db like '1600%' and
+                             t.acc_num_cr like '1500%'
+                        then
+                           '31'
+                      else
+                           (case when trim(p.d1#e2) is not null
+                                 then trim(p.d1#e2)
                                  else '00'
-                             end)
-                          else
-                            (case when trim(p.d1#e2) is not null
-                                then nvl(substr(trim(p.d1#e2), 1, 2), '00')
-                                else nvl(substr(trim(p.d1#70), 1, 2), '00')
-                             end)
-                    end)
-                end) D1#E2,
-                nvl((case when substr(trim(p.KOD_G),1,1) in ('O','P','О','П')
-                        then SUBSTR (trim(p.KOD_G), 2, 3)
-                        else SUBSTR (trim(p.KOD_G), 1, 3)
-                     end),
-                     substr(nvl(p.D6#70, p.D6#E2),1,3)) D6#E2,
-                substr(trim(nvl(p.D9#70, p.D7#E2)),1,10) D7#E2,
-                substr(trim(nvl(p.DA#70, p.D8#E2)),1,70) D8#E2,
-                substr(nvl(trim(z.value), trim(p.DD#70)),1,70) DA#E2,
-                (case when c.k040 <> '804' and
-                           not (o.nlsa like '3548%' and o.nlsb like '1500%')
-                             or
-                           substr(t.acc_num_db,1,4) = '1919' and substr(t.acc_num_cr,1,4) = '1500' and t.tt <> 'NOS'
-                      then '2' 
-                      when o.nlsa like '3548%' and o.nlsb like '1500%' 
-                      then '1'
-                      else c.k030 
-                end) P62,
-                --(case when c.k040 <> '804' then '0' else to_char(2 - to_number(c.k030)) end) P62,
-                to_number(trim(f_dop(t.ref, 'NOS_R'))) refd,
-                (case when nvl(b.kodc,'000') <> '000' then b.kodc
-                      else SUBSTR (trim(p.KOD_G), 1, 3)
-                end) kod_g,
-                substr(trim(u.nb), 1, 70) nb,
-                substr(o.nazn,1,70) nazn, t.bal_uah
-            from NBUR_DM_TRANSACTIONS t
-            join NBUR_REF_SEL_TRANS r
-            on (t.acc_num_db like r.acc_num_db||'%' and
-                t.acc_num_cr like r.acc_num_cr||'%')
-            left outer join NBUR_DM_ADL_DOC_RPT_DTL p
-            on (t.report_date = p.report_date and
-                t.kf = p.kf and
-                t.ref = p.ref)
-            join NBUR_DM_CUSTOMERS c
-            on (t.report_date = c.report_date and
-                t.kf = c.kf and
-                t.cust_id_db = c.cust_id)
-            left outer join rcukru u
-            on (trim(c.cust_type) = trim(u.ikod))
-            join oper o
-            on (t.ref = o.ref)
-            left outer join operw z
-            on (t.ref = z.ref and z.tag = 'DA#E2')
-           left outer join bopcount b
-            on (b.iso_countr = SUBSTR (trim(p.KOD_N), 1, 3))
-            where t.report_date = p_report_date and
-                t.kf = p_kod_filii and
-                t.kv not in (959, 961, 962, 964, 980) and
-                r.file_id = l_file_id and
-                --gl.p_ncurval(840, t.bal_uah, t.report_date) > l_gr_sum_840 and 
-                t.ref not in (select ref from NBUR_TMP_DEL_70 where kodf = l_file_code and datf = p_report_date) and
-                not (o.nlsa like '1500%' and o.nlsb like '1500%' or
-                     o.nlsa like '1919%' and o.nlsb like '1600%' and lower(o.nazn) like '%конвер%' or
-                     o.nlsa like '19198%' and o.nlsb like '1600%' or
-                     o.nlsa like '1600%' and o.nlsb like '1500%'  and c.k040 = '804' or
-                     t.acc_num_db like '1600%' and c.k040 = '804' or
-                     o.kf = '300465' and o.mfoa <> o.mfob or
-                     t.kf = '300465' and t.r020_db in ('2600', '2620') and t.r020_cr in ('1919','2909','3739') and t.ref <> 88702330401 or
-                     o.nlsa like '1500%' and (o.nlsb like '7100%' or o.nlsb like '7500%') and
-                     o.dk=0 and round(t.bal_uah / l_kurs_840, 0) < 100000
-                )
-          );
-   end if;
+                           end)
+                 end)
+            else
+                (case when trim(p.d1#e2) is not null
+                      then trim(p.d1#e2)
+                      when trim(p.d1#70) is null and
+                           trim(p.d1#e2) is null and
+                           trim(o.nazn) is not null
+                      then
+                         (case when instr(lower(o.nazn),'грош') > 0 or
+                                    instr(lower(o.nazn),'комерц') > 0 or
+                                    instr(lower(o.nazn),'соц_альний переказ') > 0 or
+                                    instr(lower(o.nazn),'переказ') > 0 and t.acc_num_db like '2620%'
+                             then '38'
+                             else '00'
+                         end)
+                      else
+                        (case when trim(p.d1#e2) is not null
+                            then nvl(substr(trim(p.d1#e2), 1, 2), '00')
+                            else nvl(substr(trim(p.d1#70), 1, 2), '00')
+                         end)
+                end)
+            end) D1#E2,
+            nvl((case when substr(trim(p.KOD_G),1,1) in ('O','P','О','П')
+                    then SUBSTR (trim(p.KOD_G), 2, 3)
+                    else SUBSTR (trim(p.KOD_G), 1, 3)
+                 end),
+                 substr(nvl(p.D6#70, p.D6#E2),1,3)) D6#E2,
+            substr(trim(nvl(p.D9#70, p.D7#E2)),1,10) D7#E2,
+            substr(trim(nvl(p.DA#70, p.D8#E2)),1,70) D8#E2,
+            substr(nvl(trim(z.value), trim(p.DD#70)),1,70) DA#E2,
+            (case when c.k040 <> '804' and
+                       not (o.nlsa like '3548%' and o.nlsb like '1500%')
+                         or
+                       substr(t.acc_num_db,1,4) = '1919' and substr(t.acc_num_cr,1,4) = '1500' and t.tt <> 'NOS'
+                  then '2' 
+                  when o.nlsa like '3548%' and o.nlsb like '1500%' 
+                  then '1'
+                  else c.k030 
+            end) P62,
+            --(case when c.k040 <> '804' then '0' else to_char(2 - to_number(c.k030)) end) P62,
+            to_number(trim(f_dop(t.ref, 'NOS_R'))) refd,
+            (case when nvl(b.kodc,'000') <> '000' then b.kodc
+                  else SUBSTR (trim(p.KOD_G), 1, 3)
+            end) kod_g,
+            substr(trim(u.nb), 1, 70) nb,
+            substr(o.nazn,1,70) nazn, t.bal_uah
+        from NBUR_DM_TRANSACTIONS t
+            join NBUR_TMP_INS_70 r
+            on (t.report_date = r.datf and
+                t.kf = r.kf and
+                t.ref = r.ref and
+                r.kodf = l_file_code)
+        left outer join NBUR_DM_ADL_DOC_RPT_DTL p
+        on (t.report_date = p.report_date and
+            t.kf = p.kf and
+            t.ref = p.ref)
+        join NBUR_DM_CUSTOMERS c
+        on (t.report_date = c.report_date and
+            t.kf = c.kf and
+            t.cust_id_db = c.cust_id)
+        left outer join rcukru u
+        on (trim(c.cust_type) = trim(u.ikod))
+        join oper o
+        on (t.ref = o.ref)
+        left outer join operw z
+        on (t.ref = z.ref and z.tag = 'DA#E2')
+       left outer join bopcount b
+        on (b.iso_countr = SUBSTR (trim(p.KOD_N), 1, 3))
+        where t.report_date = p_report_date and
+            t.kf = p_kod_filii and
+            t.kv not in (959, 961, 962, 964, 980) and
+            --gl.p_ncurval(840, t.bal_uah, t.report_date) > l_gr_sum_840 and 
+            t.ref not in (select ref from nbur_detail_protocols where report_code = p_file_code and report_date = p_report_date) and
+            not (o.nlsa like '1500%' and o.nlsb like '1500%' or
+                 ((o.nlsa like '1500%' or o.nlsb like '1500%') and nvl(f_get_swift_country(t.ref), 'ZZZ') = '804') or -- 15/08/2017 (Дубина О.)
+                 o.nlsa like '1919%' and o.nlsb like '1600%' and lower(o.nazn) like '%конвер%' or
+                 o.nlsa like '19198%' and o.nlsb like '1600%' or
+                 o.nlsa like '1600%' and o.nlsb like '1500%'  and c.k040 = '804' or
+                 t.acc_num_db like '1600%' and c.k040 = '804' or
+                 o.kf = '300465' and o.mfoa <> o.mfob or
+                 t.kf = '300465' and t.r020_db in ('2600', '2620') and t.r020_cr in ('1919','2909','3739') and t.ref <> 88702330401 or
+                 o.nlsa like '1500%' and (o.nlsb like '7100%' or o.nlsb like '7500%') and
+                 o.dk=0 and round(t.bal_uah / l_kurs_840, 0) < 100000
+            ) and
+            -- виключаємо взаєморозрахунки ПрАТ "УФГ" (15/08/2017 Дубина О.)
+            not ((nlsa = '26507301976' or nlsb = '26507301976') and 
+                  (lower(nazn) like '%vzaimoraschet%po%sistem%' or 
+                   lower(nazn) like '%взаєморозрахун%по%систем%' or
+                   lower(nazn) like '%взаиморасчет%по%систем%')) 
+      );
+
    
    -- формування детального протоколу (частина 1)
    INSERT INTO nbur_detail_protocols (report_date,
@@ -638,8 +469,14 @@ BEGIN
                            ), 3, '0') nnn,
                      p10, 
                      p20, 
-                     (case when flag_kons = 0 then p31 else (case when p31 = '006' then p31 else '0' end) end) p31, 
+                     (case when flag_kons = 0 then p31 else (case when p31 = '006' then p31 else '0' end) end) p31,
+                     (case when flag_kons = 0 then p32 else (case when p31 = 'Ощадний банк' then p32 else ' ' end) end) p32,
                      (case when flag_kons = 0 then p40 else '00' end) p40, 
+                     (case when flag_kons = 0 then p51 else '00000' end) p51, 
+                     (case when flag_kons = 0 then p52 else '00000000' end) p52, 
+                     (case when flag_kons = 0 then p53 else ' ' end) p53, 
+                     (case when flag_kons = 0 then p54 else '0' end) p54, 
+                     (case when flag_kons = 0 then p55 else '2' end) p55, 
                      (case when flag_kons = 0 then p62 else '0' end) p62, 
                      (case when flag_kons = 0 then p64 else '000' end) p64, 
                      (case when flag_kons = 0 then p65 else '0' end) p65, 
@@ -656,7 +493,13 @@ BEGIN
                    z.p10,
                    z.p20,
                    z.p31,
+                   z.p32,
                    z.p40,
+                   z.p51,
+                   z.p52,
+                   z.p53,
+                   z.p54,
+                   z.p55,
                    nvl(lpad(nvl(nvl(trim(translate(z.kod_g, '0123456789OPОП', '0123456789')),
                                     substr(trim (z.D6#E2), 1, 70)),
                                 f_get_swift_country(z.ref)), 3, '0'),
@@ -708,6 +551,7 @@ BEGIN
                           else r.DC1#E2
                      end) D61#E2,
                     a.nb, substr(a.nazn, 1, 70) nazn,
+                    a.p32, a.p51, a.p52, a.p53, a.p54, a.p55,
                     a.p62, a.kod_g, a.DA#E2, b.nbuc, b.branch, a.bal_uah
                 from NBUR_TMP_TRANS_1 a
                 left outer join (select ref, pid,
@@ -765,7 +609,13 @@ BEGIN
                    z.p10,
                    z.p20,
                    z.p31,
+                   z.p32,
                    z.p40,
+                   z.p51,
+                   z.p52,
+                   z.p53,
+                   z.p54,
+                   z.p55,
                    nvl(lpad(nvl(nvl(trim(translate(z.kod_g, '0123456789OPОП', '0123456789')),
                                     substr(trim (z.D6#E2), 1, 70)),
                                 f_get_swift_country(z.ref)), 3, '0'),
@@ -824,7 +674,8 @@ BEGIN
                         a.NB,
                         substr(a.NAZN, 1, 70) nazn,
                         nvl(decode(f.kva, 980, '30', '28'), a.p40) d1#E2,
-                        t1.ref refd, a.DA#E2, b.nbuc, b.branch, a.bal_uah
+                        t1.ref refd, a.DA#E2, b.nbuc, b.branch, a.bal_uah,
+                        a.p32, a.p51, a.p52, a.p53, a.p54, a.p55
                     from NBUR_TMP_TRANS_1 a
                     left outer join oper x
                     on (x.vdat between p_report_date - 7 and p_report_date
@@ -864,7 +715,13 @@ BEGIN
                    z.p10,
                    z.p20,
                    z.p31,
+                   z.p32,
                    z.p40,
+                   z.p51,
+                   z.p52,
+                   z.p53,
+                   z.p54,
+                   z.p55,
                    nvl(lpad(nvl(nvl(trim(translate(z.kod_g, '0123456789OPОП', '0123456789')),
                                     substr(trim (z.D6#E2), 1, 70)),
                                 f_get_swift_country(z.ref)), 3, '0'),
@@ -928,7 +785,8 @@ BEGIN
                         a.NB,
                         a.NAZN,
                         nvl(a.p40, decode(f.kva, 980, '30', '28')) d1#E2,
-                        x.ref refd, a.DA#E2, b.nbuc, b.branch, a.bal_uah
+                        x.ref refd, a.DA#E2, b.nbuc, b.branch, a.bal_uah,
+                        a.p32, a.p51, a.p52, a.p53, a.p54, a.p55
                     from NBUR_TMP_TRANS_1 a
                     left outer join oper x
                     on (x.vdat between p_report_date - 7 and p_report_date
@@ -988,7 +846,8 @@ BEGIN
                                 a.nls like '3739%' ) and
                                 a.tt = 'NOS')
                           and nvl(t1.tt, '***') not like 'FX%') z) )
-    UNPIVOT (VALUE FOR colname IN (p10, p20, p31, p40, p61, P62, p64, p65, p66));
+    UNPIVOT (VALUE FOR colname IN (p10, p20, p31, p32, p40, p51, p52, p53, p54, 
+                                   p55, p61, P62, p64, p65, p66));
 
     -- формирование показателей файла  в  nbur_agg_protocols
     INSERT INTO nbur_agg_protocols (report_date,
