@@ -45,6 +45,14 @@ end;
 /
 
 
+begin
+  execute immediate 'alter table KL_K070  add ( 	K077  VARCHAR2(1) ) ';
+exception when others then       
+  if sqlcode=-1430 then null; else raise; end if; 
+end; 
+/
+
+
 
 
 PROMPT *** ALTER_POLICIES to KL_K070 ***
