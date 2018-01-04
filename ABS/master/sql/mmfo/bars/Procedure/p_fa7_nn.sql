@@ -9,7 +9,7 @@ IS
 % DESCRIPTION :  Процедура формирования #A7 для КБ (универсальная)
 % COPYRIGHT   :  Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.17.011  20.12.2017
+% VERSION     :  v.17.012  31.12.2017
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%/%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_ - отчетная дата
                pmode_ = режим (0 - для отчетности, 1 - для ANI-отчетов, 2 - для @77)
@@ -263,7 +263,8 @@ IS
    s#_              NUMBER;
    freq#_           NUMBER;
    apl_dat#_        DATE;
-
+    
+   sum_zal          number:=0;
 
    CURSOR saldo_cp
    IS
@@ -284,8 +285,8 @@ IS
                     s.dapp, '0' pr, s.tobo
                 FROM otcn_saldo aa, otcn_acc s
                WHERE aa.acc = s.acc and
-                     (nvl(aa.nbs, substr(aa.nls,1,4)) in ('1490','1491','1492','1493') or
-                      fl_cp_ = 0 and nvl(aa.nbs, substr(aa.nls,1,4)) in ('3190','3290'))
+                     (nvl(aa.nbs, substr(aa.nls,1,4)) in ('1419','1429') or
+                      fl_cp_ = 0 and nvl(aa.nbs, substr(aa.nls,1,4)) in ('3119','3219'))
              ) a,
              kl_r030 l,
              specparam p,
@@ -909,6 +910,22 @@ BEGIN
    loop
        table_r013_2(k.pok) := 1;
    end loop;
+   
+   if mfo_ = 300465 then
+         pul_dat(to_char(Dat_,'dd-mm-yyyy'), '');
+
+         EXECUTE IMMEDIATE 'delete from otcn_f42_cp';
+
+         sql_acc_ :=
+                'insert into otcn_f42_cp (fdat, acc, nls, kv, sum_zal, dat_zal, rnk, kodp) '
+              ||'select c.fdat, a.acc, a.nls, a.kv, nvl(c.sum_zal, 0), c.dat_zal, a.rnk, null '
+              ||'from accounts a, cp_v_zal_acc c '
+              ||'where a.acc = c.acc '
+              ||'  and c.fdat = :dat_ '
+              ||'  and substr(a.nls,1,4) like ''14__%''' ;
+
+            EXECUTE IMMEDIATE sql_acc_ USING dat_;
+   end if;
 
    if pnd_ is null then
       sql_acc_ := ' SELECT  /*+ parallel(a, 8) */ *
@@ -1687,6 +1704,9 @@ BEGIN
                    s242_ := 'B';
                 end if;
 
+             if s242_ !='Z'  then s190_ :='0';  end if;
+             if s242_ ='Z' and s190_ ='0'  then  s190_ :='A';  end if;
+
     ------- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 IF    pr_ = '1' AND nbs_ LIKE '2%'
                    OR     300120 IN (mfo_, mfou_)
@@ -2086,61 +2106,43 @@ BEGIN
                          x_ := '2';
                       END IF;
 
-/*                      IF     nbs_ IN
-                                ('2610', '2611', '2615', '2616', '2617', '2630',
-                                 '2635', '2636', '2637', '2651', '2652', '2653',
-                                 '2656')
-                         AND (   r013_ IS NULL
-                              OR r013_ = '0'
-                              OR r013_ NOT IN ('1', '9')
-                              OR mdate_ IS NOT NULL
-                             )
-                      THEN
-                         IF mdate_ IS NULL OR mdate_ > dat_
-                         THEN
-                            r013_ := '9';
-                         END IF;
+             if s242_ !='Z'  then s190_ :='0';  end if;
+             if s242_ ='Z' and s190_ ='0'  then  s190_ :='A';  end if;
 
-                         IF mdate_ IS NOT NULL AND mdate_ <= dat_
-                         THEN
-                            r013_ := '1';
-                         END IF;
-                      END IF;
-*/
                          pp_doda;
 
-                         if datn_ < zm_date2_ then
-                            kodp_ :=
-                               dk_
-                            || nbs_
-                            || r013_
-                            || x_
-                            || s242_
-                            || r031_
-                            || rez_
-                            || r012_;
-                         elsif datn_ < zm_date3_ then
-                            kodp_ :=
-                               dk_
-                            || nbs_
-                            || r013_
-                            || x_
-                            || s242_
-                            || rez_
-                            || r012_
-                            || r030_;
-                         else
-                            kodp_ :=
-                               dk_
-                            || nbs_
-                            || r011_
-                            || r013_
-                            || x_
-                            || s242_
-                            || rez_
-                            || s190_
-                            || r030_;
-                         end if;
+                      if datn_ < zm_date2_ then
+                        kodp_ :=
+                           dk_
+                        || nbs_
+                        || r013_
+                        || x_
+                        || s242_
+                        || r031_
+                        || rez_
+                        || r012_;
+                      elsif datn_ < zm_date3_ then
+                        kodp_ :=
+                           dk_
+                        || nbs_
+                        || r013_
+                        || x_
+                        || s242_
+                        || rez_
+                        || r012_
+                        || r030_;
+                      else
+                        kodp_ :=
+                           dk_
+                        || nbs_
+                        || r011_
+                        || r013_
+                        || x_
+                        || s242_
+                        || rez_
+                        || s190_
+                        || r030_;
+                      end if;
 
                       IF se_ <> 0
                       THEN
@@ -2184,29 +2186,6 @@ BEGIN
 
                    BEGIN
                       -- депозиты ФЛ
-                      IF 300120 IN (mfo_, mfou_)
-                      THEN
-                         SELECT gl.p_icurval (v.kv, v.min_summ * 100, dat_)
-                           INTO min_sum_
-                           FROM dpt_deposit c, dpt_vidd v
-                          WHERE c.acc = acc_
-                            AND c.vidd = v.vidd
-                            AND (   LOWER (v.type_name) LIKE '%рост%'
-                                 OR LOWER (v.type_name) LIKE '%сбер%'
-                                 OR LOWER (v.type_name) LIKE '%ощад%'
-                                 OR LOWER (v.type_name) LIKE '%раст%'
-                                )
-                            AND ROWNUM = 1;
-                      END IF;
-
-                      IF 300175 IN (mfo_, mfou_)
-                      THEN
-                         SELECT ABS (gl.p_icurval (a.kv, a.lim, dat_))
-                           INTO min_sum_
-                           FROM accounts a
-                          WHERE a.acc = acc_;
-                      END IF;
-
                       IF mfo_ = 300465
                       THEN
                          SELECT gl.p_icurval (v.kv, v.min_summ * 100, dat_)
@@ -2310,7 +2289,7 @@ BEGIN
                    rnls_ := nls_;
 
                    IF     x_ = '1'
-                      AND (   s180_ IN ('9', 'C', 'D', 'E', 'F', 'G', 'H','K','L','M')
+                      AND (   s180_ IN ('9', 'C', 'D', 'E', 'F', 'G', 'H')
                            OR s242_ IN ('9', 'C', 'D', 'E', 'F', 'G', 'H','K','L','M')
                           )
                    THEN
@@ -2318,13 +2297,13 @@ BEGIN
                    END IF;
 
                    IF x_ = '2'
-                      AND s180_ NOT IN ('9', 'C', 'D', 'E', 'F', 'G', 'H','K','L','M')
+                      AND s180_ NOT IN ('9', 'C', 'D', 'E', 'F', 'G', 'H')
                    THEN
                       rnls_ := nls_;
                    END IF;
 
                    IF     (x_ IS NULL OR x_ <> '2')
-                      AND s180_ IN ('9', 'C', 'D', 'E', 'F', 'G', 'H','K','L','M')
+                      AND s180_ IN ('9', 'C', 'D', 'E', 'F', 'G', 'H')
                    THEN
                       x_ := '2';
                    END IF;
@@ -2332,7 +2311,7 @@ BEGIN
                    IF     x_ = '0'
                       AND (   s180_ IS NULL
                            OR s180_ = '0'
-                           OR s180_ NOT IN ('9', 'C', 'D', 'E', 'F', 'G', 'H','K','L','M')
+                           OR s180_ NOT IN ('9', 'C', 'D', 'E', 'F', 'G', 'H')
                           )
                    THEN
                       x_ := '1';
@@ -2382,39 +2361,40 @@ BEGIN
                       r013_ := '1';
                    END IF;
 
-/*                   IF     nbs_ IN
-                             ('2610', '2611', '2615', '2616', '2617', '2630',
-                              '2635', '2636', '2637', '2651', '2652', '2653',
-                              '2656')
-                      AND (   r013_ IS NULL
-                           OR r013_ = '0'
-                           OR r013_ NOT IN ('1', '9')
-                           OR mdate_ IS NOT NULL
-                          )
-                   THEN
-                      IF mdate_ IS NULL OR mdate_ > dat_
-                      THEN
-                         r013_ := '9';
-                      END IF;
+                   pp_doda;
 
-                      IF mdate_ IS NOT NULL AND mdate_ <= dat_
-                      THEN
-                         r013_ := '1';
-                      END IF;
-                   END IF;
-*/
-                      pp_doda;
+                   if ((substr(nls_,1,4) in ('1410','1420','1430','1435','1436','1437','1440','1446','1447')) or
+                        (substr(nls_,1,4) in ('1415','1416','1417','1426','1427') and r013_ not in ('3','9'))) or
+                       ((substr(nls_,1,4) in ('1412','1413','1414','1422','1423','1424')) or 
+                         (substr(nls_,1,4) in ('1415','1416','1417','1426','1427') and r013_ in ('3','9'))) 
+                         and s242_ <= '5' 
+                   then
+                        select nvl(sum(sum_zal), 0)
+                        into sum_zal
+                          from otcn_f42_cp
+                          where fdat = dat_
+                            and substr(nls,4,1)<>'8'
+                            and acc = acc_;
+                   else
+                       sum_zal := 0;
+                   end if;
+                   
+                   if datn_ < zm_date2_ then
+                      kodp_ :=
+                             dk_ || nbs_ || r013_ || x_ || s242_ || r031_ || rez_ || r012_;
+                   elsif datn_ < zm_date3_ then
+                      kodp_ :=
+                             dk_ || nbs_ || r013_ || x_ || s242_ || rez_ || r012_ || r030_ ;
+                   else
+             if s242_ !='Z'  then s190_ :='0';  end if;
+             if s242_ ='Z' and s190_ ='0'  then  s190_ :='A';  end if;
 
-                      if datn_ < zm_date2_ then
-                          kodp_ :=
-                                 dk_ || nbs_ || r013_ || x_ || s242_ || r031_ || rez_ || r012_;
-                      elsif datn_ < zm_date3_ then
-                          kodp_ :=
-                                 dk_ || nbs_ || r013_ || x_ || s242_ || rez_ || r012_ || r030_ ;
-                      else
-                          kodp_ :=
-                                 dk_ || nbs_ || r011_||r013_ || x_ || s242_ ||rez_ || s190_ || r030_ ;
-                      end if;
+                      kodp_ :=
+                             dk_ || nbs_ || r011_||r013_ || x_ || s242_ ||rez_ || s190_ || r030_ ;
+                             
+                      se_ := TO_CHAR (ABS (se_ - sum_zal));
+                   end if;
+
 
                    IF (nbs_ = '1500' AND se_ > 0)
                       OR (    nbs_ NOT IN ('1500')
@@ -2459,6 +2439,16 @@ BEGIN
                                    data_, kodp_, TO_CHAR (ABS (se_)), acc_, rnk_,
                                    isp_, mdate_, substr(tobo_ || '  ' || comm_,1,200), nd_, nbuc_, tobo_
                                   );
+                      
+                       if sum_zal <> 0 then
+                           kodp_ :=
+                             dk_ || nbs_ || '2' ||r013_ || x_ || s242_ ||rez_ || s190_ || r030_ ;
+                             
+                          p_add_rec (s_rnbu_record.NEXTVAL, userid_, rnls_, kv_,
+                                       data_, kodp_, TO_CHAR (ABS (sum_zal)), acc_, rnk_,
+                                       isp_, mdate_, substr(tobo_ || '  ' || comm_,1,200), nd_, nbuc_, tobo_
+                                      );
+                       end if;
                    END IF;
                 END IF;
              END IF;
@@ -2640,7 +2630,7 @@ BEGIN
                    END IF;
 
                    IF     x_ = '1'
-                      AND (   s180_ IN ('9', 'C', 'D', 'E', 'F', 'G', 'H','K','L','M')
+                      AND (   s180_ IN ('9', 'C', 'D', 'E', 'F', 'G', 'H')
                            OR s242_ IN ('9', 'C', 'D', 'E', 'F', 'G', 'H','K','L','M')
                           )
                    THEN
@@ -2649,7 +2639,7 @@ BEGIN
                    END IF;
 
                    IF x_ = '2'
-                      AND s180_ NOT IN ('9', 'C', 'D', 'E', 'F', 'G', 'H','K','L','M')
+                      AND s180_ NOT IN ('9', 'C', 'D', 'E', 'F', 'G', 'H')
                    THEN
                       x_ := '1';
                       rnls_ := nls_;
@@ -2728,6 +2718,9 @@ BEGIN
                          kodp_ :=
                                  dk_ || nbs_ || r013_ || x_ || s242_ || rez_ || r012_ || r030_;
                       else
+             if s242_ !='Z'  then s190_ :='0';  end if;
+             if s242_ ='Z' and s190_ ='0'  then  s190_ :='A';  end if;
+
                          kodp_ :=
                                  dk_ || nbs_ || r011_||r013_ || x_ || s242_ || rez_ || s190_ || r030_;
                       end if;
@@ -2959,7 +2952,7 @@ BEGIN
                       t.acc = a.acc and
                       nvl(a.nbs, substr(a.nls, 1,4)) in (select r020
                                 from tmp_kod_r020
-                                WHERE r020 not in ('2924', '9001', '9020', '9100','9023','9122','9129')
+                                WHERE r020 not in ('2924')
                                       and substr(r020,1,3) not in ('141','410','420')
                                 ) and
                       t.rnk = c.rnk and
@@ -3116,7 +3109,7 @@ BEGIN
           end if;
 
           if srezp_ <> 0 and not TP_SND and k.cnt = k.rnum then
-             s181_ := substr(k.kodp, 7, 1);
+             s181_ := substr(k.kodp, 8, 1);
              s242_ := (case when 300465 in (mfo_, mfou_) then (case when s181_ = '1' then 'B' else 'H' end) else '1' end);
 
 -- превышение резерва при наличии только одной строки проц.счета
@@ -3278,7 +3271,7 @@ BEGIN
                  AND T.ACC = A.ACC
                  AND T.ACC = S.ACC(+)
                  AND A.KV = TO_NUMBER (L.R030)
-                 AND nvl(A.NBS, substr(a.nls,1,4)) NOT IN ('2924', '9001', '9020', '9023', '9100', '9122', '9129')
+                 AND nvl(A.NBS, substr(a.nls,1,4)) NOT IN ('2924')
                  AND substr(nvl(a.nbs, substr(a.nls,1,4)),1,3) not in ('141','410','420')
                  AND A.RNK = C.RNK
                  and (mfo_ = 300465 and nvl(t.dat_mi, dat_)<= dat_ or
@@ -3321,7 +3314,7 @@ BEGIN
                  AND T.ACC = A.ACC
                  AND T.ACCR_30 = S.ACC(+)
                  AND A.KV = TO_NUMBER (L.R030)
-                 AND nvl(A.NBS, substr(a.nls,1,4)) NOT IN ('2924', '9001', '9020', '9023', '9100', '9122', '9129')
+                 AND nvl(A.NBS, substr(a.nls,1,4)) NOT IN ('2924')
                  AND substr(nvl(a.nbs, substr(a.nls,1,4)),1,3) not in ('141','410','420')
                  AND A.RNK = C.RNK
                  and (mfo_ = 300465 and nvl(t.dat_mi, dat_)<= dat_ or
@@ -3359,7 +3352,7 @@ BEGIN
                  AND T.ACC = A.ACC
                  AND T.ACC = S.ACC(+)
                  AND A.KV = TO_NUMBER (L.R030)
-                 AND nvl(A.NBS, substr(a.nls,1,4)) NOT IN ('2924', '9001', '9020', '9023', '9100', '9122', '9129')
+                 AND nvl(A.NBS, substr(a.nls,1,4)) NOT IN ('2924')
                  AND substr(nvl(a.nbs, substr(a.nls,1,4)),1,3) not in ('141','410','420')
                  AND A.RNK = C.RNK
                  and (mfo_ = 300465 and nvl(t.dat_mi, dat_)<= dat_ or
@@ -3414,8 +3407,8 @@ BEGIN
          end;
 
          if kodp1_ is not null then
-            s181_ := substr(kodp1_, 7, 1);
-            s240_ := substr(kodp1_, 8, 1);
+            s181_ := substr(kodp1_, 8, 1);
+            s240_ := substr(kodp1_, 9, 1);
          end if;
       end if;
 
@@ -3599,6 +3592,9 @@ BEGIN
                 comm_ := SUBSTR (k.tobo || ' резерв під прострочені проценти відносимо до R012='||r012_, 1, 200);
              end if;
 
+             if s240_ !='Z'  then s190_ :='0';  end if;
+             if s240_ ='Z' and s190_ ='0'  then  s190_ :='A';  end if;
+
              if datn_ < zm_date2_ then
                 kodp_ := '2'||nbs_||r013_||s181_||s240_||k.r031||k.rez||r012_;
              elsif datn_ < zm_date3_ then
@@ -3620,6 +3616,9 @@ BEGIN
                 elsif datn_ < zm_date3_ then
                    kodp_ := '2'||nbs_||r013_||s181_||s240_||k.rez||'B'||k.r030;
                 else
+--                if s240_ !='Z'  then s190_ :='0';  end if;
+                if s240_ ='Z' and s190_ ='0'  then  s190_ :='A';  end if;
+
                    kodp_ := '2'||nbs_||r011_||r013_||s181_||s240_||k.rez||s190_||k.r030;
                 end if;
 
@@ -3639,6 +3638,9 @@ BEGIN
                 elsif datn_ < zm_date3_ then
                    kodp_ := '2'||nbs_||r013_||s181_||s240_||k.rez||r012_||k.r030;
                 else
+                  if s240_ !='Z'  then s190_ :='0';  end if;
+                  if s240_ ='Z' and s190_ ='0'  then  s190_ :='A';  end if;
+
                    kodp_ := '2'||nbs_||r011_||r013_||s181_||s240_||k.rez||s190_||k.r030;
                 end if;
 
@@ -3690,6 +3692,9 @@ BEGIN
              elsif datn_ < zm_date3_ then
                 kodp_ := '2'||nbs_||r013_||s181_||s240_||k.rez||r012_||k.r030;
              else
+             if s240_ !='Z'  then s190_ :='0';  end if;
+             if s240_ ='Z' and s190_ ='0'  then  s190_ :='A';  end if;
+
                 kodp_ := '2'||nbs_||r011_||r013_||s181_||s240_||k.rez||s190_||k.r030;
              end if;
 
@@ -3747,6 +3752,9 @@ BEGIN
          elsif  datn_ < zm_date3_ then
             kodp_ := '2'||nbs_||r013_||s181_||s240_||k.rez||r012_||k.r030;
          else
+             if s240_ !='Z'  then s190_ :='0';  end if;
+             if s240_ ='Z' and s190_ ='0'  then  s190_ :='A';  end if;
+
             kodp_ := '2'||nbs_||r011_||r013_||s181_||s240_||k.rez||s190_||k.r030;
          end if;
 
@@ -3995,14 +4003,17 @@ BEGIN
 
           if datn_ < zm_date2_ then
              kodp_ := substr(k.kodp, 1, 6) || k.s181_s240_a || substr(k.kodp, 9, 2) || k.r012_a;
-          elsif datn_ < zm_date2_ then
+          elsif datn_ < zm_date3_ then
              kodp_ := substr(k.kodp, 1, 6) ||
                 substr(k.s181_s240_a, 1, 1) || (case when k.suma = '0' then 'Z' else substr(k.s181_s240_a, 2, 1) end)||
                 substr(k.kodp, 9, 1) || k.r012_a || substr(k.kodp, 11, 3);
           else
              kodp_ := substr(k.kodp, 1,7) ||
-                substr(k.s181_s240_a, 1,1) || (case when k.suma = '0' then 'Z' else substr(k.s181_s240_a, 2,1) end)||
-                substr(k.kodp, 10);
+                substr(k.s181_s240_a, 1,1) ||
+                (case when k.suma = '0' then 'Z' else substr(k.s181_s240_a, 2,1) end)||
+                substr(k.kodp, 10,1) ||
+                (case when k.suma = '0' then 'B' else substr(k.kodp,11,1) end)||
+                substr(k.kodp, 12,3);
           end if;
 
           if k.rnum = 1 then
@@ -4035,7 +4046,7 @@ BEGIN
        -- заміна s240 для SNA без залишкiв на основному рахунку i рахунку прострочки
 
        update rnbu_trace
-          set kodp = substr(kodp,1,8)||'Z'||substr(kodp,10),
+          set kodp = substr(kodp,1,8)||'Z'||substr(kodp,10,1)||'B'||substr(kodp,12),
               comm = comm||' коригування S240=Z'
         where recid in (
                   select r.recid
@@ -4058,7 +4069,7 @@ BEGIN
        -- заміна s240 для SNA зв'язаних з простроч.процентами без резерву і дисконту
 
        update rnbu_trace
-          set kodp = substr(kodp,1,8)||'Z'||substr(kodp,10),
+          set kodp = substr(kodp,1,8)||'Z'||substr(kodp,10,1)||'B'||substr(kodp,12),
               comm = comm||' update S240'
         where recid in (
                   select r.recid
@@ -4149,6 +4160,10 @@ BEGIN
       dk_ := iif_n (se_, 0, '1', '2', '2');
 
       pp_doda;
+
+      if s242_ !='Z'  then  s190_ :='0';  end if;
+      if s242_ ='Z' and s190_ ='0'  then  s190_ :='A';  end if;
+
 
       if datn_ < zm_date3_ then
           kodp_ :=
@@ -4255,6 +4270,7 @@ BEGIN
                                 or   a.nls like '21_9%'
                                 or   a.nls like '22_9%'
                                 or   a.nls like '26_9%'
+                                or   a.nls like '3107%'
                                 or   a.nls like '3119%'
                                 or   a.nls like '3219%' )
                         )
@@ -4263,6 +4279,7 @@ BEGIN
                         and o.fdat = z.fdat
                         and o.stmt = z.stmt
                         and o.dk <> z.dk
+                        and o.dk = 0 
                         and z.acc = x.acc
                         and x.nls not like '7%'
                         and x.nls not like '3800%'
@@ -4397,9 +4414,9 @@ BEGIN
                              from otcn_saldo a, otcn_acc s, customer c
                              where  nvl(a.nbs, substr(a.nls,1,4)) in ('1410','1412','1415','1416','1417','1418',
                                            '1490','1491','1492','1493','1590','1592','1890',
-                                           '2400','2401','2890','3190','3290','3590','3599','3690',
+                                           '2400','2401','2890','3190','3290','3590','3599','3690','3692',
                                            '9010','9015','9030','9031','9036','9500',
-                                          '1419','1429','1519','1529','2039','2069','2089','2109','2119','2129',
+                                          '1419','1429','1509','1519','1529','2039','2069','2089','2109','2119','2129',
                                           '2139','2209','2239','2609','2629','2659','3119','3219')
                                 and a.acc = s.acc
                                 and a.rnk = c.rnk
@@ -4421,11 +4438,11 @@ BEGIN
                              min('1'||substr(kodp, 6, 2)) R013_s580_A
                          from rnbu_trace r
                          where substr(kodp, 2, 4) in ('1410','1412','1415','1416','1417','1418',
-                                       '1490','1491','1492','1493','1590','1592','1890',
-                                       '2400','2401','2890','3190','3290','3590','3599','3690',
-                                       '9010','9015','9030','9031','9036','9500',
-                                      '1419','1429','1519','1529','2039','2069','2089','2109','2119','2129',
-                                      '2139','2209','2239','2609','2629','2659','3119','3219')
+                                           '1490','1491','1492','1493','1590','1592','1890',
+                                           '2400','2401','2890','3190','3290','3590','3599','3690','3692',
+                                           '9010','9015','9030','9031','9036','9500',
+                                          '1419','1429','1509','1519','1529','2039','2069','2089','2109','2119','2129',
+                                          '2139','2209','2239','2609','2629','2659','3119','3219')
                          group by nbuc, substr(kodp, 1, 1), substr(kodp,10,1), substr(kodp, 2, 4), kv) b
                      on (a.nbuc = b.nbuc and a.rez = b.rez and a.t020 = b.t020 and a.nbs = b.nbs and a.kv = b.kv)
                  where abs(nvl(a.ostq, 0) - nvl(b.ostq, 0)) between 1 and granica_
@@ -4438,7 +4455,7 @@ BEGIN
                        into recid_
                       from rnbu_trace
                       where nbuc = k.nbuc and
-                            kodp like k.t020||k.nbs||'____'||k.rez||lpad(k.kv, 3,'0')||'%' and
+                            kodp like k.t020||k.nbs||'____'||k.rez||'_'||lpad(k.kv, 3,'0')||'%' and
                             substr(kodp, 6,2) = substr(k.R013_s580,2,2) and
                             (sign(k.rizn) = -1 and to_number(znap) >= abs(k.rizn) or
                             sign(k.rizn) = 1 and to_number(znap) > 0) and
@@ -4450,7 +4467,7 @@ BEGIN
                                into recid_
                               from rnbu_trace
                               where nbuc = k.nbuc and
-                                    kodp like k.t020||k.nbs||'____'||k.rez||lpad(k.kv, 3,'0')||'%' and
+                                    kodp like k.t020||k.nbs||'____'||k.rez||'_'||lpad(k.kv, 3,'0')||'%' and
                                     substr(kodp, 6,2) = substr(k.R013_s580_A,2,2) and
                                     (sign(k.rizn) = -1 and to_number(znap) >= abs(k.rizn) or
                                     sign(k.rizn) = 1 and to_number(znap) > 0) and
@@ -4462,7 +4479,7 @@ BEGIN
                                       into recid_
                                      from rnbu_trace
                                      where nbuc = k.nbuc and
-                                           kodp like k.t020||k.nbs||'____'||k.rez||lpad(k.kv, 3,'0')||'%' and
+                                           kodp like k.t020||k.nbs||'____'||k.rez||'_'||lpad(k.kv, 3,'0')||'%' and
                                            substr(kodp, 6,2) = substr(k.R013_s580,2,2) and
                                            (sign(k.rizn) = -1 and to_number(znap) >= abs(k.rizn) or
                                            sign(k.rizn) = 1 and to_number(znap) > 0) and
@@ -4479,7 +4496,7 @@ BEGIN
                       into recid_
                      from rnbu_trace
                      where nbuc = k.nbuc and
-                           kodp like k.t020||k.nbs||'_2__'||k.rez||lpad(k.kv, 3,'0')||'%' and
+                           kodp like k.t020||k.nbs||'_2__'||k.rez||'_'||lpad(k.kv, 3,'0')||'%' and
                            substr(kodp, 6,2) = substr(k.R013_s580,2,2) and
                            (sign(k.rizn) = -1 and to_number(znap) >= abs(k.rizn) or
                            sign(k.rizn) = 1 and to_number(znap) > 0) and
@@ -4491,7 +4508,7 @@ BEGIN
                             into recid_
                            from rnbu_trace
                            where nbuc = k.nbuc and
-                                 kodp like k.t020||k.nbs||'_3__'||k.rez||lpad(k.kv, 3,'0')||'%' and
+                                 kodp like k.t020||k.nbs||'_3__'||k.rez||'_'||lpad(k.kv, 3,'0')||'%' and
                                  substr(kodp, 6,2) = substr(k.R013_s580,2,2) and
                                  (sign(k.rizn) = -1 and to_number(znap) >= abs(k.rizn) or
                                  sign(k.rizn) = 1 and to_number(znap) > 0) and
@@ -4502,7 +4519,7 @@ BEGIN
                                into recid_
                               from rnbu_trace
                               where nbuc = k.nbuc and
-                                    kodp like k.t020||k.nbs||'____'||k.rez||lpad(k.kv, 3,'0')||'%' and
+                                    kodp like k.t020||k.nbs||'____'||k.rez||'_'||lpad(k.kv, 3,'0')||'%' and
                                     substr(kodp, 6,2) = substr(k.R013_s580_A,2,2) and
                                     (sign(k.rizn) = -1 and to_number(znap) >= abs(k.rizn) or
                                     sign(k.rizn) = 1 and to_number(znap) > 0) and
@@ -4524,57 +4541,7 @@ BEGIN
         end loop;
     end;
 
-   -- замена параметра S240 на значение "Z" для счетов дисконта, премии
-   -- для R012='D'
---   IF Dat_ >= zm_date3_
---   THEN
---      update bars.rnbu_trace r
---      set kodp = substr(r.kodp,1,7) || 'Z' || substr(r.kodp,9),
---          comm = substr(comm || ' заміна S240 з ' || substr(r.kodp,8,1) ||
---                        ' на ' || 'Z', 1, 200)
---      where ( instr(nbsdiscont_, substr(r.kodp,2,4)) > 0 or
---              instr(nbspremiy_,  substr(r.kodp,2,4)) > 0
---            )
---        and substr(r.kodp,10,1)='D';
---   END IF;
-
-   -- замена параметра S240 на значение "Z" для счетов резерва
-   -- для R012='B'
---   IF Dat_ >= zm_date3_
---   THEN
---      update bars.rnbu_trace r
---      set kodp = substr(r.kodp,1,7) || 'Z' || substr(r.kodp,9),
---          comm = substr(comm || ' заміна S240 з ' || substr(r.kodp,8,1) ||
---                        ' на ' || 'Z', 1, 200)
---      where substr(r.kodp,2,4) in ('1590')
---        and substr(r.kodp,6,1) in ('1','5')
---        and substr(r.kodp,10,1)='B';
---
---      update bars.rnbu_trace r
---      set kodp = substr(r.kodp,1,7) || 'Z' || substr(r.kodp,9),
---          comm = substr(comm || ' заміна S240 з ' || substr(r.kodp,8,1) ||
---                        ' на ' || 'Z', 1, 200)
---      where substr(r.kodp,2,4) in ('2400','2401')
---        and substr(r.kodp,6,1) in ('5','7')
---        and substr(r.kodp,10,1)='B';
---
---      update bars.rnbu_trace r
---      set kodp = substr(r.kodp,1,7) || 'Z' || substr(r.kodp,9),
---          comm = substr(comm || ' заміна S240 з ' || substr(r.kodp,8,1) ||
---                        ' на ' || 'Z', 1, 200)
---      where substr(r.kodp,2,4) in ('3190')
---        and substr(r.kodp,6,1) in ('B')
---        and substr(r.kodp,10,1)='B';
---
---      update bars.rnbu_trace r
---      set kodp = substr(r.kodp,1,7) || 'Z' || substr(r.kodp,9),
---          comm = substr(comm || ' заміна S240 з ' || substr(r.kodp,8,1) ||
---                        ' на ' || 'Z', 1, 200)
---      where substr(r.kodp,2,4) not in ('1590','2400','2401','3190')
---        and substr(r.kodp,10,1)='B';
---   END IF;
-
---------------------------------------------------
+   --------------------------------------------------
    if dat_ <to_date('20171226','yyyymmdd')  then
        delete from rnbu_trace
         where substr(kodp, 2,4) not in (select r020 from TMP_KOD_R020 ) ;
@@ -4594,7 +4561,7 @@ BEGIN
 
     update rnbu_trace
        set kodp =substr(kodp,1,8)||'J'||substr(kodp,10)
-     where substr(kodp,9,1) in ('6','7','A','B');
+     where substr(kodp,9,1) in ('6','7','8','A','B');
 
     update rnbu_trace
        set kodp =substr(kodp,1,8)||'I'||substr(kodp,10)
@@ -4650,4 +4617,3 @@ BEGIN
 --        logger.info ('P_FA7_NN: Error: '||sqlerrm);
 END p_fa7_nn;
 /
-
