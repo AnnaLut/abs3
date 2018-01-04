@@ -221,7 +221,7 @@ begin
          end if;
      else
 
-dbms_output.put_line(accr_);
+--dbms_output.put_line(accr_);
          begin
             select a.nbs, nvl(trim(s.r013), '0') r013
             into nbsr_, r013r_
