@@ -3,11 +3,13 @@ CREATE OR REPLACE PROCEDURE BARS.P_FF4_NN (Dat_ DATE ,
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :	Процедура формирования #F4
 % COPYRIGHT   :	Copyright UNITY-BARS Limited, 2009.  All Rights Reserved.
-% VERSION     : 14/11/2017 (06/07/2017, 20/06/2017)
+% VERSION     : 03/01/2018 (14/11/2017, 06/07/2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+03/01/2018 - новая структура показателя (вместо R013 будет R011 и 
+             параметр K072 уже 2-х значный вместо однозначного) 
 14/11/2017 - изменил вызов процедуры P_POPULATE_KOR для разных отчетных 
              месяцев (было на ММФО)
 06/07/2017 - для некоторых значений K072 устанавливаем K140='9'
@@ -59,10 +61,12 @@ f04d_    number;
 f04k_    number;
 kolvo_   number;
 K112_    char(1);
+r011_    varchar2(1);
+r011_1   varchar2(1);
 r013_    varchar2(1);
 r013_1   varchar2(1);
 K071_    varchar2(1);
-K072_    varchar2(1);
+K072_    varchar2(2);
 d020_    varchar2(2);
 S180_    char(1);
 S180R_   char(1);
@@ -76,13 +80,15 @@ nbuc_    varchar2(100);
 sql_     VARCHAR2 (200);
 dat_spr_ date := last_day(dat_)+1;
 dat_Izm1 date := to_date('30062017','ddmmyyyy');
+dat_Izm2 date := to_date('29122017','ddmmyyyy');
 k140_    varchar2(1);
 
 CURSOR SaldoAOd IS
   select b.acc, b.nls, b.kv, b.codc, b.odate, b.s180, NVL(trim(k.k112),'0') k112, 
          b.d020, b.ints, 
+         b.r011, 
          (case when b.mb = '0' and b.r013 <> '0' then b.r013 else b.mb end) r013,
-         decode(b.k072, '0', NVL(trim(e.k072),'0'), b.k072) k072, 
+         NVL(trim(e.k072),'00') k072, 
          b.mdate, b.dos, b.kos, b.ost, b.nbs, b.rnk, b.s180R  
   from (
     SELECT c.acc, a.nls, a.kv, mod(d.codcagent,2) codc, a.odate, NVL(a.s180,'0') s180,
@@ -92,7 +98,9 @@ CURSOR SaldoAOd IS
            NVL(trim(p.k072),'0') k072, c.mdate,
            a.dos, a.kos, a.ost, c.nbs, 
            d.rnk, nvl(trim(d.ise), '00000') k070, nvl(trim(d.ved), '00000') k110,
-           nvl(trim(P.R013), '0') r013, fs180(c.acc, substr(c.nls,1,1), a.odate) s180R
+           nvl(trim(P.R011), '0') r011, 
+           nvl(trim(P.R013), '0') r013, 
+           fs180(c.acc, substr(c.nls,1,1), a.odate) s180R
     FROM rnbu_history a, accounts c, specparam p, customer d
     WHERE a.odate between DAT1_ + 1 and Dat_
      AND (a.dos+a.kos != 0 OR a.ost != 0)
@@ -108,8 +116,10 @@ CURSOR SaldoAOd IS
            NVL(trim(a.mb),'0') mb,
            NVL(trim(p.k072),'0') k072, c.mdate,
            a.dos, a.kos, a.ost, '2'||substr(c.nbs,2) nbs, 
-           d.rnk, nvl(trim(d.ise), '0000') k070, nvl(trim(d.ved), '00000') k110,
-           nvl(trim(P.R013), '0') r013, fs180(c.acc, substr(c.nls,1,1), a.odate) s180R
+           d.rnk, nvl(trim(d.ise), '00000') k070, nvl(trim(d.ved), '00000') k110,
+           nvl(trim(P.R011), '0') r011, 
+           nvl(trim(P.R013), '0') r013, 
+           fs180(c.acc, substr(c.nls,1,1), a.odate) s180R
     FROM rnbu_history a, accounts c, specparam p, customer d
     WHERE a.nls like '86%'
 	 AND a.acc = c.acc
@@ -126,16 +136,18 @@ CURSOR SaldoAOd IS
    on (b.k070 = e.k070);
 
 CURSOR SaldoKor IS
-  select b.acc, b.nls, b.kv, b.fdat, b.nbs, b.s180, b.r013,
-         decode(b.k072, '0', NVL(trim(e.k072),'0'), b.k072) k072, 
-         b.codc, b.rnk, b.d020,b.mdate, b.sdos, b.skos, NVL(trim(k.k112),'0') k112
+  select b.acc, b.nls, b.kv, b.fdat, b.nbs, b.s180, b.r011, b.r013,
+         NVL(trim(e.k072),'0') k072, b.mdate,
+         b.codc, b.rnk, b.d020, b.sdos, b.skos, NVL(trim(k.k112),'0') k112
   from (
     SELECT s.acc, s.nls, s.kv, a.fdat, s.nbs,
            DECODE(trim(p.s180), NULL, FS180(a.acc), p.s180) s180,
-	       NVL(trim(p.r013),'0') r013, NVL(trim(p.k072),'0') k072,
-           MOD(c.codcagent, 2) codc, c.rnk, 
+           NVL(trim(p.r011),'0') r011,
+           NVL(trim(p.r013),'0') r013, 
+           NVL(trim(p.k072),'0') k072,
+           s.mdate, MOD(c.codcagent, 2) codc, c.rnk, 
            nvl(trim(c.ise), '00000') k070, nvl(trim(c.ved), '00000') k110,
-           NVL(to_char(to_number(p.d020)),'01') d020, s.mdate,
+           NVL(to_char(to_number(p.d020)),'01') d020,
            SUM(DECODE(a.dk, 0, GL.P_ICURVAL(s.kv, a.s, a.fdat), 0)) sdos,
            SUM(DECODE(a.dk, 1, GL.P_ICURVAL(s.kv, a.s, a.fdat), 0)) skos
     FROM kor_prov a, accounts s, customer c, specparam p, kod_r020 k
@@ -149,7 +161,8 @@ CURSOR SaldoKor IS
       AND s.rnk=c.rnk
     GROUP BY s.acc, s.nls, s.kv, a.fdat, s.nbs,
              DECODE(trim(p.s180), NULL, FS180(a.acc), p.s180),
-             NVL(trim(p.r013),'0'), NVL(trim(p.k072),'0'),
+             NVL(trim(p.r011),'0'), NVL(trim(p.r013),'0'), 
+             NVL(trim(p.k072),'0'),
              MOD(c.codcagent, 2), c.rnk, nvl(trim(c.ise), '00000'),
              nvl(trim(c.ved), '00000'), NVL(to_char(to_number(p.d020)),'01'),
              s.mdate) b
@@ -167,7 +180,7 @@ CURSOR SaldoKor IS
             FROM RNBU_TRACE a
             WHERE SUBSTR (a.kodp, 1, 1) = '1'
             UNION ALL
-            SELECT a.nbuc NBUC, '1'||substr(a.kodp,2,16) KODP, '0' ZNAP,
+            SELECT a.nbuc NBUC, '1'||substr(a.kodp,2,17) KODP, '0' ZNAP,
                    a.znap ZNAP_PR
             FROM RNBU_TRACE a
             WHERE SUBSTR (a.kodp, 1, 1) = '3')
@@ -210,8 +223,25 @@ mfo_:=F_OURMFO();
 OPEN SaldoAOd;
 LOOP
     FETCH SaldoAOd INTO acc_, nls_, Kv_, Cntr_, data_, S180_, K112_, d020_,
-                        sPCnt_, r013_, k072_, mdate_, sDos_, sKos_, se_, nbs_, rnk_, S180R_ ;
+                        sPCnt_, r011_, r013_, k072_, mdate_, sDos_, sKos_, se_, nbs_, rnk_, S180R_ ;
     EXIT WHEN SaldoAOd%NOTFOUND;
+
+    if r011_ <> '0' then
+       BEGIN
+          select r011
+             into r011_1
+          from kl_r011
+          where trim(prem)='КБ' and 
+                r020=nbs_ and 
+                r011=r011_ and
+                d_open <= dat_ and
+                (d_close is null or d_close > dat_);
+       EXCEPTION
+          WHEN NO_DATA_FOUND
+          THEN
+               r011_ := '0';
+       END;
+    end if;
 
     if r013_ <> '0' then
        BEGIN
@@ -229,8 +259,9 @@ LOOP
                r013_ := '0';
        END;
     end if;
-    
-    if (nls_ like '2202%' and s180_ > 'B' or nls_ like '2203%' and s180_ <= 'B') then
+
+    if Data_ < to_date('26122017','ddmmyyyy') and 
+      (nls_ like '2202%' and s180_ > 'B' or nls_ like '2203%' and s180_ <= 'B') then
         if nls_ like '2202%' and s180R_ <= 'B' or 
            nls_ like '2203%' and s180R_  > 'B'
         then   
@@ -241,7 +272,7 @@ LOOP
     end if;
     
     if cntr_ = 0 then 
-       k072_ := '0';
+       k072_ := '00';
     end if;
 
     k140_ := '9';
@@ -258,8 +289,9 @@ LOOP
           k140_ := '9';
        END;
     end if;
-
-    if k072_ in ('0','5','6','7','H','I','J','K','N','R','Z','Y')
+    
+    -- было до 29.12.2017 ('0','5','6','7','H','I','J','K','N','R','Z','Y')
+    if k072_ in ('00','21','22','23','30','31','31','32','41','42','43','51','5Y','1X','2X')
     then
        k140_ := '9';
     end if;
@@ -288,9 +320,16 @@ LOOP
                        s180_ || to_char(2-Cntr_) || d020_ ||
                        lpad(Kv_, 3, '0');
           else 
-             kodp_ := '5' || nbs_ || r013_ || K112_ || K072_ ||
-                       s180_ || to_char(2-Cntr_) || d020_ ||
-                       lpad(Kv_, 3, '0') || k140_;
+             if dat_ < dat_Izm2 
+             then
+                kodp_ := '5' || nbs_ || r013_ || K112_ || K072_ ||
+                          s180_ || to_char(2-Cntr_) || d020_ ||
+                          lpad(Kv_, 3, '0') || k140_;
+             else 
+                kodp_ := '5' || nbs_ || r011_ || K112_ || K072_ ||
+                          s180_ || to_char(2-Cntr_) || d020_ ||
+                          lpad(Kv_, 3, '0') || k140_;
+             end if; 
           end if;
  
           -- Дб. обороты
@@ -305,18 +344,32 @@ LOOP
 
     IF (nbs_ not in ('1600','2600','2605','2650','2655','8025')
             OR
-        (nbs_ = '2600' and r013_ in ('1','7','8','A'))
+        (nbs_ = '2600' and r013_ in ('1','7','8','A') and dat_ < dat_Izm2)
             OR
-        (mfo_ <> 324805 and nbs_ = '2605' and r013_ in ( '1','3'))
+        (nbs_ = '2600' and r011_ = '3' and dat_ >= dat_Izm2)
             OR
-        (mfo_ <> 324805 and nbs_ = '2655' and r013_ = '3')
+        (mfo_ <> 324805 and nbs_ = '2605' and r013_ in ( '1','3') and dat_ < dat_Izm2)
+            OR
+        (mfo_ <> 324805 and nbs_ = '2605' and r011_ = '3' and dat_ >= dat_Izm2)
+            OR
+        (mfo_ <> 324805 and nbs_ = '2655' and r013_ = '3' and dat_ < dat_Izm2)
+            OR
+        (mfo_ <> 324805 and nbs_ = '2655' and r011_ = '3' and dat_ >= dat_Izm2)
             OR
          mfo_ = 324805 and -- не включаем такие счета с нулевой проц. ставкой для Крыма
-        (nbs_ = '2605' and r013_ in ('1','3') and skos_ > 0 and spcnt_ <> 0   OR
-         nbs_ = '2655' and r013_ = '3' and skos_ > 0)
+        ( (nbs_ = '2605' and r013_ in ('1','3') and skos_ > 0 and spcnt_ <> 0 and dat_ < dat_Izm2)  
             OR
-        (nbs_ = '2650' and r013_ in ('1','3','8'))
-        ) AND
+          (nbs_ = '2605' and r011_ = '3' and skos_ > 0 and spcnt_ <> 0 and dat_ >= dat_Izm2)  
+            OR
+          (nbs_ = '2655' and r013_ = '3' and skos_ > 0 and dat_ < dat_Izm2)
+            OR
+          (nbs_ = '2655' and r011_ = '3' and skos_ > 0 and dat_ >= dat_Izm2)
+        ) 
+            OR
+         (nbs_ = '2650' and r013_ in ('1','3','8') and dat_ < dat_Izm2)
+            OR
+         (nbs_ = '2650' and r011_ = '3' and dat_ >= dat_Izm2)
+       ) AND
         sKos_>0 AND sPCnt_>=0
     THEN
 
@@ -332,10 +385,14 @@ LOOP
           d020_ := '01';
        end if;
 
-       IF f04_ > 0 OR (nbs_ = '2600' and r013_ in ('1','7','8','A')) OR
-                      (nbs_ = '2605' and r013_ in ('1','3'))   OR
-                      (nbs_ = '2655' and r013_ = '3')   OR
-                      (nbs_ = '2650' and r013_ in ('1','3','8'))
+       IF f04_ > 0 OR (nbs_ = '2600' and r013_ in ('1','7','8','A')and dat_ < dat_Izm2) OR
+                      (nbs_ = '2600' and r011_ = '3' and dat_ >= dat_Izm2) OR 
+                      (nbs_ = '2605' and r013_ in ('1','3') and dat_ < dat_Izm2)   OR
+                      (nbs_ = '2605' and r011_ = '3' and dat_ >= dat_Izm2)   OR
+                      (nbs_ = '2655' and r013_ = '3' and dat_ < dat_Izm2)   OR
+                      (nbs_ = '2655' and r011_ = '3' and dat_ >= dat_Izm2)   OR
+                      (nbs_ = '2650' and r013_ in ('1','3','8') and dat_ < dat_Izm2) OR
+                      (nbs_ = '2650' and r011_ = '3' and dat_ >= dat_Izm2)
        THEN
 
           if dat_ < dat_Izm1 
@@ -344,9 +401,16 @@ LOOP
                        s180_ || to_char(2-Cntr_) || d020_ ||
                        lpad(Kv_, 3, '0');
           else 
-             kodp_ := '6' || nbs_ || r013_ || K112_ || K072_ ||
-                       s180_ || to_char(2-Cntr_) || d020_ ||
-                       lpad(Kv_, 3, '0') || '9';
+             if dat_ < dat_Izm2
+             then
+                kodp_ := '6' || nbs_ || r013_ || K112_ || K072_ ||
+                          s180_ || to_char(2-Cntr_) || d020_ ||
+                          lpad(Kv_, 3, '0') || '9';
+             else
+                kodp_ := '6' || nbs_ || r011_ || K112_ || K072_ ||
+                          s180_ || to_char(2-Cntr_) || d020_ ||
+                          lpad(Kv_, 3, '0') || '9';
+             end if;
           end if;
 
           -- Кт. обороты
@@ -387,9 +451,16 @@ LOOP
                             s180_ || to_char(2-Cntr_) || d020_ ||
                             lpad(Kv_, 3, '0');
                 else 
-                   kodp_ := '5' || nbs_ || r013_ || K112_ || K072_ ||
-                            s180_ || to_char(2-Cntr_) || d020_ ||
-                            lpad(Kv_, 3, '0') || k140_;
+                   if dat_ < dat_Izm2
+                   then
+                      kodp_ := '5' || nbs_ || r013_ || K112_ || K072_ ||
+                               s180_ || to_char(2-Cntr_) || d020_ ||
+                               lpad(Kv_, 3, '0') || k140_;
+                   else
+                      kodp_ := '5' || nbs_ || r011_ || K112_ || K072_ ||
+                               s180_ || to_char(2-Cntr_) || d020_ ||
+                               lpad(Kv_, 3, '0') || k140_;
+                   end if;
                 end if;
 
                 -- Дб. обороты
@@ -420,9 +491,16 @@ LOOP
                          s180_ || to_char(2-Cntr_) || d020_ ||
                          lpad(Kv_, 3, '0');
              else
-                kodp_ := '6' || nbs_ || r013_ || K112_ || K072_ ||
-                         s180_ || to_char(2-Cntr_) || d020_ ||
-                         lpad(Kv_, 3, '0') || '9';
+                if dat_ < dat_Izm2
+                then 
+                   kodp_ := '6' || nbs_ || r013_ || K112_ || K072_ ||
+                            s180_ || to_char(2-Cntr_) || d020_ ||
+                            lpad(Kv_, 3, '0') || '9';
+                else
+                   kodp_ := '6' || nbs_ || r011_ || K112_ || K072_ ||
+                            s180_ || to_char(2-Cntr_) || d020_ ||
+                            lpad(Kv_, 3, '0') || '9';
+                end if;
              end if;
 
              -- Кт. обороты
@@ -454,10 +532,18 @@ LOOP
                       nbs_ || r013_ || K112_ || K072_ || s180_ ||
                       to_char(2-Cntr_) || d020_ || lpad(Kv_, 3, '0');
            else
-             kodp_ := (case when se_ < 0 then '5' else '6' end) ||
-                      nbs_ || r013_ || K112_ || K072_ || s180_ ||
-                      to_char(2-Cntr_) || d020_ || lpad(Kv_, 3, '0') || 
-                      (case when se_ < 0 then k140_ else '9' end);
+             if dat_ < dat_Izm2
+             then
+                kodp_ := (case when se_ < 0 then '5' else '6' end) ||
+                         nbs_ || r013_ || K112_ || K072_ || s180_ ||
+                         to_char(2-Cntr_) || d020_ || lpad(Kv_, 3, '0') || 
+                         (case when se_ < 0 then k140_ else '9' end);
+              else
+                kodp_ := (case when se_ < 0 then '5' else '6' end) ||
+                         nbs_ || r011_ || K112_ || K072_ || s180_ ||
+                         to_char(2-Cntr_) || d020_ || lpad(Kv_, 3, '0') || 
+                         (case when se_ < 0 then k140_ else '9' end);
+              end if; 
            end if;
 
            -- Кт. обороты
@@ -473,13 +559,30 @@ CLOSE SaldoAOd;
 ---------------------------------------------------------------------
 OPEN SaldoKor;
 LOOP
-    FETCH SaldoKor INTO acc_, nls_, Kv_, data_, nbs_, S180_, r013_,
-                        k072_, Cntr_, rnk_, d020_, mdate_, sDos_, sKos_, k112_;
+    FETCH SaldoKor INTO acc_, nls_, Kv_, data_, nbs_, S180_, r011_, r013_,
+                        k072_, mdate_, Cntr_, rnk_, d020_, sDos_, sKos_, k112_;
 
     EXIT WHEN SaldoKor%NOTFOUND;
 
     f04k_ := 0 ;
     f04d_ := 0 ;
+
+    if r011_ <> '0' then
+       BEGIN
+          select r011
+             into r011_1
+          from kl_r011
+          where trim(prem)='КБ' and 
+                r020=nbs_ and 
+                r011=r011_ and
+                d_open <= dat_ and
+                (d_close is null or d_close > dat_);
+       EXCEPTION
+          WHEN NO_DATA_FOUND
+          THEN
+               r011_ := '0';
+       END;
+    end if;
 
     if r013_ <> '0' then
        BEGIN
@@ -507,7 +610,7 @@ LOOP
     sPCnt_:= acrn.FPROC(acc_, data_) ;
     
     if cntr_ = 0 then 
-       k072_ := '0';
+       k072_ := '00';
     end if;    
 
     IF nbs_ not in ('1600','2600','2605','2620','2625','2650','2655') AND sDos_>0 AND
@@ -524,9 +627,16 @@ LOOP
                       s180_ || to_char(2-Cntr_) || d020_ ||
                       lpad(Kv_, 3, '0');
           else
-             kodp_ := '5' || nbs_ || r013_ || K112_ || K072_ ||
-                      s180_ || to_char(2-Cntr_) || d020_ ||
-                      lpad(Kv_, 3, '0') || k140_;
+             if dat_ < dat_Izm2
+             then
+                kodp_ := '5' || nbs_ || r013_ || K112_ || K072_ ||
+                         s180_ || to_char(2-Cntr_) || d020_ ||
+                         lpad(Kv_, 3, '0') || k140_;
+             else
+                kodp_ := '5' || nbs_ || r011_ || K112_ || K072_ ||
+                         s180_ || to_char(2-Cntr_) || d020_ ||
+                         lpad(Kv_, 3, '0') || k140_;
+             end if;
           end if;
 
           -- Дб. обороты
@@ -541,26 +651,45 @@ LOOP
 
     IF (nbs_ not in ('1600','2600','2605','2650','2655')
             OR
-        (nbs_ = '2600' and r013_ in ('1','7','8','A'))
+        (nbs_ = '2600' and r013_ in ('1','7','8','A') and dat_ < dat_Izm2)
             OR
-        (mfo_ <> 324805 and nbs_ = '2605' and r013_ in ('1','3'))
+        (nbs_ = '2600' and r011_ = '3' and dat_ > dat_Izm2)
             OR
-        (mfo_ <> 324805 and nbs_ = '2655' and r013_ = '3')
+        (mfo_ <> 324805 and nbs_ = '2605' and r013_ in ('1','3') and dat_ < dat_Izm2)
+            OR
+        (mfo_ <> 324805 and nbs_ = '2605' and r011_ = '3' and dat_ >= dat_Izm2)
+            OR
+        (mfo_ <> 324805 and nbs_ = '2655' and r013_ = '3' and dat_ < dat_Izm2)
+            OR
+        (mfo_ <> 324805 and nbs_ = '2655' and r011_ = '3' and dat_ >= dat_Izm2)
             OR
          mfo_ = 324805 and -- не включаем такие счета с нулевой проц. ставкой для Крыма
-        (nbs_ = '2605' and r013_ in ('1','3') and skos_ > 0 and spcnt_ <> 0   OR
-         nbs_ = '2655' and r013_ = '3' and skos_ > 0)
+        ((nbs_ = '2605' and r013_ in ('1','3') and skos_ > 0 and spcnt_ <> 0 and dat_ < dat_Izm2)  
             OR
-        (nbs_ = '2650' and r013_ in ('1','3','8')) ) AND sKos_>0 AND sPCnt_>=0
+         (nbs_ = '2605' and r011_ = '3' and skos_ > 0 and spcnt_ <> 0 and dat_ >= dat_Izm2)  
+            OR
+         (nbs_ = '2655' and r013_ = '3' and skos_ > 0 and dat_ < dat_Izm2)
+            OR
+         (nbs_ = '2655' and r011_ = '3' and skos_ > 0 and dat_ >= dat_Izm2)
+        )
+            OR
+        (nbs_ = '2650' and r013_ in ('1','3','8') and dat_ < dat_Izm2) 
+            OR
+        (nbs_ = '2650' and r011_ =  '3' and dat_ >= dat_Izm2) 
+       ) AND sKos_>0 AND sPCnt_>=0
     THEN
 
        SELECT count(*) INTO f04k_ FROM kl_f3_29 WHERE kf='03' AND
              r020=nbs_ AND r050='22' ;
 
-       IF f04k_ > 0 OR (nbs_ = '2600' and r013_ in ('1','7','8','A')) OR
-                       (nbs_ = '2605' and r013_ in ('1','3'))   OR
-                       (nbs_ = '2655' and r013_ = '3')   OR
-                       (nbs_ = '2650' and r013_ in ('1','3','8'))
+       IF f04k_ > 0 OR (nbs_ = '2600' and r013_ in ('1','7','8','A') and dat_ < dat_Izm2) OR
+                       (nbs_ = '2600' and r011_ = '3' and dat_ >= dat_Izm2) OR
+                       (nbs_ = '2605' and r013_ in ('1','3') and dat_ < dat_Izm2)   OR
+                       (nbs_ = '2605' and r011_ = '3' and dat_ >= dat_Izm2)   OR
+                       (nbs_ = '2655' and r013_ = '3' and dat_ < dat_Izm2)   OR
+                       (nbs_ = '2655' and r011_ = '3' and dat_ >= dat_Izm2)   OR
+                       (nbs_ = '2650' and r013_ in ('1','3','8') and dat_ < dat_Izm2) OR
+                       (nbs_ = '2650' and r011_ = '3' and dat_ >= dat_Izm2) 
        THEN
 
           if dat_ < dat_Izm1
@@ -569,9 +698,16 @@ LOOP
                       s180_ || to_char(2-Cntr_) || d020_ ||
                       lpad(Kv_, 3, '0');
           else
-             kodp_ := '6' || nbs_ || r013_ || K112_ || K072_ ||
-                      s180_ || to_char(2-Cntr_) || d020_ ||
-                      lpad(Kv_, 3, '0') || '9';
+             if dat_ < dat_Izm2
+             then
+                kodp_ := '6' || nbs_ || r013_ || K112_ || K072_ ||
+                         s180_ || to_char(2-Cntr_) || d020_ ||
+                         lpad(Kv_, 3, '0') || '9';
+             else
+                kodp_ := '6' || nbs_ || r011_ || K112_ || K072_ ||
+                         s180_ || to_char(2-Cntr_) || d020_ ||
+                         lpad(Kv_, 3, '0') || '9';
+             end if;
           end if;
 
           -- Кт. обороты
@@ -603,7 +739,7 @@ LOOP
    END IF;
 
    INSERT INTO tmp_nbu (kodf, datf, kodp, znap, nbuc) VALUES
-                      (kodf_, Dat_, '2'||substr(kodp_,2,16), sPCnt1_, nbuc_);
+                      (kodf_, Dat_, '2'||substr(kodp_,2,17), sPCnt1_, nbuc_);
 
 END LOOP;
 CLOSE BaseL;
