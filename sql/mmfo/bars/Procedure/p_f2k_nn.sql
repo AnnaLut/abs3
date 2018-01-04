@@ -4,7 +4,7 @@ CREATE OR REPLACE PROCEDURE BARS.P_F2K_NN (dat_ DATE ,
 % DESCRIPTION : Процедура формирование файла #2K
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
 %
-% VERSION     : v.17.009     29.12.2017
+% VERSION     : v.18.001     04.01.2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: dat_ - отчетная дата
            sheme_ - схема формирования
@@ -18,6 +18,9 @@ CREATE OR REPLACE PROCEDURE BARS.P_F2K_NN (dat_ DATE ,
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+ 04.01.2017  исключены операции по счетам КТ=65__
+             формирование значений показателей в копейках
+             новый список значений K021 (сегмент A)
  29.12.2017  уточнение в алгоритме отбора клиентов по доп.параметрам
  12.12.2017  условие на счета входящие в выборку только по дате закрытия
  05.12.2017  расширение OKPO до 10-ти знаков нулями
@@ -262,7 +265,7 @@ DELETE FROM RNBU_TRACE WHERE userid = userid_;
 
    dats_ := trunc(dat_, 'mm');
    
-   for k in ( select c.okpo, max(c.codcagent) codcagent,
+   for k in ( select c.okpo, max(c.codcagent) codcagent, max(ise) ise,
                              max(c.nmk) nmk, max(c.adr) adr, max(c.rnk) rnk,
                              max(re.rnbor) rnbor, max(re.rnbou) rnbou,
                              max(re.rnbos) rnbos, max(re.rnbod) rnbod
@@ -286,14 +289,13 @@ DELETE FROM RNBU_TRACE WHERE userid = userid_;
                group by c.okpo
             )
    loop
-       if     k.codcagent =1   then    segm_a :='3';
-       elsif  k.codcagent =2   then    segm_a :='4';
-       elsif  k.codcagent =3   then    segm_a :='1';
-       elsif  k.codcagent =5   then    segm_a :='2';
+       if     k.ise like '13%'             then    segm_a :='G';
+       elsif  k.ise in ('ZZZZZ','YYYYY')   then    segm_a :='D';
+       elsif  k.codcagent =5               then    segm_a :='2';
        else
-             segm_a := '9';
+             segm_a := '1';
        end if;
-       segm_z := lpad(k.okpo,10);
+       segm_z := lpad(k.okpo,10,'0');
 
        is_dat_exist_ := 0;
        begin
@@ -320,8 +322,8 @@ DELETE FROM RNBU_TRACE WHERE userid = userid_;
        for u in ( select a.acc, a.kv, a.nbs, a.nls, a.daos, a.dazs,
                          to_char(a.daos,'ddmmyyyy') c_daos,
                          decode(a.dazs,null,null,to_char(a.dazs,'ddmmyyyy') ) c_dazs,
-                         to_char( round(0.01*fost(a.acc,dat_rnbo_)) ) p_270,
-                         to_char( round(0.01*fost(a.acc,dat_)) ) p_280,
+                         to_char( fostq(a.acc,dat_rnbo_) ) p_270,
+                         to_char( fostq(a.acc,dat_) ) p_280,
                          nvl(a.blkd,0)+nvl(a.blkk,0) acc_blk
                     from accounts a
                    where a.rnk = k.rnk 
@@ -329,12 +331,11 @@ DELETE FROM RNBU_TRACE WHERE userid = userid_;
             '2512', '2513', '2520', '2523', '2525', '2530', '2541', '2542',
             '2544', '2545', '2546', '2550', '2551', '2553', '2555', '2556',
             '2560', '2561', '2562', '2565', '2600', '2604', '2605', '2610',
-            '2620', '2625', '2630', '2650', '2651', '2655', '3320' )
-                     and a.daos < dat_rnbo_
-                     and a.daos < dat_rnbo_
+            '2615', '2620', '2625', '2630', '2635', '2650', '2651', '2652',
+            '2655', '3320', '3330', '3340' )
                      and ( a.dazs is null
                         or a.dazs is not null and
-                           a.dazs > to_date('20150922','yyyymmdd') )
+                           a.dazs > dat_rnbo_ )
                 )
        loop
           flag_acc_ := 1;
@@ -401,6 +402,7 @@ DELETE FROM RNBU_TRACE WHERE userid = userid_;
                                  AND t.tt = o.tt
                                  AND o.accd = ad.acc
                                  AND o.acck = ak.acc
+                                 and nvl(ak.nbs,substr(ak.nls,1,4)) not like '65%'
                             ) p
                       where p.mfoa = r1.mfo
                         and p.mfob = r2.mfo
