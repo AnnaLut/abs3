@@ -525,6 +525,8 @@ END gl;
 
 show errors;
 
+----------------------------------------------------------------------
+
 CREATE OR REPLACE PACKAGE BODY GL
 IS
    --***************************************************************--
@@ -535,7 +537,7 @@ IS
    --
    --***************************************************************--
 
-  G_BODY_VERSION  CONSTANT VARCHAR2(100)  := '7.2 2017-12-11';
+  G_BODY_VERSION  CONSTANT VARCHAR2(100)  := '7.3  2017-12-29';
 
   G_AWK_BODY_DEFS CONSTANT VARCHAR2(512) := 'FM  - с поддержкой ФинМонитроинга';
 
@@ -821,8 +823,8 @@ END setP;
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
-PROCEDURE param IS
-
+PROCEDURE param
+IS
  erm  VARCHAR2 (80);
  ern  CONSTANT POSITIVE   := 200;
  err  EXCEPTION;
@@ -831,13 +833,15 @@ PROCEDURE param IS
 
 BEGIN
 
-IF deb.debug THEN
-   deb.trace( ern, 'module/0', 'param');
-END IF;
+  IF deb.debug
+  THEN
+    deb.trace( ern, 'module/0', 'param');
+  END IF;
 
    -- Проверяем выполнялась ли инициализация
-   if (    sys_context('bars_gl', 'last_init') is null
-       or  sys_context('bars_context', 'user_branch') != sys_context('bars_gl', 'branch')) then
+   if ( sys_context('bars_gl', 'last_init') is null
+     or sys_context('bars_gl', 'branch') !=  sys_context('bars_context', 'user_branch') )
+   then
       reinit(0);
    else
        -- Читаем параметры из сохраненного контекста
@@ -847,7 +851,6 @@ END IF;
        gl.aUKF       := sys_context('bars_gl', 'kf');
        gl.aMFO       := sys_context('bars_gl', 'mfo');
        gl.bDATE      := to_date(nvl(sys_context('bars_global', 'user_bankdate'), sys_context('bars_gl', 'bankdate')),  'mm/dd/yyyy');
-
 
        gl.gbDATE     := to_date(sys_context('bars_gl', 'bankdate'),  'mm/dd/yyyy');
 
@@ -3246,41 +3249,41 @@ EXCEPTION
         raise_application_error(-(20000+ern),'\9333 - Cannot execute #dyntt2',TRUE);
 END dyntt2;
 
-  --
-  -- Оплата проводок sos=0
-  -- по одному МФО
-  --
-  PROCEDURE paysos0
-  IS
-    ref#       NUMBER(38)  := NULL;
-    ref_       NUMBER(38);
-    fdat#      DATE        := NULL;
-    fdat_      DATE;
+--
+-- Оплата проводок sos=0
+-- по одному МФО
+--
+PROCEDURE paysos0
+IS
+  ref#       NUMBER(38)  := NULL;
+  ref_       NUMBER(38);
+  fdat#      DATE        := NULL;
+  fdat_      DATE;
 
-    acc#       NUMBER(38)  := NULL;
-    acc_       NUMBER(38);
+  acc#       NUMBER(38)  := NULL;
+  acc_       NUMBER(38);
 
-    vob#       SMALLINT    := NULL;
-    vob_       SMALLINT;
-    vobO_      SMALLINT    := 0;
+  vob#       SMALLINT    := NULL;
+  vob_       SMALLINT;
+  vobO_      SMALLINT    := 0;
 
-    dk#        opldok.dk%type;
-    s#         opldok.s%type;
-    sq#        opldok.sq%type;
+  dk#        opldok.dk%type;
+  s#         opldok.s%type;
+  sq#        opldok.sq%type;
 
-    sde_       NUMBER(38)  := 0;
-    sdeq_      NUMBER(38)  := 0;
+  sde_       NUMBER(38)  := 0;
+  sdeq_      NUMBER(38)  := 0;
 
-    skr_       NUMBER(38)  := 0;
-    skrq_      NUMBER(38)  := 0;
+  skr_       NUMBER(38)  := 0;
+  skrq_      NUMBER(38)  := 0;
 
-    rowid#     UROWID;
-    i          INTEGER     := 0;
-    j          INTEGER     := 0;
-    k          INTEGER     := 0;
+  rowid#     UROWID;
+  i          INTEGER     := 0;
+  j          INTEGER     := 0;
+  k          INTEGER     := 0;
 
-    l_kf       oper.kf%type	:= gl.aMFO;
-    l_branch   oper.branch%type	:= sys_context('bars_context','user_branch');
+  l_kf       oper.kf%type	:= gl.aMFO;
+  l_branch   oper.branch%type	:= sys_context('bars_context','user_branch');
 
   CURSOR c0 ( v_min_dt date, v_max_dt date )
   IS
@@ -3365,10 +3368,11 @@ BEGIN
       exception
         when others then
           rollback to this#accountT00;
+          vobO_ := 0;
           j := j + 1;
-          bars_audit.error('SOS0 ('||acc_||') ERROR:'||SUBSTR(sqlerrm
-                           ||chr(10)||dbms_utility.format_error_backtrace
-                           ,1,3000));
+          bars_audit.error( 'SOS0 ( ref='||to_char(ref_)||', acc='||to_char(acc_)||', fdat='||
+                            to_char(fdat_, 'dd.mm.yyyy')||', vob='||to_char(vob_)||' ) ERROR:'||
+                            SubStr( sqlerrm||chr(10)||dbms_utility.format_error_backtrace, 1, 3000 ) );
       end;
 
       savepoint this#accountT00;
@@ -3414,7 +3418,7 @@ BEGIN
   gl.fSOS0 := 0;
 
   -- не удаляем запись из OPER, т.к. это приводит к блокировкам по внешним ключам !!!
-  -- IF i>0 THEN DELETE FROM oper WHERE ref=ref_; END IF;
+  --IF i>0 THEN DELETE FROM oper WHERE ref=ref_; END IF;
 
   GL.PL_DAT( gl.gbDATE );
 
@@ -3434,7 +3438,7 @@ is
   l_branch           oper.branch%type := '/'||l_kf||'/';
 begin
 
-  bars_audit.trace( '%s: Entry.', title );
+  bars_audit.info( title||': Entry.' );
 
   gl.fSOS0 := 1;
 
@@ -3469,7 +3473,9 @@ begin
               where t.SOS  = 4
                 and t.TT   = 'PVP'
                 and t.FDAT = l_bnk_dt
-                and t.KF   = l_kf )
+                and t.KF   = l_kf
+                for update of q.REF nowait
+           )
   loop
 
     bars_audit.trace( '%s: ref=%s, acc=%s, dk=%s, s=%s, sq=%s.', title
@@ -3512,7 +3518,7 @@ begin
   gl.bDATE := GL.GBD;
   gl.fSOS0 := 0;
 
-  bars_audit.trace( '%s: Exit.', title );
+  bars_audit.info( title||': Exit.' );
 
 exception
   when OTHERS then
@@ -3687,7 +3693,8 @@ END p_Ncurval;
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
-PROCEDURE pl_dat( dat_      DATE
+procedure PL_DAT
+( dat_      DATE
 ) IS
   l_bnk_dt_st    fdat.stat%type;
 BEGIN
@@ -3784,7 +3791,7 @@ END gl;
 
 show err;
 
--- exec sys.utl_recomp.recomp_serial('BARS');
+exec sys.utl_recomp.recomp_serial('BARS');
 
 grant EXECUTE on GL to ABS_ADMIN;
 grant EXECUTE on GL to BARSAQ with grant option;
