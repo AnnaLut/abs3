@@ -5,6 +5,7 @@ using System.Web;
 using BarsWeb.Areas.Ndi.Infrastructure;
 using BarsWeb.Areas.Ndi.Models;
 using BarsWeb.Areas.Ndi.Models.ViewModels;
+using BarsWeb.Areas.Ndi.Infrastructure.Repository.Helpers;
 
 namespace BarsWeb.Areas.Ndi.Models.FilterModels
 {

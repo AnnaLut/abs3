@@ -6,17 +6,20 @@ using System.Web;
 /// <summary>
 /// Summary description for ExcelResulModel
 /// </summary>
-public class ExcelResulModel
+namespace BarsWeb.Areas.Ndi.Models
 {
-    public ExcelResulModel()
+    public class ExcelResulModel
     {
-        //
-        // TODO: Add constructor logic here
-        //
-    }
+        public ExcelResulModel()
+        {
+            //
+            // TODO: Add constructor logic here
+            //
+        }
 
-    public byte [] ContentResult { get; set; }
-    public string StringContentResult { get; set; }
-    public string FileName { get; set; }
-    public string ContentType { get; set; }
+        public byte[] ContentResult { get; set; }
+        public string StringContentResult { get; set; }
+        public string FileName { get; set; }
+        public string ContentType { get; set; }
+    }
 }

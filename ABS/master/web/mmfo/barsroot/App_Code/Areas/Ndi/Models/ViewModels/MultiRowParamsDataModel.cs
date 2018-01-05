@@ -9,19 +9,22 @@ using System.Web;
 /// <summary>
 /// Summary description for MultiParamsDataModel
 /// </summary>
-public class MultiRowParamsDataModel : ParamMetaInfo
+namespace BarsWeb.Areas.Ndi.Infrastructure.Helpers.ViewModels
 {
-    public MultiRowParamsDataModel()
+    public class MultiRowParamsDataModel : ParamMetaInfo
     {
-        //
-        // TODO: Add constructor logic here
-        //
+        public MultiRowParamsDataModel()
+        {
+            //
+            // TODO: Add constructor logic here
+            //
+        }
+        public List<FieldProperties> InputParams { get; set; }
+
+
+
+        public List<CallFuncRowParam> RowsData { get; set; }
+
+
     }
-    public List<FieldProperties> InputParams { get; set; }
-
-
-
-    public List<CallFuncRowParam> RowsData { get; set; }
-    
-    
 }

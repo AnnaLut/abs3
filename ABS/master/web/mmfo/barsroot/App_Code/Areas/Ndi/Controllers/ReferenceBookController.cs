@@ -14,10 +14,12 @@ using Ninject;
 using System.Web;
 using BarsWeb.Areas.Ndi.Models.ViewModels;
 using BarsWeb.Areas.Ndi.Models.FilterModels;
+using BarsWeb.Areas.Ndi.Infrastructure.Repository.Helpers;
+using BarsWeb.Areas.Ndi.Infrastructure.Helpers.ViewModels;
 
 namespace BarsWeb.Areas.Ndi.Controllers
 {
-    [AuthorizeUser]
+    [Authorize]
     public class ReferenceBookController : Controller
     {
         private readonly IReferenceBookRepository _repository;

@@ -6,15 +6,18 @@ using System.Web;
 /// <summary>
 /// Summary description for EditRowsModel
 /// </summary>
-public class EditRowsModel
+namespace BarsWeb.Areas.Ndi.Models
 {
-	public EditRowsModel()
-	{
-		//
-		// TODO: Add constructor logic here
-		//
-	}
+    public class EditRowsModel
+    {
+        public EditRowsModel()
+        {
+            //
+            // TODO: Add constructor logic here
+            //
+        }
 
-    public List<EditRowModel> RowsArray { get; set; }
+        public List<EditRowModel> RowsArray { get; set; }
 
+    }
 }
