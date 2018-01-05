@@ -181,6 +181,13 @@ exception when others then
  end;
 /
 
+begin
+    execute immediate 'create index I_ACCMSG_ACC on ACC_MSG (ACC) tablespace BRSMDLI';
+ exception when others then 
+    if sqlcode = -955 or sqlcode = -1408 then null; else raise; 
+    end if; 
+end;
+/
 
 
 PROMPT *** Create  grants  ACC_MSG ***
