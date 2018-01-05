@@ -5,6 +5,7 @@ CREATE OR REPLACE PROCEDURE p_interest_cck1
 ) IS
 
   /*
+    05/11/2017  Pivanova додано умову для нарахування basey=2 i basem=0
     18/07/2017  Pivanova додано додаткові умови для нрахування по ануїтету
     27/05/2017  Pivanova додано опцію по нарахуванню % в регламенті
     20/03/2017  Pivanova розділила нарахування по ануїтету і по рівним частинам на дві
@@ -88,7 +89,7 @@ BEGIN
     OPEN k1 FOR
       SELECT nd, cc_id, sdate, wdate
         FROM cc_deal d
-       WHERE nd = (-to_number(pul.get_mas_ini_val('ND')))
+       WHERE nd = (to_number(pul.get_mas_ini_val('ND')))
          AND sos >= 10
          AND sos < 14
          AND vidd IN (1, 2, 3, 11, 12, 13);
@@ -245,7 +246,20 @@ BEGIN
                       ,nint_
                       ,NULL
                       ,l_mode); ------ начисление по ануитету
-
+ elsif
+     p.tip IN ('SS ')
+         AND p.accc IS NOT NULL
+         AND p.basey = 2
+         AND p.basem = 0
+         AND p.id = 0 THEN
+        cck.int_metr_a(p.accc
+                      ,p.acc
+                      ,p.id
+                      ,p.ddat1
+                      ,ddat2_
+                      ,nint_
+                      ,NULL
+                      ,l_mode); ------ начисление по ануитету
       ELSIF p.tip IN ('SS ', 'SP ')
             AND p.accc IS NOT NULL
             AND p.id = 0
