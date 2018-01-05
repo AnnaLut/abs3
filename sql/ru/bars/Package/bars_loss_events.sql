@@ -42,9 +42,9 @@ show err
 
 ----------------------------------------------------------------------------------------------------
 
-CREATE OR REPLACE PACKAGE BODY BARS.BARS_LOSS_EVENTS
+create or replace package body BARS_LOSS_EVENTS
 is
-  g_body_version  constant varchar2(64)  := 'version 5.6  16.11.2017';
+  g_body_version  constant varchar2(64) := 'version 5.7  05.01.2018';
 /*
   02.10.2017 KVA - COBUSUPABS-6451 - ... не для всех типов договоров учитывается признак корректирующих проводок
   11.07.2017 LSO - COBUPRVNIX-30 - Розрахунок подій дефолту для хоз.дебиторки
@@ -499,11 +499,12 @@ is
         then
           select min(DAT_SPZ(a.ACC, p_date, l_ZO))
             into x_event_date
-            from BARS.ACCOUNTS a
-            join BARS.ND_ACC   n
+            from ACCOUNTS a
+            join ND_ACC   n
               on ( n.ACC = a.ACC )
-           where n.nd = p_nd
-             and (a.nbs like '15_7' or a.nbs like '15_8');
+           where n.ND = p_nd
+             and a.NBS like '15__'
+             and a.TIP in ( 'SP ', 'SPN' );
         end if;
 
       when g_OVR
