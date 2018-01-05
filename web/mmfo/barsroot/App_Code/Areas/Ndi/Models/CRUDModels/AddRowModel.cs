@@ -7,15 +7,18 @@ using System.Web;
 /// <summary>
 /// Summary description for AddRowModel
 /// </summary>
-public class AddRowModel
+namespace BarsWeb.Areas.Ndi.Models
 {
-	public AddRowModel()
-	{
-		//
-		// TODO: Add constructor logic here
-		//
-	}
+    public class AddRowModel
+    {
+        public AddRowModel()
+        {
+            //
+            // TODO: Add constructor logic here
+            //
+        }
 
-    public List<FieldProperties> RowToAddFielsdArray { get; set; }
+        public List<FieldProperties> RowToAddFielsdArray { get; set; }
 
+    }
 }

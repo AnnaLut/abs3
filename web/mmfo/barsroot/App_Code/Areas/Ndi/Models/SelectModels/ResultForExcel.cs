@@ -7,14 +7,17 @@ using System.Web;
 /// <summary>
 /// Summary description for ExcelResult
 /// </summary>
-public class ResultForExcel : GetDataResultInfo
+namespace BarsWeb.Areas.Ndi.Models.SelectModels
 {
-    public ResultForExcel()
+    public class ResultForExcel : GetDataResultInfo
     {
-        //
-        // TODO: Add constructor logic here
-        //
-    }
+        public ResultForExcel()
+        {
+            //
+            // TODO: Add constructor logic here
+            //
+        }
 
-    public string ExcelParam { get; set; }
+        public string ExcelParam { get; set; }
+    }
 }

@@ -225,15 +225,30 @@ Ext.onReady(function () {
                     },
                     afterRequest: function (req, res) {
                         window.executeBeforFunc = 'no';
-                        var response = Ext.decode(req.operation.response.responseText);
-                        if (response.status !== "ok") {
+                        debugger;
+                        if (req.operation.response && req.operation.response.responseText)
+                        {
+                            var response = Ext.decode(req.operation.response.responseText);
+                            if (response.status !== "ok") {
+                                Ext.Msg.show({
+                                    title: "Не вдалося отримати дані для цієї таблиці (id=" + tableId + ")",
+                                    msg: response.errorMessage + '</br> </br>',
+                                    icon: Ext.Msg.ERROR,
+                                    buttons: Ext.Msg.OK
+                                });
+                            }
+                            return;
+                        }
+                        if (req.operation.error && req.operation.error.status)
+                        {
                             Ext.Msg.show({
-                                title: "Не вдалося отримати дані для цієї таблиці (id=" + tableId + ")",
-                                msg: response.errorMessage + '</br> </br>',
+                                title: "симтемна помилка:  " + req.operation.error.status,
+                                msg: req.operation.error.statusText + '</br> </br>',
                                 icon: Ext.Msg.ERROR,
                                 buttons: Ext.Msg.OK
                             });
                         }
+
                     },
                     //params: {
                     //    TableId: referenceGrid.metadata.tableInfo.TABID,
@@ -261,7 +276,7 @@ Ext.onReady(function () {
                 },
                 listeners: {
                     load: function (store, records) {
-                        referenceGrid.height = 0 + "px";
+                        //referenceGrid.height = 0 + "px";
                         //устанавливать доступность кнопки сброса фильтра
                         var clearFiltersBtn = referenceGrid.down('button#clearFilterButton');
                         var metadata = referenceGrid.metadata;

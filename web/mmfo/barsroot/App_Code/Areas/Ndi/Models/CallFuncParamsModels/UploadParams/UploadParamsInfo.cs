@@ -13,6 +13,7 @@ namespace BarsWeb.Areas.Ndi.Models
         public UploadParamsInfo()
         {
             this.IsInput = true;
+            this.Kind = "UploadParam";
         }
         public UploadParamsInfo(bool isInpup)
             :base(isInpup)

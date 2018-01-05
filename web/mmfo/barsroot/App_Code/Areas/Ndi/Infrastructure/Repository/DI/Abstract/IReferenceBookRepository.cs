@@ -9,6 +9,8 @@ using BarsWeb.Areas.Ndi.Models.FilterModels;
 using BarsWeb.Areas.Ndi.Models.ViewModels;
 using barsroot.core;
 using BarsWeb.Areas.Ndi.Models.DbModels;
+using BarsWeb.Areas.Ndi.Infrastructure.Repository.Helpers;
+using BarsWeb.Areas.Ndi.Infrastructure.Helpers.ViewModels;
 
 namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Abstract
 {
@@ -71,7 +73,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Abstract
         string InsertFilters(List<CreateFilterModel> filterModels);
 
         FiltersMetaInfo GetFiltersInfo(int tableId, IEnumerable<ColumnMetaInfo> columnsInfo = null);
-        string GetFilterStructure(int dynFilterId);
+        //string GetFilterStructure(int dynFilterId);
         /// <summary>
         /// Удалить данные из справочника
         /// </summary>

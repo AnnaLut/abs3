@@ -6,16 +6,19 @@ using System.Web;
 /// <summary>
 /// Summary description for SimpleFieldProperty
 /// </summary>
-public class  SimpleFieldProperty
+namespace BarsWeb.Areas.Ndi.Models
 {
-	public SimpleFieldProperty()
-	{
-		//
-		// TODO: Add constructor logic here
-		//
-	}
+    public class SimpleFieldProperty
+    {
+        public SimpleFieldProperty()
+        {
+            //
+            // TODO: Add constructor logic here
+            //
+        }
 
-    public string Name { get; set; }
-    public string Value { get; set; }
+        public string Name { get; set; }
+        public string Value { get; set; }
 
+    }
 }

@@ -9,10 +9,11 @@ using Oracle.DataAccess.Client;
 /// <summary>
 /// Summary description for DbAccess
 /// </summary>
-
+namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.Helpers
+{
     public class DbAccess : IDisposable
     {
-        
+
         OracleConnection _connection;
         public OracleCommand CreateCommand(string sql, CommandType type, params OracleParameter[] parameters)
         {
@@ -68,9 +69,10 @@ using Oracle.DataAccess.Client;
                 _connection.Close();
                 _connection = null;
             }
-                
-            
+
+
         }
 
         #endregion
     }
+}
