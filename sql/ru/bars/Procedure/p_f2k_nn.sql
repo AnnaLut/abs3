@@ -4,7 +4,7 @@ CREATE OR REPLACE PROCEDURE BARS.P_F2K_NN (dat_ DATE ,
 % DESCRIPTION : Процедура формирование файла #2K
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
 %
-% VERSION     : v.18.001     04.01.2018
+% VERSION     : v.18.001     05.01.2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: dat_ - отчетная дата
            sheme_ - схема формирования
@@ -18,7 +18,8 @@ CREATE OR REPLACE PROCEDURE BARS.P_F2K_NN (dat_ DATE ,
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
- 04.01.2017  исключены операции по счетам КТ=65__
+ 05.01.2018  добавлено формирование DDD=351
+ 04.01.2018  исключены операции по счетам КТ=65__
              формирование значений показателей в копейках
              новый список значений K021 (сегмент A)
  29.12.2017  уточнение в алгоритме отбора клиентов по доп.параметрам
@@ -64,8 +65,12 @@ p_310          varchar2(1);
 p_330          varchar2(20);
 p_340          varchar2(70);
 p_350          varchar2(10);
+p_351          varchar2(1);
 p_360          varchar2(70);
 p_391          varchar2(10);
+
+ ise_          varchar2(5);
+ cod_c         integer;
 
 --    операции DDD начинающиеся с 0..
 procedure p_ins_0( p_rnk number, p_kodp varchar2,
@@ -178,7 +183,7 @@ end;
 --    операции DDD начинающиеся с 3..
 procedure p_ins_3( p_rnk number, p_kodp varchar2,
                    p_310 varchar2, p_320 varchar2, p_330 varchar2,
-                   p_340 varchar2, p_350 varchar2, p_360 varchar2, 
+                   p_340 varchar2, p_350 varchar2, p_351 varchar2, p_360 varchar2, 
                    p_ostf number, p_kv number, p_390 varchar2, p_391 varchar2 )
    is
 begin
@@ -207,6 +212,11 @@ begin
           insert into rnbu_trace
                     ( rnk, kodp, znap )
              values ( p_rnk, '350'||p_kodp, p_350 );
+
+--    351  ознака iдентифікаційного коду
+          insert into rnbu_trace
+                    ( rnk, kodp, znap )
+             values ( p_rnk, '351'||p_kodp, p_351 );
 
 --    360  наiменування банку отримувача/платника
           insert into rnbu_trace
@@ -417,13 +427,69 @@ DELETE FROM RNBU_TRACE WHERE userid = userid_;
                 p_330 := v.nlsk;
                 p_340 := substr(trim(v.nam_b),1,70);
                 p_350 := lpad(v.okpo_b,10,'0');
+                p_351 := '1';
                 p_360 := substr(trim(v.namb_b),1,70);
+
+                begin
+                    select ise, codcagent  into ise_, cod_c
+                      from customer
+                     where okpo = v.okpo_b;
+
+                    if     ise_ like '13%'             then    p_351 :='G';
+                    elsif  ise_ in ('ZZZZZ','YYYYY')   then    p_351 :='D';
+                    elsif  cod_c =5
+                       and regexp_instr(v.okpo_b,'[^[:digit:]]')=0
+                                                       then    p_351 :='2';
+                    elsif  cod_c =5                    then    p_351 :='6';
+                    else
+                         p_351 := '1';
+                    end if;
+                exception
+                   when others  then
+                     if    length(trim(v.okpo_b))=10
+                       and regexp_instr(v.okpo_b,'[^[:digit:]]')=0
+                                                       then    p_351 :='2';
+                     elsif length(trim(v.okpo_b))=10
+                                                       then    p_351 :='6';
+                     else
+                         p_351 := '1';
+                     end if;
+                end;
+
              else
                 p_310 :='2';
                 p_330 := v.nlsd;
                 p_340 := substr(trim(v.nam_a),1,70);
                 p_350 := lpad(v.okpo_a,10,'0');
+                p_351 := '1';
                 p_360 := substr(trim(v.namb_a),1,70);
+
+                begin
+                    select ise, codcagent  into ise_, cod_c
+                      from customer
+                     where okpo = v.okpo_a;
+
+                    if     ise_ like '13%'             then    p_351 :='G';
+                    elsif  ise_ in ('ZZZZZ','YYYYY')   then    p_351 :='D';
+                    elsif  cod_c =5
+                       and regexp_instr(v.okpo_a,'[^[:digit:]]')=0
+                                                       then    p_351 :='2';
+                    elsif  cod_c =5                    then    p_351 :='6';
+                    else
+                         p_351 := '1';
+                    end if;
+                exception
+                   when others  then
+                     if    length(trim(v.okpo_a))=10
+                       and regexp_instr(v.okpo_a,'[^[:digit:]]')=0
+                                                       then    p_351 :='2';
+                     elsif length(trim(v.okpo_a))=10
+                                                       then    p_351 :='6';
+                     else
+                         p_351 := '1';
+                     end if;
+                end;
+
              end if;
              
              p_391 := p_260;
@@ -440,7 +506,7 @@ DELETE FROM RNBU_TRACE WHERE userid = userid_;
                       p_260, u.p_270, u.p_280 );
 
              p_ins_3( k.rnk, kodp_, p_310, v.pdat, p_330, p_340,
-                      p_350, p_360, v.ostq, v.kv, substr(v.nazn,1,70), p_391 );
+                      p_350, p_351, p_360, v.ostq, v.kv, substr(v.nazn,1,70), p_391 );
 
           end loop;                --цикл по операциям
 
